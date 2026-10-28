@@ -9,22 +9,14 @@ order: 1
 
 # Durable sagas
 
-A saga is the answer to the question every retry loop dodges: *what happens between
-step three and step four when the process dies?* In NetScript a saga is an explicit,
-message-driven state machine — you declare the state it carries, the messages it
-reacts to, and the effects each handler emits. It is authored with a single fluent
-builder, persisted to a durable store, and served by the **sagas plugin** on its
-assigned port. The model is closer to Temporal than to a job queue, but it lives in plain
-TypeScript inside your workspace — no separate cluster to operate.
+This page covers durable sagas: message-driven state machines whose state survives a process
+crash. You author a saga with one fluent builder, the runtime persists it to a durable store, and
+the **sagas plugin** serves it on its assigned port.
 
-The stakes are easiest to see in the [storefront checkout saga](/tutorials/storefront/04-checkout-saga/):
-a payment is captured, fulfillment fails afterward, and the process restarts in between. Money has
-moved; the code that knew why is gone. A saga makes that in-between state durable and gives the undo
-— the refund — a declared place to live, so recovery is a matter of reading state, not
-reconstructing intent. And because the definition *is* data (typed state, enumerable handlers,
-enumerable compensations), the workflow is legible to more than the runtime: a coding agent asked to
-add a step can read the whole lifecycle from the builder chain, and verify the result against the
-instances API (discover the port in your console output or Aspire dashboard) instead of guessing.
+Consider the [storefront checkout saga](/tutorials/storefront/04-checkout-saga/). A payment is
+captured, fulfillment fails, and the process restarts in between. A saga keeps that in-between state
+durable and gives the undo, the refund, a declared place in the definition. Recovery then means
+reading state, not reconstructing intent.
 
 {{ comp.diagram({
   src: "/assets/diagrams/saga-state-machine.svg",
@@ -32,69 +24,33 @@ instances API (discover the port in your console output or Aspire dashboard) ins
   caption: "A saga is a state machine. Each inbound message runs a handler that mutates typed state and returns an effect ledger (advance, complete, fail, compensate); the runtime checkpoints state between messages to the durable store (kv or prisma) so an instance survives a crash."
 }) }}
 
-This is the third capability in the continuous-app thread. The
-[background jobs](/background-processing/workers/) capability ended with a job,
-`create-user-settings`, that publishes a `UserSettingsCreated` message. Here that
-message stops being fire-and-forget: a saga **consumes it**, advances its own state,
-and emits a `sagaComplete(...)` effect that the runtime records as a first-class
-outcome — and persists durably so the instance survives a process restart.
-
-{{ comp callout { type: "note", title: "Where it lives" } }}
-The plugin is installed at <code>plugins/sagas/</code> and referenced by
-<code>netscript.config.ts</code> as <code>./plugins/sagas/mod.ts</code>. The fluent
-builder and effect helpers come from <code>@netscript/plugin-sagas-core</code>; the
-config-time companion (<code>defineSagaConfig</code>) comes from
-<code>@netscript/plugin-sagas-core/config</code>; the durable runtime factory
-(<code>createDurableSagaRuntime</code>) and the HTTP publisher
-(<code>createSagaPublisher</code>) come from the
-<code>@netscript/plugin-sagas/runtime</code> subpath. Add it to a workspace with
-the public package install flow (<code>netscript plugin install @netscript/plugin-sagas</code>).
-For local-source contributor samples inside this monorepo, run
-<code>deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --samples</code>.
-{{ /comp }}
-
 ## What it is
 
-A saga is a **durable, message-driven state machine**: a typed state object plus a set
-of handlers, one per message type, that advance that state and return an effect ledger.
-The runtime persists state between every message, so an instance that is mid-flight when
-the process restarts resumes exactly where it left off. Unlike a background job — a
-single idempotent unit — a saga correlates many messages into one long-running instance
-and gives compensation (the *undo* of an already-applied step) a first-class place in
-the model. Read the conceptual companion, the
-{{ comp.xref({ key: "explain:durable-workflows" }) }}, for why state must outlive the
-process and how effect-based outcomes differ from a retry loop.
+A saga is a typed state object plus one handler per message type. Each handler advances the state
+and returns an effect ledger. The runtime persists state between messages, so an instance that is
+mid-flight when the process restarts resumes where it left off. A background job is a single
+idempotent unit; a saga correlates many messages into one long-running instance and gives
+compensation, the undo of an already-applied step, a declared place in the model. The
+{{ comp.xref({ key: "explain:durable-workflows" }) }} explains why state must outlive the process.
 
-## Learn → · Do →
+| You need | Import from |
+| --- | --- |
+| The fluent builder and effect helpers | `@netscript/plugin-sagas-core` |
+| The config-time companion, `defineSagaConfig` | `@netscript/plugin-sagas-core/config` |
+| The durable runtime factory `createDurableSagaRuntime` and the HTTP publisher `createSagaPublisher` | `@netscript/plugin-sagas/runtime` |
 
-{{ comp.featureGrid({
-  columns: 2,
-  items: [
-    { icon: "◆", title: "Learn — Build the checkout saga", body: "The storefront tutorial rung that adds the sagas plugin, correlates the order events, and compensates a failed payment step.", href: "/tutorials/storefront/04-checkout-saga/" },
-    { icon: "→", title: "Do — Wire a durable workflow", body: "Add the sagas plugin to a running app, consume a cross-plugin message, and emit sagaComplete end to end.", href: "/tutorials/storefront/04-checkout-saga/" }
-  ]
-}) }}
-
-{{ comp.featureGrid({
-  columns: 3,
-  items: [
-    { icon: "◆", title: "Fluent builder", body: "defineSaga(id).durability().state().on().compensate().build() — id, durability tier, typed state, message handlers, compensations, then build(). One chain, fully type-checked." },
-    { icon: "▣", title: "Durable store backend", body: "Runtime state persists to kv or prisma, chosen by NETSCRIPT_SAGA_STORE / appsettings. createDurableSagaRuntime({ backend, prisma }) owns the resources." },
-    { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — sagaComplete, sagaFail, sagaCompensate, send, and schedule are named outcomes. spawn is exported only to fail immediately with SAGA_NOT_IMPLEMENTED." },
-    { icon: "⊡", title: "Introspection endpoints", body: "An oRPC API (served on the plugin's assigned port) lists registered sagas, inspects running instances, publishes messages, and streams activity over SSE." },
-    { icon: "⇄", title: "Cross-plugin choreography", body: "The workers create-user-settings job publishes UserSettingsCreated; this saga consumes it — one message crossing the plugin boundary, type-checked on both sides." },
-    { icon: "◷", title: "Crash-survivable", body: "State checkpoints between messages, so an instance picks up exactly where it left off after a restart. That survival is the entire point of a saga." }
-  ]
-}) }}
+Add the plugin with `netscript plugin install @netscript/plugin-sagas`. It installs at
+`plugins/sagas/`, and `netscript.config.ts` references it as `./plugins/sagas/mod.ts`. For
+local-source contributor samples inside the NetScript monorepo, run
+`deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --samples`.
 
 ## Minimal example — an order saga with compensation
 
-The runnable shape you grow into: a real state type, multiple `.on(...)` handlers, and a
-`.compensate(...)` branch that unwinds an already-charged payment when fulfillment fails.
-The saga records workflow state and consumes results published by explicit worker boundaries. It
-does not use `send(...)` to address a service or job. The failure path returns
-`sagaCompensate(...)` so the engine routes the matching compensation handler, records cancellation,
-and then fails the instance.
+This saga has a typed state, three `.on(...)` handlers, and a `.compensate(...)` branch that
+unwinds an already-charged payment when fulfillment fails. It records workflow state and consumes
+results that workers publish; it does not use `send(...)` to address a service or job. The failure
+path returns `sagaCompensate(...)`, so the engine runs the matching compensation handler, records
+the cancellation, and fails the instance.
 
 ```ts
 // plugins/sagas/order-saga.ts
@@ -149,23 +105,15 @@ export const orderSaga = defineSaga('order-saga')
 export default orderSaga;
 ```
 
-{{ comp callout { type: "important", title: "Compensation: a .compensate() branch OR an effect" } }}
-There are <strong>two</strong> ways to compensate, and they work together. The builder
-exposes a first-class <code>.compensate(eventType, handler)</code> that registers an undo
-handler keyed by message type. A running handler routes into it by returning the
-<code>sagaCompensate(message, reason?)</code> effect. So a saga's whole lifecycle —
-advance, <code>sagaComplete</code>, <code>sagaFail</code>, <code>sagaCompensate</code>,
-<code>send</code>, and <code>schedule</code> — is a <strong>named outcome returned from
-handlers</strong>, never a fall-through. <code>spawn()</code> is reserved in the public vocabulary
-but calling it immediately throws <code>SAGA_NOT_IMPLEMENTED</code>. The undo logic
-itself lives in the <code>.compensate()</code> handler, not inline in the forward path.
+{{ comp callout { type: "important", title: "Compensation is a branch and an effect" } }}
+<code>.compensate(eventType, handler)</code> registers an undo handler keyed by message type, and a running handler routes into it by returning <code>sagaCompensate(message, reason?)</code>. The undo logic lives in the <code>.compensate()</code> handler, not inline in the forward path. Every outcome, including <code>sagaComplete</code>, <code>sagaFail</code>, <code>send</code> and <code>schedule</code>, is a named effect returned from a handler, never a fall-through. <code>spawn()</code> is reserved, and calling it throws <code>SAGA_NOT_IMPLEMENTED</code>.
 {{ /comp }}
 
-`createDurableSagaRuntime(...)` installs the native `SagaCompensator` automatically. A
-`sagaCompensate(...)` returned by a registered forward handler therefore runs its matching
+`createDurableSagaRuntime(...)` installs the native `SagaCompensator` automatically, so a
+`sagaCompensate(...)` returned by a registered forward handler runs its matching
 `.compensate(type, ...)` branch without a second dispatch call. If you compose the lower-level
-`createSagaRuntime(...)` yourself, pass `native.compensator`; externally supplied compensation
-cascades also require `native.resolveCompensation` so the runtime can recover the definition,
+`createSagaRuntime(...)` yourself, pass `native.compensator`. Externally supplied compensation
+cascades also need `native.resolveCompensation`, so the runtime can recover the definition,
 instance, and state. Missing compensators, resolvers, matching branches, and unknown effect kinds
 fail with a named `SAGA_NOT_IMPLEMENTED` error instead of being discarded.
 
@@ -173,8 +121,8 @@ fail with a named `SAGA_NOT_IMPLEMENTED` error instead of being discarded.
 
 A compensation is two persisted transitions, and neither needs a follow-up message. The `.on()`
 transition that returns `sagaCompensate(...)` saves the instance as `compensating`. When the
-`.compensate()` branch finishes, the runtime saves the branch's state change and its outcome as the
-next version of the instance. It uses the same versioned transition commit as `.on()`, on plain and
+`.compensate()` branch finishes, the runtime saves the branch's state change and outcome as the
+next version of the instance, with the same versioned transition commit as `.on()`, on plain and
 atomic stores alike:
 
 | `.compensate()` branch outcome     | Persisted status                                        |
@@ -190,31 +138,31 @@ saved unless the branch returns.
 
 When one handler returns several effects, they run in order. Each `sagaCompensate(...)` runs against
 the latest state and version saved for its instance during that dispatch, and saves its own outcome
-as the next version. That includes an earlier compensation, other sagas that handled the same
-message, and any transition a `send(...)` caused, whether the instance handled the message itself or
-it came back through other sagas. So for `[sagaCompensate(releaseStock), sagaCompensate(refundPayment)]`, both branches'
-state changes are kept, and the last outcome sets the final status.
+as the next version. That latest version includes an earlier compensation, other sagas that handled
+the same message, and any transition a `send(...)` caused, whether the instance handled the message
+itself or it came back through other sagas. For
+`[sagaCompensate(releaseStock), sagaCompensate(refundPayment)]`, both branches' state changes are
+kept, and the last outcome sets the final status.
 
 A `sagaFail(...)` returned from `.on()` saves `failed` first. If a `.compensate()` branch is
-registered for that message type, it then runs, and its outcome is saved by the same table. A
-branch's own `sagaFail` ends the instance. It is never routed back into the branch.
+registered for that message type, it then runs, and the table above decides its saved outcome. A
+branch's own `sagaFail` ends the instance; it is never routed back into the branch.
 
-`compensating` means the undo is still running. It is not a final status. An ordinary `.on()`
-handler that returns no terminal effect leaves a `compensating` instance as `compensating`; it never
-returns it to `running`. This applies to rows written by runtimes before 0.0.8, which left an
-instance at `compensating` permanently: they still load. To end one, deliver a message whose `.on()`
-handler returns `sagaFail(...)` or `sagaComplete(...)`.
+`compensating` means the undo is still running; it is not a final status. An ordinary `.on()`
+handler that returns no terminal effect leaves a `compensating` instance as `compensating` and never
+returns it to `running`. Rows that runtimes before 0.0.8 left at `compensating` still load. To end
+one, deliver a message whose `.on()` handler returns `sagaFail(...)` or `sagaComplete(...)`.
 
-Each outcome commit expects the version the compensation ran against. Its replay identity comes from
-that version. So a redelivered outcome is not applied twice: `SagaEngine.commitCompensation(...)`
-reports `committed: false`, and the branch's cascades are not dispatched again.
+Each outcome commit expects the version the compensation ran against, and takes its replay identity
+from that version. A redelivered outcome is therefore not applied twice:
+`SagaEngine.commitCompensation(...)` reports `committed: false`, and the branch's cascades are not
+dispatched again.
 
-## Key types first
+## Key types
 
-Before the options, the primary interfaces the DSL works in. `SagaState` is the base
-shape your typed state must satisfy; `SagaContext` is the read-only context passed to
-every handler; `SagaDefinition` is the frozen object `build()` returns and the runtime
-registers.
+`SagaState` is the base shape your typed state must satisfy, `SagaContext` is the read-only context
+passed to every handler, and `SagaDefinition` is the frozen object that `build()` returns and the
+runtime registers.
 
 {{ comp.apiTable({
   caption: "Primary saga types (@netscript/plugin-sagas-core)",
@@ -262,25 +210,30 @@ The transport-level message `id` is never an instance key. Distinct message ids 
 resume the same workflow, while two concurrent messages whose extractor returns different business
 keys are persisted as separate saga instances.
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "Simple — minimal saga",
-    lang: "ts",
-    code: "// plugins/sagas/<your-saga>.ts\nimport { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';\n\ntype State = Readonly<{ status: string; processedAt?: string }>;\n\n// Build a saga: id -> durability tier -> typed state -> message handlers -> build().\nexport const userSettingsSaga = defineSaga('user-settings-saga')\n  .durability('t1')\n  .state<State>({ status: 'pending' })\n  .on<'UserSettingsCreated', { userId: string }>(\n    'UserSettingsCreated',\n    (saga, event, context) => {\n      // Advance the saga's own state, then emit completion as a recorded outcome.\n      saga.state = {\n        ...saga.state,\n        status: 'completed',\n        processedAt: context.now.toISOString(),\n      };\n      return [sagaComplete({\n        userId: event.payload.userId,\n        processedAt: context.now.toISOString(),\n      })];\n    },\n  )\n  .build();\n\nexport default userSettingsSaga;"
-  },
-  {
-    label: "Config-time companion",
-    lang: "ts",
-    code: "// netscript.config.ts (excerpt)\nimport { defineSagaConfig } from '@netscript/plugin-sagas-core/config';\n\n// The config-time entry the scaffolder + CLI read. SEPARATE from the runtime\n// definition that defineSaga(...).build() produces.\nexport const orderSagaEntry = defineSagaConfig('order-saga', './plugins/sagas/order-saga.ts')\n  .name('Order saga')\n  .description('Reserve, charge, fulfill — with a compensation branch.')\n  .topic('orders')\n  .tags(['orders', 'checkout'])\n  .build();"
-  }
-] }) }}
+### Config-time companion
+
+`netscript.config.ts` declares each saga for the scaffolder and CLI with `defineSagaConfig`:
+
+```ts
+// netscript.config.ts (excerpt)
+import { defineSagaConfig } from '@netscript/plugin-sagas-core/config';
+
+// The config-time entry the scaffolder + CLI read. SEPARATE from the runtime
+// definition that defineSaga(...).build() produces.
+export const orderSagaEntry = defineSagaConfig('order-saga', './plugins/sagas/order-saga.ts')
+  .name('Order saga')
+  .description('Reserve, charge, fulfill — with a compensation branch.')
+  .topic('orders')
+  .tags(['orders', 'checkout'])
+  .build();
+```
 
 ## Effect helpers
 
-A handler's only side effect is the array of **cascaded messages** it returns. These
-helpers (`@netscript/plugin-sagas-core`) construct the named effects. Every kind in
-`CASCADED_MESSAGE_KINDS` retains `spawn` in the wire vocabulary so deserialized unsupported effects
-fail loudly, but the public `spawn()` function returns `never` and throws before creating an effect.
+A handler's only side effect is the array of **cascaded messages** it returns. These helpers from
+`@netscript/plugin-sagas-core` build the named effects. `CASCADED_MESSAGE_KINDS` keeps `spawn` in
+the wire vocabulary so that deserialized unsupported effects fail loudly; the public `spawn()`
+function returns `never` and throws before it creates an effect.
 
 {{ comp.apiTable({
   caption: "Effect helpers — saga handler outcomes",
@@ -296,28 +249,13 @@ fail loudly, but the public `spawn()` function returns `never` and throws before
 
 ## createParallelQueue — fan-out and concurrent processing
 
-Saga handlers stay synchronous and pure; the *transport* layer that carries cascaded
-messages and feeds fan-out work is where you tune concurrency. `createParallelQueue` (from
-{{ comp.xref({ key: "ref:queue", text: "@netscript/queue" }) }}) is the primitive for
-that: it wraps a base queue so a single listener processes several messages at once. It is
-the right tool when a workflow fans out independent internal messages or pushes I/O-bound side work
-(API calls, DB writes) that should run in parallel rather than one at a time. The
-`concurrency` option is the whole story — `1` is plain sequential, anything higher enables
-parallel processing.
-
-{{ comp.apiTable({
-  caption: "createParallelQueue(name, options) — ParallelQueueOptions (extends QueueOptions)",
-  rows: [
-    { name: "concurrency", type: "number (default 1)", desc: "Number of concurrent processors. Must be >= 1; values > 1 wrap the queue for parallel listening. Use for I/O-bound work; for CPU-bound work use a subprocess task executor." },
-    { name: "provider", type: "QueueProvider ('deno-kv' | 'redis' | 'rabbitmq' | 'postgres')", desc: "Backing queue provider. Omit to auto-discover from the Aspire environment." },
-    { name: "autoDiscover", type: "boolean (default true)", desc: "Discover a queue service from Aspire. Priority RabbitMQ > Redis > Deno KV." },
-    { name: "retryAttempts", type: "number (default 3)", desc: "Max retry attempts for failed messages, when the backend lacks native retry." },
-    { name: "retryDelay", type: "number ms (default 1000)", desc: "Delay between retries, when the backend lacks native retry." },
-    { name: "connection", type: "QueueConnectionOptions", desc: "Provider-specific connection options (denoKv / redis / rabbitmq / postgres)." },
-    { name: "deadLetterStore", type: "DeadLetterStorePort", desc: "Where terminal message failures land. Omit to use the provider's durable default." },
-    { name: "disableAutoTracing", type: "boolean (default false)", desc: "Skip the automatic TracedQueue wrapper when you trace manually." }
-  ]
-}) }}
+Saga handlers stay synchronous and pure, so you tune concurrency in the transport layer that
+carries cascaded messages and fan-out work. `createParallelQueue` from
+{{ comp.xref({ key: "ref:queue", text: "@netscript/queue" }) }} wraps a base queue so one listener
+processes several messages at once. Use it for independent internal messages or I/O-bound side
+work, such as API calls and database writes. `concurrency: 1` is sequential; any higher value runs
+messages in parallel. For CPU-bound work, use a subprocess task executor instead. The queue
+reference lists every `ParallelQueueOptions` field.
 
 ```ts
 // plugins/sagas/fan-out.ts — process saga side-effects concurrently
@@ -338,61 +276,42 @@ await notifications.listen(async (message) => {
 });
 ```
 
-{{ comp callout { type: "note", title: "Concurrency lives in two places" } }}
-<code>createParallelQueue({ concurrency })</code> tunes how many <em>queue</em> messages a
-listener processes at once. <code>defineSaga().concurrency({ limit, key })</code> bounds
-how many messages run against one <em>saga instance</em> (or per derived key) — overlapping
-publishes for the same key are rejected. Use the queue knob for parallel fan-out; use the
-builder knob to serialize work on a single business entity (one order, one tenant).
+{{ comp callout { type: "note", title: "Two concurrency settings" } }}
+<code>createParallelQueue({ concurrency })</code> sets how many <em>queue</em> messages a listener processes at once. <code>defineSaga().concurrency({ limit, key })</code> bounds how many messages run against one <em>saga instance</em> or derived key, and rejects overlapping publishes for the same key. Use the queue setting for parallel fan-out and the builder setting to serialize work on one business entity, such as one order or one tenant.
 {{ /comp }}
 
 ## Choosing a durable store backend
 
-Authoring a saga decides *what* it does. The **durable store backend** decides *where
-its runtime state lives between messages and across crashes*. NetScript ships two
-backends. The runner defaults to **KV** when no backend is configured; select the
-backend explicitly for deployments so durable state lands where you intend.
+The **durable store backend** decides where a saga's runtime state lives between messages and
+across crashes. The runner defaults to `kv` when no backend is configured. Select the backend
+explicitly for deployments, so durable state lands where you intend.
 
-- **`kv`** — durable saga state in Deno KV (the orchestration store stood up by
-  Aspire). Zero extra schema; the natural default for a single-service app and for
-  local development.
-- **`prisma`** — durable saga state in your scaffolded relational database via Prisma
-  (Postgres in the recommended setup; equally `mysql` / `mssql` / `sqlite`, since the store writes through
-  your project's Prisma client — it is not Postgres-specific). The `PrismaSagaStore`
-  writes the dedicated runtime tables `saga_runtime_state`, `saga_runtime_transition`,
-  and `saga_runtime_correlation`. Reach for this when you want the saga's own write
-  path in your relational database alongside the rest of your data, with SQL-level
-  inspection of in-flight state and transition history.
+| Backend | Stores state in | Use it when |
+| --- | --- | --- |
+| `kv` | Deno KV, the orchestration store that Aspire provisions. No extra schema. | You run locally or a single service. |
+| `prisma` | Your scaffolded relational database, through your project's Prisma client: Postgres in the recommended setup, or `mysql`, `mssql` or `sqlite`. `PrismaSagaStore` writes the runtime tables `saga_runtime_state`, `saga_runtime_transition` and `saga_runtime_correlation`. | You want the saga's write path beside the rest of your data, with SQL inspection of in-flight state and transition history. |
 
-You select the backend with `NETSCRIPT_SAGA_STORE` (`kv` | `prisma`) or appsettings
-`sagas.store.backend` / `Sagas.Store.Backend`; the environment takes precedence. The runner
-uses the host bootstrap's settings when supplied. Without a bootstrap, it reads the project's
-`appsettings.json` from `NETSCRIPT_PROJECT_ROOT` or the working directory, including the installed
+Select the backend with `NETSCRIPT_SAGA_STORE` (`kv` | `prisma`) or the appsettings key
+`sagas.store.backend` / `Sagas.Store.Backend`; the environment variable wins. The runner uses the
+host bootstrap's settings when supplied. Without a bootstrap, it reads `appsettings.json` from
+`NETSCRIPT_PROJECT_ROOT` or the working directory, including the installed
 `NetScript.BackgroundProcessors.sagas.Sagas` settings. Direct `sagas/runtime.ts` and packaged
-runtime launches use the same resolution and retain the KV default when nothing is configured.
-Invalid configured values always fail startup. Prisma still requires a bootstrap-supplied client.
+runtime launches resolve the same way and keep the `kv` default when nothing is configured. Invalid
+configured values always fail startup.
 
-The shared `resolveSagaStoreBackend(...)` resolver throws when selection is absent unless the
+The `prisma` backend needs a Prisma client from the bootstrap. Without one,
+`createDurableSagaRuntime` throws `Prisma saga store backend requires a Prisma client.`
+
+The shared `resolveSagaStoreBackend(...)` resolver throws when no backend is selected, unless the
 caller supplies `defaultBackend`; the runner supplies `kv` for compatibility. The low-level
-`createDurableSagaRuntime(...)` factory also defaults to KV when neither a backend nor a Prisma
-client is supplied. An explicit `backend: 'kv'` wins over an optional Prisma client.
+`createDurableSagaRuntime(...)` factory also defaults to `kv` when it gets neither a backend nor a
+Prisma client, and an explicit `backend: 'kv'` wins over an optional Prisma client.
 
-{{ comp.apiTable({
-  caption: "Durable saga store backends — trait matrix",
-  rows: [
-    { name: "kv", type: "Deno KV", desc: "Default for local/single-service. No extra schema. Provisioned by Aspire (Redis/KV). Resolved via NETSCRIPT_SAGA_STORE=kv or sagas.store.backend=kv." },
-    { name: "prisma", type: "Relational / Prisma", desc: "Writes saga_runtime_state, saga_runtime_transition, saga_runtime_correlation. Requires a Prisma client passed to createDurableSagaRuntime — so it follows whatever engine you scaffolded (Postgres in the recommended setup; mysql / mssql / sqlite all work). SQL-inspectable in-flight state. Resolved via NETSCRIPT_SAGA_STORE=prisma or sagas.store.backend=prisma." },
-    { name: "selection", type: "kv runner default", desc: "The runner defaults to KV only when no backend is configured. resolveSagaStoreBackend(...) remains strict unless a caller supplies defaultBackend. Invalid configured values fail." },
-    { name: "client requirement", type: "prisma only", desc: "backend: 'prisma' without a Prisma client throws 'Prisma saga store backend requires a Prisma client.'" }
-  ]
-}) }}
-
-The low-level factory that owns these resources is `createDurableSagaRuntime(...)` from the
-`@netscript/plugin-sagas/runtime` subpath. It resolves a `SagaStorePort`, builds an
-**unstarted** native runtime over it, and hands you back a `dispose()` that closes the store (and
-the KV handle it opened). It is deprecated as a single-point composition surface: use the
-scaffolded `startSagaRunner(...)` path for registry loading, queue delivery, delayed cascades,
-projection, and lifecycle ownership. If you deliberately use the low-level factory, you must
+`createDurableSagaRuntime(...)`, from the `@netscript/plugin-sagas/runtime` subpath, resolves a
+`SagaStorePort`, builds an **unstarted** native runtime over it, and returns a `dispose()` that
+closes the store and the KV handle it opened. It is deprecated as a single-point composition
+surface. Use the scaffolded `startSagaRunner(...)` path for registry loading, queue delivery,
+delayed cascades, projection, and lifecycle ownership. If you use the low-level factory, you must
 register definitions, inject a scheduler for `schedule()` cascades, and call `runtime.start()`
 before publishing.
 
@@ -414,35 +333,27 @@ before publishing.
   }
 ] }) }}
 
-{{ comp callout { type: "important", title: "Two durability concepts — don't conflate them" } }}
-<code>.durability('t1')</code> on the <strong>saga definition</strong> selects a
-<em>durability tier</em> (<code>SAGA_DURABILITY_TIERS</code>) — a property of the saga
-itself. The <strong>store backend</strong> (<code>kv</code> | <code>prisma</code>) is a
-<em>runtime/deployment</em> choice about <em>which database</em> holds durable state,
-resolved by <code>NETSCRIPT_SAGA_STORE</code> / <code>sagas.store.backend</code>. A
-saga keeps its declared tier regardless of which backend you deploy against.
+{{ comp callout { type: "important", title: "Tier and backend are different" } }}
+<code>.durability('t1')</code> selects a <em>durability tier</em> (<code>SAGA_DURABILITY_TIERS</code>), a property of the saga definition. The store backend (<code>kv</code> | <code>prisma</code>) is a deployment choice of <em>which database</em> holds durable state, resolved by <code>NETSCRIPT_SAGA_STORE</code> or <code>sagas.store.backend</code>. A saga keeps its declared tier whichever backend you deploy against.
 {{ /comp }}
 
-{{ comp callout { type: "note", title: "Read model vs. durable write path" } }}
-The Prisma backend's <code>saga_runtime_*</code> tables are the durable
-<strong>write path</strong> the engine checkpoints to. They are distinct from
-<code>saga_instances</code> (and <code>saga_execution_history</code>) — a
-<strong>read-model projection</strong> into Postgres for API queries, analytics, and
-debugging. The runtime persists to the former; the API surface lists from the latter.
-{{ /comp }}
+The `saga_runtime_*` tables are the durable **write path** the engine checkpoints to.
+`saga_instances` and `saga_execution_history` are a separate **read-model projection** into Postgres
+for API queries, analytics, and debugging. The runtime persists to the first; the API lists from
+the second.
 
 ## The HTTP publisher — createSagaPublisher
 
-A message reaches a saga through a **publisher**. `createSagaPublisher` (from
-`@netscript/plugin-sagas/runtime`) returns a `SagaPublisherPort` whose `publish(...)` POSTs
-to the sagas API publish endpoint, discovering the service URL from the Aspire environment
-by default. The workers `create-user-settings` job uses exactly this to emit
-`UserSettingsCreated` across the plugin boundary.
+A message reaches a saga through a **publisher**. `createSagaPublisher` from
+`@netscript/plugin-sagas/runtime` returns a `SagaPublisherPort`. Its `publish(...)` POSTs to the
+sagas API publish endpoint and, by default, discovers the service URL from the Aspire environment.
+The workers `create-user-settings` job uses it to emit `UserSettingsCreated` across the plugin
+boundary.
 
-The HTTP response acknowledges a durable enqueue, not completion of the saga transition. The
-background saga runner consumes that queue, persists engine state, and updates the
-`saga_instances` read model. Queue/provider failures and the publish deadline return a non-2xx
-response; the endpoint never treats an indefinitely pending publish as success.
+The HTTP response acknowledges a durable enqueue, not the saga transition. The background saga
+runner consumes that queue, persists engine state, and updates the `saga_instances` read model.
+Queue or provider failures and the publish deadline return a non-2xx response; the endpoint never
+treats an indefinitely pending publish as success.
 
 {{ comp.apiTable({
   caption: "createSagaPublisher(options) — HttpSagaPublisherOptions",
@@ -457,18 +368,24 @@ response; the endpoint never treats an indefinitely pending publish as success.
   ]
 }) }}
 
-The port returns a typed **receipt** rather than throwing: `publish(...)` resolves a
-`SagaPublisherResult` — either `{ published: true, ... }` (a `SagaPublisherReceipt`) or
-`{ published: false, reason, retryable }` (a `SagaPublisherRejected`). `publishMany(...)`
-takes a `mode: 'sequential' | 'parallel'` so a batch can fan out.
+The port returns a typed **receipt** instead of throwing. `publish(...)` resolves a
+`SagaPublisherResult`: either `{ published: true, ... }` (a `SagaPublisherReceipt`) or
+`{ published: false, reason, retryable }` (a `SagaPublisherRejected`). `publishMany(...)` takes
+`mode: 'sequential' | 'parallel'`, so a batch can fan out.
 
-There is no fallback port: when no source resolves, the receipt is non-retryable with
-`reason: 'no-endpoint'` and a `diagnostic` naming each source tried, in order —
-`options.baseUrl`, `services__<serviceName>__https__0`, `services__<serviceName>__http__0`,
-`SAGAS_API_URL`, `NETSCRIPT_SAGAS_URL` — plus whether a `services__*` key or `NETSCRIPT_ASPIRE`
-marker proved an Aspire environment and whether env enumeration was denied. It carries key
-names only, never values. `publishSagaOrThrow(...)` renders that diagnostic into the
-`SagasError` it raises.
+The publisher resolves its endpoint from these sources, in order:
+
+1. `options.baseUrl`
+2. `services__<serviceName>__https__0`
+3. `services__<serviceName>__http__0`
+4. `SAGAS_API_URL`
+5. `NETSCRIPT_SAGAS_URL`
+
+There is no fallback port. When no source resolves, the receipt is non-retryable with
+`reason: 'no-endpoint'` and a `diagnostic` that names each source tried. The diagnostic also says
+whether a `services__*` key or the `NETSCRIPT_ASPIRE` marker proved an Aspire environment, and
+whether env enumeration was denied. It carries key names only, never values.
+`publishSagaOrThrow(...)` renders that diagnostic into the `SagasError` it raises.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -485,10 +402,10 @@ names only, never values. `publishSagaOrThrow(...)` renders that diagnostic into
 
 ## Extension points
 
-The current scaffold uses the curated defaults, but the core package exposes the seams the
-plugin is composed from. Each is a subpath of `@netscript/plugin-sagas-core` — cite the
-sub-path in prose and look it up under {{ comp.xref({ key: "ref:sagas" }) }} (e.g.
-`reference/sagas/presets`, `reference/sagas/transports`).
+The scaffold uses curated defaults, and the core package exposes the seams the plugin is built
+from. Each seam is a subpath of `@netscript/plugin-sagas-core`, documented under
+{{ comp.xref({ key: "ref:sagas" }) }}, for example `reference/sagas/presets` and
+`reference/sagas/transports`.
 
 {{ comp.apiTable({
   caption: "Saga extension seams (@netscript/plugin-sagas-core subpaths)",
@@ -502,21 +419,15 @@ sub-path in prose and look it up under {{ comp.xref({ key: "ref:sagas" }) }} (e.
   ]
 }) }}
 
-{{ comp callout { type: "tip", title: "Default transport vs. Redis/Garnet" } }}
-The scaffolded sagas service runs over the in-process native runtime and Deno KV. The
-<code>/transports</code> adapters (<code>createGarnetListTransport</code>,
-<code>createNetScriptRedisTransport</code>) are for <strong>multi-process or distributed</strong>
-delivery — when saga handlers run as separate processes and need at-least-once delivery with
-consumer groups, delayed messages, and dead-letter handling. Reach for them only when a single
-process is no longer enough; the KV path covers local and single-service apps.
+{{ comp callout { type: "tip", title: "Default transport or Redis and Garnet" } }}
+The scaffolded sagas service runs over the in-process native runtime and Deno KV, which covers local and single-service apps. Use the <code>/transports</code> adapters (<code>createGarnetListTransport</code>, <code>createNetScriptRedisTransport</code>) only when saga handlers run as separate processes and need at-least-once delivery with consumer groups, delayed messages, and dead-letter handling.
 {{ /comp }}
 
 ## Endpoints and ports
 
 The sagas plugin runs an oRPC API service on its assigned port. It lists registered sagas and
-inspects running instances; the registry is backed by Deno KV. These are the routes
-the live scaffold serves — see {{ comp.xref({ key: "ref:sagas" }) }} for the full
-generated surface.
+inspects running instances; a Deno KV registry backs the list. The live scaffold serves these
+routes; {{ comp.xref({ key: "ref:sagas" }) }} has the full generated surface.
 
 {{ comp.apiTable({
   caption: "Sagas plugin — runtime endpoints (on its assigned port)",
@@ -531,96 +442,41 @@ generated surface.
 
 ## The continuous-app choreography
 
-The thread that ties the capabilities together is real and it compiles. The workers
-plugin's `create-user-settings` job calls a saga publisher and emits
-`UserSettingsCreated`; this saga's `.on('UserSettingsCreated', ...)` handler consumes
-it and emits `sagaComplete(...)`. One message crosses the plugin boundary, and both
-halves are type-checked against the same message type.
+The workers plugin's `create-user-settings` job publishes `UserSettingsCreated` through a saga
+publisher, and the saga's `.on('UserSettingsCreated', ...)` handler consumes it and returns
+`sagaComplete(...)`. Both halves type-check against the same message type. To watch the message
+cross the plugin boundary:
 
-After both plugins are running under Aspire, trigger the workers job
-(`POST /api/v1/workers/jobs/create-user-settings/trigger` on the workers API port) and watch the saga
-appear at `GET /api/v1/sagas/instances` (on the sagas API port) — the message crossed the boundary and a
-durable instance recorded its completion. Whether that durable instance lives in Deno
-KV or in your `saga_runtime_*` Postgres tables is exactly the `NETSCRIPT_SAGA_STORE`
-choice above.
+1. Run both plugins under Aspire.
+2. Trigger the workers job with `POST /api/v1/workers/jobs/create-user-settings/trigger` on the
+   workers API port.
+3. Read `GET /api/v1/sagas/instances` on the sagas API port. The new instance records the
+   completion.
+
+The instance lives in Deno KV or in your `saga_runtime_*` tables, depending on the
+`NETSCRIPT_SAGA_STORE` choice above.
 
 ## Production notes
 
-{{ comp callout { type: "warning", title: "Aspire first, then anything stateful" } }}
-The sagas service needs Postgres and Redis up before it can persist and list
-instances. Bring orchestration up first — <code>cd aspire &amp;&amp; aspire start</code>
-(dashboard at <a href="https://localhost:18888"><code>https://localhost:18888</code></a>) —
-<em>before</em> any <code>netscript db</code> command or before you expect
-<code>/api/v1/sagas/instances</code> to return durable state. This holds for both
-backends: <code>kv</code> needs Redis/KV up, and <code>prisma</code> needs Postgres up
-with the <code>saga_runtime_*</code> tables migrated. DB commands require Aspire running
-first.
+{{ comp callout { type: "warning", title: "Start Aspire first" } }}
+The sagas service needs Postgres and Redis before it can persist and list instances. Run <code>cd aspire &amp;&amp; aspire start</code> (dashboard at <a href="https://localhost:18888"><code>https://localhost:18888</code></a>) before any <code>netscript db</code> command, and before you expect <code>/api/v1/sagas/instances</code> to return durable state. Both backends depend on it: <code>kv</code> needs Redis/KV, and <code>prisma</code> needs Postgres with the <code>saga_runtime_*</code> tables migrated.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Handlers are synchronous and pure" } }}
-A <code>SagaHandler</code> returns <code>readonly CascadedMessage[]</code> — it is
-<strong>synchronous</strong> and does no direct I/O. All side effects (charging payment,
-sending an internal saga message) are expressed as <em>effects</em> the runtime applies, so
-the handler is replayable and crash-safe. Do not <code>await</code> a network call inside a
-handler; emit a <code>send(...)</code> effect for another saga message. Use the explicit workers
-integration helpers or triggers API <code>enqueueJob(...)</code> path for worker work. Compensation
-follows the same rule — its undo runs in the <code>.compensate()</code> handler as more
-effects, not as inline cleanup.
+A <code>SagaHandler</code> returns <code>readonly CascadedMessage[]</code>. It is <strong>synchronous</strong> and does no direct I/O; the runtime applies every side effect, so the handler is replayable and crash-safe. Do not <code>await</code> a network call inside a handler. Emit <code>send(...)</code> for another saga message, and use the workers integration helpers or the triggers API <code>enqueueJob(...)</code> path for worker work. Compensation follows the same rule: its undo runs in the <code>.compensate()</code> handler as more effects.
 {{ /comp }}
 
-## Recovery models, compared
+## When to use a saga
 
-Durable-workflow engines agree on the goal — a multi-step process that survives a crash — and
-differ on **what the author must keep deterministic** to get it. That difference is where the
-authoring models diverge, so it is the one comparison worth making precisely.
+- **Use a saga** for a multi-step process whose steps can fail independently and whose state
+  between steps must survive a crash: onboarding, checkout, provisioning. Pick `prisma` as the
+  store backend when you also want that in-flight state queryable in your relational database.
+- **Use a [background job](/background-processing/workers/)** for a single idempotent unit with
+  no state between steps.
+- **Use a database transaction** for atomic work inside one handler. A saga does not replace it.
 
-{{ comp.apiTable({
-  caption: "How three durable-workflow models recover from a crash",
-  rows: [
-    { name: "Temporal", type: "replay-based", desc: "Workflow code is re-executed against its recorded event history on recovery, so it must stay deterministic: I/O, time, and randomness move into activities, and a non-deterministic code change surfaces as a replay error." },
-    { name: "Inngest", type: "step memoization", desc: "step.run results are memoized per run; code between steps re-executes on each invocation, so side effects belong inside steps — a convention the author maintains." },
-    { name: "NetScript sagas", type: "checkpointed state machine", desc: "The runtime persists typed state between messages and resumes from that checkpoint. A SagaHandler is synchronous and returns effects, so I/O cannot appear in the recovery path by construction — the constraint is the handler's type, not a convention." }
-  ]
-}) }}
+## Next step
 
-The trade NetScript makes is explicitness: you model the state machine yourself — states, handlers,
-compensations — rather than writing linear code an engine replays. What you get back is that the
-determinism requirement never depends on discipline. The handler signature rejects `async`, effects
-are the only side-effect channel, and the whole lifecycle is named outcomes returned as data — which
-is also what keeps a saga reviewable when the author of the next handler is an agent working from
-the definition alone.
-
-## Why a saga, and why not
-
-{{ comp callout { type: "tip", title: "Reach for a saga when…" } }}
-You have a multi-step process where steps can fail independently and the
-<strong>state between steps must survive a crash</strong> — onboarding, checkout,
-provisioning. The correlation, persistence, and named completion/failure/compensation
-outcomes are exactly what a hand-rolled retry loop lacks. Pick <code>prisma</code> as the
-store backend when you also want that in-flight state queryable in your relational database.
-{{ /comp }}
-
-{{ comp callout { type: "warning", title: "Don't reach for a saga when…" } }}
-The work is a single idempotent unit with no inter-step state — that is a
-<a href="/background-processing/workers/">background job</a>, not a saga. And remember
-the alpha reality: durability and the instance store depend on the orchestration stack
-being up via Aspire (Redis/KV for <code>kv</code>, Postgres for <code>prisma</code>),
-so a saga is not a substitute for a database transaction within one handler.
-{{ /comp }}
-
-## Reference →
-
-{{ comp.featureGrid({
-  columns: 2,
-  items: [
-    { icon: "≡", title: "Look up — sagas reference", body: "The full generated @netscript/plugin-sagas API: the defineSaga builder, durability tiers, createDurableSagaRuntime, the kv/prisma store backends, effect helpers, presets/middleware/transports seams, and every API route.", href: "/reference/sagas/" },
-    { icon: "✲", title: "Understand — the durability model", body: "Why a saga's state must outlive the process, how effect-based outcomes differ from a retry loop, and where the kv vs prisma backends fit.", href: "/explanation/durability-model/" },
-    { icon: "◆", title: "Learn — Storefront checkout saga", body: "Build the order/checkout saga with a compensation branch as part of the storefront tutorial track.", href: "/tutorials/storefront/04-checkout-saga/" },
-    { icon: "▣", title: "Look up — queue reference", body: "createParallelQueue, createQueue, providers, and connection options for the fan-out concurrency primitive.", href: "/reference/queue/" }
-  ]
-}) }}
-
-{{ comp.nextPrev({
-  prev: { label: "Background jobs", href: "/background-processing/workers/" },
-  next: { label: "Triggers & ingress", href: "/durable-workflows/triggers/" }
-}) }}
+Build the checkout saga, with a compensation branch, in the
+[storefront tutorial](/tutorials/storefront/04-checkout-saga/). The full generated API is in the
+{{ comp.xref({ key: "ref:sagas", text: "sagas reference" }) }}.

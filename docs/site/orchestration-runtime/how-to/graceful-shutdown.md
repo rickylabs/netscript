@@ -4,40 +4,35 @@ title: Graceful shutdown
 templateEngine: [vento, md]
 order: 106
 oldUrl: /how-to/graceful-shutdown/
+prev: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }
+next: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }
 ---
 
 # Graceful shutdown
 
-Drain in-flight requests and jobs, run teardown hooks, and close DB/queue
-connections when your app receives `SIGINT`/`SIGTERM` — so a deploy or `Ctrl+C`
+This recipe drains in-flight requests and jobs, runs teardown hooks and closes database and queue
+connections when your app receives `SIGINT` or `SIGTERM`, so a deploy or {{ comp.kbd({ text: "Ctrl+C" }) }}
 never drops work mid-flight.
 
 ## Prerequisites
 
-{{ comp.apiTable({
-  caption: "What you need",
-  rows: [
-    { name: "@netscript/service", type: "package", desc: "Provides createRuntimeHost() for one app-wide budget plus createService().onShutdown().serve() for request draining." },
-    { name: "@netscript/plugin-workers-core/shutdown", type: "subpath export", desc: "ShutdownManager for draining worker/scheduler resources; the worker runtime also exposes a runtime.shutdown handle." },
-    { name: "@netscript/queue", type: "package (if you consume a queue)", desc: "MessageQueue.listen(handler, { signal }) + stop() let an AbortSignal stop consumption gracefully." },
-    { name: "A long-running entrypoint", type: "main.ts", desc: "A service or worker process you start with deno run / aspire start that needs to stop cleanly." }
-  ]
-}) }}
-
-{{ comp callout { type: "note", title: "Signals are wired for you (services)" } }}
-You do <strong>not</strong> call <code>Deno.addSignalListener</code> yourself for a
-service. <code>serve()</code> installs <code>SIGINT</code>/<code>SIGTERM</code> (or
-<code>SIGINT</code>/<code>SIGBREAK</code> on Windows) automatically and drains the HTTP
-listener before the process exits. You only register <em>what to tear down</em> via
-<code>.onShutdown()</code>.
-{{ /comp }}
+- **`@netscript/service`**: `createService().onShutdown().serve()` drains requests, and
+  `createRuntimeHost()` puts the whole app under one budget.
+- **`@netscript/plugin-workers-core/shutdown`**: `ShutdownManager` drains worker and scheduler
+  resources; the worker runtime also exposes a `runtime.shutdown` handle.
+- **`@netscript/queue`**, if you consume a queue: `MessageQueue.listen(handler, { signal })` and
+  `stop()` let an `AbortSignal` stop consumption gracefully.
+- **A long-running entrypoint**: a service or worker process, started with `deno run` or
+  `aspire start`, that needs to stop cleanly.
 
 ## Step 1 — Drain a service with `.onShutdown()`
 
-`serve()` already drains in-flight HTTP requests. Add `.onShutdown(hook)` to close
-the things the framework does not own — your database client, an external connection,
-a flush buffer. Each `ShutdownHook` receives a `ShutdownContext` (`reason`, optional
-`signal`) and runs during the drain, in LIFO order (last registered, first to run).
+For a service, you don't call `Deno.addSignalListener` yourself. `serve()` installs `SIGINT` and
+`SIGTERM` handlers (`SIGINT` and `SIGBREAK` on Windows) and drains in-flight HTTP requests before the
+process exits. Add `.onShutdown(hook)` to close what the framework doesn't own: your database
+client, an external connection, a flush buffer. Each `ShutdownHook` receives a `ShutdownContext`
+(`reason`, optional `signal`) and runs during the drain in LIFO order (last registered, first to
+run).
 
 ```ts
 // services/users/src/main.ts
@@ -63,27 +58,27 @@ const running = await createService(router, { name: 'users', version: '1.0.0' })
 await running.stop();
 ```
 
-The drain is bounded by `drainTimeoutMs` (default `30_000`). When it elapses the
-service stops anyway and the returned `ShutdownReport` records `timedOut: true` plus a
-per-hook `ShutdownHookOutcome`. `running.stop()` runs the identical drain with reason
-`'manual'`; both paths are idempotent, so a double `Ctrl+C` will not double-run hooks.
+`drainTimeoutMs` (default `30_000`) bounds the drain. When it elapses, the service stops anyway and
+the returned `ShutdownReport` records `timedOut: true` plus a `ShutdownHookOutcome` per hook.
+`running.stop()` runs the same drain with reason `'manual'`. Both paths are idempotent, so a double
+{{ comp.kbd({ text: "Ctrl+C" }) }} doesn't run hooks twice.
 
 {{ comp.apiTable({
   caption: "Shutdown contract (@netscript/service)",
   rows: [
-    { name: ".onShutdown(hook)", type: "ServiceBuilder method", desc: "Registers an async teardown ShutdownHook. Hooks run LIFO during the drain." },
-    { name: "ShutdownHook", type: "(context: ShutdownContext) => Promise<void> | void", desc: "Your teardown callback. Throwing is captured, not fatal — it lands in the report as a failed hook." },
-    { name: "ShutdownContext", type: "{ reason: ShutdownReason; signal?: Deno.Signal }", desc: "signal is set only when reason is 'signal'." },
-    { name: "ShutdownReason", type: "'signal' | 'manual' | 'startup-failure'", desc: "An OS signal, a manual stop() call, or a failed startup hook." },
-    { name: "ShutdownReport", type: "{ reason; timedOut: boolean; hooks: readonly ShutdownHookOutcome[] }", desc: "Returned by stop(); timedOut is true when the drain budget elapsed first." }
+    { kind: "method", name: ".onShutdown(hook)", type: "ServiceBuilder method", desc: "Registers an async teardown ShutdownHook. Hooks run LIFO during the drain." },
+    { kind: "type", name: "ShutdownHook", type: "(context: ShutdownContext) => Promise<void> | void", desc: "Your teardown callback. Throwing is captured, not fatal — it lands in the report as a failed hook." },
+    { kind: "interface", name: "ShutdownContext", type: "{ reason: ShutdownReason; signal?: Deno.Signal }", desc: "signal is set only when reason is 'signal'." },
+    { kind: "type", name: "ShutdownReason", type: "'signal' | 'manual' | 'startup-failure'", desc: "An OS signal, a manual stop() call, or a failed startup hook." },
+    { kind: "interface", name: "ShutdownReport", type: "{ reason; timedOut: boolean; hooks: readonly ShutdownHookOutcome[] }", desc: "Returned by stop(); timedOut is true when the drain budget elapsed first." }
   ]
 }) }}
 
 ## Step 2 — Configure the drain budget via `serve()`
 
-The drain budget and signal behavior are `ServeOptions` keys. Pass an external
-`AbortSignal` to stop the listener from anywhere — a parent controller, a test
-harness, or a higher-level orchestrator — without an OS signal.
+The drain budget and signal behavior are `ServeOptions` keys. Pass an external `AbortSignal` to stop
+the listener without an OS signal, from a parent controller, a test harness or a higher-level
+orchestrator.
 
 {{ comp.apiTable({
   caption: "ServeOptions — shutdown-relevant keys",
@@ -109,11 +104,11 @@ controller.abort();
 
 ## Step 3 — Drain a worker runtime
 
-The worker runtime carries its own `ShutdownManager` and exposes it as
-`runtime.shutdown`. The runtime pre-registers its worker (priority `20`) and, when
-present, its scheduler (priority `30`); higher-priority resources stop first. Register
-your own long-lived resources — a queue consumer, a connection pool — and call
-`runtime.shutdown.shutdown(reason)` to stop them all under one bounded budget.
+The worker runtime carries its own `ShutdownManager` and exposes it as `runtime.shutdown`. It
+pre-registers its worker (priority `20`) and, when present, its scheduler (priority `30`);
+higher-priority resources stop first. Register your own long-lived resources, such as a queue
+consumer or a connection pool, and call `runtime.shutdown.shutdown(reason)` to stop them all under
+one bounded budget.
 
 ```ts
 // workers/src/main.ts — drain workers + a queue consumer on signal
@@ -137,35 +132,31 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
 ```
 
 {{ comp callout { type: "important", title: "Workers need their own signal wiring" } }}
-Unlike a service's <code>serve()</code>, the worker runtime does <strong>not</strong>
-register OS signal handlers for you. Add <code>Deno.addSignalListener</code> in your
-worker entrypoint and route the signal into <code>runtime.shutdown.shutdown()</code>.
-On Windows, listen for <code>SIGBREAK</code> instead of <code>SIGTERM</code> (the
-service listener already does this internally for its own signals).
+Unlike a service's <code>serve()</code>, the worker runtime does <strong>not</strong> register OS signal handlers. A worker entrypoint without <code>Deno.addSignalListener</code> is killed ungracefully. Add the listener and route the signal into <code>runtime.shutdown.shutdown()</code>, or into <code>host.shutdown()</code> for a combined app (<a href="#step-5-compose-the-whole-app-under-one-budget">Step 5</a>). Deno doesn't deliver <code>SIGTERM</code> on Windows, so listen for <code>SIGBREAK</code> there; the service listener already does this for its own signals.
 {{ /comp }}
 
-You can also build a standalone `ShutdownManager` directly. Its `createAbortController()`
-returns an `AbortController` that aborts the moment shutdown starts — feed that signal
-into `queue.listen(handler, { signal })` so consumption stops cleanly, and `register()`
-each resource you want stopped (higher `priority` stops first).
+You can also build a standalone `ShutdownManager`. Its `createAbortController()` returns an
+`AbortController` that aborts the moment shutdown starts: pass that signal to
+`queue.listen(handler, { signal })` so consumption stops cleanly, and `register()` each resource
+you want stopped (higher `priority` stops first).
 
 {{ comp.apiTable({
   caption: "ShutdownManager (@netscript/plugin-workers-core/shutdown)",
   rows: [
-    { name: "register(resource)", type: "(ShutdownResource) => void", desc: "Adds a resource: { id, priority?, stop(reason?) }. Higher priority stops first; default 0." },
-    { name: "shutdown(reason?, options?)", type: "=> Promise<ShutdownReport>", desc: "Stops all registered resources concurrently under timeoutMs (default 30_000); idempotent — returns the same report on repeat calls." },
-    { name: "createAbortController()", type: "=> AbortController", desc: "An AbortController that aborts when shutdown begins. Pass its .signal to queue.listen({ signal })." },
-    { name: "waitForShutdown()", type: "=> Promise<void>", desc: "Resolves once shutdown has started — await it to gate your own cleanup." },
+    { kind: "method", name: "register(resource)", type: "(ShutdownResource) => void", desc: "Adds a resource: { id, priority?, stop(reason?) }. Higher priority stops first; default 0." },
+    { kind: "method", name: "shutdown(reason?, options?)", type: "=> Promise<ShutdownReport>", desc: "Stops all registered resources concurrently under timeoutMs (default 30_000); idempotent — returns the same report on repeat calls." },
+    { kind: "method", name: "createAbortController()", type: "=> AbortController", desc: "An AbortController that aborts when shutdown begins. Pass its .signal to queue.listen({ signal })." },
+    { kind: "method", name: "waitForShutdown()", type: "=> Promise<void>", desc: "Resolves once shutdown has started — await it to gate your own cleanup." },
     { name: "state", type: "'running' | 'shutting-down' | 'stopped'", desc: "Current lifecycle state." }
   ]
 }) }}
 
 ## Step 4 — Stop a queue consumer cleanly
 
-A `MessageQueue` consumer is a long-running `listen()` loop. Two ways to stop it
-without dropping a message mid-process: pass an `AbortSignal` to `listen()`, or call
-`queue.stop()` (which lets in-flight messages finish before shutting down). Wiring the
-`AbortSignal` from a `ShutdownManager` ties consumption directly to your drain.
+A `MessageQueue` consumer is a long-running `listen()` loop. Stop it without dropping a message
+mid-process in one of two ways: pass an `AbortSignal` to `listen()`, or call `queue.stop()`, which
+lets in-flight messages finish. An `AbortSignal` from a `ShutdownManager` ties consumption directly
+to your drain.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -182,10 +173,9 @@ without dropping a message mid-process: pass an `AbortSignal` to `listen()`, or 
 
 ## Step 5 — Compose the whole app under one budget
 
-Use `createRuntimeHost()` when one process owns a service plus workers, a queue consumer, and a
-database connection. Each callback invokes the resource's existing drain; the host adds no service,
-worker, queue, or database teardown logic. It supplies the missing composition boundary: one phase
-order, one deadline, and one report.
+Use `createRuntimeHost()` when one process owns a service, workers, a queue consumer and a database
+connection. Each callback invokes the resource's existing drain; the host adds no teardown logic of
+its own, only one phase order, one deadline and one report.
 
 ```ts
 import { createRuntimeHost } from '@netscript/service';
@@ -213,71 +203,29 @@ indefinitely for the slow resource.
 {{ comp.apiTable({
   caption: "App-wide runtime host (@netscript/service)",
   rows: [
-    { name: "createRuntimeHost(options)", type: "=> RuntimeHost", desc: "Composes existing drains using one timeoutMs budget (default 30_000)." },
-    { name: "RuntimeHostDrain", type: "{ id; phase; drain(reason?) }", desc: "Calls one existing resource drain in the service, workers, queue, or database phase." },
-    { name: "host.shutdown(reason?)", type: "=> Promise<RuntimeHostShutdownReport>", desc: "Runs once, returns the same promise on repeat calls, and never waits beyond the shared budget." },
-    { name: "RuntimeHostShutdownReport", type: "{ reason?; timedOut; outcomes }", desc: "Ordered stopped, failed, timed-out, or skipped outcomes for every registered resource." }
+    { kind: "function", name: "createRuntimeHost(options)", type: "=> RuntimeHost", desc: "Composes existing drains using one timeoutMs budget (default 30_000)." },
+    { kind: "type", name: "RuntimeHostDrain", type: "{ id; phase; drain(reason?) }", desc: "Calls one existing resource drain in the service, workers, queue, or database phase." },
+    { kind: "method", name: "host.shutdown(reason?)", type: "=> Promise<RuntimeHostShutdownReport>", desc: "Runs once, returns the same promise on repeat calls, and never waits beyond the shared budget." },
+    { kind: "type", name: "RuntimeHostShutdownReport", type: "{ reason?; timedOut; outcomes }", desc: "Ordered stopped, failed, timed-out, or skipped outcomes for every registered resource." }
   ]
 }) }}
 
 ## In-production pitfalls
 
-{{ comp callout { type: "warning", title: "Footguns before you ship" } }}
-<ul>
-<li><strong>Set <code>drainTimeoutMs</code> or the host's <code>timeoutMs</code> below your platform's kill grace.</strong>
-Both defaults are <code>30_000</code>. If your orchestrator sends <code>SIGKILL</code>
-sooner (Kubernetes <code>terminationGracePeriodSeconds</code> defaults to 30s), in-flight
-work is cut off — pick a budget comfortably under the grace period.</li>
-<li><strong>Workers do not auto-handle signals.</strong> Only a service's
-<code>serve()</code> installs <code>SIGINT</code>/<code>SIGTERM</code>. A standalone
-worker entrypoint that omits <code>Deno.addSignalListener</code> will be killed
-ungracefully — register the listener and route it into
-<code>runtime.shutdown.shutdown()</code>, or into <code>host.shutdown()</code> for a combined app.</li>
-<li><strong>Use <code>SIGBREAK</code>, not <code>SIGTERM</code>, on Windows.</strong>
-Deno does not deliver <code>SIGTERM</code> on Windows; the service listener already
-uses <code>SIGBREAK</code> internally, but your own worker signal wiring must too.</li>
-<li><strong>A throwing hook does not abort the drain.</strong> A
-<code>ShutdownHook</code> that rejects is captured as a failed
-<code>ShutdownHookOutcome</code> in the report, not re-thrown — inspect the returned
-<code>ShutdownReport</code> (or the logged warning) to catch teardown failures.</li>
-<li><strong>Close the DB in the host's database phase or a service hook, not at module scope.</strong>
-Use a <code>database</code>-phase host drain for a combined app, or call
-<code>db.$disconnect()</code> inside <code>.onShutdown()</code> for a service-only process. Both run
-after in-flight requests drain; disconnecting earlier breaks requests still being served.</li>
-</ul>
+{{ comp callout { type: "warning", title: "Keep the budget under the kill grace period" } }}
+Both <code>drainTimeoutMs</code> and the host's <code>timeoutMs</code> default to <code>30_000</code>. If your orchestrator sends <code>SIGKILL</code> sooner (Kubernetes <code>terminationGracePeriodSeconds</code> defaults to 30 seconds), in-flight work is cut off. Pick a budget comfortably under the grace period.
 {{ /comp }}
 
-## See also
+Close the database in the host's `database` phase for a combined app, or call `db.$disconnect()`
+inside `.onShutdown()` for a service-only process, never at module scope. Both run after in-flight
+requests drain; disconnecting earlier breaks requests still being served.
 
-{{ comp.xref({ key: "ref:service" }) }}
+A throwing hook doesn't abort the drain: a rejected `ShutdownHook` is recorded as a failed
+`ShutdownHookOutcome`, not re-thrown. Inspect the returned `ShutdownReport`, or the logged warning,
+to catch teardown failures.
 
-{{ comp.xref({ key: "cap:background-jobs" }) }}
+## Next step
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — @netscript/service",
-    body: "The full shutdown contract: onShutdown, ServeOptions (drainTimeoutMs, handleSignals, signal), ShutdownReport, and the running.stop() drain.",
-    href: "/reference/service/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — @netscript/workers",
-    body: "ShutdownManager, the runtime.shutdown handle, and the worker/scheduler resources it pre-registers.",
-    href: "/reference/workers/",
-    icon: "≡"
-  },
-  {
-    title: "Do — Tune the worker runtime",
-    body: "Recipe: concurrency, retry, and the runtime knobs that decide how much in-flight work a drain has to wait on.",
-    href: "/background-processing/how-to/tune-worker-runtime/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — The durability model",
-    body: "Why queue messages and saga steps survive a restart — the guarantees a clean drain protects.",
-    href: "/explanation/durability-model/",
-    icon: "◎"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }, next: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" } }) }}
+Decide how much in-flight work a drain waits on with
+[Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/). The
+[`@netscript/service` reference](/reference/service/) has the full shutdown contract.

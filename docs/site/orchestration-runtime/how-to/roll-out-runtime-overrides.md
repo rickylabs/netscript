@@ -4,13 +4,16 @@ title: Roll out runtime overrides
 templateEngine: [vento, md]
 order: 105
 oldUrl: /how-to/roll-out-runtime-overrides/
+prev: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" }
+next: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" }
 ---
 
 # Roll out runtime overrides
 
-Use runtime overrides when operations need to change a deployed behavior without rebuilding the
-workspace. `watchRuntimeConfig(onChange, options)` watches the runtime config directory, reloads
-after file changes settle, and passes the current `RuntimeConfig` to your callback.
+This recipe publishes a runtime override, applies it in a running process and rolls it back, so
+operators change deployed behavior without rebuilding the workspace.
+`watchRuntimeConfig(onChange, options)` watches the runtime config directory, reloads after file
+changes settle, and passes the current `RuntimeConfig` to your callback.
 
 ## Prerequisites
 
@@ -23,7 +26,7 @@ after file changes settle, and passes the current `RuntimeConfig` to your callba
 ## Create an override topic
 
 Runtime config files are versioned behind the `current` pointer. Author the topic payload locally,
-then publish it; the CLI writes `runtime/<topic>/v<version>.json` before atomically replacing
+then publish it. The CLI writes `runtime/<topic>/v<version>.json` before atomically replacing
 `current`, so readers see either the previous version or the next one.
 
 ```bash
@@ -40,8 +43,7 @@ netscript config override publish features ./features-v2026-06-22.json \
   --version 2026-06-22
 ```
 
-For a single dashboard-style feature change, the CLI can create and activate the next snapshot
-directly:
+For a single feature change, the CLI creates and activates the next snapshot directly:
 
 ```bash
 netscript config override set flags.checkout-v2 --rollout 30
@@ -83,10 +85,14 @@ addEventListener('unload', () => controller.abort());
 The watcher debounces file churn before reloading. Keep rollout writes atomic anyway: write a new
 version file first, then replace `current` in a single rename.
 
+{{ comp callout { type: "warning", title: "Don't hand-edit the pointer" } }}
+Hand-editing <code>current</code> can produce a partial read. Use <code>netscript config override publish</code> or <code>rollback</code>, which stage a complete pointer and replace it with one rename.
+{{ /comp }}
+
 ## Roll back
 
-Rollback validates that the requested topic version exists, preserves the other active topic
-pointers, and atomically replaces `current`:
+Rollback checks that the requested topic version exists, keeps the other active topic pointers,
+and atomically replaces `current`:
 
 ```bash
 netscript config override rollback features 2026-06-21
@@ -96,21 +102,14 @@ The next watcher reload sees the previous version and calls `onChange` again.
 
 ## Failure modes
 
-- Missing directory or missing files load as empty defaults so the process can start.
-- A malformed pointed-to file is surfaced in the runtime config summary; publish that summary to
-  logs or health output.
-- Hand-editing `current` can produce a partial read. Use `config override publish|rollback`, which
-  stage a complete pointer and replace it with one rename.
-- A long-running `onChange` callback can lag later updates. Keep the callback bounded and hand off
-  heavier work to a queue.
+| Situation | What happens | What to do |
+| --- | --- | --- |
+| Missing directory or files | They load as empty defaults, so the process can start. | Check `NETSCRIPT_RUNTIME_CONFIG_DIR` if overrides never apply. |
+| Malformed pointed-to file | The runtime config summary reports it. | Publish the summary to logs or health output. |
+| Long-running `onChange` callback | It can lag later updates. | Keep the callback bounded and hand heavier work to a queue. |
 
-## Next steps
+## Next step
 
-- Tune worker behavior with [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
-- Deploy the process with [Deploy](/orchestration-runtime/how-to/deploy/).
-- Look up the package surface in [runtime-config reference](/reference/runtime-config/).
-
-{{ comp.nextPrev({
-  prev: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" },
-  next: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" }
-}) }}
+Use overrides to tune job behavior with
+[Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/). The
+[runtime-config reference](/reference/runtime-config/) lists every override type.
