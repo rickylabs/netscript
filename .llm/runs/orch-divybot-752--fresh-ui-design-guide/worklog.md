@@ -266,3 +266,30 @@ Slice review (supervisor): every component/prop/class named in the guide was che
   - The guard literals are byte-identical to the probe constants. The evaluator's own negative control in a scratch
     worktree at `af6041a` (removed afterwards) was red.
   - The sweep found no other probe-trippable string. Gates: guard 6/6, `check:publish-assets`, `check:agent-docs-prose`, MCP 199/199.
+
+## S7 — rebase onto `782893a` (merge-conflict, 2026-10-28)
+
+- Main moved `1582e1c` → `782893a`: #2426, #2432 (token pipeline repair + `tokens:build --check`), #2427 (design
+  guidelines + theme DESIGN.md/SKILL.md), #2399, #2437 (generated design-system section + theme gallery).
+- Only conflict: the two embedded-docs carriers (`agent-docs-prose.generated.ts`, `publish-assets.generated.ts`) on
+  the S2 commit. Resolved by taking main's carriers and regenerating from source (`gen:agent-docs-prose`,
+  `gen:assets-barrel`, `gen:publish-assets`); later commits replayed cleanly. `build-tokens.ts` auto-merged (our header
+  hunk, main's in-memory `--check` hunk). The docs build's `docs/site/deno.lock` churn was reverted every time.
+- The branch patch outside `*.generated.ts` is byte-identical to the pre-rebase `1d71335` patch, so no product text
+  changed and no IMPL-EVAL round is due.
+- Main's design-system docs describe a future theme model (`data-theme="<language>"` + `data-scheme`, provisional until
+  S1 #2414) and state that today's NS One code uses `:root` + `[data-theme='dark']`. That matches this PR's guides; S1
+  must update them when it ships (`caveats.md`).
+
+| Gate | Result |
+| --- | --- |
+| Carriers regenerated at the rebased head | no diff |
+| `check:publish-assets` / `check:agent-docs-prose` / `check:assets-barrel` | PASS / PASS / PASS |
+| fresh-ui `tokens:build --check` (main's new frozen check) | PASS |
+| fresh-ui tests | 192 passed |
+| `generate-publish-assets_test.ts` + MCP corpus/theming tests | 17 passed |
+| CLI tests (agent-conventions, public-command-tree, init-agent*, ui) | 183 passed |
+| `packages/cli` `deno task check` | PASS |
+| MCP `deno task test` | 199 passed |
+| `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / `design-system_test` | PASS ×5 |
+| Probe strings (`routes/(design)/`, design marker) in the MCP carrier | 0 / 0 |

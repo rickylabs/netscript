@@ -52,3 +52,11 @@ Collected during this run (theming/primitives/guidance side) and from sibling ha
   root, so roughly 330 KB of embedded docs ship in `_fresh/server/_fresh-route___examples_telemetry_index.mjs`. Any
   embedded doc text also becomes app build output: here it tripped the design-exclusion probe. A narrow subpath
   export for the telemetry readers (or a lazy corpus import) would keep docs out of app bundles.
+
+## Found in S7 (2026-10-28)
+
+- **The design-system theme model will outdate these guides.** Main's `docs/design-system/` (#2427, #2437) plans
+  `data-theme="<language>"` plus `data-scheme="light|dark"` (provisional until S1 #2414). `design-with-fresh-ui`,
+  `customize-fresh-ui`, the `tokens.css` header and the generated app AGENTS.md all document today's NS One selectors
+  (`:root` light, `[data-theme='dark']` dark). When S1 ships, update those four together with its `ui:migrate` step,
+  and cross-link the guide's brand presets to the design-system section's token-only themes.
