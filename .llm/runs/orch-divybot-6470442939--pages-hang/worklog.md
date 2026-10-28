@@ -28,3 +28,33 @@
 ## Owner evaluator override (verbatim)
 
 Run IMPL-EVAL after implementing with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once and record the verdict.
+
+## Implementation gate evidence
+
+- Draft PR #2458 opened during bootstrap, within the requested 30-minute window.
+- Real-process red control: replace the process timer with 60 seconds temporarily; the new
+  nonterminating fixture test reached its external five-second safety deadline, exit 124,
+  elapsed 5.007 seconds. Restored the production timer immediately; no mutation committed.
+- Green: structured test wrapper over all docs:snippets:test files: 18 passed, 0 failed,
+  14.787 seconds. Covers nontermination, EOF, spawn errors, compiler source/lock attribution,
+  inherited pipes after leader exit, SIGTERM-resistant descendants and nested compiler groups.
+- `deno task docs:snippets`: PASS, exit 0, main content, 42.950 seconds < five minutes.
+- `deno task docs:exports-drift`: PASS, exit 0, 4.148 seconds.
+- `deno task --cwd docs/site verify`: PASS, exit 0, 9.734 seconds; source format, rendered output,
+  23,970 links across 251 pages and 15 caveat markers across 12 pages.
+- Structured check wrapper: PASS, 52 docs tool files, zero diagnostics, --unstable-kv enabled.
+- Structured format wrapper: PASS, 52 files processed, zero findings.
+- Structured lint wrapper: root config refused all .llm files; explicit docs/site config exposes
+  three pre-existing findings in unrelated files. Scoped to the nine changed TS files with that
+  config: PASS, all nine processed, zero findings. No exclusions or CI checks weakened.
+- Full `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`: exit 1 after 4.711s;
+  Aspire doctor preflight failed and cleanup could not reach the Docker daemon. Runtime remains
+  UNPROVEN; suite did not start the scaffold/runtime. No code changes made to bypass preflight.
+- Read-only leak-check: exit 0; unknown-owner/foreign processes reported and left untouched;
+  container inspection remains unavailable. No foreign resource cleanup attempted.
+- Root deno.lock unchanged; git diff --check clean; workflow diff modifies only build timeouts.
+
+## Reconcile
+
+Current origin/main remains the declared d6dfab0 baseline; only this branch’s harness bootstrap
+commit is ahead. Changes stay within declared ownership. Independent evaluation pending.

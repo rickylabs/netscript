@@ -140,6 +140,9 @@ Deno.test('empty-reason fixture exits the actual CLI non-zero and names its fenc
     args: [
       'run',
       '--allow-read',
+      '--allow-write',
+      '--allow-run',
+      '--allow-env',
       '.llm/tools/docs/check-snippets.ts',
       '--negative',
       'empty-exemption-reason',

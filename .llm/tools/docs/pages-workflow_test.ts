@@ -1,4 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
+import { SNIPPET_CHECK_TIMEOUT_MS } from './snippet-process.ts';
 
 interface SourceLine {
   number: number;
@@ -10,11 +11,13 @@ interface WorkflowStep {
   name: string;
   run?: string;
   workingDirectory?: string;
+  timeoutMinutes?: number;
 }
 
 interface PagesWorkflowContract {
   eventPaths: Record<'pull_request' | 'push', string[]>;
   buildSteps: WorkflowStep[];
+  buildTimeoutMinutes: number;
 }
 
 function sourceLines(source: string): SourceLine[] {
@@ -76,6 +79,10 @@ function parsePagesWorkflow(source: string): PagesWorkflowContract {
   const jobs = root('jobs');
   const build = childIndex(lines, jobs, sectionEnd(lines, jobs), 2, 'build');
   const steps = childIndex(lines, build, sectionEnd(lines, build), 4, 'steps');
+  const buildTimeoutMinutes = Number(
+    lines.slice(build + 1, steps).filter((line) => line.indent === 4)
+      .map((line) => scalar(line, 'timeout-minutes')).find((value) => value !== undefined),
+  );
   const stepsEnd = sectionEnd(lines, steps);
   const stepStarts = lines.flatMap((line, index) =>
     index > steps && index < stepsEnd && line.indent === 6 && line.text.startsWith('- name:')
@@ -88,6 +95,9 @@ function parsePagesWorkflow(source: string): PagesWorkflowContract {
     const fields = lines.slice(start + 1, end).filter((line) => line.indent === 8);
     return {
       name,
+      timeoutMinutes: Number(
+        fields.map((line) => scalar(line, 'timeout-minutes')).find((value) => value !== undefined),
+      ),
       run: fields.map((line) => scalar(line, 'run')).find((value) => value !== undefined),
       workingDirectory: fields.map((line) => scalar(line, 'working-directory')).find((value) =>
         value !== undefined
@@ -95,7 +105,7 @@ function parsePagesWorkflow(source: string): PagesWorkflowContract {
     };
   });
 
-  return { eventPaths, buildSteps };
+  return { eventPaths, buildSteps, buildTimeoutMinutes };
 }
 
 Deno.test('Pages structurally revalidates docs for package and plugin changes before Lume', async () => {
@@ -141,4 +151,15 @@ Deno.test('Pages structurally revalidates docs for package and plugin changes be
     'docs:snippets must run from the repository root',
   );
   assertEquals(workflow.buildSteps[lumeIndex].workingDirectory, 'docs/site');
+  const snippetTimeout = workflow.buildSteps[snippetIndex].timeoutMinutes;
+  assert(Number.isSafeInteger(snippetTimeout), 'snippet step needs a finite timeout');
+  assert(
+    snippetTimeout! * 60_000 > SNIPPET_CHECK_TIMEOUT_MS,
+    'allow worker cleanup before step timeout',
+  );
+  assert(Number.isSafeInteger(workflow.buildTimeoutMinutes), 'build job needs a finite timeout');
+  assert(
+    workflow.buildTimeoutMinutes > snippetTimeout!,
+    'allow the remaining build steps to finish',
+  );
 });

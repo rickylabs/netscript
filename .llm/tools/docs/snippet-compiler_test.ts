@@ -48,6 +48,18 @@ Deno.test('actual compiler graph rejects a non-exported SDK symbol', async () =>
   assertStringIncludes(result.diagnostics, 'DefinitelyNotExportedByNetScript');
 });
 
+Deno.test('compiler deadline fails with the source fence and preserves the tracked lock', async () => {
+  const lockBefore = await Deno.readTextFile(join(repositoryRoot, 'deno.lock'));
+  const analysis = await analyzeSnippetSite(join(fixtureRoot, 'never-exits/docs/site'), {
+    enforceCoverage: false,
+  });
+  const result = await compileSnippetAnalysis(analysis, repositoryRoot, { timeoutMs: 1 });
+  assertEquals(result.code, 1);
+  assertStringIncludes(result.diagnostics, 'page.md:3: snippet process timed out after 1ms');
+  assert(result.rootLockUnchanged);
+  assertEquals(await Deno.readTextFile(join(repositoryRoot, 'deno.lock')), lockBefore);
+});
+
 Deno.test('dialect controls discriminate typed APIs through the same docs fixture', async () => {
   const red = await compileFixture('dialect-a-object-input');
   assertEquals(red.code, 1);

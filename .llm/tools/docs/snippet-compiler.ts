@@ -1,6 +1,7 @@
 import { dirname, join, relative, toFileUrl } from '@std/path';
 import type { FencedBlock } from './snippet-extractor.ts';
 import type { SnippetSiteAnalysis } from './snippet-policy.ts';
+import { runSnippetProcess } from './snippet-process.ts';
 import {
   materializePageSupports,
   materializeSharedSupports,
@@ -110,6 +111,7 @@ function mapDiagnostics(raw: string, modules: SyntheticModule[]): string {
 export async function compileSnippetAnalysis(
   analysis: SnippetSiteAnalysis,
   repositoryRoot: string,
+  options: { timeoutMs?: number } = {},
 ): Promise<SnippetCompilationResult> {
   const tempRoot = await Deno.makeTempDir({ prefix: 'netscript-doc-snippets-' });
   const rootLockPath = join(repositoryRoot, 'deno.lock');
@@ -144,28 +146,37 @@ export async function compileSnippetAnalysis(
     );
     const tempLockPath = join(tempRoot, 'deno.lock');
     await Deno.copyFile(rootLockPath, tempLockPath);
-    const output = await new Deno.Command(Deno.execPath(), {
-      cwd: repositoryRoot,
-      args: [
+    let code = 0;
+    let stdout = '';
+    let diagnostics = '';
+    // Attribute and bound each entrypoint independently; dependencies retain page-local modules.
+    for (const module of modules) {
+      const source = `${module.block.sourcePath}:${module.block.openingLine}`;
+      console.error(`Checking documentation snippet ${source}`);
+      const output = await runSnippetProcess(Deno.execPath(), [
         'check',
         '--unstable-kv',
         '--lock',
         tempLockPath,
         '--config',
         configPath,
-        ...modules.map((module) => module.path),
-      ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+        module.path,
+      ], { cwd: repositoryRoot, source, timeoutMs: options.timeoutMs });
+      stdout += output.stdout;
+      diagnostics += mapDiagnostics(output.stderr, modules);
+      if (output.code !== 0) {
+        code = output.code;
+        break;
+      }
+    }
     const rootLockAfter = await Deno.readTextFile(rootLockPath);
     const tempLockAfter = await Deno.readTextFile(tempLockPath);
     const rootLockUnchanged = rootLockBefore === rootLockAfter;
     if (!rootLockUnchanged) throw new Error('tracked root deno.lock changed during snippet check');
     return {
-      code: output.code,
-      stdout: new TextDecoder().decode(output.stdout),
-      diagnostics: mapDiagnostics(new TextDecoder().decode(output.stderr), modules),
+      code,
+      stdout,
+      diagnostics,
       memberCount: workspace.memberCount,
       catalogCount: Object.keys(workspace.catalog).length,
       rootLockUnchanged,
