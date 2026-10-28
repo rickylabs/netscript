@@ -16,3 +16,5 @@ No package API, dependency upgrade, labels, merge, tag or release is authorized.
 The native publish-assets task may write the exact checked-in paths in `PUBLISH_ASSET_OUTPUTS` in `.llm/tools/generate-publish-assets.ts`, solely to regenerate existing assets. Inspect every resulting diff; unrelated generator drift is not silently accepted.
 
 Owner-revision carrier slice also authorizes packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts solely through gen:mcp-export-corpus, in the explicitly requested native generation order.
+
+Latest user synchronization authorization: rebase onto latest main and force-push, explicitly superseding prior merge-only/no-force constraints for this reconciliation. Use exact --force-with-lease against old remoteae2f4002b; target main0825bd0f4. PR merge/tag/release and label changes remain forbidden. Canonical upstream docs are inherited unchanged, never manually edited by this slice.

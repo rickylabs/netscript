@@ -159,5 +159,15 @@
     "seriousOrCritical": 0,
     "changedCalloutCarrierPages": 107,
     "mcpSourceBytes": 283750
+  },
+  "latestBaseReconciliation": {
+    "targetMain": "0825bd0f421c83757234044235ae4ed00323d0fd",
+    "oldFeatureTip": "ae2f4002b671937da936571926408b2ad0fa8b4c",
+    "evidence": "rebase-evidence.json",
+    "implEval": "rebase-impl-eval.md",
+    "browserPassed": 116,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "sourceAndUpstreamPreserved": true
   }
 }
