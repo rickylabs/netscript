@@ -12,6 +12,7 @@ import langTypescript from 'npm:highlight.js@11.11.1/lib/languages/typescript';
 import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
+import { getDocsLane } from './_data.ts';
 
 /**
  * NetScript external user documentation site (Diátaxis IA).
@@ -89,6 +90,7 @@ site.filter(
 // Expose the resolver + raw map as global data for `comp.xref` (so the component
 // resolves without an in-template import). Throws on unknown key inside the build.
 site.data('resolveXref', resolveXref);
+site.data('getDocsLane', getDocsLane);
 
 // Multilevel sidebar (docs-v5 IA): nav.menu()/nav.breadcrumb() derive the tree
 // from page URLs; the sidebar lanes are curated in `_data.ts` `navLanes`.

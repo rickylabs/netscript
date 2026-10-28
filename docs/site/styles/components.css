@@ -1,0 +1,64 @@
+/* Component anatomy is refined in the component slice; shared primitives use Utility roles. */
+.ns-tabbed [role="tabpanel"][hidden] {
+  display: none;
+}
+.ns-tabbed:not(.is-enhanced) > .ns-tabbed__tablist {
+  display: none;
+}
+.ns-comparison:not(.is-enhanced) > .ns-comparison__picker {
+  display: none;
+}
+.ns-callout {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: var(--ns-surface);
+}
+.ns-card,
+.ns-cards-grid__card {
+  display: block;
+  padding: 20px 0;
+  border-top: 1px solid var(--ns-studio-card-border);
+  text-decoration: none;
+}
+.ns-feature-grid,
+.ns-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 24px;
+  margin: 32px 0;
+}
+.ns-nextprev {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 48px;
+  max-width: 720px;
+}
+.ns-nextprev__link {
+  border: 1px solid var(--ns-border-subtle);
+  padding: 16px 20px;
+  text-decoration: none;
+}
+.ns-nextprev__dir {
+  display: block;
+  color: var(--ns-muted-fg);
+  font: 400 11px/16px var(--ns-font-mono);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.ns-nextprev__link--next {
+  text-align: right;
+}
+.ns-nextprev__link--next:only-child {
+  grid-column: 2;
+}
+@media (max-width: 700px) {
+  .ns-feature-grid,
+  .ns-cards-grid,
+  .ns-nextprev {
+    grid-template-columns: 1fr;
+  }
+  .ns-nextprev__link--next:only-child {
+    grid-column: 1;
+  }
+}

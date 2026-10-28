@@ -58,3 +58,16 @@ Coordinator disposition: “approves amendment B3 with two conditions: the sourc
 - Independent slice review pending before sign-off commit.
 
 Slice 1 independent review: PASS. Reconcile: no foreign edits or lock changes. PR #2439 stays draft; same branch and protected ownership. Next slice removes legacy token references and scheme selectors as the reviewer noted.
+
+## Slice 2 — shell and layout
+
+- Full-width Utility topbar, six lanes, active-lane-only tree, 272px sidebar, 544px prose / 720px wide blocks, desktop TOC and native mobile disclosure, reference section anchors, breadcrumbs/footer and modal navigation drawer. Existing tab/runtime/comparison/copy scripts were extracted without removing behavior.
+- Gates: docs build/rendered-output PASS (236 HTML pages); scoped site-config/data typecheck PASS; structured browser-JS lint and format PASS; no undefined semantic CSS roles and no old scheme selectors; real Chromium article renders at 390/1280 Dark had no page errors or horizontal overflow; mobile drawer opens and Escape closes.
+- Full link check currently fails solely on newly requested `/design-system/`: that content belongs to completed sibling PR #2437, which is still draft and absent from main. No broken-link exemption or placeholder was added. Verify the composed site once S8b lands; this remains explicit integration work.
+- Independent shell slice review pending.
+
+Shell review requested a fix for overlapping mobile reference/TOC bars. Fixed by showing the native disclosure only on article/landing pages; reference keeps its section nav. Drawer height cap and mobile scroll padding also corrected. Exploratory axe found the inherited link-inside-summary pattern; replaced it with native summary plus separate Overview link. Duplicate automatic pagers are suppressed when the article already includes a pager.
+
+The isolated pinned Mermaid run now passes all 16 source SVG comparisons; only missing worker libraries/sandbox launch setup were addressed, without source or gate changes.
+
+Slice 2 repair review: PASS. Chromium article at 1280 Dark has zero serious/critical axe findings. At 390 Dark, the scrolled CLI section link remains visible/focusable; adding explicit focus to scroll regions resolves the table keyboard finding. Full strict matrix follows in slice 5. Reconcile: no ownership/lock drift, design-system destination still waits on sibling #2437; final composed link gate remains required.
