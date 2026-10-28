@@ -435,3 +435,27 @@ v2 contradicts.
 - Not this PR: main passed the same shard on its last five commits, and the branch touches no e2e or app-template
   files. GitHub refused a job rerun while the run was in progress; this record push starts a fresh run on the new
   head instead.
+
+## S10 — rebase onto `9a31e87` and a flake-proof mode for the near-tied guidance row (2026-10-28)
+
+- Main moved `96d13d2` → `9a31e87` (#2458 bounds the Pages snippet checks; #2459 adds semantic colour and readable code
+  to the docs site). Only the two carriers conflicted, on six docs commits; each was regenerated. Outside
+  `*.generated.ts` the branch patch is byte-identical to `2af03b6`'s. Backup of the pre-rebase tip: local branch
+  `backup/divybot-752-pre-2459`.
+- MCP failed 198/199 on the same `guidance-evaluation.json` row as S8, now flipped back to main's order. Measured
+  scores: main 11.3535 / 11.2954, branch 11.5517 / 11.5187 (#2 − #3 = +0.03), with #1 about 12 points ahead. The row has
+  now flipped twice in three corpus changes, so the exact #2/#3 order is noise; S8's caveat predicted this.
+- Fix: a `rank-one-set` mode in `guidance-evaluation_test.ts` pins #1 and asserts the top three as a set. Row 7 (the
+  fixture's only score-only row, not one of RFC 0004's original five) moves to it, with main's expected order. The
+  fixture's diff against main is now that one mode line, and the S8 re-lock is gone.
+- Controls: a swapped leader fails; a wrong set member fails. The head corpus, the `2af03b6` corpus (swapped order),
+  and main's corpus all pass. RFC 0004's `exact`, `required-set`, and `rank-one` rows are unchanged.
+
+| Gate | Result |
+| --- | --- |
+| Carriers regenerated; `check:publish-assets` / `check:agent-docs-prose` / `check:assets-barrel` | no diff; PASS ×3 |
+| MCP `deno task test` | 198/199 before, 199/199 after |
+| CLI templates/app, public-command-tree, init-agent | 99 passed |
+| `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / docs `_plugins` | PASS ×4 / 7 passed |
+| `generate-publish-assets_test` + `carrier-parity_test` | 9 passed |
+| Probe strings in the MCP carrier | 0 |

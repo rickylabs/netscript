@@ -62,8 +62,7 @@ Collected during this run (theming/primitives/guidance side) and from sibling ha
   and cross-link the guide's brand presets to the design-system section's token-only themes.
 - **Guidance smoke fixture row with a coin-flip order.** In `guidance-evaluation.json`, #2 and #3 of "pick direct
   application ownership versus a reusable integration" differ by 0.01–0.03 BM25 points, so any corpus change can flip
-  them (S8 re-locked them). A mode that asserts rank-one plus the top-3 set would keep the useful check without the
-  flake.
+  them. S8 re-locked them, and they flipped back in S10, so S10 added the `rank-one-set` mode (resolved).
 
 ## Found in S9 (2026-10-28, tokens v2)
 
