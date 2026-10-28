@@ -226,8 +226,21 @@ function blockMd(node: ChildNode, origin: URL): string {
       return listMd(el, origin, true);
     case 'pre':
       return codeBlockMd(el);
+    case 'aside': {
+      // Preserve severity in twins when the visible label is an author's custom title.
+      const kind = el.getAttribute('data-variant');
+      const label = el.querySelector('.ns-callout__label');
+      const body = el.querySelector('.ns-callout__body');
+      if (el.classList.contains('ns-callout') && kind && label && body) {
+        return quoteMd(
+          `[!${kind.toUpperCase()}]\n${inlineChildren(label, origin).trim()}\n\n${
+            childBlocks(body, origin)
+          }`,
+        );
+      }
+      return quoteMd(childBlocks(el, origin));
+    }
     case 'blockquote':
-    case 'aside':
       return quoteMd(childBlocks(el, origin));
     case 'hr':
       return '---';

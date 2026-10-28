@@ -149,5 +149,15 @@
     "independentImplEval": "PASS, review only",
     "allFourCarriersRegeneratedInOrder": true,
     "docsLockMatchesMain": true
+  },
+  "calloutOwnerAddendum": {
+    "ownerComment": 6472644229,
+    "evidence": "callout-owner-evidence.json",
+    "implEval": "callout-owner-impl-eval.md",
+    "browserPassed": 116,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "changedCalloutCarrierPages": 107,
+    "mcpSourceBytes": 283750
   }
 }

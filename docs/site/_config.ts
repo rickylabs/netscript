@@ -238,6 +238,15 @@ site.addEventListener('afterRender', () => {
         `diagram-${identity}-${index}`,
       );
     }
+    // A custom label replaces the visible type, which remains in the accessible name.
+    for (const callout of document.querySelectorAll('.ns-callout')) {
+      const kind = callout.getAttribute('data-variant');
+      const type = kind ? kind[0].toUpperCase() + kind.slice(1) : undefined;
+      const label = callout.querySelector('.ns-callout__label')?.textContent?.trim();
+      if (type && label) {
+        callout.setAttribute('aria-label', label === type ? type : `${type}: ${label}`);
+      }
+    }
     // Keep package headings at display size, wrapping only at path boundaries.
     for (const code of document.querySelectorAll('.ns-prose :is(h1,h2,h3,h4,h5,h6) code')) {
       if (code.children.length || !code.textContent?.includes('/')) continue;

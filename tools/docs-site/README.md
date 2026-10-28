@@ -94,3 +94,5 @@ anchor fragments and all other assets remain byte-identical. Search behavior is 
 real browser Pagefind tests. The metadata issue remains #2453; token-source consolidation stays #2450.
 
 The public callout and code galleries live under `docs/site/design-system/docs-kit/`, linked from the Design system navigation and indexed in that search lane. API badge mappings follow the Utility spec in `docs/design-system/themes/studio/DESIGN.md`; `api-kinds_test.ts` fixes that contract independently of the browser paint checks.
+
+Callouts have one sentence-case type label (Note, Tip, Important, Warning, Caution) or an explicit custom title replacing it. The label uses Host Grotesk Medium at the callout body size; its tone also paints the icon. A line-height-sized icon box aligns with the first line, and the body shares the label's left edge. The accessible name retains the type and custom title. Markdown twins preserve a typed alert marker, label and body exactly once, including the legacy Error alias. Extend the default/custom gallery and its geometry/twin assertions together.

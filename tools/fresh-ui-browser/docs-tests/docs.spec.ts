@@ -754,6 +754,112 @@ test('callouts: semantic tone, default body and ink links', async ({ page }) => 
   }
 });
 
+test('callout labels: one body-sized label, first-line icon alignment and typed twins', async ({ page }) => {
+  await visit(page, 'design-system/docs-kit/callouts/');
+  const types: Record<string, string> = {
+    note: 'Note',
+    tip: 'Tip',
+    important: 'Important',
+    warning: 'Warning',
+    caution: 'Caution',
+    error: 'Error',
+  };
+  for (const label of Object.values(types)) {
+    const callout = page.getByRole('note', { name: label, exact: true });
+    await expect(callout).toHaveCount(1);
+    await expect(callout.locator('.ns-callout__label')).toHaveText(label);
+  }
+  await expect(page.locator('.ns-callout__head .ns-eyebrow, .ns-callout__title')).toHaveCount(0);
+  const callouts = await page.locator('.ns-callout').evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const label = node.querySelector('.ns-callout__label')!;
+      const icon = node.querySelector('.ns-callout__icon')!;
+      const body = node.querySelector('.ns-callout__body')!;
+      const glyph = icon.querySelector('svg')!;
+      const style = getComputedStyle(label);
+      const range = document.createRange();
+      range.selectNodeContents(label);
+      const lines = [...range.getClientRects()].filter((rect) => rect.width > 0);
+      const firstLine = lines[0];
+      const box = label.getBoundingClientRect(), iconBox = icon.getBoundingClientRect();
+      const glyphBox = glyph.getBoundingClientRect();
+      return {
+        kind: node.getAttribute('data-variant')!,
+        label: label.textContent!.trim(),
+        accessibleName: node.getAttribute('aria-label'),
+        headText: node.querySelector('.ns-callout__head')!.textContent!.trim(),
+        labelCount: node.querySelectorAll('.ns-callout__label').length,
+        bodyCount: node.querySelectorAll('.ns-callout__body').length,
+        family: style.fontFamily,
+        weight: style.fontWeight,
+        size: style.fontSize,
+        bodySize: getComputedStyle(body).fontSize,
+        lineHeight: Number.parseFloat(style.lineHeight),
+        transform: style.textTransform,
+        colour: style.color,
+        iconColour: getComputedStyle(icon).color,
+        iconWidth: iconBox.width,
+        iconHeight: iconBox.height,
+        glyphWidth: glyphBox.width,
+        glyphHeight: glyphBox.height,
+        iconCentre: iconBox.top + iconBox.height / 2,
+        glyphCentre: glyphBox.top + glyphBox.height / 2,
+        firstLineCentre: firstLine.top + firstLine.height / 2,
+        lineBoxCentre: box.top + Number.parseFloat(style.lineHeight) / 2,
+        labelLeft: box.left,
+        bodyLeft: body.getBoundingClientRect().left,
+        gap: box.left - iconBox.right,
+        lines: new Set(lines.map((line) => Math.round(line.top))).size,
+      };
+    })
+  );
+  expect(callouts).toHaveLength(12);
+  const twin = await readFile(resolve(SITE, 'design-system/docs-kit/callouts/index.md'), 'utf8');
+  expect(twin.match(/^> \[![A-Z]+\]$/gm)).toHaveLength(callouts.length);
+  const wrappedKinds = new Set<string>();
+  for (const callout of callouts) {
+    const type = types[callout.kind];
+    expect(callout.accessibleName).toBe(
+      callout.label === type ? type : `${type}: ${callout.label}`,
+    );
+    expect(callout.labelCount).toBe(1);
+    expect(callout.bodyCount).toBe(1);
+    expect(callout.headText).toBe(callout.label);
+    expect(callout.family).toContain('Host Grotesk');
+    expect(callout.weight).toBe('500');
+    expect(callout.size).toBe(callout.bodySize);
+    expect(callout.size).toBe('14px');
+    expect(callout.transform).toBe('none');
+    expect(callout.iconColour).toBe(callout.colour);
+    expect(callout.iconHeight).toBeCloseTo(callout.lineHeight, 2);
+    expect(callout.iconWidth).toBeCloseTo(callout.lineHeight, 2);
+    expect(callout.glyphWidth).toBe(18);
+    expect(callout.glyphHeight).toBe(18);
+    expect(Math.abs(callout.iconCentre - callout.firstLineCentre), callout.label)
+      .toBeLessThanOrEqual(1);
+    expect(Math.abs(callout.iconCentre - callout.lineBoxCentre), callout.label).toBeLessThanOrEqual(
+      1,
+    );
+    expect(callout.glyphCentre).toBeCloseTo(callout.iconCentre, 2);
+    expect(callout.bodyLeft).toBeCloseTo(callout.labelLeft, 2);
+    expect(callout.gap).toBeCloseTo(8, 2);
+    const header = `> [!${callout.kind.toUpperCase()}]\n> ${callout.label}\n`;
+    expect(twin.split(header).length - 1, header).toBe(1);
+    if (callout.label.length > 100) {
+      expect(callout.lines, callout.label).toBeGreaterThan(1);
+      wrappedKinds.add(callout.kind);
+      const block =
+        `${header}>\n> The icon stays beside the first line. The body starts on the same left edge as the label.`;
+      expect(twin.split(block).length - 1).toBe(1);
+    }
+  }
+  expect([...wrappedKinds].sort()).toEqual(['caution', 'important', 'note', 'tip', 'warning']);
+  for (const kind of Object.keys(types)) {
+    const markers = twin.split('\n').filter((line) => line === `> [!${kind.toUpperCase()}]`);
+    expect(markers).toHaveLength(callouts.filter((callout) => callout.kind === kind).length);
+  }
+});
+
 test('public galleries belong to Design system Docs kit in navigation, search and twins', async ({ page }) => {
   await visit(page, 'design-system/');
   await expect(page.locator('.ns-design__nav').getByRole('link', { name: 'Docs kit' }))
