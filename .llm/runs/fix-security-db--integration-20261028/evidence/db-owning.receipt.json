@@ -1,0 +1,45 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T04:35:31.899Z",
+  "finishedAt": "2026-10-28T04:35:32.937Z",
+  "durationMs": 1038,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 152,
+    "sha256": "25d5c1e5295807c7399a1f97b75b9efccb27e10132bfab72cf9350a23c92786f",
+    "tail": "{\"report\":\".llm/tmp/security-db-integration-20261028/db-owning.json\",\"summary\":{\"passed\":6,\"failed\":0,\"ignored\":0,\"totalResults\":6,\"uniqueFailures\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "gateId": "db-owning",
+  "gitHead": "c243d31535027addc034c99e170cb43d2faf475a",
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-test.ts",
+    "--output",
+    ".llm/tmp/security-db-integration-20261028/db-owning.json",
+    "--",
+    "--cached-only",
+    "--frozen",
+    "--check",
+    "--allow-all",
+    "--sanitize-ops",
+    "--sanitize-resources",
+    "--trace-leaks",
+    ".llm/tools/deps/check-db-alignment_test.ts"
+  ],
+  "timeoutMs": 120000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative",
+  "childReport": ".llm/tmp/security-db-integration-20261028/db-owning.json"
+}

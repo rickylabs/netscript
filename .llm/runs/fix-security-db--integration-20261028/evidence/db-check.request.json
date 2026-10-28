@@ -1,0 +1,23 @@
+{
+  "timeoutMs": 120000,
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-check.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment_test.ts",
+    "--deno-arg",
+    "--cached-only",
+    "--deno-arg",
+    "--frozen",
+    "--output",
+    ".llm/tmp/security-db-integration-20261028/db-check.json"
+  ],
+  "childReport": ".llm/tmp/security-db-integration-20261028/db-check.json"
+}
