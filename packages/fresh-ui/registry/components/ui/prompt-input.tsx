@@ -149,6 +149,8 @@ export function PromptInput(
     <form
       {...props}
       class={cn('ns-prompt-input', className)}
+      data-part='root'
+      data-scope='prompt-input'
       data-compact={compact ? '' : undefined}
       onSubmit={handleSubmit}
     >
@@ -156,6 +158,8 @@ export function PromptInput(
         name='prompt'
         rows={1}
         class='ns-prompt-input__field'
+        data-part='field'
+        data-scope='prompt-input'
         placeholder={placeholder}
         aria-keyshortcuts={submitKey === 'enter'
           ? 'Enter'
@@ -165,12 +169,19 @@ export function PromptInput(
         disabled={busy}
         onKeyDown={handleKeyDown}
       />
-      <div class='ns-prompt-input__bar'>
-        <div class='ns-prompt-input__tools'>
+      <div class='ns-prompt-input__bar' data-part='bar' data-scope='prompt-input'>
+        <div class='ns-prompt-input__tools' data-part='tools' data-scope='prompt-input'>
           {leadingActions}
           {onAttach
             ? (
-              <button type='button' class='ns-iconbtn' aria-label='Attach file' onClick={onAttach}>
+              <button
+                type='button'
+                class='ns-iconbtn'
+                data-part='root'
+                data-scope='iconbtn'
+                aria-label='Attach file'
+                onClick={onAttach}
+              >
                 <IconGlyph d={ICON_ATTACH} />
               </button>
             )
@@ -180,6 +191,8 @@ export function PromptInput(
               <button
                 type='button'
                 class='ns-pill'
+                data-part='root'
+                data-scope='pill'
                 aria-pressed={research ? 'true' : 'false'}
                 onClick={() => onResearchChange?.(!research)}
               >
@@ -192,6 +205,8 @@ export function PromptInput(
               <button
                 type='button'
                 class='ns-pill'
+                data-part='root'
+                data-scope='pill'
                 aria-pressed={grounding ? 'true' : 'false'}
                 onClick={() => onGroundingChange?.(!grounding)}
               >
@@ -203,12 +218,14 @@ export function PromptInput(
             ? <ModelSelector value={model} models={models} onChange={onModelChange} align='left' />
             : null}
         </div>
-        <div class='ns-prompt-input__actions'>
+        <div class='ns-prompt-input__actions' data-part='actions' data-scope='prompt-input'>
           {onScreenshot
             ? (
               <button
                 type='button'
                 class='ns-iconbtn'
+                data-part='root'
+                data-scope='iconbtn'
                 aria-label='Capture screenshot'
                 onClick={onScreenshot}
               >
@@ -218,7 +235,14 @@ export function PromptInput(
             : null}
           {onVoice
             ? (
-              <button type='button' class='ns-iconbtn' aria-label='Voice input' onClick={onVoice}>
+              <button
+                type='button'
+                class='ns-iconbtn'
+                data-part='root'
+                data-scope='iconbtn'
+                aria-label='Voice input'
+                onClick={onVoice}
+              >
                 <IconGlyph d={ICON_MIC} />
               </button>
             )
@@ -229,6 +253,8 @@ export function PromptInput(
               <button
                 type='button'
                 class='ns-prompt-input__send'
+                data-part='send'
+                data-scope='prompt-input'
                 aria-label='Stop generating'
                 onClick={onStop}
               >
@@ -239,6 +265,8 @@ export function PromptInput(
               <button
                 type='submit'
                 class='ns-prompt-input__send'
+                data-part='send'
+                data-scope='prompt-input'
                 aria-label='Send'
                 disabled={busy || sendDisabled}
               >
@@ -247,7 +275,13 @@ export function PromptInput(
             )}
         </div>
       </div>
-      {hint ? <div class='ns-prompt-input__hint'>{hint}</div> : null}
+      {hint
+        ? (
+          <div class='ns-prompt-input__hint' data-part='hint' data-scope='prompt-input'>
+            {hint}
+          </div>
+        )
+        : null}
     </form>
   );
 }

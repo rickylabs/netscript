@@ -53,28 +53,48 @@ export function ToolCallCard(
       {...props}
       open={defaultOpen}
       class={cn('ns-tool-call', className)}
+      data-part='root'
+      data-scope='tool-call'
       data-status={status}
     >
       <summary>
-        <span class='ns-tool-call__icon' aria-hidden='true'>ƒ</span>
-        <span class='ns-tool-call__name'>{name}</span>
+        <span
+          class='ns-tool-call__icon'
+          data-part='icon'
+          data-scope='tool-call'
+          aria-hidden='true'
+        >
+          ƒ
+        </span>
+        <span class='ns-tool-call__name' data-part='name' data-scope='tool-call'>{name}</span>
         {status === 'running' ? <Spinner size='sm' /> : null}
         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
-        <span class='ns-tool-call__chevron' aria-hidden='true'>▾</span>
+        <span
+          class='ns-tool-call__chevron'
+          data-part='chevron'
+          data-scope='tool-call'
+          aria-hidden='true'
+        >
+          ▾
+        </span>
       </summary>
-      <div class='ns-tool-call__panel'>
+      <div class='ns-tool-call__panel' data-part='panel' data-scope='tool-call'>
         {args
           ? (
-            <div class='ns-tool-call__io'>
-              <span class='ns-tool-call__io-label'>args</span>
+            <div class='ns-tool-call__io' data-part='io' data-scope='tool-call'>
+              <span class='ns-tool-call__io-label' data-part='io-label' data-scope='tool-call'>
+                args
+              </span>
               <pre>{args}</pre>
             </div>
           )
           : null}
         {result
           ? (
-            <div class='ns-tool-call__io'>
-              <span class='ns-tool-call__io-label'>result</span>
+            <div class='ns-tool-call__io' data-part='io' data-scope='tool-call'>
+              <span class='ns-tool-call__io-label' data-part='io-label' data-scope='tool-call'>
+                result
+              </span>
               <pre>{result}</pre>
             </div>
           )

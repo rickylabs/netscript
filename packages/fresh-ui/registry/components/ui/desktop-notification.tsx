@@ -46,26 +46,33 @@ export function DesktopNotification({
     <section
       aria-label='Desktop notification preview'
       class={classes('ns-desktop-notification', className)}
-      data-part='desktop-notification'
+      data-scope='desktop-notification'
+      data-part='root'
       data-state={disabled ? 'disabled' : 'ready'}
     >
       {notification.icon === undefined ? null : (
         <img
           alt=''
           class='ns-desktop-notification__icon'
+          data-scope='desktop-notification'
           data-part='icon'
           height='40'
           src={notification.icon}
           width='40'
         />
       )}
-      <div class='ns-desktop-notification__copy' data-part='copy'>
+      <div
+        class='ns-desktop-notification__copy'
+        data-scope='desktop-notification'
+        data-part='copy'
+      >
         <strong>{notification.title}</strong>
         {notification.body === undefined ? null : <span>{notification.body}</span>}
       </div>
       <button
         type='button'
         class='ns-desktop-notification__action'
+        data-scope='desktop-notification'
         data-part='action'
         disabled={disabled}
         onClick={() => onRequest?.(notification)}

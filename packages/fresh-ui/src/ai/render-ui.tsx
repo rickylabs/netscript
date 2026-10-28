@@ -203,7 +203,7 @@ function renderLayoutBlock(
   const children = renderChildren(props, depth, context);
   if (type === 'grid') {
     return (
-      <div class='ns-grid ns-render-ui ns-render-ui--layout' data-render-ui-type='grid'>
+      <div class='ns-grid ns-render-ui' data-variant='layout' data-render-ui-type='grid'>
         {title ? <h3 class='ns-render-ui__title'>{title}</h3> : null}
         {children}
       </div>
@@ -212,7 +212,8 @@ function renderLayoutBlock(
   if (type === 'section') {
     return (
       <section
-        class='ns-section ns-stack ns-render-ui ns-render-ui--layout'
+        class='ns-section ns-stack ns-render-ui'
+        data-variant='layout'
         data-render-ui-type='section'
       >
         {title ? <h2 class='ns-render-ui__title'>{title}</h2> : null}
@@ -221,7 +222,7 @@ function renderLayoutBlock(
     );
   }
   return (
-    <div class='ns-stack ns-render-ui ns-render-ui--layout' data-render-ui-type='stack'>
+    <div class='ns-stack ns-render-ui' data-variant='layout' data-render-ui-type='stack'>
       {title ? <h3 class='ns-render-ui__title'>{title}</h3> : null}
       {children}
     </div>
@@ -239,7 +240,7 @@ function renderVizBlock(
       .filter(isChartDatum);
     const max = Math.max(1, ...rows.map((row) => row.value));
     return (
-      <div class='ns-chart ns-render-ui ns-render-ui--viz' data-render-ui-type='chart'>
+      <div class='ns-chart ns-render-ui' data-variant='viz' data-render-ui-type='chart'>
         {title ? <div class='ns-chart__title'>{title}</div> : null}
         {rows.map((row) => (
           <div class='ns-chart__row'>
@@ -256,10 +257,11 @@ function renderVizBlock(
 
   return (
     <article
-      class='ns-card ns-stats-grid__card ns-render-ui ns-render-ui--viz'
+      class='ns-card ns-stats-grid__card ns-render-ui'
+      data-variant='viz'
       data-render-ui-type='metric'
     >
-      <div class='ns-card__body ns-stack ns-stack--sm ns-stats-grid__body'>
+      <div class='ns-card__body ns-stack ns-stats-grid__body' data-gap='sm'>
         <div class='ns-stats-grid__header'>
           <span class='ns-stats-grid__label'>
             {readString(props, 'label') ?? title ?? 'Metric'}
@@ -284,7 +286,7 @@ function renderDataBlock(
   if (type === 'table') return renderTableBlock(props, title);
   if (type === 'list') {
     return (
-      <ul class='ns-render-ui ns-render-ui--data ns-render-ui__list' data-render-ui-type='list'>
+      <ul class='ns-render-ui ns-render-ui__list' data-variant='data' data-render-ui-type='list'>
         {title ? <li class='ns-render-ui__title'>{title}</li> : null}
         {readArray(props, 'items').map((item) => (
           <li class='ns-render-ui__list-item'>{renderNode(item, depth + 1, context)}</li>
@@ -293,7 +295,7 @@ function renderDataBlock(
     );
   }
   return (
-    <article class='ns-card ns-render-ui ns-render-ui--data' data-render-ui-type='card'>
+    <article class='ns-card ns-render-ui' data-variant='data' data-render-ui-type='card'>
       {title
         ? (
           <div class='ns-card__header'>
@@ -314,12 +316,12 @@ function renderTableBlock(
   const rows = readArray(props, 'rows').filter(isRecord);
 
   return (
-    <div class='ns-data-table ns-render-ui ns-render-ui--data' data-render-ui-type='table'>
+    <div class='ns-data-table ns-render-ui' data-variant='data' data-render-ui-type='table'>
       {title ? <div class='ns-data-table__header'>{title}</div> : null}
       <div class='ns-data-table__body'>
         {columns.length > 0
           ? (
-            <div class='ns-data-table__row ns-data-table__row--header'>
+            <div class='ns-data-table__row' data-type='header'>
               {columns.map((column) => <span key={column.key}>{column.header}</span>)}
             </div>
           )

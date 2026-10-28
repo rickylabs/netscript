@@ -32,11 +32,21 @@ export function Search(
       {...props}
       type='button'
       class={cn('ns-search', className)}
+      data-part='root'
+      data-scope='search'
       onClick={() => onOpen?.()}
     >
-      <span class='ns-search__icon' aria-hidden='true'>⌕</span>
-      <span class='ns-search__label'>{placeholder}</span>
-      {shortcut ? <kbd class='ns-kbd ns-search__kbd'>{shortcut}</kbd> : null}
+      <span class='ns-search__icon' data-part='icon' data-scope='search' aria-hidden='true'>
+        ⌕
+      </span>
+      <span class='ns-search__label' data-part='label' data-scope='search'>{placeholder}</span>
+      {shortcut
+        ? (
+          <kbd class='ns-kbd ns-search__kbd' data-part='kbd' data-scope='search'>
+            {shortcut}
+          </kbd>
+        )
+        : null}
     </button>
   );
 }

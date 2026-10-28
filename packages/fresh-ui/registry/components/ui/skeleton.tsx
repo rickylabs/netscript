@@ -21,9 +21,20 @@ function clamp(value: number, fallback: number): number {
 }
 
 function SkeletonBlock(
-  { class: className, style }: { class?: string; style?: JSX.CSSProperties },
+  { class: className, style, ...props }: Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class'> & {
+    class?: string;
+  },
 ): VNode {
-  return <span aria-hidden='true' class={cn('ns-skeleton__block', className)} style={style} />;
+  return (
+    <span
+      {...props}
+      aria-hidden='true'
+      class={cn('ns-skeleton__block', className)}
+      data-part='block'
+      data-scope='skeleton'
+      style={style}
+    />
+  );
 }
 
 /**
@@ -41,21 +52,41 @@ export function Skeleton(
       <div
         {...props}
         aria-hidden='true'
-        class={cn('ns-skeleton ns-skeleton--stats ns-grid', className)}
+        class={cn('ns-skeleton ns-grid', className)}
+        data-variant='stats'
+        data-part='root'
+        data-scope='skeleton'
       >
         {Array.from(
           { length: resolvedCards },
           (_, index) => (
-            <div key={`stats-${index}`} class='ns-skeleton__card'>
+            <div
+              key={`stats-${index}`}
+              class='ns-skeleton__card'
+              data-part='card'
+              data-scope='skeleton'
+            >
               <SkeletonBlock
-                class='ns-skeleton__line--xs'
+                class=''
+                data-size='xs'
+                data-part='line'
+                data-scope='skeleton'
                 style={{ width: `${38 + ((index % 3) * 8)}%` }}
               />
               <SkeletonBlock
-                class='ns-skeleton__line--lg'
+                class=''
+                data-size='lg'
+                data-part='line'
+                data-scope='skeleton'
                 style={{ width: `${58 + ((index % 2) * 14)}%` }}
               />
-              <SkeletonBlock class='ns-skeleton__line--xs' style={{ width: '30%' }} />
+              <SkeletonBlock
+                class=''
+                data-size='xs'
+                data-part='line'
+                data-scope='skeleton'
+                style={{ width: '30%' }}
+              />
             </div>
           ),
         )}
@@ -68,19 +99,50 @@ export function Skeleton(
       <div
         {...props}
         aria-hidden='true'
-        class={cn('ns-skeleton ns-skeleton--detail ns-stack ns-stack--lg', className)}
+        class={cn('ns-skeleton ns-stack', className)}
+        data-variant='detail'
+        data-gap='lg'
+        data-part='root'
+        data-scope='skeleton'
       >
         {Array.from(
           { length: resolvedRows },
           (_, index) => (
-            <div key={`detail-${index}`} class='ns-stack ns-stack--sm'>
+            <div
+              key={`detail-${index}`}
+              class='ns-stack'
+              data-gap='sm'
+              data-part='root'
+              data-scope='stack'
+            >
               <SkeletonBlock
-                class='ns-skeleton__line--md'
+                class=''
+                data-size='md'
+                data-part='line'
+                data-scope='skeleton'
                 style={{ width: index === 0 ? '32%' : '24%' }}
               />
-              <SkeletonBlock class='ns-skeleton__line--sm' style={{ width: '100%' }} />
-              <SkeletonBlock class='ns-skeleton__line--sm' style={{ width: '86%' }} />
-              <SkeletonBlock class='ns-skeleton__line--sm' style={{ width: '64%' }} />
+              <SkeletonBlock
+                class=''
+                data-size='sm'
+                data-part='line'
+                data-scope='skeleton'
+                style={{ width: '100%' }}
+              />
+              <SkeletonBlock
+                class=''
+                data-size='sm'
+                data-part='line'
+                data-scope='skeleton'
+                style={{ width: '86%' }}
+              />
+              <SkeletonBlock
+                class=''
+                data-size='sm'
+                data-part='line'
+                data-scope='skeleton'
+                style={{ width: '64%' }}
+              />
             </div>
           ),
         )}
@@ -93,27 +155,51 @@ export function Skeleton(
       <div
         {...props}
         aria-hidden='true'
-        class={cn('ns-skeleton ns-skeleton--form ns-stack ns-stack--md', className)}
+        class={cn('ns-skeleton ns-stack', className)}
+        data-variant='form'
+        data-gap='md'
+        data-part='root'
+        data-scope='skeleton'
       >
         {Array.from(
           { length: resolvedRows },
           (_, index) => (
-            <div key={`form-${index}`} class='ns-stack ns-stack--sm'>
+            <div
+              key={`form-${index}`}
+              class='ns-stack'
+              data-gap='sm'
+              data-part='root'
+              data-scope='stack'
+            >
               <SkeletonBlock
-                class='ns-skeleton__line--xs'
+                class=''
+                data-size='xs'
+                data-part='line'
+                data-scope='skeleton'
                 style={{ width: `${30 + ((index % 3) * 12)}%` }}
               />
-              <SkeletonBlock class='ns-skeleton__box ns-skeleton__box--input' />
+              <SkeletonBlock
+                class='ns-skeleton__box'
+                data-shape='input'
+                data-part='box'
+                data-scope='skeleton'
+              />
             </div>
           ),
         )}
-        <div class='ns-cluster'>
+        <div class='ns-cluster' data-part='root' data-scope='cluster'>
           <SkeletonBlock
-            class='ns-skeleton__box ns-skeleton__box--input'
+            class='ns-skeleton__box'
+            data-shape='input'
+            data-part='box'
+            data-scope='skeleton'
             style={{ width: '7rem' }}
           />
           <SkeletonBlock
-            class='ns-skeleton__box ns-skeleton__box--input'
+            class='ns-skeleton__box'
+            data-shape='input'
+            data-part='box'
+            data-scope='skeleton'
             style={{ width: '5.5rem' }}
           />
         </div>
@@ -127,10 +213,16 @@ export function Skeleton(
     <div
       {...props}
       aria-hidden='true'
-      class={cn('ns-skeleton ns-skeleton--table', className)}
+      class={cn('ns-skeleton', className)}
+      data-variant='table'
+      data-part='root'
+      data-scope='skeleton'
     >
       <div
-        class='ns-skeleton__table-row ns-skeleton__table-row--head'
+        class='ns-skeleton__table-row'
+        data-type='header'
+        data-part='table-row'
+        data-scope='skeleton'
         style={{ gridTemplateColumns: tableColumns }}
       >
         {Array.from(
@@ -138,7 +230,10 @@ export function Skeleton(
           (_, index) => (
             <SkeletonBlock
               key={`table-head-${index}`}
-              class='ns-skeleton__line--xs'
+              class=''
+              data-size='xs'
+              data-part='line'
+              data-scope='skeleton'
               style={{ width: `${44 + ((index % 3) * 12)}%` }}
             />
           ),
@@ -148,12 +243,17 @@ export function Skeleton(
         <div
           key={`table-row-${rowIndex}`}
           class='ns-skeleton__table-row'
+          data-part='table-row'
+          data-scope='skeleton'
           style={{ gridTemplateColumns: tableColumns }}
         >
           {Array.from({ length: resolvedColumns }, (_, columnIndex) => (
             <SkeletonBlock
               key={`table-cell-${rowIndex}-${columnIndex}`}
-              class='ns-skeleton__line--sm'
+              class=''
+              data-size='sm'
+              data-part='line'
+              data-scope='skeleton'
               style={{ width: `${58 + (((rowIndex * 2 + columnIndex) % 4) * 9)}%` }}
             />
           ))}

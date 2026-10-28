@@ -155,6 +155,8 @@ export default function McpUiWidget(props: McpUiWidgetProps): VNode {
   const frame = h('iframe', {
     key: props.theme,
     class: 'ns-mcp-ui-widget__frame',
+    'data-part': 'frame',
+    'data-scope': 'mcp-ui-widget',
     src: attributes.src,
     title: attributes.title,
     sandbox: attributes.sandbox,
@@ -162,5 +164,5 @@ export default function McpUiWidget(props: McpUiWidgetProps): VNode {
     referrerpolicy: attributes.referrerpolicy,
   });
 
-  return <div class='ns-mcp-ui-widget'>{frame}</div>;
+  return <div class='ns-mcp-ui-widget' data-part='root' data-scope='mcp-ui-widget'>{frame}</div>;
 }

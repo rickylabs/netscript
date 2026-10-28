@@ -60,6 +60,7 @@ function renderItems(
             key={`separator-${index}`}
             aria-hidden='true'
             class='ns-desktop-tray-menu__separator'
+            data-scope='tray-menu'
             data-part='separator'
             role='separator'
           />
@@ -67,14 +68,31 @@ function renderItems(
       case 'role':
         return (
           <li key={`role-${item.role}-${index}`} data-part='role-item'>
-            <span class='ns-desktop-tray-menu__role'>{item.role}</span>
+            <span
+              class='ns-desktop-tray-menu__role'
+              data-part='role'
+              data-scope='tray-menu'
+            >
+              {item.role}
+            </span>
           </li>
         );
       case 'submenu':
         return (
           <li key={`${item.label}-${index}`} data-part='submenu'>
-            <span class='ns-desktop-tray-menu__label'>{item.label}</span>
-            <ul class='ns-desktop-tray-menu__items' role='menu'>
+            <span
+              class='ns-desktop-tray-menu__label'
+              data-part='label'
+              data-scope='tray-menu'
+            >
+              {item.label}
+            </span>
+            <ul
+              class='ns-desktop-tray-menu__items'
+              data-part='items'
+              data-scope='tray-menu'
+              role='menu'
+            >
               {renderItems(item.items, onAction, disabled)}
             </ul>
           </li>
@@ -85,6 +103,7 @@ function renderItems(
             <button
               type='button'
               class='ns-desktop-tray-menu__action'
+              data-scope='tray-menu'
               data-action-id={item.id}
               data-part='action'
               data-state={disabled || item.enabled === false ? 'disabled' : 'enabled'}
@@ -93,9 +112,15 @@ function renderItems(
               role='menuitem'
             >
               <span>{item.label}</span>
-              {item.accelerator === undefined
-                ? null
-                : <kbd class='ns-desktop-tray-menu__accelerator'>{item.accelerator}</kbd>}
+              {item.accelerator === undefined ? null : (
+                <kbd
+                  class='ns-desktop-tray-menu__accelerator'
+                  data-part='accelerator'
+                  data-scope='tray-menu'
+                >
+                  {item.accelerator}
+                </kbd>
+              )}
             </button>
           </li>
         );
@@ -115,14 +140,24 @@ export function DesktopTrayMenu({
     <nav
       aria-label={source === 'tray' ? 'Tray menu' : 'Application menu'}
       class={classes('ns-desktop-tray-menu', className)}
-      data-part='desktop-menu'
+      data-scope='tray-menu'
+      data-part='root'
       data-source={source}
       data-state={disabled ? 'disabled' : 'active'}
     >
-      <span class='ns-desktop-tray-menu__source' data-part='source'>
+      <span
+        class='ns-desktop-tray-menu__source'
+        data-scope='tray-menu'
+        data-part='source'
+      >
         {source === 'tray' ? 'Tray' : 'Application'}
       </span>
-      <ul class='ns-desktop-tray-menu__items' data-part='items' role='menu'>
+      <ul
+        class='ns-desktop-tray-menu__items'
+        data-scope='tray-menu'
+        data-part='items'
+        role='menu'
+      >
         {renderItems(items, onAction, disabled)}
       </ul>
     </nav>

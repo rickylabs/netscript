@@ -40,14 +40,38 @@ export function InlineNotice(
     <div
       {...props}
       role={role}
-      class={cn('ns-inline-notice', `ns-inline-notice--${variant}`, className)}
+      class={cn('ns-inline-notice', className)}
+      data-variant={variant}
+      data-part='root'
+      data-scope='inline-notice'
     >
-      <span aria-hidden='true' class='ns-inline-notice__icon'>
+      <span
+        aria-hidden='true'
+        class='ns-inline-notice__icon'
+        data-part='icon'
+        data-scope='inline-notice'
+      >
         {icon ?? DEFAULT_ICONS[variant]}
       </span>
-      <div class='ns-inline-notice__body'>
-        {title ? <div class='ns-inline-notice__title'>{title}</div> : null}
-        {children ? <div class='ns-inline-notice__description'>{children}</div> : null}
+      <div class='ns-inline-notice__body' data-part='body' data-scope='inline-notice'>
+        {title
+          ? (
+            <div class='ns-inline-notice__title' data-part='title' data-scope='inline-notice'>
+              {title}
+            </div>
+          )
+          : null}
+        {children
+          ? (
+            <div
+              class='ns-inline-notice__description'
+              data-part='description'
+              data-scope='inline-notice'
+            >
+              {children}
+            </div>
+          )
+          : null}
       </div>
     </div>
   );

@@ -43,8 +43,8 @@ export default function SidebarToggle({
       if (event.key === 'Escape') close();
     };
 
-    sidebar?.classList.toggle('is-open', open);
-    backdrop?.classList.toggle('is-visible', open);
+    sidebar?.setAttribute('data-state', open ? 'open' : 'rest');
+    backdrop?.setAttribute('data-state', open ? 'open' : 'rest');
 
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -69,10 +69,13 @@ export default function SidebarToggle({
     <button
       {...props}
       type='button'
-      class={cn(
-        'ns-dashboard__mobile-trigger ns-btn ns-btn--ghost ns-btn--icon ns-btn--sm',
-        className,
-      )}
+      class={cn('ns-dashboard__mobile-trigger ns-btn', className)}
+      data-variant='ghost'
+      data-size='sm'
+      data-icon='true'
+      data-part='root'
+      data-scope='sidebar-toggle'
+      data-state='rest'
       aria-label={open ? closeLabel : openLabel}
       aria-expanded={open}
       onClick={toggle}

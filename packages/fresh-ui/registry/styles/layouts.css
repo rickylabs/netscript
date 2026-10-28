@@ -15,11 +15,13 @@
   margin-inline: auto;
 }
 
-.ns-shell--wide {
+.ns-shell--wide,
+:where(.ns-shell)[data-width='wide'] {
   --ns-shell-max: 1280px;
 }
 
-.ns-shell--narrow {
+.ns-shell--narrow,
+:where(.ns-shell)[data-width='narrow'] {
   --ns-shell-max: 720px;
 }
 
@@ -29,27 +31,33 @@
   gap: var(--ns-stack-gap, var(--ns-space-4));
 }
 
-.ns-stack--xs {
+.ns-stack--xs,
+:where(.ns-stack)[data-gap='xs'] {
   --ns-stack-gap: var(--ns-space-1);
 }
 
-.ns-stack--sm {
+.ns-stack--sm,
+:where(.ns-stack)[data-gap='sm'] {
   --ns-stack-gap: var(--ns-space-2);
 }
 
-.ns-stack--md {
+.ns-stack--md,
+:where(.ns-stack)[data-gap='md'] {
   --ns-stack-gap: var(--ns-space-4);
 }
 
-.ns-stack--lg {
+.ns-stack--lg,
+:where(.ns-stack)[data-gap='lg'] {
   --ns-stack-gap: var(--ns-space-6);
 }
 
-.ns-stack--xl {
+.ns-stack--xl,
+:where(.ns-stack)[data-gap='xl'] {
   --ns-stack-gap: var(--ns-space-8);
 }
 
-.ns-stack--2xl {
+.ns-stack--2xl,
+:where(.ns-stack)[data-gap='2xl'] {
   --ns-stack-gap: var(--ns-space-12);
 }
 
@@ -60,31 +68,38 @@
   gap: var(--ns-cluster-gap, var(--ns-space-3));
 }
 
-.ns-cluster--xs {
+.ns-cluster--xs,
+:where(.ns-cluster)[data-gap='xs'] {
   --ns-cluster-gap: var(--ns-space-1);
 }
 
-.ns-cluster--sm {
+.ns-cluster--sm,
+:where(.ns-cluster)[data-gap='sm'] {
   --ns-cluster-gap: var(--ns-space-2);
 }
 
-.ns-cluster--md {
+.ns-cluster--md,
+:where(.ns-cluster)[data-gap='md'] {
   --ns-cluster-gap: var(--ns-space-4);
 }
 
-.ns-cluster--lg {
+.ns-cluster--lg,
+:where(.ns-cluster)[data-gap='lg'] {
   --ns-cluster-gap: var(--ns-space-6);
 }
 
-.ns-cluster--between {
+.ns-cluster--between,
+:where(.ns-cluster)[data-align='between'] {
   justify-content: space-between;
 }
 
-.ns-cluster--end {
+.ns-cluster--end,
+:where(.ns-cluster)[data-align='end'] {
   justify-content: flex-end;
 }
 
-.ns-cluster--start {
+.ns-cluster--start,
+:where(.ns-cluster)[data-align='start'] {
   align-items: flex-start;
 }
 
@@ -145,12 +160,14 @@
   padding-block: var(--ns-section-block, var(--ns-space-6));
 }
 
-.ns-section--sm {
+.ns-section--sm,
+:where(.ns-section)[data-size='sm'] {
   --ns-section-block: var(--ns-space-4);
   --ns-section-gap: var(--ns-space-3);
 }
 
-.ns-section--lg {
+.ns-section--lg,
+:where(.ns-section)[data-size='lg'] {
   --ns-section-block: var(--ns-space-8);
   --ns-section-gap: var(--ns-space-5);
 }
@@ -168,32 +185,40 @@
   overscroll-behavior: contain;
 }
 
-.ns-scroll-region--x {
+.ns-scroll-region--x,
+:where(.ns-scroll-region)[data-variant='x'] {
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-.ns-scroll-region--y {
+.ns-scroll-region--y,
+:where(.ns-scroll-region)[data-variant='y'] {
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.ns-grid--2 {
+.ns-grid--2,
+:where(.ns-grid)[data-variant='2'] {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.ns-grid--3 {
+.ns-grid--3,
+:where(.ns-grid)[data-variant='3'] {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.ns-grid--4 {
+.ns-grid--4,
+:where(.ns-grid)[data-variant='4'] {
   grid-template-columns: repeat(4, 1fr);
 }
 
 @media (max-width: 680px) {
   .ns-grid--2,
+:where(.ns-grid)[data-variant='2'],
   .ns-grid--3,
+:where(.ns-grid)[data-variant='3'],
   .ns-grid--4,
+:where(.ns-grid)[data-variant='4'],
   .ns-split {
     grid-template-columns: 1fr;
   }
@@ -201,7 +226,9 @@
 
 @media (min-width: 681px) and (max-width: 900px) {
   .ns-grid--3,
-  .ns-grid--4 {
+:where(.ns-grid)[data-variant='3'],
+  .ns-grid--4,
+:where(.ns-grid)[data-variant='4'] {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -465,7 +492,7 @@
 }
 
 .ns-dashboard__nav-item[aria-current='page'],
-.ns-dashboard__nav-item.is-active {
+.ns-dashboard__nav-item[data-state='selected'] {
   color: var(--ns-fg);
   font-weight: 600;
 }
@@ -630,7 +657,7 @@
     transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .ns-dashboard__sidebar.is-open {
+  .ns-dashboard__sidebar[data-state='open'] {
     transform: translateX(0);
   }
 
@@ -643,7 +670,7 @@
     transition: opacity 200ms ease;
   }
 
-  .ns-dashboard__sidebar-backdrop.is-visible {
+  .ns-dashboard__sidebar-backdrop[data-state='open'] {
     display: block;
     opacity: 1;
     pointer-events: auto;

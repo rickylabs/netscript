@@ -66,7 +66,7 @@ The runtime helpers work anywhere Preact renders:
 import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 
 // Merge class names safely (clsx + tailwind-merge semantics).
-const buttonClass = cn('ns-button', 'ns-button--primary');
+const buttonClass = cn('ns-btn', 'app-action');
 
 // Carry a redirect-flash toast across a server redirect.
 const redirectTo = withToast('/dashboard/deployments', {

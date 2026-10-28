@@ -151,13 +151,18 @@ export default function Toast(
       class={`ns-toast-wrapper ${exiting ? 'ns-toast-exit' : 'ns-toast-enter'}`}
     >
       <div
-        class={`ns-toast ns-toast--${type}`}
+        class='ns-toast'
+        data-type={type}
+        data-part='root'
+        data-scope='toast'
         onMouseEnter={pauseDismiss}
         onMouseLeave={resumeDismiss}
       >
-        <div class='ns-toast__progress-track'>
+        <div class='ns-toast__progress-track' data-part='progress-track' data-scope='toast'>
           <div
             class='ns-toast__progress-bar'
+            data-part='progress-bar'
+            data-scope='toast'
             style={{
               animation: `ns-toast-progress ${duration}ms linear forwards`,
               animationPlayState: paused ? 'paused' : 'running',
@@ -165,13 +170,19 @@ export default function Toast(
           />
         </div>
 
-        <div class='ns-toast__panel'>
-          <div class='ns-toast__header'>
-            <div class='ns-toast__title-row'>
-              <div class='ns-toast__symbol'>{TOAST_SYMBOLS[type]}</div>
-              <div class='ns-toast__title-group'>
-                <p class='ns-toast__eyebrow'>{TOAST_LABELS[type]}</p>
-                <p class='ns-toast__title'>{title ?? TOAST_LABELS[type]}</p>
+        <div class='ns-toast__panel' data-part='panel' data-scope='toast'>
+          <div class='ns-toast__header' data-part='header' data-scope='toast'>
+            <div class='ns-toast__title-row' data-part='title-row' data-scope='toast'>
+              <div class='ns-toast__symbol' data-part='symbol' data-scope='toast'>
+                {TOAST_SYMBOLS[type]}
+              </div>
+              <div class='ns-toast__title-group' data-part='title-group' data-scope='toast'>
+                <p class='ns-toast__eyebrow' data-part='eyebrow' data-scope='toast'>
+                  {TOAST_LABELS[type]}
+                </p>
+                <p class='ns-toast__title' data-part='title' data-scope='toast'>
+                  {title ?? TOAST_LABELS[type]}
+                </p>
               </div>
             </div>
 
@@ -179,13 +190,15 @@ export default function Toast(
               type='button'
               aria-label='Dismiss notification'
               class='ns-toast__dismiss'
+              data-part='dismiss'
+              data-scope='toast'
               onClick={dismiss}
             >
               ×
             </button>
           </div>
 
-          <p class='ns-toast__message'>{message}</p>
+          <p class='ns-toast__message' data-part='message' data-scope='toast'>{message}</p>
         </div>
       </div>
     </div>

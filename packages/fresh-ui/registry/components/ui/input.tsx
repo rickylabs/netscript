@@ -25,7 +25,12 @@ export function Input(
     <input
       {...props}
       type={type}
-      class={cn('ns-input', error && 'ns-input--error', className)}
+      class={cn('ns-input', className)}
+      data-invalid={error ? 'true' : undefined}
+      data-state={error ? 'invalid' : props.disabled ? 'disabled' : 'rest'}
+      data-part='root'
+      data-scope='input'
+      data-size='md'
     />
   );
 }

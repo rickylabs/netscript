@@ -40,13 +40,28 @@ export function DesktopUpdatePrompt({
         <aside
           aria-live='polite'
           class={classes('ns-desktop-update-prompt', className)}
-          data-part='update-prompt'
+          data-scope='update-prompt'
+          data-part='root'
           data-state='automatic'
           role='status'
         >
-          <div class='ns-desktop-update-prompt__copy' data-part='copy'>
-            <strong class='ns-desktop-update-prompt__title'>Update ready — restart to apply</strong>
-            <span class='ns-desktop-update-prompt__description'>
+          <div
+            class='ns-desktop-update-prompt__copy'
+            data-scope='update-prompt'
+            data-part='copy'
+          >
+            <strong
+              class='ns-desktop-update-prompt__title'
+              data-part='title'
+              data-scope='update-prompt'
+            >
+              Update ready — restart to apply
+            </strong>
+            <span
+              class='ns-desktop-update-prompt__description'
+              data-part='description'
+              data-scope='update-prompt'
+            >
               Version {event.version} has been verified and staged.
             </span>
           </div>
@@ -54,6 +69,7 @@ export function DesktopUpdatePrompt({
             <button
               type='button'
               class='ns-desktop-update-prompt__action'
+              data-scope='update-prompt'
               data-part='action'
               onClick={onRestart}
             >
@@ -67,18 +83,34 @@ export function DesktopUpdatePrompt({
         <aside
           aria-live='polite'
           class={classes('ns-desktop-update-prompt', className)}
-          data-part='update-prompt'
+          data-scope='update-prompt'
+          data-part='root'
           data-state='manual'
           role='status'
         >
-          <div class='ns-desktop-update-prompt__copy' data-part='copy'>
-            <strong class='ns-desktop-update-prompt__title'>Update ready — install manually</strong>
-            <span class='ns-desktop-update-prompt__description'>
+          <div
+            class='ns-desktop-update-prompt__copy'
+            data-scope='update-prompt'
+            data-part='copy'
+          >
+            <strong
+              class='ns-desktop-update-prompt__title'
+              data-part='title'
+              data-scope='update-prompt'
+            >
+              Update ready — install manually
+            </strong>
+            <span
+              class='ns-desktop-update-prompt__description'
+              data-part='description'
+              data-scope='update-prompt'
+            >
               Version {event.version} requires the Windows installer to finish updating.
             </span>
           </div>
           <a
             class='ns-desktop-update-prompt__action'
+            data-scope='update-prompt'
             data-part='action'
             href={event.manualUpdateUrl}
             rel='noreferrer noopener'

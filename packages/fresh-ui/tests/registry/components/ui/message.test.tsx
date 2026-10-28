@@ -40,7 +40,7 @@ Deno.test('Message renders assistant prose with author, model, body, follow-ups,
   });
   const cls = classes(vnodeProps(v).class);
   assert(cls.includes('ns-message'), 'base class');
-  assert(cls.includes('ns-message--assistant'), 'role modifier');
+  assert(vnodeProps(v)['data-role'] === 'assistant', 'role attribute');
   const json = JSON.stringify(v);
   assert(json.includes('VIF Agent'), 'author');
   assert(json.includes('opus-5'), 'model');
@@ -49,11 +49,11 @@ Deno.test('Message renders assistant prose with author, model, body, follow-ups,
   assert(json.includes('ns-msg-action'), 'hover actions');
 });
 
-Deno.test('Message applies user + system role modifiers', () => {
+Deno.test('Message exposes user + system role attributes', () => {
   const user = Message({ message: { role: 'user', author: { name: 'Eric' }, body: 'hi' } });
-  assert(classes(vnodeProps(user).class).includes('ns-message--user'), 'user modifier');
+  assert(vnodeProps(user)['data-role'] === 'user', 'user role');
   const system = Message({ message: { role: 'system', author: { name: 'sys' }, body: 'joined' } });
-  assert(classes(vnodeProps(system).class).includes('ns-message--system'), 'system modifier');
+  assert(vnodeProps(system)['data-role'] === 'system', 'system role');
 });
 
 Deno.test('TypingIndicator renders the typing seam with a status role', () => {

@@ -1,4 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
+import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { CitationChip } from '../../../../registry/components/ui/citation-chip.tsx';
 
 interface VNodeLike {
@@ -22,12 +23,12 @@ Deno.test('CitationChip renders the index as a button with a labelled source', (
   assertEquals(p['aria-label'], 'Source 3: VIF spec §4');
   assertEquals(p['aria-pressed'], 'false');
   assert(classes(p.class).includes('ns-citation'));
-  assertEquals(p.children, 3);
+  assert(render(CitationChip({ index: 3 })).includes('>3</span>'));
 });
 
-Deno.test('CitationChip active adds is-active + aria-pressed', () => {
+Deno.test('CitationChip active exposes data-state + aria-pressed', () => {
   const p = vnodeProps(CitationChip({ index: 1, active: true }));
-  assert(classes(p.class).includes('is-active'));
+  assertEquals(p['data-state'], 'active');
   assertEquals(p['aria-pressed'], 'true');
   assertEquals(p['aria-label'], 'Source 1');
 });

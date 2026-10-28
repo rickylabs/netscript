@@ -10,3 +10,6 @@
 - Initial evaluator invocation disabled persistence; re-review must use a new read-only process carrying the complete prior verdict. This is transport drift; no self-certification or vendor-family substitution.
 
 - CI build failure on cc26ede: docs export/symbol drift required updating docs/site/reference/fresh-ui/index.md for the new subpaths and symbols. This necessary API reference edit extends the declared write surface; no docs style/site implementation changes.
+
+- Source migration also updates the nine raw Button class uses in the scaffold FloatingSurfaceDemo template; otherwise a new scaffold would lose those variants after CSS migration. Existing layout utility BEM selectors remain compatibility aliases (not component variants) because broader scaffold layout markup is outside this phase. Their new data-gap/align/width selectors preserve specificity.
+- Utility parity initially caught incorrect Toast error selector classification; fixed before slice review. 171 before/after cases now have zero computed-style differences across rest/hover/focus/pressed at both widths/schemes, with identical full-page PNG bytes.

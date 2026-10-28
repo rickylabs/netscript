@@ -20,7 +20,11 @@ export function Textarea({ class: className, error = false, ...props }: Textarea
   return (
     <textarea
       {...props}
-      class={cn('ns-textarea', error && 'ns-textarea--error', className)}
+      class={cn('ns-textarea', className)}
+      data-invalid={error ? 'true' : undefined}
+      data-state={error ? 'invalid' : props.disabled ? 'disabled' : 'rest'}
+      data-part='root'
+      data-scope='textarea'
     />
   );
 }

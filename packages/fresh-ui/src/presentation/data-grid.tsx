@@ -2,186 +2,26 @@ import { h } from 'preact';
 import type { ComponentChildren, JSX } from 'preact';
 import { cn } from '../../registry/lib/cn.ts';
 
-/**
- * Built-in cell treatments supported by {@link DataGridColumn}.
- */
-export const DATA_GRID_CELL_VARIANTS = ['strong', 'num'] as const;
-
-/**
- * Built-in cell treatment names supported by {@link DataGridColumn}.
- */
-export type DataGridCellVariant = typeof DATA_GRID_CELL_VARIANTS[number];
-
-/**
- * Structural node returned by {@link DataGrid}.
- */
-export interface DataGridNode {
-  /**
-   * Render target, such as an intrinsic element name or component function.
-   */
-  type: unknown;
-  /**
-   * Props attached to the rendered node.
-   */
-  props: unknown;
-  /**
-   * Optional render key carried by the rendered node.
-   */
-  key: unknown;
-}
-
-/**
- * Preact-compatible renderable content accepted by {@link DataGridColumn.render}.
- */
-export type DataGridRenderable =
-  | DataGridNode
-  | string
-  | number
-  | bigint
-  | boolean
-  | null
-  | undefined
-  | readonly DataGridRenderable[];
-
-/**
- * Column contract for {@link DataGrid}.
- */
-export interface DataGridColumn<T> {
-  /**
-   * Property key used for fallback cell content and stable cell identity.
-   */
-  readonly key: string;
-  /**
-   * Visible column header.
-   */
-  readonly header: string;
-  /**
-   * CSS grid track width for the column, such as `2fr` or `minmax(0, 12rem)`.
-   */
-  readonly width?: string;
-  /**
-   * Optional built-in cell treatment.
-   */
-  readonly cell?: DataGridCellVariant;
-  /**
-   * Optional per-column template. Receives the row data object.
-   */
-  readonly render?: (row: T) => DataGridRenderable;
-}
-
-/** Controlled selection context supplied to DataGrid action slots. */
-export interface DataGridSelectionContext {
-  /** Number of selected rows present in this grid. */
-  readonly count: number;
-  /** Controlled selected row identities. */
-  readonly selectedIds: ReadonlySet<string>;
-  /** Requests an empty controlled selection. */
-  readonly clearSelection: () => void;
-}
-
-/** Typed context supplied to each DataGrid row-action slot. */
-export interface DataGridRowActionContext<T> {
-  /** Complete row contract associated with the action slot. */
-  readonly row: DataGridRow<T>;
-  /** Whether this row identity is in the controlled selection. */
-  readonly selected: boolean;
-}
-
-/**
- * Plain, button, or Fresh client-navigation row contract for {@link DataGrid}.
- */
-export type DataGridRow<T> =
-  | {
-    /**
-     * Stable row identity.
-     */
-    readonly id: string;
-    /**
-     * Caller-owned row payload.
-     */
-    readonly data: T;
-    /**
-     * Marks the row as selected for visual and assistive-technology state.
-     */
-    readonly selected?: boolean;
-    readonly onSelect?: undefined;
-    readonly href?: undefined;
-  }
-  | {
-    /**
-     * Stable row identity.
-     */
-    readonly id: string;
-    /**
-     * Caller-owned row payload.
-     */
-    readonly data: T;
-    /**
-     * Marks the row as selected for visual and assistive-technology state.
-     */
-    readonly selected?: boolean;
-    /**
-     * Click handler that renders the row as a button.
-     */
-    readonly onSelect: () => void;
-    readonly href?: never;
-  }
-  | {
-    /**
-     * Stable row identity.
-     */
-    readonly id: string;
-    /**
-     * Caller-owned row payload.
-     */
-    readonly data: T;
-    /**
-     * Marks the row as selected for visual and assistive-technology state.
-     */
-    readonly selected?: boolean;
-    /**
-     * Destination that renders the row as a Fresh client-navigation link.
-     */
-    readonly href: string;
-    readonly onSelect?: never;
-  };
-
-/**
- * Props accepted by {@link DataGrid}.
- */
-export interface DataGridProps<T> {
-  /**
-   * Ordered column definitions.
-   */
-  readonly columns: readonly DataGridColumn<T>[];
-  /**
-   * Ordered row definitions.
-   */
-  readonly rows: readonly DataGridRow<T>[];
-  /**
-   * Additional class names appended to the grid root.
-   */
-  readonly class?: string;
-  /**
-   * Accessible label for the grid region.
-   */
-  readonly label?: string;
-  /** Controlled selected row identities. Supplying this enables selection chrome. */
-  readonly selectedIds?: ReadonlySet<string>;
-  /** Receives the complete next controlled selection set. */
-  readonly onSelectionChange?: (selectedIds: ReadonlySet<string>) => void;
-  /** Renders bulk actions when at least one row is selected. */
-  readonly renderBulkActions?: (selection: DataGridSelectionContext) => DataGridRenderable;
-  /** Renders isolated actions for a row, typically an ActionMenu. */
-  readonly renderRowActions?: (
-    row: T,
-    context: DataGridRowActionContext<T>,
-  ) => DataGridRenderable;
-  /**
-   * Additional native attributes forwarded to the grid root.
-   */
-  readonly [attribute: string]: unknown;
-}
+import type {
+  DataGridCellVariant,
+  DataGridColumn,
+  DataGridNode,
+  DataGridProps,
+  DataGridRenderable,
+  DataGridRow,
+  DataGridSelectionContext,
+} from './data-grid-contract.ts';
+export type {
+  DataGridCellVariant,
+  DataGridColumn,
+  DataGridNode,
+  DataGridProps,
+  DataGridRenderable,
+  DataGridRow,
+  DataGridRowActionContext,
+  DataGridSelectionContext,
+} from './data-grid-contract.ts';
+export { DATA_GRID_CELL_VARIANTS } from './data-grid-contract.ts';
 
 interface FreshAnchorNavigationAttributes extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
   'f-client-nav'?: boolean;
@@ -236,7 +76,13 @@ export function DataGrid<T>(
     ...columns.map((column) =>
       h(
         'span',
-        { key: column.key, role: 'columnheader', class: 'ns-data-grid__header-cell' },
+        {
+          key: column.key,
+          role: 'columnheader',
+          class: 'ns-data-grid__header-cell',
+          'data-part': 'header-cell',
+          'data-scope': 'data-table',
+        },
         column.header,
       ) as DataGridNode
     ),
@@ -253,6 +99,8 @@ export function DataGrid<T>(
       'div',
       {
         class: 'ns-data-grid__bulk-actions',
+        'data-part': 'bulk-actions',
+        'data-scope': 'data-table',
         role: 'toolbar',
         'aria-label': `${selectedCount} selected`,
       },
@@ -262,16 +110,29 @@ export function DataGrid<T>(
   children.push(
     h(
       'div',
-      { role: 'rowgroup', class: 'ns-data-grid__head' },
+      {
+        role: 'rowgroup',
+        class: 'ns-data-grid__head',
+        'data-part': 'head',
+        'data-scope': 'data-table',
+      },
       h('div', {
         role: 'row',
-        class: 'ns-data-grid__row ns-data-grid__row--header',
+        class: 'ns-data-grid__row',
+        'data-type': 'header',
+        'data-part': 'row',
+        'data-scope': 'data-table',
         style: gridStyle,
       }, headCells as ComponentChildren),
     ) as DataGridNode,
     h(
       'div',
-      { role: 'rowgroup', class: 'ns-data-grid__body' },
+      {
+        role: 'rowgroup',
+        class: 'ns-data-grid__body',
+        'data-part': 'body',
+        'data-scope': 'data-table',
+      },
       rows.map((row) =>
         renderEnhancedDataGridRow(
           row,
@@ -293,6 +154,8 @@ export function DataGrid<T>(
       role: 'grid',
       'aria-label': label,
       class: cn('ns-data-grid', className),
+      'data-part': 'root',
+      'data-scope': 'data-table',
       'data-responsive': '',
       style: { overflowX: 'auto', ...(props.style as JSX.CSSProperties | undefined) },
     },
@@ -307,17 +170,42 @@ function renderLegacyDataGrid<T>(
   const gridStyle: JSX.CSSProperties = { gridTemplateColumns: templateColumns };
   return h(
     'div',
-    { ...props, role: 'grid', 'aria-label': label, class: cn('ns-data-grid', className) },
+    {
+      ...props,
+      role: 'grid',
+      'aria-label': label,
+      class: cn('ns-data-grid', className),
+      'data-part': 'root',
+      'data-scope': 'data-table',
+    },
     h(
       'div',
-      { role: 'rowgroup', class: 'ns-data-grid__head' },
+      {
+        role: 'rowgroup',
+        class: 'ns-data-grid__head',
+        'data-part': 'head',
+        'data-scope': 'data-table',
+      },
       h(
         'div',
-        { role: 'row', class: 'ns-data-grid__row ns-data-grid__row--header', style: gridStyle },
+        {
+          role: 'row',
+          class: 'ns-data-grid__row',
+          'data-type': 'header',
+          'data-part': 'row',
+          'data-scope': 'data-table',
+          style: gridStyle,
+        },
         columns.map((column) =>
           h(
             'span',
-            { key: column.key, role: 'columnheader', class: 'ns-data-grid__header-cell' },
+            {
+              key: column.key,
+              role: 'columnheader',
+              class: 'ns-data-grid__header-cell',
+              'data-part': 'header-cell',
+              'data-scope': 'data-table',
+            },
             column.header,
           )
         ),
@@ -325,7 +213,12 @@ function renderLegacyDataGrid<T>(
     ),
     h(
       'div',
-      { role: 'rowgroup', class: 'ns-data-grid__body' },
+      {
+        role: 'rowgroup',
+        class: 'ns-data-grid__body',
+        'data-part': 'body',
+        'data-scope': 'data-table',
+      },
       rows.map((row) => renderDataGridRow(row, columns, gridStyle)),
     ),
   ) as DataGridNode;
@@ -341,7 +234,12 @@ interface SelectionCheckboxOptions {
 function renderSelectionCheckbox(options: SelectionCheckboxOptions): DataGridNode {
   return h(
     'span',
-    { role: 'gridcell', class: 'ns-data-grid__selection' },
+    {
+      role: 'gridcell',
+      class: 'ns-data-grid__selection',
+      'data-part': 'selection',
+      'data-scope': 'data-table',
+    },
     h('input', {
       type: 'checkbox',
       checked: options.checked,
@@ -390,6 +288,8 @@ function renderEnhancedDataGridRow<T>(
     cells.push(h('span', {
       role: 'gridcell',
       class: 'ns-data-grid__actions',
+      'data-part': 'actions',
+      'data-scope': 'data-table',
       onClick: (event: Event) => event.stopPropagation(),
     }, renderRowActions(row.data, { row, selected }) as ComponentChildren) as DataGridNode);
   }
@@ -400,11 +300,11 @@ function renderEnhancedDataGridRow<T>(
       key: row.id,
       role: 'row',
       'aria-selected': selected ? 'true' : undefined,
-      class: cn(
-        'ns-data-grid__row',
-        selected && 'is-selected',
-        (row.onSelect || row.href) && 'ns-data-grid__row--interactive',
-      ),
+      class: cn('ns-data-grid__row'),
+      'data-state': selected ? ('selected') : undefined,
+      'data-interactive': (row.onSelect || row.href) ? ('true') : undefined,
+      'data-part': 'row',
+      'data-scope': 'data-table',
       style: gridStyle,
       tabIndex: activate ? 0 : undefined,
       onClick: activate,
@@ -429,10 +329,22 @@ function renderDataGridLinkCell<T>(
   const content = column.render ? column.render(row) : fallbackCellContent(row, column.key);
   return h(
     'span',
-    { key: column.key, role: 'gridcell', class: 'ns-data-grid__cell' },
+    {
+      key: column.key,
+      role: 'gridcell',
+      class: 'ns-data-grid__cell',
+      'data-part': 'cell',
+      'data-scope': 'data-table',
+    },
     h(
       'a',
-      { href, 'f-client-nav': true, class: 'ns-data-grid__row-link' },
+      {
+        href,
+        'f-client-nav': true,
+        class: 'ns-data-grid__row-link',
+        'data-part': 'row-link',
+        'data-scope': 'data-table',
+      },
       renderCellContent(content, column.cell) as ComponentChildren,
     ),
   ) as DataGridNode;
@@ -443,12 +355,7 @@ function renderDataGridRow<T>(
   columns: readonly DataGridColumn<T>[],
   gridStyle: JSX.CSSProperties,
 ): DataGridNode {
-  const rowClass = cn(
-    'ns-data-grid__row',
-    row.selected && 'is-selected',
-    row.onSelect && 'ns-data-grid__row--button',
-    row.href && 'ns-data-grid__row--link',
-  );
+  const rowClass = cn('ns-data-grid__row');
   const cells = columns.map((column) => renderDataGridCell(row.data, column));
   const selected = row.selected ? 'true' : undefined;
 
@@ -461,6 +368,10 @@ function renderDataGridRow<T>(
         role: 'row',
         'aria-selected': selected,
         class: rowClass,
+        'data-state': (row.selected) ? ('selected') : undefined,
+        'data-type': row.href ? 'link' : 'button',
+        'data-part': 'row',
+        'data-scope': 'data-table',
         style: gridStyle,
         onClick: row.onSelect,
       },
@@ -482,6 +393,10 @@ function renderDataGridRow<T>(
         role: 'row',
         'aria-selected': selected,
         class: rowClass,
+        'data-state': (row.selected) ? ('selected') : undefined,
+        'data-type': row.href ? 'link' : 'button',
+        'data-part': 'row',
+        'data-scope': 'data-table',
         style: gridStyle,
       },
       cells as ComponentChildren,
@@ -495,6 +410,10 @@ function renderDataGridRow<T>(
       role: 'row',
       'aria-selected': selected,
       class: rowClass,
+      'data-state': (row.selected) ? ('selected') : undefined,
+      'data-type': ((row.href) ? ('link') : undefined) ?? ((row.onSelect) ? ('button') : undefined),
+      'data-part': 'row',
+      'data-scope': 'data-table',
       style: gridStyle,
     },
     cells as ComponentChildren,
@@ -512,7 +431,10 @@ function renderDataGridCell<T>(
     {
       key: column.key,
       role: 'gridcell',
-      class: cn('ns-data-grid__cell', column.cell && `ns-data-grid__cell--${column.cell}`),
+      class: cn('ns-data-grid__cell', column.cell && ''),
+      'data-variant': (column.cell) ? (column.cell) : undefined,
+      'data-part': 'cell',
+      'data-scope': 'data-table',
     },
     renderCellContent(content, column.cell) as ComponentChildren,
   ) as DataGridNode;
@@ -523,11 +445,19 @@ function renderCellContent(
   variant: DataGridCellVariant | undefined,
 ): DataGridRenderable {
   if (variant === 'strong') {
-    return h('strong', { class: 'ns-data-grid__cell-strong' }, content as ComponentChildren);
+    return h('strong', {
+      class: 'ns-data-grid__cell-strong',
+      'data-part': 'cell-strong',
+      'data-scope': 'data-table',
+    }, content as ComponentChildren);
   }
 
   if (variant === 'num') {
-    return h('span', { class: 'ns-data-grid__cell-num' }, content as ComponentChildren);
+    return h('span', {
+      class: 'ns-data-grid__cell-num',
+      'data-part': 'cell-num',
+      'data-scope': 'data-table',
+    }, content as ComponentChildren);
   }
 
   return content;

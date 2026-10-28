@@ -73,6 +73,8 @@ export default function ThemeToggle(): VNode {
       type='button'
       onClick={toggle}
       class='ns-theme-toggle'
+      data-part='root'
+      data-scope='theme-toggle'
       aria-label={`Switch to ${theme.value === 'dark' ? 'light' : 'dark'} mode`}
       title={`Switch to ${theme.value === 'dark' ? 'light' : 'dark'} mode`}
     >

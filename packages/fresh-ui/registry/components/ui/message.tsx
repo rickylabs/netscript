@@ -81,7 +81,11 @@ export function renderInline(text: string, ctx?: MessageCtx): (string | VNode)[]
     if (match[2] !== undefined) {
       nodes.push(<strong>{match[2]}</strong>);
     } else if (match[4] !== undefined) {
-      nodes.push(<code class='ns-inline-code'>{match[4]}</code>);
+      nodes.push(
+        <code class='ns-inline-code' data-part='root' data-scope='inline-code'>
+          {match[4]}
+        </code>,
+      );
     } else if (match[6] !== undefined) {
       const index = Number(match[6]);
       nodes.push(
@@ -99,7 +103,13 @@ export function renderInline(text: string, ctx?: MessageCtx): (string | VNode)[]
  */
 export function TypingIndicator(): VNode {
   return (
-    <span class='ns-typing' role='status' aria-label='Assistant is typing'>
+    <span
+      class='ns-typing'
+      data-part='root'
+      data-scope='typing'
+      role='status'
+      aria-label='Assistant is typing'
+    >
       <span></span>
       <span></span>
       <span></span>
@@ -135,19 +145,41 @@ export function Message({ message, ctx, class: className, ...props }: MessagePro
   const { role, author, time, model, body, blocks, tools, followups, pending } = message;
 
   return (
-    <div {...props} class={cn('ns-message', `ns-message--${role}`, className)}>
-      <div class='ns-message__avatar'>
+    <div
+      {...props}
+      class={cn('ns-message', className)}
+      data-role={role}
+      data-part='root'
+      data-scope='message'
+    >
+      <div class='ns-message__avatar' data-part='avatar' data-scope='message'>
         <Avatar name={author.name} initials={author.initials} agent={author.agent} size='sm' />
       </div>
-      <div class='ns-message__main'>
-        <div class='ns-message__head'>
-          <span class='ns-message__author'>{author.name}</span>
-          {model ? <span class='ns-message__model'>{model}</span> : null}
-          {time ? <span class='ns-message__time'>{time}</span> : null}
+      <div class='ns-message__main' data-part='main' data-scope='message'>
+        <div class='ns-message__head' data-part='head' data-scope='message'>
+          <span class='ns-message__author' data-part='author' data-scope='message'>
+            {author.name}
+          </span>
+          {model
+            ? (
+              <span class='ns-message__model' data-part='model' data-scope='message'>
+                {model}
+              </span>
+            )
+            : null}
+          {time
+            ? <span class='ns-message__time' data-part='time' data-scope='message'>{time}</span>
+            : null}
         </div>
-        <div class='ns-message__body'>
+        <div class='ns-message__body' data-part='body' data-scope='message'>
           {pending ? <TypingIndicator /> : null}
-          {body ? <p class='ns-message__text'>{renderInline(body, ctx)}</p> : null}
+          {body
+            ? (
+              <p class='ns-message__text' data-part='text' data-scope='message'>
+                {renderInline(body, ctx)}
+              </p>
+            )
+            : null}
           {blocks?.map((block, index) => <div key={`b${index}`}>{renderBlock(block)}</div>)}
           {tools?.map((tool, index) => (
             <ToolCallCard
@@ -162,12 +194,19 @@ export function Message({ message, ctx, class: className, ...props }: MessagePro
         </div>
         {followups && followups.length
           ? (
-            <div class='ns-message__followups ns-cluster ns-cluster--sm'>
+            <div
+              class='ns-message__followups ns-cluster'
+              data-gap='sm'
+              data-part='followups'
+              data-scope='message'
+            >
               {followups.map((followup, index) => (
                 <button
                   key={`f${index}`}
                   type='button'
                   class='ns-pill'
+                  data-part='root'
+                  data-scope='pill'
                   onClick={() => ctx?.onFollowup?.(followup)}
                 >
                   {followup}
@@ -176,9 +215,23 @@ export function Message({ message, ctx, class: className, ...props }: MessagePro
             </div>
           )
           : null}
-        <div class='ns-message__actions'>
-          <button type='button' class='ns-msg-action' aria-label='Copy message'>Copy</button>
-          <button type='button' class='ns-msg-action' aria-label='Regenerate response'>
+        <div class='ns-message__actions' data-part='actions' data-scope='message'>
+          <button
+            type='button'
+            class='ns-msg-action'
+            data-part='root'
+            data-scope='msg-action'
+            aria-label='Copy message'
+          >
+            Copy
+          </button>
+          <button
+            type='button'
+            class='ns-msg-action'
+            data-part='root'
+            data-scope='msg-action'
+            aria-label='Regenerate response'
+          >
             Regenerate
           </button>
         </div>

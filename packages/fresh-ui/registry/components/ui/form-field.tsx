@@ -34,21 +34,29 @@ export function FormField({
   ...props
 }: FormFieldProps): VNode {
   return (
-    <div {...props} class={cn('ns-field', className)}>
-      <Label htmlFor={name} required={required}>{label}</Label>
+    <div {...props} class={cn('ns-field', className)} data-part='root' data-scope='field'>
+      <Label data-part='label' data-scope='field' htmlFor={name} required={required}>{label}</Label>
       {children}
       {error
         ? (
-          <div class='ns-field__error-row'>
-            <span aria-hidden='true' class='ns-field__error-icon'>
+          <div class='ns-field__error-row' data-part='error-row' data-scope='field'>
+            <span
+              aria-hidden='true'
+              class='ns-field__error-icon'
+              data-part='error-icon'
+              data-scope='field'
+            >
               ≠
             </span>
-            <p class='ns-error-text'>{error}</p>
+            <p class='ns-error-text' data-part='error' data-scope='field'>{error}</p>
           </div>
         )
         : helpText
-        ? <p class='ns-help-text'>{helpText}</p>
+        ? <p class='ns-help-text' data-part='description' data-scope='field'>{helpText}</p>
         : null}
     </div>
   );
 }
+
+/** Canonical Field name; FormField remains a compatibility export. */
+export const Field: typeof FormField = FormField;
