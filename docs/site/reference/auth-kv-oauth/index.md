@@ -10,18 +10,18 @@ package's public surface reported by `deno doc`.
 
 ## Backend and flow factories
 
-| Symbol                    | Kind     | Description                                                                                                                                                    |
-| ------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `createKvOAuthBackend`    | function | Create a KV-backed OAuth backend.                                                                                                                              |
-| `createKvOAuthFlow`       | function | Create the OAuth sign-in and callback flow.                                                                                                                    |
-| `createKvOAuthStore`      | function | Create the KV-backed OAuth store.                                                                                                                              |
-| `createKvOAuthCrypto`     | function | Create crypto helpers for OAuth state and token storage.                                                                                                       |
-| `presetProviderKind`      | function | Read the shipped preset protocol kind (`oauth` or `oidc`); custom ids return undefined. OAuth presets use explicit endpoints without issuer discovery.         |
-| `defineOAuthProvider`     | function | Normalize generic OAuth provider input into an `OAuthProviderConfig`.                                                                                          |
-| `defaultPrincipal`        | function | Default principal mapping; custom `normalizePrincipal` mappers compose on it.                                                                                  |
-| `resolvePrincipalSubject` | function | Resolve the stable subject from the provider's `subject` source (ID token or userinfo).                                                                        |
-| `presetSubjectSource`     | function | Return the subject source a shipped preset uses, by preset provider id.                                                                                        |
-| `providers`               | constant | Provider preset collection including GitHub, Google, GitLab, Discord, Slack, Spotify, Facebook, Twitter, Auth0, Okta, AWS Cognito, Azure AD, Logto, and Clerk. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createKvOAuthBackend` | function | Create a KV-backed OAuth backend. |
+| `createKvOAuthFlow` | function | Create the OAuth sign-in and callback flow. |
+| `createKvOAuthStore` | function | Create the KV-backed OAuth store. |
+| `createKvOAuthCrypto` | function | Create crypto helpers for OAuth state and token storage. |
+| `presetProviderKind` | function | Read the shipped preset protocol kind (`oauth` or `oidc`); custom ids return undefined. OAuth presets use explicit endpoints without issuer discovery. |
+| `defineOAuthProvider` | function | Normalize generic OAuth provider input into an `OAuthProviderConfig`. |
+| `defaultPrincipal` | function | Default principal mapping; custom `normalizePrincipal` mappers compose on it. |
+| `resolvePrincipalSubject` | function | Resolve the stable subject from the provider's `subject` source (ID token or userinfo). |
+| `presetSubjectSource` | function | Return the subject source a shipped preset uses, by preset provider id. |
+| `providers` | const | Provider preset collection including GitHub, Google, GitLab, Discord, Slack, Spotify, Facebook, Twitter, Auth0, Okta, AWS Cognito, Azure AD, Logto, and Clerk. |
 
 ## Cookie, environment, and discovery helpers
 

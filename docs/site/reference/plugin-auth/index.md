@@ -17,16 +17,16 @@ inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `authPlugin` | constant | Plugin manifest for NetScript auth. |
+| `authPlugin` | const | Plugin manifest for NetScript auth. |
 
 ## Constants
 
-| Symbol | Value | Description |
-| --- | --- | --- |
-| `AUTH_PLUGIN_ID` | `"auth"` | Stable plugin id. |
-| `AUTH_PLUGIN_VERSION` | `"{{ releaseVersion }}"` | Auth plugin package version constant. |
-| `AUTH_API_SERVICE_NAME` | `"auth-api"` | Service name contributed by the auth plugin. |
-| `AUTH_API_DEFAULT_PORT` | `8094` | Default auth-api service port. |
+| Symbol | Kind | Value | Description |
+| --- | --- | --- | --- |
+| `AUTH_PLUGIN_ID` | const | `"auth"` | Stable plugin id. |
+| `AUTH_PLUGIN_VERSION` | const | `"{{ releaseVersion }}"` | Auth plugin package version constant. |
+| `AUTH_API_SERVICE_NAME` | const | `"auth-api"` | Service name contributed by the auth plugin. |
+| `AUTH_API_DEFAULT_PORT` | const | `8094` | Default auth-api service port. |
 
 ## Remote session verification
 
@@ -37,10 +37,10 @@ retains no principal cache. Authorization remains a separate service policy.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createAuthServiceAuthenticator` | function | Verify an active, unexpired session through the native auth SDK. |
-| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type | Canonical service authentication types re-exported for the complete public signature. |
+| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type alias | Canonical service authentication types re-exported for the complete public signature. |
 | `AuthServiceAuthenticatorOptions` | interface | Required discovery name and timeout, optional router/protocol and explicit cleartext policy. |
 | `readBearerCredential` | function | Read a single strict bearer credential; reject ambiguous headers. |
-| `REMOTE_SESSION_REJECTIONS` | constant | Stable missing, unauthorized, inactive and expired denial reasons. |
+| `REMOTE_SESSION_REJECTIONS` | const | Stable missing, unauthorized, inactive and expired denial reasons. |
 | `RemoteSessionVerificationError` | class | Redacted transport, timeout, malformed response or remote error diagnostics. |
 
 Native middleware returns 401 for denial and 503 for verifier unavailability. Native claims are

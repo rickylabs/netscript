@@ -115,11 +115,11 @@ exposes are bound to the active worker instrumentation context.
 
 ### Schedules and permissions
 
-| Symbol              | Kind       | Description                                                      |
-| ------------------- | ---------- | ---------------------------------------------------------------- |
-| `cron`              | variable   | Cron schedule helpers for worker jobs.                           |
-| `CronHelpers`       | type alias | Cron schedule helper surface for worker jobs.                    |
-| `permissions`       | variable   | Permission presets for worker jobs and tasks.                    |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `cron` | const | Cron schedule helpers for worker jobs. |
+| `CronHelpers` | type alias | Cron schedule helper surface for worker jobs. |
+| `permissions` | const | Permission presets for worker jobs and tasks. |
 | `PermissionPresets` | type alias | Worker permission preset surface for common job execution modes. |
 
 ### Runtime

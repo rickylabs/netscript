@@ -77,17 +77,17 @@ construction with the stable
 
 ## Schema helper factories
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `boundedString` | `function boundedString(options: BoundedStringSchemaOptions): ContractStringSchema` | Creates a bounded string schema. |
-| `positiveInt` | `function positiveInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a positive integer schema with NetScript's default integer cap. |
-| `nonNegativeInt` | `function nonNegativeInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a non-negative integer schema with NetScript's default integer cap. |
-| `positiveNumber` | `function positiveNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a positive decimal-number schema. |
-| `nonNegativeNumber` | `function nonNegativeNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a non-negative decimal-number schema. |
-| `paginationLimit` | `function paginationLimit(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-limit schema. |
-| `paginationOffset` | `function paginationOffset(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-offset schema. |
-| `stringToInt` | `function stringToInt(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces an integer string into a number and validates it with `outputSchema`. |
-| `stringToNumber` | `function stringToNumber(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces a numeric string into a number and validates it with `outputSchema`. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `boundedString` | function | `function boundedString(options: BoundedStringSchemaOptions): ContractStringSchema` | Creates a bounded string schema. |
+| `positiveInt` | function | `function positiveInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a positive integer schema with NetScript's default integer cap. |
+| `nonNegativeInt` | function | `function nonNegativeInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a non-negative integer schema with NetScript's default integer cap. |
+| `positiveNumber` | function | `function positiveNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a positive decimal-number schema. |
+| `nonNegativeNumber` | function | `function nonNegativeNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a non-negative decimal-number schema. |
+| `paginationLimit` | function | `function paginationLimit(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-limit schema. |
+| `paginationOffset` | function | `function paginationOffset(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-offset schema. |
+| `stringToInt` | function | `function stringToInt(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces an integer string into a number and validates it with `outputSchema`. |
+| `stringToNumber` | function | `function stringToNumber(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces a numeric string into a number and validates it with `outputSchema`. |
 
 ## Errors
 
@@ -109,78 +109,78 @@ construction with the stable
 
 ## Pagination schemas
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `OffsetPaginationQuerySchema` | `const OffsetPaginationQuerySchema: ContractObjectSchema<OffsetPaginationQuery>` | Offset pagination schema for URL query parameters. |
-| `OffsetPaginationInputSchema` | `const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationInput>` | Offset pagination schema for request bodies. |
-| `OffsetPaginationMetaSchema` | `const OffsetPaginationMetaSchema: ContractObjectSchema<OffsetPaginationMeta>` | Offset pagination metadata schema for responses. |
-| `CursorPaginationQuerySchema` | `const CursorPaginationQuerySchema: ContractObjectSchema<CursorPaginationQuery>` | Cursor pagination schema for URL query parameters. |
-| `CursorPaginationInputSchema` | `const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationInput>` | Cursor pagination schema for request bodies. |
-| `CursorPaginationMetaSchema` | `const CursorPaginationMetaSchema: ContractObjectSchema<CursorPaginationMeta>` | Cursor pagination metadata schema for responses. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `OffsetPaginationQuerySchema` | const | `const OffsetPaginationQuerySchema: ContractObjectSchema<OffsetPaginationQuery>` | Offset pagination schema for URL query parameters. |
+| `OffsetPaginationInputSchema` | const | `const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationInput>` | Offset pagination schema for request bodies. |
+| `OffsetPaginationMetaSchema` | const | `const OffsetPaginationMetaSchema: ContractObjectSchema<OffsetPaginationMeta>` | Offset pagination metadata schema for responses. |
+| `CursorPaginationQuerySchema` | const | `const CursorPaginationQuerySchema: ContractObjectSchema<CursorPaginationQuery>` | Cursor pagination schema for URL query parameters. |
+| `CursorPaginationInputSchema` | const | `const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationInput>` | Cursor pagination schema for request bodies. |
+| `CursorPaginationMetaSchema` | const | `const CursorPaginationMetaSchema: ContractObjectSchema<CursorPaginationMeta>` | Cursor pagination metadata schema for responses. |
 
 ## Constants
 
-| Symbol | Value | Description |
-| --- | --- | --- |
-| `DEFAULT_INTEGER_MAX` | `2147483647` | Maximum integer used by contract numeric schemas. |
-| `DEFAULT_PAGINATION_LIMIT` | `10` | Default page size for contract pagination schemas. |
-| `DEFAULT_PAGINATION_LIMIT_MAX` | `1000` | Maximum page size accepted by contract pagination schemas. |
-| `DEFAULT_PAGINATION_OFFSET` | `0` | Default offset for contract offset-pagination schemas. |
+| Symbol | Kind | Value | Description |
+| --- | --- | --- | --- |
+| `DEFAULT_INTEGER_MAX` | const | `2147483647` | Maximum integer used by contract numeric schemas. |
+| `DEFAULT_PAGINATION_LIMIT` | const | `10` | Default page size for contract pagination schemas. |
+| `DEFAULT_PAGINATION_LIMIT_MAX` | const | `1000` | Maximum page size accepted by contract pagination schemas. |
+| `DEFAULT_PAGINATION_OFFSET` | const | `0` | Default offset for contract offset-pagination schemas. |
 
 ## Diagnostics
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `inspectContracts` | `function inspectContracts(target: ContractsInspectionTarget): InspectionReport` | Builds a JSON-stable inspection report for a contract primitive. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `inspectContracts` | function | `function inspectContracts(target: ContractsInspectionTarget): InspectionReport` | Builds a JSON-stable inspection report for a contract primitive. |
 
 ## Result and error types
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `Result` | `type Result<TValue, TError> = OkResult<TValue> \| ErrorResult<TError>` | Discriminated success/error result union. |
-| `OkResult` | `type OkResult<TValue> = Readonly<{ ok: true; value: TValue; }>` | Success arm of `Result`. |
-| `ErrorResult` | `type ErrorResult<TError> = Readonly<{ ok: false; error: TError; }>` | Error arm of `Result`. |
-| `SuccessResponse` | `type SuccessResponse = Readonly<{ success: boolean; message?: string; }>` | Common success response payload. |
-| `NotFoundError` | `type NotFoundError = Readonly<{ resourceType: string; resourceId: string \| number; }>` | Not-found error data. |
-| `ValidationError` | `type ValidationError = Readonly<{ formErrors: string[]; fieldErrors: Record<string, string[] \| undefined>; }>` | Validation error data. |
-| `UnauthorizedError` | `type UnauthorizedError = Readonly<{ reason?: "missing_token" \| "invalid_token" \| "expired_token"; }>` | Unauthorized error data. |
-| `ForbiddenError` | `type ForbiddenError = Readonly<{ requiredRole?: string; userRole?: string; }>` | Forbidden error data. |
-| `RateLimitError` | `type RateLimitError = Readonly<{ retryAfter: number; limit: number; }>` | Rate-limit error data. |
-| `ServiceUnavailableError` | `type ServiceUnavailableError = Readonly<{ retryAfter?: number; reason?: string; }>` | Service-unavailable error data. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `Result` | type alias | `type Result<TValue, TError> = OkResult<TValue> \| ErrorResult<TError>` | Discriminated success/error result union. |
+| `OkResult` | type alias | `type OkResult<TValue> = Readonly<{ ok: true; value: TValue; }>` | Success arm of `Result`. |
+| `ErrorResult` | type alias | `type ErrorResult<TError> = Readonly<{ ok: false; error: TError; }>` | Error arm of `Result`. |
+| `SuccessResponse` | type alias | `type SuccessResponse = Readonly<{ success: boolean; message?: string; }>` | Common success response payload. |
+| `NotFoundError` | type alias | `type NotFoundError = Readonly<{ resourceType: string; resourceId: string \| number; }>` | Not-found error data. |
+| `ValidationError` | type alias | `type ValidationError = Readonly<{ formErrors: string[]; fieldErrors: Record<string, string[] \| undefined>; }>` | Validation error data. |
+| `UnauthorizedError` | type alias | `type UnauthorizedError = Readonly<{ reason?: "missing_token" \| "invalid_token" \| "expired_token"; }>` | Unauthorized error data. |
+| `ForbiddenError` | type alias | `type ForbiddenError = Readonly<{ requiredRole?: string; userRole?: string; }>` | Forbidden error data. |
+| `RateLimitError` | type alias | `type RateLimitError = Readonly<{ retryAfter: number; limit: number; }>` | Rate-limit error data. |
+| `ServiceUnavailableError` | type alias | `type ServiceUnavailableError = Readonly<{ retryAfter?: number; reason?: string; }>` | Service-unavailable error data. |
 
 ## Schema and pagination types
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `ContractSchema` | `type ContractSchema<TOutput = unknown>` | Minimal schema contract (`parse`, `safeParse`, `optional`, `describe`). |
-| `ContractObjectSchema` | `type ContractObjectSchema<TOutput = unknown>` | Object schema contract with `extend`/`merge`. |
-| `ContractDefaultableSchema` | `type ContractDefaultableSchema<TOutput>` | Schema contract with a `default(value)` helper. |
-| `ContractNumberSchema` | `type ContractNumberSchema = ContractDefaultableSchema<number>` | Numeric schema contract. |
-| `ContractStringSchema` | `type ContractStringSchema = ContractDefaultableSchema<string>` | String schema contract. |
-| `ContractParseResult` | `type ContractParseResult<TOutput>` | Result returned by `safeParse`. |
-| `ContractSchemaInput` | `type ContractSchemaInput<T>` | Infer the accepted input value type from a Zod-compatible schema. |
-| `ContractSchemaOutput` | `type ContractSchemaOutput<T>` | Infer the parsed output value type from a Zod-compatible schema. |
-| `ContractSchemaLike` | `type ContractSchemaLike` | Cross-resolution schema constraint used at consumer-supplied boundaries. |
-| `ContractObjectSchemaLike` | `type ContractObjectSchemaLike` | Cross-resolution object-schema constraint for consumer-supplied shapes. |
-| `OffsetPaginationQuery` | `type OffsetPaginationQuery = Readonly<{ limit: number; offset: number; }>` | Offset pagination query shape. |
-| `OffsetPaginationInput` | `type OffsetPaginationInput = Readonly<{ limit: number; offset: number; }>` | Offset pagination input shape. |
-| `OffsetPaginationMeta` | `type OffsetPaginationMeta = Readonly<{ total: number; limit: number; offset: number; hasMore: boolean; }>` | Offset pagination response metadata. |
-| `CursorPaginationQuery` | `type CursorPaginationQuery = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination query shape. |
-| `CursorPaginationInput` | `type CursorPaginationInput = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination input shape. |
-| `CursorPaginationMeta` | `type CursorPaginationMeta = Readonly<{ limit: number; nextCursor: string \| null; hasMore: boolean; }>` | Cursor pagination response metadata. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `ContractSchema` | interface | `type ContractSchema<TOutput = unknown>` | Minimal schema contract (`parse`, `safeParse`, `optional`, `describe`). |
+| `ContractObjectSchema` | type alias | `type ContractObjectSchema<TOutput = unknown>` | Object schema contract with `extend`/`merge`. |
+| `ContractDefaultableSchema` | type alias | `type ContractDefaultableSchema<TOutput>` | Schema contract with a `default(value)` helper. |
+| `ContractNumberSchema` | type alias | `type ContractNumberSchema = ContractDefaultableSchema<number>` | Numeric schema contract. |
+| `ContractStringSchema` | type alias | `type ContractStringSchema = ContractDefaultableSchema<string>` | String schema contract. |
+| `ContractParseResult` | type alias | `type ContractParseResult<TOutput>` | Result returned by `safeParse`. |
+| `ContractSchemaInput` | type alias | `type ContractSchemaInput<T>` | Infer the accepted input value type from a Zod-compatible schema. |
+| `ContractSchemaOutput` | type alias | `type ContractSchemaOutput<T>` | Infer the parsed output value type from a Zod-compatible schema. |
+| `ContractSchemaLike` | type alias | `type ContractSchemaLike` | Cross-resolution schema constraint used at consumer-supplied boundaries. |
+| `ContractObjectSchemaLike` | type alias | `type ContractObjectSchemaLike` | Cross-resolution object-schema constraint for consumer-supplied shapes. |
+| `OffsetPaginationQuery` | type alias | `type OffsetPaginationQuery = Readonly<{ limit: number; offset: number; }>` | Offset pagination query shape. |
+| `OffsetPaginationInput` | type alias | `type OffsetPaginationInput = Readonly<{ limit: number; offset: number; }>` | Offset pagination input shape. |
+| `OffsetPaginationMeta` | type alias | `type OffsetPaginationMeta = Readonly<{ total: number; limit: number; offset: number; hasMore: boolean; }>` | Offset pagination response metadata. |
+| `CursorPaginationQuery` | type alias | `type CursorPaginationQuery = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination query shape. |
+| `CursorPaginationInput` | type alias | `type CursorPaginationInput = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination input shape. |
+| `CursorPaginationMeta` | type alias | `type CursorPaginationMeta = Readonly<{ limit: number; nextCursor: string \| null; hasMore: boolean; }>` | Cursor pagination response metadata. |
 
 ## Schema option types
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `StringSchemaOptions` | `type StringSchemaOptions = Readonly<{ description?: string; }>` | Options for string-derived schema factories. |
-| `BoundedStringSchemaOptions` | `type BoundedStringSchemaOptions = StringSchemaOptions & Readonly<{ min?: number; max: number; }>` | Options for `boundedString`. |
-| `IntegerSchemaOptions` | `type IntegerSchemaOptions = Readonly<{ min?: number; max?: number; description?: string; }>` | Options for integer schema factories. |
-| `DefaultedIntegerSchemaOptions` | `type DefaultedIntegerSchemaOptions = IntegerSchemaOptions & Readonly<{ default?: number; }>` | Options for defaulted integer factories. |
-| `NotFoundOptions` | `type NotFoundOptions = Readonly<{ errors: unknown; path?: readonly string[]; resourceId?: string \| number; message?: string; }>` | Options accepted by `notFound`. |
-| `ContractsInspectionTarget` | `type ContractsInspectionTarget = unknown` | Target accepted by `inspectContracts`. |
-| `InspectionReport` | `type InspectionReport` | JSON-stable report returned by `inspectContracts`. |
-| `InspectionStatus` | `type InspectionStatus = "ok" \| "warning" \| "error"` | Status field of `InspectionReport`. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `StringSchemaOptions` | type alias | `type StringSchemaOptions = Readonly<{ description?: string; }>` | Options for string-derived schema factories. |
+| `BoundedStringSchemaOptions` | type alias | `type BoundedStringSchemaOptions = StringSchemaOptions & Readonly<{ min?: number; max: number; }>` | Options for `boundedString`. |
+| `IntegerSchemaOptions` | type alias | `type IntegerSchemaOptions = Readonly<{ min?: number; max?: number; description?: string; }>` | Options for integer schema factories. |
+| `DefaultedIntegerSchemaOptions` | type alias | `type DefaultedIntegerSchemaOptions = IntegerSchemaOptions & Readonly<{ default?: number; }>` | Options for defaulted integer factories. |
+| `NotFoundOptions` | type alias | `type NotFoundOptions = Readonly<{ errors: unknown; path?: readonly string[]; resourceId?: string \| number; message?: string; }>` | Options accepted by `notFound`. |
+| `ContractsInspectionTarget` | type alias | `type ContractsInspectionTarget = unknown` | Target accepted by `inspectContracts`. |
+| `InspectionReport` | type alias | `type InspectionReport` | JSON-stable report returned by `inspectContracts`. |
+| `InspectionStatus` | type alias | `type InspectionStatus = "ok" \| "warning" \| "error"` | Status field of `InspectionReport`. |
 
 ## Sub-path exports
 

@@ -19,24 +19,24 @@ carry the framework integrations:
 
 ## Configuration
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `configureLogging` | `async function configureLogging(config?: LoggingConfig): Promise<void>` | Configure LogTape for NetScript applications, using the provided options or sensible defaults. |
-| `ensureLogging` | `async function ensureLogging(config?: LoggingConfig): Promise<void>` | Ensure logging is configured, initializing with defaults if needed. |
-| `isLoggingConfigured` | `function isLoggingConfigured(): boolean` | Check whether logging has been configured. |
-| `markConfigured` | `function markConfigured(): void` | Mark logging as configured (for manual configuration scenarios). |
-| `resetLogging` | `async function resetLogging(): Promise<void>` | Reset the LogTape configuration. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `configureLogging` | function | `async function configureLogging(config?: LoggingConfig): Promise<void>` | Configure LogTape for NetScript applications, using the provided options or sensible defaults. |
+| `ensureLogging` | function | `async function ensureLogging(config?: LoggingConfig): Promise<void>` | Ensure logging is configured, initializing with defaults if needed. |
+| `isLoggingConfigured` | function | `function isLoggingConfigured(): boolean` | Check whether logging has been configured. |
+| `markConfigured` | function | `function markConfigured(): void` | Mark logging as configured (for manual configuration scenarios). |
+| `resetLogging` | function | `async function resetLogging(): Promise<void>` | Reset the LogTape configuration. |
 
 ## Logger creators
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createLogger` | `function createLogger(category): Logger` | Create a logger with a custom category hierarchy. |
-| `createServiceLogger` | `function createServiceLogger(serviceName: string): Logger` | Create a logger for a NetScript service. |
-| `createPackageLogger` | `function createPackageLogger(packageName: string): Logger` | Create a logger for a NetScript package. |
-| `createWorkerLogger` | `function createWorkerLogger(workerName: string): Logger` | Create a logger for workers/jobs. |
-| `createJobLogger` | `function createJobLogger(jobId: string): Logger` | Create a logger for a job. |
-| `createChildLogger` | `function createChildLogger(parent: Logger, name: string): Logger` | Create a child logger from a parent logger, preserving the parent hierarchy. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createLogger` | function | `function createLogger(category): Logger` | Create a logger with a custom category hierarchy. |
+| `createServiceLogger` | function | `function createServiceLogger(serviceName: string): Logger` | Create a logger for a NetScript service. |
+| `createPackageLogger` | function | `function createPackageLogger(packageName: string): Logger` | Create a logger for a NetScript package. |
+| `createWorkerLogger` | function | `function createWorkerLogger(workerName: string): Logger` | Create a logger for workers/jobs. |
+| `createJobLogger` | function | `function createJobLogger(jobId: string): Logger` | Create a logger for a job. |
+| `createChildLogger` | function | `function createChildLogger(parent: Logger, name: string): Logger` | Create a child logger from a parent logger, preserving the parent hierarchy. |
 
 ## Re-exported LogTape primitives
 

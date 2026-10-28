@@ -32,7 +32,7 @@ canonical reference page.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `streamsPlugin` | variable | `const streamsPlugin: PluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
+| `streamsPlugin` | const | `const streamsPlugin: PluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
 
 ## Topic authoring
 
@@ -81,7 +81,7 @@ for their full definitions.
 | `PluginMetadata` | type alias |
 | `PluginMetadataValue` | type alias |
 | `PluginType` | type alias |
-| `PLUGIN_TYPES` | variable |
+| `PLUGIN_TYPES` | const |
 
 ## Sub-path exports
 
@@ -101,7 +101,7 @@ CLI command group for the plugin, mounted under `deno x -A jsr:@netscript/plugin
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `streamsCli` | variable | `const streamsCli: StreamsCli` | Default CLI instance for the streams plugin. |
+| `streamsCli` | const | `const streamsCli: StreamsCli` | Default CLI instance for the streams plugin. |
 | `StreamsCli` | class | `class StreamsCli` | CLI command group for `@netscript/plugin-streams`. |
 
 The CLI types `PluginCli`, `PluginCliArgs`, `PluginCliCommand`, and `PluginCliResult` are
@@ -112,7 +112,7 @@ re-exported from [`@netscript/plugin`](/reference/plugin/) and document the base
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `streamsScaffolder` | variable | `const streamsScaffolder: StreamsScaffolder` | Minimal scaffolder descriptor for streams plugin packages. |
+| `streamsScaffolder` | const | `const streamsScaffolder: StreamsScaffolder` | Minimal scaffolder descriptor for streams plugin packages. |
 | `StreamsScaffolder` | interface | `interface StreamsScaffolder` | Scaffolding descriptor for the streams plugin package. |
 
 ### `@netscript/plugin-streams/e2e` {#sub-path-e2e}

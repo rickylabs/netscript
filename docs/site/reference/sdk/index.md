@@ -241,72 +241,72 @@ Server-side only. Importing this subpath is inert. Custom server bootstraps must
 `setCacheProvider(cacheQuery)` explicitly; `defineFreshApp()` does this for NetScript-managed Fresh
 apps.
 
-| Symbol                   | Kind       | Description                                                            |
-| ------------------------ | ---------- | ---------------------------------------------------------------------- |
-| `cacheQuery`             | variable   | Shared cache-query singleton.                                          |
-| `CacheQuery`             | class      | Query cache engine with stale-while-revalidate semantics.              |
-| `KvCacheStore`           | class      | SDK cache store backed by the shared `@netscript/kv` singleton.        |
-| `setCacheProvider`       | function   | Register the cache engine (call once during server bootstrap).         |
-| `getCacheProvider`       | function   | Retrieve the registered cache provider.                                |
-| `hasCacheProvider`       | function   | Check whether a cache provider has been registered.                    |
-| `resetCacheProvider`     | function   | Reset the cache provider (primarily for testing).                      |
-| `createActionQueryKey`   | function   | Build a canonical resource/action/input query key.                     |
-| `serializeQueryKeyInput` | function   | Serialize structured query input into the canonical cache-key segment. |
-| `isCacheEntryStale`      | function   | Determine whether a cached entry is stale for a freshness window.      |
-| `toCachedEntry`          | function   | Convert a persisted cache entry into the public cached-entry shape.    |
-| `CacheEntry`             | interface  | Persisted cache payload stored by the SDK cache engine.                |
-| `CachedEntry`            | interface  | Public cache entry shape returned to framework consumers.              |
-| `CacheProvider`          | interface  | Minimal interface the query-factory layer needs from the cache engine. |
-| `CacheQueryOptions`      | interface  | Full cache-query execution options.                                    |
-| `QueryParams`            | interface  | Cache policy overrides for a query execution.                          |
-| `QueryKey`               | type alias | Serializable query key used to address cached entries.                 |
-| `QueryKeyPart`           | type alias | Primitive query-key segment supported by the SDK cache layer.          |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `cacheQuery` | const | Shared cache-query singleton. |
+| `CacheQuery` | class | Query cache engine with stale-while-revalidate semantics. |
+| `KvCacheStore` | class | SDK cache store backed by the shared `@netscript/kv` singleton. |
+| `setCacheProvider` | function | Register the cache engine (call once during server bootstrap). |
+| `getCacheProvider` | function | Retrieve the registered cache provider. |
+| `hasCacheProvider` | function | Check whether a cache provider has been registered. |
+| `resetCacheProvider` | function | Reset the cache provider (primarily for testing). |
+| `createActionQueryKey` | function | Build a canonical resource/action/input query key. |
+| `serializeQueryKeyInput` | function | Serialize structured query input into the canonical cache-key segment. |
+| `isCacheEntryStale` | function | Determine whether a cached entry is stale for a freshness window. |
+| `toCachedEntry` | function | Convert a persisted cache entry into the public cached-entry shape. |
+| `CacheEntry` | interface | Persisted cache payload stored by the SDK cache engine. |
+| `CachedEntry` | interface | Public cache entry shape returned to framework consumers. |
+| `CacheProvider` | interface | Minimal interface the query-factory layer needs from the cache engine. |
+| `CacheQueryOptions` | interface | Full cache-query execution options. |
+| `QueryParams` | interface | Cache policy overrides for a query execution. |
+| `QueryKey` | type alias | Serializable query key used to address cached entries. |
+| `QueryKeyPart` | type alias | Primitive query-key segment supported by the SDK cache layer. |
 
 ## Query client / TanStack integration (`@netscript/sdk/query-client`)
 
 Browser- and island-facing TanStack Query integration.
 
-| Symbol                            | Kind       | Signature / Description                                                                                                                                                                                                                                                                                         |
-| --------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `createNetScriptQueryClient`      | function   | TanStack QueryClient with server-first defaults. Signature: `createNetScriptQueryClient(options): QueryClient`.                                                                                                                                                                                                 |
-| `createServiceQueryUtils`         | function   | Thin oRPC/TanStack remap with `queryOptions({ input })`; unlike the golden-path `createQueryFactories` call `queryOptions(input)`, it has no server KV tier. Do not mix the two call shapes in one data layer. Signature: `createServiceQueryUtils<TContract>(client, options?): ServiceQueryUtils<TContract>`. |
-| `createKvCachePersister`          | function   | KV-backed async storage adapter for TanStack Query persistence.                                                                                                                                                                                                                                                 |
-| `bridgeInvalidation`              | function   | Build a client-side invalidation filter from a resource and optional action.                                                                                                                                                                                                                                    |
-| `toClientKeyPrefix`               | function   | Convert an SDK resource/action pair to a client-side TanStack key prefix.                                                                                                                                                                                                                                       |
-| `DEFAULT_STALE_TIME`              | variable   | Default stale time (30 s) matching the server-first philosophy.                                                                                                                                                                                                                                                 |
-| `DEFAULT_GC_TIME`                 | variable   | Default garbage-collection time (5 min) matching the server KV cache TTL.                                                                                                                                                                                                                                       |
-| `QueryClientPort`                 | type       | Narrow TanStack QueryClient capability set used by SDK collection and query adapters.                                                                                                                                                                                                                           |
-| `QueryClientFilters`              | interface  | Cache selector for invalidation and lookup operations.                                                                                                                                                                                                                                                          |
-| `QueryClientFetchOptions`         | interface  | Options accepted by query fetch operations.                                                                                                                                                                                                                                                                     |
-| `QueryClientSetOptions`           | interface  | Options accepted by cache write operations.                                                                                                                                                                                                                                                                     |
-| `QueryClientPredicate`            | type alias | Predicate filtering query cache operations by key or metadata.                                                                                                                                                                                                                                                  |
-| `QueryOptionsWithInitialData`     | interface  | TanStack-compatible options produced by the query-options helper.                                                                                                                                                                                                                                               |
-| `ActionQueryOptions`              | interface  | Configuration for the action query-options helper.                                                                                                                                                                                                                                                              |
-| `ActionMutationOptions`           | interface  | Configuration for the action mutation-options helper.                                                                                                                                                                                                                                                           |
-| `MutationOptionsResult`           | interface  | TanStack-compatible mutation options produced by the SDK.                                                                                                                                                                                                                                                       |
-| `CreateServiceQueryUtilsOptions`  | interface  | Options for creating TanStack Query utils from an SDK service client.                                                                                                                                                                                                                                           |
-| `NetScriptQueryClientOptions`     | interface  | Options for `createNetScriptQueryClient`.                                                                                                                                                                                                                                                                       |
-| `KvCachePersisterOptions`         | interface  | Options for `createKvCachePersister`.                                                                                                                                                                                                                                                                           |
-| `KvCachePersisterStorage`         | interface  | Async storage adapter shape used by the persister.                                                                                                                                                                                                                                                              |
-| `ServiceQueryUtils`               | type alias | TanStack Query utilities derived from a service contract.                                                                                                                                                                                                                                                       |
-| `ServiceProcedureQueryUtils`      | interface  | TanStack Query utilities for one service procedure.                                                                                                                                                                                                                                                             |
-| `ServiceProcedureQueryOptions`    | type alias | Query options accepted by a service procedure utility.                                                                                                                                                                                                                                                          |
-| `ServiceProcedureQueryResult`     | interface  | Query options returned by a service procedure utility.                                                                                                                                                                                                                                                          |
-| `ServiceProcedureMutationOptions` | interface  | Mutation options accepted by a service procedure utility.                                                                                                                                                                                                                                                       |
-| `ServiceProcedureMutationResult`  | interface  | Mutation options returned by a service procedure utility.                                                                                                                                                                                                                                                       |
-| `ServiceProcedureInfiniteOptions` | interface  | Infinite-query options accepted by a service procedure utility.                                                                                                                                                                                                                                                 |
-| `ServiceProcedureInfiniteResult`  | interface  | Infinite-query options returned by a service procedure utility.                                                                                                                                                                                                                                                 |
-| `ServiceProcedureStreamedOptions` | type alias | Streamed-query options accepted by a service procedure utility.                                                                                                                                                                                                                                                 |
-| `ServiceProcedureStreamedResult`  | type alias | Streamed-query options returned by a service procedure utility.                                                                                                                                                                                                                                                 |
-| `ServiceProcedureLiveResult`      | type alias | Live-query options returned by a service procedure utility.                                                                                                                                                                                                                                                     |
-| `ServiceOperationKey`             | type alias | Partial matching key generated by service query utilities.                                                                                                                                                                                                                                                      |
-| `ServiceOperationKeyOptions`      | interface  | Partial matching-key options at router or procedure level.                                                                                                                                                                                                                                                      |
-| `ServiceOperationType`            | type alias | Operation kinds accepted by service query utility keys.                                                                                                                                                                                                                                                         |
-| `ServiceOptionalInputRest`        | type alias | Optional/required single-option tuple based on input optionality.                                                                                                                                                                                                                                               |
-| `ServicePartialInput`             | type alias | Deep partial input used by matching-key helpers.                                                                                                                                                                                                                                                                |
-| `ServiceQueryKeyOptions`          | type alias | Query-key options for a single service procedure.                                                                                                                                                                                                                                                               |
-| `ServiceStreamedKeyOptions`       | interface  | Serializable streamed-query key options.                                                                                                                                                                                                                                                                        |
-| `ServiceQueryClientContext`       | type alias | Empty oRPC client context used by SDK-created service clients.                                                                                                                                                                                                                                                  |
+| Symbol | Kind | Signature / Description |
+| --- | --- | --- |
+| `createNetScriptQueryClient` | function | TanStack QueryClient with server-first defaults. Signature: `createNetScriptQueryClient(options): QueryClient`. |
+| `createServiceQueryUtils` | function | Thin oRPC/TanStack remap with `queryOptions({ input })`; unlike the golden-path `createQueryFactories` call `queryOptions(input)`, it has no server KV tier. Do not mix the two call shapes in one data layer. Signature: `createServiceQueryUtils<TContract>(client, options?): ServiceQueryUtils<TContract>`. |
+| `createKvCachePersister` | function | KV-backed async storage adapter for TanStack Query persistence. |
+| `bridgeInvalidation` | function | Build a client-side invalidation filter from a resource and optional action. |
+| `toClientKeyPrefix` | function | Convert an SDK resource/action pair to a client-side TanStack key prefix. |
+| `DEFAULT_STALE_TIME` | const | Default stale time (30 s) matching the server-first philosophy. |
+| `DEFAULT_GC_TIME` | const | Default garbage-collection time (5 min) matching the server KV cache TTL. |
+| `QueryClientPort` | type alias | Narrow TanStack QueryClient capability set used by SDK collection and query adapters. |
+| `QueryClientFilters` | interface | Cache selector for invalidation and lookup operations. |
+| `QueryClientFetchOptions` | interface | Options accepted by query fetch operations. |
+| `QueryClientSetOptions` | interface | Options accepted by cache write operations. |
+| `QueryClientPredicate` | type alias | Predicate filtering query cache operations by key or metadata. |
+| `QueryOptionsWithInitialData` | interface | TanStack-compatible options produced by the query-options helper. |
+| `ActionQueryOptions` | interface | Configuration for the action query-options helper. |
+| `ActionMutationOptions` | interface | Configuration for the action mutation-options helper. |
+| `MutationOptionsResult` | interface | TanStack-compatible mutation options produced by the SDK. |
+| `CreateServiceQueryUtilsOptions` | interface | Options for creating TanStack Query utils from an SDK service client. |
+| `NetScriptQueryClientOptions` | interface | Options for `createNetScriptQueryClient`. |
+| `KvCachePersisterOptions` | interface | Options for `createKvCachePersister`. |
+| `KvCachePersisterStorage` | interface | Async storage adapter shape used by the persister. |
+| `ServiceQueryUtils` | type alias | TanStack Query utilities derived from a service contract. |
+| `ServiceProcedureQueryUtils` | interface | TanStack Query utilities for one service procedure. |
+| `ServiceProcedureQueryOptions` | type alias | Query options accepted by a service procedure utility. |
+| `ServiceProcedureQueryResult` | interface | Query options returned by a service procedure utility. |
+| `ServiceProcedureMutationOptions` | interface | Mutation options accepted by a service procedure utility. |
+| `ServiceProcedureMutationResult` | interface | Mutation options returned by a service procedure utility. |
+| `ServiceProcedureInfiniteOptions` | interface | Infinite-query options accepted by a service procedure utility. |
+| `ServiceProcedureInfiniteResult` | interface | Infinite-query options returned by a service procedure utility. |
+| `ServiceProcedureStreamedOptions` | type alias | Streamed-query options accepted by a service procedure utility. |
+| `ServiceProcedureStreamedResult` | type alias | Streamed-query options returned by a service procedure utility. |
+| `ServiceProcedureLiveResult` | type alias | Live-query options returned by a service procedure utility. |
+| `ServiceOperationKey` | type alias | Partial matching key generated by service query utilities. |
+| `ServiceOperationKeyOptions` | interface | Partial matching-key options at router or procedure level. |
+| `ServiceOperationType` | type alias | Operation kinds accepted by service query utility keys. |
+| `ServiceOptionalInputRest` | type alias | Optional/required single-option tuple based on input optionality. |
+| `ServicePartialInput` | type alias | Deep partial input used by matching-key helpers. |
+| `ServiceQueryKeyOptions` | type alias | Query-key options for a single service procedure. |
+| `ServiceStreamedKeyOptions` | interface | Serializable streamed-query key options. |
+| `ServiceQueryClientContext` | type alias | Empty oRPC client context used by SDK-created service clients. |
 
 ## Collections (`@netscript/sdk/collections`)
 

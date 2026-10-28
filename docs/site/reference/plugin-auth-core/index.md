@@ -41,19 +41,19 @@ package's public surface reported by `deno doc`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `authContract` | constant | Root auth contract export. |
-| `authContractV1` | constant | Versioned v1 auth contract export. |
-| `authStreamSchema` | constant | Stream schema for auth events. |
-| `AuthConfigSchema` | constant | Schema for auth runtime configuration. |
-| `AuthProviderConfigSchema` | constant | Schema for provider configuration. |
-| `AuthSessionPolicySchema` | constant | Schema for session policy configuration. |
-| `AuthSessionSchema` | constant | Schema for auth sessions. |
-| `AuthUserSchema` | constant | Schema for auth user payloads. |
-| `AccountSchema` | constant | Schema for auth account payloads. |
-| `AUTH_SESSION_STATES` | constant | Supported auth session states. |
-| `AUTH_ACCOUNT_STATES` | constant | Supported account states. |
-| `AUTH_STREAM_EVENT_TYPES` | constant | Supported auth stream event types. |
-| `DEFAULT_AUTH_BACKEND_NAME` | constant | Default backend name used by config and registries. |
+| `authContract` | const | Root auth contract export. |
+| `authContractV1` | const | Versioned v1 auth contract export. |
+| `authStreamSchema` | const | Stream schema for auth events. |
+| `AuthConfigSchema` | const | Schema for auth runtime configuration. |
+| `AuthProviderConfigSchema` | const | Schema for provider configuration. |
+| `AuthSessionPolicySchema` | const | Schema for session policy configuration. |
+| `AuthSessionSchema` | const | Schema for auth sessions. |
+| `AuthUserSchema` | const | Schema for auth user payloads. |
+| `AccountSchema` | const | Schema for auth account payloads. |
+| `AUTH_SESSION_STATES` | const | Supported auth session states. |
+| `AUTH_ACCOUNT_STATES` | const | Supported account states. |
+| `AUTH_STREAM_EVENT_TYPES` | const | Supported auth stream event types. |
+| `DEFAULT_AUTH_BACKEND_NAME` | const | Default backend name used by config and registries. |
 
 ## Common types
 
@@ -83,10 +83,10 @@ retains no principal cache. Authorization remains a separate service policy.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createAuthServiceAuthenticator` | function | Verify an active, unexpired session through the native auth SDK. |
-| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type | Canonical service authentication types re-exported for the complete public signature. |
+| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type alias | Canonical service authentication types re-exported for the complete public signature. |
 | `AuthServiceAuthenticatorOptions` | interface | Required discovery name and timeout, optional router/protocol and explicit cleartext policy. |
 | `readBearerCredential` | function | Read a single strict bearer credential; reject ambiguous headers. |
-| `REMOTE_SESSION_REJECTIONS` | constant | Stable missing, unauthorized, inactive and expired denial reasons. |
+| `REMOTE_SESSION_REJECTIONS` | const | Stable missing, unauthorized, inactive and expired denial reasons. |
 | `RemoteSessionVerificationError` | class | Redacted transport, timeout, malformed response or remote error diagnostics. |
 
 Native middleware returns 401 for denial and 503 for verifier unavailability. Native claims are

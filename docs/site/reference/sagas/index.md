@@ -76,11 +76,11 @@ is provided by `inspectPlugin` from `@netscript/plugin`.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `sagasPlugin` | variable | `PluginManifest` | Plugin manifest for NetScript sagas. |
-| `SAGAS_PLUGIN_ID` | variable | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
-| `SAGAS_PLUGIN_VERSION` | variable | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
-| `SAGAS_API_SERVICE_NAME` | variable | `"sagas-api"` | Service contribution name for the sagas API process. |
-| `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Deprecated compatibility metadata; endpoint resolution does not use this value as an HTTP fallback. |
+| `sagasPlugin` | const | `PluginManifest` | Plugin manifest for NetScript sagas. |
+| `SAGAS_PLUGIN_ID` | const | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
+| `SAGAS_PLUGIN_VERSION` | const | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
+| `SAGAS_API_SERVICE_NAME` | const | `"sagas-api"` | Service contribution name for the sagas API process. |
+| `SAGAS_API_DEFAULT_PORT` | const | `8092` | Deprecated compatibility metadata; endpoint resolution does not use this value as an HTTP fallback. |
 
 
 ## Runtime (`@netscript/plugin-sagas/runtime`)
@@ -122,9 +122,9 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `SAGA_DURABILITY_TIERS` | variable | Durability tiers supported by saga definitions. |
-| `SAGA_INSTANCE_STATUSES` | variable | Saga instance lifecycle statuses. |
-| `CASCADED_MESSAGE_KINDS` | variable | Cascaded message kinds emitted by saga handlers. |
+| `SAGA_DURABILITY_TIERS` | const | Durability tiers supported by saga definitions. |
+| `SAGA_INSTANCE_STATUSES` | const | Saga instance lifecycle statuses. |
+| `CASCADED_MESSAGE_KINDS` | const | Cascaded message kinds emitted by saga handlers. |
 | `SagaDurabilityTier` | type alias | Saga durability tier. |
 | `SagaInstanceStatus` | type alias | Saga instance lifecycle status. |
 | `SagaDefinition` | type alias | Frozen saga definition produced by the fluent DSL. |
@@ -146,17 +146,17 @@ Version 1 of the sagas plugin API contract, its Zod schemas, and the router type
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `sagasContract` / `sagasContractV1` | variable | The versioned sagas API contract definition. |
+| `sagasContract` / `sagasContractV1` | const | The versioned sagas API contract definition. |
 | `SagasContractDefinition` / `SagasContractV1` | type alias | Contract shape for the sagas API. |
 | `SagasRouter` | interface | Router type derived from the sagas contract. |
 | `SagaDefinitionResponse` / `SagaDefinitionResponseSchema` | type / schema | Saga definition response payload and its Zod schema. |
 | `SagaInstanceResponse` / `SagaInstanceResponseSchema` | type / schema | Saga instance response payload and its Zod schema. |
 | `PublishMessageInput` / `PublishMessageInputSchema` | type / schema | Publish-message request payload and its Zod schema. |
 | `SagaSSEEvent` / `SagaSSEEventSchema` | type / schema | Server-sent event payload streamed to subscribers. |
-| `SagaFilters` / `InstanceFilters` | type | List/query filters for sagas and instances. |
-| `ListSagasInput` / `ListSagasOutput` | type | List-sagas request and response. |
-| `ListInstancesInput` / `ListInstancesOutput` | type | List-instances request and response. |
-| `GetInstanceHistoryInput` / `GetInstanceHistoryOutput` | type | Instance-history request and response. |
+| `SagaFilters` / `InstanceFilters` | type alias | List/query filters for sagas and instances. |
+| `ListSagasInput` / `ListSagasOutput` | type alias | List-sagas request and response. |
+| `ListInstancesInput` / `ListInstancesOutput` | type alias | List-instances request and response. |
+| `GetInstanceHistoryInput` / `GetInstanceHistoryOutput` | type alias | Instance-history request and response. |
 
 ## Streams (`@netscript/plugin-sagas/streams`)
 
@@ -167,9 +167,9 @@ Browser-safe stream exports for the sagas plugin.
 | `createSagasStreamDB` | function | `createSagasStreamDB(...): SagasStreamDB` | Create the saga instance stream database. |
 | `SagasStreamDB` | type alias | - | Stream database type for saga instances. |
 | `SagaInstance` | type alias | - | Saga instance row materialized into the stream. |
-| `SagaInstanceSchema` | variable | - | Zod schema for a saga instance stream row. |
-| `sagasStreamSchema` | variable | - | Stream schema describing the saga collections. |
-| `SAGA_INSTANCE_STATUSES` | variable | - | Saga instance lifecycle statuses. |
+| `SagaInstanceSchema` | const | - | Zod schema for a saga instance stream row. |
+| `sagasStreamSchema` | const | - | Stream schema describing the saga collections. |
+| `SAGA_INSTANCE_STATUSES` | const | - | Saga instance lifecycle statuses. |
 
 ## CLI, scaffolding, and Aspire
 

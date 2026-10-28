@@ -23,18 +23,18 @@ Additional integration entrypoints are published as [sub-path exports](#sub-path
 
 ## Plugin manifest
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `triggersPlugin` | `const triggersPlugin: PluginManifest` | Plugin manifest for NetScript triggers. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `triggersPlugin` | const | `const triggersPlugin: PluginManifest` | Plugin manifest for NetScript triggers. |
 
 ## Manifest constants
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `TRIGGERS_PLUGIN_ID` | `const TRIGGERS_PLUGIN_ID = "triggers"` | Stable plugin identifier for NetScript triggers. |
-| `TRIGGERS_PLUGIN_VERSION` | `const TRIGGERS_PLUGIN_VERSION = "0.1.0"` | Initial plugin package version. |
-| `TRIGGERS_API_SERVICE_NAME` | `const TRIGGERS_API_SERVICE_NAME = "triggers-api"` | Default HTTP service name for trigger ingress and management APIs. |
-| `TRIGGERS_API_DEFAULT_PORT` | `const TRIGGERS_API_DEFAULT_PORT = 8093` | Default HTTP port for trigger ingress and management APIs. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `TRIGGERS_PLUGIN_ID` | const | `const TRIGGERS_PLUGIN_ID = "triggers"` | Stable plugin identifier for NetScript triggers. |
+| `TRIGGERS_PLUGIN_VERSION` | const | `const TRIGGERS_PLUGIN_VERSION = "0.1.0"` | Initial plugin package version. |
+| `TRIGGERS_API_SERVICE_NAME` | const | `const TRIGGERS_API_SERVICE_NAME = "triggers-api"` | Default HTTP service name for trigger ingress and management APIs. |
+| `TRIGGERS_API_DEFAULT_PORT` | const | `const TRIGGERS_API_DEFAULT_PORT = 8093` | Default HTTP port for trigger ingress and management APIs. |
 
 ## Manifest types
 

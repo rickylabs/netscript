@@ -131,61 +131,61 @@ Parses and validates `appsettings.json` against the Zod schema.
 
 ### Config interfaces
 
-| Symbol | Description |
-| --- | --- |
-| `AppSettings` | Top-level `appsettings.json` structure. |
-| `NetScriptConfig` | Root NetScript configuration section. |
-| `BaseEntry` | Common fields shared by resource entries. |
-| `ReferenceEntry` | Reference fields for resources that depend on services or plugins. |
-| `ServiceEntry` | Backend service resource entry. |
-| `PluginEntry` | Plugin service resource entry. |
-| `DatabaseEntry` | Database resource entry. |
-| `CacheEntry` | Cache resource entry. |
-| `BackgroundProcessorEntry` | Background processor resource entry. |
-| `AppEntry` | Frontend, desktop, or task application entry. |
-| `ToolEntry` | Development tool entry. |
-| `DefaultsConfig` | Defaults section wrapper. |
-| `DenoDefaults` | Global Deno runtime defaults. |
-| `LoggingConfig` | ASP.NET Core logging configuration. |
-| `OtelConfig` | OpenTelemetry endpoint configuration. |
-| `ParseOptions` | Options for controlling parser behavior. |
-| `ParseResult` | Result of parsing `appsettings.json`. |
-| `AspireSchema` | Public parser contract exposed by Aspire schema constants. |
-| `AspireSafeParseSuccess` | Successful result from `AspireSchema.safeParse`. |
-| `AspireSafeParseFailure` | Failed result from `AspireSchema.safeParse`. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `AppSettings` | type alias | Top-level `appsettings.json` structure. |
+| `NetScriptConfig` | type alias | Root NetScript configuration section. |
+| `BaseEntry` | interface | Common fields shared by resource entries. |
+| `ReferenceEntry` | interface | Reference fields for resources that depend on services or plugins. |
+| `ServiceEntry` | type alias | Backend service resource entry. |
+| `PluginEntry` | type alias | Plugin service resource entry. |
+| `DatabaseEntry` | type alias | Database resource entry. |
+| `CacheEntry` | type alias | Cache resource entry. |
+| `BackgroundProcessorEntry` | type alias | Background processor resource entry. |
+| `AppEntry` | type alias | Frontend, desktop, or task application entry. |
+| `ToolEntry` | type alias | Development tool entry. |
+| `DefaultsConfig` | interface | Defaults section wrapper. |
+| `DenoDefaults` | type alias | Global Deno runtime defaults. |
+| `LoggingConfig` | interface | ASP.NET Core logging configuration. |
+| `OtelConfig` | type alias | OpenTelemetry endpoint configuration. |
+| `ParseOptions` | interface | Options for controlling parser behavior. |
+| `ParseResult` | interface | Result of parsing `appsettings.json`. |
+| `AspireSchema` | interface | Public parser contract exposed by Aspire schema constants. |
+| `AspireSafeParseSuccess` | interface | Successful result from `AspireSchema.safeParse`. |
+| `AspireSafeParseFailure` | interface | Failed result from `AspireSchema.safeParse`. |
 
 ### Config type aliases
 
-| Symbol | Description |
-| --- | --- |
-| `AppType` | Application entry variants supported by the AppHost config. |
-| `CacheEngine` | Cache engine variants supported by Aspire hosting integrations. |
-| `DatabaseEngine` | Database engine variants supported by Aspire hosting integrations. |
-| `ResourceMode` | Resource provisioning mode for managed resources. |
-| `AspireSafeParseResult` | Result from `AspireSchema.safeParse`. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `AppType` | type alias | Application entry variants supported by the AppHost config. |
+| `CacheEngine` | type alias | Cache engine variants supported by Aspire hosting integrations. |
+| `DatabaseEngine` | type alias | Database engine variants supported by Aspire hosting integrations. |
+| `ResourceMode` | type alias | Resource provisioning mode for managed resources. |
+| `AspireSafeParseResult` | type alias | Result from `AspireSchema.safeParse`. |
 
 ### Config Zod schemas
 
 These exported Zod schema values back the config contract above.
 
-| Symbol | Description |
-| --- | --- |
-| `AppSettingsSchema` | Top-level `appsettings.json` schema. |
-| `NetScriptConfigSchema` | Root NetScript configuration schema. |
-| `ServiceEntrySchema` | Service entry schema. |
-| `PluginEntrySchema` | Plugin entry schema. |
-| `DatabaseEntrySchema` | Database entry schema. |
-| `CacheEntrySchema` | Cache entry schema. |
-| `BackgroundProcessorEntrySchema` | Background processor entry schema. |
-| `AppEntrySchema` | Application entry schema. |
-| `ToolEntrySchema` | Development tool entry schema. |
-| `DefaultsSchema` | Defaults section schema. |
-| `DenoDefaultsSchema` | Global Deno runtime defaults schema. |
-| `OtelConfigSchema` | OpenTelemetry endpoint configuration schema. |
-| `AppTypeSchema` | Application type schema. |
-| `CacheEngineSchema` | Cache engine schema. |
-| `DatabaseEngineSchema` | Database engine schema. |
-| `ResourceModeSchema` | Resource provisioning mode schema. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `AppSettingsSchema` | const | Top-level `appsettings.json` schema. |
+| `NetScriptConfigSchema` | const | Root NetScript configuration schema. |
+| `ServiceEntrySchema` | const | Service entry schema. |
+| `PluginEntrySchema` | const | Plugin entry schema. |
+| `DatabaseEntrySchema` | const | Database entry schema. |
+| `CacheEntrySchema` | const | Cache entry schema. |
+| `BackgroundProcessorEntrySchema` | const | Background processor entry schema. |
+| `AppEntrySchema` | const | Application entry schema. |
+| `ToolEntrySchema` | const | Development tool entry schema. |
+| `DefaultsSchema` | const | Defaults section schema. |
+| `DenoDefaultsSchema` | const | Global Deno runtime defaults schema. |
+| `OtelConfigSchema` | const | OpenTelemetry endpoint configuration schema. |
+| `AppTypeSchema` | const | Application type schema. |
+| `CacheEngineSchema` | const | Cache engine schema. |
+| `DatabaseEngineSchema` | const | Database engine schema. |
+| `ResourceModeSchema` | const | Resource provisioning mode schema. |
 
 ## Schema generation (`@netscript/aspire/schema`)
 

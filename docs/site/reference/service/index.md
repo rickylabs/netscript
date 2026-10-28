@@ -28,31 +28,31 @@ oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibl
 
 ## Builder and presets
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createService` | `function createService<T extends ServiceRouter>(router: T, config: ServiceConfig): ServiceBuilder<T>` | Factory function to create a new service builder. |
-| `defineService` | `async function defineService<T extends ServiceRouter>(router: T, options: DefineServiceOptions): Promise<RunningService>` | One-liner preset for creating a fully-configured service. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createService` | function | `function createService<T extends ServiceRouter>(router: T, config: ServiceConfig): ServiceBuilder<T>` | Factory function to create a new service builder. |
+| `defineService` | function | `async function defineService<T extends ServiceRouter>(router: T, options: DefineServiceOptions): Promise<RunningService>` | One-liner preset for creating a fully-configured service. |
 
 ## Health primitives
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createHealthHandler` | `function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler` | Creates a comprehensive health check handler that runs all checks in parallel. |
-| `createLivenessHandler` | `function createLivenessHandler(): ServiceHandler` | Creates a simple liveness check handler. |
-| `createReadinessHandler` | `function createReadinessHandler(checks: Array<() => Promise<boolean>>): ServiceHandler` | Creates a readiness check handler that runs multiple async checks. |
-| `healthChecks` | `const healthChecks: { database; kv; service; custom }` | Pre-built health checks for common dependencies (`database`, `kv`, `service`, `custom`). |
-| `HEALTH_STATUS` | `const HEALTH_STATUS: { healthy; degraded; unhealthy }` | Health status values emitted by service health handlers. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createHealthHandler` | function | `function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler` | Creates a comprehensive health check handler that runs all checks in parallel. |
+| `createLivenessHandler` | function | `function createLivenessHandler(): ServiceHandler` | Creates a simple liveness check handler. |
+| `createReadinessHandler` | function | `function createReadinessHandler(checks: Array<() => Promise<boolean>>): ServiceHandler` | Creates a readiness check handler that runs multiple async checks. |
+| `healthChecks` | const | `const healthChecks: { database; kv; service; custom }` | Pre-built health checks for common dependencies (`database`, `kv`, `service`, `custom`). |
+| `HEALTH_STATUS` | const | `const HEALTH_STATUS: { healthy; degraded; unhealthy }` | Health status values emitted by service health handlers. |
 
 ## RPC, OpenAPI, and docs handlers
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createRPCHandler` | `function createRPCHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC RPC handler for type-safe client communication. |
-| `createRPCPlugins` | `function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin[]` | Creates the standard set of oRPC plugins. |
-| `createOpenAPIHandler` | `function createOpenAPIHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC OpenAPI handler for REST-style API access. |
-| `createOpenAPISpec` | `function createOpenAPISpec<T extends ServiceRouter>(router: T, config: OpenAPIConfig): ServiceHandler` | Creates an OpenAPI specification endpoint handler. |
-| `createScalarDocs` | `function createScalarDocs(options: ScalarDocsOptions): ServiceHandler` | Creates a Scalar API documentation UI handler. |
-| `createScalarJs` | `function createScalarJs(): ServiceHandler` | Creates a handler to serve the bundled Scalar JS file. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createRPCHandler` | function | `function createRPCHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC RPC handler for type-safe client communication. |
+| `createRPCPlugins` | function | `function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin[]` | Creates the standard set of oRPC plugins. |
+| `createOpenAPIHandler` | function | `function createOpenAPIHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC OpenAPI handler for REST-style API access. |
+| `createOpenAPISpec` | function | `function createOpenAPISpec<T extends ServiceRouter>(router: T, config: OpenAPIConfig): ServiceHandler` | Creates an OpenAPI specification endpoint handler. |
+| `createScalarDocs` | function | `function createScalarDocs(options: ScalarDocsOptions): ServiceHandler` | Creates a Scalar API documentation UI handler. |
+| `createScalarJs` | function | `function createScalarJs(): ServiceHandler` | Creates a handler to serve the bundled Scalar JS file. |
 
 When a procedure declares `NetScriptProcedureMeta.access`, `createOpenAPISpec()` preserves the
 operation and projects access as follows:
@@ -71,10 +71,10 @@ construction.
 
 ## Request-body limit
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createBodyLimitMiddleware` | `function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): ServiceMiddleware` | Creates middleware that rejects request bodies larger than `maxBytes` with a typed JSON `413` before any handler parses them. Throws `RangeError` unless `maxBytes` is a positive safe integer. |
-| `PAYLOAD_TOO_LARGE_ERROR` | `const PAYLOAD_TOO_LARGE_ERROR: 'PAYLOAD_TOO_LARGE'` | Error code carried by the JSON body of a `413` body-limit rejection. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createBodyLimitMiddleware` | function | `function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): ServiceMiddleware` | Creates middleware that rejects request bodies larger than `maxBytes` with a typed JSON `413` before any handler parses them. Throws `RangeError` unless `maxBytes` is a positive safe integer. |
+| `PAYLOAD_TOO_LARGE_ERROR` | const | `const PAYLOAD_TOO_LARGE_ERROR: 'PAYLOAD_TOO_LARGE'` | Error code carried by the JSON body of a `413` body-limit rejection. |
 
 The builder form is `createService(...).withBodyLimit({ maxBytes })` and the preset form is
 `defineService(router, { bodyLimit: { maxBytes } })`. A request that declares `Content-Length` is
@@ -112,19 +112,19 @@ The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimit
 
 The `@netscript/service/rate-limit` subpath exposes:
 
-| Symbol                        | Kind      | Description                                                                                 |
-| ----------------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| `createRateLimitMiddleware`   | function  | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After.      |
-| `createKvRateLimitStore`      | function  | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
-| `createMemoryRateLimitStore`  | function  | Creates a synchronous, capped development store with bounded TTL eviction.                  |
-| `resolveServiceClientAddress` | function  | Resolves the socket peer or explicitly trusted XFF hops, walking right to left.             |
-| `ServiceRateLimitOptions`     | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`.            |
-| `ServiceProxyTrust`           | type      | `false` or an address predicate identifying trusted proxy hops; default off.                |
-| `RateLimitStore`              | interface | Port reserving one slot atomically with `consume(request)`.                                 |
-| `RateLimitRequest`            | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal.           |
-| `RateLimitDecision`           | interface | Whether a slot was reserved and the epoch-millisecond window end.                           |
-| `KvRateLimitStoreOptions`     | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32).                      |
-| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000).                                       |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createRateLimitMiddleware` | function | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After. |
+| `createKvRateLimitStore` | function | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
+| `createMemoryRateLimitStore` | function | Creates a synchronous, capped development store with bounded TTL eviction. |
+| `resolveServiceClientAddress` | function | Resolves the socket peer or explicitly trusted XFF hops, walking right to left. |
+| `ServiceRateLimitOptions` | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`. |
+| `ServiceProxyTrust` | type alias | `false` or an address predicate identifying trusted proxy hops; default off. |
+| `RateLimitStore` | interface | Port reserving one slot atomically with `consume(request)`. |
+| `RateLimitRequest` | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal. |
+| `RateLimitDecision` | interface | Whether a slot was reserved and the epoch-millisecond window end. |
+| `KvRateLimitStoreOptions` | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32). |
+| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000). |
 
 The subpath also re-exports the first-party integration types `ServiceContext`,
 `ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
@@ -163,10 +163,10 @@ examples and storage/performance guarantees.
 
 ## Error and routing handlers
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createErrorHandler` | `function createErrorHandler(serviceName: string): ServiceErrorHandler` | Creates a global error handler for uncaught exceptions. |
-| `createNotFoundHandler` | `function createNotFoundHandler(serviceName: string): ServiceHandler` | Creates a 404 Not Found handler for unmatched routes. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createErrorHandler` | function | `function createErrorHandler(serviceName: string): ServiceErrorHandler` | Creates a global error handler for uncaught exceptions. |
+| `createNotFoundHandler` | function | `function createNotFoundHandler(serviceName: string): ServiceHandler` | Creates a 404 Not Found handler for unmatched routes. |
 
 ## Configuration and option types
 
@@ -255,12 +255,12 @@ who must reach it.
 
 ## Router and context type aliases
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `ServiceRouter` | `type ServiceRouter = Record<string, unknown>` | Router definition accepted by the service builder and handler factories. |
-| `ContextFactory<TCustom>` | `type ContextFactory<TCustom extends object = Record<never, never>> = (context: ServiceContext) => TCustom` | Creates the custom part of each service handler context. |
-| `ServiceHandlerContext<TCustom>` | `type ServiceHandlerContext<TCustom extends object = Record<never, never>> = Readonly<TCustom> & { db?; traceHeaders?; principal?; }` | Context visible after framework fields are composed. `principal` is optional and must be narrowed by handlers that require identity. |
-| `DbContext` | `type DbContext = Record<string, unknown>` | Database context injected into service handler context. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `ServiceRouter` | type alias | `type ServiceRouter = Record<string, unknown>` | Router definition accepted by the service builder and handler factories. |
+| `ContextFactory<TCustom>` | type alias | `type ContextFactory<TCustom extends object = Record<never, never>> = (context: ServiceContext) => TCustom` | Creates the custom part of each service handler context. |
+| `ServiceHandlerContext<TCustom>` | type alias | `type ServiceHandlerContext<TCustom extends object = Record<never, never>> = Readonly<TCustom> & { db?; traceHeaders?; principal?; }` | Context visible after framework fields are composed. `principal` is optional and must be narrowed by handlers that require identity. |
+| `DbContext` | type alias | `type DbContext = Record<string, unknown>` | Database context injected into service handler context. |
 
 ## Contract-declared authentication and authorization
 
@@ -464,25 +464,25 @@ assertServiceAuthPolicy(policy);
 
 ### `@netscript/service/auth` surface
 
-| Symbol | Description |
-| --- | --- |
-| `ServiceAuthPolicy` | Native guarded posture or an explicit public opt-out. |
-| `ServiceGuardedAuthPolicy` | Native authentication with optional authorization; excludes public fields. |
-| `ServicePublicAuthPolicy` | Literal public opt-out with a nonblank reason; excludes guard fields. |
-| `assertServiceAuthPolicy` | Validates an explicit posture and required callable ports without changing options. |
-| `createContractAuthorizer` | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
-| `createContractOverlayAuthorizer` | Enforces only access-marked procedures and leaves every other request to the service's own policy. |
-| `createInternalCredentialAuthenticator` | Accepts the internal bearer derived for this service and mints internal service principals. |
-| `isInternalServicePrincipal` | Default `InternalCallerPredicate`; true only for principals minted by the internal-credential authenticator. |
-| `createCompositeAuthenticator` | Tries authenticators in order over one `AuthenticatorPort` and returns the first success. |
-| `loadInstallationSecret` / `createInstallationSecret` | Import the per-installation secret from its file reference or from memory. |
-| `deriveInternalCredential` | Derives the per-service internal bearer from the installation secret. |
-| `createScopeAuthorizer` | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
-| `createStaticCredentialAuthenticator` | Maps configured credentials to principals. |
-| `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
-| `Principal` | Service-owned identity contract. |
-| `ContractPolicyAuthorizerPort` | Authorizer that binds to the builder's REST/RPC projection paths. |
-| `ContractAuthorizerRawRoute` | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `ServiceAuthPolicy` | type alias | Native guarded posture or an explicit public opt-out. |
+| `ServiceGuardedAuthPolicy` | interface | Native authentication with optional authorization; excludes public fields. |
+| `ServicePublicAuthPolicy` | interface | Literal public opt-out with a nonblank reason; excludes guard fields. |
+| `assertServiceAuthPolicy` | function | Validates an explicit posture and required callable ports without changing options. |
+| `createContractAuthorizer` | function | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
+| `createContractOverlayAuthorizer` | function | Enforces only access-marked procedures and leaves every other request to the service's own policy. |
+| `createInternalCredentialAuthenticator` | function | Accepts the internal bearer derived for this service and mints internal service principals. |
+| `isInternalServicePrincipal` | function | Default `InternalCallerPredicate`; true only for principals minted by the internal-credential authenticator. |
+| `createCompositeAuthenticator` | function | Tries authenticators in order over one `AuthenticatorPort` and returns the first success. |
+| `loadInstallationSecret` / `createInstallationSecret` | function | Import the per-installation secret from its file reference or from memory. |
+| `deriveInternalCredential` | function | Derives the per-service internal bearer from the installation secret. |
+| `createScopeAuthorizer` | function | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
+| `createStaticCredentialAuthenticator` | function | Maps configured credentials to principals. |
+| `createTrustedHeaderAuthenticator` | function | Maps trusted upstream identity headers to principals. |
+| `Principal` | interface | Service-owned identity contract. |
+| `ContractPolicyAuthorizerPort` | interface | Authorizer that binds to the builder's REST/RPC projection paths. |
+| `ContractAuthorizerRawRoute` | interface | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
 
 ## Exports
 

@@ -34,9 +34,9 @@ their canonical design files. This page covers the package API.
 
 ## Class-name helper
 
-| Symbol | Signature                                      | Description                                                 |
-| ------ | ---------------------------------------------- | ----------------------------------------------------------- |
-| `cn`   | `function cn(...inputs: ClassValue[]): string` | Combines clsx and tailwind-merge for optimal class merging. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `cn` | function | `function cn(...inputs: ClassValue[]): string` | Combines clsx and tailwind-merge for optimal class merging. |
 
 ## Icon primitive
 
@@ -168,15 +168,15 @@ filters each ingest through a shared `accept` / `multiple` policy before calling
 
 ### Dropzone ingest types
 
-| Symbol                      | Kind      | Description                                                                      |
-| --------------------------- | --------- | -------------------------------------------------------------------------------- |
-| `DROPZONE_INGEST_SOURCES`   | const     | The ingest source names: `["drop", "paste", "picker"]`.                          |
-| `DROPZONE_REJECTED_REASONS` | const     | The rejection reason names: `["type", "too-many"]`.                              |
-| `DropzoneIngestSource`      | type      | `"drop" \| "paste" \| "picker"`.                                                 |
-| `DropzoneRejectedReason`    | type      | `"type" \| "too-many"`.                                                          |
-| `DropzoneRejectedFile`      | interface | A rejected `file`, its `reason`, and the ingest `source` that supplied it.       |
-| `DropzoneIngestDetails`     | interface | `acceptedFiles`, `rejectedFiles`, the ingest `source`, and the original `event`. |
-| `DropzoneProps`             | interface | The full prop contract documented above.                                         |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `DROPZONE_INGEST_SOURCES` | const | The ingest source names: `["drop", "paste", "picker"]`. |
+| `DROPZONE_REJECTED_REASONS` | const | The rejection reason names: `["type", "too-many"]`. |
+| `DropzoneIngestSource` | type alias | `"drop" \| "paste" \| "picker"`. |
+| `DropzoneRejectedReason` | type alias | `"type" \| "too-many"`. |
+| `DropzoneRejectedFile` | interface | A rejected `file`, its `reason`, and the ingest `source` that supplied it. |
+| `DropzoneIngestDetails` | interface | `acceptedFiles`, `rejectedFiles`, the ingest `source`, and the original `event`. |
+| `DropzoneProps` | interface | The full prop contract documented above. |
 
 ### Dropzone example
 
@@ -214,12 +214,12 @@ assistive technology hears how many files were accepted or rejected.
 
 ## Redirect-flash (toast) helpers
 
-| Symbol                      | Signature                                                                           | Description                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `getToast`                  | `function getToast(url: URL): RegistryToast \| undefined`                           | Reads a toast payload from a URL when redirect-flash query parameters are present. |
-| `withToast`                 | `function withToast(path: string, toast: RegistryToast): string`                    | Appends a toast payload to a relative application path.                            |
-| `stripToastFromUrl`         | `function stripToastFromUrl(url: URL): string`                                      | Removes all toast query parameters from a URL while preserving path and hash.      |
-| `REGISTRY_TOAST_QUERY_KEYS` | `const REGISTRY_TOAST_QUERY_KEYS: { message: string; title: string; type: string }` | Query-string keys reserved by the redirect-flash helpers.                          |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `getToast` | function | `function getToast(url: URL): RegistryToast \| undefined` | Reads a toast payload from a URL when redirect-flash query parameters are present. |
+| `withToast` | function | `function withToast(path: string, toast: RegistryToast): string` | Appends a toast payload to a relative application path. |
+| `stripToastFromUrl` | function | `function stripToastFromUrl(url: URL): string` | Removes all toast query parameters from a URL while preserving path and hash. |
+| `REGISTRY_TOAST_QUERY_KEYS` | const | `const REGISTRY_TOAST_QUERY_KEYS: { message: string; title: string; type: string }` | Query-string keys reserved by the redirect-flash helpers. |
 
 ### Toast types
 
@@ -234,17 +234,17 @@ Exported from the [`@netscript/fresh-ui/interactive`](#sub-path-exports) sub-pat
 compound namespace bundling a root component with its structural subcomponents. The namespace,
 props, event, and shared structural contracts in this section are also public exports.
 
-| Symbol       | Signature                               | Description                                                                   |
-| ------------ | --------------------------------------- | ----------------------------------------------------------------------------- |
-| `Accordion`  | `const Accordion: AccordionNamespace`   | Compound accordion namespace with root and item subcomponents.                |
-| `ActionMenu` | `const ActionMenu: ActionMenuNamespace` | Keyboard-accessible action menu with intent-aware items and separators.       |
-| `Combobox`   | `const Combobox: ComboboxNamespace`     | Filterable listbox combobox with input, content, item, and empty-state parts. |
-| `Dialog`     | `const Dialog: DialogNamespace`         | Compound dialog namespace with root and structural subcomponents.             |
-| `Drawer`     | `const Drawer: DrawerNamespace`         | Compound drawer namespace with root and structural subcomponents.             |
-| `Popover`    | `const Popover: PopoverNamespace`       | Compound popover namespace with root and positioning subcomponents.           |
-| `Sheet`      | `const Sheet: SheetNamespace`           | Compound sheet namespace — side-docked inspection panel.                      |
-| `Tabs`       | `const Tabs: TabsNamespace`             | Compound tabs namespace with root, list, trigger, and content subcomponents.  |
-| `Tooltip`    | `const Tooltip: TooltipNamespace`       | Compound tooltip namespace with root and positioning subcomponents.           |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `Accordion` | const | `const Accordion: AccordionNamespace` | Compound accordion namespace with root and item subcomponents. |
+| `ActionMenu` | const | `const ActionMenu: ActionMenuNamespace` | Keyboard-accessible action menu with intent-aware items and separators. |
+| `Combobox` | const | `const Combobox: ComboboxNamespace` | Filterable listbox combobox with input, content, item, and empty-state parts. |
+| `Dialog` | const | `const Dialog: DialogNamespace` | Compound dialog namespace with root and structural subcomponents. |
+| `Drawer` | const | `const Drawer: DrawerNamespace` | Compound drawer namespace with root and structural subcomponents. |
+| `Popover` | const | `const Popover: PopoverNamespace` | Compound popover namespace with root and positioning subcomponents. |
+| `Sheet` | const | `const Sheet: SheetNamespace` | Compound sheet namespace — side-docked inspection panel. |
+| `Tabs` | const | `const Tabs: TabsNamespace` | Compound tabs namespace with root, list, trigger, and content subcomponents. |
+| `Tooltip` | const | `const Tooltip: TooltipNamespace` | Compound tooltip namespace with root and positioning subcomponents. |
 
 ### Action menu and combobox behavior
 
@@ -255,18 +255,18 @@ and empty-state parts.
 
 ### Interactive public contract inventory
 
-| Symbol                                                                                                                                                                                                                                                           | Family      | Description                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
-| `AccordionNamespace` / `AccordionRootProps` / `AccordionItemProps` / `AccordionItemTriggerProps` / `AccordionItemContentProps` / `AccordionItemIndicatorProps`                                                                                                   | Accordion   | Public compound namespace and root/item contracts.                                                                 |
-| `ACTION_MENU_ITEM_INTENTS` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuOpenChangeReason`                    | Action menu | Public namespace, part props, supported intents, and open-state reason.                                            |
-| `ComboboxNamespace` / `ComboboxRootProps` / `ComboboxInputProps` / `ComboboxContentProps` / `ComboboxItemProps` / `ComboboxEmptyProps` / `UseComboboxOptions` / `UseComboboxReturn`                                                                              | Combobox    | Public namespace, part props, and controlled filtering contracts.                                                  |
-| `DialogNamespace` / `DialogRootProps` / `DialogTriggerProps` / `DialogContentProps` / `DialogTitleProps` / `DialogDescriptionProps` / `DialogCloseProps`                                                                                                         | Dialog      | Public namespace and structural-part props.                                                                        |
-| `DrawerNamespace` / `DrawerRootProps` / `DrawerTriggerProps` / `DrawerContentProps` / `DrawerTitleProps` / `DrawerDescriptionProps` / `DrawerCloseProps`                                                                                                         | Drawer      | Public namespace and structural-part props.                                                                        |
-| `PopoverNamespace` / `PopoverRootProps` / `PopoverTriggerProps` / `PopoverAnchorProps` / `PopoverPositionerProps` / `PopoverContentProps` / `PopoverTitleProps` / `PopoverDescriptionProps` / `PopoverCloseProps` / `PopoverArrowProps` / `PopoverArrowTipProps` | Popover     | Public namespace, positioning, content, and arrow contracts.                                                       |
-| `SheetNamespace` / `SheetRootProps` / `SheetTriggerProps` / `SheetContentProps` / `SheetTitleProps` / `SheetDescriptionProps` / `SheetCloseProps`                                                                                                                | Sheet       | Public namespace and structural-part props.                                                                        |
-| `TabsNamespace` / `TabsRootProps` / `TabsListProps` / `TabsTriggerProps` / `TabsContentProps`                                                                                                                                                                    | Tabs        | Public namespace and tab/list/content props.                                                                       |
-| `TooltipNamespace` / `TooltipRootProps` / `TooltipTriggerProps` / `TooltipPositionerProps` / `TooltipContentProps` / `TooltipArrowProps` / `TooltipArrowTipProps`                                                                                                | Tooltip     | Public namespace, positioning, content, and arrow contracts.                                                       |
-| `FreshUiAttributeValue` / `FreshUiChild` / `FreshUiChildren` / `FreshUiElementProps` / `FreshUiEventHandler` / `FreshUiStyle`                                                                                                                                    | Shared      | Framework-neutral child, attribute, event, element-prop, and style contracts shared by the interactive primitives. |
+| Symbol | Kind | Family | Description |
+| --- | --- | --- | --- |
+| `AccordionNamespace` / `AccordionRootProps` / `AccordionItemProps` / `AccordionItemTriggerProps` / `AccordionItemContentProps` / `AccordionItemIndicatorProps` | type alias | Accordion | Public compound namespace and root/item contracts. |
+| `ACTION_MENU_ITEM_INTENTS` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuOpenChangeReason` | const / interface / type alias | Action menu | Public namespace, part props, supported intents, and open-state reason. |
+| `ComboboxNamespace` / `ComboboxRootProps` / `ComboboxInputProps` / `ComboboxContentProps` / `ComboboxItemProps` / `ComboboxEmptyProps` / `UseComboboxOptions` / `UseComboboxReturn` | type alias / interface | Combobox | Public namespace, part props, and controlled filtering contracts. |
+| `DialogNamespace` / `DialogRootProps` / `DialogTriggerProps` / `DialogContentProps` / `DialogTitleProps` / `DialogDescriptionProps` / `DialogCloseProps` | type alias | Dialog | Public namespace and structural-part props. |
+| `DrawerNamespace` / `DrawerRootProps` / `DrawerTriggerProps` / `DrawerContentProps` / `DrawerTitleProps` / `DrawerDescriptionProps` / `DrawerCloseProps` | type alias / reference | Drawer | Public namespace and structural-part props. |
+| `PopoverNamespace` / `PopoverRootProps` / `PopoverTriggerProps` / `PopoverAnchorProps` / `PopoverPositionerProps` / `PopoverContentProps` / `PopoverTitleProps` / `PopoverDescriptionProps` / `PopoverCloseProps` / `PopoverArrowProps` / `PopoverArrowTipProps` | type alias | Popover | Public namespace, positioning, content, and arrow contracts. |
+| `SheetNamespace` / `SheetRootProps` / `SheetTriggerProps` / `SheetContentProps` / `SheetTitleProps` / `SheetDescriptionProps` / `SheetCloseProps` | type alias | Sheet | Public namespace and structural-part props. |
+| `TabsNamespace` / `TabsRootProps` / `TabsListProps` / `TabsTriggerProps` / `TabsContentProps` | type alias | Tabs | Public namespace and tab/list/content props. |
+| `TooltipNamespace` / `TooltipRootProps` / `TooltipTriggerProps` / `TooltipPositionerProps` / `TooltipContentProps` / `TooltipArrowProps` / `TooltipArrowTipProps` | type alias | Tooltip | Public namespace, positioning, content, and arrow contracts. |
+| `FreshUiAttributeValue` / `FreshUiChild` / `FreshUiChildren` / `FreshUiElementProps` / `FreshUiEventHandler` / `FreshUiStyle` | type alias | Shared | Framework-neutral child, attribute, event, element-prop, and style contracts shared by the interactive primitives. |
 
 ## Desktop chrome
 
@@ -275,14 +275,14 @@ available browser/native bridge and returns an active or disabled capability sur
 assuming a desktop host. Window, menu, tray, notification, dialog, and event-target seams remain
 explicitly capability-checked.
 
-| Symbol                                                                                                                                                                                                                                                           | Family       | Description                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------- |
-| `createDesktopChrome` / `CreateDesktopChromeOptions`                                                                                                                                                                                                             | Factory      | Creates the capability-aware desktop chrome facade and configures bridge discovery.             |
-| `DESKTOP_CHROME_DISABLED_REASONS` / `DESKTOP_CHROME_STATUSES` / `DESKTOP_MENU_SOURCES` / `DESKTOP_OPERATION_REASONS` / `DESKTOP_OPERATION_STATUSES` / `DESKTOP_WINDOW_ACTIONS`                                                                                   | Vocabularies | Runtime constants for capability state, menu provenance, operation results, and window actions. |
-| `DesktopChromeActive` / `DesktopChromeCapability` / `DesktopChromeDisabled` / `DesktopChromeDisabledReason` / `DesktopChromeLifecycle` / `DesktopChromeStatus`                                                                                                   | Lifecycle    | Active/disabled discriminants and lifecycle contracts returned by the factory.                  |
-| `DesktopDialogCapability` / `DesktopEventTargetCapability` / `DesktopNotificationCapability` / `DesktopNotificationHandle` / `DesktopNotificationOptions` / `DesktopTrayCapability` / `DesktopTrayConfig` / `DesktopTrayConstructor` / `DesktopWindowCapability` | Capabilities | Optional native feature contracts exposed only when the host provides them.                     |
-| `DesktopMenuActionEvent` / `DesktopMenuActionItem` / `DesktopMenuItem` / `DesktopMenuRoleItem` / `DesktopMenuSeparator` / `DesktopMenuSource` / `DesktopMenuSubmenu` / `DesktopNativeMenuItem`                                                                   | Menus        | Discriminated native menu definitions and action-event payloads.                                |
-| `DesktopOperationReason` / `DesktopOperationResult` / `DesktopOperationStatus` / `DesktopWindowAction`                                                                                                                                                           | Operations   | Result and reason contracts for requested native window operations.                             |
+| Symbol | Kind | Family | Description |
+| --- | --- | --- | --- |
+| `createDesktopChrome` / `CreateDesktopChromeOptions` | function / interface | Factory | Creates the capability-aware desktop chrome facade and configures bridge discovery. |
+| `DESKTOP_CHROME_DISABLED_REASONS` / `DESKTOP_CHROME_STATUSES` / `DESKTOP_MENU_SOURCES` / `DESKTOP_OPERATION_REASONS` / `DESKTOP_OPERATION_STATUSES` / `DESKTOP_WINDOW_ACTIONS` | const | Vocabularies | Runtime constants for capability state, menu provenance, operation results, and window actions. |
+| `DesktopChromeActive` / `DesktopChromeCapability` / `DesktopChromeDisabled` / `DesktopChromeDisabledReason` / `DesktopChromeLifecycle` / `DesktopChromeStatus` | interface / type alias | Lifecycle | Active/disabled discriminants and lifecycle contracts returned by the factory. |
+| `DesktopDialogCapability` / `DesktopEventTargetCapability` / `DesktopNotificationCapability` / `DesktopNotificationHandle` / `DesktopNotificationOptions` / `DesktopTrayCapability` / `DesktopTrayConfig` / `DesktopTrayConstructor` / `DesktopWindowCapability` | interface | Capabilities | Optional native feature contracts exposed only when the host provides them. |
+| `DesktopMenuActionEvent` / `DesktopMenuActionItem` / `DesktopMenuItem` / `DesktopMenuRoleItem` / `DesktopMenuSeparator` / `DesktopMenuSource` / `DesktopMenuSubmenu` / `DesktopNativeMenuItem` | interface / type alias | Menus | Discriminated native menu definitions and action-event payloads. |
+| `DesktopOperationReason` / `DesktopOperationResult` / `DesktopOperationStatus` / `DesktopWindowAction` | type alias | Operations | Result and reason contracts for requested native window operations. |
 
 ## L0 primitives
 
@@ -290,11 +290,11 @@ Exported from the [`@netscript/fresh-ui/primitives`](#sub-path-exports) sub-path
 prefer Preact intrinsic elements and platform attributes, using these helpers only where they
 encapsulate real behavior.
 
-| Symbol           | Signature                                                                                    | Description                                                                |
-| ---------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `Show`           | `function Show<T>({ when, fallback, children }: ShowProps<T>): PrimitiveChildren`            | Conditionally renders children without introducing an extra DOM wrapper.   |
-| `VisuallyHidden` | `function VisuallyHidden({ children, style, ...props }: VisuallyHiddenProps): PrimitiveNode` | Renders content for assistive technology while keeping it visually hidden. |
-| `SrOnly`         | `function SrOnly(props: VisuallyHiddenProps): PrimitiveNode`                                 | Alias for `VisuallyHidden` using the common screen-reader naming.          |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `Show` | function | `function Show<T>({ when, fallback, children }: ShowProps<T>): PrimitiveChildren` | Conditionally renders children without introducing an extra DOM wrapper. |
+| `VisuallyHidden` | function | `function VisuallyHidden({ children, style, ...props }: VisuallyHiddenProps): PrimitiveNode` | Renders content for assistive technology while keeping it visually hidden. |
+| `SrOnly` | function | `function SrOnly(props: VisuallyHiddenProps): PrimitiveNode` | Alias for `VisuallyHidden` using the common screen-reader naming. |
 
 ### Primitive types
 
@@ -438,7 +438,7 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 | `BuiltToken` | interface | Exported token metadata plus the resolved DTCG value used by Figma and contrast tooling. |
 | `TokenSources` | interface | The single resolver and source documents keyed by their relative reference names. |
 | `TokenResolver` | interface | DTCG version, named source sets, modifier contexts and ordered resolution references. |
-| `ResolverSource` | type | An inline token document or a resolver reference to a document, set or modifier. |
+| `ResolverSource` | type alias | An inline token document or a resolver reference to a document, set or modifier. |
 | `TokenDocument` | interface | Nested token groups, typed tokens and document metadata. |
 | `DesignToken` | interface | Explicit DTCG type/value with optional description and NetScript extensions. |
 | `TokenValue` | recursive type | JSON scalar, array or object used by aliases and typed DTCG composites. |
@@ -447,8 +447,8 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 | `TokenMixDerivation` | interface | Two color paths, first-color weight and interpolation space; CSS retains native color-mix. |
 | `TokenShadowDerivation` | interface | Themeable shadow color/vertical-offset/blur paths and pixel horizontal-offset/spread values. |
 | `TokenPreset` | interface | Preset identity, language/flavor, selected Figma modes and fixed source/public density. |
-| `TokenScheme` | type | A supported scheme name derived from TOKEN_SCHEMES. |
-| `TokenDensity` | type | A supported density name derived from TOKEN_DENSITIES. |
+| `TokenScheme` | type alias | A supported scheme name derived from TOKEN_SCHEMES. |
+| `TokenDensity` | type alias | A supported density name derived from TOKEN_DENSITIES. |
 
 ```typescript
 import { buildTokens } from '@netscript/fresh-ui/tokens';

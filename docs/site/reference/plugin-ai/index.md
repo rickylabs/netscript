@@ -42,10 +42,10 @@ version) and carries no bundled service or background processor.
 
 | Symbol | Kind | Value | Description |
 | --- | --- | --- | --- |
-| `aiPlugin` | variable | `PluginManifest` | Plugin manifest for the NetScript AI plugin. |
-| `AI_PLUGIN_ID` | variable | `"@netscript/plugin-ai"` | Canonical plugin id used across the manifest, connector, and scaffolder. |
-| `AI_PLUGIN_VERSION` | variable | package version | Plugin version, single-sourced from the package `deno.json`. |
-| `AI_WORKSPACE_NAME` | variable | `"ai"` | Runtime-config topic name and generated userland workspace directory. |
+| `aiPlugin` | const | `PluginManifest` | Plugin manifest for the NetScript AI plugin. |
+| `AI_PLUGIN_ID` | const | `"@netscript/plugin-ai"` | Canonical plugin id used across the manifest, connector, and scaffolder. |
+| `AI_PLUGIN_VERSION` | const | package version | Plugin version, single-sourced from the package `deno.json`. |
+| `AI_WORKSPACE_NAME` | const | `"ai"` | Runtime-config topic name and generated userland workspace directory. |
 | `AiPluginManifest` | type alias | `PluginManifest` | Named handle consumers annotate a host plugin list with. |
 | `AiPluginId` | type alias | `"@netscript/plugin-ai"` | Literal type of the plugin id. |
 | `AiWorkspaceName` | type alias | `"ai"` | Literal type of the workspace name. |
@@ -75,8 +75,8 @@ exactly what an install will emit before writing any file.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `aiAdapterPlugin` | variable | The AI `NetScriptPlugin` connector (kind `"ai"`). |
-| `aiStarterResources` | variable | The ordered starter resources emitted by the default install. |
+| `aiAdapterPlugin` | const | The AI `NetScriptPlugin` connector (kind `"ai"`). |
+| `aiStarterResources` | const | The ordered starter resources emitted by the default install. |
 
 The connector declares:
 
@@ -247,12 +247,12 @@ for the full surface):
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `aiContract` / `aiContractV1` | variable | The versioned `/v1/ai` oRPC contract handle. |
-| `ChatInputSchema` / `ChatChunkSchema` | variable | Zod schemas for the streaming chat route IO. |
-| `ModelsInputSchema` / `ModelsResponseSchema` | variable | Zod schemas for the models route IO. |
-| `ToolInvokeInputSchema` / `ToolInvokeResponseSchema` | variable | Zod schemas for the tool-invocation route IO. |
-| `EmbedInputSchema` / `EmbedResponseSchema` | variable | Zod schemas for the embeddings route IO. |
-| `TranscribeInputSchema` / `TranscribeResponseSchema` | variable | Zod schemas for the transcription route IO. |
+| `aiContract` / `aiContractV1` | const | The versioned `/v1/ai` oRPC contract handle. |
+| `ChatInputSchema` / `ChatChunkSchema` | const | Zod schemas for the streaming chat route IO. |
+| `ModelsInputSchema` / `ModelsResponseSchema` | const | Zod schemas for the models route IO. |
+| `ToolInvokeInputSchema` / `ToolInvokeResponseSchema` | const | Zod schemas for the tool-invocation route IO. |
+| `EmbedInputSchema` / `EmbedResponseSchema` | const | Zod schemas for the embeddings route IO. |
+| `TranscribeInputSchema` / `TranscribeResponseSchema` | const | Zod schemas for the transcription route IO. |
 | `AiContract` / `AiContractV1` / `AiRouter` | type alias | Contract and router types derived from the contract. |
 
 ## Examples

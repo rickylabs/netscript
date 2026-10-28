@@ -28,11 +28,11 @@ test double:
 
 ## Factory functions
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createQueue` | `function createQueue<T = unknown>(name: string, options?: QueueOptions): MessageQueue<T>` | Create a message queue instance with auto-discovery (RabbitMQ, then Redis, then Deno KV). |
-| `createTypedQueue` | `function createTypedQueue<T>(name: string, schema: ValidationSchema<T>, options?: TypedQueueOptions): TypedMessageQueue<T>` | Create a type-safe message queue with Zod validation at enqueue and dequeue time. |
-| `createParallelQueue` | `function createParallelQueue<T = unknown>(name: string, options?: ParallelQueueOptions): MessageQueue<T>` | Create a queue with concurrent processing via Fedify ParallelMessageQueue. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createQueue` | function | `function createQueue<T = unknown>(name: string, options?: QueueOptions): MessageQueue<T>` | Create a message queue instance with auto-discovery (RabbitMQ, then Redis, then Deno KV). |
+| `createTypedQueue` | function | `function createTypedQueue<T>(name: string, schema: ValidationSchema<T>, options?: TypedQueueOptions): TypedMessageQueue<T>` | Create a type-safe message queue with Zod validation at enqueue and dequeue time. |
+| `createParallelQueue` | function | `function createParallelQueue<T = unknown>(name: string, options?: ParallelQueueOptions): MessageQueue<T>` | Create a queue with concurrent processing via Fedify ParallelMessageQueue. |
 
 ## Port contracts
 
@@ -68,13 +68,13 @@ Exported from the root and from [`@netscript/queue/errors`](#sub-path-exports).
 
 Exported from the root and from [`@netscript/queue/validation`](#sub-path-exports).
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `safeValidate` | `function safeValidate<T>(schema: ValidationSchema<T>, message: unknown): ValidationResult<T>` | Validate a message against a schema, returning a result object instead of throwing. |
-| `validateOrThrow` | `function validateOrThrow<T>(schema: ValidationSchema<T>, message: unknown, context?: Record): T` | Validate a message and throw `QueueValidationError` if invalid. |
-| `withValidation` | `function withValidation<T>(schema: ValidationSchema<T>, handler)` | Wrap a handler so messages are validated before it runs. |
-| `ValidationSchema` | interface | Minimal schema contract supported by the validation helpers. |
-| `ValidationResult` | interface | Result type returned by `safeValidate`. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `safeValidate` | function | `function safeValidate<T>(schema: ValidationSchema<T>, message: unknown): ValidationResult<T>` | Validate a message against a schema, returning a result object instead of throwing. |
+| `validateOrThrow` | function | `function validateOrThrow<T>(schema: ValidationSchema<T>, message: unknown, context?: Record): T` | Validate a message and throw `QueueValidationError` if invalid. |
+| `withValidation` | function | `function withValidation<T>(schema: ValidationSchema<T>, handler)` | Wrap a handler so messages are validated before it runs. |
+| `ValidationSchema` | interface | interface | Minimal schema contract supported by the validation helpers. |
+| `ValidationResult` | interface | interface | Result type returned by `safeValidate`. |
 
 ## Adapters
 

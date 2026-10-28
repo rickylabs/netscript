@@ -24,7 +24,7 @@ inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `workersPlugin` | variable | Plugin manifest for NetScript background workers. |
+| `workersPlugin` | const | Plugin manifest for NetScript background workers. |
 
 ## Sub-path exports
 
@@ -88,13 +88,13 @@ from its own `deno doc` surface.
 | `LogsCommand` | class | Show logs for a worker execution. |
 | `RunJobCommand` | class | Run a configured worker job. |
 | `WorkersCliCommand` | class | Base class for concrete workers CLI commands. |
-| `WORKERS_CLI_COMMANDS` | variable | Worker CLI commands exposed through the plugin CLI subpath. |
+| `WORKERS_CLI_COMMANDS` | const | Worker CLI commands exposed through the plugin CLI subpath. |
 | `WorkersCliBackend` | interface | Backend invoked by concrete command classes. |
 | `WorkersCliCategory` | type alias | Worker CLI command category used for grouped help output. |
 | `WorkersCliCommandDefinition` | interface | Workers command definition mounted by the plugin CLI. |
 | `WorkersCliCommandName` | type alias | Worker CLI command identifier. |
 | `WorkersCliFlagDefinition` | interface | Flag metadata shown by host CLI help renderers. |
-| `workersCli` | variable | Default CLI instance used by the host CLI walker. |
+| `workersCli` | const | Default CLI instance used by the host CLI walker. |
 
 ### `@netscript/plugin-workers/contracts`
 
@@ -116,19 +116,19 @@ Versioned oRPC service contracts plus the request/response schemas and types use
 | `TaskExecutionOptions` | type alias | Options supplied when executing a task. |
 | `TaskMessage` | type alias | Message enqueued to trigger a task execution. |
 | `TaskResult` | type alias | Result returned by task execution. |
-| `ExecutionFiltersSchema` | variable | Schema for list-executions filters. |
-| `ExecutionRecordResponseSchema` | variable | Schema for worker execution record responses. |
-| `JobCreateInputSchema` | variable | Schema for creating worker job definitions. |
-| `JobDefinitionResponseSchema` | variable | Schema for worker job definition responses. |
-| `JobFiltersSchema` | variable | Schema for list-jobs filters. |
-| `JobTriggerInputSchema` | variable | Schema for triggering a worker job by id. |
-| `JobUpdateInputSchema` | variable | Schema for updating worker job definitions. |
-| `JobUpdateWithIdSchema` | variable | Schema for updating a worker job definition by id. |
-| `SSEEventSchema` | variable | Schema for server-sent event payloads emitted by the workers service. |
-| `TaskDefinitionResponseSchema` | variable | Schema for worker task definition responses. |
-| `TaskFiltersSchema` | variable | Schema for list-tasks filters. |
-| `workersContract` | variable | Worker service contract definition for client generation. |
-| `workersContractV1` | variable | Context-bindable worker service contract definition. |
+| `ExecutionFiltersSchema` | const | Schema for list-executions filters. |
+| `ExecutionRecordResponseSchema` | const | Schema for worker execution record responses. |
+| `JobCreateInputSchema` | const | Schema for creating worker job definitions. |
+| `JobDefinitionResponseSchema` | const | Schema for worker job definition responses. |
+| `JobFiltersSchema` | const | Schema for list-jobs filters. |
+| `JobTriggerInputSchema` | const | Schema for triggering a worker job by id. |
+| `JobUpdateInputSchema` | const | Schema for updating worker job definitions. |
+| `JobUpdateWithIdSchema` | const | Schema for updating a worker job definition by id. |
+| `SSEEventSchema` | const | Schema for server-sent event payloads emitted by the workers service. |
+| `TaskDefinitionResponseSchema` | const | Schema for worker task definition responses. |
+| `TaskFiltersSchema` | const | Schema for list-tasks filters. |
+| `workersContract` | const | Worker service contract definition for client generation. |
+| `workersContractV1` | const | Context-bindable worker service contract definition. |
 | `ContractProcedureLike` | type alias | Structural oRPC procedure reference used by worker contracts. |
 | `ContractSchema` | interface | Package-owned structural schema surface for worker contracts. |
 | `ContractSchemaResult` | type alias | Result returned by contract schema validation. |
@@ -181,9 +181,9 @@ Browser-facing StreamDB factory and the entity schemas mirrored from worker exec
 | `WorkerExecution` | type alias | Worker execution entity stored in the durable stream. |
 | `WorkerJob` | type alias | Worker job entity stored in the durable stream. |
 | `WorkersStreamDB` | type alias | Browser-facing StreamDB surface returned by the workers stream factory. |
-| `WorkerExecutionSchema` | variable | Stream entity schema for worker executions. |
-| `WorkerJobSchema` | variable | Stream entity schema for worker jobs. |
-| `workersStreamSchema` | variable | Stream schema definition for worker executions and jobs. |
+| `WorkerExecutionSchema` | const | Stream entity schema for worker executions. |
+| `WorkerJobSchema` | const | Stream entity schema for worker jobs. |
+| `workersStreamSchema` | const | Stream schema definition for worker executions and jobs. |
 | `StreamSchemaDefinition` | type alias | Structural stream schema definition map. |
 | `WorkersStreamDefinition` | type alias | Durable stream definition for worker execution and job entities. |
 | `WorkersStreamSchema` | type alias | Package-owned structural workers stream schema surface. |
@@ -206,9 +206,9 @@ Server-side wiring that mirrors execution-state changes into the durable stream 
 | `ExecutionStatus` | type alias | Execution status discriminator. |
 | `ExecutionTriggerType` | type alias | Execution trigger discriminator. |
 | `WorkersStreamProducer` | type alias | Durable stream producer type for the workers stream schema. |
-| `WorkerExecutionSchema` | variable | Stream entity schema for worker executions. |
-| `WorkerJobSchema` | variable | Stream entity schema for worker jobs. |
-| `workersStreamSchema` | variable | Stream schema definition for worker executions and jobs. |
+| `WorkerExecutionSchema` | const | Stream entity schema for worker executions. |
+| `WorkerJobSchema` | const | Stream entity schema for worker jobs. |
+| `workersStreamSchema` | const | Stream schema definition for worker executions and jobs. |
 | `StreamSchemaDefinition` | type alias | Structural stream schema definition map. |
 | `WorkerExecution` | type alias | Worker execution entity stored in the durable stream. |
 | `WorkerJob` | type alias | Worker job entity stored in the durable stream. |

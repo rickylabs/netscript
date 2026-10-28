@@ -48,9 +48,9 @@ try {
 
 ## Factory
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createWatcher` | `function createWatcher(options: WatcherOptions): FileWatcher` | Factory function to create a `FileWatcher` with the given options. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createWatcher` | function | `function createWatcher(options: WatcherOptions): FileWatcher` | Factory function to create a `FileWatcher` with the given options. |
 
 ## Watcher
 
@@ -93,33 +93,33 @@ configured order inside the `FileWatcher` pipeline. Each implements the `WatchFi
 
 Low-level helpers that swallow only "missing/inaccessible" errors and re-throw the rest.
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `safeReadFile` | `async function safeReadFile(path: string): Promise<Uint8Array<ArrayBuffer> \| null>` | Read a file's content, returning `null` when the file is missing or inaccessible. |
-| `safeStat` | `async function safeStat(path: string): Promise<FileInfo \| null>` | Stat a file, returning `null` when the file is missing or inaccessible (only `NotFound`/`PermissionDenied`). |
-| `computeContentHash` | `async function computeContentHash(filePath: string): Promise<string \| null>` | Compute a SHA-256 hex digest of a file's content, or `null` if unreadable. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `safeReadFile` | function | `async function safeReadFile(path: string): Promise<Uint8Array<ArrayBuffer> \| null>` | Read a file's content, returning `null` when the file is missing or inaccessible. |
+| `safeStat` | function | `async function safeStat(path: string): Promise<FileInfo \| null>` | Stat a file, returning `null` when the file is missing or inaccessible (only `NotFound`/`PermissionDenied`). |
+| `computeContentHash` | function | `async function computeContentHash(filePath: string): Promise<string \| null>` | Compute a SHA-256 hex digest of a file's content, or `null` if unreadable. |
 
 ## Interfaces
 
-| Symbol | Description |
-| --- | --- |
-| `WatcherOptions` | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, signal). |
-| `WatchEvent` | A single file-system event yielded by a watcher strategy. |
-| `WatchFilter` | A filter takes an async iterable of events and yields only those that pass. |
-| `WatchStrategyHandler` | A watch strategy produces raw file-system events as an async iterable. |
-| `FileInfo` | Metadata about a watched file, built from `Deno.FileInfo`. |
-| `StabilityOptions` | Configuration for the stability filter (`checkIntervalMs`, `stableChecks`). |
-| `DedupFilterOptions` | Options for creating a `DedupFilter` (`windowMs`, default `60000`). |
-| `DebounceFilterOptions` | Options for creating a `DebounceFilter` (`debounceMs`). |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `WatcherOptions` | interface | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, signal). |
+| `WatchEvent` | interface | A single file-system event yielded by a watcher strategy. |
+| `WatchFilter` | interface | A filter takes an async iterable of events and yields only those that pass. |
+| `WatchStrategyHandler` | interface | A watch strategy produces raw file-system events as an async iterable. |
+| `FileInfo` | interface | Metadata about a watched file, built from `Deno.FileInfo`. |
+| `StabilityOptions` | interface | Configuration for the stability filter (`checkIntervalMs`, `stableChecks`). |
+| `DedupFilterOptions` | interface | Options for creating a `DedupFilter` (`windowMs`, default `60000`). |
+| `DebounceFilterOptions` | interface | Options for creating a `DebounceFilter` (`debounceMs`). |
 
 ## Type aliases
 
-| Symbol | Definition | Description |
-| --- | --- | --- |
-| `KnownEventKind` | `"create" \| "modify" \| "remove"` | Built-in file-system event kinds the watcher can detect. |
-| `EventKind` | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind; new runtime kinds require doctrine review. |
-| `KnownWatchStrategy` | `"native" \| "polling" \| "hybrid"` | Built-in watch strategies for detecting file changes. |
-| `WatchStrategy` | `KnownWatchStrategy \| (string & Record<never, never>)` | Watch-strategy identifier; built-in factory values remain runtime validated. |
+| Symbol | Kind | Definition | Description |
+| --- | --- | --- | --- |
+| `KnownEventKind` | type alias | `"create" \| "modify" \| "remove"` | Built-in file-system event kinds the watcher can detect. |
+| `EventKind` | type alias | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind; new runtime kinds require doctrine review. |
+| `KnownWatchStrategy` | type alias | `"native" \| "polling" \| "hybrid"` | Built-in watch strategies for detecting file changes. |
+| `WatchStrategy` | type alias | `KnownWatchStrategy \| (string & Record<never, never>)` | Watch-strategy identifier; built-in factory values remain runtime validated. |
 
 ## Internals
 

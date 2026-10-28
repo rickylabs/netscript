@@ -84,18 +84,18 @@ A handler does not perform work directly; it returns **actions** the dispatcher 
 
 ### Definition union and kinds
 
-| Symbol                         | Kind       | Description                                                             |
-| ------------------------------ | ---------- | ----------------------------------------------------------------------- |
-| `TriggerDefinition`            | type alias | Implemented and reserved trigger definitions exposed by the public API. |
-| `TriggerDefinitionBase`        | type alias | Common immutable fields shared by trigger definitions.                  |
-| `TriggerKind`                  | type alias | Open trigger discriminator.                                             |
-| `TriggerKnownKind`             | type alias | Canonical known trigger kind.                                           |
-| `TRIGGER_KINDS`                | variable   | Canonical trigger kinds exposed by trigger definitions.                 |
-| `ProcessableTriggerDefinition` | type alias | Trigger definition accepted by runtime processor ports.                 |
-| `RuntimeTriggerDefinition`     | type alias | Trigger definitions accepted by the current runtime processor.          |
-| `RuntimeWebhookDefinition`     | type alias | Webhook definition shape accepted by the trigger ingress runtime.       |
-| `TriggerId`                    | type alias | Branded trigger definition identifier.                                  |
-| `WebhookId`                    | type alias | Branded webhook definition identifier.                                  |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TriggerDefinition` | type alias | Implemented and reserved trigger definitions exposed by the public API. |
+| `TriggerDefinitionBase` | type alias | Common immutable fields shared by trigger definitions. |
+| `TriggerKind` | type alias | Open trigger discriminator. |
+| `TriggerKnownKind` | type alias | Canonical known trigger kind. |
+| `TRIGGER_KINDS` | const | Canonical trigger kinds exposed by trigger definitions. |
+| `ProcessableTriggerDefinition` | type alias | Trigger definition accepted by runtime processor ports. |
+| `RuntimeTriggerDefinition` | type alias | Trigger definitions accepted by the current runtime processor. |
+| `RuntimeWebhookDefinition` | type alias | Webhook definition shape accepted by the trigger ingress runtime. |
+| `TriggerId` | type alias | Branded trigger definition identifier. |
+| `WebhookId` | type alias | Branded webhook definition identifier. |
 
 `TriggerKind` is deliberately **open** while `TriggerKnownKind` is closed: a host may carry a kind
 the core does not implement, and only the known kinds narrow into `RuntimeTriggerDefinition`.
@@ -151,34 +151,34 @@ the stored event rather than losing it.
 
 ### Dispatch policies
 
-| Symbol                      | Kind       | Description                                                       |
-| --------------------------- | ---------- | ----------------------------------------------------------------- |
-| `TriggerRetryPolicy`        | type alias | Retry policy applied by the trigger processor before DLQ handoff. |
-| `TriggerConcurrencySpec`    | type alias | Bounded dispatch concurrency for a trigger definition.            |
-| `TriggerDeduplicationSpec`  | type alias | Event-boundary deduplication policy.                              |
-| `TriggerCircuitBreakerSpec` | type alias | Circuit breaker policy for repeated trigger dispatch failures.    |
-| `TriggerDurabilityTier`     | type alias | Trigger durability tier.                                          |
-| `TRIGGER_DURABILITY_TIERS`  | variable   | Durability tiers supported by trigger definitions.                |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TriggerRetryPolicy` | type alias | Retry policy applied by the trigger processor before DLQ handoff. |
+| `TriggerConcurrencySpec` | type alias | Bounded dispatch concurrency for a trigger definition. |
+| `TriggerDeduplicationSpec` | type alias | Event-boundary deduplication policy. |
+| `TriggerCircuitBreakerSpec` | type alias | Circuit breaker policy for repeated trigger dispatch failures. |
+| `TriggerDurabilityTier` | type alias | Trigger durability tier. |
+| `TRIGGER_DURABILITY_TIERS` | const | Durability tiers supported by trigger definitions. |
 
 ### Events, stores, and idempotency
 
-| Symbol                             | Kind       | Description                                                          |
-| ---------------------------------- | ---------- | -------------------------------------------------------------------- |
-| `TriggerEvent`                     | type alias | Unified event envelope consumed by every trigger processor path.     |
-| `TriggerEventId`                   | type alias | Branded trigger event identifier.                                    |
-| `TriggerEventStatus`               | type alias | Trigger event lifecycle status.                                      |
-| `TRIGGER_EVENT_STATUSES`           | variable   | Trigger event lifecycle statuses.                                    |
-| `TriggerEventStorePort`            | interface  | Persistent trigger event store boundary.                             |
-| `TriggerEventListOptions`          | type alias | Event store list filters.                                            |
-| `TriggerDlqPort`                   | interface  | Dead-letter queue boundary for exhausted trigger events.             |
-| `TriggerDlqEntry`                  | type alias | Dead-letter entry recorded after trigger retry exhaustion.           |
-| `TriggerDlqListOptions`            | type alias | Dead-letter list filters.                                            |
-| `TriggerIdempotencyPort`           | interface  | Event-boundary idempotency store with a TTL window.                  |
-| `TriggerIdempotencyClaim`          | type alias | Idempotency claim result.                                            |
-| `TriggerIdempotencyKeyInput`       | type alias | Idempotency key resolution input.                                    |
-| `TriggerEnabledStatePort`          | interface  | Persistent enabled-state boundary for trigger enable/disable routes. |
-| `TriggerEnabledStateOverride`      | type alias | Stored enabled-state override for a trigger definition.              |
-| `createKvTriggerEnabledStateStore` | function   | Create a KV-backed enabled-state store over the supplied adapter.    |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TriggerEvent` | type alias | Unified event envelope consumed by every trigger processor path. |
+| `TriggerEventId` | type alias | Branded trigger event identifier. |
+| `TriggerEventStatus` | type alias | Trigger event lifecycle status. |
+| `TRIGGER_EVENT_STATUSES` | const | Trigger event lifecycle statuses. |
+| `TriggerEventStorePort` | interface | Persistent trigger event store boundary. |
+| `TriggerEventListOptions` | type alias | Event store list filters. |
+| `TriggerDlqPort` | interface | Dead-letter queue boundary for exhausted trigger events. |
+| `TriggerDlqEntry` | type alias | Dead-letter entry recorded after trigger retry exhaustion. |
+| `TriggerDlqListOptions` | type alias | Dead-letter list filters. |
+| `TriggerIdempotencyPort` | interface | Event-boundary idempotency store with a TTL window. |
+| `TriggerIdempotencyClaim` | type alias | Idempotency claim result. |
+| `TriggerIdempotencyKeyInput` | type alias | Idempotency key resolution input. |
+| `TriggerEnabledStatePort` | interface | Persistent enabled-state boundary for trigger enable/disable routes. |
+| `TriggerEnabledStateOverride` | type alias | Stored enabled-state override for a trigger definition. |
+| `createKvTriggerEnabledStateStore` | function | Create a KV-backed enabled-state store over the supplied adapter. |
 
 Every kind — webhook, scheduled, file-watch — converges on the same `TriggerEvent` envelope, which
 is why one processor pipeline covers all of them.

@@ -146,7 +146,7 @@ from the wrapped package's `ANTHROPIC_MODELS`.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `AnthropicModelProvider` | class | `ModelProviderPort` backed by `@tanstack/ai-anthropic`. |
-| `ANTHROPIC_PROVIDER_ID` | variable | `"anthropic"`. |
+| `ANTHROPIC_PROVIDER_ID` | const | `"anthropic"`. |
 | `AnthropicModelProviderConfig` | interface | Provider configuration (below). |
 
 | Config field | Type | Default |
@@ -162,7 +162,7 @@ speaks the OpenAI wire (its own base URL, key, and model list).
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `OpenAiCompatibleModelProvider` | class | `ModelProviderPort` backed by `@tanstack/ai-openai/compatible`. |
-| `OPENAI_COMPATIBLE_PROVIDER_ID` | variable | `"openai-compatible"`. |
+| `OPENAI_COMPATIBLE_PROVIDER_ID` | const | `"openai-compatible"`. |
 | `OpenAiCompatibleModelProviderConfig` | interface | Provider configuration (below). |
 | `OpenAiCompatibleApi` | type alias | `"chat-completions" \| "responses"`. |
 
@@ -185,9 +185,9 @@ one wire divergence being reasoning: OpenRouter expects a top-level `reasoning: 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `OpenRouterModelProvider` | class | `ModelProviderPort` pinned to the OpenRouter endpoint. |
-| `OPENROUTER_PROVIDER_ID` | variable | `"openrouter"`. |
-| `DEFAULT_OPENROUTER_BASE_URL` | variable | `"https://openrouter.ai/api/v1"`. |
-| `OPENROUTER_API_KEY_ENV` | variable | `"OPENROUTER_API_KEY"` — the env var read when `apiKey` is omitted. |
+| `OPENROUTER_PROVIDER_ID` | const | `"openrouter"`. |
+| `DEFAULT_OPENROUTER_BASE_URL` | const | `"https://openrouter.ai/api/v1"`. |
+| `OPENROUTER_API_KEY_ENV` | const | `"OPENROUTER_API_KEY"` — the env var read when `apiKey` is omitted. |
 | `openRouterReasoningModelOptions` | function | Pure normalizer: `ReasoningEffort` → `{ reasoning: { effort } }` (or `undefined`). |
 | `OpenRouterModelProviderConfig` | interface | Provider configuration (below). |
 | `ReasoningEffort` | type alias | `"off" \| "low" \| "medium" \| "high"`. |
@@ -206,10 +206,10 @@ Registry id `"ollama"`. Reuses the OpenAI-compatible transport pinned to a local
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `OllamaModelProvider` | class | `ModelProviderPort` for a local Ollama daemon; exposes `checkReachable()`. |
-| `OLLAMA_PROVIDER_ID` | variable | `"ollama"`. |
-| `DEFAULT_OLLAMA_HOST` | variable | `"http://localhost:11434"`. |
+| `OLLAMA_PROVIDER_ID` | const | `"ollama"`. |
+| `DEFAULT_OLLAMA_HOST` | const | `"http://localhost:11434"`. |
 | `createHttpReachabilityPort` / `HttpReachabilityAdapter` | function / class | Fetch-backed probe of `GET {host}/api/tags`. |
-| `DEFAULT_REACHABILITY_PATH` | variable | Default probe path. |
+| `DEFAULT_REACHABILITY_PATH` | const | Default probe path. |
 | `createAssumeReachablePort` | function | A port that reports reachable without probing (tests). |
 | `OllamaModelProviderConfig` | interface | Provider configuration (below). |
 | `ReachabilityPort` / `ReachabilityCheckOptions` / `ReachabilityResult` | interface | Reachability seam and its non-throwing result. |
@@ -229,9 +229,9 @@ Speaks the OpenAI-compatible HTTP API directly with Web `fetch` (no provider SDK
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `OpenAiEmbeddingsProvider` | class | Implements `EmbeddingProviderPort` (`embed`) and `VisionProviderPort` (`analyze`). |
-| `OPENAI_EMBEDDINGS_PROVIDER_ID` | variable | `"openai-embeddings"`. |
-| `DEFAULT_OPENAI_EMBEDDING_MODEL` | variable | `"text-embedding-3-small"`. |
-| `DEFAULT_OPENAI_VISION_MODEL` | variable | `"gpt-4o-mini"`. |
+| `OPENAI_EMBEDDINGS_PROVIDER_ID` | const | `"openai-embeddings"`. |
+| `DEFAULT_OPENAI_EMBEDDING_MODEL` | const | `"text-embedding-3-small"`. |
+| `DEFAULT_OPENAI_VISION_MODEL` | const | `"gpt-4o-mini"`. |
 | `OpenAiEmbeddingsProviderConfig` | interface | Provider configuration (below). |
 
 | Config field | Type | Default |
@@ -253,7 +253,7 @@ takes no `@netscript/*` dependency.
 | --- | --- | --- |
 | `defineAiTool` | function | Start a tool definition chain (`.parameters(...).input(schema).server(handler)`). |
 | `createToolRegistry` | function | Build an in-memory registry from tool definitions. |
-| `renderUiTool` | variable | Built-in `render_ui` wire contract (input schema + metadata only, no renderer). |
+| `renderUiTool` | const | Built-in `render_ui` wire contract (input schema + metadata only, no renderer). |
 | `AiToolRegistry` | interface | Registry surface extending `ToolRegistryPort`. |
 | `AiToolBuilder` / `AiToolBuilderWithInput` | interface | Typestate builder surfaces. |
 | `AiToolDefinition` | interface | A defined tool (input/output typed). |
@@ -273,9 +273,9 @@ provider SDK.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createAgentLoop` | function | Construct a loop from `AgentLoopDeps` (a `ChatModelProviderPort`, a `ToolRegistryPort`, an optional history strategy). |
-| `DEFAULT_MAX_STEPS` | variable | Default step ceiling for a run. |
+| `DEFAULT_MAX_STEPS` | const | Default step ceiling for a run. |
 | `slidingWindowHistory` | function | A `HistoryStrategy` that keeps the last N messages. |
-| `DEFAULT_HISTORY_WINDOW` | variable | Default window used by `slidingWindowHistory`. |
+| `DEFAULT_HISTORY_WINDOW` | const | Default window used by `slidingWindowHistory`. |
 | `SlidingWindowOptions` | interface | `{ maxMessages }` for the sliding-window strategy. |
 | `tokenBudgetHistory` | function | A `HistoryStrategy` that keeps system messages and truncates older messages by token budget. |
 | `TokenBudgetHistoryOptions` | interface | `{ budget, estimator }` for the token-budget strategy. |

@@ -79,22 +79,22 @@ A handler is a pure projection: it returns cascaded messages rather than perform
 constructors keep their existing cascade meanings. Opted-in ordinary transition handlers can also
 return the explicit pure worker effects documented below.
 
-| Symbol                   | Kind       | Description                                                                               |
-| ------------------------ | ---------- | ----------------------------------------------------------------------------------------- |
-| `send`                   | function   | Create a cascade that republishes an internal saga message onto the saga bus.             |
-| `schedule`               | function   | Create a cascaded scheduled message.                                                      |
-| `sagaComplete`           | function   | Create a terminal saga completion message.                                                |
-| `sagaFail`               | function   | Create a terminal saga failure message.                                                   |
-| `sagaCompensate`         | function   | Create a cascaded compensation message.                                                   |
-| `spawn`                  | function   | **Rejects** an unsupported child-saga spawn request — spawn cascades are not implemented. |
-| `CASCADED_MESSAGE_KINDS` | variable   | Cascaded message kinds emitted by saga handlers.                                          |
-| `CascadedMessage`        | type alias | Message emitted by a saga handler as its only side-effect ledger.                         |
-| `CascadedMessageKind`    | type alias | Cascaded message discriminator.                                                           |
-| `CascadedMessageOptions` | type alias | Common options accepted by cascaded message constructors.                                 |
-| `CascadedMessageTarget`  | type alias | Cascaded message target for jobs, sagas, or arbitrary runtime adapters.                   |
-| `SendOptions`            | type alias | Options for republishing an internal saga message onto the saga bus.                      |
-| `SagaScheduleDelay`      | type alias | Delay accepted by the `schedule()` cascaded-message constructor.                          |
-| `SpawnOptions`           | type alias | Options reserved for the unsupported `spawn()` cascade.                                   |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `send` | function | Create a cascade that republishes an internal saga message onto the saga bus. |
+| `schedule` | function | Create a cascaded scheduled message. |
+| `sagaComplete` | function | Create a terminal saga completion message. |
+| `sagaFail` | function | Create a terminal saga failure message. |
+| `sagaCompensate` | function | Create a cascaded compensation message. |
+| `spawn` | function | **Rejects** an unsupported child-saga spawn request — spawn cascades are not implemented. |
+| `CASCADED_MESSAGE_KINDS` | const | Cascaded message kinds emitted by saga handlers. |
+| `CascadedMessage` | type alias | Message emitted by a saga handler as its only side-effect ledger. |
+| `CascadedMessageKind` | type alias | Cascaded message discriminator. |
+| `CascadedMessageOptions` | type alias | Common options accepted by cascaded message constructors. |
+| `CascadedMessageTarget` | type alias | Cascaded message target for jobs, sagas, or arbitrary runtime adapters. |
+| `SendOptions` | type alias | Options for republishing an internal saga message onto the saga bus. |
+| `SagaScheduleDelay` | type alias | Delay accepted by the `schedule()` cascaded-message constructor. |
+| `SpawnOptions` | type alias | Options reserved for the unsupported `spawn()` cascade. |
 
 ### Signals and queries
 
@@ -121,13 +121,13 @@ return the explicit pure worker effects documented below.
 
 ### Policies
 
-| Symbol                   | Kind       | Description                                           |
-| ------------------------ | ---------- | ----------------------------------------------------- |
-| `RetryPolicy`            | type alias | Retry policy for saga handlers and cascaded messages. |
-| `SagaConcurrencyOptions` | type alias | Concurrency options accepted by the saga builder.     |
-| `SagaConcurrencyPolicy`  | type alias | Concurrency policy for a saga definition.             |
-| `SAGA_DURABILITY_TIERS`  | variable   | Durability tiers supported by saga definitions.       |
-| `SagaDurabilityTier`     | type alias | Saga durability tier.                                 |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `RetryPolicy` | type alias | Retry policy for saga handlers and cascaded messages. |
+| `SagaConcurrencyOptions` | type alias | Concurrency options accepted by the saga builder. |
+| `SagaConcurrencyPolicy` | type alias | Concurrency policy for a saga definition. |
+| `SAGA_DURABILITY_TIERS` | const | Durability tiers supported by saga definitions. |
+| `SagaDurabilityTier` | type alias | Saga durability tier. |
 
 ## Handlers are synchronous
 
@@ -187,25 +187,25 @@ permissions; supplied publishers own their permissions.
 
 ## Atomic worker-command effects
 
-| Symbol                              | Kind       | Description                                                                         |
-| ----------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
-| `WORKER_COMMAND_EFFECT_KINDS`       | constant   | Finite distinct `worker-job` and `worker-task` effect tags.                         |
-| `WorkerCommandEffect`               | type alias | Pure intent privately bound to a selected worker definition and detached payload.   |
-| `SagaTransitionEffect`              | type alias | Ordinary transition ledger union of existing cascades and explicit worker commands. |
-| `SagaTransitionHandler`             | type alias | Synchronous typed transition projection.                                            |
-| `workerJobEffect`                   | function   | Binds a selected schema-backed job to its required payload before persistence.      |
-| `workerTaskEffect`                  | function   | Binds a selected runtime-schema task to its required payload.                       |
-| `WorkerCommandEffectOptions`        | type alias | Host-owned destination/topic routing.                                               |
-| `WorkerJobEffectDefinition`         | type alias | Selected branded job plus its runtime payload schema.                               |
-| `WorkerTaskEffectDefinition`        | type alias | Selected branded task plus its runtime payload schema.                              |
-| `SagaTransitionCommitPort`          | interface  | Explicit atomic optimistic transition, replay and outbox boundary.                  |
-| `SagaTransitionCommitRequest`       | type alias | Expected version and detached complete local row set.                               |
-| `SagaTransitionCommitResult`        | type alias | Commit result; false means already committed inbound replay with no new writes.     |
-| `SagaTransitionStore`               | type alias | Existing saga store with the explicit atomic capability.                            |
-| `createPrismaSagaTransitionStore`   | function   | Named first-party true-callback PostgreSQL store from `./stores`.                   |
-| `PrismaSagaTransitionStore`         | interface  | Atomic store with detached diagnostic state/history reads.                          |
-| `PrismaSagaTransitionStoreOptions`  | type alias | Required finite physical transaction timeout.                                       |
-| `SAGA_RUNTIME_CORRELATION_SELECTOR` | constant   | Existing shipped Prisma correlation selector, curated through stores.               |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `WORKER_COMMAND_EFFECT_KINDS` | const | Finite distinct `worker-job` and `worker-task` effect tags. |
+| `WorkerCommandEffect` | type alias | Pure intent privately bound to a selected worker definition and detached payload. |
+| `SagaTransitionEffect` | type alias | Ordinary transition ledger union of existing cascades and explicit worker commands. |
+| `SagaTransitionHandler` | type alias | Synchronous typed transition projection. |
+| `workerJobEffect` | function | Binds a selected schema-backed job to its required payload before persistence. |
+| `workerTaskEffect` | function | Binds a selected runtime-schema task to its required payload. |
+| `WorkerCommandEffectOptions` | type alias | Host-owned destination/topic routing. |
+| `WorkerJobEffectDefinition` | type alias | Selected branded job plus its runtime payload schema. |
+| `WorkerTaskEffectDefinition` | type alias | Selected branded task plus its runtime payload schema. |
+| `SagaTransitionCommitPort` | interface | Explicit atomic optimistic transition, replay and outbox boundary. |
+| `SagaTransitionCommitRequest` | type alias | Expected version and detached complete local row set. |
+| `SagaTransitionCommitResult` | type alias | Commit result; false means already committed inbound replay with no new writes. |
+| `SagaTransitionStore` | type alias | Existing saga store with the explicit atomic capability. |
+| `createPrismaSagaTransitionStore` | function | Named first-party true-callback PostgreSQL store from `./stores`. |
+| `PrismaSagaTransitionStore` | interface | Atomic store with detached diagnostic state/history reads. |
+| `PrismaSagaTransitionStoreOptions` | type alias | Required finite physical transaction timeout. |
+| `SAGA_RUNTIME_CORRELATION_SELECTOR` | const | Existing shipped Prisma correlation selector, curated through stores. |
 
 Select `.durableWorkerCommands()` on the saga definition. Registration refuses KV and the legacy
 unbound Prisma store before any handler/storage work; the test memory store and named bound

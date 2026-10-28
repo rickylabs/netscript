@@ -33,25 +33,25 @@ Two entrypoints carry the surface:
 
 ## Server composition
 
-| Symbol                 | Kind      | Summary                                                                        |
-| ---------------------- | --------- | ------------------------------------------------------------------------------ |
-| `createMcpServer`      | function  | Create the MCP server with `initialize` / `tools/list` / `tools/call` support. |
-| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 22 tools.                             |
-| `McpServer`            | interface | Callable server subset: `handle(message)` plus the registered `tools`.         |
-| `McpServerOptions`     | interface | Composition seams: `probe`, `environment`, `flows`, `truncation`.              |
-| `MCP_PROTOCOL_VERSION` | const     | The MCP protocol version the runner implements (`2025-11-25`).                 |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createMcpServer` | function | Create the MCP server with `initialize` / `tools/list` / `tools/call` support. |
+| `createToolRegistry` | function | Immutable, enumerable definitions of the 22 tools. |
+| `McpServer` | interface | Callable server subset: `handle(message)` plus the registered `tools`. |
+| `McpServerOptions` | interface | Composition seams: `probe`, `environment`, `flows`, `truncation`. |
+| `MCP_PROTOCOL_VERSION` | const | The MCP protocol version the runner implements (`2025-11-25`). |
 
 ## Tool contracts
 
-| Symbol                | Kind      | Summary                                                    |
-| --------------------- | --------- | ---------------------------------------------------------- |
-| `TOOL_NAMES`          | const     | The 22 tool names, in registry order.                      |
-| `TOOL_INPUT_SCHEMAS`  | const     | Standard Schema input contract per tool.                   |
-| `TOOL_OUTPUT_SCHEMAS` | const     | Standard Schema output contract per tool.                  |
-| `validateSchema`      | function  | Validate a value against a tool schema, throwing on drift. |
-| `ToolDefinition`      | interface | A tool's name, contracts, and flow.                        |
-| `ToolFlow`            | type      | The function a tool executes; depends only on ports.       |
-| `ToolName`            | type      | Union of the 22 tool names.                                |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TOOL_NAMES` | const | The 22 tool names, in registry order. |
+| `TOOL_INPUT_SCHEMAS` | const | Standard Schema input contract per tool. |
+| `TOOL_OUTPUT_SCHEMAS` | const | Standard Schema output contract per tool. |
+| `validateSchema` | function | Validate a value against a tool schema, throwing on drift. |
+| `ToolDefinition` | interface | A tool's name, contracts, and flow. |
+| `ToolFlow` | type alias | The function a tool executes; depends only on ports. |
+| `ToolName` | type alias | Union of the 22 tool names. |
 
 ### Per-tool field overview
 
@@ -155,13 +155,13 @@ value.
 The root and `./cli` entrypoints export the read-tool result types together with the types they
 reference, so typed consumers never meet a private type:
 
-| Symbol                        | Kind      | Summary                                                         |
-| ----------------------------- | --------- | --------------------------------------------------------------- |
-| `ServiceOperationSummary`     | interface | One bounded `list_service_operations` row.                      |
-| `ListServiceOperationsResult` | interface | Successful `list_service_operations` value.                     |
-| `GetOperationSchemaResult`    | interface | Successful `get_operation_schema` value.                        |
-| `OperationAccessSummary`      | interface | Declared access facts; also exported by `./openapi-projection`. |
-| `SchemaViewName`              | type      | Projection view name; also exported by `./openapi-projection`.  |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `ServiceOperationSummary` | interface | One bounded `list_service_operations` row. |
+| `ListServiceOperationsResult` | interface | Successful `list_service_operations` value. |
+| `GetOperationSchemaResult` | interface | Successful `get_operation_schema` value. |
+| `OperationAccessSummary` | interface | Declared access facts; also exported by `./openapi-projection`. |
+| `SchemaViewName` | type alias | Projection view name; also exported by `./openapi-projection`. |
 
 `get_operation_schema` produces different credential-free guidance for undeclared, public, optional,
 and required operations. Only the required template includes the literal placeholder
@@ -206,23 +206,23 @@ drift entries to `.netscript/agent/drift.jsonl`.
 Every successful result is bounded server-side before the runner serializes it, so a tool can never
 flood the model's context.
 
-| Symbol                      | Kind      | Summary                                                                 |
-| --------------------------- | --------- | ----------------------------------------------------------------------- |
-| `truncateResult`            | function  | Recursively bound arrays and strings in a JSON-compatible result.       |
-| `DEFAULT_TRUNCATION_POLICY` | const     | The default bounds: 50 array items, 2,000 UTF-16 code units per string. |
-| `TruncationPolicy`          | interface | `maxItems` and `maxStringLength`.                                       |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `truncateResult` | function | Recursively bound arrays and strings in a JSON-compatible result. |
+| `DEFAULT_TRUNCATION_POLICY` | const | The default bounds: 50 array items, 2,000 UTF-16 code units per string. |
+| `TruncationPolicy` | interface | `maxItems` and `maxStringLength`. |
 
 ## Command policy
 
 `execute_command` is **default-deny**: a normalized command path must match an allow rule and no
 deny rule. Deny beats allow; anything unmatched is denied.
 
-| Symbol                   | Kind      | Summary                                                          |
-| ------------------------ | --------- | ---------------------------------------------------------------- |
-| `decideCommand`          | function  | Decide whether a normalized command path is allowed by a policy. |
-| `DEFAULT_COMMAND_POLICY` | const     | Conservative allowlist shipped with the server.                  |
-| `CommandPolicy`          | interface | Ordered `allow` / `deny` prefix rules.                           |
-| `CommandPolicyDecision`  | type      | The decision returned for a command path.                        |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `decideCommand` | function | Decide whether a normalized command path is allowed by a policy. |
+| `DEFAULT_COMMAND_POLICY` | const | Conservative allowlist shipped with the server. |
+| `CommandPolicy` | interface | Ordered `allow` / `deny` prefix rules. |
+| `CommandPolicyDecision` | type alias | The decision returned for a command path. |
 
 The default policy **allows** `db init|generate|migrate|seed|status|introspect`, `generate`,
 `contract`, `service list`, `plugin install|list|sync|doctor`, and
@@ -235,15 +235,15 @@ Every tool flow depends on a port, never on a concrete client — which is why t
 on the CLI without depending on it. `@netscript/cli` implements the ports and injects them at its
 own composition root.
 
-| Symbol                    | Kind      | Summary                                                     |
-| ------------------------- | --------- | ----------------------------------------------------------- |
-| `TelemetryProbePort`      | interface | Telemetry endpoint reachability check.                      |
-| `DocsCorpusPort`          | interface | Public Markdown corpus: search, list, get.                  |
-| `ExportSurfaceCorpusPort` | interface | Version-pinned normalized `deno doc --json` export data.    |
-| `CommandCatalogPort`      | interface | Supplies the live CLI command tree to `list_commands`.      |
-| `CommandExecutorPort`     | interface | Runs an allowed command, returning structured process data. |
-| `ProjectDoctorPort`       | interface | Typed project and plugin diagnostics.                       |
-| `DoctorCheckFamily`       | interface | One group of doctor checks aggregated into the verdict.     |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TelemetryProbePort` | interface | Telemetry endpoint reachability check. |
+| `DocsCorpusPort` | interface | Public Markdown corpus: search, list, get. |
+| `ExportSurfaceCorpusPort` | interface | Version-pinned normalized `deno doc --json` export data. |
+| `CommandCatalogPort` | interface | Supplies the live CLI command tree to `list_commands`. |
+| `CommandExecutorPort` | interface | Runs an allowed command, returning structured process data. |
+| `ProjectDoctorPort` | interface | Typed project and plugin diagnostics. |
+| `DoctorCheckFamily` | interface | One group of doctor checks aggregated into the verdict. |
 
 ## Generated export corpus
 
@@ -257,15 +257,15 @@ model context.
 
 ## Default adapters
 
-| Symbol                        | Kind     | Summary                                                                                      |
-| ----------------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `EmbeddedDocsCorpus`          | class    | In-memory `DocsCorpusPort` used for package and outer-CLI Markdown assets.                   |
-| `EmbeddedExportSurfaceCorpus` | class    | Lazy mirror-free `ExportSurfaceCorpusPort` with version, hash, size, and count verification. |
-| `FilesystemDocsCorpus`        | class    | `DocsCorpusPort` over an explicit, environment, or project-probed Markdown root.             |
-| `SpawnCommandExecutor`        | class    | `CommandExecutorPort` that spawns the `netscript` binary.                                    |
-| `StaticCommandCatalog`        | class    | `CommandCatalogPort` used when no live catalog is injected.                                  |
-| `PluginDoctorFamily`          | class    | Plugin diagnostics as a doctor check family.                                                 |
-| `slugifyDocsHeading`          | function | Normalize a Markdown heading into a `get_doc` section slug.                                  |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `EmbeddedDocsCorpus` | class | In-memory `DocsCorpusPort` used for package and outer-CLI Markdown assets. |
+| `EmbeddedExportSurfaceCorpus` | class | Lazy mirror-free `ExportSurfaceCorpusPort` with version, hash, size, and count verification. |
+| `FilesystemDocsCorpus` | class | `DocsCorpusPort` over an explicit, environment, or project-probed Markdown root. |
+| `SpawnCommandExecutor` | class | `CommandExecutorPort` that spawns the `netscript` binary. |
+| `StaticCommandCatalog` | class | `CommandCatalogPort` used when no live catalog is injected. |
+| `PluginDoctorFamily` | class | Plugin diagnostics as a doctor check family. |
+| `slugifyDocsHeading` | function | Normalize a Markdown heading into a `get_doc` section slug. |
 
 ## Sub-path exports
 
@@ -280,12 +280,12 @@ model context.
 The executable composition. It binds the real telemetry query, filesystem docs corpus, Aspire /
 project-wiring / plugin doctor families, and the process executor, and runs them over stdio.
 
-| Symbol               | Kind      | Summary                                                                                                 |
-| -------------------- | --------- | ------------------------------------------------------------------------------------------------------- |
-| `runMcpStdioServer`  | function  | Run the server on Deno standard input and output.                                                       |
-| `createMcpCliServer` | function  | Compose the server with optional outer CLI adapters.                                                    |
-| `resolveDocsRoot`    | function  | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe.                   |
-| `McpCliOptions`      | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `runMcpStdioServer` | function | Run the server on Deno standard input and output. |
+| `createMcpCliServer` | function | Compose the server with optional outer CLI adapters. |
+| `resolveDocsRoot` | function | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe. |
+| `McpCliOptions` | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root. |
 
 Telemetry endpoint discovery is ordered: an explicit `endpoint` option, then
 `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`. Only

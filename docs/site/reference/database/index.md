@@ -49,15 +49,15 @@ provider-agnostic adapter contracts.
 Additional symbols re-exported from the root entrypoint (`@netscript/database`) beyond the port
 contracts and the PostgreSQL adapter.
 
-| Symbol                          | Kind     | Signature                                                | Description                                                                                                                          |
-| ------------------------------- | -------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `enableInstrumentation`         | function | `function enableInstrumentation(): boolean`              | Enable Prisma OTEL instrumentation for database tracing. Call before creating any Prisma clients; only active when `OTEL_DENO=true`. |
-| `withTransaction`               | function | `function withTransaction(client, fn, options): Promise` | Execute operations within a transaction.                                                                                             |
-| `parseConnectionString`         | function | `function parseConnectionString(connectionString)`       | Parse a database connection string.                                                                                                  |
-| `buildPostgresConnectionString` | function | `function buildPostgresConnectionString(parts): string`  | Build a PostgreSQL connection string from parts.                                                                                     |
-| `buildMssqlConnectionString`    | function | `function buildMssqlConnectionString(parts): string`     | Build a SQL Server connection string from parts.                                                                                     |
-| `jsonUtils`                     | variable | `const jsonUtils`                                        | JSON serialization utilities for manual use.                                                                                         |
-| `registerJsonFields`            | function | `function registerJsonFields(model, fields): void`       | Register additional JSON fields for a model at runtime.                                                                              |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `enableInstrumentation` | function | `function enableInstrumentation(): boolean` | Enable Prisma OTEL instrumentation for database tracing. Call before creating any Prisma clients; only active when `OTEL_DENO=true`. |
+| `withTransaction` | function | `function withTransaction(client, fn, options): Promise` | Execute operations within a transaction. |
+| `parseConnectionString` | function | `function parseConnectionString(connectionString)` | Parse a database connection string. |
+| `buildPostgresConnectionString` | function | `function buildPostgresConnectionString(parts): string` | Build a PostgreSQL connection string from parts. |
+| `buildMssqlConnectionString` | function | `function buildMssqlConnectionString(parts): string` | Build a SQL Server connection string from parts. |
+| `jsonUtils` | const | `const jsonUtils` | JSON serialization utilities for manual use. |
+| `registerJsonFields` | function | `function registerJsonFields(model, fields): void` | Register additional JSON fields for a model at runtime. |
 
 ## Adapters
 
@@ -131,19 +131,19 @@ Exported from `@netscript/database/adapters/mysql`.
 Exported from `@netscript/database/extensions`. Prisma extensions that automatically handle JSON
 serialization across SQL databases.
 
-| Symbol                    | Kind       | Signature                                                  | Description                                                              |
-| ------------------------- | ---------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `sqlJsonExtension`        | function   | `function sqlJsonExtension(Prisma, options): ReturnType`   | Create a Prisma extension that automatically handles JSON serialization. |
-| `mysqlJsonExtension`      | function   | `function mysqlJsonExtension(Prisma, options): ReturnType` | Create a Prisma extension for MySQL JSON serialization.                  |
-| `registerJsonFields`      | function   | `function registerJsonFields(model, fields): void`         | Register additional JSON fields for a model at runtime.                  |
-| `jsonUtils`               | variable   | `const jsonUtils`                                          | JSON serialization utilities for manual use.                             |
-| `SqlJsonExtensionOptions` | interface  | `interface SqlJsonExtensionOptions`                        | Options for creating the SQL JSON extension.                             |
-| `PrismaExtensionConfig`   | interface  | `interface PrismaExtensionConfig`                          | Prisma extension configuration generated by SQL JSON helpers.            |
-| `PrismaQueryContext`      | interface  | `interface PrismaQueryContext`                             | Query context passed by Prisma to extension handlers.                    |
-| `JsonField`               | type alias | `type JsonField`                                           | JSON field values.                                                       |
-| `JsonFieldConfig`         | type alias | `type JsonFieldConfig`                                     | Configuration for JSON fields per model.                                 |
-| `PrismaQueryHandler`      | type alias | `type PrismaQueryHandler`                                  | Query handler used by Prisma extension configuration.                    |
-| `SqlDatabaseType`         | type alias | `type SqlDatabaseType`                                     | Supported database types for JSON handling.                              |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `sqlJsonExtension` | function | `function sqlJsonExtension(Prisma, options): ReturnType` | Create a Prisma extension that automatically handles JSON serialization. |
+| `mysqlJsonExtension` | function | `function mysqlJsonExtension(Prisma, options): ReturnType` | Create a Prisma extension for MySQL JSON serialization. |
+| `registerJsonFields` | function | `function registerJsonFields(model, fields): void` | Register additional JSON fields for a model at runtime. |
+| `jsonUtils` | const | `const jsonUtils` | JSON serialization utilities for manual use. |
+| `SqlJsonExtensionOptions` | interface | `interface SqlJsonExtensionOptions` | Options for creating the SQL JSON extension. |
+| `PrismaExtensionConfig` | interface | `interface PrismaExtensionConfig` | Prisma extension configuration generated by SQL JSON helpers. |
+| `PrismaQueryContext` | interface | `interface PrismaQueryContext` | Query context passed by Prisma to extension handlers. |
+| `JsonField` | type alias | `type JsonField` | JSON field values. |
+| `JsonFieldConfig` | type alias | `type JsonFieldConfig` | Configuration for JSON fields per model. |
+| `PrismaQueryHandler` | type alias | `type PrismaQueryHandler` | Query handler used by Prisma extension configuration. |
+| `SqlDatabaseType` | type alias | `type SqlDatabaseType` | Supported database types for JSON handling. |
 
 ## Scripts
 

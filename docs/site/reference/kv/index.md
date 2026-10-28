@@ -26,17 +26,17 @@ exports carry the heavier integrations:
 The shared singleton resolves a provider once (auto-detecting from the environment) and
 hands back a `WatchableKv` for the rest of the process.
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `getKv` | `function getKv(config?: SharedKvConfig): Promise<WatchableKv>` | Resolve the shared `WatchableKv` singleton, initializing on first access. |
-| `getRawKv` | `async function getRawKv(config?: SharedKvConfig): Promise<Deno.Kv>` | Resolve the raw `Deno.Kv` instance when the shared provider is Deno KV. |
-| `getActiveProvider` | `function getActiveProvider(): KvProvider \| null` | Return the currently active provider, or `null` before initialization. |
-| `getKvPath` | `function getKvPath(): string \| undefined` | Return the Deno KV path currently in use, or the discovered default. |
-| `getRedisConnectionFromEnv` | `function getRedisConnectionFromEnv(): string \| undefined` | Read a normalized Redis connection string from the environment. |
-| `isKvInitialized` | `function isKvInitialized(): boolean` | Check whether the shared adapter has been initialized. |
-| `isWatchable` | `function isWatchable(store: KvStore): store is WatchableKv` | Type guard for stores that implement the `WatchableKv` contract. |
-| `resetKv` | `async function resetKv(): Promise<void>` | Reset the shared state for tests or isolated validation runs. |
-| `closeKv` | `async function closeKv(): Promise<void>` | Close and clear the shared adapter state. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `getKv` | function | `function getKv(config?: SharedKvConfig): Promise<WatchableKv>` | Resolve the shared `WatchableKv` singleton, initializing on first access. |
+| `getRawKv` | function | `async function getRawKv(config?: SharedKvConfig): Promise<Deno.Kv>` | Resolve the raw `Deno.Kv` instance when the shared provider is Deno KV. |
+| `getActiveProvider` | function | `function getActiveProvider(): KvProvider \| null` | Return the currently active provider, or `null` before initialization. |
+| `getKvPath` | function | `function getKvPath(): string \| undefined` | Return the Deno KV path currently in use, or the discovered default. |
+| `getRedisConnectionFromEnv` | function | `function getRedisConnectionFromEnv(): string \| undefined` | Read a normalized Redis connection string from the environment. |
+| `isKvInitialized` | function | `function isKvInitialized(): boolean` | Check whether the shared adapter has been initialized. |
+| `isWatchable` | function | `function isWatchable(store: KvStore): store is WatchableKv` | Type guard for stores that implement the `WatchableKv` contract. |
+| `resetKv` | function | `async function resetKv(): Promise<void>` | Reset the shared state for tests or isolated validation runs. |
+| `closeKv` | function | `async function closeKv(): Promise<void>` | Close and clear the shared adapter state. |
 
 ## Adapters
 

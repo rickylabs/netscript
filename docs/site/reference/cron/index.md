@@ -22,18 +22,18 @@ aliases). Three sub-path exports carry the rest of the surface:
 
 ## Scheduler factory
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createScheduler` | `function createScheduler(options?: CreateSchedulerOptions): CronScheduler` | Create a cron scheduler, auto-detecting the runtime (native `Deno.cron`, or in-memory for tests). |
-| `getScheduler` | `function getScheduler(options?: CreateSchedulerOptions): CronScheduler` | Get the default shared scheduler instance, creating it on first call (options only used on first call). |
-| `stopScheduler` | `async function stopScheduler(): Promise<void>` | Stop and reset the default scheduler so the next `getScheduler()` creates a fresh instance. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createScheduler` | function | `function createScheduler(options?: CreateSchedulerOptions): CronScheduler` | Create a cron scheduler, auto-detecting the runtime (native `Deno.cron`, or in-memory for tests). |
+| `getScheduler` | function | `function getScheduler(options?: CreateSchedulerOptions): CronScheduler` | Get the default shared scheduler instance, creating it on first call (options only used on first call). |
+| `stopScheduler` | function | `async function stopScheduler(): Promise<void>` | Stop and reset the default scheduler so the next `getScheduler()` creates a fresh instance. |
 
 ## Cron expression utilities
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `isValidCronExpression` | `function isValidCronExpression(expression: string): boolean` | Validate a cron expression, returning `true` if valid. |
-| `parseCronExpression` | `function parseCronExpression(expression: string): ParsedCronExpression \| null` | Parse a cron expression string into its component parts, or `null` if invalid. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `isValidCronExpression` | function | `function isValidCronExpression(expression: string): boolean` | Validate a cron expression, returning `true` if valid. |
+| `parseCronExpression` | function | `function parseCronExpression(expression: string): ParsedCronExpression \| null` | Parse a cron expression string into its component parts, or `null` if invalid. |
 
 ## Constants
 

@@ -37,8 +37,8 @@ engine-vocabulary set a connector wires.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `aiContract` | variable | AI service contract definition for client generation (the real, fully-inferred oRPC contract router — no erasure cast). |
-| `aiContractV1` | variable | The implemented, context-bindable v1 contract (`implement(definition)`); `.$context<Ctx>()` returns the precisely-typed router implementer. |
+| `aiContract` | const | AI service contract definition for client generation (the real, fully-inferred oRPC contract router — no erasure cast). |
+| `aiContractV1` | const | The implemented, context-bindable v1 contract (`implement(definition)`); `.$context<Ctx>()` returns the precisely-typed router implementer. |
 | `createAiRouter` | function | Bind a complete in-process AI implementation to the v1 contract, returning the oRPC handlers for each route. |
 | `AiRouterContext` | type alias | Request context accepted by the generated AI router (`Record<PropertyKey, unknown>`). |
 | `ContextualAiRouter` | type alias | The router implementer returned by `aiContractV1.$context<TContext>()`. |
@@ -74,16 +74,16 @@ inbound bodies and outbound frames against these.
 
 | Symbol | Kind | Validates |
 | --- | --- | --- |
-| `ChatInputSchema` | variable | `chat` request body (`ChatInput`). |
-| `ChatChunkSchema` | variable | A single streamed `chat` frame (`ChatChunk`). |
-| `ModelsInputSchema` | variable | Optional `models` filter (`{ provider? }`). |
-| `ModelsResponseSchema` | variable | `models` response (`{ models: ModelDescriptor[] }`). |
-| `ToolInvokeInputSchema` | variable | `tools/{name}` request body. |
-| `ToolInvokeResponseSchema` | variable | `tools/{name}` response. |
-| `EmbedInputSchema` | variable | `embed` request body. |
-| `EmbedResponseSchema` | variable | `embed` response. |
-| `TranscribeInputSchema` | variable | `transcribe` request body. |
-| `TranscribeResponseSchema` | variable | `transcribe` response. |
+| `ChatInputSchema` | const | `chat` request body (`ChatInput`). |
+| `ChatChunkSchema` | const | A single streamed `chat` frame (`ChatChunk`). |
+| `ModelsInputSchema` | const | Optional `models` filter (`{ provider? }`). |
+| `ModelsResponseSchema` | const | `models` response (`{ models: ModelDescriptor[] }`). |
+| `ToolInvokeInputSchema` | const | `tools/{name}` request body. |
+| `ToolInvokeResponseSchema` | const | `tools/{name}` response. |
+| `EmbedInputSchema` | const | `embed` request body. |
+| `EmbedResponseSchema` | const | `embed` response. |
+| `TranscribeInputSchema` | const | `transcribe` request body. |
+| `TranscribeResponseSchema` | const | `transcribe` response. |
 
 ### Engine-derived vocabulary types
 
