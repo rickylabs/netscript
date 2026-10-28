@@ -1,0 +1,12 @@
+# S2 registry v2 supervision
+
+- Role: implementation, feature tier; supplied leaf profile is authoritative.
+- Generator: OpenAI Codex, requested sol / xhigh.
+- Branch: `orch/divybot-6478265976`; baseline: `9a31e879c32a8066c50946a57976f3da34ba43a6`; base: `main`.
+- Worktree: repository root (`.`). No machine identity or private runtime identifiers are published.
+- Writable surface: `.llm/runs/orch-divybot-6478265976--s2/**`; registry schema, manifest, JSON authoring and registry exports in `packages/fresh-ui/`; `packages/fresh-ui/src/registry/**`; registry tests and documentation; `packages/cli/src/kernel/{domain,application,adapters}/ui/**`; `packages/cli/src/public/features/ui/**`; CLI command composition; `packages/mcp/` registry tools and composition; docs-site static registry publication wiring; scoped package export/task configuration and generated publish carriers if required.
+- Excluded surface: component sources, markup, CSS, component contract module and `ui:migrate` owned by S3; `.divybot-goal.md`; dependency lockfiles and caches.
+- Routing: `deno task agentic:matrix --tier feature --json` read successfully. Implementation primary `sol/xhigh`, fallback `muse_spark_1_3/xhigh`.
+- Owner evaluator override (verbatim): "Run PLAN-EVAL before implementing and IMPL-EVAL after, both with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once, record both verdicts."
+- Evaluators: separate Anthropic sessions, preserving evaluator sessions across repair rounds. No implementation self-certification.
+- Owner public-surface constraints: no label changes, force pushes, merge, tags or release. Refs-only issue reference takes precedence over generic assignment closing-keyword boilerplate.

@@ -1,0 +1,42 @@
+# Plan — S2 registry v2
+
+Plan & Design — READY FOR REVIEW. Feature tier. Required independent PLAN-EVAL precedes implementation; required independent IMPL-EVAL follows gates. Do not merge before both pass.
+
+## Locked decisions
+
+1. Author Fresh UI as `registry.json` with the upstream published draft-07 schema URI. Vendored schema snapshots with source hashes make validation reproducible. Twelve prefixed item types, files/path/content/target, dependencies, cssVars/css/docs/categories/meta use the upstream shapes. NetScript-specific collections, CSS import contributions and style component maps live in `meta`, preserving interoperability. The legacy manifest is a compatibility projection, so existing scaffolds keep working.
+2. Add an explicit `/registry-v2` subpath with contract, validation and static build. `ui:build` reads local files, embeds bytes in item JSON and emits an index plus one JSON per item. Docs-site build emits the same static registry. URLs and public GitHub source registries resolve through a transport adapter; remote modules are never executed.
+3. App settings live in `components.json`: version, local aliases, style, iconLibrary and namespaced registries with `{name}` templates and header environment placeholders. Defaults preserve existing Fresh UI target directories. Resolve credentials only at the network adapter; persist templates, never resolved credentials. Reject unsafe paths, unsupported protocols and invalid inputs before mutation.
+4. `fresh-ui.lock.json` records canonical source identity, source hash and installed-file SHA-256 plus installed baseline text. Baseline text supports reviewable diffs without reading auth values. Fetch/validate/resolve dependencies/plan all writes first. Edited or untracked existing files are reported rather than overwritten; explicit legacy `--force` remains an opt-in for add, never a bypass for style regeneration. Update compares local bytes to installed hashes, allowing upstream changes when local copies are unchanged. No lock means conservative conflict detection.
+5. Existing app-root resolution and page/island scaffold commands remain intact. New commands are thin factories and application flows with injected filesystem, transport and token engine. Namespace dependencies resolve in their originating registry. Reject cycles and target collisions before writes. `--diff` is read-only and includes local changes against stored baseline and current registry.
+6. Presets are versioned base64url JSON with a stable public create URL, plus plain token preset ids. `apply` defaults to token/theme/font updates and preserves component code; explicit changed style triggers regeneration of installed component items. `--only theme,font` restricts the plan. Theme preset selection calls `buildAppTokens` and installs the matching docs. Style metadata maps component item names to style-specific sources; Utility maps the shipped items. S3 supplies future complete alternative styles against the shared contract.
+7. Theme items include the canonical DESIGN.md/SKILL.md bytes with skill targets `.agents/skills/fresh-ui-theme-<id>/`. Build embeds source docs; published runtime installation uses embedded content. A test fixture supplies a second minimal style without changing real components.
+8. MCP list/search/view tools query registry data through an injected port. Add-command tool returns a structured argv command, never executes writes or interprets shell text. Keep inputs bounded and pass through the existing tool registry/schema/runner.
+
+## Ordered slices and gates
+
+1. Schema and JSON authoring: `packages/fresh-ui/registry*.{ts,json}`, `src/registry/**`, registry schema tests and export metadata. Gate: own registry valid, broken item rejected, legacy compatibility tests.
+2. Static build: registry build flow, CLI build feature, publication wiring and build tests. Gate: complete static payload, invalid/missing source fails before output, deterministic rebuild.
+3. Config and lockfile: CLI UI domain/application files and injected transport adapter. Gate: schema validation, alias containment, credential templates, hash and diff tests.
+4. Commands: add/update/init/view/search/list/docs/info/registry/preset/apply features and root composition. Gate: real command parser fixtures, namespaced auth HTTP test with secret absent from output and persisted metadata, dependency/cycle checks, read-only diff.
+5. Style regeneration and theme docs: style planning, preset integration, theme doc embedding and tests. Gate: Utility plus fixture style, edited-file refusal with zero writes, apply preserves component hashes, docs appear in skill directory.
+6. MCP tools: contracts, registry, flows, adapter and composition. Gate: MCP tools/list and tools/call tests, deterministic add argv, no mutation.
+
+Every slice updates worklog/context-pack, runs focused wrapper tests/check/lint/fmt plus quality/architecture scans, receives separate-session review, commits/pushes, and posts evidence on the draft PR.
+
+## Gate set
+
+Scoped structured check/test/lint/fmt wrappers covering all changed TypeScript; `deno task quality:scan`; `deno task arch:check`; JSR metadata/doc audit for changed export surfaces; generated registry/carrier freshness gates when touched; CLI command regressions. Final one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. Record missing Docker or other gate prerequisites as unproven. No remote CI polling or merge.
+
+## Risks and mitigations
+
+- Namespace auth leakage: transport resolves headers only at request time, sanitizes failures, disables credential forwarding across redirects, tests error/output/lock/config paths.
+- Filesystem escape: normalize/contain aliases, targets and local source paths; reject absolute/traversal and symlink traversal at the filesystem edge.
+- Partial destructive writes: preflight all conflicts, dependency resolution, style coverage and token inputs before mutation; edited style copies stop the whole regeneration plan.
+- Shared targets: detect conflicting content and retain shared dependency semantics. Theme-owned generated assets have a distinct update path from app-owned component files.
+- S3 concurrent ownership: no changes to component source or ui:migrate; record the metadata hook in drift and PR.
+- Published runtime: explicit subpath and JSON publish includes, embedded registry/docs assets; avoid new slow types, wildcard root reexports or runtime source reads after publication.
+
+## Open decisions and deferred scope
+
+No load-bearing open decision. Exact schema hashes are resolved before slice 1. Safe to defer: real S3 alternate style sources and shared-contract evolution, three-way merges, private GitHub authentication beyond environment header templates, visual redesign, /create site implementation, ui:migrate, release publication. Existing F-CLI gates without scripts remain PENDING_SCRIPT with manual evidence; no structural waivers are added.
