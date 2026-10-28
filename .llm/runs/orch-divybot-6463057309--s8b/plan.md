@@ -60,3 +60,7 @@ Round 1 returned FAIL_PLAN; adopt these constraints:
 Duplication is generated projection only: every source section remains authoritative in the full guidelines and source theme file. No copied specification text lives in the site. Corpus tests account for every GUIDELINES H2 and all theme H2/H3, YAML leaves, comments and unique headings. Raw template source is tested verbatim as escaped code.
 
 Risk register above was added while round 1 was still reading; its omission is now corrected. Raw-HTML disabling is a bounded synchronous adapter operation; the test verifies renderer options restoration. Gallery images are served unchanged with dimensions and lazy loading, not embedded as base64. The landing references live in the retained handoff run directory (not docs/), already inspected on current main.
+
+## Locked review repair
+
+Resume from `660da01f` and address the three silent-failure findings plus stylesheet, gallery-size and TOC polish. Use fixed contracts in tests, validate the actual template against them, and validate canonical sources during loading. Validate all generated guideline cross-links against configured Markdown heading IDs. Build thumbnails from existing copied images and emit CSS once through the owned generator, without shared configuration changes. All listed negative tests must be observed red before implementation and green afterward. PLAN-EVAL N/A: bounded owner-defined repair; mandatory independent IMPL-EVAL remains.

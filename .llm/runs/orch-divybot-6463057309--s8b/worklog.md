@@ -67,3 +67,19 @@ The Pages CI build on this PR has also passed (job 122698782774 in run 406533987
 Close-gate repair applied: repository mirrorIssue validated the complete five-entry PR evidence map, dry-ran, then updated only the five acceptance checkboxes in the latest issue body. Live checker now PASS on 01566c31a; issue snapshot hash f23216ce2f855f7a0c6b08e72e1cda6a82eb078a1a053c5fd6fa4b3fd3f34f45. Evidence and mutation results retained in acceptance-mirror-{dry-run,applied}.json and close-gate-repair.txt. No labels or gate code changed. The Augment review completed with no suggestions.
 
 Concurrent branch writes: the first push was rejected because two owner-authored evidence cleanup commits had landed remotely. Inspected and preserved both, then rebased only the unpublished acceptance-audit commit onto the current remote branch and pushed normally. No remote history was rewritten and no force-push used. Product source remains unchanged from the approved implementation.
+
+## Review repair design — 2026-10-28
+
+1. Public surface: the same 15 generated docs routes; malformed theme/guidelines input now stops the build. Shared stylesheet asset and build-generated gallery thumbnails.
+2. Domain vocabulary: ordered required H2 sections, fixed fixture contract, validated guideline anchors, namespaced value headings.
+3. Ports: existing configured Markdown engine, canonical Markdown/YAML, Lume generator output, supplied WebP images, build-time image resizer.
+4. Constants: fixed template H2 contract and guideline section contract; section stylesheet URL and thumbnail width.
+5. Commit slices: bootstrap/research notes; one coherent review-repair slice (generator, renderer, fixture tests, section generator, contributor README) with red/green tests, docs build/link checks, scoped wrappers, broader quality scan and independent review; final evidence/READY metadata. Every slice updates this run.
+6. Deferred: S8-owned CI path filters, shared chrome, canonical design prose, labels and release/merge. No new committed image source binaries.
+7. Contributor path: `docs/site/_plugins/design-system/README.md`.
+
+PLAN-EVAL: N/A for this bounded repair: the independent findings and explicit owner acceptance define the design; no new framework/API architecture decision. Existing PLAN-EVAL retained as historical evidence.
+Owner override (verbatim): “Run IMPL-EVAL with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once.”
+Matrix queried in feature tier; native Claude review is explicitly owner-selected. NetScript MCP connector and external memory tools are unavailable; existing MCP guidance and run memory consulted before implementation. RTK binary unavailable; direct tools used.
+
+Reconcile: fetched latest PR head `660da01f`; preserved scrub/acceptance commits. No duplicate PR; no labels changed. Contradictory closing boilerplate in current PR body will be removed to honor owner’s explicit Refs-only instruction.
