@@ -196,3 +196,16 @@ carrier, and regenerated publish/CLI assets. Combined docs build rendered251
 HTML pages and all23975 internal links resolve. This is branch synchronization;
 PR2435 remains open, with no merge to main, tag, release or GitHub label mutation.
 All three Augment threads received individual replies with the fixes and tests.
+
+## READY after CI repairs
+
+Combined-tree release preflight, repository quality, root lint/format, generated
+registry/CLI/publish asset freshness, MCP export freshness, docs prose freshness
+and both originally failing corpus integration tests PASS. The frozen token build
+again expands72 inputs and produces68 outputs without source churn. Actual CLI
+registry/init/build/reject/clean/rebuild proof reran successfully with all23 output
+hashes stable; unknown app-owned CSS and source bytes remain intact. All three
+review threads are answered; the thread gate PASS. Final source implementation is
+independently signed off. Next actions: commit this evidence, push, update PR body,
+and atomically queue the canonical READY report. Remote CI is not watched; no PR
+merge, tag, release, lock changes or GitHub label mutation.

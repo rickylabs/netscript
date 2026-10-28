@@ -62,3 +62,14 @@ First final evaluator returned FAIL_FIX for all18 presets in app CSS. See impl-f
 ## READY disposition
 
 Final independent IMPL-EVAL PASS after the single performance fix (impl-eval.md). All local source/output/CLI/browser/doc/publish quality passes;68 artifacts,23 managed app files,210 package tests,37 CLI tests,12 browser cases. Runtime remains UNPROVEN at host preflight, not waived or claimed passed. Next actions are authorized final sign-off commit/push, PR ready-for-review and atomic canonical READY handoff. No merge/tag/release, no labels, no assignment-file commit.
+
+## CI follow-up handoff
+
+READY. Source fixes are inea02e0fa;33a43f68 integrates current main and regenerates
+combined documentation/API assets. Follow-up independent review FAIL_FIX -> PASS
+is retained inimpl-eval.md with sanitized receipts inci-followup.json. Package213,
+browser24, CLI proof23files, failing corpus regressions2, contributor command-tree2,
+root lint/format, preflight and freshness gates all PASS locally. Three Augment
+threads have replies. Full scaffold runtime remains UNPROVEN for the documented
+Docker/Aspire host prerequisite. Push evidence and queue canonical READY handoff;
+stop at review, never merge/tag/release.

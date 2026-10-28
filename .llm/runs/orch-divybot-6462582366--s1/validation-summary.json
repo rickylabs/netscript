@@ -1,14 +1,14 @@
 {
-  "state": "READY \u2014 final independent IMPL-EVAL PASS; sign-off commit/push follows",
+  "state": "READY \u2014 independent follow-up PASS; CI fixes verified locally",
   "historicalSourceIteration": "validation-source-stopped.json",
   "parent": "5a5c1a42846bdde395b7fab5820cee716112129e",
   "packageTests": {
-    "rawReportSha256": "66089de3ed87f2b56f912e5b96d48f099a1ee7fe2048384fa3253f8a3880af67",
+    "sha256": "5803c8e9e1d1a3dd14fd70ab2b5ab733b8eb7e025f9faaafb7fc083a56749457",
     "summary": {
-      "passed": 210,
+      "passed": 213,
       "failed": 0,
       "ignored": 0,
-      "totalResults": 210,
+      "totalResults": 213,
       "uniqueFailures": 0
     },
     "exitCode": 0
@@ -189,5 +189,13 @@
       "uniquePaths": 0
     },
     "exitCode": 0
+  },
+  "sourceHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+  "ciFollowup": "ci-followup.json",
+  "browserCases": 24,
+  "combinedDocs": {
+    "htmlPages": 251,
+    "links": 23975,
+    "allResolve": true
   }
 }

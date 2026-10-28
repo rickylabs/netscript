@@ -80,5 +80,57 @@
       "verdict": "PASS",
       "rawSha256": "6b8c20c1264ca01cc1a1f110cb4e9ca89d9809567d7a69783ab01eab8475d711"
     }
-  ]
+  ],
+  "combinedTree": {
+    "ci-followup-corpus-regressions.json": {
+      "sha256": "ce07e02ab80fa680c14849cb4f6f89fed4e8bdaeb27d6b827743068f53daeea9",
+      "summary": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "ci-followup-merged-quality.json": {
+      "sha256": "9617191ed4c15ac5ae20c3fc7db4332d6bafe74a4e9a51d74f8caca4681dfb75",
+      "gitHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "gateId": "quality-gate"
+    },
+    "ci-followup-root-lint-receipt.json": {
+      "sha256": "26d14b418f43214a10c360ff05d5242f15cf39adc4f67432a039e9a6edca1698",
+      "gitHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "gateId": "lint-report"
+    },
+    "ci-followup-root-fmt-receipt.json": {
+      "sha256": "4c60167976ed3e135b80ff1008f5a3aa1a815dee73b7bb546e96474bd656822a",
+      "gitHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "gateId": "fmt-check-report"
+    },
+    "actualCli": {
+      "sha256": "816bcc7019565fd99dc9a5fcc94f54ae54149175e552ec29a0804f05e25affb8",
+      "codes": {
+        "ci-followup-cli-registry-theme-final": 0,
+        "ci-followup-cli-init-final": 0,
+        "ci-followup-cli-build-final": 0,
+        "ci-followup-cli-invalid-final": 1,
+        "ci-followup-cli-clean-final": 0,
+        "ci-followup-cli-rebuild-final": 0
+      },
+      "registryCopiesExactSelectedCss": true,
+      "generatedFiles": 23,
+      "allPreviewCssInheritsOverride": true,
+      "rawValueRejectedWithoutMutation": true,
+      "cleanPreservesOwnedBytes": true,
+      "rebuildMatches": true,
+      "cssExcerpt": "--ns-radius-md: var(--ns-radius-lg)"
+    }
+  }
 }
