@@ -34,13 +34,12 @@ export interface XrefTarget {
 }
 
 /**
- * The 36 hand-maintained reference xref units. Navigation is independently
+ * The 35 hand-maintained reference xref units. Navigation is independently
  * folder-derived in `_data.ts`, so keep this registry aligned with the
  * directories under `docs/site/reference/`.
  */
 const REFERENCE_UNITS = [
   'ai',
-  'auth',
   'auth-better-auth',
   'auth-kv-oauth',
   'auth-workos',
@@ -374,7 +373,7 @@ export const xref: Record<string, XrefTarget> = {
   'cli:reference': { href: '/cli-reference/', label: 'CLI reference' },
   'glossary:': { href: '/glossary/', label: 'Glossary' },
 
-  // ─── Reference index + the 36 registered units (ref:) ──────────────────────
+  // ─── Reference index + the 35 registered units (ref:) ──────────────────────
   'ref:index': { href: '/reference/', label: 'Reference index' },
   ...refEntries(),
 };

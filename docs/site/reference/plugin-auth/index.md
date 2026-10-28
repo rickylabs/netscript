@@ -1,14 +1,17 @@
 ---
 layout: layouts/base.vto
 title: "@netscript/plugin-auth"
+description: The auth plugin manifest, its constants, remote session verification, and the map of auth packages.
 templateEngine: [vento, md]
+oldUrl: /reference/auth/
 ---
 
 # `@netscript/plugin-auth`
 
 The NetScript auth plugin: its manifest, the `auth-api` service, and the integration entrypoints a
 workspace mounts. Use it to add authentication to a workspace; contracts, ports and schemas live in
-[`@netscript/plugin-auth-core`](/reference/plugin-auth-core/).
+[`@netscript/plugin-auth-core`](/reference/plugin-auth-core/). The other auth packages are listed
+under [Auth packages](#auth-packages).
 
 ## Sub-path exports
 
@@ -51,3 +54,21 @@ Inspect the manifest with `inspectPlugin` from [`@netscript/plugin`](/reference/
 `Principal` types. See
 [remote session verification](/reference/plugin-auth-core/#remote-session-verification) for the
 symbols and their behavior.
+
+## Auth packages
+
+NetScript auth spans one plugin package, one core contract package and three backend adapters. Pick
+the page for the package you import.
+
+| Package | Primary factory | Purpose |
+| --- | --- | --- |
+| [`@netscript/plugin-auth`](/reference/plugin-auth/) | | Auth plugin manifest, contribution metadata, and plugin inspection helper. |
+| [`@netscript/plugin-auth-core`](/reference/plugin-auth-core/) | | Auth contracts, backend ports, session schemas, stream schemas, config schemas, and telemetry primitives. Unsupported upstream operations raise its `AuthBackendOperationUnsupportedError`. |
+| [`@netscript/auth-kv-oauth`](/reference/auth-kv-oauth/) | `createKvOAuthBackend(options)` | KV-backed OAuth2/OIDC relying-party backend. Uses provider configs created with `defineOAuthProvider(input)` or the exported provider presets. |
+| [`@netscript/auth-workos`](/reference/auth-workos/) | `createWorkosBackend(options)` | WorkOS-backed authenticator and backend adapter. Wraps WorkOS session and token verification behind `AuthBackendPort`. |
+| [`@netscript/auth-better-auth`](/reference/auth-better-auth/) | `createBetterAuthBackend(options)` | Better Auth integration, authenticator, and backend adapter. Wraps a Better Auth instance behind `AuthBackendPort`. |
+
+The KV OAuth callback's `oauth_cookie_missing` error is documented under
+[OAuth callback errors](/reference/auth-kv-oauth/#oauth-callback-errors). For the capability
+guide, start with [Authentication](/identity-access/auth/); for the service builder behind
+`auth-api`, see [`@netscript/service`](/reference/service/).

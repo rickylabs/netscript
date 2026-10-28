@@ -21,6 +21,5 @@ error instead of falling back to an anonymous session.
   { eyebrow: "Recipes", title: "Recipes", body: "Task recipes for this area, one problem each.", href: "/identity-access/how-to/" },
   { eyebrow: "Tutorial", title: "Workspace auth", body: "Add authentication in the Team Workspace tutorial, then authorize routes on it.", href: "/tutorials/workspace/02-auth/" },
   { eyebrow: "Explanation", title: "Auth model", body: "Principal, session, backend and authorization: why auth is a pure-backend port.", href: "/explanation/auth-model/" },
-  { eyebrow: "Reference", title: "Auth backends", body: "Generated symbols for the auth, better-auth, kv-oauth and WorkOS packages.", href: "/reference/auth/" },
-  { eyebrow: "Reference", title: "Auth plugin", body: "Generated symbols for the `plugin-auth` package.", href: "/reference/plugin-auth/" }
+  { eyebrow: "Reference", title: "Auth packages", body: "The auth plugin, its core contracts, and the three backend adapters.", href: "/reference/plugin-auth/" }
 ] }) }}
