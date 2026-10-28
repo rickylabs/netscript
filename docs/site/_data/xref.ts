@@ -85,19 +85,18 @@ function refEntries(): Record<string, XrefTarget> {
 }
 
 export const xref: Record<string, XrefTarget> = {
-  // ─── Capability hubs (cap:) ────────────────────────────────────────────────
+  // ─── Build guides (cap:) ───────────────────────────────────────────────────
   'cap:services': { href: '/services-sdk/services/', label: 'Services & contracts' },
   'cap:background-jobs': { href: '/background-processing/workers/', label: 'Background jobs' },
   'cap:durable-sagas': { href: '/durable-workflows/sagas/', label: 'Durable sagas' },
-  'cap:triggers': { href: '/durable-workflows/triggers/', label: 'Triggers & ingress' },
+  'cap:triggers': { href: '/durable-workflows/triggers/', label: 'Event triggers' },
   'cap:streams': { href: '/durable-workflows/streams/', label: 'Durable streams' },
   'cap:database': { href: '/data-persistence/database/', label: 'Database & Prisma' },
   'cap:kv-queues-cron': { href: '/data-persistence/kv-queues-cron/', label: 'KV, queues & cron' },
   'cap:telemetry': { href: '/observability/telemetry/', label: 'Telemetry & logging' },
   'cap:auth': { href: '/identity-access/auth/', label: 'Authentication' },
   'cap:fresh-ui': { href: '/web-layer/fresh-ui/', label: 'Fresh UI & design' },
-  'cap:index': { href: '/', label: 'NetScript' },
-  // v3 NEW capability hubs
+  // v3 NEW Build guides
   'cap:fresh-framework': { href: '/web-layer/', label: 'Fresh meta-framework' },
   'cap:sdk': { href: '/services-sdk/sdk/', label: 'Typed SDK & client' },
   'cap:polyglot-tasks': { href: '/background-processing/polyglot-tasks/', label: 'Polyglot tasks' },
@@ -108,7 +107,7 @@ export const xref: Record<string, XrefTarget> = {
   'cap:agent-tooling': { href: '/ai/agent-tooling/', label: 'Agent tooling' },
 
   // ─── How-to recipes (howto:) ───────────────────────────────────────────────
-  'howto:index': { href: '/how-to/', label: 'How-to guides' },
+  'howto:index': { href: '/how-to/', label: 'Build' },
   'howto:add-a-plugin': {
     href: '/orchestration-runtime/how-to/add-a-plugin/',
     label: 'Add a plugin',
@@ -120,11 +119,11 @@ export const xref: Record<string, XrefTarget> = {
   },
   'howto:database-migration': {
     href: '/data-persistence/how-to/database-migration/',
-    label: 'Database & migration',
+    label: 'Migrate the database',
   },
   'howto:queue-kv-cron': {
     href: '/data-persistence/how-to/queue-kv-cron/',
-    label: 'Queue / KV / cron',
+    label: 'Use KV, queues, and cron',
   },
   'howto:add-opentelemetry': {
     href: '/observability/how-to/add-opentelemetry/',
@@ -138,14 +137,10 @@ export const xref: Record<string, XrefTarget> = {
     href: '/web-layer/how-to/build-a-desktop-frontend/',
     label: 'Build a desktop frontend',
   },
-  'howto:deploy': { href: '/orchestration-runtime/how-to/deploy/', label: 'Deploy' },
+  'howto:deploy': { href: '/orchestration-runtime/how-to/deploy/', label: 'Deploy a workspace' },
   'howto:author-a-plugin': {
     href: '/orchestration-runtime/how-to/author-a-plugin/',
     label: 'Author a plugin',
-  },
-  'howto:deno-lsp-code-intelligence': {
-    href: '/orchestration-runtime/how-to/deno-lsp-code-intelligence/',
-    label: 'Deno LSP code intelligence',
   },
   // v3 NEW how-to recipes
   'howto:run-a-polyglot-task': {
@@ -199,6 +194,18 @@ export const xref: Record<string, XrefTarget> = {
   'howto:build-a-server-validated-form': {
     href: '/web-layer/how-to/build-a-server-validated-form/',
     label: 'Build a server-validated form',
+  },
+  'howto:bound-stream-retention': {
+    href: '/durable-workflows/how-to/bound-stream-retention/',
+    label: 'Bound stream retention',
+  },
+  'howto:protect-an-anonymous-route': {
+    href: '/services-sdk/how-to/protect-an-anonymous-route/',
+    label: 'Protect an anonymous service route',
+  },
+  'howto:call-internal-procedures': {
+    href: '/services-sdk/how-to/call-internal-procedures/',
+    label: 'Call internal procedures from a service or worker',
   },
   'howto:build-a-durable-chat': {
     href: '/ai/how-to/build-a-durable-chat/',
@@ -332,10 +339,10 @@ export const xref: Record<string, XrefTarget> = {
   'tut:chat/06': { href: '/tutorials/chat/06-live-streaming/', label: 'AI Chat - Live Streaming' },
 
   // ─── Explanation essays (explain:) ─────────────────────────────────────────
-  'explain:index': { href: '/explanation/', label: 'Explanation' },
+  'explain:index': { href: '/explanation/', label: 'Concepts' },
   'explain:architecture': { href: '/explanation/architecture/', label: 'Architecture' },
   'explain:contracts': { href: '/explanation/contracts/', label: 'Contracts & type flow' },
-  'explain:plugin-model': { href: '/explanation/plugin-system/', label: 'The plugin system' },
+  'explain:plugin-model': { href: '/explanation/plugin-system/', label: 'Plugin system' },
   'explain:auth-model': { href: '/explanation/auth-model/', label: 'Auth model' },
   'explain:auth-session-lifecycles': {
     href: '/identity-access/session-lifecycles/',
@@ -343,16 +350,16 @@ export const xref: Record<string, XrefTarget> = {
   },
   'explain:durable-workflows': {
     href: '/explanation/durability-model/',
-    label: 'The durability model',
+    label: 'Durability model',
   },
-  'explain:observability': { href: '/explanation/observability/', label: 'Observability' },
+  'explain:observability': { href: '/explanation/observability/', label: 'Observability model' },
   'explain:aspire': { href: '/explanation/aspire/', label: 'Orchestration with Aspire' },
-  'explain:compared': { href: '/explanation/compared/', label: "How NetScript's path compares" },
+  'explain:compared': { href: '/comparisons/', label: 'How NetScript compares' },
   // v3 NEW / renamed explanation essays
-  'explain:plugin-system': { href: '/explanation/plugin-system/', label: 'The plugin system' },
+  'explain:plugin-system': { href: '/explanation/plugin-system/', label: 'Plugin system' },
   'explain:durability-model': {
     href: '/explanation/durability-model/',
-    label: 'The durability model',
+    label: 'Durability model',
   },
 
   // ─── Comparisons (compare:) ───────────────────────────────────────────────
@@ -367,10 +374,10 @@ export const xref: Record<string, XrefTarget> = {
   'concept:quickstart': { href: '/quickstart/', label: 'Quickstart' },
   'concept:why': { href: '/why/', label: 'Why NetScript' },
   'concept:home': { href: '/', label: 'Home' },
-  'concept:concepts': { href: '/concepts/', label: 'Core concepts' },
+  'concept:concepts': { href: '/explanation/', label: 'Concepts' },
 
   // ─── CLI + glossary (cli: / glossary:) ─────────────────────────────────────
-  'cli:reference': { href: '/cli-reference/', label: 'CLI reference' },
+  'cli:reference': { href: '/cli-reference/', label: 'CLI cheat sheet' },
   'glossary:': { href: '/glossary/', label: 'Glossary' },
 
   // ─── Reference index + the 35 registered units (ref:) ──────────────────────
