@@ -332,6 +332,11 @@ flavors are in the "Flavors" extension section. Names are provisional until the 
     square dot, radius 2, Fragment Mono 11) in its syntax colour: function and method `function`,
     class `type`, interface and type alias `keyword`, variable, constant and enum `number`, module
     and namespace `fg`. Names and types read at full `fg` contrast, with types in syntax colours.
+    The owner-authorized docs adapter generates `--ns-studio-api-kind-{keyword,function,type,number}-text`
+    from those same exported ramps. Keep step 11 when it reaches 4.5:1 on both canvas and
+    `surface`; otherwise use step 12 for tag text, dot and outline. Light function, type and
+    number need step 12; light keyword and all dark tags keep step 11. Code syntax roles stay
+    unchanged. This docs-adapter exception remains under token-consolidation debt #2450.
 - **Logo red and error red** are separate roles that differ in form as well as hue:
 
   | Role                                                                                    | Light   | Dark    | Use                                                                                                     |
@@ -679,7 +684,7 @@ the 24px minimum; use Comfortable or larger for touch). A full contrast matrix i
 | Density            | per flavor (Utility Compact)                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Flavor             | `Studio flavor`: Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal                                                                                                                                                                                                                                                                                                                                                                                               |
 | `data-theme`       | `studio` (+ `data-flavor`, provisional)                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Language roles     | Role manifest (GUIDELINES §2.4): `studio/{card,kpi,table,tabs,topbar,nav,hero,brand,button,deco,primary}/*`, `studio/badge-solid/{success,warning,info,destructive,neutral}/{bg,fg}`, `studio/signal/{brand,marker,underline}`, `studio/input/border`, `studio/brand/on`, `studio/code/scroll-thumb` → `--ns-studio-*`; scheme-independent flavor variables `--ns-studio-prose-*` and `--ns-studio-icon-stroke`; flavor `ring/{l,d}` (Utility and Atelier ink/gray rings) |
+| Language roles     | Role manifest (GUIDELINES §2.4): `studio/{card,kpi,table,tabs,topbar,nav,hero,brand,button,deco,primary}/*`, `studio/badge-solid/{success,warning,info,destructive,neutral}/{bg,fg}`, `studio/signal/{brand,marker,underline}`, `studio/input/border`, `studio/brand/on`, `studio/code/scroll-thumb`, docs-adapter `studio/api-kind/{keyword,function,type,number}/text` (exported step 11/12 AA policy above, #2450) → `--ns-studio-*`; scheme-independent flavor variables `--ns-studio-prose-*` and `--ns-studio-icon-stroke`; flavor `ring/{l,d}` (Utility and Atelier ink/gray rings) |
 
 - **Code syntax:** every `studio/*` Scheme role, and every scheme-independent, non-boolean Studio
   flavor variable without a Theme twin, has the code syntax `var(--ns-studio-<path>)`. The

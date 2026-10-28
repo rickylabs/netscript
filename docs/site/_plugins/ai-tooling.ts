@@ -1,3 +1,4 @@
+import { CALLOUT_TYPES, calloutType } from '../../../tools/docs-site/callout-types.ts';
 import { Page } from 'lume/core/file.ts';
 import { releaseVersion } from '../_data.ts';
 import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
@@ -87,7 +88,7 @@ export function aiTooling(options: AiToolingOptions = {}) {
 
       for (const page of site.pages) {
         const outputPath = page.outputPath;
-        if (!outputPath.endsWith('.html')) continue;
+        if (!outputPath.endsWith('.html') || page.data.internal === true) continue;
 
         const doc = page.document;
         if (!doc) continue;
@@ -194,7 +195,7 @@ function hasBlockChild(el: Element): boolean {
 }
 
 function isDecorative(el: Element): boolean {
-  return el.getAttribute('aria-hidden') === 'true';
+  return el.getAttribute('aria-hidden') === 'true' || el.hasAttribute('data-twin-ignore');
 }
 
 /** Serialize a single node as a block-level Markdown string. */
@@ -226,8 +227,21 @@ function blockMd(node: ChildNode, origin: URL): string {
       return listMd(el, origin, true);
     case 'pre':
       return codeBlockMd(el);
+    case 'aside': {
+      // Preserve severity in twins when the visible label is an author's custom title.
+      const kind = el.getAttribute('data-variant');
+      const label = el.querySelector('.ns-callout__label');
+      const body = el.querySelector('.ns-callout__body');
+      if (el.classList.contains('ns-callout') && kind && label && body) {
+        return quoteMd(
+          `[!${CALLOUT_TYPES[calloutType(kind)].markdown}]\n${
+            inlineChildren(label, origin).trim()
+          }\n\n${childBlocks(body, origin)}`,
+        );
+      }
+      return quoteMd(childBlocks(el, origin));
+    }
     case 'blockquote':
-    case 'aside':
       return quoteMd(childBlocks(el, origin));
     case 'hr':
       return '---';

@@ -1,0 +1,14 @@
+{
+  "baseline": "76d93e6b741f6f733419e77c7dd6411d035787b5",
+  "storedRows": 207,
+  "allIntegrityVerified": true,
+  "sameEntrySetAsBaseline": true,
+  "allSiteRowsEqualRenderedSource": true,
+  "allNonSiteBytesIdenticalToBaselineAndMain": true,
+  "changedRows": [
+    "pages/design-system/docs-kit/callouts/index.md",
+    "pages/design-system/themes/studio/index.md",
+    "pages/tutorials/erp-sync/03-polyglot-transform/index.md"
+  ],
+  "mcpExportCorpusUnchanged": true
+}

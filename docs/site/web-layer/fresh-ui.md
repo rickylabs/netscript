@@ -74,8 +74,8 @@ this page says "the dashboard," it means the scaffolded app; when it says
 
 ## The meta-framework: `@netscript/fresh`
 
-`@netscript/fresh` is a published package (`Fresh runtime extensions, builders, forms, defer
-primitives, and route contracts for NetScript`) built on `@fresh/core` 2.x + Preact. You consume it
+`@netscript/fresh` is a published package (Fresh runtime extensions, builders, forms, defer
+primitives, and route contracts for NetScript) built on `@fresh/core` 2.x + Preact. You consume it
 through **targeted subpath exports** rather than one fat barrel — import only the surface you need.
 The full generated API for every subpath lives at the
 [`@netscript/fresh` reference](/reference/fresh/); the table below is the map.

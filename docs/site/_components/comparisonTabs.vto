@@ -2,7 +2,8 @@
    changes which competitor-labelled nodes are visible. Without JavaScript, the selector stays
    hidden and the first competitor is the complete fallback view. #}}
 {{ set items = competitors || [] }}
-{{ set gid = "nscompare-" + Math.random().toString(36).slice(2, 9) }}
+{{# Final control and tab identities are assigned per page after rendering. #}}
+{{ set gid = "nscompare" }}
 {{ set oursCode = (ours.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
 <section class="ns-comparison" data-ns-comparison>
   <div class="ns-comparison__picker">

@@ -26,6 +26,16 @@ for (const group of groups) {
     panels.forEach((panel, i) => {
       panel.hidden = i !== index;
     });
+    const language = group.querySelector('[data-tab-language]');
+    if (language) language.textContent = tabs[index].dataset.codeLanguage;
+    const filename = group.querySelector('[data-tab-filename]');
+    if (filename) {
+      filename.textContent = tabs[index].dataset.codeFilename || '';
+      filename.title = filename.textContent;
+      filename.hidden = !filename.textContent;
+    }
+    const copy = group.querySelector('[data-tab-copy]');
+    if (copy) copy.setAttribute('aria-label', `Copy ${tabs[index].textContent.trim()} code`);
     if (persist && group.hasAttribute('data-ns-runtime-group')) {
       rememberRuntime(tabs[index].dataset.nsRuntime, group);
     }
@@ -74,39 +84,6 @@ for (const comparison of document.querySelectorAll('[data-ns-comparison]')) {
   update();
 }
 
-// Ordinary Markdown fences receive the same path header and non-copying line-number gutter.
-for (const pre of document.querySelectorAll('.ns-prose pre')) {
-  const code = pre.querySelector('code');
-  if (!code) continue;
-  pre.tabIndex = 0;
-  if (pre.closest('[data-code-block]')) continue;
-  const frame = document.createElement('div');
-  frame.className = 'ns-code-block';
-  frame.dataset.codeBlock = '';
-  const header = document.createElement('div');
-  header.className = 'ns-code-header';
-  const path = document.createElement('span');
-  path.className = 'ns-code-path';
-  path.textContent = code.textContent.match(
-    /(?:\/\/|#)\s+([\w./()-]+\.(?:tsx?|json|prisma|sql|sh|cs|py|go|yaml|yml))\b/,
-  )?.[1] || code.className.match(/language-(\S+)/)?.[1] || 'Code';
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'ns-copy-btn';
-  button.dataset.codeCopy = '';
-  button.textContent = 'Copy';
-  button.setAttribute('aria-label', `Copy ${path.textContent} code`);
-  header.append(path, button);
-  const body = document.createElement('div');
-  body.className = 'ns-code-body';
-  const gutter = document.createElement('div');
-  gutter.className = 'ns-code-gutter';
-  gutter.setAttribute('aria-hidden', 'true');
-  gutter.textContent = code.textContent.trimEnd().split('\n').map((_, i) => i + 1).join('\n');
-  pre.before(frame);
-  body.append(gutter, pre);
-  frame.append(header, body);
-}
 const status = document.createElement('span');
 status.className = 'ns-sr-only';
 status.setAttribute('role', 'status');
@@ -128,7 +105,12 @@ async function copy(text, button) {
 for (const button of document.querySelectorAll('[data-code-copy]')) {
   button.addEventListener(
     'click',
-    () => copy(button.closest('[data-code-block]').querySelector('pre code').textContent, button),
+    () => {
+      const code = button.hasAttribute('data-tab-copy')
+        ? button.closest('.ns-tabbed').querySelector('[role="tabpanel"]:not([hidden]) pre code')
+        : button.closest('[data-code-block]').querySelector('pre code');
+      if (code) copy(code.textContent, button);
+    },
   );
 }
 for (const button of document.querySelectorAll('[data-copy-path]')) {

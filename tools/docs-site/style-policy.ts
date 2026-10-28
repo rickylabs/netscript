@@ -8,6 +8,10 @@ export interface StyleSource {
   tokenLayer?: boolean;
   /** Generated third-party CSS still must resolve every shared role. Maintained UI gets all checks. */
   roleCheckOnly?: boolean;
+  /** Bundled raw token definitions must exactly match the verified standalone token layer. */
+  generatedTokenBundle?: boolean;
+  /** Independently resolved non-red Figma ramp values on a verified token layer only. */
+  nonRedTokenValues?: Record<string, string>;
 }
 export interface StyleFinding {
   path: string;
@@ -87,7 +91,7 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
               (node.getAttribute('class') ?? '').replaceAll(' ', '.')
             }[data-state="${node.getAttribute('data-state') ?? ''}"][data-variant="${
               node.getAttribute('data-variant') ?? ''
-            }"]`,
+            }"][data-tone="${node.getAttribute('data-tone') ?? ''}"]`,
           );
         }
         const style = globalThis.document.createElement('span').style;
@@ -136,11 +140,21 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     const hue = (((g - b) / delta * 60) + 360) % 360;
     return hue <= 18 || hue >= 340;
   }
+  const nonRedTokens = new Map<string, Set<string>>();
+  for (const file of sources.filter((file) => file.tokenLayer)) {
+    for (const [name, value] of Object.entries(file.nonRedTokenValues ?? {})) {
+      const values = nonRedTokens.get(name) ?? new Set<string>();
+      values.add(value.trim().toLowerCase());
+      nonRedTokens.set(name, values);
+    }
+  }
   function red(value: string, trail: string[] = []): boolean {
     if (literalRed(value)) return true;
     return references(value).some((name) =>
       !trail.includes(name) &&
-      [...(variables.get(name) ?? [])].some((next) => red(next, [...trail, name]))
+      [...(variables.get(name) ?? [])].some((next) =>
+        !nonRedTokens.get(name)?.has(next.trim().toLowerCase()) && red(next, [...trail, name])
+      )
     );
   }
   function raw(value: string): boolean {
@@ -163,6 +177,11 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
       value: entry.value,
     });
   }
+  const generatedTokens = new Set(
+    declarations.filter(({ file, property }) =>
+      file.kind === 'css' && file.tokenLayer && property.startsWith('--')
+    ).map(({ selector, property, value }) => JSON.stringify([selector, property, value])),
+  );
   for (const entry of declarations) {
     const { file, selector, property, value } = entry;
     const custom = property.startsWith('--');
@@ -171,15 +190,19 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     }
     if (file.roleCheckOnly) continue;
     if (custom || colourProperty.test(property)) {
-      if (raw(value) && !(custom && file.tokenLayer)) finding(entry, 'raw-colour');
+      const generated = custom && (file.tokenLayer ||
+        (file.generatedTokenBundle &&
+          generatedTokens.has(JSON.stringify([selector, property, value]))));
+      if (raw(value) && !generated) finding(entry, 'raw-colour');
     }
     if (custom) continue; // Definition is not a use; resolve it through consuming declarations.
     const selectors = selector.split(',');
     const logo = file.path === 'favicon.svg' ||
       selectors.every((part) => /\.docs-logo\b/.test(part));
     const error = selectors.every((part) =>
-      /data-(?:state|variant|intent)\s*=\s*["']?(?:error|destructive)|aria-invalid\s*=\s*["']?true|\.ns-error\b/
-        .test(part)
+      /\[data-(?:state|variant|intent|tone)\s*=\s*(?:"(?:error|destructive)"|'(?:error|destructive)'|(?:error|destructive))\s*\]/
+        .test(part) ||
+      /\[aria-invalid\s*=\s*(?:"true"|'true'|true)\s*\]/.test(part) || /\.ns-error\b/.test(part)
     );
     if (red(value) && !logo && !error) finding(entry, 'red-outside-state');
   }

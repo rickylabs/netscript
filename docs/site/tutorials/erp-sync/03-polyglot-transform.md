@@ -141,7 +141,7 @@ write only to staging, and see one environment variable — nothing else. If the
 to phone home or touch a file outside those grants, the Deno sandbox refuses at the subprocess
 boundary, not in your code review.
 
-{{ comp callout { type: "danger", title: "Omitting .permissions() on a deno task means --allow-all" } }}
+{{ comp callout { type: "caution", title: "Omitting .permissions() on a deno task means --allow-all" } }}
 Calling <code>.build()</code> on a <code>deno</code> task <em>without</em>
 <code>.permissions(...)</code> produces an <code>--allow-all</code> command line — full access.
 Always pass an explicit, least-privilege set. The framework also ships named
@@ -246,7 +246,7 @@ The process contract is unchanged — argv + env in, one JSON object on the last
 and they are why this step is a **read-now, run-on-your-own-host** capability rather than part of
 this chapter's checkpoint:
 
-{{ comp callout { type: "danger", title: "Non-Deno Runtime Sandboxing Boundary" } }}
+{{ comp callout { type: "caution", title: "Non-Deno Runtime Sandboxing Boundary" } }}
 For non-Deno task runtimes (including <code>python</code>, <code>shell</code>, <code>powershell</code>, <code>cmd</code>, <code>dotnet</code>, and <code>executable</code>), NetScript enforces a sandboxing boundary: the <code>.permissions({...})</code> keys are ignored, and subprocesses inherit the worker host's full OS-level permissions. This boundary exists because OS-level process isolation for arbitrary third-party environments is decoupled from NetScript's core application runtime. Today, you must treat these runtimes as a trust boundary: secure execution by pinning entrypoints to known local scripts, preferring a pinned interpreter or venv (<code>pythonConfig.venvPath</code>), and applying OS-level containerization or process group restrictions.
 <!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 {{ /comp }}

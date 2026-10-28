@@ -1,3 +1,5 @@
+import { AA_TEXT_CONTRAST, contrastRatio } from './contrast.ts';
+
 /** Resolve the docs Utility context from the provenance-recorded Figma export. */
 export interface FigmaVariable {
   name: string;
@@ -15,6 +17,8 @@ export interface FigmaCollection {
 export const UTILITY_MODES: Readonly<Record<string, string>> = {
   Primitives: 'Value',
   Theme: 'Studio',
+  'Theme set': 'A',
+  'Theme B': 'Bloom',
   'Studio flavor': 'Utility',
   'Base gray': 'Neutral',
   'Base accent': 'Ink',
@@ -141,6 +145,31 @@ export function generateTokens(collections: readonly FigmaCollection[]): string 
         if (!tokens.has(reference)) throw new Error(`Missing compatibility role: ${reference}`);
       }
       tokens.set(property, value);
+    }
+    // Docs adapter: preserve syntax roles and select the exported ramp step required on surfaces.
+    for (
+      const [role, ramp] of Object.entries({
+        keyword: 'violet',
+        function: 'blue',
+        type: 'teal',
+        number: 'orange',
+      })
+    ) {
+      const backgrounds = ['code/bg', 'surface/bg', 'surface/surface'].map((name) =>
+        String(resolveVariable(collections, `Scheme/${name}`, modes))
+      );
+      let colour = tokens.get(`--ns-code-syntax-${role}`)!;
+      if (backgrounds.some((bg) => contrastRatio(colour, bg) < AA_TEXT_CONTRAST)) {
+        colour = String(resolveVariable(
+          collections,
+          `Primitives/color/${ramp}/${scheme[0]}/12`,
+          modes,
+        ));
+      }
+      if (backgrounds.some((bg) => contrastRatio(colour, bg) < AA_TEXT_CONTRAST)) {
+        throw new Error(`API kind ${role} fails AA in ${scheme}`);
+      }
+      tokens.set(`--ns-studio-api-kind-${role}-text`, colour);
     }
     const declarations = [...tokens].sort(([a], [b]) => a.localeCompare(b, 'en'))
       .map(([name, value]) => `  ${name}: ${value};`).join('\n');
