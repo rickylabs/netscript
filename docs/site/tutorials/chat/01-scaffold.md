@@ -128,13 +128,14 @@ Leave `aspire start` running in this terminal. It is your control plane for the 
 
 ## Verify your progress
 
-In a second terminal, type-check the workspace from the project root:
+1. Open the Aspire dashboard and check that it lists the streams runtime and the Fresh app.
+2. In a second terminal, type-check the workspace from the project root:
 
-```sh
-deno task check
-```
+   ```sh
+   deno task check
+   ```
 
-A clean check confirms the scaffold and plugin wiring line up.
+   A clean check confirms the scaffold and plugin wiring line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `chat-app/` exists with `apps/dashboard/` and a `plugins/` entry for `streams`.

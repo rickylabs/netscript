@@ -177,26 +177,30 @@ This resolver is the one documented exception to NetScript's typed-route rule: t
 
 ## Verify your progress
 
-With `aspire start` running, drive one turn against a new session id, then replay it. Aspire
-assigns the app's port at start-up so several workspaces can run side by side, so take the app
-URL from the Aspire dashboard first:
+With `aspire start` running:
 
-```sh
-APP=http://localhost:<port shown for your app in the dashboard>
+1. Drive one turn against a new session id, then replay it. Aspire assigns the app's port at
+   start-up so several workspaces can run side by side, so take the app URL from the Aspire
+   dashboard first:
 
-# Run a turn (the assistant reply streams back and is persisted durably).
-curl -N -X POST "$APP/api/chat/demo-1"
+   ```sh
+   APP=http://localhost:<port shown for your app in the dashboard>
 
-# Replay: read the same session again — the transcript is still there.
-curl -N "$APP/api/chat-stream/ai/chat/demo-1"
-```
+   # Run a turn (the assistant reply streams back and is persisted durably).
+   curl -N -X POST "$APP/api/chat/demo-1"
 
-The first call streams a reply. The second shows that the durable session already holds it: the
-reply is replayed, not generated again. Then type-check:
+   # Replay: read the same session again — the transcript is still there.
+   curl -N "$APP/api/chat-stream/ai/chat/demo-1"
+   ```
 
-```sh
-deno task check
-```
+   The first call streams a reply. The second shows that the durable session already holds it:
+   the reply is replayed, not generated again.
+
+2. Type-check the workspace:
+
+   ```sh
+   deno task check
+   ```
 
 - [ ] `POST /api/chat/{sessionId}` streams an assistant reply.
 - [ ] A denied `authorize` returns `403`.
