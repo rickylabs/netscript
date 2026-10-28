@@ -1,0 +1,51 @@
+{
+    "workspaceCompilerTempDirs":  [
+
+                                  ],
+    "files":  [
+                  {
+                      "path":  ".llm/tools/docs/check-exports-drift.ts",
+                      "sha256":  "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269",
+                      "bytes":  45861
+                  },
+                  {
+                      "path":  ".llm/tools/docs/check-exports-drift_test.ts",
+                      "sha256":  "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1",
+                      "bytes":  10823
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-compiler.ts",
+                      "sha256":  "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18",
+                      "bytes":  18773
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+                      "sha256":  "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417",
+                      "bytes":  22992
+                  },
+                  {
+                      "path":  "deno.lock",
+                      "sha256":  "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+                      "bytes":  191344
+                  },
+                  {
+                      "path":  "deno.json",
+                      "sha256":  "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+                      "bytes":  22366
+                  },
+                  {
+                      "path":  ".mcp.json",
+                      "sha256":  "b066b9f8f64347029a8b0db7bfe6396d4433335706ca6d7a433cba1334feda5a",
+                      "bytes":  698
+                  },
+                  {
+                      "path":  ".llm/runs/fix-windows-qualification-tools--20261028/four-owner.diff",
+                      "sha256":  "89644f0d34fa7f88d4be02329f263f2abe85d90d40e6171ca4183ce84fd107de",
+                      "bytes":  9657
+                  }
+              ],
+    "baseline":  "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+    "branch":  "fix/windows-qualification-tools",
+    "diffCheck":  "PASS",
+    "worktree":  "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008"
+}
