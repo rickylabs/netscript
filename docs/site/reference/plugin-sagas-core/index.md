@@ -5,52 +5,41 @@ title: '@netscript/plugin-sagas-core'
 
 # `@netscript/plugin-sagas-core`
 
-Saga DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript sagas
-plugins. This page is written against the package's public surface reported by `deno doc`. For the
-full index of packages and plugins return to the [reference overview](/reference/).
+Saga DSL, runtime ports, adapters, transports, stores, telemetry, config and testing primitives for
+NetScript sagas. `defineSaga` builds a frozen, typed definition (state, handlers, compensations,
+signals, queries), and the runtime drives it through explicit ports for storage, transport, clock
+and idempotency, so applications inject their own durability and tests inject in-memory doubles.
+The deployable [`@netscript/plugin-sagas`](/reference/sagas/) plugin binds this core to a NetScript
+host; use the core directly for custom hosts, libraries and tests.
 
-Sagas are the honest answer to distributed transactions: a sequence of steps, each with a
-compensation, driven by messages that may arrive twice or out of order. `defineSaga` builds a
-frozen, typed definition — state, handlers, compensations, signals, queries — and the runtime drives
-it through explicit ports for storage, transport, clock, and idempotency. Nothing is global:
-applications inject their own durability, and tests inject deterministic in-memory doubles.
+## Sub-path exports
 
-This is the core that the deployable [`@netscript/plugin-sagas`](/reference/sagas/) plugin binds to
-a NetScript host. Use it directly for custom hosts, libraries, and tests.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-sagas-core` | `./mod.ts` | The userland saga DSL: `defineSaga`, the cascaded-message constructors, signals, queries, and the definition types they produce. See [details](#root-surface-netscriptplugin-sagas-core). |
+| `@netscript/plugin-sagas-core/builders` | `./src/builders/mod.ts` | The builder layer behind the DSL, for tooling that constructs definitions programmatically. |
+| `@netscript/plugin-sagas-core/domain` | `./src/domain/mod.ts` | Saga domain vocabulary and policy defaults (`DEFAULT_RETRY_POLICY`, `DEFAULT_IDEMPOTENCY_WINDOW_MS`, `DEFAULT_RETRY_MAX_ATTEMPTS`). |
+| `@netscript/plugin-sagas-core/ports` | `./src/ports/mod.ts` | The port interfaces the runtime depends on: store, bus, transport, clock, idempotency, telemetry. |
+| `@netscript/plugin-sagas-core/runtime` | `./src/runtime/mod.ts` | The engine: `createSagaRuntime`, `createSagaEngine`, `createSagaCompensator`, `createSagaScheduler`, and the idempotency-key helpers. See [details](#composing-a-runtime). |
+| `@netscript/plugin-sagas-core/adapters` | `./src/adapters/mod.ts` | Concrete port adapters, including `createSagaBusBridge`. |
+| `@netscript/plugin-sagas-core/transports` | `./src/transports/mod.ts` | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs. |
+| `@netscript/plugin-sagas-core/stores` | `./src/stores/mod.ts` | KV-backed instance, scheduler, and applied-key stores, `openSagaRuntimeKv`, and the shared canonical-store selectors and Prisma-client predicate. |
+| `@netscript/plugin-sagas-core/stores/backends` | `./src/stores/saga-store-backend.ts` | Backend selectors and projection env/value/type contracts without importing persistent adapters. |
+| `@netscript/plugin-sagas-core/middleware` | `./src/middleware/mod.ts` | Host middleware: `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`. |
+| `@netscript/plugin-sagas-core/integration/workers` | `./src/integration/workers/mod.ts` | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers. See [details](#atomic-worker-command-effects). |
+| `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary. |
+| `@netscript/plugin-sagas-core/integration/commands` | `./commands.ts` | Checked existing-publisher sink for the service command relay. See [details](#checked-command-sink). |
+| `@netscript/plugin-sagas-core/telemetry` | `./src/telemetry/mod.ts` | Telemetry attributes and instrumentation helpers, including an OpenTelemetry tracer factory. |
+| `@netscript/plugin-sagas-core/config` | `./src/config/mod.ts` | `defineSagaConfig` and the saga runtime configuration schemas. |
+| `@netscript/plugin-sagas-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Version 1 saga API schemas and contract route types (`sagasContract`, `sagasContractV1`). |
+| `@netscript/plugin-sagas-core/streams` | `./src/streams/mod.ts` | Durable stream schemas for projected saga instance records (`sagasStreamSchema`). |
+| `@netscript/plugin-sagas-core/presets` | `./src/presets/mod.ts` | Preset composition helpers: `startSagas`, `startSagaHandlers`. See [details](#composing-a-runtime). |
+| `@netscript/plugin-sagas-core/abstracts` | `./src/abstracts/mod.ts` | Abstract runtime contracts and reserved extension-point base classes. |
+| `@netscript/plugin-sagas-core/testing` | `./src/testing/mod.ts` | `createTestSagaRuntime` plus in-memory bus and store doubles for deterministic verification. |
+| `@netscript/plugin-sagas-core/agent` | `./src/agent/mod.ts` | `defineAgent`: the agent-shaped builder over the same saga definition. |
+| `@netscript/plugin-sagas-core/discovery` | `./src/builders/discovery.ts` | [Contribution-builder discovery metadata](#discovery-metadata). |
 
-## Exports
-
-The package publishes twenty-one entrypoints. The root path carries the userland DSL; the remaining
-subpaths expose the layers a host, adapter author, or test harness composes.
-
-| Export specifier                                     | Module                               | Exports | Purpose                                                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@netscript/plugin-sagas-core`                       | `./mod.ts`                           | 45      | The userland saga DSL — `defineSaga`, the cascaded-message constructors, signals, queries, and the definition types they produce (documented below). |
-| `@netscript/plugin-sagas-core/builders`              | `./src/builders/mod.ts`              | 31      | The builder layer behind the DSL, for tooling that constructs definitions programmatically.                                                          |
-| `@netscript/plugin-sagas-core/domain`                | `./src/domain/mod.ts`                | 48      | Saga domain vocabulary and policy defaults (`DEFAULT_RETRY_POLICY`, `DEFAULT_IDEMPOTENCY_WINDOW_MS`, `DEFAULT_RETRY_MAX_ATTEMPTS`).                  |
-| `@netscript/plugin-sagas-core/ports`                 | `./src/ports/mod.ts`                 | 70      | The port interfaces the runtime depends on — store, bus, transport, clock, idempotency, telemetry.                                                   |
-| `@netscript/plugin-sagas-core/runtime`               | `./src/runtime/mod.ts`               | 87      | The engine: `createSagaRuntime`, `createSagaEngine`, `createSagaCompensator`, `createSagaScheduler`, and the idempotency-key helpers.                |
-| `@netscript/plugin-sagas-core/adapters`              | `./src/adapters/mod.ts`              | 72      | Concrete port adapters, including `createSagaBusBridge`.                                                                                             |
-| `@netscript/plugin-sagas-core/transports`            | `./src/transports/mod.ts`            | 49      | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs.                      |
-| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 81      | KV-backed instance, scheduler, and applied-key stores, `openSagaRuntimeKv`, and the shared canonical-store selectors and Prisma-client predicate.    |
-| `@netscript/plugin-sagas-core/stores/backends`       | `./src/stores/saga-store-backend.ts` | 9       | Backend selectors and projection env/value/type contracts without importing persistent adapters.                                                     |
-| `@netscript/plugin-sagas-core/middleware`            | `./src/middleware/mod.ts`            | 30      | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`.                                                              |
-| `@netscript/plugin-sagas-core/integration/workers`   | `./src/integration/workers/mod.ts`   | 23      | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers.                              |
-| `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 11      | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary.                                                       |
-| `@netscript/plugin-sagas-core/integration/commands`  | `./commands.ts`                      | 17      | Checked existing-publisher sink for the service command relay.                                                                                       |
-| `@netscript/plugin-sagas-core/telemetry`             | `./src/telemetry/mod.ts`             | 43      | Telemetry attributes and instrumentation helpers, including an OpenTelemetry tracer factory.                                                         |
-| `@netscript/plugin-sagas-core/config`                | `./src/config/mod.ts`                | 24      | `defineSagaConfig` and the saga runtime configuration schemas.                                                                                       |
-| `@netscript/plugin-sagas-core/contracts/v1`          | `./src/contracts/v1/mod.ts`          | 31      | Version 1 saga API schemas and contract route types (`sagasContract`, `sagasContractV1`).                                                            |
-| `@netscript/plugin-sagas-core/streams`               | `./src/streams/mod.ts`               | 17      | Durable stream schemas for projected saga instance records (`sagasStreamSchema`).                                                                    |
-| `@netscript/plugin-sagas-core/presets`               | `./src/presets/mod.ts`               | 9       | Preset composition helpers — `startSagas`, `startSagaHandlers`.                                                                                      |
-| `@netscript/plugin-sagas-core/abstracts`             | `./src/abstracts/mod.ts`             | 62      | Abstract runtime contracts and reserved extension-point base classes.                                                                                |
-| `@netscript/plugin-sagas-core/testing`               | `./src/testing/mod.ts`               | 67      | `createTestSagaRuntime` plus in-memory bus and store doubles for deterministic verification.                                                         |
-| `@netscript/plugin-sagas-core/agent`                 | `./src/agent/mod.ts`                 | 6       | `defineAgent` — the agent-shaped builder over the same saga definition.                                                                              |
-
-Export counts are the symbol counts `deno doc` reports for each entrypoint; subpaths overlap where a
-type is re-exported through more than one layer.
-
-The stores subpath exposes `isPrismaSagaStoreClient(value)` for the canonical-store delegate
+The stores sub-path exposes `isPrismaSagaStoreClient(value)` for the canonical-store delegate
 contract shared by API and runner bootstrap validation. Query delegates remain a separate API
 requirement. `resolveSagaStoreBackend` accepts an optional `defaultBackend` used only when neither
 environment nor appsettings selects a backend; invalid configured values always fail. Runner backend
@@ -75,9 +64,9 @@ separate KV handle that is closed on shutdown.
 
 ### Cascaded messages
 
-A handler is a pure projection: it returns cascaded messages rather than performing effects. These
-constructors keep their existing cascade meanings. Opted-in ordinary transition handlers can also
-return the explicit pure worker effects documented below.
+A handler is a pure projection: it returns cascaded messages rather than performing effects.
+Opted-in ordinary transition handlers can also return the explicit pure
+[worker effects](#atomic-worker-command-effects).
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -131,39 +120,26 @@ return the explicit pure worker effects documented below.
 
 ## Handlers are synchronous
 
-A saga handler is synchronous and returns cascaded messages; it does not `await`. That is what makes
-replay deterministic and what keeps the compensation path a pure function of the transcript. Work
-that must happen outside the handler — enqueueing a worker job, calling a service — is expressed as
-a cascaded message the runtime dispatches, or through the explicit
-`@netscript/plugin-sagas-core/integration/workers` helpers.
+A saga handler is synchronous and returns cascaded messages; it does not `await`. This makes replay
+deterministic and keeps the compensation path a pure function of the transcript. Work outside the
+handler, such as enqueueing a worker job or calling a service, is a cascaded message the runtime
+dispatches, or goes through the explicit `@netscript/plugin-sagas-core/integration/workers` helpers.
 
-`spawn()` is present in the surface but **rejects**: child-saga spawn cascades are unsupported, and
-calling it raises rather than silently succeeding. Its return type is `never`, so a handler that
-returns `spawn(...)` does not type-check into the cascade union by accident.
+> [!WARNING]
+> `spawn()` is in the surface but rejects: child-saga spawn cascades are unsupported, and calling it
+> raises rather than silently succeeding. Its return type is `never`, so a handler that returns
+> `spawn(...)` does not type-check into the cascade union by accident.
 
 ## Composing a runtime
 
 `@netscript/plugin-sagas-core/runtime` exposes `createSagaRuntime`, which takes explicit ports
-rather than reaching for globals. The store, transport, clock, and idempotency edges are all
-injected, so the same definitions run against Redis or Garnet in production
+instead of globals. The store, transport, clock, and idempotency edges are injected, so the same
+definitions run against Redis or Garnet in production
 (`@netscript/plugin-sagas-core/transports`) and against in-memory doubles in tests
 (`@netscript/plugin-sagas-core/testing`).
 
-`@netscript/plugin-sagas-core/presets` collapses the common case: `startSagas` composes a runtime
+`@netscript/plugin-sagas-core/presets` covers the common case: `startSagas` composes a runtime
 and starts it, and `startSagaHandlers` binds a definition set to an already-composed runtime.
-
-## Related pages
-
-- [`@netscript/plugin-sagas`](/reference/sagas/) — the deployable plugin that binds this core to a
-  NetScript host.
-- [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) — the worker primitives the
-  `integration/workers` helpers dispatch to.
-- [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) — the producer behind the
-  projected instance stream.
-
----
-
-Back to the [reference overview](/reference/).
 
 ## Checked command sink
 
@@ -217,8 +193,8 @@ Selected schema validation and bounded canonical I-JSON encoding precede all tra
 Non-JSON prototypes/accessors and schema transformations changing canonical identity are refused.
 Stable versioned SHA-256 command identities include saga id, instance id, next version and original
 effect ordinal. State CAS, correlation, history, outbound intents and hashed inbound marker share
-one commit. Failed work retains retry eligibility; committed replay writes nothing. The marker is
-limited to this protocol and does not close general Prisma idempotency parity debt.
+one commit. Failed work retains retry eligibility; committed replay writes nothing. The marker
+applies only to this protocol.
 
 Migrate the shipped saga runtime/replay models and command outbox before selecting PostgreSQL. The
 host supplies the real generated interactive callback and owns resources; the database bound writer
@@ -263,9 +239,12 @@ a host Prisma client. The default `archiveToDb: false` skips it, keeping KV-only
 With `Sagas.Projection.Backend: prisma`, the Prisma query model remains required runtime state so
 `listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
 
-Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay
-markers. Configure `completedRetentionDays` to match the canonical terminal window instead. Markers
-survive open instances and receive their deadline only after terminal state.
+> [!IMPORTANT]
+> `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay markers.
+> Configure `completedRetentionDays` to match the canonical terminal window instead. Markers survive
+> open instances and receive their deadline only after terminal state.
+
+### Scheduled cascades
 
 The default saga runner stores new scheduled cascades in the existing KV polling queue under
 `queue:pending/sagas-scheduled`; ready messages still use the configured delivery provider. Each
@@ -284,6 +263,8 @@ drained without an idle delay; idle and failure waits use the existing 100 ms to
 Cleanup requires no API read or owner session. Due timers check canonical state before forwarding to
 the delivery queue; an already forwarded/in-flight delivery remains subject to the engine's existing
 terminal checks.
+
+### Custom schedulers
 
 Custom runner delivery queues preserve their existing native-delay behavior unless the host supplies
 `scheduledQueue` with the `cancelPending` capability. Low-level `SagaQueueScheduler` callers supply
@@ -312,18 +293,23 @@ canonical reads are batched in native pages of at most ten keys. Only explicitly
 are cancellation candidates; legacy unscoped queue messages and native-provider delayed entries need
 separate migration.
 
-Terminal records written before the retention policy was installed still need a migration/backfill.
-This leaf proves new scoped delayed-message cancellation; legacy saga/trigger terminal-family
-backfill, new and legacy unscoped schedules, and native-provider delayed messages remain separate
-acceptance scope for issue #2109.
+> [!WARNING]
+> Terminal records written before the retention policy was installed need a migration or backfill.
+> Only new scoped delayed messages are cancelled; legacy saga/trigger terminal records, new and
+> legacy unscoped schedules, and native-provider delayed messages are not covered.
 
-## Exports: discovery metadata
+## Discovery metadata
 
 The `@netscript/plugin-sagas-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-| Export specifier                         | Module                        |
-| ---------------------------------------- | ----------------------------- |
-| `@netscript/plugin-sagas-core/discovery` | `./src/builders/discovery.ts` |
+## Related pages
+
+- [`@netscript/plugin-sagas`](/reference/sagas/): the deployable plugin that binds this core to a
+  NetScript host.
+- [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/): the worker primitives the
+  `integration/workers` helpers dispatch to.
+- [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/): the producer behind the
+  projected instance stream.
