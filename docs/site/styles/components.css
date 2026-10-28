@@ -637,6 +637,10 @@
   color: var(--ns-muted-fg);
   font-size: 12px;
 }
+/* Code spans keep the comment's mono size instead of the prose chip's smaller one. */
+.ns-file-tree__comment code {
+  font-size: inherit;
+}
 .ns-file-tree__ownership {
   margin-left: auto;
   padding-left: 20px;

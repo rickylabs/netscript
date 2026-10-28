@@ -70,7 +70,7 @@ lays down a `database/postgres/` workspace (a different engine lays down
 `database/<engine>/`). A few facts are worth internalizing before you run anything, because
 they differ from a typical single-file Prisma setup.
 
-```text
+```tree
 my-app/
 ├── appsettings.json              # NetScript.Databases.postgres — Engine/Mode/DatabaseName (the real config)
 ├── netscript.config.ts           # databases.config is intentionally EMPTY here

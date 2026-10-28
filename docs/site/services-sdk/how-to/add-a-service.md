@@ -75,7 +75,7 @@ netscript service add --name users --with-client
 and `usersQueries` symbols used by page loaders and islands. Either path lays down a
 `services/users/` workspace member with this shape:
 
-```text
+```tree
 services/users/
 ├── deno.json              # workspace member; exports ./src/main.ts
 └── src/

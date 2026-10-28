@@ -199,7 +199,7 @@ The opt-in thread store adds one more file:
 | --- | --- | --- |
 | `ai/thread-store.ts` | `threadStoreScaffolder` | App-owned `ThreadStore` port + starter `Deno.Kv` store (opt-in). |
 
-```text
+```tree
 ai/
 ├── ai.ts                 # composition root: ai(), chatModel(), aiTools
 ├── models.ts             # AI_PROVIDERS, AI_MODELS, DEFAULT_CHAT_MODEL

@@ -76,7 +76,7 @@ domain, ports, application logic, and contract live and is independently publish
 The **core engine package** owns the capability. Its `deno.json` is strict and exports
 `. ./contracts/v1 ./domain ./ports ./testing`:
 
-```
+```tree
 packages/plugin-notifier-core/
 ├── deno.json                          # strict; exports . ./contracts/v1 ./domain ./ports ./testing
 ├── mod.ts                             # curated builders + domain type re-exports
@@ -94,7 +94,7 @@ The **thin connector** carries only integration. Its `deno.json` exports
 `. ./contracts ./services ./aspire ./cli ./scaffold`, and its `contracts/v1.ts` re-exports the core's
 `contracts/v1`:
 
-```
+```tree
 plugins/notifier/
 ├── deno.json                 # exports . ./contracts ./services ./aspire ./cli ./scaffold
 ├── package.json

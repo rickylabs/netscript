@@ -29,6 +29,7 @@ export const LANGUAGE_LABELS: Readonly<Record<string, string>> = {
   plaintext: 'Plain text',
   'no-highlight': 'Plain text',
   prisma: 'Prisma',
+  tree: 'File tree',
 };
 
 /** Unknown fence languages are build errors, rather than silent uncoloured output. */

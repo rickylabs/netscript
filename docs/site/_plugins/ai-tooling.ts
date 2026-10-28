@@ -2,6 +2,7 @@ import { CALLOUT_TYPES, calloutType } from '../../../tools/docs-site/callout-typ
 import { Page } from 'lume/core/file.ts';
 import { releaseVersion } from '../_data.ts';
 import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
+import { TREE_SOURCE_ATTRIBUTE } from './file-tree.ts';
 
 /**
  * AI-affordance tooling for the NetScript docs site (SOTA study rec #1).
@@ -165,7 +166,8 @@ function absoluteUrl(href: string, origin: URL): string {
 /* HTML -> Markdown (rendered `.ns-prose` body)                        */
 /* ------------------------------------------------------------------ */
 
-function articleToMarkdown(article: Element, origin: URL): string {
+/** Serialize a rendered `.ns-prose` article as its Markdown twin. */
+export function articleToMarkdown(article: Element, origin: URL): string {
   return childBlocks(article, origin)
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -221,8 +223,12 @@ function blockMd(node: ChildNode, origin: URL): string {
     }
     case 'p':
       return inlineChildren(el, origin).trim();
-    case 'ul':
+    case 'ul': {
+      // A fenced `tree` keeps its authored ASCII; the nested list is presentation only.
+      const tree = el.getAttribute(TREE_SOURCE_ATTRIBUTE);
+      if (tree !== null) return `\`\`\`text\n${tree}\n\`\`\``;
       return listMd(el, origin, false);
+    }
     case 'ol':
       return listMd(el, origin, true);
     case 'pre':
