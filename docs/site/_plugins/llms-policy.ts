@@ -46,15 +46,43 @@ export function sectionOf(url: string): string {
   return 'start';
 }
 
+/**
+ * Concatenation order of llms-full.txt, which has no section headings. It predates the lane
+ * sections above and stays fixed: the frozen carrier-parity fixture rebuilds the full corpus from
+ * its legacy pages and compares digests, so reordering it would break that guarantee.
+ */
+const CORPUS_ORDER = ['start', 'tutorials', 'howto', 'capabilities', 'reference', 'explanation'];
+
+const CORPUS_HUB_PREFIXES = [
+  '/web-layer/',
+  '/services-sdk/',
+  '/background-processing/',
+  '/durable-workflows/',
+  '/data-persistence/',
+  '/identity-access/',
+  '/orchestration-runtime/',
+  '/observability/',
+  '/capabilities/',
+];
+
+function corpusGroupOf(url: string): string {
+  if (url.startsWith('/tutorials/')) return 'tutorials';
+  if (url.startsWith('/how-to/')) return 'howto';
+  if (url.startsWith('/reference/')) return 'reference';
+  if (url.startsWith('/explanation/')) return 'explanation';
+  if (CORPUS_HUB_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
+  return 'start';
+}
+
 export function buildLlmsFull(
   infos: readonly LlmsPage[],
   origin: URL,
   releaseVersion: string,
 ): string {
-  const order = new Map(SECTIONS.map((section, i) => [section.id, i]));
+  const order = new Map(CORPUS_ORDER.map((group, i) => [group, i]));
   const sorted = [...infos].sort((a, b) => {
-    const sa = order.get(sectionOf(a.url)) ?? 99;
-    const sb = order.get(sectionOf(b.url)) ?? 99;
+    const sa = order.get(corpusGroupOf(a.url)) ?? 99;
+    const sb = order.get(corpusGroupOf(b.url)) ?? 99;
     return sa !== sb ? sa - sb : a.url.localeCompare(b.url);
   });
 
