@@ -1,0 +1,124 @@
+{
+  "at": "2026-10-28T04:34:48.338Z",
+  "offlineOnly": true,
+  "noInference": true,
+  "noSourceGateRerun": true,
+  "head": "9288ea2939f56eeb75fa53b6260f6cf1e91f31f0",
+  "session": "a4d71fd7-efc6-4444-8141-7fa312a2977a",
+  "nativeExit": 0,
+  "nativeTurns": 1,
+  "reportSha256": "6aad36bb5dddc131e71cf32017bdf64b96f8f97b69857b0615ce2b872f6807c2",
+  "verdict": "PASS",
+  "originalWrapperExit": 1,
+  "originalWrapperFailurePreserved": true,
+  "parserFalseNegative": "Original regex rejected the Markdown heading ## VERDICT: PASS; unchanged complete report has one exact-head verdict.",
+  "allProtectedMatched": 163,
+  "actualModel": "claude-opus-5",
+  "requestedEffort": "xhigh",
+  "actualResponseEffortAttested": false,
+  "sourceReferencesQualification": "Several independent report line numbers refer to packet/historical offsets, not physical shipping lines. Do not reuse them as file links. These measured physical anchors supersede only those coordinates; original report bytes/verdict remain unchanged.",
+  "physicalAnchors": [
+    {
+      "control": "Fresh native type identity",
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "line": 21,
+      "text": "import type { HeadersRecord, MaybePromise } from '@durable-streams/client';"
+    },
+    {
+      "control": "Fresh undefined-only fallback",
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "line": 167,
+      "text": "headers: options.headers === undefined ? getStreamsAuth() : options.headers,"
+    },
+    {
+      "control": "Workers native type identity",
+      "path": "plugins/workers/streams/factory.ts",
+      "line": 12,
+      "text": "import type { HeadersRecord, MaybePromise } from '@durable-streams/client';"
+    },
+    {
+      "control": "Workers undefined-only fallback",
+      "path": "plugins/workers/streams/factory.ts",
+      "line": 70,
+      "text": "headers: options.headers === undefined ? getStreamsAuth() : options.headers,"
+    },
+    {
+      "control": "Fresh nonempty/non-minus-one checkpoint",
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "line": 243,
+      "text": "assert(typeof checkpoint === 'string' && checkpoint.length > 0 && checkpoint !== '-1');"
+    },
+    {
+      "control": "Fresh retained entity",
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "line": 255,
+      "text": "assert(collection.get(before) === originalEntity);"
+    },
+    {
+      "control": "Fresh retained offset",
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "line": 258,
+      "text": "assertEquals(reads[reconnectStart]?.offset, checkpoint);"
+    },
+    {
+      "control": "Fresh rotated reconnect",
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "line": 261,
+      "text": "assert(reconnected.some((read) => read.authorization === 'Bearer u3-v3'));"
+    },
+    {
+      "control": "Fresh env-denied configured-port qualification",
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "line": 345,
+      "text": "streamOptions: { ...input.streamOptions, warnOnHttp: false },"
+    },
+    {
+      "control": "Fresh genuine negative compiler oracle",
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "line": 436,
+      "text": "assert(result.text.includes('TS2322'), `Expected TS2322 for ${negative.name}.`);"
+    },
+    {
+      "control": "Workers lazy callbacks",
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "line": 140,
+      "text": "assertEquals(asyncCalls, 0);"
+    },
+    {
+      "control": "Workers borrowed record mutation",
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "line": 141,
+      "text": "headers['x-u3-static'] = 'workers-static';"
+    },
+    {
+      "control": "Workers real long poll rotation",
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "line": 154,
+      "text": "assertEquals(rotated.live, 'long-poll');"
+    },
+    {
+      "control": "Workers collection identity",
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "line": 160,
+      "text": "assert(db.collections === collections);"
+    },
+    {
+      "control": "Workers transient in-tree compiler fixture",
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "line": 186,
+      "text": "dir: fromFileUrl(new URL('./', import.meta.url)),"
+    },
+    {
+      "control": "Workers genuine negative compiler oracle",
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "line": 213,
+      "text": "assert(negative.text.includes('TS2322'), negative.text);"
+    }
+  ],
+  "breakingLabel": "Root independently verified PR2423 already has breaking; reviewer did not inspect live labels.",
+  "ownMcpQualification": "Seven successful own calls; relevant export lookups explicitly return truncated:false. Broad search is not independent proof of the native type shape.",
+  "remainingGates": "Full CLI E2E, unintegrated DB/security/Windows tool repair, docs links/private findings/facade surplus, final integration and browser/CEF/EIS/release remain unwaived.",
+  "rootManualCompleteReportRead": true,
+  "sourcePassAccepted": true,
+  "mergeAccepted": false
+}

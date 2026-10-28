@@ -1,0 +1,651 @@
+-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\nTask lume echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\nTask check:rendered-output deno run --no-lock --allow-read _plugins/check-rendered-output.ts _site/index.html\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\n",
+[End literal fragments.]
+    "truncated": false
+  }
+}
+
+## .llm/tmp/root-ci-generation-20261028/index-audit.json
+
+Original-byte SHA256:2d5abba5f9632f1b437c29e59a0a6d86646fcc684287d1df8aae654c8281ed3a (complete parsed JSON pretty view; original bytes remain bound)
+
+[
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json",
+    "sha256": "f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json",
+    "sha256": "7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json",
+    "sha256": "6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json",
+    "sha256": "b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review-v2.ts.txt",
+    "sha256": "2de6e64501d0f83f21ff0ce6ce83940c4b69c89d57bd6fbed6421a4d27ea9adb"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review.ts.txt",
+    "sha256": "bbcf053383e533b82700fb354c77f1be9e6b19209d0d23649eb48ee9a3ba82f0"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/root-audit.json",
+    "sha256": "7a3cbbb78e7eee3560020300a54e19bca2d2e069c60f8e689e4359d7962bbf67"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/root-ci-generation-acceptance-20261028.md",
+    "sha256": "eef7d04ca74b2d26bc4f46ee40c398a5e6eef04777fbec4dd8070ceae0b6c2e6"
+  },
+  {
+    "path": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "sha256": "22d0110ceccac7956008746785a5bfbc684cb77d18f6d8c7bcf7a7347de98498"
+  },
+  {
+    "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+    "sha256": "83ec73db03b7cef8142387a5fd2dfa49ab678342f8f543db3aa3e2e02c6c73b1"
+  }
+]
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/application-review.md
+
+Original-byte SHA256:0490dcb5d0e4321022a088d1a8ecf3d6d1a35ee0a2c07c25d7eecdcfee26de4c
+
+# Corrective native type-closure application — root review pending
+
+Applied only the accepted four-site native HeadersRecord/MaybePromise patch (+8/-2)
+and one48-line canonical debt entry. The entry explicitly accepts both F-15 native
+type exposure and F-5 measured facade growth, with fixed2026-11-10/no extension/no
+growth, prior surplus and baseline findings unwaived. The exact independent public
+verdict is copied byte-for-byte into scoped run provenance; no account/usage data.
+
+Actual shipping owning doc lint is Fresh10/workers0, warning-free. Fresh's ten
+finding identities exactly match the retained original baseline. All four native
+public JSON roots contain real client0.2.7 declarations: facade counts54/26,
+factory counts11/6. This qualifies the new finding delta, never a global doc or
+F-15/F-5 PASS. Native shape/provenance and guards are sealed in final-evidence.json.
+
+- C1 focused runtime:20/0/0; C2 complete focused runtime/compiler suite:5/0/0.
+- Native compiler:13 identity/anti-any assertions pass; three negative cases each
+  yield three intended TS2322 errors across the three seams. Owned sources removed.
+- Four selected types/lint/format pass; both authored consumers and both full
+  package checks pass. Quality has0 findings; workers retains1 unchanged producer allowance.
+- Both publish dry-runs pass; no publication. Direct doctrine exits0 with existing
+  warnings; acknowledged F-15/F-5 debt is not converted into scanner compliance.
+- `arch:check` fails its existing DB identity prerequisite (`identities=<none>`),
+  and the ten Fresh baseline findings/prior surplus remain unwaived.
+
+Supporting external reference evidence is genuinely green: qualified Windows
+checker commit0d5b982b0a3050b94172770a435581c931c93b22, SHA256
+df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269, run against
+THIS worktree's CWD/config/frozen outer graph. Coverage36/36 and full declared
+exports/symbol contract pass, stderr empty, no missing-symbol receipt. Fresh and
+workers mappings are entrypoints-only; this is not exhaustive per-name reference
+prose. No page edit, waiver, cherry-pick or checker import. The original parent
+docs:accuracy task still fails36 Windows reference-path coverage prerequisites;
+its exact task command came from shipping deno.json and remains RED.
+
+All four source hashes exactly match the independently reviewed candidate.
+Root/package configs and lock bytes remain unchanged. Canonical debt changes only
+by the appended entry, SHA256d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3.
+`git diff --check` passes. Tracked changes are exactly the four approved source
+sites plus registry; explicit run provenance is separate. Source/docs footprint
+is12 plus registry13. Full delta: final.diff; full raw gate/source bindings:
+final-evidence.json. No checkpoint, independent IMPL, readiness or merge claim.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-proof.json
+
+Original-byte SHA256:41ebb46f5be5cda05c68c7785ca946e2b635fed9623263fe9e86ed0434b62df7 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "results": [
+    {
+      "name": "positive",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/positive.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 0,
+      "ts2322Count": 0,
+      "expectedErrors": 0,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    },
+    {
+      "name": "numeric-value",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 1,
+      "ts2322Count": 3,
+      "expectedErrors": 3,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    },
+    {
+      "name": "numeric-async",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 1,
+      "ts2322Count": 3,
+      "expectedErrors": 3,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    },
+    {
+      "name": "map-factory",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 1,
+      "ts2322Count": 3,
+      "expectedErrors": 3,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    }
+  ],
+  "exactNativeVersion": "0.2.7",
+  "positiveIdentityAssertions": 13,
+  "negativeControls": 3,
+  "negativeSeamErrors": 9,
+  "ownedFixtureRemoved": true,
+  "sourceExecuted": false
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.ts
+
+Original-byte SHA256:e835a01b93b814bf279e6b5131d6f0ec7a8eb7085a0c195436c0ce6020bdfa89
+
+import type { HeadersRecord as Native, MaybePromise as NativePromise } from '@durable-streams/client';
+import type { HeadersRecord as Fresh, MaybePromise as FreshPromise, NetScriptStreamDBOptions, NetScriptStreamDBFactoryInput, NetScriptStreamStateDefinition } from 'file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/mod.ts';
+import type { HeadersRecord as FreshSource, MaybePromise as FreshSourcePromise } from 'file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts';
+import { createWorkersStreamDB } from 'file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/mod.ts';
+import type { HeadersRecord as Workers, MaybePromise as WorkersPromise } from 'file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/mod.ts';
+import type { HeadersRecord as WorkersSource, MaybePromise as WorkersSourcePromise } from 'file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts';
+type FreshHeaders = NonNullable<NetScriptStreamDBOptions<NetScriptStreamStateDefinition>['headers']>;
+type InputHeaders = NetScriptStreamDBFactoryInput<NetScriptStreamStateDefinition>['streamOptions']['headers'];
+type WorkersHeaders = NonNullable<NonNullable<Parameters<typeof createWorkersStreamDB>[0]>['headers']>;
+
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+type Assert<T extends true> = T;
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+export type NativeNotAny = Assert<Equal<IsAny<Native>, false>>;
+export type ExportNotAny = Assert<Equal<IsAny<Fresh | Workers | FreshSource | WorkersSource>, false>>;
+export type FreshIdentity = Assert<Equal<Fresh, Native>>;
+export type WorkersIdentity = Assert<Equal<Workers, Native>>;
+export type FreshSourceIdentity = Assert<Equal<FreshSource, Native>>;
+export type WorkersSourceIdentity = Assert<Equal<WorkersSource, Native>>;
+export type FreshPromiseIdentity = Assert<Equal<FreshPromise<string>, NativePromise<string>>>;
+export type WorkersPromiseIdentity = Assert<Equal<WorkersPromise<string>, NativePromise<string>>>;
+export type FreshSourcePromiseIdentity = Assert<Equal<FreshSourcePromise<string>, NativePromise<string>>>;
+export type WorkersSourcePromiseIdentity = Assert<Equal<WorkersSourcePromise<string>, NativePromise<string>>>;
+export type FreshHeadersIdentity = Assert<Equal<FreshHeaders, Native>>;
+export type InputHeadersIdentity = Assert<Equal<InputHeaders, Native>>;
+export type WorkersHeadersIdentity = Assert<Equal<WorkersHeaders, Native>>;
+const native: Native = { static: 'value', sync: () => 'value', async: async () => 'value' };
+const fresh: FreshHeaders = native;
+const input: InputHeaders = native;
+const workers: WorkersHeaders = native;
+const backFresh: Native = fresh;
+const backInput: Native = input;
+const backWorkers: Native = workers;
+void [backFresh, backInput, backWorkers];
+
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-fresh-1793154019653.stderr
+
+Original-byte SHA256:a7f26422892853738dfb83c87524e996bda22b74028298d88124b18c5a3bcc59
+
+error[private-type-ref]: public type 'NetScriptStateSchema' references private type 'StateSchema'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:49:1
+    | 
+ 49 | export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = StateSchema<TDef>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | type StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDB["collections"]' references private type 'StreamDB'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:54:3
+   | 
+54 |   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+67 | type StreamDB<TDef extends StreamStateDefinition> = {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDB["collections"]' references private type 'StateSchema'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:54:3
+    | 
+ 54 |   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | type StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:53:1
+   | 
+53 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'InitialQueryBuilder'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:53:1
+    | 
+ 53 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+463 | export type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'QueryBuilder'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:53:1
+    | 
+ 53 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+465 | export type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:70:1
+   | 
+70 | export function useLiveQuery<TContext extends Context>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'InferResultType'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:70:1
+    | 
+ 70 | export function useLiveQuery<TContext extends Context>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+542 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:87:1
+   | 
+87 | export function useLiveSuspenseQuery<TContext extends Context>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'InferResultType'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:87:1
+    | 
+ 87 | export function useLiveSuspenseQuery<TContext extends Context>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+542 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 10 documentation lint errors.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-workers-1793154019983.stderr
+
+Original-byte SHA256:2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7
+
+Checked 1 file
+
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.json
+
+Original-byte SHA256:113cf48746ca9e9d3a724adf2c71f57eb3073abbbda3b6e4b6bc1d7c82486be4 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "selected": "c1-tests",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-test.ts",
+    "--",
+    "--frozen",
+    "-A",
+    "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+    "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+    "packages/fresh/tests/streamdb-headers-contract_test.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:21.324Z",
+  "ended": "2026-10-28T02:20:32.840Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321"
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.json
+
+Original-byte SHA256:f1322a2976a55c3c0266cbf62b1962f0df6d6b98968f25c80db65a149d3558cb (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "selected": "c2-tests",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-test.ts",
+    "--",
+    "--frozen",
+    "-A",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "plugins/workers/tests/streams/factory-discovery_test.ts",
+    "plugins/workers/tests/streams/live-query-consumer_test.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:32.971Z",
+  "ended": "2026-10-28T02:20:40.091Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967"
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/types-1793154040205.json
+
+Original-byte SHA256:df2a14ad9db61b90153847873b07d78c295b01e4c11c6731604db33b5b6dd3a5 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "selected": "types",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-check.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--deno-arg",
+    "--frozen",
+    "--deno-arg",
+    "--unstable-kv"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:40.209Z",
+  "ended": "2026-10-28T02:20:42.515Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205"
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/lint-1793154043228.json
+
+Original-byte SHA256:5d9568ed4ffbba305d50b86f4aed2f077453da5366afa591c2c065cebff4abd2 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "selected": "lint",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-lint.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:43.231Z",
+  "ended": "2026-10-28T02:20:44.600Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228"
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/fmt-1793154044722.json
+
+Original-byte SHA256:9b6ed4ecc8caffc93a9f2e29220e7d3f6d429b4818213973e4dacdadf7e38a11 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "selected": "fmt",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-fmt.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:44.725Z",
+  "ended": "2026-10-28T02:20:44.998Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722"
+}
+
+## .llm/harness/archetypes/ARCHETYPE-1-small-contract.md
+
+Original-byte SHA256:25baf2693cf82f54be07a0a96c82fc90f7b8ef3b19f4c6dec382a47e71b154d9
+
+# Archetype 1 — Small Contract
+
+## Doctrine Reference
+
+- Axioms: A1, A2, A6, A7, A8, A9, A14.
+- Primary sections:
+  - `docs/architecture/doctrine/02-public-surface.md`
+  - `docs/architecture/doctrine/04-modules-and-helpers.md`
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
+- Anti-patterns: AP-1, AP-2, AP-7, AP-9, AP-13, AP-14, AP-15, AP-16, AP-20, AP-22, AP-25.
+- Fitness functions: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15, F-16, F-17, F-18, F-19.
+
+## When This Archetype Applies
+
+Use this profile for packages whose value is a clear public contract: types, schemas, branded
+identifiers, parse/validation helpers, and small invariants. If the work introduces adapters,
+runtime lifecycle, state, or a fluent API as the main product, select a larger archetype.
+
+Current examples are listed in `docs/architecture/doctrine/06-archetypes.md` under "Archetype
+assignments for current packages."
+
+## Minimum Folder Shape
+
+Use the canonical shape in
+`docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`. The review question is
+not whether every folder exists; it is whether the package stayed small and avoided invented layers.
+
+## Skills to Activate
+
+- `netscript-doctrine`
+- `jsr-audit` when publishability or JSR score is in scope
+
+## Read First
+
+1. This profile.
+2. `../gates/archetype-gate-matrix.md`.
+3. `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`.
+4. `docs/architecture/doctrine/02-public-surface.md`.
+5. The package README, `mod.ts`, `deno.json`, and tests.
+6. Relevant debt entries in `../debt/arch-debt.md`.
+
+## Required Gates in Order
+
+1. Static gates: narrow `deno check` when justified, structured package check/test,
+   `deno task fmt:check`, `deno task lint`, `deno task doc:lint`, and `deno publish --dry-run` when
+   package scope.
+2. Fitness gates: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15, F-16, F-17, F-18, F-19.
+3. Runtime gates: none by default.
+4. Consumer gates: optional unless exports, names, or validation semantics changed.
+
+## Anti-Patterns to Watch For
+
+- AP-1: one schema/type file that grows into a bag of concepts.
+- AP-2: helpers that rename Zod, Web Platform, or `@std/*` primitives.
+- AP-7: telescoping parse or factory functions.
+- AP-9: premature abstraction across two similar schemas.
+- AP-14: re-exporting upstream libraries as part of the package surface.
+- AP-16: `utils/`, `helpers/`, or `common/` folders.
+- AP-22: a `mod.ts` inside `src/` that only re-exports the sibling type/schema files next to it.
+- AP-25: a load-time side effect in a file that should hold only pure types and parse logic.
+
+## False-Done States
+
+- The package compiles but the README does not document the type table or permissions.
+- A single large `schema.ts` remains because "it is only types."
+- The public surface exports every internal type instead of a curated contract.
+- Validation changed but consumer examples were not checked.
+
+## Rescope Triggers
+
+- The package needs adapters or external IO.
+- The package needs lifecycle, state, or background work.
+- The exported symbol count suggests subpaths or a split package.
+- The current doctrine verdict is `Restructure` or `Rewrite`.
+
+## Design Checkpoint Expectations
+
+The design checkpoint names the contract boundary first: public types, exported schemas, README
+sections, and semantic tests. Implementation follows that surface.
+
+The design section in `worklog.md` must include:
+
+- public surface (types, schemas, parse/validate functions),
+- constants for finite domain values,
+- commit slices with gates,
+- contributor path for adding a new type or schema.
+
+## Concept of Done
+
+Beyond the universal slice checklist in `workflow/run-loop.md`:
+
+- the README documents the type table and permissions,
+- the public surface exports a curated contract, not every internal type,
+- no single schema file has grown into a bag of unrelated concepts,
+- validation semantics are tested, not just compilation.
+
+## Historical Notes
+
+Small packages are allowed to remain small. Adding generic layers to make them look
+enterprise-shaped is a doctrine violation, not a maturity upgrade.
+
+
+## .llm/harness/archetypes/ARCHETYPE-5-plugin.md
+
+Original-byte SHA256:41abbc01781524e355d3436690673cc241a90e46693006a4aacbde23dbc1893c
+
+# Archetype 5 — Plugin Package
+
+**Thinness law (framing for this whole profile).** Convention-bearing primitives — contracts, base
+services, schema/runtime conventions, event/kind vocabularies — live in `@netscript/*` **core**. A
+first-party `plugins/*` package is **thin userland glue**: it **wires and composes** core-owned
+primitives into a concrete integration and **re-exports** sibling contracts; it does **not** redefine
+contracts, re-implement a core convention, or own what core should own. The reference shape is
+`auth-core` + its thin adapters: the core package carries the convention, the plugin/adapter is the
+minimal wiring that binds it to a provider. Read every section below through that lens — a plugin
+that "owns" a contribution axis is a smell, not the target.
+
+## Doctrine Reference
+
+- Axioms: A1, A2, A5, A7, A8, A9, A10, A11, A12, A13, A14.
+- Primary sections:
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`
+  - `docs/architecture/doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`
