@@ -61,6 +61,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/ns-one.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/SKILL.md"
         }
       ]
     },
@@ -122,6 +132,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-utility.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-utility/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-utility/SKILL.md"
         }
       ]
     },
@@ -183,6 +203,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-cloud.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-cloud/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-cloud/SKILL.md"
         }
       ]
     },
@@ -244,6 +274,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-workshop.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-workshop/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-workshop/SKILL.md"
         }
       ]
     },
@@ -305,6 +345,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-playful.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-playful/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-playful/SKILL.md"
         }
       ]
     },
@@ -366,6 +416,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-ledger.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-ledger/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-ledger/SKILL.md"
         }
       ]
     },
@@ -427,6 +487,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-atelier.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-atelier/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-atelier/SKILL.md"
         }
       ]
     },
@@ -488,6 +558,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/studio-signal.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-signal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-signal/SKILL.md"
         }
       ]
     },
@@ -549,6 +629,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/tonal.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/tonal/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tonal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/tonal/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tonal/SKILL.md"
         }
       ]
     },
@@ -610,6 +700,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/bloom.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/bloom/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-bloom/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/bloom/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-bloom/SKILL.md"
         }
       ]
     },
@@ -671,6 +771,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/cupertino.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/cupertino/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-cupertino/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/cupertino/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-cupertino/SKILL.md"
         }
       ]
     },
@@ -732,6 +842,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/liquid.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/liquid/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-liquid/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/liquid/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-liquid/SKILL.md"
         }
       ]
     },
@@ -793,6 +913,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/fluent.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/fluent/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-fluent/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/fluent/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-fluent/SKILL.md"
         }
       ]
     },
@@ -854,6 +984,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/brutal.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/brutal/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-brutal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/brutal/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-brutal/SKILL.md"
         }
       ]
     },
@@ -915,6 +1055,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/filigrane.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/filigrane/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-filigrane/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/filigrane/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-filigrane/SKILL.md"
         }
       ]
     },
@@ -976,6 +1126,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/terminal.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/terminal/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-terminal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/terminal/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-terminal/SKILL.md"
         }
       ]
     },
@@ -1037,6 +1197,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/pixel.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/pixel/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-pixel/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/pixel/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-pixel/SKILL.md"
         }
       ]
     },
@@ -1098,6 +1268,16 @@
           "path": "packages/fresh-ui/registry/theme/presets/tactile.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/tactile/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tactile/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/tactile/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tactile/SKILL.md"
         }
       ]
     },

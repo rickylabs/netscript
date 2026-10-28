@@ -7,3 +7,8 @@ Integrated work: canonical JSON/schema + 85-item legacy compatibility; static bu
 Concurrent ownership: this continuation owns config/lock/CLI install/update/remove/style/preset behavior; the other continuation completed MCP and next reserves theme-doc registry authoring/embedded-carrier proof. Do not duplicate or revert its files. Observe/preserve remote commits and normal-merge as needed; no force push.
 
 Latest local proof: six metadata/transport tests; 49 existing UI tests; full docs build; scoped check/lint/format and root quality/architecture pass. Production installer must pass DenoUiRegistryPaths to staged commits. Next implement CLI behavior, then style/preset integration; reconcile pushed theme-doc work. Final full scaffold runtime and independent IMPL-EVAL remain required. No component restyling/markup/CSS/contract or ui:migrate work. No labels, merge, tags or release. Assignment stays untracked. Canonical final uses atomic .divybot-final-report.md.
+
+
+## Theme docs carrier complete
+
+All 18 preset items now declare canonical DESIGN.md/SKILL.md with preset-id skill targets. The asset generator embeds their exact bytes under package-relative keys; static and published consumers need no repository source tree. Legacy projection retains its original files. Focused registry suite 17/0/0; scoped source gates, root quality/architecture and real 87-artifact CLI build pass. Independent review PASS. CLI installation and style/preset behavior remain with the active continuation.
