@@ -17,3 +17,7 @@ Coordinator disposition: “approves amendment B3 with two conditions: the sourc
 The existing copper favicon was an identity asset outside the named page/style folders. Replaced it with a generated sharp N mark whose embedded semantic token declarations resolve from Figma, with freshness checks. This necessary identity output is now explicitly declared in supervisor.md.
 
 Slice5 found a pre-existing AI-twin URL assumption exposed by the new component homepage: absoluteUrl double-prefixed links already passed through the url filter. The minimal plugin repair is necessary for working Markdown navigation and is now declared in supervisor/plan. The browser test guards the built twin. Browser CI path additions also require extending the existing Pages trigger regression expectation; all prior paths and build checks remain.
+
+The required lane and Design system captures could not pass while S8b remained green/READY but unmerged. Integrated its exact approved head9bc3445 into this branch locally to compose the real content; no GitHub PR merge or protected-source edit. Generated carrier conflicts are resolved only through native regeneration. This preserves both workers instead of reimplementing or exempting the missing section.
+
+The visible runtime hint is now `Runtime` rather than the implementation attribute/storage hint shown in the reference; it is decorative and hidden from twins/assistive output. The actual runtime attribute and persistence remain. This follows the product requirement to keep implementation details out of reader flows.

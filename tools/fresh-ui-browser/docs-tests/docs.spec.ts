@@ -69,6 +69,17 @@ for (const route of ROUTES) {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await visit(page, route.path);
+    if (route.kind === 'design-system') {
+      const themes = page.locator('[data-sidebar] details.ns-nav-branch').filter({
+        has: page.locator('summary', { hasText: 'Themes' }),
+      });
+      await expect(themes.locator(':scope > summary')).toHaveText('Themes');
+      await expect(themes.locator('a').filter({ hasText: /^Overview$/ })).toHaveCount(0);
+      await expect(themes.locator('a').first()).toHaveAttribute(
+        'href',
+        '/netscript/design-system/themes/studio/',
+      );
+    }
     if (route.kind === 'search') await search(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
@@ -244,6 +255,12 @@ test('diagram twins, accessible names, two-instance IDs and fileTree compatibili
     `![${alt}](https://rickylabs.github.io/netscript/assets/diagrams/contract-flow.svg)`,
   );
   expect(twin).not.toContain('/netscript/netscript/');
+  const prose = twin.replace(/^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm, '');
+  expect(prose.match(/^# /gm)).toHaveLength(1);
+  expect(twin).not.toContain('data-ns-runtime · remembered');
+  expect(twin).toContain(
+    '[Read the quickstart →](https://rickylabs.github.io/netscript/quickstart/)',
+  );
   const svg = await readFile(resolve(REPO, 'docs/site/assets/diagrams/contract-flow.svg'), 'utf8');
   await page.evaluate(
     (html) => {

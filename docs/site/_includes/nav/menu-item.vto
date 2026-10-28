@@ -1,21 +1,22 @@
 {{# A native disclosure owns expansion; the separate Overview link owns navigation. #}}
 {{ if item.data }}
   {{ set nodeUrl = item.data.url }}
+  {{ set nodeLabel = item.data.nav_title || item.data.title || item.slug.replaceAll("-", " ").replace(/^./, (letter) => letter.toUpperCase()) }}
   {{ set isCurrent = nodeUrl === currentUrl }}
   {{ if item.children && item.children.length }}
-    <details class="ns-nav-branch"{{ if currentUrl.startsWith(nodeUrl) }} open{{ /if }}>
+    <details class="ns-nav-branch"{{ if (nodeUrl && currentUrl.startsWith(nodeUrl)) || item.children.some((child) => child.data.url && currentUrl.startsWith(child.data.url)) }} open{{ /if }}>
       <summary class="ns-nav-branch__summary">
         <span class="ns-nav-branch__chevron" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 5 7 7-7 7" /></svg></span>
-        <span>{{ item.data.nav_title || item.data.title }}</span>
+        <span>{{ nodeLabel }}</span>
       </summary>
       <div class="ns-nav-branch__children">
-        <a href="{{ nodeUrl |> url }}" class="ns-dashboard__nav-item"{{ if isCurrent }} aria-current="page"{{ /if }}>Overview</a>
+        {{ if nodeUrl }}<a href="{{ nodeUrl |> url }}" class="ns-dashboard__nav-item"{{ if isCurrent }} aria-current="page"{{ /if }}>Overview</a>{{ /if }}
         {{ for child of item.children }}
           {{ include "nav/menu-item.vto" { item: child, currentUrl: currentUrl } }}
         {{ /for }}
       </div>
     </details>
-  {{ else }}
-    <a href="{{ nodeUrl |> url }}" class="ns-dashboard__nav-item"{{ if isCurrent }} aria-current="page"{{ /if }}>{{ item.data.nav_title || item.data.title }}</a>
+  {{ else if nodeUrl }}
+    <a href="{{ nodeUrl |> url }}" class="ns-dashboard__nav-item"{{ if isCurrent }} aria-current="page"{{ /if }}>{{ nodeLabel }}</a>
   {{ /if }}
 {{ /if }}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "decodedPageCount": 205,
+  "designSystemTwins": 15,
+  "allTwinsByteEqualToBuiltSite": true,
+  "mcpSourceBytes": 284489,
+  "mcpBudgetBytes": 294912,
+  "mcpDocuments": 14,
+  "newPublicExports": false,
+  "handwrittenPackageChanges": false
+}

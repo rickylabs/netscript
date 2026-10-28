@@ -98,7 +98,7 @@ export function aiTooling(options: AiToolingOptions = {}) {
         const title = String(page.data.title ?? deriveTitle(article) ?? url);
 
         let body = articleToMarkdown(article, origin);
-        if (!/^#\s/.test(body)) {
+        if (!article.querySelector('h1')) {
           body = `# ${title}\n\n${body}`;
         }
 

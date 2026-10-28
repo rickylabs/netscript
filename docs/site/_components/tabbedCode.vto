@@ -6,7 +6,7 @@
     {{ for index, tab of items }}
       <button type="button" class="ns-tabbed__tab" role="tab" id="{{ gid }}-tab-{{ index }}" aria-controls="{{ gid }}-panel-{{ index }}" aria-selected="{{ index === 0 ? 'true' : 'false' }}" tabindex="{{ index === 0 ? '0' : '-1' }}"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>{{ tab.label }}</button>
     {{ /for }}
-    <span class="ns-tabbed__hint">{{ runtime ? 'data-ns-runtime · remembered' : (items[0]?.lang || 'code') }}</span>
+    <span class="ns-tabbed__hint" aria-hidden="true">{{ runtime ? 'Runtime' : (items[0]?.lang || 'code') }}</span>
   </div>
   {{ for index, tab of items }}
     <div class="ns-tabbed__panel" role="tabpanel" id="{{ gid }}-panel-{{ index }}" aria-labelledby="{{ gid }}-tab-{{ index }}" tabindex="0"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>

@@ -23,6 +23,12 @@ package runtime dependencies. Five sub-path exports carry the package runtime se
 - [`@netscript/fresh-ui/registry`](#sub-path-exports) — embedded copy-registry manifest and file
   content.
 
+For visual design, use the [Design system](/design-system/) section:
+[guidelines](/design-system/guidelines/), [theme gallery](/design-system/#design-catalogue),
+[token contract](/design-system/token-contract/) and
+[theme authoring](/design-system/create-your-own-theme/). The theme specifications are generated from
+their canonical design files. This page covers the package API.
+
 ## Class-name helper
 
 | Symbol | Signature                                      | Description                                                 |
