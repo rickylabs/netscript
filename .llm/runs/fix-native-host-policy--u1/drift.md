@@ -198,3 +198,9 @@ without changing executable bytes. Initial ANSI-sensitive comparison, missing PA
 lookup, lint and format failures are retained separately from final9/0/0 and four-file static
 success. The final ANSI helper reuses the existing pinned standard library. Root accepted only
 caller abort/listener release and owned-KV cleanup; no drain/legacy/streams or broader waiver.
+
+S3f retains the exact S3e prefix and adds138 lines within the authorized270 cap. Actual10/0/0
+plus four-file static and quality gates pass; the observation-negative changes no native stop.
+Two outer formatting findings are retained; no production/helper/config/lock/debt or permission
+change. Root reviewed and authorized the concrete five-owner legacy follow-on separately in
+root-s3f-source-acceptance.md, including the explicit ephemeral wildcard-bind fixture authority.

@@ -879,3 +879,21 @@ failures and complete final child outputs. Earlier archives/verdicts remain unch
 explicitly authorizes this checkpoint/push and draft PR2421 update; no readiness, merge, closure,
 independent IMPL or whole U1 acceptance. In-flight drain/legacy/streams, documentation and
 broader gates remain open. Next scope is preparation only until root review.
+
+## Root-accepted S3f: real in-flight request drain
+
+Root accepted the 247-line lifecycle owner SHA256
+7d772b6010487cc828227c49b7ae973b7944bd53d5cf35cb4295080088f3090b after complete source read,
+independent verification of the 4,758-byte S3e prefix and all26 other protected hashes.
+Final owning suite10/0/0 in30,767ms; all four type/lint/format owners pass and quality reports
+zero findings/allowances. Three profiles were removed empty. Two initial outer formatting
+failures remain distinct from native behavior, which passed throughout.
+
+Real auth-held request, two real native concurrent stops pending before release, consumed200
+response and post-stop KV survival are qualified. The fresh observation-negative control fails
+exactly DRAIN_COMPLETED_BEFORE_RELEASE while actual stops and cleanup remain real. New78-file
+byte-audited receipts/s3f-evidence.json.gz preserves200,645 original bytes and prior artifacts.
+Root acceptance in root-s3f-source-acceptance.md authorizes this scoped checkpoint/push/DRAFT2421
+update and the already-reviewed five-owner S3g legacy slice afterward. No further approval pause
+inside that exact scope; no independent IMPL/full U1/readiness/merge/closure claim. Existing
+native-service baseline diagnosis remains separate and untouched.
