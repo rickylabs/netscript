@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "3f73f1b84534cc9dcd5382c1ea51bea6b8bb30b1",
+  "baseHead": "ff6215ff7b54de63dd525538d2e3f19b5a7ef787",
+  "browser": {
+    "command": "npm test -- --config docs.playwright.config.ts",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "requestHash": "b458ba9c6b9dcfbafe274a21f27771874a7d295180b7c8628a0c5a7a05864a1c",
+    "durationMs": 107498,
+    "passed": 100,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "captureCount": 52,
+    "requiredPageTypes": [
+      "home",
+      "article",
+      "reference",
+      "design-system",
+      "callouts",
+      "code"
+    ],
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      390,
+      1280
+    ]
+  },
+  "tokens": {
+    "oldDeclarationsPerScheme": 281,
+    "onlyApprovedException": "--ns-input-border",
+    "allOtherOldDeclarationsByteIdentical": true,
+    "syntaxMinimumContrast": 4.5
+  },
+  "localGates": {
+    "toolTests": {
+      "passed": 11,
+      "exitCode": 0
+    },
+    "classifierAndWorkflowTests": {
+      "passed": 71,
+      "exitCode": 0
+    },
+    "docsBuild": 0,
+    "htmlReproducibility": {
+      "exitCode": 0,
+      "htmlPages": 253,
+      "markdownTwins": 202,
+      "reportedException": "Upstream Pagefind entry/filter/meta serialization only; strict default remains."
+    },
+    "exportsDrift": 0,
+    "snippets": {
+      "exitCode": 0,
+      "scanned": 668
+    },
+    "links": 0,
+    "caveats": 0,
+    "toolingCheckLintFmt": 0,
+    "browserCheckLintFmt": 0,
+    "generatedCheck": 0,
+    "agentDocsProseFreshness": 0,
+    "publishAssetsFreshness": 0,
+    "mcpExportFreshness": 0,
+    "assetsBarrelFreshness": 0,
+    "qualityGate": 0,
+    "reviewThreads": {
+      "exitCode": 0,
+      "unanswered": 0
+    }
+  },
+  "negativeControls": {
+    "raw-colour": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedFinding": "raw-colour",
+      "foundExpectedFinding": true
+    },
+    "raw-custom": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedFinding": "raw-colour",
+      "foundExpectedFinding": true
+    },
+    "red-role": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedFinding": "red-outside-state",
+      "foundExpectedFinding": true
+    }
+  },
+  "runtimeSmoke": {
+    "local": "UNPROVEN: Docker unavailable; Aspire preflight and cleanup failed before runtime start.",
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "exitCode": 1,
+    "hostedRun": "https://github.com/rickylabs/netscript/actions/runs/40706285391",
+    "hostedLastObserved": "Static, Postgres and SQLite canonical jobs completed successfully; the additive desktop-native job failed because its expected installed executable was missing.",
+    "desktopFailure": "Additive desktop-native job cannot stat its expected installed executable; this docs PR does not alter the installer/runtime source.",
+    "hostedSourceHead": "f9c75c882754ace8b87a27b3b97b437c1cdbc55b",
+    "hostedJobs": {
+      "static": "PASS",
+      "postgres": "PASS",
+      "sqlite": "PASS",
+      "desktopNative": "FAIL: installed executable missing"
+    }
+  },
+  "sourceOnlyRisks": [
+    "Upstream Pagefind metadata serialization remains #2453.",
+    "Token-source consolidation remains #2450."
+  ],
+  "screenshotsArtifact": {
+    "url": "https://github.com/rickylabs/netscript/actions/runs/40708109088/artifacts/12823903814",
+    "sourceHead": "3f73f1b84534cc9dcd5382c1ea51bea6b8bb30b1",
+    "pagesWorkflowConclusion": "success"
+  },
+  "evaluation": {
+    "verdict": "PASS \u2014 implementation accepted, ready for review; no merge/release certification",
+    "sourceHead": "3f73f1b84534cc9dcd5382c1ea51bea6b8bb30b1",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "independentVendorFamily": true
+  }
+}

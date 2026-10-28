@@ -101,3 +101,15 @@ Native carrier sign-off PASS in the independent reviewer. Generated-file structu
 ## Current-main reconciliation
 
 Merged ff6215ff7 (the complementary #2442/#2457 main commits) normally, without force push. Native prose and publish-assets regeneration after the merge produce no additional source diff: the mergeable carrier preserves both the new Utility specification and S8c rendered changes. Generated data remains in declared scope. Main’s process/label-definition changes are inherited baseline changes and are not PR-owned label operations. Final assets-barrel freshness check follows the committed generated data.
+
+Final assets-barrel and review-thread gates pass. A final capture attempt at 3f73f1b84 raced with check:agent-docs-prose, which rebuilds _site, causing temporary light/mobile 404s (85/100 passed). No product change was made to bypass this; the complete matrix is rerun serially after freshness finished, with its own native receipt ID. This orchestration failure remains recorded rather than relabelled a product failure or hidden.
+
+Final serialized browser receipt PASS at 3f73f1b84: 100/100, 0 skipped/flaky, 32 zero-blocking axe audits and the complete screenshot matrix. All freshness writers had finished before this rerun. The prior race receipt is retained outside the public repo and explicitly superseded by this successful same-source capture. Final evidence is summarized in gate-evidence.json without private transport details.
+
+## Final IMPL-EVAL and hosted proof
+
+Independent mandatory IMPL-EVAL round 1: PASS — implementation accepted, ready for review, no merge/release certification. All #2455 acceptance surfaces and #2451 delivery accepted without blocking code findings. Full verdict preserved in evaluate.md.
+
+Subsequent hosted observations strengthen the recorded proof: Pages run 40708109088 succeeds at reconciled source 3f73f1b84, with screenshot/axe artifact 12823903814. Hosted E2E run 40706285391 completes static, Postgres and SQLite jobs successfully at f9c75c882; additive desktop-native fails because its expected installed executable is missing. No claim of all-workflow success is made. Local Docker limitation remains recorded, and no runtime process/resource was started here.
+
+Final implementation source is unchanged since the evaluated 3f73f1b84; remaining commit carries evidence/lessons only. READY means ready for review, not merge authorization. No labels, merge, tag or release.
