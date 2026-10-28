@@ -1,0 +1,17 @@
+{
+  "name": "netscript-fresh-ui-browser",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "baseline": "node capture-baseline.ts",
+    "baseline:axe": "node record-axe-baseline.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.0.1",
+    "playwright-core": "1.63.0",
+    "axe-core": "4.11.4"
+  }
+}

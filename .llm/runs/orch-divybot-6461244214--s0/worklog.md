@@ -57,3 +57,22 @@ Independent token-slice review: PASS (token-review.md). Incorporated the suggest
 | `run-deno-doc-lint.ts --root packages/fresh-ui` | 1 | Supplemental existing interactive-surface documentation failures, unchanged by S0 |
 
 Reconcile: no issue scope change, private lock only, no generated theme diff. Preserve independent browser lane and no-label owner override. Token slice terminal; next slice is browser harness/CI.
+
+## Browser slice discoveries
+
+All eight real gallery cases reached screenshots and passed keyboard activation. Existing serious/critical findings are contrast failures and tray-menu list/menu semantics. Independent policy review accepts an exact per-case multiset baseline as appropriate for unchanged S0 before evidence; requested stronger negative controls and explicit existing-debt reporting (browser-policy-round-1.md). This is not an axe-clean claim. No existing CI gate is weakened.
+
+Full scaffold.runtime was invoked twice: first inherited local browser-library environment blocked narrow Deno subprocess permissions; rerun with clean environment exits 1 on Aspire doctor and reports Docker daemon unavailable. No runtime behavior gate is claimed green.
+
+### Browser evidence
+
+- Normal matrix: 8 passed, 0 failed, 0 skipped; captures and complete plain axe reports exist for both routes, both themes, both widths.
+- Dated before capture: `npm run baseline` exits 0, 8 PNGs saved under `tools/fresh-ui-browser/baselines/2026-10-28-before/`; Chromium 153.0.8010.12, Playwright 1.63.0, axe-core 4.11.4. Mobile token capture visually inspected; gallery is the actual scaffold, with no product UI changes.
+- Exact-baseline validator contract: 4 tests passed. Four deliberate browser controls each fail through the same validator (axe-negative-controls.json); combined command exits 1 as expected.
+- Independent browser policy re-review: PASS after one correction (browser-policy-review.md). This records existing accessibility findings and is explicitly not axe-clean.
+- Workflow/classifier/gate regression: 71 tests passed via structured wrapper.
+- Tooling type-check: 7 TS files, exit 0 via structured wrapper in Node package cwd with `--no-config --no-lock --node-modules-dir=manual`.
+- Tooling/source lint: exit 0, all 11 selected files processed. Root configuration excludes tools/.llm, so a temporary config copies the exact root lint rules with exclusions removed for this scoped check; no rules are disabled.
+- The dedicated baseline contract uses `accessibility.contract.ts`, explicitly run after npm ci by its own gate. Standard root Deno shards do not need to install the separate Node browser toolchain.
+
+Reconcile: no UI or scaffold template changes were necessary, so conditional asset regeneration gates remain not applicable. Main acceptance remains S0 token hygiene and reusable evidence. No existing CI gate is removed, labels unchanged. Full scaffold.runtime remains unproven locally due unavailable Docker/Aspire prerequisites.

@@ -1022,3 +1022,31 @@ Deno.test('parseFiles: newline and comma forms', () => {
   assertEquals(parseFiles('a.md,b.ts\n'), ['a.md', 'b.ts']);
   assertEquals(parseFiles(''), []);
 });
+
+Deno.test('design gallery and browser harness inputs schedule Fresh UI evidence', () => {
+  for (
+    const path of [
+      'tools/fresh-ui-browser/playwright.config.ts',
+      'tools/fresh-ui-browser/package-lock.json',
+      'tools/fresh-ui-browser/tests/design.spec.ts',
+      'tools/fresh-ui-browser/README.md',
+      'packages/fresh/src/runtime/server/mod.ts',
+      'packages/cli/src/kernel/assets/app/routes/(design)/design/tokens.tsx.template',
+      'packages/cli/src/kernel/assets/app/routes/(design)/design/components.tsx.template',
+      'packages/cli/src/kernel/assets/app/routes/_app.tsx.template',
+      'packages/cli/src/kernel/assets/embedded.generated.ts',
+      'packages/cli/src/kernel/assets/publish-assets.generated.ts',
+      '.llm/tools/run-deno-test.ts',
+      '.llm/tools/gates/catalog.ts',
+    ]
+  ) {
+    assertEquals(classifyPath(path).freshUi, true, path);
+    assertEquals(
+      decide({ eventName: 'pull_request', files: [path], labels: [] }).needsFreshUi,
+      true,
+      path,
+    );
+  }
+  assertEquals(classifyPath('tools/fresh-ui-browser/tests/design.spec.ts').scaffold, false);
+  assertEquals(classifyPath('packages/sdk/src/unrelated.ts').freshUi, false);
+});

@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-10-28T05:47:36.297Z",
+  "sourceHead": "28b0050d9832ec00386b9f9d0f1adc4ca37e7230",
+  "platform": "linux",
+  "architecture": "x64",
+  "browser": "Chromium 153.0.8010.12",
+  "playwright": "1.63.0",
+  "routes": [
+    "/design/tokens",
+    "/design/components"
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    390,
+    1280
+  ],
+  "screenshotPolicy": "Capture only. No pixel comparison; normal tests do not rewrite this baseline.",
+  "axeAdapter": "4.11.1",
+  "axeEngine": "4.11.4",
+  "accessibilityPolicy": "Exact reviewed S0 findings; not an axe-clean claim. See axe-baseline.json."
+}

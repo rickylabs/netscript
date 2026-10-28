@@ -198,6 +198,14 @@ function isFreshBrowserSurface(path: string): boolean {
   return path.startsWith('packages/fresh/') || path.startsWith('packages/fresh-ui/');
 }
 
+/** Inputs that can change the scaffold design gallery or its browser evidence. */
+function isFreshUiGallerySurface(path: string): boolean {
+  return isFreshBrowserSurface(path) ||
+    path.startsWith('packages/cli/src/kernel/assets/app/') ||
+    path === 'packages/cli/src/kernel/assets/embedded.generated.ts' ||
+    path === 'packages/cli/src/kernel/assets/publish-assets.generated.ts';
+}
+
 export function classifyPath(
   rawPath: string,
   rootDenoConfig: DenoConfigChange = 'toolchain',
@@ -258,6 +266,9 @@ export function classifyPath(
     // executable inputs. Their contents must not fan out into runtime lanes.
     return { ...NONE };
   }
+  if (path.startsWith('tools/fresh-ui-browser/')) {
+    return { ...NONE, freshUi: true };
+  }
   if (path.startsWith('tools/design-sync/')) {
     return { ...NONE, deno: hasExtension(path, CODE_EXTENSIONS) };
   }
@@ -289,7 +300,7 @@ export function classifyPath(
       surface: path.startsWith('packages/'),
       pages: (path.startsWith('packages/') || path.startsWith('plugins/')) &&
         !isPackageTestOnly(path),
-      freshUi: path.startsWith('packages/fresh-ui/'),
+      freshUi: isFreshUiGallerySurface(path),
       freshBrowser: isFreshBrowserSurface(path),
     };
   }
@@ -303,6 +314,8 @@ export function classifyPath(
       freshUi: [
         '.llm/tools/run-deno-check.ts',
         '.llm/tools/run-deno-lint.ts',
+        '.llm/tools/run-deno-test.ts',
+        '.llm/tools/gates/catalog.ts',
         '.llm/tools/validation/fresh-ui-quality_test.ts',
       ].includes(path),
       freshBrowser: path === '.llm/tools/gates/catalog.ts',
