@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Web Layer
 templateEngine: [vento, md]
+oldUrl: /web-layer/examples/
 ---
 
 # Web Layer
@@ -64,8 +65,9 @@ Each guide covers one part of that model. Read the one you need.
   layer.
 - [Interactivity](/web-layer/interactive/) and [durable-stream consumption](/durable-workflows/streams/):
   island runtime helpers and the browser-side client for durable HTTP/SSE streams.
-- [Vite integration](/web-layer/vite/), [testing](/web-layer/testing/),
-  [diagnostics](/web-layer/error/) and [worked examples](/web-layer/examples/).
+- [Vite integration](/web-layer/vite/), [testing](/web-layer/testing/) and
+  [diagnostics](/web-layer/error/). For a worked example of the whole layer, follow
+  [the Live Dashboard tutorial](/tutorials/live-dashboard/).
 - [Fresh UI & design](/web-layer/fresh-ui/): the visual layer on top, with the copy-source component
   registry, design tokens and the scaffolded dashboard app.
 
