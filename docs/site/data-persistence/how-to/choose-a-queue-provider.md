@@ -8,16 +8,13 @@ oldUrl: /how-to/choose-a-queue-provider/
 
 # Choose a queue provider
 
-**Scope:** how to pick the right backend for `@netscript/queue` — the in-memory test
-adapter, the zero-config Deno KV default, Redis, RabbitMQ (AMQP), and PostgreSQL — and how
-to either let auto-discovery select one or pin one explicitly with `provider` +
-`connection`. This is the *decision* recipe; for the enqueue/consume/cron mechanics see
-[Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
+This recipe helps you pick a backend for `@netscript/queue` and select it, either through
+auto-discovery or by pinning one with `provider` and `connection`. For the enqueue, consume and cron
+mechanics, see [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
 
-A NetScript queue is provider-agnostic by design: the same `createQueue("jobs")` runs on an
-in-memory adapter in a unit test, on Deno KV on your laptop, and on a real broker under
-Aspire — without touching the call site. The only thing that changes is which backend the
-factory resolves. This recipe is about making that choice deliberately.
+A NetScript queue is provider-agnostic: the same `createQueue("jobs")` call runs on an in-memory
+adapter in a unit test, on Deno KV on your laptop and on a broker under Aspire. Only the backend the
+factory resolves changes, never the call site.
 
 ## Prerequisites
 
@@ -41,10 +38,9 @@ factory resolves. This recipe is about making that choice deliberately.
 
 ## The five backends at a glance
 
-There are **four** selectable production providers in the `QueueProvider` enum — Deno KV,
-Redis, RabbitMQ, and PostgreSQL — plus the `MemoryQueueAdapter` from
-`@netscript/queue/testing` for tests and examples. Pick by the row that matches your
-deployment, then jump to the matching step.
+The `QueueProvider` enum names four selectable providers: Deno KV, Redis, RabbitMQ and PostgreSQL.
+The `MemoryQueueAdapter` from `@netscript/queue/testing` covers tests and examples. Find the row
+that matches your deployment, then follow its step.
 
 {{ comp.apiTable({ caption: "Queue backends in @netscript/queue", columns: ["Backend", "How you select it", "Reach for it when"], rows: [
   ["<code>MemoryQueueAdapter</code>", "<code>new MemoryQueueAdapter()</code> from <code>@netscript/queue/testing</code> (never auto-discovered)", "Unit tests and isolated examples — volatile, in-process, zero setup; data is lost on restart."],
@@ -54,11 +50,10 @@ deployment, then jump to the matching step.
   ["PostgreSQL <code>(provider: 'postgres')</code>", "<strong>Explicit only</strong> — pass <code>QueueProvider.Postgres</code>; never auto-discovered", "You already run Postgres and want one fewer moving part, or want the queue to share your transactional store. Row-claim via <code>FOR UPDATE SKIP LOCKED</code>."]
 ] }) }}
 
-## Step 1 — Default: let auto-discovery pick
+## Step 1 — Let auto-discovery pick
 
-If you pass no `provider`, the factory probes the Aspire environment and selects the first
-available backend in a fixed order. Write provider-neutral code and let the environment
-decide:
+Pass no `provider` and the factory probes the Aspire environment, then selects the first available
+backend in a fixed order. Write provider-neutral code and let the environment decide:
 
 ```ts
 // queue.ts
@@ -71,22 +66,20 @@ const JobSchema = z.object({ id: z.string(), kind: z.string() });
 export const jobs = createTypedQueue("jobs", JobSchema);
 ```
 
-The probe order is **RabbitMQ (AMQP) → Redis → Deno KV**. Deno KV is the always-available
-fallback when no broker is discoverable, so the same code runs unchanged from laptop to
-production as you provision real backends under Aspire.
+The probe order is **RabbitMQ (AMQP) → Redis → Deno KV**. Deno KV is the always-available fallback
+when no broker is discoverable, so the same code runs unchanged from laptop to production as you
+provision real backends under Aspire.
 
-{{ comp callout { type: "note", title: "PostgreSQL is the deliberate exception" } }}
-Auto-discovery probes <strong>RabbitMQ → Redis → Deno KV only</strong>. It will
-<strong>never</strong> fall through to PostgreSQL — even when a Postgres connection is
-present in the environment. The SQL-durable queue is opt-in: you must pass
-<code>provider: 'postgres'</code> (Step 3) or you will quietly land on the Deno KV adapter.
-{{ /comp }}
+> [!WARNING]
+> Auto-discovery **never** selects PostgreSQL, even when a Postgres connection is present in the
+> environment. Pass `provider: 'postgres'` (Step 3), or the queue quietly runs on the Deno KV
+> adapter.
 
 ## Step 2 — Pin a provider explicitly
 
-To take auto-discovery out of the loop, pass `provider` from the `QueueProvider` enum.
-Connection details go under `connection.<provider>`; every URL is optional and falls back
-to Aspire service discovery when omitted.
+To take auto-discovery out of the loop, pass `provider` from the `QueueProvider` enum. Connection
+details go under `connection.<provider>`; every URL is optional and falls back to Aspire service
+discovery when omitted.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -106,20 +99,18 @@ to Aspire service discovery when omitted.
   }
 ] }) }}
 
-### RabbitMQ heartbeat migration in 0.0.8
-
-The RabbitMQ adapter now uses amqplib 2. An explicit `heartbeat=0` in a connection URL disables
-heartbeats. To preserve broker-negotiated heartbeats when upgrading from 0.0.7, remove that query
-parameter from `AMQP_URL` or `connection.rabbitmq.url`. URLs generated through Aspire omit it and
-continue to negotiate with the broker. Keep `heartbeat=0` only when you intend to disable
-heartbeats; a positive value still requests an interval in seconds.
+> [!WARNING]
+> **Upgrading from 0.0.7:** the RabbitMQ adapter now uses amqplib 2, and an explicit `heartbeat=0`
+> in a connection URL disables heartbeats. To keep broker-negotiated heartbeats, remove that query
+> parameter from `AMQP_URL` or `connection.rabbitmq.url`. URLs generated through Aspire omit it and
+> keep negotiating with the broker. Keep `heartbeat=0` only when you mean to disable heartbeats; a
+> positive value still requests an interval in seconds.
 
 ## Step 3 — Select the PostgreSQL backend
 
-The PostgreSQL provider gives you a SQL-durable queue with row-claim semantics
-(`FOR UPDATE SKIP LOCKED`), a visibility timeout, ack/nack, and a dead-letter store — so
-concurrent consumers never double-claim a message. Because it is never auto-discovered, you
-must name it:
+The PostgreSQL provider is a SQL-durable queue with row-claim semantics (`FOR UPDATE SKIP LOCKED`), a
+visibility timeout, ack/nack and a dead-letter store, so concurrent consumers never double-claim a
+message. Because auto-discovery never picks it, you must name it:
 
 ```ts
 // queue.ts
@@ -141,14 +132,14 @@ const jobs = createQueue("jobs", {
 await jobs.enqueue({ id: "job-1", kind: "reindex" });
 ```
 
-Reach for Postgres when you already run it under Aspire and want the queue and your
-application data in one transactional store, rather than standing up a dedicated broker.
+Choose Postgres when you already run it under Aspire and want the queue and your application data in
+one transactional store instead of a dedicated broker.
 
 ## Step 4 — Use the in-memory backend in tests
 
-For unit tests and examples, construct the `MemoryQueueAdapter` directly from the testing
-sub-path. It is volatile and in-process — nothing to provision, and it is never selected by
-auto-discovery, so production code paths stay untouched:
+For unit tests and examples, construct the `MemoryQueueAdapter` from the testing sub-path. It is
+volatile and in-process, needs nothing provisioned, and auto-discovery never selects it, so production
+code paths stay untouched:
 
 ```ts
 // jobs_test.ts
@@ -164,10 +155,9 @@ await queue.listen(async (message) => {
 
 ## Step 5 — Add concurrency with createParallelQueue
 
-Any provider can be wrapped for concurrent processing with `createParallelQueue`. Pass a
-`concurrency` greater than 1 and a single listener processes that many messages at once —
-ideal for I/O-bound work (HTTP calls, DB queries). At `concurrency: 1` (the default) it is
-identical to `createQueue`.
+`createParallelQueue` wraps any provider for concurrent processing. With a `concurrency` greater
+than 1, one listener processes that many messages at once, which suits I/O-bound work such as HTTP
+calls and database queries. At `concurrency: 1` (the default) it behaves like `createQueue`.
 
 ```ts
 // queue.ts
@@ -184,14 +174,13 @@ await queue.listen(async (message) => {
 });
 ```
 
-For CPU-bound work, prefer Web Workers over queue concurrency — see
+For CPU-bound work, prefer Web Workers over queue concurrency; see
 [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 
-## Prove it end to end — same call site, two backends
+## Step 6 — Run one file on two backends
 
-The pluggability claim is only convincing if you can watch one file run unchanged on two backends.
-Write the producer/consumer against the factory (no `provider`), then run it first on the Deno KV
-fallback locally and again on Redis under Aspire — the file never changes.
+To confirm the selection, run one provider-neutral file first on the Deno KV fallback and then on
+Redis under Aspire. The file doesn't change between the runs:
 
 ```ts
 // jobs.ts — the resulting file: provider-neutral producer + consumer
@@ -226,42 +215,30 @@ deno run --unstable-kv -A jobs.ts
 #    -> processed job-1 reindex   (now auto-discovered onto Redis)
 ```
 
-The call site — `createTypedQueue('jobs', JobSchema)`, `enqueue`, `listen` — is identical in both
-runs; only the resolved backend changed. Pin a specific provider with `provider: QueueProvider.*`
-(Step 2) when you want to take auto-discovery out of the loop.
+The call site (`createTypedQueue('jobs', JobSchema)`, `enqueue`, `listen`) is identical in both runs;
+only the resolved backend changed. Pin a provider with `provider: QueueProvider.*` (Step 2) to take
+auto-discovery out of the loop.
 
-## In-production pitfalls
+## Production notes
 
-{{ comp callout { type: "warning", title: "Choosing a provider — read before you ship" } }}
-<ul>
-<li><strong>Local default is Deno KV, not a broker.</strong> If you never start Aspire, auto-discovery silently lands on the Deno KV fallback. Fine for dev — but don't assume broker-grade ordering or fan-out until you've provisioned and confirmed the real backend.</li>
-<li><strong>PostgreSQL is opt-in, never auto-selected.</strong> The probe is RabbitMQ → Redis → Deno KV; it will <strong>not</strong> choose Postgres even when a Postgres connection exists. Pin <code>provider: QueueProvider.Postgres</code> or you'll quietly run on Deno KV.</li>
-<li><strong>Remote Deno KV (KV Connect) switches adapters.</strong> A Deno KV path that is an <code>http(s)://</code> URL is treated as KV Connect, which has no native queue ops — the factory transparently swaps in a polling adapter (configurable <code>pollInterval</code>, <code>visibilityTimeout</code>, <code>maxRetries</code> under <code>connection.denoKv</code>). A local/SQLite KV path uses native queue ops. Know which one you're on before tuning.</li>
-<li><strong>Make handlers idempotent.</strong> A thrown <code>QueueHandlerError</code> follows each backend's own ack/retry policy, so the same message can be redelivered. An idempotent handler can't double-charge or double-send on a retry.</li>
-</ul>
-{{ /comp }}
+- **The local default is Deno KV, not a broker.** If you never start Aspire, auto-discovery lands on
+  the Deno KV fallback. That is fine for development, but don't assume broker-grade ordering or
+  fan-out until you have provisioned and confirmed the real backend.
+- **Remote Deno KV (KV Connect) switches adapters.** A Deno KV path that is an `http(s)://` URL is
+  treated as KV Connect, which has no native queue operations, so the factory swaps in a polling
+  adapter. Tune it with `pollInterval`, `visibilityTimeout` and `maxRetries` under
+  `connection.denoKv`. A local or SQLite KV path uses native queue operations; know which one you are
+  on before tuning.
 
-{{ comp callout { type: "important", title: "Validate at the boundary" } }}
-Prefer <code>createTypedQueue</code> (Zod-validated at enqueue and dequeue) over the
-untyped <code>createQueue</code> whenever the payload shape matters. An unvalidated queue
-can carry malformed messages until the consumer fails inside the handler;
-validation at enqueue time fails fast at the producer, regardless of which provider you
-chose.
-{{ /comp }}
+## Next steps
 
-## See also
+Enqueue and consume on the backend you chose with
+{{ comp.xref({ key: "howto:queue-kv-cron" }) }}.
 
-{{ comp.xref({ key: "cap:kv-queues-cron" }) }} — the concept-level tour of queues, KV, and
-cron, and how Aspire wires the four queue backends.
-
-{{ comp.xref({ key: "cap:background-jobs" }) }} — when you want a managed worker job
-(persistence, retries, an HTTP trigger) instead of a raw queue.
-
-{{ comp.xref({ key: "howto:queue-kv-cron" }) }} — the mechanics recipe: enqueue, consume,
-and schedule. This page pairs with it: choose the backend here, run it there.
-
-For the full `QueueProvider` enum, the `QueueConnectionOptions` shape, `createParallelQueue`
-/ `ParallelQueueOptions`, the `MessageQueue` interface, and the `QueueError` hierarchy, see
-{{ comp.xref({ key: "ref:queue" }) }}.
+- {{ comp.xref({ key: "cap:kv-queues-cron" }) }}: the concept-level tour of queues, KV and cron.
+- {{ comp.xref({ key: "cap:background-jobs" }) }}: a managed worker job (persistence, retries, an
+  HTTP trigger) instead of a raw queue.
+- {{ comp.xref({ key: "ref:queue" }) }}: the `QueueProvider` enum, `QueueConnectionOptions`,
+  `ParallelQueueOptions`, the `MessageQueue` interface and the `QueueError` hierarchy.
 
 {{ comp.nextPrev({ prev: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" }, next: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" } }) }}
