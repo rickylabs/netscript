@@ -12,3 +12,7 @@ Latest local proof: six metadata/transport tests; 49 existing UI tests; full doc
 ## Theme docs carrier complete
 
 All 18 preset items now declare canonical DESIGN.md/SKILL.md with preset-id skill targets. The asset generator embeds their exact bytes under package-relative keys; static and published consumers need no repository source tree. Legacy projection retains its original files. Focused registry suite 17/0/0; scoped source gates, root quality/architecture and real 87-artifact CLI build pass. Independent review PASS. CLI installation and style/preset behavior remain with the active continuation.
+
+## CLI-hosted MCP app config integration complete
+
+The CLI's MCP server now composes the existing app config/client/transport into its injected catalog. Search includes qualified configured namespaces; view resolves their exact bytes. The fixture proves environment auth is sent, absent from results, and no app files change. 10 focused tests and source/root gates pass; separate review PASS. Standalone @netscript/mcp still defaults to its embedded offline catalog. Remaining active worker owns installer/commands/style/preset and final runtime smoke/evaluation.

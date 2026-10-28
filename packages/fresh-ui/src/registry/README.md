@@ -62,3 +62,8 @@ The legacy manifest intentionally retains its original file list for existing sc
 design-sync; protocol-only theme skills are installed by the v2 installer. To extend a built-in
 theme, update its two canonical document paths and targets in `registry.json`, then run
 `deno task gen:assets-barrel`. `registry-theme-docs.test.ts` checks every preset and exact bytes.
+
+CLI-hosted MCP (`netscript agent mcp --project-root <app>`) reads that app's `components.json`.
+Its registry search combines the built-in catalog and configured namespaces, qualifies names as
+`@namespace/item`, and views items through the same client and environment-header transport as
+the CLI. Discovery writes no config, locks, installed files, or diagnostic receipts.
