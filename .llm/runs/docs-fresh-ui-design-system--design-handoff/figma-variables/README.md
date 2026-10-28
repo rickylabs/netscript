@@ -7,12 +7,14 @@ variable count.
 | File                 | Collection    | Modes                                                                           | Variables |
 | -------------------- | ------------- | ------------------------------------------------------------------------------- | --------: |
 | `primitives.json`    | Primitives    | Value                                                                           |       413 |
-| `theme.json`         | Theme         | Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel |       146 |
+| `theme.json`         | Theme         | Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel |       277 |
 | `base-accent.json`   | Base accent   | Ink, Blue, Violet, Orange, Indigo, Tomato, Lime                                 |        32 |
-| `scheme.json`        | Scheme        | Light, Dark                                                                     |       399 |
-| `density.json`       | Density       | Comfortable, Compact, Dense, Airy, Chunky                                       |        15 |
+| `scheme.json`        | Scheme        | Light, Dark                                                                     |       446 |
+| `density.json`       | Density       | Comfortable, Compact, Dense, Airy, Chunky                                       |        19 |
 | `base-gray.json`     | Base gray     | Neutral, Slate, Sand, Mauve                                                     |        26 |
-| `studio-flavor.json` | Studio flavor | Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal                      |       198 |
+| `studio-flavor.json` | Studio flavor | Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal                      |       202 |
+| `theme-b.json`       | Theme B       | Bloom, Cupertino, Liquid, Terminal, macOS 27, Apple Classic, Fluent 2 Web       |       277 |
+| `theme-set.json`     | Theme set     | A, B                                                                            |       277 |
 
 ## File shape
 
@@ -27,8 +29,8 @@ variable count.
       "scopes": ["FRAME_FILL", "SHAPE_FILL"],
       "codeSyntax": "var(--ns-bg)",
       "values": {
-        "Light": { "alias": "Theme/surface/l/canvas" },
-        "Dark": { "alias": "Theme/surface/d/canvas" }
+        "Light": { "alias": "Theme set/surface/l/canvas" },
+        "Dark": { "alias": "Theme set/surface/d/canvas" }
       }
     }
   ]
@@ -79,5 +81,15 @@ referring collection. For example, `Theme` mode `Studio` aliases `type/display/t
 `Studio flavor/type/display/tracking`, which then takes its value from the active `Studio flavor`
 mode.
 
-Every alias target in these files exists in the export: 1,755 alias values point to 651 distinct
+Every alias target in these files exists in the export: 4,498 alias values point to 1,315 distinct
 variables, all local to this file.
+
+## Theme set
+
+Scheme roles alias through `Theme set` rather than straight to a theme collection. `Theme set` has
+the same 277 variable names as `Theme` and `Theme B`. Mode `A` aliases each one to the variable of
+the same name in `Theme`, and mode `B` to the variable of the same name in `Theme B`, so set `A`
+selects Theme and set `B` selects Theme B. Studio flavor and Base accent reach theme variables
+through `Theme set` in the same way. For example, `surface/bg` Light resolves through
+`Theme set/surface/l/canvas` (set `A`), then `Theme/surface/l/canvas` (mode `Studio`), then
+`Studio flavor/surface/l/canvas` (mode `Utility`).

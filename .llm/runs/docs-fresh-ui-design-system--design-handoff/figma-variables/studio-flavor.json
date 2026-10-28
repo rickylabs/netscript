@@ -125,22 +125,22 @@
       ],
       "values": {
         "Utility": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         },
         "Cloud": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         },
         "Workshop": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         },
         "Playful": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         },
         "Ledger": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         },
         "Atelier": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         },
         "Signal": "#0b0f0b"
       }
@@ -155,22 +155,22 @@
       ],
       "values": {
         "Utility": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Cloud": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Workshop": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Playful": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Ledger": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Atelier": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Signal": "#0b0f0b"
       }
@@ -505,6 +505,24 @@
       }
     },
     {
+      "name": "deco/marker",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-studio-deco-marker)",
+      "description": "Shows the 6px location marker in Tabs, Nav item and Navigation menu. Utility only.",
+      "values": {
+        "Utility": true,
+        "Cloud": false,
+        "Workshop": false,
+        "Playful": false,
+        "Ledger": false,
+        "Atelier": false,
+        "Signal": false
+      }
+    },
+    {
       "name": "deco/sparkline",
       "type": "BOOLEAN",
       "scopes": [
@@ -550,6 +568,36 @@
         "Ledger": "IBM Plex Mono",
         "Atelier": "Hanken Grotesk",
         "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "font/eyebrow",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-studio-font-eyebrow)",
+      "description": "Eyebrow family per Studio flavor: Utility uses its mono (Fragment Mono); other flavors follow font/label.",
+      "values": {
+        "Utility": "Fragment Mono",
+        "Cloud": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Workshop": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Playful": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Ledger": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Atelier": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Signal": {
+          "alias": "Studio flavor/font/label"
+        }
       }
     },
     {
@@ -763,22 +811,22 @@
           "alias": "Base gray/gray/d/9"
         },
         "Cloud": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         },
         "Workshop": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         },
         "Playful": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         },
         "Ledger": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         },
         "Atelier": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         },
         "Signal": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         }
       }
     },
@@ -794,22 +842,22 @@
           "alias": "Base gray/gray/l/9"
         },
         "Cloud": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         },
         "Workshop": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         },
         "Playful": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         },
         "Ledger": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         },
         "Atelier": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         },
         "Signal": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         }
       }
     },
@@ -1793,6 +1841,24 @@
       }
     },
     {
+      "name": "radius/checkbox",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-radius-checkbox)",
+      "description": "Checkbox corner radius per Studio flavor (Utility 2, other flavors 4). Theme radius/checkbox follows it in Theme Studio.",
+      "values": {
+        "Utility": 2,
+        "Cloud": 4,
+        "Workshop": 4,
+        "Playful": 4,
+        "Ledger": 4,
+        "Atelier": 4,
+        "Signal": 4
+      }
+    },
+    {
       "name": "radius/control",
       "type": "FLOAT",
       "scopes": [
@@ -2051,22 +2117,22 @@
           "alias": "Base gray/gray/d/12"
         },
         "Cloud": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         },
         "Workshop": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         },
         "Playful": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         },
         "Ledger": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         },
         "Atelier": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         },
         "Signal": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         }
       }
     },
@@ -2082,22 +2148,22 @@
           "alias": "Base gray/gray/d/8"
         },
         "Cloud": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         },
         "Workshop": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         },
         "Playful": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         },
         "Ledger": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         },
         "Atelier": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         },
         "Signal": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         }
       }
     },
@@ -2147,22 +2213,22 @@
           "alias": "Base gray/gray/l/12"
         },
         "Cloud": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Workshop": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Playful": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Ledger": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Atelier": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Signal": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         }
       }
     },
@@ -2179,22 +2245,22 @@
           "alias": "Base gray/gray/l/8"
         },
         "Cloud": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Workshop": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Playful": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Ledger": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Atelier": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Signal": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         }
       }
     },
@@ -3280,6 +3346,36 @@
         "Ledger": -0.6000000238418579,
         "Atelier": -2.4000000953674316,
         "Signal": -1.2000000476837158
+      }
+    },
+    {
+      "name": "type/eyebrow/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-studio-weight-eyebrow)",
+      "description": "Eyebrow font style per Studio flavor, paired with font/eyebrow. Utility is Regular because Fragment Mono has no Medium face; other flavors follow type/label/style.",
+      "values": {
+        "Utility": "Regular",
+        "Cloud": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Workshop": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Playful": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Ledger": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Atelier": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Signal": {
+          "alias": "Studio flavor/type/label/style"
+        }
       }
     },
     {
