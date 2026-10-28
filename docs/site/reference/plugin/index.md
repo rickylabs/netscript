@@ -5,15 +5,28 @@ title: '@netscript/plugin'
 
 # `@netscript/plugin`
 
-Plugin manifest, validation, discovery, and host-context contracts for NetScript. This page is
-written against the package's public surface reported by `deno doc`. For the full index of packages
-and plugins return to the [reference overview](/reference/).
+Plugin manifest, validation, discovery, and host-context contracts for NetScript. Use it to author a
+plugin with `definePlugin`, validate a root composition, and build the CLI, scaffold, service and
+health surfaces a plugin contributes.
 
-The root entrypoint (`@netscript/plugin`) is the plugin authoring contract: the `definePlugin`
-builder DSL, the manifest and contribution types, the plugin error classes, the contribution base
-class, and the `inspectPlugin` diagnostic. Host tooling, CLI integration, SDK discovery, abstract
-contribution bases, runtime loaders, testing fixtures, and template assets live on the sub-path
-exports listed at the end of this page.
+## Sub-path exports
+
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin` | `./mod.ts` | Plugin authoring contract: [definition](#plugin-definition), [diagnostics](#diagnostics), [errors](#errors), [contributions](#contributions) and manifest types. |
+| `@netscript/plugin/health` | `./src/health/mod.ts` | [Background child health contract and process transport](#netscriptpluginhealth). |
+| `@netscript/plugin/config` | `./src/config/mod.ts` | [Builder, manifest schema, and contribution type contracts](#netscriptpluginconfig). |
+| `@netscript/plugin/abstracts` | `./src/abstracts/mod.ts` | [Abstract contribution base classes per axis](#netscriptpluginabstracts). |
+| `@netscript/plugin/adapter` | `./src/adapter/mod.ts` | [Local host command adapters](#netscriptpluginadapter). |
+| `@netscript/plugin/cli` | `./src/cli/mod.ts` | [Plugin CLI base classes, command mounting, and doctor reports](#netscriptplugincli). |
+| `@netscript/plugin/sdk` | `./src/sdk/mod.ts` | [Discovery ports, alpha adapters, and runtime host stubs](#netscriptpluginsdk). |
+| `@netscript/plugin/loader` | `./loader.ts` | [Host-side plugin service bootstrap helpers](#netscriptpluginloader). |
+| `@netscript/plugin/protocol` | `./src/protocol/mod.ts` | [Plugin manifest schemas and installer protocol definitions](#netscriptpluginprotocol). |
+| `@netscript/plugin/scaffold` | `./src/scaffold/mod.ts` | [Template generators and registry emitters](#netscriptpluginscaffold). |
+| `@netscript/plugin/testing` | `./src/testing/mod.ts` | [In-memory adapters, fixtures, and the CLI contract harness](#netscriptplugintesting). |
+| `@netscript/plugin/templates` | `./src/templates/mod.ts` | [Plugin skeleton template asset paths](#netscriptplugintemplates). |
+| `@netscript/plugin/contract-base` | `./src/contract-base/mod.ts` | [Standard plugin capability checks](#netscriptplugincontract-base). |
+| `@netscript/plugin/service` | `./src/service/mod.ts` | [Out-of-process plugin service binders](#netscriptpluginservice). |
 
 ## Plugin definition
 
@@ -107,9 +120,10 @@ Every declared dependency must be composed. Its `version` is read as a semver ra
 version matches only itself. Library packages that are not plugins belong in `deno.json` imports,
 not in a manifest's `dependencies`.
 
-**Migration (breaking).** `PluginManifestSchema`, `definePlugin(...).build()`, and the composition
-check now reject unknown contribution keys. A misspelled key such as `servces` used to be ignored;
-now it fails with the plugin name and the key. Rename it to the documented key, or remove it.
+> [!IMPORTANT]
+> **Breaking change.** `PluginManifestSchema`, `definePlugin(...).build()`, and the composition check
+> reject unknown contribution keys. A misspelled key such as `servces`, previously ignored, fails with
+> the plugin name and the key. Rename it to the documented key, or remove it.
 
 ## Manifest types
 
@@ -131,30 +145,7 @@ now it fails with the plugin name and the key. Rename it to the documented key, 
 | `PluginContext`        | interface | Context supplied to plugin lifecycle hooks.      |
 | `PluginLogger`         | interface | Logger shape supplied to plugin lifecycle hooks. |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. The tables below summarize each
-sub-path's own `deno doc` surface. Symbols that one sub-path re-exports from another are called out
-instead of described twice.
-
-| Export                            | Entrypoint                   | Purpose                                                        |
-| --------------------------------- | ---------------------------- | -------------------------------------------------------------- |
-| `@netscript/plugin`               | `./mod.ts`                   | Plugin authoring contract (documented above).                  |
-| `@netscript/plugin/health`        | `./src/health/mod.ts`        | Background child health contract and process transport.        |
-| `@netscript/plugin/config`        | `./src/config/mod.ts`        | Builder, manifest schema, and contribution type contracts.     |
-| `@netscript/plugin/abstracts`     | `./src/abstracts/mod.ts`     | Abstract contribution base classes per axis.                   |
-| `@netscript/plugin/adapter`       | `./src/adapter/mod.ts`       | Local host command adapters.                                   |
-| `@netscript/plugin/cli`           | `./src/cli/mod.ts`           | Plugin CLI base classes, command mounting, and doctor reports. |
-| `@netscript/plugin/sdk`           | `./src/sdk/mod.ts`           | Discovery ports, alpha adapters, and runtime host stubs.       |
-| `@netscript/plugin/loader`        | `./loader.ts`                | Host-side plugin service bootstrap helpers.                    |
-| `@netscript/plugin/protocol`      | `./src/protocol/mod.ts`      | Plugin manifest schemas and installer protocol definitions.    |
-| `@netscript/plugin/scaffold`      | `./src/scaffold/mod.ts`      | Template generators and registry emitters.                     |
-| `@netscript/plugin/testing`       | `./src/testing/mod.ts`       | In-memory adapters, fixtures, and the CLI contract harness.    |
-| `@netscript/plugin/templates`     | `./src/templates/mod.ts`     | Plugin skeleton template asset paths.                          |
-| `@netscript/plugin/contract-base` | `./src/contract-base/mod.ts` | Standard plugin capability checks.                             |
-| `@netscript/plugin/service`       | `./src/service/mod.ts`       | Out-of-process plugin service binders.                         |
-
-### `@netscript/plugin/config`
+## `@netscript/plugin/config`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -178,7 +169,7 @@ This entrypoint also re-exports `PluginBuilder`, `ContributionInput`, `Dependenc
 `RuntimeConfigTopicContribution`, `ServiceContribution`, `StreamTopicContribution`, and
 `TelemetryContribution`, documented in the root sections above.
 
-### `@netscript/plugin/abstracts`
+## `@netscript/plugin/abstracts`
 
 | Symbol                                  | Kind       | Description                                                                         |
 | --------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
@@ -198,7 +189,7 @@ This entrypoint also re-exports `PluginBuilder`, `ContributionInput`, `Dependenc
 | `PluginSchemaResult`                    | type alias | Validation result returned by package-owned schema contracts.                       |
 | `ContributionAxis`                      | type alias | Supported plugin contribution axes.                                                 |
 
-### `@netscript/plugin/adapter`
+## `@netscript/plugin/adapter`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -244,10 +235,10 @@ This entrypoint also re-exports the root and CLI symbols `DoctorCheck`, `DoctorR
 `PluginCliArgs`, `PluginCliCommand`, `PluginCliResult`, `PluginLogger`, and `FileSystemPort`; the
 protocol symbols `PluginScaffoldEntrypoint`, `ScaffolderContext`, and `ScaffoldResult`; and the
 scaffold symbols `ItemScaffolder`, `ScaffoldArtifact`, `ScaffoldArtifactBody`, `artifactText`,
-`textArtifact`, `StubSource`, `TokenValues`, `defineStub`, and `substituteTokens`. They are
-documented in their owning sections below.
+`textArtifact`, `StubSource`, `TokenValues`, `defineStub`, and `substituteTokens`, documented in their owning
+sections.
 
-### `@netscript/plugin/cli`
+## `@netscript/plugin/cli`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -283,7 +274,7 @@ documented in their owning sections below.
 | `DefinitionGuard` | type alias | type alias | Runtime guard for a generated definition value. |
 | `GeneratedProjectRegistryOptions` | interface | interface | Options for loading a generated registry from a project. |
 
-### `@netscript/plugin/sdk`
+## `@netscript/plugin/sdk`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -323,14 +314,14 @@ This entrypoint also re-exports `BackgroundProcessorContribution`, `ContractVers
 `StreamTopicContribution`, `TelemetryContribution`, `PluginContext`, and `PluginLogger` from the
 root/config surface, plus `DoctorCheck` and `DoctorReport` from the CLI surface.
 
-### `@netscript/plugin/loader`
+## `@netscript/plugin/loader`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `createPluginLogger` | function | `function createPluginLogger(pluginName: string): PluginLogger` | Create a logger scoped to a plugin service process. |
 | `PluginLogger` | interface | `interface PluginLogger` | Minimal logger shape supplied to plugin service contexts. |
 
-### `@netscript/plugin/protocol`
+## `@netscript/plugin/protocol`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -357,7 +348,7 @@ root/config surface, plus `DoctorCheck` and `DoctorReport` from the CLI surface.
 
 This entrypoint also re-exports the root `PluginLogger` type.
 
-### `@netscript/plugin/scaffold`
+## `@netscript/plugin/scaffold`
 
 | Symbol                        | Kind       | Description                                                          |
 | ----------------------------- | ---------- | -------------------------------------------------------------------- |
@@ -378,7 +369,7 @@ This entrypoint also re-exports the root `PluginLogger` type.
 | `renderRegistrySource`        | function   | Render a deterministic registry module from structured data.         |
 | `renderRuntimeRegistrySource` | function   | Render a deterministic runtime registry module from structured data. |
 
-### `@netscript/plugin/testing`
+## `@netscript/plugin/testing`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -400,7 +391,7 @@ This entrypoint also re-exports the root/config symbols `BackgroundProcessorCont
 `ManifestResolverPort`, `RegistryEmission`, `WalkedFile`, and `WalkerPort`; and the CLI symbols
 `PluginCli`, `PluginCliArgs`, `PluginCliCommand`, and `PluginCliResult`.
 
-### `@netscript/plugin/templates`
+## `@netscript/plugin/templates`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -408,7 +399,7 @@ This entrypoint also re-exports the root/config symbols `BackgroundProcessorCont
 | `PLUGIN_SKELETON_TEMPLATES` | const | Paths for plugin skeleton template assets. |
 | `PluginSkeletonTemplatePath` | type alias | Plugin skeleton template path. |
 
-### `@netscript/plugin/contract-base`
+## `@netscript/plugin/contract-base`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -424,7 +415,7 @@ This entrypoint also re-exports the root/config symbols `BackgroundProcessorCont
 | `BasePluginDescribeProcedure` | type alias | Mandatory `describe` procedure shape for plugin contracts. |
 | `BasePluginDescribeRoute` | type alias | Explicit type of the base contract's `describe` route. |
 
-### `@netscript/plugin/service`
+## `@netscript/plugin/service`
 
 | Symbol                         | Kind       | Description                                                                                                         |
 | ------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -445,10 +436,6 @@ This entrypoint also re-exports the root/config symbols `BackgroundProcessorCont
 This entrypoint also re-exports `ContextFactory`, `CorsOptions`, `DbContext`, `HealthCheck`,
 `ServiceConfig`, `ServiceHandler`, `ServiceMiddleware`, `ServiceRouteMethod`, and `ServiceRouter`
 from `@netscript/service`.
-
----
-
-Back to the [reference overview](/reference/).
 
 ### Plugin service authentication posture
 
@@ -473,7 +460,7 @@ builder installs auth middleware before deferred RPC, REST and raw routes. Its b
 routes retain their native public behavior. A custom nonempty anonymous-prefix list replaces the
 default; the factory does not merge another policy into it.
 
-### `@netscript/plugin/health`
+## `@netscript/plugin/health`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -490,8 +477,7 @@ default; the factory does not merge another policy into it.
 
 Workers, triggers, and sagas runtime entrypoints also re-export the shared health types. The child
 health payload is bounded and excludes raw exception messages and stacks. Dependency readiness
-records startup checks and listener failures; continuous backing-service heartbeat remains follow-up
-scope. Generated AppHost probes and doctor/MCP aggregation consume the same child contract.
+records startup checks and listener failures. Generated AppHost probes and doctor/MCP aggregation consume the same child contract.
 
 Registry readiness records loaded and validated definitions; runtime registration belongs to
 dependency readiness. Crash-loop recovery requires a full 60 seconds of uninterrupted running with
@@ -550,4 +536,4 @@ are not treated as no-plugin projects.
 
 These are diagnostic reads. Child processing and its health listener run under the background
 service identity, independently of a phone, browser, or owner session. Dashboard panels consume the
-health report; panel rendering and integrated scaffold failure injection remain separate scope.
+health report.
