@@ -6,18 +6,7 @@
    redirect shims, the how-to catalog) fall back to Home / <title>. #}}
 {{ set homeUrl = "/" |> url }}
 
-{{ set laneLabel = null }}
-{{ for lane of navLanes }}
-  {{ if lane.kind === "flat" }}
-    {{ for item of lane.items }}
-      {{ if url === item.href }}{{ set laneLabel = lane.label }}{{ /if }}
-    {{ /for }}
-  {{ else }}
-    {{ for root of lane.roots }}
-      {{ if url.startsWith(root) }}{{ set laneLabel = lane.label }}{{ /if }}
-    {{ /for }}
-  {{ /if }}
-{{ /for }}
+{{ set laneLabel = getDocsLane(url).label }}
 
 {{ set crumbs = nav.breadcrumb(url, navQuery, navSort) }}
 

@@ -1,179 +1,144 @@
-// Progressive code tabs, runtime persistence, comparison and clipboard actions.
-
-(function () {
-  function setup(root) {
-    const tabs = Array.prototype.slice.call(root.querySelectorAll('.ns-tabbed__tab'));
-    const panels = Array.prototype.slice.call(root.querySelectorAll('.ns-tabbed__panel'));
-    if (!tabs.length || !panels.length) return;
-
-    function activate(index) {
-      tabs.forEach(function (tab, i) {
-        const on = i === index;
-        tab.classList.toggle('is-active', on);
-        tab.setAttribute('aria-selected', on ? 'true' : 'false');
-        tab.setAttribute('tabindex', on ? '0' : '-1');
-      });
-      panels.forEach(function (panel, i) {
-        if (i === index) panel.removeAttribute('hidden');
-        else panel.setAttribute('hidden', '');
-      });
-    }
-
-    tabs.forEach(function (tab, i) {
-      tab.addEventListener('click', function () {
-        activate(i);
-        if (root.hasAttribute('data-ns-runtime-group')) {
-          const label = tab.getAttribute('data-ns-runtime');
-          if (label) {
-            try {
-              localStorage.setItem('ns-runtime', label);
-            } catch { /* storage unavailable: selection just won't persist */ }
-            syncRuntimeGroups(label, root);
-          }
-        }
-      });
-      tab.addEventListener('keydown', function (e) {
-        let next = null;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          next = (i - 1 + tabs.length) % tabs.length;
-        } else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = tabs.length - 1;
-        if (next === null) return;
-        e.preventDefault();
-        activate(next);
-        tabs[next].focus();
-      });
-    });
-
-    root.classList.add('is-enhanced');
-    root._nsActivate = activate;
-    activate(0);
-  }
-
-  function syncRuntimeGroups(label, except) {
-    const groups = Array.prototype.slice.call(
-      document.querySelectorAll('.ns-tabbed[data-ns-runtime-group]'),
+// Tabs enhance visible HTML panels; runtime choices synchronize across groups and navigation.
+const RUNTIME_KEY = 'ns-runtime';
+const groups = [...document.querySelectorAll('.ns-tabbed')];
+const activators = new Map();
+function rememberRuntime(label, except) {
+  try {
+    localStorage.setItem(RUNTIME_KEY, label);
+  } catch { /* Persistence is optional. */ }
+  for (const [group, activate] of activators) {
+    if (group === except || !group.hasAttribute('data-ns-runtime-group')) continue;
+    const index = [...group.querySelectorAll('[role="tab"]')].findIndex((tab) =>
+      tab.dataset.nsRuntime === label
     );
-    groups.forEach(function (group) {
-      if (group === except || typeof group._nsActivate !== 'function') return;
-      const tabs = Array.prototype.slice.call(group.querySelectorAll('.ns-tabbed__tab'));
-      for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i].getAttribute('data-ns-runtime') === label) {
-          group._nsActivate(i);
-          break;
-        }
-      }
-    });
+    if (index >= 0) activate(index, false);
   }
-
-  function restoreRuntime() {
-    let label = null;
-    try {
-      label = localStorage.getItem('ns-runtime');
-    } catch {
-      return;
-    }
-    if (!label) return;
-    syncRuntimeGroups(label, null);
-  }
-
-  function init() {
-    Array.prototype.slice.call(document.querySelectorAll('.ns-tabbed')).forEach(setup);
-    restoreRuntime();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-
-(function () {
-  function setup(root) {
-    const select = root.querySelector('[data-ns-comparison-select]');
-    if (!select) return;
-
-    function activate(key) {
-      Array.prototype.slice.call(root.querySelectorAll('[data-ns-competitor]')).forEach(
-        function (node) {
-          if (node.getAttribute('data-ns-competitor') === key) {
-            node.removeAttribute('hidden');
-          } else {
-            node.setAttribute('hidden', '');
-          }
-        },
-      );
-      const option = select.options[select.selectedIndex];
-      const label = option ? option.textContent : 'Competitor';
-      Array.prototype.slice.call(root.querySelectorAll('[data-ns-competitor-label]')).forEach(
-        function (node) {
-          node.textContent = label;
-        },
-      );
-    }
-
-    select.addEventListener('change', function () {
-      activate(select.value);
-    });
-    root.classList.add('is-enhanced');
-    activate(select.value);
-  }
-
-  function init() {
-    Array.prototype.slice.call(document.querySelectorAll('[data-ns-comparison]')).forEach(setup);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-
-(function () {
-  function copyText(text, btn) {
-    const done = function () {
-      const prev = btn.textContent;
-      btn.textContent = 'Copied';
-      btn.classList.add('is-copied');
-      setTimeout(function () {
-        btn.textContent = prev;
-        btn.classList.remove('is-copied');
-      }, 1600);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, function () {});
-    }
-  }
-  function init() {
-    const pres = Array.prototype.slice.call(
-      document.querySelectorAll('.ns-prose pre, .ns-tabbed__panel pre'),
-    );
-    pres.forEach(function (pre) {
-      if (pre.querySelector('.ns-copy-btn')) return;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'ns-copy-btn';
-      btn.textContent = 'Copy';
-      btn.setAttribute('aria-label', 'Copy code to clipboard');
-      pre.classList.add('ns-pre--copyable');
-      pre.appendChild(btn);
-      btn.addEventListener('click', function () {
-        const code = pre.querySelector('code');
-        copyText((code || pre).innerText, btn);
-      });
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-
-// Keyboard users can enter code/table scrolling regions even when they contain no controls.
-for (const region of document.querySelectorAll('.ns-prose pre, .ns-prose table')) {
-  region.tabIndex = 0;
 }
+for (const group of groups) {
+  const tabs = [...group.querySelectorAll('[role="tab"]')];
+  const panels = [...group.querySelectorAll('[role="tabpanel"]')];
+  if (!tabs.length || tabs.length !== panels.length) continue;
+  const activate = (index, persist = true) => {
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('aria-selected', String(i === index));
+      tab.tabIndex = i === index ? 0 : -1;
+    });
+    panels.forEach((panel, i) => {
+      panel.hidden = i !== index;
+    });
+    if (persist && group.hasAttribute('data-ns-runtime-group')) {
+      rememberRuntime(tabs[index].dataset.nsRuntime, group);
+    }
+  };
+  activators.set(group, activate);
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => activate(index));
+    tab.addEventListener('keydown', (event) => {
+      let next;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        next = (index + tabs.length - 1) % tabs.length;
+      }
+      if (event.key === 'Home') next = 0;
+      if (event.key === 'End') next = tabs.length - 1;
+      if (next === undefined) return;
+      event.preventDefault();
+      activate(next);
+      tabs[next].focus();
+    });
+  });
+  group.classList.add('is-enhanced');
+  let selected = 0;
+  if (group.hasAttribute('data-ns-runtime-group')) {
+    try {
+      const stored = localStorage.getItem(RUNTIME_KEY);
+      const index = tabs.findIndex((tab) => tab.dataset.nsRuntime === stored);
+      if (index >= 0) selected = index;
+    } catch { /* Use first runtime. */ }
+  }
+  activate(selected, false);
+}
+for (const comparison of document.querySelectorAll('[data-ns-comparison]')) {
+  const select = comparison.querySelector('[data-ns-comparison-select]');
+  if (!select) continue;
+  const update = () => {
+    comparison.querySelectorAll('[data-ns-competitor]').forEach((node) => {
+      node.hidden = node.dataset.nsCompetitor !== select.value;
+    });
+    comparison.querySelectorAll('[data-ns-competitor-label]').forEach((node) => {
+      node.textContent = select.selectedOptions[0]?.textContent || 'Comparison';
+    });
+  };
+  select.addEventListener('change', update);
+  comparison.classList.add('is-enhanced');
+  update();
+}
+
+// Ordinary Markdown fences receive the same path header and non-copying line-number gutter.
+for (const pre of document.querySelectorAll('.ns-prose pre')) {
+  const code = pre.querySelector('code');
+  if (!code) continue;
+  pre.tabIndex = 0;
+  if (pre.closest('[data-code-block]')) continue;
+  const frame = document.createElement('div');
+  frame.className = 'ns-code-block';
+  frame.dataset.codeBlock = '';
+  const header = document.createElement('div');
+  header.className = 'ns-code-header';
+  const path = document.createElement('span');
+  path.className = 'ns-code-path';
+  path.textContent = code.textContent.match(
+    /(?:\/\/|#)\s+([\w./()-]+\.(?:tsx?|json|prisma|sql|sh|cs|py|go|yaml|yml))\b/,
+  )?.[1] || code.className.match(/language-(\S+)/)?.[1] || 'Code';
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'ns-copy-btn';
+  button.dataset.codeCopy = '';
+  button.textContent = 'Copy';
+  button.setAttribute('aria-label', `Copy ${path.textContent} code`);
+  header.append(path, button);
+  const body = document.createElement('div');
+  body.className = 'ns-code-body';
+  const gutter = document.createElement('div');
+  gutter.className = 'ns-code-gutter';
+  gutter.setAttribute('aria-hidden', 'true');
+  gutter.textContent = code.textContent.trimEnd().split('\n').map((_, i) => i + 1).join('\n');
+  pre.before(frame);
+  body.append(gutter, pre);
+  frame.append(header, body);
+}
+const status = document.createElement('span');
+status.className = 'ns-sr-only';
+status.setAttribute('role', 'status');
+document.body.append(status);
+async function copy(text, button) {
+  const previous = [...button.childNodes].map((node) => node.cloneNode(true));
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = 'Copied';
+    status.textContent = 'Copied to clipboard';
+  } catch {
+    button.textContent = 'Copy unavailable';
+    status.textContent = 'Clipboard unavailable. Select the text and copy it.';
+  }
+  setTimeout(() => {
+    button.replaceChildren(...previous);
+  }, 1800);
+}
+for (const button of document.querySelectorAll('[data-code-copy]')) {
+  button.addEventListener(
+    'click',
+    () => copy(button.closest('[data-code-block]').querySelector('pre code').textContent, button),
+  );
+}
+for (const button of document.querySelectorAll('[data-copy-path]')) {
+  button.addEventListener(
+    'click',
+    () =>
+      copy(
+        button.closest('.ns-file-path').querySelector('.ns-file-path__value').textContent,
+        button,
+      ),
+  );
+}
+for (const table of document.querySelectorAll('.ns-prose table')) table.tabIndex = 0;

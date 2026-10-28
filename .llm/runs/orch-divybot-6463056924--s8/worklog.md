@@ -71,3 +71,19 @@ Shell review requested a fix for overlapping mobile reference/TOC bars. Fixed by
 The isolated pinned Mermaid run now passes all 16 source SVG comparisons; only missing worker libraries/sandbox launch setup were addressed, without source or gate changes.
 
 Slice 2 repair review: PASS. Chromium article at 1280 Dark has zero serious/critical axe findings. At 390 Dark, the scrolled CLI section link remains visible/focusable; adding explicit focus to scroll regions resolves the table keyboard finding. Full strict matrix follows in slice 5. Reconcile: no ownership/lock drift, design-system destination still waits on sibling #2437; final composed link gate remains required.
+
+## Slice 3 — components and prose
+
+- Rebuilt all 16 existing Vento components while preserving arguments. Added the Utility signature kit and shared CodeBlock: path headers, gutters, tabs/runtime synchronization, clean copy text, ruled cards, two-column object API rows, native file lists, pager, status badges and semantic callouts.
+- Homepage now follows the reference hierarchy: display/install aside, pillars, quickstart runtime tabs, owned-source tree/code, four-column capability grid, learning path and footer. The existing contract explanation remains available in a disclosure; rendered homepage semantic checks remain intact.
+- Diagram filter maps only presentation to semantic ink roles, isolates all IDs and names inline SVG. Original renderer-owned assets stay byte-identical. Source `<img>` has `hidden` and `loading=lazy`; its raw source URL is base-prefixed once by the existing plugin, so the Markdown twin retains the correct canonical image URL/alt rather than a duplicate base path.
+- Gates passed: build and source/rendered-output checks; four tool tests (alias failure modes and real-SVG ID/name/paint contracts); structured tools/site typecheck, lint and TS format; docs snippets; representative home Light/1280, article Dark/390 and reference Dark/1280 browser/axe checks with zero serious/critical findings, zero page errors and no horizontal overflow.
+- B3 full built-twin/accessible-name assertions and two-diagram browser fixture are required in the final browser suite and IMPL-EVAL. Independent slice review pending.
+
+Slice 3 repair: preserved the existing fileTree single-root `tree` alias alongside items. Built runtime-config now includes runtime/current/features, and afterRender rejects any empty root file tree. Learning-path current state and scroll-surface tabindex now render without JavaScript; duplicate API row IDs yield to heading anchors. Heading permalinks are added after twin extraction to keep Markdown headings clean.
+
+B3 browser assertions PASS: hidden/lazy source image, canonical twin URL/alt, named inline diagram, and duplicate-free two-diagram fixture. Clipboard excludes gutter, runtime ArrowRight choice persists/reloads, all four no-JS panels remain visible, and blocked localStorage does not break drawer/content. Evidence: slice3-browser-evidence.json. A real assertion caught an async filter integration issue; the filter now returns its build-time SVG synchronously and the build itself rejects missing named SVGs.
+
+The old copper favicon is now a generated sharp N mark; its two semantic paint declarations come from the same Figma resolver in an embedded generated token layer. Freshness checks cover both outputs. No hand-authored palette.
+
+Slice 3 repair review: PASS; reviewer confirmed all B3 guards and source/twin contracts, fileTree alias, server-rendered keyboard/current-step states, generated favicon and no-JS paths. Applied the suggested short Permalink label to avoid repeating heading text in its accessible name. Reconcile: only owned site/tooling and run files changed, no generated Mermaid/source-content or lock changes. Full design-system link still depends on #2437. Next: Pagefind palette and mobile search.

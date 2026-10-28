@@ -302,13 +302,6 @@ kbd {
 .ns-nav-branch__summary::-webkit-details-marker {
   display: none;
 }
-.ns-nav-branch__summary a {
-  flex: 1;
-  padding-left: 22px;
-}
-.ns-nav-branch__summary a::before {
-  display: none;
-}
 .ns-nav-branch__summary .ns-nav-branch__chevron {
   order: -1;
   position: absolute;
@@ -317,10 +310,6 @@ kbd {
 }
 .ns-nav-branch[open] > summary .ns-nav-branch__chevron {
   transform: rotate(90deg);
-}
-.ns-nav-branch[open] > summary a {
-  color: var(--ns-fg);
-  font-weight: 500;
 }
 .ns-nav-branch__children {
   padding-left: 12px;

@@ -22,3 +22,8 @@ The docs build preserves its existing source-format and rendered-output checks. 
 `deno task --cwd docs/site verify` for build, links and caveats. Browser evidence uses the
 pinned dependencies in `tools/fresh-ui-browser`; the docs suite is separate from the scaffold
 gallery and has no accessibility baseline exemptions.
+
+The generator also emits the standalone SVG favicon. Its embedded semantic declarations are a
+second serialization of the same generated token layer; the path fills consume those named roles.
+Freshness checks verify both outputs. Renderer-owned diagram inputs stay byte-identical; the build
+inlines a semantic-paint presentation and retains a hidden lazy source image for Markdown twins.

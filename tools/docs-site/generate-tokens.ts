@@ -23,6 +23,7 @@ export const UTILITY_MODES: Readonly<Record<string, string>> = {
 
 const SOURCE = new URL('./figma-variables/', import.meta.url);
 const OUTPUT = new URL('../../docs/site/styles/tokens.css', import.meta.url);
+const FAVICON = new URL('../../docs/site/favicon.svg', import.meta.url);
 const SCHEMES = ['light', 'dark'] as const;
 const FOREIGN_PACK =
   /^(?:liquid|tactile|bloom|cupertino|fluent|pixel|tonal|glass|brutal|ledger|filigrane|signal)\//;
@@ -110,6 +111,21 @@ export function generateTokens(collections: readonly FigmaCollection[]): string 
   }\n`;
 }
 
+/** A standalone favicon embeds only its generated semantic roles, then consumes those roles. */
+export function generateFavicon(collections: readonly FigmaCollection[]): string {
+  const roles = SCHEMES.map((scheme) => {
+    const modes = { ...UTILITY_MODES, Scheme: scheme === 'light' ? 'Light' : 'Dark' };
+    const brand = resolveVariable(collections, 'Scheme/studio/signal/brand', modes);
+    const foreground = resolveVariable(collections, 'Scheme/studio/primary/fg', modes);
+    const declarations =
+      `:root{--ns-studio-signal-brand:${brand};--ns-studio-primary-fg:${foreground}}`;
+    return scheme === 'light' ? declarations : `@media(prefers-color-scheme:dark){${declarations}}`;
+  });
+  return `<!-- Generated token layer and logo by tools/docs-site/generate-tokens.ts. -->\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>${
+    roles.join('')
+  }</style><path fill="var(--ns-studio-signal-brand)" d="M0 0h32v32H0z"/><path fill="var(--ns-studio-primary-fg)" d="M8 24V8h4l8 11V8h4v16h-4L12 13v11z"/></svg>\n`;
+}
+
 /** Load every collection named by the export manifest. */
 export async function loadCollections(): Promise<FigmaCollection[]> {
   const index: { collections: { file: string }[] } = JSON.parse(
@@ -123,14 +139,20 @@ export async function loadCollections(): Promise<FigmaCollection[]> {
 }
 
 if (import.meta.main) {
-  const css = generateTokens(await loadCollections());
+  const collections = await loadCollections();
+  const css = generateTokens(collections);
+  const favicon = generateFavicon(collections);
   if (Deno.args.includes('--check')) {
     if (await Deno.readTextFile(OUTPUT) !== css) {
       throw new Error('Docs tokens are stale; regenerate with tools/docs-site/generate-tokens.ts');
     }
+    if (await Deno.readTextFile(FAVICON) !== favicon) {
+      throw new Error('Docs favicon tokens are stale');
+    }
     console.log('Utility token freshness: PASS');
   } else {
     await Deno.writeTextFile(OUTPUT, css);
+    await Deno.writeTextFile(FAVICON, favicon);
     console.log('Generated Utility Light and Dark tokens');
   }
 }

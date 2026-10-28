@@ -1,13 +1,4 @@
-{{# Lume component — docs/site/_components/learningPath.vto
-   Ordered, stepped strip of linked steps. Invoke:
-     {{ comp.learningPath({ steps: [{ label, href }, …] }) }}
-   Rendered as a real ordered list for semantics; visually a horizontal stepper that wraps.
-   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
-{{ set items = steps || [] }}
+{{# A real sequence; optional current URL marks a tutorial step without changing steps arguments. #}}
 <ol class="ns-learning-path" aria-label="Learning path">
-  {{ for step of items }}
-    <li class="ns-learning-path__step">
-      <a class="ns-learning-path__link" href="{{ step.href |> url }}">{{ step.label }}</a>
-    </li>
-  {{ /for }}
+  {{ for index, step of steps || [] }}<li class="ns-learning-path__step"><a class="ns-learning-path__link" href="{{ step.href |> url }}"{{ if url === step.href }} aria-current="step"{{ /if }}><span class="ns-learning-path__index">{{ String(index + 1).padStart(2, "0") }}</span><span>{{ step.label }}</span></a></li>{{ /for }}
 </ol>
