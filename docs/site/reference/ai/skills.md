@@ -6,67 +6,22 @@ templateEngine: [vento, md]
 
 # `@netscript/ai/skills`
 
-Load validated **Agent Skills** with progressive disclosure and optional semantic matching. A
-skill is a `SKILL.md` document — a small frontmatter block plus Markdown instructions — that an
-agent can discover cheaply by tags (or embeddings) and only fully disclose when it is actually
-selected. This subpath is a **library surface only**: it has no CLI verbs and takes no
-`@netscript/*` runtime dependency. For the full package index return to the
-[`@netscript/ai` reference](/reference/ai/) or the [reference overview](/reference/).
+Load validated Agent Skills with progressive disclosure and optional semantic matching. A skill is a
+`SKILL.md` document, a small front matter block plus Markdown instructions, that an agent discovers
+cheaply by tags or embeddings and reads in full only when it is selected. Use this sub-path of
+[`@netscript/ai`](/reference/ai/) to load skills at runtime.
 
-{{ comp callout { type: "note", title: "Library surface vs. installed skills" } }}
-This page is the <strong>loader API</strong> — the code you call to discover and
-disclose <code>SKILL.md</code> documents at runtime. It is distinct from the
-<strong>public skill bundle</strong> that <code>netscript agent init</code> installs
-for a coding agent (the next section). The library loads skills; the bundle is a set
-of five ready-made skills that teach an agent the NetScript vocabulary.
-{{ /comp }}
+## Sub-path exports
 
-## Installed NetScript skills
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/ai/skills` | `./src/skills/mod.ts` | [Composition](#composition), [matching primitives](#matching-primitives) and [types](#types) for loading `SKILL.md` documents. |
 
-`netscript agent init` installs five first-party skills and a symptom playbook in the canonical
-`.agents/skills/` tree and adds a marked NetScript section to `AGENTS.md` for every host. The
-Claude Code host integration is the fallback default when no host is selected or detected from
-project markers or the invoking environment. It writes `.mcp.json`, the single discovery bridge
-`.claude/skills/repo-skills/SKILL.md`, and a `CLAUDE.md` import of `@AGENTS.md` (merged
-idempotently into existing content); the VS Code editor writes `.vscode/mcp.json`; Zed writes native
-`context_servers` into `.zed/settings.json`; OpenCode gets `opencode.json` and discovers
-`.agents/skills/` natively. The `AGENTS.md` section names each skill by its registered name
-("call the `netscript-build` skill"). Hosts that register those names use their skill tool; on Claude
-Code, call `repo-skills` with the requested skill name. Its bridge instructions permit reading the
-canonical `.agents/skills/<name>/SKILL.md` and bundled references. Select an editor with
-`netscript agent init --editor none|zed|vscode`, including on a cloned existing project. They share
-one vocabulary with the
-`netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#what-the-server-exposes),
-so an agent routes to a workflow and then reaches for the matching CLI verb or MCP tool.
-
-| Skill | Role |
-| --- | --- |
-| `netscript` | Router. Dispatches a task to the build or operate skill (or to the Aspire skill for orchestration); it is not useful on its own. |
-| `netscript-build` | Scaffold and build with real `netscript` CLI verbs: `init`, the contract-first flow, the database lifecycle, adding and syncing plugins, adding services and UI, and generating registries. |
-| `netscript-operate` | Monitor, debug, and analyze a running app through the bounded MCP tools: health, recent runs, one execution end to end, recent errors, job results, service and database performance, and doc search. |
-| `aspire` | Diagnose orchestration and runtime state from symptoms with resource descriptions, console logs, structured logs, spans, traces, and targeted resource control. |
-| `deno` | Diagnose runtime and toolchain problems with focused checks, module-resolution inspection, permissions, test sanitizers, cache evidence, and API docs. |
-
-These are the skills named in the bundle manifest and installed as an atomic set. The companion
-`.agents/skills/help.md` playbook starts from symptoms—including broken plugin wiring—and routes to
-the first diagnostic command; Claude Code reaches the same canonical playbook through its bridge;
-re-running `netscript agent init` is idempotent. See
-[Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP combo.
-
-The upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`,
-`aspire-deployment`) can be installed beside NetScript's `aspire` diagnostic skill by explicit
-name; they never overwrite `aspire/SKILL.md`. Agent initialization uses only Aspire's standard
-`.agents/skills/` location. It preserves existing legacy mirrors and custom Claude skills, and warns
-when known legacy skill directories remain because they are no longer refreshed. Legacy mirror
-cleanup and divergent-file reporting remain follow-up work.
-
-Agents connect to the Aspire MCP server with `aspire agent mcp`, or with the dashboard-only form
-`aspire agent mcp --dashboard-url <url>` (plus an optional `--api-key`). Aspire 13.5.3 exposes a
-**14-tool MCP baseline**: `list_resources`, `list_console_logs`, `list_structured_logs`,
-`list_traces`, `list_trace_structured_logs`, `execute_resource_command`, `list_apphosts`,
-`select_apphost`, `list_integrations`, `list_docs`, `search_docs`, `get_doc`, `doctor`, and
-`refresh_tools`. (`get_integration_docs` is documented upstream on aspire.dev but was not observed
-at 13.5.3.)
+The sub-path is a library surface only: it has no CLI verbs and takes no `@netscript/*` runtime
+dependency. Nothing here reads the environment or performs IO on its own. Content enters through an
+injected `SkillContentSource`, and semantic ranking runs only when you supply a
+`SkillEmbeddingProvider`. It is published as the `./skills` export of `@netscript/ai` (version
+`{{ releaseVersion }}`):
 
 ```ts
 import {
@@ -75,16 +30,11 @@ import {
 } from "jsr:@netscript/ai{{ releaseSpecifier }}/skills";
 ```
 
-The subpath is published as the `./skills` export of `@netscript/ai` (version
-`{{ releaseVersion }}`). Nothing here reads the environment or performs IO on its own: content
-enters through an injected `SkillContentSource`, and semantic ranking is only performed when you
-supply a `SkillEmbeddingProvider`.
-
 ## The skill document
 
-`parseSkillMarkdown` is the single validator for the blessed `SKILL.md` shape. The frontmatter
-must be a closed `---` block whose only allowed keys are the four required fields; the body is the
-Markdown that follows and must be non-empty.
+`parseSkillMarkdown` is the single validator for the `SKILL.md` shape. The front matter must be a
+closed `---` block whose only allowed keys are the four required fields; the body is the Markdown
+that follows and must be non-empty.
 
 | Frontmatter field | Rule |
 | --- | --- |
@@ -108,11 +58,11 @@ Inspect the diff and report actionable findings.
 
 ## Progressive disclosure
 
-The design keeps cheap metadata enumeration separate from full-content reads. A
-`SkillContentSource` lists validated `SkillSummary` rows (id, name, tags, description — no body)
-and loads the raw `SKILL.md` for one id on demand. A `SkillLoaderPort` composes over a source: it
-matches summaries first, and only `load(id)` parses and validates the full `SkillDocument`
-(summary + `body`). This is the same two-phase shape the runtime's `skills` capability port speaks.
+Metadata enumeration stays separate from full-content reads. A `SkillContentSource` lists validated
+`SkillSummary` rows (id, name, tags, description, no body) and loads the raw `SKILL.md` for one id
+on demand. A `SkillLoaderPort` composes over a source: it matches summaries first, and only
+`load(id)` parses and validates the full `SkillDocument` (summary plus `body`). The runtime's
+`skills` capability port uses the same two-phase shape.
 
 ## Surface
 
@@ -126,8 +76,8 @@ matches summaries first, and only `load(id)` parses and validates the full `Skil
 
 ### Matching primitives
 
-The loader delegates to two pure ranking functions, also exported directly for callers that hold
-their own summaries. Both return results sorted by descending score.
+The loader delegates to two pure ranking functions, also exported for callers that hold their own
+summaries. Both return results sorted by descending score.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -153,16 +103,15 @@ their own summaries. Both return results sorted by descending score.
 ## Default runtime port
 
 The runtime's `skills` capability is a `SkillLoaderPort`. When `AiRuntimeConfig.skills` is omitted,
-`createAiRuntime` injects a no-op loader that lists and matches nothing — so agent code can call
-the port unconditionally before any skills are wired.
+`createAiRuntime` injects a no-op loader that lists and matches nothing, so agent code can call the
+port before any skills are wired.
 
 | `AiRuntimeConfig` field | Port | Default when omitted |
 | --- | --- | --- |
 | `skills` | `SkillLoaderPort` | No-op returning no skills (`createNoopSkillLoader` from `@netscript/ai/ports`). |
 
-Provide a real loader by wiring one built here into the runtime config; see the
-[runtime capability ports](/reference/ai/#runtime-capability-ports-and-their-defaults) table on the
-package page.
+To provide a real loader, wire one built here into the runtime config; see
+[runtime capability ports](/reference/ai/#runtime-capability-ports-and-their-defaults).
 
 ## Examples
 
@@ -219,7 +168,7 @@ const ranked = await loader.matchByQuery("find bugs in my patch", {
 
 ### Rank summaries you already hold
 
-`matchByTags` and `matchBySemantic` are pure and usable without a loader:
+`matchByTags` and `matchBySemantic` are pure and work without a loader:
 
 ```ts
 import { matchByTags } from "@netscript/ai/skills";
@@ -229,7 +178,29 @@ const results = matchByTags(summaries, ["quality"]);
 // results: [{ skill, score, modes: ["tag"] }, ...] sorted by descending score
 ```
 
----
+## Installed NetScript skills
 
-Back to the [`@netscript/ai` reference](/reference/ai/) or the
-[reference overview](/reference/).
+This library is distinct from the skill bundle that `netscript agent init` installs for a coding
+agent. The bundle is five ready-made skills, installed as an atomic set in `.agents/skills/` with a
+symptom playbook at `.agents/skills/help.md`. Hosts, generated files and re-running are covered in
+[Agent tooling](/ai/agent-tooling/).
+
+| Skill | Role |
+| --- | --- |
+| `netscript` | Router. Dispatches a task to the build or operate skill (or to the Aspire skill for orchestration); it is not useful on its own. |
+| `netscript-build` | Scaffold and build with real `netscript` CLI verbs: `init`, the contract-first flow, the database lifecycle, adding and syncing plugins, adding services and UI, and generating registries. |
+| `netscript-operate` | Monitor, debug, and analyze a running app through the bounded MCP tools: health, recent runs, one execution end to end, recent errors, job results, service and database performance, and doc search. |
+| `aspire` | Diagnose orchestration and runtime state from symptoms with resource descriptions, console logs, structured logs, spans, traces, and targeted resource control. |
+| `deno` | Diagnose runtime and toolchain problems with focused checks, module-resolution inspection, permissions, test sanitizers, cache evidence, and API docs. |
+
+The upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`,
+`aspire-deployment`) can be installed beside NetScript's `aspire` diagnostic skill by explicit name;
+they never overwrite `aspire/SKILL.md`.
+
+Agents connect to the Aspire MCP server with `aspire agent mcp`, or with the dashboard-only form
+`aspire agent mcp --dashboard-url <url>` (plus an optional `--api-key`). Aspire 13.5.3 exposes a
+**14-tool MCP baseline**: `list_resources`, `list_console_logs`, `list_structured_logs`,
+`list_traces`, `list_trace_structured_logs`, `execute_resource_command`, `list_apphosts`,
+`select_apphost`, `list_integrations`, `list_docs`, `search_docs`, `get_doc`, `doctor`, and
+`refresh_tools`. (`get_integration_docs` is documented upstream on aspire.dev but was not observed
+at 13.5.3.)

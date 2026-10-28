@@ -5,31 +5,26 @@ title: "@netscript/plugin-ai-core"
 
 # `@netscript/plugin-ai-core`
 
-The contract-only core for the NetScript AI plugin: the oRPC `/v1/ai` route surface — an
-SSE-framed `chat` stream plus `models`, `tools/{name}`, `embed`, and `transcribe` — that a
-connector implements and the typed client calls. This page is written against the package's
-public surface reported by `deno doc`. For the full index of packages and plugins return to the
-[reference overview](/reference/).
+The contract-only core of the NetScript AI plugin: the oRPC `/v1/ai` route surface, an SSE-framed
+`chat` stream plus `models`, `tools/{name}`, `embed`, and `transcribe`, that a connector implements
+and the typed client calls. Use it to implement or call the AI plugin's API; it ships no service
+implementation.
 
-The package ships **zero service implementation** (Archetype 1 — Small Contract). It declares the
-route shapes and their Zod IO vocabulary; a connector (`@netscript/plugin-ai`) binds the contract
-to a host and the `@netscript/fresh/ai` client generates a typed caller from it. Every route schema
-mirrors an engine type from `@netscript/ai/contracts`, and a compile-time drift guard
-(`z.ZodType<EngineType> = schema`) asserts the mirror cannot silently diverge from the domain
-contract.
-
-## Exports
-
-The package publishes two entrypoints. Each is documented against its own `deno doc` surface.
+## Sub-path exports
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/plugin-ai-core` | `./mod.ts` | Contract handles, router helpers, and route IO types (documented below). |
-| `@netscript/plugin-ai-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Full contract surface: the Zod `*Schema` validators plus the engine-derived vocabulary types. |
+| `@netscript/plugin-ai-core` | `./mod.ts` | [Contract handles, router helpers, and route IO types](#root-surface-netscriptplugin-ai-core). |
+| `@netscript/plugin-ai-core/contracts/v1` | `./src/contracts/v1/mod.ts` | [Full contract surface](#full-contract-surface-netscriptplugin-ai-corecontractsv1): the Zod `*Schema` validators plus the engine-derived vocabulary types. |
 
-The root path curates to the handles and IO types a typical consumer imports (staying within the
-≤20-export doctrine budget); the `./contracts/v1` subpath exposes the complete schema and
-engine-vocabulary set a connector wires.
+The root path holds the handles and IO types a typical consumer imports; `./contracts/v1` exposes
+the complete schema and engine-vocabulary set a connector wires.
+
+The package declares the route shapes and their Zod IO vocabulary. A connector
+(`@netscript/plugin-ai`) binds the contract to a host, and the `@netscript/fresh/ai` client
+generates a typed caller from it. Every route schema mirrors an engine type from
+`@netscript/ai/contracts`, and a compile-time guard (`z.ZodType<EngineType> = schema`) keeps the
+mirror from diverging from the domain contract.
 
 ## Root surface (`@netscript/plugin-ai-core`)
 
@@ -68,9 +63,9 @@ above, and the following additional symbols.
 
 ### Zod IO schemas
 
-Each schema is a named, explicitly-annotated Zod validator (annotated `z.ZodType<EngineType>` so the
-module fails to compile if it drifts from the engine contract it mirrors). A connector validates
-inbound bodies and outbound frames against these.
+Each schema is a named Zod validator annotated `z.ZodType<EngineType>`, so the module fails to compile
+if it drifts from the engine contract it mirrors. A connector validates inbound bodies and outbound
+frames against these.
 
 | Symbol | Kind | Validates |
 | --- | --- | --- |
@@ -128,13 +123,12 @@ The contract layers five plugin-specific routes onto the base seam `describe` ro
 
 ## SSE chat contract (durable-CHAT)
 
-`chat` is the streaming centerpiece. Its output is not a request/response pair but an oRPC
-**`eventIterator`** whose element type is `ChatChunk` — an alias of the engine `AgentChunk` union.
-Because the contract output type is an async event-iterator, a connector's `chat` handler must be an
+`chat` output is an oRPC `eventIterator` whose element type is `ChatChunk`, an alias of the engine
+`AgentChunk` union, not a request/response pair. A connector's `chat` handler must therefore be an
 async generator that yields frames; a buffered single-response implementation does not type-check.
-Recoverable and terminal errors surface **in-stream** as the `error` chunk rather than as an oRPC
-error, matching the engine's streaming model — so the `chat` route (built with `oc.route`, not the
-base contract) carries an empty error map.
+Recoverable and terminal errors surface in-stream as the `error` chunk rather than as an oRPC error,
+matching the engine's streaming model, so the `chat` route (built with `oc.route`, not the base
+contract) carries an empty error map.
 
 ### Event (chunk) shapes
 
@@ -150,18 +144,17 @@ Each streamed frame is one of seven discriminated shapes, keyed on `type`:
 | `error` | `{ error: string, cause?: unknown }` | A recoverable or terminal error surfaced through the stream. |
 | `done` | `{ usage?: Usage }` | Terminal frame closing the run, optionally carrying final usage. |
 
-> **The contract declares frame shapes, not wire headers.** `@netscript/plugin-ai-core` is a
-> transport-agnostic oRPC contract: the `text/event-stream` wire framing (per-frame `data:` lines,
-> the response content type) is produced by the oRPC handler at the host mount point when it serves
-> an `eventIterator` output, not declared in this package. This page documents the event *shapes*
-> the stream carries; the HTTP framing belongs to the connector's service host.
+> [!NOTE]
+> The contract declares frame shapes, not wire headers. The `text/event-stream` framing (per-frame
+> `data:` lines, the response content type) is produced by the oRPC handler at the host mount point
+> when it serves an `eventIterator` output. The HTTP framing belongs to the connector's service host.
 
 ## Base-contract extension
 
 `aiContract` spreads `BASE_PLUGIN_CONTRACT_ROUTES` from
 [`@netscript/plugin/contract-base`](https://jsr.io/@netscript/plugin) verbatim, so it inherits the
 mandatory `describe` route (GET `/describe`) unchanged. `describe` returns a
-marketplace-discoverable `AiCapabilities` document — a named alias of `PluginCapabilities`:
+marketplace-discoverable `AiCapabilities` document, a named alias of `PluginCapabilities`:
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -184,9 +177,8 @@ the shared plugin error vocabulary from `BASE_PLUGIN_ERRORS`:
 A connector binds its host request context and implements each route handler. The precise per-route
 IO types check every handler; there is no erasure cast on the contract or the implementer.
 
-`aiContractV1.$context<TContext>()` returns the contract-bound **implementer** — `AiRouter` is the
-type alias naming its default (empty-context) shape, and `ContextualAiRouter<TContext>` the
-context-parameterized one. The implementer is not an assembled handler map: each route on it
+`aiContractV1.$context<TContext>()` returns the contract-bound implementer. `AiRouter` names its
+default (empty-context) shape and `ContextualAiRouter<TContext>` the context-parameterized one. The implementer is not an assembled handler map: each route on it
 exposes a `.handler()` call that binds one implementation function.
 
 ```typescript
@@ -205,9 +197,9 @@ const chat = router.chat.handler(async function* ({ input }) {
 // models / invokeTool / embed / transcribe / describe bind the same way.
 ```
 
-Assembling all six bound routes by hand is what `createAiRouter` exists to avoid: it wraps
-`aiContractV1.$context()`, binds a complete per-route implementation (`AiRouterImplementation`)
-in one call, and returns the bound handler map (`BoundAiRouter`):
+`createAiRouter` saves assembling all six bound routes by hand: it wraps `aiContractV1.$context()`,
+binds a complete per-route implementation (`AiRouterImplementation`) in one call, and returns the
+bound handler map (`BoundAiRouter`):
 
 ```typescript
 import { createAiRouter } from '@netscript/plugin-ai-core';
@@ -250,17 +242,13 @@ console.log(request.model, chunk.type);
 
 ## How the AI plugin stack consumes this contract
 
-- **Connector (`@netscript/plugin-ai`)** — re-exports this contract surface from its own
+- **Connector (`@netscript/plugin-ai`)** re-exports this contract surface from its own
   `./contracts/v1` (`export * from '@netscript/plugin-ai-core/contracts/v1'`) and declares the
   loader on its manifest (`withContractVersions`), so a host binds the AI plugin against a single
   pinned `/v1/ai` contract. It binds `aiContractV1.$context<Ctx>()` and implements each route against
   a provider adapter.
-- **`@netscript/fresh/ai` client** — imports `aiContract` and generates a typed caller, so a Fresh
+- **`@netscript/fresh/ai` client** imports `aiContract` and generates a typed caller, so a Fresh
   island streams `chat` chunks and calls `models` / `embed` / `transcribe` with full type inference
   and no hand-written request types.
-- **Marketplace tooling** — reads the `describe` route's `AiCapabilities` document to introspect a
+- **Marketplace tooling** reads the `describe` route's `AiCapabilities` document to introspect a
   running AI plugin without parsing source.
-
----
-
-Back to the [reference overview](/reference/).

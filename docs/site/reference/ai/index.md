@@ -5,17 +5,33 @@ title: "@netscript/ai"
 
 # `@netscript/ai`
 
-The provider-agnostic AI engine core for NetScript: a composition root, a global model
-registry, the domain vocabulary and capability ports for chat/embeddings/vision/tools/agents/MCP,
-and a set of opt-in provider adapters. This page is written against the package's public surface
-reported by `deno doc`. For the full index of packages and plugins return to the
-[reference overview](/reference/).
+The provider-agnostic AI engine core for NetScript: a composition root, a global model registry, the
+domain vocabulary and capability ports for chat, embeddings, vision, tools, agents and MCP, and
+opt-in provider adapters. Use it to call language models from NetScript code without binding to one
+provider SDK.
 
-The base `@netscript/ai` entrypoint takes **no** `@netscript/*` runtime dependency and pulls no
-provider SDK into the module graph. Provider adapters (Anthropic, OpenAI-compatible, OpenRouter,
-Ollama, OpenAI embeddings/vision) live on **separate subpath exports** and **self-register** into
-the shared registry as a side effect of being imported — so an application chooses its providers
-with one-line side-effect imports and only those SDKs enter the graph:
+## Sub-path exports
+
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/ai` | `./mod.ts` | [Composition root](#composition-root-and-model-registry-netscriptai) (`createAiRuntime` / `getAiRuntime`) and the model registry accessors. |
+| `@netscript/ai/contracts` | `./src/contracts/mod.ts` | [Domain vocabulary](#domain-contracts-netscriptaicontracts): messages, content parts, model identity, agent chunks, usage, errors. |
+| `@netscript/ai/ports` | `./src/ports/mod.ts` | [Capability port interfaces](#capability-ports-netscriptaiports), their no-op/unconfigured defaults, and the provider registries. |
+| `@netscript/ai/skills` | `./src/skills/mod.ts` | [Validated Agent Skills](/reference/ai/skills/) parsing, loading, tag and semantic matching, and an in-memory content source. |
+| `@netscript/ai/anthropic` | `./anthropic.ts` | [Anthropic model provider](#netscriptaianthropic) (wraps `@tanstack/ai-anthropic`). |
+| `@netscript/ai/openai-compatible` | `./openai-compatible.ts` | [OpenAI-compatible model provider](#netscriptaiopenai-compatible) (any base URL / key / model list). |
+| `@netscript/ai/openrouter` | `./openrouter.ts` | [OpenRouter model provider](#netscriptaiopenrouter) with reasoning-effort passthrough. |
+| `@netscript/ai/ollama` | `./ollama.ts` | [Local Ollama model provider](#netscriptaiollama) with a reachability preflight. |
+| `@netscript/ai/openai-embeddings` | `./openai-embeddings.ts` | [OpenAI-compatible embeddings and vision provider](#netscriptaiopenai-embeddings). |
+| `@netscript/ai/tools` | `./tools.ts` | [Standard Schema tool definitions](#tools-netscriptaitools), in-memory registry, and the `render_ui` wire contract. |
+| `@netscript/ai/agent` | `./agent.ts` | The [agent loop](#agent-loop-netscriptaiagent), typestate, and history strategies. |
+| `@netscript/ai/mcp` | `./mcp.ts` | [MCP transports](#mcp-netscriptaimcp) (stdio, Streamable-HTTP), auth modes, and tool registration. |
+| `@netscript/ai/testing` | `./src/testing/mod.ts` | [Deterministic fakes](#testing-netscriptaitesting) for downstream unit tests. |
+
+The root entrypoint has no `@netscript/*` runtime dependency and pulls no provider SDK into the
+module graph. Each provider adapter lives on its own sub-path and registers itself in the shared
+registry when imported, so you choose providers with side-effect imports and only those SDKs enter
+the graph:
 
 ```ts
 import "@netscript/ai/anthropic"; // self-registers the 'anthropic' provider
@@ -24,32 +40,11 @@ import { getModel } from "@netscript/ai";
 const handle = await getModel("anthropic:claude-sonnet-4-5");
 ```
 
-## Exports
-
-The package publishes the following entrypoints. Each is documented against its own `deno doc`
-surface.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/ai` | `./mod.ts` | Composition root (`createAiRuntime` / `getAiRuntime`) and the model registry accessors. |
-| `@netscript/ai/contracts` | `./src/contracts/mod.ts` | Domain vocabulary: messages, content parts, model identity, agent chunks, usage, errors. |
-| `@netscript/ai/ports` | `./src/ports/mod.ts` | Capability port interfaces, their no-op/unconfigured defaults, and the provider registries. |
-| `@netscript/ai/skills` | `./src/skills/mod.ts` | Validated Agent Skills parsing, loading, tag and semantic matching, and an in-memory content source. |
-| `@netscript/ai/anthropic` | `./anthropic.ts` | Anthropic model provider (wraps `@tanstack/ai-anthropic`). |
-| `@netscript/ai/openai-compatible` | `./openai-compatible.ts` | OpenAI-compatible model provider (any base URL / key / model list). |
-| `@netscript/ai/openrouter` | `./openrouter.ts` | OpenRouter model provider with reasoning-effort passthrough. |
-| `@netscript/ai/ollama` | `./ollama.ts` | Local Ollama model provider with a reachability preflight. |
-| `@netscript/ai/openai-embeddings` | `./openai-embeddings.ts` | OpenAI-compatible embeddings **and** vision provider. |
-| `@netscript/ai/tools` | `./tools.ts` | Standard-Schema tool definitions, in-memory registry, and the `render_ui` wire contract. |
-| `@netscript/ai/agent` | `./agent.ts` | The E3 agent loop, typestate, and history strategies. |
-| `@netscript/ai/mcp` | `./mcp.ts` | MCP transports (stdio, Streamable-HTTP), auth modes, and tool registration. |
-| `@netscript/ai/testing` | `./src/testing/mod.ts` | Deterministic fakes for downstream unit tests. |
-
 ## Composition root and model registry (`@netscript/ai`)
 
-The root entrypoint is the composition root plus the model-registry accessors. Model providers
-are resolved through a module-level registry (not stored on the runtime), so provider packages
-self-register independently of runtime construction.
+The composition root plus the model-registry accessors. Model providers are resolved through a
+module-level registry, not stored on the runtime, so provider packages register independently of
+runtime construction.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -78,12 +73,11 @@ self-register independently of runtime construction.
 | `withRetryingEmbeddingProvider` | function | `withRetryingEmbeddingProvider(provider, policy): EmbeddingProviderPort` | Wrap an embedding provider with opt-in rate-limit retries. |
 | `AiRetryPolicy` | interface | - | Opt-in retry config (maxAttempts, delays, factor, classifiers). |
 
-
 ### Runtime capability ports and their defaults
 
 `createAiRuntime` injects each capability port, defaulting any omitted field to a no-op or a
-throwing "unconfigured" port. Model providers are **not** on the runtime — they are resolved from
-the global registry.
+throwing "unconfigured" port. Model providers are not on the runtime; they are resolved from the
+global registry.
 
 | `AiRuntimeConfig` field | Port | Default when omitted |
 | --- | --- | --- |
@@ -99,8 +93,8 @@ the global registry.
 
 ## Domain contracts (`@netscript/ai/contracts`)
 
-The provider-neutral vocabulary. The tables below list the primary surface; the module is the
-source of truth via `deno doc packages/ai/src/contracts/mod.ts`.
+The provider-neutral vocabulary. The table lists the primary surface; `deno doc` on the module lists
+everything.
 
 | Group | Symbols |
 | --- | --- |
@@ -115,7 +109,7 @@ source of truth via `deno doc packages/ai/src/contracts/mod.ts`.
 ## Capability ports (`@netscript/ai/ports`)
 
 The capability seams the engine is programmed against, their default implementations, and the
-model/embedding/vision registries. Primary surface:
+model, embedding and vision registries. Primary surface:
 
 | Group | Symbols |
 | --- | --- |
@@ -132,11 +126,10 @@ model/embedding/vision registries. Primary surface:
 
 ## Model providers
 
-Each provider lives on its own subpath. Importing the subpath self-registers the provider under
-its stable id and re-exports the adapter class and config type for direct construction. All chat
-adapters translate the wrapped SDK to the owned chat vocabulary — no provider-SDK type escapes the
-public surface — and support per-turn cancellation through the chat client's `stream(_, { signal })`
-option.
+Each provider lives on its own sub-path. Importing it registers the provider under its stable id
+and re-exports the adapter class and config type for direct construction. Chat adapters translate
+the wrapped SDK to the owned chat vocabulary, so no provider-SDK type escapes the public surface,
+and support per-turn cancellation through the chat client's `stream(_, { signal })` option.
 
 ### `@netscript/ai/anthropic`
 
@@ -244,10 +237,9 @@ Speaks the OpenAI-compatible HTTP API directly with Web `fetch` (no provider SDK
 
 ## Tools (`@netscript/ai/tools`)
 
-Define server-executable (or client-deferred) tools, validate their input with **Standard
-Schema** (bring any conforming schema — zod, valibot, arktype, or hand-written), and dispatch them
-through an in-memory registry that satisfies `ToolRegistryPort`. The core adds no schema DSL and
-takes no `@netscript/*` dependency.
+Define server-executable or client-deferred tools, validate their input with any Standard Schema
+(zod, valibot, arktype or hand-written), and dispatch them through an in-memory registry that
+satisfies `ToolRegistryPort`. The core adds no schema DSL and takes no `@netscript/*` dependency.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -266,9 +258,8 @@ takes no `@netscript/*` dependency.
 
 ## Agent loop (`@netscript/ai/agent`)
 
-The E3 agent loop drives a bounded, cancellable model/tool interaction and emits `AgentChunk`s.
-It consumes its collaborators purely by factory injection — importing this subpath pulls **no**
-provider SDK.
+The agent loop drives a bounded, cancellable model/tool interaction and emits `AgentChunk`s. It
+receives its collaborators by factory injection, so importing this sub-path pulls no provider SDK.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -287,7 +278,7 @@ provider SDK.
 | `AgentMaxStepsExceededError` | class | Thrown when a run exceeds its step ceiling. |
 
 The subpath also re-exports the seams the loop is programmed against (`AgentLoopPort`,
-`ChatClientPort` / `ChatModelProviderPort` and their event types, `ToolRegistryPort`) so it is a
+`ChatClientPort` / `ChatModelProviderPort` and their event types, `ToolRegistryPort`), so it is a
 self-contained wiring surface.
 
 ## MCP (`@netscript/ai/mcp`)
@@ -308,8 +299,8 @@ modes, and lifecycle state.
 
 ## Testing (`@netscript/ai/testing`)
 
-Deterministic fakes for unit-testing code built on the ports. This subpath is excluded from the
-provider dependency graph.
+Deterministic fakes for unit-testing code built on the ports. This sub-path is outside the provider
+dependency graph.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -324,9 +315,9 @@ provider dependency graph.
 
 ## Configuration
 
-`@netscript/ai` reads no `@netscript/*` config surface — capabilities are wired through
+`@netscript/ai` reads no `@netscript/*` config surface. Capabilities are wired through
 `AiRuntimeConfig` (see [runtime capability ports](#runtime-capability-ports-and-their-defaults))
-and providers through their config bags. Two adapters resolve an API key from the environment when
+and providers through their config objects. Two adapters resolve an API key from the environment when
 `apiKey` is omitted:
 
 | Environment variable | Read by | When |
@@ -336,16 +327,17 @@ and providers through their config bags. Two adapters resolve an API key from th
 | `ANTHROPIC_API_KEY` | `@netscript/ai/anthropic` | Final environment fallback when `apiKey` is omitted (via the wrapped `@tanstack/ai-anthropic` client). |
 | `OPENROUTER_API_KEY` | `@netscript/ai/openrouter` | When `apiKey` is omitted (exported as `OPENROUTER_API_KEY_ENV`). |
 
-> The `openai-compatible`, `openai-embeddings`, and `ollama` providers do **not** read the
-> environment. Pass `apiKey` (and `baseURL`/`host`) explicitly — commonly from
-> `Deno.env.get(...)` in your composition code. Reading a key from the environment requires
-> `--allow-env` for the variable in question.
+> [!NOTE]
+> The `openai-compatible`, `openai-embeddings`, and `ollama` providers do not read the
+> environment. Pass `apiKey` (and `baseURL`/`host`) explicitly, commonly from `Deno.env.get(...)`
+> in your composition code. Reading a key from the environment requires `--allow-env` for that
+> variable.
 
-> **Provider keys have no typed config surface — by design.** Unlike service topology (typed
-> through `@netscript/config`), AI provider credentials are **not** modelled in
-> `netscript.config.ts`. Reading the key with raw `Deno.env.get(...)` (or letting the Anthropic /
-> OpenRouter adapters resolve their env var) is the **supported** path — secrets stay out of the
-> committed config and are injected by the runtime environment instead.
+Provider keys have no typed config surface by design. Unlike service topology, which is typed
+through `@netscript/config`, AI provider credentials are not modelled in `netscript.config.ts`.
+Reading the key with `Deno.env.get(...)`, or letting the Anthropic and OpenRouter adapters resolve
+their variable, is the supported path: secrets stay out of committed config and come from the
+runtime environment.
 
 ## Examples
 
@@ -459,14 +451,17 @@ const registry = createToolRegistry();
 await registerMcpTools(registry, transport);
 ```
 
-### Opt-in Rate-Limit Retries
+### Opt-in rate-limit retries
 
-Wrap any concrete `ChatClientPort` or `EmbeddingProviderPort` with `withRetryingChatClient` / `withRetryingEmbeddingProvider` to add automatic exponential backoff with full jitter for rate limits.
+Wrap a `ChatClientPort` or `EmbeddingProviderPort` with `withRetryingChatClient` /
+`withRetryingEmbeddingProvider` to add exponential backoff with full jitter for rate limits.
 
-> **Failure & Replay Contract:**
-> - Only rate limit failures (HTTP `429` status code, `AiRateLimitError`, or errors classified by `isRateLimitError`) trigger a retry.
-> - Bounded delays respect `Retry-After` headers (in seconds or HTTP date formats) or fallback to exponential delay, capped by `maxDelayMs`.
-> - **Chat Stream Safety:** Chat streams are never replayed/retried after the first chunk has been successfully yielded to the caller. This ensures that half-written responses are not duplicated or restarted mid-stream.
+- Only rate-limit failures (HTTP `429`, `AiRateLimitError`, or errors classified by
+  `isRateLimitError`) trigger a retry.
+- Bounded delays respect `Retry-After` headers (seconds or HTTP date) or fall back to exponential
+  delay, capped by `maxDelayMs`.
+- Chat streams are never replayed after the first chunk reaches the caller, so half-written
+  responses are not duplicated or restarted mid-stream.
 
 ```ts
 import { getModelProvider, AiRateLimitError } from "@netscript/ai";
@@ -506,14 +501,16 @@ try {
 }
 ```
 
-### Manage Token Budgets in Agent Loops
+### Manage token budgets in agent loops
 
-The `tokenBudgetHistory` strategy is a token-aware alternative to a simple sliding message window. It keeps the context window bounded by evaluating message token sizes and trimming the history.
+`tokenBudgetHistory` is a token-aware alternative to a sliding message window. It keeps the context
+bounded by measuring message token sizes and trimming the history.
 
-> **Trimming Logic:**
-> - **Preserved System Messages:** All leading system messages are always retained, even if their size alone exceeds the budget.
-> - **Contiguous Suffix:** The strategy scans backwards from the most recent message, keeping the newest contiguous suffix of messages that fits within the remaining token budget.
-> - **Estimator:** The default estimator assumes 1 token per 4 characters. You can supply a custom model-specific token estimator to precisely calculate tokens.
+- All leading system messages are kept, even if their size alone exceeds the budget.
+- The strategy scans backwards from the most recent message and keeps the newest contiguous suffix
+  that fits the remaining budget.
+- The default estimator assumes 1 token per 4 characters; supply a model-specific estimator for
+  exact counts.
 
 ```ts
 import { createAgentLoop, tokenBudgetHistory } from "@netscript/ai/agent";
@@ -536,15 +533,15 @@ const loop = createAgentLoop({
 });
 ```
 
-### Citation-Ready RAG Retrieval
+### Citation-ready RAG retrieval
 
-`RetrieverPort` provides a provider-neutral interface for retrieval augmented generation (RAG) that emits structured, citation-ready provenance details.
+`RetrieverPort` is a provider-neutral interface for retrieval-augmented generation (RAG) that emits
+citation-ready provenance.
 
-> **Key Requirements:**
-> - **Normalized Score:** The relevance score is normalized to the range `0.0` to `1.0` (descending order).
-> - **Matched By:** The retrieval match channel must be one of `"vector"`, `"keyword"`, or `"hybrid"`.
-> - **Stable Source:** Provenance must specify a stable `sourceId` to correctly associate the citation.
-> - **Citation Span:** Character spans use zero-based offsets with an exclusive end offset (`span.end`).
+- The relevance score is normalized to `0.0`–`1.0`, in descending order.
+- The match channel is one of `"vector"`, `"keyword"`, or `"hybrid"`.
+- Provenance specifies a stable `sourceId` for the citation.
+- Character spans use zero-based offsets with an exclusive end offset (`span.end`).
 
 ```ts
 import type { RetrieverPort, RetrievalResult } from "@netscript/ai";
@@ -583,7 +580,3 @@ for (const doc of docs) {
   console.log(`Exact Match span [${doc.provenance.span.start}-${doc.provenance.span.end}]: "${doc.provenance.span.text}"`);
 }
 ```
-
----
-
-Back to the [reference overview](/reference/).
