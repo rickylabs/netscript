@@ -9,81 +9,39 @@ order: 2
 
 # Polyglot tasks
 
-**Keep the script, gain the runtime.** A working Python, .NET, or shell step becomes a
-queued, retried, traced unit of work by declaring it with `defineTask` — the script itself
-does not change, and nothing about your platform has to stop being TypeScript for one step
-that is not.
+This page explains how a polyglot task runs a non-TypeScript script on the worker runtime, how input
+and output cross the process boundary, and what to check before you ship one.
+{{ comp.badge({ status: "alpha" }) }}
 
-A **polyglot task** runs non-TypeScript work — a Python script, a .NET program, a
-shell or PowerShell script, or any executable — as a **managed subprocess** spawned by the
-worker runtime. NetScript hands the task its input as command-line arguments and
-environment variables or a bounded stdin payload, captures every line of `stdout`/`stderr`, parses a final JSON line
-into a structured result, and normalizes the exit code into a `TaskResult`. It is the
-escape hatch for the moments your platform is otherwise all-TypeScript: an ML model in
-Python, a legacy .NET DLL, a system `pwsh` script. {{ comp.badge({ status: "alpha" }) }}
+A **polyglot task** runs a Python script, a .NET program, a shell or PowerShell script, or any
+executable as a subprocess managed by the worker runtime. You declare it with `defineTask`; the
+script itself does not change. NetScript passes input as arguments, environment variables or a
+bounded stdin payload, captures `stdout` and `stderr`, parses a final JSON line into a structured
+result and normalizes the exit code into a `TaskResult`.
 
 {{ comp.diagram({ src: "/assets/diagrams/polyglot-task-execution.svg", alt: "The worker runtime resolves a TaskDefinition to a runtime adapter, which builds an argv and spawns a python/node/dotnet subprocess; input flows in as args, env, or bounded stdin, the subprocess streams stdout/stderr back, and the last JSON line of stdout becomes the structured result returned to the queue and database.", caption: "A task is dispatched to a runtime adapter that spawns a subprocess. Input arrives as argv, env, or bounded stdin; the last JSON line of stdout is parsed into the result; the exit code, captured logs, and duration become a TaskResult." }) }}
 
-The typical story is an import pipeline with one step that already exists in another
-language: a legacy-data transform owned by a Python script, say, sitting in the middle of
-an otherwise-TypeScript flow. Rewriting it buys nothing; running it ad hoc loses the
-queue, retry, and trace behavior every other step has. Declaring it as a task resolves
-that tension — the [ERP Sync tutorial](/tutorials/erp-sync/03-polyglot-transform/) walks
-exactly this step, and trace context is injected into the subprocess environment so the
-Python span stitches into the same trace as the TypeScript steps around it.
+Use a task when the work must run in another runtime and you want it queued, retried, traced and
+result-captured like any other step. Plain TypeScript work belongs in an in-process
+[background job](/background-processing/workers/), which avoids the process spawn. The
+[ERP Sync tutorial](/tutorials/erp-sync/03-polyglot-transform/) runs a Python legacy-data transform
+inside a TypeScript import flow; trace context reaches the subprocess, so the Python span joins the
+same trace.
 
-## What it is
+## How a task runs
 
-A **job** runs in-process TypeScript on a worker; a **task** runs a *subprocess* in
-another runtime. Tasks share the worker plugin's queue, retry, and telemetry machinery
-with [background jobs](/background-processing/workers/) — the difference is purely the
-execution surface. The `MultiRuntimeTaskExecutor` keeps a map of **runtime adapters**
-(one per `TaskType`) and dispatches a `TaskDefinition` to the adapter that supports its
-`type`. Each adapter builds an `argv` for its runtime (e.g. `python3 -u script.py …`,
-`pwsh -File script.ps1 …`) and runs it through a process runner backed by Deno.Command that streams
-output and times the process out. This page covers that subprocess seam; for in-process
-TS handlers, runtime modes, and the queue lifecycle, start at
-[background jobs](/background-processing/workers/).
-
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for a polyglot task when the work <strong>must</strong> run in another runtime — a
-Python data/ML script, a .NET tool, an existing shell or PowerShell automation, or a
-prebuilt binary — and you want it queued, retried, traced, and result-captured like any
-other unit of work. If the work is plain TypeScript, use an in-process
-<a href="/background-processing/workers/">background job</a> instead — it avoids a process
-spawn entirely.
-{{ /comp }}
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Workers track",
-    body: "Tutorial Track C builds the worker plugin end to end; lesson 03 adds a polyglot task with explicit permissions.",
-    href: "/tutorials/erp-sync/",
-    icon: "→"
-  },
-  {
-    title: "Do — Run a polyglot task",
-    body: "Task recipe: define a python (or shell) task, wire its entrypoint and permissions, and execute it through the runtime.",
-    href: "/background-processing/how-to/run-a-polyglot-task/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — Background jobs",
-    body: "The queue, worker-runtime modes, retry, and shutdown machinery that polyglot tasks share with in-process jobs.",
-    href: "/background-processing/workers/",
-    icon: "◎"
-  }
-] }) }}
+A job runs TypeScript in-process; a task runs a subprocess in another runtime. Both use the worker
+plugin's queue, retry and telemetry. The `MultiRuntimeTaskExecutor` holds one **runtime adapter**
+per `TaskType` and dispatches each `TaskDefinition` to the adapter that supports its `type`. The
+adapter builds an `argv` for its runtime, such as `python3 -u script.py …` or
+`pwsh -File script.ps1 …`, and runs it through a process runner built on `Deno.Command` that streams
+output and enforces the timeout.
 
 ## Minimal example
 
-A task is authored with the `defineTask` typestate builder, then run through the default
-multi-runtime executor. The builder's default `runtime` is `'deno'`; call `.runtime(type)`
-to target another language. Input reaches the script as **argv** (`.args(...)`) and
-**environment variables** (`.env({...})`); the script returns a result by writing a single
-JSON object as the **last line of `stdout`**.
+Build a task with the `defineTask` builder and run it through the default multi-runtime executor.
+The builder's default `runtime` is `'deno'`; call `.runtime(type)` for another language. The script
+returns its result by writing one JSON object as the last line of `stdout`.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -98,25 +56,35 @@ JSON object as the **last line of `stdout`**.
   }
 ] }) }}
 
-{{ comp callout { type: "important", title: "How input and output cross the process boundary" } }}
-Input is passed as <strong>command-line arguments</strong> (<code>args</code>),
-<strong>environment variables</strong> (<code>env</code>), or a bounded
-<strong>stdin payload</strong> (<code>.stdin(bytesOrJson)</code> or <code>options.stdin</code>). The runtime merges <code>Deno.env</code>, the task's <code>env</code>, and the
-call's <code>options.env</code>, then sets <code>TRACEPARENT</code>,
-<code>TRACESTATE</code>, and <code>CORRELATION_ID</code> from the call's
-<code>options.traceparent</code>, <code>options.tracestate</code>, and
-<code>options.correlationId</code> (each only when supplied). Output is
-the reverse: the subprocess returns a structured value by printing <strong>one JSON object
-as the final line of <code>stdout</code></strong>; the runtime parses that line into
-<code>result.result</code> (a non-object or non-final-line value yields <code>null</code>).
-All other lines are captured into <code>stdout</code>/<code>stderr</code> and streamed to
-the <code>onStdout</code>/<code>onStderr</code>/<code>onLog</code> callbacks.
-{{ /comp }}
+## Input and output
 
-## Key types first — TaskResult
+Input reaches the subprocess as command-line arguments (`.args(...)`), environment variables
+(`.env({...})`) or a bounded stdin payload (`.stdin(bytesOrJson)` or `options.stdin`). The runtime
+merges `Deno.env`, the task's `env` and the call's `options.env`, in rising order of precedence.
+It then sets `TRACEPARENT`,
+`TRACESTATE` and `CORRELATION_ID` from `options.traceparent`, `options.tracestate` and
+`options.correlationId`, each only when supplied.
 
-Every task — whatever its runtime — resolves to one `TaskResult`. This is the shape your
-calling code reads; check it before writing per-runtime branches.
+When the worker runs a task from its task queue, or runs a non-Deno job, it supplies those trace
+options itself. `CORRELATION_ID` is the message's `correlationId`. `TRACEPARENT` and `TRACESTATE`
+come from the active span, so the subprocess continues the worker's trace; with no active span they
+fall back to the message's `traceparent` and `tracestate`. A direct `executor.execute()` call gets
+only the options you pass.
+
+Output works in reverse. The runtime parses the last line of `stdout` into `result.result` when it
+is one JSON object; otherwise `result.result` is `null`. Every other line is captured into `stdout`
+or `stderr` and streamed to the `onStdout`, `onStderr` and `onLog` callbacks.
+
+> [!WARNING]
+> A trailing log line, a pretty-printed payload, a JSON array or a stray newline after the payload
+> makes `result.result` `null` even though the task succeeded. Print diagnostics to `stderr` and emit
+> the JSON object last. The runtime runs `python3 -u` (unbuffered) for this reason; flush your own
+> output in other runtimes.
+
+## `TaskResult`
+
+Every task, whatever its runtime, resolves to one `TaskResult`. Read this shape before writing
+per-runtime branches.
 
 {{ comp.apiTable({
   caption: "TaskResult — returned by executor.execute()",
@@ -137,10 +105,10 @@ calling code reads; check it before writing per-runtime branches.
 
 ## TaskDefinition & runtimes
 
-`defineTask(id)` returns a typestate builder; `.build()` is only callable once an
-`.entrypoint(path)` (subprocess) or `.handler(fn)` (in-process) is set. The resulting
-`TaskDefinition` carries the runtime `type`, entrypoint, args, env, timeout, and
-permissions. The seven supported runtimes (`TaskType`) and how each is launched:
+`defineTask(id)` returns a typestate builder. `.build()` becomes callable once you set
+`.entrypoint(path)` for a subprocess or `.handler(fn)` for in-process work. The resulting
+`TaskDefinition` carries the runtime `type`, entrypoint, args, env, timeout and permissions.
+`TaskType` has seven built-in runtimes:
 
 {{ comp.apiTable({
   caption: "TaskType — built-in runtime adapters",
@@ -155,39 +123,24 @@ permissions. The seven supported runtimes (`TaskType`) and how each is launched:
   ]
 }) }}
 
-The per-task permission set passed to `.permissions(...)` mirrors the Deno permission
-model. **It is enforced only for the `deno` runtime** — those keys are translated into
-`--allow-*` flags on the `deno run` command line. For `python`, `shell`, and the other
-external runtimes there is no Deno sandbox; the subprocess inherits the OS-level access of
-the worker process.
+`.permissions(...)` applies to the `deno` runtime only: its keys become `--allow-*` flags on the
+`deno run` command line. Python, shell and the other external runtimes have no Deno sandbox and
+inherit the worker process's OS access.
+[Restrict worker task permissions](/background-processing/how-to/restrict-worker-task-permissions/)
+lists every key, the flag it emits and the built-in presets.
 
-{{ comp.apiTable({
-  caption: "permissions() options — applied to the deno runtime",
-  rows: [
-    { name: "net", type: "boolean | string[]", desc: "--allow-net (true) or --allow-net=HOSTS (array). Network access." },
-    { name: "read", type: "boolean | string[]", desc: "--allow-read or --allow-read=PATHS. Filesystem read." },
-    { name: "write", type: "boolean | string[]", desc: "--allow-write or --allow-write=PATHS. Filesystem write." },
-    { name: "env", type: "boolean | string[]", desc: "--allow-env or --allow-env=VARS. Environment-variable access." },
-    { name: "run", type: "boolean | string[]", desc: "--allow-run or --allow-run=CMDS. Subprocess spawn." },
-    { name: "ffi", type: "boolean", desc: "--allow-ffi. FFI access to native libraries." },
-    { name: "import", type: "string[]", desc: "--allow-import=SPECIFIERS. Allowed dynamic-import sources." }
-  ]
-}) }}
-
-{{ comp callout { type: "note", title: "Omitting permissions widens the Deno sandbox" } }}
-For a <code>deno</code> task, calling <code>.build()</code> <em>without</em>
-<code>.permissions(...)</code> produces an <code>--allow-all</code> command line. Always
-pass an explicit, least-privilege permission set for untrusted or third-party Deno task
-code. Non-Deno runtimes ignore these keys entirely — gate those at the OS level instead.
-{{ /comp }}
+> [!CAUTION]
+> A `deno` task built without `.permissions(...)` runs with `--allow-all`. Pass an explicit,
+> least-privilege set for untrusted or third-party Deno task code, and gate non-Deno runtimes at the
+> OS level.
 
 ## Send private input on stdin
 
 Use `.stdin(bytesOrJson)` for a fixed task payload or `options.stdin` for input supplied at
-execution time. The execution option replaces the builder payload. JSON is encoded as UTF-8;
+execution time; the execution option replaces the builder payload. JSON is encoded as UTF-8, and
 `Uint8Array` values are sent unchanged. The runner writes the payload with backpressure and closes
-stdin, so the script can read to EOF. Absent input uses null stdin and never inherits input from the
-worker host. An explicitly supplied `undefined` payload fails with `MissingStdinPayload`.
+stdin, so the script can read to EOF. Without input, the subprocess gets a null stdin and never
+inherits input from the worker host.
 
 ```ts
 import { defineTask } from '@netscript/plugin-workers-core/builders';
@@ -216,107 +169,68 @@ payload = json.load(sys.stdin)
 print(json.dumps({'accepted': len(payload['roots'])}))
 ```
 
-Stdin is capped at **1 MiB of encoded bytes**, including JSON punctuation and escaping. Builder
-input is validated and snapshotted when `.stdin()` is called; each `.build()` receives its own
-byte buffer, which the adapter passes directly to the runner. Execution input is validated before
-spawning. Oversized input produces `StdinPayloadTooLarge`. JSON accepts finite numbers, strings,
-booleans, null, arrays, and plain objects with at most 64 levels of nesting; cycles, accessors, and
-unsupported values produce `InvalidStdinPayload`. A subprocess that closes stdin before accepting
-the payload produces `StdinWriteFailed`.
+Stdin is capped at **1 MiB of encoded bytes**, including JSON punctuation and escaping. The builder
+validates and snapshots its input when you call `.stdin()`; each `.build()` gets its own byte
+buffer, which the adapter passes directly to the runner. Execution input is validated before the
+spawn.
 
-By default, stdout and stderr each retain only their **last 1 MiB** while continuing to read and
-stream all output. Healthy tasks can print more than 1 MiB without failing; a final stdout JSON
-object that fits in the retained tail remains available. Lines longer than 1 MiB of characters are delivered
-to log callbacks in bounded fragments. Set positive integer `stdoutLimitBytes` / `stderrLimitBytes`
-execution options, or configure them on
-`new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`, to opt into a total output
-cap. Exceeding an explicit cap terminates the process tree and returns `status: 'failed'`,
-`success: false`, and `StdoutLimitExceeded` or `StderrLimitExceeded`; explicit caps also apply with
-`streamLogs: false`. Runtime validation and write errors return failed task results; builder
-validation throws before building the task. Running aborts return `cancelled`, and timeouts return
-`timeout`, both with exit code `-1`. Subprocesses inherit the worker's process group so terminal and supervisor
-signals also reach active tasks.
+| Error | Cause |
+| --- | --- |
+| `StdinPayloadTooLarge` | The encoded payload exceeds 1 MiB. |
+| `InvalidStdinPayload` | The JSON holds a cycle, an accessor or an unsupported value. JSON accepts finite numbers, strings, booleans, null, arrays and plain objects, nested at most 64 levels deep. |
+| `StdinWriteFailed` | The subprocess closed stdin before accepting the payload. |
+| `MissingStdinPayload` | An explicitly supplied payload is `undefined`. |
 
 Builder `.stdin()` applies only to direct executor calls. KV task registration validates through a
-schema that strips this runtime field, and queue dispatch does not carry it. Supply private
-per-execution input in `options.stdin` when calling the executor in a worker. Stdin is not a CLI
-stdin flag. Scripts control their own stdout/stderr: do not print private payloads.
+schema that strips this runtime field, and queue dispatch does not carry it, so in a worker supply
+private per-execution input in `options.stdin`. Stdin is not a CLI flag.
+
+> [!CAUTION]
+> Scripts control their own `stdout` and `stderr`. Never print the private payload.
+
+## Output capture and limits
+
+By default, `stdout` and `stderr` each keep only their **last 1 MiB** while the runner continues to
+read and stream all output. A healthy task can print more than 1 MiB, and a final JSON object that
+fits in the retained tail stays available. Lines longer than 1 MiB of characters reach the log
+callbacks in bounded fragments.
+
+To cap total output, set positive integer `stdoutLimitBytes` and `stderrLimitBytes` execution
+options, or pass them to `new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`.
+Exceeding an explicit cap terminates the process tree and returns `status: 'failed'`,
+`success: false` and `StdoutLimitExceeded` or `StderrLimitExceeded`. Explicit caps also apply with
+`streamLogs: false`.
+
+Runtime validation and write errors return failed task results; builder validation throws before the
+task is built. A running abort returns `cancelled` and a timeout returns `timeout`, both with exit
+code `-1`. Subprocesses stay in the worker's process group, so terminal and supervisor signals also
+reach active tasks.
 
 ## Production notes
 
-{{ comp callout { type: "warning", title: "The result contract is the LAST stdout line" } }}
-A subprocess returns structured data <strong>only</strong> by printing a single JSON
-<em>object</em> as its final <code>stdout</code> line. A trailing log line, a pretty-print,
-a JSON <em>array</em>, or a stray newline after the payload all cause
-<code>result.result</code> to be <code>null</code> even though the task
-<code>succeeded</code>. Print diagnostics to <code>stderr</code>, and emit the JSON result
-last with no trailing output. Buffering can also reorder this — for Python the runtime runs
-<code>python3 -u</code> (unbuffered) for exactly this reason; flush your own output in other
-runtimes.
-{{ /comp }}
+- Each non-Deno runtime needs its toolchain on the **worker host**: a Python interpreter or a
+  configured venv, the .NET SDK, `pwsh`/`powershell`, or `bash`. `cmd` and `powershell.exe` are
+  Windows-only; `shell` uses bash and resolves Git Bash utility paths on Windows.
+- A missing interpreter fails the task. Exit code `127` is reported as *command not found* and
+  `126` as *command not executable*.
+- A task that exceeds its `timeout` resolves with status `timeout` and exit code `-1`. Passing an
+  already-aborted `signal` yields `cancelled`.
 
-{{ comp callout { type: "important", title: "Runtimes must exist on the host; exit codes are diagnostic" } }}
-Each non-Deno runtime requires its toolchain on the <strong>worker host</strong>: a Python
-interpreter (or a configured venv), the .NET SDK, <code>pwsh</code>/<code>powershell</code>,
-or <code>bash</code>. A missing interpreter surfaces as a failed task — exit code
-<code>127</code> is reported as <em>command not found</em> and <code>126</code> as
-<em>command not executable</em>. <code>cmd</code> and <code>powershell.exe</code> are
-Windows-only; <code>shell</code> uses bash and resolves Git Bash utility paths on Windows.
-A task that exceeds its <code>timeout</code> resolves with status <code>timeout</code> and
-exit code <code>-1</code>; passing an already-aborted <code>signal</code> yields
-<code>cancelled</code>.
-{{ /comp }}
+> [!CAUTION]
+> **Tasks run external code with the worker's OS privileges.** Pin entrypoints to known scripts,
+> prefer a pinned interpreter or venv (`pythonConfig.venvPath`) over `$PATH` discovery, and avoid
+> interpolating untrusted input into `args` or the entrypoint path.
 
-{{ comp callout { type: "note", title: "Tasks run external code — treat them as a trust boundary" } }}
-Polyglot tasks spawn arbitrary processes with the worker's OS privileges. Pin entrypoints
-to known scripts, prefer a pinned interpreter / venv (<code>pythonConfig.venvPath</code>)
-over <code>$PATH</code> discovery, and avoid interpolating untrusted input into
-<code>args</code> or the entrypoint path.
-{{ /comp }}
+## Next steps
 
-{{ comp callout { type: "note", title: "Queue-triggered tasks carry trace and correlation context" } }}
-When the worker runs a task from its task queue, or runs a polyglot (non-Deno) job, it
-supplies the trace options itself. <code>CORRELATION_ID</code> is the message's
-<code>correlationId</code>. <code>TRACEPARENT</code>/<code>TRACESTATE</code> come from
-the active span, so the subprocess continues the worker's trace; when no span is active
-they fall back to the message's <code>traceparent</code>/<code>tracestate</code>. Read
-them in the subprocess to stitch cross-runtime spans and logs together. A direct
-<code>executor.execute()</code> call gets only the options you pass.
-{{ /comp }}
+Define, run and sandbox a task step by step in
+[Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/).
 
-## Reference →
-
-The full generated API — `defineTask`, `MultiRuntimeTaskExecutor`,
-`createDefaultTaskExecutor`, every runtime adapter, and the executor option types — lives
-in the workers reference.
-
-{{ comp.xref({ key: "ref:workers" }) }}
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — Workers reference",
-    body: "defineTask, the multi-runtime executor, runtime adapters, TaskDefinition / TaskResult / TaskExecutionOptions, and permission types.",
-    href: "/reference/workers/",
-    icon: "≡"
-  },
-  {
-    title: "Do — Run a polyglot task",
-    body: "Step-by-step recipe for a python and a shell task with explicit permissions and result capture.",
-    href: "/background-processing/how-to/run-a-polyglot-task/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — Background jobs",
-    body: "The queue, worker-runtime modes, retry, and graceful-shutdown drain shared with in-process jobs.",
-    href: "/background-processing/workers/",
-    icon: "◎"
-  },
-  {
-    title: "Next — Runtime configuration",
-    body: "How worker, service, and adapter settings resolve from schema defaults, config files, env vars, and overrides.",
-    href: "/orchestration-runtime/runtime-config/",
-    icon: "→"
-  }
-] }) }}
+- [ERP Sync, lesson 03](/tutorials/erp-sync/03-polyglot-transform/): a polyglot step inside a
+  running app.
+- [Background jobs](/background-processing/workers/): the queue, retry and shutdown machinery tasks
+  share.
+- {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}: `defineTask`, the executor,
+  runtime adapters and option types.
 
 {{ comp.nextPrev({ prev: { label: "Typed SDK & client", href: "/services-sdk/sdk/" }, next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" } }) }}

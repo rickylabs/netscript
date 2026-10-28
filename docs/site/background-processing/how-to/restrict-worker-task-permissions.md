@@ -8,20 +8,20 @@ oldUrl: /how-to/restrict-worker-task-permissions/
 
 # Restrict worker task permissions
 
-Deno tasks are the worker runtime path that can receive Deno permission flags. Use `.permissions()`
-or `permissions` presets for every Deno task you ship; an omitted permission object compiles to
-`--allow-all`.
+This recipe gives every Deno worker task the narrowest permission set it needs. Deno tasks are the
+only worker runtime path that receives Deno permission flags, and an omitted permission object
+compiles to `--allow-all`.
 
 ## Prerequisites
 
 - A `deno` task definition.
-- A list of hosts, files, env vars, and subprocesses the task actually needs.
+- The hosts, files, environment variables and subprocesses the task actually needs.
 - A production review step that rejects omitted permissions.
 
-## Start from a restrictive preset
+## Step 1 — Start from a restrictive preset
 
-The public `permissions` constant exposes `minimal`, `none`, `network`, `filesystem`, `readOnly`,
-`subprocess`, `full`, and `allAccess`.
+The public `permissions` constant exposes the presets `minimal`, `none`, `network`, `filesystem`,
+`readOnly`, `subprocess`, `full` and `allAccess`. Spread one and narrow each field to an allowlist:
 
 ```ts
 import { defineTask, permissions } from '@netscript/plugin-workers-core';
@@ -38,9 +38,9 @@ export default defineTask('charge-customer')
   .build();
 ```
 
-## Know the emitted flags
+## Step 2 — Check the emitted flags
 
-The Deno adapter helper `buildDenoPermissionFlags(permissions?)` emits these flags:
+The Deno adapter helper `buildDenoPermissionFlags(permissions?)` turns each field into a flag:
 
 | Permission field | Example value | Emitted flag |
 | --- | --- | --- |
@@ -54,35 +54,40 @@ The Deno adapter helper `buildDenoPermissionFlags(permissions?)` emits these fla
 | `ffi` | `true` | `--allow-ffi` |
 | `import` | `['jsr.io']` | `--allow-import=jsr.io` |
 
-The helper does not emit a flag for `false` or an empty allowlist. Deny by leaving the field false
-or empty, not by passing a broad `true`.
+The helper emits no flag for `false` or an empty allowlist. Deny by leaving a field `false` or
+empty, not by passing a broad `true`.
 
-## Runtime boundary
+> [!CAUTION]
+> Only the `deno` task adapter turns `permissions` into `--allow-*` flags. Python, .NET, shell,
+> PowerShell, cmd, executable and custom task adapters inherit the worker process's OS permissions
+> unless the adapter adds its own sandbox.
 
-Only the `deno` task adapter converts `permissions` into Deno `--allow-*` flags. Python, .NET,
-shell, PowerShell, cmd, executable, and custom task adapters inherit the worker process OS
-permissions unless the adapter adds its own sandbox.
+## Troubleshooting
 
-## Production checklist
+- **The task can reach everything:** its permission object is omitted, so the Deno adapter emits
+  `--allow-all`.
+- **The task fails with a Deno permission error:** a required grant is missing from the allowlist.
+- **The task spawns commands it should not:** `run` is too broad; use a command allowlist.
+- **`.permissions()` has no effect:** the task uses a non-Deno runtime, which it does not sandbox.
 
-- [ ] Every `deno` task has `.permissions(...)` or a declarative `permissions` object.
-- [ ] `net`, `read`, `write`, `env`, and `run` use allowlists instead of `true` where possible.
-- [ ] No task ships with `permissions.allAccess` unless it is explicitly accepted for that task.
-- [ ] Non-Deno tasks are reviewed as OS-permission workloads, not Deno-sandboxed workloads.
-- [ ] Timeout and retry settings are explicit for high-impact tasks.
+## Production notes
 
-## Failure modes
+Before you ship, check that:
 
-- Omitted permissions: the Deno adapter emits `--allow-all`.
-- Missing required grant: the task fails at runtime with a Deno permission error.
-- Overbroad `run`: the task can spawn any allowed command; prefer a command allowlist.
-- Non-Deno runtime: `.permissions()` does not sandbox it.
+- every `deno` task has `.permissions(...)` or a declarative `permissions` object;
+- `net`, `read`, `write`, `env` and `run` use allowlists instead of `true` where possible;
+- no task ships with `permissions.allAccess` unless it is explicitly accepted for that task;
+- non-Deno tasks are reviewed as OS-permission workloads, not Deno-sandboxed ones;
+- timeout and retry settings are explicit for high-impact tasks.
 
 ## Next steps
 
-- Tune process isolation with [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
-- Add a custom adapter with [Add a task runtime adapter](/background-processing/how-to/add-a-task-runtime-adapter/).
-- Look up worker symbols in [workers reference](/reference/workers/).
+Set timeouts, retries and concurrency next in
+[Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
+
+- [Add a task runtime adapter](/background-processing/how-to/add-a-task-runtime-adapter/): add a
+  runtime with its own sandbox.
+- [workers reference](/reference/workers/): worker symbols and types.
 
 {{ comp.nextPrev({
   prev: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" },
