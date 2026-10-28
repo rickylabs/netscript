@@ -21,26 +21,22 @@
   },
   "publish": {
     "include": [
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.css",
-      "registry/**/*.json",
+      "*.ts",
+      "*.tsx",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "registry/lib/cn.ts",
+      "registry/lib/toast.ts",
       "deno.json",
       "README.md",
-      "tokens/**/*.json",
       "tokens/README.md"
     ],
     "exclude": [
-      "!**/*.ts",
-      "!**/*.tsx",
-      "!**/*.css",
-      "!registry/**/*.json",
-      "!deno.json",
-      "!README.md",
       "scripts/**",
       "tests/**",
-      "!tokens/**/*.json",
-      "!tokens/README.md"
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/*.test.tsx"
     ]
   },
   "tasks": {

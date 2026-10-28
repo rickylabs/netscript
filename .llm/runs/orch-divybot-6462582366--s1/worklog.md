@@ -209,3 +209,25 @@ review threads are answered; the thread gate PASS. Final source implementation i
 independently signed off. Next actions: commit this evidence, push, update PR body,
 and atomically queue the canonical READY report. Remote CI is not watched; no PR
 merge, tag, release, lock changes or GitHub label mutation.
+
+## Review fixes — design checkpoint
+
+Owner resumes the completed S1 implementation to repair publish size and app startup.
+
+1. Public surface: unchanged tokens CLI and registry content bytes; lazy registry loading, production theme metadata only, explicit preview assets, bounded published payload and default CSS.
+2. Vocabulary: carrier = generated publish-safe TS data; preview = opt-in design-only preset stylesheet; production theme = configured preset and font metadata.
+3. Ports: CLI owns token build options; engine exposes lightweight output metadata independently of compilation/source defaults; existing filesystem port owns source replacement.
+4. Constants: named five-MB publish budget and default gzip CSS budget; existing preset/output constants retained.
+5. Commit slices: (a) publish carrier and lazy CLI registry plus budget/graph proof, generator and freshness gates; (b) production theme/design boundary and cheap token lifecycle/performance repairs plus graph/regression tests; (c) independent IMPL-EVAL, full applicable validation, final evidence. Every implementation commit updates worklog/context-pack and is pushed to PR 2435.
+6. Deferred scope: no new themes, values, defaults, releases or unrelated architecture changes. Any nonblocking omission receives a concrete reason.
+7. Contributor path: `packages/fresh-ui/tokens/README.md` describes token build and asset ownership; extend it with budgets and preview opt-in.
+
+PLAN-EVAL: N/A for this owner-scoped repair of existing reviewed contracts; mandatory separate final IMPL-EVAL retained. NetScript stdio MCP find_guidance/search_docs consulted before design. RTK unavailable, so raw tools and structured wrappers are used.
+
+### Publish repair candidate
+
+Native publish regression: RED at baseline (28,186,585 bytes); GREEN after (90 files, 2,756,540 bytes against 5,000,000). One generated gzip carrier ships registry copy bytes; raw copy assets/source JSON are excluded. The two registry runtime modules remain shipped. Token JSON carriers also use Web gzip; no import attributes or package filesystem assumptions. CLI registry imports occur inside operations.
+
+Registry tests and startup graph: 97 PASS. Structured check: 5 files, zero diagnostics; scoped lint/format: 5 files, full coverage, zero findings after formatting. Full repository quality/architecture PASS; frozen tokens freshness PASS (68 outputs/72 inputs). JSR audit dry-run passes, with existing folder/namespace documentation warnings. Full package tests and independent slice supervisor review are running. Raw root lint/fmt exclusions refuse CLI/tool coverage; the scoped config preserves repository rules/style and removes path-selection exclusions only, with all selected files processed.
+
+Publish slice supervisor: PASS, no blockers (`review-fix-publish-review.md`). Frozen tokens gate proves the noted task permissions work. Reconcile: current main merge retained; only declared publish/lazy-import surfaces changed. Supervisor-authorized sign-off commit follows.

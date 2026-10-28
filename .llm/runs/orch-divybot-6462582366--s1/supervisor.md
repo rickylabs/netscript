@@ -34,3 +34,9 @@
   handoff, not committed.
 
 Any necessary addition to this surface is recorded in `drift.md` before editing.
+
+## Owner-authorized review-blocker continuation (2026-10-28)
+
+Baseline: cebe1c0d51e2df9f5bc0c08bb2fc0ff8f9c3e265; current main integrated by merge commit. Existing branch and PR 2435 retained. Feature matrix inspected; owner override: “Run IMPL-EVAL after the fixes with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once and record the verdict.” Separate Anthropic evaluator; no self-certification.
+
+Additional declared writes: `.llm/tools/generate-cli-assets-barrel.ts`, package asset loader/generator/tests, CLI token ports/adapters/application/templates/tests, the root carrier freshness list, and this run’s review-fix evidence. No labels, merge, tag, release, force push, or assignment-file commit.

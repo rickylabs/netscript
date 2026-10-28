@@ -73,3 +73,7 @@ root lint/format, preflight and freshness gates all PASS locally. Three Augment
 threads have replies. Full scaffold runtime remains UNPROVEN for the documented
 Docker/Aspire host prerequisite. Push evidence and queue canonical READY handoff;
 stop at review, never merge/tag/release.
+
+## Review-blocker continuation
+
+Current owner assignment resumes PR 2435, never creates a duplicate. Main integrated with a merge commit. Publish repair candidate cuts native payload from 28,186,585 to 2,756,540 bytes (five-MB test red/green). Exact gzip TS carriers replace duplicate raw publish assets; CLI registry imports are lazy. Read `memory-publish-budget.md` and the latest worklog section. First slice awaits separate supervisor sign-off; second slice addresses production theme/design graph and cheap lifecycle/performance issues. Final owner-requested independent Claude IMPL-EVAL and full scaffold runtime remain required. No labels or merge/release actions.

@@ -11,9 +11,29 @@ export const nameMigrations: {
     reason: string;
   }[];
 } = JSON.parse(
-  '{"version":1,"migrations":[{"collection":"Studio flavor","variable":"table/cell-rule","originalCssVar":"--ns-studio-table-cell-rule","cssVar":"--ns-studio-table-cell-rule-width","reason":"The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."},{"collection":"Studio flavor","variable":"table/head-rule","originalCssVar":"--ns-studio-table-head-rule","cssVar":"--ns-studio-table-head-rule-width","reason":"The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."},{"collection":"Studio flavor","variable":"table/row-rule","originalCssVar":"--ns-studio-table-row-rule","cssVar":"--ns-studio-table-row-rule-width","reason":"The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."},{"collection":"Studio flavor","variable":"topbar/rule","originalCssVar":"--ns-studio-topbar-rule","cssVar":"--ns-studio-topbar-rule-width","reason":"The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."}]}',
+  await new Response(
+    new Blob([
+      Uint8Array.from(
+        atob(
+          'H4sIAAAAAAAA/9XQsU4DMQyA4VexPF9asd5IxYZURBEMiMFNzJ2lXIzs9DpUfXfUQ4hO0NvoFFn6Ekf/AUc2Fy3Y3jQ4SGdURYtj+3rAqDlzPM3Y4qbukii8ZxrVsMGRTGibGVusp3MZOedgu8zYoJp0Uiiv3J/JsMUQigefnggTD+c8XsDCXlLtsUFj8ulHTz3D9yJ4ubuFQgODOFB2BXKXrnCCqkCwiT0PDKv1/fpxAQ/GzjYy1J4qRM1qX5epJDDuxCsbECTxKiVWSDJwOWWa2AKPzdw6PVOaUeecxwvYldcx3c+Ic6bj3+p60+jHlmx5UZeJ/h7lh/yvIm/HTyF2w5yFBAAA',
+        ),
+        (char) => char.charCodeAt(0),
+      ),
+    ])
+      .stream().pipeThrough(new DecompressionStream('gzip')),
+  ).text(),
 );
 
 export const fontRequests: { version: number; families: Record<string, number[]> } = JSON.parse(
-  '{"version":1,"description":"Provider-supported weights for the three mono families whose requests need explicit constraints. Font and role values remain in DTCG sources.","families":{"Fragment Mono":[400],"DM Mono":[400,500],"Space Mono":[400,700]}}',
+  await new Response(
+    new Blob([
+      Uint8Array.from(
+        atob(
+          'H4sIAAAAAAAA/03NMWvDQAyG4b8ibnaDCy0Frw3pFCi0W8lw3H2JBbZ0kWSnEPLfC4FCxvdZ3mtaYc4qaXjuUoUX4xb3Tp+mK1fYky+tqQUqXcCnMZyOahQjKEYDaFZROuaZJ4bTZVQHGc4LPJwEqITfNnHhoKLiYZklfEM7laAslUwn0JqnBU6GObMQC22/3z/IdbEC36Qu/R/ScE07y6cZErRX0TT8vPT9oUvb/UN3r3f7arngkd/6/nC7/QHarlZ9+QAAAA==',
+        ),
+        (char) => char.charCodeAt(0),
+      ),
+    ])
+      .stream().pipeThrough(new DecompressionStream('gzip')),
+  ).text(),
 );
