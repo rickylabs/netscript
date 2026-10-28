@@ -83,3 +83,23 @@ Owner override (verbatim): “Run IMPL-EVAL with claude -p --model claude-opus-5
 Matrix queried in feature tier; native Claude review is explicitly owner-selected. NetScript MCP connector and external memory tools are unavailable; existing MCP guidance and run memory consulted before implementation. RTK binary unavailable; direct tools used.
 
 Reconcile: fetched latest PR head `660da01f`; preserved scrub/acceptance commits. No duplicate PR; no labels changed. Contradictory closing boilerplate in current PR body will be removed to honor owner’s explicit Refs-only instruction.
+
+## Review repair implementation and gates
+
+- Three new source-mutation regressions were first executed against the original implementation: **0 passed, 3 failed**, each with “Missing expected exception” (`review-negative-red.json`). With validation repaired: **13 passed, 0 failed** (`review-tests-green.json`), including all three unchanged regression cases and exhaustive required-section controls.
+- Theme parsing now enforces all thirteen template H2s exactly once in order; loading rejects template/contract drift. Tests independently fix theme H2s and guidelines 1–8 instead of deriving expectations from the source under test. Missing, reordered, duplicate and fenced substitute headings fail.
+- Guideline links use actual configured Markdown heading IDs and assert existence in the complete rendered guidelines. Renaming a required heading or removing an anchor fails before publishing.
+- The owned Lume generator emits one section CSS asset and 34 sequentially resized 480px WebP thumbnails. Gallery comparisons also use thumbnails; originals stay linked and theme specimens retain full images. Build output only; no new source binaries or shared config edits. Sharp comes through the existing pinned Lume dependency surface.
+- Generated value tables are H3s under Theme values, with unique “Values: Colors”, “Values: Typography”, etc. labels. Spec prose retains canonical Colors spelling. The screenshot shows both the local and shared TOCs.
+- Final docs build: **PASS**, 789 files / 251 HTML pages. Link check: **PASS**, 42,322 internal links. Caveat refs: **PASS**, 15 across 12 pages. Exports drift and snippets: **PASS**, 27 snippet checks / zero malformed fences. Scoped six-file check/lint/fmt and root test bridge: **PASS**. Broader quality scan: **PASS**; sanitized summary points to the private raw receipt and explicitly records precommit provenance.
+- Browser: **PASS**, linked stylesheet applies; all 68 gallery image elements decode as thumbnails <=480px with matching declared dimensions; unique theme TOC labels; responsive checks at 390px/1440px, no browser errors. `screenshots/tonal--fixed-toc.png` inspected visually.
+- Full `deno task e2e:cli`: attempted, **exit 1 / UNPROVEN**. Aspire environment preflight failed before scaffolding; cleanup could not reach Docker. No gate weakened. Leak check reviewed; only counts retained, no foreign/unknown resources mutated.
+- Local build automatically expands the docs lock for Lume’s image helper. Those generated lock edits are outside the declared ownership and were restored byte-for-byte; no lock/cache deleted or reloaded. The build runs successfully with the tracked lock.
+
+Pending before sign-off commit: owner-selected independent read-only Claude IMPL-EVAL / slice review. One fix round allowed. Preserve existing PR #2437 and Refs-only linkage.
+
+## Independent sign-off and reconcile
+
+Owner-selected `claude -p --model claude-opus-5-5 --effort high` completed read-only with stdin closed. Observed model: claude-opus-5-5, separate Anthropic family from OpenAI implementation. Verdict **PASS**, independent wrapper rerun **13 passed / 0 failed**, explicit substantive slice approval to commit. No blocking repairs required; no second evaluator round. `review-evaluate.md` contains the returned verdict; private transcript identity is excluded.
+
+The same three negative tests rerun after the fix are independently **3 passed / 0 failed** in `review-negative-green.json`. Current review-thread gate **PASS**, 0 threads / 0 unanswered. Latest remote head matches the bootstrap commit; no intervening commits require integration. No labels changed, no closing keyword remains in PR body, no shared/CI/lock source changes. The owned screenshot server was stopped after capture. Resource reports remain counts only; foreign/unknown resources remain untouched.

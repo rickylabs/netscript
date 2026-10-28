@@ -6,6 +6,68 @@ export const SOURCE_ROOT =
 export const ASSET_ROOT = '/assets/design-system/';
 export const SCHEMES = ['light', 'dark'] as const;
 export const VALUE_GROUPS = ['colors', 'typography', 'rounded', 'spacing', 'components'] as const;
+export const SECTION_STYLESHEET = `${ASSET_ROOT}section.css`;
+export const THUMBNAIL_WIDTH = 480;
+
+/** The template contract: eight specification sections followed by five extensions. */
+export const THEME_SECTIONS = [
+  'Overview',
+  'Colors',
+  'Typography',
+  'Layout',
+  'Elevation & Depth',
+  'Shapes',
+  'Components',
+  "Do's and Don'ts",
+  'Iconography & Imagery',
+  'Motion & States',
+  'Accessibility',
+  'NetScript Mapping',
+  'Sources',
+] as const;
+export const GUIDELINE_SECTIONS = [
+  '1. Two rules that override everything',
+  '2. Theme architecture',
+  '3. Compatibility contract (MUST)',
+  '4. The quality method',
+  '5. Anti-patterns',
+  '6. Theme catalogue',
+  '7. Creating a new theme: step by step',
+  '8. Shipping (planned)',
+] as const;
+
+/** Read real H2s, excluding comments and fenced Markdown examples. */
+export function sectionHeadings(source: string): string[] {
+  const headings: string[] = [];
+  let fence = '';
+  for (const line of source.replace(/<!--[\s\S]*?-->/g, '').split(/\r?\n/)) {
+    const delimiter = line.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (delimiter) {
+      if (!fence) fence = delimiter[1];
+      else if (delimiter[1][0] === fence[0] && delimiter[1].length >= fence.length) fence = '';
+      continue;
+    }
+    if (fence) continue;
+    const heading = line.match(/^ {0,3}##[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/);
+    if (heading) headings.push(heading[1]);
+  }
+  return headings;
+}
+
+/** Extra theme sections are allowed, but required sections occur exactly once in order. */
+export function validateSections(source: string, required: readonly string[], label: string): void {
+  const headings = sectionHeadings(source);
+  let previous = -1;
+  for (const heading of required) {
+    const position = headings.indexOf(heading);
+    if (position < 0) throw new Error(`${label}: missing section ${heading}`);
+    if (position <= previous) throw new Error(`${label}: misordered section ${heading}`);
+    if (headings.lastIndexOf(heading) !== position) {
+      throw new Error(`${label}: duplicate section ${heading}`);
+    }
+    previous = position;
+  }
+}
 
 export interface Theme {
   id: string;
@@ -57,7 +119,7 @@ export function parseTheme(id: string, source: string): Theme {
       throw new Error(`${id}: missing value group ${group}`);
     }
   }
-  if (!/^## /m.test(match[2])) throw new Error(`${id}: missing specification sections`);
+  validateSections(match[2], THEME_SECTIONS, `${id}/DESIGN.md`);
   return {
     id,
     name: String(values.name),
@@ -129,6 +191,15 @@ export function themePreviews(themes: Theme[]): Preview[] {
 export async function loadDesignSources(): Promise<DesignSources> {
   const root = new URL('../../design-system/', import.meta.url);
   const guidelines = await Deno.readTextFile(new URL('GUIDELINES.md', root));
+  validateSections(guidelines, GUIDELINE_SECTIONS, 'GUIDELINES.md');
+  const templates = {
+    design: await Deno.readTextFile(new URL('themes/_template/DESIGN.md', root)),
+    skill: await Deno.readTextFile(new URL('themes/_template/SKILL.md', root)),
+  };
+  // Template additions must update the explicit contract, never silently weaken validation.
+  if (JSON.stringify(sectionHeadings(templates.design)) !== JSON.stringify(THEME_SECTIONS)) {
+    throw new Error('DESIGN.md template sections differ from the required theme contract');
+  }
   const directories: string[] = [];
   for await (const entry of Deno.readDir(new URL('themes/', root))) {
     if (entry.isDirectory && !entry.name.startsWith('_')) directories.push(entry.name);
@@ -173,10 +244,7 @@ export async function loadDesignSources(): Promise<DesignSources> {
     guidelines,
     themes,
     previews,
-    templates: {
-      design: await Deno.readTextFile(new URL('themes/_template/DESIGN.md', root)),
-      skill: await Deno.readTextFile(new URL('themes/_template/SKILL.md', root)),
-    },
+    templates,
     imageSizes,
   };
 }

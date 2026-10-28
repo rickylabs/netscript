@@ -21,6 +21,33 @@ import {
   valueRows,
 } from '../design-system.ts';
 
+// Deliberately independent of production constants and the mutated source.
+const REQUIRED_THEME_H2S = [
+  'Overview',
+  'Colors',
+  'Typography',
+  'Layout',
+  'Elevation & Depth',
+  'Shapes',
+  'Components',
+  "Do's and Don'ts",
+  'Iconography & Imagery',
+  'Motion & States',
+  'Accessibility',
+  'NetScript Mapping',
+  'Sources',
+];
+const REQUIRED_GUIDELINE_H2S = [
+  '1. Two rules that override everything',
+  '2. Theme architecture',
+  '3. Compatibility contract (MUST)',
+  '4. The quality method',
+  '5. Anti-patterns',
+  '6. Theme catalogue',
+  '7. Creating a new theme: step by step',
+  '8. Shipping (planned)',
+];
+
 const md = designMarkdown(site);
 
 function assertStringIncludes(actual: string, expected: string, message?: string): void {
@@ -46,7 +73,8 @@ function assertUniqueIds(html: string): void {
 
 function assertCompleteTheme(theme: Theme, html: string): void {
   const prose = html.slice(html.indexOf('<section aria-label="Design specification">'));
-  for (const heading of theme.body.match(/^#{2,4} .+$/gm) ?? []) {
+  for (const title of REQUIRED_THEME_H2S) {
+    const heading = `## ${title}`;
     assertStringIncludes(
       prose,
       md(heading).trim(),
@@ -130,6 +158,100 @@ Deno.test('fixture contract fails if a renderer drops a section or value table',
   );
 });
 
+// These regressions exercise source mutations, rather than only output mutations.
+Deno.test('negative: deleting a required theme section fails source validation', () => {
+  assertThrows(() => parseTheme('fixture', fixture.replace('## Colors\n', '')), {
+    message: /Colors/,
+  });
+});
+
+Deno.test('negative: deleting a guidelines section fails page generation', async () => {
+  const sources = await loadDesignSources();
+  sources.guidelines = sources.guidelines.replace('## 5. Anti-patterns\n', '');
+  assertThrows(() => renderDesignPages(sources, md), { message: /5/ });
+});
+
+Deno.test('negative: renaming a referenced guidelines heading fails instead of publishing a dead link', async () => {
+  const sources = await loadDesignSources();
+  sources.guidelines = sources.guidelines.replace(
+    '## 3. Compatibility contract (MUST)',
+    '## 3. Renamed compatibility',
+  );
+  assertThrows(() => renderDesignPages(sources, md), { message: /3|anchor/ });
+});
+
+Deno.test('required sections cannot be missing, reordered, duplicated or hidden in fences', async () => {
+  for (const title of REQUIRED_THEME_H2S) {
+    const heading = `## ${title}\n`;
+    assertThrows(() => parseTheme('fixture', fixture.replace(heading, '')));
+    assertThrows(() =>
+      parseTheme('fixture', fixture.replace(heading, `\`\`\`md\n${heading}\`\`\`\n`))
+    );
+    assertThrows(() => parseTheme('fixture', fixture.replace(heading, heading + heading)));
+  }
+  assertThrows(() =>
+    parseTheme(
+      'fixture',
+      fixture.replace('## Colors', '## Typography').replace(
+        '## Typography\n\nTypography',
+        '## Colors\n\nTypography',
+      ),
+    )
+  );
+  const sources = await loadDesignSources();
+  for (const title of REQUIRED_GUIDELINE_H2S) {
+    assertThrows(() =>
+      renderDesignPages(
+        { ...sources, guidelines: sources.guidelines.replace(`## ${title}\n`, '') },
+        md,
+      )
+    );
+  }
+});
+
+Deno.test('fixed fixture assertions detect a section deleted from both input and output', async () => {
+  const theme = parseTheme('fixture', fixture);
+  theme.body = theme.body.replace('## Colors\n', '');
+  assertThrows(() => assertCompleteTheme(theme, renderTheme(theme, [], fixtureSources, md)));
+  const sources = await loadDesignSources();
+  assertEquals(
+    sources.templates.design.match(/^## .+$/gm) ?? [],
+    REQUIRED_THEME_H2S.map((title) => `## ${title}`),
+  );
+});
+
+Deno.test('page assets are linked once and generated table headings are unambiguous', async () => {
+  const sources = await loadDesignSources();
+  const pages = renderDesignPages(sources, md);
+  for (const page of pages) {
+    assertStringIncludes(
+      page.content,
+      '<link rel="stylesheet" href="/assets/design-system/section.css">',
+    );
+    assert(!page.content.includes('<style>'));
+  }
+  const theme = pages.find((page) => page.url.endsWith('/themes/tonal/'))!;
+  for (const label of ['Colors', 'Typography', 'Radii', 'Spacing', 'Component recipes']) {
+    assertStringIncludes(theme.content, `Values: ${label}</a>`);
+  }
+  assert(!theme.content.includes('Colours'));
+  assertStringIncludes(
+    pages[0].content,
+    'src="/assets/design-system/thumbnails/studio-utility--light.webp"',
+  );
+  assertStringIncludes(pages[0].content, 'width="480"');
+  const links = pages.flatMap((page) =>
+    [...page.content.matchAll(/href="\/design-system\/guidelines\/#([^"]+)"/g)].map((match) =>
+      match[1]
+    )
+  );
+  const guide = pages.find((page) => page.url.endsWith('/guidelines/'))!;
+  for (const anchor of links) assertStringIncludes(guide.content, `id="${anchor}"`);
+  const missingAnchor = (source: string) =>
+    md(source).replace(/id="3-compatibility-contract-must"/g, '');
+  assertThrows(() => renderDesignPages(sources, missingAnchor), { message: /anchor/ });
+});
+
 Deno.test('incomplete source fails closed instead of publishing an empty specification', () => {
   assertThrows(() => parseTheme('fixture', '# Missing front matter'), Error, 'front matter');
   assertThrows(
@@ -188,7 +310,7 @@ Deno.test('configured Markdown keeps site anchors and restores raw HTML settings
 
 Deno.test('real corpus: all theme sections, YAML leaves/comments, guidelines sections, flavors and templates survive', async () => {
   const sources = await loadDesignSources();
-  const pages = renderDesignPages(sources, md, '');
+  const pages = renderDesignPages(sources, md);
   assertEquals(sources.themes.length, 11);
   assertEquals(sources.previews.length, 17);
   assertEquals(pages.length, 15);
@@ -214,8 +336,8 @@ Deno.test('real corpus: all theme sections, YAML leaves/comments, guidelines sec
   assertStringIncludes(landing, 'Studio · Utility');
   assertStringIncludes(landing, 'NetScript default');
   const guide = pages.find((page) => page.url.endsWith('/guidelines/'))!;
-  for (const heading of sources.guidelines.match(/^## .+$/gm) ?? []) {
-    assertStringIncludes(guide.content, md(heading).trim());
+  for (const title of REQUIRED_GUIDELINE_H2S) {
+    assertStringIncludes(guide.content, md(`## ${title}`).trim());
   }
   const tokenPage = pages.find((page) => page.url.endsWith('/token-contract/'))!;
   assertStringIncludes(tokenPage.content, md(guidelineSection(sources.guidelines, 2)));

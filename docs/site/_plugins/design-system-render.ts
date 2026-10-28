@@ -2,12 +2,16 @@ import {
   ASSET_ROOT,
   DESIGN_ROOT,
   type DesignSources,
+  GUIDELINE_SECTIONS,
   guidelineSection,
   type Preview,
   SCHEMES,
+  SECTION_STYLESHEET,
   SOURCE_ROOT,
   type Theme,
   themeUrl,
+  THUMBNAIL_WIDTH,
+  validateSections,
   valueRows,
 } from './design-system.ts';
 import type { MarkdownRenderer } from './design-system-markdown.ts';
@@ -21,7 +25,7 @@ export interface DesignPage {
 }
 
 const GROUP_LABELS: Record<string, string> = {
-  colors: 'Colours',
+  colors: 'Colors',
   typography: 'Typography',
   rounded: 'Radii',
   spacing: 'Spacing',
@@ -75,21 +79,25 @@ function image(
   preview: Preview,
   scheme: typeof SCHEMES[number],
   sizes: DesignSources['imageSizes'],
+  thumbnail = false,
 ): string {
   const file = `${preview.id}--${scheme}.webp`;
   const size = sizes[file];
   if (!size) throw new Error(`Missing image dimensions: ${file}`);
-  return `<img src="${ASSET_ROOT}${file}" alt="${
+  const width = thumbnail ? Math.min(THUMBNAIL_WIDTH, size.width) : size.width;
+  const height = Math.round(size.height * width / size.width);
+  const path = thumbnail ? `thumbnails/${file}` : file;
+  return `<img src="${ASSET_ROOT}${path}" alt="${
     escapeHtml(preview.name)
   } Orders specimen, ${scheme} scheme"
-    width="${size.width}" height="${size.height}" loading="lazy" decoding="async">`;
+    width="${width}" height="${height}" loading="lazy" decoding="async">`;
 }
 
-function compare(preview: Preview, sizes: DesignSources['imageSizes']): string {
+function compare(preview: Preview, sizes: DesignSources['imageSizes'], thumbnail = false): string {
   return `<div class="ns-design__compare">${
     SCHEMES.map((scheme) =>
       `<figure><a href="${ASSET_ROOT}${preview.id}--${scheme}.webp">${
-        image(preview, scheme, sizes)
+        image(preview, scheme, sizes, thumbnail)
       }</a><figcaption>${scheme === 'light' ? 'Light' : 'Dark'}</figcaption></figure>`
     ).join('')
   }</div>`;
@@ -103,14 +111,14 @@ function galleryCard(preview: Preview, sizes: DesignSources['imageSizes']): stri
     isDefault ? ' ns-design__preset--default' : ''
   }" data-preset="${preview.id}">
     <a class="ns-design__preview" href="${url}" aria-label="Explore ${escapeHtml(preview.name)}">
-      <span class="ns-design__scheme-light">${image(preview, 'light', sizes)}</span>
-      <span class="ns-design__scheme-dark">${image(preview, 'dark', sizes)}</span>
+      <span class="ns-design__scheme-light">${image(preview, 'light', sizes, true)}</span>
+      <span class="ns-design__scheme-dark">${image(preview, 'dark', sizes, true)}</span>
     </a>
     <div class="ns-design__preset-heading"><h3><a href="${url}">${
     escapeHtml(preview.name)
   }</a></h3>${isDefault ? '<span class="ns-design__label">NetScript default</span>' : ''}</div>
     <p>${escapeHtml(preview.theme.description)}</p>
-    <details><summary>Compare light and dark</summary>${compare(preview, sizes)}</details>
+    <details><summary>Compare light and dark</summary>${compare(preview, sizes, true)}</details>
     ${rawLinks(`themes/${preview.theme.id}/`)}
   </article>`;
 }
@@ -122,10 +130,10 @@ export function valueTables(theme: Theme): string {
   );
   return `<section aria-label="Theme values"><p class="ns-design__eyebrow">Specification values · ${
     escapeHtml(theme.version)
-  }</p>${
+  }</p><h2 id="design-values">Theme values</h2>${
     groups.map(([group, values]) => {
       const label = GROUP_LABELS[group] ?? group;
-      return `<h2 id="values-${escapeHtml(group)}">${escapeHtml(label)}</h2>
+      return `<h3 id="values-${escapeHtml(group)}">Values: ${escapeHtml(label)}</h3>
       <div class="ns-design__table" role="region" aria-label="${
         escapeHtml(label)
       } values" tabindex="0"><table>
@@ -176,25 +184,35 @@ export function renderTheme(
     }</h3>${compare(preview, sources.imageSizes)}
   </article>`
   ).join('');
+  const body = `<section aria-label="Theme specimens"><h2 id="design-specimens">${
+    theme.id === 'studio' ? 'Studio flavors' : 'Light and dark'
+  }</h2>${specimens}</section>
+    ${valueTables(theme)}<section aria-label="Design specification">${prose}</section>`;
   return `<header><p class="ns-design__eyebrow">Design system · Theme</p><h1>${
     escapeHtml(theme.name)
   }</h1>
     <p class="ns-design__lede">${escapeHtml(theme.description)}</p>${
     rawLinks(`themes/${theme.id}/`)
   }</header>
-    ${contents(prose)}<section aria-label="Theme specimens"><h2 id="design-specimens">${
-    theme.id === 'studio' ? 'Studio flavors' : 'Light and dark'
-  }</h2>${specimens}</section>
-    ${valueTables(theme)}<section aria-label="Design specification">${prose}</section>`;
+    ${contents(body)}${body}`;
 }
 
 /** All routes are projections of canonical sources, so a spec edit reaches the next docs build. */
 export function renderDesignPages(
   sources: DesignSources,
   md: MarkdownRenderer,
-  styles: string,
 ): DesignPage[] {
   const { guidelines, themes, previews, templates } = sources;
+  validateSections(guidelines, GUIDELINE_SECTIONS, 'GUIDELINES.md');
+  const guidelineHtml = sourceLinks(md(guidelines), 'GUIDELINES.md');
+  // Use the configured Markdown engine's actual IDs, including its slugifier.
+  const guidelineAnchor = (section: number): string => {
+    const id = md(guidelineSection(guidelines, section)).match(/<h2\b[^>]*\bid="([^"]+)"/);
+    if (!id || !guidelineHtml.includes(`id="${id[1]}"`)) {
+      throw new Error(`GUIDELINES.md: missing anchor for section ${section}`);
+    }
+    return `${DESIGN_ROOT}guidelines/#${escapeHtml(id[1])}`;
+  };
   const renderGuidelines = (source: string) => sourceLinks(md(source), 'GUIDELINES.md');
   const intro = guidelines.slice(0, guidelines.indexOf('\n## ')).replace(/^# [^\n]*\n/, '');
   const content = [
@@ -232,15 +250,19 @@ export function renderDesignPages(
       title: 'Design guidelines',
       content:
         `<p class="ns-design__eyebrow">Design system · Guidelines</p><p><a href="${SOURCE_ROOT}GUIDELINES.md">Read GUIDELINES.md</a></p>${
-          contents(renderGuidelines(guidelines))
-        }${renderGuidelines(guidelines)}`,
+          contents(guidelineHtml)
+        }${guidelineHtml}`,
     },
     {
       url: `${DESIGN_ROOT}token-contract/`,
       title: 'Token contract',
       content:
         `<header><p class="ns-design__eyebrow">Design system · Tokens</p><h1>Token contract</h1>
-      <p>Theme architecture from the design guidelines. Read it with the <a href="${DESIGN_ROOT}guidelines/#1-two-rules-that-override-everything">two governing rules</a> and the <a href="${DESIGN_ROOT}guidelines/#3-compatibility-contract-must">compatibility contract</a>.</p></header>
+      <p>Theme architecture from the design guidelines. Read it with the <a href="${
+          guidelineAnchor(1)
+        }">two governing rules</a> and the <a href="${
+          guidelineAnchor(3)
+        }">compatibility contract</a>.</p></header>
       ${
           renderGuidelines(guidelineSection(guidelines, 2))
         }<p><a href="${SOURCE_ROOT}GUIDELINES.md">Read GUIDELINES.md</a></p>`,
@@ -250,7 +272,9 @@ export function renderDesignPages(
       title: 'Create your own theme',
       content:
         `<header><p class="ns-design__eyebrow">Design system · Authoring</p><h1>Create your own theme</h1>
-      <p>Start with the <a href="${DESIGN_ROOT}guidelines/#4-the-quality-method">quality method</a> and <a href="${DESIGN_ROOT}guidelines/#3-compatibility-contract-must">compatibility contract</a>.</p></header>
+      <p>Start with the <a href="${guidelineAnchor(4)}">quality method</a> and <a href="${
+          guidelineAnchor(3)
+        }">compatibility contract</a>.</p></header>
       ${renderGuidelines(guidelineSection(guidelines, 7))}
       <h2 id="design-template">DESIGN.md template</h2><p><a href="${SOURCE_ROOT}themes/_template/DESIGN.md">Open DESIGN.md template</a></p>
       <details><summary>Read the specification template</summary><pre><code class="language-text">${
@@ -276,7 +300,7 @@ export function renderDesignPages(
     ...page,
     layout: 'layouts/base.vto',
     order: index,
-    content: `<style>${styles}</style><div class="ns-design">${
+    content: `<link rel="stylesheet" href="${SECTION_STYLESHEET}"><div class="ns-design">${
       sectionNav(themes, page.url)
     }${page.content}</div>`,
   }));
