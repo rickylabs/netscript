@@ -76,3 +76,9 @@ Full scaffold.runtime was invoked twice: first inherited local browser-library e
 - The dedicated baseline contract uses `accessibility.contract.ts`, explicitly run after npm ci by its own gate. Standard root Deno shards do not need to install the separate Node browser toolchain.
 
 Reconcile: no UI or scaffold template changes were necessary, so conditional asset regeneration gates remain not applicable. Main acceptance remains S0 token hygiene and reusable evidence. No existing CI gate is removed, labels unchanged. Full scaffold.runtime remains unproven locally due unavailable Docker/Aspire prerequisites.
+
+## Final independent implementation evaluation
+
+PASS at source head `958c2b5cb741152b6dd0ff488609e510445ce005`, separate Anthropic evaluator, high effort, read-only, stdin closed. No implementation repair requested. See evaluate.md. Durable source-head token freshness/build and browser receipts all PASS; gate-evidence.json is a privacy-safe index, not a substitute for native receipts. The browser receipt includes the fresh JSON domain report and 8 passed cases.
+
+Final source and assignment-file exclusion verified. Remaining work is to mark the PR ready, verify the first remote dedicated workflow and its screenshot artifact, then publish the canonical READY file handoff. No merge/tag/release or label mutation is authorized.

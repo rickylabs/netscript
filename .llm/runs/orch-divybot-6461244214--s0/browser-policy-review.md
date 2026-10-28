@@ -23,7 +23,7 @@ All three round-1 blockers are fixed and I found no new blockers.
   - overwrite an existing output;
   - accept negative-control results;
   - accept mixed engine or browser versions, or an incomplete or duplicated matrix.
-  
+
   It records the source commit and writes a candidate marked pending review.
 - No negative-control or strict setting appears in the workflow, so CI runs the normal policy.
 
