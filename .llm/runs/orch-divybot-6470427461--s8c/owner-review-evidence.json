@@ -63,5 +63,74 @@
     "sourceChanged": false
   },
   "independentSliceReview": "PASS",
-  "nativeCarriers": "pending slice 2"
+  "nativeCarriers": {
+    "generationOrder": [
+      "gen:agent-docs-prose",
+      "gen:mcp-export-corpus --allow-dirty",
+      "gen:assets-barrel",
+      "gen:publish-assets"
+    ],
+    "allGenerationExitCodes": 0,
+    "freshness": {
+      "prose": "PASS",
+      "mcpExports": "PASS",
+      "publishAssets": "PASS",
+      "assetsBarrel": "pending post-commit"
+    },
+    "generatedTypeCheck": "PASS",
+    "storedRows": 207,
+    "decodedEntriesIncludingDerivedFullCorpus": 208,
+    "addedPublicDocsKitPages": 3,
+    "removedEntries": 0,
+    "contextEntriesByteIdentical": true,
+    "mcpBudget": {
+      "sourceBytes": 283546,
+      "maxBytes": 294912,
+      "count": 14
+    }
+  },
+  "docsLockMatchesMain": true,
+  "reproducibility": {
+    "html": 254,
+    "twins": 205,
+    "outcome": "PASS",
+    "reportedException": "upstream Pagefind entry/filter/meta serialization only; strict default retained"
+  },
+  "localFullRuntime": {
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "exitCode": 1,
+    "outcome": "UNPROVEN",
+    "reason": "Docker unavailable; Aspire preflight and cleanup fail before runtime start",
+    "readOnlyLeakCheck": "completed; foreign or unknown resources untouched"
+  },
+  "postGenerationBrowser": {
+    "outcome": "PASS",
+    "passed": 112,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "receipt": {
+      "requestHash": "90a1322cd8efe614a3e613775064f55abe11bdb42896a39d8cafe88820eb84a8",
+      "outcome": "PASS",
+      "durationMs": 149101,
+      "exitCode": 0
+    }
+  },
+  "classifierAndWorkflowTests": {
+    "passed": 71,
+    "failed": 0
+  },
+  "internalLinks": 24217,
+  "independentImplEval": "PASS, accepted for review only",
+  "refreshedUiScreenshotArtifact": {
+    "sourceHead": "4caa5151018a5f28996b90b55edbb6059136c996",
+    "run": 40716590145,
+    "artifact": 12829755515,
+    "url": "https://github.com/rickylabs/netscript/actions/runs/40716590145/artifacts/12829755515",
+    "build": "PASS",
+    "browser": "PASS"
+  },
+  "hostedCarrierHead": "pending normal push; final PR report records latest status"
 }

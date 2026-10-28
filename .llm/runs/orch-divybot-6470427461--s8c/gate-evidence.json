@@ -134,5 +134,20 @@
     "model": "claude-opus-5-5",
     "effort": "high",
     "independentVendorFamily": true
+  },
+  "ownerReviewDelta": {
+    "authority": "issue2455 comment6472570294",
+    "evidence": "owner-review-evidence.json",
+    "uiSourceHead": "4caa5151018a5f28996b90b55edbb6059136c996",
+    "browserPassed": 112,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "publicDocsKitPages": 3,
+    "htmlPages": 254,
+    "twins": 205,
+    "internalLinks": 24217,
+    "independentImplEval": "PASS, review only",
+    "allFourCarriersRegeneratedInOrder": true,
+    "docsLockMatchesMain": true
   }
 }
