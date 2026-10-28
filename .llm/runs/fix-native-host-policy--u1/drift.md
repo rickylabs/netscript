@@ -213,3 +213,11 @@ in the new byte-audited bundle. Final11/0/0, seven-file static, docs, quality an
 README compile pass. Temporary compile source was removed; no configuration exclusion was bypassed.
 S4 RED is authorized; S5 production requires root review of exact footprint, native public closure
 and owned-upstream cleanup. Historical workers22-symbol F5 debt does not extend to streams.
+
+S4 preserves an actual2-pass/2-missing-export RED checkpoint with106 frozen protected owners.
+The local bounded helper is intentionally private in the382-line owner; no shared framework or
+permission growth. Actual streams CORS counts6/9/12 correct evaluated prose6/11/14 by explicit root
+addendum; original plan bytes remain immutable. Type-only native closure requires21 names and is
+not covered by workers22 debt. Root chooses a prospective separate exact21 numericDEBT_ACCEPTED
+process disposition, subject to same original independent review before any canonical registry or
+S5 source change. An initial doc-JSON parser extraction failure remains retained, not a native RED.

@@ -227,3 +227,20 @@ named profiles plus temporary recipe are removed; all output directories show no
 Missing synthetic-stream diagnostics match prior accepted evidence. Earlier bundles/verdicts stay
 immutable. Root acceptance authorizes checkpoint/push/DRAFT2421 and S4 streams RED next; concrete
 S5 footprint/public-type/native-upstream ownership review precedes production. No broader acceptance.
+
+## Root-accepted S4 streams RED
+
+Root read the complete382-line test and S5 proposal and independently matched107 hashes: the new
+owner d4b383c13f6f30dfa40de4842dd680cb33819321485de7e90dec7f2620d44678 plus106 protected owners.
+Actual2 controls pass/2 product tests fail/0 ignored in2084ms; both REDs are specifically missing
+./service exports. No product auth/inertness GREEN claim. Nonempty static and quality gates pass;
+explicit sanitizers, seven denied capabilities and10s/2s/32KiB child bounds remain. Two profiles
+were removed empty. Existing streams and workers source/config/locks/debt remain unchanged.
+
+New51-file byte-audited s4-evidence bundle preserves229784 original bytes, type-only6/20 RED and21
+GREEN doc probes, actual native symbol inventory, initial JSON-shape extraction failure and exact
+source/cleanup proof. Previous bundles and original PASS/FAIL/debt verdicts stay immutable.
+Root accepts factual6/9/12 legacy-CORS correction and prospective separate exact21 streams F5
+DEBT_ACCEPTED process choice: coordinator+rickylabs,target2026-11-10,no extension/no growth.
+Same original evaluator review is required before debt/facade/source application. Checkpoint is
+RED only; S5 production and paid review launch remain unauthorized pending concrete root review.
