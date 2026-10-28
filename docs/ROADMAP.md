@@ -13,13 +13,17 @@ beta, and canary prereleases. The first normal NetScript version is `0.0.2`.
 
 ## How to read a milestone
 
-GitHub milestones name the normal release that owns the work. Open release milestones currently
-run from `0.0.2` through `0.0.9`; `Backlog / Triage` holds accepted but unscheduled work. Assign the
-explicit cut milestone. A `wave:*` label supplies scheduling context but may span several releases
-and does not determine the milestone.
+Only the next release has a milestone named by a version (currently `0.0.9`). It holds the work
+agreed for that release. The other open milestones are themes that own longer-running work, such as
+`Frontend Contribution`, `Runtime Automation`, `Deploy Plugin`, `Enterprise Auth` and
+`Process Manager`. `Backlog / Triage` holds accepted work that has no theme yet, waits on an
+upstream change, or needs a decision. When a release starts, its scope is drawn from the themes.
+Order within a theme comes from issue dependencies, not from milestone names. A `wave:*` label
+supplies scheduling context and does not determine the milestone.
 
-Each release is cut when its scoped work and acceptance gates are green. Additional scope moves to
-a later `0.0.x` milestone rather than creating another prerelease train inside `0.0.1`.
+Each release is cut when its scoped work and acceptance gates are green. Work that misses a release
+returns to its theme or moves into the next release milestone; it does not start another
+prerelease train.
 
 ## Release maturity
 
