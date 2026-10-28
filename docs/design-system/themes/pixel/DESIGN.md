@@ -251,7 +251,7 @@ components:
   Mojang fonts, textures, the green/stone palette and logos.
 - **Family:** Expressive. **Best for:** games, playful products, creator and community tools, hobby
   dashboards. **Avoid for:** formal finance, legal and medical; suggest `studio` or `filigrane`.
-- **Feel:** warm and playful. Target first impression: "a launcher I want to click."
+- **Feel:** warm and playful.
 
 ## Colors
 

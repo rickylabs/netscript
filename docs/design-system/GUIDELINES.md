@@ -57,7 +57,7 @@ Figma owns values; code owns names, tiers, modes and component anatomy.
   #2414. It never ships in L2 component CSS.
 - **Layer ownership is unchanged.** L0/L1 own platform behaviour, attributes and prop getters. L2
   registry components consume component and semantic tokens. An L2 component never imports another
-  L2 component (`.agents/skills/fresh-ui-horizontal/l0-conventions.md`).
+  L2 component.
 
 ### 2.2 How Figma collections map to the resolver
 
@@ -116,13 +116,12 @@ The mode assignments are read from the Figma library and are not yet verified in
 | Tactile   | `Tactile`          | none                                      | none; Tactile reads `tactile/*`                         |
 
 **Migration from today's selectors.** Code today (NS One) scopes light on `:root` and dark on
-`[data-theme='dark']` (`.agents/skills/fresh-ui-horizontal/theme-authoring.md`). The new model moves
-the scheme to `data-scheme` and gives `data-theme` to the language: `data-theme="dark"` becomes
-`data-theme="<language>" data-scheme="dark"`. S1 acceptance requires that existing `--ns-*` names
-keep resolving or have a documented migration, and that NS One renders unchanged. S1 therefore
-either keeps `[data-theme='dark']` resolving as the default preset's dark scheme or ships that
-migration, with a `ui:migrate` step for app-owned copies. Never rename an existing `--ns-*` name
-without a migration.
+`[data-theme='dark']`. The new model moves the scheme to `data-scheme` and gives `data-theme` to the
+language: `data-theme="dark"` becomes `data-theme="<language>" data-scheme="dark"`. S1 acceptance
+requires that existing `--ns-*` names keep resolving or have a documented migration, and that NS One
+renders unchanged. S1 therefore either keeps `[data-theme='dark']` resolving as the default preset's
+dark scheme or ships that migration, with a `ui:migrate` step for app-owned copies. Never rename an
+existing `--ns-*` name without a migration.
 
 ### 2.4 Token-only assignments and declared language packs
 
@@ -238,7 +237,7 @@ work from memory.
 | Liquid    | Apple macOS 27 / iOS 27 Liquid Glass (official Figma kits)                                                                                                                                    |
 | Fluent    | WinUI theme resources and Fluent 2 (MIT)                                                                                                                                                      |
 | Brutal    | Gumroad UI and neobrutalism.dev                                                                                                                                                               |
-| Filigrane | minimal thin type (defined by NetScript; no external reference)                                                                                                                               |
+| Filigrane | NetScript-defined minimal typography; FT Origami o3 and Guardian Source for focus, data and accent patterns, without newspaper chrome                                                         |
 | Terminal  | Charm Lip Gloss and Bubbles                                                                                                                                                                   |
 | Pixel     | the Mistral pixel idea, plus Ore UI component cues                                                                                                                                            |
 | Tactile   | Themesberg Neumorphism UI and flutter_neumorphic (verified upstream, pinned), plus setproduct guidance adopted as local parameters (upstream unverified; see Tactile `DESIGN.md` → _Sources_) |
@@ -289,9 +288,9 @@ activity feed. It exercises about 30 components in one view. Then add:
    text.
 2. **Dark inversion audit.** Check every dark frame for white headers, light slabs, white outlines
    or shadows, and light primary buttons. Each is a high-severity defect, even when contrast passes.
-   The only exception is a waiver recorded with its scope in that theme's `DESIGN.md`. There is one
-   today: Fluent's native dark accent `#60CDFF` is allowed only at control size and on selection
-   indicators. Never use it as a surface fill.
+   The single exception in this catalogue is Fluent's native dark accent `#60CDFF`, at control size
+   and on native selection indicators as specified in Fluent's `DESIGN.md`. It never fills content
+   surfaces. No other theme or usage is exempt.
 3. **Measure pixels, not tokens.** Sample the exported PNG. Two traps make a correct token measure
    wrong:
    - a stale stored paint colour on side-specific strokes;

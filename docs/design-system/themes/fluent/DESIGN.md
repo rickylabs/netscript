@@ -430,8 +430,8 @@ the core roles to those roles is pending in #2414:
 
 ## Do's and Don'ts
 
-- **Don't** restyle web components to look like WinUI controls. Symptom: the app reads as a web
-  dashboard, not a native Windows 11 app.
+- **Do** implement the WinUI control anatomy and brushes specified here. **Don't** substitute Fluent
+  2 web anatomy for the documented WinUI controls.
 - **Do** take every colour, size and radius from WinUI theme resources and cite its key. No invented
   brushes.
 - **Do** keep cards flat. Depth comes from layers and elevation borders, not shadows.

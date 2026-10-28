@@ -85,7 +85,7 @@ Pixel combines amber pixels with game-key physics and keeps everything else calm
   frame). Use exactly one of those depth treatments.
 - Cut corners as pixel steps with `clip-path` (4px on 40px keys, 2px on smaller controls).
 - New visual roles go under `pixel/<path>` and must be registered in S1.
-- Specify every new component in all its states.
+- Add every new component, in all its states, to the Light and Dark components sheets.
 
 ## Self-check before handing off
 

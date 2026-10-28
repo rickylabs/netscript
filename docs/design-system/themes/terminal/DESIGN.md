@@ -253,12 +253,11 @@ Names are provisional until the token export in #2414.
   440.
 - **Orders grid:** `grid-template-columns: 2ch 12ch 25ch minmax(0, 1fr) 17ch 10ch 18ch 12ch` at
   Geist Mono 14/24: marker, id, customer, email (the flexible track), channel, status, date and
-  total (right aligned). The fixed tracks are 96ch (806.4px). Resolve the email track inside the
-  Orders pane's content box: the 1240px pane minus its 16px side padding, its border (2px while
-  active) and any column gaps. Don't hard-code resolved pixel widths: a fixed pixel list does not
-  fit the pane once padding, borders and gaps are counted. Compute the track from the layout. Never
-  shrink the type or clip a column to force the arithmetic. Every row reserves the marker cell.
-  Header row in `muted-fg`, then a 1px `border` rule; rows 24 tall.
+  total (right aligned). The fixed tracks are 96ch (806.4px). Resolve the email track from the final
+  content box of the Orders pane (the 1240px pane) after subtracting padding, borders and gaps. A
+  resolved pixel width is not a reusable track token. Never shrink the type or clip a column to
+  force the arithmetic. Every row reserves the marker cell. Header row in `muted-fg`, then a 1px
+  `border` rule; rows 24 tall.
 - **Other grids:** metrics 16ch / 12ch right / 3ch gap / delta / trend fill; alerts with a 6ch level
   column; log 9/6/8/10ch plus fill, single-line truncation with `…`.
 - **Density:** Terminal sets Density `Compact` (control 32, row 44) but binds no Density variable;

@@ -270,8 +270,7 @@ Names are provisional until S1 #2414.
   panels, widgets, settings. Avoid dense tables, many-field forms and data-dense dashboards. This is
   Tactile's adopted design rule, taken from setproduct's guide (upstream unverified). It is not a
   universal neumorphism standard.
-- **Feel:** soft, physical and calm. Target first impression: "a well-made control panel you want to
-  touch".
+- **Feel:** soft, physical and calm.
 
 ## Colors
 

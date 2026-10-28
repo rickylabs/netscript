@@ -505,8 +505,8 @@ Contrast ratios are measured on exported pixels.
   toolbar top; toolbar items 36 with a 28px inner button; the item recipe is fill `#fbfbfb`, 0.5px
   spread `#ebebeb`, ±0.75px `#f2f2f2`, no drop shadow.
 - **NetScript deviations from the kit:** outline `#e3e3e6` (not `#ebebeb`); an added `GLASS` (0.35),
-  a 1px black 10% stroke and a top highlight on toolbar items; sidebar blur 60 (the kit sidebar has
-  no blur effect).
+  a 1px black 10% stroke and a top highlight on toolbar items; sidebar blur 60 (the inspected kit
+  sidebar instance exposes no blur effect; the kit's canonical sidebar blur remains unverified).
 - **Links:** [Apple Design Resources](https://developer.apple.com/design/resources/),
   [Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/),
   [Get to know the new design system](https://developer.apple.com/videos/play/wwdc2025/356/),

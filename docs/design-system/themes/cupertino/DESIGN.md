@@ -471,10 +471,10 @@ Measured on rendered pixels and resolved tokens (WCAG 2.2):
   - Reduce Transparency capsules use `surface-raised` (82% alpha), not an opaque role.
   - `cupertino/*`: delete it, or keep it as the Cupertino resolver mode once the Theme collection
     has no mode limit. Don't bind only some of its roles.
-- **Status.** Values come from the NetScript Figma library. Token export is tracked in #2414,
-  component states, focus and accessible names in #2416, and runtime checks such as motion,
-  keyboard, scroll, live preferences and glass rendering in #2419. The blur-only vibrancy stays
-  _proposed_ until the #2419 comparison.
+- **Status.** Values come from the NetScript Figma library. Token names and export, fonts, tabular
+  figures and the full contrast matrix are pending in #2414. Component states, focus and accessible
+  names are pending in #2416, and runtime checks such as motion, keyboard, scroll, live preferences
+  and glass rendering in #2419. The blur-only vibrancy stays _proposed_ until the #2419 comparison.
 
 ## Sources
 

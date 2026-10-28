@@ -408,7 +408,7 @@ until S3 #2416 registers them:
 - **Do** go big and regular: 92/96 title, 60/64 values.
 - **Do** centre every icon on whole pixels inside its disc.
 - **Do** draw the floating selection bar as one ink material, with no second background.
-- **Do** let regions breathe: 64 margins, 16 gaps, 6px row gaps. Symptom to avoid: a cramped layout.
+- **Do** keep the spacing: 64 margins, 16 gaps, 6px row gaps.
 - **Do** keep pastels for categories and ink for actions; never a pastel or violet primary.
 - **Do** use `bloom-muted` #655f55 for supporting text in light. The lighter #7d786f is 3.32:1 on
   lavender.

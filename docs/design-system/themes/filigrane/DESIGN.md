@@ -300,10 +300,10 @@ Names are provisional until the token export in #2414.
   selected tab; a link action on the right.
 - **Table:** header 40, rows 52 with a 1px `border` rule. Columns: mark 36px, No. 108px, customer
   `minmax(0, 1fr)`, channel 140px, status 150px, date 132px, amount 120px (right aligned). The
-  customer track is flexible. Resolve it from the 1168px content width only after subtracting row
-  padding, borders and column gaps. A fixed 482px customer width ignores those and does not fit;
-  compute the track from the layout instead. Never shrink the type or clip a column to force the
-  arithmetic. Footnote row 36: "Page 1 of 531 · amounts in USD, refunds in parentheses".
+  customer track is flexible. The 482px figure assumes no additional row padding, borders or column
+  gaps; recompute the customer track from the final content box. Never shrink the type or clip a
+  column to force the arithmetic. Footnote row 36: "Page 1 of 531 · amounts in USD, refunds in
+  parentheses".
 - **Bottom** (padding 40, gap 56): a 732px form (1px top rule, gap 22) and a 380px side column
   (gap 36) with the attention notice and recent activity.
 - **Density:** Filigrane sets no density mode and binds no density variable. Its rhythm is fixed and

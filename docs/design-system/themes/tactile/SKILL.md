@@ -104,7 +104,8 @@ that hold a value sink as concave wells. A selected thing is pressed in. Signatu
 - Classify, then derive from the closest existing element of the same height and size band.
 - If a new visual role is needed, add it as `tactile/<path>` and register it in code (S1). Don't
   reuse an unrelated role. Don't add effect styles outside the ladder.
-- Specify the new component in Light and Dark, and re-run the audit in the self-check below.
+- Add the new component to the components sheet in Light and Dark, and re-run the audit in the
+  self-check below.
 
 ## Self-check before handing off
 
