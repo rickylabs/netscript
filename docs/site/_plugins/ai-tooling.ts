@@ -2,6 +2,8 @@ import { CALLOUT_TYPES, calloutType } from '../../../tools/docs-site/callout-typ
 import { Page } from 'lume/core/file.ts';
 import { releaseVersion } from '../_data.ts';
 import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
+import { TREE_SOURCE_ATTRIBUTE } from './file-tree.ts';
+import { ALERT_ATTRIBUTE } from './callout.ts';
 
 /**
  * AI-affordance tooling for the NetScript docs site (SOTA study rec #1).
@@ -165,7 +167,8 @@ function absoluteUrl(href: string, origin: URL): string {
 /* HTML -> Markdown (rendered `.ns-prose` body)                        */
 /* ------------------------------------------------------------------ */
 
-function articleToMarkdown(article: Element, origin: URL): string {
+/** Serialize a rendered `.ns-prose` article as its Markdown twin. */
+export function articleToMarkdown(article: Element, origin: URL): string {
   return childBlocks(article, origin)
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -221,8 +224,12 @@ function blockMd(node: ChildNode, origin: URL): string {
     }
     case 'p':
       return inlineChildren(el, origin).trim();
-    case 'ul':
+    case 'ul': {
+      // A fenced `tree` keeps its authored ASCII; the nested list is presentation only.
+      const tree = el.getAttribute(TREE_SOURCE_ATTRIBUTE);
+      if (tree !== null) return `\`\`\`text\n${tree}\n\`\`\``;
       return listMd(el, origin, false);
+    }
     case 'ol':
       return listMd(el, origin, true);
     case 'pre':
@@ -232,6 +239,16 @@ function blockMd(node: ChildNode, origin: URL): string {
       const kind = el.getAttribute('data-variant');
       const label = el.querySelector('.ns-callout__label');
       const body = el.querySelector('.ns-callout__body');
+      // A Markdown alert is written back as authored: `[!TYPE]`, an optional `**title**`
+      // paragraph, then the body.
+      const marker = el.getAttribute(ALERT_ATTRIBUTE);
+      if (el.classList.contains('ns-callout') && kind && label && body && marker) {
+        const title = inlineChildren(label, origin).trim();
+        const head = title && title !== CALLOUT_TYPES[calloutType(kind)].label
+          ? `[!${marker}]\n**${title}**\n`
+          : `[!${marker}]`;
+        return quoteMd(`${head}\n${childBlocks(body, origin)}`);
+      }
       if (el.classList.contains('ns-callout') && kind && label && body) {
         return quoteMd(
           `[!${CALLOUT_TYPES[calloutType(kind)].markdown}]\n${
