@@ -1,7 +1,2 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#12100e"/>
-  <text x="50%" y="50%" dy="0.35em" text-anchor="middle"
-    font-family="'DM Mono', ui-monospace, monospace" font-size="18" font-weight="600">
-    <tspan fill="#fcfaf6">n</tspan><tspan fill="#bd774c">s</tspan>
-  </text>
-</svg>
+<!-- Generated token layer and logo by tools/docs-site/generate-tokens.ts. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>:root{--ns-studio-signal-brand:#da291c;--ns-studio-primary-fg:#fcfcfc}@media(prefers-color-scheme:dark){:root{--ns-studio-signal-brand:#e5332a;--ns-studio-primary-fg:#eeeeee}}</style><path fill="var(--ns-studio-signal-brand)" d="M0 0h32v32H0z"/><path fill="var(--ns-studio-primary-fg)" d="M8 24V8h4l8 11V8h4v16h-4L12 13v11z"/></svg>

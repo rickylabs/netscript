@@ -14,7 +14,7 @@
  * `_data/xref.ts`).
  */
 
-import cliPackageJson from "../../packages/cli/deno.json" with { type: "json" };
+import cliPackageJson from '../../packages/cli/deno.json' with { type: 'json' };
 
 /**
  * Default nav sort weight, cascaded to every page (front matter overrides).
@@ -39,9 +39,11 @@ export interface NavLaneLink {
 
 export interface NavLane {
   label: string;
+  /** Landing page for the top-bar lane. */
+  href: string;
   /** One-line intent gloss rendered under the lane header. */
   subtitle: string;
-  kind: "flat" | "menu";
+  kind: 'flat' | 'menu';
   /** kind "flat": curated links rendered as-is (Start lane). */
   items?: NavLaneLink[];
   /** kind "menu": nav.menu() roots rendered as subtrees, in curated order. */
@@ -56,60 +58,81 @@ export interface NavLane {
 
 export const navLanes: NavLane[] = [
   {
-    label: "Start",
-    subtitle: "Get running in minutes",
-    kind: "flat",
+    label: 'Start',
+    href: '/quickstart/',
+    subtitle: 'Get running in minutes',
+    kind: 'flat',
     items: [
-      { href: "/why/", label: "Why NetScript" },
-      { href: "/quickstart/", label: "Quickstart" },
-      { href: "/quickstart/aspire/", label: "Aspire quickstart" },
-      { href: "/concepts/", label: "Core concepts" },
-      { href: "/cli-reference/", label: "CLI reference" },
-      { href: "/glossary/", label: "Glossary" },
-      { href: "/how-to/", label: "All recipes" },
+      { href: '/why/', label: 'Why NetScript' },
+      { href: '/quickstart/', label: 'Quickstart' },
+      { href: '/quickstart/aspire/', label: 'Aspire quickstart' },
+      { href: '/concepts/', label: 'Core concepts' },
+      { href: '/cli-reference/', label: 'CLI reference' },
+      { href: '/glossary/', label: 'Glossary' },
+      { href: '/how-to/', label: 'All recipes' },
     ],
   },
   {
-    label: "Learn",
-    subtitle: "Build one thing end to end",
-    kind: "menu",
-    roots: ["/tutorials/"],
+    label: 'Learn',
+    href: '/tutorials/',
+    subtitle: 'Build one thing end to end',
+    kind: 'menu',
+    roots: ['/tutorials/'],
     expandRoot: true,
   },
   {
-    label: "Build",
-    subtitle: "Add a capability to your app",
-    kind: "menu",
+    label: 'Build',
+    href: '/web-layer/',
+    subtitle: 'Add a capability to your app',
+    kind: 'menu',
     roots: [
-      "/web-layer/",
-      "/services-sdk/",
-      "/background-processing/",
-      "/durable-workflows/",
-      "/ai/",
-      "/data-persistence/",
-      "/identity-access/",
-      "/orchestration-runtime/",
-      "/observability/",
+      '/web-layer/',
+      '/services-sdk/',
+      '/background-processing/',
+      '/durable-workflows/',
+      '/ai/',
+      '/data-persistence/',
+      '/identity-access/',
+      '/orchestration-runtime/',
+      '/observability/',
     ],
   },
   {
-    label: "Reference",
-    subtitle: "Every published symbol",
-    kind: "menu",
-    roots: ["/reference/"],
+    label: 'Reference',
+    href: '/reference/',
+    subtitle: 'Every published symbol',
+    kind: 'menu',
+    roots: ['/reference/'],
     expandRoot: true,
   },
   {
-    label: "Concepts",
-    subtitle: "How and why it works",
-    kind: "menu",
-    roots: ["/explanation/", "/comparisons/"],
+    label: 'Concepts',
+    href: '/explanation/',
+    subtitle: 'How and why it works',
+    kind: 'menu',
+    roots: ['/explanation/', '/comparisons/'],
+    expandRoot: true,
+  },
+  {
+    label: 'Design system',
+    href: '/design-system/',
+    subtitle: 'One design grammar, every surface',
+    kind: 'menu',
+    roots: ['/design-system/'],
     expandRoot: true,
   },
 ];
 
+/** Choose one lane from the source URL, before the base-path plugin rewrites links. */
+export function getDocsLane(url: string): NavLane {
+  if (url === '/cli-reference/') return navLanes[3];
+  return navLanes.find((lane) => lane.roots?.some((root) => url.startsWith(root))) ??
+    navLanes.find((lane) => lane.items?.some((item) => url.startsWith(item.href))) ??
+    navLanes[0];
+}
+
 /** nav.menu()/nav.breadcrumb() query — one definition so templates agree. */
-export const navQuery = "nav_hide!=true isRedirect!=true";
+export const navQuery = 'nav_hide!=true isRedirect!=true';
 
 /** nav.menu() sort — `order` front matter first, url as tiebreak. */
-export const navSort = "order url";
+export const navSort = 'order url';

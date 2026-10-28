@@ -211,6 +211,8 @@ export function classifyPath(
   rootDenoConfig: DenoConfigChange = 'toolchain',
 ): Capabilities {
   const path = normalise(rawPath);
+  // The site renders canonical design sources outside its own source directory.
+  const docsSiteSource = path.startsWith('docs/site/') || path.startsWith('docs/design-system/');
   if (path === 'deno.json' || path === 'deno.jsonc') {
     return rootDenoConfig === 'tasks-only' ? { ...NONE, deno: true } : {
       ...NONE,
@@ -233,8 +235,9 @@ export function classifyPath(
       desktop: true,
       deno: true,
       surface: path.startsWith('packages/'),
-      pages: (path === 'deno.lock' || /^(packages|plugins)\/[^/]+\/deno\.jsonc?$/.test(path)) &&
-        !isPackageTestOnly(path),
+      pages: docsSiteSource ||
+        ((path === 'deno.lock' || /^(packages|plugins)\/[^/]+\/deno\.jsonc?$/.test(path)) &&
+          !isPackageTestOnly(path)),
       freshUi: path.startsWith('packages/fresh-ui/') || path === 'deno.lock' ||
         /^(?:packages\/[^/]+|packages\/cli\/e2e|plugins\/[^/]+)\/deno\.jsonc?$/.test(path),
       freshBrowser: path === 'deno.lock' || isFreshBrowserSurface(path),
@@ -285,7 +288,7 @@ export function classifyPath(
       ...NONE,
       docs: !AGENT_CONTEXT_PREFIXES.some((prefix) => path.startsWith(prefix)),
       surface: path.startsWith('packages/'),
-      pages: path.startsWith('docs/site/') ||
+      pages: docsSiteSource ||
         ((path.startsWith('packages/') || path.startsWith('plugins/')) &&
           !isPackageTestOnly(path)),
     };
@@ -310,7 +313,7 @@ export function classifyPath(
       docs: path.startsWith('docs/'),
       // Root `deno test`/task gates execute code under `.llm/tools` etc.
       deno: hasExtension(path, CODE_EXTENSIONS),
-      pages: path.startsWith('docs/site/') || path.startsWith('.llm/tools/docs/'),
+      pages: docsSiteSource || path.startsWith('.llm/tools/docs/'),
       freshUi: [
         '.llm/tools/run-deno-check.ts',
         '.llm/tools/run-deno-lint.ts',

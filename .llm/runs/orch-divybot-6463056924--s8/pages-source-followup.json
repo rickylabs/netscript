@@ -1,0 +1,40 @@
+{
+  "scope": "Coordinator-requested canonical Design system source triggers",
+  "baseline": "3a7a4a53e33d2d2193cd401c17440e47733b09db",
+  "red": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 65,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 67,
+      "uniqueFailures": 2
+    },
+    "causes": [
+      "Canonical design source classified as not needing Pages",
+      "Both workflow trigger lists omit canonical source prefix"
+    ]
+  },
+  "green": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 67,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 67,
+      "uniqueFailures": 0
+    }
+  },
+  "checks": {
+    "typecheck": "PASS: three edited TypeScript files, structured wrapper, unstable-kv",
+    "lint": "PASS: three files processed, structured wrapper",
+    "format": "PASS: three files processed, structured wrapper"
+  },
+  "coverage": [
+    "Markdown, JSON and nested config sources select Pages",
+    "pull_request build and main push deployment decisions",
+    "Both Pages workflow event path lists",
+    "Build/deploy consumption of classifier output"
+  ],
+  "privacy": "Only repo-relative commands and compact results recorded; raw outputs retained outside the tracked run."
+}

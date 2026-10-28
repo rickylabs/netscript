@@ -1,0 +1,85 @@
+{
+  "cause": "Approved S8b index.page.ts already imports the Lume2.5.4 sharp adapter for bounded thumbnails. Native build materialized this closure; no declared dependency or resolution updates.",
+  "oldHead": "1923676",
+  "removed": {
+    "specifiers": [],
+    "npm": [],
+    "jsr": [],
+    "remote": []
+  },
+  "changed": {
+    "specifiers": [],
+    "npm": [],
+    "jsr": [],
+    "remote": []
+  },
+  "added": {
+    "specifiers": [
+      "npm:ico-endec@0.1.6",
+      "npm:sharp@0.33.5",
+      "npm:svg2png-wasm@1.4.1"
+    ],
+    "npm": [
+      "@emnapi/runtime@1.11.3",
+      "@img/sharp-darwin-arm64@0.33.5",
+      "@img/sharp-darwin-x64@0.33.5",
+      "@img/sharp-libvips-darwin-arm64@1.0.4",
+      "@img/sharp-libvips-darwin-x64@1.0.4",
+      "@img/sharp-libvips-linux-arm64@1.0.4",
+      "@img/sharp-libvips-linux-arm@1.0.5",
+      "@img/sharp-libvips-linux-s390x@1.0.4",
+      "@img/sharp-libvips-linux-x64@1.0.4",
+      "@img/sharp-libvips-linuxmusl-arm64@1.0.4",
+      "@img/sharp-libvips-linuxmusl-x64@1.0.4",
+      "@img/sharp-linux-arm64@0.33.5",
+      "@img/sharp-linux-arm@0.33.5",
+      "@img/sharp-linux-s390x@0.33.5",
+      "@img/sharp-linux-x64@0.33.5",
+      "@img/sharp-linuxmusl-arm64@0.33.5",
+      "@img/sharp-linuxmusl-x64@0.33.5",
+      "@img/sharp-wasm32@0.33.5",
+      "@img/sharp-win32-ia32@0.33.5",
+      "@img/sharp-win32-x64@0.33.5",
+      "color-convert@2.0.1",
+      "color-name@1.1.4",
+      "color-string@1.9.1",
+      "color@4.2.3",
+      "detect-libc@2.1.2",
+      "ico-endec@0.1.6",
+      "is-arrayish@0.3.4",
+      "semver@7.8.5",
+      "sharp@0.33.5",
+      "simple-swizzle@0.2.4",
+      "svg2png-wasm@1.4.1"
+    ],
+    "jsr": [],
+    "remote": [
+      "https://deno.land/x/lume@v2.5.4/deps/sharp.ts",
+      "https://deno.land/x/lume@v2.5.4/deps/svg2png.ts"
+    ]
+  },
+  "nativeInfoCommand": "deno info --json design-system/index.page.ts (cwd docs/site)",
+  "nativeImportProvenance": [
+    {
+      "source": "docs/site/design-system/index.page.ts",
+      "imports": [
+        "https://deno.land/x/lume@v2.5.4/deps/sharp.ts"
+      ]
+    },
+    {
+      "source": "https://deno.land/x/lume@v2.5.4/deps/sharp.ts",
+      "imports": [
+        "npm:sharp@0.33.5",
+        "npm:ico-endec@0.1.6",
+        "https://deno.land/x/lume@v2.5.4/deps/svg2png.ts"
+      ]
+    },
+    {
+      "source": "https://deno.land/x/lume@v2.5.4/deps/svg2png.ts",
+      "imports": [
+        "npm:svg2png-wasm@1.4.1"
+      ]
+    }
+  ],
+  "whyWrapperLimitation": "deps:why scans the repository import-map graph; it does not include this dynamically discovered nested site page entrypoint. Do not treat its no-hit result as a removable dependency finding."
+}

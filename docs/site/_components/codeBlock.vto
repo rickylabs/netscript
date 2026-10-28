@@ -1,0 +1,9 @@
+{{# Stable code frame with optional filename. Keep the gutter outside code for clean copying. #}}
+{{ set source = code || "" }}
+{{ set language = lang || "text" }}
+{{ set file = filename || source.match(/(?:\/\/|#)\s+([\w./()-]+\.(?:tsx?|json|prisma|sql|sh|cs|py|go|yaml|yml))\b/)?.[1] || language }}
+{{ set escaped = source.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
+<div class="ns-code-block" data-code-block>
+  <div class="ns-code-header"><span class="ns-code-path"{{ if file === language }} aria-hidden="true"{{ /if }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v6h6" /></svg>{{ file }}</span><button type="button" class="ns-copy-btn js-only" data-code-copy aria-label="Copy {{ file }} code">Copy</button></div>
+  <div class="ns-code-body"><div class="ns-code-gutter" aria-hidden="true">{{ source.replace(/\n$/, "").split("\n").map((_, i) => i + 1).join("&#10;") }}</div><pre tabindex="0"><code class="language-{{ language }}">{{ escaped }}</code></pre></div>
+</div>

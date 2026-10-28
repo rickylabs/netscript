@@ -48,7 +48,7 @@
       aria-labelledby="{{ gid }}-tab-ours"
       tabindex="0"
     >
-      <pre><code class="language-{{ ours.lang }}">{{ oursCode }}</code></pre>
+      {{ comp.codeBlock({ code: ours.code, lang: ours.lang, filename: ours.filename }) }}
     </div>
     <div
       class="ns-tabbed__panel"
@@ -59,7 +59,7 @@
     >
       {{ for index, item of items }}
         {{ set itemCode = (item.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
-        <div data-ns-competitor="{{ item.key }}"{{ if index !== 0 }} hidden{{ /if }}><pre><code class="language-{{ item.lang }}">{{ itemCode }}</code></pre></div>
+        <div data-ns-competitor="{{ item.key }}"{{ if index !== 0 }} hidden{{ /if }}>{{ comp.codeBlock({ code: item.code, lang: item.lang, filename: item.filename }) }}</div>
       {{ /for }}
     </div>
   </div>

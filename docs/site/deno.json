@@ -13,7 +13,11 @@
     "diagrams:check": "deno run -A _diagrams/render.ts --check"
   },
   "imports": {
-    "lume/": "https://deno.land/x/lume@v2.5.4/"
+    "lume/": "https://deno.land/x/lume@v2.5.4/",
+    "markdown-it-anchor": "npm:markdown-it-anchor@9.2.0",
+    "highlight.js/bash": "npm:highlight.js@11.11.1/lib/languages/bash",
+    "highlight.js/json": "npm:highlight.js@11.11.1/lib/languages/json",
+    "highlight.js/typescript": "npm:highlight.js@11.11.1/lib/languages/typescript"
   },
   "fmt": {
     "useTabs": false,

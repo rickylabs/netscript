@@ -98,7 +98,7 @@ export function aiTooling(options: AiToolingOptions = {}) {
         const title = String(page.data.title ?? deriveTitle(article) ?? url);
 
         let body = articleToMarkdown(article, origin);
-        if (!/^#\s/.test(body)) {
+        if (!article.querySelector('h1')) {
           body = `# ${title}\n\n${body}`;
         }
 
@@ -151,6 +151,8 @@ function absoluteUrl(href: string, origin: URL): string {
   if (!trimmed || trimmed.startsWith('#')) return trimmed;
   if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed; // has a scheme
   try {
+    // Component `url` filters already include the project base; preserve it once.
+    if (trimmed.startsWith(origin.pathname)) return new URL(trimmed, origin.origin).href;
     const path = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
     return new URL(path, origin).href;
   } catch {
