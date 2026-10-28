@@ -1,0 +1,34 @@
+{
+  "previousGoalTurn": "progress: implementation, commits, PR updates, independent evaluation and evidence delivered",
+  "currentImplementation": "1828064b",
+  "auditedHead": "b9dd656cb2b0fe7c19398316fea116a4bb50e27c",
+  "requiredReviewFixes": "PASS: thirteen ordered required theme H2s; independent fixed fixture lists; validated rendered guideline anchors",
+  "requiredPolish": "PASS: linked section CSS on all fifteen pages; thirty-four build-only thumbnails; distinct Colors/value headings",
+  "requiredProof": "PASS: docs build, thirteen tests, three red-before/green-after regressions, links, fixed-TOC screenshot and independent read-only Claude Opus 5.5/high sign-off",
+  "currentRenderedAudit": {
+    "generatedPages": 15,
+    "markdownTwins": 15,
+    "linkedSectionCssEveryPage": true,
+    "generatedThumbnails": 34,
+    "excludedFilesUnchanged": true
+  },
+  "currentMcpBudgetAudit": {
+    "method": "Native buildAgentDocsProseFromSite into a temporary carrier, then actual buildMcpEmbeddedDocs",
+    "sourceBytes": 284489,
+    "budgetBytes": 294912,
+    "documentCount": 14,
+    "trackedAssetWrites": 0,
+    "verdict": "PASS"
+  },
+  "additionalFreshnessGate": {
+    "command": "deno task check:agent-docs-prose",
+    "exitCode": 1,
+    "result": "Site build passes; checked-in agent-docs-prose.generated.ts is stale",
+    "owner": "Existing declared generation-only support lane on PR 2437",
+    "handoff": "Source repair pushed; support lane notified in PR comment",
+    "liveness": "Native Codex process referencing the support worktree confirmed live; no process identifiers retained"
+  },
+  "runtimeGate": "UNPROVEN locally: Aspire/Docker environment; independent runtime support is separate and no merge readiness is claimed",
+  "completion": "Not yet claimed while the known generated-carrier freshness failure remains",
+  "stopPoint": "READY for review; never merge, tag or release"
+}
