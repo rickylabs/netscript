@@ -101,7 +101,8 @@ Signature moves:
 ## Self-check before handing off
 
 - [ ] Recognisable as Terminal at a 480px thumbnail: boxed panes, mono grid, one lime bar.
-- [ ] Dark audit: no white or pale tab, key, header or outline; only the selection row is lime.
+- [ ] Dark audit: no white or pale tab, key, header or outline; lime fills only the selection row
+      and the sync progress bar.
 - [ ] Text ≥ 4.5:1; active-pane border and key edges ≥ 3:1. Measured on pixels.
 - [ ] Every prompt, check and key is reachable by keyboard with its own visible focus; each
       composite has a documented way in and out.

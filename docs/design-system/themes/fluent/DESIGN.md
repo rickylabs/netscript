@@ -301,14 +301,14 @@ components:
 ### Dark accent `#60CDFF`: control size only
 
 WinUI's dark `AccentFillColorDefault` is `SystemAccentColorLight2` (`#60CDFF`) with black
-`TextOnAccentFillColorPrimary` (11.67:1). GUIDELINES §4.5 treats a light-filled primary as a
-dark-mode defect, so Fluent keeps this native value only inside a fixed scope:
+`TextOnAccentFillColorPrimary` (11.67:1). It is a saturated accent fill, so this accent policy sets
+where it may appear in dark (GUIDELINES §4.5):
 
 - The dark accent `#60CDFF` is allowed only at control size (accent buttons up to 32px tall, the
   40×20 toggle, the 20px checkbox) and on the native selection indicators (3px pills, the
   SelectorBar bar).
 - Never use it as a surface fill: no content slab, card, header, row, banner or other surface larger
-  than a control. Any use outside this scope is a GUIDELINES §4.5 defect.
+  than a control. Any use outside this scope is a dark-inversion defect.
 - The rule applies to Fluent only. Another theme cannot inherit it by citing a platform reference.
 
 ### Differences from the native WinUI values

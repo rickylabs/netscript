@@ -286,27 +286,14 @@ activity feed. It exercises about 30 components in one view. Then add:
 
 1. **Thumbnail test.** On a 4×2 contact sheet at 480px, each theme is identifiable without reading
    text.
-2. **Dark inversion audit.** Check every dark frame for white or pale neutral surfaces: white
-   headers, light gray slabs, white outlines or shadows, and white or pale primary buttons. Each is
-   a high-severity defect, even when contrast passes. A saturated accent fill with dark ink is not
-   an inversion when a theme's language requires it. These are the named cases, each limited to the
-   scope in that theme's `DESIGN.md`:
-   - **Fluent:** the native dark accent `#60CDFF` with black text, at control size and on native
-     selection indicators only. It never fills content surfaces.
-   - **Terminal:** lime `#bdee63` with dark ink on the selection row (inverse video) and the lime
-     fill of the sync progress bar. The selected tab and the primary key stay dark.
-   - **Pixel:** amber `#faab35` with `#12100e` ink, only where its accent policy allows it: the
-     primary and hero keys, the selected tab, the current page key, checked checkboxes, the on
-     switch, the focus ring, the block cursor, and the 2px amber bands used as signals.
-   - **Brutal:** the saturated blocks and the amber primary, which are the language's surfaces in
-     both schemes. They carry black ink, except the dark violet `block-purple`, which takes
-     `text/fg` because black on it is 3.9:1.
-   - **Cupertino:** `primary` `#0090ff` with dark ink `#111113`, only where its accent policy allows
-     it: the prominent capsule, the selected list row, checked selection circles, and the brand and
-     avatar discs.
-
-   No other theme or usage is exempt. A new theme that needs such a fill is added to this list by a
-   change to these guidelines.
+2. **Dark inversion audit.** Check every dark frame for pale or white surfaces produced by inverting
+   the light scheme: white or light gray headers, slabs and panels, white outlines or shadows, white
+   or pale primary buttons, and pale accent tints used as slabs. Each is a high-severity defect,
+   even when contrast passes. Saturated accent fills are not inversions. Where a theme uses them in
+   dark, and which ink sits on them, is set by the accent policy in that theme's `DESIGN.md`
+   (_Colors_), which is the single authority. An accent policy covers saturated accent fills only:
+   it can never allow a pale or neutral fill, and the ink on every fill must meet the contrast rules
+   in §3.
 3. **Measure pixels, not tokens.** Sample the exported PNG. Two traps make a correct token measure
    wrong:
    - a stale stored paint colour on side-specific strokes;

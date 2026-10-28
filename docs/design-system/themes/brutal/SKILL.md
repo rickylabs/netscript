@@ -97,7 +97,7 @@ stays black in the dark scheme. Signature moves:
 - [ ] Recognisable as Brutal at a 480px thumbnail: blocks, black slabs, mono stickers.
 - [ ] Dark audit: no white headers, pale gray slabs, white outlines or shadows. The amber primary
       and the saturated blocks keep black ink, except dark `block-purple`, which uses `text/fg`
-      (GUIDELINES §4.5). Shadows and outlines are `#000000`.
+      (accent policy in `DESIGN.md` → _Colors_). Shadows and outlines are `#000000`.
 - [ ] Text ≥ 4.5:1 on every block in both schemes; control boundaries and focus ≥ 3:1. Measured on
       pixels.
 - [ ] Every shadow is a zero-blur offset from the 3/4/6 ladder; no other effect exists.

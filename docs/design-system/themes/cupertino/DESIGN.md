@@ -293,7 +293,10 @@ side-by-side comparison against the Figma frames in #2419 (GUIDELINES §3).
 - **Dark design notes.** The ground is tinted slate, not black. Raised surfaces get a lighter tint
   (`card` `#18191b`, grouped rows `#2b2e36` 78%). The aurora uses deep tones (`#2870bd`, `#6958ad`,
   `#7e451d`, `#435db1`). The dark primary is saturated `#0090ff` with **dark** ink `#111113`
-  (5.78:1). White on `#0090ff` is 3.26:1, so never use white there. Rims drop to white 13%.
+  (5.78:1). White text on `#0090ff` is 3.26:1, so labels on it use `#111113`. The white tick on a
+  checked selection circle is a graphical object and meets the 3:1 non-text minimum at 3.26:1.
+  Inside a selected row the circle inverts to a `#111113` disc with a blue tick. Rims drop to white
+  13%.
 
 ## Typography
 
