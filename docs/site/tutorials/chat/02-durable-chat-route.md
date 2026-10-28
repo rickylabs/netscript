@@ -8,11 +8,9 @@ next: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }
 
 # The durable chat route
 
-The backend of a durable chat is two routes and one model call. In this chapter you wire the
-**session route** (runs a model turn, persists it durably, gated by `authorize`), the **one
-stream proxy** the browser reads through, and the direct model call on `@tanstack/ai`. When
-you finish, a `curl` can drive a full turn and a second `curl` replays it — the transcript
-is durable.
+This chapter builds the chat backend: a session route that runs a model turn and persists it
+behind an `authorize` hook, the one stream proxy the browser reads through, and the model call on
+`@tanstack/ai`.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
@@ -23,10 +21,20 @@ is durable.
   { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
+## What you will build
+
+Two routes and one model call. When you finish, one `curl` drives a full turn and a second `curl`
+replays it from the durable session.
+
+## Before you begin
+
+You need the `chat-app/` workspace from [chapter 1](/tutorials/chat/01-scaffold/), with
+`aspire start` running and `ANTHROPIC_API_KEY` set.
+
 ## The four seams
 
-`@netscript/fresh/ai` gives you one function per job. This chapter uses three of the four;
-chapter 3 uses the fourth (`createNetScriptChatConnection`) in the island.
+`@netscript/fresh/ai` has one function per job. This chapter uses three of them; chapter 3 uses
+the fourth, `createNetScriptChatConnection`, in the island.
 
 {{ comp.apiTable({
   caption: "@netscript/fresh/ai — the durable-chat seams used here",
@@ -39,10 +47,9 @@ chapter 3 uses the fourth (`createNetScriptChatConnection`) in the island.
 
 ## Step 1 — The model call
 
-The model layer is wired directly on `@tanstack/ai` and a provider adapter. `chat()` returns
-an async iterable of stream chunks — exactly the `source` shape `toNetScriptChatResponse`
-persists. `anthropicText()` reads `ANTHROPIC_API_KEY` from the environment, so no key
-appears in code:
+`chat()` from `@tanstack/ai` returns an async iterable of stream chunks, which is the `source`
+shape `toNetScriptChatResponse` persists. `anthropicText()` reads `ANTHROPIC_API_KEY` from the
+environment, so no key appears in code:
 
 ```ts
 import { chat } from '@tanstack/ai';
@@ -58,20 +65,15 @@ const source = chat({
 ```
 
 {{ comp callout { type: "note", title: "Where the @netscript/ai engine fits" } }}
-NetScript also ships a provider-neutral engine — the <a href="/ai/engine/">@netscript/ai</a> package, published on JSR as of <code>{{ releaseVersion }}</code>. Its entry seam is a model registry with self-registering providers: <code>import '@netscript/ai/anthropic'</code> registers the Anthropic provider, and <code>getModel('anthropic:claude-sonnet-4-5')</code> resolves a model handle; an agent loop, a tool registry, and MCP transports live behind its other subpaths (<a href="/reference/ai/">reference</a>). This route keeps the direct <code>@tanstack/ai</code> wiring because the durable session plane persists and reduces TanStack chunk streams, while the engine's chat clients stream the engine's own event vocabulary — two different wire shapes.
+NetScript also ships a provider-neutral engine, the <a href="/ai/engine/">@netscript/ai</a> package on JSR. Its entry seam is a model registry with self-registering providers: <code>import '@netscript/ai/anthropic'</code> registers the Anthropic provider, and <code>getModel('anthropic:claude-sonnet-4-5')</code> resolves a model handle. The agent loop, tool registry and MCP transports live behind its other subpaths (<a href="/reference/ai/">reference</a>). This route stays on <code>@tanstack/ai</code> because the durable session plane persists and reduces TanStack chunk streams, while the engine's chat clients stream the engine's own event vocabulary. The two wire shapes differ.
 {{ /comp }}
 
-## Step 2 — The session route
+## Step 2 — The route contract
 
-This route runs one turn and persists it. It pulls the transcript so far through
-`resolveChatSnapshot` (so the model has context), calls the model, and hands the stream to
-`toNetScriptChatResponse` — gated by an `authorize` hook.
-
-First give that dynamic route a **typed identity**. `createRouteReference` from
-`@netscript/fresh/route` infers the `{ sessionId }` path param straight from the `[sessionId]`
-pattern, so the id the server reads and the URL the browser posts to in chapter 3 both come from
-one declaration — never a string assembled two different ways. Put it in the shared `contracts/`
-tree so the route and the island import the *same* object:
+Give the dynamic route a typed identity. `createRouteReference` from `@netscript/fresh/route`
+infers the `{ sessionId }` path param from the `[sessionId]` pattern, so the id the server reads
+and the URL the browser posts to in chapter 3 come from one declaration. Put it in the shared
+`contracts/` tree so the route and the island import the same object:
 
 ```ts
 // contracts/routes/chat-turn.ts
@@ -83,7 +85,12 @@ export const chatTurnRoute = createRouteReference('/api/chat/[sessionId]');
 // chatTurnRoute.href({ path: { sessionId } }) -> "/api/chat/<id>"  (the island posts here in ch. 3)
 ```
 
-Now the route reads its param **through the contract** instead of touching `ctx.params` by hand:
+## Step 3 — The session route
+
+This route runs one turn and persists it. It reads the transcript so far through
+`resolveChatSnapshot`, so the model has context, calls the model, and hands the stream to
+`toNetScriptChatResponse`, gated by an `authorize` hook. It reads its param through the contract
+instead of touching `ctx.params` by hand:
 
 ```ts
 // apps/dashboard/routes/api/chat/[sessionId].ts
@@ -118,31 +125,34 @@ export const handler = {
 };
 ```
 
-{{ comp callout { type: "important", title: "authorize is not optional" } }}
-<code>toNetScriptChatResponse</code> enforces access only when you pass an <code>authorize</code> hook, and the factory applies <strong>no</strong> default. Omit it and the session stream is unauthenticated. Pass <code>authorize</code> without a <code>request</code> and it throws — always thread <code>ctx.req</code> through. A denial returns <code>403 Forbidden</code> and the session stream is never touched.
+{{ comp callout { type: "caution", title: "authorize is not optional" } }}
+<code>toNetScriptChatResponse</code> enforces access only when you pass an <code>authorize</code> hook, and the factory applies <strong>no</strong> default. Omit it and the session stream is unauthenticated. Pass <code>authorize</code> without a <code>request</code> and it throws, so always pass <code>ctx.req</code> through. A denial returns <code>403 Forbidden</code> and never touches the session stream.
 {{ /comp }}
 
-The user message is appended to the durable session by the island in chapter 3 (via
-`connection.send`), so this route reads it back through `resolveChatSnapshot` and only needs
-to stream the assistant reply. You could instead pass `newMessages: [userMessage]` to
-`toNetScriptChatResponse` to persist the prompt here — one place, either way, never both.
-That input accepts server-trusted TanStack UI/Model messages as `NetScriptChatSendMessage`,
-including original parts, attachments, metadata and tool calls. Validate any client
-input and give the model that same prompt; the plugin-AI scaffold instead builds a
-user turn from `message.text` and ignores client transcript fields. The legacy
-content-string input remains valid. `snapshot.nativeMessages` exposes
-the complete persisted messages for native consumers; `NetScriptChatMessage` remains the reduced
-rendering projection used by this text-only example. For a multimodal model, validate and supply
-supported native parts instead of mapping to text. Pair `initialMessages: snapshot.nativeMessages`
-with `initialOffset: snapshot.offset` on the live connection so native `MESSAGES_SNAPSHOT` chunks
-retain stored history. Native tool and data parts now replay on both seed and live paths.
-Publication and downstream EIS adoption with a live one-SSE-per-pane check remain release steps.
+### Where the prompt is persisted
 
-## Step 3 — The one stream proxy
+In chapter 3 the island appends the user message to the durable session with `connection.send`.
+This route reads it back through `resolveChatSnapshot` and only streams the assistant reply.
 
-The browser must not hold streams credentials, so it never talks to the durable-streams
-service directly. It reads through a single proxy that attaches auth server-side and keeps
-every response header accurate. Mount `createNetScriptChatStreamProxy` once as a catch-all:
+You can instead pass `newMessages: [userMessage]` to `toNetScriptChatResponse` to persist the
+prompt in the route. Pick one place, never both.
+
+- `newMessages` accepts server-trusted TanStack UI/Model messages as `NetScriptChatSendMessage`,
+  including original parts, attachments, metadata and tool calls. Validate any client input and
+  give the model that same prompt. The plugin-AI scaffold instead builds a user turn from
+  `message.text` and ignores client transcript fields. The content-string input remains valid.
+- `snapshot.nativeMessages` exposes the complete persisted messages for native consumers.
+  `NetScriptChatMessage` is the reduced rendering projection this text-only example uses. For a
+  multimodal model, validate and supply supported native parts instead of mapping to text.
+- On the live connection, pair `initialMessages: snapshot.nativeMessages` with
+  `initialOffset: snapshot.offset` so native `MESSAGES_SNAPSHOT` chunks keep stored history.
+  Native tool and data parts replay on both the seed and live paths.
+
+## Step 4 — The one stream proxy
+
+The browser must not hold streams credentials, so it never talks to the durable-streams service
+directly. It reads through one proxy that attaches auth on the server. Mount
+`createNetScriptChatStreamProxy` once as a catch-all:
 
 ```ts
 // apps/dashboard/routes/api/chat-stream/[...path].ts
@@ -156,37 +166,41 @@ const proxy = createNetScriptChatStreamProxy({
 export const handler = { GET: proxy, POST: proxy };
 ```
 
-{{ comp callout { type: "note", title: "Why a raw Request here, not a route contract" } }}
-This resolver is the one documented exception to NetScript's typed-route rule: <code>createNetScriptChatStreamProxy</code>'s <code>target</code> only ever receives the raw <code>Request</code>, so the session id is parsed from <code>req.url</code> by hand. Everywhere else you build a URL or read a path param, prefer a bound <a href="/reference/fresh/"><code>createRouteReference</code></a> contract so the pattern and its typed params come from one source of truth.
-{{ /comp }}
+The proxy attaches the `Authorization` header only on the server-to-streams hop and never echoes
+it back. It passes the body through unbuffered and strips `content-encoding` and
+`content-length`, which no longer describe the bytes once the stream is re-framed. A client
+disconnect aborts the upstream fetch, so no stream is left open.
 
-{{ comp callout { type: "note", title: "Why a proxy at all?" } }}
-The proxy exists so the browser gets a durable stream <em>without</em> streams credentials. It attaches the <code>Authorization</code> header only on the server → streams hop (never echoed back), passes the body through unbuffered, and strips <code>content-encoding</code> / <code>content-length</code> — which stop describing the bytes once the stream is re-framed across the proxy. A client disconnect aborts the upstream fetch, so no stream is left dangling.
+{{ comp callout { type: "note", title: "Why a raw Request here, not a route contract" } }}
+This resolver is the one documented exception to NetScript's typed-route rule: the <code>target</code> of <code>createNetScriptChatStreamProxy</code> only receives the raw <code>Request</code>, so the session id is parsed from <code>req.url</code> by hand. Everywhere else you build a URL or read a path param, use a bound <a href="/reference/fresh/"><code>createRouteReference</code></a> contract.
 {{ /comp }}
 
 ## Verify your progress
 
-With `aspire start` running, drive one turn against a fresh session id, then replay it:
+With `aspire start` running:
 
-Aspire assigns the app's port at start-up so several workspaces can run side by side, so take
-the app URL from the Aspire dashboard and put it in a variable first:
+1. Drive one turn against a new session id, then replay it. Aspire assigns the app's port at
+   start-up so several workspaces can run side by side, so take the app URL from the Aspire
+   dashboard first:
 
-```sh
-APP=http://localhost:<port shown for your app in the dashboard>
+   ```sh
+   APP=http://localhost:<port shown for your app in the dashboard>
 
-# Run a turn (the assistant reply streams back and is persisted durably).
-curl -N -X POST "$APP/api/chat/demo-1"
+   # Run a turn (the assistant reply streams back and is persisted durably).
+   curl -N -X POST "$APP/api/chat/demo-1"
 
-# Replay: read the same session again — the transcript is still there.
-curl -N "$APP/api/chat-stream/ai/chat/demo-1"
-```
+   # Replay: read the same session again — the transcript is still there.
+   curl -N "$APP/api/chat-stream/ai/chat/demo-1"
+   ```
 
-The first call streams a reply; the second shows the durable session already holds it —
-that is durability, not a re-run. Then type-check:
+   The first call streams a reply. The second shows that the durable session already holds it:
+   the reply is replayed, not generated again.
 
-```sh
-deno task check
-```
+2. Type-check the workspace:
+
+   ```sh
+   deno task check
+   ```
 
 - [ ] `POST /api/chat/{sessionId}` streams an assistant reply.
 - [ ] A denied `authorize` returns `403`.
@@ -194,17 +208,15 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If the turn errors" } }}
-A provider error (bad or missing <code>ANTHROPIC_API_KEY</code>) surfaces <em>into</em> the assistant stream rather than as an HTTP error — check the reply body. A <code>403</code> means <code>authorize</code> returned <code>false</code>. An empty replay means the streams runtime is not up: confirm it in the Aspire dashboard.
+A provider error, such as a bad or missing <code>ANTHROPIC_API_KEY</code>, surfaces <em>inside</em> the assistant stream rather than as an HTTP error, so check the reply body. A <code>403</code> means <code>authorize</code> returned <code>false</code>. An empty replay means the streams runtime is not up: confirm it in the Aspire dashboard.
 {{ /comp }}
 
 ## What you built
 
-The durable backend: a session route that runs a model turn and persists it behind a
-required `authorize` gate, and the one proxy the browser reads through. Notice the
-discipline underneath — native messages enter persistence while `NetScriptChatMessage`
-describes the reduced rendering projection, and the turn is written to the durable session *before* anyone renders it, so an
-accepted reply survives the request that produced it. That "durable delivery" spine is what
-every later chapter builds on. Next you give it a face — copy the fresh-ui chat components
-and hydrate an island.
+A session route that runs a model turn and persists it behind a required `authorize` gate, and
+the one proxy the browser reads through. Each turn is written to the durable session before
+anything renders it, so an accepted reply outlives the request that produced it. Every later
+chapter builds on this. Next, you give the backend a face: copy the fresh-ui chat components and
+hydrate an island.
 
 {{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }, next: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" } }) }}

@@ -8,12 +8,12 @@ next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" }
 
 # Add a queue and a cron schedule
 
-Your [import job](/tutorials/erp-sync/02-import-job/) runs one file at a time. A migration does
-not: the day you backfill Dynamics with SAP's historical exports, twenty files land in the hand-off
-folder at once, and until cutover the two systems only stay aligned if a full re-sync runs every
-night whether or not a file arrived. This chapter adds the two pieces that make both durable: a
-**queue provider** and a worker **concurrency** so I/O-bound bursts overlap, and a **cron
-schedule** that fires on a cadence rather than an event.
+This chapter prepares the sync for bursts and recurring work. Your
+[import job](/tutorials/erp-sync/02-import-job/) runs one file at a time, but the day you backfill
+Dynamics with SAP's historical exports, twenty files land in the hand-off folder at once. Until
+cutover, the two systems also stay aligned only if a full re-sync runs every night, whether or not
+a file arrived. You add a **queue provider** and a worker **concurrency** so I/O-bound bursts
+overlap, and a **cron schedule** that fires on a cadence rather than an event.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
@@ -25,31 +25,30 @@ schedule** that fires on a cadence rather than an event.
 
 ## What you will build
 
-By the end of this chapter your workers config will name a **queue provider** and a worker
-**concurrency** so I/O-bound imports overlap instead of one-by-one, and a new
-**scheduled trigger** (`defineScheduledTrigger`) will enqueue a re-sync job on a cron cadence. You
-will also know the one concurrency naming gotcha to set explicitly so it does not bite you under
-Aspire.
+A workers config that names a **queue provider** and a worker **concurrency**, so I/O-bound
+imports overlap instead of running one by one, and a **scheduled trigger**
+(`defineScheduledTrigger`) that enqueues a re-sync job on a cron cadence. You also see where the
+running concurrency comes from under Aspire.
 
 ## Before you begin
 
-You need the `my-erp/` workspace from [Chapter 2](/tutorials/erp-sync/02-import-job/) with the
-`import-products` job and `product-import-trigger` working, and `aspire start` healthy. Confirm the job
-is registered:
+You need the `my-erp/` workspace from [chapter 2](/tutorials/erp-sync/02-import-job/) with the
+`import-products` job and `product-import-trigger` working, and `aspire start` healthy. Confirm the
+job is registered:
 
 ```sh
 curl '<workers-endpoint>/api/v1/workers/jobs'
 ```
 
-Expected: `import-products` appears in the list. If not, return to Chapter 2 and re-run
+`import-products` should appear in the list. If it does not, return to chapter 2 and re-run
 `netscript generate plugins`.
 
 ## Step 1 — Choose a queue provider
 
 A NetScript queue is provider-agnostic: the same job-enqueue path runs on the zero-config Deno KV
-default on your laptop and on a real broker under Aspire, without touching your job code. The
-`QueueProvider` enum has four selectable production backends, and auto-discovery picks one for you
-when you do not pin one:
+default on your laptop and on a real broker under Aspire, with no change to your job code. The
+`QueueProvider` enum has four selectable production backends, and auto-discovery picks one when you
+do not pin one:
 
 {{ comp.apiTable({ caption: "Queue providers (QueueProvider) in @netscript/queue", columns: ["Provider", "How you select it", "Reach for it when"], rows: [
   ["<code>deno-kv</code>", "Auto-discovery <strong>fallback</strong>, or pin <code>QueueProvider.DenoKv</code>", "Local dev and single-instance apps with no broker. Durable to the Deno KV store; needs <code>--unstable-kv</code>."],
@@ -58,24 +57,19 @@ when you do not pin one:
   ["<code>postgres</code>", "<strong>Explicit only</strong> — pass <code>QueueProvider.Postgres</code>; never auto-discovered", "You already run Postgres and want the queue in the same transactional store. Row-claim via FOR UPDATE SKIP LOCKED."]
 ] }) }}
 
-For the ERP sync, the right default is to let the environment decide: write provider-neutral config
-and you get Deno KV locally, and the Aspire cache once it is up — `redis` by default, or `garnet` via `--cache-backend`. The auto-discovery probe order is
-**RabbitMQ → Redis → Deno KV**.
+For the ERP sync, let the environment decide. Write provider-neutral config and you get Deno KV
+locally, then the Aspire cache once it is up: `redis` by default, or `garnet` via
+`--cache-backend`. The auto-discovery probe order is **RabbitMQ → Redis → Deno KV**.
 
 {{ comp callout { type: "note", title: "PostgreSQL is the deliberate exception" } }}
-Auto-discovery probes <strong>RabbitMQ → Redis → Deno KV only</strong>. It will <strong>never</strong>
-fall through to PostgreSQL, even when a Postgres connection is present. The SQL-durable queue is
-opt-in — you must pass <code>provider: QueueProvider.Postgres</code> or you will quietly land on the
-Deno KV adapter. The full decision guide is in
-<a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue provider</a>.
+Auto-discovery probes <strong>RabbitMQ → Redis → Deno KV only</strong>. It <strong>never</strong> falls through to PostgreSQL, even when a Postgres connection is present. The SQL-durable queue is opt-in: pass <code>provider: QueueProvider.Postgres</code>, or you silently get the Deno KV adapter. The full decision guide is <a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue provider</a>.
 {{ /comp }}
 
 ## Step 2 — Size worker concurrency in config
 
-`concurrency` declares queue concurrency. Jobs execute in-process in the background worker
-and share its event loop. Raising concurrency lets I/O-bound imports overlap; it does not
-allocate V8 isolates or speed up synchronous CPU-bound transformations. Set it in the
-generated worker config:
+`concurrency` declares queue concurrency. Jobs execute in-process in the background worker and
+share its event loop. Raising concurrency lets I/O-bound imports overlap; it does not allocate V8
+isolates or speed up synchronous CPU-bound transformations. Set it in the generated worker config:
 
 ```ts
 // config/official-plugins/mod.ts
@@ -104,31 +98,26 @@ export const workers = defineWorkers({
   ]
 }) }}
 
-For per-topic control — a hot `imports` topic at concurrency 10 while a heavy `reports` topic stays
-at 1 — use a `WorkerGroup` with its own `scaling: { mode, concurrency }`. The full per-topic and
-runner-mode knobs are in [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
+For per-topic control, such as a busy `imports` topic at concurrency 10 while a heavy `reports`
+topic stays at 1, use a `WorkerGroup` with its own `scaling: { mode, concurrency }`.
+[Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/) covers the per-topic
+and runner-mode settings.
 
-The running queue concurrency is set by `WORKERS_CONCURRENCY`. Aspire injects it on the workers
-background resource with the plugin's declared default, so you only set it to override that value.
+`WORKERS_CONCURRENCY` sets the running queue concurrency. Aspire injects it on the workers
+background resource with the plugin's declared default, so set it only to override that value.
+
+{{ comp callout { type: "warning", title: "Make handlers idempotent before you scale concurrency" } }}
+Raising <code>concurrency</code> runs more jobs at once, and every queue backend can redeliver a message on retry. An idempotent import, keyed on the file's content hash or name, can re-run without importing twice. Pair retries with an <code>idempotencyKey</code> on enqueue so a redelivery after a restart does not duplicate rows. <a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue provider</a> lists each backend's delivery semantics.
+{{ /comp }}
 
 ## Step 3 — Add a cron schedule
 
-Some migration work is time-driven, not file-driven: the nightly full re-sync that keeps Dynamics
-aligned with SAP until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
-`defineScheduledTrigger(handler, spec)` from
-`@netscript/plugin-triggers-core/builders`. The `add-scheduled` verb uses the spaced
-`add scheduled` shell syntax and can scaffold the job action already wired:
-
-{{ comp callout { type: "note", title: "ns-triggers / ns-workers are shorthands you install once" } }}
-<code>ns-triggers</code> and <code>ns-workers</code> are names <em>you</em> give the triggers and
-workers plugin CLIs — the scaffold does not create them. Install them once, globally, and every
-shorthand command on this page works as written:
-<pre><code class="language-bash">deno install -gArf -n ns-triggers jsr:@netscript/plugin-triggers{{ releaseSpecifier }}/cli
-deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
-Rather not install them? Each <code>ns-&lt;plugin&gt; &lt;verb …&gt;</code> is exactly
-<code>deno x -A jsr:@netscript/plugin-&lt;plugin&gt;{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> —
-run that full form instead.
-{{ /comp }}
+Some migration work runs on time, not on files: the nightly full re-sync that keeps Dynamics
+aligned with SAP until cutover, or an hourly cleanup of stale staging files. That is a
+**scheduled trigger**, `defineScheduledTrigger(handler, spec)` from
+`@netscript/plugin-triggers-core/builders`. The `add-scheduled` verb, written as `add scheduled`,
+can scaffold the job action already wired. `ns-triggers` and `ns-workers` are the plugin CLI
+shorthands you installed in [chapter 2](/tutorials/erp-sync/02-import-job/).
 
 ```sh
 ns-triggers add scheduled daily-resync-schedule \
@@ -140,8 +129,8 @@ ns-triggers add scheduled daily-resync-schedule \
 ```
 
 The command writes `triggers/daily-resync-schedule-trigger.ts` and refreshes the trigger registry.
-Like the file-watch trigger, its generated handler returns an array of effects; here the `--job`
-flag supplies the enqueue action without hand-authoring the definition.
+Like the file-watch trigger, its generated handler returns an array of effects; the `--job` flag
+supplies the enqueue action, so you don't write the definition by hand:
 
 ```ts
 // triggers/daily-resync-schedule-trigger.ts (generated excerpt)
@@ -174,41 +163,40 @@ export default dailyResyncSchedule;
   rows: [
     { name: "id", type: "string", desc: "Stable identifier for the schedule, used in logs and the events feed." },
     { name: "cron", type: "string", desc: "Standard 5-field cron expression. '0 6 * * *' = daily at 06:00; '*/5 * * * *' = every five minutes." },
-    { name: "timezone", type: "string", desc: "IANA timezone the cron is evaluated in. Set it explicitly — 'UTC' here — so the cadence is unambiguous." },
+    { name: "timezone", type: "string", desc: "IANA timezone the cron is evaluated in. Set it explicitly ('UTC' here) so the cadence is unambiguous." },
     { name: "description / tags", type: "string / string[]", desc: "Metadata for discovery and the dashboard." }
   ]
 }) }}
 
 {{ comp callout { type: "note", title: "Cron lives on the triggers axis" } }}
-Scheduling is a triggers concern, not a workers concern — a scheduled trigger is just another way to
-<code>enqueueJob</code>, alongside file-watch and webhooks. That keeps one durable path: every job
-enters the workers runtime the same way, however it was kicked off. The scaffold's <code>--samples</code>
-ship several <code>defineScheduledTrigger</code> examples under the triggers plugin to crib from.
+Scheduling is a triggers concern, not a workers concern. A scheduled trigger is another way to <code>enqueueJob</code>, alongside file-watch and webhooks, so every job enters the workers runtime the same way, however it was started. The <code>--samples</code> triggers include several <code>defineScheduledTrigger</code> examples to copy from.
 {{ /comp }}
 
 ## Step 4 — Load the new trigger
 
-The scaffold command already refreshed the registry. Restart `aspire start` (or let it hot-reload) so the triggers processor loads
-`daily-resync-schedule`.
+The scaffold command already refreshed the registry. Restart `aspire start` (or let it hot-reload)
+so the triggers processor loads `daily-resync-schedule`.
 
 ## Verify your progress
 
-First confirm the config type-checks with the new concurrency and provider settings:
+1. Confirm the config type-checks with the new concurrency and provider settings:
 
-```sh
-deno task check
-```
+   ```sh
+   deno task check
+   ```
 
-Expected: a clean check. Then confirm the cron schedule registered — for a fast feedback loop you can
-temporarily set its `cron` to `*/2 * * * *` (every two minutes), regenerate, restart Aspire, wait,
-and read the executions feed:
+2. Confirm the cron schedule registered. For fast feedback, temporarily set its `cron` to
+   `*/2 * * * *` (every two minutes), regenerate, restart Aspire, wait, and read the executions
+   feed:
 
-```sh
-ns-workers executions --limit=10 --json
-```
+   ```sh
+   ns-workers executions --limit=10 --json
+   ```
 
-Expected: an `import-products` execution appears on the cron cadence with no file dropped — the
-schedule, not a file event, enqueued it. Set the cron back to `0 6 * * *` when you are done testing.
+   An `import-products` execution appears on the cron cadence with no file dropped: the schedule,
+   not a file event, enqueued it.
+
+3. Set the cron back to `0 6 * * *` when you are done testing.
 
 - [ ] `config/official-plugins/mod.ts` sets `concurrency` and `queueProvider`.
 - [ ] `deno task check` is clean.
@@ -216,19 +204,11 @@ schedule, not a file event, enqueued it. Set the cron back to `0 6 * * *` when y
 - [ ] A scheduled `import-products` execution appears on the cron cadence with no file dropped.
 - [ ] The workers background resource shows `WORKERS_CONCURRENCY` in the Aspire dashboard, and you changed it only to override the declared default.
 
-{{ comp callout { type: "important", title: "Make handlers idempotent before you scale concurrency" } }}
-Raising <code>concurrency</code> means more jobs run at once, and every queue backend can redeliver a
-message on retry. An idempotent import — keyed on the file's content hash or name — can re-run without
-double-importing. Pair retries with an <code>idempotencyKey</code> on enqueue so a redelivery after a
-restart does not duplicate rows. See <a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue
-provider</a> for each backend's delivery semantics.
-{{ /comp }}
-
 ## What you built
 
-A workers config that names a queue provider and a worker concurrency so a SAP backfill burst
-drains with overlapping I/O, and a `defineScheduledTrigger` cron that enqueues the nightly re-sync — plus
-the knowledge to set concurrency where it actually takes effect. The sync now absorbs bursts and
-runs its recurring work unattended. The last chapter runs the whole thing under Aspire.
+A workers config that names a queue provider and a worker concurrency, so a SAP backfill burst
+drains with overlapping I/O, and a `defineScheduledTrigger` cron that enqueues the nightly
+re-sync. The sync now absorbs bursts and runs its recurring work unattended. Next, you run the
+whole pipeline under Aspire.
 
 {{ comp.nextPrev({ prev: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" }, next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" } }) }}
