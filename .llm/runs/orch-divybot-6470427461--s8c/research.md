@@ -1,0 +1,11 @@
+# Research — 2026-10-28
+
+Baseline d6dfab0 equals fetched main. Preflight #2455 has no orchid-triage comment. PR #2457 changes design prose only, not this implementation. PR #2452 is open and contains the #2451 follow-ups; main still contains random diagram/tab ids, unbundled CSS, positional lane selection, and repeated permalink labels. Reuse its reviewed source fixes in slice 5 with overlap reconciled.
+
+Consulted the tracked S8/S8b memory notes first; no persistent matching memory exists. Local NetScript MCP initialize, find_guidance(intent), and search_docs(query) all succeeded before implementation. MCP recommends first-party APIs and preserving public Markdown documentation; local docs-site README and build configuration are the authority for this static Lume/Vento site. No Fresh application or backend is needed.
+
+Existing callouts only colour warning/error, including body and links; NOTE/TIP/IMPORTANT are monochrome. Error is an existing alias to preserve; CAUTION is missing. API tables have generic and object contracts; generated reference tables also need inspecting because kind is a generic column. Code components use a filename header inside a separate tab bar, with raw language ids; fenced blocks gain their frame in tabs.js. The highlighter registers bash/json/TypeScript and deliberate plaintext variants only. File-path chips use overflow-wrap:anywhere.
+
+Colour authority is tools/docs-site/figma-variables and generate-tokens.ts. Existing status triplets suffice for slices 1–5. Syntax, code background and IMPORTANT must wait for the owner export, and all old generated declarations must remain byte-identical. Existing browser style policy parses actual CSSOM and follows aliases across schemes. Its negative controls must continue to fail the real gate. The docs Playwright suite already attaches screenshots, zero-allowance axe audits, Pagefind behavior and provenance; extend it to six requested page types plus existing search.
+
+Source/format, rendered-output, links and caveat gates are built into docs/site verify. Pages CI additionally requires docs:exports-drift and docs:snippets. Rendered twins feed generated CLI prose; regenerate only using native tasks and verify freshness. No framework API or package architecture changes planned; doctrine and JSR audit package waves are N/A.
