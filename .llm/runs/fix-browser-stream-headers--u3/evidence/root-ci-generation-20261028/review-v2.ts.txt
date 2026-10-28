@@ -1,0 +1,44 @@
+const base = 'C:/Users/ericc/source/repos/netscript-browser-stream-headers-008';
+const scratch = base + '/.llm/tmp/root-ci-generation-20261028';
+function rows(source: string, key: (row: unknown[]) => string) {
+  return new Map(source.split('\n').filter(line => line.startsWith('  [')).map(line => {
+    const row = JSON.parse(line.trim().replace(/,$/, ''));
+    return [key(row), row] as const;
+  }));
+}
+async function decode(encoded: string, format: CompressionFormat) {
+  return await new Response(new Blob([Uint8Array.fromBase64(encoded)]).stream().pipeThrough(new DecompressionStream(format))).text();
+}
+const oldMcp = rows(await Deno.readTextFile(scratch + '/old-export-corpus.ts'), r => r[0] + '/' + r[1]);
+const newMcp = rows(await Deno.readTextFile(base + '/packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts'), r => r[0] + '/' + r[1]);
+const mcp = [];
+for (const [key, row] of newMcp) {
+  const old = oldMcp.get(key);
+  if (JSON.stringify(old) === JSON.stringify(row)) continue;
+  if (!old) throw Error('Unexpected new public surface ' + key);
+  const a = JSON.parse(await decode(String(old[2]), 'deflate-raw'));
+  const b = JSON.parse(await decode(String(row[2]), 'deflate-raw'));
+  const before = new Map(a[0].map((name: string, i: number) => [name, a.map((col: unknown[]) => col[i])]));
+  const after = new Map(b[0].map((name: string, i: number) => [name, b.map((col: unknown[]) => col[i])]));
+  const changed = [];
+  for (const name of new Set([...before.keys(), ...after.keys()])) {
+    if (JSON.stringify(before.get(name)) !== JSON.stringify(after.get(name))) changed.push({ name, before: before.get(name), after: after.get(name) });
+  }
+  mcp.push({ key, changed });
+}
+const oldProse = rows(await Deno.readTextFile(scratch + '/old-agent-prose.ts'), r => String(r[0]));
+const newProse = rows(await Deno.readTextFile(base + '/packages/cli/src/kernel/assets/agent-docs-prose.generated.ts'), r => String(r[0]));
+const prose = [];
+for (const [key, row] of newProse) {
+  const old = oldProse.get(key);
+  if (JSON.stringify(old) === JSON.stringify(row)) continue;
+  if (!old || key !== 'pages/durable-workflows/streams/index.md') throw Error('Unexpected prose delta ' + key);
+  const before = await decode(String(old[1]), 'gzip'), after = await decode(String(row[1]), 'gzip');
+  await Deno.writeTextFile(scratch + '/old-streams-page.md', before, { createNew: true });
+  await Deno.writeTextFile(scratch + '/new-streams-page.md', after, { createNew: true });
+  prose.push({ key, beforeBytes: old[3], afterBytes: row[3], beforeHash: old[2], afterHash: row[2] });
+}
+if (oldMcp.size !== newMcp.size || oldProse.size !== newProse.size) throw Error('Unexpected surface/page count delta');
+const result = { mcpSurfaces: newMcp.size, mcp, prosePages: newProse.size, prose };
+await Deno.writeTextFile(scratch + '/decoded-delta.json', JSON.stringify(result, null, 2), { createNew: true });
+console.log(JSON.stringify(result));
