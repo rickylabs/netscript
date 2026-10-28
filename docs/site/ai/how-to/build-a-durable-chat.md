@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a durable chat
+description: An AI chat on a Fresh route whose transcript survives reload and reconnect, with one server-side tool.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/build-a-durable-chat/

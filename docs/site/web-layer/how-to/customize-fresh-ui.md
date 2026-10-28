@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Customize Fresh UI
+description: Edit a route, add an island, restyle a component, install more UI primitives, and re-theme the scaffolded app.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/customize-fresh-ui/

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Database & migration
+description: Initialize, generate, seed, and inspect the database schema with the netscript db commands.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/database-migration/

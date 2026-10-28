@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add a plugin
+description: Install an official plugin, register it, and confirm it is healthy.
 templateEngine: [vento, md]
 order: 107
 oldUrl: /how-to/add-a-plugin/

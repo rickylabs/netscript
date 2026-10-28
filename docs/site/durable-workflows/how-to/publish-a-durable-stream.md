@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Publish a durable stream
+description: Publish server-owned entity state as a durable stream that browsers and other consumers subscribe to.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/publish-a-durable-stream/

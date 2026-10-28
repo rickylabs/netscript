@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Call internal procedures from a service or worker
+description: Expose a procedure to workers, sagas, and triggers in the same installation with the provisioned installation credential.
 templateEngine: [vento, md]
 order: 110
 ---

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add authentication
+description: Install the auth plugin, pick one active backend, migrate, and sign in through the generated app.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/add-authentication/

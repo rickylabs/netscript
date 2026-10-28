@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Tune the worker runtime
+description: Trade throughput against isolation with concurrency, runner mode, per-task permissions, timeouts, and retries.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/tune-worker-runtime/

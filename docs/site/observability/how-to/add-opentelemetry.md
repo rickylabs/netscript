@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add OpenTelemetry
+description: Emit custom spans and structured logs, propagate traceparent, and read the traces in the Aspire dashboard.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/add-opentelemetry/

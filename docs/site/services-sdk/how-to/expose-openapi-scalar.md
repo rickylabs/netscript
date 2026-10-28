@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Expose OpenAPI & Scalar
+description: Serve the generated OpenAPI document and the Scalar reference UI for a service.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/expose-openapi-scalar/

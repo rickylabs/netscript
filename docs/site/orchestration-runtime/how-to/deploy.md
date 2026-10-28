@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Deploy
+description: Run the workspace on a container host, a VM, or a cloud target, and see what the scaffold wires for you.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/deploy/

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Building a desktop frontend the NetScript way
+description: One Fresh frontend that runs in the browser and gains native window chrome, tray menus, dialogs, notifications, and typed RPC under Deno Desktop.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/build-a-desktop-frontend/

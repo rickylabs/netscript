@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Deploy locally with Aspire
+description: Bring up the whole resource graph on one machine from the generated Aspire AppHost.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/deploy-local-aspire/

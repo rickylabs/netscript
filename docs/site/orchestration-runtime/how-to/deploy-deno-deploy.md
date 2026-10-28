@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Deploy to Deno Deploy
+description: Push a stateless entrypoint to Deno Deploy, promote it, and read its status and logs.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/deploy-deno-deploy/

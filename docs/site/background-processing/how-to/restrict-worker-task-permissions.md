@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Restrict worker task permissions
+description: Give every Deno task explicit permissions, because an omitted permission object compiles to allow-all.
 templateEngine: [vento, md]
 order: 104
 oldUrl: /how-to/restrict-worker-task-permissions/

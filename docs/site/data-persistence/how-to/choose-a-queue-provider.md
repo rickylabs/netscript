@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Choose a queue provider
+description: Pick a queue backend, then let auto-discovery select it or pin it explicitly.
 templateEngine: [vento, md]
 order: 104
 oldUrl: /how-to/choose-a-queue-provider/

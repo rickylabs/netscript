@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Detached start for agents and CI
+description: Start the AppHost non-interactively with JSON output, timeout budgets, and isolated parallel runs.
 templateEngine: [vento, md]
 order: 104
 prev: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }

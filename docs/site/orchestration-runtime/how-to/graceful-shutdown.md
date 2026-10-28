@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Graceful shutdown
+description: Drain requests, jobs, and connections on SIGTERM, and run teardown hooks.
 templateEngine: [vento, md]
 order: 106
 oldUrl: /how-to/graceful-shutdown/

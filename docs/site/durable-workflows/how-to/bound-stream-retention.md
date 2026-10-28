@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Bound stream retention
+description: Put a hard limit on how long a durable stream keeps data, with absolute expiry or rotating day segments.
 templateEngine: [vento, md]
 order: 103
 ---

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Run a polyglot task
+description: Run a Python, shell, .NET, or other non-TypeScript script as a task with a permission sandbox.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/run-a-polyglot-task/

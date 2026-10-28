@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add a service
+description: Add a typed oRPC service to a workspace, serve it with defineService, and verify its REST and RPC surfaces.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/add-a-service/

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a validated ingestion queue
+description: Reject malformed messages before they enter a queue and again before a consumer runs.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/build-a-validated-ingestion-queue/

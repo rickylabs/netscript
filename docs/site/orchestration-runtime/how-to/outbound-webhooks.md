@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Deliver outbound webhooks
+description: Send signed events from a worker with bounded retries and a dead-letter queue.
 templateEngine: [vento, md]
 order: 112
 ---

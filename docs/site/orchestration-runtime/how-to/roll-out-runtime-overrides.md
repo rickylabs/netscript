@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Roll out runtime overrides
+description: Change deployed behavior without rebuilding the workspace.
 templateEngine: [vento, md]
 order: 105
 oldUrl: /how-to/roll-out-runtime-overrides/

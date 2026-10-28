@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Queue / KV / cron
+description: Use the reactive KV store, the durable queue, and cron schedules.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/queue-kv-cron/

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add a task runtime adapter
+description: Add a custom runtime adapter to the built-in task executor.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/add-a-task-runtime-adapter/

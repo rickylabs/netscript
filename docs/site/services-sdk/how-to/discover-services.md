@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Discover services
+description: Declare a service reference and call it through a typed client that resolves its URL from Aspire.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/discover-services/

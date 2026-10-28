@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a server-validated form
+description: Route-bound form state, server validation, mutation, and success handling in one typed page definition.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/build-a-server-validated-form/

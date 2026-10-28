@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Use a second database
+description: Add a second Postgres, or a MySQL or SQL Server instance, alongside the default database.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/use-a-second-database/

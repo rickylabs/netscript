@@ -1,21 +1,17 @@
 ---
 layout: layouts/base.vto
-title: Recipes
+title: Durable workflows recipes
+nav_title: Recipes
+description: Task-oriented recipes for durable workflows, one problem each.
 templateEngine: [vento, md]
 order: 100
 ---
 
-# Durable workflows — recipes
+# Durable workflows recipes
 
-Each recipe here solves one concrete problem with sagas, triggers, queues or streams. They assume you
-know the basics from the guides above them in the sidebar.
+Each recipe here solves one concrete problem with sagas, triggers, queues or streams. It assumes the
+guides above it in the sidebar.
 
-| Recipe | Solves |
-| --- | --- |
-| [Build a validated ingestion queue](/durable-workflows/how-to/build-a-validated-ingestion-queue/) | Reject malformed messages before they enter a queue and before a consumer runs |
-| [Publish a durable stream](/durable-workflows/how-to/publish-a-durable-stream/) | Publish server-owned entity state for live consumers |
-| [Bound stream retention](/durable-workflows/how-to/bound-stream-retention/) | Put a hard limit on how long a durable stream keeps data |
-
-## Next step
-
-Browse [All how-to recipes]({{ "howto:index" |> xref |> url }}) for recipes in other areas.
+{{ for recipe of nav.menu(url, navQuery, navSort)?.children ?? [] -}}
+- [{{ recipe.data.title }}]({{ recipe.data.url }}){{ recipe.data.description ? ": " + recipe.data.description : "" }}
+{{ /for }}
