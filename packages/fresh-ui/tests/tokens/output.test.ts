@@ -1,6 +1,11 @@
 import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
 import { buildTokens, defaultTokenSources } from '../../tokens.ts';
-import type { TokenBuildResult, TokenContextOutput, TokenDocument } from '../../tokens.ts';
+import type {
+  DesignToken,
+  TokenBuildResult,
+  TokenContextOutput,
+  TokenDocument,
+} from '../../tokens.ts';
 import type { FigmaCollection } from '../../src/tokens/domain/token-contract.ts';
 import legacy from '../../tokens/legacy.json' with { type: 'json' };
 import figmaIndex from '../../tokens/figma/index.json' with { type: 'json' };
@@ -8,6 +13,8 @@ import { figmaCollections } from '../../src/tokens/adapters/figma-collections.ts
 import { formatFigmaPreset } from '../../src/tokens/adapters/format-figma.ts';
 import { normalizeFontStyle, roundTokenNumber } from '../../src/tokens/domain/figma-aliases.ts';
 import nameMigrations from '../../tokens/name-migrations.json' with { type: 'json' };
+import contrastExclusions from '../../tokens/contrast-exclusions.json' with { type: 'json' };
+import { defaultContrastCoverage } from '../../src/tokens/adapters/default-token-quality.ts';
 
 let cached: Promise<TokenBuildResult> | undefined;
 const built = () => cached ??= buildTokens();
@@ -105,22 +112,9 @@ Deno.test('semantic overrides propagate to component values, derived mixes and s
 
 Deno.test('component source edits reach SD output without editing CSS', async () => {
   const sources = structuredClone(defaultTokenSources());
-  (sources.documents as Record<string, TokenDocument>)['component.tokens.json'] = {
-    component: {
-      button: {
-        radius: {
-          $type: 'dimension',
-          $value: '{semantic.radius-card}',
-          $extensions: {
-            netscript: {
-              cssVar: '--ns-component-button-radius',
-              category: ['component', 'button', 'radius'],
-            },
-          },
-        },
-      },
-    },
-  };
+  const component = sources.documents['component.tokens.json'].component as TokenDocument;
+  const button = component.button as TokenDocument;
+  button.radius = { ...button.radius as DesignToken, $value: '{semantic.radius-card}' };
   const build = await buildTokens({ sources });
   for (const context of build.contexts) {
     assertEquals(
@@ -242,4 +236,37 @@ Deno.test('builder rejects resolver contexts that have no registered preset', as
   const contexts = sources.resolver.modifiers.theme.contexts as Record<string, unknown>;
   contexts.invented = contexts['ns-one'];
   await assertRejects(() => buildTokens({ sources }), Error, 'registered public contexts');
+});
+
+Deno.test('NS One exclusions contain only legacy roles or exact inherited component colors', async () => {
+  const build = await built();
+  const pairs = new Map(defaultContrastCoverage().pairs.map((pair) => [pair.id, pair]));
+  const inherited: Readonly<Record<string, string>> = {
+    'component-button-fg': 'primary-fg',
+    'component-button-hover': 'primary-hover',
+    'component-input-bg': 'surface',
+    'component-tabs-ring': 'ring',
+    'component-tabs-bg': 'muted',
+  };
+  for (
+    const exclusion of contrastExclusions.exclusions.filter((entry) => entry.preset === 'ns-one')
+  ) {
+    const pair = pairs.get(exclusion.pair)!;
+    const context = build.contexts.find((entry) =>
+      entry.preset.id === 'ns-one' && entry.scheme === exclusion.scheme
+    )!;
+    for (const name of [pair.foreground, ...pair.background]) {
+      if (Object.hasOwn(legacy.tokens, name)) continue;
+      assertEquals(
+        name.startsWith('component-') && Object.hasOwn(inherited, name),
+        true,
+        `A new NS One gap cannot be excluded as S0: ${name}`,
+      );
+      assertEquals(
+        context.tokens[name].resolved,
+        context.tokens[inherited[name]].resolved,
+        `Component color must exactly match its S0 role: ${name}`,
+      );
+    }
+  }
 });

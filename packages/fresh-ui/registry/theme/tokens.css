@@ -284,7 +284,7 @@
   --ns-accent-fg: var(--ns-gray-12);
   --ns-accent-hover: var(--ns-accent);
   --ns-accent-subtle: rgba(200, 149, 108, 0.08);
-  --ns-accent-text: var(--ns-accent);
+  --ns-accent-text: var(--ns-copper-8);
   --ns-action-primary-bg: var(--ns-primary);
   --ns-action-primary-border: var(--ns-primary-border);
   --ns-action-primary-fg: var(--ns-primary-fg);
@@ -303,7 +303,7 @@
   --ns-block-green: var(--ns-teal-5);
   --ns-block-fg: var(--ns-gray-12);
   --ns-block-pink: var(--ns-red-5);
-  --ns-block-purple: var(--ns-slate-6);
+  --ns-block-purple: var(--ns-slate-4);
   --ns-block-yellow: var(--ns-amber-5);
   --ns-bloom-butter: #f8edb9;
   --ns-bloom-canvas: #faf8f4;
@@ -341,7 +341,7 @@
   --ns-bloom-surface-high: #f2efe9;
   --ns-bloom-tangerine: #ffd9c2;
   --ns-bloom-warn: #8a5a00;
-  --ns-border-control: var(--ns-input-border);
+  --ns-border-control: var(--ns-gray-6);
   --ns-border: rgba(0, 0, 0, 0.08);
   --ns-border-hover: rgba(0, 0, 0, 0.14);
   --ns-ink: var(--ns-fg);
@@ -380,9 +380,9 @@
   --ns-destructive-border: rgba(224, 69, 69, 0.2);
   --ns-destructive: var(--ns-red-5);
   --ns-destructive-fg: #ffffff;
-  --ns-destructive-hover: var(--ns-destructive);
+  --ns-destructive-hover: var(--ns-red-6);
   --ns-destructive-subtle: rgba(224, 69, 69, 0.1);
-  --ns-destructive-text: var(--ns-destructive);
+  --ns-destructive-text: var(--ns-red-7);
   --ns-shadow-color: var(--ns-gray-12);
   --ns-elevation-ambient: var(--ns-gray-12);
   --ns-elevation-key: var(--ns-gray-12);
@@ -469,9 +469,9 @@
   --ns-info-border: var(--ns-secondary-border);
   --ns-info: var(--ns-secondary);
   --ns-info-fg: var(--ns-secondary-fg);
-  --ns-info-hover: var(--ns-secondary-hover);
+  --ns-info-hover: var(--ns-secondary);
   --ns-info-subtle: var(--ns-secondary-subtle);
-  --ns-info-text: var(--ns-secondary-text);
+  --ns-info-text: var(--ns-slate-7);
   --ns-ink-fg: var(--ns-bg);
   --ns-liquid-accent-system: #007aff;
   --ns-liquid-border-default: #d2d2d7;
@@ -552,13 +552,13 @@
   --ns-primary-hover: var(--ns-copper-7);
   --ns-primary-on-container: var(--ns-fg);
   --ns-primary-subtle: rgba(200, 149, 108, 0.1);
-  --ns-primary-text: var(--ns-primary);
+  --ns-primary-text: var(--ns-copper-8);
   --ns-secondary-border: rgba(144, 152, 166, 0.2);
   --ns-secondary: var(--ns-slate-5);
   --ns-secondary-fg: var(--ns-gray-12);
   --ns-secondary-hover: var(--ns-slate-6);
   --ns-secondary-subtle: rgba(144, 152, 166, 0.1);
-  --ns-secondary-text: var(--ns-secondary);
+  --ns-secondary-text: var(--ns-slate-7);
   --ns-state-disabled-container: var(--ns-muted);
   --ns-state-disabled-fg: var(--ns-muted-fg);
   --ns-studio-badge-solid-destructive-bg: #641723;
@@ -614,7 +614,7 @@
   --ns-success-fg: var(--ns-gray-12);
   --ns-success-hover: var(--ns-success);
   --ns-success-subtle: rgba(91, 168, 160, 0.1);
-  --ns-success-text: var(--ns-success);
+  --ns-success-text: var(--ns-teal-7);
   --ns-bg: var(--ns-gray-1);
   --ns-card: #ffffff;
   --ns-container: var(--ns-surface);
@@ -677,7 +677,7 @@
   --ns-warning-fg: var(--ns-gray-12);
   --ns-warning-hover: var(--ns-warning);
   --ns-warning-subtle: rgba(224, 174, 79, 0.1);
-  --ns-warning-text: var(--ns-warning);
+  --ns-warning-text: var(--ns-fg);
   --ns-font-data: var(--ns-font-mono);
   --ns-font-heading: var(--ns-font-sans);
   --ns-font-kpi: var(--ns-font-sans);
@@ -741,7 +741,7 @@
   --ns-table-cell-padding-x: var(--ns-space-3);
   --ns-table-row-height: var(--ns-space-10);
   --ns-topbar-height: var(--ns-topbar-h);
-  --ns-accent-solid-hover: var(--ns-primary-hover);
+  --ns-accent-solid-hover: var(--ns-copper-5);
   --ns-studio-avatar-radius: 0px;
   --ns-studio-button-shadow-x: 0px;
   --ns-studio-button-shadow-y: 0px;
@@ -1191,7 +1191,7 @@
   --ns-accent-fg: var(--ns-gray-12);
   --ns-accent-hover: var(--ns-accent);
   --ns-accent-subtle: rgba(200, 149, 108, 0.08);
-  --ns-accent-text: var(--ns-accent);
+  --ns-accent-text: var(--ns-copper-8);
   --ns-action-primary-bg: var(--ns-primary);
   --ns-action-primary-border: var(--ns-primary-border);
   --ns-action-primary-fg: var(--ns-primary-fg);
@@ -1210,7 +1210,7 @@
   --ns-block-green: var(--ns-teal-5);
   --ns-block-fg: var(--ns-gray-12);
   --ns-block-pink: var(--ns-red-5);
-  --ns-block-purple: var(--ns-slate-6);
+  --ns-block-purple: var(--ns-slate-4);
   --ns-block-yellow: var(--ns-amber-5);
   --ns-bloom-butter: #f8edb9;
   --ns-bloom-canvas: #faf8f4;
@@ -1248,7 +1248,7 @@
   --ns-bloom-surface-high: #f2efe9;
   --ns-bloom-tangerine: #ffd9c2;
   --ns-bloom-warn: #8a5a00;
-  --ns-border-control: var(--ns-input-border);
+  --ns-border-control: var(--ns-gray-6);
   --ns-border: rgba(0, 0, 0, 0.08);
   --ns-border-hover: rgba(0, 0, 0, 0.14);
   --ns-ink: var(--ns-fg);
@@ -1287,9 +1287,9 @@
   --ns-destructive-border: rgba(224, 69, 69, 0.2);
   --ns-destructive: var(--ns-red-5);
   --ns-destructive-fg: #ffffff;
-  --ns-destructive-hover: var(--ns-destructive);
+  --ns-destructive-hover: var(--ns-red-6);
   --ns-destructive-subtle: rgba(224, 69, 69, 0.1);
-  --ns-destructive-text: var(--ns-destructive);
+  --ns-destructive-text: var(--ns-red-7);
   --ns-shadow-color: var(--ns-gray-12);
   --ns-elevation-ambient: var(--ns-gray-12);
   --ns-elevation-key: var(--ns-gray-12);
@@ -1376,9 +1376,9 @@
   --ns-info-border: var(--ns-secondary-border);
   --ns-info: var(--ns-secondary);
   --ns-info-fg: var(--ns-secondary-fg);
-  --ns-info-hover: var(--ns-secondary-hover);
+  --ns-info-hover: var(--ns-secondary);
   --ns-info-subtle: var(--ns-secondary-subtle);
-  --ns-info-text: var(--ns-secondary-text);
+  --ns-info-text: var(--ns-slate-7);
   --ns-ink-fg: var(--ns-bg);
   --ns-liquid-accent-system: #007aff;
   --ns-liquid-border-default: #d2d2d7;
@@ -1459,13 +1459,13 @@
   --ns-primary-hover: var(--ns-copper-7);
   --ns-primary-on-container: var(--ns-fg);
   --ns-primary-subtle: rgba(200, 149, 108, 0.1);
-  --ns-primary-text: var(--ns-primary);
+  --ns-primary-text: var(--ns-copper-8);
   --ns-secondary-border: rgba(144, 152, 166, 0.2);
   --ns-secondary: var(--ns-slate-5);
   --ns-secondary-fg: var(--ns-gray-12);
   --ns-secondary-hover: var(--ns-slate-6);
   --ns-secondary-subtle: rgba(144, 152, 166, 0.1);
-  --ns-secondary-text: var(--ns-secondary);
+  --ns-secondary-text: var(--ns-slate-7);
   --ns-state-disabled-container: var(--ns-muted);
   --ns-state-disabled-fg: var(--ns-muted-fg);
   --ns-studio-badge-solid-destructive-bg: #641723;
@@ -1521,7 +1521,7 @@
   --ns-success-fg: var(--ns-gray-12);
   --ns-success-hover: var(--ns-success);
   --ns-success-subtle: rgba(91, 168, 160, 0.1);
-  --ns-success-text: var(--ns-success);
+  --ns-success-text: var(--ns-teal-7);
   --ns-bg: var(--ns-gray-1);
   --ns-card: #ffffff;
   --ns-container: var(--ns-surface);
@@ -1584,7 +1584,7 @@
   --ns-warning-fg: var(--ns-gray-12);
   --ns-warning-hover: var(--ns-warning);
   --ns-warning-subtle: rgba(224, 174, 79, 0.1);
-  --ns-warning-text: var(--ns-warning);
+  --ns-warning-text: var(--ns-fg);
   --ns-font-data: var(--ns-font-mono);
   --ns-font-heading: var(--ns-font-sans);
   --ns-font-kpi: var(--ns-font-sans);
@@ -1648,7 +1648,7 @@
   --ns-table-cell-padding-x: var(--ns-space-3);
   --ns-table-row-height: var(--ns-space-10);
   --ns-topbar-height: var(--ns-topbar-h);
-  --ns-accent-solid-hover: var(--ns-primary-hover);
+  --ns-accent-solid-hover: var(--ns-copper-5);
   --ns-studio-avatar-radius: 0px;
   --ns-studio-button-shadow-x: 0px;
   --ns-studio-button-shadow-y: 0px;
@@ -2118,7 +2118,7 @@
   --ns-block-green: var(--ns-teal-5);
   --ns-block-fg: var(--ns-gray-12);
   --ns-block-pink: var(--ns-red-5);
-  --ns-block-purple: var(--ns-slate-6);
+  --ns-block-purple: var(--ns-slate-4);
   --ns-block-yellow: var(--ns-amber-5);
   --ns-bloom-butter: #352f14;
   --ns-bloom-canvas: #0f0e0d;
@@ -2156,7 +2156,7 @@
   --ns-bloom-surface-high: #22201e;
   --ns-bloom-tangerine: #6b3416;
   --ns-bloom-warn: #f0c46a;
-  --ns-border-control: var(--ns-input-border);
+  --ns-border-control: var(--ns-gray-6);
   --ns-border: rgba(235, 228, 210, 0.06);
   --ns-border-hover: rgba(235, 228, 210, 0.12);
   --ns-ink: var(--ns-fg);
@@ -2195,7 +2195,7 @@
   --ns-destructive-border: rgba(224, 69, 69, 0.16);
   --ns-destructive: var(--ns-red-5);
   --ns-destructive-fg: #ffffff;
-  --ns-destructive-hover: var(--ns-destructive);
+  --ns-destructive-hover: var(--ns-red-6);
   --ns-destructive-subtle: rgba(224, 69, 69, 0.08);
   --ns-destructive-text: var(--ns-destructive);
   --ns-shadow-color: var(--ns-gray-12);
@@ -2284,7 +2284,7 @@
   --ns-info-border: var(--ns-secondary-border);
   --ns-info: var(--ns-secondary);
   --ns-info-fg: var(--ns-secondary-fg);
-  --ns-info-hover: var(--ns-secondary-hover);
+  --ns-info-hover: var(--ns-secondary);
   --ns-info-subtle: var(--ns-secondary-subtle);
   --ns-info-text: var(--ns-secondary-text);
   --ns-ink-fg: var(--ns-bg);
@@ -2556,7 +2556,7 @@
   --ns-table-cell-padding-x: var(--ns-space-3);
   --ns-table-row-height: var(--ns-space-10);
   --ns-topbar-height: var(--ns-topbar-h);
-  --ns-accent-solid-hover: var(--ns-primary-hover);
+  --ns-accent-solid-hover: var(--ns-copper-5);
   --ns-studio-avatar-radius: 0px;
   --ns-studio-button-shadow-x: 0px;
   --ns-studio-button-shadow-y: 0px;
@@ -33865,7 +33865,7 @@
   --ns-block-green: var(--ns-teal-5);
   --ns-block-fg: var(--ns-gray-12);
   --ns-block-pink: var(--ns-red-5);
-  --ns-block-purple: var(--ns-slate-6);
+  --ns-block-purple: var(--ns-slate-4);
   --ns-block-yellow: var(--ns-amber-5);
   --ns-bloom-butter: #352f14;
   --ns-bloom-canvas: #0f0e0d;
@@ -33903,7 +33903,7 @@
   --ns-bloom-surface-high: #22201e;
   --ns-bloom-tangerine: #6b3416;
   --ns-bloom-warn: #f0c46a;
-  --ns-border-control: var(--ns-input-border);
+  --ns-border-control: var(--ns-gray-6);
   --ns-border: rgba(235, 228, 210, 0.06);
   --ns-border-hover: rgba(235, 228, 210, 0.12);
   --ns-ink: var(--ns-fg);
@@ -33942,7 +33942,7 @@
   --ns-destructive-border: rgba(224, 69, 69, 0.16);
   --ns-destructive: var(--ns-red-5);
   --ns-destructive-fg: #ffffff;
-  --ns-destructive-hover: var(--ns-destructive);
+  --ns-destructive-hover: var(--ns-red-6);
   --ns-destructive-subtle: rgba(224, 69, 69, 0.08);
   --ns-destructive-text: var(--ns-destructive);
   --ns-shadow-color: var(--ns-gray-12);
@@ -34031,7 +34031,7 @@
   --ns-info-border: var(--ns-secondary-border);
   --ns-info: var(--ns-secondary);
   --ns-info-fg: var(--ns-secondary-fg);
-  --ns-info-hover: var(--ns-secondary-hover);
+  --ns-info-hover: var(--ns-secondary);
   --ns-info-subtle: var(--ns-secondary-subtle);
   --ns-info-text: var(--ns-secondary-text);
   --ns-ink-fg: var(--ns-bg);
@@ -34303,7 +34303,7 @@
   --ns-table-cell-padding-x: var(--ns-space-3);
   --ns-table-row-height: var(--ns-space-10);
   --ns-topbar-height: var(--ns-topbar-h);
-  --ns-accent-solid-hover: var(--ns-primary-hover);
+  --ns-accent-solid-hover: var(--ns-copper-5);
   --ns-studio-avatar-radius: 0px;
   --ns-studio-button-shadow-x: 0px;
   --ns-studio-button-shadow-y: 0px;

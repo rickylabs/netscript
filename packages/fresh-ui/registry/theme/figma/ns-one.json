@@ -51,8 +51,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-accent-solid-hover)",
       "values": {
-        "Light": "#a36034",
-        "Dark": "#a36034"
+        "Light": "#d08a5e",
+        "Dark": "#d08a5e"
       }
     },
     {
@@ -71,7 +71,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-accent-text)",
       "values": {
-        "Light": "#bd774c",
+        "Light": "#884719",
         "Dark": "#bd774c"
       }
     },
@@ -511,8 +511,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-block-purple)",
       "values": {
-        "Light": "#606b7b",
-        "Dark": "#606b7b"
+        "Light": "#95a1b2",
+        "Dark": "#95a1b2"
       }
     },
     {
@@ -1361,8 +1361,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-border-control)",
       "values": {
-        "Light": "#c1bfbb",
-        "Dark": "#ebe4d21a"
+        "Light": "#807e7b",
+        "Dark": "#807e7b"
       }
     },
     {
@@ -2311,8 +2311,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-destructive-hover)",
       "values": {
-        "Light": "#d9584c",
-        "Dark": "#d9584c"
+        "Light": "#bd3e35",
+        "Dark": "#bd3e35"
       }
     },
     {
@@ -2331,7 +2331,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-destructive-text)",
       "values": {
-        "Light": "#d9584c",
+        "Light": "#9e1d19",
         "Dark": "#d9584c"
       }
     },
@@ -3811,8 +3811,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-info-hover)",
       "values": {
-        "Light": "#606b7b",
-        "Dark": "#606b7b"
+        "Light": "#7a8696",
+        "Dark": "#7a8696"
       }
     },
     {
@@ -3831,7 +3831,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-info-text)",
       "values": {
-        "Light": "#7a8696",
+        "Light": "#475261",
         "Dark": "#7a8696"
       }
     },
@@ -5571,7 +5571,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-primary-text)",
       "values": {
-        "Light": "#bd774c",
+        "Light": "#884719",
         "Dark": "#bd774c"
       }
     },
@@ -5981,7 +5981,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-secondary-text)",
       "values": {
-        "Light": "#7a8696",
+        "Light": "#475261",
         "Dark": "#7a8696"
       }
     },
@@ -7551,7 +7551,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-success-text)",
       "values": {
-        "Light": "#3e938e",
+        "Light": "#026460",
         "Dark": "#3e938e"
       }
     },
@@ -8881,7 +8881,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-warning-text)",
       "values": {
-        "Light": "#d69e3c",
+        "Light": "#090806",
         "Dark": "#d69e3c"
       }
     },

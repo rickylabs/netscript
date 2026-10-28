@@ -2,6 +2,16 @@ import { tokenAlias, type TokenDocument } from './token-contract.ts';
 import { LEGACY_ROLE_MAP } from './preset-role-map.ts';
 
 const PACKS = ['studio', 'bloom', 'liquid', 'cupertino', 'tactile', 'fluent', 'pixel', 'terminal'];
+// New text roles use existing darker steps on light surfaces; old role values never change.
+const LIGHT_INTENT_TEXT: Readonly<Record<string, string>> = {
+  'primary-text': 'copper-8',
+  'accent-text': 'copper-8',
+  'secondary-text': 'slate-7',
+  'info-text': 'slate-7',
+  'success-text': 'teal-7',
+  'destructive-text': 'red-7',
+  'warning-text': 'fg',
+};
 
 /** Fill new NS One roles from its existing values without changing legacy declarations. */
 export function applyLegacyGaps(
@@ -18,7 +28,8 @@ export function applyLegacyGaps(
       values[name] = tokenAlias(weights[name], 'fontWeight');
       continue;
     }
-    let target = LEGACY_ROLE_MAP[name];
+    let target = (scheme === 'light' ? LIGHT_INTENT_TEXT[name] : undefined) ??
+      LEGACY_ROLE_MAP[name];
     if (name.startsWith('text-')) {
       const sizes: Readonly<Record<string, string>> = {
         body: 'base',

@@ -27,7 +27,8 @@
       "registry/**/*.json",
       "deno.json",
       "README.md",
-      "tokens/**/*.json"
+      "tokens/**/*.json",
+      "tokens/README.md"
     ],
     "exclude": [
       "!**/*.ts",
@@ -38,7 +39,8 @@
       "!README.md",
       "scripts/**",
       "tests/**",
-      "!tokens/**/*.json"
+      "!tokens/**/*.json",
+      "!tokens/README.md"
     ]
   },
   "tasks": {
@@ -47,7 +49,10 @@
     "lint": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-lint.ts --cwd . --root . --ext ts,tsx --config deno.json",
     "test": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-test.ts --cwd . -- --allow-read --allow-write --allow-run --allow-env --lock=deno.lock --frozen --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
     "tokens:build": "deno run --lock=deno.lock --frozen --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
-    "tokens:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts --check"
+    "tokens:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts --check",
+    "tokens:validate": "deno task tokens:sources:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/check-tokens.ts",
+    "tokens:sources:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/import-figma-tokens.ts --check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/validate-token-sources.ts",
+    "tokens:report": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/check-tokens.ts --report"
   },
   "compilerOptions": {
     "lib": [

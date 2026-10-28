@@ -3,8 +3,9 @@
 The canonical inputs live under `v2/`. `deno task tokens:build` uses the public
 `@netscript/fresh-ui/tokens` builder and Style Dictionary 5.7.1 formats to build
 all 72 scheme × preset × requested-density inputs. `tokens:check` compares all
-50 generated outputs without writing or repairing them. The CLI, CI checks,
-and route migration are the remaining S1 slices; the draft PR is not READY.
+50 generated outputs without writing or repairing them. `tokens:validate` checks
+source freshness, official schemas, aliases, registered names and contrast. The
+CLI and route migration are the remaining S1 slices; the draft PR is not READY.
 
 Figma owns values. The registered roles and DTCG resolver own names, tiers and
 supported contexts. NS One remains the default. Studio Utility is an additional
@@ -76,3 +77,52 @@ Modern selection uses `data-theme` for the language, `data-scheme` for light or
 dark, `data-density` for the preset density, and Studio `data-flavor`.
 `data-density` reports the preset's effective geometry; it is not a separate
 density toggle that overrides that preset.
+
+## Validation and contrast feedback
+
+From this package directory:
+
+```sh
+deno task tokens:sources:check
+deno task tokens:validate
+deno task tokens:report
+deno task tokens:check
+```
+
+`role-manifest.json` is the independent code vocabulary and type contract. Import
+and build never regenerate it. Unknown, missing, duplicate or changed-type
+exports fail before SD serialization. Source-level alias validation also checks
+values that a later modifier would otherwise overwrite.
+
+`contrast-pairs.json` declares intentional foreground/background uses and paint
+stacks. Every foreground and named background must be covered in its owning
+language; shared roles apply to all presets. Core input/control boundaries and
+focus require 3:1, and text requires 4.5:1. The Terminal key variant is measured
+in Terminal. Fluent's outer 2px indicator provides the focus contrast; its inner
+1px decorative line is not treated as a standalone indicator.
+
+Color.js measures native oklch components with CSS gamut mapping and sRGB
+source-over alpha compositing against the opaque preset ground. Hex output does
+not quantize the values before measurement. The report includes every measured
+use; it does not omit accepted failures from the count.
+
+`contrast-exclusions.json` binds one preset, scheme, pair, threshold, measured
+ratio and rendered foreground/background colors, with source provenance and a
+reason. Ratios are recorded to twelve decimal places after the AA decision.
+Unused, fixed, changed or duplicate entries fail. Figma values stay unchanged;
+the owner corrects and re-exports them. Inherited S0 color failures are separately
+identified to preserve NS One compatibility. Newly introduced NS One gaps use
+suitable existing palette aliases rather than adding avoidable exceptions.
+
+The required negative controls deliberately exit nonzero:
+
+```sh
+deno task tokens:validate --negative-control=unknown-name
+deno task tokens:validate --negative-control=raw-semantic
+deno task tokens:validate --negative-control=contrast
+```
+
+The package tests invoke the real checker for all three controls. A separate
+policy regression rejects unpaired roles, missing focus checks, weakened text
+thresholds and stale exclusions. `tokens:report` emits JSON on stdout; the normal
+validation task also prints its source-freshness preflight.

@@ -7,6 +7,8 @@ import {
 } from '../src/tokens/domain/resolve-tokens.ts';
 import { TOKEN_DENSITIES, TOKEN_SCHEMES } from '../src/tokens/domain/token-contract.ts';
 import { TOKEN_PRESETS } from '../src/tokens/domain/token-presets.ts';
+import roleRegistry from '../tokens/role-manifest.json' with { type: 'json' };
+import { assertRegisteredTokenNames } from '../src/tokens/domain/check-token-names.ts';
 
 const sources = defaultTokenSources();
 validateDtcgSources(sources);
@@ -24,11 +26,13 @@ let permutations = 0;
 for (const preset of TOKEN_PRESETS) {
   for (const scheme of TOKEN_SCHEMES) {
     for (const density of TOKEN_DENSITIES) {
-      assertTokenReferences(resolveTokenSources(sources, { theme: preset.id, scheme, density }));
+      const document = resolveTokenSources(sources, { theme: preset.id, scheme, density });
+      assertTokenReferences(document);
+      assertRegisteredTokenNames(document, roleRegistry);
       permutations++;
     }
   }
 }
 console.log(
-  `DTCG 2025.10 schemas and alias-only semantics: PASS; ${permutations} resolver inputs.`,
+  `DTCG schemas, alias-only semantics and registered names: PASS; ${permutations} resolver inputs.`,
 );

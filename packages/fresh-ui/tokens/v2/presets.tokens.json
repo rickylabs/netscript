@@ -25,7 +25,7 @@
         },
         "accent-text": {
           "$type": "color",
-          "$value": "{context.light.accent}"
+          "$value": "{context.light.copper-8}"
         },
         "action-primary-bg": {
           "$type": "color",
@@ -101,7 +101,7 @@
         },
         "block-purple": {
           "$type": "color",
-          "$value": "{context.light.slate-6}"
+          "$value": "{context.light.slate-4}"
         },
         "block-yellow": {
           "$type": "color",
@@ -109,7 +109,7 @@
         },
         "border-control": {
           "$type": "color",
-          "$value": "{context.light.input-border}"
+          "$value": "{context.light.gray-6}"
         },
         "border": {
           "$type": "color",
@@ -157,7 +157,7 @@
         },
         "destructive-hover": {
           "$type": "color",
-          "$value": "{context.light.destructive}"
+          "$value": "{context.light.red-6}"
         },
         "destructive-subtle": {
           "$type": "color",
@@ -165,7 +165,7 @@
         },
         "destructive-text": {
           "$type": "color",
-          "$value": "{context.light.destructive}"
+          "$value": "{context.light.red-7}"
         },
         "shadow-color": {
           "$type": "color",
@@ -197,7 +197,7 @@
         },
         "info-hover": {
           "$type": "color",
-          "$value": "{context.light.secondary-hover}"
+          "$value": "{context.light.secondary}"
         },
         "info-subtle": {
           "$type": "color",
@@ -205,7 +205,7 @@
         },
         "info-text": {
           "$type": "color",
-          "$value": "{context.light.secondary-text}"
+          "$value": "{context.light.slate-7}"
         },
         "ink-fg": {
           "$type": "color",
@@ -257,7 +257,7 @@
         },
         "primary-text": {
           "$type": "color",
-          "$value": "{context.light.primary}"
+          "$value": "{context.light.copper-8}"
         },
         "secondary-border": {
           "$type": "color",
@@ -281,7 +281,7 @@
         },
         "secondary-text": {
           "$type": "color",
-          "$value": "{context.light.secondary}"
+          "$value": "{context.light.slate-7}"
         },
         "state-disabled-container": {
           "$type": "color",
@@ -885,7 +885,7 @@
         },
         "success-text": {
           "$type": "color",
-          "$value": "{context.light.success}"
+          "$value": "{context.light.teal-7}"
         },
         "bg": {
           "$type": "color",
@@ -977,7 +977,7 @@
         },
         "warning-text": {
           "$type": "color",
-          "$value": "{context.light.warning}"
+          "$value": "{context.light.fg}"
         },
         "font-data": {
           "$type": "fontFamily",
@@ -1233,7 +1233,7 @@
         },
         "accent-solid-hover": {
           "$type": "color",
-          "$value": "{context.light.primary-hover}"
+          "$value": "{context.light.copper-5}"
         },
         "studio-avatar-radius": {
           "$type": "dimension",
@@ -2266,7 +2266,7 @@
         },
         "block-purple": {
           "$type": "color",
-          "$value": "{context.dark.slate-6}"
+          "$value": "{context.dark.slate-4}"
         },
         "block-yellow": {
           "$type": "color",
@@ -2274,7 +2274,7 @@
         },
         "border-control": {
           "$type": "color",
-          "$value": "{context.dark.input-border}"
+          "$value": "{context.dark.gray-6}"
         },
         "border": {
           "$type": "color",
@@ -2322,7 +2322,7 @@
         },
         "destructive-hover": {
           "$type": "color",
-          "$value": "{context.dark.destructive}"
+          "$value": "{context.dark.red-6}"
         },
         "destructive-subtle": {
           "$type": "color",
@@ -2362,7 +2362,7 @@
         },
         "info-hover": {
           "$type": "color",
-          "$value": "{context.dark.secondary-hover}"
+          "$value": "{context.dark.secondary}"
         },
         "info-subtle": {
           "$type": "color",
@@ -3359,7 +3359,7 @@
         },
         "accent-solid-hover": {
           "$type": "color",
-          "$value": "{context.dark.primary-hover}"
+          "$value": "{context.dark.copper-5}"
         },
         "studio-avatar-radius": {
           "$type": "dimension",

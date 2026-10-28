@@ -1,13 +1,44 @@
-# S1 active — documentation CI correction
+# S1 active — name/contrast slice in review
 
-Full #2414 remains the objective. Branch `orch/divybot-6462582366`, PR #2435 (draft). Source slice is terminal PASS after the explicit user continuation; earlier stopped verdicts remain historical evidence in slice-1-review.md.
+Full #2414 remains the objective, one PR #2435 on `orch/divybot-6462582366`.
+Published head is 23cdce92 (documentation CI correction); Pages build is confirmed
+SUCCESS. Source slice and output slice have independent PASS verdicts. Both
+historical source stops and the owner-resumed repair stay recorded. Do not
+reduce scope or treat the old stopped report as current.
 
-The output engine is implemented: public `packages/fresh-ui/tokens.ts`, domain contracts/resolver and adapter formats, canonical `tokens/v2/` sources, 50 SD outputs from 72 requested inputs. Read `tokens/README.md` to extend it. Root lock additions are only the exact already-approved SD 5.7.1 and Color.js 0.5.2 entries; existing resolutions are unchanged. Original sources are retained as the legacy value/CSS snapshot; stale top-level DTCG source files were removed.
+Slice 3 is implemented and gated with independent PASS after one fix round. Read slice-3-checks.md, worklog.md and drift.md.
+It adds the independently maintained 903-name/type registry; source-level
+alias-only checks; coverage contracts and a Color.js native-color/alpha/WCAG
+calculation port; 381 explicit pair definitions covering 4,066 uses in all 36
+effective contexts; 406 exact exclusions (389 Figma, 17 inherited S0); the
+read-only package quality/report tasks; and a new allowlisted CI receipt step.
+Import/build never regenerate the name or exclusion registries.
 
-Source/output tests pass, frozen build/check and source freshness pass, scoped quality and root architecture pass. Publish dry-run passes; token export doc lint is clean. Existing interactive export has 123 findings and remains unchanged. First output review found two Figma defects: rem pixel conversion and migrated width syntax. Both are fixed and tested across all exported values/bindings. The fix-round full suite passes 202 tests; scoped frozen checks, quality/architecture, generation and publish pass. The same independent supervisor returned PASS and signed off on the fix round. The output slice is terminal PASS, including the supervisor-suggested native-value symmetry regression. This commit is its sign-off; push/comment follow, then begin checks. Read slice-2-review.md and slice-2-output.md.
+All Figma values and both locks are unchanged. Only new NS One gaps were
+remapped to suitable existing legacy steps; every old declaration remains
+unchanged. Terminal key component tokens are a declared Terminal variant.
+Fluent's outer 2px ring is the indicator; its decorative inner 1px line is not
+misclassified as a standalone focus indicator. Explicit paint stacks include
+Liquid/Cupertino materials and Fluent card/control layers. Foreground/background
+omissions, weakened text thresholds and stale exclusions fail.
 
-Next ordered slices: checks (independent role registry, complete contrast coverage, exact exclusions and negative controls), CLI build/clean/init and real scaffold override, migration/fonts/design ramps/attributes/browser proof, mandatory full runtime E2E and independent final IMPL-EVAL. No gate from those slices is claimed complete. Do not start the next slice until output review is terminal.
+Current gates: 209 package tests PASS, 3 CI contract tests PASS, all three actual
+negative commands exit 1, frozen source/build/freshness PASS for 50 outputs/72
+inputs, structured root check33/package lint-fmt32 plus catalog PASS, repository
+quality/architecture PASS, publish dry-run PASS. JSON report confirms 406
+excluded and zero unapproved failures. The token export doc lint is clean;
+unchanged interactive export still has 123 pre-existing doc-lint findings.
 
-No labels, force push, merge, tag or release. Keep `.divybot-goal.md` and final-report handoff out of Git. Final READY is written atomically to `.divybot-final-report.md` only after all required work; earlier stopped report was archived outside Git when work resumed.
+After review PASS: record verdict, reconcile, sign-off commit and push/comment
+this slice. If FAIL_FIX: fix once in this same supervisor session, gate and
+re-review; follow the supplied leaf limit. Then implement CLI build/clean/init
+with ports and a real scaffold override proof, followed by templates/fonts/
+attributes/ramps/browser migration. Mandatory full runtime E2E and separate final
+IMPL-EVAL remain required. No CLI or migration implementation is claimed yet.
 
-Output commit 5aa2cc43195243e5a1d2a3b9dac58bd2cd3ef866 is pushed and PR body/comment updated. The owner then reported Pages build FAILURE: complete site export inventory omitted the tokens entrypoint and 24 symbols. Current delta fixes the reference and changes only the coverage reason count to seven, with complete coverage preserved. All Pages local build checks, the accuracy aggregate and the independent correction review PASS. The small reference correction is now ready to commit/push; complete coverage and workflow checks stay intact. The name/contrast slice has not started implementation.
+No labels, force push, merge, tag or release. Keep .divybot-goal.md and final
+report handoff out of Git. Raw logs/reviewer envelopes stay outside Git in the
+project run area. Final READY is written atomically to .divybot-final-report.md
+only when all work is done; the earlier stopped report was archived privately.
+
+Checks review round1 found destructive-hover was a new gap, not inherited. It now aliases red-6, its two exclusions are removed, and a regression verifies every NS One exclusion is truly legacy or an exact component alias. Full fix-round gates pass; same-session fix review returned PASS.

@@ -2,6 +2,8 @@ import StyleDictionary from 'npm:style-dictionary@5.7.1';
 import type { Config } from 'npm:style-dictionary@5.7.1/types';
 import legacy from '../../../tokens/legacy.json' with { type: 'json' };
 import figmaIndex from '../../../tokens/figma/index.json' with { type: 'json' };
+import roleRegistry from '../../../tokens/role-manifest.json' with { type: 'json' };
+import { assertRegisteredTokenNames } from '../domain/check-token-names.ts';
 import {
   assertSemanticAliases,
   assertTokenReferences,
@@ -66,6 +68,7 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
         );
         assertSemanticAliases({ semantic: document.semantic, context: document.context });
         assertTokenReferences(document);
+        assertRegisteredTokenNames(document, roleRegistry);
         const dictionary = new StyleDictionary({
           tokens: document,
           usesDtcg: true,

@@ -18,7 +18,7 @@ function pointer(document: object, fragment: string): unknown {
   let value: unknown = document;
   for (const part of fragment.replace(/^#\//, '').split('/')) {
     const key = part.replaceAll('~1', '/').replaceAll('~0', '~');
-    if (!value || typeof value !== 'object' || !(key in value)) {
+    if (!value || typeof value !== 'object' || !Object.hasOwn(value, key)) {
       throw new Error(`Unknown resolver pointer: ${fragment}`);
     }
     value = (value as Record<string, unknown>)[key];
@@ -29,11 +29,18 @@ function pointer(document: object, fragment: string): unknown {
 /** Merge DTCG groups in source order; a later token replaces the whole token. */
 export function mergeTokenDocuments(target: TokenDocument, source: TokenDocument): TokenDocument {
   for (const [key, value] of Object.entries(source)) {
-    const old = target[key];
-    target[key] = typeof value !== 'string' && !('$value' in value) && old &&
-        typeof old !== 'string' && !('$value' in old)
-      ? mergeTokenDocuments(old, value)
-      : structuredClone(value);
+    const old = Object.hasOwn(target, key) ? target[key] : undefined;
+    const next =
+      value && typeof value === 'object' && !Array.isArray(value) && !('$value' in value) && old &&
+        typeof old === 'object' && !Array.isArray(old) && !('$value' in old)
+        ? mergeTokenDocuments(old, value)
+        : structuredClone(value);
+    Object.defineProperty(target, key, {
+      value: next,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
   }
   return target;
 }
@@ -74,7 +81,7 @@ export function resolveTokenSources(
       modifier.contexts[input].forEach(expand);
     } else {
       const [file, fragment] = ref.split('#');
-      const document = sources.documents[file];
+      const document = Object.hasOwn(sources.documents, file) ? sources.documents[file] : undefined;
       if (!document) throw new Error(`Unknown token document: ${file}`);
       const selected = fragment ? pointer(document, `#${fragment}`) : document;
       if (!selected || typeof selected !== 'object') throw new Error(`Invalid source: ${ref}`);
@@ -130,6 +137,18 @@ export function resolveTokenSources(
 export function assertSemanticAliases(document: TokenDocument): void {
   for (const { path, token } of tokenEntries(document)) {
     if (!isTokenAlias(token.$value)) throw new Error(`Semantic token must be an alias: ${path}`);
+  }
+}
+
+/** Inspect source tiers too, so a later modifier cannot hide a raw semantic value. */
+export function assertSemanticSourceAliases(document: TokenDocument): void {
+  for (const { path, token } of tokenEntries(document)) {
+    if (
+      path.split('.').some((part) => part === 'semantic' || part === 'context') &&
+      !isTokenAlias(token.$value)
+    ) {
+      throw new Error(`Semantic token must be an alias: ${path}`);
+    }
   }
 }
 

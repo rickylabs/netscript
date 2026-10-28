@@ -9,11 +9,41 @@ import { validateDtcgSources } from '../../src/tokens/adapters/dtcg-validation.t
 import {
   assertSemanticAliases,
   assertTokenReferences,
+  mergeTokenDocuments,
   resolveTokenSources,
 } from '../../src/tokens/domain/resolve-tokens.ts';
 import { TOKEN_PRESETS } from '../../src/tokens/domain/token-presets.ts';
 import { type FigmaCollection, tokenEntries } from '../../src/tokens/domain/token-contract.ts';
 import legacy from '../../tokens/legacy.json' with { type: 'json' };
+
+Deno.test('source merging keeps JSON keys and metadata without touching inherited objects', () => {
+  const source = JSON.parse(
+    '{"__proto__":{"s1TokenMergeProbe":{"$type":"number","$value":1}},"$deprecated":true}',
+  );
+  const prototype = Object.prototype as Record<string, unknown>;
+  try {
+    const merged = mergeTokenDocuments({}, source);
+    assertEquals(Object.getPrototypeOf(merged), Object.prototype);
+    assertEquals(Object.hasOwn(merged, '__proto__'), true);
+    assertEquals(Object.hasOwn(prototype, 's1TokenMergeProbe'), false);
+    assertEquals(merged, source);
+  } finally {
+    Reflect.deleteProperty(prototype, 's1TokenMergeProbe');
+  }
+  const sources = defaultTokenSources();
+  assertThrows(
+    () =>
+      resolveTokenSources({
+        ...sources,
+        resolver: {
+          ...sources.resolver,
+          resolutionOrder: [{ $ref: 'semantic.tokens.json#/__proto__' }],
+        },
+      }, {}),
+    Error,
+    'Unknown resolver pointer',
+  );
+});
 
 Deno.test('NS One line heights fit their paired text sizes in both schemes', () => {
   const sources = defaultTokenSources();
