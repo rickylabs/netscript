@@ -6,16 +6,18 @@ templateEngine: [vento, md]
 
 # Service layout
 
-Keep routers thin; place service logic behind repository ports.
+This page describes the folders inside a generated service, the dependency direction between them,
+when to split a module, and how to move an existing service to this layout. The rule throughout:
+keep routers thin and put service logic behind repository ports.
 
 ## Generated single-entity layout
 
-The CLI emits one application file per entity and keeps its repository interface in that file.
-This is the **collapsed** shape: operations share one application module and the port does not yet
-need a separate directory. Pure policy and technology adapters remain explicit. For a database
-service named `users` with model `User`, the tree is:
+The CLI emits one application file per entity and keeps its repository interface in that file. This
+is the **collapsed** shape: operations share one application module, and the port does not yet need
+its own directory. Pure policy and technology adapters stay explicit. For a database service named
+`users` with model `User`, the tree is:
 
-```text
+```tree
 services/users/
 ├── deno.json
 └── src/
@@ -32,9 +34,9 @@ services/users/
 
 Without a database, filenames use the service name: `application/users.ts`, `domain/users.ts`,
 `adapters/memory-users-repository.ts`, and `application/users_test.ts`. The memory adapter owns
-seeded records per instance; list results are snapshots. Its existing offset/search and status
-contract differs from the Prisma CRUD contract, while the dependency direction stays the same.
-Run `deno task test` inside either generated service; its test module needs no running database.
+seeded records per instance, and list results are snapshots. Its offset/search and status contract
+differs from the Prisma CRUD contract; the dependency direction is the same. Run `deno task test`
+inside either generated service; its test module needs no running database.
 
 ## Vocabulary and dependency direction
 
@@ -48,10 +50,10 @@ Run `deno task test` inside either generated service; its test module needs no r
 | `src/auth/`        | Service-local authenticator and authorizer composition.                                                |
 | `tests/`           | Cross-module suites; single-module tests may be colocated as `*_test.ts`.                              |
 
-A router depends on the application; the application depends on domain policy and ports. An adapter
-implements a port and imports its types. `main.ts` selects the concrete repository once, passes it
-to `createRouter(repository)`, and starts `defineService`. The repository port is type-only in the
-collapsed application module, so adapter imports do not reverse that dependency.
+A router depends on the application, and the application depends on domain policy and ports. An
+adapter implements a port and imports its types. `main.ts` selects the concrete repository once,
+passes it to `createRouter(repository)`, and starts `defineService`. The repository port is
+type-only in the collapsed application module, so adapter imports do not reverse that dependency.
 
 ## Collapse decision table
 
@@ -86,5 +88,7 @@ logic in the application module and bind it from the router manually.
    application and adapters. Split domain modules only where policy warrants it. Keep routers thin
    and leave the public contract unchanged.
 
-See [Add a service](/services-sdk/how-to/add-a-service/) for CLI commands and
+## Next steps
+
+Create a service in this layout with [Add a service](/services-sdk/how-to/add-a-service/). See also
 [Services & contracts](/services-sdk/services/) for contract binding and bootstrap options.

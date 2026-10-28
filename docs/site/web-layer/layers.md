@@ -7,24 +7,16 @@ order: 16
 
 # Layers, layout, and slots
 
-A dashboard page is a header, a table, a stats strip, and a side panel. Four regions, four different
-data needs, four different acceptable latencies. Written as one route handler they become one
-function with one await budget and one props bag — and the slowest of the four decides when any of
-them paints.
+This page explains `withLayer(id, Component, config)` and `withLayout(slots => …)`. A layer is a
+named region of the page: it loads its own props and can carry its own fallback, freshness window
+and refresh route. `withLayout` places the regions. **Layers resolve concurrently** and **cannot see
+each other**, which is why [request-scoped resources](/web-layer/resources/) exist alongside them.
 
-`withLayer(id, Component, config)` splits that page back into the regions it visually already is.
-Each layer names itself, loads its own props, and can carry its own fallback, freshness window, and
-refresh route. `withLayout(slots => …)` then places them. The two facts worth internalising up front
-are that **layers resolve concurrently** and that **they cannot see each other** — which is precisely
-why [request-scoped resources](/web-layer/resources/) exist alongside them.
+It assumes you know the [builder chain](/web-layer/builders/).
 
-The builder-chain overview lives in [Pages and the define-page builder](/web-layer/builders/); this
-page assumes it.
+## Compared with bare Fresh
 
-## What bare Fresh makes you write
-
-Fresh 2 gives a route one handler and one component. Regions are a convention you maintain, not a
-thing the framework knows about:
+Fresh 2 gives a route one handler and one component. Regions are a convention you maintain:
 
 ```tsx
 // routes/orders.tsx — bare Fresh
@@ -52,26 +44,17 @@ export default define.page<typeof handler>(({ data }) => (
 ));
 ```
 
-Nothing here is wrong, and `Promise.all` is the right tool — the point is what the shape costs as the
-page grows.
+This works, but the shape costs more as the page grows:
 
-**A region is not addressable.** There is no name to hang anything on. A skeleton for the slow one, a
-freshness window, a URL that can re-render only that box: each of those needs an identity the page
-does not have. `routes/_layout.tsx` does not help, because a Fresh layout receives a single
-`{ Component }` and wraps it — it is chrome around a whole route, not a placement grid for the parts
-inside one.
-
-**Adding a region couples several sites in the route module.** The handler's `Promise.all`, the
-returned data shape, and the JSX must change together, and the type tying them together is inferred
-from the whole handler rather than declared per region.
-
-**Concurrency is bookkeeping.** Two fetches overlap because you wrote `Promise.all`. Add a third and
-forget, and you have silently serialised the page — with no trace to say so, because there are no
-per-region spans to compare.
-
-**One slow region is the whole page's latency.** The handler resolves or it does not. Painting the
-fast three while the fourth is still loading means reaching for Suspense and inventing your own
-boundary, fallback, and refresh path per page.
+- **A region is not addressable.** A skeleton, a freshness window or a URL that re-renders only one
+  box each need an identity the region does not have. `routes/_layout.tsx` does not help: a Fresh
+  layout wraps a whole route, not the parts inside one.
+- **Adding a region couples several sites.** The `Promise.all`, the returned data shape and the JSX
+  change together, and their type is inferred from the whole handler.
+- **Concurrency is bookkeeping.** Forget to add a third fetch to `Promise.all` and the page is
+  silently serialised, with no per-region spans to show it.
+- **One slow region is the whole page's latency.** Painting the fast regions first means inventing
+  your own Suspense boundary, fallback and refresh path per page.
 
 ## The mechanism
 
@@ -86,45 +69,38 @@ const layers = await Promise.all(
 );
 ```
 
-Four properties follow from that one line, and they are the whole model.
+Four properties follow from it:
 
-**1. Layers run concurrently.** Resources are a sequential `for…of`; layers are a `Promise.all`. Two
-loaders taking 40 ms and 10 ms interleave — the second finishes first — so a page's layer cost is its
-slowest region, not the sum. This is the exact inverse of the resource contract, and the split is
-deliberate: resources are for values whose *order* matters, layers for regions whose order does not.
-
-**2. Layers cannot read each other.** Because they start together, there is no moment at which layer
-B could observe layer A's result. `ctx.layerData` exists on a layer loader's context and is `{}` for
-the whole of it. Two regions that need the same value declare it as a resource and both read it from
-there; that is the division of labour the two APIs are for.
-
-**3. Each layer is its own span.** Every resolution is wrapped as `page.layer.<id>` carrying
-`page.route`, `page.layer.id`, `page.layer.has_partial`, `page.layer.has_loader`, and
-`page.layer.delivery` — so "which region is slow" is a trace question, not a bisection.
-
-**4. The loader's return value decides whether the component renders at all.** The contract is
-`TProps | CacheEntryLike<TProps> | null | undefined`, and the runtime renders the component only when
-it received data:
+1. **Layers run concurrently.** Resources are a sequential `for…of`; layers are a `Promise.all`.
+   Loaders taking 40 ms and 10 ms interleave, so a page's layer cost is its slowest region, not the
+   sum. Resources are for values whose *order* matters; layers are for regions whose order does not.
+2. **Layers cannot read each other.** They start together, so layer B never observes layer A's
+   result. `ctx.layerData` on a layer loader's context is `{}`. Two regions that need the same value
+   declare it as a resource and both read it from there.
+3. **Each layer is its own span.** Every resolution is wrapped as `page.layer.<id>` carrying
+   `page.route`, `page.layer.id`, `page.layer.has_partial`, `page.layer.has_loader` and
+   `page.layer.delivery`, so a trace shows which region is slow.
+4. **The loader's return value decides whether the component renders.** The contract is
+   `TProps | CacheEntryLike<TProps> | null | undefined`, and the runtime renders the component only
+   when it received data:
 
 ```ts
 const component = data ? renderLayerComponent(descriptor.component, data) : null;
 ```
 
-That is a sharper rule than it looks, and it has one genuinely surprising consequence.
-
 {{ comp callout { type: "warning", title: "A layer with no loader renders nothing" } }}
-<code>.withLayer('banner', Banner)</code> — no third argument — produces empty output. There is no
-loader, so there is no data, so the component is never constructed. The same is true of a loader that
-returns <code>null</code> or <code>undefined</code>. A static region needs a loader that returns an
-empty object: <code>.withLayer('banner', Banner, { loader: () => ({}) })</code> renders
-<code>&lt;Banner /&gt;</code> with no props. Declaring a <code>fallback</code> also fills the hole —
-with the fallback, not the component.
+<code>.withLayer('banner', Banner)</code>, with no third argument, produces empty output: there is no
+loader, so no data, so the component is never constructed. A loader that returns <code>null</code> or
+<code>undefined</code> behaves the same way. A static region needs a loader that returns an empty
+object: <code>.withLayer('banner', Banner, { loader: () => ({}) })</code> renders
+<code>&lt;Banner /&gt;</code> with no props. A <code>fallback</code> also fills the hole, with the
+fallback rather than the component.
 {{ /comp }}
 
 ## Two ways to configure a layer
 
 The third argument is either the loader itself or a config object holding it. `resolveLayerConfig`
-normalises the shorthand — `typeof layerConfig === 'function' ? { loader: layerConfig } : …` — so
+normalises the shorthand (`typeof layerConfig === 'function' ? { loader: layerConfig } : …`), so
 these are the same layer:
 
 ```tsx
@@ -141,8 +117,8 @@ these are the same layer:
 })
 ```
 
-Use the shorthand when the loader is all there is. Everything else — a fallback, a stale window, a
-partial route — needs the object form.
+Use the shorthand when the loader is all there is. A fallback, a stale window or a partial route
+needs the object form.
 
 | Field | Effect |
 | --- | --- |
@@ -159,24 +135,25 @@ partial route — needs the object form.
 | `delivery` | `'blocking' \| 'defer' \| 'stream'`. |
 | `gcTime` | Accepted by the type, **not read by the page runtime**. |
 
-The `partial`, `partialName`, `staleTime`, `staleReloadMode`, `policy`, and `params` fields are the
-deferred-region half; what the runtime builds out of them is documented in
-[Partials](/web-layer/partials/#deferred-loader-composition-the-page-runtime-drives-the-partial), and
-the freshness behaviour they select is [Deferred and streaming UI](/web-layer/defer-streaming-ui/).
+The `partial`, `partialName`, `staleTime`, `staleReloadMode`, `policy` and `params` fields configure
+the deferred region. [Partials](/web-layer/partials/#deferred-loader-composition-the-page-runtime-drives-the-partial)
+documents what the runtime builds from them, and
+[Deferred and streaming UI](/web-layer/defer-streaming-ui/) documents the freshness behaviour they
+select.
 
-Two behaviours are worth knowing before you reach for `delivery`:
+Two `delivery` behaviours to know:
 
 - **`delivery: 'stream'` only streams on a `withStreaming()` page.** The condition is
   `config.streaming && descriptor.config.delivery === 'stream'`. On an ordinary page a `'stream'`
-  layer does not stream *and* does not defer — it renders inline, even if it also declares a
-  `partial`. There is no warning.
-- **`delivery: 'blocking'` opts a region out of deferral** while keeping its `partial` declared, which
-  is the switch to reach for when a region must be present in the first HTML.
+  layer neither streams nor defers: it renders inline, even if it declares a `partial`, and nothing
+  warns you.
+- **`delivery: 'blocking'` opts a region out of deferral** while keeping its `partial` declared. Use
+  it when a region must be present in the first HTML.
 
-## Cached data goes in and props come out
+## Cache-entry loaders
 
-A loader may return a cache entry — `{ data, cachedAt }` — instead of props, and the runtime unwraps
-it. The layer component still receives `data`'s shape as its props; `cachedAt` becomes the region's
+A loader may return a cache entry (`{ data, cachedAt }`) instead of props, and the runtime unwraps
+it. The layer component receives `data`'s shape as its props, and `cachedAt` becomes the region's
 freshness stamp:
 
 ```tsx
@@ -189,7 +166,7 @@ freshness stamp:
 })
 ```
 
-This is why `getCachedEntry()` and `withLayer` fit together without an adapter — see
+That is why `getCachedEntry()` and `withLayer` fit together without an adapter. See
 [The query bridge](/web-layer/query-bridge/#the-loader-half-a-read-not-a-fetch) for what that call
 does and does not do.
 
@@ -199,19 +176,19 @@ owns its refresh: on a miss or a stale entry the runtime prewarms the `partial` 
 route's loader runs the callable action that fetches and re-caches. A layer with no `partial` has no
 such path; give it the action-then-metadata loader instead.
 
-`staleReloadMode` decides what a *stale* entry means. With `'background'`, the stale data still
-renders and the server is asked to prewarm behind it. With `'blocking'`, the runtime discards the
-data before render, so the region paints its fallback rather than known-stale content:
+`staleReloadMode` decides what a *stale* entry means. With `'background'`, the stale data renders
+and the server prewarms behind it. With `'blocking'`, the runtime discards the data before render,
+so the region paints its fallback instead of known-stale content:
 
 | `staleReloadMode` | Entry inside `staleTime` | Entry older than `staleTime` |
 | --- | --- | --- |
 | `'background'` (or unset) | renders the data | renders the data, server prewarms |
 | `'blocking'` | renders the data | renders the **fallback** |
 
-## The layout places what the layers produced
+## Placing layers with `withLayout`
 
-Without `withLayout`, layers render in declaration order, one after another. With it, you get a
-`slots` object keyed by layer id and place them wherever you like:
+Without `withLayout`, layers render in declaration order. With it, you get a `slots` object keyed
+by layer id and place each region where you want it:
 
 ```tsx
 export const ordersPage = definePage()
@@ -243,12 +220,12 @@ export const ordersPage = definePage()
   .build('/orders');
 ```
 
-`loadSession` runs once, before the layers; all three loaders then run together. Placement in the
-layout is independent of declaration order — moving `{slots.tickets()}` above `{slots.header()}`
-changes the markup and nothing else.
+`loadSession` runs once, before the layers; the three loaders then run together. Placement is
+independent of declaration order: moving `{slots.tickets()}` above `{slots.header()}` changes the
+markup and nothing else.
 
-A slot is a function that returns the region's rendered element, and it carries the resolved props on
-`.data` — so a layout can read a layer's result without rendering it twice:
+A slot is a function that returns the region's rendered element. It carries the resolved props on
+`.data`, so a layout can read a layer's result without rendering it twice:
 
 ```tsx
 .withLayout((slots) => (
@@ -259,19 +236,19 @@ A slot is a function that returns the region's rendered element, and it carries 
 ```
 
 `.data` is optional because a layer that produced no data has none. The layout's second argument is
-the full page context, and by the time the layout runs `ctx.layerData` is populated with every
-layer's props — the same values, reached by id instead of through a slot.
+the full page context; by the time the layout runs, `ctx.layerData` holds every layer's props, keyed
+by id.
 
 {{ comp callout { type: "note" } }}
-<code>withLayout</code> is not a replacement for <code>routes/_layout.tsx</code>. The Fresh layout is
-route-tree chrome — nav bars, theme, the app shell — and still applies. <code>withLayout</code> places
+<code>withLayout</code> does not replace <code>routes/_layout.tsx</code>. The Fresh layout is
+route-tree chrome (nav bars, theme, the app shell) and still applies. <code>withLayout</code> places
 the regions <em>inside</em> one page. A NetScript app normally has both.
 {{ /comp }}
 
 ## Reading layers from a component
 
-A routed `build()` returns a definition carrying `hooks`, and those hooks read the page context from
-inside the render tree — no prop path:
+A routed `build()` returns a definition carrying `hooks`. They read the page context from inside
+the render tree, without a prop path:
 
 ```tsx
 export const ordersPage = definePage()
@@ -294,16 +271,15 @@ export function OrdersCount() {
 | `useSlots()` | the slot map, callable per layer id |
 
 `useRequiredLayer` throws
-`definePage() could not resolve layer data for "<id>" in the current render tree.` — which is what you
-get when the layer produced no data, not only when the id is wrong. The standalone forms
-(`useDefinePageLayer`, `useRequiredDefinePageLayer`, `useDefinePageSlots`) are the same functions
-without the page's type binding; the full hook list is in
-[Pages and the define-page builder](/web-layer/builders/).
+`definePage() could not resolve layer data for "<id>" in the current render tree.` when the layer
+produced no data, not only when the id is wrong. The standalone forms (`useDefinePageLayer`,
+`useRequiredDefinePageLayer`, `useDefinePageSlots`) are the same functions without the page's type
+binding.
 
 ## Typing a layer component from its loader
 
 When a loader lives in its own module, `InferDefinePageLayerLoaderProps` derives the component's
-props from it instead of restating them:
+props from it:
 
 ```tsx
 import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
@@ -319,39 +295,31 @@ export function OrdersPanel(props: OrdersLayerProps) {
 }
 ```
 
-It understands the cache-entry case too: a loader returning `{ data, cachedAt }` infers `data`'s shape,
-not the envelope, matching what the runtime actually passes. `null` and `undefined` are excluded, so
-the props type describes the rendered case rather than the empty one.
+A loader returning `{ data, cachedAt }` infers `data`'s shape, not the envelope, which matches what
+the runtime passes. `null` and `undefined` are excluded, so the props type describes the rendered
+case.
 
 ## What to watch for
 
-- **Ids are identity, and duplicates collapse.** Layers are memoised per render on id plus route
-  state plus `layerDeps`. Declaring the same id twice means the second loader never runs and the first
-  region's element is emitted twice.
+- **Ids are identity, and duplicates collapse.** Layers are memoised per render on id, route state
+  and `layerDeps`. Declare the same id twice and the second loader never runs; the first region's
+  element is emitted twice.
 - **`gcTime` is inert.** The type accepts it; the page runtime never reads it. Freshness comes from
-  `staleTime`, `staleReloadMode`, and the policy.
+  `staleTime`, `staleReloadMode` and the policy.
 - **An empty object is data; `null` is not.** `{}` renders the component with no props. `null` renders
   the fallback, or nothing.
-- **Concurrency means no ordering.** If one region genuinely must run after another, the earlier value
-  is a resource, not a layer.
+- **Concurrency means no ordering.** If one region must run after another, the earlier value is a
+  resource, not a layer.
 - **Fallbacks are not universal.** A deferred or streamed region without a `fallback` gets a default
-  `aria-busy` placeholder; a plain inline region without one renders nothing when its loader comes back
+  `aria-busy` placeholder; a plain inline region without one renders nothing when its loader returns
   empty.
-- **The `delivery` span attribute currently misreports its default.** The span records
+- **The `delivery` span attribute misreports its default.** The span records
   `delivery ?? 'blocking'` while the defer decision reads `delivery ?? 'defer'`, so a region that
-  omits `delivery` and declares a `partial` defers but traces as `blocking`. That is a reporting
-  discrepancy rather than a difference in behaviour, and it is expected to be corrected — until it is,
-  read `page.layer.has_partial` alongside it.
+  omits `delivery` and declares a `partial` defers but traces as `blocking`. Behaviour is correct;
+  read `page.layer.has_partial` alongside the attribute.
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [
-  { title: "Pages and the define-page builder", body: "The full builder chain this page zooms into.", href: "/web-layer/builders/" },
-  { title: "Request-scoped resources", body: "The sequential half: values layers share.", href: "/web-layer/resources/" },
-  { title: "Partials", body: "What a layer's partial config actually builds.", href: "/web-layer/partials/" },
-  { title: "Deferred and streaming UI", body: "Policies, stale windows, and the refresh decision.", href: "/web-layer/defer-streaming-ui/" },
-  { title: "Response shaping", body: "withMeta, withHeader, and withStatus after the layers resolve.", href: "/web-layer/response/" },
-  { title: "Live dashboard tutorial", body: "Three layers and a layout, end to end.", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }
-] }) }}
-
-See the [Web Layer overview](/web-layer/) for the full pillar map.
+Continue with [Partials](/web-layer/partials/) to see what a layer's `partial` config builds. See
+also [Deferred and streaming UI](/web-layer/defer-streaming-ui/) for the freshness policies and
+[Response shaping](/web-layer/response/) for what runs after the layers resolve.

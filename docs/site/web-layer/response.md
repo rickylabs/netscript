@@ -7,22 +7,17 @@ order: 17
 
 # Response shaping
 
-Everything a page produces beyond its markup — the `<head>` block, the status code, the response
-headers, and which HTTP methods it answers — is decided after the layers resolve, by five builder
-methods and the `GET` handler the builder synthesises from them.
+This page covers what a page produces besides its markup: the `<head>` block, the status code, the
+response headers, and the HTTP methods it answers. Builder methods decide these after the layers
+resolve, and `build()` synthesises a `GET` handler from them. It decides at build time whether the
+page needs a handler at all, so the wrong combination of methods fails with one of three errors,
+sometimes naming a method you did not call.
 
-That synthesis is the part worth understanding. `definePage()` does not hand you a handler and let you
-mutate its response; it decides, at `build()` time, whether the page needs a handler at all and what
-that handler must be able to do. Get that wrong and you meet one of three errors with a message that
-names a method you may not have called. This page is about which combinations produce which handler,
-and why.
+It assumes you know the [builder chain](/web-layer/builders/).
 
-The builder-chain overview lives in [Pages and the define-page builder](/web-layer/builders/); this
-page assumes it.
+## Compared with bare Fresh
 
-## What bare Fresh makes you write
-
-Fresh's own answer is direct and, for one page, entirely adequate:
+For one page, Fresh's own answer is adequate:
 
 ```tsx
 // routes/orders.tsx — bare Fresh
@@ -50,27 +45,20 @@ export const handler = define.handlers({
 });
 ```
 
-`ctx.render(vnode, init)` takes a `ResponseInit`, so status and headers are one object literal. Three
-costs show up as the app grows rather than in this snippet.
+`ctx.render(vnode, init)` takes a `ResponseInit`, so status and headers are one object literal. The
+costs appear as the app grows:
 
-**Shaping a response changes the module's shape.** A page that renders with `define.page()` and needs
-one header must become a `define.handlers({ GET })` that renders explicitly. The rendering and the
-shaping are the same expression, so you cannot add a header without taking ownership of the render.
-
-**Headers do not merge at the component-region level.** The handler can assemble them in
-`ResponseInit`, and Fresh middleware can add or replace headers around `await ctx.next()` — that is
-the ordinary cross-route seam for cache directives, tenant tags, and cookies. What no seam reaches is
-a rendered component: a region that needs a header of its own cannot contribute one, so a form
-wanting `Set-Cookie` has to be handled by an agreed handler or middleware that knows the region
-exists.
-
-**Metadata is placement, not resolution.** `<Head>` renders where you put it, which means it can only
-see values already in scope at that point in the tree. Titles that depend on loaded data are drilled
-down to wherever `<Head>` sits, or the `<Head>` is hoisted to wherever the data is.
+- **Shaping a response changes the module's shape.** A `define.page()` that needs one header must
+  become a `define.handlers({ GET })` that renders explicitly.
+- **Headers do not merge at the region level.** Handlers and middleware can set headers, but a
+  rendered region cannot contribute its own. A form that needs `Set-Cookie` depends on a handler or
+  middleware that knows the region exists.
+- **Metadata is placement, not resolution.** `<Head>` only sees values in scope where you put it, so
+  titles that depend on loaded data are drilled down to it, or `<Head>` is hoisted up to the data.
 
 ## The mechanism: a synthesised GET
 
-`build()` inspects the config and decides which of three shapes the page has. From
+`build()` inspects the config and picks one of three shapes. From
 `packages/fresh/src/application/builders/define-page/builder/mod.tsx`:
 
 ```ts
@@ -84,7 +72,7 @@ if (config.streaming) {
 const handler = Object.keys(builtHandlers).length > 0 ? builtHandlers : undefined;
 ```
 
-Read as a table:
+As a table:
 
 | The page declares | `build()` produces |
 | --- | --- |
@@ -93,7 +81,7 @@ Read as a table:
 | `withStreaming()` | a `GET` handler returning a streaming `Response`, carrying the headers and status too |
 | any of the above **plus** an explicit `withHandler('GET')` | a throw at `build()` |
 
-The three messages are verbatim, and worth searching for as strings:
+The three error messages, verbatim:
 
 ```text
 definePage() cannot combine withHandler("GET") with withStreaming().
@@ -101,27 +89,26 @@ definePage() cannot combine withHandler("GET") with withHeader() or withStatus()
 definePage() requires ctx.render() when withHeader() or withStatus() is used.
 ```
 
-The first two fire at `build()` — module load, not request time. The third fires per request, when the
-synthesised handler receives a context without a `render` method.
+The first two fire at `build()`, which is module load rather than request time. The third fires per
+request, when the synthesised handler receives a context without a `render` method.
 
 {{ comp callout { type: "warning", title: "withForm() makes a page a shaped page" } }}
-<code>withForm</code> appends a CSRF header resolver to <code>config.headers</code> unless you passed
-<code>csrf: false</code>. That is enough to take the headers branch, so <strong>every form page has a
-synthesised <code>GET</code> that requires <code>ctx.render()</code></strong> — and adding
+<code>withForm</code> appends a CSRF header resolver to <code>config.headers</code> unless you pass
+<code>csrf: false</code>. That takes the headers branch, so <strong>every form page has a synthesised
+<code>GET</code> that requires <code>ctx.render()</code></strong>. Adding
 <code>withHandler('GET')</code> to a form page throws
 <em>cannot combine withHandler("GET") with withHeader() or withStatus()</em>, naming two methods you
-never called. If you need a custom <code>GET</code> on a form page, the form's cookie has to come from
+never called. A custom <code>GET</code> on a form page needs the form's cookie to come from
 somewhere else.
 {{ /comp }}
 
-Only `GET` is affected. A `withHandler('POST')` coexists with `withStatus()` and `withHeader()`
-without complaint: the built handler map ends up with both the POST you wrote and the GET the builder
-synthesised.
+Only `GET` is affected. A `withHandler('POST')` coexists with `withStatus()` and `withHeader()`: the
+built handler map holds both the POST you wrote and the GET the builder synthesised.
 
 ## `withMeta`: a resolver, not a placement
 
-`withMeta(resolver)` registers a resolver — synchronous or asynchronous — that runs **after** every
-layer has resolved, so it can read what they produced:
+`withMeta(resolver)` registers a synchronous or asynchronous resolver that runs **after** every layer
+has resolved, so it can read what they produced:
 
 ```tsx
 .withMeta((ctx) => ({
@@ -131,9 +118,9 @@ layer has resolved, so it can read what they produced:
 }))
 ```
 
-`ctx.layerData` is fully populated by then — the same values a layout sees — and `ctx.resource(key)`
-and the parsed `ctx.path` / `ctx.search` are available too. The resolver returns a descriptor with
-seven optional fields, which the runtime renders into a Fresh `<Head>`:
+By then `ctx.layerData` holds the same values a layout sees, and `ctx.resource(key)` and the parsed
+`ctx.path` / `ctx.search` are available. The resolver returns a descriptor with seven optional
+fields, which the runtime renders into a Fresh `<Head>`:
 
 | Field | Emits |
 | --- | --- |
@@ -146,17 +133,16 @@ seven optional fields, which the runtime renders into a Fresh `<Head>`:
 | `jsonLd` | one `<script type="application/ld+json">` per entry, `JSON.stringify`d |
 
 `jsonLd` accepts a single value or an array; both produce script tags. The head block is prepended to
-the page body, so it composes with whatever `routes/_app.tsx` already renders rather than replacing
-it.
+the page body, so it composes with whatever `routes/_app.tsx` renders.
 
-Layer props are `Partial` on `ctx.layerData` — a region that produced no data has no entry — so read
-them with `?.` and a default, as above. That is the honest shape: a title computed from a region that
-failed to load should degrade, not throw.
+Layer props are `Partial` on `ctx.layerData` (a region that produced no data has no entry), so read
+them with `?.` and a default, as above. A title computed from a region that failed to load then
+degrades instead of throwing.
 
 ## `withHeader`: three overloads, merged in order
 
-`resolveHeaderDescriptor` normalises three call shapes into one descriptor list, and the list is
-resolved in declaration order with later entries overriding earlier ones:
+`resolveHeaderDescriptor` normalises three call shapes into one descriptor list. The list resolves
+in declaration order, and later entries override earlier ones:
 
 ```tsx
 .withHeader('cache-control', 'private, max-age=0, must-revalidate')     // name + value
@@ -164,19 +150,19 @@ resolved in declaration order with later entries overriding earlier ones:
 .withHeader((ctx) => ({ 'x-tenant': ctx.resource('session').tenantId })) // computed per request
 ```
 
-The resolver form receives the same context the layout and `withMeta` see, so a header can depend on a
-resource or on resolved layer data. Static and computed descriptors are resolved together with
-`Promise.all` and then merged with `Headers.set` — meaning **last writer wins per header name**, not
-per call: a map that repeats a name set by an earlier string pair replaces it.
+The resolver form receives the same context the layout and `withMeta` see, so a header can depend on
+a resource or on resolved layer data. Static and computed descriptors resolve together with
+`Promise.all` and merge with `Headers.set`, so **the last writer wins per header name**, not per call:
+a map that repeats a name set by an earlier string pair replaces it.
 
-The three overloads are declared separately rather than as one loose signature, so the string form
-requires its value: `withHeader('x-thing')` on its own does not compile — a bare string matches
-neither `HeadersInit` nor a resolver.
+The three overloads are declared separately, so the string form requires its value:
+`withHeader('x-thing')` alone does not compile, because a bare string matches neither `HeadersInit`
+nor a resolver.
 
 ## `withStatus`: the page's default GET status
 
 `withStatus(status)` sets the status the synthesised `GET` renders with. It applies to that handler
-only — a `withHandler('POST')` returns whatever `Response` you build. The common use is a page that
+only; a `withHandler('POST')` returns whatever `Response` you build. The common use is a page that
 renders a real body under a non-200 code:
 
 ```tsx
@@ -193,40 +179,35 @@ export const orderDetailPage = definePage()
   .build('/orders/[id]');
 ```
 
-Note what this does *not* do: the status is fixed at build time, not chosen per request. A page that
-must return 200 or 404 depending on what it found needs a `withHandler` that returns its own
-`Response`, or a redirect from a middleware — the builder has one status per page.
+The status is fixed at build time, not chosen per request. A page that returns 200 or 404 depending
+on what it found needs a `withHandler` that returns its own `Response`, or a redirect from a
+middleware.
 
 ## `withPolicy` and `withStreaming`
 
 `withPolicy(policy)` sets the page-level defer policy: a named profile (`'balanced'`,
 `'aggressive-first-paint'`, `'background-refresh'`, `'low-bandwidth'`) or an object overriding
-individual fields. It is a **default, not a mandate** — the runtime reads
-`descriptor.config.policy ?? config.policy`, so any layer naming its own `policy` wins for that
-region. Setting it at page level is how several regions end up with the same freshness behaviour on
-purpose.
+individual fields. It is a **default**: the runtime reads `descriptor.config.policy ?? config.policy`,
+so a layer that names its own `policy` wins for that region. Set it at page level when several
+regions should share the same freshness behaviour.
+[Deferred and streaming UI](/web-layer/defer-streaming-ui/#the-policy-engine) tabulates what each
+profile sets.
 
-A policy resolves to a stale window plus four booleans deciding prewarm-on-miss, prewarm-on-stale,
-client-refresh-on-fresh-cache, and skip-client-while-server-prewarms. Which profile sets which is
-tabulated once, in
-[Deferred and streaming UI](/web-layer/defer-streaming-ui/#the-policy-engine); the short version is
-that `balanced` trusts a fresh cache and `background-refresh` re-verifies even a fresh one.
-
-That policy governs reads; it does not make writes coherent by itself. After a mutation commits,
-await `invalidateServerQueryCache(action.key(input))` to clear the server CacheProvider entry, then
-invalidate the matching island QueryClient key. The ordering matters under `balanced`: if the
-browser reloads before the server tier is cleared, the otherwise-correct cache-first policy can
-paint the value the write just made stale. `defineFreshApp()` owns the standard invalidation route,
-so application code does not need a bespoke proxy handler.
+The policy governs reads; it does not make writes coherent. After a mutation commits, await
+`invalidateServerQueryCache(action.key(input))` to clear the server CacheProvider entry, then
+invalidate the matching island QueryClient key. Order matters under `balanced`: if the browser
+reloads before the server tier is cleared, the cache-first policy can paint the value the write just
+made stale. `defineFreshApp()` owns the standard invalidation route, so you do not need a bespoke
+proxy handler.
 
 `withStreaming()` opts the page into builder-owned HTML streaming. It only affects layers that also
-declare `delivery: 'stream'`; the page-level flag and the per-layer flag are both required, and
-neither warns when the other is missing. The streaming handler still applies the page's headers and
-status. See [Layers, layout, and slots](/web-layer/layers/) for the layer half.
+declare `delivery: 'stream'`. Both flags are required, and neither warns when the other is missing.
+The streaming handler still applies the page's headers and status. See
+[Layers, layout, and slots](/web-layer/layers/) for the layer half.
 
 ## What `build()` returns
 
-`build()` has three call shapes, and the difference is whether the result knows its own route:
+`build()` has three call shapes. They differ in whether the result knows its own route:
 
 ```tsx
 const unrouted = definePage().build();                              // page, default, handler
@@ -236,9 +217,9 @@ const alsoRouted = definePage().build({ routePattern: '/orders/[id]' });
 
 An unrouted definition is `{ page, default, handler }`. A routed one adds `nav` (the typed href
 builder), `route` (the bound `RouteReference`, so `route.href({ path: { id: '7' } })` yields
-`/orders/7`), and `hooks` (the eleven page-bound hooks). A page bound with `withRoute()` or
-`withRouteContract()` is already routed, so its bare `build()` returns the routed shape — which is
-what the Vite plugin's generated binding gives you without a pattern argument. See
+`/orders/7`) and `hooks` (the eleven page-bound hooks). A page bound with `withRoute()` or
+`withRouteContract()` is already routed, so its bare `build()` returns the routed shape; the Vite
+plugin's generated binding relies on this. See
 [Routing and route contracts](/web-layer/route/#three-authoring-forms-one-generated-binding).
 
 Route modules export the built page:
@@ -248,14 +229,13 @@ export const { handler, default: page } = ordersPage;
 export { page as default };
 ```
 
-`handler` being `undefined` on an unshaped page is correct and expected — Fresh renders the default
-export.
+On an unshaped page `handler` is `undefined`, and Fresh renders the default export.
 
-## Custom handlers see a prepared context
+## Custom handlers
 
 `withHandler(method, handler)` registers a handler for `'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' |
-'OPTIONS' | 'HEAD'`. The builder wraps it so that params are parsed and resources are resolved before
-your code runs:
+'OPTIONS' | 'HEAD'`. The builder wraps it so params are parsed and resources resolved before your code
+runs:
 
 ```tsx
 .withHandler('POST', async (ctx) => {
@@ -264,13 +244,13 @@ your code runs:
 })
 ```
 
-What the wrapper does **not** do is run the layers. `ctx.layerData` is `{}` inside a custom handler,
-and no layer loader fires. A handler that needs a region's data loads it itself, or the page renders
-through the normal path. The handler may return a `Response` or a `{ data }` object.
+The wrapper does **not** run the layers. `ctx.layerData` is `{}` inside a custom handler and no
+layer loader fires, so a handler that needs a region's data loads it itself. The handler may return a
+`Response` or a `{ data }` object.
 
-The other consequence is that a custom handler prepares its **own** request state, including its own
-resource store. A `POST` handler that resolves resources and then triggers a page render resolves them
-twice — see [Request-scoped resources](/web-layer/resources/) for where that guarantee stops.
+A custom handler also prepares its **own** request state, including its own resource store. A `POST`
+handler that resolves resources and then triggers a page render resolves them twice; see
+[Request-scoped resources](/web-layer/resources/).
 
 ## Putting it together
 
@@ -294,7 +274,7 @@ export const ordersPage = definePage()
   .build('/orders');
 ```
 
-One request: the session resolves, the layer loads and renders, the meta resolver reads the layer's
+Per request, the session resolves, the layer loads and renders, the meta resolver reads the layer's
 props to build the title, both header descriptors resolve against the same context, and the
 synthesised `GET` calls `ctx.render()` with the merged headers and the status.
 
@@ -302,24 +282,17 @@ synthesised `GET` calls `ctx.render()` with the merged headers and the status.
 
 - **The error names the method the builder saw, not the one you wrote.** `withForm` contributes a
   header, so its pages report a `withHeader()` conflict.
-- **`withHeader` and `withStatus` require a render-capable context.** The per-request throw is what a
-  handler invoked outside Fresh's rendering path produces; in tests, supply a `render` function.
-- **Streaming is checked first.** A page with streaming, headers, and a `GET` handler reports the
-  streaming conflict — fixing it surfaces the header conflict next.
+- **`withHeader` and `withStatus` require a render-capable context.** A handler invoked outside
+  Fresh's rendering path throws per request; in tests, supply a `render` function.
+- **Streaming is checked first.** A page with streaming, headers and a `GET` handler reports the
+  streaming conflict; fixing it surfaces the header conflict next.
 - **Status is per page, not per request.** Conditional status codes need a custom handler.
 - **Header merging is per name, not per call.** A later map silently replaces a name an earlier call
   set.
 - **Meta reads layer data, and layer data is partial.** Guard the read.
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [
-  { title: "Pages and the define-page builder", body: "The full builder chain this page zooms into.", href: "/web-layer/builders/" },
-  { title: "Layers, layout, and slots", body: "What resolves before meta, headers, and status.", href: "/web-layer/layers/" },
-  { title: "Request-scoped resources", body: "What a custom handler prepares, and what it does not.", href: "/web-layer/resources/" },
-  { title: "Routing and route contracts", body: "Where a routed build()'s route and nav come from.", href: "/web-layer/route/" },
-  { title: "Deferred and streaming UI", body: "What each withPolicy profile actually sets.", href: "/web-layer/defer-streaming-ui/" },
-  { title: "Server-validated forms", body: "The header resolver withForm installs.", href: "/web-layer/form/" }
-] }) }}
-
-See the [Web Layer overview](/web-layer/) for the full pillar map.
+Continue with [Deferred and streaming UI](/web-layer/defer-streaming-ui/) to choose a `withPolicy`
+profile. See also [Server-validated forms](/web-layer/form/) for the header resolver `withForm`
+installs.

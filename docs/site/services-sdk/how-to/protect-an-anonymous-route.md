@@ -7,9 +7,9 @@ order: 105
 
 # Protect an anonymous service route
 
-**Goal:** protect an anonymous device-flow start/poll pair with a shared client-address quota,
-without requiring a signed-in principal. Use the service builder's rate-limit stage before the route
-handlers. The same stage protects RPC and REST projections when their URL paths are selected.
+This recipe protects an anonymous device-flow start/poll pair with a shared client-address quota,
+without a signed-in principal. You add the service builder's rate-limit stage before the route
+handlers; the same stage protects the RPC and REST projections when you select their URL paths.
 
 ## Reserve the quota in KV
 
@@ -63,8 +63,8 @@ continues to report that peer. The limiter defaults to this address. A mounting 
 share the `unknown` bucket. The stage logs a warning once when it first encounters this fallback,
 through the request logger or the service package logger. Configure logging to make it visible.
 
-Forwarded headers are ignored by default, matching the auth transport policy introduced in #2026.
-Enable XFF only with an explicit predicate identifying trusted proxy addresses:
+Forwarded headers are ignored by default, matching the auth transport policy. Enable XFF only with
+an explicit predicate that identifies trusted proxy addresses:
 
 ```ts
 import {
@@ -120,7 +120,13 @@ and never evicts a live quota to admit another client. There are no timers to sh
 tests/development; separate instances have separate quotas.
 
 Fixed windows permit up to two windows' quota near a boundary. This primitive controls a shared
-request quota; different start/poll quotas can use additional stages with separate stores/prefixes
-and custom keys. A minimum elapsed interval between polls requires a separate policy. See the
-[`@netscript/service` reference](/reference/service/#rate-limits-and-client-addresses) for the
-public contracts and [KV reference](/reference/kv/#atomic-operations) for adapter atomic semantics.
+request quota; separate start and poll quotas can use additional stages with separate stores or
+prefixes and custom keys. A minimum interval between polls needs a separate policy.
+
+## Next steps
+
+Read the public rate-limit contracts in the
+[`@netscript/service` reference](/reference/service/#rate-limits-and-client-addresses). See also the
+[KV reference](/reference/kv/#atomic-operations) for adapter atomic semantics and
+[Call internal procedures from a service or worker](/services-sdk/how-to/call-internal-procedures/)
+for backend-only procedures.

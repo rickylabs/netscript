@@ -8,19 +8,17 @@ oldUrl: /how-to/discover-services/
 
 # Discover services
 
-**Goal:** call another plugin's (or another workspace member's) oRPC service from your
-app, end to end — declare the dependency so Aspire injects the callee's URL, then obtain a
-fully typed client from `@netscript/sdk` that resolves that URL at request time. The shared
-contract supplies the method inputs, outputs, and declared errors; discovery or transport failures
-remain non-defined failures. No registry, no hardcoded `localhost:<port>`, no codegen.
+This recipe calls another workspace member's or plugin's oRPC service from your app. You declare the
+dependency so Aspire injects the callee's URL, then build a typed client from `@netscript/sdk` that
+resolves that URL at request time. The shared contract supplies the method inputs, outputs, and
+declared errors; discovery and transport failures stay non-defined failures.
 
 {{ comp.badge({ status: "alpha" }) }}
 
-There is **no service-registry API** in NetScript. "Discovery" is two cooperating
-mechanics: Aspire injects each referenced service's resolved endpoint as an environment
-variable (`services__<name>__http__0`), and the SDK's typed client reads that variable
-lazily via `@netscript/sdk/discovery` when it builds the request URL. Declare the reference,
-import the contract, construct the client — that is the whole recipe.
+NetScript has no service-registry API. Discovery is two mechanisms working together: Aspire injects
+each referenced service's resolved endpoint as an environment variable (`services__<name>__http__0`),
+and the typed client reads that variable lazily through `@netscript/sdk/discovery` when it builds the
+request URL.
 
 {{ comp.diagram({
   src: "/assets/diagrams/sdk-data-flow.svg",
@@ -30,26 +28,29 @@ import the contract, construct the client — that is the whole recipe.
 
 ## Before you start
 
-{{ comp.apiTable({
-  caption: "Prerequisites",
-  rows: [
-    { name: "A NetScript workspace", type: "netscript init", desc: "An existing project with at least the caller (an app, plugin, or service) and the callee service already present. Run commands from the workspace root." },
-    { name: "The callee service", type: "services/<name>/", desc: "A target service that answers on its own port over /api/rpc/* — e.g. the example users service on its assigned port. See the Add a service recipe to create one." },
-    { name: "@netscript/sdk", type: "import alias", desc: "The SDK provides the typed client (createServiceClient / defineServices) and the discovery readers (@netscript/sdk/discovery). It is a workspace dependency of apps and consuming services." },
-    { name: "The shared contract", type: "@<project>/contracts", desc: "Both the service and the caller import the SAME oRPC contract object through the project alias, so the client's input, output, and declared-error types are inferred — never duplicated." },
-    { name: "Aspire (for resolved URLs)", type: "aspire start", desc: "Aspire injects the services__<name>__http__<index> env vars that discovery reads. Without it you must set those vars yourself (see pitfalls)." }
-  ]
-}) }}
+You need:
 
-This recipe assumes the callee is the example `users` service (on its assigned port) and the caller
-is an app or another service. Substitute your own service name throughout.
+- A NetScript workspace containing the caller (an app, plugin, or service) and the callee service.
+  Run commands from the workspace root.
+- A callee service that answers on its own port over `/api/rpc/*`, such as the example `users`
+  service. [Add a service](/services-sdk/how-to/add-a-service/) creates one.
+- `@netscript/sdk`, a workspace dependency of apps and consuming services. It provides the typed
+  client (`createServiceClient`, `defineServices`) and the discovery readers
+  (`@netscript/sdk/discovery`).
+- The shared contract, imported through the `@<project>/contracts` alias by both the service and the
+  caller, so the client's types are inferred rather than duplicated.
+- Aspire, which injects the `services__<name>__http__<index>` variables that discovery reads.
+  Without it you set those variables yourself (see [Manual / non-Aspire resolution](#manual-non-aspire-resolution)).
 
-## Step 1 — Declare the service reference
+This recipe uses the example `users` service as the callee and an app or another service as the
+caller. Substitute your own service name.
 
-The caller declares which services it depends on by name in its resource entry under
-`ServiceReferences`. The init scaffold already writes this into the Aspire `appsettings.json`
-when you scaffold an app against a service; to add a dependency to an existing resource, add
-the callee's name to that resource's `ServiceReferences` array.
+## 1. Declare the service reference
+
+The caller lists the services it depends on, by name, in the `ServiceReferences` array of its
+resource entry. The init scaffold writes this into the Aspire `appsettings.json` when you scaffold an
+app against a service. To add a dependency to an existing resource, add the callee's name to that
+array.
 
 ```jsonc
 // aspire/appsettings.json — the caller (an app here) depends on the users service
@@ -67,40 +68,37 @@ the callee's name to that resource's `ServiceReferences` array.
 }
 ```
 
-`ServiceReferences` is the live field. The names you list here must match the service
-resource keys under `NetScript.Services`.
+The names you list must match the service resource keys under `NetScript.Services`.
 
 {{ comp callout { type: "note", title: "What the reference actually wires" } }}
-At generate time the Aspire helper does a two-pass registration: pass 1 creates every
-service resource, pass 2 walks each resource's <code>ServiceReferences</code> and, for each
-referenced name, calls <code>getEndpoint('http')</code> on the target and injects it into the
-caller as <code>services__&lt;name&gt;__http__0</code> via <code>withEnvironment(...)</code>.
-That env var is exactly what the SDK's discovery layer reads at request time — so declaring
-the reference is what makes <code>getServiceUrl('users')</code> resolve.
+At generate time the Aspire helper registers resources in two passes. Pass 1 creates every service
+resource. Pass 2 walks each resource's <code>ServiceReferences</code>, calls
+<code>getEndpoint('http')</code> on each referenced target, and injects it into the caller as
+<code>services__&lt;name&gt;__http__0</code> through <code>withEnvironment(...)</code>. The SDK's
+discovery layer reads that variable at request time, which is why the reference makes
+<code>getServiceUrl('users')</code> resolve.
 {{ /comp }}
 
-## Step 2 — Regenerate the Aspire helpers
+## 2. Regenerate the Aspire helpers
 
-The `register-services` helper that performs the two-pass wiring is generated from
-`appsettings.json`. After editing `ServiceReferences`, regenerate so the new dependency is
-emitted into the AppHost helpers:
+The `register-services` helper that performs this wiring is generated from `appsettings.json`. After
+editing `ServiceReferences`, regenerate it:
 
 ```bash
 # from the workspace root — regenerates the Aspire helper files only
 netscript service generate
 ```
 
-`service generate` only rewrites the Aspire helper files (it does not touch your service
-code). The next `aspire start` will inject the `services__users__http__0` variable into the
-caller's environment.
+`service generate` only rewrites the Aspire helper files, not your service code. The next
+`aspire start` injects `services__users__http__0` into the caller's environment.
 
-## Step 3 — Construct the typed client
+## 3. Construct the typed client
 
-In the caller, import the **same contract object** the service implements and hand it to
-`createServiceClient`. The `serviceName` you pass is the discovery key — it must match the
-name you referenced in Step 1. The client is fully typed from the contract; there is no
-generated client file to import. When its routes are composed from `baseContract`, every method
-also carries the six standard declared errors through the returned promise.
+In the caller, import the same contract object the service implements and pass it to
+`createServiceClient`. The `serviceName` is the discovery key and must match the name you referenced
+in step 1. The client is typed from the contract; there is no generated client file. When its routes
+are composed from `baseContract`, every method also carries the six standard declared errors through
+the returned promise.
 
 ```ts
 // web/src/clients/users.ts — a typed client for the discovered users service
@@ -117,32 +115,17 @@ export const usersClient = createServiceClient({
 const { items } = await usersClient.list({ limit: 20 });
 ```
 
-The URL is resolved **lazily**, on the first call, by the internal HTTP link — so the client
-can be constructed at import time (even in a browser bundle) without touching Deno APIs. By
-default it targets `<resolved-url>/api/rpc/v1/<service>` over HTTP.
+The internal HTTP link resolves the URL lazily on the first call, so you can construct the client at
+import time (even in a browser bundle) without touching Deno APIs. By default it targets
+`<resolved-url>/api/rpc/v1/<service>` over HTTP.
+[Constructing the client & factory](/services-sdk/sdk/#constructing-the-client-factory) lists every
+option and its default.
 
-{{ comp.apiTable({
-  caption: "CreateServiceClientOptions (createServiceClient) — confirmed surface",
-  rows: [
-    { name: "contract", type: "TContract (required)", desc: "The shared oRPC contract object. Drives both client typing and HTTP method inference — import the same object the service implements." },
-    { name: "serviceName", type: "string (required)", desc: "The discovery key. Resolved as services__<serviceName>__http__<index> on the server (and the VITE_ form in the browser). Must match the ServiceReferences entry." },
-    { name: "routerName", type: "string?", desc: "Overrides the URL path segment for the router; defaults to serviceName. Use when the mounted router path differs from the service name." },
-    { name: "protocol", type: "'http' | 'https'?", desc: "Discovery protocol. Defaults to 'http' (resolves the __http__ endpoint)." },
-    { name: "apiPath", type: "string?", desc: "Base RPC path the runtime mounts. Defaults to '/api/rpc' — match what the service serves." },
-    { name: "apiVersion", type: "string?", desc: "API version segment in the URL. Defaults to 'v1'." },
-    { name: "propagateTraceContext", type: "boolean?", desc: "Attach W3C traceparent/tracestate headers automatically from the active trace context. Defaults to true." },
-    { name: "resolveServiceUrl", type: "ServiceUrlResolver?", desc: "(serviceName, protocol) => string | URL, called per request instead of discovery. Defaults to getServiceUrl. Only the origin of the result is used. See Manual / non-Aspire resolution." }
-  ]
-}) }}
+## 4. Call it and handle typed errors
 
-## Step 4 — Call it (and handle typed errors)
-
-The client methods mirror the contract's procedure tree. For a `baseContract` route, the defined
-error codes are exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`,
-`RATE_LIMITED`, and `SERVICE_UNAVAILABLE`. Wrap a call in the SDK's `safe()` helper, test the
-literal `isSuccess` discriminant first, and then test `isDefined` on the failure. A plain error,
-transport failure, or other non-defined value must be thrown or surfaced from that second branch;
-it must not fall through to the successful output path.
+The client methods mirror the contract's procedure tree. Wrap a call in `safe()`, test `isSuccess`
+first, then test `isDefined` on the failure. Throw or surface a plain error, transport failure, or
+other non-defined value from that second branch so it never falls through to the success path.
 
 ```ts
 // web/src/routes/users.ts — typed call with safe-style error handling
@@ -171,37 +154,15 @@ export async function listUsers() {
 }
 ```
 
-On the defined branch, `error.data` is selected by `error.code` from the schema declared in the
-contract; it is not an open bag and it is not `any`. `isDefinedError(failure.error)` is the
-predicate form for an already typed failure union. It preserves the defined members present in
-that union rather than promoting arbitrary `unknown` values into contract errors.
+On the defined branch, `error.code` selects the schema for `error.data`.
+[Safe error narrowing](/services-sdk/sdk/#safe-error-narrowing) covers the six `baseContract`
+codes, `isDefinedError()`, and the [0.0.7 migration](/services-sdk/sdk/#migrating-to-007).
 
-### Migrating typed-error handling to 0.0.7
+## Many services at once with `defineServices`
 
-The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
-patch-compatible**. Migrate callers with all of these changes in view:
-
-| Surface | Before 0.0.7 | 0.0.7 and later |
-| --- | --- | --- |
-| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
-| `SafeFailure` arms | `SafeFailure<TError = unknown>` was one failure arm with `isDefined: boolean`. | It is two literal-discriminated arms, `isDefined: false` and `isDefined: true`. Code that typed the property as a general `boolean` or treated failure as one undifferentiated arm must branch on the literal. |
-| Default error type | `SafeFailure` and `SafeResult` defaulted `TError` to `unknown`; `safe<TOutput>` had no `TError` parameter and returned `SafeResult<TOutput>`, inheriting that default. | `SafeFailure`, `SafeResult`, and `safe` now default `TError` to `Error`. |
-| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
-| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
-| `baseContract` error codes | The error-map key space was open, so undeclared codes remained type-valid even though comparisons against them were silently false at runtime. | The key space is exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`. Comparing `error.code` with any other code is now a type error: intentional typo/undeclared-code protection and a breaking tightening. |
-| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in Step 4. |
-
-The tuple form has **not** been removed: both result arms remain tuple-and-object intersections, so
-destructuring still works. The discriminated form is the documented path because it prevents a
-plain or transport error from falling through as successful data and preserves code-specific
-contract error typing. For the concrete payload migration, replace
-`if (failure.data === null)` with `if (failure.data === undefined)`.
-
-## Many services at once — `defineServices`
-
-When the caller talks to several services, `defineServices` builds the clients (plus
-cache-aware query factories and TanStack Query utils) from one map. The map key is the
-discovery key unless you override `serviceName`.
+When the caller talks to several services, `defineServices` builds the clients, cache-aware query
+factories and TanStack Query utils from one map. The map key is the discovery key unless you override
+`serviceName`.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -216,16 +177,16 @@ discovery key unless you override `serviceName`.
   }
 ] }) }}
 
-`defineServices` returns `{ clients, queries, queryUtils }`. The `serviceName` per entry
-defaults to the map key, so `users` resolves `services__users__http__0` automatically —
-override it only when the registered service name differs from your local map key.
+`defineServices` returns `{ clients, queries, queryUtils }`. Each entry's `serviceName` defaults to
+the map key, so `users` resolves `services__users__http__0`. Override it only when the registered
+service name differs from your map key.
 
 ## Manual / non-Aspire resolution
 
-The discovery readers are usable on their own when you are not running under Aspire — for a
-smoke test, a one-off script, or a custom transport. `getServiceUrl(name)` throws a clear
-error naming the missing env var; `isServiceAvailable(name)` is the non-throwing probe;
-`getAllServices()` lists every `services__*` name in the environment.
+Use the discovery readers directly when you are not running under Aspire, for a smoke test, a
+one-off script, or a custom transport. `getServiceUrl(name)` throws an error naming the missing
+variable, `isServiceAvailable(name)` is the non-throwing probe, and `getAllServices()` lists every
+`services__*` name in the environment.
 
 ```ts
 // scripts/check-users.ts — resolve a discovered URL by hand
@@ -237,9 +198,9 @@ if (isServiceAvailable('users')) {
 }
 ```
 
-The server-side lookup key is `services__<name>__http__<index>`; the browser path checks the
-`VITE_`-prefixed forms first (Aspire injects those for Vite apps). Set the env var yourself
-to point a client at a fixed URL with no orchestrator:
+The server-side lookup key is `services__<name>__http__<index>`. The browser path checks the
+`VITE_`-prefixed forms first, which Aspire injects for Vite apps. To point a client at a fixed URL
+without an orchestrator, set the variable yourself:
 
 ```bash
 # point the users client at a locally-running service, no Aspire
@@ -275,8 +236,8 @@ export const usersClient = createServiceClient({
 
 ## End to end in one pass
 
-The four steps above, run start to finish against the example `users` service. Copy the file, then
-run the command sequence from the workspace root:
+The four steps against the example `users` service, start to finish. Copy the file, then run the
+commands from the workspace root:
 
 ```ts
 // web/src/clients/users.ts — the resulting file (contract in, typed client out)
@@ -328,48 +289,32 @@ cd aspire && aspire start && cd ..
 deno task --cwd web dev
 ```
 
-With `aspire start` up, `usersClient.list({ limit: 20 })` resolves
-`services__users__http__0`, issues the oRPC call to `<resolved-url>/api/rpc/v1/users`, and returns
-the contract's typed `items` on success. Its declared error union comes from the same contract;
-non-defined runtime failures stay separate. No registry, no `localhost:<port>`, no generated client
-file.
+With `aspire start` up, `usersClient.list({ limit: 20 })` resolves `services__users__http__0`,
+calls `<resolved-url>/api/rpc/v1/users`, and returns the contract's typed `items` on success. Its
+declared error union comes from the same contract; non-defined runtime failures stay separate.
 
 ## Production pitfalls
 
-{{ comp callout { type: "warning", title: "Footguns before you ship" } }}
-<ul>
-<li><strong>Alpha surface.</strong> NetScript packages share the aligned
-<code>{{ releaseVersion }}</code> version; the discovery env-var convention and client option names are
-stable in the scaffold but may shift before <code>1.0</code>. Pin the version you build on.</li>
-<li><strong>The reference must be declared, then generated.</strong> Adding a
-<code>ServiceReferences</code> entry does nothing until you re-run <code>netscript service
-generate</code> and restart <code>aspire start</code>. A missing reference means
-<code>getServiceUrl</code> throws <em>"Service URL not found … Expected environment variable:
-services__&lt;name&gt;__http__0"</em>.</li>
-<li><strong>The discovery key must match.</strong> <code>serviceName</code> (and the
-<code>defineServices</code> map key) must equal the service's registered name, or discovery
-resolves a variable that was never injected.</li>
-<li><strong>The served path is <code>/api/rpc/*</code>.</strong> The client defaults to
-<code>apiPath: '/api/rpc'</code> and <code>apiVersion: 'v1'</code>; if your service mounts a
-different path, set them explicitly or calls 404. It is <em>not</em> a bare <code>/rpc</code>.</li>
-<li><strong>Aspire injects the URL; outside Aspire you must.</strong> Without an orchestrator
-the <code>services__&lt;name&gt;__http__0</code> variable is unset — provide it yourself (env
-var, or a <code>resolveServiceUrl</code> callback on a runtime with no environment) or the
-client cannot find the service.</li>
-</ul>
-{{ /comp }}
+- **Pre-1.0 surface.** NetScript packages share the aligned `{{ releaseVersion }}` version. The
+  discovery variable convention and client option names are stable in the scaffold but may change
+  before 1.0. Pin the version you build on.
+- **Declare, then generate.** A `ServiceReferences` entry does nothing until you re-run
+  `netscript service generate` and restart `aspire start`. Without the reference,
+  `getServiceUrl` throws `Service URL not found … Expected environment variable:
+  services__<name>__http__0`.
+- **The discovery key must match.** `serviceName` (and the `defineServices` map key) must equal the
+  service's registered name, or discovery reads a variable that was never injected.
+- **The served path is `/api/rpc/*`.** The client defaults to `apiPath: '/api/rpc'` and
+  `apiVersion: 'v1'`. If your service mounts a different path, set them explicitly or calls return
+  404. It is not a bare `/rpc`.
+- **Outside Aspire, you supply the URL.** Without an orchestrator, `services__<name>__http__0` is
+  unset. Set it yourself, or pass a `resolveServiceUrl` callback on a runtime with no environment.
 
-## See also
+## Next steps
 
-{{ comp.featureGrid({ items: [
-  { title: "Do — Add a service", body: "Create the callee first: contract → defineService → an oRPC service answering on its own port.", href: "/services-sdk/how-to/add-a-service/", icon: "◆" },
-  { title: "Capability — Services & contracts", body: "Why the shared contract object is the single source of truth, and how a typed client cannot drift from the service.", href: "/capabilities/services/", icon: "▣" },
-  { title: "Look up — @netscript/sdk", body: "The full SDK surface: createServiceClient, defineServices, the discovery readers, query factories, and TanStack utils.", href: "/reference/sdk/", icon: "≡" },
-  { title: "Understand — Orchestration with Aspire", body: "How Aspire wires resources, resolves endpoints, and injects the services__ env vars discovery reads.", href: "/explanation/aspire/", icon: "◎" }
-] }) }}
-
-For the concepts behind the typed-client surface see {{ comp.xref({ key: "cap:sdk" }) }};
-the sibling recipe that builds the callee is {{ comp.xref({ key: "howto:add-a-service" }) }};
-and the orchestration that injects the URLs is explained in {{ comp.xref({ key: "explain:aspire" }) }}.
+Serve the OpenAPI document and Scalar UI for your service with
+[Expose OpenAPI & Scalar](/services-sdk/how-to/expose-openapi-scalar/). See also
+[Typed SDK & client](/services-sdk/sdk/), the [`@netscript/sdk` reference](/reference/sdk/), and
+[Orchestration with Aspire](/explanation/aspire/).
 
 {{ comp.nextPrev({ prev: { label: "How-to guides", href: "/how-to/" }, next: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" } }) }}

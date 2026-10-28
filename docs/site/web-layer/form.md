@@ -7,24 +7,16 @@ order: 5
 
 # Server-validated forms
 
-A form is a round trip, and the round trip is where the work is. The browser posts, the server
-parses, a schema validates, and — when validation fails — the same page has to come back with the
-user's values still in the inputs, the right message under the right field, and a CSRF token that is
-still valid for the retry. None of that is hard. All of it is repetitive, and every hand-written copy
-gets a slightly different subset of it right.
-
-`definePage().withForm(id, Component, config)` declares that round trip once. You supply a Zod
-schema, a `mutate` function, and a component; the builder installs the handler, the validation
-pipeline, the CSRF cookie, and the state your component renders from. This page is about what that
-one call actually installs, what the component receives, and where the guarantees stop.
-
-The builder-chain overview lives in [Pages and the define-page builder](/web-layer/builders/); this
-page assumes it.
+This page explains what `definePage().withForm(id, Component, config)` installs on a page, what your
+form component receives, and where the guarantees stop. You supply a Zod schema, a `mutate`
+function and a component; the builder adds the handler, the validation pipeline, the CSRF cookie and
+the state your component renders from. The page assumes you know the builder chain from
+[Pages and the define-page builder](/web-layer/builders/).
 
 ## What bare Fresh makes you write
 
-Fresh 2 hands you a `Request` and a render function. Everything between them is yours. A minimal
-server-validated contact form is roughly this:
+Fresh 2 gives you a `Request` and a render function, and everything between them is yours. A minimal
+server-validated contact form looks like this:
 
 ```tsx no-check:counter-example intentionally omits bare Fresh setup
 // routes/contact.tsx — bare Fresh
@@ -72,38 +64,34 @@ export default define.page<typeof handler>(({ data }) => (
 ));
 ```
 
-Four costs are worth naming, because they are the ones the builder removes.
+The builder removes four costs from that code:
 
-**The error shape is invented per form.** `Record<string, string[]>` is a choice you made in this
-file. Nothing ties it to `ContactSchema`, so renaming a schema field leaves the error lookup keyed on
-a string that no longer exists — and the field silently stops showing messages.
-
-**Every field re-derives its own accessibility wiring.** `id`, `for`, `aria-invalid`,
-`aria-describedby`, and the matching `id` on the error paragraph are five facts that must agree, per
-field, by hand. The schema already knows the field is required and has a length bound; the markup
-does not, so `minLength` and `required` get typed in a second time or omitted.
-
-**CSRF is entirely yours.** Generate a token, set a cookie, render a hidden input, read both back on
-POST, compare them — in every form, consistently, including the failure copy.
-
-**Repeatable fields are a hand-rolled encoding.** Three line items means `items[0].productId`,
-`items[1].productId`, and a scheme for adding and removing rows that survives a failed validation
-round trip without shuffling the wrong row away.
+- **An error shape per form.** `Record<string, string[]>` is a choice made in this file. Nothing ties
+  it to `ContactSchema`, so renaming a schema field leaves the error lookup keyed on a missing string,
+  and the field stops showing messages.
+- **Accessibility wiring per field.** `id`, `for`, `aria-invalid`, `aria-describedby` and the error
+  paragraph's `id` must agree by hand for every field. The schema knows the field is required and has
+  a length bound; the markup does not, so `minLength` and `required` are typed a second time or
+  omitted.
+- **CSRF by hand.** Generate a token, set a cookie, render a hidden input, read both back on POST and
+  compare them, consistently in every form.
+- **Repeatable fields.** Three line items need `items[0].productId`, `items[1].productId` and a scheme
+  for adding and removing rows that survives a failed validation round trip without dropping the
+  wrong row.
 
 ## One call, four installs
 
-`withForm(id, Component, formConfig)` is not a layer with extras. Reading
-`builders/define-page/builder/mod.tsx`, one call appends **four** things to the page config:
+One `withForm(id, Component, formConfig)` call appends four things to the page config:
 
 | What | Where it lands |
 | --- | --- |
-| A **layer** whose loader builds the form state | `config.layers` — rendered under the layer id, like any other region |
+| A **layer** whose loader builds the form state | `config.layers`, rendered under the layer id like any other region |
 | A **method handler** at `formConfig.method ?? 'POST'` | `config.handlers[method]` |
-| A **CSRF header resolver** that sets the cookie from the rendered token | `config.headers` — skipped entirely when `csrf: false` |
+| A **CSRF header resolver** that sets the cookie from the rendered token | `config.headers`, skipped when `csrf: false` |
 | The form descriptor itself | `config.form = { id, config }` |
 
-So the page keeps its other layers, its layout, and its route contract; the form is one more region
-that happens to own a method.
+The page keeps its other layers, its layout and its route contract; the form is one more region that
+owns a method.
 
 ```tsx
 // routes/contact.tsx
@@ -130,51 +118,49 @@ export const contactPage = definePage()
 export default contactPage.default;
 ```
 
-`definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders` — the
-scaffold's wrapper binds the app's `State` type, the same rule every other page follows.
+`definePage` comes from `@app/utils.ts`, not from `@netscript/fresh/builders`: the scaffold's wrapper
+binds the app's `State` type, as on every other page.
 
-Two inference sites carry the whole chain: `schema` types `mutate`'s input, and `mutate`'s return
-type flows into `redirectTo`, `onSuccess`, and `invalidate` as `NoInfer<TOutput>` — so those three
-consume the mutation result without widening it.
+Two inference sites carry the types. `schema` types `mutate`'s input, and `mutate`'s return type
+flows into `redirectTo`, `onSuccess` and `invalidate` as `NoInfer<TOutput>`, so those three consume
+the mutation result without widening it.
 
 ## The submission pipeline
 
-The handler `withForm` installs runs a fixed sequence, from
-`builders/define-page/builder/form-support.ts`. Each named stage is wrapped in a span called
-`{spanName}.{phase}`, where `spanName` defaults to `form.{id}`:
+The handler that `withForm` installs runs a fixed sequence. Each named stage runs in a span called
+`{spanName}.{phase}`; `spanName` defaults to `form.{id}`.
 
-1. **`parse`** — `await ctx.req.formData()`.
+1. **`parse`**: `await ctx.req.formData()`.
 2. **Normalize.** `parseFormSubmission` turns the payload into a nested object (dotted paths and
-   bracket indices), lifts the intent, collection keys, submission id, and CSRF token out of it,
-   strips those framework fields from the values, converts empty strings to `undefined`, and runs
+   bracket indices), lifts out the intent, collection keys, submission id and CSRF token, strips
+   those framework fields from the values, converts empty strings to `undefined`, and runs
    `schema.safeParse`.
-3. **CSRF verify** — unless `csrf: false`. A mismatch returns immediately with the form-level message
+3. **CSRF verify**, unless `csrf: false`. A mismatch returns at once with the form-level message
    `Your form session expired. Reload the page and try again.` and no mutation runs.
-4. **`intent`** — if the payload carries a non-`submit` intent *and* the config supplies `onIntent`,
-   the intent handler runs and the request returns here. The schema has already been evaluated
-   during parsing, but this branch returns before the validation result is enforced.
+4. **`intent`**. If the payload carries a non-`submit` intent and the config supplies `onIntent`, the
+   intent handler runs and the request returns here. The schema was already evaluated during
+   parsing, but this branch returns before the validation result is enforced.
 5. **Validation gate.** On failure the reply carries the submitted values plus `fieldErrors` and
-   `formErrors`. Still no mutation.
-6. **`mutate`** — with the parsed `z.output` of your schema.
-7. **`invalidate`** — awaited before any response is produced, so a redirect never races the cache
+   `formErrors`, and no mutation runs.
+6. **`mutate`**, with the parsed `z.output` of your schema.
+7. **`invalidate`**, awaited before any response is produced, so a redirect never races the cache
    drop.
 8. **`redirect`** or **`onSuccess`.** `redirectTo` wins when both are present. A returned string
    becomes a 303 with `Cache-Control: no-store, no-cache, must-revalidate`; a returned `Response`
-   passes through with those same headers forced on. Otherwise `onSuccess` may return
+   passes through with those headers forced on. Otherwise `onSuccess` may return
    `{ message, nextValues }`.
-9. **Throw** — logged, emitted as a `{spanName}.mutate.error` span, and normalized into a
-   form-level error reply rather than a 500.
+9. **Throw.** An error is logged, emitted as a `{spanName}.mutate.error` span, and normalized into a
+   form-level error reply instead of a 500.
 
-The layer loader then runs on the *rendered* side of both requests. On a GET it merges the schema's
-defaults with your `initial()`; on a POST it recognises the handler's reply structurally and rebuilds
-state from it. That is the whole "values survive a failed submit" mechanism — there is no session
-storage and no flash cookie involved.
+The layer loader then runs on the rendered side of both requests. On a GET it merges the schema's
+defaults with your `initial()`; on a POST it recognizes the handler's reply and rebuilds state from
+it. That is how values survive a failed submit, with no session storage or flash cookie.
 
 ## `RuntimeFormState`: the props contract
 
-Your component's props type is `RuntimeFormState<TValues>` — importable from
-`@netscript/fresh/builders` or `@netscript/fresh/form`. Sixteen readonly members, grouped by what
-they are for:
+Your component's props type is `RuntimeFormState<TValues>`, importable from
+`@netscript/fresh/builders` or `@netscript/fresh/form`. Its sixteen readonly members group as
+follows:
 
 | Group | Members |
 | --- | --- |
@@ -184,22 +170,22 @@ they are for:
 | Submission | `submitted`, `intent` |
 | Markup | `fields`, `constraints`, `formProps`, `csrfInputProps`, `csrfToken` |
 
-`action` is the current pathname, so the form posts to the page that rendered it. `initialValues` is
-what `dirty` is computed against, and it is *rebased* after a successful submit — the values that
-just saved become the new baseline. `submitted` is true on any render that followed a submission,
-including an intent round trip.
+`action` is the current pathname, so the form posts to the page that rendered it. `dirty` is computed
+against `initialValues`, which is rebased after a successful submit: the values just saved become
+the new baseline. `submitted` is true on any render that follows a submission, including an intent
+round trip.
 
-Note what is **not** there. `RuntimeFormState` exposes no success flag and no success message today:
-`onSuccess` may return a `message`, and the reply carries it, but `resolveRuntimeFormState` does not
-copy `message`, `status`, or `output` into the component's props. What *does* survive is
-`nextValues`, which rebases the rendered values after a success. For visible success feedback, redirect
-or use an application-owned channel. Pending state is likewise absent — that is a client concern and
-belongs to `useFormEnhancement`.
+> [!NOTE]
+> `RuntimeFormState` has no success flag, success message or pending state. `onSuccess` may return a
+> `message` and the reply carries it, but `resolveRuntimeFormState` does not copy `message`, `status`
+> or `output` into the props. Only `nextValues` survives, rebasing the rendered values after a
+> success. For visible success feedback, redirect or use an application-owned channel. Pending state
+> is a client concern handled by `useFormEnhancement`.
 
 ## Fields, constraints, and the markup they generate
 
-`state.fields` is a `FieldDescriptorMap<TValues>` — one descriptor per schema field, addressed the
-same way the values are. Each descriptor carries the resolved facts (`value`, `initialValue`,
+`state.fields` is a `FieldDescriptorMap<TValues>`: one descriptor per schema field, addressed the
+same way as the values. Each descriptor carries the resolved facts (`value`, `initialValue`,
 `errors`, `error`, `invalid`, `required`, `dirty`, `constraints`) and four prop bags:
 
 - `labelProps` → `{ for }`
@@ -209,8 +195,8 @@ same way the values are. Each descriptor carries the resolved facts (`value`, `i
   (or `defaultChecked` for booleans), `aria-invalid` / `aria-describedby` / `aria-required` derived
   from the live error state, the HTML constraints below, and `data-field-*` diagnostic markers.
 
-`controlProps` is a **method**, not a property — it takes optional overrides and merges them, so
-`controlProps({ type: 'email' })` is how the input type gets in.
+`controlProps` is a method. It takes optional overrides and merges them, so
+`controlProps({ type: 'email' })` sets the input type.
 
 ```tsx
 // routes/contact/(_components)/ContactForm.tsx
@@ -238,43 +224,41 @@ export default function ContactForm(state: RuntimeFormState<ContactValues>) {
 
 {{ comp callout { type: "warning", title: "controlProps does not spread onto an intrinsic element as-is" } }}
 <code>ControlProps</code> declares <code>role?: string</code>, while Preact's JSX types expect
-<code>role?: AriaRole</code> — so <code>&lt;input {...field.controlProps()} /&gt;</code> fails
-<code>deno check</code> on that one property. Adding <code>role={undefined}</code> after the spread
-satisfies it, and naming the props individually always works. <code>@netscript/fresh-ui</code> ships
-narrowing helpers for exactly this reason — <code>getInputProps</code>,
-<code>getSelectProps</code>, and <code>getTextareaProps</code> in
-<code>registry/components/ui/control-props.ts</code> — which take a descriptor and return a bag typed
-for the element. Prefer those when the registry component is already in your app.
+<code>role?: AriaRole</code>, so <code>&lt;input {...field.controlProps()} /&gt;</code> fails
+<code>deno check</code> on that property. Add <code>role={undefined}</code> after the spread, or name
+the props individually. <code>@netscript/fresh-ui</code> ships narrowing helpers for this case:
+<code>getInputProps</code>, <code>getSelectProps</code> and <code>getTextareaProps</code> in
+<code>registry/components/ui/control-props.ts</code> take a descriptor and return a bag typed for the
+element. Prefer them when the registry component is already in your app.
 {{ /comp }}
 
-### What the schema actually contributes
+### What the schema contributes
 
-`constraints` is derived from the Zod schema by walking it once, so the HTML attributes and the
-server validator read from a single definition. The derivation is **partial today**. Against Zod
-4.4.3 it emits:
+`constraints` comes from walking the Zod schema once, so the HTML attributes and the server
+validator share one definition. The derivation is partial. Against Zod 4.4.3 it emits:
 
 | Schema | Derived constraint |
 | --- | --- |
-| any field | `required` — `true`, or `false` for `.optional()` |
+| any field | `required`: `true`, or `false` for `.optional()` |
 | `z.string().min(n)` / `.max(n)` | `minLength` / `maxLength` |
 | `z.string().url()` | `pattern` |
 | `z.array(...).min(n)` / `.max(n)` | `minItems` / `maxItems` (plus per-item constraints under `field[0]`) |
 
-and it emits **nothing** for `z.string().regex(...)`, `z.number().min()`, `.max()`, or
-`.multipleOf()`. Zod 4 reports those as `string_format:regex`, `greater_than`, `less_than`, and
-`multiple_of` checks, which the extractor does not read. Server-side validation still enforces every
-one of them — only the rendered attributes are missing, so a number field will not carry `min`/`max`
-until you pass them through `controlProps({ min: 1, max: 99 })` yourself.
+It emits nothing for `z.string().regex(...)`, `z.number().min()`, `.max()` or `.multipleOf()`. Zod 4
+reports those as `string_format:regex`, `greater_than`, `less_than` and `multiple_of` checks, which
+the extractor does not read. Server-side validation still enforces them; only the rendered
+attributes are missing. A number field gets `min` and `max` only when you pass them yourself, for
+example `controlProps({ min: 1, max: 99 })`.
 
-One more boundary in the same area: `formProps` sets `noValidate: true`. The framework owns error
-presentation, so the browser's native constraint UI is off by default. The constraint attributes
-still render and still reach assistive technology through `aria-required`; they just do not trigger
-the browser's own validation bubbles unless you override `noValidate`.
+`formProps` sets `noValidate: true` because the framework owns error presentation, so the browser's
+native constraint UI is off. The constraint attributes still render and reach assistive technology
+through `aria-required`, but they do not trigger the browser's validation bubbles unless you override
+`noValidate`.
 
 ## Repeatable fields: collections and intents
 
-A schema field typed as an array gets a `CollectionDescriptor` merged into its descriptor —
-`list`, `length`, `minItems`/`maxItems`, collection-level errors, and four button builders.
+A schema field typed as an array gets a `CollectionDescriptor` merged into its descriptor: `list`,
+`length`, `minItems`/`maxItems`, collection-level errors and four button builders.
 
 ```tsx no-check:partial field-array fragment uses the surrounding form state
 const lines = state.fields.items;
@@ -291,64 +275,64 @@ const lines = state.fields.items;
 </fieldset>;
 ```
 
-Each button builder returns `IntentButtonProps`: a `type='submit'` button carrying
-`name='__intent__'`, a JSON-encoded intent as its value, and `formNoValidate: true` so adding a row
-does not trip validation on the rows already there. On the server, `applyIntentOperation` performs
-the array edit and `applyCollectionKeyOperation` maintains the per-item keys, so removing row 1 does
-not renumber row 2 into row 1's identity — that is what `item.keyInputProps` round-trips.
+Each button builder returns `IntentButtonProps`: a `type='submit'` button with
+`name='__intent__'`, a JSON-encoded intent as its value, and `formNoValidate: true`, so adding a row
+does not trigger validation on the existing rows. On the server, `applyIntentOperation` performs the
+array edit and `applyCollectionKeyOperation` maintains the per-item keys, so removing row 1 does not
+give row 2 row 1's identity. `item.keyInputProps` round-trips those keys.
 
 {{ comp callout { type: "important", title: "Intent buttons need onIntent" } }}
-The handler only takes the intent branch when the config supplies <code>onIntent</code>. Without it,
+The handler takes the intent branch only when the config supplies <code>onIntent</code>. Without it,
 an "Add line" click is an ordinary submit: validation runs and, if it passes, so does your
 <code>mutate</code>. Supply <code>onIntent</code> whenever you render intent buttons.
 {{ /comp }}
 
-`onIntent` receives the parsed intent, the values with the operation already applied, and the form
-context; it returns `{ values, fieldErrors?, formErrors? }`. Returning no errors re-renders the form
-with the new row and no mutation. A malformed or unmatched collection target is a deliberate no-op
-rather than a throw.
+`onIntent` receives the parsed intent, the values with the operation applied, and the form context.
+It returns `{ values, fieldErrors?, formErrors? }`. Returning no errors re-renders the form with the
+new row and no mutation. A malformed or unmatched collection target is a deliberate no-op, not a
+throw.
 
 ## CSRF
 
-The default (`csrf: true`) is a double-submit cookie. The header resolver installed by `withForm`
-sets `ns_form_csrf` from whatever token the rendered state carries — `httpOnly`, `SameSite=Lax`,
-path `/`, and `Secure` only when the request URL is `https:`. The token also renders as a hidden
-`__csrf__` input via `csrfInputProps`. On POST the two are compared with a constant-time equality
-check; a missing, empty, or mismatched pair fails.
+The default, `csrf: true`, is a double-submit cookie. The header resolver installed by `withForm`
+sets `ns_form_csrf` from the token in the rendered state, with `httpOnly`, `SameSite=Lax`, path `/`,
+and `Secure` only when the request URL is `https:`. The token also renders as a hidden `__csrf__`
+input through `csrfInputProps`. On POST the two are compared in constant time; a missing, empty or
+mismatched pair fails.
 
-`csrf: false` removes three things at once: token generation in the layer loader, the header resolver
-in the builder, and the verification branch in the handler. It is the right switch for a form whose
-handler is protected some other way, and the wrong one for anything a browser session can reach.
+`csrf: false` removes token generation in the layer loader, the header resolver in the builder and
+the verification branch in the handler. Use it only for a form whose handler is protected another
+way, never for anything a browser session can reach.
 
-The module's own comment describes this as a baseline "intentionally explicit and easy to replace
-after a future security review" — the token is a `crypto.randomUUID()` with no expiry and no binding
-to a user session. Treat it as request-forgery protection, not as authentication.
+> [!CAUTION]
+> The token is a `crypto.randomUUID()` with no expiry and no binding to a user session. Treat it as
+> request-forgery protection, not as authentication.
 
 ## Idempotency: an id, not a guarantee
 
-Every rendered form carries `submissionId` through a hidden `__submission_id__` field, and the
-handler reuses the submitted id when one arrives. So a retried POST is identifiable as the *same*
-submission — but nothing in `@netscript/fresh` stores or compares those ids. Deduplication is your
-`mutate`'s job: pass `ctx.form.submissionId` to a write that treats it as an idempotency key. The
-field name is stable so a later runtime can add storage without changing page contracts.
+Every rendered form carries `submissionId` in a hidden `__submission_id__` field, and the handler
+reuses the submitted id when one arrives, so a retried POST is identifiable as the same submission.
+Nothing in `@netscript/fresh` stores or compares those ids. Deduplication is your `mutate`'s job:
+pass `ctx.form.submissionId` to a write that treats it as an idempotency key. The field name is
+stable.
 
 ## Progressive enhancement
 
-The server round trip works with JavaScript disabled. `useFormEnhancement` layers client behaviour on
+The server round trip works with JavaScript disabled. `useFormEnhancement` adds client behavior on
 top of it without replacing it:
 
 ```tsx
 import { createFormEnhancementSnapshot, Form, useFormEnhancement } from '@netscript/fresh/form';
 ```
 
-`createFormEnhancementSnapshot(state)` produces a serializable snapshot you can pass into an island;
+`createFormEnhancementSnapshot(state)` produces a serializable snapshot you can pass to an island.
 `useFormEnhancement(snapshot, options)` returns `{ pending, formProps, fieldErrors, formErrors,
-collectionStrategies, submit }`. Its `formProps` add Fresh's `f-client-nav` / `f-partial` attributes
-plus the submit, blur, and input handlers — so `validate: 'onBlur'` or `'onChange'` runs your schema
-client-side before the network, focusing the first invalid control by default.
+collectionStrategies, submit }`. Its `formProps` add Fresh's `f-client-nav` and `f-partial`
+attributes plus the submit, blur and input handlers, so `validate: 'onBlur'` or `'onChange'` runs
+your schema in the browser before the request and, by default, focuses the first invalid control.
 
-The managed `Form` component renders the hidden submission-id and CSRF inputs for you and accepts an
-`enhancement` prop to merge those props in:
+The managed `Form` component renders the hidden submission-id and CSRF inputs and accepts an
+`enhancement` prop that merges those props in:
 
 ```tsx no-check:partial JSX fragment uses the surrounding form state
 const formOverrides = { class: 'stack' };
@@ -358,65 +342,53 @@ const formOverrides = { class: 'stack' };
 </Form>;
 ```
 
-`Form`'s `state` prop is a `FormStateLike` — a `RuntimeFormState` or a `FormEnhancementSnapshot`. Its
-`formProps` override bag types `onSubmit`, `onBlurCapture`, `onInputCapture`, and `ref` as `never`,
-so passing one is a compile error rather than a silent override of the enhancement wiring.
+`Form`'s `state` prop is a `FormStateLike`: a `RuntimeFormState` or a `FormEnhancementSnapshot`. Its
+`formProps` override bag types `onSubmit`, `onBlurCapture`, `onInputCapture` and `ref` as `never`, so
+passing one is a compile error instead of a silent override of the enhancement wiring.
 
-`FormRegion` wraps content in a Fresh partial boundary (`name`, `mode` of `'replace' | 'prepend' |
-'append'`) so an enhanced submission can repaint one region instead of the page. The partial route on
-the other end is covered in [Partials](/web-layer/partials/).
+`FormRegion` wraps content in a Fresh partial boundary (`name`, and a `mode` of
+`'replace' | 'prepend' | 'append'`) so an enhanced submission can repaint one region instead of the
+page. The partial route on the other end is covered in [Partials](/web-layer/partials/).
 
 ## Server round trip or island mutation
 
-The tutorials use both, and the split is not about complexity — it is about what the interaction
-*is*.
+Choose by what the interaction is:
 
-**Use `withForm` when the submission is a page event.** The storefront's checkout, an account
-settings page, anything that creates a record and then navigates. You get server validation, error
-round-tripping, CSRF, and a working form without JavaScript, and the response is allowed to be a
-redirect.
+| Use | When the submission is | What you get |
+| --- | --- | --- |
+| `withForm` | A page event: a checkout, an account settings page, anything that creates a record and then navigates. | Server validation, error round trips, CSRF, a form that works without JavaScript, and a redirect response. |
+| An island mutation | A widget event: an inline status change where the user stays on the page and a query cache, not the document, needs updating. | The typed write and the cache key from the same contract, through `useIslandMutation` and the SDK's `mutationOptions()`. See [The query bridge](/web-layer/query-bridge/). |
 
-**Use an island mutation when the submission is a widget event.** The live dashboard's inline status
-change: the user stays on the page, the change should feel instant, and what needs updating
-afterwards is a query cache rather than a document. `useIslandMutation` with the SDK's
-`mutationOptions()` gives you the typed write and the cache key from the same contract — see
-[The query bridge](/web-layer/query-bridge/).
-
-The two are not exclusive. A `withForm` page enhanced with `useFormEnhancement` and a `FormRegion`
-submits without a navigation while keeping the no-JavaScript path intact; that is usually a better
-first move than reaching for an island.
+The two combine. A `withForm` page enhanced with `useFormEnhancement` and a `FormRegion` submits
+without a navigation and keeps the no-JavaScript path. Try that before reaching for an island.
 
 ## The narrower helper surface
 
-`@netscript/fresh/form` also ships an older, smaller state model: `FormState<TValues>` — just
-`values` and `errors` — built by `resolveFormState(data, initialValues)`. It exists for routes that
-hand-roll their handler and want only the values/errors preservation, and the module's own comment
-frames it as the interim surface alongside the richer runtime model.
+`@netscript/fresh/form` also ships an older, smaller state model: `FormState<TValues>`, with only
+`values` and `errors`, built by `resolveFormState(data, initialValues)`. It serves routes that
+hand-roll their handler and need only values and errors preserved.
 
-Keep the two straight: `FormState` has no `fields`, no `constraints`, no `formProps`, and no
-`submissionId`, so it is **not** accepted by `Form` — `<Form state={resolveFormState(...)}>` fails
-`deno check`. If you are building the form by hand and want `Form`, you want a `RuntimeFormState`,
-which means you want `withForm`.
+`FormState` has no `fields`, `constraints`, `formProps` or `submissionId`, so `Form` does not accept
+it: `<Form state={resolveFormState(...)}>` fails `deno check`. To use `Form`, you need a
+`RuntimeFormState`, which means `withForm`.
 
-For a hand-rolled handler the parsing primitives are public: `formDataToRawValues` (dotted paths and
-bracket indices → nested object), `normalizeFormValues` (empty strings → `undefined`),
-`createStandardSchemaAdapter` (any Standard Schema v1 validator → a `FormSchemaAdapter` with
-`parse`, `safeParse`, `getConstraints`, `getDefaults`), and `toFormErrors` / `createEmptyFormErrors`
-/ `firstFieldError` for the error map.
+For a hand-rolled handler the parsing primitives are public:
+
+- `formDataToRawValues` turns dotted paths and bracket indices into a nested object.
+- `normalizeFormValues` converts empty strings to `undefined`.
+- `createStandardSchemaAdapter` turns any Standard Schema v1 validator into a `FormSchemaAdapter`
+  with `parse`, `safeParse`, `getConstraints` and `getDefaults`.
+- `toFormErrors`, `createEmptyFormErrors` and `firstFieldError` build and read the error map.
 
 ## What to watch for
 
 - **`controlProps()` is a call.** Spreading the method itself renders nothing useful and type-checks
-  as a function — see the caution above for the `role` boundary that comes with the spread.
-- **Number and regex constraints are not derived.** Server validation still enforces them; pass the
-  attributes through `controlProps(overrides)` if the markup needs them.
-- **`redirectTo` shadows `onSuccess`.** If both are set, `onSuccess` never runs.
+  as a function. The warning above covers the `role` mismatch that comes with the spread.
 - **`invalidate` runs before the response.** A slow invalidation is latency the user sees.
-- **Intent buttons are inert without `onIntent`** — and worse than inert: they submit.
-- **Two forms on one page collide on the method slot.** Each `withForm` writes
-  `handlers[method]`, so a second `POST` form silently replaces the first one's handler — both
-  regions still render, but only the last one can receive a submission. Give them different methods,
-  different routes, or one form with intents.
+- **Two forms on one page collide on the method slot.** Each `withForm` writes `handlers[method]`, so
+  a second `POST` form replaces the first one's handler. Both regions still render, but only the last
+  one receives submissions. Give them different methods, different routes, or use one form with
+  intents.
 
 ## API summary
 
@@ -435,7 +407,7 @@ bracket indices → nested object), `normalizeFormValues` (empty strings → `un
 | --- | --- |
 | `Form` | Managed form element; renders the submission-id and CSRF hidden inputs. |
 | `FormProps<TValues>` | `state`, `children`, optional `formProps` and `enhancement`. |
-| `FormStateLike<TValues>` | `RuntimeFormState` or `FormEnhancementSnapshot` — what `Form` accepts. |
+| `FormStateLike<TValues>` | What `Form` accepts: a `RuntimeFormState` or a `FormEnhancementSnapshot`. |
 | `FormElementOverrideProps` | The open override bag, with the four runtime-owned handlers typed `never`. |
 | `FormRegion` / `FormRegionProps` | Fresh partial boundary for form-driven region updates. |
 
@@ -481,15 +453,8 @@ bracket indices → nested object), `normalizeFormValues` (empty strings → `un
 | `FormEnhancementOptions<TValues>` | `partial`, `clientNav`, `validate`, `schema`, `focusOnError`, `collections`, submit callbacks. |
 | `FormEnhancementState<TValues>` | `pending`, `formProps`, `fieldErrors`, `formErrors`, `collectionStrategies`, `submit()`. |
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [
-  { title: "Pages and the define-page builder", body: "withForm in the context of the full chain.", href: "/web-layer/builders/" },
-  { title: "Request-scoped resources", body: "Load once, read from the form layer and every other region.", href: "/web-layer/resources/" },
-  { title: "The query bridge", body: "The island-mutation half of the decision above.", href: "/web-layer/query-bridge/" },
-  { title: "Partials", body: "The partial route a FormRegion submission targets.", href: "/web-layer/partials/" },
-  { title: "Build a server-validated form", body: "The task-shaped walkthrough.", href: "/web-layer/how-to/build-a-server-validated-form/" },
-  { title: "Storefront tutorial", body: "The checkout page where this decision first bites.", href: "/tutorials/storefront/06-storefront-ui/" }
-] }) }}
-
-See the [Web Layer overview](/web-layer/) for the full pillar map.
+Follow [Build a server-validated form](/web-layer/how-to/build-a-server-validated-form/) to add a
+form to a page. See also [Partials](/web-layer/partials/) for the route a `FormRegion` submission
+targets, and the [storefront tutorial](/tutorials/storefront/06-storefront-ui/) for a checkout form.

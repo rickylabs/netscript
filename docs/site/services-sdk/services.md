@@ -9,22 +9,16 @@ order: 1
 
 # Services & contracts
 
-**Establish the public contract once; the handler, typed client, and OpenAPI surface are all derived
-from it — so an agent (or a teammate) never spends a turn keeping them in sync.**
+This page explains how a NetScript service implements a versioned contract and which runtime APIs
+serve it: `defineService`, the fluent builder, OpenAPI, health probes, graceful shutdown, TLS and
+service-level auth.
 
-A NetScript **service** is a typed HTTP runtime that *implements* an
-[`@orpc/contract`](/explanation/contracts/) definition. You establish the versioned public contract
-(route + Zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting
-router on a Hono + oRPC runtime. The contract object is the single source of truth: the
-same object a typed client imports is the one the server implements, so caller and server
-**cannot drift**. The example `users` service answers on its assigned port with both an
-OpenAPI surface (`/api/v1/users/*`) and a typed oRPC endpoint (`/api/rpc/*`).
-
-For a DB-backed service, the public Zod shape normally has a generated predecessor: run
-`netscript db generate`, import from `@database/zod`, and narrow or extend the model before binding
-it to the route. See the [generated-schema step](/data-persistence/database/#generated-schemas-feed-public-contracts)
-and the [two contract origins](/explanation/contracts/#where-the-public-shape-begins). DB-less
-services author the same public shape directly.
+A **service** is a typed HTTP runtime that implements an [`@orpc/contract`](/explanation/contracts/)
+definition. You define the versioned public contract (routes with Zod input and output),
+`implement()` it, bind `.handler()`s, and serve the router on a Hono and oRPC runtime. A typed client
+imports the same contract object the server implements, so caller and server cannot drift. The
+example `users` service answers on its assigned port with an OpenAPI surface (`/api/v1/users/*`) and
+a typed oRPC endpoint (`/api/rpc/*`).
 
 {{ comp.diagram({
   src: "/assets/diagrams/request-lifecycle.svg",
@@ -32,86 +26,39 @@ services author the same public shape directly.
   caption: "Request lifecycle: browser → service router → middleware → contract handler → database → typed response."
 }) }}
 
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for a service when you need a <strong>synchronous, request/response API</strong> with
-a versioned, type-locked contract shared between front end and back end — a CRUD surface,
-an internal RPC boundary, or a public REST/OpenAPI endpoint. For <em>fire-and-forget</em>
-work use a <a href="/background-processing/workers/">background job</a>; for
-<em>message-driven, long-running</em> orchestration use a
-<a href="/durable-workflows/sagas/">durable saga</a>; for <em>inbound HTTP that kicks
-off work</em> use a <a href="/durable-workflows/triggers/">trigger</a>; for
-<em>signed-in identity and sessions</em> compose the
-<a href="/identity-access/auth/">auth plugin</a>.
-{{ /comp }}
+## When to use a service
 
-## Why contract-first: the drift you never debug
+A service is the synchronous request/response boundary. Other work has its own runtime:
 
-Every hand-synced API dies the same way. A field gets renamed on the server; the client wrapper,
-the API docs, and the front-end types each get updated in separate steps — and one of them gets
-missed. The bug ships silently and surfaces later as a runtime `undefined`, and the fix costs a
-round of archaeology to find which of the three copies drifted.
-
-A NetScript service removes the wire-shape copies. The contract — plain `@orpc/contract` routes with Zod
-input/output schemas, versioned in its own package — is the only declaration of the wire shape.
-The handler binds to it via `implement()`, the client imports it, and the OpenAPI spec is
-generated from it. Rename a field and the build fails in the handler *and* the caller before
-anything ships. The [in-repo Storefront tutorial](/tutorials/storefront/02-catalog-service/) uses
-this same path: its catalog contract derives from generated Product schemas, the service implements
-that contract, and callers consume the same type without a separate "keep the API docs in sync"
-step.
-
-The same property is why contract-first services suit AI-agent codebases. Encore's
-[NestJS-alternatives article](https://encore.dev/articles/nestjs-alternatives) names the failure
-mode: TypeScript's backend ecosystem has many valid ways to structure validation, data access,
-and project layout, so coding agents pick a different combination on every prompt. Encore's
-answer is to fix the conventions in application code; NetScript locks the convention at the
-**contract layer** — one way to declare a route (contract + zod schemas + `implement()`), and
-everything downstream derived from it. An agent working in the codebase reads one declared shape
-and follows it, instead of inventing a new client wrapper per session.
+| You need | Use |
+| --- | --- |
+| A versioned, type-locked API shared by front end and back end: CRUD, an internal RPC boundary, or a public REST/OpenAPI endpoint | A service (this page) |
+| Fire-and-forget work | A [background job](/background-processing/workers/) |
+| Message-driven, long-running orchestration | A [durable saga](/durable-workflows/sagas/) |
+| Inbound HTTP that starts work | A [trigger](/durable-workflows/triggers/) |
+| Signed-in identity and sessions | The [auth plugin](/identity-access/auth/) |
 
 ## What it is
 
-A service is the **Layer 3 preset** (`defineService`) over a three-layer package. Layer 1 is
-small primitives — health, error, RPC, OpenAPI, and Scalar docs handlers you can mount in any
-Hono app. Layer 2 is `createService()`, a fluent builder that materializes a mountable
-`ServiceApp` (via `build()`) or starts a Deno listener (via `serve()`). Layer 3 is
-`defineService()`, the curated one-call preset used by generated service entrypoints. Every
-layer takes the oRPC router as its input, and the same contract the router implements is the
-one a typed client imports — so a renamed field is a compile error on both sides. The full
-type story is in [Contracts](/explanation/contracts/).
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Build a service",
-    body: "Track A 02: author a contract, stand up the users service, call it from a typed client.",
-    href: "/tutorials/storefront/02-catalog-service/",
-    icon: "→"
-  },
-  {
-    title: "Do — Expose OpenAPI & Scalar",
-    body: "Recipe: turn on the generated OpenAPI spec and the Scalar docs UI for an existing service.",
-    href: "/services-sdk/how-to/expose-openapi-scalar/",
-    icon: "◆"
-  },
-  {
-    title: "Do — Graceful shutdown",
-    body: "Recipe: drain in-flight requests and run teardown hooks on SIGINT/SIGTERM before the process exits.",
-    href: "/orchestration-runtime/how-to/graceful-shutdown/",
-    icon: "◆"
-  }
-] }) }}
+`@netscript/service` has three layers. Layer 1 is small primitives: health, error, RPC, OpenAPI,
+and Scalar docs handlers you can mount in any Hono app. Layer 2 is `createService()`, a fluent
+builder that materializes a mountable `ServiceApp` (via `build()`) or starts a Deno listener (via
+`serve()`). Layer 3 is `defineService()`, the one-call preset that generated service entrypoints
+use. Every layer takes the oRPC router as its input.
 
 ## The contract is the source of truth
 
-Before there is a service there is a contract. A contract is plain `@orpc/contract`
-routes whose inputs and outputs are Zod schemas, collected into an object and passed to
-`implement()` from `@orpc/server`. `implement()` returns a `.handler()`-bindable object
-the service router consumes. The example workspace versions its contracts under
-`contracts/versions/v1/` and re-exports them as `@<project>/contracts` — so a contract
-bump is an explicit, reviewable version directory, never an accidental break. When a generated
-database schema exists, it precedes this public declaration rather than replacing it.
+A contract is plain `@orpc/contract` routes whose inputs and outputs are Zod schemas, collected into
+an object and passed to `implement()` from `@orpc/server`. `implement()` returns the
+`.handler()`-bindable object the service router consumes. The example workspace versions its
+contracts under `contracts/versions/v1/` and re-exports them as `@<project>/contracts`, so a contract
+bump is an explicit, reviewable version directory.
+
+For a database-backed service, the public Zod shape usually starts from a generated schema: run
+`netscript db generate`, import from `@database/zod`, and narrow or extend the model before binding
+it to the route. See the [generated-schema step](/data-persistence/database/#generated-schemas-feed-public-contracts)
+and the [two contract origins](/explanation/contracts/#where-the-public-shape-begins). A service
+without a database authors the same public shape directly.
 
 ```ts
 // contracts/versions/v1/users.contract.ts
@@ -129,19 +76,17 @@ export const UsersContractV1 = {
 export const UsersV1 = implement(UsersContractV1);
 ```
 
-The chain end-to-end — contract → `implement()` → `.handler()` → typed client → query →
-island — is laid out in [Contracts](/explanation/contracts/). The key property: the
-client imports the *same* contract object, so a renamed field or a changed output shape is
-a **compile error in both the handler and the caller** before it can ship.
+Because the client imports the same contract object, a renamed field or a changed output shape is a
+compile error in both the handler and the caller. [Contracts](/explanation/contracts/) traces the
+full chain from contract to island.
 
-## Headline API: two ways to construct a service
+## Two ways to construct a service
 
-NetScript ships **two** service-construction APIs, and the example project uses both.
-Workspace services use the one-call `defineService(router, options)` — the right default
-for the 80% case. Plugin API services (workers, sagas, auth) use the fluent
-`createService(router, options).with*().serve()` builder when they need to add CORS,
-OpenAPI, a database client, auth middleware, or custom context step by step. Both stand up
-the same Hono + oRPC runtime; `defineService` is a curated preset over the same builder.
+Workspace services use the one-call `defineService(router, options)`, the default for most
+services. Plugin API services (workers, sagas, auth) use the fluent
+`createService(router, options).with*().serve()` builder to add CORS, OpenAPI, a database client,
+auth middleware, or custom context step by step. Both run the same Hono and oRPC runtime;
+`defineService` is a preset over the builder.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -156,14 +101,14 @@ the same Hono + oRPC runtime; `defineService` is a curated preset over the same 
   }
 ] }) }}
 
-Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
-of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
-fallback default — set the port there rather than editing this line.
+Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment. The typed source
+of truth is the `services.<name>.port` field in `netscript.config.ts`, which the scaffold wires as the
+fallback default. Set the port there rather than editing this line.
 
-### `defineService(router, options)` — the preset options
+### `defineService(router, options)` options
 
-`DefineServiceOptions` extends the base `ServiceConfig` (`name`, `version`, `port`) and adds
-the preset-only keys below. This is the complete option list.
+`DefineServiceOptions` extends the base `ServiceConfig` (`name`, `version`, `port`) with the
+preset-only keys below. This is the complete option list.
 
 {{ comp.apiTable({
   caption: "DefineServiceOptions (extends ServiceConfig)",
@@ -182,28 +127,28 @@ the preset-only keys below. This is the complete option list.
   ]
 }) }}
 
+> [!IMPORTANT]
+> `defineService()` requires an explicit auth policy. The examples on this page are public
+> demonstrations. For protected operations, pass
+> `auth: { authn: { authenticator }, authz: { authorizer } }`; authorization is optional. A missing
+> policy is a type error, and a runtime `TypeError` for JavaScript callers. To keep a public
+> service public, add `auth: { public: true, reason: 'Public status service with no protected operations' }`.
+> See the [explicit service posture and migration](/reference/service/#explicit-service-posture).
+
 {{ comp callout { type: "note", title: "Handlers bind to the contract" } }}
-A router aggregates versioned handlers — <code>export const router = { v1: { users: { ...UsersV1, health } } }</code> —
-and each handler is bound from the implemented contract:
+A router aggregates versioned handlers, for example
+<code>export const router = { v1: { users: { ...UsersV1, health } } }</code>, and each handler is
+bound from the implemented contract:
 <code>v1.users.list.handler(async ({ input }) =&gt; { /* return records */ })</code>. In the
-scaffold's <strong>Step 5</strong> the <code>users</code> handlers return seeded
-<strong>in-memory records</strong> (no database yet) — the front-end ↔ contract proof. Wiring
-Prisma comes later; see <a href="/data-persistence/database/">Database</a>.
+scaffold's <strong>Step 5</strong> the <code>users</code> handlers return seeded in-memory records
+(no database yet). See <a href="/data-persistence/database/">Database</a> to wire Prisma.
 {{ /comp }}
 
 ## Endpoints & ports
 
-In 0.0.8, `defineService()` requires an explicit auth policy. The examples above are deliberately
-public demonstrations. For protected operations, pass `auth: { authn: { authenticator }, authz:
-{ authorizer } }`; authorization is optional. Missing policy is a type error and a runtime
-`TypeError` for JavaScript callers. To keep a genuinely public service public, add
-`auth: { public: true, reason: 'Public status service with no protected operations' }`.
-See the [explicit service posture and migration](/reference/service/#explicit-service-posture).
-
-A `defineService` runtime exposes its OpenAPI routes, a typed oRPC endpoint mounted under
-`/api/rpc/*`, and a health check. The example `users` service is reachable once
-`aspire start` is up (Aspire provisions Postgres/Redis first) or when you run it directly
-with `deno task --cwd services/users dev`.
+A `defineService` runtime exposes its OpenAPI routes, a typed oRPC endpoint under `/api/rpc/*`, and
+a health check. The example `users` service is reachable once `aspire start` is up (Aspire provisions
+Postgres and Redis first), or when you run it directly with `deno task --cwd services/users dev`.
 
 {{ comp.apiTable({
   caption: "Users service surface",
@@ -215,77 +160,29 @@ with `deno task --cwd services/users dev`.
   ]
 }) }}
 
-{{ comp callout { type: "important", title: "Aspire first, then hit the endpoint" } }}
-Services that touch the database need orchestration up first:
-<code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis (dashboard at
-<a href="https://localhost:18888">https://localhost:18888</a>) <strong>before</strong> any
-<code>netscript db</code> command. The seeded-records example service runs without the DB,
-but the real workflow expects Aspire running. See <a href="/explanation/aspire/">Aspire</a>.
-{{ /comp }}
-
 ## OpenAPI spec & Scalar docs
 
-Passing `openapi` to `defineService` (or calling `.withOpenAPI().withDocs()` on the builder)
-turns on a REST surface generated from the same contract, a machine-readable OpenAPI JSON
-spec, and the **Scalar** interactive docs UI. Under the hood three Layer-1 primitives do the
-work, and you can mount them directly in any host Hono app when you need finer control:
-`createOpenAPISpec` serves the spec JSON, `createScalarDocs` serves the Scalar HTML page, and
-`createOpenAPIHandler` serves the REST routes themselves (it adds the `ZodSmartCoercionPlugin`
-so query-string values coerce to their schema types automatically).
-
-{{ comp.apiTable({
-  caption: "OpenAPI / Scalar primitives (@netscript/service)",
-  rows: [
-    { name: "createOpenAPISpec(router, config)", type: "→ ServiceHandler", desc: "Serves the OpenAPI JSON spec. config is OpenAPIConfig (see below). Mount at e.g. /api/openapi.json." },
-    { name: "createScalarDocs(options)", type: "→ ServiceHandler", desc: "Serves the Scalar docs UI HTML that loads the spec. options is ScalarDocsOptions (specUrl, title?, theme?)." },
-    { name: "createScalarJs()", type: "→ ServiceHandler", desc: "Serves the bundled Scalar JS so the docs UI works offline without CDN access." },
-    { name: "createOpenAPIHandler(router, config?)", type: "→ FetchHandler", desc: "The OpenAPI REST request handler (with ZodSmartCoercionPlugin). config is RPCHandlerConfig; mount under /api/*." }
-  ]
-}) }}
-
-{{ comp.apiTable({
-  caption: "OpenAPIConfig (createOpenAPISpec)",
-  rows: [
-    { name: "title", type: "string (required)", desc: "API title shown in the spec and docs." },
-    { name: "version", type: "string (required)", desc: "API version, e.g. '1.0.0'." },
-    { name: "description", type: "string?", desc: "Longer API description." },
-    { name: "servers", type: "Array<{ url; description? }>?", desc: "Server URLs advertised in the spec (e.g. staging vs. production base URLs)." }
-  ]
-}) }}
-
-{{ comp.apiTable({
-  caption: "ScalarDocsOptions (createScalarDocs)",
-  rows: [
-    { name: "specUrl", type: "string (required)", desc: "URL the docs UI fetches the OpenAPI spec from, e.g. '/api/openapi.json'." },
-    { name: "title", type: "string?", desc: "Docs page title." },
-    { name: "theme", type: "'default' | 'kepler' | 'moon' | 'purple' | 'saturn'", desc: "Scalar UI theme." }
-  ]
-}) }}
-
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "Preset — defineService({ openapi })",
-    lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Turns on the OpenAPI spec + Scalar docs UI in one option.\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
-  },
-  {
-    label: "Primitives — mount in a host app",
-    lang: "ts",
-    code: "// host/openapi-routes.ts — wire the primitives onto an existing Hono app\nimport {\n  createOpenAPISpec,\n  createScalarDocs,\n  createScalarJs,\n} from '@netscript/service';\nimport { router } from './router.ts';\n\napp.get('/api/openapi.json', createOpenAPISpec(router, {\n  title: 'Users API',\n  version: '1.0.0',\n  description: 'User management service',\n}));\n\napp.get('/api/docs', createScalarDocs({\n  specUrl: '/api/openapi.json',\n  title: 'Users API',\n  theme: 'kepler',\n}));\n\n// Serve Scalar offline (no CDN dependency)\napp.get('/api/docs/scalar.js', createScalarJs());"
-  }
-] }) }}
+Passing `openapi` to `defineService`, or calling `.withOpenAPI().withDocs()` on the builder, turns on
+a REST surface generated from the same contract, a machine-readable OpenAPI JSON document, and the
+Scalar interactive docs UI. Three Layer-1 primitives do the work and can be mounted in any Hono app:
+`createOpenAPISpec` serves the document, `createScalarDocs` serves the Scalar page, and
+`createScalarJs` serves the bundled Scalar runtime. `createOpenAPIHandler` serves the REST routes
+themselves and adds the `ZodSmartCoercionPlugin`, so query-string values coerce to their schema
+types. [Expose OpenAPI & Scalar](/services-sdk/how-to/expose-openapi-scalar/) shows both paths and
+every option.
 
 ## Health, readiness & liveness
 
-The preset wires `/health` automatically; the underlying primitives let you compose probes
-by hand or mount them in a host app. `createHealthHandler` runs every registered
-`HealthCheck` in parallel and returns an aggregate `HealthResponse`
-(`status` ∈ `healthy | degraded | unhealthy`). `createReadinessHandler` takes an array of
-async boolean checks and is the one to point an orchestrator's *readiness* probe at — it
-fails until dependencies (DB, caches) are reachable. `createLivenessHandler` is a bare
-"is the process up" probe that returns 200 with no dependency checks, for an orchestrator's
-*liveness* probe. The `healthChecks` namespace ships pre-built checks for the common
-dependencies so you don't hand-roll them.
+The preset wires `/health` automatically. The primitives let you compose probes by hand or mount
+them in a host app:
+
+- `createHealthHandler` runs every registered `HealthCheck` in parallel and returns an aggregate
+  `HealthResponse` (`status` ∈ `healthy | degraded | unhealthy`).
+- `createReadinessHandler` takes an array of async boolean checks. Point an orchestrator's readiness
+  probe at it: it fails until dependencies (database, caches) are reachable.
+- `createLivenessHandler` returns 200 while the process runs, with no dependency checks, for an
+  orchestrator's liveness probe.
+- The `healthChecks` namespace ships pre-built checks for common dependencies.
 
 {{ comp.apiTable({
   caption: "Health primitives & checks (@netscript/service)",
@@ -308,23 +205,23 @@ dependencies so you don't hand-roll them.
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Liveness vs. readiness" } }}
-Point an orchestrator's <strong>liveness</strong> probe at <code>/health/live</code> (restart
-the container only when the process is wedged) and its <strong>readiness</strong> probe at
-<code>/health/ready</code> (stop routing traffic until the DB and caches answer). Wiring both
-to the same dependency-checking endpoint is the classic footgun: a transient DB blip then
-triggers a <em>restart</em> instead of a brief traffic pause.
+{{ comp callout { type: "warning", title: "Keep liveness free of dependency checks" } }}
+Point an orchestrator's <strong>liveness</strong> probe at <code>/health/live</code>, which restarts
+the container only when the process is wedged, and its <strong>readiness</strong> probe at
+<code>/health/ready</code>, which stops routing traffic until the database and caches answer. If
+both use the same dependency-checking endpoint, a transient database blip triggers a restart loop
+instead of a brief traffic pause.
 {{ /comp }}
 
 ## Graceful shutdown
 
-`serve()` installs SIGINT/SIGTERM (or SIGBREAK on Windows) handlers and drains in-flight
-requests before exiting. Register teardown work with `.onShutdown(hook)` on the builder — a
-`ShutdownHook` receives a `ShutdownContext` (`reason`, optional `signal`) and runs during the
-drain. The drain is bounded by `drainTimeoutMs` (default `30_000`); when it elapses the
-service stops anyway and the resulting `ShutdownReport` records `timedOut: true` plus a
-per-hook `ShutdownHookOutcome` for each registered hook. Calling `running.stop()` triggers
-the same drain manually (reason `'manual'`).
+`serve()` installs SIGINT/SIGTERM (or SIGBREAK on Windows) handlers and drains in-flight requests
+before exiting. Register teardown work with `.onShutdown(hook)` on the builder. A `ShutdownHook`
+receives a `ShutdownContext` (`reason`, optional `signal`) and runs during the drain. `drainTimeoutMs`
+bounds the drain (default `30_000`); when it elapses the service stops anyway, and the
+`ShutdownReport` records `timedOut: true` and a `ShutdownHookOutcome` for each hook. Calling
+`running.stop()` triggers the same drain manually (reason `'manual'`). The
+[Graceful shutdown recipe](/orchestration-runtime/how-to/graceful-shutdown/) walks through it.
 
 {{ comp.apiTable({
   caption: "Shutdown types (@netscript/service)",
@@ -358,13 +255,13 @@ the same drain manually (reason `'manual'`).
 
 ## TLS & HTTP/2 (opt-in)
 
-By default a service listens over plain HTTP. Pass a `tls` option and the *same* listener serves
-HTTPS and negotiates **HTTP/2 automatically via ALPN** — HTTP/1.1 stays available as a fallback, and
-there is no separate `http2` flag. TLS is purely additive: a service that omits `tls` is unchanged.
+A service listens over plain HTTP by default. Pass a `tls` option and the same listener serves HTTPS
+and negotiates HTTP/2 through ALPN, with HTTP/1.1 as a fallback. There is no separate `http2` flag,
+and a service that omits `tls` is unchanged.
 
-`tls` is a `ServiceTlsOptions` object whose `cert` and `key` are **PEM-encoded strings** — the
-certificate chain and the private key as *contents*, not file paths. It is accepted by both
-`defineService(router, { …, tls })` and the fluent builder's `.serve({ tls })`.
+`tls` is a `ServiceTlsOptions` object whose `cert` and `key` are PEM-encoded strings: the certificate
+chain and the private key as contents, not file paths. Both `defineService(router, { …, tls })` and
+the builder's `.serve({ tls })` accept it.
 
 ```ts
 // services/users/src/main.ts — serve HTTPS + HTTP/2 with an inline cert/key
@@ -383,10 +280,10 @@ await defineService(router, {
 // Fluent equivalent: createService(router, { name }).withHealth().serve({ tls: { cert, key } })
 ```
 
-If you omit `tls`, the listener falls back to environment configuration: set **both**
+If you omit `tls`, the listener falls back to environment configuration: set both
 `NETSCRIPT_TLS_CERT_FILE` and `NETSCRIPT_TLS_KEY_FILE` and the service serves HTTPS from those files.
-Unlike the inline `cert`/`key` (PEM contents), these env vars are **file paths** — and both are
-required; one alone is ignored.
+Unlike the inline `cert`/`key`, these variables are file paths, and both are required; one alone is
+ignored.
 
 {{ comp.apiTable({
   caption: "ServiceTlsOptions (@netscript/service) + env fallback",
@@ -400,18 +297,17 @@ required; one alone is ignored.
 
 ## Service-layer authn / authz middleware
 
-The service builder ships a **provider-agnostic** authentication and authorization seam in
-`@netscript/service/auth`. It is a thin Hono-middleware layer over the request pipeline —
-deliberately **distinct from the [auth plugin](/identity-access/auth/)**, which composes a
-sign-in/session backend (kv-oauth, WorkOS, better-auth). Use this seam when a service needs
-to gate its own routes — verify a credential, trust an upstream identity header, or check a
-scope — without taking on an interactive identity provider.
+`@netscript/service/auth` is a provider-agnostic authentication and authorization seam: a thin
+Hono-middleware layer over the request pipeline. Use it when a service gates its own routes (verify
+a credential, trust an upstream identity header, or check a scope) without an interactive identity
+provider. It is separate from the [auth plugin](/identity-access/auth/), which composes a
+sign-in/session backend (kv-oauth, WorkOS, better-auth).
 
-Two stages wrap the request: `.withAuthn()` resolves a `Principal` (authentication) via an
-`AuthenticatorPort`, and `.withAuthz()` makes an `AuthzDecision` from that principal
-(authorization) via an `AuthorizerPort`. By default the `/api` surface is protected and
-`/health` is anonymous — both configurable through `AuthnOptions.protect` /
-`AuthnOptions.allowAnonymous`. The preset form is `defineService(router, { auth: { authn, authz } })`.
+Two stages wrap the request. `.withAuthn()` resolves a `Principal` through an `AuthenticatorPort`,
+and `.withAuthz()` makes an `AuthzDecision` from that principal through an `AuthorizerPort`. By
+default `/api` is protected and `/health` is anonymous; `AuthnOptions.protect` and
+`AuthnOptions.allowAnonymous` change that. The preset form is
+`defineService(router, { auth: { authn, authz } })`.
 
 {{ comp.apiTable({
   caption: "@netscript/service/auth surface",
@@ -438,68 +334,11 @@ Two stages wrap the request: `.withAuthn()` resolves a `Principal` (authenticati
 ] }) }}
 
 {{ comp callout { type: "note", title: "Service-auth seam vs. the auth plugin" } }}
-This middleware is for <strong>machine-to-machine and gateway-fronted</strong> gating: static
-credentials, trusted upstream headers, scope checks. It does <em>not</em> do interactive
-sign-in, OAuth callbacks, or session cookies. For <strong>signed-in human users</strong>
-(sign-in / callback / session / me), compose the
-<a href="/identity-access/auth/"><code>auth</code> plugin</a> backend instead — the two layers
-are complementary and can run together.
+This middleware gates machine-to-machine and gateway-fronted traffic: static credentials, trusted
+upstream headers, scope checks. It does no interactive sign-in, OAuth callbacks, or session cookies.
+For signed-in users, compose the <a href="/identity-access/auth/"><code>auth</code> plugin</a>
+backend. The two layers can run together.
 {{ /comp }}
-
-## Production notes
-
-{{ comp callout { type: "warning", title: "Footguns before you ship" } }}
-<ul>
-<li><strong>Don't wire liveness to dependency checks.</strong> <code>/health/live</code> must
-stay dependency-free; only <code>/health/ready</code> should fail on an unreachable DB. Crossing
-them turns a transient DB blip into a container restart loop.</li>
-<li><strong>Set <code>drainTimeoutMs</code> below your platform's kill grace.</strong> The drain
-defaults to <code>30_000</code>; if your orchestrator sends SIGKILL sooner, in-flight requests
-are cut off — pick a timeout under the platform's termination grace period.</li>
-<li><strong>The served RPC path is <code>/api/rpc/*</code>, not <code>/rpc</code>.</strong>
-Point generated clients at the same path the runtime mounts.</li>
-<li><strong><code>denyByDefault</code> is <code>true</code>.</strong> With <code>.withAuthz()</code>
-installed, any request that reaches no matching rule is rejected — add an explicit allow rule for
-public-but-authenticated routes rather than relaxing the default.</li>
-<li><strong>Aspire first for DB-backed services.</strong> <code>aspire start</code> must bring up
-Postgres/Redis before any <code>netscript db</code> command or the readiness probe will fail.</li>
-</ul>
-{{ /comp }}
-
-## Reference
-
-This hub is intentionally thin — the full generated API lives in the reference.
-
-{{ comp.xref({ key: "ref:service" }) }}
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — @netscript/service",
-    body: "The full generated API: defineService, createService, the fluent builder, the OpenAPI/Scalar and health primitives, the shutdown types, and the /auth middleware seam.",
-    href: "/reference/service/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — @netscript/contracts",
-    body: "Contract primitives plus the /crud, /query, and /transform helpers that generate CRUD contracts, paginated queries, and response transformers.",
-    href: "/reference/contracts/",
-    icon: "≡"
-  },
-  {
-    title: "Understand — Contracts",
-    body: "The oRPC contract → implement → handler → typed client → query → island type flow, explained.",
-    href: "/explanation/contracts/",
-    icon: "◎"
-  },
-  {
-    title: "Learn — Build a service",
-    body: "Guided tutorial: contract → users service → typed client → island, built from scratch.",
-    href: "/tutorials/storefront/02-catalog-service/",
-    icon: "→"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Capabilities", href: "/capabilities/" }, next: { label: "Background jobs", href: "/background-processing/workers/" } }) }}
 
 ## Protect anonymous routes
 
@@ -511,3 +350,23 @@ storage supports tests/development. Follow
 device-flow start/poll example and the
 [`@netscript/service` reference](/reference/service/#rate-limits-and-client-addresses) for the
 contracts.
+
+## Production notes
+
+- **Set `drainTimeoutMs` below your platform's kill grace.** The drain defaults to `30_000`. If your
+  orchestrator sends SIGKILL sooner, in-flight requests are cut off.
+- **The served RPC path is `/api/rpc/*`, not `/rpc`.** Point generated clients at the path the
+  runtime mounts.
+- **`denyByDefault` is `true`.** With `.withAuthz()` installed, a request that matches no rule is
+  rejected. Add an explicit allow rule for public-but-authenticated routes instead of relaxing the
+  default.
+- **Start Aspire first for database-backed services.** `aspire start` must bring up Postgres and
+  Redis (dashboard at [https://localhost:18888](https://localhost:18888)) before any
+  `netscript db` command, or the readiness probe fails.
+
+## Next steps
+
+Call this service from an app or another service with [Typed SDK & client](/services-sdk/sdk/). See
+also the [Add a service](/services-sdk/how-to/add-a-service/) recipe and the
+[`@netscript/service`](/reference/service/) and [`@netscript/contracts`](/reference/contracts/)
+references.
