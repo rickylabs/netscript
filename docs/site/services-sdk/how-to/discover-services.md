@@ -317,5 +317,3 @@ Serve the OpenAPI document and Scalar UI for your service with
 [Expose OpenAPI & Scalar](/services-sdk/how-to/expose-openapi-scalar/). See also
 [Typed SDK & client](/services-sdk/sdk/), the [`@netscript/sdk` reference](/reference/sdk/), and
 [Orchestration with Aspire](/explanation/aspire/).
-
-{{ comp.nextPrev({ prev: { label: "How-to guides", href: "/how-to/" }, next: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" } }) }}

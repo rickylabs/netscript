@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Database & Prisma
 templateEngine: [vento, md]
-prev: { label: "Durable streams", href: "/durable-workflows/streams/" }
-next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
 order: 1
 ---
 
@@ -288,5 +286,3 @@ Postgres and apply your first migration.
   through the database from scratch.
 - [`@netscript/database` reference](/reference/database/): ports, the postgres/mssql/mysql adapters,
   extensions and tracing.
-
-{{ comp.nextPrev({ prev: { label: "Durable streams", href: "/durable-workflows/streams/" }, next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" } }) }}

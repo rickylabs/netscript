@@ -230,5 +230,3 @@ Pick or pin the queue backend in
   an HTTP trigger instead of a raw queue.
 - References: [`@netscript/kv`](/reference/kv/), [`@netscript/queue`](/reference/queue/) and
   [`@netscript/cron`](/reference/cron/).
-
-{{ comp.nextPrev({ prev: { label: "Database & migration", href: "/data-persistence/how-to/database-migration/" }, next: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" } }) }}

@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Fresh UI & design
 templateEngine: [vento, md]
-prev: { label: "Telemetry & logging", href: "/observability/telemetry/" }
-next: { label: "Authentication", href: "/identity-access/auth/" }
 order: 17
 ---
 

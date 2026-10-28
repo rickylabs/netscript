@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Run the ERP sync under Aspire
 templateEngine: [vento, md]
 prev: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
 # Run the ERP sync under Aspire
@@ -183,5 +183,3 @@ production companion to this local run: deployable units, managed backing servic
 - [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) and
   [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/): tune throughput.
 - [Orchestration with Aspire](/explanation/aspire/) and the [How-to guides](/how-to/).
-
-{{ comp.nextPrev({ prev: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

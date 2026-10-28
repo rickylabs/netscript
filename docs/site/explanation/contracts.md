@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Contracts & type flow
 templateEngine: [vento, md]
-prev: { label: "Architecture", href: "/explanation/architecture/" }
-next: { label: "The plugin system", href: "/explanation/plugin-system/" }
 order: 2
 ---
 
@@ -272,5 +270,3 @@ That exception marks where the model stops: contracts are for boundaries you *ow
 webhook is a boundary someone else owns.
 
 Next: build a contract-first service in the [Build a service tutorial](/tutorials/storefront/02-catalog-service/).
-
-{{ comp.nextPrev({ prev: { label: "Architecture", href: "/explanation/architecture/" }, next: { label: "The plugin system", href: "/explanation/plugin-system/" } }) }}

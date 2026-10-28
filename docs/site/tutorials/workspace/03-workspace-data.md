@@ -216,5 +216,3 @@ exists.
 A second, isolated Postgres datasource with `Workspace` and `Member` models, its own migration
 history and its own typed client, separate from auth and the primary database. Org scoping stays
 app-level. Next, you add members to a team with a background job that runs off the request path.
-
-{{ comp.nextPrev({ prev: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }, next: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" } }) }}

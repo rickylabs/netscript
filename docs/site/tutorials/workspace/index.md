@@ -105,5 +105,3 @@ then adds authentication. If `netscript init` and `aspire start` are new to you,
 
 Start at chapter 1 and keep the same `my-workspace/` through to chapter 6. After the track, the
 guides in **Build › [Identity & Access](/identity-access/)** pick up where these chapters stop.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" } }) }}

@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Live streaming
 templateEngine: [vento, md]
 prev: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" }
-next: { label: "Tutorials", href: "/tutorials/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
 # Live streaming
@@ -184,5 +184,3 @@ recipe. Related pages:
 - [AI engine](/ai/engine/): the provider-neutral model registry, agent loop, tool registry and MCP
   transports.
 - [fresh reference](/reference/fresh/): exact signatures.
-
-{{ comp.nextPrev({ prev: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" }, next: { label: "Tutorials", href: "/tutorials/" } }) }}

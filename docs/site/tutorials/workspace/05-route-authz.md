@@ -430,5 +430,3 @@ scope authorization, not org or role RBAC: tenancy stays in your code.
 - **Reuse the contract on the client.** A typed SDK derived from `WorkspaceContractV1` exposes the
   same `members` procedure and metadata. If you rename that procedure key, its contract-local
   metadata follows it, and a stale SDK reference to the old key fails to type-check.
-
-{{ comp.nextPrev({ prev: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" }, next: { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" } }) }}

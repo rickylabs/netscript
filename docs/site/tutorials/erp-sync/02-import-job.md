@@ -273,5 +273,3 @@ into the hand-off folder, and a durable background job (`defineJobHandler`) that
 together by `enqueueJob` and made addressable with `netscript generate plugins`. The imported rows
 are still in the legacy shape, with column names Dynamics does not use and prices in cents. Next,
 you build and run the transform stage that fixes them.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" }, next: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" } }) }}

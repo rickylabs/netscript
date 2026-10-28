@@ -411,5 +411,3 @@ A `definePage` orders page that renders cache-first through layers, partials and
 hydrated `QueryIsland` that reads with `useQuery` and mutates optimistically with `useMutation`, all
 keyed off the same contract-derived helpers. The table is live on the client. Next, the *server*
 pushes rows into an open page over a durable StreamDB.
-
-{{ comp.nextPrev({ prev: { label: "3 · Cache-first query", href: "/tutorials/live-dashboard/03-sdk-cache-first-query/" }, next: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" } }) }}

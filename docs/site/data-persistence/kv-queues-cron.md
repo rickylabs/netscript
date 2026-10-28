@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: KV, queues & cron
 templateEngine: [vento, md]
-prev: { label: "Database & Prisma", href: "/data-persistence/database/" }
-next: { label: "Telemetry & logging", href: "/observability/telemetry/" }
 order: 2
 ---
 
@@ -291,5 +289,3 @@ Use these primitives in code with the
   {{ comp.xref({ key: "ref:cron" }) }}: the full generated APIs.
 - [Telemetry & logging](/observability/telemetry/): how queue and scheduler spans reach the Aspire
   dashboard.
-
-{{ comp.nextPrev({ prev: { label: "Database & Prisma", href: "/data-persistence/database/" }, next: { label: "Telemetry & logging", href: "/observability/telemetry/" } }) }}

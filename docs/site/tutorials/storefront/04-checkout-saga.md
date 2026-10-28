@@ -423,5 +423,3 @@ A durable checkout. A `CheckoutSaga` built with `defineSaga().state().correlate(
 an order to payment and cancels it through a `PaymentFailed` compensation branch. A trigger enqueues
 the `process-payment` worker job, which reports back with `createSagaPublisher`, and every instance
 is visible on the Sagas API. Next, you accept events from outside providers with a verified webhook.
-
-{{ comp.nextPrev({ prev: { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" }, next: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" } }) }}

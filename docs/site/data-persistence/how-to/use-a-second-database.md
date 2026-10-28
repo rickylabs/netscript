@@ -328,5 +328,3 @@ can share one of these datasources.
   {{ comp.xref({ key: "ref:prisma-adapter-mysql", text: "@netscript/prisma-adapter-mysql reference" }) }}.
 - {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }}: how the AppHost
   provisions each database container.
-
-{{ comp.nextPrev({ prev: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" }, next: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" } }) }}

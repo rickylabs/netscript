@@ -3,7 +3,6 @@ layout: layouts/base.vto
 title: CLI cheat sheet
 description: The netscript commands you use most, grouped by task, with the files each one changes.
 templateEngine: [vento, md]
-prev: { label: "Glossary", href: "/glossary/" }
 ---
 
 # CLI cheat sheet
@@ -364,5 +363,3 @@ These commands install and run the NetScript tooling for coding agents.
 }) }}
 
 See [Agent tooling](/ai/agent-tooling/) for the mental model.
-
-{{ comp.nextPrev({ prev: { label: "Glossary", href: "/glossary/" }, next: { label: "Command reference", href: "/reference/cli/commands/" } }) }}

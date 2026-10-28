@@ -162,5 +162,3 @@ Lock down every Deno task you ship with
 - [Add a task runtime adapter](/background-processing/how-to/add-a-task-runtime-adapter/): run a
   runtime NetScript does not ship.
 - {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}
-
-{{ comp.nextPrev({ prev: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" }, next: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" } }) }}

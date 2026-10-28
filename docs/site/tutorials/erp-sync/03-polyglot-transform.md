@@ -284,5 +284,3 @@ JSON-out process contract, a `defineTask` definition whose `.permissions(...)` c
 `--allow-*` flags on the spawned subprocess, and an executor run you observed end to end. You also
 saw the same stage in Python and the two rules for non-Deno runtimes: no sandbox, and the
 interpreter must exist. Next, the pipeline learns to absorb bursts and run on a schedule.
-
-{{ comp.nextPrev({ prev: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }, next: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" } }) }}

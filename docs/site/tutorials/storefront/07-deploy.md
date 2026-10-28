@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Run the storefront under Aspire
 templateEngine: [vento, md]
 prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
 # Run the storefront under Aspire
@@ -191,5 +191,3 @@ topology; for production, start from the Deploy guide below.
 - **Go deeper on the ideas** → [Durability model](/explanation/durability-model/),
   [Contracts & type flow](/explanation/contracts/), and [the plugin system](/explanation/plugin-system/).
 - **Solve a specific task** → the full [How-to guides](/how-to/).
-
-{{ comp.nextPrev({ prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

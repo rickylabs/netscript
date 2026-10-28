@@ -337,5 +337,3 @@ reads with `useIslandQuery` and begins checkout with `useIslandMutation`, all ke
 contracts as the backend. The [live-dashboard track](/tutorials/live-dashboard/03-sdk-cache-first-query/)
 takes these query utilities further, with cache-first reads and streamed updates. Next, you run the
 whole storefront under one `aspire start`.
-
-{{ comp.nextPrev({ prev: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" }, next: { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" } }) }}

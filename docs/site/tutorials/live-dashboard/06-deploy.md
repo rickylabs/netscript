@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Run the dashboard under Aspire
 templateEngine: [vento, md]
 prev: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
 # Run the dashboard under Aspire
@@ -193,5 +193,3 @@ view.
   contributions, and two-pass reference resolution; {{ comp.xref({ key: "cap:streams" }) }} and
   {{ comp.xref({ key: "cap:fresh-framework", text: "the Fresh meta-framework" }) }} back chapters 4
   and 5.
-
-{{ comp.nextPrev({ prev: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

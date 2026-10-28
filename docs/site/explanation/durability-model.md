@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Durability model
 templateEngine: [vento, md]
-prev: { label: "Auth model", href: "/explanation/auth-model/" }
-next: { label: "Observability", href: "/explanation/observability/" }
 order: 5
 ---
 
@@ -304,5 +302,3 @@ When the process dies mid-workflow:
   without editing host code.
 
 Next: build a saga in [Durable checkout](/tutorials/storefront/04-checkout-saga/).
-
-{{ comp.nextPrev({ prev: { label: "Auth model", href: "/explanation/auth-model/" }, next: { label: "Observability", href: "/explanation/observability/" } }) }}

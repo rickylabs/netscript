@@ -99,5 +99,3 @@ Start at chapter 1 and keep the same `my-dashboard/` through to chapter 6. For e
 [fresh](/reference/fresh/), [sdk](/reference/sdk/), [service](/reference/service/) and
 [streams](/reference/streams/) reference units back these chapters. After the track, the guides in
 **Build › [Web Layer](/web-layer/)** pick up where the chapters stop.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" } }) }}

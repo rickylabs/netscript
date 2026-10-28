@@ -79,5 +79,3 @@ These are architectural estimates for this generic product page, not benchmark r
 | Route-specific orchestration | ~175 LOC | ~190–225 LOC |
 | Files needed to see page behaviour | 1 | ~5–8 |
 | Architectural surface visible at entry | ~87–93% | ~40–53% |
-
-{{ comp.nextPrev({ prev: { label: "Comparisons", href: "/comparisons/" }, next: { label: "Backend frameworks", href: "/comparisons/backend/" } }) }}

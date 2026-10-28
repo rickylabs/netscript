@@ -210,5 +210,3 @@ A workers config that names a queue provider and a worker concurrency, so a SAP 
 drains with overlapping I/O, and a `defineScheduledTrigger` cron that enqueues the nightly
 re-sync. The sync now absorbs bursts and runs its recurring work unattended. Next, you run the
 whole pipeline under Aspire.
-
-{{ comp.nextPrev({ prev: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" }, next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" } }) }}

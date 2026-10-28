@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: MCP client
 templateEngine: [vento, md]
-prev: { label: "AI", href: "/ai/" }
-next: { label: "Durable chat", href: "/ai/durable-chat/" }
 order: 1
 ---
 

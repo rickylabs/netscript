@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Event triggers
 templateEngine: [vento, md]
-prev: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
-next: { label: "Durable streams", href: "/durable-workflows/streams/" }
 order: 2
 ---
 

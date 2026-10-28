@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Telemetry & logging
 templateEngine: [vento, md]
-prev: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
-next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
 order: 1
 ---
 
@@ -301,8 +299,3 @@ spans and read them in the dashboard.
   generated APIs.
 - [Telemetry conventions](/reference/telemetry/convention/): span naming, SpanKind and the
   `netscript.*` attribute rules.
-
-{{ comp.nextPrev({
-  prev: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" },
-  next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
-}) }}

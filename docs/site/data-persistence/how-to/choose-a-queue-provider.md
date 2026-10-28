@@ -241,5 +241,3 @@ Enqueue and consume on the backend you chose with
   HTTP trigger) instead of a raw queue.
 - {{ comp.xref({ key: "ref:queue" }) }}: the `QueueProvider` enum, `QueueConnectionOptions`,
   `ParallelQueueOptions`, the `MessageQueue` interface and the `QueueError` hierarchy.
-
-{{ comp.nextPrev({ prev: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" }, next: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" } }) }}

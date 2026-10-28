@@ -251,8 +251,3 @@ Restrict what each Deno task can reach with
 - {{ comp.xref({ key: "howto:choose-a-queue-provider" }) }}
 - {{ comp.xref({ key: "howto:run-a-polyglot-task" }) }}
 - {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}
-
-{{ comp.nextPrev({
-  prev: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" },
-  next: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }
-}) }}

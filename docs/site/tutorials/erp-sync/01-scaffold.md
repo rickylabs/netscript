@@ -190,5 +190,3 @@ Three checks cover most first-run problems: (1) is <code>aspire start</code> sti
 `my-erp/`, with the **workers** and **triggers** plugins installed and the stack (Postgres, Redis,
 both plugin APIs and their background processors) running under one `aspire start`. Next, you give
 it the SAP export to ingest.
-
-{{ comp.nextPrev({ prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }, next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" } }) }}

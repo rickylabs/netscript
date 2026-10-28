@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Typed SDK & client
 templateEngine: [vento, md]
-prev: { label: "Fresh meta-framework", href: "/web-layer/" }
-next: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }
 order: 2
 ---
 

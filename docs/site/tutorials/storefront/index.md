@@ -112,5 +112,3 @@ capability and ends with a command whose output you can check.
 Work the chapters in order. The `my-shop/` workspace you create in chapter 1 is the one you finish
 in chapter 7: each chapter starts by checking the state the previous one left. After the track, the
 guides in **Build › [Services & SDK](/services-sdk/)** pick up where these chapters stop.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" } }) }}

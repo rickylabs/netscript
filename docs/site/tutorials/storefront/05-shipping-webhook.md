@@ -301,5 +301,3 @@ secretEnv, ... })`, that rejects forged requests and enqueues a `process-shippin
 each accepted one. You confirmed the hand-off end to end: an event recorded on the triggers API and a
 worker execution on the workers API. The backend now covers catalog, cart, durable checkout and
 verified ingress. Next, you give it a storefront page.
-
-{{ comp.nextPrev({ prev: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" }, next: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" } }) }}

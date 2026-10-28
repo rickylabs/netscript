@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Plugin system
 templateEngine: [vento, md]
-prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }
-next: { label: "Auth model", href: "/explanation/auth-model/" }
 order: 3
 ---
 
@@ -251,5 +249,3 @@ plugin contributes its services, background processors, schemas, and topics thro
 vocabulary, each running as its own isolated resource.
 
 Next: install one with [Add a plugin](/orchestration-runtime/how-to/add-a-plugin/).
-
-{{ comp.nextPrev({ prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }, next: { label: "Auth model", href: "/explanation/auth-model/" } }) }}

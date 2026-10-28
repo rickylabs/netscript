@@ -5,8 +5,6 @@ description: Reject malformed messages before they enter a queue and again befor
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/build-a-validated-ingestion-queue/
-prev: { label: "Build a server-validated form", href: "/web-layer/how-to/build-a-server-validated-form/" }
-next: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" }
 ---
 
 # Build a validated ingestion queue

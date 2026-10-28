@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Architecture
 templateEngine: [vento, md]
-prev: { label: "Explanation", href: "/explanation/" }
-next: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 order: 1
 ---
 
@@ -274,5 +272,3 @@ broken by definition, which is why the published surface can be trusted as the p
 
 Next: [Contracts &amp; type flow]({{ "explain:contracts" |> xref }}) shows how types flow from a
 contract to a client.
-
-{{ comp.nextPrev({ prev: { label: "Explanation", href: "/explanation/" }, next: { label: "Contracts & type flow", href: "/explanation/contracts/" } }) }}

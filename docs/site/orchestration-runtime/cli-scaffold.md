@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: CLI & scaffold
 templateEngine: [vento, md]
-prev: { label: "Orchestration & Runtime", href: "/orchestration-runtime/" }
-next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" }
 order: 1
 ---
 

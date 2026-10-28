@@ -230,5 +230,3 @@ starting: wait a few seconds and retry.
 A NetScript workspace, `my-dashboard/`, with a Fresh app, an `orders` service on `:3002` and a
 Postgres database, all orchestrated by Aspire and visible at `:18888`. Next, you shape the `orders`
 read-model that the dashboard displays.
-
-{{ comp.nextPrev({ prev: { label: "Live Dashboard", href: "/tutorials/live-dashboard/" }, next: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" } }) }}

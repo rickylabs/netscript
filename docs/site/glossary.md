@@ -3,8 +3,6 @@ layout: layouts/base.vto
 title: Glossary
 description: The terms the NetScript docs use, with the symbol or command behind each one.
 templateEngine: [vento, md]
-prev: null
-next: { label: "CLI reference", href: "/cli-reference/" }
 ---
 
 # Glossary
@@ -81,5 +79,3 @@ and the moving parts under a running plugin.
   { name: "Prisma (Deno runtime)", type: "database/postgres/schema/", desc: "The ORM layer, over a choice of databases. You choose the engine at scaffold time with <code>--db</code>: <code>postgres</code> (the recommended default; Prisma provider <code>postgresql</code>), <code>mysql</code>, <code>mssql</code> (provider <code>sqlserver</code>), or <code>sqlite</code> (file-backed, with no Aspire container resource). The Prisma authoring model is the same for every engine. The root schema sets <code>generator client { runtime = \"deno\" }</code> plus a zod generator, and each plugin contributes its own <code>.prisma</code> models under <code>schema/plugins/&lt;plugin&gt;/</code>; the auth plugin installs <code>auth_users</code> / <code>auth_sessions</code> / <code>auth_accounts</code> / <code>auth_verifications</code>. Generate the typed client with <code>netscript db generate</code> once Aspire is up. See <a href=\"/capabilities/database/\">Capabilities → Database</a> and <a href=\"/reference/database/\">reference/database/</a>." },
   { name: "queue provider", type: "QueueProvider.Postgres", desc: "The transport that <code>createQueue('name', { provider })</code> binds to, one of <strong>four</strong> backends: Deno KV, Redis, RabbitMQ, and PostgreSQL (<code>provider: 'postgres'</code>, <code>connection.postgres.{url,tableName}</code>). Postgres is available only as an <em>explicit provider</em>: auto-discovery probes RabbitMQ, then Redis, then Deno KV, and never picks Postgres. See <a href=\"/capabilities/kv-queues-cron/\">Capabilities → KV / queues / cron</a> and <a href=\"/reference/queue/\">reference/queue/</a>." }
 ] }) }}
-
-{{ comp.nextPrev({ next: { label: "CLI reference", href: "/cli-reference/" } }) }}

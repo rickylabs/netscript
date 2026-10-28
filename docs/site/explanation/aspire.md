@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Orchestration with Aspire
 templateEngine: [vento, md]
-prev: { label: "Observability", href: "/explanation/observability/" }
-next: { label: "How NetScript's path compares", href: "/explanation/compared/" }
 order: 7
 ---
 
@@ -443,5 +441,3 @@ The default path has three more trade-offs:
 
 Next: [Deploy locally with Aspire]({{ "howto:deploy-local-aspire" |> xref }}) walks through the full
 local flow step by step.
-
-{{ comp.nextPrev({ prev: { label: "Observability", href: "/explanation/observability/" }, next: { label: "How NetScript's path compares", href: "/explanation/compared/" } }) }}

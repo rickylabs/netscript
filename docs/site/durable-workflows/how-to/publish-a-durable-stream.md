@@ -5,8 +5,6 @@ description: Publish server-owned entity state as a durable stream that browsers
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/publish-a-durable-stream/
-prev: { label: "Build a validated ingestion queue", href: "/durable-workflows/how-to/build-a-validated-ingestion-queue/" }
-next: { label: "Restrict worker task permissions", href: "/background-processing/how-to/restrict-worker-task-permissions/" }
 ---
 
 # Publish a durable stream

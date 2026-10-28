@@ -353,6 +353,3 @@ Prisma-generated schemas, Prisma-backed handlers bound through `v1.products.$con
 a `defineService` entry point on port **3001**. Your one change, `errors.NOT_FOUND(...)`, turned a
 `500` into a typed `404`. Next, you apply the same contract-first loop to a domain that doesn't exist
 yet: a shopping cart.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" },
-next: { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" } }) }}

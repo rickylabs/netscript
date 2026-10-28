@@ -301,5 +301,3 @@ wrapped in a `QueryIsland` and mounted by a `definePage` page whose `.withResour
 streams address. State that entered the store through a saga publish arrived in an already-open page
 with no polling, refetch or reload, and each later transition updates the same row. Next, you run
 the whole graph locally under Aspire.
-
-{{ comp.nextPrev({ prev: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }, next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" } }) }}

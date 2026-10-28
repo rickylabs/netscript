@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Run the team workspace under Aspire
 templateEngine: [vento, md]
 prev: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
 # Run the team workspace under Aspire
@@ -169,5 +169,3 @@ scoping as an app-level extension.
   [The authentication model](/explanation/auth-model/).
 - **Understand the orchestrator** → [Orchestration with Aspire](/explanation/aspire/).
 - **Browse more recipes** → the [how-to guides](/how-to/).
-
-{{ comp.nextPrev({ prev: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

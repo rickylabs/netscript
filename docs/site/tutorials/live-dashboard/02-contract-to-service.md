@@ -255,5 +255,3 @@ A typed `orders.list` read-model: an oRPC contract (`@orpc/contract` and Zod), a
 handler bound with `.handler(...)`, and a service running on port **3002** through `defineService`,
 with its `/api/rpc/*` surface and `/api/v1/orders/*` OpenAPI projection. Next, you read this service
 from the Fresh app through a typed SDK client and a cache-first query layer.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" }, next: { label: "3 · Cache-first query", href: "/tutorials/live-dashboard/03-sdk-cache-first-query/" } }) }}

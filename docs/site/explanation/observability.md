@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Observability model
 templateEngine: [vento, md]
-prev: { label: "Durability model", href: "/explanation/durability-model/" }
-next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
 order: 6
 ---
 
@@ -199,5 +197,3 @@ compliance-grade write-once log. For how auth itself is shaped, see
   Aspire.
 
 Next: add a custom span and structured logs with [Add OpenTelemetry](/observability/how-to/add-opentelemetry/).
-
-{{ comp.nextPrev({ prev: { label: "Durability model", href: "/explanation/durability-model/" }, next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" } }) }}

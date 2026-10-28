@@ -272,5 +272,3 @@ With the app running:
 Give the UI a typed backend with [Add a service](/services-sdk/how-to/add-a-service/). See also
 [Fresh UI & design](/web-layer/fresh-ui/), the [`@netscript/fresh-ui` reference](/reference/fresh-ui/),
 and the [contracts explanation](/explanation/contracts/).
-
-{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" }, next: { label: "Build a durable chat", href: "/ai/how-to/build-a-durable-chat/" } }) }}

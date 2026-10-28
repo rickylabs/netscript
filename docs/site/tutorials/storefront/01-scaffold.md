@@ -242,5 +242,3 @@ the start command usually succeeds. Without a browser, inspect failures with the
 A NetScript workspace, `my-shop/`: a shared `contracts/` workspace, a `products` service, a Fresh
 app, and a Postgres database plus Redis cache, all orchestrated by Aspire and visible in one
 dashboard. Next, you read the `products` service as a typed catalog and give it a typed 404.
-
-{{ comp.nextPrev({ prev: { label: "Storefront", href: "/tutorials/storefront/" }, next: { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" } }) }}

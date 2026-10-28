@@ -5,8 +5,6 @@ description: Bring up the whole resource graph on one machine from the generated
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/deploy-local-aspire/
-prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }
-next: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" }
 ---
 
 # Deploy locally with Aspire

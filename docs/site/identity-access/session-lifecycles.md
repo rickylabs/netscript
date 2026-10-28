@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Session lifecycles
 templateEngine: [vento, md]
-prev: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" }
-next: null
 order: 3
 ---
 

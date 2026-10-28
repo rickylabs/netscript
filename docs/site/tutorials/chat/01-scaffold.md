@@ -152,5 +152,3 @@ Three checks cover most first-run problems: (1) is <code>aspire start</code> sti
 A `chat-app/` workspace with a Fresh app, the streams runtime for durable sessions and your model
 key wired to the app process, all orchestrated by Aspire. Next, you wire the durable chat route
 that turns a prompt into a persisted, streamed reply.
-
-{{ comp.nextPrev({ prev: { label: "AI Chat", href: "/tutorials/chat/" }, next: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" } }) }}

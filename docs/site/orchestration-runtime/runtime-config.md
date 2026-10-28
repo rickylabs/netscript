@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Runtime configuration
 templateEngine: [vento, md]
-prev: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }
-next: { label: "Capabilities", href: "/capabilities/" }
 order: 2
 ---
 

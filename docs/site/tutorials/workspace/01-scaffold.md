@@ -185,5 +185,3 @@ A NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`
 a Postgres database and a Redis cache, all orchestrated by Aspire and visible in one dashboard. The
 service still answers anyone. Next, you add an identity layer so the app can tell a team member from
 a stranger.
-
-{{ comp.nextPrev({ prev: { label: "Team Workspace", href: "/tutorials/workspace/" }, next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" } }) }}

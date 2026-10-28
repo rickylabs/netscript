@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Authentication
 templateEngine: [vento, md]
-prev: { label: 'Fresh UI & design', href: '/web-layer/fresh-ui/' }
-next: { label: 'better-auth plugins', href: '/identity-access/better-auth-plugins/' }
 order: 1
 ---
 
@@ -349,5 +347,3 @@ and signs in through the generated app.
 - [better-auth plugins](/identity-access/better-auth-plugins/): mount better-auth plugins and
   protect a route with the resolved session.
 - {{ comp.xref({ key: "ref:plugin-auth" }) }}: the API reference for the auth packages.
-
-{{ comp.nextPrev({ prev: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }, next: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" } }) }}

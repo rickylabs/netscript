@@ -70,5 +70,3 @@ These are architectural estimates for this generic report endpoint, not benchmar
 | Consumer client after a contract change | Imported directly | Regenerated or hand-updated |
 | Files touched to add one required request field | ~2 | ~3–5 |
 | Architectural surface visible at entry | ~87–93% | ~40–53% |
-
-{{ comp.nextPrev({ prev: { label: "Frontend frameworks", href: "/comparisons/frontend/" }, next: { label: "Comparisons", href: "/comparisons/" } }) }}

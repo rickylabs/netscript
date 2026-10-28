@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Background jobs
 templateEngine: [vento, md]
-prev: { label: "Services & contracts", href: "/services-sdk/services/" }
-next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
 order: 1
 ---
 
@@ -419,8 +417,3 @@ Build and trigger a job inside a running app in [ERP Sync, lesson 02](/tutorials
   same queue.
 - {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}: every exported symbol, type
   and subpath.
-
-{{ comp.nextPrev({
-  prev: { label: "Services & contracts", href: "/services-sdk/services/" },
-  next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
-}) }}

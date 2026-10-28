@@ -3,8 +3,6 @@ layout: layouts/base.vto
 title: AI
 description: The AI engine, MCP client, durable chat, chat UI, and tooling for coding agents.
 templateEngine: [vento, md]
-prev: null
-next: { label: "MCP", href: "/ai/mcp/" }
 ---
 
 # AI

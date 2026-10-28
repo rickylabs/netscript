@@ -93,5 +93,3 @@ The track uses Postgres, the default; you can swap `--db postgres` for `mysql`, 
 
 When you finish, the [Background jobs](/background-processing/) guides pick up where the track
 stops. Start with chapter 1.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" } }) }}

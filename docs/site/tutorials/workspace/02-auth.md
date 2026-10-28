@@ -289,5 +289,3 @@ An identity layer for your workspace: the `auth` plugin composed onto the intera
 backend, the `auth.prisma` migration applied, and the `auth-api` service answering on `:8094` with
 the five-route contract. The app can now tell a signed-in team member from a stranger. Next, you give
 it something to protect: an isolated database for team records.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }, next: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" } }) }}

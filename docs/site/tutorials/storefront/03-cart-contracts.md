@@ -312,5 +312,3 @@ created the contract and its routes (`netscript contract add` and `contract add-
 regenerated `contracts/versions/v1/mod.ts`, and a typed `@orpc/client` derived from the contract alone
 type-checks with no codegen. Next, that contract feeds checkout, which you make reliable with a
 durable saga.
-
-{{ comp.nextPrev({ prev: { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" }, next: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" } }) }}

@@ -152,5 +152,3 @@ calls through this client, and a missing `services__orders__http__0` shows up th
 A typed `ordersClient` and a cache-first `ordersQueries` query layer, both derived from the chapter 2
 contract, with service discovery resolving the URL. Next, you render the table with NetScript's
 `definePage` builder and a `QueryIsland` that hydrates these query helpers in the browser.
-
-{{ comp.nextPrev({ prev: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" }, next: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" } }) }}

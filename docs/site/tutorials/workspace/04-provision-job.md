@@ -216,5 +216,3 @@ Aspire resource. Run <code>aspire start</code> from <code>aspire/</code> and ret
 A `provision-member` background job that writes a workspace membership off the request path,
 triggered through the Workers API and visible in the Aspire dashboard. The `workspace` service itself
 still answers anyone who asks. Next, you make its routes fail closed.
-
-{{ comp.nextPrev({ prev: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" }, next: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" } }) }}

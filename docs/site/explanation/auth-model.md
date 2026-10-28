@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Auth model
 templateEngine: [vento, md]
-prev: { label: 'The plugin system', href: '/explanation/plugin-system/' }
-next: { label: 'Durability model', href: '/explanation/durability-model/' }
 order: 4
 ---
 
@@ -204,5 +202,3 @@ triggers, using service identities.
 
 Next: [Add authentication](/identity-access/how-to/add-authentication/) installs the plugin, picks a
 backend, and covers the generated routes, local cookie behavior, and deployment limits.
-
-{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}

@@ -175,5 +175,3 @@ A server-side tool the model can call inside the same `authorize`-gated turn. It
 citations render as a `tool-call-card` stored in the durable transcript, so the card survives a
 reload. Next, you connect the chat to a remote MCP server and render the `ui://` widgets its
 tools return.
-
-{{ comp.nextPrev({ prev: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }, next: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" } }) }}
