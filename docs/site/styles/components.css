@@ -487,11 +487,35 @@
 .ns-prose .ns-api-table code {
   padding: 0;
   background: none;
-  font: 400 12px/20px var(--ns-font-mono);
+  font: 400 13px/21px var(--ns-font-mono);
+  color: var(--ns-fg);
   overflow-wrap: anywhere;
 }
+.ns-api-table__name,
 .ns-api-table__type {
-  color: var(--ns-muted-fg);
+  color: var(--ns-fg);
+}
+.ns-api-kind {
+  display: inline-block;
+  width: fit-content;
+  padding: 1px 6px;
+  margin-bottom: 4px;
+  border: 1px solid currentColor;
+  border-radius: var(--ns-radius-badge);
+  font: 400 11px/18px var(--ns-font-mono);
+  white-space: nowrap;
+}
+.ns-api-kind:is([data-kind="class"], [data-kind="interface"]) {
+  color: var(--ns-info-text);
+  background: var(--ns-info-subtle);
+}
+.ns-api-kind:is([data-kind="function"], [data-kind="method"], [data-kind="component"]) {
+  color: var(--ns-success-text);
+  background: var(--ns-success-subtle);
+}
+.ns-api-kind:is([data-kind="type"], [data-kind="enum"], [data-kind="const"], [data-kind="variable"]) {
+  color: var(--ns-warning-text);
+  background: var(--ns-warning-subtle);
 }
 .ns-api-table__desc {
   font-size: 14px;

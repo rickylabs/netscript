@@ -39,3 +39,13 @@ PASS, same independent Claude evaluator after the one plan correction. Baseline 
 Slice review initial FAIL_FIX: internal gallery was indexed as public documentation. Fixed once by marking internal pages noindex/ignored in Pagefind, omitting twin links and skipping AI twin/index emission. Added real Pagefind and output assertions. Re-review pending.
 
 Slice 1 final review PASS (same independent reviewer). Expanded browser run 20/20 passes, including real Pagefind exclusion; links: 24,011 links across 252 pages, all resolve. Browser formatting uses docs/site/deno.json. Sign-off commit prepared only after this substantive independent review.
+
+## Slice 2 — API tables
+
+- Ordinary reference Markdown Kind columns and optional object-row kind fields now render small monospace tags with visible labels; recognized aliases include typeAlias/type alias and constants. Names and signatures use full foreground and readable monospace size. Real database reference joins screenshot matrix.
+- Gates: docs build exit 0; structured tooling check/lint/fmt and standalone _config.ts check exit 0; 16/16 reference/style-policy browser checks pass with four zero-blocking axe audits. Initial build caught unsupported server-DOM replaceChildren; fixed using textContent + appendChild before the successful build.
+- Reconcile: no lock/dependency/API changes. Existing status-token tag paint is intermediate until the locked slice 6 mapping. Independent review pending.
+
+Slice 2 initial review FAIL_FIX: preserve existing generic component tables and lock component kind to syntax function in slice 6. Fixed once, with a real Official plugins table regression assertion and explicit plan/drift mapping.
+
+Slice 2 final independent review PASS after the single repair. Post-repair docs build exit 0 and all 16/16 reference/style browser checks pass. Generic plugin-table regression covered in every project. Sign-off authorized by the independent review; reconcile against current head is clean within declared scope.

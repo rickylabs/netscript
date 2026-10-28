@@ -12,7 +12,7 @@ const SITE = resolve(REPO, 'docs/site/_site');
 const ROUTES = [
   { kind: 'home', path: './' },
   { kind: 'article', path: 'web-layer/fresh-ui/' },
-  { kind: 'reference', path: 'cli-reference/' },
+  { kind: 'reference', path: 'reference/database/' },
   { kind: 'design-system', path: 'design-system/' },
   { kind: 'callouts', path: 'internal/callouts/' },
   { kind: 'search', path: 'web-layer/fresh-ui/' },
@@ -693,4 +693,35 @@ test('internal galleries stay out of search and agent documentation', async ({ p
     return result.results.length;
   });
   expect(matches).toBe(0);
+});
+
+test('API reference: visible kind tags and full-contrast names and signatures', async ({ page }) => {
+  await visit(page, 'reference/database/');
+  const tags = page.locator('.ns-api-kind');
+  expect(await tags.count()).toBeGreaterThan(10);
+  for (const kind of ['class', 'function', 'interface', 'type']) {
+    await expect(page.locator(`.ns-api-kind[data-kind="${kind}"]`).first()).toBeVisible();
+  }
+  const contrast = await page.locator('.ns-api-table__name, .ns-api-table__type').evaluateAll(
+    (cells) => {
+      const probe = document.createElement('span');
+      document.body.append(probe);
+      probe.style.color = 'var(--ns-fg)';
+      const foreground = getComputedStyle(probe).color;
+      probe.remove();
+      return cells.every((cell) =>
+        getComputedStyle(cell).color === foreground &&
+        [...cell.querySelectorAll('code')].every((code) =>
+          getComputedStyle(code).color === foreground
+        )
+      );
+    },
+  );
+  expect(contrast).toBe(true);
+  await visit(page, 'orchestration-runtime/how-to/add-a-plugin/');
+  const plugins = page.locator('.ns-api-table').filter({
+    has: page.locator('caption', { hasText: 'Official plugins' }),
+  });
+  await expect(plugins).toHaveAttribute('data-variant', 'generic');
+  await expect(plugins.locator('.ns-api-kind')).toHaveCount(0);
 });

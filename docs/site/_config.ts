@@ -13,6 +13,7 @@ import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
 import { getDocsLane } from './_data.ts';
+import { apiKind } from '../../tools/docs-site/api-kinds.ts';
 import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
 
 /**
@@ -77,6 +78,7 @@ site.addEventListener('beforeBuild', async () => {
 //   {{ "cap:services" |> xref }}
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
+site.filter('apiKind', apiKind);
 // Inline presentation inherits the page scheme; the original SVG remains available to twins.
 site.filter('utilityDiagram', (src: string, alt: string) => {
   if (!/^\/assets\/diagrams\/[a-z0-9-]+\.svg$/.test(src)) {
@@ -161,6 +163,37 @@ site.addEventListener('afterRender', () => {
         !svg || svg.getAttribute('aria-label') !== image.getAttribute('alt')
       ) {
         throw new Error(`Diagram source or accessible name missing on ${sourceUrl}`);
+      }
+    }
+    // Reference Markdown tables and the component share one visible kind-tag anatomy.
+    for (const table of document.querySelectorAll('.ns-prose table')) {
+      if (table.classList.contains('ns-api-table')) continue;
+      const headings = [...table.querySelectorAll('thead th')];
+      const kindColumn = headings.findIndex((head) => head.textContent?.trim() === 'Kind');
+      if (kindColumn < 0) continue;
+      const rows = [...table.querySelectorAll('tbody tr')];
+      if (!rows.some((row) => apiKind(row.querySelectorAll('td')[kindColumn]?.textContent))) {
+        continue;
+      }
+      table.classList.add('ns-api-table');
+      table.setAttribute('data-variant', 'symbols');
+      for (const row of rows) {
+        const cells = [...row.querySelectorAll('td')];
+        for (const [index, cell] of cells.entries()) {
+          const column = headings[index]?.textContent?.trim();
+          if (column === 'Symbol' || column === 'Name') cell.classList.add('ns-api-table__name');
+          if (column === 'Signature' || column === 'Type') cell.classList.add('ns-api-table__type');
+        }
+        const cell = cells[kindColumn];
+        const label = cell?.textContent?.trim();
+        const kind = apiKind(label);
+        if (!cell || !kind) continue;
+        const tag = document.createElement('span');
+        tag.className = 'ns-api-kind';
+        tag.setAttribute('data-kind', kind);
+        tag.textContent = label ?? kind;
+        cell.textContent = '';
+        cell.appendChild(tag);
       }
     }
     const headingIds = new Set(
