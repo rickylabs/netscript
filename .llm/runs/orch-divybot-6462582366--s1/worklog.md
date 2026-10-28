@@ -127,3 +127,18 @@ The owner reported `build: FAILURE` after the output push. The failed Pages job 
 - Checks supervisor round1: FAIL_FIX on new destructive-hover being labelled inherited. Fixed with existing red-6 and removed two exclusions. The fix-round complete package suite209 PASS, frozen token quality PASS (406 exact exclusions), and scoped type/lint/fmt PASS. The new legacy-eligibility regression covers every remaining NS One exclusion. Same-session fix review follows.
 
 - Independent checks supervisor fix-round verdict: PASS. It accepts the389 Figma and17 inherited S0 exact exclusions and verifies the new-gap eligibility regression. Reconciled against parent23cdce92: this slice includes names/contrast enforcement, necessary new-gap alias corrections, regenerated outputs and run evidence; CLI/migration remain separate. Sign-off commit and push follow.
+
+## Slice 4 — CLI contract before implementation
+
+- MCP consulted again through the real local server: find_guidance/search_docs identify the CLI command references; find_export locates FileSystemPort on the public scaffolding/testing surfaces. Reuse that port and the existing Fresh app-root resolver.
+- Public surface: `netscript tokens init|build|clean`, with `--app` and `--project-root`; init/build accept a preset, build accepts an explicit app-relative semantic override, init has explicit force for existing configuration/source copies.
+- Domain: `tokens.config.json` version1 selects a preset, optional sourceRoot and override. Init writes the bundled DTCG sources to `tokens/source/` and an alias-only last layer at `tokens/semantic.tokens.json`. Build can use bundled sources before init, preserves an existing generated theme preset, and writes only the five web artifacts under assets. Clean removes only those known generated files.
+- Ports: FileSystemPort and a lazy token-engine port. The adapter calls only the public fresh-ui/tokens API. Canonical DTCG types cross the type-only boundary; the library owns schema/alias/type/name/cycle validation. No process spawn or Deno filesystem calls in feature/application logic.
+- Constants: named config/source/override/assets paths and config version. App-relative paths stay inside the selected Fresh app; no guessed multi-app target and no workspace-root writes.
+- Validation: controller/help/registry tests, filesystem-flow tests for no overwrite/no partial output on validation failure/known-file cleanup, and actual scaffold init/build/clean with a semantic radius override. Update the command references and run their audit before pushing. Full runtime E2E remains the migration/final pass.
+- Deferred: public Figma round-trip CLI and general token-editor UI. Package builder already returns Figma/registry outputs; these commands manage a consuming application's web artifacts.
+- Contributor entry remains packages/fresh-ui/tokens/README.md, with CLI usage linked from the command references.
+
+- CLI implementation and focused gates PASS: 14 tests, frozen structured check, explicit-coverage lint/fmt, repository quality receipt, CLI publish dry-run and docs accuracy/snippets. Actual scaffold init/build/clean proved final semantic alias propagation and raw-value rejection without changing any existing output bytes. Full details are in slice-4-cli.md. Same-session supervisor review follows before sign-off and push.
+
+- Independent CLI supervisor verdict: PASS, no blockers. Reconciled against25a53198; this slice adds commands/docs/tests and no migration edits. Supervisor authorizes the sign-off commit and push. Nonblocking limits (lexical containment, sequential writes, publication-version coordination) remain explicit in slice-4-review.md. Review-thread gate PASS, zero threads.

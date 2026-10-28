@@ -21,6 +21,20 @@ Deno.test('public root command reports the package version', () => {
   assertEquals(command.getVersion() === '1.0.0', false);
 });
 
+Deno.test('public root composes the token build, clean and init commands', () => {
+  const host = { cwd: () => Deno.cwd(), resolvePath: (path?: string) => path ?? Deno.cwd() };
+  const dependencies = createPublicCommandDependencies(host);
+  const root = createPublicCommandRegistry().program({
+    name: 'netscript',
+    version: 'test',
+    description: 'test',
+    context: { host, dependencies },
+  });
+  const tokens = root.getCommands().find((entry) => entry.getName() === 'tokens');
+  assert(tokens);
+  assertEquals(tokens.getCommands().map((entry) => entry.getName()), ['build', 'clean', 'init']);
+});
+
 Deno.test('public generate group exposes resource fourth with composed dependencies and exact help', () => {
   const host = {
     cwd: () => Deno.cwd(),

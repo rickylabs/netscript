@@ -42,3 +42,9 @@ project run area. Final READY is written atomically to .divybot-final-report.md
 only when all work is done; the earlier stopped report was archived privately.
 
 Checks review round1 found destructive-hover was a new gap, not inherited. It now aliases red-6, its two exclusions are removed, and a regression verifies every NS One exclusion is truly legacy or an exact component alias. Full fix-round gates pass; same-session fix review returned PASS.
+
+## CLI candidate on parent25a53198
+
+See slice-4-cli.md for the command contract and all gate evidence. New tokens init/build/clean are composed into the root and use FileSystemPort plus lazy TokenEnginePort. Focused tests14 PASS, actual scaffold override/negative/cleanup proof PASS. Root quality and publish dry-run PASS; docs census97 and recursive162 verified without exemptions. Independent same-session CLI review is next. Migration/font/root attributes/design route/browser/full runtime remain untouched by this slice.
+
+CLI slice is terminal PASS (slice-4-review.md), ready for supervisor-authorized sign-off commit/push. Next authorized slice is migration: token-driven fonts/root attributes/design model, browser/axe proof, then final full runtime and IMPL-EVAL.

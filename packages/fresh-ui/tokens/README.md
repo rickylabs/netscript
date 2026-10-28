@@ -126,3 +126,35 @@ The package tests invoke the real checker for all three controls. A separate
 policy regression rejects unpaired roles, missing focus checks, weakened text
 thresholds and stale exclusions. `tokens:report` emits JSON on stdout; the normal
 validation task also prints its source-freshness preflight.
+
+## Consuming app commands
+
+From a NetScript workspace, select an app with `--app dashboard` (or point
+`--project-root` to the Fresh app itself):
+
+```sh
+netscript tokens init --app dashboard --preset studio-utility
+netscript tokens build --app dashboard
+netscript tokens clean --app dashboard
+```
+
+Init copies the eight bundled DTCG source documents into `tokens/source/`, writes
+`tokens.config.json`, and creates `tokens/semantic.tokens.json`. Existing copies
+require explicit `--force`. Edit the final alias layer, for example:
+
+```json
+{
+  "semantic": {
+    "radius-md": { "$type": "dimension", "$value": "{semantic.radius-lg}" }
+  }
+}
+```
+
+Build validates all contexts before writing the five web assets. The public
+builder owns DTCG, alias, reference, type and name validation. CLI application
+logic uses the existing filesystem port; its lazy engine adapter imports this
+package's public `tokens` entrypoint only for token commands. Clean retains app
+styles, settings, overrides and source copies. Build also works before init using
+bundled sources, retaining an installed registry preset and detecting the
+conventional override when present. The detailed command reference documents
+configuration and explicit override precedence.

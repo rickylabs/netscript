@@ -17,7 +17,7 @@ installed on your PATH — not any maintainer-only tree. Everything here is veri
 `netscript --help` or `netscript <group> --help`.
 
 The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, `generate`,
-`marketplace`, `plugin`, `service`, and the `ui:*` commands — each has a section below.
+`marketplace`, `plugin`, `service`, `tokens`, and the `ui:*` commands — each has a section below.
 
 ## `init` — scaffold a workspace
 
@@ -286,6 +286,40 @@ require Aspire to be running (`cd aspire && aspire start`) unless you scaffolded
 | `netscript db deploy`             | Apply pending migrations without creating one. Flags: `--db <target>` (config key, database name, or `all`), `--project-root <path>`.                                             |
 | `netscript db validate`           | Validate database schemas. Flags: `--db <target>`, `--project-root <path>`.                                                                                                       |
 | `netscript db resolve`            | Resolve migration history state. Flags: `--db <target>`, `--project-root <path>`, `--applied <migration>` (mark as applied), `--rolled-back <migration>` (mark as rolled back).   |
+
+## `tokens` — Fresh application design tokens
+
+All three commands select a Fresh app with `--app <name>` from a workspace, or an explicit
+`--project-root <path>` pointing to the app. Multiple apps require an explicit selection.
+
+| Command | Description |
+| --- | --- |
+| `netscript tokens init` | Copy the editable DTCG sources, `tokens.config.json`, and an empty semantic override. Flags: `--preset <id>` (NS One by default), `--force` (replace existing token sources and settings). |
+| `netscript tokens build` | Validate and compile five web assets into the app's `assets/`. Flags: `--preset <id>` (override app settings), `--override <path>` (app-relative semantic alias layer applied last). |
+| `netscript tokens clean` | Remove only `tokens.css`, `theme-bridge.css`, `tokens.json`, `fonts.json`, and `theme-preset.json` from `assets/`. Keep app CSS, settings and source documents. |
+
+Build works with bundled sources before initialization and retains the app's installed registry
+preset. Initialization creates a version 1 `tokens.config.json` with `preset`, `sourceRoot`, and
+`override`. Configured source and override paths must exist and stay inside the selected app.
+The `sourceRoot` contains the single `tokens.resolver.json` and its referenced DTCG documents.
+Omitting it uses bundled sources. A configured override is mandatory; before initialization, build
+also detects the conventional `tokens/semantic.tokens.json` when present.
+
+An override may only reassign existing semantic roles to aliases of the same type. Raw values,
+primitive/component edits, unknown roles, metadata edits and reference cycles fail before any
+generated asset is replaced. For example, `tokens/semantic.tokens.json` can contain:
+
+```json
+{
+  "semantic": {
+    "radius-md": { "$type": "dimension", "$value": "{semantic.radius-lg}" }
+  }
+}
+```
+
+Run `netscript tokens build --app dashboard` after editing it. The component aliases and all
+serialized outputs inherit the final semantic choice. See the package's `tokens/README.md` for
+the source and output extension contract.
 
 ## `ui:*` — Fresh UI registry
 
