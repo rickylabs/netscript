@@ -41,3 +41,18 @@ FAIL_PLAN: preset persistence/only filtering, managed asset hashes, removal lock
 - Reconcile: #2415 remains open, draft #2468 carries only a reference. No labels or milestones changed on the issue, no merge/tag/release, and no unrelated resources started or mutated.
 
 Final full Fresh UI doc-lint: 123 errors (96 private type references, 27 missing docs), in unchanged runtime component sources. Both changed registry entrypoints individually exit 0. Final quality/architecture reruns exit 0.
+
+## Authorized continuation
+
+The next user instruction resumes the full goal: "Continue working toward the active thread goal" and "Keep the full objective intact." Previous turn classification: progress (schema implementation and pushed evidence), but the objective remains incomplete. The continuation authorizes a new implementation/review cycle from `cdbbe24`; historical review verdicts remain intact and no earlier PASS is invented. The subsequent user instruction requires addressing failed CI while completing S2. The draft remains open; no merge or release is authorized.
+
+CI failure inspected at run 40756074834 / build job: docs:exports-drift reports twelve new registry symbols absent from the Fresh UI reference. Added the new subpath and all exported symbols to the existing reference page, preserving complete coverage.
+
+## Slice 2 — static registry build and CI documentation repair
+
+- `buildRegistry` returns deterministic static index and per-item JSON after validating all source/includes, detecting cycles and duplicate ids, and reading exact source bytes. CLI ui:build preflights sources and output paths, including physical symlink containment, before any write.
+- Docs build now publishes `_site/r/registry.json` and all 86 item payloads through its normal build task. Real CLI and docs build:registry both exit 0 and produce 87 JSON artifacts.
+- Focused structured tests: exit 0, 11 passed / 0 failed / 0 skipped. Structured check traversing the CLI root/new build test/registry export: 3 selected, 0 failures. Lint/format: 11 selected and processed, 0 dropped/refused, exit 0. Registry entrypoint doc-lint, quality:scan, arch:check and docs:exports-drift all exit 0.
+- Independent same-session reviewer: PASS; see slice-2-review.md. The reviewer inspected source/tests but did not independently execute commands, as required by the read-only tool restriction.
+- CI repair: the failed Pages build reported missing registry exports in the Fresh UI reference. All twelve symbols plus build APIs and the eighth subpath are now documented. The exact failing docs:exports-drift command exits 0 locally.
+- Reconcile: draft #2468 remains open from main, no label changes; full S2 scope is active under user continuation. No component source modifications. The pending work is config/lock/remote commands, style+docs/preset, and MCP.

@@ -12,7 +12,7 @@ the [reference overview](/reference/).
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
 components and islands remain on workspace-local deep paths so applications can own and evolve them
 after copy. The root module exposes only the supported helper utilities that are safe to consume as
-package runtime dependencies. Seven sub-path exports carry runtime seams and build tooling:
+package runtime dependencies. Eight sub-path exports carry runtime seams and build tooling:
 
 - [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for
   validated tool payloads.
@@ -22,6 +22,7 @@ package runtime dependencies. Seven sub-path exports carry runtime seams and bui
 - [`@netscript/fresh-ui/primitives`](#sub-path-exports) — L0 platform-contract primitives.
 - [`@netscript/fresh-ui/registry`](#sub-path-exports) — embedded copy-registry manifest and file
   content.
+- [`@netscript/fresh-ui/registry-v2`](#registry-protocol) — portable JSON registry contracts and validation.
 - [`@netscript/fresh-ui/token-config`](#token-build-tooling) — lightweight file and preset metadata without the compiler.
 - [`@netscript/fresh-ui/tokens`](#token-build-tooling) — DTCG sources, language presets and the
   Style Dictionary builder for CLI and build tooling.
@@ -410,6 +411,24 @@ manifest without reading package files at runtime.
 | `FRESH_UI_REGISTRY_CONTENT`                                                                                    | const             | Embedded file-content lookup referenced by manifest entries.                             |
 | `FreshUiRegistryCollection` / `FreshUiRegistryCssContribution` / `FreshUiRegistryFile` / `FreshUiRegistryItem` | interfaces        | Collection, stylesheet contribution, file, and item contracts that make up the manifest. |
 
+## Registry protocol
+
+`@netscript/fresh-ui/registry-v2` validates source catalogs and individual items against pinned
+published shadcn JSON schemas. The canonical `registry.json` also supplies the compatibility
+manifest on `@netscript/fresh-ui/registry`.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `freshUiRegistryJson` | const | Canonical Fresh UI JSON catalog, available on `/registry`. |
+| `REGISTRY_ITEM_TYPES` / `RegistryItemType` | const / type | The twelve supported `registry:*` item categories. |
+| `Registry` / `RegistryItem` | interfaces | Portable catalog and individual item contracts. |
+| `RegistryFile` / `RegistryFont` | interfaces | File payload and font-provider metadata. |
+| `RegistryCss` | type | Nested CSS properties, selectors and at-rules. |
+| `REGISTRY_SCHEMA_URL` / `REGISTRY_ITEM_SCHEMA_URL` | constants | Published schema URIs used by source catalogs and built items. |
+| `validateRegistry` | function | Validates a catalog and rejects duplicate or unsafe item names. |
+| `validateRegistryItem` | function | Validates one untrusted item before installation or publication. |
+| `buildRegistry` / `RegistryBuildInput` | function / interface | Reads contained source files and returns deterministic static catalog and item JSON bytes. |
+
 ## Token build tooling
 
 `@netscript/fresh-ui/tokens` builds the DTCG 2025.10 three-tier contract through Style Dictionary
@@ -503,6 +522,7 @@ The following 7 entrypoints are published as declared in the package export map:
 | `@netscript/fresh-ui/interactive`  | `./interactive.ts`       | Package-owned interactive compound namespaces (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` — documented above). |
 | `@netscript/fresh-ui/primitives`   | `./primitives.tsx`       | L0 platform-contract primitives (`Show`, `VisuallyHidden`, `SrOnly` — documented above).                                                   |
 | `@netscript/fresh-ui/registry`     | `./registry.ts`          | Embedded Fresh UI copy-registry manifest and file content (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`).                        |
+| `@netscript/fresh-ui/registry-v2` | `./registry-v2.ts` | Portable registry contracts, schema URIs and JSON validation. |
 | `@netscript/fresh-ui/token-config` | `./token-config.ts` | Lightweight APP_TOKEN_FILES, PREVIEW_TOKEN_FILES and TOKEN_PRESETS metadata, with no Style Dictionary or source corpus. |
 | `@netscript/fresh-ui/tokens`       | `./tokens.ts`            | DTCG sources, language presets and the IO-free Style Dictionary token builder. |
 

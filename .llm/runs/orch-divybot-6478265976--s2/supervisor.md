@@ -10,3 +10,5 @@
 - Owner evaluator override (verbatim): "Run PLAN-EVAL before implementing and IMPL-EVAL after, both with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once, record both verdicts."
 - Evaluators: separate Anthropic sessions, preserving evaluator sessions across repair rounds. No implementation self-certification.
 - Owner public-surface constraints: no label changes, force pushes, merge, tags or release. Refs-only issue reference takes precedence over generic assignment closing-keyword boilerplate.
+
+Continuation write surface also includes `docs/site/reference/fresh-ui/index.md` for export parity, `.llm/tools/generate-cli-assets-barrel.ts` for the approved doc carrier, CLI root feature composition/dependencies, and narrowly scoped UI registry transport/path ports.

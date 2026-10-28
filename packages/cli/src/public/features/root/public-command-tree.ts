@@ -1,3 +1,4 @@
+import { createUiBuildCommand } from '../ui/build/build-ui-command.ts';
 import { CliCommandRegistry } from '../../composition/cli-command-registry.ts';
 import { contractCommand } from '../contracts/contracts-group.ts';
 import { createDbCommand } from '../db/db-group.ts';
@@ -92,6 +93,15 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
   registry.register('tokens', {
     id: 'tokens',
     create: ({ dependencies }) => createTokensCommand(dependencies),
+  });
+  registry.register('ui:build', {
+    id: 'ui:build',
+    create: ({ host, dependencies }) =>
+      createUiBuildCommand({
+        fs: dependencies.fs,
+        paths: dependencies.uiRegistryPaths,
+        resolvePath: host.resolvePath,
+      }),
   });
   registry.register('ui:add', {
     id: 'ui:add',

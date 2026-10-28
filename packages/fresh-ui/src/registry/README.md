@@ -29,3 +29,23 @@ NetScript extensions live in metadata:
 To add a component, author its item, files and dependencies in `registry.json`, include it in the
 appropriate collection and style map, and regenerate the embedded registry carrier. To extend a
 style, change its source map and supply items with the same public component contract.
+
+## Static hosting
+
+Build a registry whose file paths are relative to its source directory:
+
+```sh
+netscript ui:build --registry registry.json --output public/r
+```
+
+For Fresh UI's repository-relative sources, select the repository root explicitly:
+
+```sh
+netscript ui:build --registry packages/fresh-ui/registry.json --source-root . --output public/r
+```
+
+The output contains `registry.json` and `<name>.json` with embedded UTF-8 file content. Serve this
+directory as static files on any HTTP host. Source chunks use `include` with explicit relative
+`registry.json` paths. All sources and includes validate before output is written, and paths must
+stay within the selected root through filesystem links. The docs site's normal build publishes the
+same artifacts under `r/`.

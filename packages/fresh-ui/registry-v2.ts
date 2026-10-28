@@ -23,3 +23,6 @@ export {
   validateRegistry,
   validateRegistryItem,
 } from './src/registry/validate-registry.ts';
+
+export { buildRegistry } from './src/registry/build-registry.ts';
+export type { RegistryBuildInput } from './src/registry/build-registry.ts';

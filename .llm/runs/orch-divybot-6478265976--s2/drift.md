@@ -6,3 +6,5 @@
 - Public privacy: use model/branch/baseline and repository-relative paths in run records; private execution receipts are not published.
 
 - Terminal process drift: schema slice did not receive sign-off; two FAIL_FIX reviews trigger the supplied leaf stop rule. Remaining five slices are not implemented. The final test correction is locally verified but has no independent passing verdict.
+
+- User-directed continuation starts a new review cycle at cdbbe24. The prior stop is historical; full S2 scope remains active. Latest steering also requires inspecting the failed CI build and pushing a repair.
