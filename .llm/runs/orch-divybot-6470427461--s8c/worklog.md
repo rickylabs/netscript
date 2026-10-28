@@ -173,3 +173,7 @@ Discarded the first link result: it overlapped the reproducibility rebuild and r
 Accepted final link scan:24219 internal links across254 pages, all resolve. Repro PASS254HTML/205twins with only known #2453 metadata exception. All source/generator preservation checks hold; final serialized116browser in progress.
 
 Rebase integration terminal before sign-off commit: final serialized116browser PASS,32axe audits/zero serious-critical, no skips/flakies; all3style negative controls meet expected failure contracts. Mandatory independent IMPL-EVAL PASS (rebase-impl-eval.md). Final source comparison still proves all authored UI bytes preserved and all5canonical docs exactly main; docs lock exactmain. Only native CLI prose and scoped run evidence differ beyond upstream. Post-commit assets-barrel, final remote-ref currency check and exact leasepush next; no branch publication yet.
+
+## Main advanced during hosted verification
+
+R4 exact leasepush succeeded at9cc0442b2 and GitHub initially reported MERGEABLE. Before final READY, main advanced to96d13d294 (PR2435 tokens v2), and GitHub now reports CONFLICTING. Latest user repeats rebase/force request. Read S1 memory before generation. Upstream286paths overlap this feature at ONLY generated CLI prose; no authored source overlap. Same independently approved upstream-side/context-preservation algorithm applies with new fixed base96 and exact leaseold9cc. New checkpoint addendum advancing-base-plan.md; independent plan addendum before replay. No fresh READY queued for the superseded R4 snapshot.
