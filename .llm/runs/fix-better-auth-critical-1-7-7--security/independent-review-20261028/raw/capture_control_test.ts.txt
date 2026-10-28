@@ -1,0 +1,47 @@
+import { captureOwnedCommand, OwnedCaptureError } from './owned-capture.ts';
+
+const env: Record<string, string> = { DENO_NO_UPDATE_CHECK: '1', DENO_NO_PROMPT: '1' };
+for (const name of ['SYSTEMROOT', 'WINDIR', 'COMSPEC', 'SYSTEMDRIVE']) {
+ const value = Deno.env.get(name);
+ if (value !== undefined) env[name] = value;
+}
+function assert(value: unknown, message: string): asserts value {
+ if (!value) throw new Error(message);
+}
+async function expectFailure(source: string, label: string, deadline = 5_000) {
+ try {
+  await captureOwnedCommand(Deno.execPath(), ['eval', '--no-config', source], Deno.cwd(), env, deadline);
+  throw new Error('Expected owned capture failure.');
+ } catch (error) {
+  assert(error instanceof OwnedCaptureError, 'Must preserve capture failure and settlement evidence.');
+  assert(error.message.includes(label), `Missing expected failure: ${label}`);
+  assert(error.observations.stdoutCapturedBytes <= 12 * 1024 * 1024, 'stdout retained above cap.');
+  assert(error.observations.stderrCapturedBytes <= 64 * 1024, 'stderr retained above cap.');
+  assert(error.observations.terminationRequested, 'Owned termination absent.');
+  assert(error.observations.statusAwaited && error.observations.pipesAwaited, 'Owned status/pipes not awaited.');
+ }
+}
+const writeChunks = (pipe: 'stdout' | 'stderr', chunks: number) => `
+const bytes = new Uint8Array(65536);
+for (let i = 0; i < ${chunks}; i++) {
+ let offset = 0;
+ while (offset < bytes.length) offset += await Deno.${pipe}.write(bytes.subarray(offset));
+}
+await new Promise((resolve) => setTimeout(resolve, 60000));
+`;
+Deno.test({ name: 'owned capture preserves both bounded pipes', sanitizeOps: true, sanitizeResources: true, sanitizeExit: true, fn: async () => {
+ const output = await captureOwnedCommand(Deno.execPath(), ['eval', '--no-config',
+  `await Deno.stdout.write(new TextEncoder().encode('public-fixture')); await Deno.stderr.write(new TextEncoder().encode('diagnostic'));`], Deno.cwd(), env);
+ assert(output.success && new TextDecoder().decode(output.stdout) === 'public-fixture', 'stdout changed.');
+ assert(new TextDecoder().decode(output.stderr) === 'diagnostic', 'stderr changed.');
+ assert(output.observations.statusAwaited && output.observations.pipesAwaited, 'Normal settlement incomplete.');
+}});
+Deno.test({ name: 'owned capture stops during stdout overflow', sanitizeOps: true, sanitizeResources: true, sanitizeExit: true,
+ fn: () => expectFailure(writeChunks('stdout', 193), 'stdoutCapturedBytes exceeds'),
+});
+Deno.test({ name: 'owned capture stops during stderr overflow', sanitizeOps: true, sanitizeResources: true, sanitizeExit: true,
+ fn: () => expectFailure(writeChunks('stderr', 2), 'stderrCapturedBytes exceeds'),
+});
+Deno.test({ name: 'owned capture stops on deadline and drains ownership', sanitizeOps: true, sanitizeResources: true, sanitizeExit: true,
+ fn: () => expectFailure('await new Promise((resolve) => setTimeout(resolve, 60000));', 'deadline', 500),
+});

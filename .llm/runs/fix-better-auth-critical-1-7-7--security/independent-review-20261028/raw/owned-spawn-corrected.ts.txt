@@ -1,0 +1,40 @@
+export interface OwnedChild {
+  readonly status: Promise<Deno.CommandStatus>;
+  readonly stdout: ReadableStream<Uint8Array>;
+  kill(signal?:Deno.Signal):void;
+}
+export interface Settlement {
+  spawnCount:number;statusAwaited:boolean;stdoutSettled:boolean;pipesAwaited:boolean;failures:string[];
+}
+/** Owns exactly one inference child; settlement never skips pipes after a status error. */
+export class OwnedSpawn {
+  #attempted=false;
+  #child:OwnedChild|undefined;
+  #completed=false;
+  spawn<T extends OwnedChild>(factory:()=>T):T {
+    if(this.#attempted)throw new Error('Only one inference spawn is authorized.');
+    this.#attempted=true;
+    const child=factory();this.#child=child;
+    void child.status.then(()=>{this.#completed=true;},()=>{this.#completed=true;});
+    return child;
+  }
+  async settle(pipes:()=>Promise<void>):Promise<Settlement> {
+    const result:Settlement={spawnCount:this.#attempted?1:0,statusAwaited:false,stdoutSettled:false,pipesAwaited:false,failures:[]};
+    const child=this.#child;let escalation:ReturnType<typeof setTimeout>|undefined;
+    try {
+      if(child){
+        if(!this.#completed){
+          try{child.kill('SIGTERM');}catch{/* May already be exiting. */}
+          escalation=setTimeout(()=>{if(!this.#completed){try{child.kill('SIGKILL');}catch{/* Already exited. */}}},1000);
+        }
+        try{await child.status;result.statusAwaited=true;}catch{result.failures.push('Owned child status rejected.');}
+        if(child.stdout.locked)result.failures.push('Owned stdout remains locked after runner settlement.');
+        else{try{await child.stdout.cancel();result.stdoutSettled=true;}catch{result.failures.push('Owned stdout settlement failed.');}}
+      }
+    } finally {
+      try{await pipes();result.pipesAwaited=true;}catch{result.failures.push('Owned pipe settlement failed.');}
+      if(escalation!==undefined)clearTimeout(escalation);
+    }
+    return result;
+  }
+}
