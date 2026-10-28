@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"/home/agent/projects/orchid/worktrees/issue-750","mode":"check","summary":{"filesSelected":122,"batches":3,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":122,"filesProcessed":122,"droppedFiles":[],"refusals":[]},"findings":[]}

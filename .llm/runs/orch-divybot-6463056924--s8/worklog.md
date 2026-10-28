@@ -128,3 +128,5 @@ Independent generated-data review PASS: native provenance,190entries/0removed, p
 - Owned manual preview stopped. Playwright servers terminate with each run; foreign resources untouched.
 
 Independent composition review PASS. Final stable browser result subsequently completed48PASS/0FAIL/0skipped;24axe audits have0serious/critical. Keep safe landing order #2437 before #2439; local composition enables complete review/CI without changing ownership or merging a GitHub PR. No claim that the owner requested S8a to land before S8b. Main reconciliation will use a normal merge (no force/rebase).
+
+Reconciled current main21dada0 by normal merge after composed source4e0560e. This brings the already accepted telemetry isolation fix and its generated export corpus, without conflicts or docs UI changes. Protected S8b source still matches9bc3445. Native committed freshness and final CI/evaluation follow on this reconciled head.

@@ -1,6 +1,7 @@
 import {
   context,
   propagation,
+  ROOT_CONTEXT,
   type TextMapGetter,
   type TextMapSetter,
   trace,
@@ -193,10 +194,12 @@ export function resolveTraceContextFromSpan(span: Span): SerializedTraceContext 
 }
 
 /**
- * Extract a telemetry context from propagation headers.
+ * Extract an incoming parent from propagation headers, independently of ambient work.
+ * Missing or invalid headers yield a root context so unrelated deliveries never
+ * inherit a long-lived worker span. Nested local work should use the active context.
  */
 export function extractContext(headers: PropagationHeaders): Context {
-  const extractedContext = propagation.extract(context.active(), headers, headersGetter);
+  const extractedContext = propagation.extract(ROOT_CONTEXT, headers, headersGetter);
   const extractedSpan = trace.getSpan(extractedContext);
   if (extractedSpan && extractedSpan.spanContext().traceId !== INVALID_TRACE_ID) {
     return extractedContext;
@@ -208,12 +211,12 @@ export function extractContext(headers: PropagationHeaders): Context {
   }
 
   if (!traceparent) {
-    return context.active();
+    return extractedContext;
   }
 
   const parsed = parseTraceparent(traceparent);
   if (!parsed) {
-    return context.active();
+    return extractedContext;
   }
 
   // Preserve `tracestate` when reconstructing the remote span context. The
@@ -228,7 +231,7 @@ export function extractContext(headers: PropagationHeaders): Context {
     ...(traceState ? { traceState } : {}),
   };
 
-  return trace.setSpan(context.active(), trace.wrapSpanContext(remoteSpanContext));
+  return trace.setSpan(extractedContext, trace.wrapSpanContext(remoteSpanContext));
 }
 
 /**

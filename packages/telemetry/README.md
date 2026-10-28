@@ -83,8 +83,13 @@ console.log(total, snapshot?.name, snapshot?.attributes['netscript.job.source'])
 // 42 "job.import" "erp-sync"
 ```
 
-To continue a worker's trace inside a spawned job subprocess, extract the propagated context at the
-start of the job script:
+Incoming queue messages and trigger deliveries follow their own `traceparent` and `tracestate`.
+Without a valid carrier, each delivery starts a fresh trace instead of inheriting the shared worker's
+active span. `extractContext` and `resolveParentContextFromHeaders` apply this rule; nested local
+operations use the active context so their spans stay beneath the current job.
+
+To continue a job execution's trace inside a spawned job subprocess, extract the propagated context at
+the start of the job script:
 
 ```typescript
 import { initJobTracing } from '@netscript/telemetry';

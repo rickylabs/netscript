@@ -12,8 +12,8 @@
  * @module
  */
 
-import { getParentContextFromHeaders } from '@netscript/telemetry/context';
-import { getTracer } from '@netscript/telemetry/tracer';
+import { getParentContextFromHeaders, hasActiveSpan } from '@netscript/telemetry/context';
+import { getActiveContext, getTracer } from '@netscript/telemetry/tracer';
 
 const DEFAULT_SERVER_QUERY_PARAM = 'serverId';
 const DEFAULT_TOOL_NAME_SEPARATOR = '__';
@@ -243,6 +243,8 @@ function requestServerId(request: Request, queryParam: string): string | null {
 }
 
 function parentFromRequest(request: Request): ReturnType<typeof getParentContextFromHeaders> {
+  const active = getActiveContext();
+  if (hasActiveSpan(active)) return active;
   return getParentContextFromHeaders(Object.fromEntries(request.headers));
 }
 
