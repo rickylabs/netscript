@@ -10,3 +10,7 @@ deduplicating different targets or separate ordinary type errors. Root README ce
 External SIGTERM on the outer launcher differs from its own timer firing. The launcher must give
 its worker a longer graceful cleanup window than the worker gives a compiler group. Test direct
 signals to the launcher with a TERM-resistant compiler, not only the launcher timeout path.
+
+Every consumer must also treat `interrupted` as fatal: git check-ignore ordinarily uses nonzero
+to mean "not ignored", but cancellation must abort traversal, not be converted to false. The
+extractor regression pauses a real probe, signals the worker, and proves the walk cannot resume.

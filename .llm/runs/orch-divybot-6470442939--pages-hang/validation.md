@@ -88,3 +88,16 @@ locally (exit 1, 2.428s); SGR normalization before mapping fixes it with the ass
 
 No further push is needed merely to copy later CI results into this file. The PR head and native
 receipts/comments carry that final evidence; the existing runtime/history caveats remain unchanged.
+
+## Final interrupted-probe repair
+
+bfe3fa3 now has successful core CI (including quality, test-4, test-5 and aggregate), Pages and
+Code quality. Its exact-head native README gate is PASS, 130.690s, unchanged 99/five/four/false.
+The last change only aborts an interrupted ignore probe; compiler, README policy and workflows
+are identical to that green source. A real-process regression goes RED before and GREEN after.
+
+- Focused structured suite: PASS, 30 tests, 19.767s.
+- Actual `docs:snippets:test`: PASS, 21 tests.
+- Structured check: PASS, 53 files; lint: PASS, both edited files; format: PASS, 53 files.
+- Same-session independent pre-commit review: PASS, 23.197s; source fingerprints in evaluate.md.
+- Exact-head final CI is recorded in the PR's checks/comments after this signoff commit.

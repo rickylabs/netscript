@@ -1,5 +1,19 @@
 # Worklog
 
+## Final cancellation consumer
+
+The bfe3fa3 ANSI repair is fully green in actual core CI (quality, all shards and aggregate),
+Pages and Code quality. Its native README gate passes at 99/five/four/false in 130.690s.
+Inspection found the Git ignore-probe caller still treating `interrupted` as ordinary nonzero
+"not ignored", which could resume scanning after cancellation. A real paused-probe regression
+reproduced the defect (RED, exit 1, 1.194s); the one-line abort condition makes it GREEN.
+
+All 30 focused tests pass (19.767s), the actual docs:snippets:test task passes 21 tests, and
+structured check (53), lint (two edited files) and format (53) pass. The same read-only evaluator
+returned PASS before signoff (23.197s); reviewed fingerprints are in evaluate.md. No compiler,
+README, ratchet or workflow code changes in this last repair. Exact-head final CI results will
+be posted on PR #2458 and the excluded READY handoff without a further push cycle.
+
 ## Review repair plan
 
 ### CI follow-up: colored source locations

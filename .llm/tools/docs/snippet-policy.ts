@@ -67,7 +67,7 @@ async function isGeneratedOrIgnoredDirectory(path: string, name: string): Promis
       cwd: Deno.cwd(),
       source: path,
     });
-    if (result.timedOut) throw new Error(result.stderr);
+    if (result.timedOut || result.interrupted) throw new Error(result.stderr);
     return result.code === 0;
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) return false;

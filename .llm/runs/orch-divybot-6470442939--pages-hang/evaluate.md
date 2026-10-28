@@ -93,3 +93,24 @@ reviewed blob fingerprints at commit time:
 
 Exact-head README and CI results follow the signoff commit and are published on PR #2458.
 Prior runtime/history limitations remain disclosed; this verdict does not authorize a release.
+
+## Interrupted ignore-probe review — PASS
+
+Same independent read-only session reviewed the proposed working tree based on bfe3fa3 before
+its signoff commit. Native claude-opus-5-5, high effort, closed stdin, Read/Glob/Grep only;
+exit 0 after 23.197s, PASS, no blocking defects.
+
+Confirmed the last process-result consumer now aborts for interrupted Git probes. The thrown
+error cannot enter the missing-Git fallback, so the walk cannot resume and start a new compiler.
+Ordinary git exit results are unchanged. The regression waits for a real probe before signalling,
+asserts failure and interruption provenance, bounds the test, and cleans only positively owned
+process groups and temporary files. CI's setup-deno supplies the fixture's executable dependency.
+
+The evaluator reviewed source content against the diff; verify these blobs at signoff:
+
+- snippet-policy.ts: `c2c33072bb6dca6b5b9510dd3c674bb48ddbabaf`
+- snippet-extractor_test.ts: `cdc903fd437da043e18217f33ae1756883887cfd`
+
+All 30 focused tests and structured check/lint/format pass. The preceding bfe3fa3 has successful
+core CI, Pages, Code quality and native README gate; the final exact-head CI follows this commit.
+The existing runtime/history caveats remain unchanged and disclosed.

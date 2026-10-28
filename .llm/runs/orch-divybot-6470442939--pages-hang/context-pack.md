@@ -1,5 +1,13 @@
 # Resume
 
+Final cancellation-consumer repair: interrupted Git ignore probes now throw instead of resuming
+the source walk. A real-process SIGTERM regression went red before this one-line change and
+green afterward. All 30 focused tests, the real 21-test snippet task, check/lint/format and the
+same-session independent pre-commit review pass. Match the source fingerprints in evaluate.md.
+The preceding bfe3fa3 has all core CI, Pages, Code quality and native README green. The final
+push contains this narrow probe repair plus its evidence; confirm exact-head CI and publish the
+results on the PR/READY handoff, without another evidence-only push.
+
 Current follow-up: core CI at f8f3b28 passed quality and all shards except test-4. The source-line
 assertion exposed ANSI codes preventing line-offset mapping. Forced color reproduced the failure;
 the repaired mapper and always-colored regression now pass all 23 focused tests and structured
