@@ -82,3 +82,12 @@ Slice 6 independent addendum PASS. All required source/migration/AA/browser chec
 - Reconcile: path spacing portion of reviewed #2452 is already integrated here and must not be duplicated in slice 5. No locks or colour declarations changed.
 
 Strengthened tagline regression rerun passes in all four browser projects (4/4); slice 4 sign-off complete.
+
+## Slice 5 — #2451 reviewed follow-ups
+
+- Reconciled source fixes from #2452: bundled CSS, conservative classifier-aware browser skip and complete push diffs, deterministic comparison/tab/diagram identities before search, heading-specific permalink names, lane IDs, real test fixture paths and historical drift repair. Preserved richer dotenv grammar and path-gap fix already delivered. Token consolidation remains #2450.
+- Built-in Vento escape preserves API generic text before highlighting; regression covers real SagaState and SagaDefinition signatures. No build highlighter warnings remain.
+- Gates: two builds compare all 253 HTML pages, 202 twins, anchor fragments and assets exactly; only upstream Pagefind entry/filter/meta differences reported separately under #2453. 70 classifier tests + 1 workflow guard and 11 tooling tests pass. Structured tooling/site checks pass. Full browser receipt PASS: 100 tests, 0 skipped/flaky, 32 axe reports with zero serious/critical findings; 52 screenshot captures including requested six-page matrix.
+- Docs export drift, snippets (668 scanned), 24,069 links and 15 caveat references pass. Independent slice review PASS.
+- Required one-pass CLI runtime smoke attempted unchanged, exit 1: Aspire preflight and cleanup cannot reach a Docker daemon. Marked UNPROVEN locally; no gate suppressed or changed. Read-only leak reporter follows, and unchanged hosted workflow will be dispatched after push.
+- Reconcile: only reviewed lightningcss lock additions; root lock untouched. No source gate removed, labels changed or foreign resources mutated.

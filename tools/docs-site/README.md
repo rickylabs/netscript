@@ -81,3 +81,14 @@ add its import-map entry and human label in `code-languages.ts`, then extend the
 gallery. Unknown rendered fences fail the build. Internal gallery pages declare `internal: true`,
 which excludes them from Pagefind, Markdown twins and the AI documentation indexes. Header metadata
 uses `data-twin-ignore` and headers/gutters use `data-pagefind-ignore`; code itself remains indexed.
+
+
+CSS is bundled by Lume lightningcss before publication, avoiding the chained @import waterfall.
+The style gate accepts bundled token definitions only when their selector, property and value
+exactly match the separately verified token layer; authored custom colours still fail.
+
+`deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts` builds twice
+and compares every output. The default is strict. `--allow-pagefind-metadata` reports only the
+known upstream Pagefind entry/filter/meta serialization variation separately; HTML, Markdown twins,
+anchor fragments and all other assets remain byte-identical. Search behavior is verified by the
+real browser Pagefind tests. The metadata issue remains #2453; token-source consolidation stays #2450.

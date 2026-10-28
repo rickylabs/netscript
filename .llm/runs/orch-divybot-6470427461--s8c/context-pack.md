@@ -15,3 +15,5 @@ Slice 3 pushed b9e161ae1. Advanced syntax slice 6 implemented from b9dd32aac; mi
 Advanced slice 6 signed off: migration/AA 6/6, targeted browser 32/32, both real negative controls reject correctly, independent review and visual/policy addendum PASS. Ready for commit/push; continue with paths (slice 4), then #2451 (slice 5), then full gates and IMPL-EVAL.
 
 Advanced syntax slice pushed 43e931fd4. Slice 4 implementation, 12/12 browser checks and independent review PASS; strengthened tagline test rerun before commit. Only #2451 integration remains before full verification/evaluation.
+
+Slice 4 pushed cbe3dfae0. Final implementation slice 5 independently PASS; full docs browser 100/100 with 32 zero-blocking axe audits, repro/exports/snippets/links/caveats pass. CLI runtime smoke UNPROVEN locally (Docker unavailable); hosted workflow dispatch needed after push. Next: native doc carrier generators + freshness, final IMPL-EVAL and READY report handoff.

@@ -38,6 +38,7 @@ export interface NavLaneLink {
 }
 
 export interface NavLane {
+  id: 'start' | 'learn' | 'build' | 'reference' | 'concepts' | 'design-system';
   label: string;
   /** Landing page for the top-bar lane. */
   href: string;
@@ -58,6 +59,7 @@ export interface NavLane {
 
 export const navLanes: NavLane[] = [
   {
+    id: 'start',
     label: 'Start',
     href: '/quickstart/',
     subtitle: 'Get running in minutes',
@@ -73,6 +75,7 @@ export const navLanes: NavLane[] = [
     ],
   },
   {
+    id: 'learn',
     label: 'Learn',
     href: '/tutorials/',
     subtitle: 'Build one thing end to end',
@@ -81,6 +84,7 @@ export const navLanes: NavLane[] = [
     expandRoot: true,
   },
   {
+    id: 'build',
     label: 'Build',
     href: '/web-layer/',
     subtitle: 'Add a capability to your app',
@@ -98,6 +102,7 @@ export const navLanes: NavLane[] = [
     ],
   },
   {
+    id: 'reference',
     label: 'Reference',
     href: '/reference/',
     subtitle: 'Every published symbol',
@@ -106,6 +111,7 @@ export const navLanes: NavLane[] = [
     expandRoot: true,
   },
   {
+    id: 'concepts',
     label: 'Concepts',
     href: '/explanation/',
     subtitle: 'How and why it works',
@@ -114,6 +120,7 @@ export const navLanes: NavLane[] = [
     expandRoot: true,
   },
   {
+    id: 'design-system',
     label: 'Design system',
     href: '/design-system/',
     subtitle: 'One design grammar, every surface',
@@ -125,10 +132,10 @@ export const navLanes: NavLane[] = [
 
 /** Choose one lane from the source URL, before the base-path plugin rewrites links. */
 export function getDocsLane(url: string): NavLane {
-  if (url === '/cli-reference/') return navLanes[3];
+  if (url === '/cli-reference/') return navLanes.find((lane) => lane.id === 'reference')!;
   return navLanes.find((lane) => lane.roots?.some((root) => url.startsWith(root))) ??
     navLanes.find((lane) => lane.items?.some((item) => url.startsWith(item.href))) ??
-    navLanes[0];
+    navLanes.find((lane) => lane.id === 'start')!;
 }
 
 /** nav.menu()/nav.breadcrumb() query — one definition so templates agree. */

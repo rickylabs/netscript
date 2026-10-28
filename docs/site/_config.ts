@@ -5,6 +5,7 @@ import nav from 'lume/plugins/nav.ts';
 import redirects from 'lume/plugins/redirects.ts';
 import pagefind from 'lume/plugins/pagefind.ts';
 import codeHighlight from 'lume/plugins/code_highlight.ts';
+import lightningCss from 'lume/plugins/lightningcss.ts';
 import anchor from 'markdown-it-anchor';
 import langBash from 'highlight.js/bash';
 import langJson from 'highlight.js/json';
@@ -77,8 +78,8 @@ const site: ReturnType<typeof lume> = lume({
   },
 });
 
-// Copy CSS + favicon to _site verbatim; base_path prefixes their hrefs at build.
-site.copy('styles');
+// Bundle relative CSS imports at build time; retain Lume's default targets/minification.
+site.use(lightningCss());
 site.copy('favicon.svg');
 
 // Committed static diagram SVGs (OD1) + other site assets; base_path prefixes hrefs.
@@ -103,7 +104,8 @@ site.filter('utilityDiagram', (src: string, alt: string) => {
     throw new Error(`Unsupported diagram source: ${src}`);
   }
   const source = Deno.readTextFileSync(new URL(`.${src}`, import.meta.url));
-  return inlineUtilityDiagram(source, alt, `diagram-${crypto.randomUUID()}`);
+  // Page URL/local-index identity is assigned after rendering.
+  return inlineUtilityDiagram(source, alt, 'diagram');
 });
 
 // Inline-code (ic): comp string args are emitted raw and are NOT markdown-
@@ -170,9 +172,6 @@ site.use(codeHighlight({
   options: { cssSelector: 'pre code, .ns-api-table__type code, code.ns-api-table__type' },
 }));
 
-// Build the static index; custom and fallback UIs load only when requested.
-site.use(pagefind({ ui: false }));
-
 // These states belong in rendered HTML as well as in the browser enhancement path.
 site.addEventListener('afterRender', () => {
   for (const page of site.pages) {
@@ -185,6 +184,32 @@ site.addEventListener('afterRender', () => {
       lede.parentNode.insertBefore(cue, lede.nextSibling);
     }
     const sourceUrl = String(page.data.url ?? '');
+    const identity = `page-${sourceUrl.replace(/[^a-zA-Z0-9_-]/g, '-') || 'home'}`;
+    for (
+      const [index, comparison] of [...document.querySelectorAll('[data-ns-comparison]')].entries()
+    ) {
+      const id = `nscompare-${identity}-${index}-select`;
+      const select = comparison.querySelector('select');
+      const label = comparison.querySelector('label');
+      if (select && label) {
+        select.id = id;
+        label.setAttribute('for', id);
+      }
+    }
+    // Scope by the owning page and DOM order, independent of concurrent render order.
+    for (const [index, group] of [...document.querySelectorAll('.ns-tabbed')].entries()) {
+      const id = `nstab-${identity}-${index}`;
+      for (const [tabIndex, tab] of [...group.querySelectorAll('[role="tab"]')].entries()) {
+        tab.id = `${id}-tab-${tabIndex}`;
+        tab.setAttribute('aria-controls', `${id}-panel-${tabIndex}`);
+      }
+      for (
+        const [panelIndex, panel] of [...group.querySelectorAll('[role="tabpanel"]')].entries()
+      ) {
+        panel.id = `${id}-panel-${panelIndex}`;
+        panel.setAttribute('aria-labelledby', `${id}-tab-${panelIndex}`);
+      }
+    }
     const currentUrl = site.options.location.pathname.replace(/\/$/, '') + sourceUrl;
     for (const link of document.querySelectorAll('.ns-learning-path__link')) {
       const href = link.getAttribute('href');
@@ -196,7 +221,7 @@ site.addEventListener('afterRender', () => {
     for (const tree of document.querySelectorAll('.ns-file-tree--root')) {
       if (!tree.querySelector('li')) throw new Error(`Empty file tree on ${sourceUrl}`);
     }
-    for (const figure of document.querySelectorAll('.ns-diagram')) {
+    for (const [index, figure] of [...document.querySelectorAll('.ns-diagram')].entries()) {
       const image = figure.querySelector('img');
       const svg = figure.querySelector('svg[role="img"]');
       if (
@@ -205,6 +230,13 @@ site.addEventListener('afterRender', () => {
       ) {
         throw new Error(`Diagram source or accessible name missing on ${sourceUrl}`);
       }
+      const viewport = figure.querySelector('.ns-diagram__viewport');
+      if (!viewport) throw new Error(`Diagram viewport missing on ${sourceUrl}`);
+      viewport.innerHTML = inlineUtilityDiagram(
+        svg.outerHTML,
+        image.getAttribute('alt')!,
+        `diagram-${identity}-${index}`,
+      );
     }
     // Reference Markdown tables and the component share one visible kind-tag anatomy.
     for (const table of document.querySelectorAll('.ns-prose table')) {
@@ -300,6 +332,9 @@ site.addEventListener('afterRender', () => {
   }
 });
 
+// Index only final deterministic identities; twins below see the same document.
+site.use(pagefind({ ui: false }));
+
 // MUST run last: rewrite every root-relative href/src to the /netscript/ base (TD-1).
 site.use(basePath());
 
@@ -319,7 +354,7 @@ site.addEventListener('afterRender', () => {
       anchor.className = 'ns-heading-anchor';
       anchor.setAttribute('data-pagefind-ignore', '');
       anchor.setAttribute('href', `#${heading.id}`);
-      anchor.setAttribute('aria-label', 'Permalink');
+      anchor.setAttribute('aria-label', `Permalink to ${heading.textContent?.trim()}`);
       heading.appendChild(anchor);
     }
   }
