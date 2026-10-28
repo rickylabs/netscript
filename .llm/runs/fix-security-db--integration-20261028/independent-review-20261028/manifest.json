@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "pr": 2426,
+  "reviewSession": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "actualNewSteps": 2,
+  "actualPublicEvents": 19,
+  "rawCopyCount": 56,
+  "fullPackets": 12,
+  "copyPolicy": "Byte-exact originals, UTF8 fatal decoder, immutable actual verdict and public stdout; scripts .ts.txt; no operational snapshots.",
+  "copies": [
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/final-verdict.utf8.md",
+      "destination": "raw/final-verdict.utf8.md",
+      "bytes": 8892,
+      "sha256": "352cd44f7a73a6eae5ed92ba545cc37f2b25ae9cac7206dff7090cefd2715918"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/native.stdout.jsonl",
+      "destination": "raw/native.stdout.jsonl",
+      "bytes": 406377,
+      "sha256": "427850185d75c75f7cf560f1162c757c48aaf8567ed1d8fcb6b5da2a93a6d19a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/observed-identity.json",
+      "destination": "raw/observed-identity.json",
+      "bytes": 1725,
+      "sha256": "e4b1489a51d1c5a57e7a8546cfd96d3953edc1cb7c70bdc1dda3f7493519acfd"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/coverage.json",
+      "destination": "raw/coverage.json",
+      "bytes": 3019,
+      "sha256": "34a84bf2fb3da0d49abdef455762424f1315120e909897e9415cab7170c10d8f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/final-guards.json",
+      "destination": "raw/final-guards.json",
+      "bytes": 356,
+      "sha256": "e76f3a636b6dd4fe0ec66aa72906336dcc3db20d1823b32287f885d31606b50a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/result.json",
+      "destination": "raw/result.json",
+      "bytes": 225,
+      "sha256": "94a1f56ee770ca9471c1ed4813ec9906e193fe3767a8cbc0892b0d8c708c148e"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/mcp.jsonl",
+      "destination": "raw/mcp.jsonl",
+      "bytes": 576,
+      "sha256": "595efc61690c683e439b0f9e8dc1c69285ae4341661e4198c42dee3773a30316"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/root-final-integration-acceptance.md",
+      "destination": "raw/root-final-integration-acceptance.md",
+      "bytes": 3762,
+      "sha256": "979463126b8438d830a14f71507d9dd7dfa1be804b9e68f7ba6f1c9afd9d5e94"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/root-exact-eof-audit.json",
+      "destination": "raw/root-exact-eof-audit.json",
+      "bytes": 3070,
+      "sha256": "abeed45c95d83e120dfc8b065cb0429ccdf7ff0629c7338c9c546e37b5e6b116"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/packet-manifest-ci-successor.json",
+      "destination": "raw/packet-manifest-ci-successor.json",
+      "bytes": 19582,
+      "sha256": "04c9116a871c6c73b796b5461f0b1e7e975187cae412f04f8d9414b06a1c55d2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/prompt-ci-successor.md",
+      "destination": "raw/prompt-ci-successor.md",
+      "bytes": 5877,
+      "sha256": "e26026db48d6571c71d0af71b0df9301167c364c6abb37f1309ad31b2472b651"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/source-snapshot.json",
+      "destination": "raw/source-snapshot.json",
+      "bytes": 53728,
+      "sha256": "2cb10a6f28fe238a9e1e019dac73c6ceee4037a4d37cca56d7a8dee51bacf22e"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/source-reconstruction.json",
+      "destination": "raw/source-reconstruction.json",
+      "bytes": 2914,
+      "sha256": "3fa9c131c6987422acc30acffd5f924cdc232aac6509ba9e01c1dd5b0a4074d6"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/predecessor-bindings.json",
+      "destination": "raw/predecessor-bindings.json",
+      "bytes": 2835,
+      "sha256": "64a0fc9479363f70b05df3b81c9308fe46adb01127d6912853ab1436e6268e72"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/session-baseline.json",
+      "destination": "raw/session-baseline.json",
+      "bytes": 735,
+      "sha256": "9f4981ea9ff4b81ed42aa4bc0bf6a48e1cb9c845fc6d8de21553759fa7b4e2c2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/config-proposal.json",
+      "destination": "raw/config-proposal.json",
+      "bytes": 747,
+      "sha256": "37faeaa85508130b5cbfe9e26e06f28e2b9e79a1f32f76cdba49cd9028e7c252"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/effective-config.json",
+      "destination": "raw/effective-config.json",
+      "bytes": 1941,
+      "sha256": "a6ba158cd774f24e034712a94788bc5ae68b07eb01132d27852e9eed9eb30aea"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/continuation-controls.json",
+      "destination": "raw/continuation-controls.json",
+      "bytes": 542,
+      "sha256": "30f0f5fd75d9564f1d8a4e600d55bf0577e256246abc5982b0ae5db1a577fd66"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/helper-typecheck-ci-successor.json",
+      "destination": "raw/helper-typecheck-ci-successor.json",
+      "bytes": 489,
+      "sha256": "f9e920d6be710f9bb6fcbe51f00e35b9d4dfc126e9ad218e8ee766c47dce2b7a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/credential-provenance.json",
+      "destination": "raw/credential-provenance.json",
+      "bytes": 674,
+      "sha256": "5c47a442edaa6f015b10ea5c9edaf1fbf87eb780e770fea4a5d1bc0302c7f961"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/ci-status-successor.json",
+      "destination": "raw/ci-status-successor.json",
+      "bytes": 8392,
+      "sha256": "b2be7a16d5e9b604256def79a63e278257798b5fb67e815d0b8f127cff9e3612"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/implementation-driver-ci-successor.ts",
+      "destination": "helpers/implementation-driver-ci-successor.ts.txt",
+      "bytes": 10040,
+      "sha256": "9b04a18f619edbd9fd2ea387082506baa600ef812ad311bb13705d6b5e644dfd"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/common-corrected.ts",
+      "destination": "helpers/common-corrected.ts.txt",
+      "bytes": 9280,
+      "sha256": "c854a16126ac6feb7174b5d1fdaa6dc35b5d589aca32269cefdb67751186eb09"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/review-audit-ci-successor.ts",
+      "destination": "helpers/review-audit-ci-successor.ts.txt",
+      "bytes": 4852,
+      "sha256": "49289867977dc57b3d264e405a47a0e2c6c297a7a1cf7c8301198e4c47357da8"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/owned-spawn-corrected.ts",
+      "destination": "helpers/owned-spawn-corrected.ts.txt",
+      "bytes": 1929,
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/public-events-corrected.ts",
+      "destination": "helpers/public-events-corrected.ts.txt",
+      "bytes": 2468,
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/owned-capture.ts",
+      "destination": "helpers/owned-capture.ts.txt",
+      "bytes": 3891,
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/continuation-identity.ts",
+      "destination": "helpers/continuation-identity.ts.txt",
+      "bytes": 878,
+      "sha256": "06c3d820bf37b5e8ddc5059bfdb3318d7e8fa08cd92b31ee16f5ec8da6da3b65"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/continuation-identity_control_test.ts",
+      "destination": "helpers/continuation-identity_control_test.ts.txt",
+      "bytes": 1697,
+      "sha256": "774936c33d9343b0eef70cdeb3e661f94317ddf95c6050d5c1eba932eb5550cf"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-01-two-db-owners.md",
+      "destination": "packets/integration-01-two-db-owners.md",
+      "bytes": 7492,
+      "sha256": "45f2615a214667484ec6f3e25787539dca36f860c5b3fff2ed4da909fc8248fc"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-02-exact-combined-diff.md",
+      "destination": "packets/integration-02-exact-combined-diff.md",
+      "bytes": 25113,
+      "sha256": "6d1165cab06ddb716e920321caba94d75c51db116e4dc7f3b3feed2a4d54bee8"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-03-exact-combined-diff.md",
+      "destination": "packets/integration-03-exact-combined-diff.md",
+      "bytes": 8782,
+      "sha256": "d4584f084318c9cdc69e1917a03fa065928e3e27167dde5cd7c718114f00c45f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-04-db-only-diff.md",
+      "destination": "packets/integration-04-db-only-diff.md",
+      "bytes": 6224,
+      "sha256": "5e487294935f0d2065b4c4b5f734512fb3496a740ad9c5c99dd0e4a37f2c4170"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-05-origins-boundary.md",
+      "destination": "packets/integration-05-origins-boundary.md",
+      "bytes": 17466,
+      "sha256": "6fe752d1e193dcc2772832a75d39503544cb5a1d14db8be91dd14ba5c0f4d905"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-06-accepted-db-report.md",
+      "destination": "packets/integration-06-accepted-db-report.md",
+      "bytes": 14312,
+      "sha256": "4fc0bab053c2c6bbeb8f4584e7e2310289f6e564218cdf4595e674a20b266a89"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-07-integrated-six-gates.md",
+      "destination": "packets/integration-07-integrated-six-gates.md",
+      "bytes": 6766,
+      "sha256": "06083cf8ace337a9d4c80ac3e6b82a4b2dd0ddb758540190c0adaf0b9d158b62"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-08-full-native-composite.md",
+      "destination": "packets/integration-08-full-native-composite.md",
+      "bytes": 25134,
+      "sha256": "4ea5daf4b3430a68a3b614282efbef4ef68bc211df1e4643e7164f1f2d555ea6"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-09-full-native-composite.md",
+      "destination": "packets/integration-09-full-native-composite.md",
+      "bytes": 24784,
+      "sha256": "bff15337b84c3a9483af334247b524c16dbdcf7e6b5e34c34b369d7aebab7961"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-10-full-native-composite.md",
+      "destination": "packets/integration-10-full-native-composite.md",
+      "bytes": 1757,
+      "sha256": "b13732459a147cc319c173f18ce60a26192f86a1aadf55068e742816b1ea4ce1"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-11-actual-ci.md",
+      "destination": "packets/integration-11-actual-ci.md",
+      "bytes": 4282,
+      "sha256": "59559f2a0c6b5588c59411ff6f5b73df1de15233336a0305b4fc318dbaaf2570"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host/integration-12-actual-ci-successor.md",
+      "destination": "packets/integration-12-actual-ci-successor.md",
+      "bytes": 24060,
+      "sha256": "efc9a8c3d861d1e9ce242eb1a5fc135da99ac5def5b526e4bf2eeb338e54dca9"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/ci-test5-failure-40633645853/test.report.json",
+      "destination": "ci/attempt1-test5.report.json",
+      "bytes": 19401,
+      "sha256": "f9fcbded3f866e7852a2edaf94bff6002315cd507a2ce10e60c30b95760884e3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/ci-test5-failure-40633645853/test.receipt.json",
+      "destination": "ci/attempt1-test5.receipt.json",
+      "bytes": 34790,
+      "sha256": "ca8607953fa7a86e20348a255220d204b3479057e2644131b88ee192c50ab998"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/attempt2-test5-artifact/test.report.json",
+      "destination": "ci/attempt2-test5.report.json",
+      "bytes": 15915,
+      "sha256": "d78cf7eac4aaf145859f67d3cb56fba82664492bb01cdf8f6f2ca0d7ddcbf941"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/attempt2-test5-artifact/test.receipt.json",
+      "destination": "ci/attempt2-test5.receipt.json",
+      "bytes": 34789,
+      "sha256": "aa042f420ed2f6e0ecd54b90503b676693982be1f7e75b132f98acaa173e3fe7"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/ci-failure-classification.json",
+      "destination": "ci/first-failure-classification.json",
+      "bytes": 5788,
+      "sha256": "cda3c178cc481e62e0acdf88fc1e2277ec9999b32411880b14b0c5e0f251ec79"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/pre-dispatch-source-proof.json",
+      "destination": "ci/pre-dispatch-source-proof.json",
+      "bytes": 3281,
+      "sha256": "679306352bb0b8e50d8741f62c0554bb67fa9e7bb6b28f6d0e68938d6f04857c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/single-job-rerun-decision.md",
+      "destination": "ci/single-job-rerun-decision.md",
+      "bytes": 1499,
+      "sha256": "514aa7bbc9ddc2a279c793f752eb9a1a4c447d607dc0e4cb3a4438a241c6be5a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/completed-parent-before-dispatch.json",
+      "destination": "ci/completed-parent-before-dispatch.json",
+      "bytes": 393,
+      "sha256": "9a256c48e68653d08b394a5fe29defbaaef5e41ba0a18d89f147352fd071cb93"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/single-dispatch-intent.json",
+      "destination": "ci/single-dispatch-intent.json",
+      "bytes": 339,
+      "sha256": "61c6a61ce5717ba48bdd4b830dbeb352fac91e10e6afa25e276eeecf08f9c13f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/single-dispatch-result.json",
+      "destination": "ci/single-dispatch-result.json",
+      "bytes": 362,
+      "sha256": "a2d2db75ec6402eb96c967920f457943bb2cf6676b71422ec5fe34c81f6b3fd9"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/attempt2-artifact-summary.json",
+      "destination": "ci/attempt2-artifact-summary.json",
+      "bytes": 1556,
+      "sha256": "b307711af45076b76031fffb52ae9b4a7331803eacfddddd9def2a9a2a7d5183"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/close-gate-error-excerpt.txt",
+      "destination": "ci/close-gate-error-excerpt.txt",
+      "bytes": 1277,
+      "sha256": "13e6f382e1de7d9f66ae1412997bec68a0880cae03c8743a3701c5ea80b30582"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/single-job-rerun.ts",
+      "destination": "helpers/single-job-rerun.ts.txt",
+      "bytes": 4622,
+      "sha256": "481d7cdf81616020a189c9f98c542c0fbd9ed335aaa0f569d7e14a3a1afedcda"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/capture-attempt-status.ts",
+      "destination": "helpers/capture-attempt-status.ts.txt",
+      "bytes": 1989,
+      "sha256": "e0d08cc84ee9ce976ee0b284065b0589e7924e2453b1f1781ba877b215332a0d"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-ci-retry-20261028/build-ci-successor.ts",
+      "destination": "helpers/build-ci-successor.ts.txt",
+      "bytes": 8941,
+      "sha256": "701e8b9cf7b6cd434e969c51851d3b9cad7eb814f5b77f5990b78aa5d6893d33"
+    }
+  ],
+  "rootAcceptanceSha256": "979463126b8438d830a14f71507d9dd7dfa1be804b9e68f7ba6f1c9afd9d5e94",
+  "rootExactEofSha256": "abeed45c95d83e120dfc8b065cb0429ccdf7ff0629c7338c9c546e37b5e6b116",
+  "operationalHashmapSha256": "003d17e6a2d4864c271c461e3461f7f371a91359758084dde2589652e128b705"
+}

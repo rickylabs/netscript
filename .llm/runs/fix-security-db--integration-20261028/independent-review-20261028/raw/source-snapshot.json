@@ -1,0 +1,1072 @@
+{
+  "targets": [
+    {
+      "name": "SecurityDb2426",
+      "root": "C:/Users/ericc/source/repos/netscript-better-auth-security-008",
+      "head": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+      "protected": [
+        {
+          "path": ".llm/tools/deps/check-db-alignment.ts",
+          "sha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1"
+        },
+        {
+          "path": ".llm/tools/deps/check-db-alignment_test.ts",
+          "sha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/combined-seven-owner.diff",
+          "sha256": "4100ceedfb09b3a7f42a8bc126c498c55310bfb6d93649fad54f14c78ade45b3"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/security-to-integration-db.diff",
+          "sha256": "406fd7521b3efed90d0c6e26c5e819817400bb6f7f80e5b85f470b0dd20c495e"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/seven-owner-proof.json",
+          "sha256": "d2c6a2e6f1b89702254b9d526410a8984abeb89ec2ab3143abc2b5216e9f39ff"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/root-integration-authority.md",
+          "sha256": "9410cca810a7a4ceeaac6ec7932ed6dfc1c27c89144e76caac49b42cdade5b4c"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/accepted-integration-proposal.md",
+          "sha256": "d48e028012030aaa17a21cf586a1ae16aabdcc071cd6ff1a791531cdab1e0ebf"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/README.md",
+          "sha256": "04dde044ea8e9ad5a2ba87381b4b80fdfedb9f0a886273c463a6aefcf35433ec"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/plan.md",
+          "sha256": "31a6e93f51469e3c04a996babd8dac47933ba35c81e9fafcf46d78b6be0a0319"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/root-source-acceptance.md",
+          "sha256": "47fdb1784373789aa1d7f40b85fbbd528879cf0e53ed0fbfdcbbf86cee159a2c"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/root-independent-impl-acceptance-20261028.md",
+          "sha256": "ef86adeacc01c66c855b0aa09a5fca1e5476ad99225c3288b64b1cf225b57881"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/final-verdict.utf8.md",
+          "sha256": "fe446890d8a6cc50fbfeedaa544ad9e1410acf7dfc45bea42ccc293709d1e82a"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/combined-qualification.json",
+          "sha256": "729267e19b74f050875cdf6e1c9c54623708cd9d86a8a94a2d880e9375c5fb15"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.json",
+          "sha256": "5c26794b1c53b87dba62713d74145a90f1ca57da18fe04475908349c0737f14d"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.json",
+          "sha256": "5a58378425da72fed87e7cd843813d4cf14c95e8988939307060be80852dd49b"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.json",
+          "sha256": "67b5e4e9a6361e7f2790563106bbc093f46630e73d376731fdc7ed164cd9f3da"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.json",
+          "sha256": "391ff91f31530e33acae0bb50c860506ab8c315d003327eaccc84725124d7de6"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.receipt.json",
+          "sha256": "e74ff897c21a2a9d90633ad5a9ebc0ab08ad24c7e930fc1e2fff2cfdf2ec9e4f"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/lint-canonical-rules.json",
+          "sha256": "6719ae56409be666c395e987e248958bd4af54efa9e3f23d6575c4362fcb9c0a"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/cleanup.json",
+          "sha256": "baca7b916fadf9ac9d2ff511fee373d58afa4a341e1f5ece54d265f9435096cc"
+        },
+        {
+          "path": ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.receipt.json",
+          "sha256": "4d16a41b6236b2e8d63cd3d61156375fcdf32030ade1c3cf21e14a985bc3cd44"
+        },
+        {
+          "path": ".llm/tmp/security-db-integration-continuation-20261028/ci-status.json",
+          "sha256": "587131d1089b74b9007400e67b7233e8e89a2959ad44f1af47e8645c1f4bfe3e"
+        },
+        {
+          "path": "deno.json",
+          "sha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee"
+        },
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        },
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        },
+        {
+          "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+          "sha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac"
+        },
+        {
+          "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+          "sha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871"
+        },
+        {
+          "path": "packages/auth-better-auth/mod.ts",
+          "sha256": "d42b3f01291b096bab3cf727974b8d9925c2a6a50b044aa6a065b69b20c4e5d7"
+        },
+        {
+          "path": "packages/auth-better-auth/deno.json",
+          "sha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+        },
+        {
+          "path": "packages/auth-better-auth/package.json",
+          "sha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth.ts",
+          "sha256": "e8dc9c8cfb9a54c70c4bbed3ed0d22e8d493a7c96d749733dc33840649cd41e9"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth-backend.ts",
+          "sha256": "336fa7e09a90476c8b0c33923edafee352893e30897291cabce33a5ae1cf91cb"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth_test.ts",
+          "sha256": "bf3f7cd4f5859801a18628d1beb814de84a4275b744ebe13c50f09c5100bcea5"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth-node-compat_test.ts",
+          "sha256": "253c44d21ec21b950cacc7856718461cd3bce94e1243582c567f1c3a3ce6165a"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/backend-error-interop_test.ts",
+          "sha256": "dffdf3ee12e49b975b6303c5640a32bb53cc872d8afc7e600f0de7ac3f370c41"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/subject-revocation_test.ts",
+          "sha256": "59ec73a5a82e20ce0bcbbc52e904c97fa1d03cc0d54aed58507af8a4d9ac4f75"
+        },
+        {
+          "path": "packages/plugin-auth-core/src/ports/mod.ts",
+          "sha256": "9fa0612bc50398e42efd96772b7b6188b394d958e1a4e9c1902de48038d56336"
+        },
+        {
+          "path": "packages/plugin-auth-core/src/ports/ports_test.ts",
+          "sha256": "079ae74bbe61f46afe5df23bfb50cfa6b42485e175a08a7f64287abd618e50ff"
+        },
+        {
+          "path": "plugins/auth/services/src/backend-registry.ts",
+          "sha256": "e33ddaea16bfd98351ed9c4d9bd5fe7eb3b62b6cb5693555e1edf5ae92ec9ca0"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-handlers.ts",
+          "sha256": "e56620a73ecd5a5ce6c2c6255af579a788a6b359e5282cb3879956b214a69fc8"
+        },
+        {
+          "path": "plugins/auth/tests/testing/auth-service-fixture.ts",
+          "sha256": "e30c62992be4352e36eae8c1e291bb57e5c19575a139540e1c0d123d6af37897"
+        },
+        {
+          "path": "packages/kv/adapters/memory.adapter.ts",
+          "sha256": "e48f44221ebf98b8f1196abd3ec1bd60b84731bc3390cef894b079e09c102ec2"
+        },
+        {
+          "path": "plugins/auth/tests/testing/documented-cookie-jar.ts",
+          "sha256": "2a754c62944d7fd178343a4689e9daa85466cb6e79b0bc54da0694a5ac6ac4d6"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-composition_test.ts",
+          "sha256": "f358f159c8c175387dce09eaf798337e6af492220739563e6353f403560e7f56"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff",
+          "sha256": "0da3897f00d0b97bc272470ea1b7c3c143d1ac7ba033692d2abc7216583df15c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-proposal.md",
+          "sha256": "11ac4de2906d874136f0bf6a436d05d6546ace224563e3bf1bddb61f26767d8f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/plan.md",
+          "sha256": "1811fa3c2adf6bc1e523f388c68c3381f46e465d7c1e6d97aab469725553091b"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-scope-authority.md",
+          "sha256": "9f759d8640300c3ba79bbfd0b7b0de8061bca77714d5b4f5e9b7ee8966d98ed4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-selection-amendment.md",
+          "sha256": "b9f920daa2fb2f6d4830ecb0be0f335aabeffbfc7068fb9bc0c451db7ae1344c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-acceptance-20261028.md",
+          "sha256": "4676ccaefcd0327ac321c16e3f47a950a4d4669088764693bfb642fbeca92731"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-20261028.json",
+          "sha256": "8ceedd7c0a6537c9d1224f3b37f98d68a383d95e38d451c131438b20d0e172ea"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-handoff.md",
+          "sha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9"
+        },
+        {
+          "path": ".agents/skills/netscript-harness/SKILL.md",
+          "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+        },
+        {
+          "path": ".llm/harness/evaluator/protocol.md",
+          "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+        },
+        {
+          "path": ".llm/harness/evaluator/verdict-definitions.md",
+          "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+        },
+        {
+          "path": ".llm/harness/workflow/run-loop.md",
+          "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+        },
+        {
+          "path": ".llm/harness/archetypes/SCOPE-service.md",
+          "sha256": "ab24ab54359d52db23b5adc30b5ab6fd1f1a2adf0675f201e562c903bc9f0cc7"
+        },
+        {
+          "path": ".llm/harness/workflow/lane-policy.md",
+          "sha256": "aaf406ad2f44409ffd81696ddd4796d4c0313fb77e615224722e096b1cbdf48b"
+        },
+        {
+          "path": ".agents/skills/netscript-tools/SKILL.md",
+          "sha256": "e85a8e970fe53e26279203e7c77faf34a0a16c739b9e10d0ae83a2f29bf3e01f"
+        },
+        {
+          "path": ".agents/skills/deno/SKILL.md",
+          "sha256": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.receipt.json",
+          "sha256": "d6fe0a34e43eba83034996d0e2e67ea34f321bb45e06d15e21469d6ecfbeedb0"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.receipt.json",
+          "sha256": "8bba7947548a0f071f32a9661b10bc830ccc17b5a683534d09669b748179db2a"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.receipt.json",
+          "sha256": "7ce2efd20f8bfdcff61b18cbd32172359237b047aa1a5ce2505ca714b3e9a938"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.process.json",
+          "sha256": "61e9b64f443b14014526d4c5cc9a1bbe64ab50fde25083b96584c89c3ac6a733"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.process.json",
+          "sha256": "ee821618343391ce4b3870e6786f1eb9bc4810671fa334b2447f5c5d32f4361f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.stdout.log",
+          "sha256": "37975c8e9086ede794d552c6acb4b8c01aff2092599739904d2e1a722f334c57"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.json",
+          "sha256": "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls-unchanged-baseline.json",
+          "sha256": "429122eface2bf845afc17d8b2004461a13b0a302bb79bd795122c7c9024a04f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.receipt.json",
+          "sha256": "6d7856bc1b7c281eb97bc181408c329ae36bc026be1e749a88f19e1476162584"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.json",
+          "sha256": "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.json",
+          "sha256": "12f4030dd3b4c31a8115b877c72694bfc6a83a3cef0b22687f26ca38f3bdc336"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-unchanged.json",
+          "sha256": "dde7411d2dcbaa15c194f8fa7d41fdcfa09eeeac6d132e3fe507bef88db426c8"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.receipt.json",
+          "sha256": "e4ca8a4cd739a913a4fb40393aefa553e796af231928d2c648c98f0006e55464"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.json",
+          "sha256": "301074d1a00ba03d10a93731611801b84431312ed555128d5996f4efcb298941"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.json",
+          "sha256": "f3ed8878aef97d694fbf46f46466325046bba096ac53fde1c89a973cfc074aa4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.json",
+          "sha256": "0375a7da9944233fb1797b3685b3933ccba2f72cfe749c804cf29a14574ff645"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.native-receipt.json",
+          "sha256": "0d480ec8630f653c360373dd50bb74b91aef39a0305ee80aab2b9edbbb886f6c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.json",
+          "sha256": "923c4b8419dbe41845eac1d4ee4be9d2618ea3440873bf74b67b69318e19173c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-unchanged.json",
+          "sha256": "bf03dfc4d4c8dd4c6586b63c7db34951f6c1bff6dd10d9a3d4e13e7747e09054"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.json",
+          "sha256": "ddbb210576aac92d2e15e2fbc0b05b6359bce11bdb8367178e497bbf684791c5"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.receipt.json",
+          "sha256": "85e458b513c05ecb8c8d8d8b1765360a799070826454efc2d377476a69c817b6"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.native-receipt.json",
+          "sha256": "9c024049bb1b6f0c32051cb3891d27e2020bc9152c0b34f9ccf8b05a3b292d49"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.native-receipt.json",
+          "sha256": "505296c0e0c9a66bb0d418e4718dc6607e43103b89a799cfd9891824a36f16e4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/cleanup-final.json",
+          "sha256": "34abc7d744bb2c9852036ee2e3ea28a4485bf486614529cbe733affdbdde1d5b"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/pre-review-evidence-manifest.json",
+          "sha256": "7f71a8d9a633759ad789c43940981a737f35bfe37c5f209b1d9336d967d3fd6d"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/archive-map.json",
+          "sha256": "2efc9f627d89c8115c0393f4854e2f1c21d54014638ddf39a015f44be545de38"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-closure.json",
+          "sha256": "bba1db7e664e07cf7d3eabdf6b0ed81cc6efb7941f1c30f6c6e463abd84eb6c9"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/protected-final.json",
+          "sha256": "7c710e05d57294ac4cf19de27f83b9e09661499cb91cd7fba0933055a9b96874"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/checkpoint-index-audit.json",
+          "sha256": "09e7b442af905e8929c050364f2e8a692cb4f2808e47db924db75a98eef25112"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-first-attempt-20261028.ts.txt",
+          "sha256": "866c4bc7630b3ea08469ecbb2c1a57e6a35f5fba576bd14da2131a9d73924688"
+        },
+        {
+          "path": ".mcp.json",
+          "sha256": "4350c8fb7a777ff4408aae2f75d327377fbf6804533bccf95d962fb2244254f4"
+        },
+        {
+          "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--dotnet-rfc/bench/bootsharp-lcg/package.json",
+          "sha256": "e7786a4c0cfacba76a578a82d3548b137fbfe36703ce0ba860441c100c8b3dfa"
+        },
+        {
+          "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.json",
+          "sha256": "d94c243a63bce94784ca036911d363492add32165bdfe0942163111dc9c7ccec"
+        },
+        {
+          "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.lock",
+          "sha256": "99537c6196d90ca77dbc4b5e074acb213136e2bf86cbdd8643a79749152a14c1"
+        },
+        {
+          "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.json",
+          "sha256": "61c727ccb1244b95ed768f17253f2cb5ff8fba66cbc1dc85938bd233130473e3"
+        },
+        {
+          "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.lock",
+          "sha256": "ba1b593c2be6b5097a9a4d7c168a6c1abe9ab1df96d8fd635d9fe396735e2c93"
+        },
+        {
+          "path": ".llm/runs/plan-devtools-contribution--seed/research/sources/nuxt-devtools__packages_devtools-kit_package.json",
+          "sha256": "ee3efb93c3051259e3c3725a6f836affd96bd179b4841c1ad8587e2dcc6e0b3a"
+        },
+        {
+          "path": "docs/site/deno.json",
+          "sha256": "6ee7fa5da3d189e74af7be7d4c209b33258ef9235585d46b1fd9a31aa931fb3c"
+        },
+        {
+          "path": "docs/site/deno.lock",
+          "sha256": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057"
+        },
+        {
+          "path": "packages/ai/deno.json",
+          "sha256": "ff97564ea9e42cc49afb6a9da5864bd2327feb0f008a5a4254ae8baa9fb27d1e"
+        },
+        {
+          "path": "packages/aspire/deno.json",
+          "sha256": "1d440df9e1e152e2be68a7408a09099c5a6cb1eea12ea3d9b2f99d6eb4eadc42"
+        },
+        {
+          "path": "packages/auth-kv-oauth/deno.json",
+          "sha256": "574608715e6564a2a1f5c4ea7deb91c2b66498da011d14988647e2e86e3a7206"
+        },
+        {
+          "path": "packages/auth-kv-oauth/package.json",
+          "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+        },
+        {
+          "path": "packages/auth-workos/deno.json",
+          "sha256": "0388d9fd89f61ab086c80bd20812511b25d7e8871c3c2fe437f7b9178ce5c76c"
+        },
+        {
+          "path": "packages/auth-workos/package.json",
+          "sha256": "dec9db272dca369514253e12795a4cb5dd4d4f2acc499c86e4b0ad6de07a5442"
+        },
+        {
+          "path": "packages/bench/deno.json",
+          "sha256": "4401cbbca430cac110e657d4aa94a16e189e5de8eed81fd6d417f3cfc61ba347"
+        },
+        {
+          "path": "packages/cli/deno.json",
+          "sha256": "778cff41fa1553de8e38c622d5be3c007dd57921401c7708a7d10bb36731979b"
+        },
+        {
+          "path": "packages/cli/e2e/deno.json",
+          "sha256": "0fcaa84136640b9f1a4fa424f1a9f30ad42c9b9375f978496e627565a3160d95"
+        },
+        {
+          "path": "packages/cli/e2e/fixtures/desktop-native/deno.json",
+          "sha256": "2a13d1a769e52424ee86ed44f128c160bd9f30f649cdcb24d5d59471f91c5ba7"
+        },
+        {
+          "path": "packages/cli/e2e/fixtures/desktop-native/deno.lock",
+          "sha256": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a"
+        },
+        {
+          "path": "packages/config/deno.json",
+          "sha256": "e455fc1d45fe2008df6f4cf31fc5e1937da9c853e4d0dfdc7dcb6dd87c1edf64"
+        },
+        {
+          "path": "packages/contracts/deno.json",
+          "sha256": "6d770b348514841838c68432b1decbbaacdb48f16a53efaa4ed21eb6918e2718"
+        },
+        {
+          "path": "packages/contracts/package.json",
+          "sha256": "78170b8b72c058aad12e45f1c026033a6a7562bb97c9b596e6e55d527a980e9b"
+        },
+        {
+          "path": "packages/cron/deno.json",
+          "sha256": "8095ce1848250aab5432caf017f6c3b670f526733c781234047d89c38d48b62b"
+        },
+        {
+          "path": "packages/database/deno.json",
+          "sha256": "9f4138183a0227d6ee14c7cde2672eaf7d4f7c157eba731c961122b943bf9087"
+        },
+        {
+          "path": "packages/database/package.json",
+          "sha256": "c49333df8fd0237914e43208899c4c0713a2a03e42c5057f4817427e5efd519a"
+        },
+        {
+          "path": "packages/fresh-ui/deno.json",
+          "sha256": "8858451a95ff4c56bdaa5725d6a0be74a5a5c7c9a77be6ba7436e26260bb438b"
+        },
+        {
+          "path": "packages/fresh-ui/package.json",
+          "sha256": "244aa0a6dc7fe4b105e09a9a70453fcd1dab062317f07db34c44ca3cc94c73be"
+        },
+        {
+          "path": "packages/fresh/deno.json",
+          "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56"
+        },
+        {
+          "path": "packages/fresh/package.json",
+          "sha256": "42b09520e14b3d54de99ae694a106b0dcbd268bc4cfa29ed6b9c8ca6ce543a4a"
+        },
+        {
+          "path": "packages/fresh/tests/type-fixtures/query-hydration-5.101.0-deno.json",
+          "sha256": "086e999a4c39e3f7bc0d70e6e8159bddf644b5ed30518aa8e8c777e907619384"
+        },
+        {
+          "path": "packages/fresh/tests/type-fixtures/query-hydration-5.102.8-deno.json",
+          "sha256": "3e27d29628d164b26db94ffabec55b5662621adab9449ef542ed296ef630fdcb"
+        },
+        {
+          "path": "packages/fresh/tests/type-fixtures/query-hydration-5.104.1-deno.json",
+          "sha256": "5558eef4500da1276b650307d2ec0c7140abbab6ac357bc41dcd0523805a8b2c"
+        },
+        {
+          "path": "packages/fresh/tests/type-fixtures/streamdb-consumer-deno.json",
+          "sha256": "16a9189c140cc2c2626082a2083308a0ae4166530c922f7c8e97348acf5f616f"
+        },
+        {
+          "path": "packages/kv/deno.json",
+          "sha256": "7253605e36f72b58c5fe0b1f933016bee962cc6b37f4358da461d8adaa664f73"
+        },
+        {
+          "path": "packages/kv/package.json",
+          "sha256": "bb9ccd1176d2dfaff5829aa0b083d1585cc2de3ab27471d8e10a1a1ca3bc815d"
+        },
+        {
+          "path": "packages/logger/deno.json",
+          "sha256": "bbea9a14463d562790cb2d73c8f78d8ab07a0850d1d19cf73740574a0cf4a176"
+        },
+        {
+          "path": "packages/mcp/deno.json",
+          "sha256": "6a005c2890c618a9bd6d11087476274865a9e8cd18192f7366562239e9604b5f"
+        },
+        {
+          "path": "packages/mcp/tests/fixtures/doctor/broken/deno.json",
+          "sha256": "6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361"
+        },
+        {
+          "path": "packages/mcp/tests/fixtures/doctor/healthy/deno.json",
+          "sha256": "499b4217cd2fa71181d534f3b1ad8aed684ef454acce652913fd4b3e412d609f"
+        },
+        {
+          "path": "packages/plugin-ai-core/deno.json",
+          "sha256": "c762d15b83f30226578bec370e2fabbc780d916a26fca3748fe625ea6fcaeb1e"
+        },
+        {
+          "path": "packages/plugin-ai-core/package.json",
+          "sha256": "373e8117e98ad776231e38714d202551051b9b28fe33bf5bb99328e21db19c82"
+        },
+        {
+          "path": "packages/plugin-auth-core/deno.json",
+          "sha256": "163aa1c2ea334525ec3f62deff57182e3d6a1ca752eb4f6f1c76ab67c4c9be43"
+        },
+        {
+          "path": "packages/plugin-auth-core/package.json",
+          "sha256": "dbf8c78b4490d39c179c4da3e4a8097136f07a85bc6e2705eb9c22423b3037fa"
+        },
+        {
+          "path": "packages/plugin-sagas-core/deno.json",
+          "sha256": "35b1d5b77a08392da7e538dc52c67432085e425873c665854f60211aa821db3e"
+        },
+        {
+          "path": "packages/plugin-sagas-core/package.json",
+          "sha256": "517e0bd8c190f5932617d8b879f951abc7d09770bc337b7e430b69b837bb268f"
+        },
+        {
+          "path": "packages/plugin-streams-core/deno.json",
+          "sha256": "c2357c0cb27502a1983474cf97ff8f0ce9442aeb1d4fecb55a34f1c90eb32757"
+        },
+        {
+          "path": "packages/plugin-streams-core/package.json",
+          "sha256": "847cf8357caf867d847d56940ce9183a015139f936a47acb1dea917b1855247d"
+        },
+        {
+          "path": "packages/plugin-streams-core/tests/type-fixtures/producer-consumer-deno.json",
+          "sha256": "81e5340fe061b954f281d4b0d37f911d66e376e0d511a88abeb49e9801a7e3b5"
+        },
+        {
+          "path": "packages/plugin-triggers-core/deno.json",
+          "sha256": "a5cd22e15d458e1d58c4754bcdc1b93c75b873411f10a9b73113ef8cb63599bf"
+        },
+        {
+          "path": "packages/plugin-triggers-core/package.json",
+          "sha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66"
+        },
+        {
+          "path": "packages/plugin-workers-core/deno.json",
+          "sha256": "be7620df38f5d68f0630809e9e57d7dda8b578b34aa81698c4583eb0153dc934"
+        },
+        {
+          "path": "packages/plugin-workers-core/package.json",
+          "sha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66"
+        },
+        {
+          "path": "packages/plugin/deno.json",
+          "sha256": "ad569a7e7d3570b5a8f5bcb9b62ab77aa0fed0cc8aa517004ae7ffdd609ef247"
+        },
+        {
+          "path": "packages/prisma-adapter-mysql/deno.json",
+          "sha256": "18c3ea278afcae571428b146b58eef5a496a89d4909e7cebef2cfe408a33e54b"
+        },
+        {
+          "path": "packages/prisma-adapter-mysql/package.json",
+          "sha256": "f4ccc169e0e35b4e717962a203de504f5c8d644bca08b88b007a7e0d4bdf2d86"
+        },
+        {
+          "path": "packages/queue/deno.json",
+          "sha256": "d562b7e08101e37414018f40c9f7bbcc39c8a5f45f5d1170ebd547d8f191a8d8"
+        },
+        {
+          "path": "packages/queue/package.json",
+          "sha256": "e4e0b46a72f8ee169ccdd982949902b98f07ef9661e3b99e06492def8a5bdaca"
+        },
+        {
+          "path": "packages/runtime-config/deno.json",
+          "sha256": "914bf6589706da6957e5a79134ea165a9000de867a47f177b22e0101dd7e4cbe"
+        },
+        {
+          "path": "packages/sdk/deno.json",
+          "sha256": "c3ee8b9719fca2f2faeeb62422ba5596ef1ce9c2ffd7e73f2060cd2ca3f1e5cc"
+        },
+        {
+          "path": "packages/sdk/package.json",
+          "sha256": "3ab89c4758982551c02f1430ed86832fedc81e7a0e3b8b32165d5d9ba7a6415a"
+        },
+        {
+          "path": "packages/service/deno.json",
+          "sha256": "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70"
+        },
+        {
+          "path": "packages/service/package.json",
+          "sha256": "b68c1f8091e566601f6be579ae95a8da9a5d244535ec4989789a234b96485df1"
+        },
+        {
+          "path": "packages/telemetry/deno.json",
+          "sha256": "8d71f8a43aad6b53646a6cce076913faa7ba9eac76cc1a0bbe033fad925b6a5d"
+        },
+        {
+          "path": "packages/telemetry/package.json",
+          "sha256": "1a390489439fa337f6b08cea2f586dd4ed4e4896343b0dbbbea0bf7172302104"
+        },
+        {
+          "path": "packages/watchers/deno.json",
+          "sha256": "af996587c28f2948125331c9d09f7840468c4073286662dcd6b6264e394b88c9"
+        },
+        {
+          "path": "plugins/ai/deno.json",
+          "sha256": "6eddd0a9352194259e65b57f6956b28b6b1b4f4ac1c2df16950ed3179ce89c85"
+        },
+        {
+          "path": "plugins/ai/package.json",
+          "sha256": "bfb62e6eafd1bf6db3ca8fa70b6712d62d1ba3562451585ece7bdb56ffcd2f73"
+        },
+        {
+          "path": "plugins/auth/deno.json",
+          "sha256": "2070ee8bf2da1bec746923d1ffecf6db79c0eb379b66e3965fe679aad4ca64f2"
+        },
+        {
+          "path": "plugins/auth/package.json",
+          "sha256": "204550257f9673f24fb2abb2b72944f162e43519e2097b86503cc62f6c5b7b8f"
+        },
+        {
+          "path": "plugins/sagas/deno.json",
+          "sha256": "42d994ad1cf58c24b8b5c778c8d9ddbda789a8e11165ca02903c8e81b0d2c41a"
+        },
+        {
+          "path": "plugins/sagas/package.json",
+          "sha256": "2186043a64cb54803e88b62c4aa37531c856d1b0ea2c9f22a4501c876958123a"
+        },
+        {
+          "path": "plugins/streams/deno.json",
+          "sha256": "647bdf32fa2400139c20e384ec7993435e9c13d85d9c3971cd88118bfdfb8147"
+        },
+        {
+          "path": "plugins/streams/package.json",
+          "sha256": "a8afee82893425ddf33517e56175b3115017fabcf7e21c24c26369cf05defb36"
+        },
+        {
+          "path": "plugins/triggers/deno.json",
+          "sha256": "987493fae18d76a2372673dee1f28699a799f117f76af335a23c9630484003ce"
+        },
+        {
+          "path": "plugins/triggers/package.json",
+          "sha256": "6b165d3656c74b064375858b74b38967f695c17c6ee6b018a39ac3c55402c500"
+        },
+        {
+          "path": "plugins/workers/deno.json",
+          "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a"
+        },
+        {
+          "path": "plugins/workers/package.json",
+          "sha256": "564376c32ad1fccc5a9eb8c313b81ee3228f5d76f9a26cd42dcac23fb8d49429"
+        },
+        {
+          "path": "resources/examples/expo-streams/deno.json",
+          "sha256": "e473fdc51a2f77dc578dc6b9ec484c190615e8aff7bf9c1bca9e3c329f98a101"
+        },
+        {
+          "path": "resources/examples/expo-streams/deno.lock",
+          "sha256": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e"
+        },
+        {
+          "path": "resources/examples/expo-streams/package.json",
+          "sha256": "aa9daff31e5e11a9b52829d81d50894720ac42c05d0b67f0b8ca93fbb33f146b"
+        },
+        {
+          "path": "packages/auth-better-auth/README.md",
+          "sha256": "63b45863ccd9a8b542f8bda731b87246455ecef18ccc79e94a9565331461d001"
+        },
+        {
+          "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+          "sha256": "eabb1c9f54a502a119b10a6bb908410da7ba41a8ba553f6893023bfed021796f"
+        },
+        {
+          "path": "plugins/auth/services/src/auth-guard.ts",
+          "sha256": "9710f193ec8e40ce570a08a93180c4ac36336b7576e3ca5b0046f3d8f02b1a61"
+        },
+        {
+          "path": "plugins/auth/services/src/auth-service-runtime.ts",
+          "sha256": "05e78dd771935b7f65d8a6f5614a334f55c8700f65eb69c352293629e35757eb"
+        },
+        {
+          "path": "plugins/auth/services/src/auth-service-types.ts",
+          "sha256": "182952e5b1ad4da8d0e2f04ad3d9e46f54aaf7db686fd9333ec2f5ca814eac2d"
+        },
+        {
+          "path": "plugins/auth/services/src/init.ts",
+          "sha256": "5fee72b31b0689f1df17b65eac98bf66fd1268c7ed712ca2ed5ac855111afc64"
+        },
+        {
+          "path": "plugins/auth/services/src/kv-oauth-subject.ts",
+          "sha256": "b2c12149a871f22585a7f2c5a7221739e684ff3d20b212b93619ca2130eaf45b"
+        },
+        {
+          "path": "plugins/auth/services/src/main.ts",
+          "sha256": "0855efbbfaec016c25c407bef80e0bdfa8a1f05c02a60fcd6f146a01c69a5083"
+        },
+        {
+          "path": "plugins/auth/services/src/request-context.ts",
+          "sha256": "1d56cb93b1ee859c459889b397fd6b0143ecd70d6631c8b1b010196ff0582df0"
+        },
+        {
+          "path": "plugins/auth/services/src/router.ts",
+          "sha256": "14bdf98c40a519cb57fa904d77a9e4bf0616fa17ba23253f7daa83961c8de52f"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/router-context.ts",
+          "sha256": "3eda52f2be079bc9cd8096a5e9dfc57b5c845b27407adf79f9021cae2ef41ffe"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-helpers.ts",
+          "sha256": "8e69f877495378688aa6e7c25d0c847b5898c3d97408d42f948188f14e1da437"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-session-ownership.ts",
+          "sha256": "3e7709eba1c1e90208ca56081e4681d83e737972b2fdbce1811f9327eb493b93"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-telemetry.ts",
+          "sha256": "30cd0b7b2b1b20467d7bc5f85e325054dc1483710353fbcc283d7cdfd27a5c8f"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-types.ts",
+          "sha256": "f3cb43824506315c02d59f955fa753f102eb8a0090226ee981156e9ed4cf3bb6"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1.ts",
+          "sha256": "bd8b3b1484b70cd64374990943896e1bf932d0c3cb83671d5f490364bf30bff6"
+        },
+        {
+          "path": "plugins/auth/services/src/workos-revocation-worker.ts",
+          "sha256": "e2fdb79406914c1555d336e0c1cd4c7bd656522d5af25ecefdefe869dbe8cc9e"
+        },
+        {
+          "path": "plugins/auth/services/src/workos-worker-observer.ts",
+          "sha256": "4ee5a5195fc3a9c3a29a1ab5caa3b9622ee7e21676385afd85e0800801ae9143"
+        },
+        {
+          "path": "plugins/auth/tests/services/auth-service_test.ts",
+          "sha256": "5e26d6cc5e6670a11d25ec40f08d58296c56af54615f0a616194c7bfdc61abbb"
+        },
+        {
+          "path": "plugins/auth/tests/services/auth-v1-context-types_test.ts",
+          "sha256": "39f4d9c451e06f75276c437f7cc49ab62e8f92e4996778db1c8ba3cddceb91b9"
+        },
+        {
+          "path": "plugins/auth/tests/services/callback-cookie-contract-http_test.ts",
+          "sha256": "cb1805b767a6f57d84fe9612632f86174e2e5d11abf6e1b8a6e6ce881257c771"
+        },
+        {
+          "path": "plugins/auth/tests/services/configured-cookie_test.ts",
+          "sha256": "5fc8cb5f21f0ed95e02da3d13b0bb86a815e319e1d5b51ebef369696f30e6ab5"
+        },
+        {
+          "path": "plugins/auth/tests/services/cookie-audit-failure_test.ts",
+          "sha256": "d2817c34705430b7dfc8662c1096d2c4fbbd7b7a18b3226a968a8a7daa798269"
+        },
+        {
+          "path": "plugins/auth/tests/services/cookie-propagation-http_test.ts",
+          "sha256": "74886f67288fb60dd2f225f9f77caea3a8fe4860e36cd0bdf9757a8c2fa4bab7"
+        },
+        {
+          "path": "plugins/auth/tests/services/cookie-propagation-production_test.ts",
+          "sha256": "a7917dd4b31cf9f5ed7eb9b7231177bc4dac9c9614d428129ded3ae4d50b4bf8"
+        },
+        {
+          "path": "plugins/auth/tests/services/documented-cookie-jar_test.ts",
+          "sha256": "9f95314c9b8380f3f04b60089f31222cc297d27d5a1857d33877482f5ced0b39"
+        },
+        {
+          "path": "plugins/auth/tests/services/global-signout-cookie-http_test.ts",
+          "sha256": "6a3ebcaae8088a804c0ecf9aad7a97948ee9984d253c9f94dc9eddbde4e3673b"
+        },
+        {
+          "path": "plugins/auth/tests/services/import-surface_test.ts",
+          "sha256": "de4e1cd88e64f21f0518a540d850f9fdf96af8b1428de7de7769d05b0b00b781"
+        },
+        {
+          "path": "plugins/auth/tests/services/kv-oauth-subject_test.ts",
+          "sha256": "5637eeb59e41079598fc20f4dbd8fb286487a9a1bdd8cb1db80398e4ac5befa6"
+        },
+        {
+          "path": "plugins/auth/tests/services/me-bearer-parity-http_test.ts",
+          "sha256": "24808b9b2e85be8d713e072330894f2472f8de85604639552ca6f25d5443e41f"
+        },
+        {
+          "path": "plugins/auth/tests/services/me-empty-input-http_test.ts",
+          "sha256": "5f925a0bff7506d7879304ae9950824b49d64b82704334d8bb54beca75b6fa09"
+        },
+        {
+          "path": "plugins/auth/tests/services/session-credentials-http_test.ts",
+          "sha256": "48637da86fc3dd3d1d4a15811d77645e01432eefcd07e61a8d48e8cd5dc056a7"
+        },
+        {
+          "path": "plugins/auth/tests/services/signout-ownership-http_test.ts",
+          "sha256": "e6f965ee649fc66acb88c3577538972821bc97d6c97fcdb952484454301bc374"
+        },
+        {
+          "path": "plugins/auth/tests/services/transport-policy_test.ts",
+          "sha256": "0c60f2ac253ce23f0456cbeb291a06d79dc0b59e8d18a33105cb1d2b663f6ce2"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-global-logout-http_test.ts",
+          "sha256": "c8a79e30c6f8c28081001a6d60ecb68d5f566e870131b60c889b1fbb102f5f5b"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-observer_test.ts",
+          "sha256": "51ea5b70b5dad9e5f6dd7901148c63d5407de79e089381e49efc4ebbf840d59a"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-revocation-worker_test.ts",
+          "sha256": "7399334b807a894afa03ba4418b36d03b81275b3ced0c099e2cea968d3a1e944"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-wake-availability_test.ts",
+          "sha256": "2fe2b5d520a5609f3eb210f45411e8fb57d0eb355db503270ad76f7fe4130bc2"
+        }
+      ],
+      "untracked": [
+        ".agents/skills/aspire-deployment/SKILL.md",
+        ".agents/skills/aspire-deployment/references/aws.md",
+        ".agents/skills/aspire-deployment/references/azure.md",
+        ".agents/skills/aspire-deployment/references/cicd.md",
+        ".agents/skills/aspire-deployment/references/docker-compose.md",
+        ".agents/skills/aspire-deployment/references/github-actions-azure-csharp.yml",
+        ".agents/skills/aspire-deployment/references/github-actions-azure-typescript.yml",
+        ".agents/skills/aspire-deployment/references/javascript.md",
+        ".agents/skills/aspire-deployment/references/kubernetes.md",
+        ".agents/skills/aspire-deployment/references/preflight.md",
+        ".agents/skills/aspire-init/SKILL.md",
+        ".agents/skills/aspire-init/references/init-workflow.md",
+        ".agents/skills/aspire-init/references/templates.md",
+        ".agents/skills/aspire-monitoring/SKILL.md",
+        ".agents/skills/aspire-monitoring/references/diagnostics-bridge.md",
+        ".agents/skills/aspire-monitoring/references/monitoring.md",
+        ".agents/skills/aspire-monitoring/references/playwright-handoff.md",
+        ".agents/skills/aspire-orchestration/SKILL.md",
+        ".agents/skills/aspire-orchestration/references/agent-workflows.md",
+        ".agents/skills/aspire-orchestration/references/app-commands.md",
+        ".agents/skills/aspire-orchestration/references/detection.md",
+        ".agents/skills/aspire-orchestration/references/resource-management.md",
+        ".agents/skills/aspire-orchestration/references/safety-guardrails.md",
+        ".agents/skills/deno/SKILL.md",
+        ".agents/skills/help.md",
+        ".agents/skills/netscript-build/SKILL.md",
+        ".agents/skills/netscript-operate/SKILL.md",
+        ".agents/skills/netscript/SKILL.md",
+        ".llm/tools/release.json",
+        ".mcp.json",
+        ".netscript/docs/MANIFEST.md",
+        ".netscript/docs/context/01-how-the-web-became-the-default.mdx",
+        ".netscript/docs/context/02-how-the-web-stack-grew-up.mdx",
+        ".netscript/docs/deno-doc/service.txt",
+        ".netscript/docs/llms-full.txt",
+        ".netscript/docs/llms.txt",
+        ".netscript/docs/pages/ai/agent-tooling/index.md",
+        ".netscript/docs/pages/ai/chat-ui/index.md",
+        ".netscript/docs/pages/ai/durable-chat/index.md",
+        ".netscript/docs/pages/ai/engine/index.md",
+        ".netscript/docs/pages/ai/how-to/build-a-durable-chat/index.md",
+        ".netscript/docs/pages/ai/how-to/index.md",
+        ".netscript/docs/pages/ai/index.md",
+        ".netscript/docs/pages/ai/mcp/index.md",
+        ".netscript/docs/pages/background-processing/how-to/add-a-task-runtime-adapter/index.md",
+        ".netscript/docs/pages/background-processing/how-to/index.md",
+        ".netscript/docs/pages/background-processing/how-to/restrict-worker-task-permissions/index.md",
+        ".netscript/docs/pages/background-processing/how-to/run-a-polyglot-task/index.md",
+        ".netscript/docs/pages/background-processing/how-to/tune-worker-runtime/index.md",
+        ".netscript/docs/pages/background-processing/index.md",
+        ".netscript/docs/pages/background-processing/polyglot-tasks/index.md",
+        ".netscript/docs/pages/background-processing/workers/index.md",
+        ".netscript/docs/pages/cli-reference/index.md",
+        ".netscript/docs/pages/comparisons/backend/index.md",
+        ".netscript/docs/pages/comparisons/frontend/index.md",
+        ".netscript/docs/pages/comparisons/index.md",
+        ".netscript/docs/pages/concepts/index.md",
+        ".netscript/docs/pages/data-persistence/database/index.md",
+        ".netscript/docs/pages/data-persistence/how-to/choose-a-queue-provider/index.md",
+        ".netscript/docs/pages/data-persistence/how-to/database-migration/index.md",
+        ".netscript/docs/pages/data-persistence/how-to/index.md",
+        ".netscript/docs/pages/data-persistence/how-to/queue-kv-cron/index.md",
+        ".netscript/docs/pages/data-persistence/how-to/use-a-second-database/index.md",
+        ".netscript/docs/pages/data-persistence/index.md",
+        ".netscript/docs/pages/data-persistence/kv-queues-cron/index.md",
+        ".netscript/docs/pages/durable-workflows/expo-streams/index.md",
+        ".netscript/docs/pages/durable-workflows/how-to/bound-stream-retention/index.md",
+        ".netscript/docs/pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md",
+        ".netscript/docs/pages/durable-workflows/how-to/index.md",
+        ".netscript/docs/pages/durable-workflows/how-to/publish-a-durable-stream/index.md",
+        ".netscript/docs/pages/durable-workflows/index.md",
+        ".netscript/docs/pages/durable-workflows/sagas/index.md",
+        ".netscript/docs/pages/durable-workflows/streams/index.md",
+        ".netscript/docs/pages/durable-workflows/triggers/index.md",
+        ".netscript/docs/pages/explanation/architecture/index.md",
+        ".netscript/docs/pages/explanation/aspire/index.md",
+        ".netscript/docs/pages/explanation/auth-model/index.md",
+        ".netscript/docs/pages/explanation/compared/index.md",
+        ".netscript/docs/pages/explanation/contracts/index.md",
+        ".netscript/docs/pages/explanation/durability-model/index.md",
+        ".netscript/docs/pages/explanation/index.md",
+        ".netscript/docs/pages/explanation/observability/index.md",
+        ".netscript/docs/pages/explanation/plugin-system/index.md",
+        ".netscript/docs/pages/glossary/index.md",
+        ".netscript/docs/pages/how-to/index.md",
+        ".netscript/docs/pages/identity-access/auth/index.md",
+        ".netscript/docs/pages/identity-access/better-auth-plugins/index.md",
+        ".netscript/docs/pages/identity-access/how-to/add-authentication/index.md",
+        ".netscript/docs/pages/identity-access/how-to/index.md",
+        ".netscript/docs/pages/identity-access/index.md",
+        ".netscript/docs/pages/identity-access/session-lifecycles/index.md",
+        ".netscript/docs/pages/index.md",
+        ".netscript/docs/pages/observability/how-to/add-opentelemetry/index.md",
+        ".netscript/docs/pages/observability/how-to/index.md",
+        ".netscript/docs/pages/observability/index.md",
+        ".netscript/docs/pages/observability/telemetry/index.md",
+        ".netscript/docs/pages/orchestration-runtime/child-health/index.md",
+        ".netscript/docs/pages/orchestration-runtime/cli-scaffold/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/add-a-plugin/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/author-a-plugin/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/deno-lsp-code-intelligence/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/deploy-deno-deploy/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/deploy-local-aspire/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/deploy/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/graceful-shutdown/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/outbound-webhooks/index.md",
+        ".netscript/docs/pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md",
+        ".netscript/docs/pages/orchestration-runtime/index.md",
+        ".netscript/docs/pages/orchestration-runtime/runtime-config/index.md",
+        ".netscript/docs/pages/quickstart/aspire/index.md",
+        ".netscript/docs/pages/quickstart/index.md",
+        ".netscript/docs/pages/reference/ai/index.md",
+        ".netscript/docs/pages/reference/ai/skills/index.md",
+        ".netscript/docs/pages/reference/aspire/index.md",
+        ".netscript/docs/pages/reference/auth-better-auth/index.md",
+        ".netscript/docs/pages/reference/auth-kv-oauth/index.md",
+        ".netscript/docs/pages/reference/auth-workos/index.md",
+        ".netscript/docs/pages/reference/auth/index.md",
+        ".netscript/docs/pages/reference/cli/commands/index.md",
+        ".netscript/docs/pages/reference/cli/index.md",
+        ".netscript/docs/pages/reference/config/index.md",
+        ".netscript/docs/pages/reference/contracts/index.md",
+        ".netscript/docs/pages/reference/cron/index.md",
+        ".netscript/docs/pages/reference/database/index.md",
+        ".netscript/docs/pages/reference/fresh-ui/index.md",
+        ".netscript/docs/pages/reference/fresh/index.md",
+        ".netscript/docs/pages/reference/index.md",
+        ".netscript/docs/pages/reference/kv/index.md",
+        ".netscript/docs/pages/reference/logger/index.md",
+        ".netscript/docs/pages/reference/mcp/index.md",
+        ".netscript/docs/pages/reference/plugin-ai-core/index.md",
+        ".netscript/docs/pages/reference/plugin-ai/index.md",
+        ".netscript/docs/pages/reference/plugin-auth-core/index.md",
+        ".netscript/docs/pages/reference/plugin-auth/index.md",
+        ".netscript/docs/pages/reference/plugin-sagas-core/index.md",
+        ".netscript/docs/pages/reference/plugin-streams-core/index.md",
+        ".netscript/docs/pages/reference/plugin-triggers-core/index.md",
+        ".netscript/docs/pages/reference/plugin-workers-core/index.md",
+        ".netscript/docs/pages/reference/plugin/index.md",
+        ".netscript/docs/pages/reference/prisma-adapter-mysql/index.md",
+        ".netscript/docs/pages/reference/queue/index.md",
+        ".netscript/docs/pages/reference/runtime-config/index.md",
+        ".netscript/docs/pages/reference/sagas/index.md",
+        ".netscript/docs/pages/reference/sdk/index.md",
+        ".netscript/docs/pages/reference/service/index.md",
+        ".netscript/docs/pages/reference/streams/index.md",
+        ".netscript/docs/pages/reference/telemetry/index.md",
+        ".netscript/docs/pages/reference/triggers/index.md",
+        ".netscript/docs/pages/reference/watchers/index.md",
+        ".netscript/docs/pages/reference/workers/index.md",
+        ".netscript/docs/pages/services-sdk/how-to/add-a-service/index.md",
+        ".netscript/docs/pages/services-sdk/how-to/call-internal-procedures/index.md",
+        ".netscript/docs/pages/services-sdk/how-to/discover-services/index.md",
+        ".netscript/docs/pages/services-sdk/how-to/expose-openapi-scalar/index.md",
+        ".netscript/docs/pages/services-sdk/how-to/index.md",
+        ".netscript/docs/pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
+        ".netscript/docs/pages/services-sdk/index.md",
+        ".netscript/docs/pages/services-sdk/sdk/index.md",
+        ".netscript/docs/pages/services-sdk/service-layout/index.md",
+        ".netscript/docs/pages/services-sdk/services/index.md",
+        ".netscript/docs/pages/tutorials/chat/01-scaffold/index.md",
+        ".netscript/docs/pages/tutorials/chat/02-durable-chat-route/index.md",
+        ".netscript/docs/pages/tutorials/chat/03-chat-ui/index.md",
+        ".netscript/docs/pages/tutorials/chat/04-tool-call/index.md",
+        ".netscript/docs/pages/tutorials/chat/05-mcp/index.md",
+        ".netscript/docs/pages/tutorials/chat/06-live-streaming/index.md",
+        ".netscript/docs/pages/tutorials/chat/index.md",
+        ".netscript/docs/pages/tutorials/erp-sync/01-scaffold/index.md",
+        ".netscript/docs/pages/tutorials/erp-sync/02-import-job/index.md",
+        ".netscript/docs/pages/tutorials/erp-sync/03-polyglot-transform/index.md",
+        ".netscript/docs/pages/tutorials/erp-sync/04-queue-and-cron/index.md",
+        ".netscript/docs/pages/tutorials/erp-sync/05-deploy/index.md",
+        ".netscript/docs/pages/tutorials/erp-sync/index.md",
+        ".netscript/docs/pages/tutorials/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/01-scaffold/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/02-contract-to-service/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/05-live-stream/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/06-deploy/index.md",
+        ".netscript/docs/pages/tutorials/live-dashboard/index.md",
+        ".netscript/docs/pages/tutorials/storefront/01-scaffold/index.md",
+        ".netscript/docs/pages/tutorials/storefront/02-catalog-service/index.md",
+        ".netscript/docs/pages/tutorials/storefront/03-cart-contracts/index.md",
+        ".netscript/docs/pages/tutorials/storefront/04-checkout-saga/index.md",
+        ".netscript/docs/pages/tutorials/storefront/05-shipping-webhook/index.md",
+        ".netscript/docs/pages/tutorials/storefront/06-storefront-ui/index.md",
+        ".netscript/docs/pages/tutorials/storefront/07-deploy/index.md",
+        ".netscript/docs/pages/tutorials/storefront/index.md",
+        ".netscript/docs/pages/tutorials/workspace/01-scaffold/index.md",
+        ".netscript/docs/pages/tutorials/workspace/02-auth/index.md",
+        ".netscript/docs/pages/tutorials/workspace/03-workspace-data/index.md",
+        ".netscript/docs/pages/tutorials/workspace/04-provision-job/index.md",
+        ".netscript/docs/pages/tutorials/workspace/05-route-authz/index.md",
+        ".netscript/docs/pages/tutorials/workspace/06-deploy/index.md",
+        ".netscript/docs/pages/tutorials/workspace/index.md",
+        ".netscript/docs/pages/web-layer/builders/index.md",
+        ".netscript/docs/pages/web-layer/defer-streaming-ui/index.md",
+        ".netscript/docs/pages/web-layer/error/index.md",
+        ".netscript/docs/pages/web-layer/examples/index.md",
+        ".netscript/docs/pages/web-layer/form/index.md",
+        ".netscript/docs/pages/web-layer/fresh-ui/index.md",
+        ".netscript/docs/pages/web-layer/generated-surface/index.md",
+        ".netscript/docs/pages/web-layer/how-to/build-a-desktop-frontend/index.md",
+        ".netscript/docs/pages/web-layer/how-to/build-a-server-validated-form/index.md",
+        ".netscript/docs/pages/web-layer/how-to/customize-fresh-ui/index.md",
+        ".netscript/docs/pages/web-layer/how-to/index.md",
+        ".netscript/docs/pages/web-layer/index.md",
+        ".netscript/docs/pages/web-layer/interactive/index.md",
+        ".netscript/docs/pages/web-layer/layers/index.md",
+        ".netscript/docs/pages/web-layer/partials/index.md",
+        ".netscript/docs/pages/web-layer/query-bridge/index.md",
+        ".netscript/docs/pages/web-layer/query/index.md",
+        ".netscript/docs/pages/web-layer/resources/index.md",
+        ".netscript/docs/pages/web-layer/response/index.md",
+        ".netscript/docs/pages/web-layer/route/index.md",
+        ".netscript/docs/pages/web-layer/server/index.md",
+        ".netscript/docs/pages/web-layer/testing/index.md",
+        ".netscript/docs/pages/web-layer/vite/index.md",
+        ".netscript/docs/pages/why/index.md",
+        ".netscript/schema/config-file.v1.json"
+      ]
+    }
+  ]
+}

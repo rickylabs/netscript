@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-28T04:56:00.394Z",
+  "head": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "acceptedSecurityOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+  "files": [
+    {
+      "path": "packages/cli/tests/installed-auth-fixture.ts",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "2ad1b17e0ada7be2bbdaf658a1714b45818aaccbf3caa6ddb534e359a87e2aed",
+      "headSha256": "2ad1b17e0ada7be2bbdaf658a1714b45818aaccbf3caa6ddb534e359a87e2aed",
+      "workingSha256": "2ad1b17e0ada7be2bbdaf658a1714b45818aaccbf3caa6ddb534e359a87e2aed",
+      "match": true
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "ac767a5c5fd2138a493ee3019797bf6ca11d7852babb1ac1e3da0623613cfe39",
+      "headSha256": "ac767a5c5fd2138a493ee3019797bf6ca11d7852babb1ac1e3da0623613cfe39",
+      "workingSha256": "ac767a5c5fd2138a493ee3019797bf6ca11d7852babb1ac1e3da0623613cfe39",
+      "match": true
+    },
+    {
+      "path": "deno.json",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "headSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "workingSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "match": true
+    },
+    {
+      "path": "deno.lock",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "headSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "workingSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "match": true
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "headSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "workingSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "match": true
+    },
+    {
+      "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "headSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "workingSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "match": true
+    },
+    {
+      "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+      "acceptedOrigin": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "acceptedSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "headSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "workingSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "match": true
+    }
+  ],
+  "allSevenMatch": true,
+  "trackedDiffEmpty": true,
+  "noSourceChanges": true
+}

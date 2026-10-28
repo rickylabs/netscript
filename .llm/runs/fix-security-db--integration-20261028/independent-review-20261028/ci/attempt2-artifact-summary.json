@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-28T05:04:20.502Z",
+  "workflowRun": 40633645853,
+  "runAttempt": 2,
+  "head": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "nativeCiMergeHead": "189c903b25e38f4aa99780be012cb258dd0f6198",
+  "job": 122640688638,
+  "artifactId": 12793835848,
+  "artifactName": "ci-check-test-shard-test-5-gate-receipts-40633645853-2",
+  "exactOneRootAuthorizedFailedJobRerun": true,
+  "files": [
+    {
+      "name": "test.report.json",
+      "bytes": 15915,
+      "sha256": "d78cf7eac4aaf145859f67d3cb56fba82664492bb01cdf8f6f2ca0d7ddcbf941",
+      "exitCode": 0,
+      "summary": {
+        "passed": 1456,
+        "failed": 0,
+        "ignored": 3,
+        "totalResults": 1459,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "test.receipt.json",
+      "bytes": 34789,
+      "sha256": "aa042f420ed2f6e0ecd54b90503b676693982be1f7e75b132f98acaa173e3fe7",
+      "exitCode": 0,
+      "gateId": "test-shard",
+      "outcome": "PASS",
+      "gitHead": "189c903b25e38f4aa99780be012cb258dd0f6198",
+      "actualGitHead": "189c903b25e38f4aa99780be012cb258dd0f6198",
+      "childReportEvidence": {
+        "path": ".llm/tmp/gate-receipts/check-test/test.report.json",
+        "bytes": 15915,
+        "sha256": "d78cf7eac4aaf145859f67d3cb56fba82664492bb01cdf8f6f2ca0d7ddcbf941",
+        "modifiedAt": "2026-10-28T05:02:29.478Z"
+      }
+    }
+  ],
+  "first17FailuresPreserved": true,
+  "preciseTransientTransportCauseUnproven": true,
+  "noSourceChanges": true,
+  "noSkipOrAgeOrSanitizerChanges": true,
+  "noInference": true,
+  "noReservation": true
+}
