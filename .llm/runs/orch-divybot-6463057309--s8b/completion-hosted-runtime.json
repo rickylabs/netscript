@@ -1,0 +1,18 @@
+{
+  "workflowRun": 40655446049,
+  "testedHead": "2c3199e74d471863056ac886429d24065b1ab70a",
+  "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime.json",
+  "runtimeJobConclusion": "success",
+  "runtimeJobUrl": "https://github.com/rickylabs/netscript/actions/runs/40655446049/job/122705497381",
+  "runtimeSummary": {
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0
+  },
+  "otherPassedJobs": [
+    "scaffold-static",
+    "scaffold-runtime-sqlite"
+  ],
+  "separateFailedJob": "desktop-native-linux (deb + signed updater)",
+  "scopeNote": "Hosted runtime evidence on the stated earlier source head; not a claim that the whole workflow or the final PR head was tested. No runtime implementation changes in this docs repair."
+}

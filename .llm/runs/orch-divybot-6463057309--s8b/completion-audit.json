@@ -1,7 +1,7 @@
 {
   "previousGoalTurn": "progress: implementation, commits, PR updates, independent evaluation and evidence delivered",
   "currentImplementation": "1828064b",
-  "auditedHead": "b9dd656cb2b0fe7c19398316fea116a4bb50e27c",
+  "auditedHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
   "requiredReviewFixes": "PASS: thirteen ordered required theme H2s; independent fixed fixture lists; validated rendered guideline anchors",
   "requiredPolish": "PASS: linked section CSS on all fifteen pages; thirty-four build-only thumbnails; distinct Colors/value headings",
   "requiredProof": "PASS: docs build, thirteen tests, three red-before/green-after regressions, links, fixed-TOC screenshot and independent read-only Claude Opus 5.5/high sign-off",
@@ -13,7 +13,7 @@
     "excludedFilesUnchanged": true
   },
   "currentMcpBudgetAudit": {
-    "method": "Native buildAgentDocsProseFromSite into a temporary carrier, then actual buildMcpEmbeddedDocs",
+    "method": "Actual committed CLI carrier decoded and checked by native buildMcpEmbeddedDocs; all fifteen design-system twins verified",
     "sourceBytes": 284489,
     "budgetBytes": 294912,
     "documentCount": 14,
@@ -21,14 +21,36 @@
     "verdict": "PASS"
   },
   "additionalFreshnessGate": {
-    "command": "deno task check:agent-docs-prose",
-    "exitCode": 1,
-    "result": "Site build passes; checked-in agent-docs-prose.generated.ts is stale",
-    "owner": "Existing declared generation-only support lane on PR 2437",
-    "handoff": "Source repair pushed; support lane notified in PR comment",
-    "liveness": "Native Codex process referencing the support worktree confirmed live; no process identifiers retained"
+    "commands": [
+      "check:agent-docs-prose",
+      "check:mcp-export-corpus",
+      "check:assets-barrel",
+      "check:publish-assets"
+    ],
+    "exitCodes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "verdict": "PASS",
+    "integrationCommits": [
+      "977f2742",
+      "9fa47591"
+    ],
+    "scope": "Native-generated CLI prose and MCP publish data only; reviewed source unchanged",
+    "evidence": "completion-freshness-summary.json"
   },
-  "runtimeGate": "UNPROVEN locally: Aspire/Docker environment; independent runtime support is separate and no merge readiness is claimed",
-  "completion": "Not yet claimed while the known generated-carrier freshness failure remains",
-  "stopPoint": "READY for review; never merge, tag or release"
+  "runtimeGate": "Local final-head runtime remains UNPROVEN due environment. Hosted one-pass runtime is separately verified on earlier head 2c3199e74: 120 passed / 0 failed / 0 skipped; separate desktop-native packaging failed.",
+  "completion": "All implementation, deterministic freshness, budget and independent review requirements verified for READY. Final evidence commit and canonical report handoff remain; no merge or final-head runtime readiness claimed.",
+  "stopPoint": "READY for review; never merge, tag or release",
+  "independentFinalDeltaEvaluation": {
+    "verdict": "PASS",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "sameIndependentSessionAsSourceReview": true,
+    "readOnly": true,
+    "stdin": "closed",
+    "evidence": "completion-evaluate.md"
+  }
 }
