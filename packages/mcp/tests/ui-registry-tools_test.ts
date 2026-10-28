@@ -111,6 +111,8 @@ Deno.test('registry add tool returns argv for names, namespaces and URLs without
       '$(pwd)',
       'file:///etc/passwd',
       'https://user:password@example.com/x.json',
+      'https://registry.example/x.json?token=secret',
+      'https://registry.example/x.json#secret',
     ]
   ) {
     assertEquals((await call('get_registry_add_command', { name })).result?.isError, true);
