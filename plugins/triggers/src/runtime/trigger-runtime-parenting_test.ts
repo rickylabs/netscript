@@ -1,4 +1,11 @@
-import { assertEquals, assertExists } from '@std/assert';
+import { assertEquals, assertExists, assertNotEquals } from '@std/assert';
+import { context, trace } from 'npm:@opentelemetry/api@^1.9.1';
+import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
+import {
+  BasicTracerProvider,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import { defineJob } from '@netscript/plugin-workers-core';
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
@@ -76,6 +83,80 @@ Deno.test(
     await processor.stop();
   },
 );
+
+Deno.test('shared trigger processor follows each delivery instead of the worker lifetime', async () => {
+  const manager = new AsyncLocalStorageContextManager().enable();
+  context.setGlobalContextManager(manager);
+  const exporter = new InMemorySpanExporter();
+  const provider = new BasicTracerProvider({
+    spanProcessors: [new SimpleSpanProcessor(exporter)],
+  });
+  trace.setGlobalTracerProvider(provider);
+  const tracer = provider.getTracer('trigger-parenting-test');
+  const worker = tracer.startSpan('worker.lifetime');
+  const clock = new TriggerTestClock(new Date('2026-05-17T00:00:00.000Z'));
+  const processor = await createRuntimeTriggerProcessor({
+    idempotency: new MemoryIdempotency(),
+    dlq: new MemoryDlq(),
+    deferScheduler: new MemoryTriggerDeferScheduler(clock),
+    clock,
+  });
+  const definition = defineWebhook(() => {
+    const nested = tracer.startSpan('handler.work');
+    nested.end();
+    return Promise.resolve([]);
+  }, { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' });
+  try {
+    await context.with(trace.setSpan(context.active(), worker), async () => {
+      for (
+        const [index, traceparent] of [undefined, 'malformed', tracedWebhookEvent().traceparent]
+          .entries()
+      ) {
+        const event: TriggerEvent<'webhook'> = {
+          ...tracedWebhookEvent(),
+          id: `delivery-${index}` as TriggerEventId,
+          idempotencyKey: `delivery-${index}`,
+          traceparent,
+        };
+        const result = await processor.process(event, definition);
+        assertEquals(result.status, 'completed');
+        assertEquals(trace.getActiveSpan()?.spanContext().spanId, worker.spanContext().spanId);
+      }
+    });
+    const spans = exporter.getFinishedSpans();
+    const ingress = spans.filter((span) => span.name === SpanNames.TRIGGER_INGRESS);
+    assertEquals(ingress.length, 3);
+    assertEquals(new Set(ingress.map((span) => span.spanContext().traceId)).size, 3);
+    for (const [index, root] of ingress.entries()) {
+      const traceId = root.spanContext().traceId;
+      assertNotEquals(traceId, worker.spanContext().traceId);
+      assertEquals(root.parentSpanContext?.spanId, index === 2 ? INBOUND_PARENT_ID : undefined);
+      if (index === 2) assertEquals(traceId, INBOUND_TRACE_ID);
+      const detect = spans.find((span) =>
+        span.name === SpanNames.TRIGGER_DETECT && span.spanContext().traceId === traceId
+      );
+      const process = spans.find((span) =>
+        span.name === SpanNames.TRIGGER_PROCESS && span.spanContext().traceId === traceId
+      );
+      const handler = spans.find((span) =>
+        span.name === 'handler.work' && span.spanContext().traceId === traceId
+      );
+      assertExists(detect);
+      assertExists(process);
+      assertExists(handler);
+      assertEquals(detect.parentSpanContext?.spanId, root.spanContext().spanId);
+      assertEquals(process.parentSpanContext?.spanId, detect.spanContext().spanId);
+      assertEquals(handler.parentSpanContext?.spanId, process.spanContext().spanId);
+    }
+  } finally {
+    await processor.stop();
+    worker.end();
+    await provider.shutdown();
+    trace.disable();
+    context.disable();
+    manager.disable();
+  }
+});
 
 interface RecordedSpan {
   name: string;

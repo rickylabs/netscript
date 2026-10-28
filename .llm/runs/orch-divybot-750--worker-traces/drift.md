@@ -1,0 +1,46 @@
+# Drift
+
+- 2026-10-18: assignment branch `orch/divybot-750` is operator-mandated; retain it rather than normal
+  fix/ naming. Inbox closes line must be last in PR body.
+- 2026-10-18: RTK absent; use direct commands with structured wrappers as verdict sources.
+- 2026-10-18: initial shallow-history rebase aborted without changes; full history fetched and
+  rebase on main completed. No source conflict resolutions or unrelated changes retained.
+- 2026-10-18: Muse primary OpenRouter route cannot prove allowance without a fresh usage snapshot
+  (`paid openrouter route requires --usage-snapshot`); no spend attempted. An initial Go contributor
+  preflight was rejected as undeclared, then the keyed MODEL_CATALOG resolved the exact route.
+  Native declared fallback Opus 5/xhigh confirmed, session recorded in supervisor.md.
+- 2026-10-18: `git` shim rewrote the baseline worktree location into a nested worktrees directory.
+  Moved that owned worktree immediately with `/usr/bin/git worktree move` to the required sibling
+  path and removed the empty shim-created directory. No product changes in the baseline.
+- 2026-10-18: full E2E first failed preflight with unavailable default Docker socket and unselected
+  dotnet shim. Verified existing DinD 28.5.2 and .NET SDK 10.0.400; retry selects installed SDK via
+  `mise exec dotnet@10.0.400` with `DOCKER_HOST=tcp://netscript-dind:2375`.
+- 2026-10-18: read-only leak reporter found no proven run-owned resources; existing deploy AppHost,
+  two Postgres containers and other unknown-owner processes were left untouched.
+- 2026-10-18: independent review confirmed two intentional read-only consumer effects beyond the
+  write surface. `createStreamMutationHook` (workers-core streams producer) no longer adopts the
+  ambient worker for executions without stored traceparent; malformed saga parent carriers now
+  root rather than adopt ambient context. Valid stored parents and deliberate local nesting are
+  preserved. Reviewer independently ran workers streams and the whole saga-core suite: 144 pass,
+  4 existing ignored, 0 fail. Author ran additional saga/streams/Fresh consumers: 46 pass.
+- 2026-10-18: S1 review PASS_SLICE_REVIEW. Addressed F1 README wrapping, F2 release-note handoff,
+  F3 consumer consequence recording, F4 absent-carrier expression, F5 duplicate test span end,
+  F6 shared parent-ID constant. Source manifest and changed-source gates refreshed after these edits.
+- 2026-10-18: clarified slice gate placement: the full scaffold.runtime gate belongs to final S2
+  evaluator/merge-readiness, per AGENTS.md, rather than blocking S1 source sign-off. S1 still requires
+  complete affected suites, structured source gates, quality:gate and independent substantive review.
+  No functional gate was removed and no merge readiness is claimed before S2.
+- 2026-10-18: pinned Deno 2.9.7 full smoke terminated with 50 passing gates and the same
+  runtime.aspire-start convergence failure: real Postgres/cache loopback listeners were unreachable.
+  Cleanup passed and final leak inspection found zero proven run-owned survivors. Full runtime
+  acceptance is UNPROVEN. Ready-for-review transition follows the operator's explicit delivery
+  instruction; status:impl-eval and unchecked full-runtime DoD preserve the ready-merge block.
+- 2026-10-27 (pr-backlog session): CI at 0b8a0a07b was red on three items the run had not seen.
+  (1) The Fresh defer-island browser bundle aliases `@opentelemetry/api` to a fixture stub that did
+  not export `ROOT_CONTEXT`; the stub now exports it. (2) The MCP export corpus was stale after the
+  telemetry JSDoc change; regenerated. (3) A Codex gpt-6.1-sol caller audit found that Fresh's
+  `createMcpAppCallHandler` parented `mcp.tool.call` from request headers only, so a browser POST
+  with no `traceparent` inside an active request span started an unrelated root. It now uses the
+  active span first, then a valid carrier, then root, with a colocated SDK-backed regression test
+  (implemented by Codex, relocated into Fresh by the supervisor). Full scaffold.runtime acceptance
+  is re-run in CI via `e2e-cli-gate`.
