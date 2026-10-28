@@ -17,3 +17,9 @@
 ## Bootstrap
 
 Read the complete assignment, prior S0/S8 memory, harness/doctrine/CLI/PR/tooling/JSR guidance and full component spec. Queried matrix feature row. Consulted NetScript MCP. No duplicate implementation found. Implementation has not started; PLAN-EVAL pending.
+
+## Slice 1 — contract format
+
+PLAN-EVAL round 2 PASS before product implementation. Added explicit documented readonly contract types and pure JSON serialization on ./contracts. No runtime implementation imports or dependencies. Format/serialization tests and scoped check/lint/fmt pending; separate review pending.
+
+Slice 1 terminal: separate Claude review FAIL_FIX repaired once → PASS; scoped test (1 passed), check/lint/fmt and quality:gate all exit 0. Published contributor guide included; full metadata round-trip covered. Reconciled against bootstrap head; no registry/lock changes.

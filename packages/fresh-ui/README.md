@@ -173,6 +173,13 @@ Style Dictionary. Presets fix their own geometry. NS One stays the default;
 Studio Utility is available as `theme-studio-utility` in the registry. The
 three-tier source and extension guide is [tokens/README.md](tokens/README.md).
 
+## Component contracts
+
+Import types and the JSON serializer from `@netscript/fresh-ui/contracts`. This pure-data
+subpath describes props, anatomy, data attributes, slots, APG patterns, keyboard maps and token
+roles shared by styles. It performs no IO. See [the contributor guide](src/contracts/README.md)
+for native, pseudo-element and planned-part representations.
+
 ## Docs
 
 - **Web layer — the design system in context**:
