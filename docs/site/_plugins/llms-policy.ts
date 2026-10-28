@@ -12,33 +12,37 @@ export interface Section {
   heading: string;
 }
 
+/** One section per docs lane, in top-bar order; `sectionOf` mirrors `getDocsLane`. */
 export const SECTIONS: readonly Section[] = [
-  { id: 'start', heading: 'Getting started' },
-  { id: 'tutorials', heading: 'Tutorials' },
-  { id: 'howto', heading: 'How-to guides' },
-  { id: 'capabilities', heading: 'Capabilities & hubs' },
+  { id: 'start', heading: 'Start' },
+  { id: 'tutorials', heading: 'Learn' },
+  { id: 'capabilities', heading: 'Build' },
   { id: 'reference', heading: 'Reference' },
-  { id: 'explanation', heading: 'Explanation' },
+  { id: 'explanation', heading: 'Concepts' },
+  { id: 'design-system', heading: 'Design system' },
 ];
 
-const HUB_PREFIXES = [
+const BUILD_PREFIXES = [
+  '/how-to/',
   '/web-layer/',
   '/services-sdk/',
   '/background-processing/',
   '/durable-workflows/',
+  '/ai/',
   '/data-persistence/',
   '/identity-access/',
   '/orchestration-runtime/',
   '/observability/',
-  '/capabilities/',
 ];
 
 export function sectionOf(url: string): string {
   if (url.startsWith('/tutorials/')) return 'tutorials';
-  if (url.startsWith('/how-to/')) return 'howto';
-  if (url.startsWith('/reference/')) return 'reference';
-  if (url.startsWith('/explanation/')) return 'explanation';
-  if (HUB_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
+  if (url.startsWith('/reference/') || url === '/cli-reference/' || url === '/glossary/') {
+    return 'reference';
+  }
+  if (url.startsWith('/explanation/') || url.startsWith('/comparisons/')) return 'explanation';
+  if (url.startsWith('/design-system/')) return 'design-system';
+  if (BUILD_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
   return 'start';
 }
 
