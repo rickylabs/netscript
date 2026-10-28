@@ -238,6 +238,16 @@ site.addEventListener('afterRender', () => {
         `diagram-${identity}-${index}`,
       );
     }
+    // Keep package headings at display size, wrapping only at path boundaries.
+    for (const code of document.querySelectorAll('.ns-prose :is(h1,h2,h3,h4,h5,h6) code')) {
+      if (code.children.length || !code.textContent?.includes('/')) continue;
+      const parts = code.textContent.split('/');
+      code.textContent = '';
+      for (const [index, part] of parts.entries()) {
+        code.appendChild(document.createTextNode(part + (index < parts.length - 1 ? '/' : '')));
+        if (index < parts.length - 1) code.appendChild(document.createElement('wbr'));
+      }
+    }
     // Reference Markdown tables and the component share one visible kind-tag anatomy.
     for (const table of document.querySelectorAll('.ns-prose table')) {
       if (table.classList.contains('ns-api-table')) continue;
@@ -250,6 +260,10 @@ site.addEventListener('afterRender', () => {
       }
       table.classList.add('ns-api-table');
       table.setAttribute('data-variant', 'symbols');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ns-api-table-wrap';
+      table.parentNode!.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
       for (const row of rows) {
         const cells = [...row.querySelectorAll('td')];
         for (const [index, cell] of cells.entries()) {
@@ -265,7 +279,11 @@ site.addEventListener('afterRender', () => {
         tag.className = 'ns-api-kind';
         tag.setAttribute('data-kind', kind);
         tag.setAttribute('data-syntax-role', apiKindRole(kind)!);
-        tag.textContent = label ?? kind;
+        const dot = document.createElement('span');
+        dot.className = 'ns-api-kind__dot';
+        dot.setAttribute('aria-hidden', 'true');
+        tag.appendChild(dot);
+        tag.appendChild(document.createTextNode(label ?? kind));
         cell.textContent = '';
         cell.appendChild(tag);
       }

@@ -390,7 +390,7 @@
   align-items: center;
   justify-content: center;
   min-height: 24px;
-  margin-left: auto;
+  margin-left: 0;
   flex-shrink: 0;
   padding: 2px 6px;
   background: var(--ns-card);
@@ -542,8 +542,28 @@
 .ns-api-table__type {
   color: var(--ns-fg);
 }
+.ns-prose .ns-api-table[data-variant="symbols"] {
+  display: table;
+}
+.ns-prose .ns-api-table .ns-api-table__name,
+.ns-prose .ns-api-table__name code {
+  min-width: 16ch;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.ns-prose .ns-api-table[data-variant="symbols"] .ns-api-table__type {
+  min-width: 24ch;
+}
+.ns-prose .ns-api-table[data-variant="symbols"] .ns-api-table__type code {
+  overflow-wrap: normal;
+  word-break: normal;
+}
 .ns-api-kind {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
   width: fit-content;
   padding: 1px 6px;
   margin-bottom: 4px;
@@ -554,15 +574,25 @@
 }
 .ns-api-kind[data-syntax-role="type"] {
   color: var(--ns-code-syntax-type);
-  background: var(--ns-code-bg);
 }
 .ns-api-kind[data-syntax-role="function"] {
   color: var(--ns-code-syntax-function);
-  background: var(--ns-code-bg);
 }
 .ns-api-kind[data-syntax-role="keyword"] {
   color: var(--ns-code-syntax-keyword);
-  background: var(--ns-code-bg);
+}
+.ns-api-kind[data-syntax-role="number"] {
+  color: var(--ns-code-syntax-number);
+}
+.ns-api-kind[data-syntax-role="fg"] {
+  color: var(--ns-fg);
+}
+.ns-api-kind__dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 0;
+  background: currentColor;
 }
 .ns-api-table__desc {
   font-size: 14px;

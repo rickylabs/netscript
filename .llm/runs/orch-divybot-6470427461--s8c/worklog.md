@@ -117,3 +117,21 @@ Final implementation source is unchanged since the evaluated 3f73f1b84; remainin
 ## Close-gate feedback repair
 
 Owner reported current CI close-gate failure at 39a70d046. Native currency audit confirmed nine unchecked acceptance boxes on #2455; no code or PR DoD defect. Validated exact 9/9 structured evidence mapping with repository helpers, checked the verified boxes, and attached issue provenance. Native live close-gate PASS at 2026-10-28T14:57:11.637Z, issue body hash 26eca920f3a8406f2263813bbed157db01b5dac49bbb2f39a5327f7fa3f62fe6. Detailed audit in close-gate-repair.md. Publishing this real acceptance record; product source unchanged. No labels or issue state changed.
+
+## Owner screenshot review revision
+
+Read comment 6472570294 in full. Five fixes authorized. Main fetched/merged normally first and is current. Locked plan in owner-review-plan.md: public Design system Docs kit galleries, exact Utility kind mapping/dot anatomy, no mid-symbol wraps, heading code without chip paint, consistently right-aligned language metadata. New test-3 failure under investigation from live current-head logs. Prior READY evidence is historical and superseded by this active revision.
+
+Owner-review PLAN-EVAL initial FAIL_PLAN: exact badge anatomy also requires no fill and a 1px role-coloured outline. Corrected once with transparent-background, border, square-dot, radius/font and actual-backdrop contrast assertions. CI test-3 artifact identifies a single generated-browser DevTools startup timeout under CI load (1369 passed, 1 failed, 2 ignored), not a docs assertion/type error; rerun the unchanged test after targeted verification, preserving all gates.
+
+### Owner revision UI implementation
+
+PLAN-EVAL repaired once from FAIL_PLAN to PASS (owner-review-plan-eval-initial.md and owner-review-plan-eval.md). Implemented all five requested changes. Public galleries now live in Design system → Docs kit with sidebar/section links, correct breadcrumbs/search lane, twins and AI indexing. Added a Docs kit kind specimen for all 11 kinds; tests use the merged Utility contract independently of API_KINDS. Symbols stay on one line within horizontally scrollable tables. Heading code keeps display typography, no chip, and package slash boundaries permit mobile wrapping. Header metadata shares a single right spacer and 12px language–Copy gap.
+
+First browser pass: 108 passing, four failures all traced to the newly enlarged package H1 overflowing at mobile width. Added semantic slash-boundary wbr breaks; full serialized rerun pending. Native tools tests 12/12; typed tools/browser/config and lint/fmt wrappers pass. Manual screenshot inspection confirms heading treatment, correct Design system lane and consistent header alignment in both schemes/widths.
+
+CI test-3 at 900a1ebd3: one generated-browser DevTools startup timeout; 1369 passed, one failed, two ignored. No docs assertion or compiler error. The focused real generated-browser test plus both negative controls pass locally (3/3) with unchanged source/assertions/timeouts. An initial local attempt failed because inherited LD_LIBRARY_PATH restricted nested Deno subprocess permissions; moving the browser library environment into an executable wrapper resolved that worker setup issue. Retried the original hosted shard unchanged; verdict pending. No backend/browser helper source change.
+
+Full browser rerun PASS: 112/112, zero skips/flakies; independent slice review PASS. Hosted unchanged retry at 900a1ebd3 passed test-3 (job 122908458529) and aggregate check-test (122911766055), run 40711367098. All three style-policy injected negative controls exit 1 with expected raw-colour/red-outside-state diagnostics. Manual table inspection prompted a final signature-column minimum and normal token wrapping so the mobile scroll view preserves signature words too; extended Range regression covers highlighted signature tokens as well. Rebuild/recheck and reviewer addendum before commit.
+
+UI slice terminal: final post-polish serialized browser112/112 PASS,32 axe audits/zero serious-critical, independent review+addendum PASS. Reconciled against900a1ebd3; no unrelated source changes. Proceeding to the approved native carrier slice after normal commit/push.

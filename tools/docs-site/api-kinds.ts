@@ -1,14 +1,16 @@
-/** Visible labels identify kinds; generated syntax roles will supply their final paint. */
+/** Visible labels identify kinds; generated syntax roles supply their paint per the merged Utility spec. */
 export const API_KINDS = {
   class: 'type',
-  interface: 'type',
-  type: 'type',
-  enum: 'type',
+  interface: 'keyword',
+  type: 'keyword',
+  enum: 'number',
   function: 'function',
   method: 'function',
-  const: 'keyword',
-  variable: 'keyword',
+  const: 'number',
+  variable: 'number',
   component: 'function',
+  module: 'fg',
+  namespace: 'fg',
 } as const;
 
 export type ApiKind = keyof typeof API_KINDS;

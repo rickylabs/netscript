@@ -7,7 +7,6 @@ import { execFileSync } from 'node:child_process';
 import { analyzeStylePolicy, type StyleSource } from '../../docs-site/style-policy.ts';
 import { inlineUtilityDiagram } from '../../docs-site/inline-diagram.ts';
 import { AA_TEXT_CONTRAST, contrastRatio } from '../../docs-site/contrast.ts';
-import { API_KINDS } from '../../docs-site/api-kinds.ts';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SITE = resolve(REPO, 'docs/site/_site');
@@ -16,8 +15,8 @@ const ROUTES = [
   { kind: 'article', path: 'web-layer/fresh-ui/' },
   { kind: 'reference', path: 'reference/database/' },
   { kind: 'design-system', path: 'design-system/' },
-  { kind: 'callouts', path: 'internal/callouts/' },
-  { kind: 'code', path: 'internal/code/' },
+  { kind: 'callouts', path: 'design-system/docs-kit/callouts/' },
+  { kind: 'code', path: 'design-system/docs-kit/code/' },
   { kind: 'search', path: 'web-layer/fresh-ui/' },
 ] as const;
 
@@ -711,7 +710,7 @@ test('style policy negative contracts reject literal, named and aliased colours'
 });
 
 test('callouts: semantic tone, default body and ink links', async ({ page }) => {
-  await visit(page, 'internal/callouts/');
+  await visit(page, 'design-system/docs-kit/callouts/');
   for (
     const [kind, tone] of Object.entries({
       note: 'info',
@@ -755,21 +754,42 @@ test('callouts: semantic tone, default body and ink links', async ({ page }) => 
   }
 });
 
-test('internal galleries stay out of search and agent documentation', async ({ page }) => {
+test('public galleries belong to Design system Docs kit in navigation, search and twins', async ({ page }) => {
+  await visit(page, 'design-system/');
+  await expect(page.locator('.ns-design__nav').getByRole('link', { name: 'Docs kit' }))
+    .toHaveAttribute('href', '/netscript/design-system/docs-kit/');
   for (const [slug, title] of [['callouts', 'Callout gallery'], ['code', 'Code gallery']]) {
-    await visit(page, `internal/${slug}/`);
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
-    await expect(page.locator('[data-pagefind-body], .ns-md-link')).toHaveCount(0);
-    await expect(access(resolve(SITE, `internal/${slug}/index.md`))).rejects.toThrow();
+    const route = `design-system/docs-kit/${slug}/`;
+    await visit(page, route);
+    await expect(page.locator('.ns-breadcrumb__item')).toHaveText([
+      'Home',
+      'Design system',
+      'Docs kit',
+      title,
+    ]);
+    await expect(page.locator('[data-pagefind-body]')).toHaveCount(1);
+    await expect(page.locator('[data-sidebar] a').filter({ hasText: new RegExp(`^${title}$`) }))
+      .toHaveAttribute('href', `/netscript/${route}`);
+    await access(resolve(SITE, `${route}index.md`));
     for (const index of ['llms.txt', 'llms-full.txt']) {
+      expect(await readFile(resolve(SITE, index), 'utf8')).toContain(`/${route}`);
       expect(await readFile(resolve(SITE, index), 'utf8')).not.toContain(`/internal/${slug}/`);
     }
     const matches = await page.evaluate(async (title) => {
       const module = await import(new URL('/netscript/pagefind/pagefind.js', location.href).href);
       const result = await module.search(`"${title}"`);
-      return result.results.length;
+      return await Promise.all(
+        result.results.map((
+          match: { data: () => Promise<{ url: string; filters: Record<string, string[]> }> },
+        ) => match.data()),
+      );
     }, title);
-    expect(matches).toBe(0);
+    expect(
+      matches.some((match) =>
+        match.url.endsWith(`/${route}`) && match.filters.lane.includes('Design system')
+      ),
+    ).toBe(true);
+    await expect(access(resolve(SITE, `internal/${slug}/index.html`))).rejects.toThrow();
   }
 });
 
@@ -806,7 +826,7 @@ test('API reference: visible kind tags and full-contrast names and signatures', 
 
 test('code headers: filename, human language, selected clipboard and no duplicate header', async ({ page }) => {
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
-  await visit(page, 'internal/code/');
+  await visit(page, 'design-system/docs-kit/code/');
   const group = page.locator('.ns-tabbed').first();
   const header = group.locator(':scope > .ns-code-header');
   await expect(header).toBeVisible();
@@ -862,7 +882,7 @@ test(
     });
     try {
       const page = await context.newPage();
-      await visit(page, 'internal/code/');
+      await visit(page, 'design-system/docs-kit/code/');
       await expect(page.locator('.ns-tabbed > .ns-code-header')).not.toBeVisible();
       for (const panel of await page.locator('.ns-tabbed__panel').all()) {
         await expect(panel).toBeVisible();
@@ -890,7 +910,7 @@ test('code header metadata stays out of twins and search bodies', async ({ page 
 });
 
 test('syntax: generated roles, actual code backgrounds and AA contrast', async ({ page }) => {
-  await visit(page, 'internal/code/');
+  await visit(page, 'design-system/docs-kit/code/');
   const paint = await page.locator('.ns-prose').evaluate((prose) => {
     const probe = document.createElement('span');
     prose.append(probe);
@@ -935,35 +955,78 @@ test('syntax: generated roles, actual code backgrounds and AA contrast', async (
   }
 });
 
-test('API kind paint follows the final generated role and signatures have syntax colours', async ({ page }) => {
+test('API kind paint and badge anatomy follow the merged Utility spec', async ({ page }) => {
+  // Independent contract: do not derive expectations from the implementation mapping.
+  const expectedRoles: Record<string, string> = {
+    class: 'type',
+    interface: 'keyword',
+    type: 'keyword',
+    function: 'function',
+    method: 'function',
+    const: 'number',
+    variable: 'number',
+    enum: 'number',
+    module: 'fg',
+    namespace: 'fg',
+    component: 'function',
+  };
   const seen = new Set<string>();
   let highlightedSignatures = 0;
-  for (const route of ['reference/database/', 'reference/fresh-ui/']) {
+  for (const route of ['reference/database/', 'reference/fresh-ui/', 'design-system/docs-kit/']) {
     await visit(page, route);
     const tags = await page.locator('.ns-api-kind').evaluateAll((tags) =>
       tags.map((tag) => {
         const role = tag.getAttribute('data-syntax-role')!;
         const probe = document.createElement('span');
         tag.append(probe);
-        probe.style.color = `var(--ns-code-syntax-${role})`;
+        probe.style.color = role === 'fg' ? 'var(--ns-fg)' : `var(--ns-code-syntax-${role})`;
         const expected = getComputedStyle(probe).color;
         probe.remove();
+        const style = getComputedStyle(tag);
+        let ancestor = tag.parentElement!;
+        while (
+          getComputedStyle(ancestor).backgroundColor === 'rgba(0, 0, 0, 0)' &&
+          ancestor.parentElement
+        ) ancestor = ancestor.parentElement;
+        const dot = tag.querySelector('.ns-api-kind__dot')!;
+        const dotStyle = getComputedStyle(dot);
         return {
           kind: tag.getAttribute('data-kind')!,
           role,
-          actual: getComputedStyle(tag).color,
-          background: getComputedStyle(tag).backgroundColor,
-          tableBackground: getComputedStyle(document.documentElement).backgroundColor,
+          actual: style.color,
+          background: style.backgroundColor,
+          tableBackground: getComputedStyle(ancestor).backgroundColor,
           expected,
+          outline: [style.borderTopWidth, style.borderTopStyle, style.borderTopColor],
+          radius: style.borderRadius,
+          font: style.fontFamily,
+          size: style.fontSize,
+          dot: {
+            width: dotStyle.width,
+            height: dotStyle.height,
+            radius: dotStyle.borderRadius,
+            colour: dotStyle.backgroundColor,
+            hidden: dot.getAttribute('aria-hidden'),
+          },
         };
       })
     );
     for (const tag of tags) {
       seen.add(tag.kind);
-      expect(tag.role).toBe(API_KINDS[tag.kind as keyof typeof API_KINDS]);
+      expect(tag.role).toBe(expectedRoles[tag.kind]);
       expect(tag.actual).toBe(tag.expected);
-      expect(contrastRatio(tag.actual, tag.background)).toBeGreaterThanOrEqual(AA_TEXT_CONTRAST);
-      // The page canvas is the transparent table's background.
+      expect(tag.background).toBe('rgba(0, 0, 0, 0)');
+      expect(tag.outline).toEqual(['1px', 'solid', tag.expected]);
+      expect(tag.radius).toBe('2px');
+      expect(tag.font).toContain('Fragment Mono');
+      expect(tag.size).toBe('11px');
+      expect(tag.dot).toEqual({
+        width: '6px',
+        height: '6px',
+        radius: '0px',
+        colour: tag.expected,
+        hidden: 'true',
+      });
       expect(contrastRatio(tag.actual, tag.tableBackground)).toBeGreaterThanOrEqual(
         AA_TEXT_CONTRAST,
       );
@@ -971,8 +1034,90 @@ test('API kind paint follows the final generated role and signatures have syntax
     highlightedSignatures += await page.locator('.ns-api-table__type .hljs-keyword').count();
   }
   expect(highlightedSignatures).toBeGreaterThan(0);
-  for (const kind of ['class', 'function', 'interface', 'type', 'const', 'component']) {
+  for (const kind of Object.keys(expectedRoles)) {
     expect(seen.has(kind)).toBe(true);
+  }
+});
+
+test('API symbols never wrap inside an identifier and scroll within their table', async ({ page }) => {
+  await visit(page, 'reference/database/');
+  const symbols = await page.locator(
+    '.ns-api-table__name code, .ns-api-table[data-variant="symbols"] .ns-api-table__type code > span',
+  ).evaluateAll((codes) =>
+    codes.filter((code) =>
+      code.closest('.ns-api-table__name') || /^[A-Za-z_$][\w$]*$/.test(code.textContent ?? '')
+    ).map((code) => {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      const rows = new Set(
+        [...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) =>
+          Math.round(rect.top)
+        ),
+      );
+      const wrapper = code.closest('.ns-api-table-wrap')!;
+      return {
+        name: code.textContent,
+        lines: rows.size,
+        overflow: getComputedStyle(wrapper).overflowX,
+      };
+    })
+  );
+  expect(symbols.length).toBeGreaterThan(50);
+  expect(symbols.some((symbol) => symbol.name === 'DatabaseConnectionOptions')).toBe(true);
+  for (const symbol of symbols) {
+    expect(symbol.lines, symbol.name!).toBe(1);
+    expect(symbol.overflow).toBe('auto');
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('package heading code inherits display typography without a chip', async ({ page }) => {
+  await visit(page, 'reference/database/');
+  const paint = await page.locator('h1 code').evaluate((code) => {
+    const style = getComputedStyle(code), heading = getComputedStyle(code.parentElement!);
+    return {
+      font: style.fontFamily,
+      size: style.fontSize,
+      headingSize: heading.fontSize,
+      weight: style.fontWeight,
+      headingWeight: heading.fontWeight,
+      lineHeight: style.lineHeight,
+      headingLineHeight: heading.lineHeight,
+      background: style.backgroundColor,
+      padding: style.padding,
+      border: style.borderWidth,
+      radius: style.borderRadius,
+    };
+  });
+  expect(paint.font).toContain('Fragment Mono');
+  expect(paint.size).toBe(paint.headingSize);
+  expect(paint.weight).toBe(paint.headingWeight);
+  expect(paint.lineHeight).toBe(paint.headingLineHeight);
+  expect(paint.background).toBe('rgba(0, 0, 0, 0)');
+  expect(paint.padding).toBe('0px');
+  expect(paint.border).toBe('0px');
+  expect(paint.radius).toBe('0px');
+});
+
+test('filename and tab headers align language beside Copy with the same gap', async ({ page }) => {
+  await visit(page, 'design-system/docs-kit/code/');
+  const group = page.locator('.ns-tabbed').first();
+  for (const tab of await group.getByRole('tab').all()) {
+    await tab.click();
+    const headers = page.locator('.ns-code-header:visible').filter({
+      has: page.locator('.ns-code-path'),
+    });
+    expect(await headers.count()).toBeGreaterThan(1);
+    for (const header of await headers.all()) {
+      const language = await header.locator('.ns-code-language').boundingBox();
+      const copy = await header.locator('.ns-copy-btn').boundingBox();
+      const box = await header.boundingBox();
+      expect(language).not.toBeNull();
+      expect(copy).not.toBeNull();
+      expect(box).not.toBeNull();
+      expect(copy!.x - (language!.x + language!.width)).toBeCloseTo(12, 0);
+      expect(box!.x + box!.width - (copy!.x + copy!.width)).toBeCloseTo(10, 0);
+    }
   }
 });
 

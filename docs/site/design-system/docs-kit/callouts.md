@@ -2,10 +2,9 @@
 layout: layouts/base.vto
 templateEngine: [vento, md]
 title: Callout gallery
-description: Internal visual fixtures for semantic documentation notices.
-url: /internal/callouts/
-nav_hide: true
-internal: true
+description: Semantic documentation notices in the NetScript design system.
+url: /design-system/docs-kit/callouts/
+order: 1
 ---
 
 # Callout gallery

@@ -2,10 +2,9 @@
 layout: layouts/base.vto
 templateEngine: [vento, md]
 title: Code gallery
-description: Internal fixtures for code languages, filenames and keyboard tabs.
-url: /internal/code/
-nav_hide: true
-internal: true
+description: Code languages, filenames and keyboard tabs in the NetScript design system.
+url: /design-system/docs-kit/code/
+order: 2
 codeTabs: [{"label": "TypeScript", "filename": "src/greeting.ts", "lang": "ts", "code": "// A typed greeting\nexport function greet(name: string): string {\n  return `Hello ${name}`;\n}\nconst ready = true;\nconst count = 42;"}, {"label": "Shell", "filename": "scripts/start.sh", "lang": "sh", "code": "#!/bin/sh\nprintf '%s\\n' 'Hello NetScript'"}, {"label": "JSON", "filename": "deno.json", "lang": "jsonc", "code": "// App configuration\n{ \"tasks\": { \"start\": \"deno run main.ts\" } }"}]
 filenameCode: "export interface User {\n  name: string;\n}\nexport const limit = 42;"
 ---

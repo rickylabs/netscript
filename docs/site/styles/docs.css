@@ -418,6 +418,19 @@ kbd {
   background: var(--ns-surface);
   overflow-wrap: anywhere;
 }
+/* Package names retain heading typography without an inline-code chip. */
+.ns-prose :is(h1,h2,h3,h4,h5,h6) code {
+  font-family: var(--ns-font-mono);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  background: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow-wrap: normal;
+}
+
 .ns-prose pre {
   position: relative;
   margin: 24px 0;

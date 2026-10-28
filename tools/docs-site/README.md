@@ -77,8 +77,8 @@ computes unrounded WCAG ratios on code and table backgrounds. The browser suite 
 computed token paint, syntax spans, IMPORTANT and zero serious/critical axe findings.
 
 To add a language, register its existing-version highlight.js grammar in `docs/site/_config.ts`,
-add its import-map entry and human label in `code-languages.ts`, then extend the internal code
-gallery. Unknown rendered fences fail the build. Internal gallery pages declare `internal: true`,
+add its import-map entry and human label in `code-languages.ts`, then extend the Design system → Docs kit code
+gallery. Unknown rendered fences fail the build. Internal pages declare `internal: true`,
 which excludes them from Pagefind, Markdown twins and the AI documentation indexes. Header metadata
 uses `data-twin-ignore` and headers/gutters use `data-pagefind-ignore`; code itself remains indexed.
 
@@ -92,3 +92,5 @@ and compares every output. The default is strict. `--allow-pagefind-metadata` re
 known upstream Pagefind entry/filter/meta serialization variation separately; HTML, Markdown twins,
 anchor fragments and all other assets remain byte-identical. Search behavior is verified by the
 real browser Pagefind tests. The metadata issue remains #2453; token-source consolidation stays #2450.
+
+The public callout and code galleries live under `docs/site/design-system/docs-kit/`, linked from the Design system navigation and indexed in that search lane. API badge mappings follow the Utility spec in `docs/design-system/themes/studio/DESIGN.md`; `api-kinds_test.ts` fixes that contract independently of the browser paint checks.

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "revision": "owner comment 6472570294",
+  "baseline": "900a1ebd3a54e28b0e4b5d83f6116e7f940dfb91",
+  "browser": {
+    "passed": 112,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "receipt": {
+      "requestHash": "bacedbdbc1aa5cba8ae88f7895f0f0bab20fac21f649658f0e8d51e8bd2d526f",
+      "outcome": "PASS",
+      "durationMs": 106799,
+      "exitCode": 0
+    }
+  },
+  "kindSpec": "docs/design-system/themes/studio/DESIGN.md:331-334",
+  "allElevenKindsComputed": true,
+  "symbolAndSignatureIdentifierGeometry": [
+    390,
+    1280
+  ],
+  "fiveOwnerItems": "PASS",
+  "toolTests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "docsBuild": "PASS",
+  "links": "PASS",
+  "typedCheckLintFmt": "PASS",
+  "exportsSnippetsQuality": "PASS",
+  "negativeControls": {
+    "raw-colour": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "rawColourDiagnostic": true,
+      "redDiagnostic": false
+    },
+    "raw-custom": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "rawColourDiagnostic": true,
+      "redDiagnostic": false
+    },
+    "red-role": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "rawColourDiagnostic": false,
+      "redDiagnostic": true
+    }
+  },
+  "unchangedHostedTestRetry": {
+    "run": 40711367098,
+    "test3Job": 122908458529,
+    "aggregateTestJob": 122911766055,
+    "outcome": "PASS"
+  },
+  "generatedBrowserPositiveAndNegativeControls": {
+    "passed": 3,
+    "failed": 0,
+    "sourceChanged": false
+  },
+  "independentSliceReview": "PASS",
+  "nativeCarriers": "pending slice 2"
+}

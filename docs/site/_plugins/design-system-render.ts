@@ -65,6 +65,7 @@ function sectionNav(themes: Theme[], current: string): string {
     [DESIGN_ROOT, 'Overview'],
     [`${DESIGN_ROOT}guidelines/`, 'Guidelines'],
     [`${DESIGN_ROOT}token-contract/`, 'Token contract'],
+    [`${DESIGN_ROOT}docs-kit/`, 'Docs kit'],
     [`${DESIGN_ROOT}create-your-own-theme/`, 'Create your own theme'],
     ...themes.map((theme) => [themeUrl(theme.id), theme.name]),
   ];
