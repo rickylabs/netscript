@@ -41,6 +41,8 @@ for (const route of ROUTES) {
         await expect(toggle).toBeVisible();
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
 
+        // Discard the seed so each activation must persist its own result.
+        await page.evaluate((key) => localStorage.removeItem(key), THEME_STORAGE_KEY);
         // Reach a real island by Tab, then prove its handlers hydrated using Enter and Space.
         for (
           let index = 0;
@@ -52,6 +54,9 @@ for (const route of ROUTES) {
         await expect(toggle).toBeFocused();
         await page.keyboard.press('Enter');
         await expect(page.locator('html')).toHaveAttribute('data-theme', otherTheme);
+        expect(await page.evaluate((key) => localStorage.getItem(key), THEME_STORAGE_KEY)).toBe(
+          otherTheme,
+        );
         await expect(page.getByRole('button', { name: `Switch to ${theme} mode`, exact: true }))
           .toBeFocused();
         await page.keyboard.press('Space');

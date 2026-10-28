@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { dirname, posix, resolve } from 'node:path';
 import process from 'node:process';
 import { Buffer } from 'node:buffer';
 import type { AxeResults } from 'axe-core';
@@ -25,7 +25,10 @@ if (!input || !output) {
 if (existsSync(output)) {
   throw new Error('Choose a new output file, then review its diff against axe-baseline.json');
 }
-const report = JSON.parse(readFileSync(input, 'utf8')) as { suites: Suite[] };
+const report = JSON.parse(readFileSync(input, 'utf8')) as {
+  config: { projects: Array<{ name: string; outputDir: string }> };
+  suites: Suite[];
+};
 const cases: Record<string, Record<string, number>> = {};
 let engine: AxeResults['testEngine'] | undefined;
 let browser: string | undefined;
@@ -43,12 +46,20 @@ function collect(suite: Suite): void {
       if (attachment.body) {
         scan = JSON.parse(Buffer.from(attachment.body, 'base64').toString('utf8')) as AxeResults;
       } else if (attachment.path) {
-        // Downloaded CI artifacts retain the case directory, but their original absolute paths move.
-        const path = existsSync(attachment.path) ? attachment.path : join(
-          dirname(resolve(input)),
-          basename(dirname(attachment.path)),
-          basename(attachment.path),
+        // Resolve the whole case/attachments suffix against the relocated report directory.
+        const outputDir = report.config.projects.find((project) =>
+          project.name === test.projectName
+        )?.outputDir;
+        if (!outputDir) throw new Error(`Missing project output directory for ${test.projectName}`);
+        const suffix = posix.relative(
+          outputDir.replaceAll('\\', '/'),
+          attachment.path.replaceAll('\\', '/'),
         );
+        if (!suffix || suffix.startsWith('../') || posix.isAbsolute(suffix)) {
+          throw new Error('Axe attachment is outside its project output directory');
+        }
+        const relocated = resolve(dirname(input), ...suffix.split('/'));
+        const path = existsSync(relocated) ? relocated : attachment.path;
         scan = JSON.parse(readFileSync(path, 'utf8')) as AxeResults;
       } else throw new Error('Axe attachment has neither inline data nor a report path');
       if (engine && JSON.stringify(engine) !== JSON.stringify(scan.testEngine)) {

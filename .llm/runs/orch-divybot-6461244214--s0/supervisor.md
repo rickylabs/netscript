@@ -13,6 +13,8 @@ Implementer: OpenAI Codex, feature tier, high effort as requested.
 - `.llm/tools/validation/fresh-ui-quality_test.ts`, `.llm/tools/gates/catalog.ts` if needed for durable gates.
 - Scaffold design templates and corresponding generated asset module only if browser evidence requires a scoped accessibility correction (record exact additions before editing).
 
+- `.llm/tools/validation/aspire-surface-manifest.ts` and `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv` — classify the maintained browser README required by the unchanged parity gate.
+
 ## Routing
 
 Read feature routing with `deno task agentic:matrix --tier feature --json` (exit 0).
