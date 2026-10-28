@@ -1,7 +1,7 @@
 {
   "source": {
     "mode": "command",
-    "cwd": "/home/agent/projects/orchid/worktrees/issue-6463057309/docs/site",
+    "cwd": "docs/site",
     "exitCode": 0
   },
   "selection": {

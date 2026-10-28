@@ -1,6 +1,6 @@
 {
   "command": "deno fmt --check",
-  "cwd": "/home/agent/projects/orchid/worktrees/issue-6463057309/docs/site",
+  "cwd": "docs/site",
   "mode": "check",
   "summary": {
     "filesSelected": 6,

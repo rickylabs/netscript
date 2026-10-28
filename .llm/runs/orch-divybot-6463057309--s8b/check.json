@@ -1,7 +1,7 @@
 {
   "source": {
     "mode": "selection",
-    "cwd": "/home/agent/projects/orchid/worktrees/issue-6463057309/docs/site"
+    "cwd": "docs/site"
   },
   "command": "deno check --unstable-kv --no-lock <files>",
   "selection": {

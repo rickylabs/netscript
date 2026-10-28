@@ -6,7 +6,7 @@
     "task",
     "quality:scan"
   ],
-  "cwd": "/home/agent/projects/orchid/worktrees/issue-6463057309",
+  "cwd": ".",
   "gitHead": "fafe315a15b50e403623a402615ff635f473224f",
   "actualGitHead": "fafe315a15b50e403623a402615ff635f473224f",
   "timeoutMs": 1800000,

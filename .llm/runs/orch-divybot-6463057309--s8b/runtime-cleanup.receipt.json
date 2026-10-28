@@ -8,12 +8,12 @@
     "--allow-write",
     "--allow-run=aspire,docker",
     "packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts",
-    "/home/agent/projects/orchid/worktrees/issue-6463057309/.llm/tmp/cli-e2e/plugin-smoke-20261028-084123/aspire/apphost.mts",
-    "/home/agent/projects/orchid/worktrees/issue-6463057309/.llm/tmp/cli-e2e/plugin-smoke-20261028-084123",
+    ".llm/tmp/cli-e2e/plugin-smoke-20261028-084123/aspire/apphost.mts",
+    ".llm/tmp/cli-e2e/plugin-smoke-20261028-084123",
     "true",
-    "/home/agent/projects/orchid/worktrees/issue-6463057309/.llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json"
+    ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json"
   ],
-  "cwd": "/home/agent/projects/orchid/worktrees/issue-6463057309",
+  "cwd": ".",
   "gitHead": "da605e2fc455e298b10b4fcfce6c3a678677dc8e",
   "actualGitHead": "da605e2fc455e298b10b4fcfce6c3a678677dc8e",
   "timeoutMs": 1800000,
@@ -24,7 +24,7 @@
   "lifecycleId": "worker:4075157:scaffold.runtime:cleanup.aspire-stop:1",
   "outcome": "FAIL",
   "claimedAt": "2026-10-28T07:41:27.850Z",
-  "childReport": "/home/agent/projects/orchid/worktrees/issue-6463057309/.llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json",
+  "childReport": ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json",
   "startedAt": "2026-10-28T07:41:27.852Z",
   "finishedAt": "2026-10-28T07:41:28.521Z",
   "durationMs": 669,
@@ -38,8 +38,8 @@
   "stderr": {
     "bytes": 693,
     "sha256": "ac232db16886f67af85185d9214864ba7cf1caa751784aaa95aa88b460c2bbe5",
-    "tail": "error: Uncaught (in promise) Error: docker ps -aq failed (1): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n\n    throw new Error(\n          ^\n    at requireSuccess (file:///home/agent/projects/orchid/worktrees/issue-6463057309/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:309:11)\n    at async stopAndProbe (file:///home/agent/projects/orchid/worktrees/issue-6463057309/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:194:21)\n    at async file:///home/agent/projects/orchid/worktrees/issue-6463057309/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:383:3\n",
+    "tail": "error: Uncaught (in promise) Error: docker ps -aq failed (1): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n\n    throw new Error(\n          ^\n    at requireSuccess (file://packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:309:11)\n    at async stopAndProbe (file://packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:194:21)\n    at async file://packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:383:3\n",
     "truncated": false
   },
-  "reason": "Child report /home/agent/projects/orchid/worktrees/issue-6463057309/.llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json was not created"
+  "reason": "Child report .llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json was not created"
 }
