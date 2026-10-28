@@ -826,3 +826,34 @@ unmodifieddriftstagePASS is supportingonly. Sourcechecker unchanged/no edit allo
 mustqualifynewcommit. Root authorizescheckpoint/push/honestdrafttrail. TLSheld forfreshbindingafter
 thischeckpoint; no TLSinference yet. Exactrowreversal restoresoriginaldocbytehash andall17other
 dispatchbindingsmatch;12observedPIDsfreshabsent(snapshotonly), no source edits inthisproof.
+Root FULLREAD reviewedTLS4665/rebound494539a6 and independently verified21bindings at439dae548;
+authorizes ONE300s SAME nativeFable session now. Only append conformanceowner/cap460, preserve304
+prefix/helper/oldtests/config/locks, use exactpublicinlinefixture/unchangedpermissions. RealHTTPS
+401/200+untrustedrejection/body/client/listener/KVcleanup and owning8/staticgates required. No blind
+retry/commit/nextslice until root actualsource/gatereview; all realfailures remain visible.
+## Root S3d formatter-only prospective disposition
+
+Root full-read final459line typed-request helper/untrusted path and actual4/0conformance/type0/
+fmtRED1. Root explicitly authorizes ONLY canonical formatting of this conformance owner without
+new model; prospective checkpoint cap460->465 solely forformatterexpansion, doctrine480unchanged.
+No new architecture/oracle/permission/API owner; additionalPLAN N/A mechanicalformattingonly,
+not a retroactive evaluatorapproval of465. Preserve originalfmtRED, preformatbytes and300stimeout.
+Then exact304prefix/helper/oldtests/PEMs/locks proof plus fresh8focused+selected3staticfinalbytes.
+No commit until rootactualsource/gateacceptance. Root also verified predecessorLinuxdocs40605465746
+buildSUCCESS/classifySUCCESS/deploySKIPPED; main/e2e/qualitydraftskipped, WindowscheckerREDremains.
+## Root accepted workers trusted-TLS checkpoint
+
+Root-s3d-source-acceptance.md accepts only isolated workers TLS. Actual tested/formatted bytes9fe8f84e...
+passed8/0/0 in16310ms, selected3types/lint/fmt0,304prefix/helper/old4/PEMs/all20otherbindings unchanged.
+Root's exact one-word comment-only successor89f89312... removes exclusive-trust wording; actual
+single-filefmt0 and byte-equivalence are retained in root-comment-only-successor.json SHA2062f312... .
+Final461lines<=prospective465(doctrine480unchanged). No behavior rerun aftercomment or inventedPASS.
+
+Native300s authoringtimeout remainsFAIL; firstTS2353(DOMRequestInit client literal), within-turn
+explicittyped nativeclient option, formatterRED and mechanicalformatteronlyrescope allretained.
+ConfiguredclientHTTPS401/200 and ordinaryclientrejection prove no exclusiveambienttrustisolation.
+Clients/listener/KVcleanup passed; emptywrapperprofile removed nonrecursively;8observedPIDsabsent
+snapshot-only. Rootauthorizescheckpoint/push/draft2421 withNEWauditedevidence, notready/merge/closure.
+PredecessorLinuxdocs40605465746buildSUCCESS/classifySUCCESS/deploySKIPPED; othermainchecksdraftskipped.
+WindowscanonicaldocscheckerRED persists. Next signal/drain orlegacybrief needs separate rootread;
+streams/consumers/publish/IMPL andwholeS3/U1/securityacceptance remainopen. No next model authorized.

@@ -184,3 +184,9 @@ streams/consumer/publish/IMPL stillopen; exactworkers22numericF5staysDEBT_ACCEPT
 Exactreference row accepted separately. Windows canonical docs:exports-drift is STILLRED due36
 path-keyseparatorfailures beforedriftstage; normalizedscratchcomponentPASS isNOTcanonicalPASS.
 No checker/sourcepolicywaiver; rootexplicitlyholds checkerfix and requiresLinuxdocsCIqualification.
+S3d prospectiveformat-onlycap460->465(root,notoriginalevaluator) accommodatescanonicalformatter;
+final461below480hardcap. Initial3TS2353 were typedsetupfailure, notTLSbehaviorRED. Named test-local
+nativeclient optionavoidsDOMexcess-propertyliteralerror withoutcast/suppression; configured/untrusted
+realclients thenpass. Rootcommentonlysuccessor removes'only' trustoverclaim; preservesallbehavior,
+actual8passingtestbytes andone-filefmtproof, no fictitiouspostcommentbehaviorrerun.300stimeout and
+fmtRED preserved. Remainingarchitecture/release/securitygates unchanged, no publicAPIscopegrowth.

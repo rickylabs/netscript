@@ -158,3 +158,11 @@ root-reference-row-acceptance.md accepts one service-entry table row only. Canon
 coverage is RED(all36separator-mismatchedpaths); normalizedcoverage/unmodifieddriftstagePASS is
 supportingonly. No checkeredit/baselinewaiver; LinuxdocsCIpending. Native118.520s/code0 completed
 sourcewithin180s. NextworkersTLSproposalremainsheld untilfreshhead/hashbinding/rootlaunch.
+## Current root-accepted workers TLS checkpoint
+
+root-s3d-source-acceptance.md:8/0/0 at tested9fe8...; final rootcomment-only89f89312... hasidentical
+executablebytes/fixtures,461lines,canonicalfmt0. Full304prefix/helper/oldtests/20otherbindingsmatch.
+ActualHTTPS401/200+ordinaryclientrejection, no trust-storemutation/exclusive-trustclaim.300stimeout,
+TS2353 andfmtRED remainfailures distinct fromlaterGREEN. Newrootbyteproof2062f312... mapsactualtest
+source tofinalcomment-onlysuccessor. TLSacceptedonly, no signal/drain/legacy/streams/consumer/
+publish/IMPLclosure. ReferenceLinuxdocs40605465746buildSUCCESS; WindowscheckerstillRED, no waiver.
