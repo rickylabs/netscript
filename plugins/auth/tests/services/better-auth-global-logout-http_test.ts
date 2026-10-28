@@ -5,8 +5,8 @@
  */
 
 import { assert, assertEquals } from '@std/assert';
-import { betterAuth } from 'npm:better-auth@^1.6.20';
-import { memoryAdapter } from 'npm:better-auth@^1.6.20/adapters/memory';
+import { betterAuth } from 'npm:better-auth@^1.7.7';
+import { memoryAdapter } from 'npm:better-auth@^1.7.7/adapters/memory';
 import { createBetterAuthBackend } from '@netscript/auth-better-auth';
 import { createAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
 import { serveAuthTestService } from '../testing/auth-service-fixture.ts';

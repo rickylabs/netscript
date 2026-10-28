@@ -1,0 +1,29 @@
+const dir = '.llm/tmp/better-auth-security-sol-20261028';
+const sha = async (bytes: Uint8Array) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((n) => n.toString(16).padStart(2, '0')).join('');
+const getJson = async (path: string) => JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/, ''));
+const paths = ['deno.json', 'deno.lock', 'packages/fresh-ui/deno.lock', 'plugins/auth/tests/services/better-auth-global-logout-http_test.ts', 'plugins/auth/tests/services/unsupported-revocation-http_test.ts'];
+const authored = [];
+for (const path of paths) {
+  const bytes = await Deno.readFile(path);
+  const snapshot = `${dir}/baseline-${path.replaceAll('/', '-')}.txt`;
+  await Deno.writeFile(snapshot, bytes);
+  authored.push({ path, snapshot, sha256: await sha(bytes), lines: new TextDecoder().decode(bytes).split('\n').length - 1 });
+}
+const git = await new Deno.Command('git', { args: ['ls-files'], stdout: 'piped', stderr: 'piped' }).output();
+if (!git.success) throw new Error('Cannot inventory tracked source');
+const ownProtected = new TextDecoder().decode(git.stdout).trim().split(/\r?\n/).filter((path) =>
+  /^(?:packages\/auth-better-auth\/|plugins\/auth\/(?:services\/src\/|tests\/services\/))/.test(path) ||
+  /(?:^|\/)deno\.lock$/.test(path) && !path.startsWith('.llm/runs/') ||
+  path === 'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts'
+).filter((path) => !paths.includes(path));
+const protectedFiles = [];
+for (const path of ownProtected) protectedFiles.push({ root: Deno.cwd(), path, sha256: await sha(await Deno.readFile(path)) });
+const serviceRoot = 'C:/Users/ericc/source/repos/netscript-native-service-policy-008';
+const service = await getJson(`${serviceRoot}/.llm/tmp/native-service-policy-impl-ci-successor-20261028/source-bindings.json`);
+for (const path of service.changedProductOwners) protectedFiles.push({ root: serviceRoot, path, sha256: await sha(await Deno.readFile(`${serviceRoot}/${path}`)) });
+const dbRoot = 'C:/Users/ericc/source/repos/netscript-native-db-qualification-008';
+const db = await getJson(`${dbRoot}/.llm/tmp/native-db-qualification-sol-20261028/final-audit.json`);
+for (const row of db.protectedFiles.filter((row: { root: string }) => row.root.endsWith('netscript-windows-qualification-008'))) protectedFiles.push({ root: row.root, path: row.path, sha256: await sha(await Deno.readFile(`${row.root}/${row.path}`)) });
+for (const row of db.sourceOwners) protectedFiles.push({ root: dbRoot, path: row.path, sha256: await sha(await Deno.readFile(`${dbRoot}/${row.path}`)) });
+await Deno.writeTextFile(`${dir}/baseline.json`, JSON.stringify({ baseline: '1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d', authored, protectedFiles, actualAgeBypassFlags: [], rootPackageJsonAbsent: !(await Deno.stat('package.json').catch(() => null)) }, null, 2) + '\n');
+console.log(JSON.stringify({ authored: authored.length, protectedFiles: protectedFiles.length, release: (await getJson('deno.json')).catalog['better-auth'] }));

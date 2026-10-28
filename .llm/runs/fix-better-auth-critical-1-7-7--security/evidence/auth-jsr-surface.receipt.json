@@ -1,0 +1,51 @@
+{
+  "gateId": "auth-jsr-surface",
+  "invocationId": "auth-jsr-surface",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-all",
+    ".llm/tools/fitness/audit-jsr-package.ts",
+    "--root",
+    "packages/auth-better-auth",
+    "--no-dry-run",
+    "--out",
+    ".llm/tmp/better-auth-security-sol-20261028/auth-jsr-surface.json"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "50106b849e6bc43905fe3cc655d810b449395d9ff0e4c520c855646d3184e763",
+  "lifecycleId": "/root/service_qualification_sol:auth-jsr-surface:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:28:41.830Z",
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/auth-jsr-surface.json",
+  "startedAt": "2026-10-28T03:28:41.836Z",
+  "finishedAt": "2026-10-28T03:28:42.042Z",
+  "durationMs": 206,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/better-auth-security-sol-20261028/auth-jsr-surface.json",
+    "bytes": 1124,
+    "sha256": "ddbb210576aac92d2e15e2fbc0b05b6359bce11bdb8367178e497bbf684791c5",
+    "modifiedAt": "2026-10-28T03:28:42.029Z"
+  }
+}

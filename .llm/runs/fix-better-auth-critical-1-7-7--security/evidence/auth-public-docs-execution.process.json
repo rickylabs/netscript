@@ -1,0 +1,17 @@
+﻿{
+    "name":  "auth-public-docs-execution",
+    "startedUtc":  "2026-10-28T03:28:41.4992343Z",
+    "finishedUtc":  "2026-10-28T03:28:43.2866132Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tmp/better-auth-security-sol-20261028/run-request.ts",
+                      "auth-public-docs"
+                  ],
+    "exitCode":  1,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\auth-public-docs-execution.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\auth-public-docs-execution.stderr.log"
+}

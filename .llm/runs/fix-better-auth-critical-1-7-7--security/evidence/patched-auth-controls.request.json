@@ -1,0 +1,26 @@
+{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-read",
+                 "--allow-write",
+                 "--allow-run",
+                 ".llm/tools/run-deno-test.ts",
+                 "--output",
+                 ".llm/tmp/better-auth-security-sol-20261028/patched-auth-controls.json",
+                 "--",
+                 "--cached-only",
+                 "--frozen",
+                 "--check",
+                 "--allow-all",
+                 "--sanitize-ops",
+                 "--sanitize-resources",
+                 "--trace-leaks",
+                 "packages/auth-better-auth/tests/",
+                 "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+                 "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+             ],
+    "timeoutMs":  120000,
+    "childReport":  ".llm/tmp/better-auth-security-sol-20261028/patched-auth-controls.json"
+}

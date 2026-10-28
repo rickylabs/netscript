@@ -1,0 +1,14 @@
+﻿{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-read",
+                 "--allow-net",
+                 "--allow-run",
+                 ".llm/tools/deps/audit.ts",
+                 "--level",
+                 "low"
+             ],
+    "timeoutMs":  120000
+}

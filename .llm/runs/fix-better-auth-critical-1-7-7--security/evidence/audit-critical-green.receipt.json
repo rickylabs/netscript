@@ -1,0 +1,36 @@
+{
+  "gateId": "audit-critical",
+  "invocationId": "better-auth-critical-green",
+  "argv": [
+    "deno",
+    "task",
+    "audit:critical"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:61864",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "e90a8de4c7c8c019abfd89d4a75bffc27f1dfc979508aeacac1c40b1ddfc7669",
+  "lifecycleId": "worker:61864:better-auth-critical-green:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:17:55.392Z",
+  "startedAt": "2026-10-28T03:17:55.397Z",
+  "finishedAt": "2026-10-28T03:17:56.218Z",
+  "durationMs": 821,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 75,
+    "sha256": "ad243fc31fc43a63836efa8f029ab1a206d535634583e2a9d20c05857f679492",
+    "tail": "Found 47 vulnerabilities\nSeverity: 4 low, 23 moderate, 20 high, 0 critical\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 48,
+    "sha256": "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9",
+    "tail": "Task audit:critical deno audit --level critical\n",
+    "truncated": false
+  }
+}

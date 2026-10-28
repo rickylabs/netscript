@@ -1,0 +1,36 @@
+{
+  "gateId": "audit-critical",
+  "invocationId": "better-auth-unchanged-red",
+  "argv": [
+    "deno",
+    "task",
+    "audit:critical"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:106172",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6628f373d30fee8fc15af2ade758af2eef660ba1fac28a95a2949607f4bfb41d",
+  "lifecycleId": "worker:106172:better-auth-unchanged-red:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-10-28T03:02:27.216Z",
+  "startedAt": "2026-10-28T03:02:27.222Z",
+  "finishedAt": "2026-10-28T03:02:28.081Z",
+  "durationMs": 860,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 318,
+    "sha256": "7a246a27e4d5e948a51a06f2245754e079482578d7ecc6e32dfe309d4a260736",
+    "tail": "╭ better-auth: OAuth state can be used as a Magic Link to sign in as another user\n│ Severity:   critical\n│ Package:    better-auth\n│ Vulnerable: >=1.4.0-beta.18 <1.7.7\n╰ Info:       https://github.com/advisories/GHSA-965c-763c-88jm\n\nFound 54 vulnerabilities\nSeverity: 7 low, 23 moderate, 23 high, 1 critical\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 320,
+    "sha256": "3a69c08a72d759feed428749d68adc60021fc8ba279b6e7c9d24af34c3278805",
+    "tail": "╭ Warning\n│\n│  Ignored build scripts for packages:\n│  npm:lmdb@3.5.7\n│  npm:msgpackr-extract@3.0.4\n│\n│  Lifecycle scripts are only supported when using a `node_modules` directory.\n│  Enable it in your deno config file:\n│  \"nodeModulesDir\": \"auto\"\n╰─\nTask audit:critical deno audit --level critical\n",
+    "truncated": false
+  }
+}

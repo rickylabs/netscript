@@ -1,0 +1,5 @@
+# Preserve immutable evidence and copied root records byte-for-byte. No whitespace-ignore attributes.
+/evidence/** -text
+/root-* -text
+/accepted-handoff.md -text
+/accepted-proposal.md -text

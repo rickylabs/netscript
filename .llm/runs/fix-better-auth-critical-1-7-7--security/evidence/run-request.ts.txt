@@ -1,0 +1,16 @@
+import { executeGate } from '../../tools/gates/command-lifecycle.ts';
+import { AtomicFileReceiptStore } from '../../tools/gates/receipt-store.ts';
+const name = Deno.args[0];
+if (!name || !/^[a-z][a-z0-9-]+$/.test(name)) throw new Error('Explicit named gate required');
+const dir = '.llm/tmp/better-auth-security-sol-20261028';
+const request = JSON.parse(await Deno.readTextFile(`${dir}/${name}.request.json`));
+if (!Array.isArray(request.args) || request.timeoutMs > 300_000 || request.timeoutMs < 1) throw new Error('Invalid bounded request');
+const head = await new Deno.Command('git', { args: ['rev-parse', 'HEAD'], stdout: 'piped', stderr: 'piped' }).output();
+if (!head.success) throw new Error('Cannot attest source head');
+const gitHead = new TextDecoder().decode(head.stdout).trim();
+const result = await executeGate({ gateId: name, invocationId: name, attempt: 1,
+  argv: [Deno.execPath(), ...request.args], cwd: Deno.cwd(), gitHead, actualGitHead: gitHead,
+  timeoutMs: request.timeoutMs, runnerIdentity: '/root/service_qualification_sol',
+}, { store: new AtomicFileReceiptStore(`${dir}/${name}.receipt.json`), childReport: request.childReport });
+console.log(JSON.stringify(result));
+Deno.exit(result.exitCode ?? 1);

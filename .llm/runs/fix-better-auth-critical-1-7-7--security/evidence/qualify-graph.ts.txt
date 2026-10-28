@@ -1,0 +1,22 @@
+import { join, toFileUrl } from '@std/path';
+const root = Deno.cwd(), dir = '.llm/tmp/better-auth-security-sol-20261028';
+const entries = ['packages/auth-better-auth/mod.ts', 'plugins/auth/tests/services/better-auth-global-logout-http_test.ts', 'plugins/auth/tests/services/unsupported-revocation-http_test.ts'];
+const entry = join(root, dir, 'selected-auth-graph.ts');
+await Deno.writeTextFile(entry, entries.map((path) => `import ${JSON.stringify(toFileUrl(join(root, path)).href)};`).join('\n') + '\n');
+const controller = new AbortController();
+const timer = setTimeout(() => controller.abort(), 120_000);
+try {
+  const args = ['info', '--json', '--lock=deno.lock', '--frozen-lockfile', toFileUrl(entry).href];
+  const result = await new Deno.Command(Deno.execPath(), { args, signal: controller.signal, stdout: 'piped', stderr: 'piped' }).output();
+  await Deno.writeFile(`${dir}/selected-auth-graph.raw.json`, result.stdout);
+  await Deno.writeFile(`${dir}/selected-auth-graph.native-stderr.log`, result.stderr);
+  if (!result.success) throw new Error(`Native graph failed: ${result.code}`);
+  const graph = JSON.parse(new TextDecoder().decode(result.stdout));
+  const errors = (graph.modules ?? []).filter((module: {error?: unknown}) => module.error !== undefined);
+  const family = Object.keys(graph.npmPackages ?? {}).filter((id) => /^(?:better-auth|@better-auth\/(?:core|drizzle-adapter|kysely-adapter|memory-adapter|mongo-adapter|prisma-adapter|telemetry))@/.test(id));
+  const observed = [...new Set(family.map((id) => id.match(/@([^@_]+)(?:_|$)/)?.[1]))];
+  if (graph.modules.length === 0 || errors.length || family.length < 8 || JSON.stringify(observed) !== JSON.stringify(['1.7.14'])) throw new Error('Incomplete or mixed selected native release graph');
+  const report = { args, exitCode: result.code, selectedSources: entries, roots: graph.roots, moduleCount: graph.modules.length, errors, family, observedReleaseVersions: observed, ordinaryAgeAndAdmission: true, noOverridesReloadOrAgeBypass: true };
+  await Deno.writeTextFile(`${dir}/selected-auth-graph.receipt.json`, JSON.stringify(report, null, 2) + '\n');
+  console.log(JSON.stringify(report));
+} finally { clearTimeout(timer); }
