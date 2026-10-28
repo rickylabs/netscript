@@ -42,13 +42,13 @@ Widget-first Material You. Signature moves:
 - MUST keep dark designed: pastels become deep tones of the same hue; the ink card and discs lift to
   warm browns (#453a2c, #3b3631). No white outlines, no black slab on black.
 - MUST only read semantic `--ns-bloom-*` roles. In the Figma prototype the core roles resolve to
-  Tonal values (a borrowed mode, not a contract, until S1 #2414 exports a complete Bloom core-role
-  map); never paint them, and never use primitives.
+  Tonal values (Bloom's own mode is still seeded from Tonal; not a contract until #2414 exports a
+  complete Bloom core-role map); never paint them, and never use primitives.
 
 ## Building a screen
 
-1. **Enable the theme:** `data-theme="bloom"`, `data-scheme` (provisional until S1 #2414; Bloom
-   borrows the Tonal Theme mode in Figma and lives in `bloom/*` roles).
+1. **Enable the theme:** `data-theme="bloom"`, `data-scheme` (provisional until #2414; in Figma,
+   Bloom has its own Theme mode, still seeded from Tonal, and lives in `bloom/*` roles).
 2. **Compose:** warm paper with backdrop arcs → greeting + 92px title + one control pair → a row of
    3–5 widgets (272px tall, 16px gaps, one stacked column of 128px tiles allowed) → a 700px list
    column beside a 420px detail panel with a white sheet. A floating ink selection bar appears only
@@ -78,11 +78,11 @@ Widget-first Material You. Signature moves:
 
 - Derive from the closest widget, disc or pill; keep Regular display type, ink actions and pastel
   categories.
-- New roles go under `bloom/<path>` and must be registered in code (S1); don't reuse an unrelated
+- New roles go under `bloom/<path>` and must be registered in code (#2414); don't reuse an unrelated
   pastel for a new meaning.
 - A new notch size needs its own measured path (outer r, notch w × h, inner convex r, concave r) and
   a disc placed 4px from the outer edges. Add it as a new `data-variant` of `.ns-bloom-notch`
-  registered through S3 #2416, never as a BEM modifier class.
+  registered through the component anatomy spec (#2416), never as a BEM modifier class.
 - Bloom has no state sheet yet; create one (Light and Dark) for every new interactive component.
 
 ## Self-check before handing off

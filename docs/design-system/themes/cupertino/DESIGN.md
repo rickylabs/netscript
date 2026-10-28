@@ -3,7 +3,8 @@ version: alpha
 name: Cupertino
 description: 'Apple-inspired classic: a translucent floating sidebar, a large-title header, capsule buttons, inset grouped lists and blur-only materials, with full-row system-blue selection on opaque slate content cards.'
 colors:
-  # Resolved from the NetScript Figma library, Theme mode "Glass", Light and Dark frames.
+  # Resolved from the NetScript Figma library, Theme mode "Glass" (the seed of Cupertino's own
+  # mode), Light and Dark frames.
   # Keys are the --ns-* suffix from each variable's code syntax.
   bg: '#f0f0f3'
   bg-dark: '#111113'
@@ -266,8 +267,9 @@ components:
 ### Composition boundary
 
 Cupertino keeps the composition above: a floating sidebar, capsule buttons, a large title and an
-inline grouped editor. Strict macOS 15 / iOS 18 anatomy is out of scope: no attached 208px sidebar,
-no 6px-corner 28px bordered push buttons, no docked inspector.
+inline grouped editor. Strict macOS 15 / iOS 18 anatomy (an attached 208px sidebar, 6px-corner 28px
+bordered push buttons, a docked inspector) belongs to the faithful Apple Classic theme (planned,
+#2443), not to Cupertino.
 
 Cupertino never takes lensing, specular rims, a detached sheet, a floating selection bar, glass on
 content or the macOS 27 toolbar groups from Liquid. The Figma frames carry a `GLASS` effect on the
@@ -303,8 +305,8 @@ side-by-side comparison against the Figma frames in #2419 (GUIDELINES §3).
 - **Families.** Inter (OFL, Google Fonts) stands in for SF Pro, which cannot be embedded and renders
   blank from the Figma Plugin API. The theme uses one family; size and weight set the hierarchy.
   Code stack: `Inter, -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif`.
-- **Scale (Theme mode `Glass`, bound on the frames).** Large title 34/40 Bold −0.9px ("Orders"). KPI
-  34/40 Semi Bold −1px. Heading 17/22 Semi Bold −0.3px (the iOS headline size, used for "Order
+- **Scale (`Glass` seed values, bound on the frames).** Large title 34/40 Bold −0.9px ("Orders").
+  KPI 34/40 Semi Bold −1px. Heading 17/22 Semi Bold −0.3px (the iOS headline size, used for "Order
   SO-10480" and "Activity"). Body 14/20 −0.1px. Strong 14/20 Medium. Small 13/18 −0.05px. Caption
   12/16. Label 12/16 Medium.
 - **Literal styles (not yet tokens).** Buttons 14/20 Semi Bold. Segments 13/18: Medium at rest, Semi
@@ -393,8 +395,9 @@ Hover, pressed, focus and disabled are not drawn for any Cupertino component. Th
 ## Do's and Don'ts
 
 - **Do** keep the hand-built composition, including the capsules and the floating sidebar.
-- **Don't** describe or rebuild Cupertino as strict macOS 15 / iOS 18 (opaque attached sidebar,
-  bordered push buttons). Symptom: the screen reads as a generic Bootstrap admin.
+- **Don't** turn Cupertino into a strict macOS 15 / iOS 18 reproduction (opaque attached sidebar,
+  bordered push buttons). That is the faithful Apple Classic theme (planned, #2443); Cupertino keeps
+  its own composition.
 - **Don't** ship lensing, refraction, dispersion or specular rims. Those belong to Liquid, and the
   two themes stay visually distinct. Blur-only CSS is the proposed approximation of the Figma
   frames, pending the comparison in #2419.
@@ -456,14 +459,14 @@ Measured on rendered pixels and resolved tokens (WCAG 2.2):
 
 ## NetScript Mapping
 
-| Layer              | Value                                                                                                                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `Glass`. The Liquid windows use the same mode, because the Figma Theme collection is limited to 10 modes                                                                              |
-| Base gray × accent | Radix **slate × blue**. The `Glass` mode's own `gray/*` and `accent/*` alias them directly (`surface/bg` → `surface/l/canvas` → `slate/l/3`) instead of the default `Neutral` × `Ink` |
-| Density            | Comfortable (default; not bound)                                                                                                                                                      |
-| Flavor             | n/a                                                                                                                                                                                   |
-| `data-theme`       | `cupertino`                                                                                                                                                                           |
-| Language roles     | `cupertino/*`: 27 Scheme roles, `--ns-cupertino-*`. The current design binds none of them; every paint binds a core role                                                              |
+| Layer              | Value                                                                                                                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Figma Theme mode   | `Cupertino`, its own mode in `Theme B` (set B), still seeded from `Glass`'s values                                                                                                                  |
+| Base gray × accent | Radix **slate × blue**. The mode's own `gray/*` and `accent/*`, seeded from `Glass`, alias them directly (`surface/bg` → `surface/l/canvas` → `slate/l/3`) instead of the default `Neutral` × `Ink` |
+| Density            | Comfortable (default; not bound)                                                                                                                                                                    |
+| Flavor             | n/a                                                                                                                                                                                                 |
+| `data-theme`       | `cupertino`                                                                                                                                                                                         |
+| Language roles     | `cupertino/*`: 27 Scheme roles, `--ns-cupertino-*`. The current design binds none of them; every paint binds a core role                                                                            |
 
 - **Roles pending in #2414:**
   - `switch-thumb` for the switch knob (`#ffffff` light, `#111113` dark). It has the same values as
@@ -472,8 +475,8 @@ Measured on rendered pixels and resolved tokens (WCAG 2.2):
     adds a 24 / 26 container tier or snaps them to `radius/card`; the second option changes the
     look.
   - Reduce Transparency capsules use `surface-raised` (82% alpha), not an opaque role.
-  - `cupertino/*`: delete it, or keep it as the Cupertino resolver mode once the Theme collection
-    has no mode limit. Don't bind only some of its roles.
+  - `cupertino/*`: delete it, or use its values in Cupertino's own Theme mode, which still holds the
+    `Glass` seed values. Don't bind only some of its roles.
 - **Status.** Values come from the NetScript Figma library. Token names and export, fonts, tabular
   figures and the full contrast matrix are pending in #2414. Component states, focus and accessible
   names are pending in #2416, and runtime checks such as motion, keyboard, scroll, live preferences

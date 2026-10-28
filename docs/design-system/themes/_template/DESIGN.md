@@ -7,7 +7,7 @@ description: >-
 colors:
   # ILLUSTRATIVE SUBSET, NOT A COMPLETE EXPORT. Keys are the NetScript CSS suffix of a core role
   # (surface/bg -> --ns-bg -> `bg`); the Dark value uses the same key with `-dark`. Replace every
-  # value with the resolved Figma value, and list every core role the theme changes. The S1 export
+  # value with the resolved Figma value, and list every core role the theme changes. The token export
   # (#2414) remains the complete role map.
   # The defaults below are safe, Utility-compatible values: a designed graphite dark, never white
   # primaries, borders or rings in dark. `muted` is a surface; `muted-fg` is its text.
@@ -192,8 +192,8 @@ with their tracking issue.
 | Language roles     | Token-only assignment: `none`. Declared language pack: the role manifest, every `<theme>/<path>` → `--ns-<theme>-<path>` it adds (GUIDELINES §2.4) |
 
 - **Pending roles:** any value that has no semantic role yet (a primitive or raw value bound
-  directly in Figma). For each one, give the S1 role that will replace it and the reason, marked
-  "role pending in #2414". These values never ship in L2 component CSS (GUIDELINES §2.1).
+  directly in Figma). For each one, give the role that will replace it and the reason, marked "role
+  pending in #2414". These values never ship in L2 component CSS (GUIDELINES §2.1).
 - **Implementation status:** one or two sentences, with an issue for everything not yet proven in
   code. For example: "Values come from the NetScript Figma library. Token and font export is tracked
   in #2414, component states in #2416, and runtime checks such as motion, RTL and glass rendering in
