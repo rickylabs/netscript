@@ -161,10 +161,10 @@
     "mcpSourceBytes": 283750
   },
   "latestBaseReconciliation": {
-    "targetMain": "0825bd0f421c83757234044235ae4ed00323d0fd",
-    "oldFeatureTip": "ae2f4002b671937da936571926408b2ad0fa8b4c",
-    "evidence": "rebase-evidence.json",
-    "implEval": "rebase-impl-eval.md",
+    "targetMain": "96d13d29434d44538480b29ac11ac988a66d2042",
+    "oldFeatureTip": "9cc0442b2fe2a606694c126b933095d12bb6f054",
+    "evidence": "advancing-base-evidence.json",
+    "implEval": "advancing-base-impl-eval.md",
     "browserPassed": 116,
     "axeAudits": 32,
     "seriousOrCritical": 0,
