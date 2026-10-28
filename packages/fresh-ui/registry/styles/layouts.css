@@ -885,3 +885,8 @@
     animation-duration: 0.01ms;
   }
 }
+
+/* The preset's muted foreground already encodes its intended readable contrast. */
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-dashboard__nav-group-label {
+  opacity: 1;
+}

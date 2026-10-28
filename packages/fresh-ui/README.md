@@ -146,9 +146,32 @@ declare const setSelectedIds: (next: ReadonlySet<string>) => void;
 | `./ai/render-ui` | `RenderUiSurface`, `renderUiPayload` — the safe generative-UI renderer                           |
 | `./desktop`      | `createDesktopChrome` — menus, tray, dialogs, notifications, window actions                      |
 | `./registry`     | The registry manifest and content map the CLI copies from                                        |
+| `./tokens`       | DTCG sources, preset metadata and the IO-free Style Dictionary builder for tooling                |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/fresh-ui@<version>`](https://jsr.io/@netscript/fresh-ui/doc).
+
+The token builder is a tooling entrypoint. Import it from CLI or build code:
+
+```typescript
+import { buildTokens } from '@netscript/fresh-ui/tokens';
+
+const build = await buildTokens({
+  preset: 'studio-utility',
+  override: {
+    semantic: {
+      'radius-md': { $type: 'dimension', $value: '{semantic.radius-lg}' },
+    },
+  },
+});
+// The caller chooses the destination and writes the returned bytes.
+console.log(build.files['tokens.css']);
+```
+
+All 18 presets, both schemes and both requested density contexts build through
+Style Dictionary. Presets fix their own geometry. NS One stays the default;
+Studio Utility is available as `theme-studio-utility` in the registry. The
+three-tier source and extension guide is [tokens/README.md](tokens/README.md).
 
 ## Docs
 
@@ -169,3 +192,8 @@ browser. Registry copy commands (`netscript ui:*`) require the NetScript CLI.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+Token build metadata is available from `@netscript/fresh-ui/token-config` without
+loading Style Dictionary or the source corpus. See [token contribution and output
+budgets](tokens/README.md). Design preview styles are opt-in through
+`netscript ui:add theme-previews` or `netscript tokens build --previews`.

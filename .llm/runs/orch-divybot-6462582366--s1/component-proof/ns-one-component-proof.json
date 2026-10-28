@@ -1,0 +1,382 @@
+{
+  "before": {
+    "light": {
+      "button": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "500",
+          "line-height": "14px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "16px",
+          "padding-bottom": "8px",
+          "padding-left": "16px",
+          "border-top-width": "1px",
+          "border-top-color": "oklch(0.635 0.105 52)",
+          "border-radius": "6px",
+          "background-color": "oklch(0.635 0.105 52)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "color(srgb 0.423041 0.271744 0.174142) 3px 3px 0px 0px",
+          "transition-duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+          "transition-timing-function": "ease, ease, ease, ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-light-button.png"
+      },
+      "input": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "400",
+          "line-height": "21px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "12px",
+          "padding-bottom": "8px",
+          "padding-left": "12px",
+          "border-top-width": "1px",
+          "border-top-color": "oklch(0.805 0.006 85)",
+          "border-radius": "6px",
+          "background-color": "rgb(255, 255, 255)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "none",
+          "transition-duration": "0.15s, 0.15s",
+          "transition-timing-function": "ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-light-input.png"
+      },
+      "card": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "16px",
+          "font-weight": "400",
+          "line-height": "24px",
+          "letter-spacing": "normal",
+          "padding-top": "0px",
+          "padding-right": "0px",
+          "padding-bottom": "0px",
+          "padding-left": "0px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(0, 0, 0, 0.14)",
+          "border-radius": "12px",
+          "background-color": "rgb(255, 255, 255)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-light-card.png"
+      },
+      "badge": {
+        "styles": {
+          "font-family": "\"DM Mono\", ui-monospace, \"Cascadia Code\", \"Fira Code\", monospace",
+          "font-size": "10.72px",
+          "font-weight": "500",
+          "line-height": "12.864px",
+          "letter-spacing": "0.8576px",
+          "padding-top": "2px",
+          "padding-right": "8px",
+          "padding-bottom": "2px",
+          "padding-left": "8px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(200, 149, 108, 0.25)",
+          "border-radius": "4px",
+          "background-color": "rgba(200, 149, 108, 0.1)",
+          "color": "oklch(0.635 0.105 52)",
+          "box-shadow": "none",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-light-badge.png"
+      }
+    },
+    "dark": {
+      "button": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "500",
+          "line-height": "14px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "16px",
+          "padding-bottom": "8px",
+          "padding-left": "16px",
+          "border-top-width": "1px",
+          "border-top-color": "oklch(0.635 0.105 52)",
+          "border-radius": "6px",
+          "background-color": "oklch(0.635 0.105 52)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "color(srgb 0.423041 0.271744 0.174142) 3px 3px 0px 0px",
+          "transition-duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+          "transition-timing-function": "ease, ease, ease, ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-dark-button.png"
+      },
+      "input": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "400",
+          "line-height": "21px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "12px",
+          "padding-bottom": "8px",
+          "padding-left": "12px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(235, 228, 210, 0.1)",
+          "border-radius": "6px",
+          "background-color": "oklch(0.215 0.006 85)",
+          "color": "oklch(0.985 0.006 85)",
+          "box-shadow": "none",
+          "transition-duration": "0.15s, 0.15s",
+          "transition-timing-function": "ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-dark-input.png"
+      },
+      "card": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "16px",
+          "font-weight": "400",
+          "line-height": "24px",
+          "letter-spacing": "normal",
+          "padding-top": "0px",
+          "padding-right": "0px",
+          "padding-bottom": "0px",
+          "padding-left": "0px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(235, 228, 210, 0.12)",
+          "border-radius": "12px",
+          "background-color": "oklch(0.215 0.006 85)",
+          "color": "oklch(0.985 0.006 85)",
+          "box-shadow": "rgba(0, 0, 0, 0.18) 0px 1px 2px 0px",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-dark-card.png"
+      },
+      "badge": {
+        "styles": {
+          "font-family": "\"DM Mono\", ui-monospace, \"Cascadia Code\", \"Fira Code\", monospace",
+          "font-size": "10.72px",
+          "font-weight": "500",
+          "line-height": "12.864px",
+          "letter-spacing": "0.8576px",
+          "padding-top": "2px",
+          "padding-right": "8px",
+          "padding-bottom": "2px",
+          "padding-left": "8px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(200, 149, 108, 0.18)",
+          "border-radius": "4px",
+          "background-color": "rgba(200, 149, 108, 0.08)",
+          "color": "oklch(0.635 0.105 52)",
+          "box-shadow": "none",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "before-dark-badge.png"
+      }
+    }
+  },
+  "after": {
+    "light": {
+      "button": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "500",
+          "line-height": "14px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "16px",
+          "padding-bottom": "8px",
+          "padding-left": "16px",
+          "border-top-width": "1px",
+          "border-top-color": "oklch(0.635 0.105 52)",
+          "border-radius": "6px",
+          "background-color": "oklch(0.635 0.105 52)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "color(srgb 0.423041 0.271744 0.174142) 3px 3px 0px 0px",
+          "transition-duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+          "transition-timing-function": "ease, ease, ease, ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-light-button.png"
+      },
+      "input": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "400",
+          "line-height": "21px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "12px",
+          "padding-bottom": "8px",
+          "padding-left": "12px",
+          "border-top-width": "1px",
+          "border-top-color": "oklch(0.805 0.006 85)",
+          "border-radius": "6px",
+          "background-color": "rgb(255, 255, 255)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "none",
+          "transition-duration": "0.15s, 0.15s",
+          "transition-timing-function": "ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-light-input.png"
+      },
+      "card": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "16px",
+          "font-weight": "400",
+          "line-height": "24px",
+          "letter-spacing": "normal",
+          "padding-top": "0px",
+          "padding-right": "0px",
+          "padding-bottom": "0px",
+          "padding-left": "0px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(0, 0, 0, 0.14)",
+          "border-radius": "12px",
+          "background-color": "rgb(255, 255, 255)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-light-card.png"
+      },
+      "badge": {
+        "styles": {
+          "font-family": "\"DM Mono\", ui-monospace, \"Cascadia Code\", \"Fira Code\", monospace",
+          "font-size": "10.72px",
+          "font-weight": "500",
+          "line-height": "12.864px",
+          "letter-spacing": "0.8576px",
+          "padding-top": "2px",
+          "padding-right": "8px",
+          "padding-bottom": "2px",
+          "padding-left": "8px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(200, 149, 108, 0.25)",
+          "border-radius": "4px",
+          "background-color": "rgba(200, 149, 108, 0.1)",
+          "color": "oklch(0.635 0.105 52)",
+          "box-shadow": "none",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-light-badge.png"
+      }
+    },
+    "dark": {
+      "button": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "500",
+          "line-height": "14px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "16px",
+          "padding-bottom": "8px",
+          "padding-left": "16px",
+          "border-top-width": "1px",
+          "border-top-color": "oklch(0.635 0.105 52)",
+          "border-radius": "6px",
+          "background-color": "oklch(0.635 0.105 52)",
+          "color": "oklch(0.135 0.006 85)",
+          "box-shadow": "color(srgb 0.423041 0.271744 0.174142) 3px 3px 0px 0px",
+          "transition-duration": "0.15s, 0.15s, 0.15s, 0.15s, 0.15s",
+          "transition-timing-function": "ease, ease, ease, ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-dark-button.png"
+      },
+      "input": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "14px",
+          "font-weight": "400",
+          "line-height": "21px",
+          "letter-spacing": "normal",
+          "padding-top": "8px",
+          "padding-right": "12px",
+          "padding-bottom": "8px",
+          "padding-left": "12px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(235, 228, 210, 0.1)",
+          "border-radius": "6px",
+          "background-color": "oklch(0.215 0.006 85)",
+          "color": "oklch(0.985 0.006 85)",
+          "box-shadow": "none",
+          "transition-duration": "0.15s, 0.15s",
+          "transition-timing-function": "ease, ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-dark-input.png"
+      },
+      "card": {
+        "styles": {
+          "font-family": "\"DM Sans\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+          "font-size": "16px",
+          "font-weight": "400",
+          "line-height": "24px",
+          "letter-spacing": "normal",
+          "padding-top": "0px",
+          "padding-right": "0px",
+          "padding-bottom": "0px",
+          "padding-left": "0px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(235, 228, 210, 0.12)",
+          "border-radius": "12px",
+          "background-color": "oklch(0.215 0.006 85)",
+          "color": "oklch(0.985 0.006 85)",
+          "box-shadow": "rgba(0, 0, 0, 0.18) 0px 1px 2px 0px",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-dark-card.png"
+      },
+      "badge": {
+        "styles": {
+          "font-family": "\"DM Mono\", ui-monospace, \"Cascadia Code\", \"Fira Code\", monospace",
+          "font-size": "10.72px",
+          "font-weight": "500",
+          "line-height": "12.864px",
+          "letter-spacing": "0.8576px",
+          "padding-top": "2px",
+          "padding-right": "8px",
+          "padding-bottom": "2px",
+          "padding-left": "8px",
+          "border-top-width": "1px",
+          "border-top-color": "rgba(200, 149, 108, 0.18)",
+          "border-radius": "4px",
+          "background-color": "rgba(200, 149, 108, 0.08)",
+          "color": "oklch(0.635 0.105 52)",
+          "box-shadow": "none",
+          "transition-duration": "0s",
+          "transition-timing-function": "ease",
+          "min-height": "auto"
+        },
+        "screenshot": "after-dark-badge.png"
+      }
+    }
+  }
+}

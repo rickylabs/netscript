@@ -1,7 +1,7 @@
 # Fresh UI browser evidence
 
 This harness runs the real scaffold gallery through Chromium at 390 and 1280 CSS pixels in light
-and dark mode. Each route must return HTTP 200, show its heading, hydrate the theme island, and let
+and dark mode, including the Studio Utility token preview (12 cases). Each route must return HTTP 200, show its heading, stamp language/scheme/density/flavor, hydrate the scheme island, and let
 keyboard users reach and activate its theme toggle using Tab, Enter and Space. It captures a
 full-page PNG and attaches the complete axe report. Serious/critical findings must match the exact
 reviewed S0 baseline; this is not a claim that today’s gallery is axe-clean. CI uploads screenshots, traces on failure,
@@ -17,6 +17,8 @@ From the repository root, generate a local-source app:
 deno run -A --frozen packages/cli/bin/netscript-dev.ts init fresh-ui-browser \
   --path .llm/tmp/s0/scaffold --app-name dashboard --db none \
   --no-aspire --no-git --editor none --ci --yes
+deno run -A --frozen packages/cli/bin/netscript-dev.ts ui:add theme-previews \
+  --project-root .llm/tmp/s0/scaffold/fresh-ui-browser/apps/dashboard
 ```
 
 Then run from this directory:
@@ -37,7 +39,7 @@ The test runner never reuses an unrelated server.
 | --- | --- |
 | `FRESH_UI_APP_DIR` | App directory, relative to this directory or absolute; must have a `dev` task |
 | `FRESH_UI_BASE_URL` | Already running app; disables server startup and shutdown |
-| `FRESH_UI_ROUTES` | Comma-separated app-relative paths; defaults to `/design/tokens,/design/components` |
+| `FRESH_UI_ROUTES` | Comma-separated app-relative paths; defaults to `/design/tokens,/design/components,/design/tokens?preset=studio-utility` |
 | `FRESH_UI_PORT` | Port for an owned local dev server; change it if the default is busy |
 | `FRESH_UI_OUTPUT_DIR` | Capture/report directory; defaults to ignored `test-results/` |
 | `FRESH_UI_AXE_STRICT` | Set to `1` to require zero serious/critical axe findings |
@@ -114,3 +116,9 @@ inputs differ; the recorder supports relocated artifact paths.
 
 Upstream references: [Playwright accessibility testing](https://playwright.dev/docs/accessibility-testing)
 and [screenshots](https://playwright.dev/docs/screenshots).
+
+The S1 matrix changes data-scheme through the keyboard while retaining data-theme
+as the language. NS One remains the default. Utility has zero serious/critical
+allowances; its authored token failures stay in the separate exact token contrast
+report. Specimen captions use readable neutral surfaces without changing swatch
+values. Original S0 screenshots remain untouched.

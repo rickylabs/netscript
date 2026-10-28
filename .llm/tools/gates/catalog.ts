@@ -101,6 +101,7 @@ export const GATE_CATALOG = {
   'public-doc-lint': ['deno', 'doc', '--lint'],
   'fresh-browser': ['deno', 'task', 'test:browser'],
   'fresh-ui-token-build': ['deno', 'task', 'tokens:build'],
+  'fresh-ui-token-quality': ['deno', 'task', 'tokens:validate'],
   'fresh-ui-tokens': ['deno', 'task', 'tokens:check'],
   'fresh-ui-browser': ['npm', 'test'],
   'fresh-ui-browser-contract': [

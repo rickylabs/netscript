@@ -6,5 +6,7 @@ export const handler = define.middleware(async (ctx) => {
     return new Response('Not Found', { status: 404 });
   }
 
+  const { designTheme } = await import('./(_shared)/theme.ts');
+  ctx.state.themePreview = designTheme(ctx.url);
   return await ctx.next();
 });

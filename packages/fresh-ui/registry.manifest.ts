@@ -1,4 +1,6 @@
-import type { RegistryManifest } from './registry.schema.ts';
+import type { RegistryItemDefinition, RegistryManifest } from './registry.schema.ts';
+import { generatedThemes } from './registry.theme-items.generated.ts';
+import { PREVIEW_TOKEN_FILES } from './src/tokens/domain/token-output.ts';
 import { FRESH_UI_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 
 /**
@@ -12,6 +14,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
   schemaVersion: 2,
   tokenSourceStrategy: 'style-dictionary-dtcg-source',
   items: [
+    ...generatedThemes as RegistryItemDefinition[],
     {
       name: 'cn',
       kind: 'lib',
@@ -160,6 +163,8 @@ export const freshUiRegistryManifest: RegistryManifest = {
           target: '@assets/theme-bridge.css',
         },
         { source: 'registry/theme/tokens.json', target: '@assets/tokens.json' },
+        { source: 'registry/theme/fonts.json', target: '@assets/fonts.json' },
+        { source: 'registry/theme/theme-preset.json', target: '@assets/theme-preset.json' },
       ],
       registryDependencies: ['cn', 'public-types'],
       cssVars: {
@@ -174,6 +179,17 @@ export const freshUiRegistryManifest: RegistryManifest = {
           '--ns-fg': 'var(--ns-gray-12)',
         },
       },
+    },
+    {
+      name: 'theme-previews',
+      tags: ['theme', 'preview', 'development'],
+      kind: 'lib',
+      description: 'Opt-in stylesheets for development-only design preset previews.',
+      copyOwnership: 'app-owned-after-copy',
+      files: PREVIEW_TOKEN_FILES.map((file) => ({
+        source: `registry/theme/${file}`,
+        target: `static/${file}`,
+      })),
     },
     {
       name: 'layout-objects',

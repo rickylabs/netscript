@@ -1,0 +1,4333 @@
+{
+  "version": 1,
+  "source": "Approved GUIDELINES 2.5 core uses and per-language NetScript Mapping/node bindings; explicit paint stacks composite over the preset ground.",
+  "pairs": [
+    {
+      "id": "fg/bg",
+      "foreground": "fg",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/surface",
+      "foreground": "fg",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/card",
+      "foreground": "fg",
+      "background": [
+        "card"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/surface-raised",
+      "foreground": "fg",
+      "background": [
+        "surface-raised"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/muted",
+      "foreground": "fg",
+      "background": [
+        "muted"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/hover",
+      "foreground": "fg",
+      "background": [
+        "hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/selected",
+      "foreground": "fg",
+      "background": [
+        "selected"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/container",
+      "foreground": "fg",
+      "background": [
+        "container"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/container-high",
+      "foreground": "fg",
+      "background": [
+        "container-high"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/container-highest",
+      "foreground": "fg",
+      "background": [
+        "container-highest"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "card-fg/card",
+      "foreground": "card-fg",
+      "background": [
+        "card"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "muted-fg/bg",
+      "foreground": "muted-fg",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "muted-fg/surface",
+      "foreground": "muted-fg",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "muted-fg/card",
+      "foreground": "muted-fg",
+      "background": [
+        "card"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "muted-fg/muted",
+      "foreground": "muted-fg",
+      "background": [
+        "muted"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg-subtle/bg",
+      "foreground": "fg-subtle",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg-subtle/surface",
+      "foreground": "fg-subtle",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg-subtle/card",
+      "foreground": "fg-subtle",
+      "background": [
+        "card"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg-subtle/muted",
+      "foreground": "fg-subtle",
+      "background": [
+        "muted"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "inverse-fg/inverse",
+      "foreground": "inverse-fg",
+      "background": [
+        "inverse"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "ink-fg/ink",
+      "foreground": "ink-fg",
+      "background": [
+        "ink"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "block-fg/block-blue",
+      "foreground": "block-fg",
+      "background": [
+        "block-blue"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "block-fg/block-green",
+      "foreground": "block-fg",
+      "background": [
+        "block-green"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "block-fg/block-pink",
+      "foreground": "block-fg",
+      "background": [
+        "block-pink"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "block-fg/block-purple",
+      "foreground": "block-fg",
+      "background": [
+        "block-purple"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "block-fg/block-yellow",
+      "foreground": "block-fg",
+      "background": [
+        "block-yellow"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "primary-fg/primary",
+      "foreground": "primary-fg",
+      "background": [
+        "primary"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "primary-fg/primary-hover",
+      "foreground": "primary-fg",
+      "background": [
+        "primary-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "primary-text/bg",
+      "foreground": "primary-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "primary-text/surface",
+      "foreground": "primary-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "primary-text/primary-subtle",
+      "foreground": "primary-text",
+      "background": [
+        "primary-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "secondary-fg/secondary",
+      "foreground": "secondary-fg",
+      "background": [
+        "secondary"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "secondary-fg/secondary-hover",
+      "foreground": "secondary-fg",
+      "background": [
+        "secondary-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "secondary-text/bg",
+      "foreground": "secondary-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "secondary-text/surface",
+      "foreground": "secondary-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "secondary-text/secondary-subtle",
+      "foreground": "secondary-text",
+      "background": [
+        "secondary-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "accent-fg/accent",
+      "foreground": "accent-fg",
+      "background": [
+        "accent"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "accent-fg/accent-hover",
+      "foreground": "accent-fg",
+      "background": [
+        "accent-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "accent-text/bg",
+      "foreground": "accent-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "accent-text/surface",
+      "foreground": "accent-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "accent-text/accent-subtle",
+      "foreground": "accent-text",
+      "background": [
+        "accent-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "success-fg/success",
+      "foreground": "success-fg",
+      "background": [
+        "success"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "success-fg/success-hover",
+      "foreground": "success-fg",
+      "background": [
+        "success-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "success-text/bg",
+      "foreground": "success-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "success-text/surface",
+      "foreground": "success-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "success-text/success-subtle",
+      "foreground": "success-text",
+      "background": [
+        "success-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "warning-fg/warning",
+      "foreground": "warning-fg",
+      "background": [
+        "warning"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "warning-fg/warning-hover",
+      "foreground": "warning-fg",
+      "background": [
+        "warning-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "warning-text/bg",
+      "foreground": "warning-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "warning-text/surface",
+      "foreground": "warning-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "warning-text/warning-subtle",
+      "foreground": "warning-text",
+      "background": [
+        "warning-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "destructive-fg/destructive",
+      "foreground": "destructive-fg",
+      "background": [
+        "destructive"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "destructive-fg/destructive-hover",
+      "foreground": "destructive-fg",
+      "background": [
+        "destructive-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "destructive-text/bg",
+      "foreground": "destructive-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "destructive-text/surface",
+      "foreground": "destructive-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "destructive-text/destructive-subtle",
+      "foreground": "destructive-text",
+      "background": [
+        "destructive-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "info-fg/info",
+      "foreground": "info-fg",
+      "background": [
+        "info"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "info-fg/info-hover",
+      "foreground": "info-fg",
+      "background": [
+        "info-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "info-text/bg",
+      "foreground": "info-text",
+      "background": [
+        "bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "info-text/surface",
+      "foreground": "info-text",
+      "background": [
+        "surface"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "info-text/info-subtle",
+      "foreground": "info-text",
+      "background": [
+        "info-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "accent-fg/accent-solid-hover",
+      "foreground": "accent-fg",
+      "background": [
+        "accent-solid-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "primary-on-container/primary-container",
+      "foreground": "primary-on-container",
+      "background": [
+        "primary-container"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "action-primary-fg/action-primary-bg",
+      "foreground": "action-primary-fg",
+      "background": [
+        "action-primary-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "state-disabled-fg/state-disabled-container",
+      "foreground": "state-disabled-fg",
+      "background": [
+        "state-disabled-container"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "ring/bg",
+      "foreground": "ring",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "ring/surface",
+      "foreground": "ring",
+      "background": [
+        "surface"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "ring/card",
+      "foreground": "ring",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "ring/component-input-bg",
+      "foreground": "ring",
+      "background": [
+        "component-input-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "input-border/bg",
+      "foreground": "input-border",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "input-border/surface",
+      "foreground": "input-border",
+      "background": [
+        "surface"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "input-border/card",
+      "foreground": "input-border",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "input-border/component-input-bg",
+      "foreground": "input-border",
+      "background": [
+        "component-input-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "border-control/bg",
+      "foreground": "border-control",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "border-control/surface",
+      "foreground": "border-control",
+      "background": [
+        "surface"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "border-control/card",
+      "foreground": "border-control",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "border-control/component-input-bg",
+      "foreground": "border-control",
+      "background": [
+        "component-input-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "component-button-fg/component-button-bg",
+      "foreground": "component-button-fg",
+      "background": [
+        "component-button-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-input-fg/component-input-bg",
+      "foreground": "component-input-fg",
+      "background": [
+        "component-input-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-card-fg/component-card-bg",
+      "foreground": "component-card-fg",
+      "background": [
+        "component-card-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-badge-fg/component-badge-bg",
+      "foreground": "component-badge-fg",
+      "background": [
+        "component-badge-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-table-fg/component-table-bg",
+      "foreground": "component-table-fg",
+      "background": [
+        "component-table-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-dialog-fg/component-dialog-bg",
+      "foreground": "component-dialog-fg",
+      "background": [
+        "component-dialog-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-tabs-fg/component-tabs-bg",
+      "foreground": "component-tabs-fg",
+      "background": [
+        "component-tabs-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-key-fg/component-key-bg",
+      "foreground": "component-key-fg",
+      "background": [
+        "component-key-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "terminal"
+      ]
+    },
+    {
+      "id": "component-button-fg/component-button-hover",
+      "foreground": "component-button-fg",
+      "background": [
+        "component-button-hover"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-tabs-fg/component-tabs-selected",
+      "foreground": "component-tabs-fg",
+      "background": [
+        "component-tabs-selected"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "component-input-ring/component-input-bg",
+      "foreground": "component-input-ring",
+      "background": [
+        "component-input-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "component-tabs-ring/component-tabs-bg",
+      "foreground": "component-tabs-ring",
+      "background": [
+        "component-tabs-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "component-key-border/component-key-bg",
+      "foreground": "component-key-border",
+      "background": [
+        "component-key-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "terminal"
+      ]
+    },
+    {
+      "id": "studio-badge-solid-neutral-fg/studio-badge-solid-neutral-bg",
+      "foreground": "studio-badge-solid-neutral-fg",
+      "background": [
+        "studio-badge-solid-neutral-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-badge-solid-info-fg/studio-badge-solid-info-bg",
+      "foreground": "studio-badge-solid-info-fg",
+      "background": [
+        "studio-badge-solid-info-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-badge-solid-success-fg/studio-badge-solid-success-bg",
+      "foreground": "studio-badge-solid-success-fg",
+      "background": [
+        "studio-badge-solid-success-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-badge-solid-warning-fg/studio-badge-solid-warning-bg",
+      "foreground": "studio-badge-solid-warning-fg",
+      "background": [
+        "studio-badge-solid-warning-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-badge-solid-destructive-fg/studio-badge-solid-destructive-bg",
+      "foreground": "studio-badge-solid-destructive-fg",
+      "background": [
+        "studio-badge-solid-destructive-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-primary-fg/studio-primary-bg",
+      "foreground": "studio-primary-fg",
+      "background": [
+        "studio-primary-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-primary-fg/studio-primary-bg-hover",
+      "foreground": "studio-primary-fg",
+      "background": [
+        "studio-primary-bg-hover"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-brand-on/studio-brand",
+      "foreground": "studio-brand-on",
+      "background": [
+        "studio-brand"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "studio-brand-on/studio-signal-brand",
+      "foreground": "studio-brand-on",
+      "background": [
+        "studio-signal-brand"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-card-bg",
+      "foreground": "fg",
+      "background": [
+        "studio-card-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-card-footer",
+      "foreground": "fg",
+      "background": [
+        "studio-card-footer"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-hero-bg",
+      "foreground": "fg",
+      "background": [
+        "studio-hero-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-nav-track",
+      "foreground": "fg",
+      "background": [
+        "studio-nav-track"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-nav-active",
+      "foreground": "fg",
+      "background": [
+        "studio-nav-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-table-bg",
+      "foreground": "fg",
+      "background": [
+        "studio-table-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-table-head",
+      "foreground": "fg",
+      "background": [
+        "studio-table-head"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-table-hover",
+      "foreground": "fg",
+      "background": [
+        "studio-table-hover"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-table-row-bg",
+      "foreground": "fg",
+      "background": [
+        "studio-table-row-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-table-zebra",
+      "foreground": "fg",
+      "background": [
+        "studio-table-zebra"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-tabs-track",
+      "foreground": "fg",
+      "background": [
+        "studio-tabs-track"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-tabs-sel-bg",
+      "foreground": "fg",
+      "background": [
+        "studio-tabs-sel-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-topbar-bg",
+      "foreground": "fg",
+      "background": [
+        "studio-topbar-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-kpi-bg-1",
+      "foreground": "fg",
+      "background": [
+        "studio-kpi-bg-1"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-kpi-bg-2",
+      "foreground": "fg",
+      "background": [
+        "studio-kpi-bg-2"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-kpi-bg-3",
+      "foreground": "fg",
+      "background": [
+        "studio-kpi-bg-3"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "fg/studio-kpi-bg-4",
+      "foreground": "fg",
+      "background": [
+        "studio-kpi-bg-4"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ]
+    },
+    {
+      "id": "bloom-on-butter/bloom-butter",
+      "foreground": "bloom-on-butter",
+      "background": [
+        "bloom-butter"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-hero/bloom-hero",
+      "foreground": "bloom-on-hero",
+      "background": [
+        "bloom-hero"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-hero-accent/bloom-hero-accent",
+      "foreground": "bloom-on-hero-accent",
+      "background": [
+        "bloom-hero-accent"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-ink-card/bloom-ink-card",
+      "foreground": "bloom-on-ink-card",
+      "background": [
+        "bloom-ink-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-lime/bloom-lime",
+      "foreground": "bloom-on-lime",
+      "background": [
+        "bloom-lime"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-primary/bloom-primary",
+      "foreground": "bloom-on-primary",
+      "background": [
+        "bloom-primary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-primary-container/bloom-primary-container",
+      "foreground": "bloom-on-primary-container",
+      "background": [
+        "bloom-primary-container"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-rose/bloom-rose",
+      "foreground": "bloom-on-rose",
+      "background": [
+        "bloom-rose"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-sky/bloom-sky",
+      "foreground": "bloom-on-sky",
+      "background": [
+        "bloom-sky"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-on-tangerine/bloom-tangerine",
+      "foreground": "bloom-on-tangerine",
+      "background": [
+        "bloom-tangerine"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-fg/bloom-canvas",
+      "foreground": "bloom-fg",
+      "background": [
+        "bloom-canvas"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-fg/bloom-surface",
+      "foreground": "bloom-fg",
+      "background": [
+        "bloom-surface"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-fg/bloom-surface-high",
+      "foreground": "bloom-fg",
+      "background": [
+        "bloom-surface-high"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-muted/bloom-canvas",
+      "foreground": "bloom-muted",
+      "background": [
+        "bloom-canvas"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-muted/bloom-surface",
+      "foreground": "bloom-muted",
+      "background": [
+        "bloom-surface"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-muted/bloom-surface-high",
+      "foreground": "bloom-muted",
+      "background": [
+        "bloom-surface-high"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-error/bloom-canvas",
+      "foreground": "bloom-error",
+      "background": [
+        "bloom-canvas"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-error/bloom-surface",
+      "foreground": "bloom-error",
+      "background": [
+        "bloom-surface"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-error/bloom-surface-high",
+      "foreground": "bloom-error",
+      "background": [
+        "bloom-surface-high"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-success/bloom-canvas",
+      "foreground": "bloom-success",
+      "background": [
+        "bloom-canvas"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-success/bloom-surface",
+      "foreground": "bloom-success",
+      "background": [
+        "bloom-surface"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-success/bloom-surface-high",
+      "foreground": "bloom-success",
+      "background": [
+        "bloom-surface-high"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-warn/bloom-canvas",
+      "foreground": "bloom-warn",
+      "background": [
+        "bloom-canvas"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-warn/bloom-surface",
+      "foreground": "bloom-warn",
+      "background": [
+        "bloom-surface"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-warn/bloom-surface-high",
+      "foreground": "bloom-warn",
+      "background": [
+        "bloom-surface-high"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-control-outline/bloom-canvas",
+      "foreground": "bloom-control-outline",
+      "background": [
+        "bloom-canvas"
+      ],
+      "minimum": 3,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "bloom-control-outline/bloom-surface",
+      "foreground": "bloom-control-outline",
+      "background": [
+        "bloom-surface"
+      ],
+      "minimum": 3,
+      "presets": [
+        "bloom"
+      ]
+    },
+    {
+      "id": "liquid-primary-fg/liquid-primary-default",
+      "foreground": "liquid-primary-fg",
+      "background": [
+        "liquid-primary-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-fg/liquid-primary-hover",
+      "foreground": "liquid-primary-fg",
+      "background": [
+        "liquid-primary-hover"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-surface-bg",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-surface-card",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-surface-raised",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-surface-well",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-surface-bg",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-surface-card",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-surface-raised",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-surface-well",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-surface-bg",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-surface-card",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-surface-raised",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-surface-well",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-destructive-text/liquid-destructive-bg",
+      "foreground": "liquid-destructive-text",
+      "background": [
+        "liquid-destructive-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-destructive-text/liquid-surface-bg",
+      "foreground": "liquid-destructive-text",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-info-text/liquid-info-bg",
+      "foreground": "liquid-info-text",
+      "background": [
+        "liquid-info-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-info-text/liquid-surface-bg",
+      "foreground": "liquid-info-text",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-success-text/liquid-success-bg",
+      "foreground": "liquid-success-text",
+      "background": [
+        "liquid-success-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-success-text/liquid-surface-bg",
+      "foreground": "liquid-success-text",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-warning-text/liquid-warning-bg",
+      "foreground": "liquid-warning-text",
+      "background": [
+        "liquid-warning-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-warning-text/liquid-surface-bg",
+      "foreground": "liquid-warning-text",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-border-ring/liquid-surface-bg",
+      "foreground": "liquid-border-ring",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-border-ring/liquid-surface-card",
+      "foreground": "liquid-border-ring",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-border-input/liquid-field-bg",
+      "foreground": "liquid-border-input",
+      "background": [
+        "liquid-field-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "cupertino-primary-fg/cupertino-primary-default",
+      "foreground": "cupertino-primary-fg",
+      "background": [
+        "cupertino-primary-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-fg/cupertino-primary-hover",
+      "foreground": "cupertino-primary-fg",
+      "background": [
+        "cupertino-primary-hover"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-fg/cupertino-surface-bg",
+      "foreground": "cupertino-text-fg",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-fg/cupertino-surface-card",
+      "foreground": "cupertino-text-fg",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-fg/cupertino-surface-raised",
+      "foreground": "cupertino-text-fg",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-fg/cupertino-surface-well",
+      "foreground": "cupertino-text-fg",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-muted/cupertino-surface-bg",
+      "foreground": "cupertino-text-muted",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-muted/cupertino-surface-card",
+      "foreground": "cupertino-text-muted",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-muted/cupertino-surface-raised",
+      "foreground": "cupertino-text-muted",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-muted/cupertino-surface-well",
+      "foreground": "cupertino-text-muted",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-text/cupertino-surface-bg",
+      "foreground": "cupertino-primary-text",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-text/cupertino-surface-card",
+      "foreground": "cupertino-primary-text",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-text/cupertino-surface-raised",
+      "foreground": "cupertino-primary-text",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-text/cupertino-surface-well",
+      "foreground": "cupertino-primary-text",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-destructive-text/cupertino-destructive-bg",
+      "foreground": "cupertino-destructive-text",
+      "background": [
+        "cupertino-destructive-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-destructive-text/cupertino-surface-bg",
+      "foreground": "cupertino-destructive-text",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-info-text/cupertino-info-bg",
+      "foreground": "cupertino-info-text",
+      "background": [
+        "cupertino-info-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-info-text/cupertino-surface-bg",
+      "foreground": "cupertino-info-text",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-success-text/cupertino-success-bg",
+      "foreground": "cupertino-success-text",
+      "background": [
+        "cupertino-success-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-success-text/cupertino-surface-bg",
+      "foreground": "cupertino-success-text",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-warning-text/cupertino-warning-bg",
+      "foreground": "cupertino-warning-text",
+      "background": [
+        "cupertino-warning-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-warning-text/cupertino-surface-bg",
+      "foreground": "cupertino-warning-text",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-border-ring/cupertino-surface-bg",
+      "foreground": "cupertino-border-ring",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-border-ring/cupertino-surface-card",
+      "foreground": "cupertino-border-ring",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-border-input/cupertino-field-fill",
+      "foreground": "cupertino-border-input",
+      "background": [
+        "cupertino-field-fill"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "liquid-status-shipped-fg/liquid-info-bg",
+      "foreground": "liquid-status-shipped-fg",
+      "background": [
+        "liquid-info-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-avatar-fg/liquid-tag-gray",
+      "foreground": "liquid-avatar-fg",
+      "background": [
+        "liquid-tag-gray"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-avatar-fg/liquid-tag-green",
+      "foreground": "liquid-avatar-fg",
+      "background": [
+        "liquid-tag-green"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-avatar-fg/liquid-tag-orange",
+      "foreground": "liquid-avatar-fg",
+      "background": [
+        "liquid-tag-orange"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-avatar-fg/liquid-tag-purple",
+      "foreground": "liquid-avatar-fg",
+      "background": [
+        "liquid-tag-purple"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-avatar-fg/liquid-tag-red",
+      "foreground": "liquid-avatar-fg",
+      "background": [
+        "liquid-tag-red"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-avatar-fg/liquid-tag-pink",
+      "foreground": "liquid-avatar-fg",
+      "background": [
+        "liquid-tag-pink"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-success-text/liquid-success-tint",
+      "foreground": "liquid-success-text",
+      "background": [
+        "liquid-success-tint"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "fluent-avatar-grape-fg/fluent-avatar-grape-bg",
+      "foreground": "fluent-avatar-grape-fg",
+      "background": [
+        "fluent-avatar-grape-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-avatar-light-green-fg/fluent-avatar-light-green-bg",
+      "foreground": "fluent-avatar-light-green-fg",
+      "background": [
+        "fluent-avatar-light-green-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-avatar-marigold-fg/fluent-avatar-marigold-bg",
+      "foreground": "fluent-avatar-marigold-fg",
+      "background": [
+        "fluent-avatar-marigold-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-avatar-pumpkin-fg/fluent-avatar-pumpkin-bg",
+      "foreground": "fluent-avatar-pumpkin-fg",
+      "background": [
+        "fluent-avatar-pumpkin-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-avatar-royal-blue-fg/fluent-avatar-royal-blue-bg",
+      "foreground": "fluent-avatar-royal-blue-fg",
+      "background": [
+        "fluent-avatar-royal-blue-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-avatar-teal-fg/fluent-avatar-teal-bg",
+      "foreground": "fluent-avatar-teal-fg",
+      "background": [
+        "fluent-avatar-teal-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-badge-brand-fg/fluent-badge-brand-bg",
+      "foreground": "fluent-badge-brand-fg",
+      "background": [
+        "fluent-badge-brand-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-badge-danger-fg/fluent-badge-danger-bg",
+      "foreground": "fluent-badge-danger-fg",
+      "background": [
+        "fluent-badge-danger-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-badge-informative-fg/fluent-badge-informative-bg",
+      "foreground": "fluent-badge-informative-fg",
+      "background": [
+        "fluent-badge-informative-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-badge-success-fg/fluent-badge-success-bg",
+      "foreground": "fluent-badge-success-fg",
+      "background": [
+        "fluent-badge-success-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-badge-warning-fg/fluent-badge-warning-bg",
+      "foreground": "fluent-badge-warning-fg",
+      "background": [
+        "fluent-badge-warning-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent/fluent-solid-base+fluent-accent-default",
+      "foreground": "fluent-text-on-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent-secondary/fluent-solid-base+fluent-accent-default",
+      "foreground": "fluent-text-on-accent-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent/fluent-solid-base+fluent-accent-secondary",
+      "foreground": "fluent-text-on-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent-secondary/fluent-solid-base+fluent-accent-secondary",
+      "foreground": "fluent-text-on-accent-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent/fluent-solid-base+fluent-accent-tertiary",
+      "foreground": "fluent-text-on-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent-secondary/fluent-solid-base+fluent-accent-tertiary",
+      "foreground": "fluent-text-on-accent-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-on-accent-disabled/fluent-solid-base+fluent-accent-disabled",
+      "foreground": "fluent-text-on-accent-disabled",
+      "background": [
+        "fluent-solid-base",
+        "fluent-accent-disabled"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-inverse/inverse",
+      "foreground": "fluent-text-inverse",
+      "background": [
+        "inverse"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-control-default",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-control-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-control-tertiary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-control-solid",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-control-input-active",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-control-default",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-control-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-control-tertiary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-control-solid",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-control-input-active",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-default",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-tertiary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-solid",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-input-active",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-control-default",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-control-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-control-tertiary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-control-solid",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-control-input-active",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-disabled/fluent-solid-base+fluent-control-disabled",
+      "foreground": "fluent-text-disabled",
+      "background": [
+        "fluent-solid-base",
+        "fluent-control-disabled"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-system-caution/fluent-solid-base+fluent-system-caution-bg",
+      "foreground": "fluent-system-caution",
+      "background": [
+        "fluent-solid-base",
+        "fluent-system-caution-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-system-critical/fluent-solid-base+fluent-system-critical-bg",
+      "foreground": "fluent-system-critical",
+      "background": [
+        "fluent-solid-base",
+        "fluent-system-critical-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-system-success/fluent-solid-base+fluent-system-success-bg",
+      "foreground": "fluent-system-success",
+      "background": [
+        "fluent-solid-base",
+        "fluent-system-success-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-focus-outer/fluent-solid-base",
+      "foreground": "fluent-focus-outer",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-focus-outer/fluent-solid-base+fluent-layer-default",
+      "foreground": "fluent-focus-outer",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-focus-outer/fluent-solid-base+fluent-layer-default+fluent-control-default",
+      "foreground": "fluent-focus-outer",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-control-default"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "tactile-text-strong/tactile-surface-base",
+      "foreground": "tactile-text-strong",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-strong/tactile-surface-tone",
+      "foreground": "tactile-text-strong",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-strong/tactile-surface-well",
+      "foreground": "tactile-text-strong",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-body/tactile-surface-base",
+      "foreground": "tactile-text-body",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-body/tactile-surface-tone",
+      "foreground": "tactile-text-body",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-body/tactile-surface-well",
+      "foreground": "tactile-text-body",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-muted/tactile-surface-base",
+      "foreground": "tactile-text-muted",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-muted/tactile-surface-tone",
+      "foreground": "tactile-text-muted",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-muted/tactile-surface-well",
+      "foreground": "tactile-text-muted",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-accent/tactile-surface-base",
+      "foreground": "tactile-text-accent",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-accent/tactile-surface-tone",
+      "foreground": "tactile-text-accent",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-accent/tactile-surface-well",
+      "foreground": "tactile-text-accent",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-danger/tactile-surface-base",
+      "foreground": "tactile-text-danger",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-danger/tactile-surface-tone",
+      "foreground": "tactile-text-danger",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-danger/tactile-surface-well",
+      "foreground": "tactile-text-danger",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-success/tactile-surface-base",
+      "foreground": "tactile-text-success",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-success/tactile-surface-tone",
+      "foreground": "tactile-text-success",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-success/tactile-surface-well",
+      "foreground": "tactile-text-success",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-warning/tactile-surface-base",
+      "foreground": "tactile-text-warning",
+      "background": [
+        "tactile-surface-base"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-warning/tactile-surface-tone",
+      "foreground": "tactile-text-warning",
+      "background": [
+        "tactile-surface-tone"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-warning/tactile-surface-well",
+      "foreground": "tactile-text-warning",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-on-accent/tactile-accent",
+      "foreground": "tactile-text-on-accent",
+      "background": [
+        "tactile-accent"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-on-accent/tactile-surface-accent",
+      "foreground": "tactile-text-on-accent",
+      "background": [
+        "tactile-surface-accent"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-on-accent/tactile-surface-accent-start",
+      "foreground": "tactile-text-on-accent",
+      "background": [
+        "tactile-surface-accent-start"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-on-accent/tactile-surface-accent-end",
+      "foreground": "tactile-text-on-accent",
+      "background": [
+        "tactile-surface-accent-end"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-text-disabled/tactile-surface-disabled",
+      "foreground": "tactile-text-disabled",
+      "background": [
+        "tactile-surface-disabled"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "tactile-edge-control/tactile-surface-well",
+      "foreground": "tactile-edge-control",
+      "background": [
+        "tactile-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "tactile"
+      ]
+    },
+    {
+      "id": "block-fg/pixel-band-1",
+      "foreground": "block-fg",
+      "background": [
+        "pixel-band-1"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "pixel"
+      ]
+    },
+    {
+      "id": "block-fg/pixel-band-2",
+      "foreground": "block-fg",
+      "background": [
+        "pixel-band-2"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "pixel"
+      ]
+    },
+    {
+      "id": "block-fg/pixel-band-3",
+      "foreground": "block-fg",
+      "background": [
+        "pixel-band-3"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "pixel"
+      ]
+    },
+    {
+      "id": "block-fg/pixel-band-4",
+      "foreground": "block-fg",
+      "background": [
+        "pixel-band-4"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "pixel"
+      ]
+    },
+    {
+      "id": "block-fg/pixel-band-5",
+      "foreground": "block-fg",
+      "background": [
+        "pixel-band-5"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "pixel"
+      ]
+    },
+    {
+      "id": "terminal-key-fg/terminal-key-bg",
+      "foreground": "terminal-key-fg",
+      "background": [
+        "terminal-key-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "terminal"
+      ]
+    },
+    {
+      "id": "terminal-key-border/terminal-key-bg",
+      "foreground": "terminal-key-border",
+      "background": [
+        "terminal-key-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "terminal"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-surface-zebra",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-field-bg",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-field-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-material-glass-control",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-material-glass-control"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-material-glass-float",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-material-glass-float"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-material-glass-sheet",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-material-glass-sheet"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-material-glass-sidebar",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-material-glass-sidebar"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-material-segment-thumb",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-material-segment-thumb"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-fg/liquid-material-tinted-primary",
+      "foreground": "liquid-text-fg",
+      "background": [
+        "liquid-material-tinted-primary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-surface-zebra",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-field-bg",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-field-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-material-glass-control",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-material-glass-control"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-material-glass-float",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-material-glass-float"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-material-glass-sheet",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-material-glass-sheet"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-material-glass-sidebar",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-material-glass-sidebar"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-material-segment-thumb",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-material-segment-thumb"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-text-muted/liquid-material-tinted-primary",
+      "foreground": "liquid-text-muted",
+      "background": [
+        "liquid-material-tinted-primary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-surface-zebra",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-field-bg",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-field-bg"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-material-glass-control",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-material-glass-control"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-material-glass-float",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-material-glass-float"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-material-glass-sheet",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-material-glass-sheet"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-material-glass-sidebar",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-material-glass-sidebar"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-material-segment-thumb",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-material-segment-thumb"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "liquid-primary-text/liquid-material-tinted-primary",
+      "foreground": "liquid-primary-text",
+      "background": [
+        "liquid-material-tinted-primary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "cupertino-text-fg/cupertino-field-fill",
+      "foreground": "cupertino-text-fg",
+      "background": [
+        "cupertino-field-fill"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-fg/cupertino-push-fill",
+      "foreground": "cupertino-text-fg",
+      "background": [
+        "cupertino-push-fill"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-muted/cupertino-field-fill",
+      "foreground": "cupertino-text-muted",
+      "background": [
+        "cupertino-field-fill"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-text-muted/cupertino-push-fill",
+      "foreground": "cupertino-text-muted",
+      "background": [
+        "cupertino-push-fill"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-text/cupertino-field-fill",
+      "foreground": "cupertino-primary-text",
+      "background": [
+        "cupertino-field-fill"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "cupertino-primary-text/cupertino-push-fill",
+      "foreground": "cupertino-primary-text",
+      "background": [
+        "cupertino-push-fill"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-default",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-default",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-default",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-default",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-tertiary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-tertiary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-tertiary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-tertiary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-solid",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-solid",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-solid",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-solid",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-alt-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-input-active",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-input-active",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-input-active",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-input-active",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-disabled/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-disabled",
+      "foreground": "fluent-text-disabled",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-default",
+        "fluent-control-disabled"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-default",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-default",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-default",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-default",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-default"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-tertiary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-tertiary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-tertiary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-tertiary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-tertiary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-solid",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-solid",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-solid",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-solid",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-solid"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-alt-secondary",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-alt-secondary",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-alt-secondary",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-alt-secondary",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-alt-secondary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-input-active",
+      "foreground": "fluent-text-primary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-secondary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-input-active",
+      "foreground": "fluent-text-secondary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-input-active",
+      "foreground": "fluent-text-tertiary",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-accent/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-input-active",
+      "foreground": "fluent-text-accent",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-input-active"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "fluent-text-disabled/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-disabled",
+      "foreground": "fluent-text-disabled",
+      "background": [
+        "fluent-solid-base",
+        "fluent-layer-default",
+        "fluent-card-secondary",
+        "fluent-control-disabled"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "fluent"
+      ]
+    }
+  ],
+  "decorativeRoles": {
+    "liquid-on-accent-rim": "White translucent inset stroke on an accent control, not label text.",
+    "liquid-on-accent-rim-strong": "Stronger white translucent accent-control rim, not label text.",
+    "liquid-switch-on-track": "The switch on-state track uses on as a state name, not an on-color label role.",
+    "liquid-switch-on-edge": "The switch on-state edge uses on as a state name, not an on-color label role.",
+    "fluent-stroke-on-accent": "An accent-control decorative stroke, not text on the accent fill."
+  },
+  "usageNotes": {
+    "fluent-focus-inner": "The 1px inner focus line is decorative in the approved 2px outer + 1px inner anatomy. The outer indicator and core ring are measured against base/layer/control backgrounds; the inner line is not a standalone focus indicator.",
+    "terminal-component-key": "These component tokens alias the Terminal-owned key variant; its actual consumers are measured in Terminal.",
+    "alpha": "Background layers paint over the opaque preset ground. Native oklch values and alpha are measured before hex serialization."
+  }
+}

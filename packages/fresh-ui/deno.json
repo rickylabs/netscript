@@ -10,7 +10,9 @@
     "./desktop": "./desktop.ts",
     "./interactive": "./interactive.ts",
     "./primitives": "./primitives.tsx",
-    "./registry": "./registry.ts"
+    "./registry": "./registry.ts",
+    "./tokens": "./tokens.ts",
+    "./token-config": "./token-config.ts"
   },
   "imports": {
     "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.8/auto-update",
@@ -20,31 +22,36 @@
   },
   "publish": {
     "include": [
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.css",
-      "registry/**/*.json",
+      "*.ts",
+      "*.tsx",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "registry/lib/cn.ts",
+      "registry/lib/toast.ts",
       "deno.json",
-      "README.md"
+      "README.md",
+      "tokens/README.md"
     ],
     "exclude": [
-      "!**/*.ts",
-      "!**/*.tsx",
-      "!**/*.css",
-      "!registry/**/*.json",
-      "!deno.json",
-      "!README.md",
       "scripts/**",
-      "tests/**"
+      "tests/**",
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/*.test.tsx"
     ]
   },
   "tasks": {
     "check": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen",
     "lock:update": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen=false",
     "lint": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-lint.ts --cwd . --root . --ext ts,tsx --config deno.json",
-    "test": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-test.ts --cwd . -- --allow-read --allow-write --allow-run --lock=deno.lock --frozen --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
-    "tokens:build": "deno run --lock=deno.lock --frozen --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
-    "tokens:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts --check"
+    "test": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-test.ts --cwd . -- --allow-read --allow-write --allow-run --allow-env --lock=deno.lock --frozen --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
+    "tokens:build": "deno task tokens:embed && deno run --lock=deno.lock --frozen --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts && deno task tokens:embed",
+    "tokens:check": "deno task tokens:embed:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts --check",
+    "tokens:validate": "deno task tokens:sources:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/check-tokens.ts",
+    "tokens:sources:check": "deno task tokens:embed:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/import-figma-tokens.ts --check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/validate-token-sources.ts",
+    "tokens:report": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/check-tokens.ts --report",
+    "tokens:embed": "deno run --lock=deno.lock --frozen --allow-read=. --allow-write=. --allow-run=deno scripts/embed-token-assets.ts",
+    "tokens:embed:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check"
   },
   "compilerOptions": {
     "lib": [
