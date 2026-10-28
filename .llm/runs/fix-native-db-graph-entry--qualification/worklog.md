@@ -27,3 +27,12 @@ Final owners are 100/120 and 86/140, +84/-8 combined. All 35 protected hashes ma
 owners. Owned scratch entries 0 and observed owned native fixture processes 0. Root package.json
 remains absent. Full two-owner diff and raw evidence are in ignored native-db-qualification-sol-20261028.
 No commit, push, other-worktree edit or inference. Root source review and independent IMPL remain.
+
+
+## Independent IMPL root acceptance20261028
+
+Separate Zhipu sessionses_e7f7e1f2fffeXF2xqxTB3BtiwD returns exact-source PASS for this leaf; root substantively reviewed its entire report, own MCP and14 EOF reads, and accepted the scoped verdict. No product source changes. [Root qualifications](root-independent-impl-acceptance-20261028.md). Critical dependency/integration gates remain open; no merge/release acceptance.
+
+## Design
+
+The pre-implementation design is recorded in plan.md under 'Design and gates'; this pointer normalizes navigation after independent review without changing its chronology or source authority.

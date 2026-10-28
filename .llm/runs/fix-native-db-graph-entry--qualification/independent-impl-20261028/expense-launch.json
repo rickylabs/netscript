@@ -1,0 +1,16 @@
+{
+  "allowed": true,
+  "provider": "openrouter",
+  "reason": "allowed",
+  "warning": false,
+  "snapshotAgeMs": 1,
+  "windows": [
+    {
+      "id": "available_balance",
+      "limitUsd": 8.543679366,
+      "usedUsd": 0,
+      "remainingAfterUsd": 7.843679365999999,
+      "exhausted": false
+    }
+  ]
+}
