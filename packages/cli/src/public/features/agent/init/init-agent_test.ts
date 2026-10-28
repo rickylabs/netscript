@@ -610,6 +610,7 @@ Deno.test('agent init installs the complete diagnostic surface', async () => {
       'netscript',
       'netscript-operate',
       'netscript-build',
+      'netscript-design',
       'aspire',
       'deno',
     ]);
@@ -642,10 +643,66 @@ Deno.test('agent init installs the complete diagnostic surface', async () => {
       'aspire',
       'deno',
       'netscript-build',
+      'netscript-design',
       'netscript-operate',
     ]);
   } finally {
     await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('S9 installs discoverable design guidance and a canonical local reference for every host', async () => {
+  const guidelines = await Deno.readTextFile(
+    new URL('../../../../../../../docs/design-system/GUIDELINES.md', import.meta.url),
+  );
+  const themes: string[] = [];
+  for await (
+    const entry of Deno.readDir(
+      new URL('../../../../../../../docs/design-system/themes/', import.meta.url),
+    )
+  ) {
+    if (entry.isDirectory && !entry.name.startsWith('_')) themes.push(entry.name);
+  }
+  for (const host of ['claude', 'vscode', 'opencode'] as const) {
+    const root = await Deno.makeTempDir();
+    try {
+      const dependencies = {
+        fs: new DenoAgentInitFileSystem(),
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      };
+      await initAgent({ projectRoot: root, host }, dependencies);
+      const skill = await Deno.readTextFile(join(root, '.agents/skills/netscript-design/SKILL.md'));
+      assertStringIncludes(skill, 'name: netscript-design');
+      assertStringIncludes(skill, 'references/GUIDELINES.md');
+      assertEquals(
+        await Deno.readTextFile(
+          join(root, '.agents/skills/netscript-design/references/GUIDELINES.md'),
+        ),
+        guidelines,
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(root, 'AGENTS.md')),
+        'Call the `netscript-design` skill',
+      );
+      if (host === 'claude') {
+        assertStringIncludes(
+          await Deno.readTextFile(join(root, '.claude/skills/repo-skills/SKILL.md')),
+          'netscript-design',
+        );
+      }
+      for (const id of themes) {
+        for (const file of ['DESIGN.md', 'SKILL.md']) {
+          assertStringIncludes(
+            skill,
+            `https://raw.githubusercontent.com/rickylabs/netscript/main/docs/design-system/themes/${id}/${file}`,
+          );
+        }
+      }
+      const second = await initAgent({ projectRoot: root, host }, dependencies);
+      assertEquals(second.changedFiles, [], `${host} init should remain idempotent`);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
   }
 });
 

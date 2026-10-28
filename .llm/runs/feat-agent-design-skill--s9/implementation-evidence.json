@@ -1,0 +1,48 @@
+{
+  "tests": {
+    "passed": 46,
+    "failed": 0,
+    "skipped": 0
+  },
+  "sourceChecks": {
+    "files": 3,
+    "check": "PASS",
+    "lint": "PASS",
+    "format": "PASS",
+    "processed": 3,
+    "dropped": 0
+  },
+  "nativeCli": {
+    "result": "PASS",
+    "command": "netscript-dev agent init --host vscode",
+    "firstExit": 0,
+    "repeatExit": 0,
+    "themePairs": 11,
+    "canonicalReferenceEqual": true,
+    "discovery": true,
+    "idempotent": true
+  },
+  "negativeControl": {
+    "sourceDriftExit": 1,
+    "intendedStaleFinding": true,
+    "ownedOutputsAndCarriersUnchanged": true,
+    "canonicalSourceRestored": true,
+    "restoredCheckExit": 0
+  },
+  "mcpBefore": 283387,
+  "mcpAfter": 283387,
+  "mcpBudget": 294912,
+  "themePairs": 11,
+  "generatedFiles": [
+    "skills/netscript-design/SKILL.md",
+    "skills/netscript-design/references/GUIDELINES.md"
+  ],
+  "qualityArchitecture": "PASS with existing warnings",
+  "carrierGeneration": "all four native generators exit0 in order",
+  "canonicalSourcesChanged": false,
+  "dependencyLockChanges": false,
+  "sourceReview": "PASS",
+  "claudeBridgeDiscovery": "PASS",
+  "jsrAuditExit": 0,
+  "cliPublishDryRunExit": 0
+}

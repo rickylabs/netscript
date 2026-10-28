@@ -1,0 +1,3 @@
+# Resume
+
+S9#2431 source complete on feat/agent-design-skill, baseline d6dfab0. Independent PLAN and source IMPL PASS.46tests including three-host exact reference/theme links/idempotence/Claude bridge pass; real CLIvscode init exits0twice; actual source-drift check fails before writes and restores bytes; structured3files allprocessed; JSR audit and CLIpublishdryrun0; MCPunchanged283387/294912. Source/canonical reference and native embedded carriers are ready to commit. Next push/open draftPR, four carrier checks at immutable head, include currentmain normally, hostedCLI readiness then markready. No dependency/lock/canonical source change.
