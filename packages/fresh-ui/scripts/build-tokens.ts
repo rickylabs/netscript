@@ -1,4 +1,4 @@
-import StyleDictionary from 'npm:style-dictionary@5.4.4';
+import StyleDictionary from 'npm:style-dictionary@5.7.1';
 
 type TokenValue =
   | string
@@ -180,15 +180,33 @@ const css = [
   '}',
 ].join('\n');
 
-await Deno.writeTextFile('registry/theme/tokens.css', `${css}\n`);
-await Deno.writeTextFile(
-  'registry/theme/theme-bridge.css',
-  renderThemeBridge(rootTokens),
-);
-await Deno.writeTextFile(
-  'registry/theme/tokens.json',
-  `${JSON.stringify(renderTokensJson(lightRootTokens, darkOverrideTokens), null, 2)}\n`,
-);
+// Check compares in memory: it must never repair an edited artifact before reporting drift.
+const artifacts = new Map([
+  ['registry/theme/tokens.css', `${css}\n`],
+  ['registry/theme/theme-bridge.css', renderThemeBridge(rootTokens)],
+  [
+    'registry/theme/tokens.json',
+    `${JSON.stringify(renderTokensJson(lightRootTokens, darkOverrideTokens), null, 2)}\n`,
+  ],
+]);
+const check = Deno.args.includes('--check');
+const stale: string[] = [];
+for (const [path, contents] of artifacts) {
+  if (check) {
+    let actual: string | undefined;
+    try {
+      actual = await Deno.readTextFile(path);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+    if (actual !== contents) stale.push(path);
+  } else {
+    await Deno.writeTextFile(path, contents);
+  }
+}
+if (stale.length) {
+  throw new Error(`Generated tokens are stale: ${stale.join(', ')}. Run deno task tokens:build.`);
+}
 
 async function loadDictionaryTokens(
   options: { include: string[]; source: string[] },

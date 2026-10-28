@@ -1,0 +1,7 @@
+{
+  "command": "deno task --cwd packages/fresh-ui tokens:check",
+  "exitCode": 1,
+  "handEditPreserved": true,
+  "expected": "nonzero without rewriting the hand edit",
+  "stderr": "Uncaught (in promise) Error: Generated tokens are stale: registry/theme/tokens.css. Run deno task tokens:build.\n  throw new Error(`Generated tokens are stale: ${stale.join(', ')}. Run deno task tokens:build.`);\n        ^"
+}

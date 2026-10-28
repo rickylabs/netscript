@@ -7,6 +7,7 @@ Implementer: OpenAI Codex, feature tier, high effort as requested.
 
 - `.llm/runs/orch-divybot-6461244214--s0/**` — plan, evaluation, evidence and lessons.
 - `packages/fresh-ui/scripts/build-tokens.ts`, `packages/fresh-ui/deno.json`, `packages/fresh-ui/deno.lock`, `packages/fresh-ui/README.md`, `packages/fresh-ui/registry/theme/{tokens.css,theme-bridge.css,tokens.json}`.
+- `packages/fresh-ui/tests/token-build.test.ts` — isolated frozen build/check regression with stale and missing artifacts.
 - `tools/fresh-ui-browser/**` — reusable browser harness and before baseline.
 - `.github/workflows/fresh-ui-quality.yml`, `.github/scripts/ci-classify-changes{.ts,.test.ts}`.
 - `.llm/tools/validation/fresh-ui-quality_test.ts`, `.llm/tools/gates/catalog.ts` if needed for durable gates.
