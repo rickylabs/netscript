@@ -98,7 +98,8 @@ live in the `netscript-pr` agent skill.
 **Milestones** come in three kinds: the next release (the one milestone named by a version, such as
 `0.0.9`, holding the work agreed for that release), themes that own longer-running work (such as
 `Frontend Contribution` or `Enterprise Auth`), and `Backlog / Triage` for accepted work with no
-theme yet or that waits on a decision. `wave:*` labels are scheduling context, not a milestone map. New contributors should look for [`good first issue`](https://github.com/rickylabs/netscript/labels/good%20first%20issue)
+theme yet or that waits on a decision. `wave:*` labels are scheduling context, not a milestone map.
+New contributors should look for [`good first issue`](https://github.com/rickylabs/netscript/labels/good%20first%20issue)
 and [`help wanted`](https://github.com/rickylabs/netscript/labels/help%20wanted).
 
 ## Releases

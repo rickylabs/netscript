@@ -320,7 +320,8 @@ a board column reflect reality.
   implies it.
 - `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
   `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.
-- `wave:` — scheduling band that drives the **milestone** (see below): `v1`, `v1-min`, `defer`.
+- `wave:` — scheduling band: `v1`, `v1-min`, `defer`. It does not determine the milestone (see
+  Milestones below).
 - flags — `rfc` (an RFC tracking issue/PR; see `rfcs/README.md`), `breaking`, `good first issue`,
   `help wanted`
 
