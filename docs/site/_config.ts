@@ -9,6 +9,21 @@ import anchor from 'markdown-it-anchor';
 import langBash from 'highlight.js/bash';
 import langJson from 'highlight.js/json';
 import langTypescript from 'highlight.js/typescript';
+import langPython from 'highlight.js/python';
+import langPowershell from 'highlight.js/powershell';
+import langMarkdown from 'highlight.js/markdown';
+import langIni from 'highlight.js/ini';
+import langYaml from 'highlight.js/yaml';
+import langCss from 'highlight.js/css';
+import langDiff from 'highlight.js/diff';
+import langSql from 'highlight.js/sql';
+import langXml from 'highlight.js/xml';
+import langJavascript from 'highlight.js/javascript';
+import {
+  assertCodeLanguage,
+  codeFilename,
+  LANGUAGE_LABELS,
+} from '../../tools/docs-site/code-languages.ts';
 import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
@@ -79,6 +94,8 @@ site.addEventListener('beforeBuild', async () => {
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
 site.filter('apiKind', apiKind);
+site.filter('languageLabel', (language: string) => LANGUAGE_LABELS[language] ?? language);
+site.filter('codeFilename', codeFilename);
 // Inline presentation inherits the page scheme; the original SVG remains available to twins.
 site.filter('utilityDiagram', (src: string, alt: string) => {
   if (!/^\/assets\/diagrams\/[a-z0-9-]+\.svg$/.test(src)) {
@@ -112,22 +129,42 @@ site.use(nav());
 // base_path so the generated pages get base-prefixed hrefs like everything else.
 site.use(redirects());
 
-// Syntax highlighting for fenced code blocks (TD-6).
-site.use(codeHighlight({
-  languages: {
-    bash: langBash,
-    sh: langBash,
-    shell: langBash,
-    json: langJson,
-    ts: langTypescript,
-    tsx: langTypescript,
-    typescript: langTypescript,
-    text: plaintextLanguage,
-    plaintext: plaintextLanguage,
-    'no-highlight': plaintextLanguage,
-    prisma: plaintextLanguage,
-  },
-}));
+// Registration and labels are checked together; no fence silently falls back to plain text.
+const codeLanguages = {
+  bash: langBash,
+  sh: langBash,
+  shell: langBash,
+  json: langJson,
+  jsonc: langJson,
+  ts: langTypescript,
+  tsx: langTypescript,
+  typescript: langTypescript,
+  js: langJavascript,
+  javascript: langJavascript,
+  jsx: langJavascript,
+  python: langPython,
+  py: langPython,
+  powershell: langPowershell,
+  ps1: langPowershell,
+  md: langMarkdown,
+  markdown: langMarkdown,
+  dotenv: langIni,
+  yaml: langYaml,
+  yml: langYaml,
+  css: langCss,
+  diff: langDiff,
+  sql: langSql,
+  xml: langXml,
+  html: langXml,
+  text: plaintextLanguage,
+  plaintext: plaintextLanguage,
+  'no-highlight': plaintextLanguage,
+  prisma: plaintextLanguage,
+};
+for (const language of Object.keys(LANGUAGE_LABELS)) {
+  assertCodeLanguage(language, Object.keys(codeLanguages));
+}
+site.use(codeHighlight({ languages: codeLanguages }));
 
 // Build the static index; custom and fallback UIs load only when requested.
 site.use(pagefind({ ui: false }));
@@ -195,6 +232,53 @@ site.addEventListener('afterRender', () => {
         cell.textContent = '';
         cell.appendChild(tag);
       }
+    }
+    // Frame Markdown fences at build time so labels and filenames also work without JavaScript.
+    for (const pre of document.querySelectorAll('.ns-prose pre')) {
+      const code = pre.querySelector('code');
+      if (!code) continue;
+      const language = code.className.match(/language-([\w-]+)/)?.[1] ?? 'text';
+      assertCodeLanguage(language, Object.keys(codeLanguages));
+      if (pre.closest('[data-code-block]')) continue;
+      const frame = document.createElement('div');
+      frame.className = 'ns-code-block';
+      frame.setAttribute('data-code-block', '');
+      const header = document.createElement('div');
+      header.className = 'ns-code-header';
+      header.setAttribute('data-twin-ignore', '');
+      header.setAttribute('data-pagefind-ignore', '');
+      const filename = codeFilename(code.textContent ?? '');
+      if (filename) {
+        const path = document.createElement('span');
+        path.className = 'ns-code-path';
+        path.textContent = filename;
+        path.setAttribute('title', filename);
+        header.appendChild(path);
+      }
+      const label = document.createElement('span');
+      label.className = 'ns-code-language';
+      label.textContent = LANGUAGE_LABELS[language];
+      header.appendChild(label);
+      const button = document.createElement('button');
+      button.className = 'ns-copy-btn js-only';
+      button.setAttribute('type', 'button');
+      button.setAttribute('data-code-copy', '');
+      button.setAttribute('aria-label', `Copy ${filename ?? LANGUAGE_LABELS[language]} code`);
+      button.textContent = 'Copy';
+      header.appendChild(button);
+      const body = document.createElement('div');
+      body.className = 'ns-code-body';
+      const gutter = document.createElement('div');
+      gutter.className = 'ns-code-gutter';
+      gutter.setAttribute('aria-hidden', 'true');
+      gutter.setAttribute('data-pagefind-ignore', '');
+      gutter.textContent = (code.textContent ?? '').replace(/\n$/, '').split('\n')
+        .map((_, index) => index + 1).join('\n');
+      pre.parentNode!.insertBefore(frame, pre);
+      body.appendChild(gutter);
+      body.appendChild(pre);
+      frame.appendChild(header);
+      frame.appendChild(body);
     }
     const headingIds = new Set(
       [...document.querySelectorAll('.ns-prose :is(h1,h2,h3,h4)[id]')].map((h) => h.id),

@@ -2,15 +2,19 @@
 {{ set items = tabs || [] }}
 {{ set gid = "nstab-" + Math.random().toString(36).slice(2, 9) }}
 <div class="ns-tabbed"{{ if runtime }} data-ns-runtime-group{{ /if }}>
-  <div class="ns-tabbed__tablist" role="tablist" aria-label="{{ runtime ? 'Runtime examples' : 'Code examples' }}">
-    {{ for index, tab of items }}
-      <button type="button" class="ns-tabbed__tab" role="tab" id="{{ gid }}-tab-{{ index }}" aria-controls="{{ gid }}-panel-{{ index }}" aria-selected="{{ index === 0 ? 'true' : 'false' }}" tabindex="{{ index === 0 ? '0' : '-1' }}"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>{{ tab.label }}</button>
-    {{ /for }}
-    <span class="ns-tabbed__hint" aria-hidden="true">{{ runtime ? 'Runtime' : (items[0]?.lang || 'code') }}</span>
+  <div class="ns-tabbed__header ns-code-header" data-twin-ignore data-pagefind-ignore>
+    <div class="ns-tabbed__tablist" role="tablist" aria-label="{{ runtime ? 'Runtime examples' : 'Code examples' }}">
+      {{ for index, tab of items }}
+        <button type="button" class="ns-tabbed__tab" role="tab" id="{{ gid }}-tab-{{ index }}" aria-controls="{{ gid }}-panel-{{ index }}" aria-selected="{{ index === 0 ? 'true' : 'false' }}" tabindex="{{ index === 0 ? '0' : '-1' }}" data-code-language="{{ (tab.lang || 'text') |> languageLabel }}" data-code-filename="{{ tab.filename || tab.path || '' }}"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>{{ tab.label || tab.filename || tab.path }}</button>
+      {{ /for }}
+    </div>
+    <span class="ns-code-path" data-tab-filename title="{{ items[0]?.filename || items[0]?.path || '' }}">{{ items[0]?.filename || items[0]?.path || '' }}</span>
+    <span class="ns-code-language" data-tab-language>{{ (items[0]?.lang || 'text') |> languageLabel }}</span>
+    <button type="button" class="ns-copy-btn js-only" data-code-copy data-tab-copy aria-label="Copy selected code">Copy</button>
   </div>
   {{ for index, tab of items }}
     <div class="ns-tabbed__panel" role="tabpanel" id="{{ gid }}-panel-{{ index }}" aria-labelledby="{{ gid }}-tab-{{ index }}" tabindex="0"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>
-      {{ comp.codeBlock({ code: tab.code, lang: tab.lang, filename: tab.filename || tab.path }) }}
+      {{ comp.codeBlock({ code: tab.code, lang: tab.lang, filename: tab.filename || tab.path, tabLabel: tab.label }) }}
     </div>
   {{ /for }}
 </div>

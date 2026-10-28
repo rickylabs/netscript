@@ -315,8 +315,34 @@
 .ns-tabbed[data-ns-runtime-group] .ns-tabbed__tab {
   font: 400 12px/18px var(--ns-font-mono);
 }
-.ns-tabbed:not(.is-enhanced) > .ns-tabbed__tablist {
+.ns-tabbed:not(.is-enhanced) > .ns-tabbed__header {
   display: none;
+}
+.ns-tabbed__header .ns-tabbed__tablist {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.ns-tabbed.is-enhanced .ns-tabbed__panel .ns-code-header {
+  display: none;
+}
+.ns-tabbed__header > .ns-code-path {
+  max-width: 25%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.ns-code-label {
+  font: 500 12px/18px var(--ns-font-mono);
+}
+.ns-code-language {
+  margin-left: auto;
+  color: var(--ns-muted-fg);
+  font: 400 11px/18px var(--ns-font-mono);
+  white-space: nowrap;
 }
 .ns-tabbed__panel .ns-code-block {
   border: 0;

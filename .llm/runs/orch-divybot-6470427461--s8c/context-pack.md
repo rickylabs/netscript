@@ -5,3 +5,7 @@ PR #2459 (draft), branch orch/divybot-6470427461, baseline d6dfab0. PLAN-EVAL in
 Slice 1 pushed as 83621ec95, PR comment published. Slice 2 implemented and gates pass (16/16 reference/style browser cases); independent review pending. Use server DOM appendChild, not replaceChildren.
 
 Slice 2 final independent review PASS, 16/16 post-repair browser checks pass, ready for sign-off commit/push. Remaining slices 3–6.
+
+Slice 2 pushed c2474aa8a. Slice 3 build/links/tooling/language tests pass; expanded browser suite and independent review pending. Build frames now own fence headers, JS only enhances tabs/copy. New grammar metadata in tools/docs-site/code-languages.ts.
+
+Slice 3 independent review PASS and all 36/36 post-repair browser checks pass. Ready for reviewed commit/push. Coordinator supplied Figma b9dd32aac and explicitly moved syntax next; after it, finish path chips and #2451. Sole old-token exception is input-border as recorded in drift/plan.

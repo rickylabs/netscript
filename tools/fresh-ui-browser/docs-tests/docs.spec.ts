@@ -15,6 +15,7 @@ const ROUTES = [
   { kind: 'reference', path: 'reference/database/' },
   { kind: 'design-system', path: 'design-system/' },
   { kind: 'callouts', path: 'internal/callouts/' },
+  { kind: 'code', path: 'internal/code/' },
   { kind: 'search', path: 'web-layer/fresh-ui/' },
 ] as const;
 
@@ -400,6 +401,7 @@ test(
     ]);
     await visit(page, './');
     const tabs = page.locator('[data-ns-runtime-group] [role="tab"]');
+    await expect(tabs).toHaveText(['postgres', 'mysql', 'mssql', 'sqlite']);
     await tabs.first().focus();
     await page.keyboard.press('ArrowRight');
     expect(await page.evaluate(() => localStorage.getItem('ns-runtime'))).toBe(
@@ -422,7 +424,12 @@ test(
       await visit(p, './');
       const panels = p.locator('[data-ns-runtime-group] [role="tabpanel"]');
       await expect(panels).toHaveCount(4);
-      for (const panel of await panels.all()) await expect(panel).toBeVisible();
+      for (const [index, panel] of (await panels.all()).entries()) {
+        await expect(panel).toBeVisible();
+        await expect(panel.locator('.ns-code-label')).toHaveText(
+          ['postgres', 'mysql', 'mssql', 'sqlite'][index],
+        );
+      }
       await p.locator('#search-fallback > summary').click();
       // Playwright's textContent matcher deliberately ignores noscript descendants.
       await expect(p.locator('#search noscript p')).toBeVisible();
@@ -670,29 +677,21 @@ test('callouts: semantic tone, default body and ink links', async ({ page }) => 
 });
 
 test('internal galleries stay out of search and agent documentation', async ({ page }) => {
-  await visit(page, 'internal/callouts/');
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    'content',
-    'noindex',
-  );
-  await expect(page.locator('[data-pagefind-body], .ns-md-link')).toHaveCount(
-    0,
-  );
-  await expect(access(resolve(SITE, 'internal/callouts/index.md'))).rejects
-    .toThrow();
-  for (const index of ['llms.txt', 'llms-full.txt']) {
-    expect(await readFile(resolve(SITE, index), 'utf8')).not.toContain(
-      '/internal/callouts/',
-    );
+  for (const [slug, title] of [['callouts', 'Callout gallery'], ['code', 'Code gallery']]) {
+    await visit(page, `internal/${slug}/`);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    await expect(page.locator('[data-pagefind-body], .ns-md-link')).toHaveCount(0);
+    await expect(access(resolve(SITE, `internal/${slug}/index.md`))).rejects.toThrow();
+    for (const index of ['llms.txt', 'llms-full.txt']) {
+      expect(await readFile(resolve(SITE, index), 'utf8')).not.toContain(`/internal/${slug}/`);
+    }
+    const matches = await page.evaluate(async (title) => {
+      const module = await import(new URL('/netscript/pagefind/pagefind.js', location.href).href);
+      const result = await module.search(`"${title}"`);
+      return result.results.length;
+    }, title);
+    expect(matches).toBe(0);
   }
-  const matches = await page.evaluate(async () => {
-    const module = await import(
-      new URL('/netscript/pagefind/pagefind.js', location.href).href
-    );
-    const result = await module.search('"Callout gallery"');
-    return result.results.length;
-  });
-  expect(matches).toBe(0);
 });
 
 test('API reference: visible kind tags and full-contrast names and signatures', async ({ page }) => {
@@ -724,4 +723,89 @@ test('API reference: visible kind tags and full-contrast names and signatures', 
   });
   await expect(plugins).toHaveAttribute('data-variant', 'generic');
   await expect(plugins.locator('.ns-api-kind')).toHaveCount(0);
+});
+
+test('code headers: filename, human language, selected clipboard and no duplicate header', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await visit(page, 'internal/code/');
+  const group = page.locator('.ns-tabbed').first();
+  const header = group.locator(':scope > .ns-code-header');
+  await expect(header).toBeVisible();
+  await expect(group.locator('.ns-code-header:visible')).toHaveCount(1);
+  const tabs = group.getByRole('tab');
+  for (const [index, label] of ['TypeScript', 'Shell', 'JSON with comments'].entries()) {
+    await tabs.nth(index).click();
+    await expect(header.locator('.ns-code-language')).toHaveText(label);
+    await expect(header.locator('[data-tab-filename]')).toHaveText(
+      ['src/greeting.ts', 'scripts/start.sh', 'deno.json'][index],
+    );
+    await header.locator('[data-code-copy]').click();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+      await group.locator('[role="tabpanel"]:visible pre code').textContent(),
+    );
+  }
+  for (const block of await page.locator('[data-code-block]').all()) {
+    await expect(block.locator('.ns-code-language')).not.toHaveText(/^(ts|sh|jsonc|py|ps1)$/);
+  }
+  const filename = page.locator('[data-code-block]').filter({
+    has: page.locator('.ns-code-path', { hasText: 'services/users.contract.ts' }),
+  });
+  await expect(filename.locator('.ns-code-header')).toHaveCount(1);
+  await expect(filename.locator('.ns-code-language')).toHaveText('TypeScript');
+  for (
+    const language of [
+      'python',
+      'powershell',
+      'jsonc',
+      'markdown',
+      'dotenv',
+      'yaml',
+      'css',
+      'diff',
+      'sql',
+      'html',
+      'xml',
+    ]
+  ) {
+    const code = page.locator(`code.language-${language}`).last();
+    await expect(code.locator('[class^="hljs-"]').first()).toBeAttached();
+  }
+});
+
+test(
+  'code gallery remains labelled and fully readable without JavaScript',
+  async ({ browser }, info) => {
+    const context = await browser.newContext({
+      javaScriptEnabled: false,
+      baseURL: String(info.project.use.baseURL),
+      viewport: info.project.use.viewport,
+      colorScheme: info.project.use.colorScheme,
+    });
+    try {
+      const page = await context.newPage();
+      await visit(page, 'internal/code/');
+      await expect(page.locator('.ns-tabbed > .ns-code-header')).not.toBeVisible();
+      for (const panel of await page.locator('.ns-tabbed__panel').all()) {
+        await expect(panel).toBeVisible();
+        await expect(panel.locator('.ns-code-header')).toBeVisible();
+        await expect(panel.locator('.ns-code-path')).not.toBeEmpty();
+        await expect(panel.locator('.ns-code-language')).not.toBeEmpty();
+      }
+    } finally {
+      await context.close();
+    }
+  },
+);
+
+test('code header metadata stays out of twins and search bodies', async ({ page }) => {
+  await visit(page, 'durable-workflows/sagas/');
+  for (const node of await page.locator('.ns-code-header, .ns-code-gutter').all()) {
+    await expect(node).toHaveAttribute('data-pagefind-ignore', '');
+  }
+  const twin = await readFile(resolve(SITE, 'durable-workflows/sagas/index.md'), 'utf8');
+  const prose = twin.replace(/^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm, '');
+  expect(prose).not.toMatch(/\S+(?:TypeScript|Shell|JSON with comments)/);
+  expect(prose).not.toMatch(/^(?:TypeScript|Shell|Plain text|JSON with comments)$/m);
+  expect(twin).toMatch(/```(?:ts|typescript)\n/);
+  expect(twin).toContain('plugins/sagas/order-saga.ts');
 });

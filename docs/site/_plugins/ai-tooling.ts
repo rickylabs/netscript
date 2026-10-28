@@ -194,7 +194,7 @@ function hasBlockChild(el: Element): boolean {
 }
 
 function isDecorative(el: Element): boolean {
-  return el.getAttribute('aria-hidden') === 'true';
+  return el.getAttribute('aria-hidden') === 'true' || el.hasAttribute('data-twin-ignore');
 }
 
 /** Serialize a single node as a block-level Markdown string. */

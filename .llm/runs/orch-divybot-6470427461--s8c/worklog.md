@@ -49,3 +49,16 @@ Slice 1 final review PASS (same independent reviewer). Expanded browser run 20/2
 Slice 2 initial review FAIL_FIX: preserve existing generic component tables and lock component kind to syntax function in slice 6. Fixed once, with a real Official plugins table regression assertion and explicit plan/drift mapping.
 
 Slice 2 final independent review PASS after the single repair. Post-repair docs build exit 0 and all 16/16 reference/style browser checks pass. Generic plugin-table regression covered in every project. Sign-off authorized by the independent review; reconcile against current head is clean within declared scope.
+
+## Slice 3 — unified code headers and registered languages
+
+- Build-time frames give fences a human language label, optional filename and Copy without browser-side rewrapping. Enhanced tabs own one shared visible header; no-JS panels retain their own labelled headers. Selected copy resolves the active panel.
+- Registered requested grammars plus existing JS aliases at highlight.js 11.11.1. dotenv uses upstream INI and JSONC uses JSON grammar. Startup validates registration against shared language metadata; rendered unknown fences fail the build. Two tests check real maintained fences and rejected unknown/missing registrations, preserving four-backtick nested samples.
+- Internal code gallery covers all requested grammars. Both galleries excluded from Pagefind/AI carriers. Browser tests cover mixed labels, real highlighted spans, clipboard, keyboard, no-JS and responsive captures.
+- Gates: docs build exit 0; 24,067 internal links resolve; structured tools check/lint/fmt, standalone config and browser type checks pass; language tests 2/2. Final expanded browser and independent slice review pending.
+- Visual inspection: both 390 scheme captures keep a single header, ink chrome and no pale dark surfaces. Syntax paint intentionally waits for slice 6.
+- Reconcile: no lock churn or dependency upgrades; the workflow adds the language test to its existing tooling gate.
+
+Slice 3 initial review FAIL_FIX: filename-first tab names hid runtime labels, and build-time metadata entered twins/search. Single repair restores primary tab labels with selected filename metadata, passes labels to no-JS panel headers, explicitly excludes headers/gutters from Pagefind and headers from twins, and adds real runtime-label/twin regressions.
+
+Slice 3 final independent review PASS after the one repair. Post-repair build exit 0; 36/36 code/keyboard/clipboard/no-JS/style/metadata browser checks pass. Browser and site-config structured checks pass, as do browser lint/fmt. Sign-off follows this independent review. Coordinator export is available; syntax slice 6 moves immediately next, followed by remaining slices 4 and 5; the single input-border compatibility exception is recorded in drift.md.

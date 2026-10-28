@@ -17,7 +17,17 @@
     "markdown-it-anchor": "npm:markdown-it-anchor@9.2.0",
     "highlight.js/bash": "npm:highlight.js@11.11.1/lib/languages/bash",
     "highlight.js/json": "npm:highlight.js@11.11.1/lib/languages/json",
-    "highlight.js/typescript": "npm:highlight.js@11.11.1/lib/languages/typescript"
+    "highlight.js/typescript": "npm:highlight.js@11.11.1/lib/languages/typescript",
+    "highlight.js/python": "npm:highlight.js@11.11.1/lib/languages/python",
+    "highlight.js/powershell": "npm:highlight.js@11.11.1/lib/languages/powershell",
+    "highlight.js/markdown": "npm:highlight.js@11.11.1/lib/languages/markdown",
+    "highlight.js/ini": "npm:highlight.js@11.11.1/lib/languages/ini",
+    "highlight.js/yaml": "npm:highlight.js@11.11.1/lib/languages/yaml",
+    "highlight.js/css": "npm:highlight.js@11.11.1/lib/languages/css",
+    "highlight.js/diff": "npm:highlight.js@11.11.1/lib/languages/diff",
+    "highlight.js/sql": "npm:highlight.js@11.11.1/lib/languages/sql",
+    "highlight.js/xml": "npm:highlight.js@11.11.1/lib/languages/xml",
+    "highlight.js/javascript": "npm:highlight.js@11.11.1/lib/languages/javascript"
   },
   "fmt": {
     "useTabs": false,
@@ -41,7 +51,9 @@
     ]
   },
   "compilerOptions": {
-    "types": ["lume/types.ts"],
+    "types": [
+      "lume/types.ts"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "npm:react@18.3.1"
   }
