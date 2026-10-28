@@ -10,12 +10,14 @@ full specification. This file is the working procedure. Cross-theme rules are in
 `docs/design-system/GUIDELINES.md` (shipped as the `netscript-design` skill).
 
 > **Utility is the NetScript default theme**, and the docs site is the first product to use it. It
-> is monochrome and sharp, with one red mark. It has 0–2px radii; 1px hairlines (#e0e0e0 / #313131,
-> row rules #f0f0f0 / #2a2a2a); gray-9 field boundaries (#8d8d8d / #6e6e6e, ≥ 3:1); a 6px ink square
-> location marker and a 2px ink selected-row bar; a 2px ink focus ring with a 2px gap; **red only in
-> the logo (#DA291C / #E5332A) and in errors**; a Medium title and Regular KPI numerals at −2.5%;
-> Fragment Mono for eyebrows, IDs and column heads; 1.5px icons; file-path and `data-*` chips.
-> Values and roles are in `DESIGN.md` → front matter and _Flavors_ → Utility.
+> has monochrome, sharp chrome with one red mark, and content in semantic colour (status tones on
+> callouts, badges and notices; syntax colours in code; coloured API kind tags). It has 0–2px radii;
+> 1px hairlines (#e0e0e0 / #313131, row rules #f0f0f0 / #2a2a2a); gray-9 field boundaries (#8d8d8d /
+> #6e6e6e, ≥ 3:1); a 6px ink square location marker and a 2px ink selected-row bar; a 2px ink focus
+> ring with a 2px gap; **red only in the logo (#DA291C / #E5332A) and in errors**; a Medium title
+> and Regular KPI numerals at −2.5%; Fragment Mono for eyebrows, IDs and column heads; 1.5px icons;
+> file-path and `data-*` chips. Values and roles are in `DESIGN.md` → front matter and _Flavors_ →
+> Utility.
 
 ## Use it when / don't use it when
 

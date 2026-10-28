@@ -256,8 +256,8 @@ flavors are in the "Flavors" extension section. Names are provisional until the 
 - **Thesis:** seven flavors share one component anatomy. Each flavor changes the ground, shape, type
   pairing, density and component variants of the same Orders screen, so that it reads as a different
   product at a 480px thumbnail.
-- **Utility is the NetScript default theme.** The docs site is the first product to use it. It is
-  monochrome and sharp, with one red mark:
+- **Utility is the NetScript default theme.** The docs site is the first product to use it. Its
+  chrome is monochrome and sharp, with one red mark; its content keeps semantic colour:
   - radius 0 on controls, inputs and cards; 2px on badges, kbd, chips and checkboxes;
   - 1px hairlines: structural rules #e0e0e0 / #313131 (gray 5), row rules #f0f0f0 / #2a2a2a;
   - a 6px ink square marks the active nav lane, tab, segment and filter, and a 2px ink bar marks the
@@ -265,6 +265,8 @@ flavors are in the "Flavors" extension section. Names are provisional until the 
   - a 2px ink focus ring with a 2px gap (#202020 / #7b7b7b);
   - field, checkbox and switch boundaries in gray 9 (#8d8d8d / #6e6e6e, ≥ 3:1);
   - **red only in the logo (#DA291C / #E5332A) and in errors**;
+  - status tones in callouts, alerts, badges, toasts and inline notices; syntax colours in code;
+    coloured kind tags in API references (see _Content colour_);
   - a Medium title and Regular KPI numerals, both at −2.5% tracking;
   - Fragment Mono for eyebrows, IDs, column heads, breadcrumbs, kbd and chips;
   - 1.5px icon strokes, and file-path and `data-*` attribute chips as copy-source cues.
@@ -292,7 +294,40 @@ flavors are in the "Flavors" extension section. Names are provisional until the 
 - **Accent policy (Utility):** Base accent Ink sets `primary` to ink (#202020, dark #313131).
   Location, selection, links and focus also use ink: `studio/signal/marker` #202020 / #eeeeee. **Red
   appears only in the logo and in errors.** There are no red markers, links, hairlines or focus
-  rings. Status colours (success, warning, info) remain for badges and notices.
+  rings. Monochrome applies to the chrome: header, navigation, rules, markers, links, focus and
+  selection. Content primitives keep their semantic colour (next bullet).
+- **Content colour (Utility).** A grey-only callout, badge or code block loses meaning and contrast,
+  so Utility colours its content primitives:
+  - **Status tones.** Callouts, alerts, badges, toasts and inline notices use `info`, `success`,
+    `warning` and `destructive`: `*-subtle` fill, `*-border` edge, `*-text` icon and title, body in
+    `fg`. Red stays limited to the `destructive` tone (errors, destructive actions, caution).
+  - **Docs callouts** map GitHub alert types to tones: NOTE `info`, TIP `success`, IMPORTANT
+    `important` (violet), WARNING `warning`, CAUTION `destructive`.
+
+    | Role               | Light             | Dark              |
+    | ------------------ | ----------------- | ----------------- |
+    | `important/subtle` | #f4f0fe violet 3  | #291f43 violet 3  |
+    | `important/border` | #d4cafe violet 6  | #473876 violet 6  |
+    | `important/text`   | #2f265f violet 12 | #baa7ff violet 11 |
+
+  - **Syntax colours.** Code blocks sit on `code/bg` (#ffffff / #191919) under a `surface` header.
+    Every token colour reaches 4.5:1 on `code/bg`. No syntax role is red.
+
+    | Role                      | Tokens                                    | Light             | Dark              |
+    | ------------------------- | ----------------------------------------- | ----------------- | ----------------- |
+    | `code/syntax/keyword`     | keywords, `this`, modifiers               | #6550b9 violet 11 | #baa7ff violet 11 |
+    | `code/syntax/function`    | function and method names                 | #0d74ce blue 11   | #70b8ff blue 11   |
+    | `code/syntax/type`        | types, classes, built-ins, shell commands | #008573 teal 11   | #0bd8b6 teal 11   |
+    | `code/syntax/string`      | strings, template literals                | #2a7e3b grass 11  | #71d083 grass 11  |
+    | `code/syntax/number`      | numbers, literals, regexps, variables     | #cc4e00 orange 11 | #ffa057 orange 11 |
+    | `code/syntax/comment`     | comments (italic)                         | #646464 gray 11   | #b4b4b4 gray 11   |
+    | `code/syntax/punctuation` | operators, punctuation                    | #646464 gray 11   | #b4b4b4 gray 11   |
+
+    Properties, attributes and plain identifiers stay `fg`.
+  - **Kind tags.** API references tag each symbol's kind with the badge anatomy (1px outline, 6px
+    square dot, radius 2, Fragment Mono 11) in its syntax colour: function and method `function`,
+    class `type`, interface and type alias `keyword`, variable, constant and enum `number`, module
+    and namespace `fg`. Names and types read at full `fg` contrast, with types in syntax colours.
 - **Logo red and error red** are separate roles that differ in form as well as hue:
 
   | Role                                                                                    | Light   | Dark    | Use                                                                                                     |
@@ -436,7 +471,10 @@ Light and Dark state sheets.
 
 ## Do's and Don'ts
 
-- **Do** keep Utility monochrome: red only in the logo and in errors.
+- **Do** keep Utility's chrome monochrome: red only in the logo and in errors.
+- **Do** give content primitives their semantic colour: status tones on callouts, alerts, badges and
+  notices; syntax colours in code; coloured kind tags in API references.
+- **Don't** render a callout, badge, tag or code block in grey only.
 - **Do** keep Utility sharp and quiet: radii 0–2px, 1px gray-5 structural hairlines, quiet row
   rules, no shadows. Separations must not read stronger than the content they separate.
 - **Don't** use 2px ink rules, underline tabs, a Bold title, Medium KPI numerals or JetBrains Mono
