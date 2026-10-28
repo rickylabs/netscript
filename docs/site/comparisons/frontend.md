@@ -1,6 +1,6 @@
 ---
 layout: layouts/base.vto
-title: NetScript vs Next.js, Nuxt, SvelteKit, and TanStack Start
+title: NetScript vs frontend frameworks
 description: Compare one streamed detail page in NetScript with four leading frontend frameworks.
 templateEngine: [vento, md]
 order: 2
