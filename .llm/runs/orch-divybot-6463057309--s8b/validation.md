@@ -51,3 +51,10 @@ implementation HEAD `fafe315a15b50e403623a402615ff635f473224f`, including the fi
 The earlier exports/quality receipts remain preserved with their original provenance. Failed runtime
 preflight and cleanup command receipts are retained as runtime-preflight.receipt.json and
 runtime-cleanup.receipt.json; they came from the single full suite invocation, not split smoke runs.
+
+Close-gate follow-up: the owner-requested failure repair checked the five issue Acceptance boxes
+only after attaching and validating exact evidence. `acceptance-mirror-dry-run.json` and
+`acceptance-mirror-applied.json` retain the native mirror results; `close-gate-repair.txt` records
+live PASS. No labels or gate code were changed. Supplemental source-refresh and Markdown-twin
+checks are in acceptance-render-audit.json. Actual MCP generation against a temporary updated
+carrier passes at 284,489 / 294,912 bytes (markdown-budget-audit.json).
