@@ -361,13 +361,24 @@ exception path described in the close-gate section.
 > workflow per status) is deferred to the repo-process-automation umbrella. Until it lands, apply
 > labels manually per this taxonomy so the future automation has clean data.
 
-## Milestones (release mapping)
+## Milestones (releases and themes)
 
-Assign every open issue and PR to the explicit release that owns it: `0.0.2` through `0.0.9`, or
-`Backlog / Triage` when it is accepted but unscheduled. The `wave:*` labels are scheduling bands and
-may span several releases; they do not determine a milestone. Epics and umbrellas use the cut in
-which their coordinated scope is expected to complete. Keep milestone scope in sync with the live
-roadmap and issue board rather than inferring it from a wave label.
+Every open issue and PR carries exactly one milestone, of one of three kinds:
+
+- **The next release**, named by its version (for example `0.0.9`). Only one release milestone is
+  open at a time. It holds the work agreed for that release when the release starts; do not add
+  work to it without that agreement.
+- **A theme**, named for what the work is for (for example `Frontend Contribution`,
+  `Runtime Automation`, `Deploy Plugin`, `Enterprise Auth`, `Process Manager`). Themes own
+  long-running programs and areas. When a release starts, its scope is pulled from the themes.
+- **`Backlog / Triage`**, for accepted work with no theme yet, upstream-blocked work, or work that
+  needs a decision.
+
+Order inside a theme comes from issue dependencies (blocked-by links and slice numbers), not from
+milestone names. The `wave:*` labels are scheduling bands; they do not determine a milestone. An
+epic or umbrella sits in its theme, or in the release milestone when its whole scope ships in that
+release. Keep milestone scope in sync with the live roadmap and issue board rather than inferring it
+from a wave label.
 
 ## Issue and PR templates
 
