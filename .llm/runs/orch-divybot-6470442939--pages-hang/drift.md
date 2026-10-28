@@ -7,3 +7,8 @@
 - Node spawn needs allow-env; the three snippet tasks and actual-CLI regression declare it.
 - Runtime gate attempted but unavailable: Aspire doctor failed; Docker daemon cannot be reached.
   This is unproven evidence, never a green gate or a reason to weaken CI.
+
+- Publication correction: the read-only leak checker generated a report containing local runtime
+  paths; that generated report was inadvertently included in the implementation commit. The next
+  commit replaces it with a privacy-safe summary. No secrets were included. Earlier history remains
+  because the owner prohibits force-pushing; this limitation is disclosed rather than hidden.

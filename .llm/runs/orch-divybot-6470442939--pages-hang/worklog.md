@@ -58,3 +58,7 @@ Run IMPL-EVAL after implementing with claude -p --model claude-opus-5-5 --effort
 
 Current origin/main remains the declared d6dfab0 baseline; only this branch’s harness bootstrap
 commit is ahead. Changes stay within declared ownership. Independent evaluation pending.
+
+- Reporter output correction: generated leak-report content was inadvertently committed with local
+  runtime paths. Replaced by a public summary; no secret material was included. Prior commit history
+  cannot be rewritten under the owner’s no-force-push instruction.
