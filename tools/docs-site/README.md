@@ -67,3 +67,23 @@ components, resolving them through Utility density and typography roles. The bro
 undefined shared roles in every shipped stylesheet, including generated third-party CSS. All maintained
 UI styles, including the sibling section stylesheet, receive the raw-colour and red-context checks too. Design system
 acceptance asserts visible navigation gaps so missing layout roles cannot pass on axe alone.
+
+Build output is bundled by Lume 2.5.4's Lightning CSS plugin with its default minification and
+browser targets; source CSS stays readable. Standalone partials remain emitted and checked.
+The bundle permits raw custom token declarations only when the exact CSSOM selector, name and
+value match the verified generated token layer. All maintained declarations and all uses retain
+raw-colour, red and undefined-role checks; raw-custom is another real negative control.
+
+After rendering, page URL and local DOM order supply tab/diagram namespaces before Pagefind and
+Markdown twins consume the page. Do not add random IDs or shared render counters. The strict checker compares every output file, including search fragments and twins, with zero exclusions.
+Use `--allow-pagefind-metadata` for #2451: every output is compared; only the named Pagefind
+entry JSON/filter/meta serialization differences are reported without blocking. HTML, twins,
+llms files, anchor fragments, styles, scripts and all other assets must match. Pagefind 1.3 filter/meta hash entropy is reported separately; a trial of
+1.5.2 did not eliminate it and was reverted. Search behavior remains covered by the full browser suite:
+
+```sh
+deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts --allow-pagefind-metadata
+```
+
+Token-source consolidation is tracked in #2450 after S1 and the new Figma export; this follow-up
+preserves the current snapshot until that canonical build integration is available.

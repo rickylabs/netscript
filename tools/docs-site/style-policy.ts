@@ -8,6 +8,8 @@ export interface StyleSource {
   tokenLayer?: boolean;
   /** Generated third-party CSS still must resolve every shared role. Maintained UI gets all checks. */
   roleCheckOnly?: boolean;
+  /** Bundled raw token definitions must exactly match the verified standalone token layer. */
+  generatedTokenBundle?: boolean;
 }
 export interface StyleFinding {
   path: string;
@@ -163,6 +165,11 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
       value: entry.value,
     });
   }
+  const generatedTokens = new Set(
+    declarations.filter(({ file, property }) =>
+      file.kind === 'css' && file.tokenLayer && property.startsWith('--')
+    ).map(({ selector, property, value }) => JSON.stringify([selector, property, value])),
+  );
   for (const entry of declarations) {
     const { file, selector, property, value } = entry;
     const custom = property.startsWith('--');
@@ -171,7 +178,10 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     }
     if (file.roleCheckOnly) continue;
     if (custom || colourProperty.test(property)) {
-      if (raw(value) && !(custom && file.tokenLayer)) finding(entry, 'raw-colour');
+      const generated = custom && (file.tokenLayer ||
+        (file.generatedTokenBundle &&
+          generatedTokens.has(JSON.stringify([selector, property, value]))));
+      if (raw(value) && !generated) finding(entry, 'raw-colour');
     }
     if (custom) continue; // Definition is not a use; resolve it through consuming declarations.
     const selectors = selector.split(',');
