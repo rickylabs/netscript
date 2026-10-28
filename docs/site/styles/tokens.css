@@ -251,6 +251,10 @@
   --ns-state-disabled-opacity: 38;
   --ns-state-hover-opacity: 8;
   --ns-state-pressed-opacity: 12;
+  --ns-studio-api-kind-function-text: #113264;
+  --ns-studio-api-kind-keyword-text: #6550b9;
+  --ns-studio-api-kind-number-text: #582d1d;
+  --ns-studio-api-kind-type-text: #0d3d38;
   --ns-studio-avatar-radius: 0px;
   --ns-studio-badge-solid-destructive-bg: #641723;
   --ns-studio-badge-solid-destructive-fg: #ffffff;
@@ -717,6 +721,10 @@
   --ns-state-disabled-opacity: 38;
   --ns-state-hover-opacity: 8;
   --ns-state-pressed-opacity: 12;
+  --ns-studio-api-kind-function-text: #70b8ff;
+  --ns-studio-api-kind-keyword-text: #baa7ff;
+  --ns-studio-api-kind-number-text: #ffa057;
+  --ns-studio-api-kind-type-text: #0bd8b6;
   --ns-studio-avatar-radius: 0px;
   --ns-studio-badge-solid-destructive-bg: #611623;
   --ns-studio-badge-solid-destructive-fg: #ff9592;

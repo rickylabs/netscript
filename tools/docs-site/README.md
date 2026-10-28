@@ -70,7 +70,7 @@ acceptance asserts visible navigation gaps so missing layout roles cannot pass o
 
 
 S8c semantic content uses the owner export at `b9dd32aac`: `code/bg`, seven `code/syntax/*`
-roles and the violet `important/*` triplet. Code and API kind paint consume those roles directly.
+roles and the violet `important/*` triplet. Code consumes those syntax roles directly; API badges consume generated `--ns-studio-api-kind-*-text` adapters selecting exported step 11/12 for AA on canvas and surface.
 The pre-S8c declaration fixture proves every old role remains byte-identical in both schemes,
 except the explicitly approved `--ns-input-border` change to Utility gray 9. The contrast test
 computes unrounded WCAG ratios on code and table backgrounds. The browser suite verifies actual
@@ -96,3 +96,8 @@ real browser Pagefind tests. The metadata issue remains #2453; token-source cons
 The public callout and code galleries live under `docs/site/design-system/docs-kit/`, linked from the Design system navigation and indexed in that search lane. API badge mappings follow the Utility spec in `docs/design-system/themes/studio/DESIGN.md`; `api-kinds_test.ts` fixes that contract independently of the browser paint checks.
 
 Callouts have one sentence-case type label (Note, Tip, Important, Warning, Caution) or an explicit custom title replacing it. The label uses Host Grotesk Medium at the callout body size; its tone also paints the icon. A line-height-sized icon box aligns with the first line, and the body shares the label's left edge. The accessible name retains the type and custom title. Markdown twins preserve a typed alert marker, label and body exactly once, including the legacy Error alias. Extend the default/custom gallery and its geometry/twin assertions together.
+
+
+`callout-types.ts` owns the type, label, tone, icon shape and twin marker. Omitted types default to Note; explicit unknown types fail the build. Danger is destructive and canonicalizes to `[!CAUTION]`; Error remains destructive with a distinct circle-X. Only Caution and Danger share an icon. The authored-corpus and browser tests enforce this alongside the geometry assertions.
+
+Commit `docs/site/deno.lock` when native Lume imports change: it pins the lightningcss plugin and WASM dependency used by `_config.ts`. Root `deno.lock` remains subject to the root no-churn rule. A build from clean git must leave status clean. The style policy recognizes the verified exported orange-12 badge role as orange, without exempting authored paint or red role overrides.

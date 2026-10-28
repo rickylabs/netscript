@@ -18,3 +18,5 @@ The native publish-assets task may write the exact checked-in paths in `PUBLISH_
 Owner-revision carrier slice also authorizes packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts solely through gen:mcp-export-corpus, in the explicitly requested native generation order.
 
 Latest user synchronization authorization: rebase onto latest main and force-push, explicitly superseding prior merge-only/no-force constraints for this reconciliation. Use exact --force-with-lease against old remoteae2f4002b; target main0825bd0f4. PR merge/tag/release and label changes remain forbidden. Canonical upstream docs are inherited unchanged, never manually edited by this slice.
+
+Latest cross-family remediation authorizes docs/design-system/themes/studio/DESIGN.md only to document the coordinator-requested step12 kind-text contrast policy and docs-adapter role manifest. Actual colours still resolve from the immutable Figma export. Latest refs-only/no-force supersedes older closing-line/force permissions; docs/site/deno.lock pins are intentionally committed while ROOT deno.lock is preserved.

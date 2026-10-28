@@ -1,9 +1,7 @@
-{{# Public type/title/content contract; error remains a destructive alias. #}}
-{{ set requested = (type || "note").toLowerCase() }}
-{{ set tones = { note: "info", tip: "success", important: "important", warning: "warning", caution: "destructive", error: "destructive" } }}
-{{ set kind = tones[requested] ? requested : "note" }}
-{{ set labels = { note: "Note", tip: "Tip", important: "Important", warning: "Warning", caution: "Caution", error: "Error" } }}
-<aside class="ns-callout" data-variant="{{ kind }}" data-tone="{{ tones[kind] }}" role="note" aria-label="{{ labels[kind] }}">
-  <div class="ns-callout__head"><span class="ns-callout__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">{{ if kind === "tip" }}<path d="m5 12 4 4L19 6" />{{ else if kind === "warning" }}<path d="M12 3 2 21h20ZM12 9v5m0 3v1" />{{ else if tones[kind] === "destructive" }}<path d="m8 2-6 6v8l6 6h8l6-6V8l-6-6ZM8 8l8 8m0-8-8 8" />{{ else }}<circle cx="12" cy="12" r="9" /><path d="M12 10v7m0-11v1" />{{ /if }}</svg></span><span class="ns-callout__label">{{ if title }}{{ title |> ic }}{{ else }}{{ labels[kind] }}{{ /if }}</span></div>
+{{# Shared contract rejects unknown types instead of downgrading security notices. #}}
+{{ set kind = type |> calloutType }}
+{{ set definition = calloutTypes[kind] }}
+<aside class="ns-callout" data-variant="{{ kind }}" data-tone="{{ definition.tone }}" role="note" aria-label="{{ definition.label }}">
+  <div class="ns-callout__head"><span class="ns-callout__icon" aria-hidden="true"><svg data-icon="{{ definition.icon }}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ calloutIcons[definition.icon] }}</svg></span><span class="ns-callout__label">{{ if title }}{{ title |> ic }}{{ else }}{{ definition.label }}{{ /if }}</span></div>
   <div class="ns-callout__body">{{ content }}</div>
 </aside>

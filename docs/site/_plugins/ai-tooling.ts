@@ -1,3 +1,4 @@
+import { CALLOUT_TYPES, calloutType } from '../../../tools/docs-site/callout-types.ts';
 import { Page } from 'lume/core/file.ts';
 import { releaseVersion } from '../_data.ts';
 import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
@@ -233,9 +234,9 @@ function blockMd(node: ChildNode, origin: URL): string {
       const body = el.querySelector('.ns-callout__body');
       if (el.classList.contains('ns-callout') && kind && label && body) {
         return quoteMd(
-          `[!${kind.toUpperCase()}]\n${inlineChildren(label, origin).trim()}\n\n${
-            childBlocks(body, origin)
-          }`,
+          `[!${CALLOUT_TYPES[calloutType(kind)].markdown}]\n${
+            inlineChildren(label, origin).trim()
+          }\n\n${childBlocks(body, origin)}`,
         );
       }
       return quoteMd(childBlocks(el, origin));

@@ -37,8 +37,8 @@ Deleting data cannot be undone. <a href="/data-persistence/">Read the database g
 The operation failed. Correct the input and try again.
 {{ /comp }}
 
-{{ comp callout { type: "unknown", title: "Unknown types fall back to Note" } }}
-The default notice remains informational.
+{{ comp callout { type: "danger" } }}
+Danger is a destructive alias and keeps the Caution marker in Markdown.
 {{ /comp }}
 
 ## Custom titles

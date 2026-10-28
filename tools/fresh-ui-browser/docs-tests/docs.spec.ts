@@ -515,6 +515,16 @@ async function collectFiles(
   return files;
 }
 async function ownedSources(): Promise<StyleSource[]> {
+  // Orange 12 is a brown in the exported orange ramp, despite the red-hue heuristic.
+  // Resolve its value independently; overrides and raw authored colours still fail.
+  const primitives = JSON.parse(
+    await readFile(
+      resolve(REPO, 'tools/docs-site/figma-variables/primitives.json'),
+      'utf8',
+    ),
+  ) as { variables: Array<{ name: string; values: { Value: string } }> };
+  const orange = primitives.variables.find((v) => v.name === 'color/orange/l/12')!.values.Value;
+  const nonRedTokenValues = { '--ns-studio-api-kind-number-text': orange };
   const root = resolve(REPO, 'docs/site');
   const files = [resolve(root, 'favicon.svg')];
   for (const dir of ['styles', '_includes', '_components', 'assets/docs']) {
@@ -531,6 +541,7 @@ async function ownedSources(): Promise<StyleSource[]> {
       source: await readFile(file, 'utf8'),
       kind: path.endsWith('.css') ? 'css' : path.endsWith('.js') ? 'js' : 'html',
       tokenLayer: path === 'styles/tokens.css' || path === 'favicon.svg',
+      nonRedTokenValues: path === 'styles/tokens.css' ? nonRedTokenValues : undefined,
     });
   }
   for (const file of await collectFiles(SITE)) {
@@ -541,6 +552,7 @@ async function ownedSources(): Promise<StyleSource[]> {
         kind: 'css',
         source: await readFile(file, 'utf8'),
         tokenLayer: path === 'styles/tokens.css',
+        nonRedTokenValues: path === 'styles/tokens.css' ? nonRedTokenValues : undefined,
         generatedTokenBundle: path === 'styles/docs.css',
         roleCheckOnly: path.startsWith('pagefind/'),
       });
@@ -660,6 +672,8 @@ test('style policy negative contracts reject literal, named and aliased colours'
   for (
     const source of [
       '.x{color:var(--ns-studio-signal-brand)}',
+      ':root{--ns-studio-api-kind-number-text:var(--ns-destructive-text)} .x{color:var(--ns-studio-api-kind-number-text)}',
+      ':root{--ns-studio-api-kind-number-text:red} .x{color:var(--ns-studio-api-kind-number-text)}',
       '.ns-prose .hljs-keyword{color:var(--ns-destructive-text)}',
       '.ns-callout[data-tone="info"]{color:var(--ns-destructive-text)}',
       '.x[data-tone="destructive-decoration"]{color:var(--ns-destructive-text)}',
@@ -718,6 +732,7 @@ test('callouts: semantic tone, default body and ink links', async ({ page }) => 
       important: 'important',
       warning: 'warning',
       caution: 'destructive',
+      danger: 'destructive',
       error: 'destructive',
     })
   ) {
@@ -762,6 +777,7 @@ test('callout labels: one body-sized label, first-line icon alignment and typed 
     important: 'Important',
     warning: 'Warning',
     caution: 'Caution',
+    danger: 'Danger',
     error: 'Error',
   };
   for (const label of Object.values(types)) {
@@ -816,6 +832,7 @@ test('callout labels: one body-sized label, first-line icon alignment and typed 
   expect(callouts).toHaveLength(12);
   const twin = await readFile(resolve(SITE, 'design-system/docs-kit/callouts/index.md'), 'utf8');
   expect(twin.match(/^> \[![A-Z]+\]$/gm)).toHaveLength(callouts.length);
+  const markdown = (kind: string) => kind === 'danger' ? 'CAUTION' : kind.toUpperCase();
   const wrappedKinds = new Set<string>();
   for (const callout of callouts) {
     const type = types[callout.kind];
@@ -843,7 +860,7 @@ test('callout labels: one body-sized label, first-line icon alignment and typed 
     expect(callout.glyphCentre).toBeCloseTo(callout.iconCentre, 2);
     expect(callout.bodyLeft).toBeCloseTo(callout.labelLeft, 2);
     expect(callout.gap).toBeCloseTo(8, 2);
-    const header = `> [!${callout.kind.toUpperCase()}]\n> ${callout.label}\n`;
+    const header = `> [!${markdown(callout.kind)}]\n> ${callout.label}\n`;
     expect(twin.split(header).length - 1, header).toBe(1);
     if (callout.label.length > 100) {
       expect(callout.lines, callout.label).toBeGreaterThan(1);
@@ -854,9 +871,11 @@ test('callout labels: one body-sized label, first-line icon alignment and typed 
     }
   }
   expect([...wrappedKinds].sort()).toEqual(['caution', 'important', 'note', 'tip', 'warning']);
-  for (const kind of Object.keys(types)) {
-    const markers = twin.split('\n').filter((line) => line === `> [!${kind.toUpperCase()}]`);
-    expect(markers).toHaveLength(callouts.filter((callout) => callout.kind === kind).length);
+  for (const marker of new Set(Object.keys(types).map(markdown))) {
+    const markers = twin.split('\n').filter((line) => line === `> [!${marker}]`);
+    expect(markers).toHaveLength(
+      callouts.filter((callout) => markdown(callout.kind) === marker).length,
+    );
   }
 });
 
@@ -1080,12 +1099,23 @@ test('API kind paint and badge anatomy follow the merged Utility spec', async ({
   let highlightedSignatures = 0;
   for (const route of ['reference/database/', 'reference/fresh-ui/', 'design-system/docs-kit/']) {
     await visit(page, route);
+    if (route === 'design-system/docs-kit/') {
+      const tables = page.locator('.ns-api-table-wrap');
+      expect(await tables.count()).toBeGreaterThan(0);
+      await tables.evaluateAll((tables) => {
+        for (const table of tables) {
+          (table as HTMLElement).style.backgroundColor = 'var(--ns-surface)';
+        }
+      });
+    }
     const tags = await page.locator('.ns-api-kind').evaluateAll((tags) =>
       tags.map((tag) => {
         const role = tag.getAttribute('data-syntax-role')!;
         const probe = document.createElement('span');
         tag.append(probe);
-        probe.style.color = role === 'fg' ? 'var(--ns-fg)' : `var(--ns-code-syntax-${role})`;
+        probe.style.color = role === 'fg'
+          ? 'var(--ns-fg)'
+          : `var(--ns-studio-api-kind-${role}-text)`;
         const expected = getComputedStyle(probe).color;
         probe.remove();
         const style = getComputedStyle(tag);
@@ -1292,4 +1322,62 @@ test('API signature generics survive HTML rendering and highlighting', async ({ 
   await expect(definition.locator('.ns-api-table__type')).toContainText(
     'Readonly<{ id, durability, initialState',
   );
+});
+
+test('callout icons distinguish every type except caution and danger', async ({ page }) => {
+  await visit(page, 'design-system/docs-kit/callouts/');
+  const expected = {
+    note: 'info',
+    tip: 'lightbulb',
+    important: 'message-square-warning',
+    warning: 'triangle-alert',
+    caution: 'octagon-alert',
+    danger: 'octagon-alert',
+    error: 'circle-x',
+  };
+  const shapes: Array<[string, string]> = [];
+  for (const [kind, icon] of Object.entries(expected)) {
+    const svg = page.locator(`.ns-callout[data-variant="${kind}"] svg`).first();
+    await expect(svg).toHaveAttribute('data-icon', icon);
+    shapes.push([kind, await svg.innerHTML()]);
+  }
+  for (const [index, [a, first]] of shapes.entries()) {
+    for (const [b, second] of shapes.slice(index + 1)) {
+      if (a === 'caution' && b === 'danger') expect(first).toBe(second);
+      else expect(first, `${a}/${b}`).not.toBe(second);
+    }
+  }
+});
+
+test('ERP security notices stay destructive in HTML and Markdown', async ({ page }, info) => {
+  await visit(page, 'tutorials/erp-sync/03-polyglot-transform/');
+  const titles = [
+    'Omitting .permissions() on a deno task means --allow-all',
+    'Non-Deno Runtime Sandboxing Boundary',
+  ];
+  const twin = await readFile(
+    resolve(SITE, 'tutorials/erp-sync/03-polyglot-transform/index.md'),
+    'utf8',
+  );
+  for (const [index, title] of titles.entries()) {
+    const notice = page.getByRole('note', { name: `Caution: ${title}`, exact: true });
+    await expect(notice).toHaveAttribute('data-variant', 'caution');
+    await expect(notice).toHaveAttribute('data-tone', 'destructive');
+    await expect(notice.locator('svg')).toHaveAttribute('data-icon', 'octagon-alert');
+    const colour = await notice.evaluate((node) => {
+      const label = node.querySelector('.ns-callout__label')!;
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--ns-destructive-text)';
+      node.append(probe);
+      const expected = getComputedStyle(probe).color;
+      probe.remove();
+      return { actual: getComputedStyle(label).color, expected };
+    });
+    expect(colour.actual).toBe(colour.expected);
+    expect(twin.split(`> [!CAUTION]\n> ${title}\n`).length - 1).toBe(1);
+    const path = info.outputPath(`erp-security-${index + 1}.png`);
+    await notice.screenshot({ path, animations: 'disabled' });
+    await info.attach(`erp-security-${index + 1}`, { path, contentType: 'image/png' });
+  }
+  await audit(page, info, 'erp-security');
 });

@@ -29,6 +29,7 @@ import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
 import { getDocsLane } from './_data.ts';
+import { CALLOUT_ICONS, CALLOUT_TYPES, calloutType } from '../../tools/docs-site/callout-types.ts';
 import { apiKind, apiKindRole } from '../../tools/docs-site/api-kinds.ts';
 import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
 
@@ -94,6 +95,9 @@ site.addEventListener('beforeBuild', async () => {
 //   {{ "cap:services" |> xref }}
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
+site.filter('calloutType', calloutType);
+site.data('calloutTypes', CALLOUT_TYPES);
+site.data('calloutIcons', CALLOUT_ICONS);
 site.filter('apiKind', apiKind);
 site.filter('apiKindRole', apiKindRole);
 site.filter('languageLabel', (language: string) => LANGUAGE_LABELS[language] ?? language);
@@ -241,7 +245,7 @@ site.addEventListener('afterRender', () => {
     // A custom label replaces the visible type, which remains in the accessible name.
     for (const callout of document.querySelectorAll('.ns-callout')) {
       const kind = callout.getAttribute('data-variant');
-      const type = kind ? kind[0].toUpperCase() + kind.slice(1) : undefined;
+      const type = CALLOUT_TYPES[calloutType(kind)].label;
       const label = callout.querySelector('.ns-callout__label')?.textContent?.trim();
       if (type && label) {
         callout.setAttribute('aria-label', label === type ? type : `${type}: ${label}`);

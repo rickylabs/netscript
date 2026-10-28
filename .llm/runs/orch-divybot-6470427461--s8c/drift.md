@@ -13,3 +13,6 @@
 - Generated-carrier scope clarification before native publish-assets generation: the documented native task also refreshes packages/mcp/src/publish-assets.generated.ts and the deterministic prose provenance sidecar. These exact generated surfaces are now declared in supervisor.md; no package API or hand-authored framework source changes are planned.
 
 - Owner review explicitly supersedes the original internal-gallery choice: public galleries now belong to Design system → Docs kit, including navigation, search and AI carriers. The merged Utility spec supersedes the earlier kind mapping: interfaces/types violet, variables/constants/enums orange, modules/namespaces foreground, transparent outlined badges with square dots.
+
+
+Latest coordinator explicitly supersedes earlier docs-lock restoration and closing-keyword rules: commit native lightningcss docs pins, refs-only PR, no force-push. Owner-authorized step12 badge text supersedes exactstep11 spec; docs-adapter alias scope and #2450 debt are recorded in Studio DESIGN.md. Orange12 policy recognition uses immutable-export value provenance only; all existing raw/red controls remain required.

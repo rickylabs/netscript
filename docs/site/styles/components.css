@@ -575,16 +575,16 @@
   white-space: nowrap;
 }
 .ns-api-kind[data-syntax-role="type"] {
-  color: var(--ns-code-syntax-type);
+  color: var(--ns-studio-api-kind-type-text);
 }
 .ns-api-kind[data-syntax-role="function"] {
-  color: var(--ns-code-syntax-function);
+  color: var(--ns-studio-api-kind-function-text);
 }
 .ns-api-kind[data-syntax-role="keyword"] {
-  color: var(--ns-code-syntax-keyword);
+  color: var(--ns-studio-api-kind-keyword-text);
 }
 .ns-api-kind[data-syntax-role="number"] {
-  color: var(--ns-code-syntax-number);
+  color: var(--ns-studio-api-kind-number-text);
 }
 .ns-api-kind[data-syntax-role="fg"] {
   color: var(--ns-fg);

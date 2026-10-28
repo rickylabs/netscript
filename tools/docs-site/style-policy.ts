@@ -10,6 +10,8 @@ export interface StyleSource {
   roleCheckOnly?: boolean;
   /** Bundled raw token definitions must exactly match the verified standalone token layer. */
   generatedTokenBundle?: boolean;
+  /** Independently resolved non-red Figma ramp values on a verified token layer only. */
+  nonRedTokenValues?: Record<string, string>;
 }
 export interface StyleFinding {
   path: string;
@@ -138,11 +140,21 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     const hue = (((g - b) / delta * 60) + 360) % 360;
     return hue <= 18 || hue >= 340;
   }
+  const nonRedTokens = new Map<string, Set<string>>();
+  for (const file of sources.filter((file) => file.tokenLayer)) {
+    for (const [name, value] of Object.entries(file.nonRedTokenValues ?? {})) {
+      const values = nonRedTokens.get(name) ?? new Set<string>();
+      values.add(value.trim().toLowerCase());
+      nonRedTokens.set(name, values);
+    }
+  }
   function red(value: string, trail: string[] = []): boolean {
     if (literalRed(value)) return true;
     return references(value).some((name) =>
       !trail.includes(name) &&
-      [...(variables.get(name) ?? [])].some((next) => red(next, [...trail, name]))
+      [...(variables.get(name) ?? [])].some((next) =>
+        !nonRedTokens.get(name)?.has(next.trim().toLowerCase()) && red(next, [...trail, name])
+      )
     );
   }
   function raw(value: string): boolean {
