@@ -1,9 +1,0 @@
-{
-  "provider": "openrouter",
-  "capturedAt": "2026-10-28T03:15:54.630Z",
-  "availableBalanceUsd": 8.543679366,
-  "accountAvailableUsd": 45.424443556999904,
-  "keyLimit": 20,
-  "keyRemainingUsd": 8.543679366,
-  "minimumAccountAndSelectedKey": true
-}
