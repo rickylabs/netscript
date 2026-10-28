@@ -24,6 +24,10 @@ export interface WorkersServiceOptions {
 
 const MISSING_PORT_MESSAGE = 'Workers API requires the host-provided PORT environment variable.';
 
+/** Exact public posture retained by the legacy plural service entrypoint. */
+export const LEGACY_WORKERS_PUBLIC_REASON: string =
+  'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).';
+
 /**
  * Starts the Workers API service over the host-provided context.
  *

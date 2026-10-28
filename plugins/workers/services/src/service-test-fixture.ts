@@ -13,7 +13,8 @@
  * always-checked runtime child: loopback net, env, and read/write confined to the sandbox scratch
  * only, with run/ffi/sys still denied; that allowlist is test authority, not OS confinement. This
  * module registers no tests and imports no product code; it exports only the symbols the test
- * owners consume.
+ * owners consume. Only explicit `legacyPublicHost` in HTTP mode additionally permits the native
+ * wildcard ephemeral bind (`0.0.0.0:0`); callers still connect through loopback.
  *
  * @module
  */
@@ -71,6 +72,8 @@ interface Sandbox extends AsyncDisposable {
       readonly deadlineMs?: number;
       readonly check?: boolean;
       readonly http?: boolean;
+      /** HTTP-only authority for a synthetic legacy listener on the native wildcard ephemeral port. */
+      readonly legacyPublicHost?: boolean;
     },
   ): Promise<ChildRun>;
 }
@@ -103,11 +106,18 @@ export async function createSandbox(): Promise<Sandbox> {
       if (options.http && options.check !== undefined) {
         return Promise.reject(new Error('http mode is always checked; do not pass check with it'));
       }
+      if (options.legacyPublicHost && !options.http) {
+        return Promise.reject(new Error('legacyPublicHost requires http mode'));
+      }
       return runChild({
         args: options.http
           ? [
             'run',
-            ...HTTP_RUNTIME,
+            ...HTTP_RUNTIME.map((arg) =>
+              options.legacyPublicHost && arg === '--allow-net=127.0.0.1'
+                ? '--allow-net=127.0.0.1,0.0.0.0:0'
+                : arg
+            ),
             `--allow-read=${scratch}`,
             `--allow-write=${scratch}`,
             ...HTTP_DENIED,

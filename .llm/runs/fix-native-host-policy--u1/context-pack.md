@@ -206,3 +206,24 @@ Root acceptance in root-s3f-source-acceptance.md authorizes this scoped checkpoi
 update and the already-reviewed five-owner S3g legacy slice afterward. No further approval pause
 inside that exact scope; no independent IMPL/full U1/readiness/merge/closure claim. Existing
 native-service baseline diagnosis remains separate and untouched.
+
+## Root-accepted S3g: legacy default-context delegate
+
+Root accepted all five legacy owners after full source read and independent32-hash verification
+(five candidates plus27 protected). Main/service/fixture/test/README are69/140/252/159/269lines,
+within every authorized cap. Native factory composition and public facade stay frozen except the
+internal exact legacy-reason constant. Main retains Redis/bootstrap/default signature/type exports.
+Explicit HTTP fixture opt-in alone adds wildcard ephemeral0.0.0.0:0; omitted argv remain exact.
+
+Actual final owning11/0/0 in37489ms; seven-file types/lint/fmt, five-owner zero-finding/zero-allowance
+quality, public singular docs and exact README recipe compile pass. Native positive proves both
+PORT precedence/fallback, public200/body consumption, double-stop, port reuse and surviving caller
+KV. Fresh no-opt-in control is exact wildcard NotCapable with cleanup. Native signals are registered
+and manually cleaned; no OS signal or handler-count claim. All existing ten tests remain unchanged.
+
+New90-file receipts/s3g-evidence.json.gz preserves184036 original bytes including initial lint,
+unsupported doc flag, both excluded-snippet refusals and evidence-driver createNew collision. Three
+named profiles plus temporary recipe are removed; all output directories show no scratch residue.
+Missing synthetic-stream diagnostics match prior accepted evidence. Earlier bundles/verdicts stay
+immutable. Root acceptance authorizes checkpoint/push/DRAFT2421 and S4 streams RED next; concrete
+S5 footprint/public-type/native-upstream ownership review precedes production. No broader acceptance.

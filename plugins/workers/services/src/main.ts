@@ -18,13 +18,7 @@ import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { RunningService } from '@netscript/service';
-import { createPluginService } from '@netscript/plugin/service';
-import { router } from './router.ts';
-import { registerPluginJobs } from './init.ts';
-import { registerGeneratedJobDefinitions } from './generated-jobs.ts';
-import { describeGeneratedJobRegistry } from '../../src/runtime/generated-jobs.ts';
-import { createStreamMutationHook } from '../../streams/server.ts';
-import { createWorkersServiceRuntime } from './service-runtime.ts';
+import { LEGACY_WORKERS_PUBLIC_REASON, startWorkersService } from './service.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
@@ -45,45 +39,9 @@ type PluginServiceBootstrap = {
 export default async function createWorkersService(
   ctx: PluginServiceContext,
 ): Promise<RunningService> {
-  const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
-  if (portValue === undefined) {
-    throw new Error('Workers API requires the host-provided PORT environment variable.');
-  }
-  const port = Number.parseInt(portValue, 10);
-  const runtime = await createWorkersServiceRuntime();
-  await registerPluginJobs(runtime);
-  const generated = await registerGeneratedJobDefinitions(runtime);
-  console.log(`[Workers Plugin] ${describeGeneratedJobRegistry(generated)}`);
-
-  const running = await createPluginService(router, {
-    auth: {
-      public: true,
-      reason:
-        'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
-    },
-    name: 'workers',
-    version: '1.0.0',
-    port,
-    openApi: {
-      title: 'Workers API',
-      description: 'Workers service for job management and execution',
-    },
-    context: () => ({ workers: runtime }),
-  }).serve();
-
-  queueMicrotask(() => {
-    try {
-      runtime.executionState.setMutationHook(createStreamMutationHook());
-
-      console.log(
-        `Subscribe: http://localhost:${port}/api/v1/workers/subscribe (KV watch SSE)`,
-      );
-    } catch (error) {
-      console.error('[Workers Plugin] Failed to finish post-listen startup:', error);
-    }
+  return await startWorkersService(ctx, {
+    auth: { public: true, reason: LEGACY_WORKERS_PUBLIC_REASON },
   });
-
-  return running;
 }
 
 async function loadWorkersServiceContext(): Promise<PluginServiceContext> {

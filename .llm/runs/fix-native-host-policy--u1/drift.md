@@ -204,3 +204,12 @@ plus four-file static and quality gates pass; the observation-negative changes n
 Two outer formatting findings are retained; no production/helper/config/lock/debt or permission
 change. Root reviewed and authorized the concrete five-owner legacy follow-on separately in
 root-s3f-source-acceptance.md, including the explicit ephemeral wildcard-bind fixture authority.
+
+S3g applies the root-reviewed five-owner legacy slice only. Focused legacy test takes prospective
+U1 footprint to18 owners; no new public type/debt exception. The authorized HTTP-only fixture
+option adds precisely0.0.0.0:0 and preserves prior default/compiler/runtime argv. Initial lint,
+unsupported doc flag, excluded-snippet false-green refusals and evidence-driver collision remain
+in the new byte-audited bundle. Final11/0/0, seven-file static, docs, quality and actual selected1
+README compile pass. Temporary compile source was removed; no configuration exclusion was bypassed.
+S4 RED is authorized; S5 production requires root review of exact footprint, native public closure
+and owned-upstream cleanup. Historical workers22-symbol F5 debt does not extend to streams.
