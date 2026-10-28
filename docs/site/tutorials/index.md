@@ -8,56 +8,46 @@ next:
   href: "/tutorials/storefront/"
 ---
 
-Tutorials are for **learning by building**. Each one walks a fixed path from an
-empty directory to a running application — no step skipped, every rung proven by
-a real command or endpoint. You don't need to understand the whole framework
-before you start; each track introduces its capabilities in the order you'd
-actually reach for them.
+Each tutorial builds one application step by step, from an empty directory to a running app. Every
+step ends with a command or an endpoint you can check, and each track introduces capabilities in the
+order you need them. You don't need to know the framework before you start.
 
-Unlike the [how-to guides](/how-to/), which assume you already know the shape of
-the task, a tutorial follows one continuous example and never leaves you guessing
-what to do next.
-
-{{ comp callout { type: "tip", title: "How the four lanes fit together" } }}
-Tutorials teach you a path end to end. When you already know the path and just
-need the recipe, use the <a href="/how-to/">how-to guides</a>. For exact symbols
-and signatures, go to the <a href="/reference/">reference</a>. For the design
-reasoning behind durability, contracts, and plugins, read the
-<a href="/explanation/">explanation</a> pages.
+{{ comp callout { type: "tip", title: "Tutorials, how-to guides, reference, explanation" } }}
+A tutorial teaches one path end to end. When you know the path and need a recipe, use the
+<a href="/how-to/">how-to guides</a>. For exact symbols and signatures, use the
+<a href="/reference/">reference</a>. For the design reasoning behind durability, contracts and
+plugins, read the <a href="/explanation/">explanation</a> pages.
 {{ /comp }}
 
 ## Five tracks, five applications
 
-There are five independent tracks. **Each builds one complete application** from a
-fresh `netscript init`, and each ends by running that application **locally
-under Aspire** — so whichever you pick, you finish with something that boots,
-serves, and survives a restart. The tracks don't depend on each other; start with
-the one closest to what you're building.
+Each track builds one complete application from a fresh `netscript init` and ends by running it
+locally under Aspire. The tracks are independent: start with the one closest to what you're building.
 
 {{ comp.featureGrid({ items: [
   {
     title: "Storefront",
-    body: "Build an e-commerce backend: a typed catalog service, contract-first cart, a durable <code>checkout</code> saga with compensation, and an HMAC-verified shipping webhook. The track for <strong>services + durable workflows</strong>. 7 chapters.",
+    body: "An e-commerce backend: a typed catalog service, a contract-first cart, a durable <code>checkout</code> saga with compensation, an HMAC-verified shipping webhook and a storefront page. Teaches <strong>services and durable workflows</strong>. 7 chapters.",
     href: "/tutorials/storefront/"
   },
   {
     title: "Team Workspace",
-    body: "Build an authenticated SaaS backend: add a pluggable auth backend and session, model per-plugin data across a second database, run a provisioning job, and protect routes with the <code>.withAuthz()</code> seam. The track for <strong>auth + access control</strong>. 6 chapters.",
+    body: "An authenticated SaaS backend: a pluggable auth backend and session, team data in a second database, a provisioning job, and routes protected with <code>.withAuthz()</code>. Teaches <strong>auth and access control</strong>. 6 chapters.",
     href: "/tutorials/workspace/"
   },
   {
     title: "ERP Sync",
-    body: "Build a legacy-ERP migration sync: watch for incoming data files, ingest them with durable jobs, run a sandboxed transform task, and add a queue provider and a cron schedule. The track for <strong>jobs, queues &amp; polyglot</strong>. 5 chapters.",
+    body: "A legacy-ERP migration sync: watch for incoming data files, ingest them with durable jobs, run a sandboxed transform task, and add a queue provider and a cron schedule. Teaches <strong>jobs, queues and polyglot tasks</strong>. 5 chapters.",
     href: "/tutorials/erp-sync/"
   },
   {
     title: "Live Dashboard",
-    body: "Build a real-time UI that stays current with no polling and no hand-rolled WebSocket: go from a typed contract to an SDK client, a cache-first query, a Fresh <code>definePage</code> with a hydrated <code>QueryIsland</code>, and finally a durable StreamDB feed that pushes updates into the table live. The track for <strong>the typed-end-to-end Fresh + SDK stack</strong>. 6 chapters.",
+    body: "A real-time UI with no polling: a typed contract, an SDK client, a cache-first query, a Fresh <code>definePage</code> with a hydrated <code>QueryIsland</code>, and a durable StreamDB feed that pushes updates into the page. Teaches <strong>the typed Fresh and SDK stack</strong>. 6 chapters.",
     href: "/tutorials/live-dashboard/"
   },
   {
     title: "AI Chat",
-    body: "Build a durable AI chat app whose transcript, streaming markdown, tool-call cards, and MCP widgets survive reload and reconnect: wire a durable chat route on <code>@netscript/fresh/ai</code>, hydrate the <code>fresh-ui</code> chat components, add a server-side tool, connect a remote MCP server, and turn the island live. The track for <strong>durable AI chat</strong>. 6 chapters.",
+    body: "A durable AI chat app whose transcript, streaming markdown, tool-call cards and MCP widgets survive reload and reconnect: a durable chat route on <code>@netscript/fresh/ai</code>, the <code>fresh-ui</code> chat components, a server-side tool, a remote MCP server and a live island. Teaches <strong>durable AI chat</strong>. 6 chapters.",
     href: "/tutorials/chat/"
   }
 ] }) }}
@@ -67,56 +57,52 @@ the one closest to what you're building.
 {{ comp.apiTable({
   caption: "Choose by what you're building",
   rows: [
-    { name: "An API with multi-step business logic", type: "Storefront", desc: "You need typed services and a workflow that can't half-complete — orders, payments, fulfillment. Teaches contracts, defineService, sagas, and webhooks." },
-    { name: "An app behind a login", type: "Team Workspace", desc: "You need authentication, sessions, and route-level access control before anything else. Teaches the auth backend, session crypto, and the .withAuthz() seam." },
-    { name: "Data pipelines and scheduled work", type: "ERP Sync", desc: "Your work happens off the request path — file ingestion, batch jobs, scheduled syncs, and tasks in other languages. Teaches triggers, jobs, queues, cron, and the task runtime." },
-    { name: "A live, reactive frontend", type: "Live Dashboard", desc: "You're rendering server data in a Fresh UI that stays current without a refresh. Teaches the SDK client, cache-first queries, the page builder, islands, and durable streams." },
-    { name: "A durable AI chat app", type: "AI Chat", desc: "You're building a chat UI whose transcript, streaming markdown, tool-call cards, and MCP widgets survive reload and reconnect, with replies that stream in live. Teaches the durable chat route on @netscript/fresh/ai, the fresh-ui chat components, a server-side tool, the MCP client stack, and the live subscription." }
+    { name: "An API with multi-step business logic", type: "Storefront", desc: "Typed services and a workflow that can't half-complete: orders, payments, fulfillment. Teaches contracts, defineService, sagas and webhooks." },
+    { name: "An app behind a login", type: "Team Workspace", desc: "Authentication, sessions and route-level access control first. Teaches the auth backend, session crypto and the .withAuthz() seam." },
+    { name: "Data pipelines and scheduled work", type: "ERP Sync", desc: "Work off the request path: file ingestion, batch jobs, scheduled syncs and tasks in other languages. Teaches triggers, jobs, queues, cron and the task runtime." },
+    { name: "A live, reactive frontend", type: "Live Dashboard", desc: "Server data in a Fresh UI that stays current without a refresh. Teaches the SDK client, cache-first queries, the page builder, islands and durable streams." },
+    { name: "A durable AI chat app", type: "AI Chat", desc: "A chat UI whose transcript, streaming markdown, tool-call cards and MCP widgets survive reload and reconnect, with replies that stream in live. Teaches the durable chat route on @netscript/fresh/ai, the fresh-ui chat components, a server-side tool, the MCP client stack and the live subscription." }
   ]
 }) }}
 
-New to NetScript entirely? Any track starts from zero, but **Storefront** is the broadest
-tour of the core ideas — to inspect the whole shape of a NetScript backend, start there.
+New to NetScript? Any track starts from zero, but **Storefront** covers the most core ideas.
 
 ## Before you start
 
-Every track assumes a working local toolchain. If you have never run NetScript on
-this machine, the [quickstart](/quickstart/) installs the CLI and gets a project
-up in a few commands; each track's first chapter then re-grounds you from the
-scaffold, so you can start in either place.
+Every track needs the same local toolchain:
 
-{{ comp callout { type: "note", title: "What you'll need" } }}
-A recent <a href="https://deno.com/">Deno</a> and the
-<a href="https://aspire.dev">Aspire</a> CLI on your
-PATH. Install the NetScript CLI with
-<code>deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}</code>.
-Each chapter lists its own prerequisite state, so you always know which earlier
-chapters it builds on.
-{{ /comp }}
+- a recent [Deno](https://deno.com/);
+- the [Aspire](https://aspire.dev) CLI on your `PATH`;
+- the NetScript CLI:
+
+```sh
+deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+```
+
+If you have never run NetScript on this machine, the [quickstart](/quickstart/) installs the CLI and
+boots a project in a few commands. Each chapter lists the earlier chapters it builds on.
 
 ## When you finish
-
-Once you've completed a track, branch out into the rest of the docs:
 
 {{ comp.featureGrid({ items: [
   {
     title: "How-to guides",
-    body: "Task-focused recipes for things the tutorials don't cover — discovering services, exposing OpenAPI, choosing a queue provider, second databases, and production pitfalls.",
+    body: "Recipes for tasks the tutorials don't cover: discovering services, exposing OpenAPI, choosing a queue provider, second databases and production pitfalls.",
     href: "/how-to/"
   },
   {
     title: "Capabilities",
-    body: "One hub per capability (services, workers, sagas, triggers, streams, auth) with the headline API, ports, and endpoints on one screen.",
+    body: "One hub per capability (services, workers, sagas, triggers, streams, auth) with the headline API, ports and endpoints on one screen.",
     href: "/capabilities/"
   },
   {
     title: "Reference",
-    body: "Generated, always-current API surface for every <code>@netscript/*</code> unit — exact symbols, signatures, and types.",
+    body: "Generated API surface for every <code>@netscript/*</code> unit: exact symbols, signatures and types.",
     href: "/reference/"
   },
   {
     title: "Explanation",
-    body: "The design reasoning behind contracts-first services, durable execution, the plugin model, and the local Aspire topology.",
+    body: "The design reasoning behind contracts-first services, durable execution, the plugin model and the local Aspire topology.",
     href: "/explanation/"
   }
 ] }) }}

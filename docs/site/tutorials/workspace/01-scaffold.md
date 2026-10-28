@@ -8,15 +8,9 @@ next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }
 
 # Scaffold the workspace
 
-You are building the team layer of an operations workspace — the part that will decide who is on
-the team, where team records live, and which routes a caller may reach. Every chapter in this track
-adds one layer to that single app. This first chapter lays the foundation: a real NetScript
-workspace on disk named `my-workspace/`, with an example service and a Postgres database, booted
-under Aspire. You will not write auth yet — you will create the base that the auth backend, the
-team database, the provisioning job, and the route guards all attach to in the chapters that
-follow. Everything that later fails closed or provisions off-path attaches to what you scaffold
-here, so the checkpoint at the end of this chapter — a healthy service and a clean type-check — is
-the ground truth the rest of the track builds on.
+In this chapter you create `my-workspace/`, a NetScript workspace with an example service and a
+Postgres database, and boot it under Aspire. The auth backend, the team database, the provisioning
+job and the route guards in later chapters all attach to this app.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -29,17 +23,15 @@ the ground truth the rest of the track builds on.
 
 ## What you will build
 
-A working `my-workspace/` directory: a typed `workspace` service on its own port, a Postgres database,
-the Aspire orchestration that provisions Postgres and the Redis cache, and a clean
-`deno task check`. By the end you will have the Aspire dashboard open on `https://localhost:18888` showing your
-service, database, and cache running together — the control plane you keep up for the rest of the
-track.
+A `my-workspace/` directory with a typed `workspace` service on its own port, a Postgres database,
+and the Aspire orchestration that provisions Postgres and the Redis cache. At the end, the Aspire
+dashboard at `https://localhost:18888` shows the service, database and cache running, and
+`deno task check` passes.
 
 ## Before you begin
 
-This is the first chapter, so there is no prior project state to check — but your local toolchain must
-be ready. You need **[Deno](https://deno.com/) 2.x**, the **[Aspire CLI](https://aspire.dev)**, and
-**Docker** running so Aspire can start the Postgres and Redis containers. Verify all three:
+You need **[Deno](https://deno.com/) 2.x**, the **[Aspire CLI](https://aspire.dev)**, and **Docker**
+running, because Aspire starts the Postgres and Redis containers. Check all three:
 
 ```sh
 deno --version     # Deno 2.x
@@ -47,56 +39,60 @@ aspire --version   # the Aspire CLI
 docker info        # prints engine details, not a connection error
 ```
 
-Install the NetScript CLI from JSR once, then confirm it is on your `PATH`:
+Install the NetScript CLI from JSR, then confirm it is on your `PATH`:
 
 ```sh
 deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-`netscript --help` should list the command groups `agent`, `config`, `deploy`, `init`, `contract`,
-`db`, `generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update`,
-and `ui:remove`. If `netscript` is not found, make sure
-Deno's install directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
+`netscript --help` lists the command groups `agent`, `config`, `deploy`, `init`, `contract`, `db`,
+`generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update` and
+`ui:remove`. If `netscript` is not found, add Deno's install directory (printed by `deno install`)
+to your `PATH` and open a new terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad-hoc with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>.
-The rest of this track assumes the installed <code>netscript</code> form.
+Run any command with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>.
+The rest of this track uses the installed <code>netscript</code> form.
 {{ /comp }}
 
 ## Step 1 — Preview the scaffold
 
-Before writing files, ask the CLI what it *would* create. `--dry-run` plans the scaffold and prints
-per-phase file and directory totals without touching disk:
+`--dry-run` plans the scaffold and prints per-phase file and directory totals without writing to
+disk:
 
 ```sh
 netscript init my-workspace --service --service-name workspace --service-port 3001 --db postgres --dry-run
 ```
 
-A clean dry run validates your flag combination — it rejects bad mixes (an unknown `--db` engine, for
-example) here, before any files exist. Treat a clean plan as a green light to scaffold for real.
+A clean dry run confirms your flags are valid. The CLI rejects bad combinations, such as an unknown
+`--db` engine, before any file exists.
 
-This track uses `--db postgres`, the recommended default. The database is polyglot, so you can swap
-`--db postgres` for `mysql`, `mssql`, or `sqlite` and follow along the same way (sqlite is file-backed,
-so it has no Aspire container).
+This track uses `--db postgres`, the recommended default. You can swap it for `mysql`, `mssql` or
+`sqlite` and follow along the same way; SQLite is file-backed, so it has no Aspire container.
 
 ## Step 2 — Create `my-workspace/`
 
-Run the same command without `--dry-run`. This track uses an example service named `workspace` on port
-`3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) and a Postgres database, so you have something real to authenticate and protect later:
+Run the same command without `--dry-run`:
 
 ```sh
 netscript init my-workspace --service --service-name workspace --service-port 3001 --db postgres
 cd my-workspace
 ```
 
-This scaffolds `my-workspace/`, formats the output with `deno fmt`, and initializes a git repository.
-On completion the CLI prints a **next steps** summary tailored to your options.
+The CLI scaffolds `my-workspace/`, formats the output with `deno fmt`, initializes a git repository,
+and prints a **next steps** summary for your options.
+
+{{ comp callout { type: "note", title: "Pinned ports in this track" } }}
+This track pins the <code>workspace</code> service to port <code>3001</code> with
+<code>--service-port</code>. Without a pinned port, each scaffold gets its own randomized high-range
+ports.
+{{ /comp }}
 
 {{ comp.apiTable({
   caption: "netscript init options used here",
   rows: [
-    { name: "--service --service-name workspace --service-port 3001", type: "example service", desc: "Include an example oRPC service named 'workspace' on port 3001 — the service you protect in chapter 5." },
+    { name: "--service --service-name workspace --service-port 3001", type: "example service", desc: "Include an example oRPC service named 'workspace' on port 3001. You protect it in chapter 5." },
     { name: "--db postgres", type: "database workspace", desc: "Scaffold a Postgres database workspace. The auth plugin's auth.prisma migration (chapter 2) aggregates into this primary datasource." },
     { name: "--dry-run", type: "plan only", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
@@ -104,8 +100,7 @@ On completion the CLI prints a **next steps** summary tailored to your options.
 
 ## Step 3 — Tour what you got
 
-Open `my-workspace/` and you will find this shape. These are the directories the rest of the track
-edits:
+`my-workspace/` has this shape. The rest of the track edits these directories:
 
 {{ comp.fileTree({ items: [
   { name: "my-workspace/", children: [
@@ -121,21 +116,20 @@ edits:
   ] }
 ] }) }}
 
-The two pieces you will return to most: **`services/workspace/`** is the oRPC service whose routes you
+You return to two of them most: **`services/workspace/`** is the oRPC service whose routes you
 protect in chapter 5, and **`plugins/`** is where the `auth` plugin lands in chapter 2. Everything
-derives its types from `contracts/` — the typed seam between your services and any client.
+takes its types from `contracts/`, the typed seam between your services and any client.
 
 {{ comp callout { type: "note", title: "Where is packages/?" } }}
-If you scaffolded from a checkout of the NetScript repo you may see a vendored <code>packages/</code>
-directory. A normal JSR install does not have one — your project pulls <code>@netscript/*</code> from
-the registry. Ignore <code>packages/</code> throughout this track.
+If you scaffolded from a checkout of the NetScript repo, you may see a vendored
+<code>packages/</code> directory. A normal JSR install doesn't have one: your project pulls
+<code>@netscript/*</code> from the registry. Ignore <code>packages/</code> throughout this track.
 {{ /comp }}
 
 ## Step 4 — Bring up orchestration
 
-This is the step that turns a folder of files into a running system. **Aspire provisions your database
-and cache; you do not start containers by hand, and you run it before any `netscript db` command.**
-Run it from the `aspire/` subfolder so the CLI finds `apphost.mts`:
+Aspire provisions your database and cache; you don't start containers by hand. Run it from the
+`aspire/` folder so the CLI finds `apphost.mts`:
 
 ```sh
 cd aspire
@@ -143,35 +137,34 @@ aspire restore   # once per machine: restores the Aspire SDK modules
 aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up the Postgres database, the Redis cache, and your `workspace` service together,
-then prints the **Aspire dashboard** URL and a one-time login token. Open it:
+`aspire start` brings up Postgres, Redis and your `workspace` service, then prints the **Aspire
+dashboard** URL and a one-time login token. Open the dashboard:
 
-```
+```text
 https://localhost:18888
 ```
 
-Leave `aspire start` running in this terminal — it is your app's control plane for the entire track. The
-dashboard's resource list is the authority for the exact port each resource bound.
+Leave `aspire start` running in this terminal for the rest of the track. The dashboard's resource
+list shows the exact port each resource bound.
 
-{{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
-The Postgres container only exists while <code>aspire start</code> is up. So
-<code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> — which you use from
-chapter 2 onward — must run <strong>after</strong> Aspire has started, never before. A db command with
-no Aspire up fails fast: there is no Postgres for it to reach.
+{{ comp callout { type: "important", title: "Database commands need Aspire running" } }}
+The Postgres container exists only while <code>aspire start</code> is up. Run
+<code>netscript db init</code>, <code>db generate</code> and <code>db seed</code>, which you use from
+chapter 2 onward, <strong>after</strong> Aspire has started. Without Aspire, a db command fails fast:
+there is no Postgres for it to reach.
 {{ /comp }}
 
 ## Verify your progress
 
-In a second terminal (leave `aspire start` going in the first), confirm the `workspace` service is up
-and the workspace type-checks:
+In a second terminal, with `aspire start` still running in the first, check the `workspace` service
+and type-check the workspace:
 
 ```sh
 curl http://localhost:3001/health
 deno task check
 ```
 
-`curl` should return a healthy JSON response, and `deno task check` should finish clean — confirming
-the scaffold, contracts, and service all line up.
+`curl` returns a healthy JSON response and `deno task check` finishes clean.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-workspace/` exists with `services/workspace/`, `plugins/`, `database/`, and `aspire/`.
@@ -180,19 +173,17 @@ the scaffold, contracts, and service all line up.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with
-<code>postgres</code> and <code>redis</code> healthy in the dashboard? (2) is Docker running
-(<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it
-found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished
-starting — wait a few seconds and retry.
+Check three things: (1) is <code>aspire start</code> still up, with <code>postgres</code> and
+<code>redis</code> healthy in the dashboard? (2) is Docker running (<code>docker info</code>)? (3) did
+you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? A
+failed <code>curl</code> usually means the service is still starting: wait a few seconds and retry.
 {{ /comp }}
 
 ## What you built
 
-A real NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`, shared
-contracts, a Postgres database, and a Redis cache — all orchestrated by Aspire and visible in one
-dashboard. This is the base — and right now it answers absolutely anyone. Next you fix that: you
-add an identity layer, so the app can tell a team member from a stranger.
+A NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`, shared contracts,
+a Postgres database and a Redis cache, all orchestrated by Aspire and visible in one dashboard. The
+service still answers anyone. Next, you add an identity layer so the app can tell a team member from
+a stranger.
 
 {{ comp.nextPrev({ prev: { label: "Team Workspace", href: "/tutorials/workspace/" }, next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" } }) }}
-</content>

@@ -8,18 +8,10 @@ next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" }
 
 # Real-time updates with durable streams
 
-In chapter 4 the table was live on the *client* — it refetched and mutated without a navigation.
-But it still only knows what it fetched, and it only learns anything by asking. This chapter builds
-the other direction: a durable change-stream that the **server** pushes into an open page, read by a
-`useLiveQuery` hook that re-renders when data arrives — no polling loop, no refresh button, no
-refetch.
-
-Be clear-eyed about how far the shipped plumbing carries that today. The subscription half is
-complete: a StreamDB handle, a live query, and rows that appear in an already-open page without a
-reload. The *producer* half is where the current runtime stops short — the sagas plugin mirrors its
-instances into the stream once, when its service starts, rather than on every transition. So you will
-build a genuinely live view and drive a genuinely pushed update through it, and you will see exactly
-where the seam ends.
+In this chapter the **server** pushes data into an open page. In chapter 4 the table learned about
+changes only by asking; here a durable change-stream feeds a `useLiveQuery` hook that re-renders when
+data arrives, with no polling loop, no refresh button and no refetch. The worked example is the
+sagas stream, which the sagas plugin updates after each durable saga transition.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -33,40 +25,52 @@ where the seam ends.
 ## What you will build
 
 A live monitor island that subscribes to a durable StreamDB and re-renders when new events arrive.
-You will open a `StreamDB` handle pointed at the streams runtime, drive a table with `useLiveQuery`,
-and mount it from a `definePage` page that resolves the stream address on the server. The worked
-example is the **sagas** stream — the durable change-stream the sagas plugin ships with a ready-made
-typed collection.
+You open a `StreamDB` handle pointed at the streams runtime, drive a table with `useLiveQuery`, and
+mount it from a `definePage` page that resolves the stream address on the server. The example uses
+the **sagas** stream, the durable change-stream the sagas plugin ships with a ready-made typed
+collection.
 
 {{ comp callout { type: "note", title: "Why the example uses the sagas stream" } }}
-NetScript's durable-streams runtime mirrors execution state — saga instances, worker executions — into change-streams that the frontend can subscribe to. The sagas plugin ships the ready-made <em>typed</em> collection for this: <code>createSagasStreamDB</code> gives <code>useLiveQuery</code> a StreamDB it can query with full types, which is why this chapter's worked live table grounds there. The pattern is identical for any StreamDB collection; once you have it, pointing a live table at your own stream is the same three moves — and the producer half of that story is already in reach, because the streams plugin scaffolds a user-owned durable stream into your workspace (see the closing section). To follow this chapter against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime — add the published package with <code>netscript plugin install @netscript/plugin-sagas</code> if it is not already installed.
+NetScript's durable-streams runtime mirrors execution state, such as saga instances and worker
+executions, into change-streams the frontend can subscribe to. The sagas plugin ships a ready-made
+<em>typed</em> collection: <code>createSagasStreamDB</code> gives <code>useLiveQuery</code> a StreamDB
+it can query with full types. The pattern is the same for any StreamDB collection, and the streams
+plugin scaffolds a user-owned durable stream you can point a live table at (see
+<a href="#point-it-at-your-own-stream">Point it at your own stream</a>). To follow this chapter
+against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime:
+install it with <code>netscript plugin install @netscript/plugin-sagas</code> if it isn't installed
+yet.
 {{ /comp }}
 
 ## Before you begin
 
-You should have completed [chapter 4](/tutorials/live-dashboard/04-definePage-QueryIsland/): the
-orders page rendering through `definePage` with a hydrated `QueryIsland`. The live layer needs the
-streams runtime reachable. With `aspire start` up, find the `streams` resource in the
-[dashboard](/explanation/aspire/) resource list, copy its endpoint, and confirm it answers:
+You need [chapter 4](/tutorials/live-dashboard/04-definePage-QueryIsland/)'s orders page rendering
+through `definePage` with a hydrated `QueryIsland`, and a reachable streams runtime. With
+`aspire start` up, copy the `streams` endpoint from the [dashboard](/explanation/aspire/) resource
+list and confirm it answers:
 
 ```sh
 curl <streams-endpoint>/health
 ```
 
-Its host port was picked by the installer, not fixed by you — the resource list is the only place to
-read it. A healthy response means the durable-streams producer runtime is live. If it is dead, the
-sagas plugin (which brings the stream) is not installed or Aspire has not finished booting it — check
-the [dashboard](/explanation/aspire/) resource list at `:18888`.
+The installer picked its host port, so the resource list is the only place to read it. A healthy
+response means the durable-streams producer runtime is live. If it doesn't answer, the sagas plugin
+(which brings the stream) isn't installed or Aspire hasn't finished booting it: check the resource
+list at `:18888`.
 
 {{ comp callout { type: "note", title: "HTTP/2 is opt-in for live subscriptions" } }}
-The live subscription is <strong>long-poll by default</strong> (SSE is opt-in) and runs over plaintext <strong>HTTP/1.1</strong>, which caps how many long-lived connections a browser opens per origin. HTTP/2 lifts that cap but is opt-in and requires TLS — via <code>ServiceTlsOptions</code> or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables. See {{ comp.xref({ key: "cap:streams" }) }} for the connection-limit detail.
+The live subscription is <strong>long-poll by default</strong> (SSE is opt-in) and runs over
+plaintext <strong>HTTP/1.1</strong>, which caps how many long-lived connections a browser opens per
+origin. HTTP/2 lifts that cap; it is opt-in and requires TLS, through <code>ServiceTlsOptions</code>
+or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment
+variables. See {{ comp.xref({ key: "cap:streams" }) }} for the connection limit.
 {{ /comp }}
 
 ## Step 1 — Open a StreamDB handle
 
 `createSagasStreamDB` from `@plugins/sagas/streams` opens a typed StreamDB client against the streams
-runtime. You give it the runtime's `baseUrl`; it gives you typed `collections` you can query. Build
-it inside the island, memoized on the URL, and manage its lifecycle:
+runtime: you give it the runtime's `baseUrl` and get typed `collections` to query. Build it inside
+the island, memoized on the URL, and manage its lifecycle:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx (the StreamDB handle)
@@ -89,14 +93,13 @@ function SagasLiveInner(props: { streamsBaseUrl: string }) {
 }
 ```
 
-`preload()` warms the stream so the first frame has data; `close()` tears the subscription down when
-the island unmounts. Always pair them — a leaked subscription keeps a connection open.
+`preload()` warms the stream so the first frame has data, and `close()` ends the subscription when
+the island unmounts. Always pair them: a leaked subscription keeps a connection open.
 
 ## Step 2 — Drive a table with useLiveQuery
 
 `useLiveQuery` from `@netscript/fresh/query` runs a query against a StreamDB collection and
-**re-renders whenever the underlying data changes** — no polling, no manual refetch. Query the
-`sagaInstance` collection:
+**re-renders whenever the underlying data changes**. Query the `sagaInstance` collection:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx (the live query)
@@ -112,21 +115,25 @@ const instances = instanceRows as SagaInstance[];
 // pushes a change for one of these rows, and the table re-renders.
 ```
 
-The callback shape is a tiny query builder: `query.from({ instance: <collection> })` selects rows
-from the `sagaInstance` collection. When the server pushes a change for any of those rows,
-`useLiveQuery` returns the new array and the table re-renders. That is the entire push path on the
-client — it reacts to whatever the producer sends, as soon as it arrives.
+The callback is a small query builder: `query.from({ instance: <collection> })` selects rows from the
+`sagaInstance` collection. When the server pushes a change for any of those rows, `useLiveQuery`
+returns the new array and the table re-renders. That is the whole push path on the client.
 
-{{ comp callout { type: "tip", title: "Live vs. fetched — when you would run both" } }}
-A mature live island often runs <strong>two</strong> kinds of read side by side: a <code>useQuery</code> against a typed service contract for slow-changing reference data, and a <code>useLiveQuery</code> against a StreamDB collection for the fast-changing rows. This chapter builds only the second. The first would need a sagas <em>service</em> client — a <code>createServiceClient</code> + <code>createQueryFactories</code> pair like chapter 3 built for <code>orders</code> — and this track never creates one, so no snippet here pretends to. Chapter 4's orders island is the worked example of the cache-first half.
+{{ comp callout { type: "tip", title: "Live and fetched reads together" } }}
+A live island often runs <strong>two</strong> kinds of read: a <code>useQuery</code> against a typed
+service contract for slow-changing reference data, and a <code>useLiveQuery</code> against a StreamDB
+collection for fast-changing rows. This chapter builds only the second. The first would need a sagas
+<em>service</em> client, a <code>createServiceClient</code> and <code>createQueryFactories</code> pair
+like the one chapter 3 built for <code>orders</code>; chapter 4's orders island shows that
+cache-first half.
 {{ /comp }}
 
 ## Step 3 — Seed the island from the server
 
-The island needs one thing from the server before it can subscribe: the streams runtime's address.
-Resolve it in a `definePage` page — the same shape as chapter 4, a request-scoped `.withResource`
-feeding a `.withLayer` loader — so the live monitor gets a real page rather than a loose helper
-function. `getStreamsUrl` from `@netscript/plugin-streams-core` resolves the runtime address:
+Before it can subscribe, the island needs the streams runtime's address from the server. Resolve it
+in a `definePage` page with the same shape as chapter 4, a request-scoped `.withResource` feeding a
+`.withLayer` loader. `getStreamsUrl` from `@netscript/plugin-streams-core` resolves the runtime
+address:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/sagas/index.tsx
@@ -151,26 +158,32 @@ export const { handler, default: page } = sagasMonitorPage;
 export { page as default };
 ```
 
-The layer loader hands the island the one prop Step 1's StreamDB handle needs. Note what is *not*
-here: no `withPolicy`, no `partial`, no `staleTime`, and no dehydrated query cache. Chapter 4 needed
-all of that because its rows arrive by request and must survive a cold cache; these rows arrive by
-**push**, so the same machinery would be dead weight. A live page is the lighter of the two — the
-builder does not force you to carry what you are not using. [Partials](/web-layer/partials/) covers
-the other side of that choice: what a `partial` layer buys a region whose data arrives by request,
-and why a pushed region does not want it.
+The layer loader hands the island the one prop Step 1's StreamDB handle needs. This page has no
+`withPolicy`, `partial` or `staleTime`, and no dehydrated query cache. Chapter 4 needed them because
+its rows arrive by request and must survive a cold cache; these rows arrive by **push**.
+[Partials](/web-layer/partials/) explains what a `partial` layer gives a region whose data arrives by
+request, and why a pushed region doesn't need one.
 
 {{ comp callout { type: "note", title: "Why no dehydrated seed here" } }}
-Chapter 4 seeded its island with <code>dehydrateQueryClient</code> because <code>useQuery</code> reads through a query key that the server can pre-populate. <code>useLiveQuery</code> reads from a StreamDB collection instead, and <code>preload()</code> — Step 1 — is its equivalent warm-up: it fills the first frame from the stream itself. Adding a dehydrated TanStack cache here would seed a cache nothing on this page reads.
+Chapter 4 seeded its island with <code>dehydrateQueryClient</code> because <code>useQuery</code>
+reads through a query key the server can pre-populate. <code>useLiveQuery</code> reads from a
+StreamDB collection, and <code>preload()</code> from Step 1 is its warm-up: it fills the first frame
+from the stream. A dehydrated TanStack cache here would seed a cache nothing on the page reads.
 {{ /comp }}
 
-{{ comp callout { type: "warning", title: "Streams is its own runtime — and it must be up" } }}
-The durable-streams producer is a <strong>separate Aspire service</strong> with its own allocated port, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire start</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty. See {{ comp.xref({ key: "cap:streams" }) }}.
+{{ comp callout { type: "warning", title: "The streams runtime must be up" } }}
+The durable-streams producer is a <strong>separate Aspire service</strong> with its own allocated
+port, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the
+environment, as <code>getServiceUrl</code> does for services, so it works only when
+<code>aspire start</code> has brought the streams runtime up. Without it, <code>useLiveQuery</code>
+has nothing to subscribe to and the live table stays empty. See
+{{ comp.xref({ key: "cap:streams" }) }}.
 {{ /comp }}
 
 ## Step 4 — Wrap the island in QueryIsland
 
-`useLiveQuery` needs the TanStack Query context, so the live monitor lives inside a `QueryIsland`
-exactly like chapter 4's orders island:
+`useLiveQuery` needs the TanStack Query context, so the live monitor sits inside a `QueryIsland`, like
+chapter 4's orders island:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx (the island boundary)
@@ -187,9 +200,9 @@ export default function SagasLiveIsland(props: { streamsBaseUrl: string }) {
 // SagasLiveInner holds Step 1's StreamDB handle and Step 2's useLiveQuery.
 ```
 
-The boundary is deliberately thin: `QueryIsland` supplies the context, and `SagasLiveInner` does the
-work — open the handle, `preload()`, subscribe with `useLiveQuery`, `close()` on unmount. The island
-is now complete — prove it compiles as a unit:
+`QueryIsland` supplies the context, and `SagasLiveInner` does the work: open the handle, `preload()`,
+subscribe with `useLiveQuery`, and `close()` on unmount. The island is complete; check it compiles on
+its own:
 
 ```sh
 deno check 'apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx' --unstable-kv
@@ -199,10 +212,10 @@ A clean check confirms the StreamDB handle and the live query line up.
 
 ## Point it at your own stream
 
-Everything above consumes a stream the framework produces for you. The producer half of the seam is
-just as close: if your workspace has the **streams** plugin installed (`netscript plugin install
-streams`), its scaffolder wrote `streams/notifications-stream.ts` — a user-owned durable stream you
-edit like any other source file. It is the same two primitives this whole chapter rides on:
+Everything above consumes a stream the framework produces. You can also produce your own: if the
+**streams** plugin is installed (`netscript plugin install streams`), its scaffolder wrote
+`streams/notifications-stream.ts`, a user-owned durable stream you edit like any other source file.
+It uses the same two primitives as this chapter:
 
 ```ts
 // streams/notifications-stream.ts (scaffolded — yours to edit)
@@ -212,27 +225,26 @@ edit like any other source file. It is the same two primitives this whole chapte
 import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';
 ```
 
-The producer publishes with `upsert(collection, row)` and `await flush()`; a browser consumes a
-user-defined stream over HTTP at its `streamPath` (long-poll subscription by default, SSE available). The full producer surface, URL resolution,
-and current limitations are on {{ comp.xref({ key: "cap:streams", text: "the Durable streams page" }) }} —
-when you outgrow the sagas monitor, that is where your own `order-events` stream starts.
+The producer publishes with `upsert(collection, row)` and `await flush()`, and a browser consumes a
+user-defined stream over HTTP at its `streamPath` (long-poll subscription by default, SSE available).
+{{ comp.xref({ key: "cap:streams", text: "The Durable streams page" }) }} covers the full producer
+surface, URL resolution and current limitations; start your own `order-events` stream there.
 
 ## Verify your progress
 
-With `aspire start` up, open the live monitor at `/dashboard/sagas/` — the route Step 3's page
-declares. Get the app's host from the [Aspire dashboard](/explanation/aspire/) resource list rather
-than a memorized port; a scaffolded Fresh app pins no host port, so Aspire allocates one at each
-start.
+With `aspire start` up, open the live monitor at `/dashboard/sagas/`, the route Step 3's page
+declares. Take the app's host from the [Aspire dashboard](/explanation/aspire/) resource list: a
+scaffolded Fresh app pins no host port, so Aspire allocates one at each start.
 
-The table starts empty, because nothing in this track has created a saga instance yet — chapter 2
-built a plain oRPC read-model, not a saga producer, so posting an order does **not** publish a saga
-message. You create one yourself, and the order of the steps is what makes the push observable.
+The table starts empty. Chapter 2 built a plain oRPC read-model, not a saga producer, so posting an
+order does **not** publish a saga message. You create a saga instance yourself, in the order below,
+so the push is observable.
 
 The live producer runs in the saga processor after each durable transition, on either the Prisma or
-KV store backend. Prisma additionally enables startup reconciliation of instances created before the
-stream producer was available; install it with
-`netscript plugin install @netscript/plugin-sagas --saga-store-backend prisma`, then
-`netscript db init`, when you need that historical backfill.
+the KV store backend. Prisma also reconciles, at startup, instances created before the stream
+producer was available. When you need that historical backfill, install the plugin with
+`netscript plugin install @netscript/plugin-sagas --saga-store-backend prisma`, then run
+`netscript db init`.
 
 ```sh
 # Install the shorthand once (see the storefront track for the full form):
@@ -252,10 +264,10 @@ ns-sagas publish DemoStarted --payload='{ "id": "demo_1" }' --correlation-key=de
 ns-sagas list --instances --saga=DemoSaga --json
 ```
 
-With the subscription live, the first transition upsert arrives over the open connection and the row
-appears **without a page reload**. Every later step—including failure and compensation steps—updates
-the same `sagaInstance` row after its transition is durable. Restarting the saga processor does not
-erase canonical progress; on Prisma, the service's startup reconciliation also backfills historical
+With the subscription live, the first transition's upsert arrives over the open connection and the
+row appears **without a page reload**. Every later step, including failure and compensation steps,
+updates the same `sagaInstance` row once its transition is durable. Restarting the saga processor
+doesn't erase progress; on Prisma, the service's startup reconciliation also backfills historical
 rows into the stream.
 
 Type-check the new files:
@@ -273,18 +285,21 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "No row after the restart?" } }}
-Work down the path in order. <code>ns-sagas list --instances --json</code> tells you whether the instance exists at all — if it does not, the saga never registered (<code>ns-sagas list --registered --json</code>) or the publish failed. If the instance exists but no row arrives, check that the streams runtime is up and that both the processor's durable-stream producer and the page's <code>getStreamsUrl()</code> resolved the streams service. A dead streams endpoint (such as the <code>:4437</code> port assigned in this tutorial's scaffold; note that each scaffold allocates its own randomized ports) means no transition event can reach the stream. The Prisma-only <code>Saga Prisma delegates unavailable</code> startup warning means historical reconciliation is skipped; it does not disable live per-transition upserts on KV.
+Work down the path in order. <code>ns-sagas list --instances --json</code> shows whether the instance
+exists; if it doesn't, the saga never registered (<code>ns-sagas list --registered --json</code>) or
+the publish failed. If the instance exists but no row arrives, check that the streams runtime is up
+and that both the processor's durable-stream producer and the page's <code>getStreamsUrl()</code>
+resolved the streams service; with a dead streams endpoint, no transition event reaches the stream.
+The Prisma-only <code>Saga Prisma delegates unavailable</code> startup warning means historical
+reconciliation is skipped; it doesn't disable live per-transition upserts on KV.
 {{ /comp }}
 
 ## What you built
 
 A server-pushed table: a durable StreamDB handle (`createSagasStreamDB`) driving `useLiveQuery`,
 wrapped in a `QueryIsland` and mounted by a `definePage` page whose `.withResource` resolves the
-streams address. You proved the push end to end — state that entered the database through a saga
-publish arrived in an already-open browser page with no polling, no refetch and no reload — and you
-saw precisely how far the shipped producer carries it: one reconciliation per sagas-service start.
-The client half is the durable part; when a plugin's producer grows a per-transition feed, this page
-gets finer-grained updates without a line of change. Next you run the whole graph locally under
-Aspire.
+streams address. State that entered the store through a saga publish arrived in an already-open page
+with no polling, refetch or reload, and each later transition updates the same row. Next, you run
+the whole graph locally under Aspire.
 
 {{ comp.nextPrev({ prev: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }, next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" } }) }}
