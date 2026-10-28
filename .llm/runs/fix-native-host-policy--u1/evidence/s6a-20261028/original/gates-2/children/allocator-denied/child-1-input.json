@@ -1,0 +1,50 @@
+{
+  "args": [
+    "run",
+    "--check",
+    "--frozen",
+    "--cached-only",
+    "--ext=ts",
+    "--allow-env",
+    "--allow-net=127.0.0.1",
+    "--allow-read=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee,C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm,C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7",
+    "--allow-write=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "--allow-sys",
+    "--deny-run",
+    "--allow-ffi=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node,C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+    "-"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\plugins\\streams\\",
+  "clearEnv": true,
+  "env": {
+    "DENO_DIR": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache",
+    "NO_COLOR": "1",
+    "HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "USERPROFILE": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "APPDATA": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "LOCALAPPDATA": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "TMP": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "TEMP": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "TMPDIR": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "XDG_CACHE_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "XDG_CONFIG_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "XDG_DATA_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "XDG_STATE_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-astra-20261028\\gates-2\\owned-profile-dbd6b79f4f5726f0\\streams-service-runtime-b56f5b9989d2cfee",
+    "SystemRoot": "C:\\windows",
+    "PATH": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7;C:\\windows\\System32;C:\\windows",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD"
+  },
+  "addons": [
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "bytes": 912896
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "bytes": 112640
+    }
+  ],
+  "source": "import { assert, assertEquals, assertStrictEquals } from 'jsr:@std/assert@^1';\nimport type {\n  AuthenticatorPort, AuthnRequest, AuthnResult, AuthorizerPort, AuthzDecision, AuthzRequest,\n  Principal, RunningService,\n} from '@netscript/plugin-streams/service';\n\nconst scratch = \"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6a-astra-20261028\\\\gates-2\\\\owned-profile-dbd6b79f4f5726f0\\\\streams-service-runtime-b56f5b9989d2cfee\";\nconst ports: readonly number[] = [55377,55378];\nconst handles: RunningService[] = [];\nconst releasedPorts: number[] = [];\nconst failures: unknown[] = [];\nconst serve = { hostname: '127.0.0.1', port: 0, handleSignals: false };\nfunction retain(handle: RunningService, upstream: number): RunningService {\n  handles.push(handle);\n  releasedPorts.push(handle.addr.port, upstream);\n  assertEquals([handle.addr.hostname, handle.addr.transport], ['127.0.0.1', 'tcp']);\n  assert(Number.isInteger(handle.addr.port) && handle.addr.port > 0);\n  return handle;\n}\nfunction rebind(port: number): void {\n  Deno.listen({ hostname: '127.0.0.1', port }).close();\n}\nasync function request(port: number, path: string, init?: RequestInit): Promise<[number, string]> {\n  const response = await fetch(`http://127.0.0.1:${port}${path}`, init);\n  return [response.status, await response.text()];\n}\ntry {\n  Deno.chdir(scratch);\n  Deno.env.set('PORT', 'ambient-port-must-not-win');\n  Deno.env.set('STREAMS_PORT', 'fallback-port-must-not-win');\n  const { startStreamsService } = await import('@netscript/plugin-streams/service');\n  Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[0]));\n  const running = retain(await startStreamsService({\n    auth: { public: true, reason: 'S6a explicit native permission control' }, serve,\n  }), ports[0]);\n  const [status, body] = await request(running.addr.port, '/');\n  assertEquals(status, 200);\n  const info: unknown = JSON.parse(body);\n  assert(typeof info === 'object' && info !== null && 'service' in info);\n  assertEquals(info.service, 'streams');\n  const [upstreamStatus] = await request(ports[0], '/');\n  assert(upstreamStatus < 500, 'expected selected loopback upstream is reachable');\n  await running.stop();\n  await running.stop();\n  rebind(running.addr.port);\n  rebind(ports[0]);\n} catch (error) {\n  failures.push(error);\n}\nfor (const handle of handles) {\n  try { await handle.stop(); } catch (error) { failures.push(error); }\n}\nfor (const port of releasedPorts) {\n  try { rebind(port); } catch (error) { failures.push(error); }\n}\nif (failures.length === 1) throw failures[0];\nif (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));\nconsole.log('s6a-streams: assertions and native cleanup settled');\n"
+}

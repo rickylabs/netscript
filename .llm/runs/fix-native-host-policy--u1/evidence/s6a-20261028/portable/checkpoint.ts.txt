@@ -1,0 +1,43 @@
+const root = 'C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const run = '.llm/runs/fix-native-host-policy--u1';
+const target = run + '/evidence/s6a-20261028';
+const out = root + '/.llm/tmp/native-host-policy-u1-s6a-checkpoint-20261028';
+await Deno.mkdir(out);
+const sha = async (bytes: Uint8Array) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('');
+const rows: {source: string; archive: string; bytes: number; sha256: string}[] = [];
+const scoped = [
+  'plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts',
+  'plugins/streams/services/src/service-runtime_test.ts',
+  run + '/root-s6a-source-acceptance.md', run + '/s6-streams-conformance-proposal.md',
+  run + '/s6a-portable-fixture-revision-proposal.md', run + '/receipts/s6a-evidence.md',
+];
+await Deno.mkdir(root + '/' + target, {recursive: true});
+await Deno.writeTextFile(root + '/' + target + '/.gitattributes', '* -text\n', {createNew: true});
+scoped.push(target + '/.gitattributes');
+async function copyTree(source: string, destination: string) {
+  await Deno.mkdir(root + '/' + destination, {recursive: true});
+  for await (const entry of Deno.readDir(source)) {
+    if (entry.isSymlink) throw new Error('Unexpected evidence symlink: ' + entry.name);
+    const from = source + '/' + entry.name;
+    const to = destination + '/' + entry.name + (/\.tsx?$/.test(entry.name) ? '.txt' : '');
+    if (entry.isDirectory) { await copyTree(from, destination + '/' + entry.name); continue; }
+    const bytes = await Deno.readFile(from);
+    await Deno.writeFile(root + '/' + to, bytes, {createNew: true});
+    const actual = await sha(await Deno.readFile(root + '/' + to));
+    if (actual !== await sha(bytes)) throw new Error('Archive byte mismatch: ' + to);
+    rows.push({source: from, archive: to, bytes: bytes.length, sha256: actual});
+    scoped.push(to);
+  }
+}
+for (const [folder, name] of [
+  ['native-host-policy-u1-s6a-astra-20261028', 'original'],
+  ['native-host-policy-u1-s6a-portability-proposal-20261028', 'portability-audit'],
+  ['native-host-policy-u1-s6a-portable-20261028', 'portable'],
+]) await copyTree(root + '/.llm/tmp/' + folder, target + '/' + name);
+const acceptance = await Deno.readFile(root + '/.llm/tmp/root-s6a-source-acceptance-20261028.md');
+await Deno.writeFile(root + '/' + run + '/root-s6a-source-acceptance.md', acceptance, {createNew: true});
+await Deno.writeTextFile(root + '/' + target + '/archive-map.json', JSON.stringify({rows, files: rows.length, totalBytes: rows.reduce((sum, row) => sum + row.bytes, 0), diagnosticSuffix: '.ts.txt', byteExact: true}, null, 2) + '\n', {createNew: true});
+scoped.push(target + '/archive-map.json');
+await Deno.writeTextFile(out + '/paths.txt', scoped.join('\n') + '\n');
+await Deno.writeTextFile(out + '/paths.nul', scoped.join('\0') + '\0');
+console.log(JSON.stringify({archiveFiles: rows.length, bytes: rows.reduce((sum, row) => sum + row.bytes, 0), stagePaths: scoped.length, archiveMapSha256: await sha(await Deno.readFile(root + '/' + target + '/archive-map.json'))}));

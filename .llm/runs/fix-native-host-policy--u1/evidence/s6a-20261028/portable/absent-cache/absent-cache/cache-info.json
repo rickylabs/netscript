@@ -1,0 +1,12 @@
+{
+  "code": 0,
+  "stdout": "{\n  \"version\": 1,\n  \"denoVersion\": \"2.9.7\",\n  \"denoDir\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\",\n  \"modulesCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\\\\remote\",\n  \"npmCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\\\\npm\",\n  \"typescriptCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\\\\gen\",\n  \"registryCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\\\\registries\",\n  \"originStorage\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\\\\location_data\",\n  \"webCacheStorage\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache\\\\owned-profile-6d9e01af4b43bf04\\\\deno\\\\location_data\\\\web_cache\"\n}\n",
+  "stderr": "",
+  "pid": 22304,
+  "startedAt": "2026-10-28T04:16:37.281Z",
+  "finishedAt": "2026-10-28T04:16:37.331Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true,
+  "explicitDenoDir": false
+}

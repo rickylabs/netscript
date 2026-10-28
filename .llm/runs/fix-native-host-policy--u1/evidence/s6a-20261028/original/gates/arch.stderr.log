@@ -1,0 +1,6 @@
+error: Uncaught (in promise) NotCapable: Requires write access to "C:\Users\ericc\source\repos\netscript-native-host-policy-008\.llm\tmp\native-host-policy-u1-s6a-astra-20261028\gates", run again with the --allow-write flag
+    await Deno.mkdir((args.out as string).split('/').slice(0, -1).join('/'), { recursive: true });
+               ^
+    at Object.mkdir (ext:deno_fs/30_fs.js:1:2988)
+    at main (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tools/fitness/check-doctrine.ts:751:16)
+    at async file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tools/fitness/check-doctrine.ts:772:23

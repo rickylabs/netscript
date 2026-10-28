@@ -1,0 +1,254 @@
+/** Real streams factory permission, policy, proxy and owned-listener qualification. @module */
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { fromFileUrl } from 'jsr:@std/path@^1';
+import { type ChildRun, createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
+
+const PUBLIC_SUBPATH = '@netscript/plugin-streams/service';
+const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const MARKER = 's6a-streams: assertions and native cleanup settled';
+
+Deno.test({
+  name: 'streams runtime permissions: native allocator/addon grants and fresh precise refusals',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  async fn() {
+    for (const mode of ['approved', 'allocator-denied', 'ffi-denied']) {
+      await using sandbox = await createRuntimeSandbox(mode);
+      const ports = choosePorts();
+      const run = await sandbox.run(probe(sandbox.scratch, ports, permissionBody()), {
+        cwd: PLUGIN_ROOT,
+        preferredPorts: ports,
+        denyAllocator: mode === 'allocator-denied',
+        denyFfi: mode === 'ffi-denied',
+      });
+      if (mode === 'approved') {
+        assertSuccess(run);
+      } else {
+        assertEquals(run.code, 1, `${mode}\n${run.stderr}`);
+        assertEquals(run.stdout.includes(MARKER), false, run.stdout);
+        assertStringIncludes(run.stderr, 'NotCapable: Requires ');
+        assertStringIncludes(
+          run.stderr,
+          mode === 'allocator-denied' ? `net access to "0.0.0.0:${ports[0]}"` : 'ffi access to ',
+        );
+        if (mode === 'ffi-denied') assertStringIncludes(run.stderr, 'node.napi.node');
+        assertEquals(/TS\d{4}|exceeded \d+ms|AggregateError/.test(run.stderr), false, run.stderr);
+      }
+    }
+  },
+});
+
+Deno.test({
+  name: 'streams HTTP: native guarded/public instances preserve identities, bytes and both ports',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  async fn() {
+    await using sandbox = await createRuntimeSandbox('http');
+    const ports = choosePorts();
+    const run = await sandbox.run(probe(sandbox.scratch, ports, httpBody()), {
+      cwd: PLUGIN_ROOT,
+      preferredPorts: ports,
+    });
+    assertSuccess(run);
+  },
+});
+
+/** Hold both selections concurrently so the two intended upstream ports cannot coincide. */
+function choosePorts(): number[] {
+  using first = Deno.listen({ hostname: '127.0.0.1', port: 0 });
+  using second = Deno.listen({ hostname: '127.0.0.1', port: 0 });
+  return [first.addr.port, second.addr.port];
+}
+
+function assertSuccess(run: ChildRun): void {
+  assertEquals(run.code, 0, `exit ${run.code}\n${run.stderr}\n${run.stdout}`);
+  assertEquals(run.stdout.split(MARKER).length - 1, 1, run.stdout);
+  assertEquals(run.stdout.trimEnd().endsWith(MARKER), true, run.stdout);
+}
+
+/** All resource-producing factory work is inside primary-first cleanup protection. */
+function probe(scratch: string, ports: readonly number[], body: string): string {
+  return `import { assert, assertEquals, assertStrictEquals } from 'jsr:@std/assert@^1';
+import type {
+  AuthenticatorPort, AuthnRequest, AuthnResult, AuthorizerPort, AuthzDecision, AuthzRequest,
+  Principal, RunningService,
+} from '${PUBLIC_SUBPATH}';
+
+const scratch = ${JSON.stringify(scratch)};
+const ports: readonly number[] = ${JSON.stringify(ports)};
+const handles: RunningService[] = [];
+const releasedPorts: number[] = [];
+const failures: unknown[] = [];
+const serve = { hostname: '127.0.0.1', port: 0, handleSignals: false };
+function retain(handle: RunningService, upstream: number): RunningService {
+  handles.push(handle);
+  releasedPorts.push(handle.addr.port, upstream);
+  assertEquals([handle.addr.hostname, handle.addr.transport], ['127.0.0.1', 'tcp']);
+  assert(Number.isInteger(handle.addr.port) && handle.addr.port > 0);
+  return handle;
+}
+function rebind(port: number): void {
+  Deno.listen({ hostname: '127.0.0.1', port }).close();
+}
+async function request(port: number, path: string, init?: RequestInit): Promise<[number, string]> {
+  const response = await fetch(\`http://127.0.0.1:\${port}\${path}\`, init);
+  return [response.status, await response.text()];
+}
+try {
+  Deno.chdir(scratch);
+  Deno.env.set('PORT', 'ambient-port-must-not-win');
+  Deno.env.set('STREAMS_PORT', 'fallback-port-must-not-win');
+  const { startStreamsService } = await import('${PUBLIC_SUBPATH}');
+  ${body}
+} catch (error) {
+  failures.push(error);
+}
+for (const handle of handles) {
+  try { await handle.stop(); } catch (error) { failures.push(error); }
+}
+for (const port of releasedPorts) {
+  try { rebind(port); } catch (error) { failures.push(error); }
+}
+if (failures.length === 1) throw failures[0];
+if (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));
+console.log(JSON.stringify({ reboundPorts: releasedPorts }));
+console.log('${MARKER}');
+`;
+}
+
+function permissionBody(): string {
+  return `Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[0]));
+  const running = retain(await startStreamsService({
+    auth: { public: true, reason: 'S6a explicit native permission control' }, serve,
+  }), ports[0]);
+  const [status, body] = await request(running.addr.port, '/');
+  assertEquals(status, 200);
+  const info: unknown = JSON.parse(body);
+  assert(typeof info === 'object' && info !== null && 'service' in info);
+  assertEquals(info.service, 'streams');
+  const [upstreamStatus] = await request(ports[0], '/');
+  assert(upstreamStatus < 500, 'expected selected loopback upstream is reachable');
+  await running.stop();
+  await running.stop();
+  rebind(running.addr.port);
+  rebind(ports[0]);`;
+}
+
+function httpBody(): string {
+  return `const path = '/v1/stream/s6a-' + crypto.randomUUID();
+  const allowed: Principal = {
+    subject: 'fixture:allowed', scopes: ['streams:read-write'], roles: ['fixture'],
+    scheme: 'custom', claims: { fixture: 'allowed' },
+  };
+  const denied: Principal = { ...allowed, subject: 'fixture:denied', scopes: [] };
+  const issued: Principal[] = [];
+  const authnCalls: { self: unknown; method: string; path: string }[] = [];
+  const authzCalls: { self: unknown; request: AuthzRequest }[] = [];
+  const authenticator: AuthenticatorPort = {
+    authenticate(request: AuthnRequest): AuthnResult {
+      authnCalls.push({ self: this, method: request.method, path: request.path });
+      const token = request.header('x-fixture-token');
+      if (token === 'outage') throw new Error('synthetic-authenticator-outage');
+      if (token === undefined) return { ok: false, reason: 'missing-credential' };
+      const principal = token === 'allowed' ? allowed : token === 'denied' ? denied : undefined;
+      if (principal === undefined) return { ok: false, reason: 'invalid-credential' };
+      issued.push(principal);
+      return { ok: true, principal };
+    },
+  };
+  const authorizer: AuthorizerPort = {
+    authorize(request: AuthzRequest): AuthzDecision {
+      authzCalls.push({ self: this, request });
+      return request.principal.scopes.includes('streams:read-write')
+        ? { allow: true } : { allow: false, reason: 'scope-missing' };
+    },
+  };
+  async function guardedCall(token?: string): Promise<[number, unknown]> {
+    const [status, text] = await request(guarded.addr.port, path, {
+      headers: token === undefined ? {} : { 'x-fixture-token': token },
+    });
+    return [status, JSON.parse(text)];
+  }
+  const credential = { 'x-fixture-token': 'allowed' };
+  Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[0]));
+  const guarded = retain(await startStreamsService({
+    auth: {
+      authn: { authenticator, protect: ['/'], allowAnonymous: ['/health'] },
+      authz: { authorizer },
+    }, serve,
+  }), ports[0]);
+  assertEquals(await guardedCall(), [401, { error: 'UNAUTHORIZED', message: 'missing-credential' }]);
+  assertEquals(await guardedCall('wrong'), [401, { error: 'UNAUTHORIZED', message: 'invalid-credential' }]);
+  assertEquals(await guardedCall('outage'), [503, { error: 'SERVICE_UNAVAILABLE', message: 'Authentication service unavailable' }]);
+  assertEquals(await guardedCall('denied'), [403, { error: 'FORBIDDEN', message: 'scope-missing' }]);
+  const [created] = await request(guarded.addr.port, path, {
+    method: 'PUT', headers: { ...credential, 'content-type': 'text/plain' }, body: 'before-',
+  });
+  assertEquals(created, 201);
+  const [appended] = await request(guarded.addr.port, path, {
+    method: 'POST', headers: { ...credential, 'content-type': 'text/plain' }, body: 'after',
+  });
+  assertEquals(appended, 204);
+  const front = await request(guarded.addr.port, path + '?offset=-1', { headers: credential });
+  assertEquals(front, [200, 'before-after']);
+  assertEquals(await request(ports[0], path + '?offset=-1'), front, 'real loopback proxy bytes');
+  // Native service-info is registered before auth: this public metadata is not a guarded raw route.
+  const beforeMetadata = [authnCalls.length, authzCalls.length];
+  const [rootStatus, rootText] = await request(guarded.addr.port, '/');
+  const root: unknown = JSON.parse(rootText);
+  assertEquals(rootStatus, 200);
+  assert(typeof root === 'object' && root !== null && 'service' in root);
+  assertEquals(root.service, 'streams');
+  assertEquals([authnCalls.length, authzCalls.length], beforeMetadata);
+  const [healthStatus, healthText] = await request(guarded.addr.port, '/health');
+  const health: unknown = JSON.parse(healthText);
+  assertEquals(healthStatus, 200);
+  assert(typeof health === 'object' && health !== null && 'status' in health && 'checks' in health);
+  assertEquals(health.status, 'healthy');
+  assert(Array.isArray(health.checks));
+  const storage: unknown = health.checks.find((check: unknown) =>
+    typeof check === 'object' && check !== null && 'name' in check && check.name === 'streams-storage');
+  assert(typeof storage === 'object' && storage !== null && 'storage' in storage);
+  const details = storage.storage;
+  assert(typeof details === 'object' && details !== null);
+  assert('mode' in details && 'durable' in details && 'probe' in details);
+  assertEquals(details.mode, 'memory');
+  assertEquals(details.durable, false);
+  assertEquals(details.probe, 'not-applicable');
+  assertEquals('dataDir' in details, false);
+  assertEquals(authnCalls.map((c) => [c.self === authenticator, c.method, c.path]), [
+    ...Array.from({ length: 4 }, () => [true, 'GET', path]),
+    [true, 'PUT', path], [true, 'POST', path], [true, 'GET', path],
+  ]);
+  assertEquals(authzCalls.length, 4);
+  for (const [index, call] of authzCalls.entries()) {
+    assertStrictEquals(call.self, authorizer);
+    assertStrictEquals(call.request.principal, issued[index]);
+    assertStrictEquals(issued[index], index === 0 ? denied : allowed);
+  }
+  const callCount = authnCalls.length;
+  Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[1]));
+  const open = retain(await startStreamsService({
+    auth: { public: true, reason: 'S6a independent public factory control' }, serve,
+  }), ports[1]);
+  assert(open.addr.port !== guarded.addr.port && ports[0] !== ports[1]);
+  assertEquals((await request(open.addr.port, path + '?offset=-1'))[0], 404);
+  assertEquals((await request(open.addr.port, path, {
+    method: 'PUT', headers: { 'content-type': 'text/plain' }, body: 'independent',
+  }))[0], 201);
+  assertEquals(await request(open.addr.port, path + '?offset=-1'), [200, 'independent']);
+  assertEquals(await request(ports[1], path + '?offset=-1'), [200, 'independent']);
+  assertEquals(await request(guarded.addr.port, path + '?offset=-1', { headers: credential }), front);
+  assertEquals(authnCalls.length, callCount + 1, 'public requests never call the guarded ports');
+  await guarded.stop();
+  await guarded.stop();
+  rebind(guarded.addr.port);
+  rebind(ports[0]);
+  assertEquals(await request(open.addr.port, path + '?offset=-1'), [200, 'independent']);
+  await open.stop();
+  await open.stop();
+  rebind(open.addr.port);
+  rebind(ports[1]);`;
+}

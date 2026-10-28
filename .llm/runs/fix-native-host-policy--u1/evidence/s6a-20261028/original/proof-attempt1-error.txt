@@ -1,0 +1,1 @@
+Observed source-proof preparation failure: JSON.parse rejected the UTF-8 BOM in the copied PowerShell-written protected-before.json. No final proof/diff/source copies had been written. Corrected the proof reader to accept that existing BOM; protected-before.json itself stays unchanged.
