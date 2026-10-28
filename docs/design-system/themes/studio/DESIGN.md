@@ -249,7 +249,7 @@ components:
 
 <!-- Format: Google Labs DESIGN.md (alpha). Values resolved from the NetScript Figma library on
 2026-10-27; Utility values updated on 2026-10-28. Front matter = Utility flavor; the other six
-flavors are in the "Flavors" extension section. Names are provisional until S1 #2414. -->
+flavors are in the "Flavors" extension section. Names are provisional until the tokens build (#2414). -->
 
 ## Overview
 
@@ -639,9 +639,9 @@ the 24px minimum; use Comfortable or larger for touch). A full contrast matrix i
 
 - **Code syntax:** every `studio/*` Scheme role, and every scheme-independent, non-boolean Studio
   flavor variable without a Theme twin, has the code syntax `var(--ns-studio-<path>)`. The
-  `studio-*` keys in the front matter follow that rule. All of them must be registered in S1 #2414.
-  Flavor geometry booleans (border sides, ticks, sparkline, block bars) exist only in the flavor
-  collection for now.
+  `studio-*` keys in the front matter follow that rule. All of them must be registered in the tokens
+  build (#2414). Flavor geometry booleans (border sides, ticks, sparkline, block bars) exist only in
+  the flavor collection for now.
 - **Studio variables:** primitives `color/swiss-red/{l,d}/9`; flavor variables
   `signal/{l,d}/{brand,marker,underline}`, `input/{l,d}/border`, `icon/stroke`, `prose/*` and
   `ring/{l,d}`, with values in all seven flavor modes; Scheme roles `studio/signal/*`,

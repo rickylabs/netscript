@@ -47,13 +47,13 @@ Pixel combines amber pixels with game-key physics and keeps everything else calm
 - MUST use red only as an error or destructive role (`--ns-pixel-destructive-face`,
   `--ns-destructive-*`).
 - MUST only read `--ns-*` and `--ns-pixel-*` roles. The bands bind primitives (`--ns-band-*`) today;
-  that exception is documented and waits for S1 band roles (#2414). Don't add new primitive
-  bindings.
+  that exception is documented and waits for band roles in the tokens build (#2414). Don't add new
+  primitive bindings.
 
 ## Building a screen
 
 1. **Enable the theme:** `data-theme="pixel"`, `data-scheme`, `data-density="comfortable"`
-   (provisional until S1 #2414).
+   (provisional until #2414).
 2. **Compose:** 64px top bar with a banded mark, uppercase mono nav and identicon → 10px band stripe
    → content at 40px sides, sections 32 apart → flat panels framed in 1px `--ns-frame-ink` (no lips
    on panels) → keys, tabs and fields inside them.
@@ -84,7 +84,7 @@ Pixel combines amber pixels with game-key physics and keeps everything else calm
 - First classify it as pressable (key on a lip), input (recess), signal (bands) or panel (flat
   frame). Use exactly one of those depth treatments.
 - Cut corners as pixel steps with `clip-path` (4px on 40px keys, 2px on smaller controls).
-- New visual roles go under `pixel/<path>` and must be registered in S1.
+- New visual roles go under `pixel/<path>` and must be registered in the tokens build (#2414).
 - Add every new component, in all its states, to the Light and Dark components sheets.
 
 ## Self-check before handing off

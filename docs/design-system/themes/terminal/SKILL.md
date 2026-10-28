@@ -63,8 +63,8 @@ Signature moves:
 ## Building a screen
 
 1. **Enable the theme:** `data-theme="terminal"`, `data-scheme="dark|light"` (dark is the
-   reference), `data-density="compact"`. The Figma Theme mode is the shared `Signal`; all names are
-   provisional until the token export in #2414.
+   reference), `data-density="compact"`. The Figma Theme mode is `Terminal`, still seeded from
+   `Signal`; all names are provisional until the token export in #2414.
 2. **Compose:** a 32px status line, a 43px numbered tab line, panes inside 20px outer padding (28
    top) with 16px between side-by-side panes, and a 33px help bar pinned to the bottom. One pane is
    active at a time: the one that contains DOM focus.
@@ -95,7 +95,8 @@ Signature moves:
 - Start from the closest existing component's variant. Keep the ch grid, 24px line box, square keys
   and 8px panes.
 - If you need a new visual role, add it as `terminal/<path>` and register it in code (#2414). Don't
-  reuse an unrelated role, and don't add another Theme-mode value to `Signal`, which Studio shares.
+  reuse an unrelated role, and don't add another Theme-mode value to `Signal`; Terminal's own mode
+  is `Terminal`.
 - Add the new component to a state sheet, in Light and Dark. Terminal has none yet.
 
 ## Self-check before handing off

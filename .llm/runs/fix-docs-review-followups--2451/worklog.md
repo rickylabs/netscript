@@ -25,3 +25,7 @@ Reconcile1: source scope remains #2451. Token authority stays assigned to #2450.
 Slice2 complete:71classifier/workflow tests PASS after intended68/3RED; structured2-file types/lint/fmt PASS; native CLI probes prove opted-in push needs_pages=false and default push=true. Separate source review PASS. Browser/deploy conditions retain fail-toward-running behavior and the rendered reproducibility check is now in CI.
 
 Reconcile2: new PR2452 remains draft for carrier integration/final IMPL. Current main has advanced with #2449; include it normally before native generation. Independent source reviews accept both slices. No protected theme-source edits.
+
+Integration: normally merged main d6dfab0 (#2449 theme framing). Protected canonical design sources match main exactly. Ran gen:agent-docs-prose, gen:mcp-export-corpus --allow-dirty, gen:assets-barrel, gen:publish-assets in order, all exit0. The native write option covers only staged generated carriers; package/plugin implementation input is unchanged. Restored incidental nested lock churn; retain the previously reviewed seven-line Lightning CSS closure. Root quality:gate, including architecture, exits0 with existing warnings.
+
+Canonical local e2e:cli exits1 at preflight.aspire; Docker is also unavailable. No runtime PASS is claimed. Hosted canonical workflow will qualify that gate. Full source/browser evidence remains separate from this environment limitation.

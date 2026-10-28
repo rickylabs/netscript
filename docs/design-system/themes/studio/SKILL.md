@@ -74,7 +74,7 @@ Seven flavors share one component anatomy. Signature moves:
    `data-flavor="<utility|cloud|workshop|playful|
    ledger|atelier|signal>"`, `data-scheme`, plus
    the flavor's `data-gray`, `data-accent` and `data-density` (Utility: neutral, ink, compact).
-   Provisional until S1 #2414.
+   Provisional until the tokens build (#2414).
 2. **Compose** the Orders pattern: top bar → page header (breadcrumb, title, two actions) → four
    KPIs → table card with a segmented filter and toolbar → form card beside a notice and an activity
    card. Density comes from the flavor (Utility 32px controls, 44px rows).
@@ -102,7 +102,7 @@ Seven flavors share one component anatomy. Signature moves:
   rather than a per-flavor component.
 - If a new visual role is needed, add it as `studio/<path>` (and a flavor variable if it varies by
   flavor), list it in the pack manifest (`DESIGN.md` → _NetScript Mapping_), then register it in
-  code (S1). Its code syntax is `var(--ns-studio-<path>)`.
+  code (#2414). Its code syntax is `var(--ns-studio-<path>)`.
 - Add the component to all fourteen state sheets (seven flavors, Light and Dark).
 - In Figma, seed bound paints with their resolved colour after any mode change. An unseeded paint
   can keep a stale value, such as a #ffffff edge on a primary button.
