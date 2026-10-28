@@ -26,3 +26,10 @@ The required lock-metadata surface also includes `packages/fresh-ui/deno.lock`, 
 CLI-host MCP composition reservation: `packages/cli/src/public/features/agent/mcp/run-agent-mcp.ts` and `create-cli-ui-registry-catalog{,_test}.ts`, plus registry README/run evidence. The composition reuses the already-landed config/client/transport; no installer or command-root changes.
 
 Style/preset integration additionally updates the public CLI README, docs command reference, contributor registry README, exact local/public command census and their generated prose carrier. The final theme-seed alias uses existing NS One canonical docs; legacy copy lists remain filtered.
+
+
+Final documentation reservation: `docs/site/reference/cli/commands.md`, the direct-command census in `.llm/tools/docs/check-accuracy-and-discoverability.ts`, related generated documentation carriers, and combined acceptance evidence. Overlapping uncommitted query code was discarded after the active continuation reached the same subsystem; its implementation remains canonical.
+
+## Review transport availability fallback
+
+The owner's model/effort remains Claude Opus 5.5 High. Native `claude -p --model claude-opus-5-5 --effort high` is unavailable at its weekly quota. Following the documented capable-provider order, the existing native Antigravity subscription was inspected with `agy models`; it explicitly lists `claude-opus-5-5-high`. A closed-stdin, read-only, no-tools canary through that exact catalog id returned PASS. Evaluation therefore continues through `agy --model claude-opus-5-5-high --effort high --mode plan`, preserving model, effort, different vendor family and independent session. This is a transport fallback, not a new model selection or paid-route substitution. The exact native Claude command remains recorded as quota-unavailable; no PASS is attributed to it. Requested launch identity is evidenced by the native catalog and argv; provider-side identity attestation is not available. Keep the same fallback conversation across repair rounds.

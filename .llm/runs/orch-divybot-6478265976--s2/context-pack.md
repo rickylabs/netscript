@@ -13,3 +13,13 @@ Canonical one-pass scaffold.runtime with --cleanup attempted: exit 1; preflight.
 Remaining: required independent slice5/final IMPL-EVAL, any resulting repairs, current remote reconciliation, final truthful gate audit/PR readiness and atomic READY report. No final READY report queued. Do not force-push, label, merge, tag, release or commit the assignment. Owner Refs-only issue link overrides generic closing keyword rules. Preserve concurrent worker commits by normal integration.
 
 Implementation head is now 12ef006ea9556d46847c5e7041f047d1e2b02f45, pushed. Post-commit quality receipt PASS, assets-barrel freshness PASS, review threads 0 unanswered. Final same-session Opus attempt also returned weekly quota with no verdict; evaluate.md records current status above the preserved historical stop. PR body is current and draft.
+
+
+
+## Documentation/census repair complete
+
+CLI command reference documents the approved registry/preset workflow and environment-header template usage. docs:accuracy now passes for the **current tree's 98 commands**, including ui:build; its ten fixtures pass. Site build, export drift and seven carrier parity tests pass; source checker check/lint/format pass. Independent review PASS, with a correction explaining encoded prose rows. **Recompute the command census when new CLI commands are integrated (expected final additions include inspect/registry/preset/apply).** Source/runtime/style/preset delivery remains in progress under the other continuation.
+
+## Integrated real CLI acceptance
+
+The pushed command slice is integrated. Live docs census is 108/108 with explicit registry/preset group roots. Full focused UI suite 94/0/0, agent/MCP plus census fixtures 20/0/0, and actual CLI HTTP acceptance 1/0/0 pass. The real fixture proves env auth sent but absent from output/persistence, source identity and content hashes, visible local edits, and zero diff writes. Same requested Opus 5.5 High gives independent PASS through the already-configured native Antigravity transport after native Claude weekly quota exhaustion. Preserve that fallback conversation across review rounds; do not misattribute its verdict to the quota-blocked exact Claude command. Next reconcile style commit and recompute final census, then final full-change evaluation.

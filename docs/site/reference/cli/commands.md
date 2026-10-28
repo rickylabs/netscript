@@ -323,28 +323,40 @@ the source and output extension contract.
 
 ## `ui:*` — Fresh UI registry
 
-Fresh UI installs app-owned files from its built-in JSON registry, configured namespaces, or a
-static item URL. App commands accept `--project-root <path>` or `--app <name>`.
+Fresh UI copies registry source into the selected application. Use `--app <name>` for a
+workspace app or `--project-root <path>` for an explicit application directory. App settings
+live in `components.json`; `fresh-ui.lock.json` records source identity and installed content hashes.
+The page/island scaffold forms of `ui:add` remain available in the
+[CLI reference](/cli-reference/#fresh-ui).
+
+| Command                      | Description                                                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `netscript ui:list`          | List Fresh UI registry items. Flags: `--project-root <path>`, `--json`, `--collections` (include collections). |
+| `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
+| `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
+
+`ui:update` compares installed copies with their lock baselines and reports local edits. The
+following registry and preset commands complete the setup and discovery workflow:
 
 | Command | Behavior |
 | --- | --- |
-| `ui:init [--preset <code>]` | Install the foundation; optionally apply a token preset id, encoded preset, or shared preset URL in the same operation. |
-| `ui:add <name\|@ns/name\|url>` | Resolve and copy an item and its dependencies. `--diff` reports local and registry differences without writes; `--json` emits structured results. |
-| `ui:apply --preset <code> [--only theme,font]` | Apply token, font, style, and icon choices. `--only theme` preserves fonts and component code; `--only font` preserves theme outputs and the selected token preset. |
-| `ui:list [--registry @ns]` | List metadata and installed state; `--collections` includes built-in collections and `--json` emits JSON. |
-| `ui:update [name]` | Update copies that still match their installed baseline. Without a name, update exactly the items in the lockfile. |
-| `ui:remove <name>` | Remove an item's unchanged copies and reconcile file, stylesheet, and package ownership. Required or edited items are refused. |
-| `ui:view <name>` | Show registry metadata and exact source bytes. |
-| `ui:search [query] [--registry @ns]` | Search item names, descriptions, and categories. |
-| `ui:docs <name>` | Show an item's installation documentation and declared Markdown files. |
-| `ui:info` | Show aliases, selected style, namespace names, and installed hashes/edit state. |
-| `ui:registry add <@ns> <url>` | Register an item URL template or source catalog. Optional `--index <url>` supplies discovery; repeat `--header 'Name=${ENV_NAME}'` for environment-backed authentication. |
-| `ui:registry validate <source>` | Validate a local JSON file, URL, namespace catalog, or namespaced item against the registry schema. |
-| `ui:preset decode <code>` | Decode a preset id, encoded preset, or shared URL. |
-| `ui:preset url [--theme <id>] [--style <item>] [--font <item>] [--icon-library <id>]` | Produce a portable preset link without network access. |
-| `ui:build --registry <file> --output <directory>` | Build a static catalog and embedded item JSON. `--source-root <directory>` selects the contained file source root. |
+| `netscript ui:build --registry registry.json --source-root . --output public/r` | Validate local authoring and publish a static catalog plus one JSON file per item. Resolve source paths inside the declared source root. |
+| `netscript ui:init --preset <code>` | Initialize the foundation using a token preset id, encoded preset, or shared URL. |
+| `netscript ui:add <name\|@namespace/name\|url> --diff` | Show installed/local/registry differences without writing application files. Omit `--diff` to install; `--style <reference>` selects the setup-time component style. |
+| `netscript ui:view <reference>` | Print portable metadata and exact source files without installing. |
+| `netscript ui:search [query] --registry @acme` | Search item metadata in the built-in catalog or a configured namespace. |
+| `netscript ui:docs <reference>` | Show publisher documentation and Markdown file locations. |
+| `netscript ui:info` | Describe app UI settings, install provenance and edited copies without revealing registry header values. |
+| `netscript ui:registry` | Group for source registration and JSON schema validation. |
+| `netscript ui:registry add @acme <url>` | Register a catalog or `{name}` item URL template. Repeat `--header Name=template`; `--index <url>` sets an explicit catalog URL. |
+| `netscript ui:registry validate [reference]` | Validate local JSON, a static URL, a configured namespace, or a namespaced item against the published registry schemas. Defaults to local `registry.json`. |
+| `netscript ui:preset` | Group for offline preset decoding and shareable URL generation. |
+| `netscript ui:preset decode <code>` | Decode a versioned preset, shared URL or plain token preset id without a network request. |
+| `netscript ui:preset url [code] --theme studio-utility` | Construct a shareable URL; optional `--style`, `--font`, and `--icon-library` set those preset fields. |
+| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
 
-`components.json` owns aliases, style, icon library, and registry URL/header templates. For example:
+An app configuration can declare a registry source and unresolved header templates:
+
 
 ```json
 {
@@ -361,26 +373,30 @@ static item URL. App commands accept `--project-root <path>` or `--app <name>`.
 }
 ```
 
-Credentials resolve only when sending a request. The config retains the environment placeholders;
-command results and `fresh-ui.lock.json` omit resolved header values. The lock stores source
-identity, hashes, and installed file bytes for comparisons. `ui:add --diff` never updates that
-history. Ordinary updates skip edited copies; explicit `ui:add --force` replaces them.
+For example, register an authenticated namespace with an environment template, then inspect and
+install one item:
 
-A style item declares `meta.components`, mapping logical component ids to source items with the
-same explicit file targets and component contract. Selecting a different style through `ui:add`
-or a preset regenerates the installed copies. An edited copy stops the entire operation and lists
-its filename and diff, including when `--force` is present. Page imports and props stay unchanged.
+```bash
+netscript ui:registry add @acme 'https://registry.example/r/{name}.json' \
+  --header 'Authorization=Bearer ${ACME_REGISTRY_TOKEN}' --project-root apps/dashboard
+netscript ui:view @acme/x --project-root apps/dashboard
+netscript ui:add @acme/x --diff --project-root apps/dashboard
+netscript ui:add @acme/x --project-root apps/dashboard
+```
 
-A preset containing only a theme changes generated assets through the existing `tokens build`
-compiler and preserves component code. It keeps configured token source/semantic override paths
-and persists the selected theme in `tokens.config.json`, so a later build retains it. Theme items
-also install their canonical `DESIGN.md` and `SKILL.md` under
-`.agents/skills/fresh-ui-theme-<preset-id>/`. Preset initialization validates the whole plan before
-writing any files.
+The transport resolves header templates from the environment when issuing a request. Resolved
+credentials are not written to app config or the install lock and are not included in diagnostic
+output. Registry source modules are never executed.
 
-For a package-root override, `ui:init` / `ui:add --registry-root <path>` retain the original local
-manifest copy flow. JSON registry config, lock history, and `--diff` use the default path.
-See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+A token-only preset application leaves component source unchanged and persists the selected token
+preset for later `netscript tokens build`. An explicitly changed style regenerates installed
+component copies from that style's registry source map. If a copied file differs from its recorded
+hash, regeneration stops and lists edited paths, including with `--force`. Utility is the built-in
+component style; additional source maps use the same shared contract. Theme items also install their `DESIGN.md` and
+`SKILL.md` under `.agents/skills/fresh-ui-theme-<preset-id>/`.
+
+See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) and the
+[Fresh UI reference](/reference/fresh-ui/).
 
 ## `deploy` — cloud and container targets
 
