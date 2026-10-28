@@ -266,3 +266,7 @@ Root accepts the full same-session Grok source PASS and bounded debt disposition
 and [faithful original/continuation evidence](independent-impl-20261028/checkpoint.md).
 Original23 total EOF reads, own MCP, actual model identity and owned status/pipe settlement are
 verified. Security/DB integration and remaining Windows/e2e/production gates stay open.
+
+## Accepted prerequisite union, 2026-10-28
+
+Root accepts exact source5ef03198 integrating merged security/DB main and Windows qualification owners; see [root acceptance and measured gates](prerequisite-integration-20261028/README.md). Focused461, policy7, exports36, actual checked examples471, critical0 and one cold architecture pass. Five Aspire links remain failing; independent integration review and actual new-head CI remain required. No debt/baseline/release waiver.

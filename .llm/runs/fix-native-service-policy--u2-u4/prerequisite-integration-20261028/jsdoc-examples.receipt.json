@@ -1,0 +1,30 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T05:49:41.446Z",
+  "finishedAt": "2026-10-28T05:50:57.493Z",
+  "durationMs": 76040,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 330,
+    "sha256": "ebb1d19093c84d3d16f49f4f8f581de6669ecd516e6ad0d0d39c34cb3f2488ff",
+    "tail": "jsdoc examples: PASS members=35 files=2317 examples=472 candidates=471 checked=471 exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0\nenforcedFailureCensus={\"badSpecifier\":0,\"typeError\":0,\"unfenced\":0,\"malformed\":0,\"unboundName\":0}\ntypeErrorExamples=.llm/tmp/native-service-prerequisite-integration-20261028/jsdoc-type-errors.md\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 216,
+    "sha256": "64924caee521f4c5ffa930e8eb9cb328c838b1e3db044f27561e591d80843c4b",
+    "tail": "Task docs:jsdoc-examples deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts '--type-error-output' '.llm/tmp/native-service-prerequisite-integration-20261028/jsdoc-type-errors.md'\n",
+    "truncated": false
+  },
+  "gateId": "jsdoc-examples",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "task",
+    "docs:jsdoc-examples",
+    "--type-error-output",
+    ".llm/tmp/native-service-prerequisite-integration-20261028/jsdoc-type-errors.md"
+  ],
+  "timeoutMs": 300000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative"
+}
