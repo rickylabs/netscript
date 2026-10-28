@@ -1,0 +1,72 @@
+{
+  "kind": "local gate evidence index; not a replacement for native receipts",
+  "gates": [
+    {
+      "gate": "fresh-ui-browser",
+      "command": [
+        "npm",
+        "test"
+      ],
+      "sourceHead": "958c2b5cb741152b6dd0ff488609e510445ce005",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 39182,
+      "stdoutSha256": "e8edada03ca745369843f2f4780071bb415f5ae2f956788dc897e8c8741a3efb",
+      "stderrSha256": "284e38a387d2ebd5f065cd0d101bf8f35f04a48fba6f7f9549b7ead9f091955e"
+    },
+    {
+      "gate": "fresh-ui-tokens",
+      "command": [
+        "deno",
+        "task",
+        "tokens:check"
+      ],
+      "sourceHead": "958c2b5cb741152b6dd0ff488609e510445ce005",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 454,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e549931842c8c90d25558ac628e0e75f36d2b67c79f7e6a2e1897625b498d5fa"
+    },
+    {
+      "gate": "fresh-ui-token-build",
+      "command": [
+        "deno",
+        "task",
+        "tokens:build"
+      ],
+      "sourceHead": "958c2b5cb741152b6dd0ff488609e510445ce005",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 395,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "deb774843d75b571b37975a596761b5a3a74a17fe829b7a2dc6edd5995ad9377"
+    },
+    {
+      "gate": "fresh-ui-browser-contract",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "../../.llm/tools/run-deno-test.ts",
+        "--cwd",
+        ".",
+        "--",
+        "--no-config",
+        "--no-lock",
+        "--node-modules-dir=manual",
+        "accessibility.contract.ts",
+        "--report-output",
+        "../../.llm/tmp/s0/contract-final.report.json"
+      ],
+      "sourceHead": "28b0050d9832ec00386b9f9d0f1adc4ca37e7230",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 917,
+      "stdoutSha256": "320d3cc44bf8f2817eccddbbbce19a6c835ba4e4f7d47aed695a5ee96488fe1c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

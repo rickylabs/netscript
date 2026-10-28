@@ -405,6 +405,12 @@ const RULES: readonly Rule[] = [
   },
   // ---- maintainer and agentic tooling ----
   {
+    test: starts('tools/fresh-ui-browser/'),
+    cls: 'tooling-doc',
+    owner: 'design-system-S0',
+    disposition: 'browser evidence guide; orchestration references only, no version pins',
+  },
+  {
     test: starts('.llm/tools/maint/teardown/'),
     cls: 'teardown',
     owner: 'S7',

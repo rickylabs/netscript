@@ -15,6 +15,13 @@ on:
       - 'plugins/*/deno.json'
       - 'plugins/*/deno.jsonc'
       - 'deno.lock'
+      - 'tools/fresh-ui-browser/**'
+      - 'packages/fresh/**'
+      - 'packages/cli/src/kernel/assets/app/**'
+      - 'packages/cli/src/kernel/assets/embedded.generated.ts'
+      - 'packages/cli/src/kernel/assets/publish-assets.generated.ts'
+      - '.llm/tools/run-deno-test.ts'
+      - '.llm/tools/gates/catalog.ts'
       - '.github/workflows/fresh-ui-quality.yml'
       - '.llm/tools/run-deno-check.ts'
       - '.llm/tools/run-deno-lint.ts'
@@ -35,6 +42,13 @@ on:
       - 'plugins/*/deno.json'
       - 'plugins/*/deno.jsonc'
       - 'deno.lock'
+      - 'tools/fresh-ui-browser/**'
+      - 'packages/fresh/**'
+      - 'packages/cli/src/kernel/assets/app/**'
+      - 'packages/cli/src/kernel/assets/embedded.generated.ts'
+      - 'packages/cli/src/kernel/assets/publish-assets.generated.ts'
+      - '.llm/tools/run-deno-test.ts'
+      - '.llm/tools/gates/catalog.ts'
       - '.github/workflows/fresh-ui-quality.yml'
       - '.llm/tools/run-deno-check.ts'
       - '.llm/tools/run-deno-lint.ts'
@@ -160,6 +174,32 @@ jobs:
           --child-report ../../.llm/tmp/gate-receipts/fresh-ui/lint.report.json --
           --output ../../.llm/tmp/gate-receipts/fresh-ui/lint.report.json
 
+      - name: Token artifact freshness
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-tokens --id fresh-ui-tokens
+          --cwd packages/fresh-ui
+          --output .llm/tmp/gate-receipts/fresh-ui/tokens.json
+
+      - name: Fresh UI tests
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate test --id fresh-ui-tests
+          --cwd packages/fresh-ui
+          --output .llm/tmp/gate-receipts/fresh-ui/tests.receipt.json
+          --child-report ../../.llm/tmp/gate-receipts/fresh-ui/tests.report.json --
+          --report-output ../../.llm/tmp/gate-receipts/fresh-ui/tests.report.json
+
+      - name: Frozen token build
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-token-build --id fresh-ui-token-build
+          --cwd packages/fresh-ui
+          --output .llm/tmp/gate-receipts/fresh-ui/token-build.json
+
       - name: Frozen-lock failure regression
         if: env.RUN == 'true'
         run: >-
@@ -181,3 +221,75 @@ jobs:
           name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/fresh-ui/*.json
           if-no-files-found: error
+
+  fresh-ui-browser:
+    name: Fresh UI design browser evidence
+    needs: classify
+    if: >-
+      !cancelled() && needs.classify.result != 'skipped'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_fresh_ui != 'false' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
+    steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        run: printf '::notice::Fresh UI browser evidence skipped by policy. %s\n' "$SKIP_REASON"
+      - name: Checkout
+        if: env.RUN == 'true'
+        uses: actions/checkout@v5
+      - name: Setup Deno
+        if: env.RUN == 'true'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.7'
+      - name: Setup Node
+        if: env.RUN == 'true'
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tools/fresh-ui-browser/package-lock.json
+      - name: Install locked browser tooling
+        if: env.RUN == 'true'
+        working-directory: tools/fresh-ui-browser
+        run: npm ci --ignore-scripts
+      - name: Install Chromium and system dependencies
+        if: env.RUN == 'true'
+        working-directory: tools/fresh-ui-browser
+        run: npx playwright install --with-deps chromium
+      - name: Generate local-source gallery app
+        if: env.RUN == 'true'
+        run: >-
+          deno run -A --frozen packages/cli/bin/netscript-dev.ts init fresh-ui-browser
+          --path .llm/tmp/s0/scaffold --app-name dashboard --db none
+          --no-aspire --no-git --editor none --ci --yes
+      - name: Exact axe baseline contract
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-browser-contract --id fresh-ui-browser-contract
+          --cwd tools/fresh-ui-browser
+          --output .llm/tmp/gate-receipts/fresh-ui-browser/contract.receipt.json
+          --child-report ../../.llm/tmp/gate-receipts/fresh-ui-browser/contract.report.json --
+          --report-output ../../.llm/tmp/gate-receipts/fresh-ui-browser/contract.report.json
+      - name: Screenshots, axe and keyboard matrix
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-browser --id fresh-ui-browser
+          --cwd tools/fresh-ui-browser
+          --output .llm/tmp/gate-receipts/fresh-ui-browser/browser.receipt.json
+          --child-report test-results/results.json
+      - name: Upload design screenshots and reports
+        if: always() && env.RUN == 'true'
+        uses: actions/upload-artifact@v5
+        with:
+          name: fresh-ui-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tools/fresh-ui-browser/test-results/
+            tools/fresh-ui-browser/playwright-report/
+            .llm/tmp/gate-receipts/fresh-ui-browser/
+          if-no-files-found: error
+          retention-days: 30
