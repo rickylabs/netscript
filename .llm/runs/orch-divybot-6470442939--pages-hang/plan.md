@@ -15,3 +15,15 @@ real-process timeout and success tests plus existing compiler fixtures cover the
 
 Export drift investigation is evidence-only; defer multi-line performance fixes. No package/plugin
 architecture or publish surface changes; JSR and framework doctrine gates are not applicable.
+
+## Review blocker plan — supersedes per-entrypoint compilation
+
+Restore the original combined compiler graph, retaining the existing deadline and group cleanup.
+Only timed-out corpora enter bounded per-fence diagnostics; external cancellation stops work.
+Remove prior syntax exclusions as justification for a later unexplained failure. Add actual
+unknown-export and process-count tests, a deploy-timeout contract and independent fixture guards.
+One repair/signoff commit follows successful required gates and separate-family review.
+
+Plan review is N/A for the same bounded bug-repair rationale above. No package/plugin source
+or public architecture changes. Main synchronization is a merge commit, not an implementation
+slice. Keep CI contracts and ratchet values intact.

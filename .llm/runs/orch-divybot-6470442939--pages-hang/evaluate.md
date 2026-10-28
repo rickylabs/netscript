@@ -114,3 +114,31 @@ The evaluator reviewed source content against the diff; verify these blobs at si
 All 30 focused tests and structured check/lint/format pass. The preceding bfe3fa3 has successful
 core CI, Pages, Code quality and native README gate; the final exact-head CI follows this commit.
 The existing runtime/history caveats remain unchanged and disclosed.
+
+## Four-blocker resumption evaluation — PASS (2026-10-28)
+
+Independent Anthropic session, requested and observed `claude-opus-5-5`, high effort. Native
+`claude -p`, closed stdin, Read/Glob/Grep tools only, strict empty MCP configuration, no command
+or write tools. Exit 0 after 202.241s, zero permission denials. No repair round was required.
+The evaluator read the actual source and raw test/timing/native-receipt evidence; it made no edits.
+
+Returned verdict:
+
+> Verdict: PASS. I found no blockers in the four repairs.
+
+The reviewer independently verified the combined bounded check, timeout-only diagnostic probes,
+interruption abort, copied-lock and compile-only semantics, once-only source list, and stale-comment
+repair. It recomputed the warm median differences (+2.0% snippets, +2.2% README). It verified the
+real unknown-export fixture, unchanged ratchet limits, two-minute deploy timeout sizing, and
+independent test watchdog cleanup. Raw negative controls fail with the intended watchdog and
+survival assertions; 38 combined regressions and the native README receipt pass.
+
+Nonblocking cautions: the 30-second compiler deadline now covers the corpus, so cold or slow CI
+can enter bounded diagnostic fallback. New-head CI remains required before merge. The actual
+full scaffold.runtime attempt remains UNPROVEN because Aspire/Docker preflight is unavailable;
+it needs a passing runtime verdict or owner waiver before merge. This is review readiness only,
+with no merge or release authorization. No new architectural debt was found.
+
+Source fingerprints in review-blockers-validation.md match the submitted and approved files.
+The supervisor records this independent verdict before the signoff commit; raw reviewer runtime
+identity and JSON remain outside Git. No implementation self-certification.

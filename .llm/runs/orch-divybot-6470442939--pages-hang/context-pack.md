@@ -1,51 +1,34 @@
-# Current coordinator follow-up
+# READY for review — Pages snippet repair
 
-The coordinator-requested permission audit and full local quality sweep are complete. All four
-spawning tasks already include --allow-env from a6e91af. The cited failure predates that repair. All
-23 local quality validations and workspace install exited zero; README checked all 99 fences in
-139.598 seconds with unchanged allowances. Review threads pass with zero unanswered. Production
-source remains 29dc9de; this push adds only sanitized validation evidence. Confirm the new head
-quality result, then publish a fresh READY reply and refresh the excluded final-report handoff. No
-further implementation change is required. Keep the previously disclosed runtime and historical
-limitations visible. No private runtime details belong in tracked records.
+Assignment #2454, existing PR #2458, branch `orch/divybot-6470442939`. All four resumed review
+blockers are fixed. Main 96d13d294 was merged normally; no rebase or force-push.
 
-# Resume
+The compiler checks the entire corpus once under the existing deadline and group cleanup.
+Only timeouts start per-fence diagnostic probes; cancellation stops immediately. The source
+list prints once. README graph failures cannot borrow known type errors or prior syntax
+exclusions. The unknown-JSR-export fixture proves the old defect. Pages deploy has a two-minute
+timeout, sized from 9–10 second successful jobs. Process tests have their own five-second
+watchdog and independent fixture-group cleanup.
 
-Final cancellation-consumer repair: interrupted Git ignore probes now throw instead of resuming
-the source walk. A real-process SIGTERM regression went red before this one-line change and
-green afterward. All 30 focused tests, the real 21-test snippet task, check/lint/format and the
-same-session independent pre-commit review pass. Match the source fingerprints in evaluate.md.
-The preceding bfe3fa3 has all core CI, Pages, Code quality and native README green. The final
-push contains this narrow probe repair plus its evidence; confirm exact-head CI and publish the
-results on the PR/READY handoff, without another evidence-only push.
+Completed evidence: before 98.574s/277.052s (snippets/README); repaired medians 11.523s/22.563s
+versus main 11.294s/22.082s, within 20%. Actual snippet task 27 PASS; structured combined suite
+38 PASS, including all 11 existing README policy/workflow tests. Structured check/format 53
+files and lint seven touched files PASS. All 23 native quality/documentation gates PASS,
+including ci:quality. Final native README covers all 100 fences in 10.489s with five known
+errors across four READMEs. Frozen install, release preflight, docs-site verification and
+review-thread check PASS. Root lock unchanged. Negative controls are RED as intended.
 
-Current follow-up: core CI at f8f3b28 passed quality and all shards except test-4. The source-line
-assertion exposed ANSI codes preventing line-offset mapping. Forced color reproduced the failure;
-the repaired mapper and always-colored regression now pass all 23 focused tests and structured
-check/lint/format. Same-session independent pre-commit review is PASS; fingerprint verification
-ties it to the signoff commit. After pushing, run native README and current CI, then record final
-results on the PR and refresh the excluded READY handoff without an extra push cycle. The prior
-Utility browser failure passed on an unchanged 48-test rerun. No UI-owned files changed.
+Independent read-only native claude-opus-5-5 high-effort IMPL-EVAL: PASS, 202.241s, no blockers
+or repair round. Exact source fingerprints and all current gate details are in
+review-blockers-validation.md; returned verdict is summarized in evaluate.md.
 
-Issue #2454, branch orch/divybot-6470442939, main baseline d6dfab0. Plan checkpoint recorded;
-implementation delivered in open, ready-for-review PR #2458. Review repair is in progress for three
-Augment findings: README env permissions, full-corpus checking, and outer-launcher cancellation.
-All are fixed and pushed in a6e91af/d77b4b6; all three threads have replies. The real
-main docs corpus passes in 41.689s. Original main's README gate confirms five known errors across
-99 fences; the full repaired README gate PASSES at final source head d77b4b6 with exactly five
-errors / four failing READMEs, in 149.623s, using a native receipt. Final same-session independent
-review is PASS. Structured checks pass 53 files, lint all nine edited files; 23 focused tests and
-20 snippet-task tests pass. Distinct unmapped bare imports retain separate locations; only missing
-physical targets coalesce. Actual repaired Pages build passes in 112s (snippets 65s). CI test-5's auth fixture
-failed on a transient fetch and passes unchanged in a focused local rerun. Earlier runtime E2E
-preflight remains unavailable. Historical review/timings remain in evaluate.md and validation.md. Public
-records must contain no private runtime details. Keep assignment file uncommitted. Final READY
-report must be handed off via excluded `.divybot-final-report.md`.
+Full one-pass scaffold.runtime was attempted but remains UNPROVEN after Aspire doctor failed
+and Docker was unavailable. New-head CI is required before merge. Earlier history includes a
+replaced inspection report; do not rewrite history or reintroduce private runtime data.
+Public records use relative paths and aggregate evidence. Raw receipts and runtime identities
+stay outside Git. Unknown/foreign resources were left alone.
 
-The closeout commit changes only run evidence. PR #2458 is authoritative for final head and CI
-state. No implementation work remains unless new review findings or current CI failures require it;
-do not wait for a merge, or merge/tag/release. Keep full runtime E2E and the history limitation honest.
-
-History limitation: a generated resource inspection report with local runtime paths was
-inadvertently included in an earlier commit; current content is privacy-safe, and no secrets were
-included. No history rewrite is authorized. Do not hide this limitation in the handoff.
+Finish the signoff commit and normal push to this same branch, refresh the existing PR with its
+Refs URL and no closing keywords or label changes, then atomically write the canonical READY
+report through excluded .divybot-final-report.md. The dispatcher publishes it on #2454.
+Stop at READY for review; no merge, tag, release or remote CI polling.

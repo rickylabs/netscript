@@ -107,16 +107,14 @@ function mapDiagnostics(raw: string, modules: SyntheticModule[]): string {
       diagnostics = diagnostics.replaceAll(generatedPath, module.block.sourcePath);
     }
   }
-  const fences = modules.map((module) => `${module.block.sourcePath}:${module.block.openingLine}`)
-    .join(', ');
-  return `source fences: ${fences}\n${diagnostics}`;
+  return diagnostics;
 }
 
 /** Assemble page-isolated synthetic modules and run Deno check without executing snippets. */
 export async function compileSnippetAnalysis(
   analysis: SnippetSiteAnalysis,
   repositoryRoot: string,
-  options: { timeoutMs?: number } = {},
+  options: { timeoutMs?: number; processRunner?: typeof runSnippetProcess } = {},
 ): Promise<SnippetCompilationResult> {
   const tempRoot = await Deno.makeTempDir({ prefix: 'netscript-doc-snippets-' });
   const rootLockPath = join(repositoryRoot, 'deno.lock');
@@ -151,33 +149,44 @@ export async function compileSnippetAnalysis(
     );
     const tempLockPath = join(tempRoot, 'deno.lock');
     await Deno.copyFile(rootLockPath, tempLockPath);
-    let code = 0;
-    let incomplete = false;
-    let stdout = '';
-    let diagnostics = '';
-    // Attribute and bound each entrypoint independently; dependencies retain page-local modules.
-    for (const module of modules) {
-      const source = `${module.block.sourcePath}:${module.block.openingLine}`;
-      console.error(`Checking documentation snippet ${source}`);
-      const output = await runSnippetProcess(Deno.execPath(), [
+    const processRunner = options.processRunner ?? runSnippetProcess;
+    const checkModules = (entries: SyntheticModule[], source: string) =>
+      processRunner(Deno.execPath(), [
         'check',
         '--unstable-kv',
         '--lock',
         tempLockPath,
         '--config',
         configPath,
-        module.path,
+        ...entries.map((module) => module.path),
       ], { cwd: repositoryRoot, source, timeoutMs: options.timeoutMs });
-      stdout += output.stdout;
-      diagnostics += mapDiagnostics(output.stderr, modules);
-      if (output.code !== 0) {
-        code = output.code;
-        if (output.timedOut || output.interrupted) {
-          incomplete = true;
-          break;
+    let stdout = '';
+    let diagnostics = '';
+    let code = 0;
+    let incomplete = false;
+    // One compiler shares graph loading and type-checking across the whole corpus.
+    if (modules.length > 0) {
+      console.error(`Checking documentation corpus (${modules.length} fences)`);
+      const output = await checkModules(modules, 'documentation corpus');
+      code = output.code;
+      incomplete = output.timedOut || output.interrupted;
+      stdout = output.stdout;
+      diagnostics = mapDiagnostics(output.stderr, modules);
+      // After a timeout, identify a stalled fence under the same deadline and group cleanup.
+      // External cancellation must abort instead of starting more compiler processes.
+      if (output.timedOut && !output.interrupted) {
+        for (const module of modules) {
+          const source = `${module.block.sourcePath}:${module.block.openingLine}`;
+          console.error(`Diagnosing documentation snippet ${source}`);
+          const probe = await checkModules([module], source);
+          stdout += probe.stdout;
+          diagnostics += mapDiagnostics(probe.stderr, modules);
+          if (probe.timedOut || probe.interrupted) break;
         }
       }
     }
+    const fences = modules.map((module) => `${module.block.sourcePath}:${module.block.openingLine}`)
+      .join(', ');
     const rootLockAfter = await Deno.readTextFile(rootLockPath);
     const tempLockAfter = await Deno.readTextFile(tempLockPath);
     const rootLockUnchanged = rootLockBefore === rootLockAfter;
@@ -186,7 +195,7 @@ export async function compileSnippetAnalysis(
       code,
       incomplete,
       stdout,
-      diagnostics,
+      diagnostics: `source fences: ${fences}\n${diagnostics}`,
       memberCount: workspace.memberCount,
       catalogCount: Object.keys(workspace.catalog).length,
       rootLockUnchanged,

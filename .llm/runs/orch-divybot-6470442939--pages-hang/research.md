@@ -50,3 +50,20 @@ between network, graph construction, or individual entrypoints. This is abnormal
 15–17-second successful CI sample and a 4.148-second warm local reproduction (exit 0).
 No credible one-line performance fix was established; preserve drift semantics and report the
 performance finding separately on #2454 for follow-up.
+
+## Review resumption: deploy sizing and controls
+
+NetScript MCP find_guidance/search_docs were consulted again through local CLI stdio before
+implementation. They returned cancellation/deadline guidance and no existing corpus-checker
+implementation. Preserve the existing process runner as the process boundary.
+
+Successful deploy jobs in runs 40729019703, 40725641918 and 40687615531 took 10, 9 and 9
+seconds respectively; the deploy action itself took 7 seconds in all three. Add a two-minute
+job timeout (12 times the observed maximum), independent of build and snippet-step limits.
+
+The unknown-JSR-export regression and deploy timeout contract both failed before repair.
+Independent-watchdog negative control: changing the production deadline to 60 seconds made
+the never-exits regression fail at its own 5,000ms guard (7.424s whole wrapper including
+type-check/startup, exit 1). Disabling process-group SIGKILL made the inherited-pipe descendant
+regression fail on the survival marker (3.136s whole wrapper, exit 1). Production mutations
+were restored in finally; raw logs are retained outside Git.

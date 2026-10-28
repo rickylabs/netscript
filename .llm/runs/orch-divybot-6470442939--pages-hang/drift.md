@@ -15,3 +15,15 @@
 - Review repair: the initial implementation/evaluation missed the shared README compiler caller
   and the external launcher-signal path. All three Augment findings are fixed, with red/green
   regressions and same-session re-evaluation PASS. README ratchet bounds and CI gates remain intact.
+
+## Review resumption
+
+- Origin/main advanced to 96d13d294; merged normally before repairs. Upstream's additional README
+  fence raises the measured corpus from 99 to 100; no ratchet values changed.
+- The initial local baseline ran slower than the prior review machine; first snippets took
+  84.838s and README reached a 240s external safety limit. Compare warm main and repaired code
+  on the same merged corpus and machine, and report full repeated baseline timing separately.
+- Interruption preserves immediate cancellation; diagnostic fallback is restricted to timeout
+  because launching new processes after cancellation would regress the prior review repair.
+- The read-only resource reporter wrote only to the external run evidence directory. No generated
+  report or private process data is staged or committed. Foreign resources remain untouched.

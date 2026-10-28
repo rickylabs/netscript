@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { kill } from 'node:process';
 
-/** A cold compiler gets ample margin over the normal 8–12 second corpus check. */
+/** Bound a whole-corpus compile, including cold dependency loading. */
 export const SNIPPET_TIMEOUT_MS = 30_000;
 /** Includes dependency loading before the checker can extract source fences. */
 export const SNIPPET_CHECK_TIMEOUT_MS = 240_000;

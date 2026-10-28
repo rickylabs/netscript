@@ -163,3 +163,70 @@ dependency-generated lock additions, the sequential retry passed. The full sweep
 tracked lock unchanged. The source-only independent PASS remains applicable. Commit this sanitized
 record, push normally, confirm new-head quality, and post fresh READY evidence. No merge or history
 rewrite.
+
+## Review blockers — design checkpoint (2026-10-28)
+
+1. Public surface: the two existing docs commands check a complete corpus with one bounded
+   compiler process; graph failures cannot borrow another fence's tolerated errors.
+2. Vocabulary: corpus check is the fast path; diagnostic fallback identifies timeout sources;
+   an unattributed failure is a compiler failure not fully explained by readable diagnostics.
+3. Ports: existing process runner, Deno compiler, source extractor, GitHub job timings.
+4. Constants: retain compiler/launcher timeout policy; name independent test watchdog bounds;
+   size deploy timeout from recent successful jobs with explicit margin.
+5. One repair slice: compiler batching and failure attribution, README regression fixture,
+   bounded process tests, Pages deploy timeout and its contract test. Gates: red/green controls,
+   before/after/main wall times, docs tasks and tests, structured check/lint/fmt, configured
+   quality checks, full CLI runtime attempt, and separate read-only IMPL-EVAL before signoff.
+   Files: declared docs tools/tests/fixtures, Pages deploy job, and this run's records.
+6. Deferred scope: export drift redesign, UI/utility-browser work, unrelated source or locks.
+7. Contributor path: `.llm/tools/docs/snippet-compiler.ts`.
+
+PLAN-EVAL: N/A — four prescribed review repairs to established internal contracts; no new
+framework or public API design. Preserve all existing error/coverage ceilings and CI gates.
+
+Owner override (verbatim): “Run IMPL-EVAL with claude -p --model claude-opus-5-5 --effort high,
+read-only, stdin closed, blockers only. Fix once and record the verdict.”
+
+Reconcile: resuming the expected PR baseline; origin/main has advanced and will be merged
+without rebasing. Direct tools are the fallback because RTK is not installed.
+
+### Review-blocker implementation and paired timings
+
+The completed warm before run passes at 98.574s (snippets) and 277.052s (README). Two
+paired main/repaired runs produce medians 11.294s / 11.523s for snippets and 22.082s /
+22.563s for README: +2.0% and +2.2%, within the 20% target. The same merged corpus has
+100 README fences and retains five known errors across four READMEs. The normal path uses
+one compiler process; only a timeout enters diagnostic probes. Interruption never restarts
+work. The source-list prefix appears once, including fallback output.
+
+Unknown-export regression and deploy timeout contract both went RED before repair and GREEN
+in the 30-test focused suite. Independent timer-disabled and group-kill-disabled controls
+are RED with the intended watchdog/survival failures. Final test/quality passes follow.
+
+### Final local gates before independent review
+
+38 structured tests and the actual 27-test snippet task PASS. Structured check/format pass
+53 files; lint passes all seven touched TS files. All 23 native quality/documentation gates
+PASS, including quality:gate, ci:quality, README, exports and publish dry-run. The final
+README gate checks all 100 fences in 10.489s with the original five-error/four-README budget.
+Frozen install, release preflight, docs-site verification and review-thread check also PASS.
+
+Full one-pass scaffold.runtime was attempted: exit 1 at Aspire doctor; Docker is unavailable.
+Runtime remains UNPROVEN. The read-only resource report stays outside Git and foreign/unknown
+resources remain untouched. Root lock and CI gates are unchanged. See review-blockers-validation.md
+for exact commands, paired timings, negative controls, gate table and reviewed source blobs.
+Independent Anthropic read-only evaluation is next; no implementation self-certification.
+
+### Independent signoff and reconcile
+
+Separate-family, read-only native `claude-opus-5-5` high-effort IMPL-EVAL returned PASS in
+202.241s, no blockers and no repair round. It inspected raw evidence and recomputed the median
+timing comparison. Zero write/command tools and zero permission denials. Approved source blob
+fingerprints match the working tree. Record full verdict in evaluate.md before committing.
+
+Reconcile: current main 96d13d294 is merged without rebasing; all repair files are inside the
+declared surface. No new architecture debt, lock churn or CI weakening. All four blockers are
+complete. Keep the disclosed runtime preflight and historical report limitations visible.
+Privacy screening covers outgoing diff paths, hosts/endpoints, numeric runtime identifiers and
+certificate/container-like values; only public source/test literals and Git source identities
+are appropriate. Push normally to the existing PR after the final scan. Stop at READY for review.

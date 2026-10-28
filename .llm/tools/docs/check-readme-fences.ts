@@ -110,10 +110,10 @@ export async function checkReadmeFences(
 
   const typeErrors = readmeFenceTypeErrorPaths(plain);
   const failingReadmes = new Set(typeErrors);
-  // A non-zero compile that produced neither an attributed type error nor an excluded fence means a
-  // diagnostic shape this checker cannot read. Reporting it beats passing on an unread failure.
+  // Each round checks only the remaining fences. Earlier syntax exclusions cannot account for a
+  // failure in the final round (for example a module-graph error without a TypeScript diagnostic).
   const unattributedFailure = compilerIncomplete ||
-    (compilerCode !== 0 && typeErrors.length === 0 && syntaxFailures.length === 0);
+    (compilerCode !== 0 && typeErrors.length === 0);
   return {
     census: {
       readmes: readmes.length,

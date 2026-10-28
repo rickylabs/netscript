@@ -11,3 +11,15 @@
 - Review repair scope authorized by the owner’s “address each item, push fixes, keep the PR green”:
   README fence task/shebang and caller coverage, compiler failure aggregation, signal forwarding,
   focused regressions and `.llm/tools/gates/readme-fence-workflow_test.ts`; run evidence stays here.
+
+## Review-blocker resumption — 2026-10-28
+
+- Resumed by OpenAI Codex; reviewed baseline `8c86721b74763aad2f49821138daa76822e86070`.
+- Continue the existing branch and PR #2458; no new PR, labels, or closing keywords.
+- Writable surface extends the original declaration to the Pages deploy job timeout,
+  `.llm/tools/docs/` compiler/process/tests and fixtures,
+  `.llm/tools/gates/readme-fence-workflow_test.ts` if needed, this run directory,
+  and a dated `.llm/` session note. Root docs tasks only if tests need wiring.
+- Query of the pinned feature matrix completed; retain the owner's explicit separate-family
+  native Claude high-effort evaluation override. Public records omit runtime identities.
+- Merge origin/main if advanced; never rebase or force-push. Privacy-scan each outgoing diff.

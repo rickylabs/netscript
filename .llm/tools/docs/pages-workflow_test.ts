@@ -18,6 +18,7 @@ interface PagesWorkflowContract {
   eventPaths: Record<'pull_request' | 'push', string[]>;
   buildSteps: WorkflowStep[];
   buildTimeoutMinutes: number;
+  deployTimeoutMinutes: number;
 }
 
 function sourceLines(source: string): SourceLine[] {
@@ -105,7 +106,12 @@ function parsePagesWorkflow(source: string): PagesWorkflowContract {
     };
   });
 
-  return { eventPaths, buildSteps, buildTimeoutMinutes };
+  const deploy = childIndex(lines, jobs, sectionEnd(lines, jobs), 2, 'deploy');
+  const deployTimeoutMinutes = Number(
+    lines.slice(deploy + 1, sectionEnd(lines, deploy)).filter((line) => line.indent === 4)
+      .map((line) => scalar(line, 'timeout-minutes')).find((value) => value !== undefined),
+  );
+  return { eventPaths, buildSteps, buildTimeoutMinutes, deployTimeoutMinutes };
 }
 
 Deno.test('Pages structurally revalidates docs for package and plugin changes before Lume', async () => {
@@ -162,4 +168,13 @@ Deno.test('Pages structurally revalidates docs for package and plugin changes be
     workflow.buildTimeoutMinutes > snippetTimeout!,
     'allow the remaining build steps to finish',
   );
+});
+
+Deno.test('Pages deploy releases the serial queue within its own finite deadline', async () => {
+  const workflow = parsePagesWorkflow(await Deno.readTextFile('.github/workflows/pages.yml'));
+  assert(
+    Number.isSafeInteger(workflow.deployTimeoutMinutes) && workflow.deployTimeoutMinutes > 0,
+    'deploy job needs a finite positive timeout',
+  );
+  assertEquals(workflow.deployTimeoutMinutes, 2, 'two minutes allows margin over 9–10 second jobs');
 });

@@ -3,6 +3,9 @@ import { dirname, fromFileUrl, join } from '@std/path';
 import { compileSnippetAnalysis } from './snippet-compiler.ts';
 import { analyzeSnippetSite } from './snippet-policy.ts';
 import { canonicalizePackageSpecifier, resolveWorkspaceSurface } from './snippet-workspace.ts';
+import { checkReadmeFences } from './check-readme-fences.ts';
+import { readmeFenceRatchetFailures } from './readme-fence-policy.ts';
+import type { SnippetProcessResult } from './snippet-process.ts';
 
 const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
 const fixtureRoot = join(repositoryRoot, '.llm/tools/docs/fixtures');
@@ -75,6 +78,75 @@ Deno.test('compiler reports later fence errors after an earlier tolerated failur
     await Deno.remove(site, { recursive: true });
   }
 });
+
+Deno.test('README module-graph failures cannot borrow the known type-error allowance', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'readme-graph-failure-' });
+  try {
+    await Deno.mkdir(join(root, 'packages/example'), { recursive: true });
+    await Deno.copyFile(
+      join(fixtureRoot, 'unknown-export/README.md'),
+      join(root, 'packages/example/README.md'),
+    );
+    await Deno.writeTextFile(
+      join(root, 'deno.json'),
+      JSON.stringify({ workspace: [], catalog: { preact: '^10.29.2' } }),
+    );
+    await Deno.copyFile(join(repositoryRoot, 'deno.lock'), join(root, 'deno.lock'));
+    const result = await checkReadmeFences(root);
+    assertStringIncludes(result.diagnostics, 'Unknown export');
+    assertEquals(result.census.unattributedFailure, true, result.diagnostics);
+    assert(
+      readmeFenceRatchetFailures(result.census).includes(
+        'compiler reported failure that no fence accounts for',
+      ),
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+for (const outcome of ['success', 'type-error', 'timeout', 'interruption'] as const) {
+  Deno.test(`corpus compiler uses one process, diagnostic fallback only on timeout: ${outcome}`, async () => {
+    const site = await Deno.makeTempDir({ prefix: 'snippet-corpus-' });
+    try {
+      await Deno.writeTextFile(
+        join(site, 'page.md'),
+        '```ts\nexport {};\n```\n\n```ts\nexport {};\n```\n',
+      );
+      const analysis = await analyzeSnippetSite(site, { enforceCoverage: false });
+      const calls: string[][] = [];
+      const result = await compileSnippetAnalysis(analysis, repositoryRoot, {
+        processRunner: (_command, args, options): Promise<SnippetProcessResult> => {
+          calls.push(args);
+          const timedOut = outcome === 'timeout' && calls.length !== 2;
+          const interrupted = outcome === 'interruption';
+          return Promise.resolve({
+            code: outcome === 'success' || (outcome === 'timeout' && calls.length === 2) ? 0 : 1,
+            timedOut,
+            interrupted,
+            stdout: '',
+            stderr: timedOut ? `${options.source}: timed out` : 'compiler output\n',
+          });
+        },
+      });
+      const firstPaths = calls[0].filter((arg) => arg.endsWith('.ts'));
+      assertEquals(firstPaths.length, 2, 'all corpus entrypoints belong to one check');
+      assertEquals(calls.length, outcome === 'timeout' ? 3 : 1);
+      assertEquals(result.code, outcome === 'success' ? 0 : 1);
+      assertEquals(result.incomplete, outcome === 'timeout' || outcome === 'interruption');
+      assertEquals(result.diagnostics.match(/source fences:/g)?.length, 1);
+      if (outcome === 'timeout') {
+        assertEquals(
+          calls.slice(1).map((args) => args.filter((arg) => arg.endsWith('.ts')).length),
+          [1, 1],
+        );
+        assertStringIncludes(result.diagnostics, 'page.md:5: timed out');
+      }
+    } finally {
+      await Deno.remove(site, { recursive: true });
+    }
+  });
+}
 
 Deno.test('compiler deadline fails with the source fence and preserves the tracked lock', async () => {
   const lockBefore = await Deno.readTextFile(join(repositoryRoot, 'deno.lock'));
