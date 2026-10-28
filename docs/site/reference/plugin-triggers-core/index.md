@@ -5,46 +5,39 @@ title: '@netscript/plugin-triggers-core'
 
 # `@netscript/plugin-triggers-core`
 
-Trigger DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript
-trigger plugins. This page is written against the package's public surface reported by `deno doc`.
-For the full index of packages and plugins return to the [reference overview](/reference/).
+Trigger DSL, runtime ports, adapters, telemetry, config and testing primitives for NetScript
+triggers. Triggers must survive duplicate webhooks, senders that retry on a slow response, and
+crashes between the acknowledgement and the work. `defineWebhook`, `defineScheduledTrigger` and
+`defineFileWatch` take the handler first and a frozen spec second; ingress verifies and persists an
+event before responding `202`; and the processor applies idempotency, retry policy, bounded
+concurrency, dead-lettering and circuit-breaking around every dispatch, all through explicit ports.
+The deployable [`@netscript/plugin-triggers`](/reference/triggers/) plugin binds this core to a
+NetScript host; use the core directly for custom hosts, libraries and tests.
 
-The hard part of triggers is not receiving them — it is surviving them: duplicate webhooks, senders
-that retry on a slow response, crashes between the acknowledgement and the work. `defineWebhook`,
-`defineScheduledTrigger`, and `defineFileWatch` take the handler first and a frozen spec second;
-ingress verifies and persists an event before responding `202`; and the processor applies
-idempotency, retry policy, bounded concurrency, dead-lettering, and circuit-breaking around every
-dispatch — all through explicit ports you can swap.
+## Sub-path exports
 
-This is the core that the deployable [`@netscript/plugin-triggers`](/reference/triggers/) plugin
-binds to a NetScript host. Use it directly for custom hosts, libraries, and tests.
-
-## Exports
-
-| Export specifier                               | Module                      | Exports | Purpose                                                                                                                                              |
-| ---------------------------------------------- | --------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@netscript/plugin-triggers-core`              | `./mod.ts`                  | 106     | The full public surface — builders, runtime factories, ports, and the event model (documented below).                                                |
-| `@netscript/plugin-triggers-core/public`       | `./src/public/mod.ts`       | 106     | The same curated public surface the root re-exports, for consumers that prefer to name it explicitly.                                                |
-| `@netscript/plugin-triggers-core/builders`     | `./src/builders/mod.ts`     | 50      | The three definition builders and the handler-action constructors (`enqueueJob`).                                                                    |
-| `@netscript/plugin-triggers-core/domain`       | `./src/domain/mod.ts`       | 69      | Trigger domain vocabulary and policy defaults (concurrency limit, idempotency TTL, circuit-breaker thresholds, backoff multiplier).                  |
-| `@netscript/plugin-triggers-core/ports`        | `./src/ports/mod.ts`        | 80      | The port interfaces the runtime depends on — event store, DLQ, idempotency, enabled-state, scheduler, verifier, subscription.                        |
-| `@netscript/plugin-triggers-core/runtime`      | `./src/runtime/mod.ts`      | 97      | The runtime factories — `createTriggerIngress`, `createTriggerProcessor`, `createManualDispatcher`, `createEventSubscription`, `defaultRetryPolicy`. |
-| `@netscript/plugin-triggers-core/adapters`     | `./src/adapters/mod.ts`     | 28      | Concrete adapters: the cron scheduler adapter, the file-watcher port, and the HMAC-SHA256 webhook verifier.                                          |
-| `@netscript/plugin-triggers-core/stores`       | `./src/stores/mod.ts`       | 40      | KV-backed store implementations and `openTriggerRuntimeKv`.                                                                                          |
-| `@netscript/plugin-triggers-core/config`       | `./src/config/mod.ts`       | 17      | `defineTriggers` and the trigger configuration schemas.                                                                                              |
-| `@netscript/plugin-triggers-core/contracts/v1` | `./src/contracts/v1/mod.ts` | 35      | Version 1 trigger API schemas and contract route types (`triggersContract`, `triggersContractV1`).                                                   |
-| `@netscript/plugin-triggers-core/telemetry`    | `./src/telemetry/mod.ts`    | 37      | `createTriggerInstrumentation`, span names, and attribute keys for trigger dispatch.                                                                 |
-| `@netscript/plugin-triggers-core/testing`      | `./src/testing/mod.ts`      | 79      | In-memory and KV store doubles for deterministic runtime verification.                                                                               |
-
-Export counts are the symbol counts `deno doc` reports for each entrypoint; the layered subpaths
-re-export shared vocabulary, so the counts overlap rather than sum.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-triggers-core` | `./mod.ts` | The full public surface: builders, runtime factories, ports, and the event model. See [details](#root-surface-netscriptplugin-triggers-core). |
+| `@netscript/plugin-triggers-core/public` | `./src/public/mod.ts` | The same curated public surface the root re-exports, for consumers that prefer to name it explicitly. |
+| `@netscript/plugin-triggers-core/builders` | `./src/builders/mod.ts` | The three definition builders and the handler-action constructors (`enqueueJob`). |
+| `@netscript/plugin-triggers-core/domain` | `./src/domain/mod.ts` | Trigger domain vocabulary and policy defaults (concurrency limit, idempotency TTL, circuit-breaker thresholds, backoff multiplier). |
+| `@netscript/plugin-triggers-core/ports` | `./src/ports/mod.ts` | The port interfaces the runtime depends on: event store, DLQ, idempotency, enabled-state, scheduler, verifier, subscription. |
+| `@netscript/plugin-triggers-core/runtime` | `./src/runtime/mod.ts` | The runtime factories: `createTriggerIngress`, `createTriggerProcessor`, `createManualDispatcher`, `createEventSubscription`, `defaultRetryPolicy`. |
+| `@netscript/plugin-triggers-core/adapters` | `./src/adapters/mod.ts` | Concrete adapters: the cron scheduler adapter, the file-watcher port, and the HMAC-SHA256 webhook verifier. |
+| `@netscript/plugin-triggers-core/stores` | `./src/stores/mod.ts` | KV-backed store implementations and `openTriggerRuntimeKv`. |
+| `@netscript/plugin-triggers-core/config` | `./src/config/mod.ts` | `defineTriggers` and the trigger configuration schemas. |
+| `@netscript/plugin-triggers-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Version 1 trigger API schemas and contract route types (`triggersContract`, `triggersContractV1`). |
+| `@netscript/plugin-triggers-core/telemetry` | `./src/telemetry/mod.ts` | `createTriggerInstrumentation`, span names, and attribute keys for trigger dispatch. |
+| `@netscript/plugin-triggers-core/testing` | `./src/testing/mod.ts` | In-memory and KV store doubles for deterministic runtime verification. |
+| `@netscript/plugin-triggers-core/discovery` | `./src/builders/discovery.ts` | [Contribution-builder discovery metadata](#discovery-metadata). |
 
 ## Root surface (`@netscript/plugin-triggers-core`)
 
 ### Defining triggers
 
-Each builder takes the **handler first** and an immutable spec second, and returns a frozen
-definition the runtime walker discovers.
+Each builder takes the handler first and an immutable spec second, and returns a frozen definition
+the runtime walker discovers.
 
 | Symbol                        | Kind       | Description                                                               |
 | ----------------------------- | ---------- | ------------------------------------------------------------------------- |
@@ -67,7 +60,7 @@ definition the runtime walker discovers.
 
 ### Handler context and actions
 
-A handler does not perform work directly; it returns **actions** the dispatcher carries out.
+A handler does not perform work directly; it returns actions the dispatcher carries out.
 
 | Symbol                    | Kind       | Description                                                               |
 | ------------------------- | ---------- | ------------------------------------------------------------------------- |
@@ -84,20 +77,20 @@ A handler does not perform work directly; it returns **actions** the dispatcher 
 
 ### Definition union and kinds
 
-| Symbol                         | Kind       | Description                                                             |
-| ------------------------------ | ---------- | ----------------------------------------------------------------------- |
-| `TriggerDefinition`            | type alias | Implemented and reserved trigger definitions exposed by the public API. |
-| `TriggerDefinitionBase`        | type alias | Common immutable fields shared by trigger definitions.                  |
-| `TriggerKind`                  | type alias | Open trigger discriminator.                                             |
-| `TriggerKnownKind`             | type alias | Canonical known trigger kind.                                           |
-| `TRIGGER_KINDS`                | variable   | Canonical trigger kinds exposed by trigger definitions.                 |
-| `ProcessableTriggerDefinition` | type alias | Trigger definition accepted by runtime processor ports.                 |
-| `RuntimeTriggerDefinition`     | type alias | Trigger definitions accepted by the current runtime processor.          |
-| `RuntimeWebhookDefinition`     | type alias | Webhook definition shape accepted by the trigger ingress runtime.       |
-| `TriggerId`                    | type alias | Branded trigger definition identifier.                                  |
-| `WebhookId`                    | type alias | Branded webhook definition identifier.                                  |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TriggerDefinition` | type alias | Implemented and reserved trigger definitions exposed by the public API. |
+| `TriggerDefinitionBase` | type alias | Common immutable fields shared by trigger definitions. |
+| `TriggerKind` | type alias | Open trigger discriminator. |
+| `TriggerKnownKind` | type alias | Canonical known trigger kind. |
+| `TRIGGER_KINDS` | const | Canonical trigger kinds exposed by trigger definitions. |
+| `ProcessableTriggerDefinition` | type alias | Trigger definition accepted by runtime processor ports. |
+| `RuntimeTriggerDefinition` | type alias | Trigger definitions accepted by the current runtime processor. |
+| `RuntimeWebhookDefinition` | type alias | Webhook definition shape accepted by the trigger ingress runtime. |
+| `TriggerId` | type alias | Branded trigger definition identifier. |
+| `WebhookId` | type alias | Branded webhook definition identifier. |
 
-`TriggerKind` is deliberately **open** while `TriggerKnownKind` is closed: a host may carry a kind
+`TriggerKind` is open while `TriggerKnownKind` is closed: a host may carry a kind
 the core does not implement, and only the known kinds narrow into `RuntimeTriggerDefinition`.
 
 ### Payloads
@@ -111,8 +104,9 @@ the core does not implement, and only the known kinds narrow into `RuntimeTrigge
 
 ### Reserved kinds
 
-These are declared in the type surface but **not executed** by the current runtime. They exist so a
-host can carry the shape without the core pretending to run it.
+> [!NOTE]
+> These kinds are declared in the type surface but not executed by the runtime, so a host can carry
+> the shape without the core pretending to run it.
 
 | Symbol                    | Kind       | Description                                                               |
 | ------------------------- | ---------- | ------------------------------------------------------------------------- |
@@ -134,7 +128,7 @@ host can carry the shape without the core pretending to run it.
 | `TriggerIngressResponse`       | type alias | Fast ack response returned by ingress adapters.           |
 | `TriggerIngressEventIdFactory` | type alias | Generates event ids for accepted ingress events.          |
 
-Ingress **verifies the signature and persists the event before responding**. That ordering is the
+Ingress verifies the signature and persists the event before responding. That ordering is the
 contract: a slow handler never blocks the sender, and a crash after the acknowledgement replays from
 the stored event rather than losing it.
 
@@ -151,37 +145,37 @@ the stored event rather than losing it.
 
 ### Dispatch policies
 
-| Symbol                      | Kind       | Description                                                       |
-| --------------------------- | ---------- | ----------------------------------------------------------------- |
-| `TriggerRetryPolicy`        | type alias | Retry policy applied by the trigger processor before DLQ handoff. |
-| `TriggerConcurrencySpec`    | type alias | Bounded dispatch concurrency for a trigger definition.            |
-| `TriggerDeduplicationSpec`  | type alias | Event-boundary deduplication policy.                              |
-| `TriggerCircuitBreakerSpec` | type alias | Circuit breaker policy for repeated trigger dispatch failures.    |
-| `TriggerDurabilityTier`     | type alias | Trigger durability tier.                                          |
-| `TRIGGER_DURABILITY_TIERS`  | variable   | Durability tiers supported by trigger definitions.                |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TriggerRetryPolicy` | type alias | Retry policy applied by the trigger processor before DLQ handoff. |
+| `TriggerConcurrencySpec` | type alias | Bounded dispatch concurrency for a trigger definition. |
+| `TriggerDeduplicationSpec` | type alias | Event-boundary deduplication policy. |
+| `TriggerCircuitBreakerSpec` | type alias | Circuit breaker policy for repeated trigger dispatch failures. |
+| `TriggerDurabilityTier` | type alias | Trigger durability tier. |
+| `TRIGGER_DURABILITY_TIERS` | const | Durability tiers supported by trigger definitions. |
 
 ### Events, stores, and idempotency
 
-| Symbol                             | Kind       | Description                                                          |
-| ---------------------------------- | ---------- | -------------------------------------------------------------------- |
-| `TriggerEvent`                     | type alias | Unified event envelope consumed by every trigger processor path.     |
-| `TriggerEventId`                   | type alias | Branded trigger event identifier.                                    |
-| `TriggerEventStatus`               | type alias | Trigger event lifecycle status.                                      |
-| `TRIGGER_EVENT_STATUSES`           | variable   | Trigger event lifecycle statuses.                                    |
-| `TriggerEventStorePort`            | interface  | Persistent trigger event store boundary.                             |
-| `TriggerEventListOptions`          | type alias | Event store list filters.                                            |
-| `TriggerDlqPort`                   | interface  | Dead-letter queue boundary for exhausted trigger events.             |
-| `TriggerDlqEntry`                  | type alias | Dead-letter entry recorded after trigger retry exhaustion.           |
-| `TriggerDlqListOptions`            | type alias | Dead-letter list filters.                                            |
-| `TriggerIdempotencyPort`           | interface  | Event-boundary idempotency store with a TTL window.                  |
-| `TriggerIdempotencyClaim`          | type alias | Idempotency claim result.                                            |
-| `TriggerIdempotencyKeyInput`       | type alias | Idempotency key resolution input.                                    |
-| `TriggerEnabledStatePort`          | interface  | Persistent enabled-state boundary for trigger enable/disable routes. |
-| `TriggerEnabledStateOverride`      | type alias | Stored enabled-state override for a trigger definition.              |
-| `createKvTriggerEnabledStateStore` | function   | Create a KV-backed enabled-state store over the supplied adapter.    |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `TriggerEvent` | type alias | Unified event envelope consumed by every trigger processor path. |
+| `TriggerEventId` | type alias | Branded trigger event identifier. |
+| `TriggerEventStatus` | type alias | Trigger event lifecycle status. |
+| `TRIGGER_EVENT_STATUSES` | const | Trigger event lifecycle statuses. |
+| `TriggerEventStorePort` | interface | Persistent trigger event store boundary. |
+| `TriggerEventListOptions` | type alias | Event store list filters. |
+| `TriggerDlqPort` | interface | Dead-letter queue boundary for exhausted trigger events. |
+| `TriggerDlqEntry` | type alias | Dead-letter entry recorded after trigger retry exhaustion. |
+| `TriggerDlqListOptions` | type alias | Dead-letter list filters. |
+| `TriggerIdempotencyPort` | interface | Event-boundary idempotency store with a TTL window. |
+| `TriggerIdempotencyClaim` | type alias | Idempotency claim result. |
+| `TriggerIdempotencyKeyInput` | type alias | Idempotency key resolution input. |
+| `TriggerEnabledStatePort` | interface | Persistent enabled-state boundary for trigger enable/disable routes. |
+| `TriggerEnabledStateOverride` | type alias | Stored enabled-state override for a trigger definition. |
+| `createKvTriggerEnabledStateStore` | function | Create a KV-backed enabled-state store over the supplied adapter. |
 
-Every kind — webhook, scheduled, file-watch — converges on the same `TriggerEvent` envelope, which
-is why one processor pipeline covers all of them.
+Every kind (webhook, scheduled, file-watch) converges on the same `TriggerEvent` envelope, so one
+processor pipeline covers all of them.
 
 ### Live event subscription
 
@@ -194,8 +188,9 @@ is why one processor pipeline covers all of them.
 | `TriggerEventSubscriptionOptions` | type alias | Subscribe options for live trigger event streams.                  |
 | `TriggerEventSubscriptionType`    | type alias | Trigger lifecycle event emitted to live subscribers.               |
 
-`createEventSubscription` is explicitly **single-replica** and in-process: it is a live-tail hub for
-one host, not a distributed fan-out.
+> [!NOTE]
+> `createEventSubscription` is single-replica and in-process: a live-tail hub for one host, not a
+> distributed fan-out.
 
 ### Scheduling
 
@@ -206,8 +201,8 @@ one host, not a distributed fan-out.
 | `ScheduledTriggerHandle`      | type alias | Scheduled trigger handle returned by scheduler adapters.          |
 | `computeNextFireTimes`        | function   | Compute upcoming fire times for a 5-field scheduled trigger spec. |
 
-`computeNextFireTimes` is a pure preview over a **5-field** cron spec — it starts no scheduler and
-is what the CLI and dashboards use to show "next runs".
+`computeNextFireTimes` is a pure preview over a 5-field cron spec. It starts no scheduler; the CLI and
+dashboards use it to show the next runs.
 
 ### Manual dispatch
 
@@ -235,8 +230,8 @@ is what the CLI and dashboards use to show "next runs".
 | `WebhookTestDeliveryOptions`    | type alias | Options accepted by the webhook test-delivery helper factory.             |
 | `WebhookTestDeliveryResponse`   | type alias | Webhook test delivery response mapped to the trigger fire contract shape. |
 
-A verifier extracts the **provider event id** as well as validating the signature; that id is what
-lets deduplication recognize the sender's retry as the same event.
+A verifier extracts the provider event id as well as validating the signature; deduplication uses
+that id to recognize the sender's retry as the same event.
 
 `@netscript/plugin-triggers-core/adapters` ships `HmacSha256WebhookVerifier` as the default
 implementation of `WebhookVerifierPort`.
@@ -247,17 +242,6 @@ implementation of `WebhookVerifierPort`.
 | ------------ | --------- | ------------------------------------------------------------ |
 | `LoggerPort` | interface | Structured logger boundary consumed by trigger runtime code. |
 
-## Related pages
-
-- [`@netscript/plugin-triggers`](/reference/triggers/) — the deployable plugin that binds this core
-  to a NetScript host.
-- [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) — the job surface `enqueueJob`
-  hands work to.
-
----
-
-Back to the [reference overview](/reference/).
-
 ## KV retention
 
 Trigger groups declare `retention.kvDays` (default 7). Runtime startup resolves that policy per
@@ -265,7 +249,7 @@ trigger and applies it to terminal event records, their `triggers/by-trigger` in
 and their `triggers/dlq/by-trigger` indexes. Store callers can inject `kvRetentionDays` and a clock
 for a custom composition. Each record/index pair receives the same `expireIn` in one atomic write.
 Event TTL starts at terminal `updatedAt`; DLQ TTL starts at `failedAt`, so rewriting old failures
-does not extend their window. Manual fire now persists its processing outcome before returning.
+does not extend their window. Manual fire persists its processing outcome before returning.
 
 Pending, in-flight, and deferred events keep their durable state until processing settles. When a
 deferred action fires, the original event becomes terminal and its event/index pair receives TTL.
@@ -273,17 +257,22 @@ Each replay is persisted separately; a further deferral keeps that replay open u
 fires. The service shares its ingress event store with the background replay processor. Active
 idempotency claims and completed deduplication markers retain their existing claim/deduplication
 TTLs. Deferred replay records are removed on successful replay or explicit cancellation; enabled
-state remains configuration. Existing terminal records written without TTL need a migration; this
-policy applies when records are written or their status changes. Runtime/backend expiry does not
-depend on an API read or a phone/web app being open.
+state remains configuration. This policy applies when records are written or their status changes.
+Runtime/backend expiry does not depend on an API read or a phone/web app being open.
 
-## Exports: discovery metadata
+> [!IMPORTANT]
+> Existing terminal records written without TTL need a migration.
+
+## Discovery metadata
 
 The `@netscript/plugin-triggers-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-| Export specifier                            | Module                        |
-| ------------------------------------------- | ----------------------------- |
-| `@netscript/plugin-triggers-core/discovery` | `./src/builders/discovery.ts` |
+## Related pages
+
+- [`@netscript/plugin-triggers`](/reference/triggers/): the deployable plugin that binds this core
+  to a NetScript host.
+- [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/): the job surface `enqueueJob`
+  hands work to.

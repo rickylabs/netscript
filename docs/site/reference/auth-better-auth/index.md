@@ -5,14 +5,14 @@ title: "@netscript/auth-better-auth"
 
 # `@netscript/auth-better-auth`
 
-Better Auth integration, authenticator, and backend adapter for NetScript auth. This page is
-written against the package's public surface reported by `deno doc`.
+Better Auth integration, authenticator, and backend adapter for NetScript auth. Use it when Better
+Auth is the identity layer behind your NetScript services.
 
-## Exports
+## Sub-path exports
 
-| Export | Path |
-| --- | --- |
-| `@netscript/auth-better-auth` | `./mod.ts` |
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/auth-better-auth` | `./mod.ts` | [Factories](#factories), [options and integration types](#options-and-integration-types) and [re-exported auth contracts](#re-exported-auth-contracts). |
 
 ## Factories
 
@@ -47,5 +47,3 @@ written against the package's public surface reported by `deno doc`.
 | `Principal` | interface | Principal payload returned by authenticators. |
 | `AuthBackendOperationUnsupportedError` | class | Error for unsupported upstream operations. |
 | `InteractiveFlowPort` | interface | Interactive-flow port re-exported from the core auth package. |
-
-Back to the [auth reference hub](/reference/auth/).

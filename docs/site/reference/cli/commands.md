@@ -5,19 +5,14 @@ title: "netscript command reference"
 
 # `netscript` command reference
 
-The detailed verb-and-flag companion for the published `netscript` binary (`@netscript/cli`).
-Together with the curated [CLI reference](/cli-reference/), these two pages cover every public
-command group and direct subcommand; this page concentrates the extended groups and flags while the
-curated page carries the everyday flows. For the package API surface (the embeddable helpers, not
-the command tree) see the [`@netscript/cli` package page](/reference/cli/).
-
-This page documents the **public `netscript` binary** — the CLI published as `@netscript/cli` and
-installed on your PATH — not any maintainer-only tree. Everything here is verified against
-`netscript <group> --help`. To confirm the exact spelling in your installed version, run
-`netscript --help` or `netscript <group> --help`.
+Every verb and flag of the public `netscript` binary, published as `@netscript/cli`. The curated
+[CLI reference](/cli-reference/) carries the everyday flows; together the two pages cover every
+public command group and direct subcommand. For the embeddable helpers rather than the command tree,
+see the [`@netscript/cli` package page](/reference/cli/).
 
 The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, `generate`,
-`marketplace`, `plugin`, `service`, `tokens`, and the `ui:*` commands — each has a section below.
+`marketplace`, `plugin`, `service`, `tokens`, and the `ui:*` commands. To confirm the exact spelling
+in your installed version, run `netscript --help` or `netscript <group> --help`.
 
 ## `init` — scaffold a workspace
 
@@ -48,9 +43,9 @@ The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, 
 | `--json`                    | Emit a single machine-readable JSON result (default `false`).                                  |
 | `--from <preset>`           | Apply a named scaffold preset.                                                                 |
 
-Project init runs the existing agent installer after scaffolding by default, using the generated
-project root. Host detection honours project markers before the invoking environment and defaults to
-Claude Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
+Project init runs the agent installer after scaffolding by default, using the generated project
+root. Host detection honors project markers before the invoking environment and defaults to Claude
+Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
 write no agent files, and `--json` retains its single scaffold result. Offline docs remain opt-in.
 The optional Aspire agent setup keeps its bounded timeout and reports a skip if unavailable. For an
 existing project, use `netscript agent init` to refresh integration idempotently.
@@ -73,15 +68,12 @@ existing project, use `netscript agent init` to refresh integration idempotently
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `netscript agent drift record` | Record drift after a fresh successful diagnostic pass. Flags: `--resource <name>` (**required**), `--summary <text>` (**required**), `--details <text>`. |
 
-The gate is the point. `record` appends an entry only when a diagnostic **receipt** for `--resource`
-exists, exited `0`, and is **less than 15 minutes old**; the receipt itself is embedded in the
-entry. Anything else — no receipt, a failed one, a future timestamp, or a stale one — is refused
-with a non-zero exit and a message naming how to produce a fresh receipt
-(`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API introspection, or
-`execute_command` tools). A drift note therefore cannot be written from an agent's recollection of a
-run it did not just perform.
-
-The same gate backs the MCP `record_drift` tool, so both surfaces refuse identically.
+`record` appends an entry only when a diagnostic **receipt** for `--resource` exists, exited `0`, and
+is **less than 15 minutes old**; the receipt is embedded in the entry. No receipt, a failed one, a
+future timestamp or a stale one is refused with a non-zero exit and a message naming how to produce
+a fresh receipt (`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API
+introspection, or `execute_command` tools). A drift note cannot be written from an agent's
+recollection of a run it did not just perform. The MCP `record_drift` tool uses the same gate.
 
 ## `config` — inspect and mutate configuration
 
@@ -186,12 +178,16 @@ that target in normal generation. Regeneration removes an existing inactive targ
 bytes begin with that producer's exact marker; foreign or unmarked files are preserved and continue
 to report drift. Registry paths stay within the reserved producer directories and cannot claim
 authored configuration. The host validates and formats the returned module bytes before any project
-writes. Workers, triggers, sagas and AI implement protocol 2. Auth and streams declare an empty
+writes.
+
+Workers, triggers, sagas and AI implement protocol 2. Auth and streams declare an empty
 registry surface in their runtime manifests. An immutable published version returning HTTP 404 for
 its runtime manifest also declares zero outputs, including auth and streams 0.0.7. Missing local or
 source-member manifests and other HTTP failures fail closed. Protocol-1 source-only and legacy
-generators retain normal generation support; `--check` refuses them because source paths alone
-cannot certify output bytes. The inspection child runs with read permission and denies write,
+generators keep normal generation support; `--check` refuses them because source paths alone
+cannot certify output bytes.
+
+The inspection child runs with read permission and denies write,
 subprocess, network, environment, FFI and system permissions. Imports may resolve through Deno's
 module loader. Normal generation uses the consumer's configured lock semantics and may extend its
 module graph, just as other generator invocations do. Check and protocol-2 dry-run copy the
@@ -201,12 +197,12 @@ installing packages into the consumer project. A missing lock or generator graph
 inspection failure with instructions to run `netscript generate plugins` first. Consumers must
 enable a project lock to certify registry bytes; inspection never resolves a fresh graph. Limits
 bound UTF-8 rendered bytes, source/output counts and child runtime. This check certifies generated
-bytes, not installed runtime health or every transitive import. Published-version Windows/Linux
-verification belongs to release validation.
+bytes, not installed runtime health or every transitive import.
 
-Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
-`netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official
-workers samples does not disable custom-job discovery.
+> [!WARNING]
+> Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
+> `netscript generate plugins`; don't hand-edit `.netscript/generated/**`. Removing the official
+> workers samples does not disable custom-job discovery.
 
 ## `plugin` — extended verbs
 
@@ -227,8 +223,8 @@ The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`)
 
 `plugin ai` is a **pass-through**, not a command group with its own verbs. NetScript strips
 `--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child `deno run`
-process and forwards every remaining argument verbatim, printing its output and propagating its exit
-code. The verb vocabulary therefore belongs to that plugin's release, not to this reference; see the
+process, forwards every remaining argument verbatim, prints its output and propagates its exit code.
+The verbs belong to that plugin's release; see the
 [`@netscript/plugin-ai` reference](/reference/plugin-ai/). Invoking it with no verb is an error.
 
 ### `plugin auth` subcommands
@@ -274,9 +270,8 @@ The common `contract add` and `contract list` verbs are in the
 ## `db` — extended verbs
 
 The everyday database workflow (`init`, `generate`, `migrate`, `seed`, `status`, `studio`,
-`introspect`, `reset`) is in the [CLI reference](/cli-reference/#database) — and all `db` commands
-require Aspire to be running (`cd aspire && aspire start`) unless you scaffolded a file-backed
-`sqlite` engine. The full group also carries the target-management and migration-history verbs:
+`introspect`, `reset`) is in the [CLI reference](/cli-reference/#database). The full group also
+carries the target-management and migration-history verbs:
 
 | Command                           | Description                                                                                                                                                                       |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -286,6 +281,10 @@ require Aspire to be running (`cd aspire && aspire start`) unless you scaffolded
 | `netscript db deploy`             | Apply pending migrations without creating one. Flags: `--db <target>` (config key, database name, or `all`), `--project-root <path>`.                                             |
 | `netscript db validate`           | Validate database schemas. Flags: `--db <target>`, `--project-root <path>`.                                                                                                       |
 | `netscript db resolve`            | Resolve migration history state. Flags: `--db <target>`, `--project-root <path>`, `--applied <migration>` (mark as applied), `--rolled-back <migration>` (mark as rolled back).   |
+
+> [!IMPORTANT]
+> All `db` commands require Aspire to be running (`cd aspire && aspire start`) unless you
+> scaffolded a file-backed `sqlite` engine.
 
 ## `tokens` — Fresh application design tokens
 
@@ -332,8 +331,8 @@ lists, updates, and removes copied registry items:
 | `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
 | `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
 
-Because Fresh UI is copy-source, `ui:update` only touches registry files you have not modified —
-your edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+Fresh UI is copy-source, so `ui:update` only touches registry files you have not modified; your
+edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 
 ## `deploy` — cloud and container targets
 
@@ -375,8 +374,8 @@ The router walks a fixed candidate list — `plan`, `up`, `down`, `status`, `log
 exposes a verb it cannot perform. The two container targets advertise `status` and `logs`; the five
 cloud targets do not.
 
-Running a target group with no verb prints help, as every command group in the CLI does. That is the
-group's default action, not a sign that the target is unimplemented.
+Running a target group with no verb prints help, as every command group does; it does not mean the
+target is unimplemented.
 
 | Verb     | Description                             |
 | -------- | --------------------------------------- |
@@ -403,7 +402,7 @@ not persist new values), and `--non-interactive`.
 | `netscript deploy package-cli`             | Compile the NetScript CLI itself into a self-shippable Windows `.exe`. Flags: `-o, --output-dir <dir>` (default `./.deploy/windows`; a `scripts/` subdirectory is used), `--target <triple>` (default `x86_64-pc-windows-msvc`), `--no-bundle` (compile directly from source — larger output), `-v, --verbose`.                                                                                                                 |
 
 `package-cli` bundles before compiling by default and falls back to compiling from source if the
-bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather than a repair.
+bundle step fails, so `--no-bundle` is a size/behavior trade-off rather than a repair.
 
 ### Artifact copy, logs, and upgrade
 
@@ -465,4 +464,4 @@ to 64 MiB of source characters, using one staging child and one Deno formatter. 
 outside the consumer project, including when inspection denies all writes.
 
 This command covers Aspire generation; `generate plugins --check` covers installed-plugin
-registries. Published Windows/Linux release smoke remains follow-up work under #1912.
+registries.

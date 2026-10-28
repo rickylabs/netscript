@@ -5,38 +5,35 @@ title: "@netscript/kv"
 
 # `@netscript/kv`
 
-Reactive key-value storage with a unified API across Deno KV, Redis, and in-memory
-backends. This page is written against the package's public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+Key-value storage with one API across Deno KV, Redis and in-memory backends, including atomic
+commits and watch streams. Use it for process-wide KV state that must run unchanged on Deno KV
+locally and Redis in production.
 
-The root entrypoint (`@netscript/kv`) exposes the stable shared lifecycle API, the
-portable KV types, and the lightweight Deno KV and in-memory adapters. Three sub-path
-exports carry the heavier integrations:
+## Sub-path exports
 
-- [`@netscript/kv/redis`](#sub-path-exports) — the Redis-backed adapter (self-registers
-  the `'redis'` provider on import).
-- [`@netscript/kv/kvdex`](#sub-path-exports) — the [kvdex](https://jsr.io/@olli/kvdex)
-  bridge factory and re-exported kvdex core APIs.
-- [`@netscript/kv/testing`](#sub-path-exports) — the shared KV port contract harness for
-  adapter authors.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/kv` | `./mod.ts` | [Shared lifecycle](#shared-lifecycle), [adapters](#adapters) for Deno KV and memory, and the portable KV types. |
+| `@netscript/kv/redis` | `./redis.ts` | [Redis adapter](#netscriptkvredis); registers the `'redis'` provider on import. |
+| `@netscript/kv/kvdex` | `./kvdex.ts` | [kvdex bridge factory](#netscriptkvkvdex) and re-exported [kvdex](https://jsr.io/@olli/kvdex) core APIs. |
+| `@netscript/kv/testing` | `./src/testing/mod.ts` | [Shared KV port contract harness](#netscriptkvtesting) for adapter authors. |
 
 ## Shared lifecycle
 
-The shared singleton resolves a provider once (auto-detecting from the environment) and
-hands back a `WatchableKv` for the rest of the process.
+The shared singleton resolves a provider once, detecting it from the environment, and returns a
+`WatchableKv` for the rest of the process.
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `getKv` | `function getKv(config?: SharedKvConfig): Promise<WatchableKv>` | Resolve the shared `WatchableKv` singleton, initializing on first access. |
-| `getRawKv` | `async function getRawKv(config?: SharedKvConfig): Promise<Deno.Kv>` | Resolve the raw `Deno.Kv` instance when the shared provider is Deno KV. |
-| `getActiveProvider` | `function getActiveProvider(): KvProvider \| null` | Return the currently active provider, or `null` before initialization. |
-| `getKvPath` | `function getKvPath(): string \| undefined` | Return the Deno KV path currently in use, or the discovered default. |
-| `getRedisConnectionFromEnv` | `function getRedisConnectionFromEnv(): string \| undefined` | Read a normalized Redis connection string from the environment. |
-| `isKvInitialized` | `function isKvInitialized(): boolean` | Check whether the shared adapter has been initialized. |
-| `isWatchable` | `function isWatchable(store: KvStore): store is WatchableKv` | Type guard for stores that implement the `WatchableKv` contract. |
-| `resetKv` | `async function resetKv(): Promise<void>` | Reset the shared state for tests or isolated validation runs. |
-| `closeKv` | `async function closeKv(): Promise<void>` | Close and clear the shared adapter state. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `getKv` | function | `function getKv(config?: SharedKvConfig): Promise<WatchableKv>` | Resolve the shared `WatchableKv` singleton, initializing on first access. |
+| `getRawKv` | function | `async function getRawKv(config?: SharedKvConfig): Promise<Deno.Kv>` | Resolve the raw `Deno.Kv` instance when the shared provider is Deno KV. |
+| `getActiveProvider` | function | `function getActiveProvider(): KvProvider \| null` | Return the currently active provider, or `null` before initialization. |
+| `getKvPath` | function | `function getKvPath(): string \| undefined` | Return the Deno KV path currently in use, or the discovered default. |
+| `getRedisConnectionFromEnv` | function | `function getRedisConnectionFromEnv(): string \| undefined` | Read a normalized Redis connection string from the environment. |
+| `isKvInitialized` | function | `function isKvInitialized(): boolean` | Check whether the shared adapter has been initialized. |
+| `isWatchable` | function | `function isWatchable(store: KvStore): store is WatchableKv` | Type guard for stores that implement the `WatchableKv` contract. |
+| `resetKv` | function | `async function resetKv(): Promise<void>` | Reset the shared state for tests or isolated validation runs. |
+| `closeKv` | function | `async function closeKv(): Promise<void>` | Close and clear the shared adapter state. |
 
 ## Adapters
 
@@ -87,7 +84,7 @@ contains every watched key, including absent keys as `delete`/null events, and m
 acknowledgement cannot fall into a startup load/subscribe gap; a write racing the snapshot may
 appear twice, so dedupe by equal versionstamp. Redis writers stamp independently: never use their
 versionstamps to order writes across processes. Deno KV still coalesces native watch updates.
-Without `initial`, the existing backend behavior is preserved.
+Without `initial`, each backend keeps its native behavior.
 
 The kvdex bridge applies the snapshot directly, suppresses equal-stamp changes, and re-reads each
 change batch's distinct affected keys using a batch read when available. Frames reflect stored
@@ -101,22 +98,10 @@ retain their existing `skipInitial` and discovery semantics. `createLazyKv` uses
 batch as readiness when its inner adapter has no promise. A readiness rejection alone does not make
 iteration throw; iteration retains the inner adapter's completion or error behavior.
 
-## Sub-path exports
+## `@netscript/kv/redis`
 
-The following entrypoints are published alongside the root export. Each is generated from
-its own `deno doc` surface.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/kv` | `./mod.ts` | Shared lifecycle, adapters, and types (documented above). |
-| `@netscript/kv/redis` | `./redis.ts` | Redis adapter (documented below). |
-| `@netscript/kv/kvdex` | `./kvdex.ts` | kvdex bridge factory + re-exported kvdex core (documented below). |
-| `@netscript/kv/testing` | `./src/testing/mod.ts` | Shared KV port contract harness (documented below). |
-
-### `@netscript/kv/redis`
-
-Importing this module re-exports the Redis adapter **and** self-registers the `'redis'`
-provider factory with the shared lifecycle. It also re-exports the shared store contracts
+Importing this module registers the `'redis'` provider factory with the shared lifecycle. It also
+re-exports the Redis adapter and the shared store contracts
 (`KvStore`, `WatchableKv`, `KvKey`, `KvEntry`, `KvListOptions`, `KvSetOptions`,
 `AtomicCheck`, `AtomicMutation`, `AtomicResult`, `WatchEvent`, `WatchOptions`,
 `WatchPrefixOptions`).
@@ -126,10 +111,10 @@ provider factory with the shared lifecycle. It also re-exports the shared store 
 | `RedisKvAdapter` | class | `class RedisKvAdapter implements WatchableKv` | Distributed Redis adapter for `@netscript/kv`. |
 | `RedisKvOptions` | interface | `interface RedisKvOptions` | Redis connection options for the adapter. |
 
-### `@netscript/kv/kvdex`
+## `@netscript/kv/kvdex`
 
-The kvdex bridge factory plus a curated re-export of the [kvdex](https://jsr.io/@olli/kvdex)
-core APIs and Deno-KV-compatible types.
+The kvdex bridge factory, a curated re-export of the [kvdex](https://jsr.io/@olli/kvdex) core APIs,
+and Deno-KV-compatible types.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -147,26 +132,19 @@ This entrypoint also re-exports the kvdex Deno-KV compatibility types: `KvProvid
 `DenoKvKeyPart`, `DenoKvListIterator`, `DenoKvListOptions`, `DenoKvListSelector`,
 `DenoKvSetOptions`, `DenoKvStrictKey`, and `DenoKvWatchOptions`.
 
-### `@netscript/kv/testing`
+## `@netscript/kv/testing`
 
-A reusable contract harness for adapter authors. Re-exports the shared `KvStore` and
-`WatchableKv` contracts alongside the test helpers. The in-repo memory and Redis adapters
-run both contracts.
+A contract harness for adapter authors. It re-exports the shared `KvStore` and `WatchableKv`
+contracts alongside the test helpers. The memory and Redis adapters run both contracts.
 
-`runKvStoreContract` covers CRUD, listing, and value fidelity: plain-JSON values, including
-objects shaped like encoding markers, read back unchanged. `atomic()` is optional on
-`KvStore`, so its parity checks are a separate opt-in: `runAtomicKvStoreContract` requires
-one commit to write a single versionstamp to every mutated entry and return it (so a
-compare-and-set on the returned versionstamp succeeds), `sum`/`min`/`max` to combine with
-the stored value, concurrent commits to be serializable, and `bigint` values to round-trip
-at any depth. `runWatchableKvContract` requires that watch events carry the versionstamp of
-the write that produced them and deliver values unchanged, that a change received while
-the consumer is between batches is delivered on the next request without waiting for a
-later write, that `debounce` never drops a queued change, and that aborting ends the stream
-promptly, even inside a debounce window.
+| Contract | Requires |
+| --- | --- |
+| `runKvStoreContract` | CRUD, listing, and value fidelity: plain-JSON values, including objects shaped like encoding markers, read back unchanged. |
+| `runAtomicKvStoreContract` | Opt-in, because `atomic()` is optional on `KvStore`. One commit writes a single versionstamp to every mutated entry and returns it, so a compare-and-set on the returned versionstamp succeeds; `sum`/`min`/`max` combine with the stored value; concurrent commits are serializable; `bigint` values round-trip at any depth. |
+| `runWatchableKvContract` | Watch events carry the versionstamp of the write that produced them and deliver values unchanged; a change received while the consumer is between batches is delivered on the next request without waiting for a later write; `debounce` never drops a queued change; aborting ends the stream promptly, even inside a debounce window. |
 
 Default watch scenarios always run, including on adapters without optional readiness or snapshots.
-The harness uses `ready` when exposed and preserves its legacy startup allowance otherwise. Declare
+The harness uses `ready` when exposed and keeps a startup allowance otherwise. Declare
 snapshot support with harness `initial: true` to add snapshot delivery scenarios.
 
 | Symbol | Kind | Signature | Description |
@@ -179,13 +157,9 @@ snapshot support with harness `initial: true` to add snapshot delivery scenarios
 | `createMemoryKvAdapter` | function | `function createMemoryKvAdapter(): MemoryKvAdapter` | Factory for a clean in-memory KV adapter for downstream tests. |
 | `MemoryKvAdapter` | class | `class MemoryKvAdapter implements WatchableKv` | Volatile in-memory adapter (re-exported from the root). |
 
-## See it live
+## Related pages
 
-- **How-to:** [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) — read, write, and watch a KV store with
-  these symbols in a running workspace.
-- **Concept:** [KV, queues & cron](/data-persistence/kv-queues-cron/) — the durable-by-default KV
-  model and how it backs queues and cron.
-
----
-
-Back to the [reference overview](/reference/).
+- [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/): read, write, and watch a KV store in
+  a running workspace.
+- [KV, queues & cron](/data-persistence/kv-queues-cron/): the durable-by-default KV model and how it
+  backs queues and cron.

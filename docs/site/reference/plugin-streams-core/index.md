@@ -5,34 +5,26 @@ title: '@netscript/plugin-streams-core'
 
 # `@netscript/plugin-streams-core`
 
-Schema, producer, config, telemetry, testing, and diagnostics primitives for NetScript streams. This
-page is written against the package's public surface reported by `deno doc`. For the full index of
-packages and plugins return to the [reference overview](/reference/).
+Schema, producer, config, telemetry, testing and diagnostics primitives for NetScript streams. Use it
+to publish typed change events safely: `defineStreamSchema` declares the collections a stream
+carries, with standard-schema validation and a configured primary key; `createDurableStream`
+returns a path-singleton producer whose `upsert`/`delete` appends are idempotent and auto-claimed;
+and the diagnostics helpers inspect a schema or resolve the stream endpoint without opening a
+socket. The deployable [`@netscript/plugin-streams`](/reference/streams/) service builds on this
+layer, and the other NetScript plugins use it to project entities such as executions, saga instances
+and sessions into durable topics.
 
-Publishing change events sounds trivial until it has to be safe: typed payloads, idempotent appends,
-one producer per stream path, and a clean flush on shutdown. `defineStreamSchema` declares the
-collections a stream carries with standard-schema validation and a configured primary key;
-`createDurableStream` returns a path-singleton producer whose `upsert`/`delete` appends are
-idempotent and auto-claimed; and the diagnostics helpers inspect a schema or resolve the stream
-endpoint without opening a socket.
+## Sub-path exports
 
-This is the layer the deployable [`@netscript/plugin-streams`](/reference/streams/) service builds
-on, and the layer the other NetScript plugins use when they project entities — executions, saga
-instances, sessions — into durable topics.
-
-## Exports
-
-| Export specifier                                      | Module                   | Exports | Purpose                                                                                                                              |
-| ----------------------------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `@netscript/plugin-streams-core`                      | `./mod.ts`               | 62      | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below).   |
-| `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 8       | Upstream whole-stream administrative adapter and signature types; helpers live in the root.                                          |
-| `@netscript/plugin-streams-core/sse`                  | `./src/sse/mod.ts`       | 35      | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
-| `@netscript/plugin-streams-core/telemetry`            | `./src/telemetry/mod.ts` | 33      | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics.                     |
-| `@netscript/plugin-streams-core/testing`              | `./src/testing/mod.ts`   | 4       | An in-memory producer and a small schema fixture for tests that must not open network sockets.                                       |
-| `@netscript/plugin-streams-core/integration/commands` | `./commands.ts`          | 18      | Checked producer-delivery sink for the service command relay.                                                                        |
-
-Export counts are the symbol counts `deno doc` reports for each entrypoint; a few domain types are
-re-exported through more than one subpath.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-streams-core` | `./mod.ts` | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary. See [details](#root-surface-netscriptplugin-streams-core). |
+| `@netscript/plugin-streams-core/admin` | `./admin.ts` | Upstream whole-stream administrative adapter and signature types; helpers live in the root. See [details](#bounded-streams-retention-and-trim). |
+| `@netscript/plugin-streams-core/sse` | `./src/sse/mod.ts` | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. See [details](#the-sse-contract-netscriptplugin-streams-coresse). |
+| `@netscript/plugin-streams-core/telemetry` | `./src/telemetry/mod.ts` | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics. See [details](#telemetry-and-testing). |
+| `@netscript/plugin-streams-core/testing` | `./src/testing/mod.ts` | An in-memory producer and a small schema fixture for tests that must not open network sockets. See [details](#telemetry-and-testing). |
+| `@netscript/plugin-streams-core/integration/commands` | `./commands.ts` | Checked producer-delivery sink for the service command relay. See [details](#checked-command-sink). |
+| `@netscript/plugin-streams-core/discovery` | `./src/builders/discovery.ts` | [Contribution-builder discovery metadata](#discovery-metadata). |
 
 ## Root surface (`@netscript/plugin-streams-core`)
 
@@ -61,8 +53,8 @@ re-exported through more than one subpath.
 | `DurableStreamProducerOptions` | interface  | Options accepted by `DurableStreamProducer`.                              |
 | `ServiceStreamProducerOptions` | type alias | Options accepted by `createServiceStreamProducer`.                        |
 
-`createDurableStream` is a **path singleton**: two calls for the same stream path with compatible
-options return the same producer rather than opening a second writer.
+`createDurableStream` is a path singleton: two calls for the same stream path with compatible options
+return the same producer rather than opening a second writer.
 
 ### Events
 
@@ -90,31 +82,31 @@ without connecting to the streams server.
 ### Producer port contract (v1)
 
 The `*V1` names are the versioned port contract a producer implementation satisfies and a supervisor
-consumes. They describe write acceptance, delivery outcome, reconnection, and buffering as data,
-which is what lets the retry policy live outside the transport.
+consumes. They describe write acceptance, delivery outcome, reconnection, and buffering as data, so
+the retry policy can live outside the transport.
 
-| Symbol                                        | Kind       | Description                                                                   |
-| --------------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
-| `StreamProducerPort`                          | interface  | Port implemented by stream producers that publish State Protocol changes.     |
-| `StreamProducerTransportPort`                 | interface  | Durable-stream protocol edge consumed by the producer supervisor.             |
-| `StreamProducerClockPort`                     | interface  | Clock edge used by reconnect backoff.                                         |
-| `StreamProducerRandomPort`                    | interface  | Randomness edge used only to jitter reconnect delays.                         |
-| `StreamProducerIdentityV1`                    | interface  | Exact producer identity retained across an append retry.                      |
-| `StreamProducerConnectInputV1`                | interface  | Connection input for the durable stream transport edge.                       |
-| `StreamProducerAppendInputV1`                 | interface  | Append input retained byte-for-byte until acknowledgement.                    |
-| `StreamProducerCloseInputV1`                  | interface  | Terminal close input using the next sequence in the same producer epoch.      |
-| `StreamProducerAcknowledgementV1`             | interface  | Acknowledgement returned by an append or terminal close.                      |
-| `StreamProducerStateSnapshotV1`               | interface  | Snapshot of producer readiness and buffered work.                             |
-| `StreamProducerReadinessOptionsV1`            | interface  | Options for waiting on the next ready transition.                             |
-| `StreamProducerBufferPolicyV1`                | interface  | Dual queue bounds for accepted durable stream writes.                         |
-| `StreamProducerReconnectPolicyV1`             | interface  | Finite retry policy used for connection and delivery attempts.                |
-| `StreamProducerTransportFailureV1`            | interface  | Transport failure understood by the application supervisor.                   |
-| `StreamProducerTransportFailureKindV1`        | type alias | Stable failure categories translated by the durable-stream transport adapter. |
-| `StreamProducerTransportResultV1`             | type alias | Result of one transport operation without policy or retry decisions.          |
-| `StreamProducerLifecycleStateV1`              | type alias | One legal lifecycle state for a reconnecting durable stream producer.         |
-| `STREAM_PRODUCER_LIFECYCLE_STATES_V1`         | variable   | Legal lifecycle states for a reconnecting durable stream producer.            |
-| `DEFAULT_STREAM_PRODUCER_BUFFER_POLICY_V1`    | variable   | Default bounded producer buffer policy.                                       |
-| `DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1` | variable   | Default bounded reconnect policy.                                             |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `StreamProducerPort` | interface | Port implemented by stream producers that publish State Protocol changes. |
+| `StreamProducerTransportPort` | interface | Durable-stream protocol edge consumed by the producer supervisor. |
+| `StreamProducerClockPort` | interface | Clock edge used by reconnect backoff. |
+| `StreamProducerRandomPort` | interface | Randomness edge used only to jitter reconnect delays. |
+| `StreamProducerIdentityV1` | interface | Exact producer identity retained across an append retry. |
+| `StreamProducerConnectInputV1` | interface | Connection input for the durable stream transport edge. |
+| `StreamProducerAppendInputV1` | interface | Append input retained byte-for-byte until acknowledgement. |
+| `StreamProducerCloseInputV1` | interface | Terminal close input using the next sequence in the same producer epoch. |
+| `StreamProducerAcknowledgementV1` | interface | Acknowledgement returned by an append or terminal close. |
+| `StreamProducerStateSnapshotV1` | interface | Snapshot of producer readiness and buffered work. |
+| `StreamProducerReadinessOptionsV1` | interface | Options for waiting on the next ready transition. |
+| `StreamProducerBufferPolicyV1` | interface | Dual queue bounds for accepted durable stream writes. |
+| `StreamProducerReconnectPolicyV1` | interface | Finite retry policy used for connection and delivery attempts. |
+| `StreamProducerTransportFailureV1` | interface | Transport failure understood by the application supervisor. |
+| `StreamProducerTransportFailureKindV1` | type alias | Stable failure categories translated by the durable-stream transport adapter. |
+| `StreamProducerTransportResultV1` | type alias | Result of one transport operation without policy or retry decisions. |
+| `StreamProducerLifecycleStateV1` | type alias | One legal lifecycle state for a reconnecting durable stream producer. |
+| `STREAM_PRODUCER_LIFECYCLE_STATES_V1` | const | Legal lifecycle states for a reconnecting durable stream producer. |
+| `DEFAULT_STREAM_PRODUCER_BUFFER_POLICY_V1` | const | Default bounded producer buffer policy. |
+| `DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1` | const | Default bounded reconnect policy. |
 
 ### Write outcomes
 
@@ -127,10 +119,10 @@ which is what lets the retry policy live outside the transport.
 | `StreamWriteCancellationReasonV1` | type alias | Reasons an accepted write is cancelled before its first delivery attempt. |
 | `StreamWriteUnknownReasonV1`      | type alias | Reasons an attempted write cannot be reported as delivered or rejected.   |
 
-A write returns a **receipt**, not a boolean: acceptance is immediate, and the terminal outcome —
-delivered, rejected, cancelled, or unknown — settles later. `unknown` is a distinct outcome rather
-than a failure, because a producer that lost its connection mid-append cannot honestly report either
-success or rejection.
+A write returns a receipt, not a boolean: acceptance is immediate, and the terminal outcome
+(delivered, rejected, cancelled, or unknown) settles later. `unknown` is a distinct outcome rather
+than a failure, because a producer that lost its connection mid-append cannot report either success
+or rejection.
 
 ## Bounded streams: retention and trim
 
@@ -169,24 +161,26 @@ paths to change an existing server policy.
 | `DurableStreamAdmin`           | class      | Upstream `DurableStream.head` / `delete` adapter, exported from `./admin`.        |
 
 Helpers and `StreamAdminError` have one public import path, the package root. The adapter signature
-types are intentionally re-exported from `./admin` as well, keeping that entrypoint self-contained
-for consumers and documentation tooling.
+types are also re-exported from `./admin`, so that entrypoint is self-contained.
 
 The port returns the existing `StreamProducerTransportResultV1<T>`. Authorization failures are
 `unauthorized`, request deadlines are `timeout`, caller cancellation is `aborted`, transient
 transport/server failures are `retryable`, and other client failures are `non-retryable`. Helpers
 throw `StreamAdminError` retaining that failure; absence is a successful `null`/`false` result.
 Requests default to 5,000 ms and perform one attempt, leaving retry policy to background workers.
-The shared failure union now includes `unauthorized` and `timeout`; exhaustive consumers must handle
-these new categories. Producer adapters still report retryable request failures as `retryable`;
+Producer adapters still report retryable request failures as `retryable`;
 `timeout` alone does not opt a custom producer transport into retries. Both helpers emit client
 spans through `StreamsInstrumentation` (`stream.head`, `stream.delete`).
+
+> [!IMPORTANT]
+> The shared failure union includes `unauthorized` and `timeout`; exhaustive consumers must handle
+> both categories.
 
 Use these helpers in background workers or triggers under a service identity resolved by
 `buildStreamUrl` and `getStreamsAuth`. The app is an interface and need not remain open.
 `DurableStreamProducer.delete(collection, key)` appends a tombstone; it does not reclaim stream
 storage. Stop a segment's producer before deleting it to prevent a reconnect from recreating it.
-Offset trim and server-side listing remain future protocol capabilities. The
+Offset trim and server-side listing are not supported. The
 [stream retention how-to](/durable-workflows/how-to/bound-stream-retention/) pairs server retention
 with a scheduled trigger and background deletion worker, including day-baseline guidance.
 
@@ -196,22 +190,22 @@ The `./sse` subpath is the single runtime authority for NetScript's versioned st
 It distinguishes the **wire** event names the durable-stream server emits from the **consumer**
 event names a validated binding delivers, so a consumer never branches on an unvalidated frame.
 
-| Symbol                               | Kind       | Description                                                                      |
-| ------------------------------------ | ---------- | -------------------------------------------------------------------------------- |
-| `STREAM_SSE_CONTRACT_V1`             | variable   | Single runtime authority for NetScript's versioned stream SSE envelope.          |
-| `STREAM_SSE_PROTOCOL_VERSION_V1`     | variable   | Version identifier for the first NetScript stream SSE consumer contract.         |
-| `STREAM_SSE_WIRE_EVENT_NAMES_V1`     | variable   | Actual event names emitted by the durable-stream SSE wire protocol.              |
-| `STREAM_SSE_CONSUMER_EVENT_NAMES_V1` | variable   | Validated outcomes delivered by the NetScript SSE consumer binding.              |
-| `parseStreamSseEventV1`              | function   | Parse a named SSE frame through the single v1 contract authority.                |
-| `bindStreamEventSourceV1`            | function   | Bind named `data` and `control` listeners using schema-validated v1 outcomes.    |
-| `createStreamSseReplayStateV1`       | function   | Create an empty or caller-seeded v1 replay snapshot.                             |
-| `reduceStreamSseReplayStateV1`       | function   | Apply one valid frame while committing replay progress only on a control frame.  |
-| `StreamEventSourceV1`                | interface  | Minimal native or DOM-independent EventSource-compatible surface.                |
-| `StreamSourceEventV1`                | interface  | Structural event with a type, optional data, and optional last event ID.         |
-| `StreamSourceListenerV1`             | type alias | Listener accepting structural stream events.                                     |
-| `StreamEventSourceBindingV1`         | interface  | Disposable browser binding and immutable replay snapshot accessor.               |
-| `StreamSseReplayStateV1`             | interface  | Replay snapshot consumed by reconnect policy without owning that policy.         |
-| `StreamSseOffsetV1`                  | type alias | A server-owned replay token — opaque, never parsed or incremented by a consumer. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `STREAM_SSE_CONTRACT_V1` | const | Single runtime authority for NetScript's versioned stream SSE envelope. |
+| `STREAM_SSE_PROTOCOL_VERSION_V1` | const | Version identifier for the first NetScript stream SSE consumer contract. |
+| `STREAM_SSE_WIRE_EVENT_NAMES_V1` | const | Actual event names emitted by the durable-stream SSE wire protocol. |
+| `STREAM_SSE_CONSUMER_EVENT_NAMES_V1` | const | Validated outcomes delivered by the NetScript SSE consumer binding. |
+| `parseStreamSseEventV1` | function | Parse a named SSE frame through the single v1 contract authority. |
+| `bindStreamEventSourceV1` | function | Bind named `data` and `control` listeners using schema-validated v1 outcomes. |
+| `createStreamSseReplayStateV1` | function | Create an empty or caller-seeded v1 replay snapshot. |
+| `reduceStreamSseReplayStateV1` | function | Apply one valid frame while committing replay progress only on a control frame. |
+| `StreamEventSourceV1` | interface | Minimal native or DOM-independent EventSource-compatible surface. |
+| `StreamSourceEventV1` | interface | Structural event with a type, optional data, and optional last event ID. |
+| `StreamSourceListenerV1` | type alias | Listener accepting structural stream events. |
+| `StreamEventSourceBindingV1` | interface | Disposable browser binding and immutable replay snapshot accessor. |
+| `StreamSseReplayStateV1` | interface | Replay snapshot consumed by reconnect policy without owning that policy. |
+| `StreamSseOffsetV1` | type alias | A server-owned replay token — opaque, never parsed or incremented by a consumer. |
 
 Replay progress commits **only on a control frame**: `reduceStreamSseReplayStateV1` applies a valid
 data frame without advancing the committed offset, so a consumer that reconnects mid-batch replays
@@ -220,8 +214,8 @@ Errors are normalized into `StreamSseErrorPayloadV1` and never advance replay st
 
 ## Telemetry and testing
 
-`@netscript/plugin-streams-core/telemetry` exposes `streamsInstrumentation` — a registration object
-matching the minimal contract NetScript telemetry hosts understand — plus `StreamSpanNames`,
+`@netscript/plugin-streams-core/telemetry` exposes `streamsInstrumentation`, a registration object
+matching the minimal contract NetScript telemetry hosts understand, plus `StreamSpanNames`,
 `StreamAttributes`, and `StreamProducerMetricNames`. The meter, counter, gauge, tracer, and span
 ports are declared here as interfaces, so a producer emits reconnect metrics without importing an
 OpenTelemetry SDK.
@@ -229,17 +223,6 @@ OpenTelemetry SDK.
 `@netscript/plugin-streams-core/testing` provides `MemoryStreamProducer` (records
 `MemoryStreamEvent`s instead of opening a socket) and `createStreamTopicFixture` (a small schema
 with one `execution` collection). Tests written against these run without network permissions.
-
-## Related pages
-
-- [`@netscript/plugin-streams`](/reference/streams/) — the deployable streams plugin and service.
-- [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) and
-  [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) — both project their records into
-  durable topics through this producer.
-
----
-
-Back to the [reference overview](/reference/).
 
 ## Checked command sink
 
@@ -262,13 +245,16 @@ is cooperative around completion; the supplied producer retains lifecycle and pe
 | `CommandOutboxSink`             | interface  | Service-owned documented acceptance boundary.        |
 | `CommandOutboxAcceptance`       | type alias | Service-owned normalized identity/time.              |
 
-## Exports: discovery metadata
+## Discovery metadata
 
 The `@netscript/plugin-streams-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-| Export specifier                           | Module                        |
-| ------------------------------------------ | ----------------------------- |
-| `@netscript/plugin-streams-core/discovery` | `./src/builders/discovery.ts` |
+## Related pages
+
+- [`@netscript/plugin-streams`](/reference/streams/): the deployable streams plugin and service.
+- [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) and
+  [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/): both project their records into
+  durable topics through this producer.
