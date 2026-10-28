@@ -56,3 +56,13 @@ CI failure inspected at run 40756074834 / build job: docs:exports-drift reports 
 - Independent same-session reviewer: PASS; see slice-2-review.md. The reviewer inspected source/tests but did not independently execute commands, as required by the read-only tool restriction.
 - CI repair: the failed Pages build reported missing registry exports in the Fresh UI reference. All twelve symbols plus build APIs and the eighth subpath are now documented. The exact failing docs:exports-drift command exits 0 locally.
 - Reconcile: draft #2468 remains open from main, no label changes; full S2 scope is active under user continuation. No component source modifications. The pending work is config/lock/remote commands, style+docs/preset, and MCP.
+
+## Slice 3 — app config, lock baselines and authenticated registry transport
+
+- Added strict components.json and fresh-ui.lock.json contracts, source/alias/GitHub URL validation, SHA-256 baseline verification and unified local-edit diffs. Config persists unresolved environment placeholders.
+- Registry client resolves builtin, namespaced, URL and public GitHub source data without executing remote modules. It follows registry dependencies in their namespace, bounds/caches the graph, validates payloads and sanitizes malformed JSON errors.
+- Fetch adapter resolves environment auth at request time, refuses redirects, discards failed response bodies and emits no credential-bearing diagnostics. Real HTTP fixture proves the header is sent while both an echoed error body and redirect remain safe.
+- Staged filesystem preflights all lexical and optional physical destinations before mutation. The next installer slice must wire the production physical guard into every commit; this is a recorded reviewer requirement.
+- Independent same-session reviewer PASS. Initial attempt returned a provider usage-limit error, no review verdict; the same seat/session resumed after reset. Nonblocking newline-appending diff edge case from the review was corrected with a regression assertion before commit.
+- Focused metadata/transport wrapper tests: 6/0/0, exit 0. Structured check/lint/fmt: 9 selected/processed, no drops/refusals, exit 0. Root quality/architecture tasks pass. Additional UI regression wrapper: 49/0/0, exit 0. Full docs site build exits 0, including static registry and rendered-output checks.
+- Reconcile: CI's missing-reference regression is fixed and pushed in slice 2; no new owner/reviewer thread changes were observed. Full S2 scope remains active; commands/install behavior is the next slice.
