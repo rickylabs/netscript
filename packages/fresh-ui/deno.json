@@ -13,7 +13,8 @@
     "./registry": "./registry.ts",
     "./tokens": "./tokens.ts",
     "./token-config": "./token-config.ts",
-    "./contracts": "./contracts.ts"
+    "./contracts": "./contracts.ts",
+    "./contracts.json": "./contracts.json"
   },
   "imports": {
     "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.8/auto-update",
@@ -32,7 +33,8 @@
       "deno.json",
       "README.md",
       "tokens/README.md",
-      "src/contracts/README.md"
+      "src/contracts/README.md",
+      "contracts.json"
     ],
     "exclude": [
       "scripts/**",

@@ -12,10 +12,12 @@ the [reference overview](/reference/).
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
 components and islands remain on workspace-local deep paths so applications can own and evolve them
 after copy. The root module exposes only the supported helper utilities that are safe to consume as
-package runtime dependencies. Seven sub-path exports carry runtime seams and build tooling:
+package runtime dependencies. The subpath exports carry runtime seams, build tooling and shared component contracts:
 
 - [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for
   validated tool payloads.
+- [`@netscript/fresh-ui/contracts`](#component-contracts) — shared component interface and JSON serialization.
+- [`@netscript/fresh-ui/contracts.json`](#component-contracts) — machine-readable catalog.
 - [`@netscript/fresh-ui/desktop`](#sub-path-exports) — browser-safe native desktop chrome helpers.
 - [`@netscript/fresh-ui/interactive`](#sub-path-exports) — package-owned interactive namespaces for
   stateful, accessible primitives.
@@ -31,6 +33,40 @@ For visual design, use the [Design system](/design-system/) section:
 [token contract](/design-system/token-contract/) and
 [theme authoring](/design-system/create-your-own-theme/). The theme specifications are generated from
 their canonical design files. This page covers the package API.
+
+## Component contracts
+
+`@netscript/fresh-ui/contracts` is a pure-data tooling subpath. It describes the shared interface
+that every style preserves: props, `data-part` anatomy, data-attribute values, visibility booleans,
+slots, APG/native semantics, keyboard operations and token roles. It performs no IO and contains no
+token values. Utility availability is explicit: `shipped`, planned values and native/pseudo/context
+parts distinguish a specification from a rendered implementation.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `ComponentContract` | interface | Per-component shared interface and Figma spec identity. |
+| `ComponentContractCatalog` | interface | Versioned collection of component contracts. |
+| `ContractAttribute` | interface | Allowed data-attribute values, defaults, parts and planned values. |
+| `ContractKey` | interface | Keyboard chord and observable operation. |
+| `ContractPart` | interface | Stable anatomy name, condition and element/native/pseudo/context representation. |
+| `ContractProp` | interface | Public prop kind, values, default and behavior description. |
+| `ContractSlot` | interface | Content seam and receiving part. |
+| `ContractValue` | type | Serializable scalar prop default. |
+| `componentContracts` | const | Typed catalog covering shipped components and six approved Figma categories. |
+| `serializeComponentContracts` | function | Deterministically serialize a catalog to JSON with a trailing newline. |
+| `default` | JSON module value | `./contracts.json` exports the versioned catalog as its default value. |
+
+```ts
+import { componentContracts, serializeComponentContracts } from '@netscript/fresh-ui/contracts';
+import catalog from '@netscript/fresh-ui/contracts.json' with { type: 'json' };
+
+const button = componentContracts.components.find((component) => component.name === 'button');
+console.log(button?.parts, catalog.schemaVersion);
+console.log(serializeComponentContracts(componentContracts));
+```
+
+The JSON module exports the catalog as its default value. Contracts for unshipped designs in the
+six built Figma categories are data only; additional components and styles ship in later phases.
 
 ## Class-name helper
 
@@ -493,7 +529,7 @@ create or hand-maintain a second export inventory under `docs/exports`.
 
 ## Sub-path exports
 
-The following 7 entrypoints are published as declared in the package export map:
+The following entrypoints are published as declared in the package export map:
 
 | Export                             | Entrypoint               | Purpose                                                                                                                                    |
 | ---------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -505,6 +541,9 @@ The following 7 entrypoints are published as declared in the package export map:
 | `@netscript/fresh-ui/registry`     | `./registry.ts`          | Embedded Fresh UI copy-registry manifest and file content (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`).                        |
 | `@netscript/fresh-ui/token-config` | `./token-config.ts` | Lightweight APP_TOKEN_FILES, PREVIEW_TOKEN_FILES and TOKEN_PRESETS metadata, with no Style Dictionary or source corpus. |
 | `@netscript/fresh-ui/tokens`       | `./tokens.ts`            | DTCG sources, language presets and the IO-free Style Dictionary token builder. |
+
+| `@netscript/fresh-ui/contracts` | `./contracts.ts` | Shared component types, catalog and JSON serializer. |
+| `@netscript/fresh-ui/contracts.json` | `./contracts.json` | JSON module containing the same catalog. |
 
 ---
 

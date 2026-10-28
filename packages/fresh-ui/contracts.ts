@@ -18,3 +18,4 @@ export type {
   ContractValue,
 } from './src/contracts/component-contract.ts';
 export { serializeComponentContracts } from './src/contracts/serialization.ts';
+export { componentContracts } from './src/contracts/catalog.ts';

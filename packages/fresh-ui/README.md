@@ -204,3 +204,18 @@ Token build metadata is available from `@netscript/fresh-ui/token-config` withou
 loading Style Dictionary or the source corpus. See [token contribution and output
 budgets](tokens/README.md). Design preview styles are opt-in through
 `netscript ui:add theme-previews` or `netscript tokens build --previews`.
+
+The catalog is available as `componentContracts` from `./contracts`, or as a JSON module:
+
+```ts
+import { componentContracts, serializeComponentContracts } from '@netscript/fresh-ui/contracts';
+import catalog from '@netscript/fresh-ui/contracts.json' with { type: 'json' };
+
+console.log(componentContracts.components.find((component) => component.name === 'button'));
+console.log(serializeComponentContracts(componentContracts));
+console.log(catalog.schemaVersion);
+```
+
+Phase 1 includes 66 shipped inventory entries and 21 design-only contracts from the six built
+Figma categories. `shipped: false`, planned values and native/pseudo parts distinguish specified
+anatomy from a rendering implementation. It does not add gap components or token values.
