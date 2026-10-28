@@ -22,7 +22,7 @@ No duplicate PR found for #2436. Source specification PR #2427 is merged. Initia
 
 ## PLAN-EVAL round 1
 
-Separate Claude session a94e3452-d688-4cd4-90ad-760c7ebc6bae returned FAIL_PLAN. Before implementation, added verbatim YAML comments, scoped raw-HTML-safe configured rendering, exact source-to-route table, namespaced heading ids and corpus checks. The risk register was already appended while the evaluator read. Re-steer same session for the one authorized repair. Source reference images are under the handoff run path, not docs/.
+A separate Claude session returned FAIL_PLAN. Before implementation, added verbatim YAML comments, scoped raw-HTML-safe configured rendering, exact source-to-route table, namespaced heading ids and corpus checks. The risk register was already appended while the evaluator read. Re-steer same session for the one authorized repair. Source reference images are under the handoff run path, not docs/.
 
 PLAN-EVAL repair: PASS in the same separate Claude Opus 5.5 session. Implementation starts only after this verdict. The read-only spawn adapter calls the repository `runClaudePrint` launcher, narrows permission mode and available tools, closes stdin and excludes all MCP servers. Native model is observed in stream metadata. Baseline docs/site build exited 0 before implementation.
 
@@ -44,7 +44,7 @@ Root CI dynamically discovers docs/site tests, but invokes them with the root im
 
 Also running the configured broader quality:scan because its scope includes docs/site; scoped wrappers are not the only quality evidence.
 
-Independent IMPL-EVAL round 1: PASS with no blockers; the separate native Claude Opus 5.5 session 9c2de1be-6cf4-4e78-8fe4-4410014c90cb substantively reviewed the implementation and six screenshots, and approved commit/review while explicitly leaving runtime E2E unproven. Its snapshot preceded the final root-CI test bridge, so re-steer the SAME session for that bounded delta before commit. Broader quality:scan also passed (durable receipt), no new allowances.
+Independent IMPL-EVAL round 1: PASS with no blockers; a separate native Claude Opus 5.5 session substantively reviewed the implementation and six screenshots, and approved commit/review while explicitly leaving runtime E2E unproven. Its snapshot preceded the final root-CI test bridge, so re-steer the SAME session for that bounded delta before commit. Broader quality:scan also passed (durable receipt), no new allowances.
 
 ## Final independent sign-off
 

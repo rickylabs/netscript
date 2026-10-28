@@ -50,4 +50,4 @@ The plan is close, but four content blockers would each force rework after imple
 
 This is a feature-tier review with up to two cycles, so it goes back for one repair round. Implementation shouldn't start until blockers 1–5 are fixed in `plan.md` and re-reviewed.
 
-Session: a94e3452-d688-4cd4-90ad-760c7ebc6bae
+Session: a separate Claude session (id withheld)

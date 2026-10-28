@@ -4,7 +4,7 @@ All five round-1 findings are fixed in the plan, and I found no new blockers. Im
 
 **Evaluator identity**
 - **Session and model:** same native Claude Code session as round 1, running `claude-opus-5-5` (Anthropic family).
-  - `worklog.md:25` records this session as `a94e3452-d688-4cd4-90ad-760c7ebc6bae`. I can't see that id from inside the session, so I can't confirm it myself.
+  - `worklog.md:25` records this as a separate Claude session (id withheld).
   - I also can't verify the effort level.
 - **What I did:** reviewed the current working tree read-only (`plan.md:30-62`, `worklog.md:23-25`) and spot-checked the canonical sources again.
   - I didn't read any `profiles/` file or start sub-agents.
@@ -41,5 +41,5 @@ The landing reference images also check out: `design-system--{light,dark}.webp` 
 - **Hidden HTML comments:** eight canonical bodies contain HTML comments (e.g. `brutal/DESIGN.md:258-262`, `studio/DESIGN.md:250`). With raw HTML off, markdown-it would show them as visible text. The plan says they stay hidden, so the generator has to strip them before rendering. A test should prove that `<!--` never appears as visible text.
 - **Getting the configured engine:** `_config.ts` doesn't change, so the generator probably has to import the configured `site` to reach `site.hooks.markdownIt`. The tests should prove that this gives the same engine the build uses, for example that heading ids match the site's `slugify` output.
 
-Observed session: a94e3452-d688-4cd4-90ad-760c7ebc6bae
+Observed session: a separate Claude session (id withheld)
 Requested argv: claude -p --model claude-opus-5-5 --effort high, tools Read/Glob/Grep only, strict empty MCP config, permission-mode plan, stdin null. Launch: repository runClaudePrint with restricted spawn adapter.

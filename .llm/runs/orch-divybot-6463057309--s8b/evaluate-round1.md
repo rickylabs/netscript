@@ -46,5 +46,5 @@ None.
 
 **Next steps for the supervisor:** record this verdict in `evaluate.md`, make the sign-off commit, and push. Keep the PR described as ready **for review** with E2E UNPROVEN because of the environment. No repair round is needed.
 
-Observed session: 9c2de1be-6cf4-4e78-8fe4-4410014c90cb
+Observed session: a separate Claude session (id withheld)
 Requested argv: claude -p --model claude-opus-5-5 --effort high; permission-mode plan; tools Read/Glob/Grep only; strict empty MCP; stdin null. Observed model claude-opus-5-5 in stream metadata.

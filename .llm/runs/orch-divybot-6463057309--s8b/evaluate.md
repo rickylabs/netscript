@@ -25,5 +25,5 @@ None. This was the single allowed follow-up, so no further repair round is neede
 
 The supervisor should record this verdict in `evaluate.md`, then make the sign-off commit and push. Keep the PR described as ready **for review**, with E2E UNPROVEN because of the environment.
 
-Observed evaluator session: 9c2de1be-6cf4-4e78-8fe4-4410014c90cb
+Observed evaluator session: a separate Claude session (id withheld)
 Requested: claude -p --model claude-opus-5-5 --effort high, permission-mode plan, Read/Glob/Grep tools only, strict empty MCP config, stdin null. Same IMPL-EVAL session as round 1. Native model claude-opus-5-5 observed in stream metadata.
