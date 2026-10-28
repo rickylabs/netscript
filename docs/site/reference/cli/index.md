@@ -6,17 +6,18 @@ templateEngine: [vento, md]
 
 # `@netscript/cli`
 
-Public and maintainer command-line tooling for NetScript workspaces. This page is written against
-the package's public surface reported by `deno doc`. For the full index of packages and
-plugins return to the [reference overview](/reference/).
+The programmatic surface behind the `netscript` command: build and run the command tree, load and
+dispatch plugin verbs, and scaffold plugin packages. Use it to embed the CLI in a host binary or to
+test plugin scaffolds; for the commands themselves, see the
+[`netscript` command reference](/reference/cli/commands/).
 
-The root entrypoint (`@netscript/cli`) exposes the embeddable, programmatic CLI surface — the
-helpers a host binary uses to build and run the NetScript command tree, resolve and dispatch
-plugin verbs, and scaffold plugin packages. Two sub-path exports carry the lower-level scaffold
-engine and the test fixtures:
+## Sub-path exports
 
-- [`@netscript/cli/scaffolding`](#sub-path-exports) — the template/scaffold engine and filesystem ports.
-- [`@netscript/cli/testing`](#sub-path-exports) — in-memory ports and fixture builders for tests.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/cli` | `./mod.ts` | [CLI composition](#cli-composition), [plugin host loading](#plugin-host-loading), [verb dispatch](#plugin-verb-dispatch) and [scaffold helpers](#plugin-scaffolding). |
+| `@netscript/cli/scaffolding` | `./scaffolding.ts` | [Plugin scaffold engine](#netscriptcliscaffolding) and filesystem ports. |
+| `@netscript/cli/testing` | `./testing.ts` | [Test fixtures and in-memory ports](#netscriptclitesting). |
 
 ## CLI composition
 
@@ -69,19 +70,7 @@ engine and the test fixtures:
 | `CliInspectionTarget` | interface | Target accepted by `inspectCli`. |
 | `CliInspectionReport` | interface | Diagnostic summary for an embeddable CLI target. |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. The tables below summarize each
-sub-path's own `deno doc` surface. Symbols that one sub-path re-exports from another are called out
-instead of described twice.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/cli` | `./mod.ts` | Embeddable CLI composition, plugin dispatch, and scaffold helpers (documented above). |
-| `@netscript/cli/scaffolding` | `./scaffolding.ts` | Plugin scaffold engine. |
-| `@netscript/cli/testing` | `./testing.ts` | Test fixtures and in-memory ports. |
-
-### `@netscript/cli/scaffolding`
+## `@netscript/cli/scaffolding`
 
 The scaffold engine that walks template directories, renders `{{ "{" + "{var | pipe}" + "}" }}` templates, and
 writes plugin-owned scaffold definitions.
@@ -112,9 +101,9 @@ writes plugin-owned scaffold definitions.
 | `WalkEntry` | interface | interface | Entry yielded by recursive directory walks. |
 | `FileInfo` | interface | interface | Metadata returned by filesystem stat operations. |
 
-### `@netscript/cli/testing`
+## `@netscript/cli/testing`
 
-In-memory ports and fixture builders for exercising the CLI and scaffold pipelines in tests.
+In-memory ports and fixture builders for testing the CLI and scaffold pipelines.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -145,7 +134,3 @@ In-memory ports and fixture builders for exercising the CLI and scaffold pipelin
 
 This entrypoint also re-exports `ScaffoldResult`, `DirEntry`, `FileInfo`, `WalkEntry`, and
 `FileSystemPort`, documented in the scaffolding table above.
-
----
-
-Back to the [reference overview](/reference/).
