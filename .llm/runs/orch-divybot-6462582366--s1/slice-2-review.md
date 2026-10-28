@@ -62,3 +62,44 @@ I'll keep this session open for the fix round and the CLI, checks and migration 
 `[data-theme='dark']` and `:root` have equal specificity. Today `[data-theme='dark']` wins because its block comes last, both in the base declarations and inside each `@supports` block. That only holds while every NS One color is native (oklch or `color-mix`) in both schemes or in neither, which is true now because both schemes come from the same sources. If a token were ever native in light only, the light value would override `[data-theme='dark']` in modern browsers. A one-line test asserting that every NS One name is native in both schemes or neither would lock this in. Otherwise, the browser baseline will catch it.
 
 The recorded non-blocking items stay recorded: empty scopes in the preset collections until a role-scope contract exists, and the snapshots treated as trusted pinned exports. I'll keep this session open for the name/contrast checks, CLI and migration slices.
+
+# CI documentation correction review
+
+**PASS.** The reference addition and the six→seven word change are correct, and the drift gate stays in complete mode. I read the files only and ran nothing.
+
+**Symbol inventory:** `packages/fresh-ui/tokens.ts` exports 24 symbols, and the "Token build tooling" table at `docs/site/reference/fresh-ui/index.md:418-443` documents exactly those 24, with no extras:
+- **Values:** `buildTokens`, `defaultTokenSources`, `APP_TOKEN_FILES`, `TOKEN_PRESETS`, `TOKEN_SCHEMES`, `TOKEN_DENSITIES`.
+- **Output types:** `TokenSources`, `BuiltToken`, `ExportedToken`, `TokenBuildOptions`, `TokenBuildResult`, `TokenContextOutput`.
+- **Contract types:** `DesignToken`, `ResolverSource`, `TokenDensity`, `TokenDerivation`, `TokenDocument`, `TokenMetadata`, `TokenMixDerivation`, `TokenPreset`, `TokenResolver`, `TokenScheme`, `TokenShadowDerivation`, `TokenValue`.
+
+**Entrypoint counts:**
+- The intro now says "Six sub-path exports" and lists `./tokens` (`index.md:15`, `:25-26`). That is correct: the root plus six sub-paths.
+- The sub-path table states 7 entrypoints and adds the `./tokens` → `./tokens.ts` row (`index.md:488`, `:498`). This matches the `deno.json` export map.
+- In the checker, only the coverage reason text changed, to "All seven published entrypoints…" (`check-exports-drift.ts:335`). It is still `mode: 'complete'` with `excludedExports: []`, so no omission groups were added and no gate behavior changed.
+
+**Semantics match what was signed off:**
+- **Usage example** (`index.md:445-457`): it uses a real preset (`studio-utility`) and a semantic-only override (`radius-md` → `{semantic.radius-lg}`). That is the same shape the output test exercises, and it uses the `files` map that `TokenBuildResult` returns.
+- **Prose** (`index.md:408-416`, `:459-462`) matches the reviewed behavior:
+  - it covers all 18 presets, both schemes and both densities, with each preset's geometry fixed;
+  - NS One is the default;
+  - the override applies last and must be a typed alias;
+  - unknown roles, type mismatches, raw values and cycles are rejected;
+  - the builder does no file IO;
+  - Figma output uses px floats, ms durations and lossless strings, with the explicit name migrations;
+  - CSS keeps hex fallbacks with native values behind `@supports`;
+  - the legacy dark selector is kept.
+- **Descriptions:** `APP_TOKEN_FILES` lists the same five files as `token-output.ts`. The `TokenShadowDerivation` note (px for horizontal offset and spread) matches the format code. "Clone before editing" is correct advice, because the bundled sources are shared JSON module objects.
+
+**Recorded evidence:** the worklog CI follow-up (`worklog.md:108-111`) records:
+- export drift PASS in complete mode;
+- snippets PASS;
+- site build PASS (669 files);
+- rendered-output check PASS (236 HTML files);
+- internal links and caveat references PASS;
+- checker lint/fmt PASS.
+
+**Two notes:**
+- The documentation-accuracy aggregate is recorded as still running. Add its result to the worklog before pushing; the maintenance steps on the reference page require it.
+- The new table's columns aren't padded like the other tables on the page. If a markdown fmt check covers `docs/site`, run `deno fmt` on the page first so it doesn't cause a second CI failure.
+
+I'll keep this session open for the checks, CLI and migration slices.

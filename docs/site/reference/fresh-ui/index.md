@@ -12,7 +12,7 @@ the [reference overview](/reference/).
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
 components and islands remain on workspace-local deep paths so applications can own and evolve them
 after copy. The root module exposes only the supported helper utilities that are safe to consume as
-package runtime dependencies. Five sub-path exports carry the package runtime seams:
+package runtime dependencies. Six sub-path exports carry runtime seams and build tooling:
 
 - [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for
   validated tool payloads.
@@ -22,6 +22,8 @@ package runtime dependencies. Five sub-path exports carry the package runtime se
 - [`@netscript/fresh-ui/primitives`](#sub-path-exports) — L0 platform-contract primitives.
 - [`@netscript/fresh-ui/registry`](#sub-path-exports) — embedded copy-registry manifest and file
   content.
+- [`@netscript/fresh-ui/tokens`](#token-build-tooling) — DTCG sources, language presets and the
+  Style Dictionary builder for CLI and build tooling.
 
 ## Class-name helper
 
@@ -401,6 +403,64 @@ manifest without reading package files at runtime.
 | `FRESH_UI_REGISTRY_CONTENT`                                                                                    | const             | Embedded file-content lookup referenced by manifest entries.                             |
 | `FreshUiRegistryCollection` / `FreshUiRegistryCssContribution` / `FreshUiRegistryFile` / `FreshUiRegistryItem` | interfaces        | Collection, stylesheet contribution, file, and item contracts that make up the manifest. |
 
+## Token build tooling
+
+`@netscript/fresh-ui/tokens` builds the DTCG 2025.10 three-tier contract through Style Dictionary
+5.7.1. It returns output content and resolved contexts; the caller chooses where to write files.
+Import this entrypoint in CLI or build code. The runtime UI entrypoints stay independent of the
+build engine.
+
+The builder covers all 18 presets, both schemes and both requested densities. Each preset fixes its
+effective geometry. NS One remains the default; Studio Utility is available as an additional preset.
+An app override applies last and can only reassign semantic roles to typed aliases. Unknown roles,
+type mismatches, raw semantic values and reference cycles fail before output is returned.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `buildTokens` | async function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources. |
+| `defaultTokenSources` | function | Returns the bundled resolver and DTCG source documents. Clone before editing caller-owned inputs. |
+| `APP_TOKEN_FILES` | const tuple | The five generated web files copied into an application: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. |
+| `TOKEN_PRESETS` | const array | The registered language presets and their fixed Figma modes, density and optional Studio flavor. |
+| `TOKEN_SCHEMES` | const tuple | Supported scheme contexts: light and dark. |
+| `TOKEN_DENSITIES` | const tuple | Supported density contexts: comfortable and compact. |
+| `TokenBuildOptions` | interface | Initial preset, optional semantic override and optional caller-owned sources. |
+| `TokenBuildResult` | interface | Output filenames/content, every requested resolved context and the selected initial preset. |
+| `TokenContextOutput` | interface | Effective preset, scheme, requested density and exported tokens for one resolver input. |
+| `ExportedToken` | interface | A token's DTCG type, CSS value/name, display category path and optional computed hex/fallback. |
+| `BuiltToken` | interface | Exported token metadata plus the resolved DTCG value used by Figma and contrast tooling. |
+| `TokenSources` | interface | The single resolver and source documents keyed by their relative reference names. |
+| `TokenResolver` | interface | DTCG version, named source sets, modifier contexts and ordered resolution references. |
+| `ResolverSource` | type | An inline token document or a resolver reference to a document, set or modifier. |
+| `TokenDocument` | interface | Nested token groups, typed tokens and document metadata. |
+| `DesignToken` | interface | Explicit DTCG type/value with optional description and NetScript extensions. |
+| `TokenValue` | recursive type | JSON scalar, array or object used by aliases and typed DTCG composites. |
+| `TokenMetadata` | interface | Registered CSS name, exact legacy spelling, category, derivation and optional Figma provenance. |
+| `TokenDerivation` | union type | The supported color-mix or shadow composite recipe. |
+| `TokenMixDerivation` | interface | Two color paths, first-color weight and interpolation space; CSS retains native color-mix. |
+| `TokenShadowDerivation` | interface | Themeable shadow color/vertical-offset/blur paths and pixel horizontal-offset/spread values. |
+| `TokenPreset` | interface | Preset identity, language/flavor, selected Figma modes and fixed source/public density. |
+| `TokenScheme` | type | A supported scheme name derived from TOKEN_SCHEMES. |
+| `TokenDensity` | type | A supported density name derived from TOKEN_DENSITIES. |
+
+```typescript
+import { buildTokens } from '@netscript/fresh-ui/tokens';
+
+const build = await buildTokens({
+  preset: 'studio-utility',
+  override: {
+    semantic: {
+      'radius-md': { $type: 'dimension', $value: '{semantic.radius-lg}' },
+    },
+  },
+});
+console.log(build.files['tokens.css']);
+```
+
+The generated Figma collections keep the original index/collection structure and explicit name
+migrations. Dimensions are pixel floats, durations are milliseconds, and composite shadow/transition
+values use lossless strings. CSS keeps live semantic references and native mixes with hex fallbacks
+guarded by feature support. Existing NS One declarations and the legacy dark selector remain valid.
+
 ## Maintaining this reference
 
 The package export map is the authority; this page is a derived, manually curated reference. Do not
@@ -425,7 +485,7 @@ create or hand-maintain a second export inventory under `docs/exports`.
 
 ## Sub-path exports
 
-The following 6 entrypoints are published as declared in the package export map:
+The following 7 entrypoints are published as declared in the package export map:
 
 | Export                             | Entrypoint               | Purpose                                                                                                                                    |
 | ---------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -435,6 +495,7 @@ The following 6 entrypoints are published as declared in the package export map:
 | `@netscript/fresh-ui/interactive`  | `./interactive.ts`       | Package-owned interactive compound namespaces (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` — documented above). |
 | `@netscript/fresh-ui/primitives`   | `./primitives.tsx`       | L0 platform-contract primitives (`Show`, `VisuallyHidden`, `SrOnly` — documented above).                                                   |
 | `@netscript/fresh-ui/registry`     | `./registry.ts`          | Embedded Fresh UI copy-registry manifest and file content (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`).                        |
+| `@netscript/fresh-ui/tokens`       | `./tokens.ts`            | DTCG sources, language presets and the IO-free Style Dictionary token builder. |
 
 ---
 

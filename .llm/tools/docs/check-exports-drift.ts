@@ -332,7 +332,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     excludedExports: [],
     symbolCoverage: {
       mode: 'complete',
-      reason: 'All six published entrypoints are maintained as one complete reference surface.',
+      reason: 'All seven published entrypoints are maintained as one complete reference surface.',
       documentedNonExports: [{
         reason:
           'Dropzone is an explicitly labeled copy-source registry component, not a package export.',

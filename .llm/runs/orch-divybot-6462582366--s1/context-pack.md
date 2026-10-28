@@ -1,4 +1,4 @@
-# S1 active — output slice
+# S1 active — documentation CI correction
 
 Full #2414 remains the objective. Branch `orch/divybot-6462582366`, PR #2435 (draft). Source slice is terminal PASS after the explicit user continuation; earlier stopped verdicts remain historical evidence in slice-1-review.md.
 
@@ -9,3 +9,5 @@ Source/output tests pass, frozen build/check and source freshness pass, scoped q
 Next ordered slices: checks (independent role registry, complete contrast coverage, exact exclusions and negative controls), CLI build/clean/init and real scaffold override, migration/fonts/design ramps/attributes/browser proof, mandatory full runtime E2E and independent final IMPL-EVAL. No gate from those slices is claimed complete. Do not start the next slice until output review is terminal.
 
 No labels, force push, merge, tag or release. Keep `.divybot-goal.md` and final-report handoff out of Git. Final READY is written atomically to `.divybot-final-report.md` only after all required work; earlier stopped report was archived outside Git when work resumed.
+
+Output commit 5aa2cc43195243e5a1d2a3b9dac58bd2cd3ef866 is pushed and PR body/comment updated. The owner then reported Pages build FAILURE: complete site export inventory omitted the tokens entrypoint and 24 symbols. Current delta fixes the reference and changes only the coverage reason count to seven, with complete coverage preserved. All Pages local build checks, the accuracy aggregate and the independent correction review PASS. The small reference correction is now ready to commit/push; complete coverage and workflow checks stay intact. The name/contrast slice has not started implementation.
