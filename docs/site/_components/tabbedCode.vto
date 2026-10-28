@@ -1,6 +1,7 @@
 {{# Compatible code tabs; filename is optional. Every panel remains visible without JavaScript. #}}
 {{ set items = tabs || [] }}
-{{ set gid = "nstab-" + Math.random().toString(36).slice(2, 9) }}
+{{# Final page URL/local-index ids are assigned before search indexing and twin extraction. #}}
+{{ set gid = "nstab" }}
 <div class="ns-tabbed"{{ if runtime }} data-ns-runtime-group{{ /if }}>
   <div class="ns-tabbed__tablist" role="tablist" aria-label="{{ runtime ? 'Runtime examples' : 'Code examples' }}">
     {{ for index, tab of items }}

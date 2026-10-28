@@ -102,15 +102,19 @@ jobs:
           .github/scripts/ci-classify-changes.test.ts
       - name: Compute changed files
         id: diff
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
           CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt
         run: |
           error_file="$(mktemp)"
           trap 'rm -f "$error_file"' EXIT
-          if ! git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$CHANGED_NAME_STATUS_FILE" 2> "$error_file"; then
+          # PRs compare from their merge base; pushes compare the complete before/after trees.
+          separator='..'
+          if [ "$EVENT_NAME" = 'pull_request' ]; then separator='...'; fi
+          if ! git diff --name-status -M "${BASE_SHA}${separator}${HEAD_SHA}" > "$CHANGED_NAME_STATUS_FILE" 2> "$error_file"; then
             cat "$error_file" >&2
             echo "diff_unavailable=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -120,10 +124,10 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Extract root deno.json
         id: rootcfg
-        if: github.event_name == 'pull_request' && steps.diff.outputs.diff_unavailable != 'true'
+        if: (github.event_name == 'pull_request' || github.event_name == 'push') && steps.diff.outputs.diff_unavailable != 'true'
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: |
           {
             echo "base<<__CFG_EOF__"
@@ -135,9 +139,10 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Decide run or skip
         id: decide
-        if: github.event_name != 'pull_request' || steps.diff.outputs.diff_unavailable != 'true'
+        if: (github.event_name != 'pull_request' && github.event_name != 'push') || steps.diff.outputs.diff_unavailable != 'true'
         env:
           EVENT_NAME: ${{ github.event_name }}
+          CLASSIFY_PUSH_DIFF: ${{ github.event_name == 'push' && steps.diff.outputs.diff_unavailable == 'false' }}
           CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
           ROOT_DENO_JSON_BASE: ${{ steps.rootcfg.outputs.base }}
@@ -209,6 +214,8 @@ jobs:
 
   utility-browser:
     name: Utility docs browser and style policy
+    needs: classify
+    if: ${{ !cancelled() && (needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -233,9 +240,9 @@ jobs:
           deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root tools/docs-site --ext ts
           deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root tools/docs-site --ext ts --config docs/site/deno.json
           deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root tools/docs-site --ext ts
-          deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read tools/docs-site/generate-tokens_test.ts tools/docs-site/inline-diagram_test.ts
-      - name: Build the actual docs site for browser verification
-        run: deno task --cwd docs/site build
+          deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read tools/docs-site/generate-tokens_test.ts tools/docs-site/inline-diagram_test.ts tools/docs-site/navigation_test.ts
+      - name: Reproduce rendered docs, twins and anchor fragments before browser verification
+        run: deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts --allow-pagefind-metadata
       - name: Install locked browser tooling
         working-directory: tools/fresh-ui-browser
         run: npm ci --ignore-scripts

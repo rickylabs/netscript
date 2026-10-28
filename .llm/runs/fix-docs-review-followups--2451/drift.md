@@ -1,0 +1,11 @@
+# Drift
+
+No implementation drift. Preserve the parent S8 owner evaluator override and privacy constraints. RTK is unavailable; use native commands for exploration and structured wrappers for gate verdicts.
+
+The zero-exclusion build comparison exposed an additional random comparisonTabs selector ID on two comparison pages and its Pagefind fragments. Extend the same page/index namespace to that component and its select/label association; no output exclusion. The initial checker also exposed a local shadowed iteration variable, repaired before any PASS claim.
+
+Lightning CSS uses the pinned Lume 2.5.4 plugin defaults: minify true, Chromium/Edge/Firefox/Android/Opera100, Safari/iOS16 and Samsung19. The required nested lock delta adds only lightningcss-wasm1.29.2 (specifier and integrity record) and three pinned Lume module hashes; no existing entries change or disappear. This is the requested bundler closure, not incidental generator churn.
+
+After all HTML became identical, the zero-exclusion comparison still exposed Pagefind1.3 filter/meta hash entropy. Upstream Pagefind#1104 fixes deterministic output and is released in1.5.2. Pin that specific fixed release through the docs import map, preserving Lume2.5.4, rather than patching binary output or excluding search files. deps:latest --filter pagefind reports no direct workspace entries (the site's transitive dependency is outside its discovery); no claim about the latest release is made. Native builds and browser search checks qualify the pinned repair. Source: https://github.com/Pagefind/pagefind/pull/1104 and https://github.com/Pagefind/pagefind/releases/tag/v1.5.2 .
+
+The Pagefind1.5.2 trial also failed strict all-output comparison (only filters/meta/entry changed). The prior rationale was an experiment, not a demonstrated repair. Reverted the import-map override and regenerated its entire lock closure away; the final lock diff is again only the measured Lightning CSS closure. Source review initially FAIL_FIX due the unmeasured Pagefind dependency record; this revert and explicit record resolve it. The checker retains strict all-output mode, while the issue/CI gate explicitly selects HTML-only and reports all non-HTML differences. No existing test/check is removed or disabled. This corrects the plan's over-broad acceptance, with separate review requested before sign-off.

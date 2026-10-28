@@ -115,6 +115,39 @@ for (const route of ROUTES) {
   });
 }
 
+test('reader follow-ups: bundled CSS, consistent chip gaps and named heading links', async ({ page }) => {
+  await visit(page, './');
+  const gaps = await page.locator('.ns-path-stack .ns-file-path').evaluateAll((chips) => {
+    const boxes = chips.map((chip) => chip.getBoundingClientRect());
+    return boxes.slice(1).map((box, index) => box.top - boxes[index].bottom);
+  });
+  expect(gaps).toHaveLength(3);
+  for (const gap of gaps) expect(gap).toBeCloseTo(8, 0);
+  const bundle = await readFile(resolve(SITE, 'styles/docs.css'), 'utf8');
+  expect(bundle).not.toMatch(/@import\b/);
+  expect(bundle).toContain('--ns-bg:');
+  expect(bundle).toContain('.ns-file-path');
+
+  await visit(page, 'web-layer/fresh-ui/');
+  const names = await page.locator('.ns-heading-anchor').evaluateAll((links) =>
+    links.map((link) => ({
+      actual: link.getAttribute('aria-label'),
+      expected: `Permalink to ${link.parentElement?.textContent?.trim()}`,
+    }))
+  );
+  expect(names.length).toBeGreaterThan(0);
+  for (const { actual, expected } of names) expect(actual).toBe(expected);
+  const tabs = await page.locator('.ns-tabbed [role="tab"]').evaluateAll((tabs) =>
+    tabs.map((tab) => {
+      const id = tab.getAttribute('aria-controls') ?? '';
+      const panel = document.getElementById(id);
+      return Boolean(panel && panel.getAttribute('aria-labelledby') === tab.id);
+    })
+  );
+  expect(tabs.length).toBeGreaterThan(0);
+  expect(tabs.every(Boolean)).toBe(true);
+});
+
 test('keyboard: lanes, drawer, search, TOC and code tabs', async ({ page }, info) => {
   await visit(page, 'web-layer/fresh-ui/');
   if ((page.viewportSize()?.width ?? 1280) <= 960) {
@@ -400,6 +433,7 @@ async function ownedSources(): Promise<StyleSource[]> {
         kind: 'css',
         source: await readFile(file, 'utf8'),
         tokenLayer: path === 'styles/tokens.css',
+        generatedTokenBundle: path === 'styles/docs.css',
         roleCheckOnly: path.startsWith('pagefind/'),
       });
       continue;
@@ -424,6 +458,13 @@ test(
         source: '.control { background-image: linear-gradient(#f00, #f00); }',
       });
     }
+    if (process.env.DOCS_UI_NEGATIVE_CONTROL === 'raw-custom') {
+      sources.push({
+        path: 'styles/control.css',
+        kind: 'css' as const,
+        source: ':root { --ns-authored-paint: #123456; }',
+      });
+    }
     if (process.env.DOCS_UI_NEGATIVE_CONTROL === 'red-role') {
       sources.push({
         path: 'styles/control.css',
@@ -444,6 +485,37 @@ test(
 test('style policy negative contracts reject literal, named and aliased colours', async ({ page }) => {
   await visit(page, './');
   const layers = (await ownedSources()).filter((s) => s.tokenLayer);
+  const fixtureLayer: StyleSource = {
+    path: 'styles/tokens.css',
+    kind: 'css',
+    tokenLayer: true,
+    source: ':root { --ns-known: #123456; }',
+  };
+  for (const generatedTokenBundle of [false, true]) {
+    for (
+      const source of [
+        ':root { --ns-authored-paint: #123456; }',
+        ':root { --ns-known: #654321; }',
+        '.wrong { --ns-known: #123456; }',
+      ]
+    ) {
+      const findings = await page.evaluate(analyzeStylePolicy, [fixtureLayer, {
+        path: generatedTokenBundle ? '_site/styles/docs.css' : 'styles/components.css',
+        kind: 'css' as const,
+        generatedTokenBundle,
+        source,
+      }]);
+      expect(findings.some((finding) => finding.kind === 'raw-colour')).toBe(true);
+    }
+  }
+  expect(
+    await page.evaluate(analyzeStylePolicy, [fixtureLayer, {
+      path: '_site/styles/docs.css',
+      kind: 'css' as const,
+      generatedTokenBundle: true,
+      source: fixtureLayer.source,
+    }]),
+  ).toEqual([]);
   for (
     const source of [
       '.x{color:#ff0000}',

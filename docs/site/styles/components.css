@@ -72,6 +72,13 @@
   flex-direction: column;
   gap: 8px;
 }
+.ns-prose .ns-path-stack > p {
+  display: contents;
+  margin: 0;
+}
+.ns-path-stack > p:empty {
+  display: none;
+}
 .ns-hero {
   display: grid;
   grid-template-columns: minmax(0, 680px) minmax(0, 360px);
