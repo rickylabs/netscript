@@ -8,17 +8,11 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 # Run it locally under Aspire
 
-You have built the whole SAP→Dynamics sync: a file-watch import job, a sandboxed transform task, a
-queue, and a cron schedule. This final chapter runs all of it together — workers,
-triggers, queue, and cron processors — on one machine under `aspire start`, and shows you how to read
-the running system from the dashboard. It is the **local** orchestration story: one command,
-one observable stack, throwaway infrastructure.
-
-And you wrote none of the wiring that makes that possible. `netscript init` scaffolded the AppHost
-back in Chapter 1; every plugin you added since contributed its own API and background processor to
-the graph on its own; a single `aspire start` then boots the lot with cross-references resolved for
-you. That is the scaffold-to-Aspire story this chapter surfaces end to end — from an empty folder to
-a live, correctly-wired, observable stack with no hand-written orchestration config in between.
+This chapter runs the whole SAP→Dynamics sync (workers, triggers, queue and cron processors) on
+one machine under `aspire start`, and shows you how to read the running system from the
+dashboard. You wrote none of the orchestration wiring: `netscript init` scaffolded the AppHost in
+chapter 1, each plugin you added contributed its own API and background processor to the graph,
+and one `aspire start` boots them all with cross-references resolved.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
@@ -30,40 +24,35 @@ a live, correctly-wired, observable stack with no hand-written orchestration con
 
 ## What you will build
 
-By the end of this chapter you will bring the full `my-erp/` resource graph up with a single
-`aspire start` — Postgres, Redis, the workers API + processor, and the triggers API + processor (which
-runs your file-watch and cron triggers) — initialize the database through the running AppHost, and
-read the live import pipeline in the Aspire dashboard: resources, console logs, and the traces that
-stitch a file drop to its job execution.
+The full `my-erp/` resource graph, up with a single `aspire start`: Postgres, Redis, the workers
+API and processor, and the triggers API and processor that runs your file-watch and cron triggers.
+You initialize the database through the running AppHost and read the import pipeline in the
+Aspire dashboard: resources, console logs, and the traces that connect a file drop to its job
+execution.
 
 {{ comp callout { type: "important", title: "Aspire is the LOCAL story — not a production deployer" } }}
-<code>aspire start</code> exists to make <code>git clone</code> → one command produce a complete,
-observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts
-are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
-cache. Shipping to a remote target (managed infrastructure, your own process lifecycle) is the
-<a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe; this chapter is the local companion. The full local
-walkthrough lives in <a href="/orchestration-runtime/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
+<code>aspire start</code> turns <code>git clone</code> plus one command into a complete, observable, correctly wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway Docker containers for development, <strong>not</strong> your production database or cache. Shipping to a remote target (managed infrastructure, your own process lifecycle) is the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe. The full local walkthrough is <a href="/orchestration-runtime/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
 {{ /comp }}
 
 ## Before you begin
 
-You need the complete `my-erp/` workspace from [Chapter 4](/tutorials/erp-sync/04-queue-and-cron/):
+You need the complete `my-erp/` workspace from [chapter 4](/tutorials/erp-sync/04-queue-and-cron/):
 the workers and triggers plugins, the `import-products` job, the `normalize-sap` transform task,
-the `product-import-trigger` file watch, and the `daily-resync-schedule` cron. Docker must be
-running so Aspire can provision Postgres and
-Redis. Confirm the AppHost was scaffolded (it is a TypeScript/Node program, not C#):
+the `product-import-trigger` file watch and the `daily-resync-schedule` cron. Docker must be running
+so Aspire can provision Postgres and Redis. Confirm the AppHost was scaffolded (it is a
+TypeScript/Node program, not C#):
 
 ```sh
 ls aspire/apphost.mts aspire/aspire.config.json
 ```
 
-Expected: both files exist. `netscript init` generated them in Chapter 1; you never hand-write them.
+Both files should exist. `netscript init` generated them in chapter 1; you never write them by hand.
 
 ## Step 1 — Understand the graph you are about to run
 
-The resource graph is **derived from your installed plugins** at boot via `composeAppHost` — add a
-plugin and its API plus background processor appear; remove it and they vanish, no edit to
-`apphost.mts`. With workers and triggers installed, a single `aspire start` stands up this graph:
+The resource graph is **derived from your installed plugins** at boot through `composeAppHost`.
+Add a plugin and its API and background processor appear; remove it and they disappear, with no
+edit to `apphost.mts`. With workers and triggers installed, `aspire start` stands up this graph:
 
 {{ comp.apiTable({
   caption: "What aspire start brings up for the ERP sync",
@@ -71,24 +60,22 @@ plugin and its API plus background processor appear; remove it and they vanish, 
     { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Throwaway Docker Postgres. The database netscript db commands target — reachable only while Aspire is up." },
-    { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV/queue workloads — this is what auto-discovery resolves the queue to once it is up." },
+    { name: "redis", type: "Container (cache)", desc: "Redis cache, the default `--cache-backend`; Redis-compatible. Backs the KV/queue workloads; auto-discovery resolves the queue to it once it is up." },
     { name: "workers API + processor", type: "allocated port + executable", desc: "The API enqueues; a separate background processor drains the queue and runs your import job." },
     { name: "triggers API + processor", type: "allocated port + executable", desc: "The API plus the processor that runs your file-watch and cron triggers." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Plugin API ports are allocated per start, not fixed" } }}
-A plugin runtime installed without <code>--port</code> carries no <code>HostPort</code>, so Aspire
-allocates its host port at every start — no number printed here would match yours, and yours changes
-on restart. The dashboard's <strong>Resources</strong> tab is the authority for the exact port each
-resource bound. Read it from there. Pin a plugin with <code>--port</code> only when something outside
-the graph must keep its address, such as an OAuth callback.
-{{ /comp }}
+As in [chapter 1](/tutorials/erp-sync/01-scaffold/), the plugin APIs have no fixed port: Aspire
+allocates them at every start, and the dashboard's **Resources** tab shows the port each resource
+bound. Pin a plugin with `--port` only when something outside the graph must keep its address,
+such as an OAuth callback.
 
 ## Step 2 — Restore and run
 
-The AppHost runs on its own isolated Node runtime inside `aspire/` so its dependencies never leak
-into your Deno workspace. Restore once per machine, then run — both from inside `aspire/`:
+The AppHost runs on its own isolated Node runtime inside `aspire/`, so its dependencies never leak
+into your Deno workspace. If `aspire start` is not still running from earlier chapters, restore
+once per machine and start it, both from inside `aspire/`:
 
 ```sh
 cd aspire
@@ -96,13 +83,14 @@ aspire restore   # one-time SDK restore (and after an SDK bump)
 aspire start       # boots the whole graph; prints the dashboard URL + a login token
 ```
 
-`aspire start` brings up infrastructure first, then the plugin APIs and background processors, with
-cross-references resolved into injected environment variables. Leave it running.
+`aspire start` brings up infrastructure first, then the plugin APIs and background processors,
+with cross-references resolved into injected environment variables. Leave it running.
 
 ## Step 3 — Initialize the database through the running AppHost
 
-With Aspire up, Postgres is live and the `netscript db` commands can reach it. Run them from the
-**workspace root** in a second terminal (leave `aspire start` going in the first):
+With Aspire up, Postgres is live and the `netscript db` commands can reach the container Aspire
+provisioned. Run them from the **workspace root** in a second terminal, leaving `aspire start`
+running in the first:
 
 ```sh
 netscript db init --name init   # create + apply the first migration
@@ -110,32 +98,25 @@ netscript db generate           # generate the Prisma client
 netscript db seed               # optional: seed development data
 ```
 
-These talk to the Postgres container Aspire provisioned. Run them with no Aspire up and they fail —
-there is no Postgres for them to reach.
-
 {{ comp callout { type: "warning", title: "Order matters: scaffold → orchestrate → database" } }}
-The single most common first-run error is running a <code>netscript db</code> command before
-<code>aspire start</code>. <code>aspire restore</code> and <code>aspire start</code> run from inside
-<code>aspire/</code>; <code>netscript db</code> commands run from the <strong>workspace root</strong>,
-<strong>after</strong> the graph is up. Mixing the directories or the order is what breaks. There is
-no <code>netscript generate aspire</code> — the AppHost is produced by <code>netscript init</code>.
+The most common first-run error is running a <code>netscript db</code> command before <code>aspire start</code>: without Aspire there is no Postgres to reach, and the command fails. <code>aspire restore</code> and <code>aspire start</code> run from inside <code>aspire/</code>; <code>netscript db</code> commands run from the <strong>workspace root</strong>, <strong>after</strong> the graph is up. There is no <code>netscript generate aspire</code>: <code>netscript init</code> produces the AppHost.
 {{ /comp }}
 
 ## Step 4 — Watch the pipeline run end to end
 
-With the full stack up, exercise the pipeline you built and read it from the dashboard. Drop a
-file in the SAP export shape:
+1. Drop a file in the SAP export shape:
 
-```sh
-cat > .data/incoming/products_live.csv <<'CSV'
-material_no,description,price_cents
-ANV-9,Anvil,4999
-CSV
-mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
-```
+   ```sh
+   cat > .data/incoming/products_live.csv <<'CSV'
+   material_no,description,price_cents
+   ANV-9,Anvil,4999
+   CSV
+   mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
+   ```
 
-Then open `https://localhost:18888`, paste the login token `aspire start` printed, and use the three
-dashboard surfaces:
+2. Open `https://localhost:18888` and paste the login token `aspire start` printed.
+
+3. Read the run in the three dashboard surfaces:
 
 {{ comp.apiTable({
   caption: "Reading the running ERP sync in the Aspire dashboard",
@@ -146,20 +127,18 @@ dashboard surfaces:
   ]
 }) }}
 
-Because Aspire starts each resource with an OTLP endpoint pointed at `http://localhost:4318`,
-framework-level spans (job dispatch, job execution, scheduler runs) surface in the **Traces** view on
-their own.
+Aspire starts each resource with an OTLP endpoint pointed at `http://localhost:4318`, so
+framework-level spans (job dispatch, job execution, scheduler runs) appear in the **Traces** view
+without extra setup.
 
 {{ comp callout { type: "note", title: "Which spans you see" } }}
-The <strong>dispatch/execution trace appears automatically</strong> as the framework instruments the
-run end to end. Handler calls through <code>createJobTools</code>, including
-<code>trace.withChildSpan</code>, add custom detail beneath that trace. <code>log.*</code> remains
-console-backed. See <a href="/explanation/observability/">Observability</a> for the complete path.
+The <strong>dispatch and execution trace appears automatically</strong>, because the framework instruments the run end to end. Handler calls through <code>createJobTools</code>, including <code>trace.withChildSpan</code>, add custom detail beneath that trace. <code>log.*</code> remains console-backed. <a href="/explanation/observability/">Observability</a> describes the complete path.
 {{ /comp }}
 
 ## Verify your progress
 
-Confirm the whole graph is healthy and the pipeline ran:
+Confirm the whole graph is healthy and the pipeline ran. `ns-workers` is the workers CLI shorthand
+you installed in [chapter 2](/tutorials/erp-sync/02-import-job/).
 
 ```sh
 # Both plugin APIs answer (endpoints from the Resources tab).
@@ -170,17 +149,7 @@ curl <triggers-endpoint>/health
 ns-workers executions --limit=10 --json
 ```
 
-{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
-<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
-not create it. Install it once, globally, and the <code>ns-workers</code> command above
-works as written:
-<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
-Rather not install it? <code>ns-workers &lt;verb …&gt;</code> is exactly
-<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
-that full form instead.
-{{ /comp }}
-
-Expected: both health checks return healthy JSON, and the executions feed shows a completed
+Both health checks should return healthy JSON, and the executions feed should show a completed
 `import-products` run for `products_live.csv`.
 
 - [ ] `aspire start` is up; the dashboard lists `postgres`, `redis`, workers, and triggers all green.
@@ -188,36 +157,31 @@ Expected: both health checks return healthy JSON, and the executions feed shows 
 - [ ] `curl <workers-endpoint>/health` and `curl <triggers-endpoint>/health` both return healthy.
 - [ ] A file drop produced an `import-products` execution and a dispatch/execution trace in the dashboard.
 
-{{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
+{{ comp callout { type: "tip", title: "If aspire start will not boot" } }}
 <ul>
-<li><strong>Docker not running</strong> — Aspire provisions Postgres + Redis through Docker; no
-daemon means the happy path does not start.</li>
-<li><strong>Wrong directory</strong> — <code>aspire restore</code>/<code>aspire start</code> run from
-<code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>
-<li><strong>Ports in use</strong> — the dashboard wants <code>:18888</code>/<code>:18889</code> and
-OTLP <code>:4318</code>; a stale prior run holding a port blocks boot. Free it and retry.</li>
+<li><strong>Docker is not running.</strong> Aspire provisions Postgres and Redis through Docker; without the daemon, nothing starts.</li>
+<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from <code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>
+<li><strong>Ports in use.</strong> The dashboard needs <code>:18888</code> and <code>:18889</code>, and OTLP needs <code>:4318</code>. A stale earlier run holding a port blocks boot; free it and retry.</li>
 </ul>
 {{ /comp }}
 
 ## What you built
 
-You ran the complete SAP→Dynamics sync — workers, triggers, queue, and cron — on one machine under a
-single `aspire start`, initialized the database through the running AppHost, and watched a SAP
-export flow into a durable job execution with its trace in the dashboard. You now have an
-end-to-end durable background-processing backend that could carry a real migration's parallel-run,
-and you know exactly where the local story ends and a production deployment begins.
+The complete SAP→Dynamics sync (workers, triggers, queue and cron) running on one machine under a
+single `aspire start`, with the database initialized through the running AppHost and a SAP export
+traced from file drop to durable job execution. You also know where the local setup ends and a
+production deployment begins.
 
 ## Where to go next
 
-You have finished the ERP Sync track. From here, branch into task-oriented and reference docs:
+Ship the sync to a remote target with [Deploy](/orchestration-runtime/how-to/deploy/), the
+production companion to this local run: deployable units, managed backing services and the
+`--no-aspire` path. Related pages:
 
-- **Ship it remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) — the production companion to this local run:
-  deployable units, managed backing services, and the `--no-aspire` path.
-- **Take the transform polyglot** → [Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/) — swap
-  Chapter 3's Deno transform for a Python or shell step on your own host.
-- **Tune throughput** → [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) and
-  [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
-- **Understand the orchestrator** → [Orchestration with Aspire](/explanation/aspire/) and the full
-  [How-to guides](/how-to/).
+- [Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/): swap chapter 3's Deno
+  transform for a Python or shell step on your own host.
+- [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) and
+  [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/): tune throughput.
+- [Orchestration with Aspire](/explanation/aspire/) and the [How-to guides](/how-to/).
 
 {{ comp.nextPrev({ prev: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
