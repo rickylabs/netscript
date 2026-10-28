@@ -66,3 +66,26 @@ CI failure inspected at run 40756074834 / build job: docs:exports-drift reports 
 - Independent same-session reviewer PASS. Initial attempt returned a provider usage-limit error, no review verdict; the same seat/session resumed after reset. Nonblocking newline-appending diff edge case from the review was corrected with a regression assertion before commit.
 - Focused metadata/transport wrapper tests: 6/0/0, exit 0. Structured check/lint/fmt: 9 selected/processed, no drops/refusals, exit 0. Root quality/architecture tasks pass. Additional UI regression wrapper: 49/0/0, exit 0. Full docs site build exits 0, including static registry and rendered-output checks.
 - Reconcile: CI's missing-reference regression is fixed and pushed in slice 2; no new owner/reviewer thread changes were observed. Full S2 scope remains active; commands/install behavior is the next slice.
+
+## Coordinator continuation
+
+
+The owner accepted slice 1 and authorized one fresh independent review, one blocker repair if needed, then every remaining slice. The branch and PR were verified at the requested head, and main is unchanged. Fresh review uses the exact requested Claude Opus model/effort with closed stdin and read-only instructions. Owner evaluator override and writable surface are recorded in supervisor.md.
+
+Focused baseline command through `run-deno-test.ts`: the exact `registry-v2.test.ts`, `registry-authoring.test.ts`, `registry-doc-drift.test.ts` set passes 12/0/0, exit 0. An initial invocation used nonexistent `registry-schema.test.ts` and exited 1 before tests; the corrected run is the verdict.
+
+Fresh review: FAIL_FIX for design-sync selecting the portable JSON catalog as a legacy manifest. Single authorized repair separates exports; dashboard config now loads all 85 legacy units. Structured test wrapper 13/0/0, exit 0. Scoped source formatting covers all four repair files with zero drops. Reconcile: same branch/PR and unchanged main. Remaining slice plan is unchanged.
+
+## Independent MCP slice — in progress
+
+Four tools: bounded/paginated registry list and search, portable item view, and non-executing ui:add argv. Default MCP CLI composition reads embedded Fresh UI bytes offline through an injected catalog port and the shared static publisher. Explicit Fresh UI subpath dependencies at the existing version require exactly four single-line lock workspace-metadata additions, as verified by native reference/private-lock gates.
+
+Scoped check passes five selected files; doc-lint passes all three MCP entrypoints; docs:exports-drift passes; lint passes 13 files. The first whole-package test run found a catalog-order compatibility regression (197/1/0); new tools now append to the catalog and the suite is rerunning. Member lock:update passes its structured check of 206 files in two batches. Independent evaluator transport hit its subscription window limit before issuing a slice verdict; this is a route availability failure, not PASS or FAIL_FIX. The same authorized evaluator session will resume after its indicated reset.
+
+MCP final local evidence: whole-package structured suite 198/0/0, exit 0; post-generation registry/public-doc-lint/embedded-prose/carrier-parity tests 15/0/0, exit 0; root quality:gate exit 0; scoped check/lint/format all pass without drops. Native asset and publish generators refreshed the MCP README carrier and CLI documentation carrier. The export-surface generator refused dirty sources as designed; reran explicitly with its documented `--allow-dirty` flag for this owned implementation and retained source provenance.
+
+Independent MCP review round 1: FAIL_FIX for generic source-string truncation. Repaired once by applying the existing faithful-content policy and complete-response byte guard. Added exact long component+CSS comparisons and both payload/envelope oversize controls. Same evaluator round 2: PASS (read-only source review; no independent command execution claimed). Final whole MCP structured suite: **200/0/0, exit 0**. See slice-mcp-review.md. No new architecture debt accepted.
+
+Reconcile: static-build and design-sync repair commits retained. Concurrent worker owns config/lock/CLI application work; this slice reserves only MCP, its documentation and generated carriers, and the four required dependency-metadata lock lines. Next independent unit: theme documentation authoring/carrier only, with component sources and CLI application behavior left to their existing owners.
+
+Integration: remote design-sync fix e5d8d5a and MCP slice 929a1aa were inspected and retained through a normal merge. Four dependency-lock changes are workspace metadata only, with no versions or integrity changes. Our metadata/CLI source remains intact. The concurrent continuation owns theme-doc authoring/carrier next; this continuation owns config/lock/CLI and style/preset behavior.

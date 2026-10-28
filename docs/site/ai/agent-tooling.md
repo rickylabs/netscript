@@ -157,7 +157,7 @@ output that could corrupt the JSON-RPC stream. Its flags:
 
 ## What the server exposes
 
-Twenty-two tools, every one returning a bounded structured result. Grouped by what
+Twenty-six tools, every one returning a bounded structured result. Grouped by what
 an agent is trying to do:
 
 - **Read the running app** — seven telemetry read models: `get_app_status`,
@@ -300,3 +300,19 @@ denial behavior.
   { eyebrow: "Reference", title: "CLI reference", body: "The task-oriented cheat-sheet for every netscript command, including agent init and agent mcp.", href: resolveXref("cli:reference").href, icon: "C" },
   { eyebrow: "Guide", title: "MCP client stack", body: "The other MCP surface: consume external MCP servers as tools inside your own product's agents.", href: "/ai/mcp/", icon: "M" }
 ] }) }}
+
+## UI registry discovery
+
+`list_registry_items` returns item metadata with `limit` (at most 20) and `offset`;
+`search_registry_items` adds a required `query`. Both return `items`, `total` and an optional
+`nextOffset`. `view_registry_item` accepts `name` and returns a portable item with copy bytes.
+The standalone server uses the embedded Fresh UI registry without a network request.
+Hosts can inject `McpCliOptions.uiRegistryCatalog` for a selected app's registries.
+
+`get_registry_add_command` accepts a name, `@namespace/name`, or HTTP(S) item URL and returns
+`{command: "netscript", args: ["ui:add", name]}`. It does not execute the command. Pass the
+arguments directly to a process API after reviewing the installation; never join them into shell text.
+
+Registry metadata uses the server's normal output bounds. Views preserve exact file contents and
+fail with `tool_result_too_large` when the complete JSON-RPC response exceeds 64 KiB. Use
+`netscript ui:view <name>` for larger items.

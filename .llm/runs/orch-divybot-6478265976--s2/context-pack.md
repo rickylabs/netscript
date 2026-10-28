@@ -1,9 +1,9 @@
-# Resume S2
+# Resume full S2
 
-Branch orch/divybot-6478265976, draft #2468, main base 9a31e87. User continuation authorizes full objective; preserve historical schema stop records, no false final PASS/READY.
+Branch orch/divybot-6478265976, draft #2468, base main 9a31e87. User continuation keeps full scope active. Historical schema review stop retained; owner-authorized fresh review repaired design-sync manifest selection (e5d8d5a). No final READY or merge claim.
 
-Implemented/reviewed: schema and canonical JSON (85 legacy / 86 protocol items); static build + ui:build + docs publication; strict app config, namespace/GitHub client, environment-only HTTP auth, lock/hash/diff contracts and staged writes. Slice 2 and 3 have independent PASS. CI docs:exports-drift repair is pushed. New metadata tests 6/0/0; existing UI regressions 49/0/0; full docs build, scoped checks and root quality/architecture pass.
+Integrated work: canonical JSON/schema + 85-item legacy compatibility; static build/ui:build/docs publication; app config/namespace transport/lock/hash/diff/staging (slice 3, independent PASS); MCP four bounded registry tools (929a1aa, independent PASS and 200 package tests per pushed evidence). Four accepted lock diffs only add existing-version MCP→Fresh UI workspace dependency metadata.
 
-Next slice 4: actual lock-aware installer/update/remove and thin UI command parity; then style/preset/theme docs and MCP. Production install MUST pass DenoUiRegistryPaths into staged commit (reviewer requirement). Newline-only and append-after-no-newline diffs are corrected and tested. Claude's temporary usage limit cleared by retrying the same evaluator session; preserve that session for final evaluation.
+Concurrent ownership: this continuation owns config/lock/CLI install/update/remove/style/preset behavior; the other continuation completed MCP and next reserves theme-doc registry authoring/embedded-carrier proof. Do not duplicate or revert its files. Observe/preserve remote commits and normal-merge as needed; no force push.
 
-No S3 component sources/markup/CSS/contract/ui:migrate edits. No labels/force-push/merge/tag/release. Keep assignment out of git. Final report uses a fresh atomic .divybot-final-report.md handoff at completion.
+Latest local proof: six metadata/transport tests; 49 existing UI tests; full docs build; scoped check/lint/format and root quality/architecture pass. Production installer must pass DenoUiRegistryPaths to staged commits. Next implement CLI behavior, then style/preset integration; reconcile pushed theme-doc work. Final full scaffold runtime and independent IMPL-EVAL remain required. No component restyling/markup/CSS/contract or ui:migrate work. No labels, merge, tags or release. Assignment stays untracked. Canonical final uses atomic .divybot-final-report.md.

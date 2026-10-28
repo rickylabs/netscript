@@ -9,6 +9,8 @@
     "./openapi-projection": "./openapi-projection.ts"
   },
   "imports": {
+    "@netscript/fresh-ui/registry": "jsr:@netscript/fresh-ui@0.0.8/registry",
+    "@netscript/fresh-ui/registry-v2": "jsr:@netscript/fresh-ui@0.0.8/registry-v2",
     "@netscript/plugin/health": "jsr:@netscript/plugin@0.0.8/health",
     "@netscript/aspire": "jsr:@netscript/aspire@0.0.8",
     "@netscript/telemetry/attributes": "jsr:@netscript/telemetry@0.0.8/attributes",
