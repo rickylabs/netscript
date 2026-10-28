@@ -5,21 +5,27 @@ title: "@netscript/plugin-triggers"
 
 # `@netscript/plugin-triggers`
 
-NetScript plugin for trigger ingress, scheduling, file watching, and the trigger runtime APIs.
-This page is written against the package's public surface reported by `deno doc`. For the full
-index of packages and plugins return to the [reference overview](/reference/).
+The deployable NetScript triggers plugin: trigger ingress, scheduling, file watching and the trigger
+runtime APIs. Its root entrypoint holds the plugin manifest and its metadata constants; inspect the
+manifest with `inspectPlugin` from `@netscript/plugin`. The handler-first authoring DSL
+(`defineWebhook`, `defineScheduledTrigger`, `defineFileWatch`, `enqueueJob`) and the runtime ports
+live in [`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/).
 
-The plugin's root entrypoint (`@netscript/plugin-triggers`) exposes the public **plugin manifest**
-surface — the manifest value and its metadata constants. Shared manifest inspection is provided by
-`inspectPlugin` from `@netscript/plugin`. The handler-first authoring DSL (`defineWebhook`,
-`defineScheduledTrigger`, `defineFileWatch`, `enqueueJob`) and the runtime ports live in the sibling
-[`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/) package, which has its own
-canonical reference page.
+## Sub-path exports
 
-Additional integration entrypoints are published as [sub-path exports](#sub-path-exports):
-`./public`, `./plugin`, `./runtime`, `./scaffold`, `./aspire`, `./cli`, `./services`,
-`./streams`, and `./streams/server`. Their reference detail is documented against their own
-`deno doc` surface.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-triggers` | `./mod.ts` | Public [plugin manifest](#plugin-manifest) surface. |
+| `@netscript/plugin-triggers/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
+| `@netscript/plugin-triggers/public` | `./src/public/mod.ts` | Public manifest re-export (identical to the root surface). |
+| `@netscript/plugin-triggers/plugin` | `./src/public/mod.ts` | Plugin lifecycle composition (alias of the public surface). |
+| `@netscript/plugin-triggers/runtime` | `./src/runtime/mod.ts` | Trigger runtime wiring. |
+| `@netscript/plugin-triggers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
+| `@netscript/plugin-triggers/aspire` | `./src/aspire/mod.ts` | [Aspire contribution](#aspire-aspire) for trigger services and background workers. |
+| `@netscript/plugin-triggers/cli` | `./src/cli/composition/main.ts` | Trigger CLI composition root. |
+| `@netscript/plugin-triggers/services` | `./services/src/main.ts` | Trigger ingress/management HTTP service entrypoint. |
+| `@netscript/plugin-triggers/streams` | `./streams/mod.ts` | Stream integration surface. |
+| `@netscript/plugin-triggers/streams/server` | `./streams/server.ts` | Stream server entrypoint. |
 
 ## Plugin manifest
 
@@ -44,25 +50,7 @@ Additional integration entrypoints are published as [sub-path exports](#sub-path
 | `TriggersPluginVersion` | type alias | Literal type for the triggers plugin version. |
 | `TriggersApiServiceName` | type alias | Literal type for the triggers API service name. |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/plugin-triggers` | `./mod.ts` | Public plugin manifest surface (documented above). |
-| `@netscript/plugin-triggers/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
-| `@netscript/plugin-triggers/public` | `./src/public/mod.ts` | Public manifest re-export (identical to the root surface). |
-| `@netscript/plugin-triggers/plugin` | `./src/public/mod.ts` | Plugin lifecycle composition (alias of the public surface). |
-| `@netscript/plugin-triggers/runtime` | `./src/runtime/mod.ts` | Trigger runtime wiring. |
-| `@netscript/plugin-triggers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
-| `@netscript/plugin-triggers/aspire` | `./src/aspire/mod.ts` | Aspire contribution for trigger services and background workers. |
-| `@netscript/plugin-triggers/cli` | `./src/cli/composition/main.ts` | Trigger CLI composition root. |
-| `@netscript/plugin-triggers/services` | `./services/src/main.ts` | Trigger ingress/management HTTP service entrypoint. |
-| `@netscript/plugin-triggers/streams` | `./streams/mod.ts` | Stream integration surface. |
-| `@netscript/plugin-triggers/streams/server` | `./streams/server.ts` | Stream server entrypoint. |
-
-### Aspire (`./aspire`)
+## Aspire (`./aspire`)
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -75,20 +63,17 @@ The following entrypoints are published alongside the root export.
 | `TriggersDenoBackgroundSpec` | interface | Deno background resource spec used by the triggers Aspire contribution. |
 | `TriggersEnvSource` | type alias | Environment source reference accepted by triggers Aspire declarations. |
 
----
-
 ## Core package
 
-The separately published
-[`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/) page is canonical for the
-handler-first DSL, ingress and processor runtimes, ports, configuration, and testing exports. This
-page stays focused on the deployable plugin's manifest and integration entrypoints. The testing
-example below uses core APIs intentionally; exhaustive core entrypoint and symbol tables live only
-on its reference page.
+[`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/) is canonical for the
+handler-first DSL, ingress and processor runtimes, ports, configuration and testing exports.
 
-## Testing and Verification
+## Examples
 
-Verifying trigger routing, security verification, manual replays, and real-time execution monitoring can be performed using in-memory doubles without launching live HTTP hosts or databases.
+### Test triggers with in-memory doubles
+
+Verify trigger routing, signature verification, manual replays and live execution monitoring with
+in-memory doubles, without an HTTP host or a database.
 
 ```ts
 import { assertEquals, assertExists } from "@std/assert";
@@ -184,7 +169,3 @@ Deno.test("Trigger operator, manual dispatch, test delivery, and lifecycle subsc
   assertEquals(observedEvents[0].event.triggerId, webhookDef.id);
 });
 ```
-
----
-
-Back to the [reference overview](/reference/).

@@ -5,74 +5,37 @@ title: '@netscript/plugin-workers-core'
 
 # `@netscript/plugin-workers-core`
 
-Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins. This
-page is written against the package's public surface reported by `deno doc`. For the full index of
-packages and plugins return to the [reference overview](/reference/).
+Job, task, workflow, runtime, config and testing primitives for NetScript workers. `defineJob`,
+`defineTask` and `defineWorkflow` are typestate-gated builders: `build()` exists only once an
+entrypoint or handler is set, so an incomplete definition is a compile error rather than a runtime
+surprise. The runtime composes from injected registry, worker and storage ports with memory-backed
+defaults, so the same definitions run in production and in permission-free tests. The deployable
+[`@netscript/plugin-workers`](/reference/workers/) plugin binds this core to a NetScript host; use
+the core directly for custom hosts, libraries and tests.
 
-Background-job definitions fail in two places: at definition time, when a job is missing an
-execution target and nobody notices until production; and at runtime, when the executor and its
-storage are welded together and untestable. This package attacks both. `defineJob`, `defineTask`,
-and `defineWorkflow` are **typestate-gated** builders — `build()` only exists once an entrypoint or
-handler is set, so an incomplete definition is a compile error rather than a runtime surprise. The
-runtime composes from injected registry, worker, and storage ports with memory-backed defaults, so
-the same definitions run in production and in permission-free tests.
+## Sub-path exports
 
-This is the core that the deployable [`@netscript/plugin-workers`](/reference/workers/) plugin binds
-to a NetScript host. Use it directly for custom hosts, libraries, and tests.
-
-## Job context cancellation
-
-`JobHandlerContext` on the root surface and `JobContext` on the runtime surface carry a required
-`signal: AbortSignal` and optional `deadlineAt: number` (epoch milliseconds). `JobDispatchContext`
-accepts an optional caller signal; the `InProcessJobRunner` supplies a separate owned signal to the
-handler.
-
-| Input or event                       | In-process runner behavior                                                                                       |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `job.timeout`                        | Deadline is runner clock time at dispatch plus timeout in milliseconds.                                          |
-| Caller `deadlineAt`                  | Uses the earlier of this deadline and the job timeout deadline; absent when neither exists.                      |
-| Deadline elapsed                     | Aborts with a `DOMException` named `TimeoutError`.                                                               |
-| `runner.stop()`                      | Stops admission, aborts active handlers with `ShutdownError`, and awaits bounded drain.                          |
-| Caller signal abort                  | Preserves an Error named `TimeoutError`, `ShutdownError`, or `AbortError`; otherwise normalizes to `AbortError`. |
-| Later abort                          | Does not replace the first abort reason.                                                                         |
-| Cleanup exceeds `abortGracePeriodMs` | Dispatch rejects with the abort reason; default budget 1,000 ms, without physical JavaScript termination.        |
-
-Pass the signal into downstream abort-aware APIs and check it at yielding checkpoints. Cleanup
-belongs in `finally`. See
-[handler guidance](/background-processing/workers/#observe-cancellation-and-deadlines) and
-[cleanup tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget). The
-Workers API runs router does not expose an operator cancel operation; caller signal cancellation
-here describes custom in-process dispatch, not an HTTP cancel endpoint. Other execution modes
-require their own propagation verification.
-
-## Exports
-
-The package publishes eighteen entrypoints. The root path carries the authoring surface; the
-subpaths expose the runtime layers a host composes.
-
-| Export specifier                                      | Module                          | Exports | Purpose                                                                                                                                                                        |
-| ----------------------------------------------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@netscript/plugin-workers-core/integration/commands` | `./commands.ts`                 | 14      | Thin checked command sink and its supplied worker boundary.                                                                                                                    |
-| `@netscript/plugin-workers-core`                      | `./mod.ts`                      | 32      | The authoring surface — the three typestate builders, handler results and tools, schedule and permission presets, inspection, and the runtime entry points (documented below). |
-| `@netscript/plugin-workers-core/builders`             | `./src/builders/mod.ts`         | 28      | The builder layer behind the DSL, including the builder-state types tooling needs.                                                                                             |
-| `@netscript/plugin-workers-core/runtime`              | `./src/runtime/mod.ts`          | 132     | The full runtime: `createWorkersRuntime`, the in-process dispatcher and runner, execution records, and `resolveWorkerIdempotencyKey`.                                          |
-| `@netscript/plugin-workers-core/presets`              | `./src/presets/mod.ts`          | 28      | `startWorkers` and the runtime port shapes its default composition fills in.                                                                                                   |
-| `@netscript/plugin-workers-core/executor`             | `./src/executor/mod.ts`         | 33      | The multi-runtime task executor and its per-runtime adapters (Deno, .NET, `cmd`, generic executable) plus `runProcess`.                                                        |
-| `@netscript/plugin-workers-core/workflow`             | `./src/workflow/mod.ts`         | 27      | The workflow builder, workflow events, workflow clock, and an in-memory workflow state store.                                                                                  |
-| `@netscript/plugin-workers-core/registry`             | `./src/registry/mod.ts`         | 22      | KV-backed job and task registries with their filter and selector types.                                                                                                        |
-| `@netscript/plugin-workers-core/state`                | `./src/state/mod.ts`            | 9       | Execution state: records, statuses, trigger types, and the KV execution state store.                                                                                           |
-| `@netscript/plugin-workers-core/stores`               | `./src/stores/mod.ts`           | 14      | The KV-backed worker idempotency store and its atomic KV primitives.                                                                                                           |
-| `@netscript/plugin-workers-core/streams`              | `./src/streams/mod.ts`          | 20      | Durable stream projection of executions and jobs (`workersStreamSchema`, `createWorkersStreamProducer`, the mutation hook).                                                    |
-| `@netscript/plugin-workers-core/shutdown`             | `./src/shutdown/mod.ts`         | 5       | `ShutdownManager` and the resource/report types behind graceful drain.                                                                                                         |
-| `@netscript/plugin-workers-core/schemas`              | `./src/domain/public-schema.ts` | 13      | Public structural schemas for worker definitions.                                                                                                                              |
-| `@netscript/plugin-workers-core/contracts/v1`         | `./src/contracts/v1/mod.ts`     | 27      | Version 1 workers API schemas and contract route types (`workersContract`, `workersContractV1`).                                                                               |
-| `@netscript/plugin-workers-core/config`               | `./src/config/mod.ts`           | 32      | `defineWorkers`, `defineJobs`, and the queue-provider configuration schemas.                                                                                                   |
-| `@netscript/plugin-workers-core/telemetry`            | `./src/telemetry/mod.ts`        | 26      | Worker instrumentation abstractions and `applyWorkerInstrumentations`.                                                                                                         |
-| `@netscript/plugin-workers-core/abstracts`            | `./src/abstracts/mod.ts`        | 31      | Abstract runtime contracts and reserved extension-point base classes.                                                                                                          |
-| `@netscript/plugin-workers-core/testing`              | `./src/testing/mod.ts`          | 46      | `createTestWorkersRuntime` plus job, result, and execution-record fixtures.                                                                                                    |
-
-Export counts are the symbol counts `deno doc` reports for each entrypoint; the layered subpaths
-re-export shared vocabulary, so the counts overlap rather than sum.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-workers-core` | `./mod.ts` | The authoring surface: the three typestate builders, handler results and tools, schedule and permission presets, inspection, and the runtime entry points. See [details](#root-surface-netscriptplugin-workers-core). |
+| `@netscript/plugin-workers-core/integration/commands` | `./commands.ts` | Thin checked command sink and its supplied worker boundary. See [details](#checked-command-sink). |
+| `@netscript/plugin-workers-core/builders` | `./src/builders/mod.ts` | The builder layer behind the DSL, including the builder-state types tooling needs. |
+| `@netscript/plugin-workers-core/runtime` | `./src/runtime/mod.ts` | The full runtime: `createWorkersRuntime`, the in-process dispatcher and runner, execution records, and `resolveWorkerIdempotencyKey`. |
+| `@netscript/plugin-workers-core/presets` | `./src/presets/mod.ts` | `startWorkers` and the runtime port shapes its default composition fills in. |
+| `@netscript/plugin-workers-core/executor` | `./src/executor/mod.ts` | The multi-runtime task executor and its per-runtime adapters (Deno, .NET, `cmd`, generic executable) plus `runProcess`. |
+| `@netscript/plugin-workers-core/workflow` | `./src/workflow/mod.ts` | The workflow builder, workflow events, workflow clock, and an in-memory workflow state store. |
+| `@netscript/plugin-workers-core/registry` | `./src/registry/mod.ts` | KV-backed job and task registries with their filter and selector types. |
+| `@netscript/plugin-workers-core/state` | `./src/state/mod.ts` | Execution state: records, statuses, trigger types, and the KV execution state store. |
+| `@netscript/plugin-workers-core/stores` | `./src/stores/mod.ts` | The KV-backed worker idempotency store and its atomic KV primitives. |
+| `@netscript/plugin-workers-core/streams` | `./src/streams/mod.ts` | Durable stream projection of executions and jobs (`workersStreamSchema`, `createWorkersStreamProducer`, the mutation hook). |
+| `@netscript/plugin-workers-core/shutdown` | `./src/shutdown/mod.ts` | `ShutdownManager` and the resource/report types behind graceful drain. |
+| `@netscript/plugin-workers-core/schemas` | `./src/domain/public-schema.ts` | Public structural schemas for worker definitions. |
+| `@netscript/plugin-workers-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Version 1 workers API schemas and contract route types (`workersContract`, `workersContractV1`). |
+| `@netscript/plugin-workers-core/config` | `./src/config/mod.ts` | `defineWorkers`, `defineJobs`, and the queue-provider configuration schemas. |
+| `@netscript/plugin-workers-core/telemetry` | `./src/telemetry/mod.ts` | Worker instrumentation abstractions and `applyWorkerInstrumentations`. |
+| `@netscript/plugin-workers-core/abstracts` | `./src/abstracts/mod.ts` | Abstract runtime contracts and reserved extension-point base classes. |
+| `@netscript/plugin-workers-core/testing` | `./src/testing/mod.ts` | `createTestWorkersRuntime` plus job, result, and execution-record fixtures. |
+| `@netscript/plugin-workers-core/discovery` | `./src/builders/discovery.ts` | [Contribution-builder discovery metadata](#discovery-metadata). |
 
 ## Root surface (`@netscript/plugin-workers-core`)
 
@@ -110,8 +73,8 @@ sequence their definitions. The three builders share the same typestate discipli
 | `JobTools`            | type alias | Runtime tools exposed to worker job handlers.                       |
 | `JobToolSpan`         | type alias | Span operations exposed to worker job handlers.                     |
 
-`JobTools` is how a handler reaches telemetry without importing an SDK: the span operations it
-exposes are bound to the active worker instrumentation context.
+`JobTools` gives a handler telemetry without importing an SDK: its span operations are bound to the
+active worker instrumentation context.
 
 ### Schedules and permissions
 
@@ -142,8 +105,8 @@ must be injected explicitly.
 | `inspectTask`     | function | Inspect a task definition without starting a runtime.     |
 | `inspectWorkflow` | function | Inspect a workflow definition without starting a runtime. |
 
-These are what CLI listings and doctor checks call: they read a definition and report on it without
-starting a runtime or touching storage.
+CLI listings and doctor checks call these: they read a definition and report on it without starting
+a runtime or touching storage.
 
 ### Idempotency
 
@@ -157,23 +120,33 @@ starting a runtime or touching storage.
 Delivery is at-least-once with an applied-key guard window. A crash after an external effect and
 before marking it applied can repeat that effect; one effective application requires independently
 idempotent downstream persistence. A key is resolved from a caller-supplied key, the message id, or
-a payload hash — `WorkerIdempotencySource` records which — and then claimed against the port before
-the effect runs.
+a payload hash (`WorkerIdempotencySource` records which), then claimed against the port before the
+effect runs.
 
-## Related pages
+## Job context cancellation
 
-- [`@netscript/plugin-workers`](/reference/workers/) — the deployable plugin that binds this core to
-  a NetScript host.
-- [`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/) — trigger handlers enqueue
-  these jobs through `enqueueJob`.
-- [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) — its `integration/workers`
-  helpers dispatch jobs and tasks from saga cascades.
-- [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) — the producer behind the
-  projected execution stream.
+`JobHandlerContext` on the root surface and `JobContext` on the runtime surface carry a required
+`signal: AbortSignal` and optional `deadlineAt: number` (epoch milliseconds). `JobDispatchContext`
+accepts an optional caller signal; the `InProcessJobRunner` supplies a separate owned signal to the
+handler.
 
----
+| Input or event                       | In-process runner behavior                                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `job.timeout`                        | Deadline is runner clock time at dispatch plus timeout in milliseconds.                                          |
+| Caller `deadlineAt`                  | Uses the earlier of this deadline and the job timeout deadline; absent when neither exists.                      |
+| Deadline elapsed                     | Aborts with a `DOMException` named `TimeoutError`.                                                               |
+| `runner.stop()`                      | Stops admission, aborts active handlers with `ShutdownError`, and awaits bounded drain.                          |
+| Caller signal abort                  | Preserves an Error named `TimeoutError`, `ShutdownError`, or `AbortError`; otherwise normalizes to `AbortError`. |
+| Later abort                          | Does not replace the first abort reason.                                                                         |
+| Cleanup exceeds `abortGracePeriodMs` | Dispatch rejects with the abort reason; default budget 1,000 ms, without physical JavaScript termination.        |
 
-Back to the [reference overview](/reference/).
+Pass the signal into downstream abort-aware APIs and check it at yielding checkpoints. Cleanup
+belongs in `finally`. See
+[handler guidance](/background-processing/workers/#observe-cancellation-and-deadlines) and
+[cleanup tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget). The
+Workers API runs router does not expose an operator cancel operation; caller signal cancellation
+here describes custom in-process dispatch, not an HTTP cancel endpoint. Other execution modes
+require their own propagation verification.
 
 ## Checked command sink
 
@@ -215,20 +188,26 @@ Each job's `retention.kvRetentionDays` (default 3) bounds terminal execution rec
 Pending, queued, and running executions remain durable while they are open. An explicit
 `archiveToDb: false` never causes a database archive in these KV write or cleanup paths.
 
-`DELETE /cleanup` now deletes expired terminal execution records instead of returning a stubbed
-success. It inspects at most 1000 entries per call and advances to the next page on later calls.
+`DELETE /cleanup` deletes expired terminal execution records. It inspects at most 1000 entries per call and advances to the next page on later calls.
 Atomic version checks prevent it from deleting a record updated after inspection. Fresh terminal
 records and open executions are preserved. This endpoint also removes legacy execution records
 written without TTL; normal new-record expiry is performed by the KV backend and needs no app
 session. Job/task definitions remain configuration rather than expiring execution history.
 
-## Exports: discovery metadata
+## Discovery metadata
 
 The `@netscript/plugin-workers-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-| Export specifier                           | Module                        |
-| ------------------------------------------ | ----------------------------- |
-| `@netscript/plugin-workers-core/discovery` | `./src/builders/discovery.ts` |
+## Related pages
+
+- [`@netscript/plugin-workers`](/reference/workers/): the deployable plugin that binds this core to
+  a NetScript host.
+- [`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/): trigger handlers enqueue
+  these jobs through `enqueueJob`.
+- [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/): its `integration/workers`
+  helpers dispatch jobs and tasks from saga cascades.
+- [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/): the producer behind the
+  projected execution stream.
