@@ -1,0 +1,57 @@
+{
+  "sourceHead": "f8db7eed35db5b337752896a6f297eab5a7db982",
+  "browser": {
+    "passed": 52,
+    "failed": 0,
+    "skipped": 0,
+    "axeReports": 24,
+    "seriousCritical": 0
+  },
+  "reproducibility": {
+    "outcome": "PASS",
+    "scope": "all-output-with-reported-pagefind-metadata",
+    "files": 806,
+    "html": 251,
+    "search": 250,
+    "twins": 202,
+    "nonBlockingDifferences": [
+      "pagefind/filter/en_9fdf2bb.pf_filter",
+      "pagefind/filter/en_faf0625.pf_filter",
+      "pagefind/pagefind-entry.json",
+      "pagefind/pagefind.en_391c76885e.pf_meta",
+      "pagefind/pagefind.en_caad3893c2.pf_meta"
+    ],
+    "changedNonHtml": [
+      "pagefind/filter/en_9fdf2bb.pf_filter",
+      "pagefind/filter/en_faf0625.pf_filter",
+      "pagefind/pagefind-entry.json",
+      "pagefind/pagefind.en_391c76885e.pf_meta",
+      "pagefind/pagefind.en_caad3893c2.pf_meta"
+    ]
+  },
+  "links": {
+    "resolved": 23970,
+    "pages": 251
+  },
+  "caveats": {
+    "markers": 15,
+    "pages": 12,
+    "result": "PASS"
+  },
+  "carrierChecks": {
+    "prose": 0,
+    "corpus": 0,
+    "assetsBarrel": 0,
+    "publishAssets": 0
+  },
+  "qualityArchitecture": "PASS with existing warnings",
+  "independentImplEval": "PASS for source; hosted readiness pending",
+  "localCli": {
+    "exitCode": 1,
+    "gate": "preflight.aspire",
+    "status": "unproven; Aspire unavailable and Docker disconnected"
+  },
+  "hostedCli": "https://github.com/rickylabs/netscript/actions/runs/40690612382",
+  "pagefindFollowup": 2453,
+  "tokenIntegrationOwner": 2450
+}
