@@ -58,3 +58,13 @@ only after attaching and validating exact evidence. `acceptance-mirror-dry-run.j
 live PASS. No labels or gate code were changed. Supplemental source-refresh and Markdown-twin
 checks are in acceptance-render-audit.json. Actual MCP generation against a temporary updated
 carrier passes at 284,489 / 294,912 bytes (markdown-budget-audit.json).
+
+## Completion audit: generated carriers
+
+The initial review repair found a separate deterministic freshness failure after the source slice was approved. Native-generated follow-ups `977f2742` and `9fa47591` are integrated by fast-forward, preserving all remote history. They change only the CLI prose carrier and dependent MCP publish payload. The functional generator/renderer/tests/styles remain byte-identical to the independently approved source.
+
+At head `9fa47591`, all four unmodified allowlisted freshness gates pass with actual run-gate receipts: `check:agent-docs-prose`, `check:mcp-export-corpus`, `check:assets-barrel`, `check:publish-assets`. Public sanitized receipt projections are in completion-freshness-summary.json; raw host-path receipts remain private and are not rewritten. The actual committed prose carrier now contains all fifteen design-system Markdown twins and the actual MCP generator passes at 284,489 / 294,912 bytes (14 selected documents).
+
+Hosted runtime evidence on the stated earlier source head `2c3199e74` is retained separately in completion-hosted-runtime.json: the one-pass PostgreSQL scaffold.runtime command with cleanup completed with 120 passed / 0 failed / 0 skipped. Static scaffold and SQLite runtime jobs also succeeded. The separate desktop-native packaging job failed; neither the full workflow nor the final PR head is claimed runtime-green. This evidence is distinct from the local environment-limited attempt.
+
+Final independent delta sign-off: the same Claude Opus 5.5/high evaluator returned PASS, confirmed source identity and decoded the generated changes in memory. `completion-evaluate.md` approves final READY for review and preserves exact runtime-head qualifications; no additional implementation changes were required.
