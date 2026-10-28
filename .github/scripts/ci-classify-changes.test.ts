@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^1.0.0';
+import { assertEquals } from '@std/assert';
 import {
   classifyDenoConfigChange,
   classifyPath,
@@ -536,6 +536,24 @@ Deno.test('Fresh UI and Pages selectors distinguish tasks-only root config', () 
   assertEquals(toolchain.needsFreshUi, true);
 });
 
+Deno.test('canonical design-system sources select docs builds and main-push deployment', () => {
+  for (
+    const path of [
+      'docs/design-system/GUIDELINES.md',
+      'docs/design-system/themes/studio/DESIGN.md',
+      'docs/design-system/themes/studio/SKILL.md',
+      'docs/design-system/figma-variables/index.json',
+      'docs/design-system/deno.json',
+    ]
+  ) {
+    assertEquals(classifyPath(path).pages, true, path);
+    for (const eventName of ['pull_request', 'push']) {
+      const decision = decide({ eventName, files: [path], labels: [] });
+      assertEquals(decision.needsPages, true, `${eventName}: ${path}`);
+    }
+  }
+});
+
 Deno.test('Fresh browser selector is limited to Fresh, fresh-ui and their owners', () => {
   for (
     const path of [
@@ -620,6 +638,10 @@ Deno.test('Pages and Fresh UI consume their selectors and fail closed', async ()
     pages.includes(
       "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false' }}",
     ),
+    true,
+  );
+  assertEquals(
+    workflowJob(pages, 'deploy')?.includes("needs.classify.outputs.needs_pages != 'false'"),
     true,
   );
 
