@@ -1,24 +1,25 @@
 /**
- * Rendering tests for the site's Markdown extensions: fenced `tree` blocks, `> [!TYPE]`
- * alerts, and their Markdown twins. They need the site's import map (markdown-it, the DOM
- * parser and Vento), so the site task runs this file directly and root CI reaches it through
- * `markdown-render_test.ts`.
+ * Rendering tests for the site's Markdown extensions: fenced `tree` blocks, GitHub-style
+ * `> [!TYPE]` alerts, and their Markdown twins. They need the site's import map (markdown-it,
+ * the DOM parser and Vento), so the site task runs this file directly and root CI reaches it
+ * through `markdown-render_test.ts`.
  */
 import { deepStrictEqual, ok, strictEqual } from 'node:assert/strict';
 import { markdownIt } from 'lume/deps/markdown_it.ts';
 import { DOMParser } from 'lume/deps/dom.ts';
 import { autotrim, engine } from 'lume/deps/vento.ts';
 import {
-  CALLOUT_ICONS,
   CALLOUT_TYPES,
   type CalloutType,
   calloutType,
 } from '../../../tools/docs-site/callout-types.ts';
 import { articleToMarkdown } from './ai-tooling.ts';
+import { ALERT_ATTRIBUTE, inlineCode, renderCallout } from './callout.ts';
 import { fileTreeFence, renderFileTree } from './file-tree.ts';
 import { markdownAlerts } from './markdown-alerts.ts';
 
 const ORIGIN = new URL('https://docs.example.test/netscript/');
+const PAGE = 'guide/page.md';
 
 const TREE = `my-app/
 ├── AGENTS.md              # [guidance] added by \`agent init\`
@@ -29,11 +30,12 @@ const TREE = `my-app/
 └── deno.json              # [owned config] workspace, imports, and tasks`;
 
 function site(warnings: string[] = []) {
+  const warn = (message: string) => warnings.push(message);
   const md = markdownIt({ html: true });
   md.disable('code');
-  md.use(fileTreeFence);
-  md.use(markdownAlerts, { warn: (message: string) => warnings.push(message) });
-  return md;
+  md.use(fileTreeFence, { warn });
+  md.use(markdownAlerts, { warn });
+  return { render: (source: string) => md.render(source, { filename: PAGE }) };
 }
 
 function article(html: string): Element {
@@ -55,23 +57,22 @@ function normalize(html: string): string {
   return html.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 }
 
+/** Render a component through Vento with the filters `_config.ts` registers, as Lume does. */
 async function renderComponent(name: string, data: Record<string, unknown>): Promise<string> {
   const env = engine({ dataVarname: 'it', autoescape: false, useWith: true });
   env.use(autotrim());
-  // The same filters `_config.ts` registers for these components.
   env.filters.calloutType = calloutType;
-  env.filters.ic = (value: unknown) =>
-    typeof value === 'string' ? value.replace(/`([^`]+)`/g, '<code>$1</code>') : (value ?? '');
+  env.filters.calloutHtml = renderCallout;
+  env.filters.ic = (value: unknown) => typeof value === 'string' ? inlineCode(value) : value ?? '';
   env.filters.fileTreeHtml = (nodes: unknown, nested?: boolean) =>
     renderFileTree(Array.isArray(nodes) ? nodes : [], { nested: Boolean(nested) });
   const source = await Deno.readTextFile(new URL(`../_components/${name}.vto`, import.meta.url));
-  const result = await env.runString(source, {
-    calloutTypes: CALLOUT_TYPES,
-    calloutIcons: CALLOUT_ICONS,
-    ...data,
-  });
-  return result.content;
+  return (await env.runString(source, data)).content;
 }
+
+/* ------------------------------------------------------------------ */
+/* Tree fences                                                         */
+/* ------------------------------------------------------------------ */
 
 Deno.test('a tree fence renders the fileTree component and leaves other fences alone', () => {
   const html = site().render(`\`\`\`tree\n${TREE}\n\`\`\`\n\n\`\`\`text\nplain\n\`\`\`\n`);
@@ -129,17 +130,51 @@ Deno.test('comp.fileTree still accepts a single root `tree` argument', async () 
   const html = await renderComponent('fileTree', {
     tree: { name: 'runtime', children: [{ name: 'current', comment: 'version pointer' }] },
   });
-  const root = article(html);
   deepStrictEqual(
-    [...root.querySelectorAll('.ns-file-tree__name')].map((name) => name.textContent),
+    [...article(html).querySelectorAll('.ns-file-tree__name')].map((name) => name.textContent),
     ['runtime', 'current'],
   );
+});
+
+Deno.test('an ASCII tree fence renders the same component as the Unicode one', () => {
+  const ascii = TREE.replaceAll('├──', '|--').replaceAll('└──', '`--').replaceAll('│', '|');
+  const fromAscii = article(site().render(`\`\`\`tree\n${ascii}\n\`\`\`\n`));
+  const fromUnicode = article(site().render(`\`\`\`tree\n${TREE}\n\`\`\`\n`));
+  for (const root of [fromAscii, fromUnicode]) {
+    root.querySelector('.ns-file-tree--root')!.removeAttribute('data-tree-source');
+  }
+  strictEqual(fromAscii.innerHTML, fromUnicode.innerHTML);
 });
 
 Deno.test('the Markdown twin keeps a tree fence as its ASCII text', () => {
   const markdown = twin(site().render(`Intro.\n\n\`\`\`tree\n${TREE}\n\`\`\`\n`));
   strictEqual(markdown, `Intro.\n\n\`\`\`text\n${TREE}\n\`\`\`\n`);
 });
+
+Deno.test('an empty or malformed tree fence warns and renders as plain text', () => {
+  const malformed = 'my-app/\n├── a.ts\n    stray continuation';
+  const cases: Array<[string, string, string]> = [
+    ['', `${PAGE}:3:`, 'no entries'],
+    [malformed, `${PAGE}:6:`, 'indented but has no branch'],
+  ];
+  for (const [body, where, reason] of cases) {
+    const warnings: string[] = [];
+    const source = `# Page\n\n\`\`\`tree\n${body}${body ? '\n' : ''}\`\`\`\n\nAfter.\n`;
+    const html = site(warnings).render(source);
+    const root = article(html);
+    ok(!root.querySelector('.ns-file-tree'), html);
+    strictEqual(root.querySelector('pre code.language-text')?.textContent, body ? `${body}\n` : '');
+    strictEqual(root.querySelector('p')?.textContent, 'After.', 'the page keeps rendering');
+    strictEqual(warnings.length, 1, JSON.stringify(warnings));
+    ok(warnings[0].startsWith(where), warnings[0]);
+    ok(warnings[0].includes(reason), warnings[0]);
+    if (body) ok(twin(html).includes(`\`\`\`text\n${body}\n\`\`\``), twin(html));
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/* Alerts                                                              */
+/* ------------------------------------------------------------------ */
 
 const ALERTS: ReadonlyArray<[string, CalloutType]> = [
   ['NOTE', 'note'],
@@ -153,12 +188,14 @@ const ALERTS: ReadonlyArray<[string, CalloutType]> = [
 
 Deno.test('each alert type renders the callout markup', () => {
   for (const [marker, kind] of ALERTS) {
-    const html = site().render(`> [!${marker}]\n> Read \`deno.json\` first.\n`);
+    const warnings: string[] = [];
+    const html = site(warnings).render(`> [!${marker}]\n> Read \`deno.json\` first.\n`);
     const root = article(html);
     const callout = root.querySelector('aside.ns-callout');
     const definition = CALLOUT_TYPES[kind];
     ok(callout, `${marker}: ${html}`);
     ok(!root.querySelector('blockquote'), marker);
+    strictEqual(warnings.length, 0, marker);
     deepStrictEqual(
       {
         variant: callout.getAttribute('data-variant'),
@@ -168,7 +205,7 @@ Deno.test('each alert type renders the callout markup', () => {
         icon: callout.querySelector('.ns-callout__icon svg')?.getAttribute('data-icon'),
         label: callout.querySelector('.ns-callout__label')?.textContent,
         body: callout.querySelector('.ns-callout__body')?.innerHTML.trim(),
-        alert: callout.getAttribute('data-alert'),
+        alert: callout.getAttribute(ALERT_ATTRIBUTE),
       },
       {
         variant: kind,
@@ -184,56 +221,74 @@ Deno.test('each alert type renders the callout markup', () => {
   }
 });
 
-Deno.test('an alert renders the same markup as comp.callout', async () => {
+Deno.test('an alert and comp.callout produce byte-identical markup for the same inputs', async () => {
+  const content = '<p>Body text.</p>\n';
   for (const [marker, kind] of ALERTS) {
     for (const title of [undefined, 'Use `deno task`']) {
-      const head = title ? `> [!${marker}] ${title}` : `> [!${marker}]`;
-      const html = site().render(`${head}\n> Body text.\n`);
-      const fromAlert = article(html).querySelector('aside')!;
-      fromAlert.removeAttribute('data-alert');
-      const component = await renderComponent('callout', {
-        type: kind,
-        title,
-        content: '<p>Body text.</p>',
-      });
-      strictEqual(
-        normalize(fromAlert.outerHTML),
-        normalize(article(component).innerHTML),
-        `${marker} ${title}`,
-      );
+      const head = title ? `> [!${marker}]\n> **${title}**\n>\n` : `> [!${marker}]\n`;
+      const alert = site().render(`${head}> Body text.\n`)
+        .replace(` ${ALERT_ATTRIBUTE}="${marker}"`, '');
+      const component = await renderComponent('callout', { type: kind, title, content });
+      const shared = renderCallout(content, kind, title);
+      strictEqual(alert, `${shared}\n`, `alert ${marker} ${title}`);
+      strictEqual(component, `\n\n${shared}\n`, `component ${marker} ${title}`);
     }
   }
 });
 
-Deno.test('alerts take a title, lists and several paragraphs', () => {
-  const root = article(
-    site().render(
-      '> [!warning] Before you migrate\n>\n> First paragraph.\n>\n> - one\n> - two\n',
-    ),
-  );
-  const callout = root.querySelector('aside.ns-callout')!;
-  strictEqual(callout.getAttribute('data-variant'), 'warning');
-  strictEqual(callout.querySelector('.ns-callout__label')?.textContent, 'Before you migrate');
-  strictEqual(callout.querySelectorAll('.ns-callout__body > p').length, 1);
-  strictEqual(callout.querySelectorAll('.ns-callout__body li').length, 2);
+Deno.test('a bold first paragraph becomes the title, in either GitHub-compatible form', () => {
+  const forms = [
+    '> [!warning]\n> **Before you migrate**\n>\n> First paragraph.\n>\n> - one\n> - two\n',
+    '> [!warning]\n>\n> __Before you migrate__\n>\n> First paragraph.\n>\n> - one\n> - two\n',
+  ];
+  for (const source of forms) {
+    const callout = article(site().render(source)).querySelector('aside.ns-callout')!;
+    strictEqual(callout.getAttribute('data-variant'), 'warning');
+    strictEqual(callout.querySelector('.ns-callout__label')?.textContent, 'Before you migrate');
+    deepStrictEqual(
+      [...callout.querySelectorAll('.ns-callout__body > p')].map((p) => p.textContent),
+      ['First paragraph.'],
+    );
+    strictEqual(callout.querySelectorAll('.ns-callout__body li').length, 2);
+  }
 });
 
-Deno.test('an unknown alert type stays a plain blockquote and warns', () => {
-  const warnings: string[] = [];
-  const html = site(warnings).render('> [!NOTES]\n> Not a supported type.\n');
-  const root = article(html);
-  ok(!root.querySelector('aside'), html);
-  ok(root.querySelector('blockquote')?.textContent?.includes('[!NOTES]'), html);
-  strictEqual(warnings.length, 1);
-  ok(warnings[0].includes('[!NOTES]'), warnings[0]);
+Deno.test('bold text is body, not title, when it is all the body or not the whole paragraph', () => {
+  const cases = [
+    ['> [!NOTE]\n> **Only bold**\n', '<p><strong>Only bold</strong></p>'],
+    ['> [!NOTE]\n> **Bold** then text.\n>\n> More.\n', '<p><strong>Bold</strong> then text.</p>'],
+  ];
+  for (const [source, firstBody] of cases) {
+    const callout = article(site().render(source)).querySelector('aside.ns-callout')!;
+    strictEqual(callout.querySelector('.ns-callout__label')?.textContent, 'Note');
+    strictEqual(callout.querySelector('.ns-callout__body > p')?.outerHTML, firstBody);
+  }
 });
 
-Deno.test('ordinary blockquotes are untouched', () => {
+Deno.test('quotes GitHub does not render as alerts stay plain blockquotes and warn', () => {
+  const cases: Array<[string, string]> = [
+    ['> [!NOTE] Read this first.\n', 'alone on the first line'],
+    ['> [!NOTE]\n', 'no body'],
+    ['> A quotation.\n>\n> > [!NOTE]\n> > Nested.\n', 'cannot be nested'],
+    ['- item\n\n  > [!TIP]\n  > In a list.\n', 'cannot be nested'],
+    ['> [!NOTES]\n> Not a supported type.\n', 'not a supported alert type'],
+  ];
+  for (const [source, reason] of cases) {
+    const warnings: string[] = [];
+    const html = site(warnings).render(source);
+    const root = article(html);
+    ok(!root.querySelector('aside'), `${source}\n${html}`);
+    ok(root.querySelector('blockquote')?.textContent?.includes('[!'), html);
+    strictEqual(warnings.length, 1, `${source}: ${JSON.stringify(warnings)}`);
+    ok(warnings[0].startsWith(`${PAGE}:`), warnings[0]);
+    ok(warnings[0].includes(reason), warnings[0]);
+  }
+});
+
+Deno.test('ordinary blockquotes are untouched and do not warn', () => {
   const warnings: string[] = [];
-  const html = site(warnings).render('> A quotation.\n>\n> > [!NOTE]\n> > Nested.\n');
-  const root = article(html);
-  ok(root.querySelector('blockquote > p'), html);
-  ok(root.querySelector('blockquote > aside.ns-callout'), 'a nested alert still renders');
+  const html = site(warnings).render('> A quotation with [a link](https://example.test).\n');
+  ok(article(html).querySelector('blockquote > p > a'), html);
   strictEqual(warnings.length, 0);
 });
 
@@ -242,7 +297,9 @@ Deno.test('the Markdown twin writes alerts back as authored', () => {
     '> [!NOTE]',
     '> Read `deno.json` first.',
     '',
-    '> [!DANGER] Destroys data',
+    '> [!DANGER]',
+    '> **Destroys `data`**',
+    '>',
     '> Drops every table.',
     '>',
     '> - back up first',

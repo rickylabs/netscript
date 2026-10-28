@@ -1,70 +1,51 @@
-import {
-  CALLOUT_ICONS,
-  CALLOUT_TYPES,
-  type CalloutType,
-  calloutType,
-} from '../../../tools/docs-site/callout-types.ts';
+import { type CalloutType, calloutType } from '../../../tools/docs-site/callout-types.ts';
+import { CALLOUT_CLOSE_HTML, calloutOpenHtml } from './callout.ts';
 
 /**
- * GitHub-style Markdown alerts, rendered as the site's callout component.
+ * GitHub-style Markdown alerts, rendered with the site's callout markup (`./callout.ts`).
+ *
+ * Two forms, both read the same on GitHub:
  *
  * ```md
- * > [!WARNING] Optional title
+ * > [!WARNING]
  * > Body text, lists and code blocks.
+ *
+ * > [!WARNING]
+ * > **Optional title**
+ * >
+ * > Body text.
  * ```
  *
- * Every type of the callout contract is accepted, case-insensitively: `NOTE`, `TIP`,
- * `IMPORTANT`, `WARNING`, `CAUTION`, `DANGER` (destructive) and `ERROR`. Text after the
- * marker on the same line replaces the visible label. The rendered `<aside>` matches
- * `comp.callout` and also carries the authored marker in `data-alert`, so the page's
- * Markdown twin can write the alert back as `> [!TYPE]`.
+ * As on GitHub, the marker must be alone on the first line of a top-level blockquote and be
+ * followed by a body. In the second form, a first body paragraph that is only bold text
+ * becomes the callout's label and leaves the body; GitHub shows it as a bold first line.
  *
- * An unknown marker, such as `[!NOTES]`, never downgrades to Note. The quote stays a plain
- * blockquote with its marker visible, and the build prints a warning.
+ * Types follow the callout contract, case-insensitively: `NOTE`, `TIP`, `IMPORTANT`,
+ * `WARNING` and `CAUTION` as on GitHub, plus `DANGER` (destructive) and `ERROR`.
+ *
+ * Anything GitHub would not render as an alert stays a plain blockquote, and the build warns:
+ * text after the marker, a marker with no body, a nested alert, or an unknown type. An unknown
+ * type never downgrades to Note.
  */
 
-/** Attribute holding the authored alert marker, such as `NOTE` or `DANGER`. */
-export const ALERT_ATTRIBUTE = 'data-alert';
-
-/** `[!TYPE]` at the very start of a quote, then an optional title on the same line. */
-const ALERT_MARKER = /^\[!([A-Za-z]+)\][ \t]*([^\n]*)(?:\n|$)/;
-
-const CALLOUT_SVG_ATTRIBUTES = 'width="18" height="18" viewBox="0 0 24 24" fill="none" ' +
-  'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
-  'aria-hidden="true"';
-
-function escapeAttribute(value: string): string {
-  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
-}
-
-/**
- * The callout component's opening markup, up to and including the body's opening tag.
- * `labelHtml` replaces the type's label; `marker` records the authored alert marker.
- */
-export function calloutOpenHtml(kind: CalloutType, labelHtml?: string, marker?: string): string {
-  const definition = CALLOUT_TYPES[kind];
-  const alert = marker === undefined ? '' : ` ${ALERT_ATTRIBUTE}="${escapeAttribute(marker)}"`;
-  return `<aside class="ns-callout" data-variant="${kind}" data-tone="${definition.tone}" ` +
-    `role="note" aria-label="${definition.label}"${alert}>\n` +
-    '  <div class="ns-callout__head"><span class="ns-callout__icon" aria-hidden="true">' +
-    `<svg data-icon="${definition.icon}" ${CALLOUT_SVG_ATTRIBUTES}>` +
-    `${CALLOUT_ICONS[definition.icon]}</svg></span>` +
-    `<span class="ns-callout__label">${labelHtml ?? definition.label}</span></div>\n` +
-    '  <div class="ns-callout__body">';
-}
-
-/** The callout component's closing markup. */
-export const CALLOUT_CLOSE_HTML = '</div>\n</aside>\n';
+/** `[!TYPE]` at the start of a quote's first line. */
+const MARKER = /^\[!([A-Za-z]+)\]/;
+/** The marker alone on its line. */
+const MARKER_LINE = /^\[!([A-Za-z]+)\][ \t]*(?:\n|$)/;
+/** A paragraph that is only bold text: `**Title**` or `__Title__`. */
+const BOLD_ONLY = /^(\*\*|__)(\S(?:[^\n]*\S)?)\1$/;
 
 interface AlertMeta {
   readonly kind: CalloutType;
   readonly marker: string;
-  readonly title: string;
+  readonly title?: string;
 }
 
 interface Token {
   type: string;
   content: string;
+  level: number;
+  map: [number, number] | null;
   meta: Record<string, unknown> | null;
 }
 
@@ -98,7 +79,7 @@ interface MarkdownItAlertsHost {
 
 /** Options for {@link markdownAlerts}. */
 export interface MarkdownAlertsOptions {
-  /** Receives unknown-marker warnings. Defaults to `console.warn`. */
+  /** Receives build warnings for quotes that look like alerts but are not. */
   readonly warn?: (message: string) => void;
 }
 
@@ -111,50 +92,88 @@ function closingIndex(tokens: readonly Token[], openIndex: number): number {
   throw new Error('Unclosed blockquote');
 }
 
+function isParagraph(tokens: readonly Token[], index: number): boolean {
+  return tokens[index]?.type === 'paragraph_open' && tokens[index + 1]?.type === 'inline' &&
+    tokens[index + 2]?.type === 'paragraph_close';
+}
+
+function boldTitle(text: string): string | undefined {
+  const match = text.trim().match(BOLD_ONLY);
+  return match && !match[2].includes(match[1]) ? match[2] : undefined;
+}
+
 function alertOf(token: Token): AlertMeta | undefined {
   return token.meta?.alert as AlertMeta | undefined;
 }
 
-/**
- * markdown-it plugin: render `> [!TYPE]` blockquotes with the callout component's markup.
- * Typed loosely so this module stays free of the site's markdown-it import.
- */
+/** markdown-it plugin: render GitHub-style `> [!TYPE]` alerts as callouts. */
 export function markdownAlerts(instance: object, options: MarkdownAlertsOptions = {}): void {
   const md = instance as MarkdownItAlertsHost;
   const warn = options.warn ?? ((message: string) => console.warn(message));
 
-  // After block parsing and before inline parsing, so only the marker line is removed.
+  // After block parsing and before inline parsing, so only marker and title text are removed.
   md.core.ruler.after('block', 'ns_markdown_alerts', (state) => {
     const tokens = state.tokens;
+    const filename = (state.env as { filename?: string } | undefined)?.filename;
     for (let index = 0; index < tokens.length; index++) {
-      if (tokens[index].type !== 'blockquote_open') continue;
-      const paragraph = tokens[index + 1];
+      const open = tokens[index];
+      if (open.type !== 'blockquote_open' || !isParagraph(tokens, index + 1)) continue;
       const inline = tokens[index + 2];
-      if (paragraph?.type !== 'paragraph_open' || inline?.type !== 'inline') continue;
-      const match = inline.content.match(ALERT_MARKER);
-      if (!match) continue;
+      const marker = inline.content.match(MARKER)?.[1];
+      if (!marker) continue;
+
+      const where = `${filename ?? 'Markdown'}:${(open.map?.[0] ?? 0) + 1}`;
+      const plain = (reason: string) =>
+        warn(`${where}: [!${marker}] ${reason}; it renders as a plain blockquote.`);
 
       let kind: CalloutType;
       try {
-        kind = calloutType(match[1]);
+        kind = calloutType(marker);
       } catch {
-        const filename = (state.env as { filename?: string } | undefined)?.filename;
-        warn(
-          `Unsupported Markdown alert [!${match[1]}]${filename ? ` in ${filename}` : ''}; ` +
-            'it renders as a plain blockquote.',
-        );
+        plain('is not a supported alert type');
+        continue;
+      }
+      const line = inline.content.match(MARKER_LINE);
+      if (!line) {
+        plain('must be alone on the first line of the quote');
+        continue;
+      }
+      if (open.level !== 0) {
+        plain('is nested inside another block, and alerts cannot be nested');
         continue;
       }
 
       const close = closingIndex(tokens, index);
-      const alert: AlertMeta = { kind, marker: match[1], title: match[2].trim() };
-      tokens[index].meta = { ...tokens[index].meta, alert };
-      tokens[close].meta = { ...tokens[close].meta, alert };
-      inline.content = inline.content.slice(match[0].length);
-      // A marker on its own line leaves an empty first paragraph; drop it.
-      if (!inline.content.trim() && tokens[index + 3]?.type === 'paragraph_close') {
-        tokens.splice(index + 1, 3);
+      const rest = inline.content.slice(line[0].length);
+      const firstBlockAfter = index + 4;
+      if (!rest.trim() && firstBlockAfter >= close) {
+        plain('has no body');
+        continue;
       }
+
+      // The first body paragraph is the rest of the marker's paragraph, or the next block.
+      let title: string | undefined;
+      let drop: [number, number] | undefined;
+      if (rest.trim()) {
+        title = boldTitle(rest);
+        if (title && firstBlockAfter < close) drop = [index + 1, 3];
+        else title = undefined;
+      } else {
+        drop = [index + 1, 3];
+        if (isParagraph(tokens, firstBlockAfter)) {
+          const candidate = boldTitle(tokens[firstBlockAfter + 1].content);
+          if (candidate && firstBlockAfter + 3 < close) {
+            title = candidate;
+            drop = [index + 1, 6];
+          }
+        }
+      }
+
+      const alert: AlertMeta = { kind, marker, ...(title ? { title } : {}) };
+      open.meta = { ...open.meta, alert };
+      tokens[close].meta = { ...tokens[close].meta, alert };
+      if (drop) tokens.splice(drop[0], drop[1]);
+      else inline.content = rest;
     }
   });
 
@@ -176,6 +195,6 @@ export function markdownAlerts(instance: object, options: MarkdownAlertsOptions 
         ? close(tokens, index, options, env, self)
         : self.renderToken(tokens, index, options);
     }
-    return CALLOUT_CLOSE_HTML;
+    return `${CALLOUT_CLOSE_HTML}\n`;
   };
 }

@@ -28,10 +28,11 @@ import {
 import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
+import { inlineCode, renderCallout } from './_plugins/callout.ts';
 import { fileTreeFence, renderFileTree } from './_plugins/file-tree.ts';
 import { markdownAlerts } from './_plugins/markdown-alerts.ts';
 import { getDocsLane } from './_data.ts';
-import { CALLOUT_ICONS, CALLOUT_TYPES, calloutType } from '../../tools/docs-site/callout-types.ts';
+import { CALLOUT_TYPES, calloutType } from '../../tools/docs-site/callout-types.ts';
 import { apiKind, apiKindRole } from '../../tools/docs-site/api-kinds.ts';
 import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
 
@@ -56,8 +57,9 @@ import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
  * File trees: fenced `tree` blocks render as the `fileTree` component (one renderer in
  * `_plugins/file-tree.ts`); the Markdown twin keeps the authored ASCII as a `text` fence.
  *
- * Alerts: `> [!NOTE]`-style blockquotes render as the callout component
- * (`_plugins/markdown-alerts.ts`); the Markdown twin writes them back as alerts.
+ * Alerts: GitHub-style `> [!NOTE]` blockquotes render with the callout component's
+ * renderer (`_plugins/callout.ts`, `_plugins/markdown-alerts.ts`); the Markdown twin writes
+ * them back as alerts.
  *
  * xref (OD2): the `xref` filter + `comp.xref` resolve stable keys from
  * `_data/xref.ts` to hrefs and THROW on an unknown key, so the build is the link
@@ -104,8 +106,8 @@ site.addEventListener('beforeBuild', async () => {
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
 site.filter('calloutType', calloutType);
-site.data('calloutTypes', CALLOUT_TYPES);
-site.data('calloutIcons', CALLOUT_ICONS);
+// `comp.callout` and Markdown alerts share this renderer, so they cannot drift apart.
+site.filter('calloutHtml', renderCallout);
 site.filter('apiKind', apiKind);
 site.filter('apiKindRole', apiKindRole);
 site.filter('languageLabel', (language: string) => LANGUAGE_LABELS[language] ?? language);
@@ -133,7 +135,7 @@ site.filter('utilityDiagram', (src: string, alt: string) => {
 // markdown body already renders inline code. Leaves existing HTML untouched.
 site.filter(
   'ic',
-  (s: unknown) => typeof s === 'string' ? s.replace(/`([^`]+)`/g, '<code>$1</code>') : (s ?? ''),
+  (s: unknown) => typeof s === 'string' ? inlineCode(s) : (s ?? ''),
 );
 
 // Expose the resolver + raw map as global data for `comp.xref` (so the component
