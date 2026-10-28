@@ -1,3 +1,23 @@
+# Current review status after style-update repair
+
+The partial final Opus source review exposed a reproducible configured-style update bug, fixed in d39ed87 with a failing-before/passing-after control and broader source/root gates. See style-update-review-repair.md. That review ended in alternate-provider RESOURCE_EXHAUSTED before a verdict. There is no final PASS or terminal FAIL_FIX, and no READY. Native Claude remains weekly-quota unavailable; the retained alternate Opus5.5/high conversation should resume on the reconciled source after allowance returns. Preserve the source/gate checkpoints below as historical, not as a verdict on later repairs.
+
+## Retained final gate and availability record
+
+# Final S2 evaluation — unavailable, draft only
+
+Audited source checkpoint: **e56893397d3351f01f6254b38db80de4a5d4b15d**. Full approved S2 implementation is delivered. Structured source check/lint/format (76 files), 357 integrated regressions, two actual CLI acceptance tests, broader quality/architecture, documentation/carrier gates, and full workspace publication dry-run pass. See final-gates.md.
+
+The mandatory final independent whole-change review has **no substantive verdict**. The exact owner-prescribed native command was attempted in its retained separate evaluator session with read-only tools and closed stdin; it returned weekly quota, exit 1. The same requested Opus 5.5 High in the retained native Antigravity conversation then returned individual quota, exit 3. The earlier supplemental acceptance PASS applies only to its scoped review. Neither availability failure is a terminal FAIL_FIX or a whole-change PASS.
+
+Remaining read-only transport checks found no matching Copilot/Go catalog entry. The pinned matrix's public assertion rejects the exact OpenRouter Opus 5.5 model under the existing override. No model substitution, paid inference, route fabrication or guard bypass was used. Native catalog/argv establish requested launch identity; provider-side identity attestation is unavailable.
+
+**Disposition: no slice 5/final supervisor sign-off, no READY; PR #2468 remains draft.** Resume the retained evaluator conversation after allowance resets, at the same source checkpoint (or reconcile any later source changes), address one real blocker if reported, record the verdict, then complete readiness. This evidence-only update does not change audited source. No merge/tag/release/labels or assignment-file commit.
+
+Required one-pass scaffold runtime was attempted and exited 1 with Docker unavailable and Aspire preflight/cleanup failures; full runtime/cleanup remain unproven. Full Fresh UI doc-lint retains 123 unchanged baseline findings. These remain visible in the PR and canonical handoff.
+
+## Earlier provisional evaluation record (preserved)
+
 # Current evaluation status — pending provider availability
 
 The user authorized continuation after the historical schema stop below. Subsequent schema/design-sync, build, config/lock, command, theme-doc and MCP slices have independent passing evidence in their own records. Full implementation is checkpointed at `12ef006ea9556d46847c5e7041f047d1e2b02f45`.
