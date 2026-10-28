@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "05:23:13.636 INF netscript·services·streams Service listening\n05:23:13.678 INF netscript·services·streams HTTP request started\n05:23:13.683 INF netscript·services·streams HTTP request started\n05:23:13.683 INF netscript·services·streams auth decision allow\n05:23:13.690 INF netscript·services·streams HTTP request completed\n05:23:13.692 INF netscript·services·streams HTTP request started\n05:23:13.692 INF netscript·services·streams auth decision allow\n05:23:13.693 INF netscript·services·streams HTTP request completed\n05:23:13.694 INF netscript·services·streams HTTP request started\n05:23:13.694 INF netscript·services·streams auth decision allow\n05:23:13.696 INF netscript·services·streams HTTP request completed\n05:23:13.722 INF netscript·services·streams HTTP request started\n05:23:13.723 INF netscript·services·streams auth decision allow\n05:23:13.724 INF netscript·services·streams HTTP request completed\n05:23:13.735 INF netscript·services·streams Service shutdown completed\n{\"observations\":{\"statuses\":[401,201,204,200,200],\"expectedBytes\":[116,108,115,45,98,101,102,111,114,101,124,116,108,115,45,97,102,116,101,114],\"frontBytes\":[116,108,115,45,98,101,102,111,114,101,124,116,108,115,45,97,102,116,101,114],\"upstreamBytes\":[116,108,115,45,98,101,102,111,114,101,124,116,108,115,45,97,102,116,101,114],\"authCalls\":[4,4,5]},\"rejection\":{\"name\":\"TypeError\",\"message\":\"fetch failed\",\"cause\":{\"name\":\"Error\",\"message\":\"error sending request for url (https://127.0.0.1:63504/v1/stream/s6c-3f490d75-2ae4-47d6-83cc-0881b29ebc49?offset=-1): client error (Connect): invalid peer certificate: UnknownIssuer\"}},\"reboundPorts\":[63089,63504]}\ns6c-streams-tls: assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n05:23:13.678 WRN netscript·services·streams auth decision deny\n05:23:13.678 WRN netscript·services·streams auth decision deny\n05:23:13.679 WRN netscript·services·streams HTTP request completed\n05:23:13.679 WRN netscript·services·streams HTTP request completed\n",
+  "pid": 14824,
+  "startedAt": "2026-10-28T05:23:12.255Z",
+  "finishedAt": "2026-10-28T05:23:13.769Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

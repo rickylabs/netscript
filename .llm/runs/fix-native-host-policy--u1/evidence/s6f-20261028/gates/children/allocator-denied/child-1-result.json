@@ -1,0 +1,11 @@
+{
+  "code": 1,
+  "stdout": "",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\nerror: Uncaught (in promise) NotCapable: Requires net access to \"0.0.0.0:53817\", run again with the --allow-net flag\n      using listener = Deno.listen({ port: options.preferredPort });\n                            ^\n    at Object.listen (ext:deno_net/01_net.js:1:7011)\n    at getAvailablePort (https://jsr.io/@std/net/1.0.7/get_available_port.ts:59:29)\n    at startStreamsService (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts:108:30)\n    at async file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/$deno$stdin.ts:33:26\n",
+  "pid": 88712,
+  "startedAt": "2026-10-28T05:23:06.885Z",
+  "finishedAt": "2026-10-28T05:23:08.212Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

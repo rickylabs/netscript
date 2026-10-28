@@ -22,6 +22,7 @@ interface RuntimeOptions {
   readonly preferredPorts: readonly number[];
   readonly denyAllocator?: boolean;
   readonly denyFfi?: boolean;
+  readonly denyWrite?: boolean;
 }
 
 interface Sandbox extends AsyncDisposable {
@@ -122,7 +123,7 @@ export async function createRuntimeSandbox(label: string): Promise<Sandbox> {
       const args = [
         ...base,
         `--allow-net=${net.join(',')}`,
-        `--allow-write=${scratch}`,
+        options.denyWrite ? '--deny-write' : `--allow-write=${scratch}`,
         options.denyFfi ? '--deny-ffi' : `--allow-ffi=${addonPaths.join(',')}`,
         '-',
       ];

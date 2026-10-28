@@ -1,0 +1,265 @@
+{
+  "args": [
+    "run",
+    "--check",
+    "--frozen",
+    "--cached-only",
+    "--ext=ts",
+    "--allow-env",
+    "--allow-read=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95,C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\npm,C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7",
+    "--allow-sys",
+    "--deny-run",
+    "--allow-net=127.0.0.1,0.0.0.0:0,0.0.0.0:57885",
+    "--allow-write=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "--allow-ffi=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node,C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+    "-"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\plugins\\streams\\",
+  "clearEnv": true,
+  "env": {
+    "DENO_DIR": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache",
+    "NO_COLOR": "1",
+    "HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "USERPROFILE": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "APPDATA": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "LOCALAPPDATA": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "TMP": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "TEMP": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "TMPDIR": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "XDG_CACHE_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "XDG_CONFIG_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "XDG_DATA_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "XDG_STATE_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6f-astra-20261028\\gates\\owned-profile-a4646601653de1fa\\streams-service-runtime-a56705f679c07d95",
+    "SystemRoot": "C:\\windows",
+    "PATH": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7;C:\\windows\\System32;C:\\windows",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD"
+  },
+  "addons": [
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "owner": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "manifest": {
+        "name": "lmdb",
+        "author": "Kris Zyp",
+        "version": "3.5.7",
+        "description": "Simple, efficient, scalable, high-performance LMDB interface",
+        "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "git+ssh://git@github.com/kriszyp/lmdb-js.git"
+        },
+        "keywords": [
+          "lmdb",
+          "database",
+          "mdb",
+          "lightning",
+          "key-value store",
+          "storage",
+          "adapter",
+          "performance"
+        ],
+        "type": "module",
+        "main": "dist/index.cjs",
+        "module": "index.js",
+        "exports": {
+          ".": {
+            "types": {
+              "require": "./index.d.cts",
+              "import": "./index.d.ts"
+            },
+            "node": {
+              "require": "./dist/index.cjs",
+              "import": "./node-index.js"
+            },
+            "default": "./index.js"
+          }
+        },
+        "files": [
+          "/dist",
+          "/util",
+          "/dict",
+          "/dependencies",
+          "/src",
+          "*.md",
+          "/*.js",
+          "index.d.ts",
+          "index.d.cts",
+          "/*.ts",
+          "/*.gyp",
+          "/bin"
+        ],
+        "types": "./index.d.ts",
+        "tsd": {
+          "directory": "test/types"
+        },
+        "bin": {
+          "download-lmdb-prebuilds": "./bin/download-prebuilds.js"
+        },
+        "scripts": {
+          "install": "node-gyp-build-optional-packages",
+          "build": "node-gyp --debug configure && node-gyp --debug build && rollup -c",
+          "rebuild": "node-gyp build && rollup -c && cpy index.d.ts . --rename=index.d.cts",
+          "build-js": "rollup -c",
+          "prepare": "rollup -c",
+          "before-publish": "rollup -c && cpy index.d.ts . --rename=index.d.cts && prebuildify-ci download && node util/set-optional-deps.cjs && npm run test",
+          "prebuild-libc-musl": "ENABLE_V8_FUNCTIONS=false prebuildify-platform-packages --debug --tag-libc --napi --platform-packages --target 22.11.0",
+          "prebuild-libc": "prebuildify-platform-packages --debug --tag-libc --target 20.18.0 || true && prebuildify-platform-packages --debug --platform-packages --tag-libc --target 22.11.0 && ENABLE_V8_FUNCTIONS=false prebuildify-platform-packages --debug --napi --platform-packages --tag-libc --target 22.11.0",
+          "prebuild-macos": "ENABLE_V8_FUNCTIONS=false prebuildify-platform-packages --debug --napi --platform-packages --target 18.17.1",
+          "prebuild-win32": "set ENABLE_V8_FUNCTIONS=false&& prebuildify-platform-packages --debug --napi --platform-packages --target 20.18.0",
+          "prebuild-libc-arm7": "ENABLE_V8_FUNCTIONS=false prebuildify-platform-packages --debug --napi --platform-packages --tag-libc --target 22.11.0",
+          "prebuildify": "prebuildify-platform-packages --debug --napi --target 22.11.0",
+          "full-publish": "cd prebuilds/win32-x64 && npm publish --access public && cd ../win32-arm64 && npm publish --access public && cd ../darwin-x64 && npm publish --access public && cd ../darwin-arm64 && npm publish --access public && cd ../linux-x64 && npm publish --access public && cd ../linux-arm64 && npm publish --access public  && cd ../linux-arm && npm publish --access public && cd ../.. && npm publish && node util/remove-optional-deps.cjs",
+          "recompile": "node-gyp clean && node-gyp configure && node-gyp build",
+          "recompile-v1": "node-gyp clean && set LMDB_DATA_V1=true&& node-gyp configure && set LMDB_DATA_V1=true&& node-gyp build",
+          "test": "mocha test/**.test.js --expose-gc --recursive",
+          "deno-test": "deno run --allow-ffi --allow-write --allow-read --allow-run --allow-env --allow-net --allow-import --allow-sys test/deno.ts",
+          "test2": "mocha test/performance.js -u tdd",
+          "test:types": "tsd",
+          "benchmark": "node ./benchmark/index.js"
+        },
+        "gypfile": true,
+        "dependencies": {
+          "@harperfast/extended-iterable": "^1.0.3",
+          "msgpackr": "^1.11.2",
+          "node-addon-api": "^6.1.0",
+          "node-gyp-build-optional-packages": "5.2.2",
+          "ordered-binary": "^1.5.3",
+          "weak-lru-cache": "^1.2.2"
+        },
+        "devDependencies": {
+          "@midwayjs/deno-mocha": "^1.3.0",
+          "node-gyp": ">=10.2.0",
+          "@types/node": "^16.7.10",
+          "benchmark": "^2.1.4",
+          "chai": "^4.3.4",
+          "cpy-cli": "^4.1.0",
+          "fs-extra": "^9.0.1",
+          "mocha": "^10.1.0",
+          "prebuildify-ci": "^1.0.5",
+          "prebuildify-platform-packages": "5.0.5",
+          "prettier": "^3.0.2",
+          "rimraf": "^3.0.2",
+          "rollup": "^2.61.1",
+          "tsd": "^0.14.0"
+        },
+        "bugs": {
+          "url": "https://github.com/kriszyp/lmdb-js/issues"
+        },
+        "homepage": "https://github.com/kriszyp/lmdb-js#readme",
+        "directories": {
+          "test": "tests"
+        },
+        "prettier": {
+          "useTabs": true,
+          "singleQuote": true
+        },
+        "optionalDependencies": {
+          "@lmdb/lmdb-darwin-arm64": "3.5.7",
+          "@lmdb/lmdb-darwin-x64": "3.5.7",
+          "@lmdb/lmdb-linux-arm": "3.5.7",
+          "@lmdb/lmdb-linux-arm64": "3.5.7",
+          "@lmdb/lmdb-linux-x64": "3.5.7",
+          "@lmdb/lmdb-win32-arm64": "3.5.7",
+          "@lmdb/lmdb-win32-x64": "3.5.7"
+        }
+      },
+      "platformManifest": {
+        "name": "@lmdb/lmdb-win32-x64",
+        "version": "3.5.7",
+        "os": [
+          "win32"
+        ],
+        "cpu": [
+          "x64"
+        ],
+        "license": "MIT",
+        "author": "Kris Zyp",
+        "repository": {
+          "type": "git",
+          "url": "git+ssh://git@github.com/kriszyp/lmdb-js.git"
+        },
+        "bugs": {
+          "url": "https://github.com/kriszyp/lmdb-js/issues"
+        },
+        "homepage": "https://github.com/kriszyp/lmdb-js#readme",
+        "description": "Platform specific binary for lmdb on win32 OS with x64 architecture"
+      }
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "owner": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "manifest": {
+        "name": "msgpackr-extract",
+        "author": "Kris Zyp",
+        "version": "3.0.4",
+        "description": "Node addon for string extraction for msgpackr",
+        "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "http://github.com/kriszyp/msgpackr-extract"
+        },
+        "scripts": {
+          "install": "node-gyp-build-optional-packages",
+          "recompile": "node-gyp rebuild",
+          "before-publish": "prebuildify-ci download && node set-optional-deps.cjs",
+          "prebuild": "prebuildify-platform-packages --target 20.14.0",
+          "prebuild-win32": "prebuildify-platform-packages --target 20.14.0 && set ENABLE_V8_FUNCTIONS=false&& prebuildify-platform-packages --platform-packages --napi --target 20.14.0",
+          "prebuild-libc": "prebuildify-platform-packages --tag-libc --target 20.14.0 && prebuildify-platform-packages --platform-packages --napi --tag-libc --target 22.2.0 && ENABLE_V8_FUNCTIONS=false prebuildify-platform-packages --platform-packages --napi --tag-libc --target 20.14.0",
+          "prebuild-libc-napi": "ENABLE_V8_FUNCTIONS=false prebuildify-platform-packages --platform-packages --napi --tag-libc --target 20.14.0",
+          "prebuild-libc-alpine": "prebuildify-cross --image alpine --tag-libc --target 20.14.0",
+          "publish-all": "cd prebuilds/win32-x64 && (npm publish --access public || true) && cd ../darwin-x64 && (npm publish --access public || true) && cd ../darwin-arm64 && (npm publish --access public || true) && cd ../linux-x64 && (npm publish --access public || true) && cd ../linux-arm64 && (npm publish --access public || true) && cd ../linux-arm && (npm publish --access public || true) && cd ../.. && npm publish --access public",
+          "test": "node ./index.js"
+        },
+        "main": "./index.js",
+        "gypfile": true,
+        "dependencies": {
+          "node-gyp-build-optional-packages": "5.2.2"
+        },
+        "files": [
+          "index.js",
+          "/src",
+          "/*.gyp",
+          "/bin"
+        ],
+        "bin": {
+          "download-msgpackr-prebuilds": "./bin/download-prebuilds.js"
+        },
+        "optionalDependencies": {
+          "@msgpackr-extract/msgpackr-extract-darwin-arm64": "3.0.4",
+          "@msgpackr-extract/msgpackr-extract-darwin-x64": "3.0.4",
+          "@msgpackr-extract/msgpackr-extract-linux-arm": "3.0.4",
+          "@msgpackr-extract/msgpackr-extract-linux-arm64": "3.0.4",
+          "@msgpackr-extract/msgpackr-extract-linux-x64": "3.0.4",
+          "@msgpackr-extract/msgpackr-extract-win32-x64": "3.0.4"
+        },
+        "devDependencies": {
+          "prebuildify-platform-packages": "5.0.4",
+          "prebuildify-ci": "^1.0.5",
+          "prebuildify-cross": "5.0.0"
+        }
+      },
+      "platformManifest": {
+        "name": "@msgpackr-extract/msgpackr-extract-win32-x64",
+        "version": "3.0.4",
+        "os": [
+          "win32"
+        ],
+        "cpu": [
+          "x64"
+        ],
+        "license": "MIT",
+        "author": "Kris Zyp",
+        "repository": {
+          "type": "git",
+          "url": "http://github.com/kriszyp/msgpackr-extract"
+        },
+        "description": "Platform specific binary for msgpackr-extract on win32 OS with x64 architecture"
+      }
+    }
+  ],
+  "source": "import { assert, assertEquals } from 'jsr:@std/assert@^1';\nimport { basename, dirname, normalize } from 'jsr:@std/path@^1';\nimport type { RunningService } from '@netscript/plugin-streams/service';\nconst options: {\n  scratch: string; dataDir?: string; ports: readonly [number, number]; row: string; path: string;\n  replay?: { firstOffset: string; finalOffset: string; bytes: number[] };\n} = {\"scratch\":\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-a56705f679c07d95\",\"dataDir\":\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-a56705f679c07d95/data\",\"ports\":[57885,57886],\"row\":\"missing\",\"path\":\"/v1/stream/never-started\"};\nconst { scratch, dataDir, row, path } = options, [upstream, selectedFront] = options.ports;\nconst invalid = row !== 'writer' && row !== 'reader';\nconst ports = invalid ? [upstream, selectedFront] : [upstream];\nconst failures: unknown[] = [];\nconst observations: Record<string, unknown> = { row, mode: dataDir === undefined ? 'memory' : 'file' };\nlet running: RunningService | undefined, startupError: unknown;\nlet replay = options.replay;\nasync function request(port: number, path: string, init?: RequestInit) {\n  const response = await fetch(`http://127.0.0.1:${port}${path}`, init);\n  return { status: response.status, bytes: Array.from(new Uint8Array(await response.arrayBuffer())),\n    offset: response.headers.get('stream-next-offset') };\n}\ntry {\n  Deno.chdir(scratch);\n  Deno.env.set('STREAMS_INTERNAL_PORT', String(upstream));\n  Deno.env.set('PORT', 'invalid ambient PORT');\n  Deno.env.set('STREAMS_PORT', 'invalid ambient STREAMS_PORT');\n  if (dataDir !== undefined) Deno.env.set('STREAMS_DATA_DIR', dataDir);\n  const { startStreamsService } = await import('@netscript/plugin-streams/service');\n  try {\n    running = await startStreamsService({\n      auth: { public: true, reason: 'S6f owned storage restart and refusal qualification' },\n      serve: { hostname: '127.0.0.1', port: invalid ? selectedFront : 0, handleSignals: false },\n    });\n  } catch (error) { startupError = error; }\n  if (running !== undefined) ports.push(running.addr.port);\n  if (invalid) {\n    observations.nativeError = startupError instanceof Error\n      ? { name: startupError.name, message: startupError.message,\n        cause: startupError.cause instanceof Error\n          ? { name: startupError.cause.name, message: startupError.cause.message } : undefined }\n      : String(startupError);\n    console.log(JSON.stringify({ row, nativeError: observations.nativeError }));\n    assertEquals(running, undefined, 'Invalid configured storage unexpectedly started');\n    assert(startupError instanceof Error, String(startupError));\n    if (row === 'write-denied') {\n      assert(startupError instanceof Deno.errors.NotCapable, String(startupError));\n      const denied = /^Requires write access to \"([^\"]+)\"/.exec(startupError.message);\n      assert(denied !== null, startupError.message);\n      assert(dataDir !== undefined);\n      assertEquals(normalize(dirname(denied[1])), normalize(dataDir));\n      assert(/^\\.netscript-storage-probe-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(basename(denied[1])), denied[1]);\n      observations.deniedProbe = denied[1];\n    } else {\n      assertEquals(startupError.message, 'STREAMS_DATA_DIR must name an existing directory.');\n      if (row === 'missing') assert(startupError.cause instanceof Deno.errors.NotFound);\n    }\n  } else {\n    if (startupError !== undefined) throw startupError;\n    assert(running !== undefined);\n    const front = running.addr.port;\n    assertEquals([running.addr.hostname, running.addr.transport], ['127.0.0.1', 'tcp']);\n    assert(Number.isInteger(front) && front > 0);\n    const healthResponse = await request(front, '/health');\n    assertEquals(healthResponse.status, 200);\n    const health: unknown = JSON.parse(new TextDecoder().decode(Uint8Array.from(healthResponse.bytes)));\n    assert(typeof health === 'object' && health !== null && 'checks' in health);\n    assert('status' in health && health.status === 'healthy');\n    assert(Array.isArray(health.checks));\n    const check: unknown = health.checks.find((entry: unknown) =>\n      typeof entry === 'object' && entry !== null && 'name' in entry && entry.name === 'streams-storage');\n    assert(typeof check === 'object' && check !== null && 'storage' in check);\n    const storage = check.storage;\n    assert(typeof storage === 'object' && storage !== null);\n    assert('mode' in storage && 'durable' in storage && 'probe' in storage);\n    assertEquals([storage.mode, storage.durable, storage.probe],\n      dataDir === undefined ? ['memory', false, 'not-applicable'] : ['file', true, 'passed']);\n    assertEquals('dataDir' in storage, false);\n    observations.storage = storage;\n    if (row === 'writer') {\n      const headers = { 'content-type': 'text/plain' };\n      const created = await request(front, path, { method: 'PUT', headers, body: 'before|' });\n      assertEquals(created.status, 201);\n      assert(typeof created.offset === 'string' && created.offset.length > 0);\n      assertEquals((await request(front, path, { method: 'POST', headers, body: 'after' })).status, 204);\n      const snapshot = await request(front, path + '?offset=-1');\n      assertEquals(snapshot.status, 200);\n      assertEquals(snapshot.bytes, Array.from(new TextEncoder().encode('before|after')));\n      assert(typeof snapshot.offset === 'string' && snapshot.offset.length > 0);\n      replay = { firstOffset: created.offset, finalOffset: snapshot.offset, bytes: snapshot.bytes };\n      observations.snapshot = snapshot;\n    } else {\n      assert(replay !== undefined, 'Fresh reader requires actual writer receipt');\n      const snapshot = await request(front, path + '?offset=-1');\n      observations.snapshot = snapshot;\n      if (dataDir === undefined) assertEquals(snapshot.status, 404);\n      else {\n        assertEquals(snapshot, { status: 200, bytes: replay.bytes, offset: replay.finalOffset });\n        const tail = await request(front, path + '?offset=' + encodeURIComponent(replay.firstOffset));\n        assertEquals(tail, { status: 200, bytes: Array.from(new TextEncoder().encode('after')),\n          offset: replay.finalOffset });\n        observations.tail = tail;\n      }\n    }\n    const direct = await request(upstream, path + '?offset=-1');\n    assertEquals(direct, observations.snapshot, 'actual loopback upstream matches front bytes/offset');\n    observations.upstream = direct;\n  }\n} catch (error) { failures.push(error); }\ntry { await running?.stop(); await running?.stop(); } catch (error) { failures.push(error); }\nfor (const port of new Set(ports)) {\n  try { Deno.listen({ hostname: '127.0.0.1', port }).close(); }\n  catch (error) { failures.push(error); }\n}\nif (failures.length === 1) throw failures[0];\nif (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));\nconsole.log(JSON.stringify({ observations, reboundPorts: [...new Set(ports)] }));\nif (row === 'writer') console.log('s6f-replay:' + JSON.stringify(replay));\nconsole.log('s6f-streams: storage assertions and native cleanup settled');\n"
+}

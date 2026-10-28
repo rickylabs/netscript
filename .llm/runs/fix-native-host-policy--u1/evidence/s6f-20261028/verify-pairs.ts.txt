@@ -1,0 +1,11 @@
+const out='C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028';
+const read=async(path:string)=>JSON.parse(await Deno.readTextFile(out+'/'+path));
+const proof=await read('source-proof.json'),pairs=[];
+for(const mode of ['file','memory']){
+ const label='storage-'+mode,writer=proof.observations.find(row=>row.label===label&&row.name==='child-1-result'),reader=proof.observations.find(row=>row.label===label&&row.name==='child-2-result');
+ const one=await read('gates/children/'+label+'/child-1-input.json'),two=await read('gates/children/'+label+'/child-2-input.json');
+ const row={mode,writerPid:writer.pid,readerPid:reader.pid,writerFinished:writer.finishedAt,readerStarted:reader.startedAt,distinctProcesses:writer.pid!==reader.pid,writerSettledBeforeReader:Date.parse(writer.finishedAt)<=Date.parse(reader.startedAt),sameOwnedScratch:one.env.HOME===two.env.HOME,writerReceipt:writer.replay,writer:writer.evidence,reader:reader.evidence};
+ if(!row.distinctProcesses||!row.writerSettledBeforeReader||!row.sameOwnedScratch)throw new Error('Fresh process boundary differs');pairs.push(row);
+}
+await Deno.writeTextFile(out+'/fresh-process-pairs.json',JSON.stringify({pairs},null,2),{createNew:true});
+console.log(JSON.stringify(pairs.map(row=>({mode:row.mode,writerPid:row.writerPid,readerPid:row.readerPid,distinctProcesses:row.distinctProcesses,writerSettledBeforeReader:row.writerSettledBeforeReader,sameOwnedScratch:row.sameOwnedScratch}))));
