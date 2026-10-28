@@ -26,3 +26,37 @@ Contract: parsed theme {id, metadata, body}; generated page {url, title, layout,
 ## Deferred scope
 
 S8 owns shared chrome/navigation. S1 owns actual DTCG tokens/resolver. S2/S9 own shipping installed themes/skills. This slice documents current provisional values and planned shipping directly from canonical prose.
+
+## Locked decisions and risk register
+
+No unresolved design decisions. Use the existing shared layout and Markdown helper; adding a plugin to shared config is unnecessary. Build only HTML from checked-in sources; no client fetching, dynamic theme backend or new framework abstraction. No architecture debt accepted.
+
+- Complete body/table preservation: fixture has a distinct sentinel per section and value group; corpus tests enumerate source headings and leaf values, so omission fails.
+- Template angle-bracket placeholders: display template source as escaped code, with raw GitHub links; never treat it as live HTML.
+- Relative links and base path: resolve canonical-source links before final base_path rewrite; run built-site link checker and browser navigation under /netscript/.
+- Source CSS injection: swatches accept only literal hex colors; typography/spacing/component values remain escaped text. No arbitrary front-matter styles execute.
+- S8 concurrency: no shared edits; recheck main before final readiness and adopt its layout when present.
+- Long theme pages: section TOC, responsive scrollable value tables, lazy-loaded images and no client JavaScript.
+- Runtime E2E infrastructure: execute once and preserve exact failures; never claim a gate passed from CI expectations.
+
+## PLAN-EVAL repair (before implementation)
+
+Round 1 returned FAIL_PLAN; adopt these constraints:
+
+- Preserve front-matter comments with an expandable, verbatim YAML source block next to the parsed value tables. This keeps inline provenance/contrast notes visible without inventing a comment parser. Fixture and corpus tests assert the whole escaped YAML block, including leading and inline comments.
+- Reuse the configured markdown-it instance through Lume's documented `site.hooks.markdownIt` hook. The section adapter invokes it synchronously with raw HTML disabled, then restores options in `finally` before yielding; configured plugins/slugifier remain intact, and templates are shown as escaped source code. No concurrent async work may occur while renderer options are scoped. Test script markup and angle-bracket placeholders. Canonical HTML comments are metadata and remain non-visible.
+- Give generated value headings `values-<group>` ids, never prose names. Page navigation uses its own `design-` namespace. Test unique heading ids on every complete generated page.
+- Templates are escaped code examples with raw source links (not parsed as a theme). Theme SKILL.md files are source links only, exactly as the issue requires; no skill execution or separate skill pages.
+
+| Source | Route / rendering |
+| --- | --- |
+| GUIDELINES.md introductory paragraphs + §1 | /design-system/ summary, intentionally repeated from full guidelines |
+| GUIDELINES.md all §1–§8 | /design-system/guidelines/ full document, including planned shipping |
+| GUIDELINES.md §2 | /design-system/token-contract/ exact requested projection; context links to §1 and §3 in guidelines make clear they also govern the contract |
+| GUIDELINES.md §7 + both _template files | /design-system/create-your-own-theme/; full §7 plus verbatim escaped template source, with links to method/compatibility sections |
+| themes/<id>/DESIGN.md | /design-system/themes/<id>/; complete front matter and prose, including every flavor H3 in Studio |
+| themes/<id>/SKILL.md | Raw GitHub link on the relevant theme page and gallery card |
+
+Duplication is generated projection only: every source section remains authoritative in the full guidelines and source theme file. No copied specification text lives in the site. Corpus tests account for every GUIDELINES H2 and all theme H2/H3, YAML leaves, comments and unique headings. Raw template source is tested verbatim as escaped code.
+
+Risk register above was added while round 1 was still reading; its omission is now corrected. Raw-HTML disabling is a bounded synchronous adapter operation; the test verifies renderer options restoration. Gallery images are served unchanged with dimensions and lazy loading, not embedded as base64. The landing references live in the retained handoff run directory (not docs/), already inspected on current main.
