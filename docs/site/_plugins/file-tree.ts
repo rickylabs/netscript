@@ -57,13 +57,31 @@ export const TREE_SOURCE_ATTRIBUTE = 'data-tree-source';
 const FOLDER_ICON = '<path d="M3 6h7l2 3h9v11H3z" />';
 const FILE_ICON = '<path d="M14 2H5v20h14V7zM14 2v6h6" />';
 
-/** Indentation made of rails and spaces, then a `├──` or `└──` branch glyph. */
-const BRANCH = /^([\s│]*)[├└]─+[ \t]?(.*)$/;
+/**
+ * Rails (`│`, `|` or spaces), then a branch: Unicode `├` or `└` followed by `─` or `-`, or
+ * ASCII `|`, `` ` ``, `+` or `\` followed by two or more `-`, as `tree --charset=ascii` and
+ * Windows `tree /A` draw them. Glyph styles may be mixed; nesting comes from the column.
+ */
+const BRANCH = /^([\s│|]*?)(?:[├└][─-]+|[|`+\\]-{2,})[ \t]?(.*)$/;
 /** A line holding only rails, kept by some authors as vertical spacing. */
-const RAIL_ONLY = /^[\s│]*$/;
+const RAIL_ONLY = /^[\s│|]*$/;
+/** Drawing characters left in a name mean the line's glyphs were not understood. */
+const STRAY_GLYPH = /[─-╿]|^[|`+\\]-|^[-|`+\\]+$/;
 /** The annotation starts at the first `#` preceded by whitespace. */
 const ANNOTATION = /\s#(?=\s|$)/;
 const OWNERSHIP = /^\[([^\]]+)\]\s*(.*)$/;
+
+/** An ASCII tree that cannot be read. `line` is 1-based within the fence body. */
+export class TreeParseError extends Error {
+  /** The offending line within the fence body, when there is one. */
+  readonly line?: number;
+
+  constructor(message: string, line?: number) {
+    super(message);
+    this.name = 'TreeParseError';
+    this.line = line;
+  }
+}
 
 interface MutableNode {
   name: string;
@@ -75,7 +93,10 @@ interface MutableNode {
 function parseEntry(text: string, line: number): MutableNode {
   const annotationAt = text.search(ANNOTATION);
   const name = (annotationAt < 0 ? text : text.slice(0, annotationAt)).trim();
-  if (!name) throw new Error(`Tree line ${line} has no name`);
+  if (!name) throw new TreeParseError(`line ${line} has no name`, line);
+  if (STRAY_GLYPH.test(name)) {
+    throw new TreeParseError(`line ${line} has tree glyphs that are not understood`, line);
+  }
   const node: MutableNode = { name, children: [] };
   if (annotationAt < 0) return node;
 
@@ -102,12 +123,15 @@ function freeze(node: MutableNode): ParsedFileTreeNode {
 }
 
 /**
- * Parse an ASCII file tree drawn with `│`, `├──` and `└──`.
+ * Parse a file tree drawn with Unicode (`│ ├── └──`) or ASCII (`| |-- `--`) glyphs.
  *
- * A line without a branch glyph starts a top-level entry. A branch line belongs to the
- * nearest earlier entry whose glyph sits further left, so any consistent indentation width
- * works. Text after the first whitespace-preceded `#` is the annotation: a leading
- * `[tag]` becomes `ownership`, and the rest becomes `comment`.
+ * An unindented line without a branch starts a top-level entry. A branch line belongs to the
+ * nearest earlier entry whose branch sits further left, so any consistent indentation width
+ * works. Text after the first whitespace-preceded `#` is the annotation: a leading `[tag]`
+ * becomes `ownership`, and the rest becomes `comment`.
+ *
+ * @throws {TreeParseError} for an empty tree, an indented line without a branch, an entry
+ * without a name, or drawing characters left in a name.
  */
 export function parseAsciiTree(source: string): ParsedFileTreeNode[] {
   const roots: MutableNode[] = [];
@@ -117,6 +141,9 @@ export function parseAsciiTree(source: string): ParsedFileTreeNode[] {
     if (RAIL_ONLY.test(line)) continue;
     const branch = line.match(BRANCH);
     if (!branch) {
+      if (/^\s/.test(line)) {
+        throw new TreeParseError(`line ${index + 1} is indented but has no branch`, index + 1);
+      }
       const node = parseEntry(line, index + 1);
       roots.push(node);
       open.length = 0;
@@ -133,7 +160,7 @@ export function parseAsciiTree(source: string): ParsedFileTreeNode[] {
     open.push({ column, node });
   }
 
-  if (roots.length === 0) throw new Error('Tree fence has no entries');
+  if (roots.length === 0) throw new TreeParseError('the tree has no entries');
   return roots.map(freeze);
 }
 
@@ -194,8 +221,9 @@ export function renderTreeFence(content: string): string {
 }
 
 interface FenceToken {
-  readonly info: string;
+  info: string;
   readonly content: string;
+  readonly map: readonly [number, number] | null;
 }
 
 type RenderRule = (
@@ -211,25 +239,44 @@ interface MarkdownItRenderer {
   readonly renderer: { rules: Record<string, RenderRule | undefined> };
 }
 
+/** Options for {@link fileTreeFence}. */
+export interface FileTreeFenceOptions {
+  /** Receives build warnings for trees that fall back to a plain text block. */
+  readonly warn?: (message: string) => void;
+}
+
 /**
  * markdown-it plugin: render fenced `tree` blocks as the file tree component.
+ *
+ * A tree that cannot be parsed never stops the build: it renders through markdown-it's
+ * original fence renderer as a plain `text` block, and the build warns with the page and line.
  * Typed loosely so this module stays free of the site's markdown-it import.
  */
-export function fileTreeFence(instance: object): void {
+export function fileTreeFence(instance: object, options: FileTreeFenceOptions = {}): void {
   const md = instance as MarkdownItRenderer;
+  const warn = options.warn ?? ((message: string) => console.warn(message));
   const fallback = md.renderer.rules.fence;
   if (!fallback) throw new Error('markdown-it has no fence renderer to extend');
-  md.renderer.rules.fence = (tokens, index, options, env, self) => {
+  md.renderer.rules.fence = (tokens, index, renderOptions, env, self) => {
     const token = tokens[index];
     if (token.info.trim().split(/\s+/, 1)[0] !== TREE_FENCE) {
-      return fallback(tokens, index, options, env, self);
+      return fallback(tokens, index, renderOptions, env, self);
     }
-    const filename = (env as { filename?: string } | undefined)?.filename;
     try {
       return `${renderTreeFence(token.content)}\n`;
     } catch (error) {
-      const where = filename ? ` in ${filename}` : '';
-      throw new Error(`Invalid tree fence${where}: ${(error as Error).message}`);
+      if (!(error instanceof TreeParseError)) throw error;
+      const filename = (env as { filename?: string } | undefined)?.filename ?? 'Markdown';
+      const fence = (token.map?.[0] ?? 0) + 1;
+      const line = error.line === undefined ? fence : fence + error.line;
+      warn(`${filename}:${line}: tree fence ${error.message}; it renders as plain text.`);
+      const info = token.info;
+      token.info = 'text';
+      try {
+        return fallback(tokens, index, renderOptions, env, self);
+      } finally {
+        token.info = info;
+      }
     }
   };
 }

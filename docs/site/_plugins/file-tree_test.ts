@@ -4,6 +4,7 @@ import {
   type ParsedFileTreeNode,
   renderFileTree,
   renderTreeFence,
+  TreeParseError,
 } from './file-tree.ts';
 
 /** Root CI and the site's own task both run this file, so it imports nothing bare. */
@@ -129,8 +130,73 @@ Deno.test('a plain comment and odd indentation widths still parse', () => {
   strictEqual(root.children[1].children[0].name, 'chat.tsx');
 });
 
-Deno.test('an empty tree is rejected', () => {
-  throws(() => parseAsciiTree('\n│\n'), /no entries/);
+/** The tree's shape as `[name, children]` pairs, for compact nesting assertions. */
+type Shape = [string, Shape[]];
+function shape(nodes: readonly ParsedFileTreeNode[]): Shape[] {
+  return nodes.map((node) => [node.name, shape(node.children)]);
+}
+
+const EXPECTED_SHAPE: Shape[] = [['my-app/', [
+  ['AGENTS.md', []],
+  ['apps/', [['lib/', [['users.ts', []]]], ['client.ts', []]]],
+  ['deno.json', []],
+]]];
+
+Deno.test('ASCII trees nest like Unicode trees', () => {
+  // As `tree --charset=ascii` draws them.
+  const ascii = parseAsciiTree(`my-app/
+|-- AGENTS.md      # [guidance] added by \`agent init\`
+|-- apps/
+|   |-- lib/
+|   |   \`-- users.ts
+|   \`-- client.ts
+\`-- deno.json      # [owned config] workspace`);
+  deepStrictEqual(shape(ascii), EXPECTED_SHAPE);
+  strictEqual(ascii[0].children[0].ownership, 'guidance');
+  strictEqual(ascii[0].children[0].comment, 'added by `agent init`');
+  strictEqual(ascii[0].children[2].ownership, 'owned config');
+  strictEqual(ascii[0].children[1].folder, true);
+
+  // As Windows `tree /A` draws them.
+  const windows = parseAsciiTree(`my-app/
++---AGENTS.md
++---apps/
+|   +---lib/
+|   |   \\---users.ts
+|   \\---client.ts
+\\---deno.json`);
+  deepStrictEqual(shape(windows), EXPECTED_SHAPE);
+});
+
+Deno.test('mixed Unicode and ASCII trees keep siblings under the right parent', () => {
+  const mixed = parseAsciiTree(`my-app/
+├── AGENTS.md
+|-- apps/
+│   |-- lib/
+|   │   └── users.ts
+│   \`-- client.ts
+└── deno.json`);
+  deepStrictEqual(shape(mixed), EXPECTED_SHAPE);
+});
+
+Deno.test('malformed trees throw a TreeParseError with the offending line', () => {
+  const cases: Array<[string, RegExp, number | undefined]> = [
+    ['', /no entries/, undefined],
+    ['\n│\n|\n', /no entries/, undefined],
+    ['my-app/\n├── a.ts\n    stray continuation', /indented but has no branch/, 3],
+    ['┌──────┐\n│ box  │\n└──────┘', /not understood/, 1],
+    ['my-app/\n├─┬─ split.ts', /not understood/, 2],
+    ['my-app/\n├──     # [owned] a tag without a name', /no name/, 2],
+    ['my-app/\n+-- ok.ts\n+- single-dash.ts', /not understood/, 3],
+  ];
+  for (const [source, message, line] of cases) {
+    throws(
+      () => parseAsciiTree(source),
+      (error: unknown) =>
+        error instanceof TreeParseError && message.test(error.message) && error.line === line,
+      JSON.stringify(source),
+    );
+  }
 });
 
 Deno.test('renderFileTree emits the component markup and escapes author text', () => {
@@ -175,7 +241,7 @@ Deno.test('every tree fence in the docs site parses one entry per line', async (
       else if (/\.(?:md|vto)$/.test(entry.name)) {
         const source = await Deno.readTextFile(path);
         for (const match of source.matchAll(/^```tree[ \t]*\n([\s\S]*?)^```[ \t]*$/gm)) {
-          const lines = match[1].split('\n').filter((line) => !/^[\s│]*$/.test(line));
+          const lines = match[1].split('\n').filter((line) => !/^[\s│|]*$/.test(line));
           const count = (nodes: readonly ParsedFileTreeNode[]): number =>
             nodes.reduce((total, node) => total + 1 + count(node.children), 0);
           strictEqual(count(parseAsciiTree(match[1])), lines.length, path.pathname);
