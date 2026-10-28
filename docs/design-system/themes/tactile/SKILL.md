@@ -67,13 +67,13 @@ that hold a value sink as concave wells. A selected thing is pressed in. Signatu
 - MUST read only `--ns-tactile-*` roles in Tactile components: they are the current component
   bindings. The core `--ns-*` compatibility roles under Theme = Tactile resolve to the build values
   (ground `#e0e5ec` / `#2a2d32`, primary `#1a6fe8`, ring `#1e7bff` / `#3b8bff`, input border
-  `#6a759e` / `#7a8498`). Export validation of those values is pending in S1 #2414, so don't bind
-  Tactile components to them. NEVER use primitives.
+  `#6a759e` / `#7a8498`). Export validation of those values is pending in the token export (#2414),
+  so don't bind Tactile components to them. NEVER use primitives.
 
 ## Building a screen
 
 1. **Enable the theme:** `data-theme="tactile"`, `data-scheme="light|dark"`. No density mode; the
-   guideline sizes apply. Names are provisional until S1 #2414.
+   guideline sizes apply. Names are provisional until the tokens build (#2414).
 2. **Compose:** a 48px-padded canvas with an unboxed sidebar (printed nav, wells for search and
    meters) and a main column of plateaus 48px apart. Inside a plateau, group with spacing and one
    tone step, never with rules or nested panels.
@@ -102,7 +102,7 @@ that hold a value sink as concave wells. A selected thing is pressed in. Signatu
 ## New components or screens
 
 - Classify, then derive from the closest existing element of the same height and size band.
-- If a new visual role is needed, add it as `tactile/<path>` and register it in code (S1). Don't
+- If a new visual role is needed, add it as `tactile/<path>` and register it in code (#2414). Don't
   reuse an unrelated role. Don't add effect styles outside the ladder.
 - Add the new component to the components sheet in Light and Dark, and re-run the audit in the
   self-check below.

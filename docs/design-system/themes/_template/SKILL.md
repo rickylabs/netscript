@@ -33,7 +33,7 @@ the `netscript-design` skill.
 ## Building a screen
 
 1. **Enable the theme:** `data-theme="<id>"`, `data-scheme`, `data-density="<default>"` (provisional
-   until S1 #2414).
+   until #2414).
 2. **Compose:** <how this theme lays out a page; which regions get which depth or material>.
 3. **Pick variants:** <component → variant table for this theme>.
 4. **Use the signature objects** where they carry meaning, never as decoration: <list>.
@@ -43,8 +43,8 @@ the `netscript-design` skill.
 
 - Start from the closest existing component's variant. Keep the theme's depth and shape rules.
 - If a new visual role is needed, add it as `<id>/<path>`, list it in the language pack's role
-  manifest (`DESIGN.md` → _NetScript Mapping_; GUIDELINES §2.4) and register it in code (S1). Don't
-  reuse an unrelated role.
+  manifest (`DESIGN.md` → _NetScript Mapping_; GUIDELINES §2.4) and register it in code (#2414).
+  Don't reuse an unrelated role.
 - Add the new component to the state sheet, in Light and Dark.
 
 ## Self-check before handing off

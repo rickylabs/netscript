@@ -4,7 +4,8 @@ name: Terminal
 description: A Charm-style TUI on a character grid. Rounded Lip Gloss panes, one Geist Mono 14/24 scale, bracketed keys and an inverse lime selection bar.
 colors:
   # Resolved from the NetScript Figma library for the Light and Dark Orders screens.
-  # Theme = Signal, Density = Compact. Keys are the --ns-* suffix.
+  # Theme = Signal (the seed of Terminal's own mode), Density = Compact. Keys are the --ns-*
+  # suffix.
   bg: '#fcfcfc'
   bg-dark: '#000000'
   surface: '#f9f9f9'
@@ -239,7 +240,8 @@ Names are provisional until the token export in #2414.
   cover box drawing (U+2500–257F) and the glyphs `◆ ● ▶ ▲ ▼ ✗ ⏎ •`.
 - Hierarchy comes from dim / normal / medium, not size. Tracking is 0 on the grid so columns stay
   exact.
-- The Signal Theme mode sets `font/sans` to Geist, but Terminal does not use it.
+- Terminal's Theme mode, seeded from `Signal`, sets `font/sans` to Geist, but Terminal does not use
+  it.
 
 ## Layout
 
@@ -382,14 +384,14 @@ The dark Save colours are _measured_ on rendered pixels: fill `#222222`, edge `#
 
 ## NetScript Mapping
 
-| Layer              | Value                                                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| Figma Theme mode   | `Signal`, shared with the Studio Signal flavor (same name and lime primary). In both, the dark primary must not be a pale slab |
-| Base gray × accent | Neutral × Ink by default; the Signal Theme mode supplies gray and lime directly                                                |
-| Density            | `Compact` (set explicitly; no Density variable bound)                                                                          |
-| Flavor             | n/a                                                                                                                            |
-| `data-theme`       | `terminal`                                                                                                                     |
-| Language roles     | none                                                                                                                           |
+| Layer              | Value                                                                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Figma Theme mode   | `Terminal`, its own mode in `Theme B` (set B), still seeded from `Signal` (same name and lime primary as the Studio Signal flavor). In Terminal and in the Studio Signal flavor, the dark primary must not be a pale slab |
+| Base gray × accent | Neutral × Ink by default; the Theme mode, seeded from `Signal`, supplies gray and lime directly                                                                                                                           |
+| Density            | `Compact` (set explicitly; no Density variable bound)                                                                                                                                                                     |
+| Flavor             | n/a                                                                                                                                                                                                                       |
+| `data-theme`       | `terminal`                                                                                                                                                                                                                |
+| Language roles     | none                                                                                                                                                                                                                      |
 
 - **Dark Save key:** dark draws the primary key as a `#222222` fill with a `#7b7b7b` edge and
   `#bde56c` text, while light Save stays a lime fill. No scheme-aware role covers this yet, so the
@@ -397,10 +399,10 @@ The dark Save colours are _measured_ on rendered pixels: fill `#222222`, edge `#
   `surface/muted`, `border/input` and `primary/text`, which the YAML uses. A scheme-aware key role
   (name owned by code) is pending in #2414.
 - **Status.** Values come from the NetScript Figma library. Names are provisional until the token
-  export in #2414, where the shared `Signal` mode must split from Studio. The editor-focus variant,
-  hover, pressed and disabled keys, and the keyboard map including pane-switch dispatch are pending
-  in #2416. Width behaviour at 960px with pinned id and total columns, and keyboard proof, are
-  pending in #2419.
+  export in #2414, which must take Terminal's values from its own mode, not from `Signal`. The
+  editor-focus variant, hover, pressed and disabled keys, and the keyboard map including pane-switch
+  dispatch are pending in #2416. Width behaviour at 960px with pinned id and total columns, and
+  keyboard proof, are pending in #2419.
 
 ## Sources
 

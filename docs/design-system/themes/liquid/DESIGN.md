@@ -3,7 +3,8 @@ version: alpha
 name: Liquid
 description: 'macOS 27 Liquid Glass over a real desktop: a translucent edge-to-edge sidebar, kit-recipe glass toolbar groups, and a lensing inspector sheet and selection bar floating over opaque content.'
 colors:
-  # Resolved from the NetScript Figma library, Light and Dark windows, Theme mode "Glass".
+  # Resolved from the NetScript Figma library, Light and Dark windows, Theme mode "Glass" (the
+  # seed of Liquid's own mode).
   # Keys are the --ns-* suffix from each variable's code syntax.
   card: '#f9f9fb'
   card-dark: '#18191b'
@@ -478,8 +479,8 @@ Contrast ratios are measured on exported pixels.
 
 | Layer              | Value                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `Glass` (shared with Cupertino, because the Figma Theme collection is limited to 10 modes). Liquid's own values live in `liquid/*` and in literals                                                                                                                                                                                                                                                                                             |
-| Base gray × accent | Radix slate × blue, via the `Glass` mode (the frames resolve Base gray `Neutral` / Base accent `Ink` by default)                                                                                                                                                                                                                                                                                                                               |
+| Figma Theme mode   | `Liquid`, its own mode in `Theme B` (set B), still seeded from `Glass`'s values. Liquid's distinct values live in `liquid/*` and in literals                                                                                                                                                                                                                                                                                                   |
+| Base gray × accent | Radix slate × blue, via the `Glass` seed values (the frames resolve Base gray `Neutral` / Base accent `Ink` by default)                                                                                                                                                                                                                                                                                                                        |
 | Density            | `Comfortable` (explicit)                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Flavor             | n/a                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `data-theme`       | `liquid`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -491,7 +492,7 @@ Contrast ratios are measured on exported pixels.
   - white labels and knobs, which move to `liquid-primary-fg`;
   - hairlines (black 6–18% / white 10–28%), which need roles;
   - the on-accent rims (white 30–35%) and the selected-avatar ring (white 90%);
-  - type and radii, because the `Glass` Theme scale belongs to Cupertino.
+  - type and radii, because Liquid's mode still holds the `Glass` scale, which belongs to Cupertino.
   - Green deltas bind `liquid-success-text` in light and core `success-text` in dark; #2414 picks
     one role.
 - **Status.** Values come from the NetScript Figma library. Role registration, fonts and `tnum` are

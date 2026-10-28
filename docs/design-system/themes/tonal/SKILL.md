@@ -48,7 +48,7 @@ moves:
 
 ## Building a screen
 
-1. **Enable the theme:** `data-theme="tonal"`, `data-scheme`, default density (provisional until S1
+1. **Enable the theme:** `data-theme="tonal"`, `data-scheme`, default density (provisional until
    #2414). Gray and accent come from the theme (mauve × violet).
 2. **Compose:** navigation rail (96px) + main column; pill search on top; header with title and one
    outlined action; KPI row with one hero; content in segmented lists, not ruled tables; forms in an
@@ -76,8 +76,8 @@ moves:
 
 - Start from the M3 Expressive component that does the same job (m3.material.io) and the closest
   Tonal component; keep the M3 sizes and shape scale.
-- Tonal has no namespaced roles. If a new visual role is needed, propose a core role through S1; do
-  not invent `tonal/*`.
+- Tonal has no namespaced roles. If a new visual role is needed, propose a core role through the
+  tokens build (#2414); do not invent `tonal/*`.
 - Add the component to both state sheets (Light and Dark).
 
 ## Self-check before handing off

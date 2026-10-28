@@ -265,7 +265,7 @@ components:
 # Tonal
 
 <!-- Format: Google Labs DESIGN.md (alpha). Values resolved from the NetScript Figma library on
-2026-10-27. Names are provisional until S1 #2414. -->
+2026-10-27. Names are provisional until the tokens build (#2414). -->
 
 ## Overview
 

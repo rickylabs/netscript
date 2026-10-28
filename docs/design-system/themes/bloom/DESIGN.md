@@ -5,9 +5,10 @@ description: Widget-first Material You with notch-cut pastel widgets on warm pap
 colors:
   # Light value, then the Dark twin (`-dark`). Resolved Figma variables of the Light and Dark
   # frames. Bloom components read only the `bloom-*` roles.
-  # The core roles below resolve through the Tonal Theme mode (mauve × violet), which the Figma
-  # library borrows for Bloom; Bloom never paints them. They are prototype values, not Bloom's
-  # palette or contract: S1 #2414 must export a complete Bloom core-role map (see NetScript Mapping).
+  # The core roles below resolve through Bloom's own Theme mode, which is still seeded from
+  # Tonal's values (mauve × violet); Bloom never paints them. They are prototype values, not
+  # Bloom's palette or contract: the token export (#2414) must include a complete Bloom core-role
+  # map (see NetScript Mapping).
   bg: '#fdfcfd'
   bg-dark: '#121113'
   fg: '#211f26'
@@ -245,7 +246,7 @@ components:
 # Bloom
 
 <!-- Format: Google Labs DESIGN.md (alpha). Values resolved from the NetScript Figma library on
-2026-10-27. Names are provisional until S1 #2414. -->
+2026-10-27. Names are provisional until the tokens build (#2414). -->
 
 ## Overview
 
@@ -348,7 +349,7 @@ The disc sits 4px from the outer top and right edges and 10–12px from the conc
 notches use different geometry and share no token. The CSS below is for a fixed-size widget (exact
 arcs; Figma's cubics match within 0.1px). The two sizes are variants of one declared Bloom part,
 selected with `data-variant`, never a BEM modifier class. The variant names below are provisional
-until S3 #2416 registers them:
+until the component anatomy spec (#2416) registers them:
 
 ```css
 .ns-bloom-notch[data-variant="248x128"] {
@@ -359,10 +360,11 @@ until S3 #2416 registers them:
 }
 ```
 
-- **Ownership.** The literal paths are owned component anatomy of the Bloom notched widget (S3 part
-  geometry), not tokens; keep the measurements unchanged. Every paint on the widget and its disc is
-  a semantic role (`--ns-bloom-ink-card`, `--ns-bloom-on-ink-card`, `--ns-bloom-hero`,
-  `--ns-bloom-on-hero`, `--ns-bloom-control-outline`), never a literal colour.
+- **Ownership.** The literal paths are owned component anatomy of the Bloom notched widget (part
+  geometry in the component anatomy spec, #2416), not tokens; keep the measurements unchanged. Every
+  paint on the widget and its disc is a semantic role (`--ns-bloom-ink-card`,
+  `--ns-bloom-on-ink-card`, `--ns-bloom-hero`, `--ns-bloom-on-hero`, `--ns-bloom-control-outline`),
+  never a literal colour.
 - For fluid widths, use CSS `shape()` with `calc(100% - …)` coordinates where supported, or an SVG
   `mask-image`/`<clipPath>` generated from the element box; runtime proof is pending in #2419.
 - `clip-path` clips outlines and borders: put the focus ring on the disc, and draw a notched outline
@@ -452,18 +454,19 @@ No focus indicator is drawn yet (#2416). Hit targets: toggle discs 28px, discs �
 
 | Layer              | Value                                                                                                                                                                                                                                                                 |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `Tonal` (borrowed because the Figma Theme collection is at its 10-mode limit; prototype only)                                                                                                                                                                         |
-| Base gray × accent | n/a (core roles inherit Tonal's mauve × violet)                                                                                                                                                                                                                       |
+| Figma Theme mode   | `Bloom`, its own mode in `Theme B` (set B), still seeded from `Tonal`'s values (prototype only)                                                                                                                                                                       |
+| Base gray × accent | n/a (core roles resolve to the Tonal seed values, mauve × violet)                                                                                                                                                                                                     |
 | Density            | n/a (literal geometry)                                                                                                                                                                                                                                                |
 | Flavor             | n/a                                                                                                                                                                                                                                                                   |
 | `data-theme`       | `bloom`                                                                                                                                                                                                                                                               |
 | Language roles     | `bloom/{canvas,surface,surface-high,fg,muted,outline,field-edge,control-outline,line,hero,on-hero,ink-card,on-ink-card,peach,mint,lavender,sky,butter,rose,success,warn,error}` (+ unused `primary*`, `lime*`, `tangerine*`, `hero-accent*`, `on-*`) → `--ns-bloom-*` |
 
-- **The borrowed mode is for the prototype only.** Rendering Bloom under the `Tonal` Theme mode
-  works in the Figma prototype, but it is not a compatibility contract: under it the core roles
-  resolve to Tonal's mauve × violet, not to Bloom. The S1 (#2414) export must ship a Bloom resolver
-  mode with a **complete compatible core-role map** (every core role in both schemes; proposed
-  mapping below) so a shared component rendered under `data-theme="bloom"` stays on-theme.
+- **The seed values are for the prototype only.** Bloom's own Theme mode still holds Tonal's values.
+  Rendering Bloom under it works in the Figma prototype, but it is not a compatibility contract:
+  under it the core roles resolve to Tonal's mauve × violet, not to Bloom. The token export (#2414)
+  must ship a Bloom resolver mode with a **complete compatible core-role map** (every core role in
+  both schemes; proposed mapping below) so a shared component rendered under `data-theme="bloom"`
+  stays on-theme.
 - **Bindings today.** Bloom components bind 22 `bloom/*` roles and no core roles or Theme variables,
   so Tonal values never reach a Bloom render. Text sets the Funnel fonts directly (the Theme
   `font/*` would resolve Roboto Flex), and every radius and size is a literal value. Roles pending
@@ -474,7 +477,7 @@ No focus indicator is drawn yet (#2416). Hit targets: toggle discs 28px, discs �
   - **Fonts in use:** Funnel Sans Regular, Funnel Sans Medium, Funnel Display Regular.
   - **Sizes in use:** 12, 13, 14, 15, 16, 17, 18, 22, 24, 28, 30, 32, 40, 48, 60, 92.
   - **Radii in use:** 2, 14, 15, 18, 20, 21, 22, 24, 26, 28, 30, 32, 40.
-- **What S1 (#2414) needs for a dedicated Bloom mapping:**
+- **What the token export (#2414) needs for a dedicated Bloom mapping:**
   1. A Bloom resolver mode with:
      - `font/sans` = Funnel Sans and `font/heading` / `font/kpi` = Funnel Display;
      - a type scale for the sizes above;
@@ -490,9 +493,9 @@ No focus indicator is drawn yet (#2416). Hit targets: toggle discs 28px, discs �
   3. Register the 22 used `bloom/*` roles and decide the unused ones: `primary*`, `lime*`,
      `tangerine*`, `hero-accent*`, `on-*`.
   4. Bind all Bloom text to the new font tokens.
-- **Status:** values come from the NetScript Figma library. A Bloom Theme mode or registered
-  `bloom/*` roles, Funnel font tokens, shape tokens and numerals are tracked in #2414; the state
-  sheet and focus in #2416; the notch at fluid widths, motion and RTL in #2419.
+- **Status:** values come from the NetScript Figma library. Bloom's own Theme-mode values or
+  registered `bloom/*` roles, Funnel font tokens, shape tokens and numerals are tracked in #2414;
+  the state sheet and focus in #2416; the notch at fluid widths, motion and RTL in #2419.
 
 ## Sources
 

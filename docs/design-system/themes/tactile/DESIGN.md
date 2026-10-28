@@ -240,7 +240,7 @@ Format: Google Labs DESIGN.md (alpha, Apache-2.0), github.com/google-labs-code/d
 Values: NetScript Figma library, read-only extraction on 2026-10-27.
 Sources → Source classes lists which values are verified upstream, which come from a reference
 recipe, which are adopted local parameters (upstream unverified) and which are design judgement.
-Names are provisional until S1 #2414.
+Names are provisional until the tokens build (#2414).
 -->
 
 ## Overview
@@ -302,7 +302,7 @@ Names are provisional until S1 #2414.
 - **Core roles.** Current Tactile components read only `tactile/*`. Under Theme = Tactile, the core
   `--ns-*` compatibility roles resolve to the build values (ground `#e0e5ec` / `#2a2d32`, primary
   `#1a6fe8`, ring `#1e7bff` / `#3b8bff`, input border `#6a759e` / `#7a8498`; see _NetScript
-  Mapping_). Export validation of these values is pending in S1 #2414.
+  Mapping_). Export validation of these values is pending in the token export (#2414).
 
 ## Typography
 
@@ -326,7 +326,8 @@ Names are provisional until S1 #2414.
   the rendered box heights (22 at 16px, 18 at 13px). Exact line heights are pending in #2414.
 - Text is not bound to `type/*` variables. The Theme mode `Tactile` lists Nunito Sans (`font/*`) and
   Geist Mono (`font/mono`), but its `type/*` sizes are older values that do not match this table.
-  The fonts set on the text nodes, as listed above, are the source of truth until S1.
+  The fonts set on the text nodes, as listed above, are the source of truth until the tokens build
+  (#2414).
 
 ## Layout
 
@@ -555,11 +556,12 @@ material as _measured_ 5.7895:1 light and 5.4319:1 dark.
 - **How the mode is built.** It uses a slate neutral ramp and a blue accent ramp. The ground, the
   solid accent, the ring, accent step 11 and gray step 10 are raw values in the mode, because no
   primitive exists for them.
-- **Status.** Values come from the NetScript Figma library. Names are provisional until S1 #2414,
-  including all 40 `tactile/*` roles; the Theme mode's raw values duplicate `tactile/*` today, and
-  S1 owns the aliasing. Line heights, hover, the full state matrix for every component and dialog
-  anatomy are pending in #2416. Press animation, forced-colors and contrast-preference behaviour and
-  RTL are pending in #2419; runtime behaviour is unproven until then.
+- **Status.** Values come from the NetScript Figma library. Names are provisional until the tokens
+  build (#2414), including all 40 `tactile/*` roles; the Theme mode's raw values duplicate
+  `tactile/*` today, and the tokens build owns the aliasing. Line heights, hover, the full state
+  matrix for every component and dialog anatomy are pending in #2416. Press animation, forced-colors
+  and contrast-preference behaviour and RTL are pending in #2419; runtime behaviour is unproven
+  until then.
 
 ## Sources
 

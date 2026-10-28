@@ -12,10 +12,10 @@ The guidelines define the token contract every theme follows (§1 to §3), the m
 and checking a theme (§4 and §5), the existing themes (§6), and the steps for adding and shipping a
 new one (§7 and §8).
 
-> **Status: token names are provisional.** The role names below are the current Figma contract. S1
-> (#2414) turns them into DTCG 2025.10 tokens with resolver modes. S3 (#2416) freezes component
-> anatomy and data-attribute variants. Until both land, treat names as stable and values as owned by
-> Figma. Do not invent new core role names.
+> **Status: token names are provisional.** The role names below are the current Figma contract. The
+> tokens build (#2414) turns them into DTCG 2025.10 tokens with resolver modes. The component
+> anatomy spec (#2416) freezes anatomy and data-attribute variants. Until both land, treat names as
+> stable and values as owned by Figma. Do not invent new core role names.
 
 ## 1. Two rules that override everything
 
@@ -29,31 +29,31 @@ new one (§7 and §8).
 
 ## 2. Theme architecture
 
-Figma and code describe the same system. Figma stores values in variable collections and modes. Code
-(S1 #2414) stores tokens in three DTCG 2025.10 tiers and selects between contexts with a DTCG
-resolver file. This section maps one onto the other. Ownership follows the epic (#2412, decision 2):
-Figma owns values; code owns names, tiers, modes and component anatomy.
+Figma and code describe the same system. Figma stores values in variable collections and modes. In
+code, the tokens build (#2414) stores tokens in three DTCG 2025.10 tiers and selects between
+contexts with a DTCG resolver file. This section maps one onto the other. Ownership follows the epic
+(#2412, decision 2): Figma owns values; code owns names, tiers, modes and component anatomy.
 
 ### 2.1 Three token tiers
 
-| Tier          | What it holds                                                                                                                                                                                                                                                                                   | Figma source                                                                                                                                            | Code surface (provisional until S1)             | Who may read it                                          |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------- |
-| **Primitive** | Raw values only: colour ramps (oklch with a hex fallback), dimensions, durations, font families. Radix 12-step ramps (gray, slate, sand, mauve, blue, violet, orange, indigo, tomato, lime, grass, amber, red, teal) and theme ramps (`ember`, `band`, `paper`, `glass`, `shadow`, `swiss-red`) | `Primitives` collection (Value mode)                                                                                                                    | Internal custom properties, e.g. `--ns-band-*`  | The semantic tier only. Components never read primitives |
-| **Semantic**  | **Aliases only.** Every value references a primitive (or another semantic role), never a raw hex, px or ms. Core roles plus declared language-pack roles (§2.4)                                                                                                                                 | `Scheme` collection (Light, Dark). Its aliases are selected through the `Theme`, `Base gray`, `Base accent`, `Density` and `Studio flavor` modes (§2.2) | `--ns-*` (core) and `--ns-<theme>-*` (packs)    | Component tokens and L2 component CSS                    |
-| **Component** | Part and state tokens (`button.*`, `input.*`, `card.*`, …) that alias semantic roles, so heavy customization is a token edit, not a CSS override                                                                                                                                                | Variable bindings on library components; there is no component collection yet                                                                           | Named by S1 from the S3 component specs (#2416) | That component's own CSS only                            |
+| Tier          | What it holds                                                                                                                                                                                                                                                                                   | Figma source                                                                                                                                                                       | Code surface (provisional until #2414)                            | Who may read it                                          |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
+| **Primitive** | Raw values only: colour ramps (oklch with a hex fallback), dimensions, durations, font families. Radix 12-step ramps (gray, slate, sand, mauve, blue, violet, orange, indigo, tomato, lime, grass, amber, red, teal) and theme ramps (`ember`, `band`, `paper`, `glass`, `shadow`, `swiss-red`) | `Primitives` collection (Value mode)                                                                                                                                               | Internal custom properties, e.g. `--ns-band-*`                    | The semantic tier only. Components never read primitives |
+| **Semantic**  | **Aliases only.** Every value references a primitive (or another semantic role), never a raw hex, px or ms. Core roles plus declared language-pack roles (§2.4)                                                                                                                                 | `Scheme` collection (Light, Dark). Its aliases are selected through the `Theme set` (`Theme` or `Theme B`), `Base gray`, `Base accent`, `Density` and `Studio flavor` modes (§2.2) | `--ns-*` (core) and `--ns-<theme>-*` (packs)                      | Component tokens and L2 component CSS                    |
+| **Component** | Part and state tokens (`button.*`, `input.*`, `card.*`, …) that alias semantic roles, so heavy customization is a token edit, not a CSS override                                                                                                                                                | Variable bindings on library components; there is no component collection yet                                                                                                      | Named by the tokens build from the component anatomy spec (#2416) | That component's own CSS only                            |
 
 - **Derived values.** Tints, hovers and other mixes are not raw values in the semantic tier.
   `$extensions.netscript.derive` describes them. CSS keeps `color-mix()`, and Figma receives the
   computed value.
-- **Collections and modes are not tiers.** `Scheme`, `Theme`, `Base gray`, `Base accent`, `Density`
-  and `Studio flavor` modes are contexts the resolver chooses between (§2.2). They never add a
-  fourth tier.
+- **Collections and modes are not tiers.** `Scheme`, `Theme`, `Theme B`, `Base gray`, `Base accent`,
+  `Density` and `Studio flavor` modes are contexts the resolver chooses between (§2.2). `Theme set`
+  only switches the aliases between `Theme` and `Theme B`. None of them adds a fourth tier.
 - **Raw values inside Figma modes.** Some Theme modes still store raw values in slots that are
   semantically aliases, for example Tactile's `surface/{l,d}/*` and Fluent's `accent/{l,d}/solid`.
-  Each theme's `DESIGN.md` records them. Before export, S1 splits each one into a primitive and an
-  alias.
+  Each theme's `DESIGN.md` records them. Before export, the tokens build (#2414) splits each one
+  into a primitive and an alias.
 - **Node-level exceptions are Figma-only.** A primitive or raw value bound directly on a Figma node
-  is a temporary exception. The theme's `DESIGN.md` names the S1 role that replaces it, pending in
+  is a temporary exception. The theme's `DESIGN.md` names the role that replaces it, pending in
   #2414. It never ships in L2 component CSS.
 - **Layer ownership is unchanged.** L0/L1 own platform behaviour, attributes and prop getters. L2
   registry components consume component and semantic tokens. An L2 component never imports another
@@ -61,21 +61,30 @@ Figma owns values; code owns names, tiers, modes and component anatomy.
 
 ### 2.2 How Figma collections map to the resolver
 
-| Figma collection (modes)                                                                  | What it selects                                                           | S1 resolver (#2414)                                                                                                      | Root attribute (provisional) |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------- |
-| `Scheme` (Light, Dark)                                                                    | The semantic role values for each scheme                                  | `scheme` modifier: `light`, `dark`                                                                                       | `data-scheme`                |
-| `Theme` (Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel) | Language values: fonts, type scale, radii, materials, shadow recipe, ring | `theme` modifier, with one context per **language preset** (§2.3), not one per Figma mode                                | `data-theme`                 |
-| `Density` (Comfortable, Compact, Dense, Airy, Chunky)                                     | Control, page, section, card, table and badge spacing                     | `density` modifier. S1 specifies `comfortable` and `compact` only; `dense`, `airy` and `chunky` need an S1 schema change | `data-density`               |
-| `Studio flavor` (Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal)              | Personality on top of the Studio language                                 | Not a modifier. Each flavor expands into a Studio preset                                                                 | `data-flavor` (Studio only)  |
-| `Base gray` (Neutral, Slate, Sand, Mauve)                                                 | Which gray ramp a theme sits on                                           | Not a modifier. A preset parameter                                                                                       | `data-gray`                  |
-| `Base accent` (Ink, Blue, Violet, Orange, Indigo, Tomato, Lime)                           | Which accent ramp drives `primary/*`                                      | Not a modifier. A preset parameter                                                                                       | `data-accent`                |
-| `Primitives` (Value)                                                                      | Raw ramps                                                                 | The primitive tier; no modifier                                                                                          | —                            |
+| Figma collection (modes)                                                                  | What it selects                                                                                 | Token resolver (#2414)                                                                                                                        | Root attribute (provisional) |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `Scheme` (Light, Dark)                                                                    | The semantic role values for each scheme                                                        | `scheme` modifier: `light`, `dark`                                                                                                            | `data-scheme`                |
+| `Theme` (Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel) | Language values: fonts, type scale, radii, materials, shadow recipe, ring                       | `theme` modifier, with one context per **language preset** (§2.3), not one per Figma mode                                                     | `data-theme`                 |
+| `Theme B` (Bloom, Cupertino, Liquid, Terminal, macOS 27, Apple Classic, Fluent 2 Web)     | Language values, as for `Theme`                                                                 | The same `theme` modifier                                                                                                                     | `data-theme`                 |
+| `Theme set` (A, B)                                                                        | Which Theme collection the semantic roles alias through: A selects `Theme`, B selects `Theme B` | Not a modifier; the `theme` modifier covers both Theme collections                                                                            | —                            |
+| `Density` (Comfortable, Compact, Dense, Airy, Chunky)                                     | Control, page, section, card, table and badge spacing                                           | `density` modifier. The token resolver specifies `comfortable` and `compact` only; `dense`, `airy` and `chunky` need a resolver schema change | `data-density`               |
+| `Studio flavor` (Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal)              | Personality on top of the Studio language                                                       | Not a modifier. Each flavor expands into a Studio preset                                                                                      | `data-flavor` (Studio only)  |
+| `Base gray` (Neutral, Slate, Sand, Mauve)                                                 | Which gray ramp a theme sits on                                                                 | Not a modifier. A preset parameter                                                                                                            | `data-gray`                  |
+| `Base accent` (Ink, Blue, Violet, Orange, Indigo, Tomato, Lime)                           | Which accent ramp drives `primary/*`                                                            | Not a modifier. A preset parameter                                                                                                            | `data-accent`                |
+| `Primitives` (Value)                                                                      | Raw ramps                                                                                       | The primitive tier; no modifier                                                                                                               | —                            |
 
-This Figma plan allows **10 modes per collection**, and `Theme` uses all 10. Figma modes and
-languages are therefore not one-to-one: Cupertino and Liquid share `Glass`, Terminal uses `Signal`,
-and Bloom borrows `Tonal`. A shared or borrowed Figma mode is prototype evidence only. The S1 export
-must give each language preset its own complete core-role map. A new language either replaces a mode
-or declares a language pack (§2.4). The S1 resolver removes the ceiling in code.
+This Figma plan allows **10 modes per collection**, and `Theme` uses all 10. A second collection,
+`Theme B`, holds the modes for Bloom, Cupertino, Liquid and Terminal, and for the planned macOS 27,
+Apple Classic and Fluent 2 Web themes (#2443). The semantic roles alias through the `Theme set`
+collection: set A selects `Theme` and set B selects `Theme B`. Each language has its own mode.
+
+The `Theme B` modes were seeded with copies of existing values: Bloom from Tonal; Cupertino, Liquid,
+macOS 27 and Apple Classic from Glass; Terminal from Signal; and Fluent 2 Web from Fluent. Each mode
+can diverge. Until a language's own values are set, its mode resolves to its seed values, which are
+prototype evidence only. Before a language ships, its values must come from its own mode, and the
+token export (#2414) must give each language preset its own complete core-role map. When both
+collections are full, a new language either replaces a mode or declares a language pack (§2.4). The
+token resolver (#2414) has no mode limit in code.
 
 ### 2.3 Supported resolver axes
 
@@ -88,40 +97,41 @@ accent (and, for Studio, flavor), designed and reviewed in both schemes.
 | `scheme`  | light, dark                                                                                                        | Every preset                                       | Both schemes for every preset; each dark is designed, not inverted                                                   |
 | `theme`   | `studio`, `tonal`, `bloom`, `cupertino`, `liquid`, `fluent`, `brutal`, `filigrane`, `terminal`, `pixel`, `tactile` | —                                                  | One preset per language; Studio has seven, one per flavor                                                            |
 | `flavor`  | utility, cloud, workshop, playful, ledger, atelier, signal                                                         | Studio only                                        | Each flavor fixes its own gray, accent and density (Studio `DESIGN.md` → _Flavors_). Every other language ignores it |
-| `density` | comfortable, compact (S1); dense, airy, chunky (Figma only)                                                        | Studio flavors; a few languages set one explicitly | Fixed per preset; not a free user override yet                                                                       |
+| `density` | comfortable, compact (token resolver); dense, airy, chunky (Figma only)                                            | Studio flavors; a few languages set one explicitly | Fixed per preset; not a free user override yet                                                                       |
 | `gray`    | neutral, slate, sand, mauve                                                                                        | Studio flavors                                     | Fixed per preset. The other languages alias their own ramps inside their Theme mode and ignore it                    |
 | `accent`  | ink, blue, violet, orange, indigo, tomato, lime                                                                    | Studio flavors                                     | Fixed per preset, as for gray                                                                                        |
 
 **Precedence.** The resolver applies `theme` (with `flavor` for Studio) as a preset that fixes
 density, gray and accent. `scheme` then selects the Light or Dark values. An app's override layer
-(S1) applies last, on the semantic tier only. A preset ignores attempts to change an axis it fixes,
-and the builder (§8) offers only supported combinations. A free axis, such as any density on any
-language, needs an S1 schema change and a contrast run for every new permutation.
+(#2414) applies last, on the semantic tier only. A preset ignores attempts to change an axis it
+fixes, and the builder (§8) offers only supported combinations. A free axis, such as any density on
+any language, needs a resolver schema change (#2414) and a contrast run for every new permutation.
 
 **Fixed axes per language.** This table comes from each theme's `DESIGN.md` → _NetScript Mapping_.
-The mode assignments are read from the Figma library and are not yet verified in code (S1 #2414).
+The mode assignments are read from the Figma library and are not yet verified in code (#2414). Modes
+in set B live in `Theme B` and still hold their seed values (§2.2).
 
-| Language  | Figma Theme mode   | Density                                   | Gray × accent                                           |
-| --------- | ------------------ | ----------------------------------------- | ------------------------------------------------------- |
-| Studio    | `Studio`           | per flavor (Utility: compact)             | per flavor (Utility: neutral × ink)                     |
-| Tonal     | `Tonal`            | comfortable; M3 component sizes are fixed | mauve × violet, inside the mode                         |
-| Bloom     | `Tonal` (borrowed) | none (literal geometry)                   | none; Bloom reads `bloom/*`                             |
-| Cupertino | `Glass` (shared)   | comfortable                               | slate × blue, inside the mode                           |
-| Liquid    | `Glass` (shared)   | comfortable                               | slate × blue, inside the mode; own values in `liquid/*` |
-| Fluent    | `Fluent`           | none (WinUI defaults)                     | neutral gray × WinUI accent, inside the mode            |
-| Brutal    | `Brutal`           | none (comfortable default)                | sand × amber, inside the mode                           |
-| Filigrane | `Filigrane`        | none                                      | sand × tomato, inside the mode                          |
-| Terminal  | `Signal` (shared)  | compact                                   | gray × lime, inside the mode                            |
-| Pixel     | `Pixel`            | comfortable                               | sand-family × amber, inside the mode                    |
-| Tactile   | `Tactile`          | none                                      | none; Tactile reads `tactile/*`                         |
+| Language  | Figma Theme mode                         | Density                                   | Gray × accent                                           |
+| --------- | ---------------------------------------- | ----------------------------------------- | ------------------------------------------------------- |
+| Studio    | `Studio`                                 | per flavor (Utility: compact)             | per flavor (Utility: neutral × ink)                     |
+| Tonal     | `Tonal`                                  | comfortable; M3 component sizes are fixed | mauve × violet, inside the mode                         |
+| Bloom     | `Bloom` (set B, seeded from `Tonal`)     | none (literal geometry)                   | none; Bloom reads `bloom/*`                             |
+| Cupertino | `Cupertino` (set B, seeded from `Glass`) | comfortable                               | slate × blue, inside the mode                           |
+| Liquid    | `Liquid` (set B, seeded from `Glass`)    | comfortable                               | slate × blue, inside the mode; own values in `liquid/*` |
+| Fluent    | `Fluent`                                 | none (WinUI defaults)                     | neutral gray × WinUI accent, inside the mode            |
+| Brutal    | `Brutal`                                 | none (comfortable default)                | sand × amber, inside the mode                           |
+| Filigrane | `Filigrane`                              | none                                      | sand × tomato, inside the mode                          |
+| Terminal  | `Terminal` (set B, seeded from `Signal`) | compact                                   | gray × lime, inside the mode                            |
+| Pixel     | `Pixel`                                  | comfortable                               | sand-family × amber, inside the mode                    |
+| Tactile   | `Tactile`                                | none                                      | none; Tactile reads `tactile/*`                         |
 
 **Migration from today's selectors.** Code today (NS One) scopes light on `:root` and dark on
 `[data-theme='dark']`. The new model moves the scheme to `data-scheme` and gives `data-theme` to the
-language: `data-theme="dark"` becomes `data-theme="<language>" data-scheme="dark"`. S1 acceptance
-requires that existing `--ns-*` names keep resolving or have a documented migration, and that NS One
-renders unchanged. S1 therefore either keeps `[data-theme='dark']` resolving as the default preset's
-dark scheme or ships that migration, with a `ui:migrate` step for app-owned copies. Never rename an
-existing `--ns-*` name without a migration.
+language: `data-theme="dark"` becomes `data-theme="<language>" data-scheme="dark"`. Acceptance for
+the tokens build (#2414) requires that existing `--ns-*` names keep resolving or have a documented
+migration, and that NS One renders unchanged. The tokens build therefore either keeps
+`[data-theme='dark']` resolving as the default preset's dark scheme or ships that migration, with a
+`ui:migrate` step for app-owned copies. Never rename an existing `--ns-*` name without a migration.
 
 ### 2.4 Token-only assignments and declared language packs
 
@@ -133,19 +143,20 @@ There are two kinds of theme. Keep them apart.
 - **Declared language pack.** A language whose look needs roles or anatomy the core set cannot
   express. A pack is a registered extension, not a fork. It declares:
   1. **A role manifest:** every namespaced role it adds, as `<theme>/<path>` →
-     `--ns-<theme>-<path>`, each with a Light and a Dark alias. Until S1 has a machine-readable
-     manifest, the list is the _Language roles_ row in the theme's `DESIGN.md` → _NetScript
-     Mapping_. S1 registers every listed role before the pack ships; unknown names fail CI.
-  2. **Its anatomy additions:** only the S3 parts and `data-variant` values it adds to its own
-     components, such as Studio's card variants or Bloom's notched widget. A pack never restyles
-     arbitrary app markup or another L2 component's internals.
+     `--ns-<theme>-<path>`, each with a Light and a Dark alias. Until the tokens build has a
+     machine-readable manifest, the list is the _Language roles_ row in the theme's `DESIGN.md` →
+     _NetScript Mapping_. The tokens build registers every listed role before the pack ships;
+     unknown names fail CI.
+  2. **Its anatomy additions:** only the anatomy parts (#2416) and `data-variant` values it adds to
+     its own components, such as Studio's card variants or Bloom's notched widget. A pack never
+     restyles arbitrary app markup or another L2 component's internals.
   3. **A complete core map:** every core semantic role still resolves under the pack, so shared
      components keep working.
 
 Packs with namespaced roles today: `studio/*`, `liquid/*`, `tactile/*`, `bloom/*`, `cupertino/*`,
 `fluent/*` and `pixel/*`. Only that language's components and CSS pack read its namespaced roles;
 shared components never do. A Studio flavor changes variables inside Studio anatomy. A new language
-variant changes only its declared S3 parts and variants.
+variant changes only its declared anatomy parts and variants (#2416).
 
 ### 2.5 Core semantic roles (every theme defines all of them, in Light and Dark)
 
@@ -177,13 +188,14 @@ BEM modifier classes (epic Decision 4).
 
 A theme may restyle any variant. It may add structure only through a declared language variant, such
 as Studio's card variants or Bloom's notched widget. That variant must exist in the component
-contract (S3).
+anatomy spec (#2416).
 
 ## 3. Compatibility contract (MUST)
 
 1. **Semantic roles only in components.** Components read their component tokens and semantic roles,
    never primitives. The only exception is a Figma node-level correction (§2.1). It is recorded in
-   the theme's `DESIGN.md`, removed when S1 adds the role, and never ships in L2 component CSS.
+   the theme's `DESIGN.md`, removed when the tokens build (#2414) adds the role, and never ships in
+   L2 component CSS.
 2. **Both schemes are complete.** Every core role has a designed Light and a designed Dark value.
 3. **Shippable effects only.** Every visual effect needs a web implementation. Some implementations
    only approximate the Figma effect:
@@ -197,9 +209,9 @@ contract (S3).
 
    Every translucent material needs an opaque fallback (`@supports not (backdrop-filter: …)`,
    `prefers-reduced-transparency`, `prefers-contrast: more`). Glass, the preference modes and
-   scroll-dependent effects (scroll edges, sticky glass bars) also need S6 #2419 visual proof: a
-   Playwright screenshot compared with the Figma render. Anything that cannot be shipped is not part
-   of the theme.
+   scroll-dependent effects (scroll edges, sticky glass bars) also need visual proof from the visual
+   regression tests (#2419): a Playwright screenshot compared with the Figma render. Anything that
+   cannot be shipped is not part of the theme.
 4. **Web Platform base.** Use native `<dialog>`, the Popover API, CSS anchor positioning and our
    Preact behaviour. Never use a React-only library (epic Decision 3).
 5. **Licensable assets only.**
@@ -371,7 +383,7 @@ agent builds with the theme).
    theme.
 4. **Add the values in Figma.**
    - Use a Theme mode for a token-only assignment. Declare a language pack (§2.4) when the language
-     needs namespaced roles or new anatomy, or when the mode ceiling is reached.
+     needs namespaced roles or new anatomy, or when both Theme collections are full (§2.2).
    - Use density and flavor modes as needed.
    - Seed bound paints with their resolved colour.
 5. **Build the Orders specimen,** Light and Dark, plus a state sheet. Compose the screen the way the
@@ -379,24 +391,25 @@ agent builds with the theme).
 6. **Run the self-audit (§4.5)** and record the measurements.
 7. **Write `DESIGN.md` and `SKILL.md`** from `themes/_template/`.
 8. **Get an independent review** (§4.6), apply its corrections in place, then get design sign-off.
-9. **Register any new roles in code** (S1) before the theme ships through the registry (S2). List
-   them in the pack's role manifest (§2.4) first.
+9. **Register any new roles in code** (#2414) before the theme ships through registry v2 (#2415).
+   List them in the pack's role manifest (§2.4) first.
 
 ## 8. Shipping (planned)
 
 Nothing in this section ships yet.
 
-- Themes ship as registry v2 items (S2 #2415). Adding a theme installs:
+- Themes ship as registry v2 items (#2415). Adding a theme installs:
   - its token CSS, plus its CSS pack if it is a declared language pack;
   - one co-located skill directory, `.agents/skills/fresh-ui-theme-<id>/`, holding `SKILL.md`,
     `DESIGN.md` and summaries of the sources `DESIGN.md` references. `SKILL.md` says "Read
     `DESIGN.md` in this folder", so that relative path must resolve in the installed copy.
 
   An agent working in that app then builds on-theme by default.
-- A consumer skill `netscript-design`, built from this document, ships in the CLI skill bundle (S9
-  #2431). The docs site publishes the same files in a Design system page group (S8 #2430). The skill
-  finds installed themes by skill name (`fresh-ui-theme-<id>`), never by a repository path such as
-  `docs/design-system/themes/`. It must respect the generated-asset chain and the MCP docs budget.
-- The `/create` builder (S7) offers only the supported presets and axes in §2.3 and exports the same
+- A consumer skill `netscript-design`, built from this document, ships in the CLI's consumer skill
+  bundle (#2431). The docs site (#2430) publishes the same files in a Design system page group. The
+  skill finds installed themes by skill name (`fresh-ui-theme-<id>`), never by a repository path
+  such as `docs/design-system/themes/`. It must respect the generated-asset chain and the MCP docs
+  budget.
+- The `/create` builder offers only the supported presets and axes in §2.3 and exports the same
   token set. It must not imply that every gray × accent × theme × flavor × density permutation
   exists.
