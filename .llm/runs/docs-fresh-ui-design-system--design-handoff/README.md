@@ -7,5 +7,7 @@ readers of the docs do not.
 - `docs-site.md`: how the docs site maps onto the Utility theme, component by component, with the
   component gaps (G-1…G-18) for S3.
 - `reference/`: WebP exports of the docs-site designs and the Utility specimen.
+- `figma-variables/`: a full export of the Figma variables (1,229 across 7 collections), with values
+  per mode, aliases by name and CSS code syntax. This is the value source for S1.
 - `figma/<theme>.md`: per theme, the Figma frames (node ids) and any node-level bindings that S1
   must replace with roles. File: `pGRLnkPPRZJZy74evNcQBr`.
