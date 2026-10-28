@@ -56,3 +56,12 @@ CI failure inspected at run 40756074834 / build job: docs:exports-drift reports 
 - Independent same-session reviewer: PASS; see slice-2-review.md. The reviewer inspected source/tests but did not independently execute commands, as required by the read-only tool restriction.
 - CI repair: the failed Pages build reported missing registry exports in the Fresh UI reference. All twelve symbols plus build APIs and the eighth subpath are now documented. The exact failing docs:exports-drift command exits 0 locally.
 - Reconcile: draft #2468 remains open from main, no label changes; full S2 scope is active under user continuation. No component source modifications. The pending work is config/lock/remote commands, style+docs/preset, and MCP.
+
+## Coordinator continuation
+
+
+The owner accepted slice 1 and authorized one fresh independent review, one blocker repair if needed, then every remaining slice. The branch and PR were verified at the requested head, and main is unchanged. Fresh review uses the exact requested Claude Opus model/effort with closed stdin and read-only instructions. Owner evaluator override and writable surface are recorded in supervisor.md.
+
+Focused baseline command through `run-deno-test.ts`: the exact `registry-v2.test.ts`, `registry-authoring.test.ts`, `registry-doc-drift.test.ts` set passes 12/0/0, exit 0. An initial invocation used nonexistent `registry-schema.test.ts` and exited 1 before tests; the corrected run is the verdict.
+
+Fresh review: FAIL_FIX for design-sync selecting the portable JSON catalog as a legacy manifest. Single authorized repair separates exports; dashboard config now loads all 85 legacy units. Structured test wrapper 13/0/0, exit 0. Scoped source formatting covers all four repair files with zero drops. Reconcile: same branch/PR and unchanged main. Remaining slice plan is unchanged.

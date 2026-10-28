@@ -6,7 +6,7 @@
 
 import { freshUiRegistryManifest as manifest } from './registry.manifest.ts';
 
-export { freshUiRegistryJson } from './registry.manifest.ts';
+export { freshUiRegistryJson } from './src/registry/fresh-ui-registry.ts';
 export { REGISTRY_ITEM_TYPES } from './src/registry/registry-contract.ts';
 export type {
   Registry,
