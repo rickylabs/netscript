@@ -1,3 +1,13 @@
+# Post-repair final evaluation — still unavailable
+
+Current fully gated source checkpoint: **e0769490cc6c010fd1d0eb2952d39049ebaf7360**. Product repair d39ed87 fixes the partial independent finding about old style history being reselected by unnamed update. The actual CLI fixture reproduces failure before repair and passes afterwards, checking retained style, component bytes and source identity. Post-repair 357 integrated regressions, two native acceptance cases, all 76 source wrappers, broader quality/documentation/carriers and full publication dry-run pass. See final-gates.md and acceptance-audit.md.
+
+An exact owner-prescribed native Claude review attempt for this repaired checkpoint again returned weekly quota (exit 1, no substantive verdict). The retained alternate same-model conversation remains individual-quota unavailable. There is no terminal FAIL_FIX or PASS for the final repaired whole change. The single concrete partial finding has been fixed once; confirmation and any whole-change verdict remain pending. Preserve both evaluator conversations rather than create an unrelated evaluator or self-certify.
+
+Disposition: **PR #2468 remains draft; no final independent sign-off or READY.** All safe implementation and local validation progress is pushed. The complete objective remains active pending external evaluator availability. Runtime/cleanup remain unproven with Docker unavailable; existing full Fresh UI doc-lint baseline remains explicitly disclosed. No source changed after the audited checkpoint in this evidence-only update.
+
+## Earlier evaluation records (preserved)
+
 # Current review status after style-update repair
 
 The partial final Opus source review exposed a reproducible configured-style update bug, fixed in d39ed87 with a failing-before/passing-after control and broader source/root gates. See style-update-review-repair.md. That review ended in alternate-provider RESOURCE_EXHAUSTED before a verdict. There is no final PASS or terminal FAIL_FIX, and no READY. Native Claude remains weekly-quota unavailable; the retained alternate Opus5.5/high conversation should resume on the reconciled source after allowance returns. Preserve the source/gate checkpoints below as historical, not as a verdict on later repairs.

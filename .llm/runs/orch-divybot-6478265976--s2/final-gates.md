@@ -1,3 +1,28 @@
+# Current post-repair gate evidence
+
+Audited source checkpoint: **e0769490cc6c010fd1d0eb2952d39049ebaf7360**, including product repair d39ed87 and the actual CLI style-history regression. After fast-forward reconciliation, structured regressions pass **357/0/0**, separate native acceptance passes **2/0/0**, and check/lint/format covers all **76** source TS files with no drops/refusals/findings.
+
+Durable allowlisted receipts at this exact clean source head all record **PASS, exit 0**:
+
+| Gate | Result | Exit |
+| --- | --- | --- |
+| quality-gate | PASS | 0 |
+| docs-accuracy (109/109 commands, 174 recursive paths) | PASS | 0 |
+| exports-drift | PASS | 0 |
+| mcp-export-corpus | PASS | 0 |
+| assets-barrel | PASS | 0 |
+| publish-assets | PASS | 0 |
+| agent-docs-prose | PASS | 0 |
+| full workspace publish-dry-run | PASS | 0 |
+
+The new native regression fails on the old implementation and passes after repair: Utility then a namespaced fixture style followed by unnamed ui:update preserves configured style, exact component bytes and source identity. Existing auth/hash/read-only diff and preset/doc/S1 checks remain intact. Review threads: 0 unanswered, exit 0. No package was published.
+
+The exact prescribed native Claude review command was attempted again for this repaired checkpoint with retained session, closed stdin and read-only tools. It returned weekly quota, exit 1, no verdict. The retained alternate conversation also remains individual-quota unavailable. Fresh balance/expense proof does not override the pinned matrix's rejection of the exact OpenRouter route, including under its correct opus_5_5 logical id. No paid inference or model substitution was dispatched. **Final independent verdict and READY remain unproven.**
+
+A current read-only Docker probe again exits 1: daemon unavailable. The earlier exact one-pass scaffold runtime attempt remains exit 1 with Aspire preflight/cleanup failures; full runtime/cleanup remain unproven. The unchanged 123-finding full Fresh UI doc-lint baseline remains disclosed. See acceptance-audit.md for the complete requirement/evidence mapping.
+
+## Historical earlier checkpoint
+
 # Final integrated gate evidence
 
 Audited source checkpoint: `e56893397d3351f01f6254b38db80de4a5d4b15d`. All receipts below identify this exact clean Git head. Private atomic receipts retain command identity, request/stream hashes and raw output; public summaries omit machine-specific runtime identity. No RTK-derived output is used as the durable verdict.
