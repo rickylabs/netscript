@@ -379,3 +379,46 @@ Findings: none — no severity, no file, no fix. The S9 caveats (Figma-owned sev
 | Rationale | S1 drop correct (v2 deleted its files; README forbids hand-porting; zero fresh-ui files in the branch diff); every v2 theme claim reproduced on a local-source scaffold (five-file build, stamping, 18 presets, init/force semantics, $extensions rejection, copper-left-behind, seven-role fix, per-scheme ramps, teal/copper edge cases, contrast numbers within rounding, no override contrast check, radius alias); no pre-v2 recipes remain (only correct legacy-compat notes + denials, guarded by the new no-`:root` test assertion); all gates green (MCP 199/199, CLI 10/10, three carrier checks, docs:links, probe strings 0/0). |
 
 VERDICT: PASS
+
+## Round 7 (flake-proof mode for the near-tied guidance row, same evaluator session)
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `9bee0256f86606acd7a2465a66d5375a9fdfeda4` ("test(mcp): pin the leader and set-match the followers of the near-tied guidance row"), rebased onto main `9a31e87` (#2458, #2459 docs-site only) |
+| Pre-rebase tip | local branch `backup/divybot-752-pre-2459` (`2af03b6`, the round-6 evaluated state) |
+| Evaluator route (observed) | same session, Muse Spark (`meta/muse-spark-1.3`) via OpenCode/OpenRouter |
+
+### (1) Patch identity + carriers — CONFIRMED
+
+- File lists `git diff 96d13d2 2af03b6` vs `git diff origin/main HEAD` differ only by the expected `guidance-evaluation_test.ts` addition. Content: 13/13 non-generated, non-fixture, non-run-dir files byte-identical; no changed bases on main (docs-site-only merge).
+- `check:publish-assets`, `check:agent-docs-prose` (`"fresh":true`), `check:assets-barrel`: all exit 0. MCP carrier: zero design-exclusion probe strings.
+
+### (2) `rank-one-set`: sound fix, not a weakening — VERIFIED
+
+The delta: new `rank-one-set` branch in `assertExpectedTopThree` (pins `actual[0]` == `expected[0]`, asserts top-three as a set); row 7 moves `exact` → `rank-one-set` with main's order. Fixture diff vs main is now exactly that one mode line (the S8 order re-lock is gone).
+
+- **It fixes a proven flake.** The row flipped twice in three corpus changes (S8: main order → branch order; S10: back to main order), with #2−#3 ≈ +0.03 while #1 leads by ~12 points (worklog-measured: main 11.3535/11.2954, branch 11.5517/11.5187). The S8 caveat predicted exactly this. Pinning the stable signal (#1) and set-matching the noise (#2/#3) is the minimal assertion that stops the flip-flop.
+- **#1 is still asserted.** `rank-one-set` keeps `assertEquals(actual.slice(0,1), expected.slice(0,1))` — identical to what `rank-one` checks, and strictly stronger than `required-set` (which the S8 worklog correctly rejected for this row because it would drop the leadership check).
+- **Negative controls (evaluator-run, fixture restored byte-clean after):** swapped leader → FAIL (`AssertionError … pick direct application ownership…`); wrong third member (unrelated route section) → FAIL. Both trip the intended assertion.
+- **Cross-corpus (scratch worktree under `/home/agent/projects/orchid/worktrees/`, removed after):** main `9a31e87` corpus → [decision-rule, connect-by-hand, unsupported] (== fixture order, passes under both `exact` and `rank-one-set`); pre-rebase `2af03b6` corpus order is the S8 order, which passes under `rank-one-set` (same set) while it would fail main's `exact` row — i.e. the new mode is what makes the fixture robust to corpus drift rather than re-locking to whichever corpus changed last. HEAD corpus → fixture order, deterministic ×2 runs.
+- **Nothing else weakened:** mode inventory is 5×`exact` + 1×`required-set` + 1×`rank-one` + 1×`rank-one-set`; all non-score rows untouched, test logic otherwise untouched, ranking policy/code untouched. The row is the fixture's only score-only row (not one of RFC 0004's original rows), so no RFC-described contract changes.
+
+### (3) Gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Patch identity (excl. generated/run-dir/test+fixture) | PASS | 13/13 byte-identical; file lists differ by the one expected test file |
+| `check:publish-assets` / `check:agent-docs-prose` / `check:assets-barrel` | PASS ×3 | exits 0 / `"fresh":true` / exit 0 |
+| Probe strings in MCP carrier | PASS (0 / 0) | full-carrier sweep |
+| `rank-one-set` negative controls | PASS | swapped leader FAILs, wrong member FAILs, fixture restored clean |
+| Cross-corpus row behavior | PASS | main/HEAD order measured; 2af03b6 order passes as a set |
+| MCP `deno task test` | PASS | 199 passed, 0 failed |
+
+Findings: none — no severity, no file, no fix. (Informational: the `rank-one-set` comment says "within a few hundredths" while measured gaps run 0.01–0.06 across rounds; the comment describes the mechanism, not a threshold, and no code depends on it — not raised even as low.)
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | Rebase preserves the round-6 patch byte-for-byte outside carriers/run-dir; carriers fresh with zero probe strings; `rank-one-set` is a sound, minimal fix for a twice-flipped near-tie (#1 pinned as before — stronger than the rejected `required-set` alternative — followers set-matched; both negative controls fail; row passes on main, pre-rebase, and HEAD corpora; all other modes, the ranking policy, and RFC-described rows untouched); MCP 199/199. |
+
+VERDICT: PASS

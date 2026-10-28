@@ -459,3 +459,14 @@ v2 contradicts.
 | `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / docs `_plugins` | PASS ×4 / 7 passed |
 | `generate-publish-assets_test` + `carrier-parity_test` | 9 passed |
 | Probe strings in the MCP carrier | 0 |
+
+## IMPL-EVAL round 7 (same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`)
+
+- Delta re-steer on head `9bee025` (fresh snapshot, V1 `OPENCODE_BIN`, receipt `impl-eval-launch-r7.jsonl`), covering
+  S10.
+- **Verdict: PASS**, no findings.
+  - The rebase kept the round-6 patch byte-for-byte outside the carriers and the run dir, and the carriers are fresh
+    with zero probe strings.
+  - `rank-one-set` is a sound, minimal fix, not a weakening. It still pins #1, which is stronger than
+    `required-set`. The evaluator ran both negative controls itself (they fail), and the row passes on all three
+    corpora. The mode inventory is 5 × exact, 1 × required-set, 1 × rank-one, 1 × rank-one-set. MCP is 199/199.
