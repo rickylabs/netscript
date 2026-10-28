@@ -1,3 +1,14 @@
+# Current coordinator follow-up
+
+The coordinator-requested permission audit and full local quality sweep are complete. All four
+spawning tasks already include --allow-env from a6e91af. The cited failure predates that repair. All
+23 local quality validations and workspace install exited zero; README checked all 99 fences in
+139.598 seconds with unchanged allowances. Review threads pass with zero unanswered. Production
+source remains 29dc9de; this push adds only sanitized validation evidence. Confirm the new head
+quality result, then publish a fresh READY reply and refresh the excluded final-report handoff. No
+further implementation change is required. Keep the previously disclosed runtime and historical
+limitations visible. No private runtime details belong in tracked records.
+
 # Resume
 
 Final cancellation-consumer repair: interrupted Git ignore probes now throw instead of resuming
