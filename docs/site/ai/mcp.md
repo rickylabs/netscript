@@ -9,38 +9,21 @@ order: 1
 
 # MCP
 
-`@netscript/ai/mcp` is the **MCP client stack**: it turns external Model Context
-Protocol servers into typed tools your agent loop can call — transports, injected
-auth, multi-server pooling, and a safe rendering path for the `ui://` resources a
-tool result can carry. It is published as part of `@netscript/ai{{ releaseSpecifier }}` and
-installs with the engine: `deno add jsr:@netscript/ai{{ releaseSpecifier }}`.
+`@netscript/ai/mcp` turns external Model Context Protocol servers into typed tools that your agent
+loop can call. It provides transports, injected auth, multi-server pooling and a safe rendering path
+for the `ui://` resources a tool result can carry. It ships in `@netscript/ai{{ releaseSpecifier }}`
+and installs with the engine: `deno add jsr:@netscript/ai{{ releaseSpecifier }}`.
 
-{{ comp callout { type: "note", title: "Two different MCP surfaces — don't conflate them" } }}
-This page documents the <code>@netscript/ai/mcp</code> <strong>client library</strong>:
-your app <em>consumes</em> external MCP servers as agent tools. That is a separate
-surface from the NetScript MCP <strong>server</strong> — a standalone stdio server for
-coding agents that you run with <code>netscript agent mcp</code> and install with
-<code>netscript agent init</code>. The server exposes framework-aware diagnostics,
-telemetry summaries, and doc search <em>about</em> your project; the client library on
-this page wires <em>remote</em> MCP servers <em>into</em> your product's agent loop. See
-<a href="/ai/agent-tooling/">Agent tooling</a> and the
-<a href="/reference/mcp/"><code>@netscript/mcp</code> reference</a> for the server.
-{{ /comp }}
+> [!NOTE]
+> This page covers the MCP client library, which your app uses to consume external MCP servers. The
+> NetScript MCP server is a separate surface: a stdio server that gives coding agents diagnostics,
+> telemetry summaries and doc search about your project. You run it with `netscript agent mcp` and
+> install it with `netscript agent init`; see [Agent tooling](/ai/agent-tooling/).
 
-## The story: one config instead of a protocol integration
+## Register MCP tools
 
-Your agent needs a capability that lives behind an MCP server — a docs-search
-server, an internal ops server, a vendor's tool endpoint. Wiring that by hand is a
-protocol integration, not a feature: JSON-RPC framing over stdio or HTTP, session
-lifecycle, reconnect-with-backoff when the connection drops mid-run, auth headers
-that must not be hardcoded, translating the server's tool schemas into whatever
-your agent's tool registry expects, and deciding what to do when a result embeds
-UI content you did not author. Every one of those steps is a place for an agent —
-human or AI — to burn a turn on glue that has nothing to do with the feature.
-
-The `./mcp` subpath collapses that to configuration. You declare servers as data,
-register the pool into the same tool registry the [agent loop](/ai/engine/)
-already dispatches through, and the remote tools become ordinary registry entries:
+Declare servers as data and register the pool into the tool registry that the
+[agent loop](/ai/engine/) dispatches through. The remote tools become ordinary registry entries:
 
 ```ts
 import { createMcpTransportPool, registerMcpTools } from "@netscript/ai/mcp";
@@ -61,17 +44,15 @@ const registration = await registerMcpTools(registry, pool);
 // registration.stop()   — detach them again
 ```
 
-From here the agent loop treats a remote MCP tool exactly like a local
-`defineAiTool` definition — same registry, same dispatch, same
-[`AgentChunk` stream](/ai/engine/) on the wire.
+The agent loop then treats a remote MCP tool like a local `defineAiTool` definition: same registry,
+same dispatch, same [`AgentChunk` stream](/ai/engine/#contracts) on the wire.
 
-## Transports — stdio and reconnectable Streamable-HTTP
+## Transports
 
-`createMcpTransport(config)` takes a discriminated config — `{ kind: "stdio" }` or
-`{ kind: "streamable-http" }` — and returns an `McpTransportPort`. The
-Streamable-HTTP transport is built for long-lived agent sessions: it reconnects
-with configurable backoff (`McpBackoffConfig`) and exposes its lifecycle as an
-observable state machine.
+`createMcpTransport(config)` takes a discriminated config, `{ kind: "stdio" }` or
+`{ kind: "streamable-http" }`, and returns an `McpTransportPort`. The Streamable-HTTP transport is
+built for long-lived agent sessions: it reconnects with configurable backoff (`McpBackoffConfig`)
+and exposes its lifecycle as an observable state machine.
 
 {{ comp.apiTable({
   caption: "Transport lifecycle — @netscript/ai/mcp",
@@ -83,19 +64,20 @@ observable state machine.
   ]
 }) }}
 
-Auth is **injected at the composition root**, never baked into a transport class.
-`McpAuthConfig` is a three-mode union — `{ mode: "none" }`,
-`{ mode: "api-token", token, headerName?, scheme? }`, or
-`{ mode: "oauth", accessToken, tokenType? }` — so the same server declaration works
-across environments with only the secret changing.
+`McpAuthConfig` is a three-mode union: `{ mode: "none" }`,
+`{ mode: "api-token", token, headerName?, scheme? }` or `{ mode: "oauth", accessToken, tokenType? }`.
+The same server declaration works across environments; only the secret changes.
 
-## The pool — many servers, one tool namespace
+> [!CAUTION]
+> Inject auth at the composition root and never hardcode a token in a transport class or server
+> declaration. The example above reads it from the environment with `Deno.env.get("MCP_TOKEN")`.
 
-Real agents talk to more than one server. `createMcpTransportPool(config)` builds a
-multi-server pool from **serializable** transport configs (so server declarations
-can live in configuration, not code); `createMcpTransportPoolFromTransports` wraps
-transports you already own. The pool is itself an `McpTransportPort`, so everything
-that accepts one transport accepts a pool of them.
+## The pool
+
+`createMcpTransportPool(config)` builds a multi-server pool from serializable transport configs, so
+server declarations can live in configuration instead of code. `createMcpTransportPoolFromTransports`
+wraps transports you already own. The pool is itself an `McpTransportPort`, so everything that
+accepts one transport accepts a pool.
 
 {{ comp.apiTable({
   caption: "McpTransportPool — the multi-server surface",
@@ -109,74 +91,35 @@ that accepts one transport accepts a pool of them.
   ]
 }) }}
 
-`registerMcpTools(registry, transport)` is the bridge into the agent: it surfaces
-the remote tools into a `ToolRegistryPort` and returns an `McpToolRegistration`
-whose `.stop()` detaches them — registration is reversible, not a global mutation.
+`registerMcpTools(registry, transport)` surfaces the remote tools into a `ToolRegistryPort` and
+returns an `McpToolRegistration` whose `.stop()` detaches them, so registration is reversible.
 
-## `ui://` resources — tool results that carry UI, rendered safely
+## `ui://` resources
 
-An MCP tool result can embed **`ui://` resources** — UI content authored by the
-server, not by you. The pool surfaces these on every `McpPooledToolResult` as
-`uiResources`, and `extractMcpUiResources(result)` pulls the **data-only**
-`McpUiResource` records from any raw tool result. The engine stops there by design:
-it extracts, it never renders.
+An MCP tool result can embed `ui://` resources: UI content that the server authored, not you. The
+pool surfaces them on every `McpPooledToolResult` as `uiResources`, and
+`extractMcpUiResources(result)` pulls the data-only `McpUiResource` records from any raw tool
+result. The engine extracts these resources and never renders them.
 
-Rendering belongs to the web layer, behind two guardrails you install with
+Rendering belongs to the web layer, behind two guardrails that you install with
 `netscript ui:add ai`:
 
-- the **`McpUiWidget` island** (from the `@netscript/fresh-ui` copy registry)
-  renders a `ui://` resource in a sandboxed frame — sanitized, themed through the
-  sandbox route, `no-referrer`;
-- the **`createMcpSandboxHandler`** route (on `@netscript/fresh/ai/sandbox`)
-  serves the resource with the active theme's tokens and a per-response CSP — see
-  [the durable-chat sandbox section](/ai/durable-chat/) for the handler itself.
+- the `McpUiWidget` island, from the `@netscript/fresh-ui` copy registry, renders a `ui://`
+  resource in a sandboxed frame: sanitized, themed through the sandbox route and `no-referrer`;
+- the `createMcpSandboxHandler` route on `@netscript/fresh/ai/sandbox` serves the resource with
+  the active theme's tokens and a per-response CSP; see
+  [the `ui://` sandbox](/ai/durable-chat/#the-ui-sandbox).
 
-This is the same trust boundary as the [`render_ui` tool](/ai/chat-ui/): model- or
-server-authored UI reaches the page only through a curated renderer or a sandbox,
-never as raw HTML in your island tree. The whole path is exercised by the
-framework's own merge gate — the CLI E2E suite drives a real Streamable-HTTP MCP
-round trip through this client stack into a rendered `McpUiWidget` before a branch
-can land.
+> [!CAUTION]
+> Treat `ui://` resources as untrusted. Like the [`render_ui` tool](/ai/chat-ui/), model- or
+> server-authored UI reaches the page only through a curated renderer or a sandbox, never as raw
+> HTML in your island tree.
 
-## One comparison
+## Next steps
 
-Encore's MCP story points **inward**: it ships an MCP server that exposes a running
-Encore backend's introspection surface to coding agents, so an agent can inspect
-and verify the backend it is editing. NetScript ships **both halves**. The inward
-half is the `netscript agent mcp` server (documented under
-[Agent tooling](/ai/agent-tooling/) and the
-[`@netscript/mcp` reference](/reference/mcp/)): a stdio server that gives a coding
-agent framework-aware diagnostics, telemetry summaries, and doc search over the
-project it is editing. The outward half — this page — is the `@netscript/ai/mcp`
-client stack for consuming external MCP servers as tools inside your own product's
-agents, with a sandboxed path for the UI those tools return. Both paths are
-published and gate-tested.
+Turn agent output into a chat that survives reload with [durable chat](/ai/durable-chat/).
 
-## Where to go next
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "The engine — ports, tools, agent loop",
-    body: "The @netscript/ai surface this stack plugs into: the tool registry, the agent loop, and the McpTransportPort seam.",
-    href: "/ai/engine/",
-    icon: "E"
-  },
-  {
-    title: "Durable chat — the sandbox route",
-    body: "createMcpSandboxHandler on @netscript/fresh/ai/sandbox: themed, CSP-guarded serving of ui:// resources.",
-    href: "/ai/durable-chat/",
-    icon: "◆"
-  },
-  {
-    title: "Chat UI — rendering the transcript",
-    body: "The fresh-ui copy registry: tool cards, the render_ui block renderer, and the McpUiWidget island.",
-    href: "/ai/chat-ui/",
-    icon: "U"
-  },
-  {
-    title: "Look up — @netscript/ai",
-    body: "The API reference for the engine package, including every ./mcp export.",
-    href: "/reference/ai/",
-    icon: "≡"
-  }
-] }) }}
+- The [AI engine](/ai/engine/) describes the tool registry, the agent loop and the
+  `McpTransportPort` seam.
+- The [chat UI](/ai/chat-ui/) renders tool cards, `render_ui` blocks and the `McpUiWidget` island.
+- The [`@netscript/ai` reference](/reference/ai/) lists every `./mcp` export.
