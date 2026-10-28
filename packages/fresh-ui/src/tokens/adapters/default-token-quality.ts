@@ -1,5 +1,5 @@
-import pairs from '../../../tokens/contrast-pairs.json' with { type: 'json' };
-import exclusions from '../../../tokens/contrast-exclusions.json' with { type: 'json' };
+import { pairs } from '../assets/quality.generated.ts';
+import { exclusions } from '../assets/quality.generated.ts';
 import type { TokenContrastCoverage, TokenContrastExclusion } from '../domain/contrast-contract.ts';
 import { CONTROL_CONTRAST_MINIMUM, TEXT_CONTRAST_MINIMUM } from '../domain/contrast-contract.ts';
 

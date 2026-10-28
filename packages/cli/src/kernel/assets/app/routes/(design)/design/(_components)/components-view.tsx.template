@@ -211,7 +211,9 @@ function renderDemo(name: string): VNode | null {
             <Button size='lg' variant='secondary'>Large</Button>
             <Button loading>Deploying</Button>
             <Button disabled>Disabled</Button>
-            <Button type='link' href='/design/tokens' variant='outline'>Link form</Button>
+            <Button type='link' href='/design/tokens' clientNav={false} variant='outline'>
+              Link form
+            </Button>
           </div>
         </>
       );
@@ -675,7 +677,7 @@ function renderDemo(name: string): VNode | null {
     case 'theme-seed':
       return (
         <div class='ns-gallery-row'>
-          <Button type='link' href='/design/tokens' variant='outline'>
+          <Button type='link' clientNav={false} href='/design/tokens' variant='outline'>
             Browse the {tokenManifestMeta.total}-token vocabulary
           </Button>
         </div>

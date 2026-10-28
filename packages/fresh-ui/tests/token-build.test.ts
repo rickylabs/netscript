@@ -3,6 +3,58 @@ import { fileURLToPath } from 'node:url';
 
 const PACKAGE = new URL('../', import.meta.url);
 
+Deno.test('embedded token JSON freshness rejects changed sources and missing assets without repair', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'fresh-ui-token-embed-' });
+  try {
+    for (
+      const source of [
+        'deno.json',
+        'scripts/embed-token-assets.ts',
+        'tokens/',
+        'registry/theme/theme-items.json',
+        'src/tokens/assets/',
+        'registry.theme-items.generated.ts',
+      ]
+    ) {
+      await copyFixture(new URL(source, PACKAGE), `${root}/${source}`);
+    }
+    const run = () =>
+      new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          '--config',
+          fileURLToPath(new URL('deno.json', PACKAGE)),
+          '--lock',
+          fileURLToPath(new URL('deno.lock', PACKAGE)),
+          '--frozen',
+          `--allow-read=${root}`,
+          '--allow-run=deno',
+          `${root}/scripts/embed-token-assets.ts`,
+          '--check',
+        ],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+    const clean = await run();
+    assertEquals(clean.code, 0, new TextDecoder().decode(clean.stderr));
+    const generated = `${root}/src/tokens/assets/metadata.generated.ts`;
+    const original = await Deno.readTextFile(generated);
+    const source = `${root}/tokens/font-requests.json`;
+    const bytes = await Deno.readTextFile(source);
+    const data = JSON.parse(bytes);
+    data.description = 'Deliberately changed source';
+    await Deno.writeTextFile(source, JSON.stringify(data));
+    assertEquals((await run()).code, 1);
+    assertEquals(await Deno.readTextFile(generated), original);
+    await Deno.writeTextFile(source, bytes);
+    await Deno.remove(generated);
+    assertEquals((await run()).code, 1);
+    assertEquals(await Deno.stat(generated).catch(() => undefined), undefined);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 /** Copy only the source/format boundary and artifacts; never copy dependency caches. */
 async function copyFixture(source: URL, target: string): Promise<void> {
   const info = await Deno.stat(source);

@@ -15,9 +15,43 @@ import { normalizeFontStyle, roundTokenNumber } from '../../src/tokens/domain/fi
 import nameMigrations from '../../tokens/name-migrations.json' with { type: 'json' };
 import contrastExclusions from '../../tokens/contrast-exclusions.json' with { type: 'json' };
 import { defaultContrastCoverage } from '../../src/tokens/adapters/default-token-quality.ts';
+import Color from 'npm:colorjs.io@0.5.2';
+import { tokenContrastColor } from '../../src/tokens/adapters/contrast-color.ts';
 
 let cached: Promise<TokenBuildResult> | undefined;
 const built = () => cached ??= buildTokens();
+
+for (const hex of ['#ff0000', undefined]) {
+  Deno.test(`app sRGB primitive emits matching native, fallback and Figma colors (${hex ?? 'no hex'})`, async () => {
+    const sources = structuredClone(defaultTokenSources());
+    const primitives = sources.documents['primitives.tokens.json'].primitive as TokenDocument;
+    primitives['app-red'] = {
+      $type: 'color',
+      $value: { colorSpace: 'srgb', components: [1, 0, 0], alpha: 0.5, ...(hex ? { hex } : {}) },
+    };
+    const build = await buildTokens({
+      sources,
+      override: { semantic: { primary: { $type: 'color', $value: '{primitive.app-red}' } } },
+    });
+    const context = build.contexts[0];
+    const primary = context.tokens.primary;
+    const native = new Color(primary.value).to('srgb');
+    for (const [index, expected] of [1, 0, 0].entries()) {
+      assertEquals(Math.abs(Number(native.coords[index]) - expected) < 0.0001, true);
+    }
+    assertEquals(Number(native.alpha), 0.5);
+    assertEquals(primary.fallback, '#ff000080');
+    assertEquals(primary.hex, '#ff000080');
+    const figma = JSON.parse(build.files['figma/ns-one.json']);
+    assertEquals(
+      figma.variables.find((entry: { name: string }) => entry.name === 'primary').values.Light,
+      '#ff000080',
+    );
+    const measured = tokenContrastColor.measure(primary.resolved, ['#ffffff'], '#ffffff');
+    assertEquals(measured.foreground, '#ff8080');
+    assertEquals(measured.ratio > 1, true);
+  });
+}
 
 Deno.test('app CSS contains only its preset and NS One compatibility with bounded size', async () => {
   const build = await built();

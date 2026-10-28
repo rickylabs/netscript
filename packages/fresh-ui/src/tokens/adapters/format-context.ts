@@ -8,7 +8,7 @@ import {
   type TokenValue,
 } from '../domain/token-contract.ts';
 import type { BuiltToken, TokenContextOutput } from '../domain/token-output.ts';
-import { colorHex, tokenColor } from './token-values.ts';
+import { colorHex, dtcgColor, tokenColor } from './token-values.ts';
 
 /** Serialize the DTCG types that occur in the shipped three-tier contract. */
 export function tokenCssValue(type: string, value: TokenValue, mono = false): string {
@@ -29,9 +29,11 @@ export function tokenCssValue(type: string, value: TokenValue, mono = false): st
   }
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     if (type === 'color' && Array.isArray(value.components)) {
-      const components = value.components.map(Number);
-      const round = (number: number): string => String(Math.round(number * 1e6) / 1e6);
-      const alpha = Number(value.alpha ?? 1);
+      const color = dtcgColor(value).to('oklch');
+      const components = color.coords.map((component) => Number(component ?? 0));
+      const round = (number: number): string =>
+        Number.isNaN(number) ? 'none' : String(Math.round(number * 1e6) / 1e6);
+      const alpha = Number(color.alpha);
       return `oklch(${round(components[0] * 100)}% ${round(components[1])} ${round(components[2])}${
         alpha < 1 ? ` / ${round(alpha)}` : ''
       })`;

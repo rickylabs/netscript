@@ -30,6 +30,50 @@ const fontData = JSON.parse(readFileSync(join(APP_DIR, 'assets/fonts.json'), 'ut
   imports: Record<string, string[]>;
 };
 
+for (const destination of ['Home', 'Components', 'Gallery button']) {
+  test(`leaving a Utility preview for ${destination} restores the configured document theme`, async ({ page }) => {
+    const galleryButton = destination === 'Gallery button';
+    await page.goto(
+      galleryButton
+        ? '/design/components?preset=studio-utility'
+        : '/design/tokens?preset=studio-utility',
+    );
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'studio');
+    await expect(page.locator('link[href="/presets/studio-utility.css"]'))
+      .toHaveCount(1);
+    if (galleryButton) {
+      await page.getByRole('link', { name: /Browse the .*token vocabulary/ }).click();
+    } else {
+      const sidebarToggle = page.getByRole('button', { name: 'Open sidebar', exact: true });
+      if (await sidebarToggle.isVisible()) {
+        await sidebarToggle.click();
+        await expect(page.locator('[data-sidebar]')).toHaveClass(/is-open/);
+      }
+      await page.locator('a.ns-dashboard__nav-item', { hasText: destination }).click();
+    }
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ns-one');
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-density',
+      'comfortable',
+    );
+    expect(await page.locator('html').getAttribute('data-flavor')).toBeNull();
+    await expect(page.locator('link[rel="stylesheet"][href^="/presets/"]'))
+      .toHaveCount(0);
+    const fontLinks = () =>
+      page.locator('link[rel="stylesheet"][href^="https://fonts.googleapis.com/"]').evaluateAll((
+        links,
+      ) => links.map((link) => link.getAttribute('href')));
+    expect(await fontLinks()).toEqual(fontData.imports['ns-one']);
+    await page.goBack();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'studio');
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-flavor',
+      'utility',
+    );
+    expect(await fontLinks()).toEqual(fontData.imports['studio-utility']);
+  });
+}
+
 for (const route of ROUTES) {
   for (const control of controls) {
     test(

@@ -166,6 +166,15 @@ preference key. The legacy light/dark data-theme selectors remain supported.
 See docs/site/web-layer/how-to/customize-fresh-ui.md for merging this into an
 existing app-owned shell and registry copies. NS One remains the default;
 `/design/tokens?preset=studio-utility` previews Utility in development only.
+Leaving a language preview uses document navigation: its root attributes, fonts
+and optional stylesheet belong to the document shell, outside Fresh's page partial.
+Home and Components therefore restore the configured preset; browser Back restores
+the preview.
+
+Authoritative JSON is embedded as typed TypeScript for publication. Run
+`deno task tokens:embed` after editing source JSON and `tokens:embed:check` to check
+freshness without changing files. `tokens:build` refreshes these embeddings before
+and after generating outputs; the token, source and registry asset checks verify them.
 
 
 ## CSS loading budget

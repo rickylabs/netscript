@@ -10,7 +10,7 @@ import { figmaModes, TOKEN_PRESETS } from '../domain/token-presets.ts';
 import { PRESET_ROLE_MAPS } from '../domain/preset-role-map.ts';
 import { figmaPrimitive, legacyPrimitive } from './token-values.ts';
 import { applyLegacyGaps } from '../domain/legacy-role-aliases.ts';
-import nameMigrations from '../../../tokens/name-migrations.json' with { type: 'json' };
+import { nameMigrations } from '../assets/metadata.generated.ts';
 
 /** The pre-S1 manifest is evidence and the value source for NS One. */
 export interface LegacyTokenSource {

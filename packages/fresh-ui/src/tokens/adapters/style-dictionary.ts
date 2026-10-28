@@ -1,8 +1,8 @@
 import StyleDictionary from 'npm:style-dictionary@5.7.1';
 import type { Config } from 'npm:style-dictionary@5.7.1/types';
-import legacy from '../../../tokens/legacy.json' with { type: 'json' };
-import figmaIndex from '../../../tokens/figma/index.json' with { type: 'json' };
-import roleRegistry from '../../../tokens/role-manifest.json' with { type: 'json' };
+import { legacy } from '../assets/legacy.generated.ts';
+import { figmaIndex } from '../assets/figma.generated.ts';
+import { roleRegistry } from '../assets/quality.generated.ts';
 import { assertRegisteredTokenNames } from '../domain/check-token-names.ts';
 import {
   assertSemanticAliases,

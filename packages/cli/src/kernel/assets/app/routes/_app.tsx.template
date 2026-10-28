@@ -29,7 +29,7 @@ export default define.page(function AppShell({ Component, url }) {
         {previewStylesheet && <link href={previewStylesheet} rel='stylesheet' />}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body f-client-nav>
+      <body f-client-nav={!previewStylesheet}>
         <a href='#main-content' class='ns-skip-link'>Skip to main content</a>
         <div id='main-content' tabIndex={-1}>
           <Component />

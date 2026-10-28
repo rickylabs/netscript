@@ -115,3 +115,14 @@ The total is now 68 outputs from 72 inputs, and the 23-entry `APP_TOKEN_FILES` l
 - **Small legacy change in non-NS-One apps:** `[data-theme='light']` now resolves to NS One light instead of the configured preset's light. This matches the existing rule that `[data-theme='dark']` means NS One dark, and no shipped app depends on the old behavior. NS One apps are unchanged.
 - The two round-1 advisories stay recorded: the non-default preview prints light-scheme values in dark mode, and the two packages need a coordinated release version.
 - I ran nothing. This review is based on code, tests and tracked evidence; I took the private receipts as reported.
+
+## CI/review follow-up
+
+Same independent Anthropic-family read-only evaluator, high effort, closed stdin:
+FAIL_FIX identified four additional explicit client-navigation links overriding the
+preview body setting. One repair updated all five design Button links and added
+a real gallery-Button navigation/Back case with exact font assertions. Re-evaluation
+returned **PASS**, with no new blockers. All 24 browser cases and 213 package tests
+pass. Typed JSON embedding, native color spaces, optional hex fallbacks and retained
+source values were reviewed. Durable summaries/hashes are in ci-followup.json.
+The full runtime host-prerequisite exception remains UNPROVEN.

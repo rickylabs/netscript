@@ -1,25 +1,11 @@
 import Color from 'npm:colorjs.io@0.5.2';
 import type { TokenContrastPort } from '../domain/contrast-contract.ts';
 import type { TokenValue } from '../domain/token-contract.ts';
+import { dtcgColor } from './token-values.ts';
 
 function sourceColor(value: TokenValue): Color {
-  if (typeof value === 'string') return new Color(value).to('srgb');
-  if (
-    !value || typeof value !== 'object' || Array.isArray(value) || typeof value.hex !== 'string'
-  ) {
-    throw new Error('Contrast requires a resolved DTCG color with its sRGB fallback');
-  }
-  const components = value.components;
-  if (
-    value.colorSpace !== 'oklch' || !Array.isArray(components) || components.length !== 3 ||
-    components.some((component) => !Number.isFinite(Number(component)))
-  ) throw new Error('Contrast requires native oklch components');
   // Measure the native CSS value, rather than quantizing to its 8-bit fallback first.
-  const color = new Color('oklch', [
-    Number(components[0]),
-    Number(components[1]),
-    Number(components[2]),
-  ], Number(value.alpha ?? 1)).to('srgb');
+  const color = dtcgColor(value).to('srgb');
   color.toGamut({ space: 'srgb', method: 'css' });
   if (!Number.isFinite(color.alpha) || color.alpha < 0 || color.alpha > 1) {
     throw new Error('Invalid contrast color alpha');

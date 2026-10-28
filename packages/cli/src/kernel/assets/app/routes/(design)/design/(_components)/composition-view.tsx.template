@@ -212,10 +212,10 @@ export default function DesignCompositionView({ themeLabel }: { themeLabel: stri
               </li>
             </ul>
             <div class='ns-cluster'>
-              <Button type='link' href='/design/tokens' variant='outline' size='sm'>
+              <Button type='link' clientNav={false} href='/design/tokens' variant='outline' size='sm'>
                 Token vocabulary
               </Button>
-              <Button type='link' href='/design/components' variant='outline' size='sm'>
+              <Button type='link' clientNav={false} href='/design/components' variant='outline' size='sm'>
                 Component gallery
               </Button>
             </div>

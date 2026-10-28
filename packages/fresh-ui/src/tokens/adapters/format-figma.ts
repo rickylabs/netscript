@@ -2,7 +2,7 @@ import { normalizeFontStyle, roundTokenNumber } from '../domain/figma-aliases.ts
 import type { FigmaCollection, TokenValue } from '../domain/token-contract.ts';
 import type { BuiltToken, TokenContextOutput } from '../domain/token-output.ts';
 import { effectiveContexts } from './format-css.ts';
-import nameMigrations from '../../../tokens/name-migrations.json' with { type: 'json' };
+import { nameMigrations } from '../assets/metadata.generated.ts';
 
 /** Preserve source collections and apply the explicit code-syntax migrations. */
 export function formatFigmaCollection(collection: FigmaCollection): FigmaCollection {

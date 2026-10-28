@@ -46,3 +46,13 @@
 - Final evaluation requires CSS sharding for default-output performance. The generated preset directory gains18 CSS siblings (68 total SD artifacts). App-managed files become23 (five core +18 opt-in preview CSS), and the design shell links only the selected preview stylesheet. Update registry paths, CLI whitelist/docs and current evidence; retain historical50-output/five-file slice records.
 - Fresh's static-file middleware is the public asset authority: preview CSS is copied to static/presets and linked under /presets. Core files remain in assets. Direct unregistered Vite source paths returned404 in the candidate browser run; use the existing static surface rather than adding a serving route or loading all styles through imports. CLI cleanup uses the same exact target mapping and preserves unrelated static files.
 - The actual theme-copy proof caught the registry planner's one-source/one-target contract: listing the configured CSS both as tokens.css and as its own preview path drops the first target. Theme items therefore install their configured CSS once as tokens.css and copy only the other17 preview files. The token CLI still builds all18 preview assets; the configured preset never requests its own preview. A regression requires unique copy-source paths per generated theme item. No registry planner behavior changes.
+
+## CI and review follow-up
+
+CI identified a stale MCP export corpus and contributor CLI command expectation.
+Extend the write surface to the generated MCP export corpus and its provenance,
+`packages/fresh-ui/registry.theme-items.generated.ts`, and the token asset embedding
+script. Published JSON imports will become explicitly typed generated constants;
+JSON remains authoritative and freshness is checked without repair. The existing
+release preflight remains unchanged. Review follow-up also covers native DTCG color
+spaces, optional hex hints, and document navigation out of language previews.

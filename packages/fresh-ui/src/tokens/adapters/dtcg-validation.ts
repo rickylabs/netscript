@@ -1,6 +1,6 @@
 import { Ajv } from 'npm:ajv@8.20.0';
-import formatSchema from '../../../tokens/schemas/format.json' with { type: 'json' };
-import resolverSchema from '../../../tokens/schemas/resolver.json' with { type: 'json' };
+import { formatSchema } from '../assets/schemas.generated.ts';
+import { resolverSchema } from '../assets/schemas.generated.ts';
 import { assertSemanticSourceAliases, type TokenSources } from '../domain/resolve-tokens.ts';
 
 /** Validate with the unchanged, upstream DTCG schemas rather than an importer mirror. */

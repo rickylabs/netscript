@@ -100,6 +100,32 @@ export function figmaPrimitive(
   throw new Error(`No DTCG type for Figma string ${name}: ${raw}`);
 }
 
+/** Read DTCG color coordinates without depending on its optional hex hint. */
+export function dtcgColor(value: TokenValue): Color {
+  if (typeof value === 'string') return new Color(value);
+  if (
+    !value || Array.isArray(value) || typeof value !== 'object' ||
+    typeof value.colorSpace !== 'string' || !Array.isArray(value.components) ||
+    value.components.length !== 3
+  ) throw new Error('Expected a DTCG color object');
+  const spaces: Readonly<Record<string, string>> = {
+    'display-p3': 'p3',
+    'a98-rgb': 'a98rgb',
+    'prophoto-rgb': 'prophoto',
+  };
+  const coordinate = (component: TokenValue): number =>
+    component === 'none' ? NaN : Number(component);
+  return new Color(
+    spaces[value.colorSpace] ?? value.colorSpace,
+    [
+      coordinate(value.components[0]),
+      coordinate(value.components[1]),
+      coordinate(value.components[2]),
+    ],
+    Number(value.alpha ?? 1),
+  );
+}
+
 /** Convert resolved DTCG colors back to Figma's sRGB hex shape. */
 export function colorHex(value: TokenValue): string {
   if (typeof value === 'string') return new Color(value).to('srgb').toString({ format: 'hex' });
@@ -110,5 +136,5 @@ export function colorHex(value: TokenValue): string {
     const alpha = typeof value.alpha === 'number' ? value.alpha : 1;
     return value.hex + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : '');
   }
-  throw new Error('Color has no hex fallback');
+  return dtcgColor(value).to('srgb').toString({ format: 'hex', collapse: false });
 }

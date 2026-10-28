@@ -173,3 +173,16 @@ The owner reported `build: FAILURE` after the output push. The failed Pages job 
 - Final fix gates PASS:68 frozen outputs/72 inputs,210 package tests,37 combined CLI tests,12 browser cases,8 pixel-identical S0 pairs, actual23-file CLI override/cleanup/rebuild and exact registry theme copy. Source/type/lint/format, repository/token receipts, Pages parity and both publish dry-runs PASS. CSS budget/architecture/storage details and discarded candidate failures are recorded in impl-fix.md. Same final evaluator fix review follows; no READY claim yet.
 
 - Final IMPL-EVAL same-session fix verdict: PASS. The evaluator substantively accepts CSS scope/order/size bounds,68 artifacts,23-file app lifecycle, static previews, registry copy uniqueness and all repeated proofs. Both verdicts retained; no further fix round. Reconciled against5a5c1a42: only the approved CSS performance fix and its affected contracts/evidence changed. No Figma value, exclusion, lock, schema or legacy property changed. Independent supervisor authorizes final sign-off commit/push and READY, with the explicit runtime host limitation.
+
+## CI and review repairs
+
+Release preflight exposed unsupported published JSON import attributes. Replaced
+them with generated typed assets and source/missing negative controls, preserving
+all authoritative JSON and the existing preflight guard. Fixed sRGB/native color
+serialization and optional hex hints. All preview exit links now reload document
+state; 24 real browser cases verify sidebar/Button navigation, fonts and Back.
+Refreshed the MCP export corpus and contributor command-tree expectation for the
+tokens group. Independent follow-up FAIL_FIX and PASS are both retained. Package
+tests213, source/check/lint/fmt, quality, prod install and both publish dry-runs pass.
+Before pushing, integrate current main's telemetry/doc baseline and regenerate
+combined-tree corpus/assets; no PR merge/tag/release is authorized.

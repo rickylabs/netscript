@@ -1,5 +1,5 @@
-import legacy from '../../../tokens/legacy.json' with { type: 'json' };
-import fontRequests from '../../../tokens/font-requests.json' with { type: 'json' };
+import { legacy } from '../assets/legacy.generated.ts';
+import { fontRequests } from '../assets/metadata.generated.ts';
 import type { RegistryItemDefinition } from '../../../registry.schema.ts';
 import {
   APP_TOKEN_FILES,

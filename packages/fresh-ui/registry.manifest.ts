@@ -1,5 +1,5 @@
 import type { RegistryItemDefinition, RegistryManifest } from './registry.schema.ts';
-import generatedThemes from './registry/theme/theme-items.json' with { type: 'json' };
+import { generatedThemes } from './registry.theme-items.generated.ts';
 import { APP_TOKEN_FILES } from './src/tokens/domain/token-output.ts';
 import { FRESH_UI_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 

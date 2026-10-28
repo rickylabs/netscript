@@ -1,4 +1,4 @@
-import legacy from '../../../tokens/legacy.json' with { type: 'json' };
+import { legacy } from '../assets/legacy.generated.ts';
 import type { BuiltToken, TokenContextOutput } from '../domain/token-output.ts';
 
 /** Deduplicate effective presets while retaining all requested inputs in build metadata. */
