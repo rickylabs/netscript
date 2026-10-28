@@ -51,7 +51,7 @@ randomized port (>= 49152).
     ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "Background job scheduling, task execution and the worker API, traced through Aspire from scheduler to subprocess.", "<a href=\"/reference/workers/\">workers</a>"],
     ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "Durable saga orchestration with a <code>kv</code> or <code>prisma</code> store.", "<a href=\"/reference/sagas/\">sagas</a>"],
     ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "Trigger ingress, scheduling and file watching over raw Hono routes.", "<a href=\"/reference/triggers/\">triggers</a>"],
-    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "An oRPC auth service (sign-in, callback, sign-out, session, me) with one backend: kv-oauth, WorkOS or better-auth.", "<a href=\"/capabilities/auth/\">auth</a>"],
+    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "An oRPC auth service (sign-in, callback, sign-out, session, me) with one backend: kv-oauth, WorkOS or better-auth.", "<a href=\"/identity-access/auth/\">auth</a>"],
     ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "Durable change-data stream producers, served as their own Aspire service.", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}

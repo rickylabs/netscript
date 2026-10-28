@@ -140,7 +140,7 @@ every setting to externalize. Treat that file as the contract between your infra
 NetScript processes.
 
 {{ comp callout { type: "important", title: "Choose queue and saga backends before you ship" } }}
-<strong>Queue</strong> has four backends: Deno KV, Redis, RabbitMQ and PostgreSQL. Auto-discovery probes RabbitMQ → Redis → Deno KV only; PostgreSQL is explicit-provider only (<code>provider: 'postgres'</code> with <code>connection.postgres.{url, tableName}</code>). <strong>Sagas</strong> persist durable runtime state to <code>kv</code> or <code>prisma</code>, selected by <code>NETSCRIPT_SAGA_STORE</code> (or appsettings). The selection is mandatory: the runtime throws if it is unset. The Prisma path writes the <code>saga_runtime_*</code> tables. See <a href="/capabilities/kv-queues-cron/">Queues &amp; cron</a> and <a href="/capabilities/durable-sagas/">Durable sagas</a> for the backend matrices.
+<strong>Queue</strong> has four backends: Deno KV, Redis, RabbitMQ and PostgreSQL. Auto-discovery probes RabbitMQ → Redis → Deno KV only; PostgreSQL is explicit-provider only (<code>provider: 'postgres'</code> with <code>connection.postgres.{url, tableName}</code>). <strong>Sagas</strong> persist durable runtime state to <code>kv</code> or <code>prisma</code>, selected by <code>NETSCRIPT_SAGA_STORE</code> (or appsettings). The selection is mandatory: the runtime throws if it is unset. The Prisma path writes the <code>saga_runtime_*</code> tables. See <a href="/data-persistence/kv-queues-cron/">Queues &amp; cron</a> and <a href="/durable-workflows/sagas/">Durable sagas</a> for the backend matrices.
 {{ /comp }}
 
 ## Step 4 — Choose an orchestration path

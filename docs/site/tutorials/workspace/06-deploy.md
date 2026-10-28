@@ -165,7 +165,7 @@ scoping as an app-level extension.
 
 - **Deploy remotely** → [Deploy](/orchestration-runtime/how-to/deploy/): deployable units, managed
   backing services and the `--no-aspire` path.
-- **Go deeper on auth** → [Authentication capability](/capabilities/auth/) and
+- **Go deeper on auth** → [Authentication capability](/identity-access/auth/) and
   [The authentication model](/explanation/auth-model/).
 - **Understand the orchestrator** → [Orchestration with Aspire](/explanation/aspire/).
 - **Browse more recipes** → the [how-to guides](/how-to/).

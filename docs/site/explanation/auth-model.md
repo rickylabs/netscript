@@ -10,7 +10,7 @@ order: 4
 This page explains what NetScript authentication is, why it is a **pure-backend seam** rather than
 a built-in identity provider, and how one typed port lets you swap GitHub OAuth for WorkOS or
 better-auth without changing application code. For the headline API and endpoints, see the
-[auth capability](/capabilities/auth/). To set it up, follow
+[auth capability](/identity-access/auth/). To set it up, follow
 [Add authentication](/identity-access/how-to/add-authentication/). For exact exported symbols, see
 [`reference/service/`](/reference/service/) and the auth adapter references it links to.
 
@@ -39,7 +39,7 @@ As a result, **you swap the provider by changing one environment variable, not y
 
 ## `AuthBackendPort` and its sub-ports
 
-The core package [`@netscript/plugin-auth-core`](/capabilities/auth/) defines one port,
+The core package [`@netscript/plugin-auth-core`](/identity-access/auth/) defines one port,
 **`AuthBackendPort`**, that every backend must satisfy. It is composed of small,
 single-responsibility **sub-ports**, so a backend implements exactly the concerns it owns.
 
@@ -139,7 +139,7 @@ backend does not own sign-in.
 
 ## One active backend
 
-The plugin [`@netscript/plugin-auth`](/capabilities/auth/) composes **exactly one** active backend.
+The plugin [`@netscript/plugin-auth`](/identity-access/auth/) composes **exactly one** active backend.
 It reads `NETSCRIPT_AUTH_BACKEND` (or `auth.backend` in appsettings) and resolves it through a
 registry. Valid values are `kv-oauth`, `workos`, and `better-auth`, and the **default is
 `kv-oauth`**. The plugin serves the `auth-api` oRPC service on its assigned port, with six endpoints

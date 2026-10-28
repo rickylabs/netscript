@@ -313,7 +313,7 @@ await app.serve({ port: 3001 }); // note: your scaffold's port will differ</code
 
 The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic and ships
 static-credential and trusted-header authenticators and a scope authorizer. It is separate from the
-auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>. {{ /comp }}
+auth <strong>plugin</strong> backends; see <a href="/identity-access/auth/">Authentication</a>. {{ /comp }}
 
 ## 5. Run and verify
 

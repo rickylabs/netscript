@@ -142,7 +142,7 @@ This chapter triggers the job with <code>ns-workers</code> (Step 5) so you can w
 another NetScript runtime, such as a trigger or a scheduled job, you enqueue work with the builder's
 <code>enqueueJob(...)</code> step instead of an HTTP call. The
 <a href="/tutorials/storefront/05-shipping-webhook/">webhook tutorial</a> and the
-<a href="/capabilities/background-jobs/">background-jobs capability</a> cover that path.
+<a href="/background-processing/workers/">background-jobs capability</a> cover that path.
 {{ /comp }}
 
 ## Step 4 — Confirm the generated registry

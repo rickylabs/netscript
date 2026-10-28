@@ -28,7 +28,7 @@ drifts from the code because it was never part of the code's shape.
 NetScript treats observability the way it treats
 {{ comp.xref({ key: "explain:contracts", text: "contracts" }) }}: a cross-cutting concern belongs to
 the boundary, so the framework owns it and gives you a typed seam. A service built with
-[`defineService(...)`](/capabilities/services/) wires request logging, health endpoints, and
+[`defineService(...)`](/services-sdk/services/) wires request logging, health endpoints, and
 OpenTelemetry context propagation in one call. A worker job runs *inside a span* the framework
 opens. The common signal (this operation happened, here is its trace id, here is whether it was
 healthy) comes with no code; a custom child span around an expensive step is one typed call.
