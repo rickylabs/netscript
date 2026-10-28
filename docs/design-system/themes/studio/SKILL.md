@@ -107,8 +107,8 @@ Seven flavors share one component anatomy. Signature moves:
 - Derive from the closest shared component and read its flavor variables; add a flavor variable
   rather than a per-flavor component.
 - If a new visual role is needed, add it as `studio/<path>` (and a flavor variable if it varies by
-  flavor), list it in the pack manifest (`DESIGN.md` → _NetScript Mapping_), then register it in
-  code (#2414). Its code syntax is `var(--ns-studio-<path>)`.
+  flavor), list it in the style's role manifest (`DESIGN.md` → _NetScript Mapping_), then register
+  it in code (#2414). Its code syntax is `var(--ns-studio-<path>)`.
 - Add the component to all fourteen state sheets (seven flavors, Light and Dark).
 - In Figma, seed bound paints with their resolved colour after any mode change. An unseeded paint
   can keep a stale value, such as a #ffffff edge on a primary button.

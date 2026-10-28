@@ -21,11 +21,11 @@ new one (§7 and §8).
 
 1. **Figma owns values; code owns names.** A theme changes the values of existing roles, tiers and
    modes. It never renames a core role or introduces a new core role on its own. New namespaced
-   roles come only through a declared language pack (§2.4). CI rejects exported token names that
-   code does not know.
+   roles come only through a style's role manifest (§2.4). CI rejects exported token names that code
+   does not know.
 2. **A theme is a language, not a palette.** Recolouring and re-rounding the default UI is not a
-   theme. A theme must own a depth model, a shape language, a type system and a set of component
-   variants, each traceable to a documented reference.
+   theme. A theme language is a **style**: it owns a depth model, a shape language, a type system
+   and its own version of every component, each traceable to a documented reference (§2.4).
 
 ## 2. Theme architecture
 
@@ -39,7 +39,7 @@ contexts with a DTCG resolver file. This section maps one onto the other. Owners
 | Tier          | What it holds                                                                                                                                                                                                                                                                                   | Figma source                                                                                                                                                                       | Code surface (provisional until #2414)                            | Who may read it                                          |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
 | **Primitive** | Raw values only: colour ramps (oklch with a hex fallback), dimensions, durations, font families. Radix 12-step ramps (gray, slate, sand, mauve, blue, violet, orange, indigo, tomato, lime, grass, amber, red, teal) and theme ramps (`ember`, `band`, `paper`, `glass`, `shadow`, `swiss-red`) | `Primitives` collection (Value mode)                                                                                                                                               | Internal custom properties, e.g. `--ns-band-*`                    | The semantic tier only. Components never read primitives |
-| **Semantic**  | **Aliases only.** Every value references a primitive (or another semantic role), never a raw hex, px or ms. Core roles plus declared language-pack roles (§2.4)                                                                                                                                 | `Scheme` collection (Light, Dark). Its aliases are selected through the `Theme set` (`Theme` or `Theme B`), `Base gray`, `Base accent`, `Density` and `Studio flavor` modes (§2.2) | `--ns-*` (core) and `--ns-<theme>-*` (packs)                      | Component tokens and L2 component CSS                    |
+| **Semantic**  | **Aliases only.** Every value references a primitive (or another semantic role), never a raw hex, px or ms. Core roles plus each style's namespaced roles (§2.4)                                                                                                                                | `Scheme` collection (Light, Dark). Its aliases are selected through the `Theme set` (`Theme` or `Theme B`), `Base gray`, `Base accent`, `Density` and `Studio flavor` modes (§2.2) | `--ns-*` (core) and `--ns-<theme>-*` (styles)                     | Component tokens and L2 component CSS                    |
 | **Component** | Part and state tokens (`button.*`, `input.*`, `card.*`, …) that alias semantic roles, so heavy customization is a token edit, not a CSS override                                                                                                                                                | Variable bindings on library components; there is no component collection yet                                                                                                      | Named by the tokens build from the component anatomy spec (#2416) | That component's own CSS only                            |
 
 - **Derived values.** Tints, hovers and other mixes are not raw values in the semantic tier.
@@ -83,8 +83,8 @@ macOS 27 and Apple Classic from Glass; Terminal from Signal; and Fluent 2 Web fr
 can diverge. Until a language's own values are set, its mode resolves to its seed values, which are
 prototype evidence only. Before a language ships, its values must come from its own mode, and the
 token export (#2414) must give each language preset its own complete core-role map. When both
-collections are full, a new language either replaces a mode or declares a language pack (§2.4). The
-token resolver (#2414) has no mode limit in code.
+collections are full, a new language replaces a mode or needs a new Theme collection. The token
+resolver (#2414) has no mode limit in code.
 
 ### 2.3 Supported resolver axes
 
@@ -133,30 +133,38 @@ migration, and that NS One renders unchanged. The tokens build therefore either 
 `[data-theme='dark']` resolving as the default preset's dark scheme or ships that migration, with a
 `ui:migrate` step for app-owned copies. Never rename an existing `--ns-*` name without a migration.
 
-### 2.4 Token-only assignments and declared language packs
+### 2.4 Styles and token-only presets
 
 There are two kinds of theme. Keep them apart.
 
-- **Token-only assignment.** A theme, flavor or brand preset that only assigns values to existing
-  roles, for example a Studio flavor, a gray or accent choice, or an app's brand theme. It adds no
-  names and no CSS anatomy. Most themes should be this kind.
-- **Declared language pack.** A language whose look needs roles or anatomy the core set cannot
-  express. A pack is a registered extension, not a fork. It declares:
-  1. **A role manifest:** every namespaced role it adds, as `<theme>/<path>` →
-     `--ns-<theme>-<path>`, each with a Light and a Dark alias. Until the tokens build has a
-     machine-readable manifest, the list is the _Language roles_ row in the theme's `DESIGN.md` →
-     _NetScript Mapping_. The tokens build registers every listed role before the pack ships;
-     unknown names fail CI.
-  2. **Its anatomy additions:** only the anatomy parts (#2416) and `data-variant` values it adds to
-     its own components, such as Studio's card variants or Bloom's notched widget. A pack never
-     restyles arbitrary app markup or another L2 component's internals.
-  3. **A complete core map:** every core semantic role still resolves under the pack, so shared
-     components keep working.
+- **Token-only preset.** Assigns values to existing roles: a Studio flavor, a gray or accent choice,
+  an app's brand theme. It adds no names and no component sources. Most app themes are this kind.
+- **Style.** Every theme language (Studio, Tonal, Bloom, Cupertino, Liquid, Fluent, Brutal,
+  Filigrane, Terminal, Pixel, Tactile) is a style, in the sense shadcn uses the word: it restyles
+  **every** component, including shape, borders, fills, shadows, decorations and inner markup, over
+  one shared contract. A Pixel switch is Pixel's own switch, not the base switch with a smaller
+  radius.
+  - **The contract does not change between styles** (#2416): each component keeps its props,
+    `data-part` names, `data-variant`, `data-size` and `data-state` values, slots, APG pattern and
+    keyboard map. The contract tests run against every style.
+  - **Tokens stay separate axes** under every style: scheme, gray, accent, radius and density.
+  - A style declares:
+    1. **Its component sources:** one per component, shipped as a registry `style` item (#2415).
+    2. **A role manifest:** every namespaced role it adds, as `<theme>/<path>` →
+       `--ns-<theme>-<path>`, each with a Light and a Dark alias. Until the tokens build has a
+       machine-readable manifest, the list is the _Language roles_ row in the theme's `DESIGN.md` →
+       _NetScript Mapping_. The tokens build registers every listed role before the style ships;
+       unknown names fail CI.
+    3. **A complete core map:** every core semantic role still resolves under the style, so
+       token-only presets and app-owned components keep working.
+  - A style restyles its own components only, never app-owned markup outside them.
+- **In Figma,** each style is a set of component sets named `<Style>/<Component>`, with the same
+  property names, values and layer names as the base set, so an instance swap keeps every override.
+  Variables carry the token axes; variants carry states and sizes inside a style.
 
-Packs with namespaced roles today: `studio/*`, `liquid/*`, `tactile/*`, `bloom/*`, `cupertino/*`,
-`fluent/*` and `pixel/*`. Only that language's components and CSS pack read its namespaced roles;
-shared components never do. A Studio flavor changes variables inside Studio anatomy. A new language
-variant changes only its declared anatomy parts and variants (#2416).
+Styles with namespaced roles today: `studio/*`, `liquid/*`, `tactile/*`, `bloom/*`, `cupertino/*`,
+`fluent/*` and `pixel/*`. Only that style's components read its namespaced roles. A Studio flavor is
+a token-only preset inside the Studio style.
 
 ### 2.5 Core semantic roles (every theme defines all of them, in Light and Dark)
 
@@ -186,9 +194,10 @@ The CSS custom property comes from each variable's code syntax. For example, `su
 Modes, variants and states are data attributes (`data-variant`, `data-size` and `data-state`), not
 BEM modifier classes (epic Decision 4).
 
-A theme may restyle any variant. It may add structure only through a declared language variant, such
-as Studio's card variants or Bloom's notched widget. That variant must exist in the component
-anatomy spec (#2416).
+A style restyles every variant and may change a component's inner markup. It never changes the
+contract: the same props, parts and `data-*` values exist in every style (#2416). A style that needs
+a new variant value, such as Studio's card variants or Bloom's notched widget, adds it to the
+component spec first, so every style can render it.
 
 ## 3. Compatibility contract (MUST)
 
@@ -376,14 +385,14 @@ agent builds with the theme).
 
 ## 7. Creating a new theme: step by step
 
-1. **Choose the anchor.** Record the reference pack in the theme's `DESIGN.md`: sources, licence,
-   what you take, and what you must not copy.
+1. **Choose the anchor.** Record the anchor in the theme's `DESIGN.md`: sources, licence, what you
+   take, and what you must not copy.
 2. **Write the thesis and three signature moves.**
 3. **Fill in the axes table (§4.3).** Show that at least six axes differ from the nearest existing
    theme.
 4. **Add the values in Figma.**
-   - Use a Theme mode for a token-only assignment. Declare a language pack (§2.4) when the language
-     needs namespaced roles or new anatomy, or when both Theme collections are full (§2.2).
+   - Use a Theme mode for the language's values. A new language is a style (§2.4): it also needs its
+     own version of every component, and a role manifest if it adds namespaced roles.
    - Use density and flavor modes as needed.
    - Seed bound paints with their resolved colour.
 5. **Build the Orders specimen,** Light and Dark, plus a state sheet. Compose the screen the way the
@@ -392,14 +401,14 @@ agent builds with the theme).
 7. **Write `DESIGN.md` and `SKILL.md`** from `themes/_template/`.
 8. **Get an independent review** (§4.6), apply its corrections in place, then get design sign-off.
 9. **Register any new roles in code** (#2414) before the theme ships through registry v2 (#2415).
-   List them in the pack's role manifest (§2.4) first.
+   List them in the style's role manifest (§2.4) first.
 
 ## 8. Shipping (planned)
 
 Nothing in this section ships yet.
 
 - Themes ship as registry v2 items (#2415). Adding a theme installs:
-  - its token CSS, plus its CSS pack if it is a declared language pack;
+  - its token CSS and, for a style, its component sources (a registry `style` item);
   - one co-located skill directory, `.agents/skills/fresh-ui-theme-<id>/`, holding `SKILL.md`,
     `DESIGN.md` and summaries of the sources `DESIGN.md` references. `SKILL.md` says "Read
     `DESIGN.md` in this folder", so that relative path must resolve in the installed copy.
