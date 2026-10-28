@@ -82,9 +82,9 @@ export function readmeFenceTypeErrorPaths(diagnostics: string): string[] {
     if (!header || !location) continue;
     // The combined compiler reports a missing target once, even if several fences import it.
     // Other errors remain distinct by source location, including identical type mismatches.
-    const identity = header[1] === 'TS2307'
+    const identity = header[1] === 'TS2307' && header[2].startsWith('Cannot find module ')
       ? `${header[1]}:${header[2]}`
-      : `${header[1]}:${location[1]}:${location[2]}:${location[3]}`;
+      : `${header[1]}:${header[2]}:${location[1]}:${location[2]}:${location[3]}`;
     errors.set(identity, location[1]);
   }
   return [...errors.values()];

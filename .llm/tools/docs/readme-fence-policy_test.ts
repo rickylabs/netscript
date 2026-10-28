@@ -44,6 +44,16 @@ Deno.test('type errors retain distinct locations and dependency failures cannot 
   );
 });
 
+Deno.test('unmapped bare imports remain distinct at different fence locations', () => {
+  const unmapped = (line: number) =>
+    'TS2307 [ERROR]: Import "@example/contracts" not a dependency and not in import map ' +
+    `from "file://packages/sdk/README.md"\n    at file://packages/sdk/README.md:${line}:1\n`;
+  assertEquals(
+    readmeFenceTypeErrorPaths(unmapped(10) + unmapped(20) + unmapped(20)),
+    ['packages/sdk/README.md', 'packages/sdk/README.md'],
+  );
+});
+
 Deno.test('the measured baseline passes and every ceiling sits at its exact census', () => {
   assertEquals(readmeFenceRatchetFailures(baseline), []);
 });

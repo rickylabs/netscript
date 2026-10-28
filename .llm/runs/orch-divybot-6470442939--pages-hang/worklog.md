@@ -26,6 +26,17 @@ evaluator. Inspect and address the separate test-5 failure from its structured a
 - Structured check passes 53 files; structured lint passes all nine touched TS files. The final
   full README gate and independent re-review run after the repair commit.
 
+- At a6e91af, the native readme-fences gate receipt is PASS (143.067s), with all 99 checked
+  fences, exactly five errors and four failing READMEs, no unattributed failure. Final structured
+  check after the const cleanup passes all 53 files; final format also passes all 53.
+- Same-session Claude re-evaluation returned code PASS at a6e91af, requesting the now-completed
+  README result, final check evidence and run artifact refresh before final READY. It also identified
+  a future undercount risk for unmapped bare imports. Tightened coalescing to physical missing
+  targets only, retaining ordinary/unmapped errors by message and source location, and added a
+  regression for duplicate bare imports at different fences. This does not change any ratchet bound.
+- Final combined process/compiler/README-policy/workflow suite passes all 23 tests (18.158s),
+  including the new unmapped-import case. Root deno.lock remains unchanged.
+
 ## Design checkpoint
 
 1. Public surface: docs:snippets still type-checks documentation; hung checks fail with source path
