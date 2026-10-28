@@ -120,7 +120,7 @@ Deno.test('plugin factory guards REST, RPC and raw routes independently of confi
   }
 });
 
-Deno.test('plugin factory preserves native health routes and anonymous-prefix replacement', async () => {
+Deno.test('plugin factory applies anonymous-prefix replacement to native health routes', async () => {
   const app = createPluginService(router, {
     ...config(),
     auth: { authn: { authenticator, protect: ['/'], allowAnonymous: ['/api/openapi.json'] } },
@@ -130,7 +130,7 @@ Deno.test('plugin factory preserves native health routes and anonymous-prefix re
   assertEquals(spec.status, 200);
   await spec.arrayBuffer();
   const health = await app.request('/health');
-  assertEquals(health.status, 200);
+  assertEquals(health.status, 401);
   await health.arrayBuffer();
   const privateHealth = await app.request('/health/private');
   assertEquals(privateHealth.status, 401);

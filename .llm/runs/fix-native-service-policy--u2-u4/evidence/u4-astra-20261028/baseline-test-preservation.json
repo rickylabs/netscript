@@ -1,0 +1,14 @@
+﻿[
+    {
+        "path":  "packages/service/tests/auth/middleware_test.ts",
+        "baselineBodyPreserved":  true
+    },
+    {
+        "path":  "packages/service/tests/auth/builder-auth_test.ts",
+        "baselineBodyPreserved":  true
+    },
+    {
+        "path":  "packages/service/tests/auth/define-service-auth_test.ts",
+        "baselineBodyPreserved":  true
+    }
+]

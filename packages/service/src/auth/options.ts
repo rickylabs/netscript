@@ -20,14 +20,48 @@
 import type { InternalCallerPredicate } from './contract/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
 
+/**
+ * One anonymous request with an uppercase method and byte-exact absolute path.
+ *
+ * GET does not admit HEAD. Descendants, encoded spellings and slash/case variants are not
+ * admitted; query strings are ignored. OPTIONS is excluded: use `withCors()` for preflight.
+ *
+ * @example
+ * ```ts
+ * import type { AnonymousRequestMatch } from '@netscript/service/auth';
+ * const health: readonly AnonymousRequestMatch[] = [
+ *   { method: 'GET', path: '/health' },
+ *   { method: 'GET', path: '/health/live' },
+ *   { method: 'GET', path: '/health/ready' },
+ *   { method: 'HEAD', path: '/health' },
+ *   { method: 'HEAD', path: '/health/live' },
+ *   { method: 'HEAD', path: '/health/ready' },
+ * ];
+ * ```
+ */
+export interface AnonymousRequestMatch {
+  /** Exact request method; bodyless probes require an explicit HEAD entry. */
+  readonly method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  /** Absolute path without encoding, parameters, wildcards, query or fragment. */
+  readonly path: string;
+}
+
+/** A legacy path prefix or one exact anonymous request. */
+export type AnonymousRule = string | AnonymousRequestMatch;
+
 /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
 export interface AuthnOptions {
   /** Authenticator implementation. */
   readonly authenticator: AuthenticatorPort;
   /** Path prefixes the auth stage guards. Defaults to `["/api"]`. */
   readonly protect?: readonly string[];
-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
-  readonly allowAnonymous?: readonly string[];
+  /**
+   * Requests left public by both auth stages. Strings are method-blind path prefixes; objects
+   * match one exact method/path. Omitted or empty retains the `/health` prefix default; a
+   * nonempty list replaces it. Invalid objects throw TypeError when middleware is constructed,
+   * before requests or listeners. Matched contract access declarations take precedence.
+   */
+  readonly allowAnonymous?: readonly AnonymousRule[];
 }
 
 /** Authorization middleware options for `withAuthz()` and `defineService({ auth })`. */
