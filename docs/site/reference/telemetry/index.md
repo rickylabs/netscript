@@ -6,24 +6,27 @@ title: '@netscript/telemetry'
 # `@netscript/telemetry`
 
 OpenTelemetry tracing primitives, context propagation, instrumentation registries, and NetScript
-runtime adapters for jobs, queues, RPC, and SSE. This page is written against the package's public
-surface reported by `deno doc`. For the full index of packages and plugins return to the
-[reference overview](/reference/).
+runtime adapters for jobs, queues, commands, RPC and SSE. Import the sub-path for the layer you
+need; the root entrypoint holds only diagnostics and the instrumentation registry contract.
 
-The root entrypoint (`@netscript/telemetry`) exposes the stable package diagnostic and
-instrumentation registry contract only. Runtime helpers live on typed sub-path exports so callers
-import just the layer they need:
+## Sub-path exports
 
-- [`@netscript/telemetry/config`](#sub-path-exports) — telemetry configuration and OTEL env
-  resolution.
-- [`@netscript/telemetry/tracer`](#sub-path-exports) — tracer accessors and span helpers.
-- [`@netscript/telemetry/context`](#sub-path-exports) — W3C trace context propagation.
-- [`@netscript/telemetry/attributes`](#sub-path-exports) — semantic attribute and span-name
-  constants.
-- [`@netscript/telemetry/instrumentation`](#sub-path-exports) — worker/queue/scheduler/SSE
-  instrumentation.
-- [`@netscript/telemetry/registry`](#sub-path-exports) — instrumentation lifecycle registry.
-- [`@netscript/telemetry/orpc`](#sub-path-exports) — oRPC tracing and error-handling plugins.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/telemetry` | `./mod.ts` | [Diagnostics and the instrumentation registry contract](#root-entrypoint). |
+| `@netscript/telemetry/config` | `./config.ts` | [Telemetry configuration and OTEL env resolution](#configuration-netscripttelemetryconfig). |
+| `@netscript/telemetry/tracer` | `./tracer.ts` | [Tracer accessors and span helpers](#tracer-netscripttelemetrytracer). |
+| `@netscript/telemetry/context` | `./context.ts` | [W3C trace-context propagation](#context-netscripttelemetrycontext). |
+| `@netscript/telemetry/commands` | `./commands.ts` | [Privacy-first command adapter and native relationship wrappers](#command-telemetry). |
+| `@netscript/telemetry/attributes` | `./attributes.ts` | [Semantic attribute and span-name constants](#attributes-netscripttelemetryattributes). |
+| `@netscript/telemetry/instrumentation` | `./instrumentation.ts` | [Worker/queue/scheduler/SSE instrumentation](#instrumentation-netscripttelemetryinstrumentation). |
+| `@netscript/telemetry/registry` | `./registry.ts` | [Instrumentation lifecycle registry](#registry-netscripttelemetryregistry). |
+| `@netscript/telemetry/orpc` | `./orpc.ts` | [oRPC tracing and error-handling plugins](#orpc-netscripttelemetryorpc). |
+| `@netscript/telemetry/hono` | `./hono.ts` | Hono request and response tracing middleware. |
+| `@netscript/telemetry/ai` | `./ai.ts` | GenAI request, token, and chat-client metrics and tracing. |
+| `@netscript/telemetry/otel` | `./src/adapters/otel/mod.ts` | OpenTelemetry Deno provider adapters. |
+| `@netscript/telemetry/query` | `./query.ts` | Telemetry query capabilities and filters. |
+| `@netscript/telemetry/testing` | `./src/testing/mod.ts` | In-memory span recorder for test verification. |
 
 ## Root entrypoint
 
@@ -125,7 +128,7 @@ W3C trace-context propagation across job subprocesses and message headers.
 ## Attributes (`@netscript/telemetry/attributes`)
 
 Semantic attribute keys, span-name constants, and attribute builders. The TC-1..TC-14 checklist is
-published in [`convention.md`](./convention/).
+in the [telemetry convention](./convention/).
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -166,9 +169,9 @@ published in [`convention.md`](./convention/).
 Span builders and recorders for workers, queues, schedulers, SSE, and job dispatch.
 
 `TracedQueue.listen` delivers a `TracedQueueMessageContext`, which extends `TracedMessageContext`
-with a required consumer `span`. Use `ctx.span.setAttribute('job.id', message.jobId)` inside the
-callback to annotate that active span. Plain `MessageQueue` handlers remain compatible, and the
-shared `TracedMessageContext` retains its optional span for other consumers.
+with a required consumer `span`. Call `ctx.span.setAttribute('job.id', message.jobId)` inside the
+callback to annotate that active span. Plain `MessageQueue` handlers stay compatible, and the shared
+`TracedMessageContext` keeps its optional span for other consumers.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -194,7 +197,7 @@ shared `TracedMessageContext` retains its optional span for other consumers.
 
 ## Registry (`@netscript/telemetry/registry`)
 
-Instrumentation lifecycle registry (also re-exported from the root entrypoint).
+Instrumentation lifecycle registry, also re-exported from the root entrypoint.
 
 | Symbol                          | Kind      | Description                                   |
 | ------------------------------- | --------- | --------------------------------------------- |
@@ -222,32 +225,6 @@ Tracing and error-handling plugins for the NetScript oRPC handler.
 | `TracingPluginOptions`, `ErrorHandlingPluginOptions` | interface | interfaces | Plugin options. |
 | `ErrorContext`, `ErrorLogger` | interface | interfaces | Error plugin payload and logger contracts. |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. Each is documented against its
-own `deno doc` surface.
-
-| Export                                 | Entrypoint                   | Purpose                                                             |
-| -------------------------------------- | ---------------------------- | ------------------------------------------------------------------- |
-| `@netscript/telemetry`                 | `./mod.ts`                   | Diagnostics + instrumentation registry contract (documented above). |
-| `@netscript/telemetry/config`          | `./config.ts`                | Telemetry configuration and OTEL env resolution.                    |
-| `@netscript/telemetry/tracer`          | `./tracer.ts`                | Tracer accessors and span helpers.                                  |
-| `@netscript/telemetry/context`         | `./context.ts`               | W3C trace-context propagation.                                      |
-| `@netscript/telemetry/commands`        | `./commands.ts`              | Privacy-first command adapter and native relationship wrappers.     |
-| `@netscript/telemetry/attributes`      | `./attributes.ts`            | Semantic attribute and span-name constants.                         |
-| `@netscript/telemetry/instrumentation` | `./instrumentation.ts`       | Worker/queue/scheduler/SSE instrumentation.                         |
-| `@netscript/telemetry/registry`        | `./registry.ts`              | Instrumentation lifecycle registry.                                 |
-| `@netscript/telemetry/orpc`            | `./orpc.ts`                  | oRPC tracing and error-handling plugins.                            |
-| `@netscript/telemetry/hono`            | `./hono.ts`                  | Hono request and response tracing middleware.                       |
-| `@netscript/telemetry/ai`              | `./ai.ts`                    | GenAI request, token, and chat-client metrics and tracing.          |
-| `@netscript/telemetry/otel`            | `./src/adapters/otel/mod.ts` | OpenTelemetry Deno provider adapters.                               |
-| `@netscript/telemetry/query`           | `./query.ts`                 | Telemetry query capabilities and filters.                           |
-| `@netscript/telemetry/testing`         | `./src/testing/mod.ts`       | In-memory span recorder for test verification.                      |
-
----
-
-Back to the [reference overview](/reference/).
-
 ## Command telemetry
 
 `@netscript/telemetry/commands` exports `createOtelCommandTelemetryPort({ definitions, tracer? })`,
@@ -255,14 +232,20 @@ a privacy-first adapter structurally compatible with `CommandTelemetryPort`. Reg
 name/version metadata (1–1024 unique pairs, names at most 120 characters) and pass it to the command
 executor. The attribute builders and closed vocabularies live in `@netscript/telemetry/attributes`.
 
-The fixed spans are INTERNAL `command.execute` and `command.outbox.relay`, and PRODUCER
-`command.outbox.publish`. Publication makes native context active so existing W3C injection can
-parent the consumer or create a deferred link. No queue implementation or metric instrument is
-created. Counts are bounded to 0–64 and appear only on applied/replayed outcomes. Only stable
-command failure kinds enter `error.type`; payloads, raw identities, hashes, correlation IDs,
-topics/destinations and exception text never enter command spans. Existing messaging/saga
-identifier conventions retain their separate ownership; command privacy policy deliberately
-supersedes their general correlation/exception floor.
+| Span | Kind |
+| --- | --- |
+| `command.execute` | INTERNAL |
+| `command.outbox.relay` | INTERNAL |
+| `command.outbox.publish` | PRODUCER |
+
+- Publication makes native context active, so W3C injection can parent the consumer or create a
+  deferred link.
+- No queue implementation or metric instrument is created.
+- Counts are bounded to 0–64 and appear only on applied/replayed outcomes.
+- Only stable command failure kinds enter `error.type`. Payloads, raw identities, hashes,
+  correlation IDs, topics/destinations and exception text never enter command spans.
+- Messaging and saga identifier conventions keep their separate ownership; the command privacy
+  policy supersedes their general correlation/exception floor.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |

@@ -50,4 +50,4 @@ Inspect the manifest with `inspectPlugin` from [`@netscript/plugin`](/reference/
 `RemoteSessionVerificationError` and the `AuthenticatorPort`, `AuthnRequest`, `AuthnResult` and
 `Principal` types. See
 [remote session verification](/reference/plugin-auth-core/#remote-session-verification) for the
-symbols and their behaviour.
+symbols and their behavior.

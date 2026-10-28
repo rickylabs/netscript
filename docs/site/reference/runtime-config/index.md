@@ -6,7 +6,7 @@ title: "@netscript/runtime-config"
 # `@netscript/runtime-config`
 
 Hot-reloadable runtime overrides for NetScript jobs, sagas, triggers, feature flags and tasks. Use
-it to change runtime behaviour from versioned JSON files without redeploying a service.
+it to change runtime behavior from versioned JSON files without redeploying a service.
 
 ## Sub-path exports
 
@@ -67,4 +67,3 @@ operators roll out runtime overrides independently.
 | `RUNTIME_TASK_RUNTIMES` | const | Supported runtime task execution kinds (`deno`, `python`, `dotnet`, `cmd`, `powershell`, `shell`, `executable`). |
 | `RuntimeConfigTopic` | type alias | Runtime config topic name (a member of `RUNTIME_CONFIG_TOPICS`). |
 | `RuntimeTaskRuntime` | type alias | Runtime task execution kind (a member of `RUNTIME_TASK_RUNTIMES`). |
-

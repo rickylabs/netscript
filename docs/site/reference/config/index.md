@@ -6,15 +6,20 @@ title: "@netscript/config"
 # `@netscript/config`
 
 Typed NetScript project configuration: schemas, loaders, environment helpers, workspace discovery,
-diagnostics, and scaffold constants. This page is written against the package public surface
-reported by `deno doc`. For the full index of packages and plugins return to the
-[reference overview](/reference/).
+diagnostics and scaffold constants. Define a project config once with `defineConfig` in
+`netscript.config.ts`, load it at startup with `initConfig`, and read the validated
+`NetScriptConfig` synchronously with `getConfig`.
 
-The root entrypoint (`@netscript/config`) exposes the authoring, loading, environment, workspace, and diagnostic contract. The usual path is to define a project config once with `defineConfig` in `netscript.config.ts`, load it at process startup with `initConfig`, and read the validated `NetScriptConfig` synchronously with `getConfig`. Schema-only APIs live on sub-paths so the public root surface does not leak Zod internals:
+## Sub-path exports
 
-- [`@netscript/config/merge`](#sub-path-config-merge) merges plugin-contributed partial config fragments.
-- [`@netscript/config/paths`](#sub-path-config-paths) exposes scaffold directory, file, and permission constants.
-- [`@netscript/config/schema/plugins`](#sub-path-config-schema-plugins) exposes appsettings plugin-entry validation schemas.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/config` | `./mod.ts` | Core surface: [authoring](#authoring), [loading](#loading-and-runtime-cache), [environment](#environment), [workspace discovery](#workspace-discovery), [diagnostics](#diagnostics) and [types](#types). |
+| `@netscript/config/merge` | `./src/merge/mod.ts` | [Merge plugin-contributed partial config fragments](#sub-path-config-merge). |
+| `@netscript/config/paths` | `./src/paths/mod.ts` | [Scaffold directory, file, and permission constants](#sub-path-config-paths). |
+| `@netscript/config/schema/plugins` | `./src/schema/plugins/mod.ts` | [Appsettings plugin-entry validation schemas](#sub-path-config-schema-plugins). |
+
+Schema-only APIs live on sub-paths, so the root surface does not expose Zod internals.
 
 ## Authoring
 
@@ -63,7 +68,7 @@ The root entrypoint (`@netscript/config`) exposes the authoring, loading, enviro
 
 ## Types
 
-Core authoring/validation contract and per-section configuration shapes exported from the root.
+The authoring and validation contract and the per-section configuration shapes.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -104,7 +109,7 @@ Core authoring/validation contract and per-section configuration shapes exported
 
 ### Sagas and triggers section types
 
-The `sagas` and `triggers` configuration sections have dedicated validated and authoring-form types exported from the root.
+Validated and authoring-form types for the `sagas` and `triggers` configuration sections.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -129,20 +134,9 @@ The `sagas` and `triggers` configuration sections have dedicated validated and a
 | `TriggerScalingConfig` | interface | Trigger group scaling configuration. |
 | `TriggerRetentionConfig` | interface | Trigger group retention configuration. |
 
-## Sub-path exports
+## `@netscript/config/merge` {#sub-path-config-merge}
 
-The following entrypoints are published alongside the root export.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/config` | `./mod.ts` | Core configuration surface (documented above). |
-| `@netscript/config/merge` | `./src/merge/mod.ts` | Merge plugin-contributed partial config fragments. |
-| `@netscript/config/paths` | `./src/paths/mod.ts` | Scaffold directory, file, and permission constants. |
-| `@netscript/config/schema/plugins` | `./src/schema/plugins/mod.ts` | Appsettings plugin-entry validation schemas. |
-
-<h3 id="sub-path-config-merge"><code>@netscript/config/merge</code></h3>
-
-Folds a plugin-contributed partial config fragment into an already-validated project config.
+Folds a plugin-contributed partial config fragment into a validated project config.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -155,11 +149,12 @@ Folds a plugin-contributed partial config fragment into an already-validated pro
 | `ServiceContributionEntry` | type alias | Service config entry accepted in plugin contribution fragments. |
 | `DatabaseEntry` | type alias | Database config entry accepted in plugin contribution fragments. |
 
-This entrypoint also re-exports the shared section types (`NetScriptConfig`, `ServiceConfig`, `DatabaseConfig`, the saga/trigger config types, and related shapes) documented under the root [Types](#types) section.
+This entrypoint also re-exports the shared section types (`NetScriptConfig`, `ServiceConfig`,
+`DatabaseConfig`, the saga/trigger config types, and related shapes) listed under [Types](#types).
 
-<h3 id="sub-path-config-paths"><code>@netscript/config/paths</code></h3>
+## `@netscript/config/paths` {#sub-path-config-paths}
 
-Standard scaffold constants consumed by NetScript generators and CLI commands.
+Scaffold constants consumed by NetScript generators and CLI commands.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -173,9 +168,9 @@ Standard scaffold constants consumed by NetScript generators and CLI commands.
 | `ScaffoldDirs` | interface | Standard scaffold directory names used by NetScript generators. |
 | `ScaffoldFiles` | interface | Standard scaffold file names used by NetScript generators. |
 
-<h3 id="sub-path-config-schema-plugins"><code>@netscript/config/schema/plugins</code></h3>
+## `@netscript/config/schema/plugins` {#sub-path-config-schema-plugins}
 
-Validation schemas for plugin-backed entries written into generated appsettings.json.
+Validation schemas for plugin-backed entries written into the generated `appsettings.json`.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -189,7 +184,3 @@ Validation schemas for plugin-backed entries written into generated appsettings.
 | `BackgroundProcessorEntry` | interface | Configuration for a plugin-backed background processor in appsettings.json. |
 | `InstalledVersionFields` | interface | Installed plugin version fields stored in appsettings.json. |
 | `PluginSettingsSchema` | interface | Minimal public validation contract for plugin appsettings schemas. |
-
----
-
-Back to the [reference overview](/reference/).

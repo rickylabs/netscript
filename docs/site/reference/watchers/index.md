@@ -5,46 +5,18 @@ title: "@netscript/watchers"
 
 # `@netscript/watchers`
 
-Reusable file-watching primitives for NetScript: composable strategies, filters, and a
-pipeline-based `FileWatcher` for detecting file-system changes across local and network
-filesystems. This page is written against the package's public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+File-watching primitives for NetScript: a pipeline-based `FileWatcher`, composable filters and
+failure tracking for local and network filesystems. Use `createWatcher` when a tool or service must
+react to file changes.
 
-The package exposes a single root entrypoint (`@netscript/watchers` -> `./mod.ts`). There are
-no sub-path exports. The watcher auto-selects its strategy (native OS notifications for local
-paths, polling for network paths) so most callers only need `createWatcher`; the strategy
-classes themselves are internal implementation details.
+## Sub-path exports
 
-## Exports
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/watchers` | `./mod.ts` | [Factory](#factory), [watcher](#watcher), [filters](#filters), [failure tracking](#failure-tracking) and [filesystem helpers](#filesystem-helpers). The package has no other entrypoints. |
 
-| Export | Path |
-| --- | --- |
-| `@netscript/watchers` | `./mod.ts` |
-
-```ts
-import { createWatcher } from '@netscript/watchers';
-
-const controller = new AbortController();
-const watcher = createWatcher({
-  paths: ['./incoming'],
-  patterns: ['*.csv'],
-  events: ['create'],
-  processExisting: true,
-  maxFileAge: 86400000,
-  debounceMs: 500,
-  stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
-  signal: controller.signal,
-});
-
-try {
-  for await (const event of watcher.watch()) {
-    console.log(`${event.kind}: ${event.path}`);
-  }
-} finally {
-  watcher.stop();
-}
-```
+The watcher selects its strategy automatically: native OS notifications for local paths, polling
+for network paths. Most callers only need `createWatcher`.
 
 ## Factory
 
@@ -64,7 +36,7 @@ try {
 ## Filters
 
 Filters consume an async iterable of events and yield only the events that pass. They run in
-configured order inside the `FileWatcher` pipeline. Each implements the `WatchFilter` contract.
+configured order inside the `FileWatcher` pipeline, and each implements the `WatchFilter` contract.
 
 | Symbol | Kind | Member | Signature | Description |
 | --- | --- | --- | --- | --- |
@@ -91,7 +63,7 @@ configured order inside the `FileWatcher` pipeline. Each implements the `WatchFi
 
 ## Filesystem helpers
 
-Low-level helpers that swallow only "missing/inaccessible" errors and re-throw the rest.
+Low-level helpers that swallow only missing or inaccessible errors and re-throw the rest.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -117,18 +89,41 @@ Low-level helpers that swallow only "missing/inaccessible" errors and re-throw t
 | Symbol | Kind | Definition | Description |
 | --- | --- | --- | --- |
 | `KnownEventKind` | type alias | `"create" \| "modify" \| "remove"` | Built-in file-system event kinds the watcher can detect. |
-| `EventKind` | type alias | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind; new runtime kinds require doctrine review. |
+| `EventKind` | type alias | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind: a built-in kind or another string. |
 | `KnownWatchStrategy` | type alias | `"native" \| "polling" \| "hybrid"` | Built-in watch strategies for detecting file changes. |
 | `WatchStrategy` | type alias | `KnownWatchStrategy \| (string & Record<never, never>)` | Watch-strategy identifier; built-in factory values remain runtime validated. |
 
 ## Internals
 
-The concrete strategy classes (`NativeStrategy`, `PollingStrategy`, `HybridStrategy`) and their
-option interfaces (`NativeStrategyOptions`, `PollingStrategyOptions`, `HybridStrategyOptions`)
-are marked `@internal`. They are selected automatically by `FileWatcher` based on the configured
-paths and are not part of the supported public contract -- construct watchers via `createWatcher`
-or `new FileWatcher(...)` instead.
+The strategy classes (`NativeStrategy`, `PollingStrategy`, `HybridStrategy`) and their option
+interfaces (`NativeStrategyOptions`, `PollingStrategyOptions`, `HybridStrategyOptions`) are
+`@internal` and not part of the public contract. `FileWatcher` selects one from the configured
+paths; construct watchers with `createWatcher` or `new FileWatcher(...)`.
 
----
+## Examples
 
-Back to the [reference overview](/reference/).
+### Watch a directory for new CSV files
+
+```ts
+import { createWatcher } from '@netscript/watchers';
+
+const controller = new AbortController();
+const watcher = createWatcher({
+  paths: ['./incoming'],
+  patterns: ['*.csv'],
+  events: ['create'],
+  processExisting: true,
+  maxFileAge: 86400000,
+  debounceMs: 500,
+  stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
+  signal: controller.signal,
+});
+
+try {
+  for await (const event of watcher.watch()) {
+    console.log(`${event.kind}: ${event.path}`);
+  }
+} finally {
+  watcher.stop();
+}
+```
