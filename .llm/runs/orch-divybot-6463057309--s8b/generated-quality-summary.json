@@ -1,0 +1,86 @@
+{
+  "kind": "Privacy-safe summary of native gate receipts; raw receipts remain in the private project run archive",
+  "generatedHead": "e8244b7a04443565a787193e62e7b3fef6eb99ea",
+  "gates": [
+    {
+      "gateId": "agent-docs-prose",
+      "argv": [
+        "deno",
+        "task",
+        "check:agent-docs-prose"
+      ],
+      "gitHead": "e8244b7a04443565a787193e62e7b3fef6eb99ea",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 29391,
+      "requestHash": "87636679958a9a60ef7628d8d2e34bf17b52972eda9b80f6fd698919f1776050"
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "argv": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "gitHead": "e8244b7a04443565a787193e62e7b3fef6eb99ea",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 21154,
+      "requestHash": "63333b8edfd98c2906e149bae84a3a764074a3a207ff65c090fceda638fa2570"
+    },
+    {
+      "gateId": "assets-barrel",
+      "argv": [
+        "deno",
+        "task",
+        "check:assets-barrel"
+      ],
+      "gitHead": "e8244b7a04443565a787193e62e7b3fef6eb99ea",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1556,
+      "requestHash": "34ef052bec3f70ab98d91b8562a2d7a0e280529dffc4d637bbb513e48aaa1854"
+    },
+    {
+      "gateId": "publish-assets",
+      "argv": [
+        "deno",
+        "task",
+        "check:publish-assets"
+      ],
+      "gitHead": "e8244b7a04443565a787193e62e7b3fef6eb99ea",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 569,
+      "requestHash": "2dd73c7d7ca93b65fbe381f7eac41a3292280968653726b78f8eaedf3c3effaa"
+    }
+  ],
+  "typecheck": {
+    "selected": 2,
+    "findings": 0,
+    "unstableKv": true
+  },
+  "format": {
+    "selected": 1,
+    "findings": 0,
+    "scope": "MCP generated asset; root formatter intentionally excludes packages/cli. Native carrier freshness checks cover CLI data formatting."
+  },
+  "mcpBudgetTest": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 0
+  },
+  "broaderQualityGate": {
+    "command": [
+      "deno",
+      "task",
+      "quality:gate"
+    ],
+    "exitCode": 0,
+    "scope": "quality:scan and arch:check; existing warnings retained, no new allowances"
+  },
+  "lockFiles": "Restored byte-for-byte after standalone Lume build; no lock changes committed",
+  "representation": "Retained owner carrier; all 204 decoded rows equal the separately regenerated payload; native checks repeated on retained representation."
+}
