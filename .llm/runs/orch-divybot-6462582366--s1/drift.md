@@ -10,3 +10,9 @@
   tests; these take the place of the nonexistent checked-in playground.
 - Density wording reconciled with GUIDELINES §2.3: enumerate all 72 resolver
   inputs, while each language preset retains its fixed effective density.
+
+- Source-slice supervisor review returned FAIL_FIX twice. The dispatcher leaf profile requires ending the loop after two failed terminal reviews; no third evaluator round was launched. This stops S1 before outputs, checks, CLI, and migration.
+- To leave S0 working, staged DTCG sources were moved into `packages/fresh-ui/tokens/v2/`; existing token inputs and generated artifacts retain the exact S0 bytes. This is a partial, unapproved implementation, not a completed or signed-off slice.
+- Remaining review blocker: NS One leading aliases all use the same 24px value. The second verdict supplies per-role corrections; they are intentionally left for the next authorized iteration.
+
+- Root `deno.lock` is also an allowed write surface for the two exact, already-resolved validator/conversion specifier mappings. This keeps root frozen checks from rejecting the isolated source files; no dependency versions or integrity entries may change.

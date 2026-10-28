@@ -1,11 +1,30 @@
-# Resume S1
+# S1 stopped at source review
 
-Assignment #2414; branch `orch/divybot-6462582366`; baseline S0
-`057397d3e3881a690492f518088140111711240e`. Read `plan.md` and `worklog.md`.
-Research and design checkpoint are complete; PLAN-EVAL must pass before code.
-Design reference #2427 is fetched separately, not merged into the base.
-Do not stage the assignment or report handoff. Retain NS One default. No labels,
-force push, merge, release, lock deletion or cache reload. Final visible report
-is handed to Orchid through `.divybot-final-report.md`.
+PR #2435, branch `orch/divybot-6462582366`. S1 #2414 is incomplete. Read
+`decision-record.md`, `slice-1-review.md`, `plan.md`, and `validation-summary.json`.
 
-PLAN-EVAL round 2 PASS after the documented correction; implement slice 1 next.
+PLAN-EVAL passed on round 2. The separate source supervisor returned FAIL_FIX
+on both source rounds. The dispatcher leaf limit ended this loop; no third
+round was attempted. Keep the PR in draft. No merge, tag, release or default
+switch is authorized here.
+
+Remaining blocker: NS One's new line-height roles all alias 24px, which is
+smaller than display/KPI text. The second verdict provides the exact per-role
+fix and requests a line-height >= text-size test. That correction remains open.
+
+Partial code is isolated in `packages/fresh-ui/tokens/v2/` and
+`packages/fresh-ui/src/tokens/`; the importer and official-schema validator are
+in `packages/fresh-ui/scripts/`. Approved Figma and S0 snapshots are retained.
+Existing S0 inputs, output artifacts and build script are unchanged.
+
+Validation: 194 package tests (including 7 focused source tests), 12-file scoped
+check/lint/fmt, official DTCG schemas and 72-input alias graph, frozen S0 token
+freshness, and 8 unchanged baseline browser cases pass. These do not approve the
+source design. See the public compact summary; raw local logs are kept outside
+the tracked source because they contain private operational details.
+
+Still outstanding: SD output formats, known-name/contrast CI gates and exclusion
+list, public tokens CLI and scaffold override proof, fonts/attributes/design
+route migration, registry/Figma outputs, after screenshots, full runtime E2E and
+IMPL-EVAL. Do not claim READY or issue acceptance. The assignment/report files
+must never be staged. Do not change labels or force-push.

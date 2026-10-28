@@ -1,0 +1,107 @@
+{
+  "sourceTests": {
+    "rawReportSha256": "a5ceef88b4062e5e514be19f262cbc2e75fd57b6d4fcd2010396d3d7ab37013b",
+    "summary": {
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 7,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "packageTests": {
+    "rawReportSha256": "3aca360439f38881002dc9592d6818c362c40191d42eead05d4bd4c686c581bd",
+    "summary": {
+      "passed": 194,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 194,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "typecheck": {
+    "rawReportSha256": "84cd0dfe7e35c1aa3d4da5193836da9e90d8d3df8d8fa1b7b87f2d79fb8fe603",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "lint": {
+    "rawReportSha256": "710fc3f0bf4b26c57f1e96e5f7078adb816b59ed16fd907824e17b2e1e4d229d",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  "format": {
+    "rawReportSha256": "50b1da9cbf02da15288e4ac931538051008dbd15d279b042ab4c4f5175cdb7cf",
+    "summary": {
+      "filesSelected": 12,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "dtcg": {
+    "result": "PASS",
+    "version": "2025.10",
+    "resolverInputs": 72,
+    "presets": 18,
+    "roles": 818,
+    "note": "Source expansion and alias graph only; Style Dictionary v2 outputs are not implemented."
+  },
+  "s0Compatibility": {
+    "packages/fresh-ui/scripts/build-tokens.ts": {
+      "unchanged": true,
+      "sha256": "1723a2798a488917b198862c4b1c3cabe806ae39020127278e84d0139cdd0202"
+    },
+    "packages/fresh-ui/tokens/primitives.tokens.json": {
+      "unchanged": true,
+      "sha256": "591606359a593098fe865b6642543342c88885a2bd7dda049ffc1a28b7f0dedb"
+    },
+    "packages/fresh-ui/tokens/semantic.tokens.json": {
+      "unchanged": true,
+      "sha256": "2098469ed4c4a3e0231657d9bcc958f5a60ae224d4efe04dce37aeb42cf20bc0"
+    },
+    "packages/fresh-ui/tokens/themes/light.tokens.json": {
+      "unchanged": true,
+      "sha256": "fb22fa3b6c89e95b6b9b46cedf7c73de8a60215d97cc610f395750f470ff3651"
+    },
+    "packages/fresh-ui/tokens/themes/dark.tokens.json": {
+      "unchanged": true,
+      "sha256": "41782a3c561b236e66e51962697dbf8871a764d694c6825d6e4730df1bbab445"
+    },
+    "packages/fresh-ui/registry/theme/tokens.css": {
+      "unchanged": true,
+      "sha256": "8d613d26931870758414054c7c52efd369de13d3cdb0ef7edfe07c5e66752395"
+    },
+    "packages/fresh-ui/registry/theme/theme-bridge.css": {
+      "unchanged": true,
+      "sha256": "7e7a3a3eb6cfd6f3a9ccfd07d3afe10012fb340bc9cc6ebcb8f532e29e8e4e05"
+    },
+    "packages/fresh-ui/registry/theme/tokens.json": {
+      "unchanged": true,
+      "sha256": "1be351c74abd00734a971c539b4c0f05ebf55dc7addd21d39c25bb88180072f5"
+    }
+  },
+  "browserBefore": {
+    "passed": 8,
+    "failed": 0,
+    "note": "Unchanged S0 baseline only; no v2 browser implementation or after comparison."
+  },
+  "sourceReview": [
+    "FAIL_FIX",
+    "FAIL_FIX"
+  ],
+  "fullRuntimeE2e": "NOT_RUN",
+  "implementationEvaluation": "NOT_RUN",
+  "ready": false
+}

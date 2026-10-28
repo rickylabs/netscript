@@ -182,6 +182,7 @@
     "npm:@types/babel__core@^7.20.5": "7.20.5",
     "npm:@workos-inc/node@10.4.0": "10.4.0",
     "npm:@workos-inc/node@^10.4.0": "10.4.0",
+    "npm:ajv@8.20.0": "8.20.0",
     "npm:amqplib@^2.2.0": "2.2.0",
     "npm:amqplib@~0.10.3": "0.10.9",
     "npm:asn1js@^3.0.10": "3.0.10",
