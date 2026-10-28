@@ -103,5 +103,13 @@
   ],
   "fullRuntimeE2e": "NOT_RUN",
   "implementationEvaluation": "NOT_RUN",
-  "ready": false
+  "ready": false,
+  "qualityGate": {
+    "gateId": "quality-gate",
+    "gitHead": "b39499304aad2fb43f0609a8fc7d181cddbe34c9",
+    "outcome": "PASS",
+    "durationMs": 15935,
+    "exitCode": 0,
+    "rawReceiptSha256": "471ae2df277dc421fd9e17c94c119f9de6dc2348b248f8bd16c2d2aeab16ef67"
+  }
 }

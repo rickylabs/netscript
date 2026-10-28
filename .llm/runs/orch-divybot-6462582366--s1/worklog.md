@@ -76,3 +76,7 @@ route; generator and evaluator remain separate sessions and vendor families.
 - Frozen S0 `tokens:check`: exit 0. The build script, four source files, and three generated outputs are byte-identical to S0; hashes are in `validation-summary.json`.
 - Root lock: one exact Ajv mapping; package lock: two exact Ajv/Color.js mappings. Existing resolved versions and integrity entries are unchanged.
 - This is source expansion, not a Style Dictionary v2 output verdict. No AA contrast verdict, final screenshot comparison, scaffold override proof, runtime E2E or IMPL-EVAL is claimed.
+
+- Final catalog-run `quality:gate`: PASS, exit 0, on source head `b39499304aad2fb43f0609a8fc7d181cddbe34c9`; receipt hash and verdict are in the public validation summary. This is command evidence only, not independent source approval or merge readiness.
+- Partial source snapshot committed and pushed as `b39499304aad2fb43f0609a8fc7d181cddbe34c9`. The existing S0 pipeline is preserved.
+- Close-time resource reporter ran read-only. No resources were mutated. Private raw diagnostics are stored outside the tracked source.
