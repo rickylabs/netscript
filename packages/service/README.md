@@ -122,6 +122,13 @@ before using them for private operations.
 
 ## CORS migration (breaking in 0.0.8)
 
+Under `withCors()`, the service's native CORS decision is authoritative on every response, including
+RPC/OpenAPI projections, raw routes, proxied upstreams, health and errors. All six access-control
+headers are restored to the configured decision, including absence; handler, upstream and oRPC
+headers are replaced. Declare `exposeHeaders`, `allowHeaders` and `allowMethods` on `withCors()`.
+`Vary` retains the union of tokens present before and after downstream handling, deduplicated
+case-insensitively (`*` wins). Services that never call `withCors()` are unchanged.
+
 `withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
 omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
 comma-separated exact HTTP(S) origins, with no path or trailing slash:

@@ -1,0 +1,4 @@
+# Historical receipts and verdict seals retain their original bytes, including CRLF.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# A saved patch's blank context lines contain the required diff-prefix space.
+*.diff -whitespace

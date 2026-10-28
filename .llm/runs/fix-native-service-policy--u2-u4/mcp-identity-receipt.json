@@ -1,0 +1,179 @@
+{
+    "schema":  "U2_U4_NATIVE_IDENTITY_DOCS_RECEIPT_V1",
+    "auditedAt":  "2026-10-27T21:13:33.3213187+00:00",
+    "requestedModel":  "claude-fable-5-1",
+    "requestedEffort":  "xhigh",
+    "effortIndependentlyAttested":  false,
+    "officialCliSha256":  "8d1229a281281b98fd2dee72b3253a704be4fce4d45207200cd32a9bb5a6c909",
+    "nativeSubscriptionMax":  true,
+    "paidFallbackInvoked":  false,
+    "productRuntimeInvoked":  false,
+    "turns":  [
+                  {
+                      "leaf":  "plan",
+                      "initCount":  1,
+                      "session":  [
+                                      "c2672910-4296-4cbf-b7be-4652f52837eb"
+                                  ],
+                      "initModel":  [
+                                        "claude-fable-5-1"
+                                    ],
+                      "assistantModels":  [
+                                              "claude-fable-5-1"
+                                          ],
+                      "mcp":  [
+                                  {
+                                      "name":  "netscript",
+                                      "status":  "connected"
+                                  }
+                              ],
+                      "rawSha256":  "35f2b417a250dc5bf28f5f6f45b2bfb27272ad79345518c6998dd6661f3cb1d8"
+                  },
+                  {
+                      "leaf":  "plan-finalize",
+                      "initCount":  1,
+                      "session":  [
+                                      "c2672910-4296-4cbf-b7be-4652f52837eb"
+                                  ],
+                      "initModel":  [
+                                        "claude-fable-5-1"
+                                    ],
+                      "assistantModels":  [
+                                              "claude-fable-5-1"
+                                          ],
+                      "mcp":  [
+                                  {
+                                      "name":  "netscript",
+                                      "status":  "connected"
+                                  }
+                              ],
+                      "rawSha256":  "ebf7f2465ccd8bbf588e75ac6b2cfefe3422828b3807a172023b51257369594d"
+                  },
+                  {
+                      "leaf":  "plan-revision",
+                      "initCount":  1,
+                      "session":  [
+                                      "c2672910-4296-4cbf-b7be-4652f52837eb"
+                                  ],
+                      "initModel":  [
+                                        "claude-fable-5-1"
+                                    ],
+                      "assistantModels":  [
+                                              "claude-fable-5-1"
+                                          ],
+                      "mcp":  [
+                                  {
+                                      "name":  "netscript",
+                                      "status":  "connected"
+                                  }
+                              ],
+                      "rawSha256":  "3ecfa6fe297631e2dbe133fda6a62499e600eb82db74059a5653e22f5c8604f3"
+                  },
+                  {
+                      "leaf":  "plan-checkpoint-correction",
+                      "initCount":  1,
+                      "session":  [
+                                      "c2672910-4296-4cbf-b7be-4652f52837eb"
+                                  ],
+                      "initModel":  [
+                                        "claude-fable-5-1"
+                                    ],
+                      "assistantModels":  [
+                                              "claude-fable-5-1"
+                                          ],
+                      "mcp":  [
+                                  {
+                                      "name":  "netscript",
+                                      "status":  "connected"
+                                  }
+                              ],
+                      "rawSha256":  "52a4d54d75a326df163a2ec450df8884b102af0cc870ff72ed49d8a14cfa1e5b"
+                  }
+              ],
+    "actualMcpCalls":  [
+                           {
+                               "leaf":  "plan",
+                               "tool":  "mcp__netscript__find_guidance",
+                               "input":  {
+                                             "intent":  "configure CORS for a NetScript service with withCors and understand how oRPC RPC and OpenAPI handlers emit access-control headers",
+                                             "limit":  6
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  9084
+                           },
+                           {
+                               "leaf":  "plan",
+                               "tool":  "mcp__netscript__find_guidance",
+                               "input":  {
+                                             "intent":  "allowAnonymous health path exceptions in service authentication guard; protect prefixes and anonymous paths for authn and authz",
+                                             "limit":  6
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  15257
+                           },
+                           {
+                               "leaf":  "plan",
+                               "tool":  "mcp__netscript__get_doc",
+                               "input":  {
+                                             "slug":  "pages/reference/service",
+                                             "section":  "pipeline-order"
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  1082
+                           },
+                           {
+                               "leaf":  "plan",
+                               "tool":  "mcp__netscript__search_docs",
+                               "input":  {
+                                             "query":  "allowAnonymous prefix",
+                                             "limit":  8
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  2649
+                           },
+                           {
+                               "leaf":  "plan-finalize",
+                               "tool":  "mcp__netscript__get_doc",
+                               "input":  {
+                                             "slug":  "pages/reference/service",
+                                             "section":  "contract-declared-authentication-and-authorization"
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  14463
+                           },
+                           {
+                               "leaf":  "plan-finalize",
+                               "tool":  "mcp__netscript__get_doc",
+                               "input":  {
+                                             "slug":  "pages/reference/service",
+                                             "section":  "cors-origins"
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  1594
+                           },
+                           {
+                               "leaf":  "plan-finalize",
+                               "tool":  "mcp__netscript__search_docs",
+                               "input":  {
+                                             "query":  "CORSPlugin oRPC access-control-allow-origin RPC handler",
+                                             "limit":  6
+                                         },
+                               "resultPresent":  true,
+                               "toolResultReportedError":  false,
+                               "resultBytes":  2044
+                           }
+                       ],
+    "recordedPidsNow":  [
+
+                        ],
+    "ownProjectMcpProcessesNow":  [
+
+                                  ],
+    "processControlPerformed":  false
+}

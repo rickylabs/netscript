@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Fixed:** Under `withCors()`, every response (RPC, OpenAPI, raw routes, proxied upstreams, health
+  and errors) now carries exactly the native service CORS decision: all six access-control headers,
+  present or absent, with the union of existing `Vary` tokens preserved. Handler, upstream and
+  oRPC-default access-control headers are replaced. Migrate their `exposeHeaders`, `allowHeaders`
+  and `allowMethods` declarations to `withCors()`. Services that never call `withCors()` are
+  unchanged.
+
 - **Breaking (0.0.8, #1382):** `defineService()` now requires `auth: ServiceAuthPolicy` and
   validates it before configuring the builder or starting IO. Missing policy is a type error and a
   runtime `TypeError` for JavaScript callers. Keep native guards as

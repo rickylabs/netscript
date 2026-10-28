@@ -1,0 +1,80 @@
+{
+  "kind": "netscript.harness.source-receipt",
+  "purpose": "Load-bearing files inspected read-only by the U2/U4 architecture PLAN generator. Binds research.md/decisions.md/plan.md claims to exact bytes. Not a gate verdict.",
+  "revision": 2,
+  "revisionNote": "Revision 2 adds the root-policy-addendum inputs (durable-streams server source, streams proxy files, root's in-process receipt). Repo hashes re-verified unchanged at HEAD 1582.",
+  "generatedAt": "2026-10-27",
+  "run": ".llm/runs/fix-native-service-policy--u2-u4/",
+  "generatorSession": "c2672910-4296-4cbf-b7be-4652f52837eb",
+  "worktree": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+  "branch": "fix/native-service-policy",
+  "head": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "trackedProductTreeClean": true,
+  "hash": "sha256",
+  "pins": {
+    "@netscript/service": "0.0.8",
+    "jsr:@hono/hono": "4.13.13",
+    "npm:@orpc/server": "1.15.5"
+  },
+  "repoFiles": [
+    { "path": "packages/service/src/middleware/service-cors.ts", "lines": 57, "sha256": "a34a7f6339dc3bc0af0a6b9573200c3d70424298e3818cbd361fc16034928198", "role": "U2 authority; JSDoc-only owner" },
+    { "path": "packages/service/src/builder/service-builder-impl.ts", "lines": 629, "sha256": "c81161994461703ce6028075f6128a56efb33a1a9e1d3a3d5b7d19c7bc69cbe7", "role": "pipeline order; inspect-only" },
+    { "path": "packages/service/src/builder/service-rpc.ts", "lines": 133, "sha256": "a61661d0b054c7f9fcfdae8fe0f49c27b9534b0c3748ae5a8241dd4fe107e285", "role": "U2 owner: wireRpc calls createRPCHandler/createOpenAPIHandler (lines 68-69)" },
+    { "path": "packages/service/src/builder/service-builder.ts", "lines": 263, "sha256": "7ef98679262d079701ecb136fc25e5b18570a046014bbf46501029af597c1779", "role": "withRPC options (no plugin passthrough); inspect-only" },
+    { "path": "packages/service/src/primitives/handlers.ts", "lines": 247, "sha256": "2018901610c13b62acfef93ceba7328edc7047e0441539d8ed487ef89357f2e0", "role": "U2 owner: createRPCPlugins pushes CORSPlugin unconditionally (line 77); RPCHandlerConfig" },
+    { "path": "packages/service/src/presets/define-service.ts", "lines": 355, "sha256": "9db09d2379a5658ab6c5923020243dfeb658d0dee0847189115717a27556077b", "role": "always withCors().withLogger(); assertServiceAuthPolicy before builder; inspect-only" },
+    { "path": "packages/service/src/types.ts", "lines": 335, "sha256": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c", "role": "ServiceRouteMethod vocabulary; inspect-only" },
+    { "path": "packages/service/mod.ts", "lines": 214, "sha256": "6fbb9cafd00187c0300cc733393312a336f1103e22b07d91ba6e6fa6f93d25f0", "role": "U4 owner: re-export AnonymousRequestMatch/AnonymousRule (AuthnOptions exported line 89)" },
+    { "path": "packages/service/src/auth/mod.ts", "lines": 100, "sha256": "e003b7760a681469f5c52fa06e6ff07e8477a60a36759b9d939af3713fea3571", "role": "U4 owner: re-export (options re-exports lines 37-40)" },
+    { "path": "packages/service/src/auth/options.ts", "lines": 113, "sha256": "67b2894abf0b6b421e46ba912bf163ca1cb80e53f82afe434ad7434dd95b136e", "role": "U4 owner: AuthnOptions.allowAnonymous" },
+    { "path": "packages/service/src/auth/auth-middleware.ts", "lines": 302, "sha256": "00f33679f046e803fb3f6c26afbbe43a0e1676753f92db4aef8b6d789c5d23e1", "role": "U4 owner: normalizeGuard, matchesPrefix, isGuardedPath (line 207), both stages use c.req.path (lines 52, 113), rawPathname for resolver/authorizer (129-130, 165)" },
+    { "path": "packages/service/src/auth/service-auth-policy.ts", "lines": 77, "sha256": "ac2b72d52b0c7e2d20cfc5006ba8838984fcc37311b46da7a88ebd89470c963b", "role": "untouched by U4; inspect-only" },
+    { "path": "packages/service/src/auth/contract/contract-path.ts", "lines": 17, "sha256": "eefc86167c685643b108cdd40426335cc5454f02119682294f513315ec68674c", "role": "deny-side normalizePath; inspect-only" },
+    { "path": "packages/service/src/auth/contract/contract-raw-routes.ts", "lines": 53, "sha256": "86cb12940e6e587c2b6752d914dd38d5b715f20b75d1387db4eda8f92d8436b2", "role": "NON_EXACT_PATH_SYNTAX; exact raw routes; inspect-only" },
+    { "path": "packages/service/src/auth/contract/contract-policy.ts", "lines": 104, "sha256": "856d3954dec8ae30d09b195bf6f8531e268208adcecb08209dfb14df84a9d10f", "role": "policy resolver precedence; inspect-only" },
+    { "path": "packages/service/src/auth/contract/contract-authorizer.ts", "lines": 125, "sha256": "61a466f60b9374775f4fbc87497fbab595aa1828f8d59c89bdbfe6ace7d6188f", "role": "inspect-only" },
+    { "path": "packages/service/tests/cors-policy_test.ts", "lines": 201, "sha256": "ea6fc355f50583d12d5211a1a53698d7e0135add319a563206b584a8fd4a503c", "role": "existing CORS tests hit /health only; unchanged" },
+    { "path": "packages/service/tests/cors-topology_test.ts", "lines": 88, "sha256": "69decd7228c5b5d279df0fcee6efec51f680cf2e68c78758d9fdab1b9ddc5418", "role": "pins README/CHANGELOG CORS migration headings; unchanged" },
+    { "path": "packages/service/tests/handlers_test.ts", "lines": 232, "sha256": "aec8b8b7b2ad11058369daefb0670f3d71d0d95aee34b08ca8552fda6571e1a7", "role": "U2 owner: standalone compatibility" },
+    { "path": "packages/service/tests/auth/middleware_test.ts", "lines": 326, "sha256": "500727b559161e86d38de52b1d4f25ca4fbcddf30b014c9a27200b6bf5fada19", "role": "U4 owner" },
+    { "path": "packages/service/tests/auth/builder-auth_test.ts", "lines": 295, "sha256": "cf5c04fa176fde4a8991871948c56a4a36e729ed313cf6a5b19f6e8b379d25cc", "role": "U4 owner" },
+    { "path": "packages/service/tests/auth/define-service-auth_test.ts", "lines": 219, "sha256": "d1733c00aea4fe9b164cd22fc56ed38d5d4cd3cbf12f137a3d67418adc0dcdd0", "role": "U4 owner: preset passthrough / pre-listener rejection" },
+    { "path": "packages/service/README.md", "lines": 712, "sha256": "773b10ac44bd973d3243bf19d78fff2ab9c0e456fc9e562dd59d36fb1ad38a31", "role": "U2+U4 owner; pinned headings at lines 88 and 123" },
+    { "path": "packages/service/CHANGELOG.md", "lines": 42, "sha256": "4560a99249eb77a2f291c642a56c4eba9ada0afda3472cb88d34463d5831eafe", "role": "U2+U4 owner; pinned Breaking (0.0.8) CORS bullet" },
+    { "path": "packages/service/deno.json", "lines": 57, "sha256": "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70", "role": "package tasks check/test; untouched" },
+    { "path": "packages/plugin/src/service/presentation/create-plugin-service.ts", "lines": 230, "sha256": "508ba9a9edc6000bbe869221b7e5493bfae10d1ae9f31bd5b054219477dfd9a7", "role": "consumer: withCors unless enableCors === false (164-165); string allowAnonymous; inspect-only (U1 lane)" },
+    { "path": "packages/cli/e2e/tests/application/gates/scaffold/generated-browser-conformance_test.ts", "lines": 235, "sha256": "81c3275adc170573dcca6a3c15f70cd1798a63ac33ec518cde3608f6de823b19", "role": "CORS assertions only on 401/health; compatible with U2" },
+    { "path": "packages/cli/e2e/tests/application/gates/scaffold/browser-auth-topology_test.ts", "lines": 220, "sha256": "65a4348bd05e42c6eb4f6c9f87f28a001d1a91e3f56934d9c4070c183ca44321", "role": "CORS assertions only on 401/health; compatible with U2" },
+    { "path": "docs/site/reference/service/index.md", "lines": 639, "sha256": "23f58af3c2a15c88d8021ec1c438b2b8b1d9bafbbde6690fdcd41c699a2907e5", "role": "conditional U2 prose owner (#cors-origins); allowAnonymous mentions 337/367/369/416; M-U2-2 dissolved (no type change)" },
+    { "path": "plugins/streams/services/src/main.ts", "lines": 137, "sha256": "4e7b9fc48b83b197f11286a78e0f2d16f4bc90413bf48c801ae8252093c4d72e", "role": "revision 2: consumer shape — serveRpc:false, cors origin '*', allowHeaders/exposeHeaders lists (100-128), raw all /* proxy; inspect-only (plugin lane)" },
+    { "path": "plugins/streams/services/src/proxy.ts", "lines": 223, "sha256": "69dc2ad279a4dc60a580dadaecb437af4b44107b222e9fb731c977bc4fb4181c", "role": "revision 2: fetch (181) + sanitizeProxyResponse (194, 213); inspect-only" },
+    { "path": "plugins/streams/services/src/proxy-headers.ts", "lines": 142, "sha256": "784736fe5db81b5070dd921cec23e60d289151f15d4f4686a5d4ba2221a72c1d", "role": "revision 2: strips hop-by-hop/encoding only; documents CORS headers preserved verbatim (61); inspect-only" }
+  ],
+  "revision1OwnersDropped": [
+    "packages/service/src/primitives/handlers.ts (no RPCHandlerConfig.cors knob)",
+    "packages/service/src/builder/service-rpc.ts (no cors:false call)",
+    "packages/service/tests/handlers_test.ts (no standalone change)"
+  ],
+  "rootInputs": [
+    { "path": ".llm/runs/fix-native-service-policy--u2-u4/root-policy-addendum.md", "role": "root dispositions: U2 counterexample, GET != HEAD, M-U2-1/M-U4-1 resolution; read in full this turn" },
+    { "path": "C:/Users/ericc/source/repos/eis-chat-netscript-008-foundation/.netscript/agent/native-cors-raw-characterization.json", "bytes": 1252, "sha256": "8079d15304b28193cf28e35550f4ad3018c1358f3d045c034e9f274173e2f4ad", "role": "root's in-process negative control at sourceHead 1582 (syntheticHeaderFixture, rawCalls 2, no listener/upstream/browser); read-only, NOT executed; not a security proof" }
+  ],
+  "externalFiles": [
+    { "path": "C:/Users/ericc/AppData/Local/deno/npm/registry.npmjs.org/@durable-streams/server/0.3.9/src/server.ts", "bytes": 60505, "sha256": "a6e3352a7455e8dd50905c134e983cfc0fe5c52d094c1b5ea2d82a1948c2e0cc", "role": "revision 2: locked upstream emits access-control-allow-origin '*', allow-methods, allow-headers, expose-headers on every HTTP response (446-458) and ACAO '*' on SSE (1124); hash matches root's" },
+    { "path": "C:/Users/ericc/AppData/Local/deno/npm/registry.npmjs.org/@orpc/server/1.15.5/dist/plugins/index.mjs", "sha256": "b3372a0b83a7be186a295db23642580457d0a9744709dfc2b14d49fc808108ca", "role": "CORSPlugin (lines 119-193): default origin reflect, order 9e6, ACAO \"\" without Origin" },
+    { "path": "C:/Users/ericc/AppData/Local/deno/remote/https/jsr.io/3c8771514590935dd8ef83ec25ca312a96da1bf72af54c130ee441697c6a0a05", "module": "jsr:@hono/hono@4.13.13 middleware/cors/index.ts", "sha256": "815ad8e7ed23382ab9727465658085944fa92a5fd05762ebcb06112d8ce76d61" },
+    { "path": "C:/Users/ericc/AppData/Local/deno/remote/https/jsr.io/325682e89b9045a92755cad0832508fa3ae39b572a8d1138b6b7942e73f09e8a", "module": "jsr:@hono/hono@4.13.13 context.ts", "sha256": "7741004ab6701760c460f721e30abfb9c765727d71368a63c7e41b0518d7d7a8", "role": "revision 2 re-read: set res (414-433) always rewraps + re-applies placeholder headers only; header() (519-531) rewraps when finalized, deletes on undefined" },
+    { "path": "C:/Users/ericc/AppData/Local/deno/remote/https/jsr.io/1f44edbcc98687e895474c28c67281db5ac4002daeeb85f71a74e2f813b23730", "module": "jsr:@hono/hono@4.13.13 compose.ts", "sha256": "de7922cf63cfd4a58e34b294fd7f81276c8e0346ae358d7cfadb5c25e9fb46a0" },
+    { "path": "C:/Users/ericc/AppData/Local/deno/remote/https/jsr.io/a8a5184079fc8cbe470bfa8888e6e794c114f7b99db256243a8f9b463121e8fd", "module": "jsr:@hono/hono@4.13.13 hono-base.ts", "sha256": "2fa39a51c557812b911ece9fe050352d1b1817fdb9d45caffce6ba865afc6408" },
+    { "path": "C:/Users/ericc/AppData/Local/deno/remote/https/jsr.io/38987f828063438b9526c86bdd721ff3d38239f36e43559352974c06ad93544d", "module": "jsr:@hono/hono@4.13.13 utils/url.ts", "sha256": "34a06e7aacef4a755d8bc5a13d4a5b01c8f1eb21c6b97e143cdbb53859fae650" }
+  ],
+  "mcp": [
+    { "tool": "get_doc", "target": "pages/reference/service#contract-declared-authentication-and-authorization" },
+    { "tool": "get_doc", "target": "pages/reference/service#cors-origins" },
+    { "tool": "search_docs", "query": "CORSPlugin oRPC access-control-allow-origin RPC handler" }
+  ],
+  "notes": [
+    "DENO_DIR/LOCALAPPDATA were remapped in the task environment (drift.md D1); real user caches were read without reload.",
+    "No file outside .llm/runs/fix-native-service-policy--u2-u4/ was modified. No runtime, test, build, install or provider call was made."
+  ]
+}
