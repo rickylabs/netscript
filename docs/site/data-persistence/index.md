@@ -1,44 +1,31 @@
 ---
 layout: layouts/base.vto
-title: Data and Persistence
+title: Data & persistence
+description: Prisma databases, KV, queues, and cron.
 templateEngine: [vento, md]
 ---
 
-# Data & Persistence
+# Data & persistence
 
-**Edit one schema file, run one generate, and every consumer follows** — the typed Prisma
-client, the matching zod validation schemas, and the migration all come out of the same
-`netscript db` workflow. That matters most when the one doing the editing is an AI agent:
-persistence is where a generated backend usually drifts, because a model change normally
-fans out into separate client, validation, and migration updates — each one a turn that
-can be missed. NetScript folds those into one cycle.
+This section covers where a NetScript app keeps its state and how a schema change ships.
 
-The pillar splits state along one line. **Records** — durable, relational, queried with a
-typed client — live in the [database layer](/data-persistence/database/), where every
-plugin contributes its own models to the same datasource. **Execution state** — caches,
-sessions, work queues, scheduled ticks — lives in
-[KV, queues & cron](/data-persistence/kv-queues-cron/), provider-agnostic packages that
-run on zero-config local backends until [Aspire](/explanation/aspire/) provisions the
-production ones. The scaffold uses both from day one: Postgres for records, Redis/KV for
-execution state.
-
-Start here when the question is where state lives, how schema changes ship, or how the
-workspace resolves a second database.
+**Records** (durable, relational, queried with a typed client) live in the
+[database layer](/data-persistence/database/), where every plugin contributes its models to the same
+datasource. **Execution state** (caches, sessions, work queues, scheduled ticks) lives in
+[KV, queues & cron](/data-persistence/kv-queues-cron/), provider-agnostic packages that run on
+zero-config local backends until [Aspire](/explanation/aspire/) provisions the production ones. One
+`.prisma` edit and one `netscript db generate` regenerate the typed client and the matching zod
+schemas, and the same `netscript db` workflow creates the migration, so a model change is one cycle
+rather than three separate updates that an agent or a person can miss.
 
 {{ comp.cardsGrid({ columns: 3, cards: [
-  { eyebrow: "Overview & Concepts", title: "Database and KV", body: "The persistence layer behind services, queues, and workflow state.", href: "/data-persistence/database/", icon: "O" },
-  { eyebrow: "Quickstart", title: "Data contracts", body: "Follow the Storefront data step before service and saga work expand it.", href: "/tutorials/storefront/03-cart-contracts/", icon: "Q" },
-  { eyebrow: "How-To", title: "Database and migration", body: "Initialize and migrate the primary datasource.", href: "/data-persistence/how-to/database-migration/", icon: "H" },
-  { eyebrow: "How-To", title: "Second database", body: "Add and address another datasource from the workspace.", href: "/data-persistence/how-to/use-a-second-database/", icon: "H" },
-  { eyebrow: "API Reference", title: "database", body: "Generated database package symbols.", href: "/reference/database/", icon: "R" },
-  { eyebrow: "API Reference", title: "kv and Prisma adapter", body: "Generated KV and adapter package symbols.", href: "/reference/kv/", icon: "R" }
-] }) }}
-
-## Learn, do, look up
-
-{{ comp.cardsGrid({ columns: 4, cards: [
-  { eyebrow: "Learn", title: "Storefront tutorial", body: "Cart contracts back a real database schema from chapter 3 on.", href: resolveXref("tut:storefront").href },
-  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/data-persistence/how-to/" },
-  { eyebrow: "Look up", title: "`@netscript/database` reference", body: "Generated API reference. Related units: `kv`, `prisma-adapter-mysql`.", href: resolveXref("ref:database").href },
-  { eyebrow: "Understand", title: "Architecture", body: "The design rationale behind this pillar.", href: resolveXref("explain:architecture").href },
+  { eyebrow: "Concept", title: "Database & Prisma", body: "Schema aggregation, the generated Deno client and the driver adapters.", href: "/data-persistence/database/" },
+  { eyebrow: "Concept", title: "KV, queues & cron", body: "Provider-agnostic state, queues and schedules with local fallbacks.", href: "/data-persistence/kv-queues-cron/" },
+  { eyebrow: "Tutorial", title: "Storefront: data contracts", body: "Cart contracts back a real database schema from chapter 3 on.", href: "/tutorials/storefront/03-cart-contracts/" },
+  { eyebrow: "How-to", title: "Migrate the database", body: "Initialize and migrate the primary datasource.", href: "/data-persistence/how-to/database-migration/" },
+  { eyebrow: "How-to", title: "Use a second database", body: "Add and address another datasource from the workspace.", href: "/data-persistence/how-to/use-a-second-database/" },
+  { eyebrow: "How-to", title: "Use KV, queues, and cron", body: "Enqueue and consume, read and write KV, schedule a job.", href: "/data-persistence/how-to/queue-kv-cron/" },
+  { eyebrow: "How-to", title: "Choose a queue provider", body: "Auto-discovery, explicit providers and the PostgreSQL backend.", href: "/data-persistence/how-to/choose-a-queue-provider/" },
+  { eyebrow: "Reference", title: "`@netscript/database`", body: "API reference for the database package.", href: resolveXref("ref:database").href },
+  { eyebrow: "Reference", title: "`@netscript/kv`", body: "API reference for the KV package.", href: "/reference/kv/" }
 ] }) }}

@@ -1,33 +1,33 @@
 ---
 layout: layouts/base.vto
-title: CLI reference
+title: CLI cheat sheet
+description: The netscript commands you use most, grouped by task, with the files each one changes.
 templateEngine: [vento, md]
-prev: { label: "Glossary", href: "/glossary/" }
 ---
 
-# CLI reference
+# CLI cheat sheet
 
-This is the cheat-sheet: which `netscript` command we reach for, grouped by task. Each
-section lists the everyday spelling and stops there — every flag, subcommand, and
-extended verb lives in the [command reference](/reference/cli/commands/), and the
-embeddable TypeScript surface is on the [`@netscript/cli` package page]({{ "ref:cli" |> xref }}).
-Every command here uses the public `netscript <cmd>` form backed by the published JSR
-package; the vendored `packages/cli/...` path you may see in a local-source checkout is a
-contributor-only shape.
+This page lists the `netscript` commands you use most, grouped by task, in their everyday form.
+Together with the [command reference](/reference/cli/commands/), which has every flag, subcommand,
+and extended verb, it covers every public command group and direct subcommand. The
+[`@netscript/cli` package page]({{ "ref:cli" |> xref }}) documents the embeddable TypeScript API.
+
+Every command here uses the public `netscript <cmd>` form from the published JSR package. The
+vendored `packages/cli/...` path you may see in a local-source checkout is for contributors only.
 
 {{ comp callout { type: "important", title: "Database commands need Aspire running first" } }}
-The <code>netscript db ...</code> commands provision and talk to your database <strong>through Aspire</strong>.
-<code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis via Docker and opens the dashboard at
-<a href="https://localhost:18888">:18888</a> — do this <strong>before</strong> any <code>db</code> command
-(<code>sqlite</code> is the file-backed exception with no container). Run a <code>db</code> command with Aspire
-down and it fails to find the database — the “aspire start failed: project file does not exist” error almost
-always means exactly this. See the <a href="/data-persistence/how-to/database-migration/">database &amp; migration how-to</a>.
+The <code>netscript db ...</code> commands provision and reach your database <strong>through Aspire</strong>.
+Run <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>db</code> command: it starts Postgres and Redis in Docker
+and opens the dashboard at the URL Aspire prints. <code>sqlite</code> is the exception, because it is file-backed and
+has no container. With Aspire down, a <code>db</code> command can't find the database; the
+“aspire start failed: project file does not exist” error almost always means this. See the
+<a href="/data-persistence/how-to/database-migration/">database &amp; migration how-to</a>.
 {{ /comp }}
 
 ## Install
 
-The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
-`netscript` command on your PATH, or run it ad-hoc with no install at all.
+The CLI is published to JSR as `@netscript/cli`. Install it globally to get a `netscript` command
+on your `PATH`, or run it without installing.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -47,44 +47,28 @@ The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
   }
 ] }) }}
 
-`netscript --version` prints the installed CLI version; `netscript --help` and
-`netscript <group> --help` (for example `netscript db --help`) show the exact flag
-spelling your installed version ships.
+`netscript --version` prints the installed CLI version. `netscript --help` and
+`netscript <group> --help`, for example `netscript db --help`, show the exact flags your installed
+version ships.
 
 ## The everyday flow
 
-Most sessions follow the same shape, and the order matters: **Aspire (step 2) must be up
-before any `db` command (step 3).**
+Most sessions follow the same order. Aspire (step 2) must be up before any `db` command (step 3).
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "1 · Scaffold",
-    body: "netscript init lays down the whole workspace — contracts, an example service, plugins, and the Aspire layer.",
-    icon: "◆"
-  },
-  {
-    title: "2 · Orchestrate",
-    body: "cd aspire && aspire start brings up your database and Redis, and opens the dashboard at :18888. Do this before any db command.",
-    icon: "▶"
-  },
-  {
-    title: "3 · Database",
-    body: "netscript db init / generate / migrate / seed — only after Aspire is up.",
-    icon: "▤"
-  },
-  {
-    title: "4 · Extend & generate",
-    body: "netscript plugin install, then netscript generate plugins to wire the registry.",
-    icon: "✶"
-  }
-] }) }}
+1. **Scaffold.** `netscript init` lays down the whole workspace: contracts, an example service,
+   plugins, and the Aspire layer.
+2. **Orchestrate.** `cd aspire && aspire start` brings up your database and Redis and opens the
+   dashboard at the URL Aspire prints.
+3. **Prepare the database.** Run `netscript db init`, `generate`, `migrate`, or `seed`.
+4. **Extend.** Run `netscript plugin install`, then `netscript generate plugins` to wire the
+   registry.
 
 ## Mutation and regeneration map
 
-Use this map before a command that writes. “Source of truth” is the declaration the command owns;
-generated artifacts can be deleted and rebuilt from it unless the row says the command creates
-workspace-owned source. “Preview” is deliberately explicit: do not assume every mutating command
-accepts `--dry-run`.
+Check this map before you run a command that writes. “Source of truth” is the declaration the
+command owns. You can delete generated artifacts and rebuild them from it, unless the row says the
+command creates workspace-owned source. Don't assume every mutating command accepts `--dry-run`;
+the “Preview” column says which ones do.
 
 | Command | Source of truth mutated | Generated artifacts | Runtime consumers | Preview |
 | --- | --- | --- | --- | --- |
@@ -110,9 +94,9 @@ accepts `--dry-run`.
 | `netscript deploy build` / target `plan` | Deployment manifest plus project entrypoints | Target deployment artifacts or an emitted plan | Target runtime or service manager | `plan` is non-deploying |
 | `netscript deploy up` / `deploy install` / lifecycle verbs | Deployment target or service-manager state | Provider/service-manager state; target-dependent local artifacts | Deployed services | Target-dependent; check `--help` |
 
-Read commands (`list`, `get`, `inspect`, `status`, `logs`, `doctor`) are omitted because they do not
-mutate project or provider state. Commands that invoke an external database or cloud provider say
-so in the final column; a filesystem-only `--dry-run` would not safely model those effects.
+Read commands (`list`, `get`, `inspect`, `status`, `logs`, `doctor`) are omitted because they don't
+change project or provider state. Commands that call an external database or cloud provider say so
+in the last column, because a filesystem-only `--dry-run` can't model those effects safely.
 
 ## Scaffold a workspace
 
@@ -133,7 +117,7 @@ Every `init` flag — including `--app-name`, `--no-git`, `--force`, `--json`, a
 
 ## Aspire orchestration CLI
 
-Run these commands from inside the `aspire/` folder with the Aspire CLI (13.5.3):
+Run these Aspire CLI (13.5.3) commands from inside the `aspire/` folder:
 
 {{ comp.apiTable({
   caption: "Aspire orchestration commands",
@@ -149,37 +133,36 @@ Run these commands from inside the `aspire/` folder with the Aspire CLI (13.5.3)
 
 ### Select a pinned Aspire executable
 
-Set `NETSCRIPT_ASPIRE_CLI` to the executable name or path for your pinned toolchain. Unset or empty,
-it defaults to `aspire`. The generated `aspire:otel` and `aspire:export` tasks use it for both the
-primary command and the `aspire ps` dashboard fallback. NetScript's database operation executor and
-`netscript agent init` use the same variable.
+Set `NETSCRIPT_ASPIRE_CLI` to the executable name or path of your pinned Aspire toolchain. When it
+is unset or empty, NetScript uses `aspire`. The generated `aspire:otel` and `aspire:export` tasks use
+it for the primary command and for the `aspire ps` dashboard fallback. NetScript's database
+operation executor and `netscript agent init` use the same variable.
 
-The value is one executable, not a shell command with arguments. To activate a version manager,
-create an executable wrapper such as `tools/aspire-pinned`:
+The value is one executable, not a shell command with arguments. To go through a version manager,
+create an executable wrapper:
 
-```sh
-#!/bin/sh
-exec mise exec -- aspire "$@"
-```
+{{ comp.codeBlock({ lang: "sh", filename: "tools/aspire-pinned", code: "#!/bin/sh\nexec mise exec -- aspire \"$@\"" }) }}
 
-Make it executable (`chmod +x tools/aspire-pinned`), then run from the workspace root:
+Make it executable with `chmod +x tools/aspire-pinned`, then run from the workspace root:
 
 ```sh
 export NETSCRIPT_ASPIRE_CLI="$PWD/tools/aspire-pinned"
 deno task aspire:otel -- traces users
 ```
 
-An absolute path also works in non-interactive shells without activating the version manager. Direct
-`aspire` commands and the `aspire:start` tasks still use your shell's PATH.
+An absolute path also works in non-interactive shells that don't activate the version manager.
+Direct `aspire` commands and the `aspire:start` tasks still use your shell's `PATH`.
 
-Refresh the generated helper with `netscript generate aspire`; do not hand-edit
-`.netscript/aspire-cli.ts`. This command also regenerates the AppHost helpers from root
-`appsettings.json`, and refuses a workspace scaffolded with `--no-aspire`. It does not rewrite root
-`deno.json`. Plugin install/update/remove and service add/remove also regenerate this helper.
-Existing workspace tasks with `--allow-run=aspire --allow-read` keep using `aspire` after regeneration,
-even in non-interactive runs: the helper reads the override only when env permission is already
-granted, and otherwise defaults to `aspire` without prompting. For an existing workspace, update its
-two telemetry task grants only when adopting the override:
+`netscript generate aspire` refreshes the generated helper; don't hand-edit
+`.netscript/aspire-cli.ts`. The command also regenerates the AppHost helpers from the root
+`appsettings.json`. It doesn't rewrite the root `deno.json`, and it refuses a workspace scaffolded
+with `--no-aspire`. Plugin install, update, and remove, and service add and remove, regenerate this
+helper too.
+
+Existing workspace tasks with `--allow-run=aspire --allow-read` keep using `aspire` after
+regeneration, even in non-interactive runs: the helper reads the override only when env permission
+is already granted, and otherwise defaults to `aspire` without prompting. Update an existing
+workspace's two telemetry task grants only when you adopt the override:
 
 ```json
 {
@@ -188,18 +171,18 @@ two telemetry task grants only when adopting the override:
 }
 ```
 
-These two tasks permit subprocess execution without an executable-name restriction so they can run
-the override; environment access is limited to `NETSCRIPT_ASPIRE_CLI`.
+These two tasks may run any executable, so that they can run the override. Their environment
+access is limited to `NETSCRIPT_ASPIRE_CLI`.
 
 ## Run & iterate
 
-These are workspace `deno task`s, not `netscript` subcommands — the day-to-day loop once
-the scaffold exists.
+These are workspace `deno task` commands, not `netscript` subcommands. They make up the daily loop
+once the scaffold exists.
 
 {{ comp.apiTable({
   caption: "Run and gate the workspace",
   rows: [
-    { name: "Orchestrate everything", type: "cd aspire && aspire start", desc: "Bring up the database, Redis, services, and plugin processors, with the dashboard at :18888." },
+    { name: "Orchestrate everything", type: "cd aspire && aspire start", desc: "Bring up the database, Redis, services, and plugin processors, with the dashboard at the URL Aspire prints." },
     { name: "Run the dashboard alone", type: "deno task --cwd apps/dashboard dev", desc: "Start the Fresh frontend directly (or let <code>aspire start</code> orchestrate it)." },
     { name: "Run a service alone", type: "deno task --cwd services/users dev", desc: "Start the example <code>users</code> oRPC service on its assigned port." },
     { name: "Check, lint, test", type: "deno task check · deno task lint · deno task fmt · deno task test", desc: "Type-check, lint, format, and test the whole workspace." }
@@ -227,10 +210,10 @@ The full groups — `service set` / `remove` / `ref add`, `contract remove` /
 
 ## Plugins
 
-Plugins add capabilities — background workers, durable sagas, webhook triggers, durable
-streams, authentication. Public install adds the plugin package dependency, emits
-workspace-owned glue that imports it, and registers its contributions; the plugin's
-internals stay in the installed dependency.
+Plugins add capabilities such as background workers, durable sagas, webhook triggers, durable
+streams, and authentication. A public install adds the plugin package as a dependency, emits
+workspace-owned glue that imports it, and registers its contributions. The plugin's internals stay
+in the installed dependency.
 
 {{ comp.apiTable({
   caption: "Plugin lifecycle",
@@ -250,9 +233,9 @@ The extended verbs — `plugin sync`, `enable` / `disable` / `setup`, `item-add`
 
 ### App-owned browser authentication
 
-Auth installation defaults to the generated BFF topology. For an app that already owns its backend,
-session routes, and authentication bridge, set this in `appsettings.json` before installing auth or
-regenerating helpers:
+Auth installation defaults to the generated BFF topology. If an app already owns its backend,
+session routes, and authentication bridge, set this in `appsettings.json` before you install auth or
+regenerate helpers:
 
 ```json
 {
@@ -264,12 +247,12 @@ regenerating helpers:
 }
 ```
 
-`BrowserTopology` accepts `scaffold` (the default when omitted) or `authored`. With `authored`,
+`BrowserTopology` accepts `scaffold`, the default when omitted, or `authored`. With `authored`,
 plugin installation and lifecycle reconciliation skip that app's `/auth` action route and
-service-session example routes. They neither create nor replace its browser helpers. Pure
-`netscript generate aspire` regeneration also preserves the authored files, including when they are
-absent. `netscript plugin doctor` reports the app as using an authored browser topology; this
-reports ownership, not verification of your authentication implementation.
+service-session example routes, and neither create nor replace its browser helpers. A plain
+`netscript generate aspire` run also preserves the authored files, including when they are absent.
+`netscript plugin doctor` reports the app as using an authored browser topology. That report states
+ownership; it doesn't verify your authentication implementation.
 
 Only browser apps (`Type: "app"`, including an omitted `Type`) select browser topology. Task, Tauri,
 and desktop entries do not cause shared helpers to be created alongside an authored browser app.
@@ -284,11 +267,10 @@ after your own topology replaces their callers. See the
 
 ## Database
 
-The database workflow uses Prisma with a Deno runtime, and every command below requires
-Aspire to be running first (`cd aspire && aspire start`) — `sqlite` being the file-backed
-exception. Plugin schemas (`workers`, `sagas`, `triggers`, `auth`) are picked up by the
-same `generate` / `migrate` pass. The walkthrough is the
-[database & migration how-to]({{ "howto:database-migration" |> xref }}).
+The database workflow uses Prisma with the Deno runtime. Every command below needs Aspire running
+first, except with the file-backed `sqlite` engine. The same `generate` and `migrate` pass picks up
+plugin schemas (`workers`, `sagas`, `triggers`, `auth`). The
+[database & migration how-to]({{ "howto:database-migration" |> xref }}) walks through the workflow.
 
 {{ comp.apiTable({
   caption: "Database workflow (Aspire must be running)",
@@ -302,16 +284,14 @@ same `generate` / `migrate` pass. The walkthrough is the
   ]
 }) }}
 
-The scaffolded workspace also defines Aspire-less `deno task db:*` tasks
-(`db:generate`, `db:migrate`, `db:seed`, `db:studio`, …) inside `database/<engine>/` that
-run Prisma directly — the form to use in deno-only or CI jobs. The target-management and
-migration-history verbs (`db deploy`, `validate`, `resolve`, `remove`) are in the
-[command reference](/reference/cli/commands/).
+The scaffolded workspace also defines `deno task db:*` tasks (`db:generate`, `db:migrate`,
+`db:seed`, `db:studio`, …) inside `database/<engine>/`. They run Prisma directly, without Aspire;
+use them in Deno-only or CI jobs. The target-management and migration-history verbs (`db deploy`,
+`validate`, `resolve`, `remove`) are in the [command reference](/reference/cli/commands/).
 
 ## Generate
 
-After adding or changing plugins or configuration, regenerate the artifacts the project
-consumes.
+After you add or change plugins or configuration, regenerate the artifacts the project consumes.
 
 {{ comp.apiTable({
   caption: "Code generation",
@@ -323,14 +303,14 @@ consumes.
   ]
 }) }}
 
-Related: `netscript config inspect` / `get` / `set` read and write the resolved project
-configuration, and `netscript config override` manages versioned runtime overrides — the
-full subcommand table is in the [command reference](/reference/cli/commands/).
+`netscript config inspect`, `get`, and `set` read and write the resolved project configuration,
+and `netscript config override` manages versioned runtime overrides. The
+[command reference](/reference/cli/commands/) has the full subcommand table.
 
 ## Fresh UI
 
-The frontend is copy-source: components are copied into your repo under
-`apps/dashboard`, and the code is yours to own and edit. See
+The frontend is copy-source: the CLI copies components into your repository under
+`apps/dashboard`, and you own and edit that code. See
 [customize Fresh UI]({{ "howto:customize-fresh-ui" |> xref }}).
 
 {{ comp.apiTable({
@@ -345,11 +325,10 @@ The frontend is copy-source: components are copied into your repo under
 
 ## Deploy
 
-Deploy carries several paths: the **Deno Deploy** cloud target, the **OS service** (Servy)
-path, the **container and cloud targets** routed through Aspire, and two packaging verbs
-for shipping a binary. `netscript deploy list` prints every registered target with the
-operations it advertises — start there rather than guessing. See
-[deploy]({{ "howto:deploy" |> xref }}) for the portability story.
+Deploy covers several paths: the **Deno Deploy** cloud target, the **OS service** (Servy) path,
+the **container and cloud targets** routed through Aspire, and two packaging verbs for shipping a
+binary. Start with `netscript deploy list`, which prints every registered target and the operations
+it advertises. [Deploy]({{ "howto:deploy" |> xref }}) explains portability.
 
 {{ comp.apiTable({
   caption: "Deploy commands",
@@ -372,6 +351,8 @@ per-target verb flags, and the artifact-copy verbs are in the
 
 ## Agent tooling
 
+These commands install and run the NetScript tooling for coding agents.
+
 {{ comp.apiTable({
   caption: "AI agent commands",
   rows: [
@@ -382,39 +363,3 @@ per-target verb flags, and the artifact-copy verbs are in the
 }) }}
 
 See [Agent tooling](/ai/agent-tooling/) for the mental model.
-
-## The full surface
-
-This page is the curated common path; together with the detailed
-[command reference](/reference/cli/commands/), the two-page set covers every public command group
-and direct subcommand. For the embeddable package API, use the
-[`@netscript/cli` package page]({{ "ref:cli" |> xref }}).
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Command reference",
-    body: "The detailed companion for extended command groups and flags; use it with this curated page for the complete public root/direct-command surface.",
-    href: "/reference/cli/commands/",
-    icon: "≡"
-  },
-  {
-    title: "Quickstart",
-    body: "Install → init → aspire start → db → hit an endpoint, in about five minutes.",
-    href: "/quickstart/",
-    icon: "▸"
-  },
-  {
-    title: "Database & migration",
-    body: "The full db workflow, with the Aspire-up dependency spelled out step by step.",
-    href: "/data-persistence/how-to/database-migration/",
-    icon: "▤"
-  },
-  {
-    title: "@netscript/cli package",
-    body: "The package API reference — the embeddable TypeScript surface, not the command tree.",
-    href: "/reference/cli/",
-    icon: "◇"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Glossary", href: "/glossary/" } }) }}

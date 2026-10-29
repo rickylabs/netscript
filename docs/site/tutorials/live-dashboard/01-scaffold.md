@@ -1,17 +1,16 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the dashboard workspace
+title: Scaffold the dashboard
 templateEngine: [vento, md]
 prev: { label: "Live Dashboard", href: "/tutorials/live-dashboard/" }
 next: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" }
 ---
 
-# Scaffold the dashboard workspace
+# Scaffold the dashboard
 
-Every track starts with a real project on disk. In this chapter you create `my-dashboard/` — the
-workspace that will grow into the live order queue from the [track index](/tutorials/live-dashboard/):
-a Fresh frontend, an `orders` service, and a Postgres database — then boot the whole thing under
-Aspire so the rest of the track has a running system to build on.
+In this chapter you create `my-dashboard/`, the workspace that grows into the order-queue dashboard
+from the [track index](/tutorials/live-dashboard/): a Fresh frontend, an `orders` service and a
+Postgres database. Then you boot it under Aspire so the rest of the track has a running system.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -24,60 +23,60 @@ Aspire so the rest of the track has a running system to build on.
 
 ## What you will build
 
-A `my-dashboard/` workspace on disk: shared contracts, an example `orders` service on port **3002**,
-a [Fresh](/web-layer/) app, and a Postgres database — all orchestrated by Aspire.
-By the end the Aspire dashboard at `:18888` shows every resource running, and you understand which
-generated directory does what. You will reuse this same workspace for every later chapter.
+A `my-dashboard/` workspace: shared contracts, an example `orders` service at its allocated endpoint, a
+[Fresh](/web-layer/) app and a Postgres database, all orchestrated by Aspire. At the end the Aspire
+dashboard at the URL Aspire prints shows every resource running, and you know which generated directory does
+what. Every later chapter builds on this workspace.
 
 ## Before you begin
 
-This is the first chapter; the only prerequisite is the toolchain from the
-[track index](/tutorials/live-dashboard/). Confirm the CLI is installed and reachable:
+You need the toolchain from the [track index](/tutorials/live-dashboard/). Confirm the CLI is
+installed and reachable:
 
 ```sh
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-You should see the public command groups: `agent`, `config`, `deploy`, `init`, `contract`, `db`,
-`generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update`, and
-`ui:remove`. If `netscript` is not found, make sure
-Deno's install directory is on your `PATH` and open a fresh terminal.
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
-Before writing files, ask the CLI what it *would* create. `--dry-run` plans the scaffold and prints
-totals without touching disk:
+`--dry-run` plans the scaffold and prints totals without writing to disk:
 
 ```sh
 netscript init my-dashboard --dry-run
 ```
 
-`netscript init` validates your options, then runs an ordered pipeline that lays down the project
-root, Aspire orchestration, contracts, the Fresh app workspace, an empty plugin registry, and
-(optionally) a database workspace and an example service. The dry run reports file and directory
-totals per phase, so you see the project's shape before committing to it.
-
-{{ comp callout { type: "note", title: "Why dry-run first?" } }}
-A dry run is the cheapest way to confirm your flag combination is valid — the CLI rejects bad option mixes (an unknown <code>--db</code> engine, say) here, before any files exist. A clean dry run is your green light to scaffold for real.
-{{ /comp }}
+`netscript init` validates your options, then runs an ordered pipeline: the project root, Aspire
+orchestration, contracts, the Fresh app workspace, an empty plugin registry, and optionally a
+database workspace and an example service. The dry run reports file and directory totals per phase.
+It also confirms your flags are valid: the CLI rejects bad combinations, such as an unknown `--db`
+engine, before any file exists.
 
 ## Step 2 — Create the workspace
 
-Scaffold for real, with an example service and a Postgres database so the dashboard has live data to
-read later. This track names the example service `orders` and runs it on port **3002**:
+Scaffold for real, with an example service named `orders` at its allocated endpoint and a Postgres database
+for the dashboard to read:
 
 ```sh
-netscript init my-dashboard --service --service-name orders --service-port 3002 --db postgres
+netscript init my-dashboard --service --service-name orders --db postgres
 cd my-dashboard
 ```
 
-This writes `my-dashboard/`, formats the output with `deno fmt`, and initializes a git repository. On
-completion the CLI prints a **next steps** summary tailored to your options — keep it handy.
+The CLI writes `my-dashboard/`, formats the output with `deno fmt`, initializes a git repository,
+and prints a **next steps** summary for your options.
+
+{{ comp callout { type: "note", title: "Use allocated endpoints" } }}
+Aspire allocates the service endpoint. Open the URL Aspire prints and read the service URL from
+the Resources view or <code>aspire describe</code>. Set <code>SERVICE_URL</code> to that URL before
+running a health probe; no fixed service port is required.
+{{ /comp }}
 
 {{ comp.apiTable({
   caption: "init options this track uses (run netscript init --help for the full list)",
   rows: [
-    { name: "--service --service-name orders --service-port 3002", type: "flags", desc: "Include an example oRPC service named orders on port 3002 — the read-model the dashboard consumes." },
+    { name: "--service --service-name orders", type: "flags", desc: "Include an example oRPC service named orders — the read-model the dashboard consumes." },
     { name: "--db postgres", type: "flag", desc: "Scaffold a Postgres database workspace. The orders read-model is persisted here. Postgres is this track's stack; swap --db postgres for mysql, mssql, or sqlite for a different engine." },
     { name: "--dry-run", type: "flag", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
@@ -85,7 +84,7 @@ completion the CLI prints a **next steps** summary tailored to your options — 
 
 ## Step 3 — Tour what you got
 
-Open `my-dashboard/`. The shape that matters for this track:
+The parts of `my-dashboard/` this track uses:
 
 {{ comp.fileTree({ items: [
   { name: "apps/", children: [
@@ -107,23 +106,22 @@ Open `my-dashboard/`. The shape that matters for this track:
 The two directories this track lives in:
 
 - **`apps/dashboard/`** — your Fresh app. Its entry point is `main.ts`, which calls
-  [`defineFreshApp`](/web-layer/server/#composing-the-runtime-server); its build is configured by
-  `vite.config.ts`.
-  Chapters 4 and 5 add routes and islands here. This is the heart of the track.
-- **`services/orders/`** and **`contracts/`** — the typed read-model your dashboard reads. You shape
-  these in chapter 2, then consume them from the Fresh app in chapters 3–5.
+  [`defineFreshApp`](/web-layer/server/#composing-the-runtime-server), and `vite.config.ts`
+  configures its build. Chapters 4 and 5 add routes and islands here.
+- **`services/orders/`** and **`contracts/`** — the typed read-model your dashboard reads. You read
+  them in chapter 2 and consume them from the Fresh app in chapters 3–5.
 
-For a guided walk through *every* generated directory, see
-the [Storefront scaffold chapter](/tutorials/storefront/01-scaffold/) — this track keeps the tour short on purpose.
+The [Storefront scaffold chapter](/tutorials/storefront/01-scaffold/) describes every generated
+directory.
 
 ## Step 4 — Look at the Fresh app entry point
 
-Before booting, read the two files that define how the Fresh app starts. You do not edit them yet —
-this is orientation for chapters 4 and 5.
+Two files define how the Fresh app starts. You don't edit them yet; read them as orientation for
+chapters 4 and 5.
 
-The app entry point registers the KV adapter and creates the app. **The order matters:** the
-Redis/Garnet KV adapter import must run *before* any code that reaches for KV, so it sits at the very
-top of the file:
+The app entry point registers the KV adapter and creates the app. **Order matters:** the
+Redis/Garnet KV adapter import must run *before* any code that uses KV, so it sits at the top of the
+file:
 
 ```ts
 // apps/dashboard/main.ts
@@ -135,9 +133,9 @@ import type { State } from '@app/utils.ts';
 export const app = defineFreshApp<State>({ name: 'dashboard' });
 ```
 
-The Vite config wires NetScript's Fresh build plugin alongside the Fresh and Tailwind plugins.
-`createNetScriptVitePlugin` from `@netscript/fresh/vite` is what teaches Vite about NetScript's route
-manifest, workspace aliases, and watch paths:
+The Vite config adds NetScript's Fresh build plugin next to the Fresh and Tailwind plugins.
+`createNetScriptVitePlugin` from `@netscript/fresh/vite` tells Vite about NetScript's route manifest,
+workspace aliases and watch paths:
 
 ```ts
 // apps/dashboard/vite.config.ts (trimmed to the NetScript-specific wiring)
@@ -162,14 +160,16 @@ export default defineConfig(() => ({
 ```
 
 {{ comp callout { type: "note", title: "@app/* aliases point inside your Fresh app" } }}
-The Vite config registers <code>@app</code>, <code>@app/lib</code>, <code>@app/components</code>, <code>@app/islands</code>, and <code>@app/routes</code> aliases that resolve to folders inside <code>apps/dashboard/</code>. Throughout this track, an import like <code>@app/lib/orders.ts</code> means the file at <code>apps/dashboard/lib/orders.ts</code>.
+The Vite config registers <code>@app</code>, <code>@app/lib</code>, <code>@app/components</code>,
+<code>@app/islands</code> and <code>@app/routes</code> aliases that resolve to folders inside
+<code>apps/dashboard/</code>. In this track, an import like <code>@app/lib/orders.ts</code> means the
+file at <code>apps/dashboard/lib/orders.ts</code>.
 {{ /comp }}
 
 ## Step 5 — Bring up orchestration
 
-This is the step that turns a folder of files into a running system. **Aspire provisions your
-database and cache; you run it before any `netscript db` command.** Run it from the `aspire/`
-subfolder so the CLI finds `apphost.mts`:
+Aspire provisions your database and cache, and you start it before any `netscript db` command. Run
+it from the `aspire/` folder so the CLI finds `apphost.mts`:
 
 ```sh
 cd aspire
@@ -177,29 +177,31 @@ aspire restore   # once: restores the Aspire SDK modules into .aspire/
 aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up the Postgres database, the Redis cache, your `orders` service, and the Fresh
-app together, then prints a URL and login token for the **Aspire dashboard**:
+`aspire start` brings up Postgres, the Redis cache, your `orders` service and the Fresh app, then
+prints the allocated URL for the **Aspire dashboard**:
 
+```text
+the URL Aspire prints
 ```
-https://localhost:18888
-```
 
-Leave `aspire start` running in this terminal; it is your control plane for the rest of the track.
+Leave `aspire start` running in this terminal for the rest of the track.
 
-{{ comp callout { type: "important", title: "Aspire is step 2 — before any database command" } }}
-The Postgres container only exists while <code>aspire start</code> is up. So <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must run <strong>after</strong> Aspire has started — never before. You will run them in chapter 2.
+{{ comp callout { type: "important", title: "Database commands need Aspire running" } }}
+The Postgres container exists only while <code>aspire start</code> is up. Run
+<code>netscript db init</code>, <code>db generate</code> and <code>db seed</code>
+<strong>after</strong> Aspire has started. You run them in chapter 2.
 {{ /comp }}
 
 ## Verify your progress
 
-In a second terminal (leave `aspire start` going in the first), confirm the `orders` service answers
-its health endpoint:
+In a second terminal, with `aspire start` still running in the first, check the `orders` service's
+health endpoint:
 
 ```sh
-curl http://localhost:3002/health
+curl "$SERVICE_URL/health"
 ```
 
-You should get a healthy JSON response. Then type-check the whole workspace from the project root:
+You get a healthy JSON response. Then type-check the workspace from the project root:
 
 ```sh
 deno task check
@@ -209,18 +211,20 @@ A clean check confirms the scaffold, contracts, and service line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-dashboard/` exists with `apps/dashboard/`, `contracts/`, and `services/orders/`.
-- [ ] `aspire start` is up; the dashboard at `:18888` lists `postgres`, `redis`, and `orders`.
-- [ ] `curl http://localhost:3002/health` returns a healthy response.
+- [ ] `aspire start` is up; the dashboard at the URL Aspire prints lists `postgres`, `redis`, and `orders`.
+- [ ] `curl "$SERVICE_URL/health"` returns a healthy response.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code> so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service is still starting — wait a few seconds and retry.
+Check three things: (1) is <code>aspire start</code> still up, with <code>postgres</code> and
+<code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running
+(<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it
+found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service is still
+starting: wait a few seconds and retry.
 {{ /comp }}
 
 ## What you built
 
-A real NetScript workspace — `my-dashboard/` — with a Fresh app, an `orders` service on `:3002`, and
-a Postgres database, all orchestrated by Aspire and visible at `:18888`. Next you will shape the
-`orders` read-model — the rows your operations team will eventually watch live.
-
-{{ comp.nextPrev({ prev: { label: "Live Dashboard", href: "/tutorials/live-dashboard/" }, next: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" } }) }}
+A NetScript workspace, `my-dashboard/`, with a Fresh app, an `orders` service at its allocated endpoint and a
+Postgres database, all orchestrated by Aspire and visible at the URL Aspire prints. Next, you shape the `orders`
+read-model that the dashboard displays.

@@ -1,8 +1,16 @@
 import { assert, assertEquals, assertNotEquals, assertThrows } from '@std/assert';
 import { CALLOUT_ICONS, CALLOUT_TYPES, calloutType } from './callout-types.ts';
 
+/** Fenced code shows callout syntax as text; it never renders as a callout. */
+function withoutFences(source: string): string {
+  return source.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, '');
+}
+
 Deno.test('every authored site alert type has an explicit tone without a Note fallback', async () => {
-  let count = 0;
+  // Both authoring forms render the same callout: the `comp callout` component and the
+  // GitHub alert (`> [!TYPE]` alone on a top-level blockquote line; see markdown-alerts.ts).
+  let components = 0;
+  let alerts = 0;
   const seen = new Set<string>();
   async function visit(directory: URL): Promise<void> {
     for await (const entry of Deno.readDir(directory)) {
@@ -18,13 +26,22 @@ Deno.test('every authored site alert type has an explicit tone without a Note fa
           if (field) assertEquals(kind, field[2].trim().toLowerCase(), path.pathname);
           assert(CALLOUT_TYPES[kind].tone, path.pathname);
           seen.add(kind);
-          count++;
+          components++;
+        }
+        if (entry.name.endsWith('.html')) continue;
+        for (const match of withoutFences(source).matchAll(/^>[ \t]*\[!([A-Za-z]+)\][ \t]*$/gm)) {
+          const kind = calloutType(match[1]);
+          assertEquals(kind, match[1].toLowerCase(), path.pathname);
+          assert(CALLOUT_TYPES[kind].tone, path.pathname);
+          seen.add(kind);
+          alerts++;
         }
       }
     }
   }
   await visit(new URL('../../docs/site/', import.meta.url));
-  assert(count > 100, 'The guard must inspect the actual authored corpus');
+  assert(components + alerts > 100, 'The guard must inspect the actual authored corpus');
+  assert(alerts > 0, 'The guard must inspect authored GitHub alerts as well as components');
   assertEquals([...seen].sort(), Object.keys(CALLOUT_TYPES).sort());
 });
 

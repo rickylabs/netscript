@@ -39,13 +39,7 @@ export type DenoExportTarget = string | DenoConditionalExportTarget;
 
 export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
-export const EXCLUDED_REFERENCE_PAGES: readonly ExcludedReferencePage[] = [
-  {
-    docPath: 'docs/site/reference/auth/index.md',
-    reason:
-      'Multi-package auth hub indexing @netscript/plugin-auth, @netscript/plugin-auth-core, @netscript/auth-kv-oauth, @netscript/auth-workos, and @netscript/auth-better-auth; it is not the reference page for a single package.',
-  },
-];
+export const EXCLUDED_REFERENCE_PAGES: readonly ExcludedReferencePage[] = [];
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {

@@ -5,65 +5,26 @@ title: "@netscript/plugin-sagas"
 
 # `@netscript/plugin-sagas`
 
-NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.
-This page is written against the package's public surface reported by `deno doc`. For the full
-index of packages and plugins return to the [reference overview](/reference/).
+The deployable NetScript plugin for durable sagas: the plugin manifest, the saga runtime and
+supervisor, the HTTP publisher, the versioned API contract and the browser-safe stream surface. Use
+it to run sagas in a workspace. The saga DSL (`defineSaga` and the cascaded-message constructors) is
+authored against [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/), which has its own
+reference page, and re-exported through the runtime entrypoint.
 
-The published plugin exposes the host-facing plugin manifest, the executable saga runtime and
-supervisor, the HTTP publisher, the versioned API contract, and the browser-safe stream surface.
-The userland saga DSL (`defineSaga`, the cascaded-message constructors) is authored against
-[`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) and re-exported through the runtime
-entrypoint. That separately published package has its own canonical reference page.
-
-## Atomic worker commands with query projection
-
-For `.durableWorkerCommands()` sagas, inject the store returned by `createPrismaSagaTransitionStore`
-from `@netscript/plugin-sagas-core/stores` into `createDurableSagaRuntime({ store, projection })`.
-Use `PrismaSagaInstanceProjection` from `@netscript/plugin-sagas/runtime` for the Prisma query
-model. For the complete background runner, pass `runtimeOptions: { native: { store } }` and
-`projection` to `startSagaRunner`; configure the same canonical store and projection in both API and
-background compositions. Selecting `backend: 'prisma'` alone constructs the granular legacy store
-and does not enable atomic worker commands.
-
-Apply the PostgreSQL migrations for `saga_runtime_state`, `saga_runtime_transition`,
-`saga_runtime_correlation`, `saga_runtime_command_applied_key`, and `netscript_command_outbox`, plus
-`saga_instances` for the Prisma projection. The store uses the host's real interactive Prisma
-transaction callback. State, history, correlation, inbound replay marker, and worker command intents
-commit together. Query projection runs afterward and propagates errors, matching the legacy
-projection path. `createProjectingSagaStore` retains this capability for custom compositions;
-`ProjectingSagaStore` remains the legacy granular decorator.
-
-A failed projection leaves the canonical transition and command intent committed. Redelivery is
-replay: it adds no worker command and performs no projection write. Recover the view explicitly in a
-host-owned background repair task: load the canonical envelope and its matching latest transition
-from the original atomic store, resolve the saga and correlation identity, and pass them to
-`projection.upsert`. Do not replay business effects to rebuild a view. Joining Prisma projection to
-the canonical transaction is a possible follow-up; this composition preserves post-commit behavior.
-
-The generic PostgreSQL command-outbox relay keeps its claim leases, retry attempts, and settlement
-metadata with the PostgreSQL outbox rows; those fields cannot be moved to an unrelated KV store
-while retaining this relay's contract. Worker execution/idempotency state and progress streams may
-use separate durable stores. Delivery remains at least once, with effective deduplication supplied
-by the worker's durable idempotency store. All processing and repair run under a service identity
-and need no phone, web app, or owner session.
-
-## Exports
-
-The plugin publishes the following entrypoints. Each is documented against its own `deno doc`
-surface.
+## Sub-path exports
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/plugin-sagas` | `./mod.ts` | Plugin manifest, identifiers, and inspection helper (documented below). |
+| `@netscript/plugin-sagas` | `./mod.ts` | [Plugin manifest, identifiers, and inspection helper](#plugin-manifest-netscriptplugin-sagas). |
 | `@netscript/plugin-sagas/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
 | `@netscript/plugin-sagas/public` | `./src/public/mod.ts` | Curated public manifest surface for host integration. |
 | `@netscript/plugin-sagas/plugin` | `./src/public/mod.ts` | Plugin manifest and contribution types (alias of the public surface). |
-| `@netscript/plugin-sagas/runtime` | `./src/runtime/mod.ts` | Executable saga runtime, engine, scheduler, publisher, and supervisor. |
-| `@netscript/plugin-sagas/contracts` | `./contracts/v1/mod.ts` | Versioned API contract (`sagasContract`) and router types. |
-| `@netscript/plugin-sagas/streams` | `./streams/mod.ts` | Browser-safe saga stream schema and collection. |
-| `@netscript/plugin-sagas/cli` | `./src/cli/mod.ts` | Plugin CLI commands (inspect, codemod, generate registry). |
+| `@netscript/plugin-sagas/runtime` | `./src/runtime/mod.ts` | [Executable saga runtime, engine, scheduler, publisher, and supervisor](#runtime-netscriptplugin-sagasruntime). |
+| `@netscript/plugin-sagas/contracts` | `./contracts/v1/mod.ts` | [Versioned API contract](#api-contract-netscriptplugin-sagascontracts) (`sagasContract`) and router types. |
+| `@netscript/plugin-sagas/streams` | `./streams/mod.ts` | [Browser-safe saga stream schema and collection](#streams-netscriptplugin-sagasstreams). |
+| `@netscript/plugin-sagas/cli` | `./src/cli/mod.ts` | [Plugin CLI commands](#cli-and-aspire) (inspect, codemod, generate registry). |
 | `@netscript/plugin-sagas/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
-| `@netscript/plugin-sagas/aspire` | `./src/aspire/mod.ts` | Aspire contribution for the sagas API service. |
+| `@netscript/plugin-sagas/aspire` | `./src/aspire/mod.ts` | [Aspire contribution](#cli-and-aspire) for the sagas API service. |
 | `@netscript/plugin-sagas/doctor` | `./doctor.ts` | Static sagas adapter used by plugin doctor. |
 | `@netscript/plugin-sagas/services` | `./services/src/main.ts` | Saga API service entrypoint. |
 | `@netscript/plugin-sagas/e2e` | `./src/e2e/mod.ts` | End-to-end test contributions. |
@@ -71,22 +32,21 @@ surface.
 
 ## Plugin manifest (`@netscript/plugin-sagas`)
 
-The root entrypoint exposes the plugin manifest and stable identifiers. Shared manifest inspection
-is provided by `inspectPlugin` from `@netscript/plugin`.
+The plugin manifest and stable identifiers. Inspect the manifest with `inspectPlugin` from
+`@netscript/plugin`.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `sagasPlugin` | variable | `PluginManifest` | Plugin manifest for NetScript sagas. |
-| `SAGAS_PLUGIN_ID` | variable | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
-| `SAGAS_PLUGIN_VERSION` | variable | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
-| `SAGAS_API_SERVICE_NAME` | variable | `"sagas-api"` | Service contribution name for the sagas API process. |
-| `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Deprecated compatibility metadata; endpoint resolution does not use this value as an HTTP fallback. |
-
+| `sagasPlugin` | const | `PluginManifest` | Plugin manifest for NetScript sagas. |
+| `SAGAS_PLUGIN_ID` | const | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
+| `SAGAS_PLUGIN_VERSION` | const | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
+| `SAGAS_API_SERVICE_NAME` | const | `"sagas-api"` | Service contribution name for the sagas API process. |
+| `SAGAS_API_DEFAULT_PORT` | const | `8092` | Deprecated compatibility metadata; endpoint resolution does not use this value as an HTTP fallback. |
 
 ## Runtime (`@netscript/plugin-sagas/runtime`)
 
-The runtime entrypoint provides the executable saga runtime and the building blocks a composition
-root wires together. It also re-exports the userland DSL types and cascaded-message vocabulary from
+The executable saga runtime and the building blocks a composition root wires together. It also
+re-exports the userland DSL types and cascaded-message vocabulary from
 [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/).
 
 ### Runtime entry functions and classes
@@ -122,9 +82,9 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `SAGA_DURABILITY_TIERS` | variable | Durability tiers supported by saga definitions. |
-| `SAGA_INSTANCE_STATUSES` | variable | Saga instance lifecycle statuses. |
-| `CASCADED_MESSAGE_KINDS` | variable | Cascaded message kinds emitted by saga handlers. |
+| `SAGA_DURABILITY_TIERS` | const | Durability tiers supported by saga definitions. |
+| `SAGA_INSTANCE_STATUSES` | const | Saga instance lifecycle statuses. |
+| `CASCADED_MESSAGE_KINDS` | const | Cascaded message kinds emitted by saga handlers. |
 | `SagaDurabilityTier` | type alias | Saga durability tier. |
 | `SagaInstanceStatus` | type alias | Saga instance lifecycle status. |
 | `SagaDefinition` | type alias | Frozen saga definition produced by the fluent DSL. |
@@ -135,10 +95,10 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 | `SagaStateEnvelope` | type alias | Persisted saga state envelope. |
 | `RetryPolicy` | type alias | Retry policy for saga handlers and cascaded messages. |
 
-> The runtime entrypoint exports 95 symbols in total. The tables above list the primary surface.
-> Branded id aliases (`SagaId`, `SagaInstanceId`, `SagaMessageId`, `SagaCorrelationKey`), scheduler
-> records and publisher receipt/JSON types are part of the published surface
-> and resolve through `deno doc plugins/sagas/src/runtime/mod.ts`.
+> [!NOTE]
+> The tables list the primary runtime surface. Branded id aliases (`SagaId`, `SagaInstanceId`,
+> `SagaMessageId`, `SagaCorrelationKey`), scheduler records and publisher receipt/JSON types are
+> also published; `deno doc` on the runtime entrypoint lists them.
 
 ## API contract (`@netscript/plugin-sagas/contracts`)
 
@@ -146,17 +106,14 @@ Version 1 of the sagas plugin API contract, its Zod schemas, and the router type
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `sagasContract` / `sagasContractV1` | variable | The versioned sagas API contract definition. |
+| `sagasContract` / `sagasContractV1` | const | The versioned sagas API contract definition. |
 | `SagasContractDefinition` / `SagasContractV1` | type alias | Contract shape for the sagas API. |
 | `SagasRouter` | interface | Router type derived from the sagas contract. |
-| `SagaDefinitionResponse` / `SagaDefinitionResponseSchema` | type / schema | Saga definition response payload and its Zod schema. |
-| `SagaInstanceResponse` / `SagaInstanceResponseSchema` | type / schema | Saga instance response payload and its Zod schema. |
-| `PublishMessageInput` / `PublishMessageInputSchema` | type / schema | Publish-message request payload and its Zod schema. |
-| `SagaSSEEvent` / `SagaSSEEventSchema` | type / schema | Server-sent event payload streamed to subscribers. |
-| `SagaFilters` / `InstanceFilters` | type | List/query filters for sagas and instances. |
-| `ListSagasInput` / `ListSagasOutput` | type | List-sagas request and response. |
-| `ListInstancesInput` / `ListInstancesOutput` | type | List-instances request and response. |
-| `GetInstanceHistoryInput` / `GetInstanceHistoryOutput` | type | Instance-history request and response. |
+| `SagaDefinitionResponse` / `SagaDefinitionResponseSchema` | type alias / const | Saga definition response payload and its Zod schema. |
+| `SagaInstanceResponse` / `SagaInstanceResponseSchema` | type alias / const | Saga instance response payload and its Zod schema. |
+| `PublishMessageInput` / `PublishMessageInputSchema` | type alias / const | Publish-message request payload and its Zod schema. |
+| `SagaSSEEvent` / `SagaSSEEventSchema` | type alias / const | Server-sent event payload streamed to subscribers. |
+| `SagaFilters` / `InstanceFilters` | type alias | List/query filters for sagas and instances. |
 
 ## Streams (`@netscript/plugin-sagas/streams`)
 
@@ -167,35 +124,70 @@ Browser-safe stream exports for the sagas plugin.
 | `createSagasStreamDB` | function | `createSagasStreamDB(...): SagasStreamDB` | Create the saga instance stream database. |
 | `SagasStreamDB` | type alias | - | Stream database type for saga instances. |
 | `SagaInstance` | type alias | - | Saga instance row materialized into the stream. |
-| `SagaInstanceSchema` | variable | - | Zod schema for a saga instance stream row. |
-| `sagasStreamSchema` | variable | - | Stream schema describing the saga collections. |
-| `SAGA_INSTANCE_STATUSES` | variable | - | Saga instance lifecycle statuses. |
+| `SagaInstanceSchema` | const | - | Zod schema for a saga instance stream row. |
+| `sagasStreamSchema` | const | - | Stream schema describing the saga collections. |
+| `SAGA_INSTANCE_STATUSES` | const | - | Saga instance lifecycle statuses. |
 
-## CLI, scaffolding, and Aspire
+## CLI and Aspire
 
 | Entrypoint | Primary exports |
 | --- | --- |
 | `@netscript/plugin-sagas/cli` | `SagasCli`, `SAGAS_CLI_COMMANDS`, `generateSagaRegistry`, `codemodSagaImports`, `inspectSagasProject` |
-| `@netscript/plugin-sagas/scaffolding` | `createSagasItemScaffolders`, `SAGAS_RUNTIME_SCAFFOLD_MANIFEST`, `SagaDefinitionScaffolder`, `SagaConfigScaffolder` |
 | `@netscript/plugin-sagas/aspire` | `SagasAspireContribution`, `SagasAspireBuilder`, `SagasAspireResource` |
 
----
+## Atomic worker commands with query projection
+
+For `.durableWorkerCommands()` sagas, inject the store returned by `createPrismaSagaTransitionStore`
+from `@netscript/plugin-sagas-core/stores` into `createDurableSagaRuntime({ store, projection })`.
+Use `PrismaSagaInstanceProjection` from `@netscript/plugin-sagas/runtime` for the Prisma query
+model. For the complete background runner, pass `runtimeOptions: { native: { store } }` and
+`projection` to `startSagaRunner`; configure the same canonical store and projection in both API and
+background compositions. Selecting `backend: 'prisma'` alone constructs the granular legacy store
+and does not enable atomic worker commands.
+
+Apply the PostgreSQL migrations for `saga_runtime_state`, `saga_runtime_transition`,
+`saga_runtime_correlation`, `saga_runtime_command_applied_key`, and `netscript_command_outbox`, plus
+`saga_instances` for the Prisma projection. The store uses the host's real interactive Prisma
+transaction callback. State, history, correlation, inbound replay marker, and worker command intents
+commit together. Query projection runs afterward and propagates errors, matching the legacy
+projection path. `createProjectingSagaStore` retains this capability for custom compositions;
+`ProjectingSagaStore` remains the legacy granular decorator.
+
+A failed projection leaves the canonical transition and command intent committed. Redelivery is
+replay: it adds no worker command and performs no projection write. Recover the view explicitly in a
+host-owned background repair task: load the canonical envelope and its matching latest transition
+from the original atomic store, resolve the saga and correlation identity, and pass them to
+`projection.upsert`.
+
+> [!CAUTION]
+> Don't replay business effects to rebuild a view.
+
+Prisma projection is not joined to the canonical transaction; this composition keeps post-commit
+behavior.
+
+The generic PostgreSQL command-outbox relay keeps its claim leases, retry attempts, and settlement
+metadata with the PostgreSQL outbox rows; those fields cannot be moved to an unrelated KV store
+while retaining this relay's contract. Worker execution/idempotency state and progress streams may
+use separate durable stores. Delivery remains at least once, with effective deduplication supplied
+by the worker's durable idempotency store. All processing and repair run under a service identity
+and need no phone, web app, or owner session.
 
 ## Core package
 
-The separately published
-[`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) page is canonical for the saga DSL,
-runtime ports, adapters, telemetry, configuration, and testing exports. This page stays focused on
-the deployable plugin's manifest and integration entrypoints. The testing example below uses the core
-package intentionally; exhaustive core entrypoint and symbol tables live only on its reference page.
+[`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) is canonical for the saga DSL,
+runtime ports, adapters, telemetry, configuration and testing exports.
 
-The unsupported `spawn(child, input, options?: SpawnOptions): never` contract is worth calling out:
-it throws immediately rather than starting a child saga. Its full description and every other core
-symbol live on the canonical core page.
+> [!WARNING]
+> The core `spawn(child, input, options?: SpawnOptions): never` contract is unsupported: it throws
+> immediately rather than starting a child saga.
 
-## Deterministic Testing
+## Examples
 
-Durable sagas can be tested without external message buses or databases using `createTestSagaRuntime` from `@netscript/plugin-sagas-core/testing`. This provides an in-memory bus, store, and controllable clock to assert on emitted side-effects.
+### Test a saga deterministically
+
+`createTestSagaRuntime` from `@netscript/plugin-sagas-core/testing` provides an in-memory bus, store
+and controllable clock, so you can assert on emitted side effects without an external message bus or
+database.
 
 ```ts
 import { assertEquals } from "@std/assert";
@@ -249,7 +241,3 @@ Deno.test("Saga testing with createTestSagaRuntime and controllable clock", asyn
   await runtime.stop();
 });
 ```
-
----
-
-Back to the [reference overview](/reference/).

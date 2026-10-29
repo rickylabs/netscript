@@ -1,6 +1,6 @@
 ---
 layout: layouts/base.vto
-title: NetScript vs Next.js, Nuxt, SvelteKit, and TanStack Start
+title: NetScript vs frontend frameworks
 description: Compare one streamed detail page in NetScript with four leading frontend frameworks.
 templateEngine: [vento, md]
 order: 2
@@ -8,10 +8,14 @@ order: 2
 
 # NetScript vs frontend frameworks
 
-## NetScript makes the whole page legible at its entry point
+This page builds one streamed product detail page in NetScript, then in Next.js, Nuxt, SvelteKit,
+and TanStack Start.
 
-The route, shared read, two streamed regions, skeletons, layout, refresh decision, and metadata are
-one typed chain. Pick a competitor; the NetScript side stays put because the argument does too.
+## One detail page
+
+In NetScript, the route, the shared read, two streamed regions, their skeletons, the layout, the
+refresh decision, and the metadata form one typed chain at the page's entry point. Pick a
+competitor; the NetScript side stays the same.
 
 {{ comp.comparisonTabs({
   ours: {
@@ -50,7 +54,7 @@ one typed chain. Pick a competitor; the NetScript side stays put because the arg
   ]
 }) }}
 
-## NetScript can say who owns the I/O in one line
+## Region-owned reads
 
 When a region has no authoritative cache timestamp, make its typed partial own the read and keep the
 page out of its critical path:
@@ -66,7 +70,7 @@ page out of its critical path:
 })
 ```
 
-## NetScript exposes more of the architecture where you enter the route
+## Architectural estimates
 
 These are architectural estimates for this generic product page, not benchmark results.
 
@@ -75,5 +79,3 @@ These are architectural estimates for this generic product page, not benchmark r
 | Route-specific orchestration | ~175 LOC | ~190–225 LOC |
 | Files needed to see page behaviour | 1 | ~5–8 |
 | Architectural surface visible at entry | ~87–93% | ~40–53% |
-
-{{ comp.nextPrev({ prev: { label: "Comparisons", href: "/comparisons/" }, next: { label: "Backend frameworks", href: "/comparisons/backend/" } }) }}

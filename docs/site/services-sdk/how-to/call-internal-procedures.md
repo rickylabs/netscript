@@ -1,26 +1,29 @@
 ---
 layout: layouts/base.vto
 title: Call internal procedures from a service or worker
+description: Expose a procedure to workers, sagas, and triggers in the same installation with the provisioned installation credential.
 templateEngine: [vento, md]
-order: 110
+order: 105
 ---
 
 # Call internal procedures from a service or worker
 
-**Goal:** expose a procedure to backend processes in the same installation while keeping the
-service's public procedures public. This installation service identity is separate from enterprise
-machine identity. Workers, sagas and triggers call it without a browser, phone app or user session.
+This recipe exposes a procedure to backend processes in the same installation while the service's
+public procedures stay public. Workers, sagas and triggers call it without a browser, phone app or
+user session. This installation service identity is separate from enterprise machine identity.
 
 ## Use the provisioned file reference
 
 Generate the project's Aspire helpers with `netscript generate aspire`, then start the AppHost. The
 generated carrier creates `.data/aspire-secrets/installation.secret` once under the project root,
-preserves it across starts, and registers a secret parameter. It delivers
+keeps it across starts, and registers a secret parameter. It delivers
 `NETSCRIPT_INSTALLATION_SECRET_FILE` to services, plugin APIs and background processors, with the
-Deno read/environment permissions they need. The variable contains the file path, never the secret.
-For packaged backends, the installation carrier likewise delivers the reference. Keep the file out
-of source control, browser configuration, command arguments and logs. Do not copy its value into
-appsettings or an SDK option.
+Deno read and environment permissions they need. The variable holds the file path, never the secret.
+Packaged backends receive the reference from the installation carrier in the same way.
+
+> [!CAUTION]
+> Keep the secret file out of source control, browser configuration, command arguments and logs.
+> Never copy its value into appsettings or an SDK option.
 
 Load it once when composing the service. Each SDK contribution loads the same file reference once
 and derives a bearer for the target service name. Use HTTPS outside loopback; the contribution
@@ -48,7 +51,7 @@ export const ordersContract = {
 };
 ```
 
-Never combine `audience: 'internal'` with `authentication: 'none'`; construction rejects that
+Do not combine `audience: 'internal'` with `authentication: 'none'`; construction rejects that
 contradiction. An admin role or a user session does not satisfy the internal audience.
 
 ## Compose the explicit service policy
@@ -107,7 +110,7 @@ At the service entrypoint, call `await (await createOrdersApp()).serve({ port: 3
 supervisor own the returned listener. The same `auth` object is the guarded arm of
 `ServiceAuthPolicy` accepted by `defineService(router, { name: 'orders', auth })`. Do not use
 `auth: { public: true, reason: '...' }` for a service containing internal procedures: that posture
-opts out of authentication and authorization. Do not protect just `/api/rpc`; the OpenAPI projection
+opts out of authentication and authorization. Do not protect only `/api/rpc`; the OpenAPI projection
 must use the same overlay.
 
 ## Call from another backend
@@ -141,10 +144,8 @@ Procedures explicitly declaring `authentication: 'none'` receive no internal cre
 
 ## Verify both projections
 
-The executable recipe test generates the actual credential helper and service/background resource
-registrations, writes the three snippets above into the generated project, and runs them against a
-loopback HTTP listener. It checks these calls for both `sync` (default OpenAPI path) and `reindex`
-(explicit OpenAPI route):
+Both projections must give the same answers. For `sync` (default OpenAPI path) and `reindex`
+(explicit OpenAPI route), expect:
 
 | Caller                                             | RPC `/api/rpc/v1/orders/internal/<procedure>` | OpenAPI `/api/v1/internal/<procedure>` |
 | -------------------------------------------------- | --------------------------------------------- | -------------------------------------- |
@@ -154,18 +155,19 @@ loopback HTTP listener. It checks these calls for both `sync` (default OpenAPI p
 | Valid installation credential for `orders`         | 200                                           | 200                                    |
 | Old credential after restart with rotated material | 401                                           | 401                                    |
 
-An OpenAPI URL is not a bypass: it accepts the same internal service identity, and refuses anonymous
+An OpenAPI URL is not a bypass: it accepts the same internal service identity and refuses anonymous
 or session callers. RPC POST bodies use `{"json":{}}`; OpenAPI POST bodies use `{}`. Public `ping`
-remains callable anonymously on both projections. Run the focused recipe proof from the framework
-checkout:
+stays callable anonymously on both projections.
+
+From a NetScript framework checkout, this test generates the credential helper and resource
+registrations, writes the three snippets above into a generated project, and checks the table
+against a loopback HTTP listener:
 
 ```sh
 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/src/kernel/templates/aspire/helpers/tests/installation-provisioning_test.ts
 ```
 
-This checks the generated carrier and recipe without starting the AppHost. The full
-`scaffold.runtime` suite under the runtime lease remains the acceptance check for actual Aspire
-resource startup and service discovery.
+It does not start the AppHost, so it does not cover Aspire resource startup or service discovery.
 
 ## Rotate the installation credential
 
@@ -181,3 +183,9 @@ does not rotate running instances. Recreate caller clients as part of restart. V
 backend call succeeds and a retained old bearer is refused on both projections, without printing
 either credential. Rotation invalidates credentials for every service derived from that
 installation; it is not a per-user signout operation.
+
+## Next steps
+
+Wire the caller's service reference with [Discover services](/services-sdk/how-to/discover-services/).
+See also [Service-layer authn / authz middleware](/services-sdk/services/#service-layer-authn-authz-middleware)
+and the [`@netscript/service` reference](/reference/service/).

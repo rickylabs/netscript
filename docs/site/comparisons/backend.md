@@ -1,6 +1,6 @@
 ---
 layout: layouts/base.vto
-title: NetScript vs Nest.js, Hono, and Encore.dev
+title: NetScript vs backend frameworks
 description: Compare one contract-first endpoint, typed client, and background job across backend frameworks.
 templateEngine: [vento, md]
 order: 3
@@ -8,10 +8,14 @@ order: 3
 
 # NetScript vs backend frameworks
 
-## NetScript carries one contract from request to client, then keeps the job typed
+This page builds one contract-first endpoint, its typed client, and a background job in NetScript,
+then in Nest.js, Hono, and Encore.dev.
 
-Validation is the route contract, the consumer imports that same contract, and the endpoint hands a
-validated payload to a named worker. There is no transport DTO to reconcile with a client shape later.
+## One endpoint and one job
+
+In NetScript, the route contract is the validation, the consumer imports the same contract, and the
+endpoint hands a validated payload to a named worker. There is no transport DTO to reconcile with a
+client shape later.
 
 {{ comp.comparisonTabs({
   ours: {
@@ -36,14 +40,14 @@ validated payload to a named worker. There is no transport DTO to reconcile with
     {
       key: "encore",
       label: "Encore.dev",
-      summary: "Encore makes typed endpoints and provisioned Pub/Sub impressively compact; NetScript keeps the contract object, service client, and worker runtime explicit package surfaces you can compose outside one compiler.",
+      summary: "Encore makes typed endpoints and provisioned Pub/Sub compact; NetScript keeps the contract object, service client, and worker runtime explicit package surfaces you can compose outside one compiler.",
       lang: "ts",
       code: "import { api } from 'encore.dev/api';\nimport { Subscription, Topic } from 'encore.dev/pubsub';\n\ninterface CreateReport {\n  accountId: string;\n  format: 'pdf' | 'csv';\n}\ninterface Report { id: string; status: 'queued' }\ninterface RenderReport { reportId: string }\n\nconst renders = new Topic<RenderReport>('render-reports', {\n  deliveryGuarantee: 'at-least-once',\n});\n\nexport const create = api(\n  { expose: true, method: 'POST', path: '/reports' },\n  async (input: CreateReport): Promise<Report> => {\n    const report = await reports.insert(input);\n    await renders.publish({ reportId: report.id });\n    return report;\n  },\n);\n\nconst _render = new Subscription(renders, 'render-report', {\n  handler: async ({ reportId }) => { await renderPdf(reportId); },\n});\n\n// A consumer in another Encore service\nimport { reports } from '~encore/clients';\nawait reports.create({ accountId, format: 'pdf' });"
     }
   ]
 }) }}
 
-## NetScript turns a contract change into a consumer compile error
+## Contract changes
 
 The consumer imports the contract object; nothing is generated. Add a required field to
 `CreateReport`, and every stale call becomes a TypeScript error at build time.
@@ -56,7 +60,7 @@ const reports = createServiceClient({ contract: ReportsContractV1, serviceName: 
 await reports.create({ accountId, format: 'pdf' });
 ```
 
-## NetScript keeps more of a backend change in one typed surface
+## Architectural estimates
 
 These are architectural estimates for this generic report endpoint, not benchmark results.
 
@@ -66,5 +70,3 @@ These are architectural estimates for this generic report endpoint, not benchmar
 | Consumer client after a contract change | Imported directly | Regenerated or hand-updated |
 | Files touched to add one required request field | ~2 | ~3–5 |
 | Architectural surface visible at entry | ~87–93% | ~40–53% |
-
-{{ comp.nextPrev({ prev: { label: "Frontend frameworks", href: "/comparisons/frontend/" }, next: { label: "Comparisons", href: "/comparisons/" } }) }}
