@@ -70,7 +70,7 @@ export const ordersClient = createServiceClient<typeof ordersContract>({
 reading a field the output doesn't have, is a compile error.
 
 {{ comp callout { type: "note", title: "How serviceName resolves to a URL" } }}
-You never hardcode <code>http://localhost:3002</code>. <code>getServiceUrl</code> in
+The client does not need a literal service URL. <code>getServiceUrl</code> in
 <code>@netscript/sdk/discovery</code> resolves <code>serviceName: 'orders'</code> at call time from an
 Aspire-injected environment variable: <code>services__orders__http__0</code> on the server and its
 browser mirror <code>VITE_services__orders__http__0</code>. Aspire sets them when you list

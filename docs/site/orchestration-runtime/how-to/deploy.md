@@ -290,7 +290,7 @@ curl -fsS http://localhost:<triggers-port>/health
 ns-workers executions --limit=10 --json
 ```
 
-If every health endpoint responds and `/api/v1/workers/jobs` lists your jobs, the processes are
+If every health endpoint responds and the workers CLI reports the expected executions, the processes are
 running with their permissions, reaching Postgres and KV, and discovering their registries.
 
 ## Next steps

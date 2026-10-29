@@ -116,8 +116,11 @@ netscript plugin list
 
 You should see `workers` and `triggers` in the registry.
 
-{{ comp callout { type: "note", title: "Two trees, one canonical home" } }}
-A scaffold may also create smaller top-level <code>workers/</code> and <code>triggers/</code> directories: workspace members that stage a subset of files for the background processors. The config-referenced plugins live at <strong><code>plugins/workers/</code></strong> and <strong><code>plugins/triggers/</code></strong>. That is what <code>netscript.config.ts</code> points at and where you author code.
+{{ comp callout { type: "note", title: "Authoring paths and plugin implementation" } }}
+The project configuration discovers your job modules under <code>workers/jobs/</code>, tasks under
+<code>workers/tasks/</code> and trigger definitions under <code>triggers/</code>. The plugin packages
+under <code>plugins/workers/</code> and <code>plugins/triggers/</code> supply the runtime and API.
+Use the plugin CLIs to add project definitions; their registries follow the configured authoring paths.
 {{ /comp }}
 
 ## Step 5 — Bring up orchestration

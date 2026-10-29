@@ -161,7 +161,7 @@ Confirm the database is migrated and seeded, from most to least authoritative:
    sync. If it is green, the other checks only corroborate it.
 2. **Generated client.** `database/postgres/schema/.generated/` contains the Prisma client and the
    `zod` schemas, so your typed models are importable from application code.
-3. **Aspire dashboard.** The `postgres` resource at the URL Aspire prints
+3. **Aspire dashboard.** The dashboard at the URL Aspire prints shows the `postgres` resource
    is green and shows recent activity from the migration and seed runs.
 
 When all three agree, import the generated client in a service or worker and read the rows the seed

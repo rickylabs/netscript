@@ -37,3 +37,11 @@ MCP export corpus: PASS, 35 packages, 301 subpaths, 8,926 symbols; corpus bytes 
 ## Full checks
 
 All root check:* tasks ran. All passed except Aspire manifest freshness. Regenerated the existing manifest with aspire-surface-manifest.ts: one path added, zero unmatched paths, no ownership-rule or version change. Targeted parity recheck follows this commit. docs:links, docs:snippets, docs:accuracy, docs:exports-drift, docs:readme-fences and final site verify passed. See gates.md. Source follow-ups requested by the tracker are filed together in #2472; no duplicate open issue covered them.
+
+## Independent review repair
+
+Round 1: FIX at 0341506. Removed the invisible HTML placeholder; completed fixed-port removal across tables, callouts and checklists; aligned project authoring paths; rewrote duplicated endpoint sentences; replaced cart OpenAPILink URL with SDK discovery. Updated the surrounding cart and listener explanation so it matches the replacement code.
+
+Additional local docs browser: PASS, 124 tests, four light/dark and 390/1280 combinations. Initial launch used the wrong dependency folder; pointing LD_LIBRARY_PATH at the existing project-owned Chromium libraries fixed it without system changes.
+
+Full CLI runtime one-pass attempt: UNPROVEN (Docker daemon unavailable at preflight; cleanup could not inspect Docker). No runtime behavior changed in this docs PR. Read-only leak-check ran; foreign resources left untouched. This is not reported as a passing runtime smoke.

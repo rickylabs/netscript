@@ -85,7 +85,7 @@ it brings up:
     { name: "postgres", type: "Container", desc: "The primary datasource — the auth.prisma migration from chapter 2 lives here." },
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
-    { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 — /api/workspace requires a scoped principal, /health stays public." },
+    { name: "workspace (service)", type: "allocated endpoint", desc: "Your guarded oRPC service from chapter 5 — /api/workspace/{workspace}/members requires a scoped principal, /health stays public." },
     { name: "auth-api", type: "allocated endpoint", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, sessions/revoke, session, me)." },
     { name: "workers-api", type: "allocated port", desc: "The Workers API from chapter 4 — triggers and inspects the provision-member job." },
     { name: "background processors", type: "executables (no port)", desc: "The workers processor that drains the job queue — a separate process, not a thread in the API." }
@@ -130,8 +130,8 @@ without `workspace:read` returns 403; a member with that scope receives the memb
 - [ ] `aspire restore` and `aspire start` succeed from inside `aspire/`.
 - [ ] The dashboard at the URL Aspire prints lists `postgres`, `workspace` (db), `redis`, `workspace` (service), `auth-api`, and `workers-api` — all green.
 - [ ] Aspire reports the auth service ready at its allocated endpoint.
-- [ ] An anonymous `GET /api/workspace` returns `401`; `Bearer read` returns `200`.
-- [ ] `GET /api/v1/workers/jobs` lists `provision-member`.
+- [ ] The workspace app handler returns 401 without a session, and an authorized typed members call returns data.
+- [ ] `ns-workers show-job provision-member --json` confirms the registered job, and executions show its result.
 
 {{ comp callout { type: "tip", title: "If aspire start won't boot" } }}
 <ul>
@@ -141,8 +141,8 @@ database through Docker.</li>
 from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
 <li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> Read allocated endpoints from Aspire. Stop an earlier run that
-owns a conflicting resource before starting another; a pinned endpoint is not isolated automatically.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 

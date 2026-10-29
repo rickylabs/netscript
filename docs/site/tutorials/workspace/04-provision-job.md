@@ -187,7 +187,7 @@ execution span.
 }) }}
 
 - [ ] `netscript plugin list` shows the `workers` plugin.
-- [ ] `plugins/workers/jobs/provision-member.ts` exists and exports an `id`.
+- [ ] `workers/jobs/provision-member.ts` exists and exports an `id`.
 - [ ] `ns-workers show-job provision-member --json` shows its metadata.
 - [ ] `ns-workers trigger` returns quickly, and `ns-workers executions` shows it succeeded with a `memberId`.
 - [ ] The job-dispatch trace appears in the Aspire Traces view.

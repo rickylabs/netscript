@@ -109,7 +109,7 @@ it brings up for the storefront:
   { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
   { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your products handlers and saga store target — reachable only while Aspire is up." },
   { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins." },
-  { name: "products (service)", type: ":3001 (pinned in chapter 1)", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
+  { name: "products (service)", type: "allocated endpoint", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
   { name: "sagas API", type: "allocated port", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
   { name: "triggers API", type: "allocated port", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
   { name: "workers API", type: "allocated port", desc: "Lists job executions — where the enqueued shipping and payment jobs run." },
@@ -117,11 +117,9 @@ it brings up for the storefront:
   { name: "background processors", type: "executables (no port)", desc: "Each plugin's isolated runners (workers, sagas, triggers) — separate processes, not threads inside the API." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-<code>products</code> answers on <code>:3001</code> because chapter 1 pinned it with
-<code>--service-port</code>. The plugin APIs you installed without <code>--port</code> have no
-<code>HostPort</code>, and the Fresh app pins nothing either, so Aspire allocates their host ports at
-every start. Read every unpinned port from the dashboard's resource list.
+{{ comp callout { type: "note", title: "Read allocated endpoints" } }}
+Read the service, plugin and app endpoints from the Aspire resource list or
+<code>aspire describe</code>. The CLI commands in this track do not pin host ports.
 {{ /comp }}
 
 ## Step 4 — Use the dashboard
@@ -167,9 +165,8 @@ curl <triggers-endpoint>/health            # triggers ingress is alive
 from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
 <li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> A stale earlier run holding <code>the URL Aspire prints</code>, <code>:3001</code>
-or one of the allocated high-range ports blocks boot. Check the dashboard resource list (or your
-process table) and free it.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 

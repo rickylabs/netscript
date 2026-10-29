@@ -318,8 +318,7 @@ only at runtime as an FFI capability crash, not at generate time.
 
 ## The dashboard
 
-When `aspire start` finishes booting, it prints the allocated URL for the dashboard
-at the URL Aspire prints. The dashboard covers the whole running graph:
+When `aspire start` finishes booting, open the dashboard at the URL it prints. The dashboard covers the whole running graph:
 
 - **Resources**: every container and executable above, with status, endpoints, and environment.
 - **Console logs**: stdout and stderr per resource, so a failing background processor is one click

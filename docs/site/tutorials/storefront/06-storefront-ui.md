@@ -142,7 +142,7 @@ export const productsQueries = createQueryFactories({
 reads and invalidates through. Change a field in the contract and this module re-type-checks.
 
 {{ comp callout { type: "note", title: "How serviceName becomes a URL" } }}
-You never write <code>http://localhost:3001</code>. <code>serviceName: 'products'</code> resolves at
+The client does not need a literal service URL. <code>serviceName: 'products'</code> resolves at
 call time from an Aspire-injected environment variable, <code>services__products__http__0</code> on
 the server and its browser mirror in the client, so the same client works in a page loader and in a
 hydrated island. Aspire sets those variables when the app lists <code>products</code> as a reference.

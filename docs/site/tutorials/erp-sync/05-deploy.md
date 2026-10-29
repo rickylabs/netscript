@@ -161,7 +161,8 @@ Both health checks should return healthy JSON, and the executions feed should sh
 <ul>
 <li><strong>Docker is not running.</strong> Aspire provisions Postgres and Redis through Docker; without the daemon, nothing starts.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from <code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>
-<li><strong>Ports in use.</strong> The dashboard needs <code>the URL Aspire prints</code> and <code>the URL Aspire prints</code>, and OTLP needs <code>the OTLP URL Aspire prints</code>. A stale earlier run holding a port blocks boot; free it and retry.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 

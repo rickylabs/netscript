@@ -26,7 +26,7 @@ source of truth: the same schema types the server handler now and the Fresh clie
 An `orders.list` procedure: a `GET` route that takes pagination and a `status` filter and returns a
 typed page of orders. The `status` filter selects the queue view, such as `pending` work or `failed`
 payments. You read the scaffolded contract and its `.route().input().output()` shape, serve it on
-port **3002** with `defineService`, and seed the database. Every later chapter reads this
+the endpoint Aspire allocates with `defineService`, and seed the database. Every later chapter reads this
 read-model.
 
 ## Before you begin
@@ -169,20 +169,19 @@ await defineService(router, {
   auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
   name: 'orders',
   version: '1.0.0',
-  port: parseInt(Deno.env.get('PORT') || '3002'),
+  port: Number(Deno.env.get('PORT') ?? '0'),
   db: { netscript },
   openapi: { title: 'Orders API', description: 'Order management service' },
   debug: true,
 });
 ```
 
-Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment. The typed source
-of truth is the `services.<name>.port` field in `netscript.config.ts`, which the scaffold wires as
-the fallback default: change the port there, not in this line. The service exposes this surface on
-port **3002**:
+Aspire injects `PORT` at runtime. The zero fallback requests a free listener port for a standalone
+experiment; the normal tutorial path runs through Aspire and uses its allocated endpoint. The
+service exposes these paths under that base URL:
 
 {{ comp.apiTable({
-  caption: "orders service endpoints (port 3002)",
+  caption: "orders service endpoints (use its allocated base URL)",
   rows: [
     { name: "/api/rpc/*", type: "POST", desc: "The typed oRPC surface. Your typed client calls procedures (v1.orders.list) under this prefix with end-to-end type safety. This is what the dashboard talks to." },
     { name: "/api/v1/orders/list", type: "GET", desc: "The OpenAPI/REST projection of the same procedure — inspectable through MCP." },

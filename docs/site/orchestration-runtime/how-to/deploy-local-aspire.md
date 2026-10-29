@@ -91,7 +91,7 @@ run brings up:
 
 | Resource | Address | What it is |
 | --- | --- | --- |
-| Aspire dashboard | `the URL Aspire prints`, `the URL Aspire prints` | Live resource list, console logs, structured logs and traces. |
+| Aspire dashboard | the URL Aspire prints | Live resource list, console logs, structured logs and traces. |
 | OTLP collector | `the OTLP URL Aspire prints` | The OpenTelemetry endpoint (http/protobuf) the dashboard runs. Framework spans and structured logs land here automatically. |
 | `postgres` | Container | Provisioned through Docker; the database `netscript db` commands target. Postgres is the recommended engine (`--db postgres`); `--db mysql` and `--db mssql` select those engines, also as containers, and `--db sqlite` gives a file-backed database with no container. |
 | `redis` | Container (cache) | The default `--cache-backend`, Redis-compatible, backing KV and queue workloads for the runtime plugins. Swap it for `garnet` (also a container) or app-level `deno-kv` with `--cache-backend`. |

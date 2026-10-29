@@ -202,7 +202,7 @@ With the Step 3 environment exported, start Aspire from the workspace root:
 ```
 
 If an AppHost is already running, stop it first with `(cd aspire && aspire stop)` so its replacement
-inherits the exported values. The dashboard is at <the URL Aspire prints>. With Aspire running,
+inherits the exported values. The dashboard is at the URL Aspire prints. With Aspire running,
 generate and apply the migration as for any plugin schema:
 
 ```sh

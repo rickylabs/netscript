@@ -86,17 +86,15 @@ brings up for this track:
     { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "The Aspire dashboard: live resource list, console logs, structured logs and traces. The generated local profile allows anonymous access." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your orders service reads — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV-backed query layer from chapter 3." },
-    { name: "orders", type: ":3002", desc: "Your oRPC service (defineService). RPC at /api/rpc/*, OpenAPI at /api/v1/orders/*." },
+    { name: "orders", type: "allocated endpoint", desc: "Your oRPC service (defineService). RPC at /api/rpc/*, OpenAPI at /api/v1/orders/*." },
     { name: "dashboard (Fresh app)", type: "allocated port", desc: "Your Fresh frontend — the live dashboard you built in chapters 4–5. Read its port from the dashboard resource list." },
     { name: "streams", type: "allocated port", desc: "Durable-streams producer runtime, present once the sagas plugin is installed. Feeds useLiveQuery." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-<code>orders</code> answers on <code>:3002</code> because you pinned it with
-<code>--service-port</code> in chapter 1. The Fresh <code>dashboard</code> app and every plugin
-runtime installed without <code>--port</code> pin no host port, so <strong>Aspire allocates one at
-every start</strong>. Read every unpinned port from the Aspire dashboard's resource list.
+{{ comp callout { type: "note", title: "Read allocated endpoints" } }}
+Read the service, plugin and app endpoints from the Aspire resource list or
+<code>aspire describe</code>. The CLI commands in this track do not pin host ports.
 {{ /comp }}
 
 ## Step 3 — Open the live dashboard
@@ -163,10 +161,8 @@ Docker, or take the <code>--no-aspire</code> path with your own infrastructure.<
 from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
 <li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> The dashboard uses <code>the URL Aspire prints</code>/<code>the URL Aspire prints</code> and OTLP
-<code>the OTLP URL Aspire prints</code>; the pinned <code>orders</code> service uses <code>:3002</code>, the streams
-runtime an installer-allocated port in <code>49152–65535</code>, and the Fresh app whatever Aspire
-assigns at start. A stale earlier run holding a port blocks boot.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 
