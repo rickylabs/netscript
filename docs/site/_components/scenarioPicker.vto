@@ -13,7 +13,7 @@
 </div>
 {{ for item of items }}
 <article class="ns-scenarios__panel" id="{{ gid }}-{{ item.key }}" data-ns-scenario="{{ item.key }}" aria-label="{{ item.title }}">
-<h3 class="ns-scenarios__title">{{ item.title }}</h3>
+<h3 class="ns-scenarios__title" id="{{ gid }}-{{ item.key }}-title">{{ item.title }}</h3>
 <p class="ns-scenarios__problem">{{ item.problem |> ic }}</p>
 {{ if item.setup }}<p class="ns-scenarios__setup">{{ item.setup |> ic }}</p>{{ /if }}
 <div class="ns-scenarios__solution">
@@ -23,7 +23,7 @@
 <div class="ns-scenarios__alternative">
 <p class="ns-eyebrow">{{ item.alternativeLabel || alternativeLabel || "Typical alternative" }}</p>
 <p>{{ item.alternative |> ic }}</p>
-{{ if item.sources }}<p class="ns-scenarios__sources">Sources: {{ for index, source of item.sources }}{{ if index > 0 }} · {{ /if }}<a href="{{ source.href }}">{{ source.label }}</a>{{ /for }}</p>{{ /if }}
+{{ if item.sources }}<p class="ns-scenarios__sources">Sources:&nbsp;{{ for index, source of item.sources }}{{ if index > 0 }}&nbsp;·&nbsp;{{ /if }}<a href="{{ source.href }}">{{ source.label }}</a>{{ /for }}</p>{{ /if }}
 </div>
 <p class="ns-scenarios__why"><strong>Why it matters:</strong> {{ item.why |> ic }}</p>{{ if item.href }}<p class="ns-scenarios__more"><a href="{{ item.href }}">{{ item.hrefLabel || "Build it step by step" }}</a></p>{{ /if }}
 </article>

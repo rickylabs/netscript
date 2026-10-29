@@ -61,7 +61,9 @@ Deno.test('scenario picker renders every panel with its heading and no hidden pa
   assert(/class="ns-scenarios__picker"[^>]*\shidden/.test(html), 'picker waits for the script');
   for (const scenario of scenarios) {
     assert(
-      html.includes(`<h3 class="ns-scenarios__title">${scenario.title}</h3>`),
+      html.includes(
+        `<h3 class="ns-scenarios__title" id="compare-${scenario.key}-title">${scenario.title}</h3>`,
+      ),
       `missing heading: ${scenario.title}`,
     );
     assert(html.includes(`id="compare-${scenario.key}"`), `missing anchor for ${scenario.key}`);
