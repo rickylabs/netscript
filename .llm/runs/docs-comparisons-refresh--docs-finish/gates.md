@@ -33,3 +33,5 @@ Browser full suite: 140 passed in four light/dark × 390/1280 projects. Focused 
 Prose checkpoint 9a308f9, then mcp export corpus, assets barrel and publish assets in order. Both non-site context entries remain decoded-byte-identical to main. No root or docs lock changes.
 
 Full CLI scaffold runtime remains UNPROVEN on this worker: Docker unavailable, as recorded during #2471. Runtime/scaffold CI is explicitly skipped for this docs-only slice; neither that selection nor static checks is claimed as runtime acceptance.
+
+CI reconciliation: docs browser preparation checks browser test files with the docs formatter config, while the original local format invocation inherited the tools/root config. Reformatted only the new comparisons.spec.ts using the exact CI config; structured CI formatter selection passes all three files. This is whitespace/quote style only; browser behavior is unchanged.
