@@ -15,7 +15,7 @@ This is the **collapsed** shape: operations share one application module and the
 need a separate directory. Pure policy and technology adapters remain explicit. For a database
 service named `users` with model `User`, the tree is:
 
-```text
+```tree
 services/users/
 ├── deno.json
 └── src/

@@ -84,7 +84,7 @@ A scaffolded workspace already contains the database workspace at `database/post
 author any of this by hand; the point of this step is to recognize the moving parts so the later
 commands make sense:
 
-```text
+```tree
 my-app/
 ├── appsettings.json              # NetScript.Databases.postgres — Engine/Mode/DatabaseName
 ├── netscript.config.ts           # databases.config is intentionally empty here
