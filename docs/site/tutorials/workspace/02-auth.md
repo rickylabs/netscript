@@ -201,7 +201,8 @@ provider's callback through `/auth/callback` and keeps the session cookie on its
 `/auth/session` reports the redacted session state. Before login it reports no active session;
 after login it reports the authenticated principal.
 
-Server-side loaders call services with the generated `auth/bff.ts` session client. Keep the bearer
+Server-side loaders call services with `createBrowserSessionClient` from the generated
+`auth/bff.ts`, passing `browserSessionContext(request)` for each incoming request. Keep the bearer
 on the server; chapter 5 uses that client for the guarded workspace operation.
 
 ```sh

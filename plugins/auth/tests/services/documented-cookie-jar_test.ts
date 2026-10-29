@@ -38,7 +38,7 @@ Deno.test('documented localhost curl cookie-jar flow works through the real serv
   await proveDocumentedCookieJar(await Deno.readTextFile(recipePath));
 });
 
-Deno.test('tutorial cookie-only examples use the working localhost cookie policy', async () => {
+Deno.test('tutorial uses the generated BFF while the recipe proves raw cookie transport', async () => {
   const recipe = await Deno.readTextFile(recipePath);
   const tutorial = await Deno.readTextFile('docs/site/tutorials/workspace/02-auth.md');
   verifyCookieJarTutorial(recipe, tutorial);

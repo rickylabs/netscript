@@ -14,6 +14,16 @@ concurrency, dead-lettering and circuit-breaking around every dispatch, all thro
 The deployable [`@netscript/plugin-triggers`](/reference/triggers/) plugin binds this core to a
 NetScript host; use the core directly for custom hosts, libraries and tests.
 
+## Receive a GitHub webhook and verify its signature
+
+To receive a GitHub webhook in a service, verify the signature before processing the body. Use
+`defineWebhook` with `verifier: 'hmac-sha256'` and `secretEnv` naming the webhook secret. In a
+custom host, configure `HmacSha256WebhookVerifier` with `signatureHeader: 'x-hub-signature-256'`
+and `idempotencyHeader: 'x-github-delivery'`; the defaults use NetScript header names. The verifier
+checks the signature against the original request bytes; parsing or rewriting JSON first changes
+those bytes. Invalid signatures are rejected before the event is persisted or a job is enqueued.
+The [ingress API](#ingress) shows the host boundary and verifier wiring.
+
 ## Sub-path exports
 
 | Export | Entrypoint | Purpose |
