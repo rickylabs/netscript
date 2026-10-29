@@ -40,3 +40,5 @@ Durable receipts for allowlisted gates were produced with `.llm/tools/gates/run-
 
 Local docs browser: PASS, 124 tests across four theme/viewport combinations.
 Full CLI runtime attempt: UNPROVEN, Docker daemon unreachable at preflight; cleanup could not inspect Docker. This is not a passing runtime result. Read-only leak-check reviewed 24 unproven foreign entries and mutated none.
+
+CI repair verification: structured regression test passed 27/27. Prose checkpoint d5f7149; remaining three carriers regenerated in order. Prose/publish freshness, docs accuracy/links/exports drift and site verify all pass. Explicit redirect pages preserve both historical LSP URLs while scalar oldUrl restores MCP alias resolution.

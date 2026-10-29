@@ -51,3 +51,5 @@ Review correction checkpoint: 9fe5fdb. The affected prose carrier was regenerate
 Review repair recheck: all ten affected root documentation tasks and final site verify PASS. No remaining conventional service port or plugin implementation authoring path claims in the tutorial flow. Restored docs/site/deno.lock after the final builder; root lock unchanged. Round 2 independent confirmation follows this evidence commit.
 
 CI reconciliation: measured shards found missing reserved-mode wording, exact-retrieval wording, and an MCP-incompatible oldUrl array. Restore the two statements and use one scalar alias plus two explicit compatibility redirects. No framework implementation or tests weakened. Reconfirm the amended CI-only repair with the existing independent reviewer.
+
+CI repair verification: structured regression test passed 27/27. Prose checkpoint d5f7149; remaining three carriers regenerated in order. Prose/publish freshness, docs accuracy/links/exports drift and site verify all pass. Explicit redirect pages preserve both historical LSP URLs while scalar oldUrl restores MCP alias resolution.
