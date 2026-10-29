@@ -10,3 +10,5 @@
 
 - Site fixtures importing Lume need a root-discovered subprocess bridge with the site config, like markdown-render_test.ts. Use a non-discovered fixture filename and include it explicitly in the site test task; root and standalone-site checks must both reach the assertions.
 - Resource registry slice directories bind to one worktree. A later sibling worktree needs its own private resource-report subdirectory; do not repoint or overwrite another run’s registry.
+
+- A shared schema or contract must live in a module without server construction. Importing a schema from a producer module executes its top-level transport constructor in an island; keeping typed code in one illustrative file can silently violate the browser/backend boundary.

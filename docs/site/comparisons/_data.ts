@@ -84,8 +84,8 @@ export const frontendScenarios: Scenario[] = [
     title: 'A live operations dashboard',
     problem: 'Show order changes without a separate polling loop in every widget.',
     setup:
-      'The service publishes confirmed order changes after its business write. That write and the stream flush are not atomic; use an outbox when a missed update is unacceptable. Aspire supplies the producer’s streams reference and credentials. The shared State Protocol schema works with both the producer and Fresh StreamDB. In a Fresh island, create one dashboard instance, await db.preload?.(), mount Orders, and call db.close?.() on disposal. streamsUrl is the authorized streams endpoint; use the URL Aspire prints. Expose only an appropriately authorized stream to the browser, never an internal producer credential. Handle db.status === failed with an explicit reload or recovery path: expired retained offsets do not replay automatically.',
-    tabs: [example('streams.ts'), example('dashboard.tsx')],
+      'The service publishes confirmed order changes after its business write. That write and the stream flush are not atomic; use an outbox when a missed update is unacceptable. Aspire supplies the producer’s streams reference and credentials. The shared State Protocol schema works with both the producer and Fresh StreamDB. Keep it in its own module so the island never imports or constructs the server producer. In a Fresh island, create one dashboard instance, await db.preload?.(), mount Orders, and call db.close?.() on disposal. streamsUrl is the authorized streams endpoint; use the URL Aspire prints. Expose only an appropriately authorized stream to the browser, never an internal producer credential. Handle db.status === failed with an explicit reload or recovery path: expired retained offsets do not replay automatically.',
+    tabs: [example('schema.ts'), example('streams.ts'), example('dashboard.tsx')],
     alternative:
       'Next streams server-rendered regions and can read data in Server Components. A continuously changing operations board still needs a transport, client collection and reconnect policy, whether you choose SSE, WebSockets or a hosted realtime database. Those integrations may already be a better fit for an existing React app.',
     why:
@@ -101,8 +101,8 @@ export const frontendScenarios: Scenario[] = [
     title: 'A SaaS app consuming a versioned pricing service',
     problem: 'Change a shared pricing response without silently breaking its callers.',
     setup:
-      'A public quote example: the service composition must mount this contract and router as pricing v2 before the client can call it. Keep v1 mounted for callers you have not migrated. apiVersion selects an existing server mount; it does not create one. Inside Aspire the SDK resolves pricing through service discovery. Outside Aspire, provide the SDK URL resolver with the URL Aspire prints. Protected operations also need backend authentication/authorization and the generated session-client contribution.',
-    tabs: [example('contracts.ts')],
+      'A public quote example with separate contract, server router and consumer modules: the service composition must mount this contract and router as pricing v2 before the client can call it. Keep v1 mounted for callers you have not migrated. apiVersion selects an existing server mount; it does not create one. Inside Aspire the SDK resolves pricing through service discovery. Outside Aspire, provide the SDK URL resolver with the URL Aspire prints. Protected operations also need backend authentication/authorization and the generated session-client contribution.',
+    tabs: [example('contracts.ts'), example('pricing-router.ts'), example('pricing-client.ts')],
     alternative:
       'Hono RPC infers a typed client from the server’s route type. Encore also supplies typed service calls. Both avoid hand-maintained transport DTOs. With a separate service estate, your team still chooses how route versions, service addresses and consumer rollout are represented.',
     why:

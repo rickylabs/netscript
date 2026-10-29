@@ -1,6 +1,6 @@
 /** @jsxImportSource preact */
 import { createNetScriptStreamDB, useLiveQuery } from '@netscript/fresh/streams';
-import { schema } from './streams.ts';
+import { schema } from './schema.ts';
 
 // Create once per mounted dashboard, using the authorized streams endpoint.
 export function createDashboard(streamsUrl: string) {
