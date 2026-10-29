@@ -1,12 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Queue / KV / cron
+title: Use KV, queues, and cron
+description: Use the reactive KV store, the durable queue, and cron schedules.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/queue-kv-cron/
 ---
 
-# Queue / KV / cron
+# Use KV, queues, and cron
 
 This page gives you the minimal working code for three runtime primitives: reading and writing
 **KV**, enqueueing and consuming a **queue** message, and scheduling a **cron** job. Each is a small
@@ -229,5 +230,3 @@ Pick or pin the queue backend in
   an HTTP trigger instead of a raw queue.
 - References: [`@netscript/kv`](/reference/kv/), [`@netscript/queue`](/reference/queue/) and
   [`@netscript/cron`](/reference/cron/).
-
-{{ comp.nextPrev({ prev: { label: "Database & migration", href: "/data-persistence/how-to/database-migration/" }, next: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" } }) }}

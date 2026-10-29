@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: better-auth plugins
 templateEngine: [vento, md]
-prev: { label: "Authentication", href: "/identity-access/auth/" }
-next: { label: "Session lifecycles", href: "/identity-access/session-lifecycles/" }
 order: 2
 ---
 
@@ -64,7 +62,7 @@ Whether it runs depends on what it needs at runtime:
 
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 
-[Operational session lifecycles](/identity-access/session-lifecycles/#better-auth-mounting-and-header-forwarding)
+[Session lifecycles](/identity-access/session-lifecycles/#better-auth-mounting-and-header-forwarding)
 shows how to mount better-auth's handler next to NetScript's verification.
 
 ## Protect a route with the resolved session
@@ -170,12 +168,10 @@ service forwards backend `Set-Cookie` headers only from interactive sign-out flo
 
 ## Next steps
 
-[Operational session lifecycles](/identity-access/session-lifecycles/) shows how to mount
+[Session lifecycles](/identity-access/session-lifecycles/) shows how to mount
 better-auth's handler and forward refreshed session headers.
 
 - {{ comp.xref({ key: "explain:auth-model" }) }}: how Principals, sessions and backends fit together.
 - {{ comp.xref({ key: "cap:auth" }) }}: the authentication capability overview.
-- [Reference: auth-better-auth](/reference/auth-better-auth/): generated symbols for every export
+- [Reference: auth-better-auth](/reference/auth-better-auth/): symbols for every export
   shown here.
-
-{{ comp.nextPrev({ prev: { label: "Authentication", href: "/identity-access/auth/" }, next: { label: "Session lifecycles", href: "/identity-access/session-lifecycles/" } }) }}

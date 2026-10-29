@@ -11,3 +11,5 @@
 7. Contributor path: docs/site/comparisons/_data.ts defines scenario contract, source code and links; verification imports that source rather than duplicating examples.
 
 PLAN-EVAL: N/A. Owner fixes the six-case scope and native picker; public API correctness and no-JS rendering are verified directly and by independent implementation review.
+
+Ordered integration: content #2471 merged as 55a65e2b911414134817d405e0ffaf5133aaf180 after independent MERGE and all CI green. Merge takes main for every prior content/navigation/renderer page; preserves only the started scenario picker, its tests and styles. Why already has no comparison table in the merged content pass. No predecessor content is reintroduced.

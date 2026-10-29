@@ -147,7 +147,7 @@ request-body `id` is optional and ignored, and a missing id returns a typed `VAL
 | `triggerJob` | `POST /jobs/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId?, traceparent?, tracestate? }` | `{ jobId, triggered }` |
 | `triggerTask` | `POST /tasks/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId? }` | `{ taskId, triggered }` |
 
-See the [background-jobs capability page](/background-processing/workers/#trigger-a-job-from-a-typed-client)
+See the [background jobs guide](/background-processing/workers/#trigger-a-job-from-a-typed-client)
 for the typed-client walkthrough.
 
 ## `@netscript/plugin-workers/services`

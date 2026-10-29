@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Deferred and streaming UI
 templateEngine: [vento, md]
-order: 6
+order: 9
 ---
 
 # Deferred and streaming UI
@@ -361,5 +361,5 @@ additional upstream fields.
 
 ## Next steps
 
-Continue with [The query bridge](/web-layer/query-bridge/) to see where a region's `cachedAt` comes
+Continue with [the query bridge](/web-layer/query-bridge/) to see where a region's `cachedAt` comes
 from. See also [Partials](/web-layer/partials/) for the route on the other end of a deferred region.

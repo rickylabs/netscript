@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Response shaping
 templateEngine: [vento, md]
-order: 17
+order: 5
 ---
 
 # Response shaping

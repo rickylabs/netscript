@@ -1,13 +1,11 @@
 ---
 layout: layouts/base.vto
-title: Operational session lifecycles
+title: Session lifecycles
 templateEngine: [vento, md]
-prev: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" }
-next: null
 order: 3
 ---
 
-# Operational session lifecycles
+# Session lifecycles
 
 This page shows the HTTP lifecycle each official auth adapter needs: mounting handlers, redirecting
 to the provider, exchanging the callback, checking return URLs and forwarding refreshed session
@@ -368,5 +366,5 @@ app.get("/api/protected", async (c) => {
 variables that these adapters plug into.
 
 - {{ comp.xref({ key: "explain:auth-model" }) }}: the backend-only port these lifecycles implement.
-- Generated reference: [auth-better-auth](/reference/auth-better-auth/),
+- Reference: [auth-better-auth](/reference/auth-better-auth/),
   [auth-kv-oauth](/reference/auth-kv-oauth/) and [auth-workos](/reference/auth-workos/).

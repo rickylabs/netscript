@@ -1,6 +1,6 @@
 ---
 layout: layouts/base.vto
-title: NetScript vs Nest.js, Hono, and Encore.dev
+title: NetScript vs backend frameworks
 description: Compare one contract-first endpoint, typed client, and background job across backend frameworks.
 templateEngine: [vento, md]
 order: 3
@@ -70,5 +70,3 @@ These are architectural estimates for this generic report endpoint, not benchmar
 | Consumer client after a contract change | Imported directly | Regenerated or hand-updated |
 | Files touched to add one required request field | ~2 | ~3–5 |
 | Architectural surface visible at entry | ~87–93% | ~40–53% |
-
-{{ comp.nextPrev({ prev: { label: "Frontend frameworks", href: "/comparisons/frontend/" }, next: { label: "Comparisons", href: "/comparisons/" } }) }}

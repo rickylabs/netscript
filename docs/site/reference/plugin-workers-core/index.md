@@ -201,7 +201,7 @@ The `@netscript/plugin-workers-core/discovery` entrypoint (`./src/builders/disco
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-## Related pages
+## Next steps
 
 - [`@netscript/plugin-workers`](/reference/workers/): the deployable plugin that binds this core to
   a NetScript host.

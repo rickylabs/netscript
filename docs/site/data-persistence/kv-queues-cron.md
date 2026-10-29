@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: KV, queues & cron
 templateEngine: [vento, md]
-prev: { label: "Database & Prisma", href: "/data-persistence/database/" }
-next: { label: "Telemetry & logging", href: "/observability/telemetry/" }
 order: 2
 ---
 
@@ -283,13 +281,11 @@ pointers, and the same payload works on every backend in the matrix.
 ## Next steps
 
 Use these primitives in code with the
-[Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) recipe.
+[Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/) recipe.
 
 - [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/): auto-discovery,
   explicit providers and the PostgreSQL backend.
 - {{ comp.xref({ key: "ref:kv" }) }} · {{ comp.xref({ key: "ref:queue" }) }} ·
-  {{ comp.xref({ key: "ref:cron" }) }}: the full generated APIs.
+  {{ comp.xref({ key: "ref:cron" }) }}: the full API references.
 - [Telemetry & logging](/observability/telemetry/): how queue and scheduler spans reach the Aspire
   dashboard.
-
-{{ comp.nextPrev({ prev: { label: "Database & Prisma", href: "/data-persistence/database/" }, next: { label: "Telemetry & logging", href: "/observability/telemetry/" } }) }}

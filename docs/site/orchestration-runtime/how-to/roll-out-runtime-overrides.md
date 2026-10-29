@@ -1,11 +1,10 @@
 ---
 layout: layouts/base.vto
 title: Roll out runtime overrides
+description: Change deployed behavior without rebuilding the workspace.
 templateEngine: [vento, md]
-order: 105
+order: 107
 oldUrl: /how-to/roll-out-runtime-overrides/
-prev: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" }
-next: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" }
 ---
 
 # Roll out runtime overrides
@@ -108,7 +107,7 @@ The next watcher reload sees the previous version and calls `onChange` again.
 | Malformed pointed-to file | The runtime config summary reports it. | Publish the summary to logs or health output. |
 | Long-running `onChange` callback | It can lag later updates. | Keep the callback bounded and hand heavier work to a queue. |
 
-## Next step
+## Next steps
 
 Use overrides to tune job behavior with
 [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/). The

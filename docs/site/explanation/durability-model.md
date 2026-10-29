@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Durability model
 templateEngine: [vento, md]
-prev: { label: "Auth model", href: "/explanation/auth-model/" }
-next: { label: "Observability", href: "/explanation/observability/" }
 order: 5
 ---
 
@@ -215,9 +213,9 @@ across three plugins, and it is the same continuous app the [tutorials](/tutoria
                                                            kv | prisma store)
 ```
 
-1. **A trigger turns an inbound webhook into a job.** The triggers plugin exposes raw Hono routes
+1. **A trigger turns an inbound webhook into a job.** The triggers plugin exposes raw webhook routes alongside its typed oRPC management contract
    (not oRPC). The webhook handler returns an array of `enqueueJob(jobRef, { payload, priority })`
-   effects, so a `POST` to `:8093/api/v1/webhooks/inbound/generic` enqueues a worker job: the
+   effects, so a `POST` to `/api/v1/webhooks/inbound/generic` at the triggers URL Aspire prints enqueues a worker job: the
    *ingress* of the durable flow. A handler can also return `defer({ until })`; the runtime persists
    the event and replays it once at or after that timestamp, including after a process restart.
    See {{ comp.xref({ key: "cap:triggers" }) }}.
@@ -304,5 +302,3 @@ When the process dies mid-workflow:
   without editing host code.
 
 Next: build a saga in [Durable checkout](/tutorials/storefront/04-checkout-saga/).
-
-{{ comp.nextPrev({ prev: { label: "Auth model", href: "/explanation/auth-model/" }, next: { label: "Observability", href: "/explanation/observability/" } }) }}

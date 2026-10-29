@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Layers, layout, and slots
 templateEngine: [vento, md]
-order: 16
+order: 4
 ---
 
 # Layers, layout, and slots
@@ -167,7 +167,7 @@ freshness stamp:
 ```
 
 That is why `getCachedEntry()` and `withLayer` fit together without an adapter. See
-[The query bridge](/web-layer/query-bridge/#the-loader-half-a-read-not-a-fetch) for what that call
+[the query bridge](/web-layer/query-bridge/#the-loader-half-a-read-not-a-fetch) for what that call
 does and does not do.
 
 The loader is a bare metadata read, not the

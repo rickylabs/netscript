@@ -1,11 +1,10 @@
 ---
 layout: layouts/base.vto
 title: Deploy locally with Aspire
+description: Bring up the whole resource graph on one machine from the generated Aspire AppHost.
 templateEngine: [vento, md]
-order: 102
+order: 103
 oldUrl: /how-to/deploy-local-aspire/
-prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }
-next: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" }
 ---
 
 # Deploy locally with Aspire
@@ -29,9 +28,8 @@ database and opens the Aspire dashboard. To ship to a remote target, use
   without a daemon the default workflow doesn't start.
 - **The Aspire CLI.** `aspire restore` and `aspire start` are the external Aspire CLI, run from
   inside `aspire/`, not `netscript` subcommands.
-- **Free ports**: the dashboard on `:18888` (HTTPS) and `:18889` (HTTP), OTLP on `:4318`, and the
-  high-range ports (49152–65535) allocated per project at scaffold time for services, plugin APIs
-  and frontend apps.
+- **Allocated endpoints**: the dashboard and OTLP receiver use free ports at startup. Open the URL
+  Aspire prints and read service and plugin endpoints from its resource list.
 
 ## Step 1 — Confirm the AppHost was scaffolded
 
@@ -84,17 +82,17 @@ boots it: infrastructure first, then services, plugin APIs and background proces
 cross-references resolved into injected environment variables.
 
 ```bash
-# Still inside aspire/. Boots the whole graph; prints the dashboard URL + a login token.
+# Still inside aspire/. Boots the whole graph; prints the dashboard URL.
 aspire start
 ```
 
-When boot finishes, `aspire start` prints the dashboard address and a one-time login token. One
+When boot finishes, `aspire start` prints the allocated dashboard address. One
 run brings up:
 
 | Resource | Address | What it is |
 | --- | --- | --- |
-| Aspire dashboard | `https://localhost:18888`, `http://localhost:18889` | Live resource list, console logs, structured logs and traces. |
-| OTLP collector | `http://localhost:4318` | The OpenTelemetry endpoint (http/protobuf) the dashboard runs. Framework spans and structured logs land here automatically. |
+| Aspire dashboard | the URL Aspire prints | Live resource list, console logs, structured logs and traces. |
+| OTLP collector | `the OTLP URL Aspire prints` | The OpenTelemetry endpoint (http/protobuf) the dashboard runs. Framework spans and structured logs land here automatically. |
 | `postgres` | Container | Provisioned through Docker; the database `netscript db` commands target. Postgres is the recommended engine (`--db postgres`); `--db mysql` and `--db mssql` select those engines, also as containers, and `--db sqlite` gives a file-backed database with no container. |
 | `redis` | Container (cache) | The default `--cache-backend`, Redis-compatible, backing KV and queue workloads for the runtime plugins. Swap it for `garnet` (also a container) or app-level `deno-kv` with `--cache-backend`. |
 | `users` (example service) | High-range port | The scaffolded oRPC service when you init with `--service`. OpenAPI at `/api/v1/users/*` and RPC at `/api/rpc/*`. |
@@ -121,20 +119,20 @@ netscript db seed               # optional: seed development data
 
 Outside Aspire, for example in an isolated CI container, point these commands at your own database
 with `POSTGRES_URI` or `DATABASE_URL`; see
-{{ comp.xref({ key: "howto:database-migration", text: "Database & migration" }) }}.
+{{ comp.xref({ key: "howto:database-migration", text: "Migrate the database" }) }}.
 
 ## Step 5 — Use the dashboard
 
-Open `https://localhost:18888` and paste the login token `aspire start` printed:
+Open the URL Aspire prints (the generated local profile allows anonymous access):
 
 | Tab | What it shows |
 | --- | --- |
 | Resources | Every container and executable with status, endpoints and resolved environment. The authority for which port each resource bound. |
 | Console logs | stdout and stderr per resource. A failing background processor is one click away. |
-| Structured logs and Traces | The spans and structured logs your handlers emit, correlated by `traceparent` across services and collected through the OTLP endpoint at `:4318`. |
+| Structured logs and Traces | The spans and structured logs your handlers emit, correlated by `traceparent` across services and collected through the OTLP endpoint at the OTLP URL Aspire prints. |
 
 Aspire starts each resource with its `OTEL_SERVICE_NAME` and an OTLP endpoint pointed at
-`http://localhost:4318`, so framework spans (job dispatch, job execution, scheduler runs) appear
+`the OTLP URL Aspire prints`, so framework spans (job dispatch, job execution, scheduler runs) appear
 here with no extra wiring. {{ comp.xref({ key: "explain:observability", text: "Observability" }) }}
 describes the boundary between framework and scaffold spans.
 
@@ -205,7 +203,7 @@ resource of another AppHost on the daemon is never used as evidence:
 If you run a relay, the mismatch warning stays: doctor checks where the daemon publishes ports, not
 whether your relay forwards them.
 
-## Next step
+## Next steps
 
 To start the same graph non-interactively in CI or from a coding agent, follow
 {{ comp.xref({ key: "howto:detached-start-agents-ci", text: "Detached start for agents and CI" }) }}.

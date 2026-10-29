@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Polyglot tasks
 templateEngine: [vento, md]
-prev: { label: "Typed SDK & client", href: "/services-sdk/sdk/" }
-next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" }
 order: 2
 ---
 
@@ -232,5 +230,3 @@ Define, run and sandbox a task step by step in
   share.
 - {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}: `defineTask`, the executor,
   runtime adapters and option types.
-
-{{ comp.nextPrev({ prev: { label: "Typed SDK & client", href: "/services-sdk/sdk/" }, next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" } }) }}

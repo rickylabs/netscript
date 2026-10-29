@@ -1,11 +1,10 @@
 ---
 layout: layouts/base.vto
 title: Publish a durable stream
+description: Publish server-owned entity state as a durable stream that browsers and other consumers subscribe to.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/publish-a-durable-stream/
-prev: { label: "Build a validated ingestion queue", href: "/durable-workflows/how-to/build-a-validated-ingestion-queue/" }
-next: { label: "Restrict worker task permissions", href: "/background-processing/how-to/restrict-worker-task-permissions/" }
 ---
 
 # Publish a durable stream
@@ -102,7 +101,7 @@ addEventListener('unload', async () => {
 | Runtime unavailable | `flush()` can throw the connection error. Treat it as a deploy or runtime failure. |
 | Duplicate stream path | `createDurableStream` reuses the open producer for the same `streamPath`. |
 
-## Next step
+## Next steps
 
 Read the stream from a page in [Live Dashboard, chapter 05](/tutorials/live-dashboard/05-live-stream/).
 The full API is in the [streams reference](/reference/streams/).

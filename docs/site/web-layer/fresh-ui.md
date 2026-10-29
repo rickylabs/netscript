@@ -2,9 +2,7 @@
 layout: layouts/base.vto
 title: Fresh UI & design
 templateEngine: [vento, md]
-prev: { label: "Telemetry & logging", href: "/observability/telemetry/" }
-next: { label: "Authentication", href: "/identity-access/auth/" }
-order: 12
+order: 17
 ---
 
 # Fresh UI & design
@@ -38,7 +36,7 @@ means the scaffolded app.
 `@netscript/fresh` is a published package (Fresh runtime extensions, builders, forms, defer
 primitives, and route contracts for NetScript) built on `@fresh/core` 2.x and Preact. Import the
 subpath you need; there is no single barrel. The table maps each subpath, and the
-[`@netscript/fresh` reference](/reference/fresh/) holds the generated API.
+[`@netscript/fresh` reference](/reference/fresh/) holds the full API.
 
 {{ comp.apiTable({
   caption: "@netscript/fresh subpath exports (the meta-framework surface)",
@@ -93,7 +91,7 @@ back end implements.
 {{ comp callout { type: "note", title: "Two ports, one app" } }}
 The app's dev server reads <code>PORT</code> and binds to its assigned port, with health at
 <code>/health</code>. The <strong>Aspire dashboard</strong> at
-<a href="https://localhost:18888">https://localhost:18888</a> is separate: it orchestrates the whole
+the dashboard at the URL Aspire prints is separate: it orchestrates the whole
 resource graph. Start the platform with <code>cd aspire &amp;&amp; aspire start</code> (Postgres,
 Redis and every service), or run the app on its own with
 <code>deno task --cwd apps/dashboard dev</code>.
@@ -214,7 +212,7 @@ build your screens with the same `definePage`, island, and query-factory shape o
   rows: [
     { name: "Assigned", type: "port", desc: "Dashboard dev server (reads Deno.env.get('PORT')). Standalone: deno task --cwd apps/dashboard dev." },
     { name: "/health", type: "HTTP", desc: "App health route logged at startup (e.g. /health on its assigned port)." },
-    { name: ":18888", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; token printed by aspire start." },
+    { name: "the URL Aspire prints", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; the generated local profile allows anonymous access." },
     { name: "Assigned", type: "upstream", desc: "The users service the dashboard's typed client calls, using the same UsersContractV1." },
     { name: "Assigned", type: "streams", desc: "The durable-streams Aspire service the @netscript/fresh/streams client consumes over HTTP/SSE (producer runtime in @netscript/plugin-streams-core)." }
   ]

@@ -26,7 +26,7 @@ source of truth: the same schema types the server handler now and the Fresh clie
 An `orders.list` procedure: a `GET` route that takes pagination and a `status` filter and returns a
 typed page of orders. The `status` filter selects the queue view, such as `pending` work or `failed`
 payments. You read the scaffolded contract and its `.route().input().output()` shape, serve it on
-port **3002** with `defineService`, and seed the database. Every later chapter reads this
+the endpoint Aspire allocates with `defineService`, and seed the database. Every later chapter reads this
 read-model.
 
 ## Before you begin
@@ -35,10 +35,10 @@ You need [chapter 1](/tutorials/live-dashboard/01-scaffold/)'s `my-dashboard/` w
 up. In a second terminal, confirm the `orders` service is reachable:
 
 ```sh
-curl http://localhost:3002/health
+curl "$SERVICE_URL/health"
 ```
 
-A healthy JSON response means the scaffolded `orders` service is live on **3002**.
+A healthy JSON response means the scaffolded `orders` service is live at its allocated endpoint.
 
 ## Step 1 — Read the orders contract
 
@@ -169,23 +169,22 @@ await defineService(router, {
   auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
   name: 'orders',
   version: '1.0.0',
-  port: parseInt(Deno.env.get('PORT') || '3002'),
+  port: Number(Deno.env.get('PORT') ?? '0'),
   db: { netscript },
   openapi: { title: 'Orders API', description: 'Order management service' },
   debug: true,
 });
 ```
 
-Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment. The typed source
-of truth is the `services.<name>.port` field in `netscript.config.ts`, which the scaffold wires as
-the fallback default: change the port there, not in this line. The service exposes this surface on
-port **3002**:
+Aspire injects `PORT` at runtime. The zero fallback requests a free listener port for a standalone
+experiment; the normal tutorial path runs through Aspire and uses its allocated endpoint. The
+service exposes these paths under that base URL:
 
 {{ comp.apiTable({
-  caption: "orders service endpoints (port 3002)",
+  caption: "orders service endpoints (use its allocated base URL)",
   rows: [
     { name: "/api/rpc/*", type: "POST", desc: "The typed oRPC surface. Your typed client calls procedures (v1.orders.list) under this prefix with end-to-end type safety. This is what the dashboard talks to." },
-    { name: "/api/v1/orders/list", type: "GET", desc: "The OpenAPI/REST projection of the same procedure — handy for curl and tools." },
+    { name: "/api/v1/orders/list", type: "GET", desc: "The OpenAPI/REST projection of the same procedure — inspectable through MCP." },
     { name: "/health", type: "GET", desc: "Liveness probe — the plain JSON check you hit above." }
   ]
 }) }}
@@ -209,14 +208,20 @@ netscript db seed               # seed development data (orders, users, products
 ```
 
 These commands talk to the Postgres container Aspire provisioned; without Aspire they fail. The full
-sequence is in [Database & migration](/data-persistence/how-to/database-migration/).
+sequence is in [Migrate the database](/data-persistence/how-to/database-migration/).
 
 ## Verify your progress
 
-Call the `list` procedure through the OpenAPI projection:
+Call the contract-derived `list` procedure through the SDK:
 
-```sh
-curl 'http://localhost:3002/api/v1/orders/list?limit=2&offset=0'
+```ts
+import { ordersContract } from '@my-dashboard/contracts';
+import { createServiceClient } from '@netscript/sdk/client';
+
+// Run in an Aspire-launched app or service that references orders.
+const orders = createServiceClient({ contract: ordersContract, serviceName: 'orders' });
+const result = await orders.list({ limit: 2, offset: 0 });
+console.log(result.items, result.total);
 ```
 
 You see up to two seeded orders and a total, shaped like the contract's `output`:
@@ -239,21 +244,19 @@ Then type-check the contract, handler and router together from the project root:
 deno task check
 ```
 
-- [ ] `curl …/api/v1/orders/list?limit=2&offset=0` returns a typed page of orders.
+- [ ] `orders.list({ limit: 2, offset: 0 })` returns a typed page of orders.
 - [ ] The shape matches the contract's `output` (items / total / limit / offset / hasMore).
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "Empty items array?" } }}
 If <code>items</code> comes back empty, the seed step didn't run or the database is fresh. Re-run
 <code>netscript db seed</code> from the workspace root, with <code>aspire start</code> still up, then
-retry the <code>curl</code>.
+retry the typed query.
 {{ /comp }}
 
 ## What you built
 
 A typed `orders.list` read-model: an oRPC contract (`@orpc/contract` and Zod), a database-backed
-handler bound with `.handler(...)`, and a service running on port **3002** through `defineService`,
+handler bound with `.handler(...)`, and a service running at its allocated endpoint through `defineService`,
 with its `/api/rpc/*` surface and `/api/v1/orders/*` OpenAPI projection. Next, you read this service
 from the Fresh app through a typed SDK client and a cache-first query layer.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" }, next: { label: "3 · Cache-first query", href: "/tutorials/live-dashboard/03-sdk-cache-first-query/" } }) }}

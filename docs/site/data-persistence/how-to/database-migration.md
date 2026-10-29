@@ -1,12 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Database & migration
+title: Migrate the database
+description: Initialize, generate, seed, and inspect the database schema with the netscript db commands.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/database-migration/
 ---
 
-# Database & migration
+# Migrate the database
 
 This recipe takes a freshly scaffolded workspace to a migrated, seeded database. You start the
 AppHost, create and apply the first migration, generate the typed Prisma client, seed it and confirm
@@ -92,8 +93,7 @@ Leave `aspire start` running in this terminal. It provisions Postgres and the Re
 and queue backend) as Docker containers; you need no `docker run` and no local Postgres install.
 When it settles:
 
-- The **Aspire dashboard** is at [https://localhost:18888](https://localhost:18888), with the access
-  token printed in the `aspire start` output. Confirm the `postgres` and `redis` resources are green.
+- The **Aspire dashboard** is at the URL Aspire prints, using the allocated URL from `aspire start`. The generated local profile allows anonymous access. Confirm the `postgres` and `redis` resources are green.
 - The graph also lists the per-capability services and processors (`workers-api`, `workers`,
   `sagas-api`, `sagas`, `triggers-api`, `triggers`). If you scaffolded auth and streams, `auth-api`
   and the streams service join the graph on their assigned ports.
@@ -161,7 +161,7 @@ Confirm the database is migrated and seeded, from most to least authoritative:
    sync. If it is green, the other checks only corroborate it.
 2. **Generated client.** `database/postgres/schema/.generated/` contains the Prisma client and the
    `zod` schemas, so your typed models are importable from application code.
-3. **Aspire dashboard.** The `postgres` resource at [https://localhost:18888](https://localhost:18888)
+3. **Aspire dashboard.** The dashboard at the URL Aspire prints shows the `postgres` resource
    is green and shows recent activity from the migration and seed runs.
 
 When all three agree, import the generated client in a service or worker and read the rows the seed
@@ -177,11 +177,11 @@ wrote.
 
 ## Next steps
 
-Continue with [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) to use the KV and queue
+Continue with [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/) to use the KV and queue
 backends; its PostgreSQL queue provider keeps `message_queue` rows in this same datasource.
 
 - [Database & Prisma](/data-persistence/database/): per-plugin schema aggregation, driver adapters
   and the appsettings-driven datasource.
 - [Deploy](/orchestration-runtime/how-to/deploy/): point the workspace at your own Postgres with
   `POSTGRES_URI` / `DATABASE_URL` and `--no-aspire`.
-- [`@netscript/database` reference](/reference/database/): the full generated API.
+- [`@netscript/database` reference](/reference/database/): the full API reference.

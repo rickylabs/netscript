@@ -305,7 +305,7 @@ The `@netscript/plugin-sagas-core/discovery` entrypoint (`./src/builders/discove
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-## Related pages
+## Next steps
 
 - [`@netscript/plugin-sagas`](/reference/sagas/): the deployable plugin that binds this core to a
   NetScript host.

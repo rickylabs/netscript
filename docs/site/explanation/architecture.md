@@ -2,12 +2,10 @@
 layout: layouts/base.vto
 title: Architecture
 templateEngine: [vento, md]
-prev: { label: "Explanation", href: "/explanation/" }
-next: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 order: 1
 ---
 
-# The NetScript architecture
+# Architecture
 
 This page gives you the map of a NetScript app: the layers you work with, what runs where, and which
 way the dependencies point. NetScript is a set of Deno-native framework packages published on
@@ -17,7 +15,7 @@ locally by **Aspire**.
 {{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace as four stacked layers: typed contracts at the base, packages and plugins composed on top, the host wiring plugins through generated registries, and the runtime executing services and background processors — all orchestrated by Aspire.", caption: "The four layers an app author works with: typed contracts, packages and plugins, the host that assembles them, and the runtime that executes services and background processors." }) }}
 
 This page explains why NetScript is split the way it is. For hands-on work, use the
-[tutorials]({{ "tut:index" |> xref }}) and [how-to guides]({{ "howto:index" |> xref }}); the
+[tutorials]({{ "tut:index" |> xref }}) and the guides and recipes in [Build]({{ "howto:index" |> xref }}); the
 [glossary](/glossary/) defines each term.
 
 ## The published surface
@@ -112,7 +110,7 @@ The topology below is a fully loaded workspace, with every first-party plugin en
 ```text
                               ┌───────────────────────────────────┐
                               │            Aspire AppHost          │
-                              │   dashboard  https://localhost:18888│
+                              │   dashboard  the URL Aspire prints│
                               │  provisions Postgres + Redis (KV)  │
                               └───────────────┬───────────────────┘
                                               │ wires env, ports, resources
@@ -144,7 +142,7 @@ Read the picture in three bands. **Aspire** sits on top as the local orchestrato
 `cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or
 `deno-kv` are selectable via `--cache-backend`) and starts every service *before* any
 `netscript db` command runs. Traces, logs, and health land in the dashboard at
-`https://localhost:18888`. **Plugin services** sit in the middle, each owning exactly one service;
+`the URL Aspire prints`. **Plugin services** sit in the middle, each owning exactly one service;
 your scaffolded `users` service sits beside them and uses the same contract machinery. **The
 packages** sit underneath as the substrate every plugin composes. See
 [Orchestration with Aspire]({{ "explain:aspire" |> xref }}) for the control plane.
@@ -153,7 +151,7 @@ packages** sit underneath as the substrate every plugin composes. See
   title: "Workspace ports and surfaces",
   columns: ["Surface", "Port", "Protocol", "Owner"],
   rows: [
-    ["Aspire dashboard", ":18888", "HTTP (UI)", "Aspire AppHost"],
+    ["Aspire dashboard", "the URL Aspire prints", "HTTP (UI)", "Aspire AppHost"],
     ["Example service (users)", "Assigned (>= 49152)", "oRPC over <code>/api/rpc/*</code>", "your service"],
     ["Workers", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-workers</code>"],
     ["Sagas", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-sagas</code>"],
@@ -188,7 +186,7 @@ implement it (the default interactive KV-OAuth backend, plus WorkOS and Better-A
 plugin composes the one backend named by `NETSCRIPT_AUTH_BACKEND`. When a backend cannot honor a
 capability, it fails loud with a typed `AuthBackendOperationUnsupportedError` instead of silently
 doing nothing. [The auth model]({{ "explain:auth-model" |> xref }}) covers the port, the three
-backends, and the per-backend capability matrix; the capability hub is
+backends, and the per-backend capability matrix; the guide is
 [Authentication]({{ "cap:auth" |> xref }}).
 
 The same shape appears elsewhere. The [`queue`](/reference/queue/) package defines one port behind
@@ -244,8 +242,7 @@ event-handler ladders. [Durable sagas]({{ "cap:durable-sagas" |> xref }}) are th
 a saga is a set of named phases with explicit correlation, persistence, and compensation, declared
 through a builder.
 
-{{ comp.codeBlock({ lang: "ts", code:
-"// plugins/sagas/user-registration.saga.ts\nimport { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (s, _message, _context) => {\n    s.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (s, _message, _context) => {\n    s.state = { status: \"complete\" };\n  })\n  .build();" }) }}
+{{ comp.codeBlock({ lang: "ts", code: "// plugins/sagas/user-registration.saga.ts\nimport { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (s, _message, _context) => {\n    s.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (s, _message, _context) => {\n    s.state = { status: \"complete\" };\n  })\n  .build();" }) }}
 
 Failure handling is explicit too. Handlers throw rich errors, and a supervisor, not a scatter of
 defensive `try/catch` blocks inside the handler, decides whether to restart or escalate and owns the
@@ -274,5 +271,3 @@ broken by definition, which is why the published surface can be trusted as the p
 
 Next: [Contracts &amp; type flow]({{ "explain:contracts" |> xref }}) shows how types flow from a
 contract to a client.
-
-{{ comp.nextPrev({ prev: { label: "Explanation", href: "/explanation/" }, next: { label: "Contracts & type flow", href: "/explanation/contracts/" } }) }}

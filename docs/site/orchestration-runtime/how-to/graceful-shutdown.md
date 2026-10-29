@@ -1,11 +1,10 @@
 ---
 layout: layouts/base.vto
 title: Graceful shutdown
+description: Drain requests, jobs, and connections on SIGTERM, and run teardown hooks.
 templateEngine: [vento, md]
-order: 106
+order: 108
 oldUrl: /how-to/graceful-shutdown/
-prev: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }
-next: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }
 ---
 
 # Graceful shutdown
@@ -224,7 +223,7 @@ A throwing hook doesn't abort the drain: a rejected `ShutdownHook` is recorded a
 `ShutdownHookOutcome`, not re-thrown. Inspect the returned `ShutdownReport`, or the logged warning,
 to catch teardown failures.
 
-## Next step
+## Next steps
 
 Decide how much in-flight work a drain waits on with
 [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/). The

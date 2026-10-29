@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Services & contracts
 templateEngine: [vento, md]
-prev: { label: "Capabilities", href: "/capabilities/" }
-next: { label: "Background jobs", href: "/background-processing/workers/" }
 order: 1
 ---
 
@@ -97,7 +95,7 @@ auth middleware, or custom context step by step. Both run the same Hono and oRPC
   {
     label: "Advanced — createService().serve() (fluent)",
     lang: "ts",
-    code: "// plugins/workers/services/src/main.ts — step-by-step composition\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDocs()\n  .withDatabase(dbClient)\n  .withContext(() => ({ workers: runtime }))\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .withServiceInfo()\n  .onStartup(async () => {/* seed, warm caches */})\n  .serve();"
+    code: "// plugins/workers/services/src/main.ts — step-by-step composition\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'workers', version: '1.0.0', port: Number(Deno.env.get('PORT')) }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDocs()\n  .withDatabase(dbClient)\n  .withContext(() => ({ workers: runtime }))\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .withServiceInfo()\n  .onStartup(async () => {/* seed, warm caches */})\n  .serve();"
   }
 ] }) }}
 
@@ -361,7 +359,7 @@ contracts.
   rejected. Add an explicit allow rule for public-but-authenticated routes instead of relaxing the
   default.
 - **Start Aspire first for database-backed services.** `aspire start` must bring up Postgres and
-  Redis (dashboard at [https://localhost:18888](https://localhost:18888)) before any
+  Redis (dashboard at the URL Aspire prints) before any
   `netscript db` command, or the readiness probe fails.
 
 ## Next steps

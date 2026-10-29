@@ -637,6 +637,10 @@
   color: var(--ns-muted-fg);
   font-size: 12px;
 }
+/* Code spans keep the comment's mono size instead of the prose chip's smaller one. */
+.ns-file-tree__comment code {
+  font-size: inherit;
+}
 .ns-file-tree__ownership {
   margin-left: auto;
   padding-left: 20px;
@@ -790,73 +794,6 @@
   font-size: 14px;
   line-height: 22px;
   color: var(--ns-muted-fg);
-}
-/* Scenario selector: ink chrome only; panels stack in order until the select enhances them. */
-.ns-scenarios {
-  margin: 24px 0 32px;
-}
-.ns-scenarios__picker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-.ns-scenarios__picker[hidden],
-.ns-scenarios__panel[hidden] {
-  display: none;
-}
-.ns-scenarios select {
-  max-width: 100%;
-  min-height: 32px;
-  padding: 6px 28px 6px 10px;
-  background: var(--ns-bg);
-  border: 1px solid var(--ns-studio-input-border);
-  color: var(--ns-fg);
-  font-size: 13px;
-}
-.ns-scenarios select:focus-visible {
-  outline: 2px solid var(--ns-fg);
-  outline-offset: 2px;
-}
-.ns-scenarios__panel {
-  padding-top: 16px;
-  border-top: 1px solid var(--ns-border);
-}
-.ns-scenarios__panel + .ns-scenarios__panel {
-  margin-top: 32px;
-}
-.ns-scenarios.is-enhanced .ns-scenarios__panel + .ns-scenarios__panel {
-  margin-top: 0;
-}
-.ns-prose .ns-scenarios__title {
-  margin: 0 0 8px;
-}
-.ns-prose .ns-scenarios p {
-  margin: 0;
-}
-.ns-prose .ns-scenarios .ns-eyebrow {
-  margin-bottom: 4px;
-}
-.ns-prose .ns-scenarios .ns-scenarios__problem {
-  margin-bottom: 16px;
-}
-.ns-scenarios__solution .ns-tabbed {
-  margin: 0;
-}
-.ns-scenarios__alternative {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-left: 2px solid var(--ns-border);
-  color: var(--ns-muted-fg);
-}
-.ns-prose .ns-scenarios .ns-scenarios__why {
-  margin-top: 16px;
-}
-.ns-prose .ns-scenarios .ns-scenarios__more {
-  margin-top: 8px;
-  font-size: 14px;
 }
 .ns-destination-list ul {
   display: flex;
@@ -1036,4 +973,72 @@
   flex-wrap: wrap;
   gap: 8px;
   margin: 24px 0 40px;
+}
+
+/* Scenario selector: ink chrome only; panels stack in order until the select enhances them. */
+.ns-scenarios {
+  margin: 24px 0 32px;
+}
+.ns-scenarios__picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.ns-scenarios__picker[hidden],
+.ns-scenarios__panel[hidden] {
+  display: none;
+}
+.ns-scenarios select {
+  max-width: 100%;
+  min-height: 32px;
+  padding: 6px 28px 6px 10px;
+  background: var(--ns-bg);
+  border: 1px solid var(--ns-studio-input-border);
+  color: var(--ns-fg);
+  font-size: 13px;
+}
+.ns-scenarios select:focus-visible {
+  outline: 2px solid var(--ns-fg);
+  outline-offset: 2px;
+}
+.ns-scenarios__panel {
+  padding-top: 16px;
+  border-top: 1px solid var(--ns-border);
+}
+.ns-scenarios__panel + .ns-scenarios__panel {
+  margin-top: 32px;
+}
+.ns-scenarios.is-enhanced .ns-scenarios__panel + .ns-scenarios__panel {
+  margin-top: 0;
+}
+.ns-prose .ns-scenarios__title {
+  margin: 0 0 8px;
+}
+.ns-prose .ns-scenarios p {
+  margin: 0;
+}
+.ns-prose .ns-scenarios .ns-eyebrow {
+  margin-bottom: 4px;
+}
+.ns-prose .ns-scenarios .ns-scenarios__problem {
+  margin-bottom: 16px;
+}
+.ns-scenarios__solution .ns-tabbed {
+  margin: 0;
+}
+.ns-scenarios__alternative {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-left: 2px solid var(--ns-border);
+  color: var(--ns-muted-fg);
+}
+.ns-prose .ns-scenarios .ns-scenarios__why {
+  margin-top: 16px;
+}
+.ns-prose .ns-scenarios .ns-scenarios__more {
+  margin-top: 8px;
+  font-size: 14px;
 }

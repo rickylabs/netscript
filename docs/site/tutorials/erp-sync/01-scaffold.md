@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the workspace
+title: Scaffold the ERP sync
 templateEngine: [vento, md]
 prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }
 next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }
 ---
 
-# Scaffold the workspace
+# Scaffold the ERP sync
 
 This chapter creates `my-erp/`, the workspace for the SAP-to-Dynamics sync. You add the
 **workers** and **triggers** plugins and boot the stack under Aspire, so the rest of the track has
@@ -24,8 +24,7 @@ a running system to build on.
 
 `my-erp/` on disk: a NetScript workspace with a Postgres database, the **workers** plugin at
 `plugins/workers/` (the background-job engine) and the **triggers** plugin at `plugins/triggers/`
-(the ingress engine), all running under one `aspire start`, with the Aspire dashboard live on
-`:18888`.
+(the ingress engine), all running under one `aspire start`, with the Aspire dashboard available at the URL Aspire prints.
 
 ## Before you begin
 
@@ -40,17 +39,11 @@ You need:
 Install the NetScript CLI from JSR once, then confirm it:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-You should see the public command groups, including `init`, `plugin`, `generate`, `db` and
-`deploy`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new
-terminal.
-
-{{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad hoc with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>. The rest of this track uses the installed <code>netscript</code> form.
-{{ /comp }}
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
@@ -123,8 +116,11 @@ netscript plugin list
 
 You should see `workers` and `triggers` in the registry.
 
-{{ comp callout { type: "note", title: "Two trees, one canonical home" } }}
-A scaffold may also create smaller top-level <code>workers/</code> and <code>triggers/</code> directories: workspace members that stage a subset of files for the background processors. The config-referenced plugins live at <strong><code>plugins/workers/</code></strong> and <strong><code>plugins/triggers/</code></strong>. That is what <code>netscript.config.ts</code> points at and where you author code.
+{{ comp callout { type: "note", title: "Authoring paths and plugin implementation" } }}
+The project configuration discovers your job modules under <code>workers/jobs/</code>, tasks under
+<code>workers/tasks/</code> and trigger definitions under <code>triggers/</code>. The plugin packages
+under <code>plugins/workers/</code> and <code>plugins/triggers/</code> supply the runtime and API.
+Use the plugin CLIs to add project definitions; their registries follow the configured authoring paths.
 {{ /comp }}
 
 ## Step 5 — Bring up orchestration
@@ -141,11 +137,11 @@ aspire start       # starts the AppHost and every declared resource
 ```
 
 `aspire start` brings up Postgres, the Redis cache, the workers API and processor, and the
-triggers API and processor, then prints a URL and a one-time login token for the
+triggers API and processor, then prints the allocated URL for the
 **Aspire dashboard**:
 
 ```text
-https://localhost:18888
+the URL Aspire prints
 ```
 
 The dashboard's **Resources** tab is the authority for the port each resource bound. You installed
@@ -177,7 +173,7 @@ Leave `aspire start` running in this terminal. It is your control plane for the 
 
 - [ ] `my-erp/` exists with `plugins/workers/` and `plugins/triggers/` on disk.
 - [ ] `netscript plugin list` shows both `workers` and `triggers`.
-- [ ] `aspire start` is up; the dashboard on `:18888` lists `postgres`, `redis`, and both plugin APIs.
+- [ ] `aspire start` is up; the dashboard at the URL Aspire prints lists `postgres`, `redis`, and both plugin APIs.
 - [ ] `curl <workers-endpoint>/health` and `curl <triggers-endpoint>/health` both return healthy.
 - [ ] `deno task check` is clean.
 
@@ -190,5 +186,3 @@ Three checks cover most first-run problems: (1) is <code>aspire start</code> sti
 `my-erp/`, with the **workers** and **triggers** plugins installed and the stack (Postgres, Redis,
 both plugin APIs and their background processors) running under one `aspire start`. Next, you give
 it the SAP export to ingest.
-
-{{ comp.nextPrev({ prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }, next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" } }) }}

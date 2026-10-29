@@ -1,18 +1,16 @@
 ---
 layout: layouts/base.vto
-title: Observability
+title: Observability model
 templateEngine: [vento, md]
-prev: { label: "Durability model", href: "/explanation/durability-model/" }
-next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
 order: 6
 ---
 
-# Observability
+# Observability model
 
 This page explains how NetScript keeps one logical operation readable as one trace when it crosses
 HTTP, a queue, a saga, and a worker subprocess: the trace context travels with the work, and the
 framework carries it across every boundary it owns. For the headline API, see the
-{{ comp.xref({ key: "cap:telemetry" }) }} hub; for the exported symbols, see
+{{ comp.xref({ key: "cap:telemetry" }) }} guide; for the exported symbols, see
 {{ comp.xref({ key: "ref:telemetry" }) }}.
 
 {{ comp.diagram({
@@ -30,7 +28,7 @@ drifts from the code because it was never part of the code's shape.
 NetScript treats observability the way it treats
 {{ comp.xref({ key: "explain:contracts", text: "contracts" }) }}: a cross-cutting concern belongs to
 the boundary, so the framework owns it and gives you a typed seam. A service built with
-[`defineService(...)`](/capabilities/services/) wires request logging, health endpoints, and
+[`defineService(...)`](/services-sdk/services/) wires request logging, health endpoints, and
 OpenTelemetry context propagation in one call. A worker job runs *inside a span* the framework
 opens. The common signal (this operation happened, here is its trace id, here is whether it was
 healthy) comes with no code; a custom child span around an expensive step is one typed call.
@@ -75,18 +73,16 @@ splits into separate traces.
 
 ## Structured logs
 
-Logs in NetScript are structured records, not free-text `console.log` output. A handler's
-`ctx.logger` emits JSON with a level, a message, and an attribute bag, and the logging middleware
-adds request metadata to each record. Because logging runs inside the same active span as the work,
-a log line emitted during a job carries, or can be joined to, the operation's trace id. In the
-dashboard, you select a slow trace and see the log lines emitted within its spans beside it. The
-logging surface is in {{ comp.xref({ key: "ref:logger" }) }}.
+Framework middleware emits structured request records and correlates them with the active trace.
+The generated worker helper `createJobTools(ctx)` adds progress and child-span helpers; its `log`
+methods write to the console. A job context has no built-in `ctx.logger` property. Use
+{{ comp.xref({ key: "ref:logger" }) }} when application code needs structured logging.
 
 ## OTLP and the Aspire dashboard
 
 In the default development loop, the Aspire dashboard collects the telemetry, and processes send it
 over **OTLP** (the OpenTelemetry Protocol). The generated Aspire AppHost configures an OTLP receiver
-at `http://localhost:4318` and a dashboard UI at `https://localhost:18888`. Resources started under
+at the OTLP URL Aspire prints and a dashboard UI at the URL Aspire prints. Resources started under
 Aspire receive the OTLP endpoint through environment variables, so they export telemetry without
 per-service configuration.
 
@@ -97,10 +93,10 @@ before the first handler runs. Without it, handlers still run, but their telemet
 {{ comp.apiTable({
   caption: "Where telemetry is viewed and received",
   rows: [
-    { name: "Aspire dashboard", type: "https://localhost:18888", desc: "The viewing surface: resource graph, per-resource health, structured logs, and the distributed-trace view. `aspire start` prints the login token." },
-    { name: "OTLP receiver", type: "http://localhost:4318", desc: "Where processes export OpenTelemetry traces, logs, and metrics. Configured by the generated Aspire AppHost and handed to resources through environment variables." },
+    { name: "Aspire dashboard", type: "the URL Aspire prints", desc: "The viewing surface: resource graph, per-resource health, structured logs, and the distributed-trace view. The generated local profile allows anonymous dashboard access." },
+    { name: "OTLP receiver", type: "the OTLP URL Aspire prints", desc: "Where processes export OpenTelemetry traces, logs, and metrics. Configured by the generated Aspire AppHost and handed to resources through environment variables." },
     { name: "Workers health", type: "GET /health (on assigned port)", desc: "Liveness for the workers API: the cheapest signal that the capability is up." },
-    { name: "Auth health", type: "GET :8094/health/live", desc: "Liveness for the auth-api service, which also exposes /health/ready." }
+    { name: "Auth health", type: "GET /health/live", desc: "Liveness for the auth-api service, which also exposes /health/ready." }
   ]
 }) }}
 
@@ -118,7 +114,7 @@ For a custom span outside those helpers, import `withChildSpan` from
 child nests under it:
 
 ```ts
-// services/orders/handlers/process-order.ts
+// workers/jobs/process-order.ts
 import {
   defineJobHandler,
   createSuccessResult,
@@ -127,9 +123,11 @@ import {
 // The dispatcher already opened the parent job span around this handler,
 // so this child span nests under it automatically.
 import { withChildSpan } from '@netscript/telemetry/instrumentation';
+import { createJobTools } from './job-tools.ts';
 
 const handler = defineJobHandler(async (ctx) => {
-  ctx.logger.info('processing order'); // structured log, joined to the trace
+  const { log } = createJobTools(ctx);
+  log.info('processing order'); // generated console-backed helper
 
   // Bracket an expensive step in a REAL child span.
   const result = await withChildSpan('order.charge', async (span) => {
@@ -184,7 +182,7 @@ login.
 The audit trail is not a tamper-evident, immutable ledger: the events ride the standard OTel and
 streams transport. Use it as a queryable audit trail for operational and security review, not as a
 compliance-grade write-once log. For how auth itself is shaped, see
-{{ comp.xref({ key: "explain:auth-model" }) }} and the {{ comp.xref({ key: "cap:auth" }) }} hub.
+{{ comp.xref({ key: "explain:auth-model" }) }} and the {{ comp.xref({ key: "cap:auth" }) }} guide.
 
 ## Trade-offs
 
@@ -193,11 +191,9 @@ compliance-grade write-once log. For how auth itself is shaped, see
   cannot instrument half your code by accident. The cost is that you instrument the NetScript way:
   you use `@netscript/telemetry` and the catalog-pinned `@opentelemetry/api` (`^1.9`), not the tracer
   you used on your last project.
-- **One viewing surface in development, your choice in production.** The dashboard at `:18888` is a
+- **One viewing surface in development, your choice in production.** The dashboard at the URL Aspire prints is a
   development convenience wired by Aspire, and it is an OTLP receiver like any other. In production
   you point the same OTLP export at your own collector. The model ties you to the protocol, not to
   Aspire.
 
 Next: add a custom span and structured logs with [Add OpenTelemetry](/observability/how-to/add-opentelemetry/).
-
-{{ comp.nextPrev({ prev: { label: "Durability model", href: "/explanation/durability-model/" }, next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" } }) }}

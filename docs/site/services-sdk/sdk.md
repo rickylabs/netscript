@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Typed SDK & client
 templateEngine: [vento, md]
-prev: { label: "Fresh meta-framework", href: "/web-layer/" }
-next: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }
 order: 2
 ---
 
@@ -389,27 +387,6 @@ This is a deliberate characteristic of the API. To make the defined-error arm av
 type checker, pass `safe()` a promise carrying contract error typing, such as the promise returned
 by a service-client method, rather than a bare `Promise`. For an existing typed error union,
 `isDefinedError()` narrows to the `DefinedError` members already present in that union.
-
-### Migrating to 0.0.7
-
-The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
-patch-compatible**. Existing SDK consumers should account for all of these signature changes:
-
-| Surface | Before 0.0.7 | 0.0.7 and later |
-| --- | --- | --- |
-| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
-| `SafeFailure` arms | `SafeFailure<TError = unknown>` was one failure arm with `isDefined: boolean`. | It is two literal-discriminated arms, `isDefined: false` and `isDefined: true`. Code that typed the property as a general `boolean` or treated failure as one undifferentiated arm must branch on the literal. |
-| Default error type | `SafeFailure` and `SafeResult` defaulted `TError` to `unknown`; `safe<TOutput>` had no `TError` parameter and returned `SafeResult<TOutput>`, inheriting that default. | `SafeFailure`, `SafeResult`, and `safe` now default `TError` to `Error`. |
-| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
-| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
-| `baseContract` error codes | The error-map key space was open, so undeclared codes remained type-valid even though comparisons against them were silently false at runtime. | The key space is exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`. Comparing `error.code` with any other code is now a type error: intentional typo/undeclared-code protection and a breaking tightening. |
-| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in the example above. |
-
-The tuple form has not been removed: every success and failure arm remains a tuple-and-object
-intersection, so destructuring still works. The discriminated form is the documented path because
-it keeps non-defined failures distinct from success and narrows contract-defined errors. For the
-payload migration, change a check such as `if (failure.data === null)` to
-`if (failure.data === undefined)`.
 
 ## Production notes
 

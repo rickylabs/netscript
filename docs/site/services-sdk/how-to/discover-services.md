@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Discover services
+description: Declare a service reference and call it through a typed client that resolves its URL from Aspire.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/discover-services/
@@ -26,7 +27,7 @@ request URL.
   caption: "Discovery flow: shared contract → typed client → URL resolved from the Aspire services__ env var → oRPC call to the service that implements the same contract."
 }) }}
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -156,7 +157,7 @@ export async function listUsers() {
 
 On the defined branch, `error.code` selects the schema for `error.data`.
 [Safe error narrowing](/services-sdk/sdk/#safe-error-narrowing) covers the six `baseContract`
-codes, `isDefinedError()`, and the [0.0.7 migration](/services-sdk/sdk/#migrating-to-007).
+codes and `isDefinedError()`.
 
 ## Many services at once with `defineServices`
 
@@ -316,5 +317,3 @@ Serve the OpenAPI document and Scalar UI for your service with
 [Expose OpenAPI & Scalar](/services-sdk/how-to/expose-openapi-scalar/). See also
 [Typed SDK & client](/services-sdk/sdk/), the [`@netscript/sdk` reference](/reference/sdk/), and
 [Orchestration with Aspire](/explanation/aspire/).
-
-{{ comp.nextPrev({ prev: { label: "How-to guides", href: "/how-to/" }, next: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" } }) }}

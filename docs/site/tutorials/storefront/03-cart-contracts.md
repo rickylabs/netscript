@@ -42,9 +42,9 @@ schemas here are hand-written Zod. You can generate them from Prisma later if yo
 
 From [chapter 2](/tutorials/storefront/02-catalog-service/), check that:
 
-- `my-shop/` has a working `products` service on `:3001` and a `contracts/versions/v1/` directory
+- `my-shop/` has a working `products` service at its allocated endpoint and a `contracts/versions/v1/` directory
   with `products.contract.ts` in it;
-- `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
+- `aspire start` is up (the dashboard answers at the URL Aspire prints).
 
 Confirm the contracts workspace is where you left it:
 
@@ -245,24 +245,23 @@ from the `@my-shop/contracts` barrel and from `@my-shop/contracts/versions/v1` w
 ## Step 4 — Derive a typed client
 
 A client needs **only the contract** to be fully typed: no running server, no generated SDK, no
-hand-written request types. The typed-client packages aren't in the scaffold's import map, so add
-them once:
+hand-written request types. Inspect the contract with the CLI, then derive the client through the
+SDK already present in the workspace:
 
 ```sh
-deno add npm:@orpc/client npm:@orpc/openapi-client
+netscript contract inspect cart
 ```
 
 Then create a small script:
 
 ```ts
 // scripts/cart-client.ts
-import { createORPCClient } from '@orpc/client';
-import { OpenAPILink } from '@orpc/openapi-client/fetch';
+import { createServiceClient } from '@netscript/sdk/client';
 import { CartContractV1 } from '@my-shop/contracts/versions/v1';
 
-// The client's type comes entirely from the contract. The REST projection is under /api.
-const link = new OpenAPILink(CartContractV1, { url: 'http://localhost:3001/api' });
-const client = createORPCClient<typeof CartContractV1>(link);
+// Service discovery is resolved when this runs inside the referenced app or service.
+// Implement and register the cart service before making a live call.
+const client = createServiceClient({ contract: CartContractV1, serviceName: 'cart' });
 
 // `created` is typed as CartSchemaV1 — the editor knows its fields before you run anything.
 const created = await client.create({
@@ -279,8 +278,7 @@ With no cart service implemented yet, your editor already types `created.status`
 
 {{ comp callout { type: "tip", title: "Implementing the cart is the chapter 2 loop" } }}
 This chapter stops at the contract and a typed client. For a running cart service, follow the loop
-products used: <code>v1.cart.$context&lt;{ db }&gt;()</code>, bind <code>.handler(...)</code>
-functions, aggregate them into a router, and serve it with <code>defineService(...)</code>. See
+products used: scaffold the service with <code>netscript service add --name cart --with-client</code>, implement its repository and application, bind the contract handlers, and serve the router with <code>defineService(...)</code>. See
 <a href="/tutorials/storefront/02-catalog-service/">chapter 2</a>.
 {{ /comp }}
 
@@ -309,8 +307,6 @@ and that `scripts/cart-client.ts` is consistent with `CartContractV1`.
 A new `cart` domain defined contract-first: schemas, a `list` / `getById` / `create` / `update`
 procedure set and `baseContract` typed errors, modeled on the playground's `orders` contract. The CLI
 created the contract and its routes (`netscript contract add` and `contract add-route`) and
-regenerated `contracts/versions/v1/mod.ts`, and a typed `@orpc/client` derived from the contract alone
+regenerated `contracts/versions/v1/mod.ts`, and a typed SDK client derived from the contract alone
 type-checks with no codegen. Next, that contract feeds checkout, which you make reliable with a
 durable saga.
-
-{{ comp.nextPrev({ prev: { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" }, next: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" } }) }}

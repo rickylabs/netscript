@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Database & Prisma
 templateEngine: [vento, md]
-prev: { label: "Durable streams", href: "/durable-workflows/streams/" }
-next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
 order: 1
 ---
 
@@ -137,7 +135,7 @@ typed against the old shape until you run `netscript db generate` again.
 | `netscript db status` | Shows which migrations are applied and whether the database is in sync with the schema. |
 | `netscript db migrate --name add_orders` | Creates and applies the next migration after a schema change. Run `netscript db generate` after it. |
 
-[Database & migration](/data-persistence/how-to/database-migration/) runs this cycle step by step.
+[Migrate the database](/data-persistence/how-to/database-migration/) runs this cycle step by step.
 
 ## Plugins contribute models
 
@@ -255,7 +253,7 @@ variables the workspace resolves:
   rows: [
     { name: "postgres", type: "Aspire resource", desc: "The Postgres container Aspire provisions from appsettings.json NetScript.Databases.postgres. Watch it go green in the dashboard." },
     { name: "redis", type: "Aspire resource", desc: "Redis cache — the default `--cache-backend`; Redis-compatible — backing KV/queues. A separate concern from Postgres; see KV, queues & cron. (`garnet` and `deno-kv` are alternative backends.)" },
-    { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire start`) — confirm the postgres resource is healthy." },
+    { name: "the URL Aspire prints", type: "dashboard", desc: "Aspire dashboard (anonymous local access in the generated profile) — confirm the postgres resource is healthy." },
     { name: "POSTGRES_URI / DATABASE_URL", type: "env", desc: "Connection string resolved by prisma.config.ts and normalized to a URL. Set these yourself under --no-aspire." }
   ]
 }) }}
@@ -279,7 +277,7 @@ of them.
 
 ## Next steps
 
-Run the [Database & migration](/data-persistence/how-to/database-migration/) recipe to bring up
+Run the [database migration](/data-persistence/how-to/database-migration/) recipe to bring up
 Postgres and apply your first migration.
 
 - [Use a second database](/data-persistence/how-to/use-a-second-database/): add an MSSQL or MySQL
@@ -288,5 +286,3 @@ Postgres and apply your first migration.
   through the database from scratch.
 - [`@netscript/database` reference](/reference/database/): ports, the postgres/mssql/mysql adapters,
   extensions and tracing.
-
-{{ comp.nextPrev({ prev: { label: "Durable streams", href: "/durable-workflows/streams/" }, next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" } }) }}

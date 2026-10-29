@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Consume durable streams in Expo
 templateEngine: [vento, md]
+order: 4
 ---
 
 # Consume durable streams in Expo
@@ -115,6 +116,6 @@ disconnect while you watch execution updates.
 Deno tests prove the binding works without <code>EventSource</code>. They do not prove native runtime behavior, and Hermes and Expo network behavior has not yet been verified on a device.
 {{ /comp }}
 
-## Next step
+## Next steps
 
 Look up `createStreamCollectionV1` and `useStreamLiveQueryV1` in the [SDK reference](/reference/sdk/).

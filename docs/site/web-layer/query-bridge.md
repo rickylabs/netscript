@@ -1,11 +1,11 @@
 ---
 layout: layouts/base.vto
-title: The query bridge
+title: Query bridge
 templateEngine: [vento, md]
-order: 15
+order: 11
 ---
 
-# The query bridge
+# Query bridge
 
 This page explains how a server loader's cached data reaches an island without a refetch. The
 loader reads from a KV cache on the server to render HTML; the island reads from a TanStack

@@ -1,10 +1,9 @@
 ---
 layout: layouts/base.vto
 title: Detached start for agents and CI
+description: Start the AppHost non-interactively with JSON output, timeout budgets, and isolated parallel runs.
 templateEngine: [vento, md]
 order: 104
-prev: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }
-next: { label: "Roll out runtime overrides", href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/" }
 ---
 
 # Detached start for agents and CI
@@ -32,7 +31,7 @@ identifiers, the dashboard URL and the log file path:
   "appHostPath": "/path/to/my-app/aspire/apphost.mts",
   "appHostPid": 48219,
   "cliPid": 48218,
-  "dashboardUrl": "https://localhost:18888",
+  "dashboardUrl": "<dashboard-url-from-aspire>",
   "logFile": "/path/to/logs/cli_apphost-48219.log"
 }
 ```
@@ -60,7 +59,7 @@ Output:
     "status": "running",
     "sdkVersion": "13.5.3",
     "cliPid": 48218,
-    "dashboardUrl": "https://localhost:18888",
+    "dashboardUrl": "<dashboard-url-from-aspire>",
     "logFilePath": "/path/to/logs/cli_apphost-48219.log"
   }
 ]
@@ -159,7 +158,7 @@ aspire stop --force
 
 Then check that `aspire ps --format Json` returns `[]` and that no orphaned processes survive.
 
-## Next step
+## Next steps
 
 Change behavior in the running graph without a restart:
 [Roll out runtime overrides](/orchestration-runtime/how-to/roll-out-runtime-overrides/).

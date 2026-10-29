@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Customize Fresh UI
+description: Edit a route, add an island, restyle a component, install more UI primitives, and re-theme the scaffolded app.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/customize-fresh-ui/
@@ -14,7 +15,7 @@ install more UI from the registry, and re-theme the app. NetScript scaffolds a
 [`@netscript/fresh`](/reference/fresh/) meta-framework, and its UI components live in your
 repository as copied source. [Fresh UI & design](/web-layer/fresh-ui/) explains that model.
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -34,7 +35,7 @@ UI loop:
   {
     label: "Under Aspire (recommended)",
     lang: "bash",
-    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at https://localhost:18888\ncd aspire && aspire start"
+    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at the URL Aspire prints\ncd aspire && aspire start"
   },
   {
     label: "Fresh app only",
@@ -271,5 +272,3 @@ With the app running:
 Give the UI a typed backend with [Add a service](/services-sdk/how-to/add-a-service/). See also
 [Fresh UI & design](/web-layer/fresh-ui/), the [`@netscript/fresh-ui` reference](/reference/fresh-ui/),
 and the [contracts explanation](/explanation/contracts/).
-
-{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" }, next: { label: "Build a durable chat", href: "/ai/how-to/build-a-durable-chat/" } }) }}

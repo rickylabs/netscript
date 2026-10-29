@@ -1,7 +1,9 @@
 ---
 layout: layouts/base.vto
 title: Why NetScript
+description: When NetScript is the right trade for a TypeScript app that has become a system, and when it is not.
 templateEngine: [vento, md]
+next: { label: "Quickstart", href: "/quickstart/" }
 ---
 
 {{ comp.hero({
@@ -9,7 +11,7 @@ templateEngine: [vento, md]
   subhead: "NetScript is a meta-framework: it coordinates the web layer, services, durable runtimes, and operations you would otherwise integrate by hand. The trade is explicit: you give up pick-any-library freedom for a coordinated Deno workspace.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true },
-    { label: "Read the mental model", href: "/concepts/" }
+    { label: "Read the mental model", href: "/explanation/" }
   ]
 }) }}
 
@@ -46,31 +48,20 @@ spread through an application:
   model, and Aspire starts the resources with their telemetry connected.
 
 These constraints cost flexibility. In return, a team doesn't redesign the same seams in every
-service. [Core concepts](/concepts/) covers how each layer works.
+service. [Concepts](/explanation/) covers how each layer works.
 
 ## How it compares
 
-No option wins everywhere. Choose the one whose main constraint matches yours.
-
-| Option | Choose it when | How NetScript differs |
-| --- | --- | --- |
-| Fresh or Hono | The web app or small API is the whole system. | NetScript uses Fresh and Hono as foundations, then adds service contracts, plugin runtimes, and an Aspire workspace. The cost is more framework and more project shape. |
-| Next.js | React and the Next ecosystem are the center. | NetScript chooses Deno with Fresh and Preact, plus explicit service and durable-runtime boundaries. It is not the React/Next path; choose the web ecosystem your product needs. |
-| Encore-style stack | An integrated infrastructure workflow is the center. | NetScript keeps a Deno/JSR workspace in the application and uses Aspire for local orchestration through an adapter. It provides less managed infrastructure, so deployment and operations remain your responsibility. |
-| Temporal | A dedicated workflow platform is the main decision. | NetScript's saga core keeps TypeScript definitions, store and bus ports, transports, and compensation inside a broader application workspace. It is not a drop-in Temporal API. |
-| Assemble it yourself | Maximum component choice is a requirement. | You can choose every queue, tracer, service layer, and runtime independently. NetScript constrains those choices; assembling them yourself leaves every integration seam with your team. |
-
-[Comparisons](/comparisons/) puts NetScript code side by side with frontend and backend frameworks.
-[How NetScript's path compares](/explanation/compared/) covers what the getting-started flows of
-Next.js, Nuxt, SvelteKit, Laravel, and Rails teach first, where NetScript's order differs, and where
-those peers are ahead today.
+No option wins everywhere. [How NetScript compares](/comparisons/) sets NetScript beside the
+frontend and backend frameworks you may be weighing, with side-by-side code, so you can choose the
+one whose main constraint matches yours.
 
 ## Trade-offs
 
 - **The package family is pre-1.0.** APIs move, so scaffolded imports use exact
   `{{ releaseSpecifier }}` pins. If you need a frozen surface today, NetScript is not ready for you.
 - **The Aspire CLI is the default orchestration path.** Scaffold with `--no-aspire` to opt out;
-  resource wiring and local telemetry then belong to you. [See the Aspire boundary](/quickstart/aspire/).
+  resource wiring and local telemetry then belong to you. [See the Aspire boundary](/explanation/aspire/#the---no-aspire-escape-hatch).
 - **The web layer is Fresh and Preact.** That is a deliberate fit, not compatibility with the
   React/Next ecosystem. [See the web layer](/web-layer/).
 - **A coordinated workspace adds structure that a one-process app may never use.** Durability,

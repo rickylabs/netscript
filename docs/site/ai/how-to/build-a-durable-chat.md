@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a durable chat
+description: An AI chat on a Fresh route whose transcript survives reload and reconnect, with one server-side tool.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/build-a-durable-chat/
@@ -185,8 +186,3 @@ Walk the same chat end to end in the [AI Chat tutorial](/tutorials/chat/).
 - Render rich blocks and citation chips: [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 - Understand each primitive: [Durable chat](/ai/durable-chat/).
 - Look up exact signatures in the [`@netscript/fresh` reference](/reference/fresh/).
-
-{{ comp.nextPrev({
-  prev: { label: "Customize Fresh UI", href: "/web-layer/how-to/customize-fresh-ui/" },
-  next: { label: "Deploy", href: "/orchestration-runtime/how-to/deploy/" }
-}) }}

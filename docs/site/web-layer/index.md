@@ -1,10 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Web Layer
+title: Web layer
+description: Fresh pages, routes, data loading, forms, and islands with @netscript/fresh, plus the Fresh UI components.
 templateEngine: [vento, md]
+oldUrl: /web-layer/examples/
 ---
 
-# Web Layer
+# Web layer
 
 This page maps the web-layer guides. The web layer is `@netscript/fresh`, a server-first
 meta-framework built on [Fresh](https://fresh.deno.dev/) 2.x and Preact. Its pages load data through
@@ -34,7 +36,7 @@ dehydrated.
 
 Each guide covers one part of that model. Read the one you need.
 
-- [The Fresh page model](/web-layer/server/): server-first rendering, the islands boundary, and
+- [Fresh page model](/web-layer/server/): server-first rendering, the islands boundary, and
   `defineFreshApp()` from `@netscript/fresh/server`, the bootstrap every NetScript Fresh app
   starts from.
 - [The define-page builder](/web-layer/builders/): `definePage()` and `definePartial()` from
@@ -57,15 +59,16 @@ Each guide covers one part of that model. Read the one you need.
 - [Data loading & the query cache](/web-layer/query/): `QueryIsland`, `useQuery`, `useMutation`
   and `useLiveQuery`, the TanStack Query bridge that shares one cache between server render and
   island hydration.
-- [The query bridge](/web-layer/query-bridge/): SDK query factories from loader to island, the two
+- [Query bridge](/web-layer/query-bridge/): SDK query factories from loader to island, the two
   key tiers, `getCachedEntry()` as a read rather than a fetch, and when to dehydrate instead of
   passing `initialData`.
 - [Server-validated forms](/web-layer/form/): typed, contract-aware form handling declared as a page
   layer.
 - [Interactivity](/web-layer/interactive/) and [durable-stream consumption](/durable-workflows/streams/):
   island runtime helpers and the browser-side client for durable HTTP/SSE streams.
-- [Vite integration](/web-layer/vite/), [testing](/web-layer/testing/),
-  [diagnostics](/web-layer/error/) and [worked examples](/web-layer/examples/).
+- [Vite integration](/web-layer/vite/), [testing](/web-layer/testing/) and
+  [diagnostics](/web-layer/error/). For a worked example of the whole layer, follow
+  [the Live Dashboard tutorial](/tutorials/live-dashboard/).
 - [Fresh UI & design](/web-layer/fresh-ui/): the visual layer on top, with the copy-source component
   registry, design tokens and the scaffolded dashboard app.
 
@@ -74,6 +77,6 @@ Each guide covers one part of that model. Read the one you need.
 {{ comp.cardsGrid({ columns: 4, cards: [
   { eyebrow: "Learn", title: "Live dashboard tutorial", body: "Contract to page to live stream: the web layer end to end.", href: resolveXref("tut:live-dashboard").href },
   { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/web-layer/how-to/" },
-  { eyebrow: "Look up", title: "`@netscript/fresh` reference", body: "Generated API reference. Related units: `fresh-ui`.", href: resolveXref("ref:fresh").href },
+  { eyebrow: "Look up", title: "`@netscript/fresh` reference", body: "API reference. Related units: `fresh-ui`.", href: resolveXref("ref:fresh").href },
   { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
 ] }) }}

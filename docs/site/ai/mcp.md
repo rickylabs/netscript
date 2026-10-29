@@ -1,13 +1,11 @@
 ---
 layout: layouts/base.vto
-title: MCP
+title: MCP client
 templateEngine: [vento, md]
-prev: { label: "AI", href: "/ai/" }
-next: { label: "Durable chat", href: "/ai/durable-chat/" }
 order: 1
 ---
 
-# MCP
+# MCP client
 
 `@netscript/ai/mcp` turns external Model Context Protocol servers into typed tools that your agent
 loop can call. It provides transports, injected auth, multi-server pooling and a safe rendering path

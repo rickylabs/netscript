@@ -252,7 +252,7 @@ The `@netscript/plugin-streams-core/discovery` entrypoint (`./src/builders/disco
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-## Related pages
+## Next steps
 
 - [`@netscript/plugin-streams`](/reference/streams/): the deployable streams plugin and service.
 - [`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) and

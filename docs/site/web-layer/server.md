@@ -1,11 +1,11 @@
 ---
 layout: layouts/base.vto
-title: The Fresh page model
+title: Fresh page model
 templateEngine: [vento, md]
 order: 1
 ---
 
-# The Fresh page model
+# Fresh page model
 
 This page explains how a NetScript Fresh app boots: where the islands boundary sits, how
 `@netscript/fresh` splits into subpaths, and what `defineFreshApp()` registers, in which order.
@@ -77,7 +77,7 @@ you get a slow asset path or an unreachable explicit route, not an error.
 The bare file also never registers the SDK's KV cache provider, so `getCachedEntry()` throws at the
 first loader that calls it. `defineFreshApp()` calls `setCacheProvider(cacheQuery)` as its first
 bootstrap step. See
-[The query bridge](/web-layer/query-bridge/#the-bootstrap-call-that-makes-server-caching-work).
+[the query bridge](/web-layer/query-bridge/#the-bootstrap-call-that-makes-server-caching-work).
 
 ### The bootstrap order
 
@@ -245,5 +245,5 @@ see [Deferred and streaming UI](/web-layer/defer-streaming-ui/).
 ## Next steps
 
 Continue with [Pages and the define-page builder](/web-layer/builders/) to author the pages this app
-serves. See also [The query bridge](/web-layer/query-bridge/) for the cache registration this
+serves. See also [the query bridge](/web-layer/query-bridge/) for the cache registration this
 bootstrap performs, and the [Live dashboard](/tutorials/live-dashboard/) tutorial for a full app.

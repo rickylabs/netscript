@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Use a second database
+description: Add a second Postgres, or a MySQL or SQL Server instance, alongside the default database.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/use-a-second-database/
@@ -15,7 +16,7 @@ migrations and generated client.
 The examples show the common Postgres-primary case, but the steps apply to whichever engine you
 chose with `netscript init --db`. The default scaffold aggregates every plugin's `.prisma` models
 into **one primary datasource** (see
-[Database & migration](/data-persistence/how-to/database-migration/)). A second database is a
+[Migrate the database](/data-persistence/how-to/database-migration/)). A second database is a
 **separate** Prisma schema workspace with its own `generate` output and migration history, and it
 never merges into the primary aggregation.
 
@@ -101,8 +102,8 @@ cd aspire
 aspire start
 ```
 
-Open the Aspire dashboard at [https://localhost:18888](https://localhost:18888) (`aspire start`
-prints the access token) and confirm that the new resource, `mysql`, `analytics` or whatever your
+Open the Aspire dashboard at the URL Aspire prints (`aspire start`
+prints the allocated URL) and confirm that the new resource, `mysql`, `analytics` or whatever your
 config key is, turns green beside `postgres` and `redis`.
 
 > [!WARNING]
@@ -327,5 +328,3 @@ can share one of these datasources.
   {{ comp.xref({ key: "ref:prisma-adapter-mysql", text: "@netscript/prisma-adapter-mysql reference" }) }}.
 - {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }}: how the AppHost
   provisions each database container.
-
-{{ comp.nextPrev({ prev: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" }, next: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" } }) }}

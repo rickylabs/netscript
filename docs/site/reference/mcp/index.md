@@ -26,7 +26,7 @@ MCP fit together. The complete symbol list is in
 
 > [!TIP]
 > Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task and follow
-> its ordered citations. Use `search_docs` for literal lookup and `get_doc` for a known document or
+> its ordered citations. Use `search_docs` for literal lookup and `get_doc` for exact retrieval of a known document or
 > section; check `mode` and pass `full: true` with `nextCursor` for the complete text.
 
 ## Server composition
@@ -274,7 +274,7 @@ stdio.
 | `McpCliOptions` | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root. |
 
 Telemetry endpoint discovery tries, in order: an explicit `endpoint` option,
-`NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`. Only `http:`
+`NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, then a built-in fallback. That fallback may not match an allocated port; set the endpoint to the URL Aspire prints. Only `http:`
 and `https:` endpoints are accepted, and an unreachable endpoint yields a structured warning rather
 than a crash.
 

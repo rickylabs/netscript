@@ -1,9 +1,7 @@
 ---
 layout: layouts/base.vto
-title: CLI and Scaffold
+title: CLI & scaffold
 templateEngine: [vento, md]
-prev: { label: "Orchestration & Runtime", href: "/orchestration-runtime/" }
-next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" }
 order: 1
 ---
 
@@ -41,7 +39,7 @@ the same path end to end.
    it generates a Prisma-backed CRUD contract and an oRPC playground at `GET /`. Add `--dry-run`
    to print every file the scaffold would create without writing anything.
 2. **Orchestrate.** `cd aspire && aspire start` brings up the database and cache and opens the
-   dashboard at `:18888`.
+   dashboard at the URL Aspire prints.
 3. **Database.** `netscript db init`, `generate` and `seed` run the Prisma-on-Deno workflow,
    including every plugin's contributed schema. Run them only after Aspire is up.
 4. **Extend.** `netscript plugin install workers`, then `netscript generate plugins` so the
@@ -108,7 +106,7 @@ Conventions are enforced where regeneration is cheap, and ownership is handed ov
 are the point. {{ comp.xref({ key: "cap:runtime-config", text: "Runtime configuration" }) }}
 explains how generated runtime schemas feed the operator-facing override layer.
 
-## Next step
+## Next steps
 
 Run the flow end to end in the [Quickstart](/quickstart/). For every command group, see the
 {{ comp.xref({ key: "cli:reference" }) }}.

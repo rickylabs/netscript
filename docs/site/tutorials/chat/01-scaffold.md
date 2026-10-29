@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the chat workspace
+title: Scaffold the chat app
 templateEngine: [vento, md]
 prev: { label: "AI Chat", href: "/tutorials/chat/" }
 next: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" }
 ---
 
-# Scaffold the chat workspace
+# Scaffold the chat app
 
 This chapter creates the project the whole track builds on: a NetScript workspace with a Fresh
 frontend, the streams runtime that durable chat sessions live in, and your model key, all running
@@ -24,7 +24,7 @@ under Aspire.
 ## What you will build
 
 A `chat-app/` workspace on disk: a [Fresh](/web-layer/) app, the `streams` plugin wired for
-durable sessions, and Aspire orchestration. At the end, the Aspire dashboard at `:18888` shows
+durable sessions, and Aspire orchestration. At the end, the Aspire dashboard at the URL Aspire prints shows
 every resource running, `ANTHROPIC_API_KEY` reaches the app process, and the workspace
 type-checks.
 
@@ -44,7 +44,7 @@ You need Deno, the Aspire CLI, Docker and an `ANTHROPIC_API_KEY`.
 2. Install the NetScript CLI once:
 
    ```sh
-   deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+   deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
    ```
 
 3. Confirm the CLI is on your `PATH`:
@@ -53,9 +53,7 @@ You need Deno, the Aspire CLI, Docker and an `ANTHROPIC_API_KEY`.
    netscript --help
    ```
 
-   You should see the public command groups: `init`, `contract`, `db`, `deploy`, `generate`,
-   `marketplace`, `plugin`, `service`, `ui:add` and `ui:init`. If `netscript` is not found, add
-   Deno's install directory to your `PATH` and open a new terminal.
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
@@ -118,10 +116,10 @@ aspire restore   # once: restores the Aspire SDK modules into .aspire/
 aspire start     # starts the AppHost, the streams runtime, and the Fresh app
 ```
 
-`aspire start` prints a URL and login token for the **Aspire dashboard**:
+`aspire start` prints the allocated URL for the **Aspire dashboard**:
 
 ```text
-https://localhost:18888
+the URL Aspire prints
 ```
 
 Leave `aspire start` running in this terminal. It is your control plane for the rest of the track.
@@ -140,7 +138,7 @@ Leave `aspire start` running in this terminal. It is your control plane for the 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `chat-app/` exists with `apps/dashboard/` and a `plugins/` entry for `streams`.
 - [ ] `ANTHROPIC_API_KEY` is set in the app environment.
-- [ ] `aspire start` is up; the dashboard at `:18888` lists the streams runtime and the Fresh app.
+- [ ] `aspire start` is up; the dashboard at the URL Aspire prints lists the streams runtime and the Fresh app.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
@@ -152,5 +150,3 @@ Three checks cover most first-run problems: (1) is <code>aspire start</code> sti
 A `chat-app/` workspace with a Fresh app, the streams runtime for durable sessions and your model
 key wired to the app process, all orchestrated by Aspire. Next, you wire the durable chat route
 that turns a prompt into a persisted, streamed reply.
-
-{{ comp.nextPrev({ prev: { label: "AI Chat", href: "/tutorials/chat/" }, next: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" } }) }}

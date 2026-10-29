@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Expose OpenAPI & Scalar
+description: Serve the generated OpenAPI document and the Scalar reference UI for a service.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/expose-openapi-scalar/
@@ -151,5 +152,3 @@ Decide who may read the docs with the
 [service-layer auth middleware](/services-sdk/services/#service-layer-authn-authz-middleware). See
 also [Discover services](/services-sdk/how-to/discover-services/) and the
 [`@netscript/service` reference](/reference/service/).
-
-{{ comp.nextPrev({ prev: { label: "Discover services", href: "/services-sdk/how-to/discover-services/" }, next: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" } }) }}

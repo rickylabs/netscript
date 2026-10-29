@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a server-validated form
+description: Route-bound form state, server validation, mutation, and success handling in one typed page definition.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/build-a-server-validated-form/
@@ -108,8 +109,3 @@ Read [Server-validated forms](/web-layer/form/) to render fields with the genera
 add repeatable rows, and enhance the form in the browser. See also
 [Live dashboard, chapter 04](/tutorials/live-dashboard/04-definePage-QueryIsland/) and the
 [`@netscript/fresh` reference](/reference/fresh/).
-
-{{ comp.nextPrev({
-  prev: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" },
-  next: { label: "Build a validated ingestion queue", href: "/durable-workflows/how-to/build-a-validated-ingestion-queue/" }
-}) }}

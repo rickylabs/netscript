@@ -98,7 +98,9 @@ remains available. `AuthnRequest` carries no URL, so for refresh cookies supply 
 headers with explicit trust, or set `cookie.secure: true` when the host guarantees HTTPS.
 
 > [!IMPORTANT]
-> **Migrating to 0.0.8.** Cookie helpers no longer trust protocol headers unconditionally, and
+> **Changed in 0.0.8**
+>
+> Cookie helpers no longer trust protocol headers unconditionally, and
 > `allowInsecureRequests` no longer opens the inbound flow gate. Proxied deployments must opt into
 > `trustProxyHeaders`; development HTTP callers must set `allowInsecureHttpRequests` and
 > `cookie.allowInsecureDev`. The flow throws `flow_https_required` and the cookie gate throws
@@ -119,6 +121,8 @@ To recover, restart sign-in and keep its transaction cookie for the callback, or
 explicit `txn` supplied by the sign-in redirect.
 
 > [!IMPORTANT]
-> **Migrating to 0.0.8.** This failure used the generic `AUTH_PROVIDER_ERROR` code. Clients that
+> **Changed in 0.0.8**
+>
+> This failure used the generic `AUTH_PROVIDER_ERROR` code. Clients that
 > match that code must handle `oauth_cookie_missing` for this case. The HTTP status remains 502;
 > other provider failures keep their existing mapping.

@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Runtime configuration
 templateEngine: [vento, md]
-prev: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }
-next: { label: "Capabilities", href: "/capabilities/" }
 order: 2
 ---
 
@@ -210,7 +208,7 @@ if (isFeatureEnabled(runtime, 'worker-rollout', false)) {
 }
 ```
 
-## Next step
+## Next steps
 
 To publish, watch and roll back overrides in a running deployment, follow
 [Roll out runtime overrides](/orchestration-runtime/how-to/roll-out-runtime-overrides/). For every

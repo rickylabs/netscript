@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Tune the worker runtime
+description: Trade throughput against isolation with concurrency, runner mode, per-task permissions, timeouts, and retries.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/tune-worker-runtime/
@@ -12,7 +13,8 @@ This recipe tunes queue concurrency, per-topic scaling, task timeouts and retrie
 cleanup budget without changing a job handler.
 
 Jobs execute in-process in the background worker service. Concurrency overlaps asynchronous I/O; it
-does not create Web Worker isolates or parallelize synchronous CPU work (see
+does not create Web Worker isolates or parallelize synchronous CPU work. Other runner modes are
+reserved; only `in-process` is implemented (see
 [worker runtime modes](/background-processing/workers/#worker-runtime-modes-worker_runtimes)). The
 settings live in `config/official-plugins/mod.ts` (`defineWorkers(...)`), in per-task runtime
 config, or in an environment variable that the worker entrypoint reads. For handler authoring, see
@@ -250,8 +252,3 @@ Restrict what each Deno task can reach with
 - {{ comp.xref({ key: "howto:choose-a-queue-provider" }) }}
 - {{ comp.xref({ key: "howto:run-a-polyglot-task" }) }}
 - {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}
-
-{{ comp.nextPrev({
-  prev: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" },
-  next: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }
-}) }}

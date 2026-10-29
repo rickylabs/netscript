@@ -37,7 +37,7 @@ You need the `my-erp/` workspace from [chapter 2](/tutorials/erp-sync/02-import-
 job is registered:
 
 ```sh
-curl '<workers-endpoint>/api/v1/workers/jobs'
+ns-workers show-job import-products --json
 ```
 
 `import-products` should appear in the list. If it does not, return to chapter 2 and re-run
@@ -210,5 +210,3 @@ A workers config that names a queue provider and a worker concurrency, so a SAP 
 drains with overlapping I/O, and a `defineScheduledTrigger` cron that enqueues the nightly
 re-sync. The sync now absorbs bursts and runs its recurring work unattended. Next, you run the
 whole pipeline under Aspire.
-
-{{ comp.nextPrev({ prev: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" }, next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" } }) }}

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add a task runtime adapter
+description: Add a custom runtime adapter to the built-in task executor.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/add-a-task-runtime-adapter/
@@ -166,8 +167,3 @@ Lock down Deno tasks with
 - [Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/): built-in runtime
   behavior.
 - [workers reference](/reference/workers/): the executor surface.
-
-{{ comp.nextPrev({
-  prev: { label: "Roll out runtime overrides", href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/" },
-  next: { label: "Build a server-validated form", href: "/web-layer/how-to/build-a-server-validated-form/" }
-}) }}

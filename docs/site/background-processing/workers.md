@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Background jobs
 templateEngine: [vento, md]
-prev: { label: "Services & contracts", href: "/services-sdk/services/" }
-next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
 order: 1
 ---
 
@@ -107,7 +105,7 @@ Without the install, run each command as
 `deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli <verb …>`.
 
 ```bash
-# Enqueue through the workers API (port 8091), without hand-writing HTTP.
+# Enqueue through the workers API (at the URL Aspire prints), without hand-writing HTTP.
 ns-workers trigger process-payment \
   --payload='{"orderId":"o_42","amountCents":4999}'
 
@@ -401,7 +399,7 @@ service moves into a worker unchanged.
 > execution state in Deno KV. Run `cd aspire && aspire start` to provision Postgres and Redis, then
 > `netscript db init --name init` and `netscript db generate` to wire the schema. Until then, the
 > workers API cannot resolve jobs or record executions. See
-> [Database & migration](/data-persistence/how-to/database-migration/).
+> [Migrate the database](/data-persistence/how-to/database-migration/).
 
 > [!WARNING]
 > **Drain on redeploy.** A runner that exits without draining abandons running jobs. Wire a
@@ -419,8 +417,3 @@ Build and trigger a job inside a running app in [ERP Sync, lesson 02](/tutorials
   same queue.
 - {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}: every exported symbol, type
   and subpath.
-
-{{ comp.nextPrev({
-  prev: { label: "Services & contracts", href: "/services-sdk/services/" },
-  next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
-}) }}

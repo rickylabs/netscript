@@ -55,7 +55,7 @@ variables, never stdin. The result comes **back** as exactly one JSON object pri
 transform as a plain Deno script that follows that contract:
 
 ```ts
-// plugins/workers/scripts/normalize-sap.ts
+// workers/scripts/normalize-sap.ts
 // Legacy SAP export rows in -> Microsoft Dynamics-shaped rows out. Runs as a sandboxed subprocess.
 
 // Input arrives as argv + env (NOT stdin).
@@ -112,12 +112,12 @@ returns a typestate builder:
   flag on the spawned `deno run` command line.
 
 ```ts
-// plugins/workers/tasks/normalize-sap.ts
+// workers/tasks/normalize-sap.ts
 import { defineTask } from '@netscript/plugin-workers-core/builders';
 
 export const normalizeSap = defineTask('normalize-sap')
   .runtime('deno') // the default — and the only sandboxed runtime
-  .entrypoint('./plugins/workers/scripts/normalize-sap.ts')
+  .entrypoint('./workers/scripts/normalize-sap.ts')
   .args('--input', '.data/incoming/products/products_2024.csv')
   .env({ STAGING_DIR: '.data/staging' })
   .permissions({
@@ -224,12 +224,12 @@ explains the subprocess seam and the full `TaskResult` shape.
 // The Python variant of the same stage — a forward step for your own host.
 export const dedupeSap = defineTask('dedupe-sap')
   .runtime('python')
-  .entrypoint('./plugins/workers/scripts/dedupe_sap.py')
+  .entrypoint('./workers/scripts/dedupe_sap.py')
   .args('--input', '.data/staging')
   .timeout(120_000)
   .build();
 
-// Spawns: python3 -u ./plugins/workers/scripts/dedupe_sap.py --input .data/staging
+// Spawns: python3 -u ./workers/scripts/dedupe_sap.py --input .data/staging
 ```
 
 The process contract is unchanged: argv and env in, one JSON object on the last `stdout` line out.
@@ -284,5 +284,3 @@ JSON-out process contract, a `defineTask` definition whose `.permissions(...)` c
 `--allow-*` flags on the spawned subprocess, and an executor run you observed end to end. You also
 saw the same stage in Python and the two rules for non-Deno runtimes: no sandbox, and the
 interpreter must exist. Next, the pipeline learns to absorb bursts and run on a schedule.
-
-{{ comp.nextPrev({ prev: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }, next: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" } }) }}

@@ -56,7 +56,7 @@ curl <streams-endpoint>/health
 The installer picked its host port, so the resource list is the only place to read it. A healthy
 response means the durable-streams producer runtime is live. If it doesn't answer, the sagas plugin
 (which brings the stream) isn't installed or Aspire hasn't finished booting it: check the resource
-list at `:18888`.
+list at the URL Aspire prints.
 
 {{ comp callout { type: "note", title: "HTTP/2 is opt-in for live subscriptions" } }}
 The live subscription is <strong>long-poll by default</strong> (SSE is opt-in) and runs over
@@ -301,5 +301,3 @@ wrapped in a `QueryIsland` and mounted by a `definePage` page whose `.withResour
 streams address. State that entered the store through a saga publish arrived in an already-open page
 with no polling, refetch or reload, and each later transition updates the same row. Next, you run
 the whole graph locally under Aspire.
-
-{{ comp.nextPrev({ prev: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }, next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" } }) }}

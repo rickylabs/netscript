@@ -4,7 +4,7 @@ title: Live Dashboard
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" }
-order: 1
+order: 4
 ---
 
 # Live Dashboard
@@ -63,7 +63,7 @@ hop. Each chapter adds one link:
 {{ comp.featureGrid({ items: [
   {
     title: "1 · Scaffold the workspace",
-    body: "Create <code>my-dashboard/</code> with <code>netscript init</code>, tour the Fresh app, and boot it under Aspire, with the Aspire dashboard on :18888.",
+    body: "Create <code>my-dashboard/</code> with <code>netscript init</code>, tour the Fresh app, and boot it under Aspire, with the Aspire dashboard on the URL Aspire prints.",
     href: "/tutorials/live-dashboard/01-scaffold/"
   },
   {
@@ -99,5 +99,3 @@ Start at chapter 1 and keep the same `my-dashboard/` through to chapter 6. For e
 [fresh](/reference/fresh/), [sdk](/reference/sdk/), [service](/reference/service/) and
 [streams](/reference/streams/) reference units back these chapters. After the track, the guides in
 **Build › [Web Layer](/web-layer/)** pick up where the chapters stop.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" } }) }}

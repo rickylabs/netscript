@@ -4,7 +4,7 @@ title: AI Chat
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }
-order: 2
+order: 5
 ---
 
 # AI Chat
@@ -79,5 +79,3 @@ The track does <strong>not</strong> cover the generative-UI renderer, agent memo
 
 When you finish, the [AI & Agents](/ai/) guides pick up where the track stops. Start with
 chapter 1.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" } }) }}

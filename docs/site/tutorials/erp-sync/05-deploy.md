@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Run it locally under Aspire
+title: Run the ERP sync under Aspire
 templateEngine: [vento, md]
 prev: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
-# Run it locally under Aspire
+# Run the ERP sync under Aspire
 
 This chapter runs the whole SAP→Dynamics sync (workers, triggers, queue and cron processors) on
 one machine under `aspire start`, and shows you how to read the running system from the
@@ -57,8 +57,8 @@ edit to `apphost.mts`. With workers and triggers installed, `aspire start` stand
 {{ comp.apiTable({
   caption: "What aspire start brings up for the ERP sync",
   rows: [
-    { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
-    { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
+    { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "Live resource list, console logs, structured logs and traces. The generated local profile allows anonymous dashboard access." },
+    { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Throwaway Docker Postgres. The database netscript db commands target — reachable only while Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache, the default `--cache-backend`; Redis-compatible. Backs the KV/queue workloads; auto-discovery resolves the queue to it once it is up." },
     { name: "workers API + processor", type: "allocated port + executable", desc: "The API enqueues; a separate background processor drains the queue and runs your import job." },
@@ -80,7 +80,7 @@ once per machine and start it, both from inside `aspire/`:
 ```sh
 cd aspire
 aspire restore   # one-time SDK restore (and after an SDK bump)
-aspire start       # boots the whole graph; prints the dashboard URL + a login token
+aspire start       # boots the whole graph; prints the dashboard URL
 ```
 
 `aspire start` brings up infrastructure first, then the plugin APIs and background processors,
@@ -114,7 +114,7 @@ The most common first-run error is running a <code>netscript db</code> command b
    mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
    ```
 
-2. Open `https://localhost:18888` and paste the login token `aspire start` printed.
+2. Open the URL Aspire prints (the generated local profile allows anonymous access).
 
 3. Read the run in the three dashboard surfaces:
 
@@ -127,7 +127,7 @@ The most common first-run error is running a <code>netscript db</code> command b
   ]
 }) }}
 
-Aspire starts each resource with an OTLP endpoint pointed at `http://localhost:4318`, so
+Aspire starts each resource with an OTLP endpoint pointed at the OTLP URL Aspire prints, so
 framework-level spans (job dispatch, job execution, scheduler runs) appear in the **Traces** view
 without extra setup.
 
@@ -161,7 +161,8 @@ Both health checks should return healthy JSON, and the executions feed should sh
 <ul>
 <li><strong>Docker is not running.</strong> Aspire provisions Postgres and Redis through Docker; without the daemon, nothing starts.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from <code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>
-<li><strong>Ports in use.</strong> The dashboard needs <code>:18888</code> and <code>:18889</code>, and OTLP needs <code>:4318</code>. A stale earlier run holding a port blocks boot; free it and retry.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 
@@ -172,7 +173,7 @@ single `aspire start`, with the database initialized through the running AppHost
 traced from file drop to durable job execution. You also know where the local setup ends and a
 production deployment begins.
 
-## Where to go next
+## Next steps
 
 Ship the sync to a remote target with [Deploy](/orchestration-runtime/how-to/deploy/), the
 production companion to this local run: deployable units, managed backing services and the
@@ -182,6 +183,4 @@ production companion to this local run: deployable units, managed backing servic
   transform for a Python or shell step on your own host.
 - [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) and
   [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/): tune throughput.
-- [Orchestration with Aspire](/explanation/aspire/) and the [How-to guides](/how-to/).
-
-{{ comp.nextPrev({ prev: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+- [Orchestration with Aspire](/explanation/aspire/) and the recipes in [Build](/how-to/).

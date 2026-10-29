@@ -1,12 +1,13 @@
 ---
 layout: layouts/base.vto
-title: "netscript command reference"
+title: CLI command reference
+description: Every command, subcommand and flag of the netscript binary.
 ---
 
-# `netscript` command reference
+# CLI command reference
 
-Every verb and flag of the public `netscript` binary, published as `@netscript/cli`. The curated
-[CLI reference](/cli-reference/) carries the everyday flows; together the two pages cover every
+Every verb and flag of the public `netscript` binary, published as `@netscript/cli`. The
+[CLI cheat sheet](/cli-reference/) carries the everyday flows; together the two pages cover every
 public command group and direct subcommand. For the embeddable helpers rather than the command tree,
 see the [`@netscript/cli` package page](/reference/cli/).
 
@@ -116,7 +117,7 @@ overrides.
 ## `generate` — code generation
 
 Beyond `generate plugins` and `generate runtime-schemas` (covered in the
-[CLI reference](/cli-reference/#generate)), the group also regenerates the Aspire helper layer.
+[CLI cheat sheet](/cli-reference/#generate)), the group also regenerates the Aspire helper layer.
 
 | Command                                  | Description                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -207,7 +208,7 @@ bytes, not installed runtime health or every transitive import.
 ## `plugin` — extended verbs
 
 The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`) are in the
-[CLI reference](/cli-reference/#plugins). The full group also carries:
+[CLI cheat sheet](/cli-reference/#plugins). The full group also carries:
 
 | Command                                             | Description                                                                                                                       |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -244,7 +245,7 @@ The backends selectable here are the same ones read at runtime by `NETSCRIPT_AUT
 ## `service` — extended verbs
 
 The common `service add`, `service list`, and `service generate` verbs are in the
-[CLI reference](/cli-reference/#services-contracts). The full group also carries:
+[CLI cheat sheet](/cli-reference/#services-contracts). The full group also carries:
 
 | Command                                               | Description                                                                                                                                                                                                                                                                       |
 | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -258,7 +259,7 @@ The common `service add`, `service list`, and `service generate` verbs are in th
 ## `contract` — extended verbs
 
 The common `contract add` and `contract list` verbs are in the
-[CLI reference](/cli-reference/#services-contracts). The full group also carries:
+[CLI cheat sheet](/cli-reference/#services-contracts). The full group also carries:
 
 | Command                                                                                | Description                                                                                                                                                                                                           |
 | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -270,7 +271,7 @@ The common `contract add` and `contract list` verbs are in the
 ## `db` — extended verbs
 
 The everyday database workflow (`init`, `generate`, `migrate`, `seed`, `status`, `studio`,
-`introspect`, `reset`) is in the [CLI reference](/cli-reference/#database). The full group also
+`introspect`, `reset`) is in the [CLI cheat sheet](/cli-reference/#database). The full group also
 carries the target-management and migration-history verbs:
 
 | Command                           | Description                                                                                                                                                                       |
@@ -322,7 +323,7 @@ the source and output extension contract.
 
 ## `ui:*` — Fresh UI registry
 
-`ui:init` and `ui:add` are in the [CLI reference](/cli-reference/#fresh-ui). The full set also
+`ui:init` and `ui:add` are in the [CLI cheat sheet](/cli-reference/#fresh-ui). The full set also
 lists, updates, and removes copied registry items:
 
 | Command                      | Description                                                                                                    |
@@ -336,7 +337,7 @@ edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customiz
 
 ## `deploy` — cloud and container targets
 
-The [CLI reference](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy) paths. The
+The [CLI cheat sheet](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy) paths. The
 `deploy` group also exposes a family of routed cloud and container targets, the packaging verbs, and
 artifact-copy and log verbs.
 

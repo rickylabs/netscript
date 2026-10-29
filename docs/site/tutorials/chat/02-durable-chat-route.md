@@ -218,5 +218,3 @@ the one proxy the browser reads through. Each turn is written to the durable ses
 anything renders it, so an accepted reply outlives the request that produced it. Every later
 chapter builds on this. Next, you give the backend a face: copy the fresh-ui chat components and
 hydrate an island.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }, next: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" } }) }}

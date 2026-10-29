@@ -1,6 +1,8 @@
 ---
 layout: layouts/base.vto
 title: Tutorials
+nav_title: Overview
+description: Five tracks, each building one complete application from netscript init to a running Aspire graph.
 templateEngine: [vento, md]
 prev: null
 next:
@@ -8,16 +10,11 @@ next:
   href: "/tutorials/storefront/"
 ---
 
+# Tutorials
+
 Each tutorial builds one application step by step, from an empty directory to a running app. Every
 step ends with a command or an endpoint you can check, and each track introduces capabilities in the
 order you need them. You don't need to know the framework before you start.
-
-{{ comp callout { type: "tip", title: "Tutorials, how-to guides, reference, explanation" } }}
-A tutorial teaches one path end to end. When you know the path and need a recipe, use the
-<a href="/how-to/">how-to guides</a>. For exact symbols and signatures, use the
-<a href="/reference/">reference</a>. For the design reasoning behind durability, contracts and
-plugins, read the <a href="/explanation/">explanation</a> pages.
-{{ /comp }}
 
 ## Five tracks, five applications
 
@@ -67,7 +64,7 @@ locally under Aspire. The tracks are independent: start with the one closest to 
 
 New to NetScript? Any track starts from zero, but **Storefront** covers the most core ideas.
 
-## Before you start
+## Prerequisites
 
 Every track needs the same local toolchain:
 
@@ -86,22 +83,17 @@ boots a project in a few commands. Each chapter lists the earlier chapters it bu
 
 {{ comp.featureGrid({ items: [
   {
-    title: "How-to guides",
-    body: "Recipes for tasks the tutorials don't cover: discovering services, exposing OpenAPI, choosing a queue provider, second databases and production pitfalls.",
+    title: "Build",
+    body: "A guide for each capability, and recipes for tasks the tutorials don't cover: discovering services, exposing OpenAPI, choosing a queue provider, second databases and production pitfalls.",
     href: "/how-to/"
   },
   {
-    title: "Capabilities",
-    body: "One hub per capability (services, workers, sagas, triggers, streams, auth) with the headline API, ports and endpoints on one screen.",
-    href: "/capabilities/"
-  },
-  {
     title: "Reference",
-    body: "Generated API surface for every <code>@netscript/*</code> unit: exact symbols, signatures and types.",
+    body: "The API surface of every <code>@netscript/*</code> package: exact symbols, signatures and types.",
     href: "/reference/"
   },
   {
-    title: "Explanation",
+    title: "Concepts",
     body: "The design reasoning behind contracts-first services, durable execution, the plugin model and the local Aspire topology.",
     href: "/explanation/"
   }

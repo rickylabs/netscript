@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Build a storefront backend
+title: Storefront
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" }
-order: 4
+order: 1
 ---
 
-# Build a storefront backend
+# Storefront
 
 Across seven chapters you build a small e-commerce storefront in one workspace: a products catalog,
 a cart, a durable checkout, a shipping webhook and a storefront page. The track follows the same
@@ -72,7 +72,7 @@ capability and ends with a command whose output you can check.
 {{ comp.featureGrid({ items: [
   {
     title: "1 · Scaffold",
-    body: "Create <code>my-shop/</code> with the <code>netscript</code> CLI and boot it under Aspire: Postgres, the Redis cache and your service come up together, and the dashboard answers on :18888.",
+    body: "Create <code>my-shop/</code> with the <code>netscript</code> CLI and boot it under Aspire: Postgres, the Redis cache and your service come up together, and the dashboard answers on the URL Aspire prints.",
     href: "/tutorials/storefront/01-scaffold/"
   },
   {
@@ -112,5 +112,3 @@ capability and ends with a command whose output you can check.
 Work the chapters in order. The `my-shop/` workspace you create in chapter 1 is the one you finish
 in chapter 7: each chapter starts by checking the state the previous one left. After the track, the
 guides in **Build › [Services & SDK](/services-sdk/)** pick up where these chapters stop.
-
-{{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" } }) }}

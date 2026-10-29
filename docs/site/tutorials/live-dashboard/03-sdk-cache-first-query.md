@@ -35,13 +35,17 @@ read) that chapters 4 and 5 build the page on.
 ## Before you begin
 
 You need [chapter 2](/tutorials/live-dashboard/02-contract-to-service/)'s `orders` service answering
-on **3002**, the database seeded, and `aspire start` up. Confirm the read-model returns data:
+at its allocated endpoint, the database seeded, and `aspire start` up. Confirm the read-model returns data:
 
 ```sh
-curl 'http://localhost:3002/api/v1/orders/list?limit=1&offset=0'
+netscript service list
+netscript contract inspect orders
 ```
 
-You get one seeded order back. If `items` is empty, re-run `netscript db seed` from the workspace
+Use `list_api_services` → `list_service_operations` → `get_operation_schema` for the live
+operation. The typed client in Step 1 calls it with `{ limit: 1, offset: 0 }`.
+
+The query should return one seeded order. If `items` is empty, re-run `netscript db seed` from the workspace
 root.
 
 ## Step 1 — Create the typed service client
@@ -66,7 +70,7 @@ export const ordersClient = createServiceClient<typeof ordersContract>({
 reading a field the output doesn't have, is a compile error.
 
 {{ comp callout { type: "note", title: "How serviceName resolves to a URL" } }}
-You never hardcode <code>http://localhost:3002</code>. <code>getServiceUrl</code> in
+The client does not need a literal service URL. <code>getServiceUrl</code> in
 <code>@netscript/sdk/discovery</code> resolves <code>serviceName: 'orders'</code> at call time from an
 Aspire-injected environment variable: <code>services__orders__http__0</code> on the server and its
 browser mirror <code>VITE_services__orders__http__0</code>. Aspire sets them when you list
@@ -152,5 +156,3 @@ calls through this client, and a missing `services__orders__http__0` shows up th
 A typed `ordersClient` and a cache-first `ordersQueries` query layer, both derived from the chapter 2
 contract, with service discovery resolving the URL. Next, you render the table with NetScript's
 `definePage` builder and a `QueryIsland` that hydrates these query helpers in the browser.
-
-{{ comp.nextPrev({ prev: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" }, next: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" } }) }}

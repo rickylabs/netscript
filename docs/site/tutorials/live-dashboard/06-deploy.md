@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Run the whole dashboard under Aspire
+title: Run the dashboard under Aspire
 templateEngine: [vento, md]
 prev: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
-# Run the whole dashboard under Aspire
+# Run the dashboard under Aspire
 
 In this chapter you run the entire graph as one system under a single `aspire start`: the `orders`
 service, the Fresh dashboard, the durable-streams runtime, Postgres and Redis. You never wrote a
@@ -25,7 +25,7 @@ dependency order and resolves every cross-reference into injected environment va
 ## What you will build
 
 A complete, observable run of `my-dashboard/` on one machine: every resource your dashboard uses,
-booted from a single command and visible in the Aspire dashboard at `:18888`.
+booted from a single command and visible in the Aspire dashboard at the URL Aspire prints.
 
 {{ comp callout { type: "warning", title: "Aspire runs the local topology, not production" } }}
 <code>aspire start</code> turns one command into a complete, observable, correctly wired stack on
@@ -73,30 +73,28 @@ all of it: infrastructure first, then the service, the Fresh app and the streams
 cross-references resolved into injected environment variables.
 
 ```sh
-# Still inside aspire/. Prints the dashboard URL + a one-time login token.
+# Still inside aspire/. Prints the dashboard URL.
 aspire start
 ```
 
-When boot finishes, `aspire start` prints the dashboard address and a login token. The graph it
+When boot finishes, `aspire start` prints the allocated dashboard address. The graph it
 brings up for this track:
 
 {{ comp.apiTable({
   caption: "What aspire start brings up for my-dashboard",
   rows: [
-    { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard: live resource list, console logs, structured logs and traces. A login token prints on start." },
+    { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "The Aspire dashboard: live resource list, console logs, structured logs and traces. The generated local profile allows anonymous access." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your orders service reads — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV-backed query layer from chapter 3." },
-    { name: "orders", type: ":3002", desc: "Your oRPC service (defineService). RPC at /api/rpc/*, OpenAPI at /api/v1/orders/*." },
+    { name: "orders", type: "allocated endpoint", desc: "Your oRPC service (defineService). RPC at /api/rpc/*, OpenAPI at /api/v1/orders/*." },
     { name: "dashboard (Fresh app)", type: "allocated port", desc: "Your Fresh frontend — the live dashboard you built in chapters 4–5. Read its port from the dashboard resource list." },
     { name: "streams", type: "allocated port", desc: "Durable-streams producer runtime, present once the sagas plugin is installed. Feeds useLiveQuery." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-<code>orders</code> answers on <code>:3002</code> because you pinned it with
-<code>--service-port</code> in chapter 1. The Fresh <code>dashboard</code> app and every plugin
-runtime installed without <code>--port</code> pin no host port, so <strong>Aspire allocates one at
-every start</strong>. Read every unpinned port from the Aspire dashboard's resource list.
+{{ comp callout { type: "note", title: "Read allocated endpoints" } }}
+Read the service, plugin and app endpoints from the Aspire resource list or
+<code>aspire describe</code>. The CLI commands in this track do not pin host ports.
 {{ /comp }}
 
 ## Step 3 — Open the live dashboard
@@ -113,53 +111,47 @@ up, the saga monitor receives pushed updates over its subscription (chapter 5). 
 dashboard to see the system behind it:
 
 ```text
-https://localhost:18888
+the URL Aspire prints
 ```
 
-Paste the login token `aspire start` printed:
+The generated local profile allows anonymous dashboard access:
 
 {{ comp.apiTable({
   caption: "Aspire dashboard surfaces",
   rows: [
     { name: "Resources", type: "tab", desc: "Every container and process with status, endpoints, and resolved environment. The authority for which port each resource bound." },
     { name: "Console logs", type: "tab", desc: "stdout/stderr per resource — a failing service or streams runtime is one click away, not buried in a terminal." },
-    { name: "Structured logs + Traces", type: "tab", desc: "Spans your handlers and pages emit (including the withTelemetry span from chapter 4), correlated across resources via the OTLP collector on :4318." }
+    { name: "Structured logs + Traces", type: "tab", desc: "Spans your handlers and pages emit (including the withTelemetry span from chapter 4), correlated across resources via the OTLP collector at the OTLP URL Aspire prints." }
   ]
 }) }}
 
 ## Step 4 — Watch a request flow through the graph
 
-Create an order and follow it across the stack. From a second terminal:
-
-```sh
-curl -X POST http://localhost:3002/api/v1/orders/create \
-  -H 'content-type: application/json' \
-  -d '{ "userId": 1, "total": 49.9, "status": "pending", "shippingStreet": "1 Main", "shippingCity": "Berlin", "shippingCountry": "DE", "shippingZipCode": "10115", "items": [{ "productId": 1, "quantity": 1 }] }'
-```
-
-The **Resources** tab shows the `orders` service handling it, **Traces** shows the request as a span,
-and the orders table picks up the new order on its next revalidation. Creating an order doesn't
-publish a saga message (see chapter 5), so the saga monitor doesn't change.
+Read the catalog through the typed `ordersClient.list({ limit: 20, offset: 0 })` call from chapter 3,
+inside the app. The **Traces** view shows the service request, and the table receives the returned
+rows on its next revalidation. The read-model contract from chapter 2 exposes `list`; it does not
+add a create operation. Add writes through a separate declared contract and handler when your app
+needs them. A service query does not publish a saga message.
 
 ## Verify your progress
 
 ```sh
 # From the workspace root, with `aspire start` up in another terminal:
-curl http://localhost:3002/health      # orders service — pinned, so the port is known
+curl "$SERVICE_URL/health"      # orders service URL from Aspire
 
 # The streams runtime's port is allocated, not pinned. Copy its endpoint from the
 # Aspire resource list, then:
 curl <streams-endpoint>/health         # streams runtime (if sagas installed)
 ```
 
-Both return healthy responses, and the dashboard at `:18888` lists `postgres`, `redis`, `orders`,
+Both return healthy responses, and the dashboard at the URL Aspire prints lists `postgres`, `redis`, `orders`,
 the Fresh `dashboard` and `streams`, all running.
 
 - [ ] `aspire restore` then `aspire start` boots the graph without errors.
-- [ ] `https://localhost:18888` lists every resource healthy.
+- [ ] The dashboard at the URL Aspire prints lists every resource healthy.
 - [ ] The `dashboard` app's endpoint (from the resource list) + `/dashboard/orders/` renders the
       live table.
-- [ ] Creating an order is visible in the dashboard traces.
+- [ ] The typed orders query is visible in the dashboard traces.
 
 {{ comp callout { type: "tip", title: "If aspire start won't boot" } }}
 <ul>
@@ -169,23 +161,21 @@ Docker, or take the <code>--no-aspire</code> path with your own infrastructure.<
 from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
 <li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> The dashboard uses <code>:18888</code>/<code>:18889</code> and OTLP
-<code>:4318</code>; the pinned <code>orders</code> service uses <code>:3002</code>, the streams
-runtime an installer-allocated port in <code>49152–65535</code>, and the Fresh app whatever Aspire
-assigns at start. A stale earlier run holding a port blocks boot.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 
 ## What you built
 
 The complete `my-dashboard/` graph under one `aspire start`: the service, the Fresh app, durable
-streams, Postgres and Redis, wired automatically and observable in the dashboard at `:18888`. Across
+streams, Postgres and Redis, wired automatically and observable in the dashboard at the URL Aspire prints. Across
 the track you carried one contract from the database to a cache-first page and a server-pushed live
 view.
 
-## Where to go next
+## Next steps
 
-- **Task recipes** → the [how-to guides](/how-to/) cover what the tutorials don't: adding plugins,
+- **Task recipes** → the recipes in [Build](/how-to/) cover what the tutorials don't: adding plugins,
   database migrations, queue backends, and production pitfalls.
 - **Deploy remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) is the production companion
   to local Aspire.
@@ -193,5 +183,3 @@ view.
   contributions, and two-pass reference resolution; {{ comp.xref({ key: "cap:streams" }) }} and
   {{ comp.xref({ key: "cap:fresh-framework", text: "the Fresh meta-framework" }) }} back chapters 4
   and 5.
-
-{{ comp.nextPrev({ prev: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

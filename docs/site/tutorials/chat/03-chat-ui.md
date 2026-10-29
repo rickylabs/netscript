@@ -248,5 +248,3 @@ snapshot as a request-scoped resource, an SSR-seeded island that sends through t
 connection and re-renders on settle, and `chat-render` turning assistant markdown into rich
 blocks. Next, you give the model a tool to call and render its result as a tool-call card with
 citation chips.
-
-{{ comp.nextPrev({ prev: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" }, next: { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" } }) }}

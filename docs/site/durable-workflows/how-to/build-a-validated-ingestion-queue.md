@@ -1,11 +1,10 @@
 ---
 layout: layouts/base.vto
 title: Build a validated ingestion queue
+description: Reject malformed messages before they enter a queue and again before a consumer runs.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/build-a-validated-ingestion-queue/
-prev: { label: "Build a server-validated form", href: "/web-layer/how-to/build-a-server-validated-form/" }
-next: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" }
 ---
 
 # Build a validated ingestion queue
@@ -86,7 +85,7 @@ await queue.listen(async (message, context) => {
 | Consumer validation fails with `dlq` | The message is nacked without requeue, for dead-letter handling. |
 | Consumer validation fails with `throw` | The queue throws `QueueValidationError`, and the backend retry policy decides the next delivery. |
 
-## Next step
+## Next steps
 
 Pick a backend with [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/).
 The full API is in the [queue reference](/reference/queue/).

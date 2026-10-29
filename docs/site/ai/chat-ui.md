@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Chat UI
 templateEngine: [vento, md]
-prev: { label: "Durable chat", href: "/ai/durable-chat/" }
-next: { label: "AI engine", href: "/ai/engine/" }
 order: 3
 ---
 

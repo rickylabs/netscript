@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Run the whole storefront
+title: Run the storefront under Aspire
 templateEngine: [vento, md]
 prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
-# Run the whole storefront
+# Run the storefront under Aspire
 
 In this chapter you run the **entire** `my-shop/` as one system under a single `aspire start`: the
 products service, the storefront page, the checkout saga, the shipping webhook, Postgres and the
@@ -97,19 +97,19 @@ all of it: infrastructure first, then services, plugin APIs and background proce
 cross-references resolved into injected environment variables.
 
 ```sh
-# Still inside aspire/. Boots the whole graph; prints the dashboard URL + a login token.
+# Still inside aspire/. Boots the whole graph; prints the dashboard URL.
 aspire start
 ```
 
-When boot finishes, `aspire start` prints the dashboard address and a one-time login token. The graph
+When boot finishes, `aspire start` prints the allocated dashboard address. The graph
 it brings up for the storefront:
 
 {{ comp.apiTable({ caption: "What `aspire start` brings up for my-shop/", rows: [
-  { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
-  { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
+  { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "Live resource list, console logs, structured logs and traces. The generated local profile allows anonymous dashboard access." },
+  { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
   { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your products handlers and saga store target — reachable only while Aspire is up." },
   { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins." },
-  { name: "products (service)", type: ":3001 (pinned in chapter 1)", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
+  { name: "products (service)", type: "allocated endpoint", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
   { name: "sagas API", type: "allocated port", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
   { name: "triggers API", type: "allocated port", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
   { name: "workers API", type: "allocated port", desc: "Lists job executions — where the enqueued shipping and payment jobs run." },
@@ -117,21 +117,19 @@ it brings up for the storefront:
   { name: "background processors", type: "executables (no port)", desc: "Each plugin's isolated runners (workers, sagas, triggers) — separate processes, not threads inside the API." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-<code>products</code> answers on <code>:3001</code> because chapter 1 pinned it with
-<code>--service-port</code>. The plugin APIs you installed without <code>--port</code> have no
-<code>HostPort</code>, and the Fresh app pins nothing either, so Aspire allocates their host ports at
-every start. Read every unpinned port from the dashboard's resource list.
+{{ comp callout { type: "note", title: "Read allocated endpoints" } }}
+Read the service, plugin and app endpoints from the Aspire resource list or
+<code>aspire describe</code>. The CLI commands in this track do not pin host ports.
 {{ /comp }}
 
 ## Step 4 — Use the dashboard
 
-Open `https://localhost:18888` and paste the login token `aspire start` printed:
+Open the URL Aspire prints (the generated local profile allows anonymous access):
 
 {{ comp.apiTable({ caption: "Aspire dashboard surfaces", rows: [
   { name: "Resources", type: "tab", desc: "Every container and executable above with status, endpoints, and resolved environment. The authority for which port each resource bound." },
   { name: "Console logs", type: "tab", desc: "stdout/stderr per resource — a failing background processor is one click away, not buried in a terminal." },
-  { name: "Structured logs + Traces", type: "tab", desc: "Spans and structured logs your handlers emit, correlated by traceparent across services. Collected via the OTLP endpoint at :4318." }
+  { name: "Structured logs + Traces", type: "tab", desc: "Spans and structured logs your handlers emit, correlated by traceparent across services. Collected via the OTLP endpoint at the OTLP URL Aspire prints." }
 ] }) }}
 
 Aspire starts each resource with its `OTEL_SERVICE_NAME` and an OTLP endpoint, so framework spans
@@ -144,20 +142,20 @@ With the graph up, the dashboard resource list shows `postgres`, `redis`, `produ
 `workers` / `sagas` / `triggers` APIs, all healthy. Spot-check a few endpoints:
 
 ```sh
-# Catalog service — pinned in chapter 1, so the port is known
-curl http://localhost:3001/health
+# Set SERVICE_URL to the product service URL Aspire prints.
+curl "$SERVICE_URL/health"
 
 # The plugin APIs take allocated ports. Copy each endpoint from the Aspire
 # resource list, then:
-curl <sagas-endpoint>/api/v1/sagas/sagas   # saga registry lists your checkout saga
+deno x -A jsr:@netscript/plugin-sagas{{ releaseSpecifier }}/cli list --registered --json
 curl <triggers-endpoint>/health            # triggers ingress is alive
 ```
 
 - [ ] `ls aspire/apphost.mts aspire/aspire.config.json` shows both files.
-- [ ] `aspire start` boots and prints a dashboard URL + login token.
-- [ ] The dashboard at `https://localhost:18888` lists `postgres`, `redis`, `products`, and the
+- [ ] `aspire start` boots and prints a dashboard URL.
+- [ ] The dashboard at the URL Aspire prints lists `postgres`, `redis`, `products`, and the
       `workers` / `sagas` / `triggers` plugin APIs, all healthy.
-- [ ] `curl` against `:3001` and the sagas / triggers endpoints from the resource list all answer.
+- [ ] The health probes and plugin CLI inspection use endpoints from the Aspire resource list.
 - [ ] A checkout and a webhook fire show up as correlated traces in the dashboard.
 
 {{ comp callout { type: "tip", title: "If aspire start won't boot" } }}
@@ -167,9 +165,8 @@ curl <triggers-endpoint>/health            # triggers ingress is alive
 from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
 <li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> A stale earlier run holding <code>:18888</code>, <code>:3001</code>
-or one of the allocated high-range ports blocks boot. Check the dashboard resource list (or your
-process table) and free it.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 
@@ -177,11 +174,11 @@ process table) and free it.</li>
 
 The entire `my-shop/` storefront running as one resource graph under a single `aspire start`:
 Postgres, Redis, the `products` service, the streams transport, and the workers, sagas and triggers
-plugin APIs with their background processors. The dashboard at `https://localhost:18888` shows the
+plugin APIs with their background processors. The dashboard at the URL Aspire prints shows the
 live port map, per-resource console logs and correlated traces. This is the local development
 topology; for production, start from the Deploy guide below.
 
-## Where to go next
+## Next steps
 
 - **Deploy remotely** → the [Deploy](/orchestration-runtime/how-to/deploy/) how-to (production
   targets) and [Deploy locally with Aspire](/orchestration-runtime/how-to/deploy-local-aspire/) (the
@@ -189,7 +186,5 @@ topology; for production, start from the Deploy guide below.
 - **Add observability** → [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) and the
   [Observability explanation](/explanation/observability/).
 - **Go deeper on the ideas** → [Durability model](/explanation/durability-model/),
-  [Contracts & type flow](/explanation/contracts/), and [The plugin system](/explanation/plugin-system/).
-- **Solve a specific task** → the full [How-to guides](/how-to/).
-
-{{ comp.nextPrev({ prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+  [Contracts & type flow](/explanation/contracts/), and [the plugin system](/explanation/plugin-system/).
+- **Solve a specific task** → the recipes in [Build](/how-to/).

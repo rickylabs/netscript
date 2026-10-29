@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add OpenTelemetry
+description: Emit custom spans and structured logs, propagate traceparent, and read the traces in the Aspire dashboard.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/add-opentelemetry/
@@ -24,7 +25,7 @@ the OTLP collector and the trace UI. For the mental model, read
 
 {{ comp.apiTable({ caption: "What this recipe assumes", rows: [
   { name: "netscript workspace", type: "netscript init", desc: "An existing workspace. If you have none, scaffold one first — see the tutorials." },
-  { name: "Start Aspire", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at https://localhost:18888." },
+  { name: "Start Aspire", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at the URL Aspire prints." },
   { name: "@netscript/telemetry", type: "OTel facade", desc: "Wraps @opentelemetry/api and ships the worker/scheduler/queue/SSE instrumentation. Already wired into the generated handlers — no install step." },
   { name: "A service or plugin to trace", type: "services/users or plugins/workers", desc: "The users service (on its assigned port) and the workers/sagas/triggers/auth plugins all emit health + trace data once running." }
 ] }) }}
@@ -43,7 +44,7 @@ and where you add your own.
   { name: "Service layer (real spans)", type: "@netscript/service", desc: "RPC trace context (header extraction into ctx.traceHeaders) is ON by default — traceContext defaults to true when withRPC() is called without arguments. The OTel TracingPlugin that creates real spans is also always active; it is independent of the traceContext option." },
   { name: "Worker runtime (real spans)", type: "job dispatcher + scheduler", desc: "Job dispatch and execution, scheduler runs, and the task subprocess emit real OTel spans automatically via @netscript/telemetry — traceJobExecution, scheduler spans, task.execute. Traces show up in Aspire with no handler code." },
   { name: "Scaffold job tools", type: "createJobTools(ctx)", desc: "log / progress / trace handed to defineJobHandler bodies. trace.addEvent records on the active job span, withChildSpan exports child work, and progress emits telemetry while forwarding to the runtime channel. log.* remains console-backed." },
-  { name: "OTLP export + UI", type: "http://localhost:4318 → :18888", desc: "The Aspire profile points OTLP at http://localhost:4318; the dashboard renders the collected traces and correlated structured logs at :18888." }
+  { name: "OTLP export + UI", type: "the OTLP URL Aspire prints → the URL Aspire prints", desc: "The Aspire profile points OTLP at the OTLP URL Aspire prints; the dashboard renders the collected traces and correlated structured logs at the URL Aspire prints." }
 ] }) }}
 
 The dispatcher layer emits lifecycle spans automatically, including `task.execute` spans. Inside a
@@ -59,15 +60,15 @@ dashboard, then boots Postgres, Redis and every service and plugin resource.
 ```bash
 cd aspire
 aspire start
-# dashboard: https://localhost:18888  (login token printed in the console)
+# dashboard: the URL Aspire prints  (anonymous local access in the generated profile)
 ```
 
-Open [https://localhost:18888](https://localhost:18888), authenticate with the token Aspire printed
+Open the dashboard at the URL Aspire prints; the generated local profile allows anonymous access
 and select the **Traces** tab. It stays empty until you exercise something, and it updates live.
 
 The resource graph lists `postgres`, `redis`, `workers-api`, `workers`, `sagas-api`, `sagas`,
 `triggers-api`, `triggers`, `auth-api` and the durable-streams service, each API on its assigned
-port. Every resource exports telemetry to the OTLP endpoint at `http://localhost:4318`, and the
+port. Every resource exports telemetry to the OTLP endpoint at the OTLP URL Aspire prints, and the
 dashboard reads from there.
 
 ## Step 2 — Generate a trace without writing any code
@@ -90,14 +91,14 @@ To skip the install, run each `ns-workers <verb …>` as
     code: "# Workers API — enqueue the sample health-check job by id (on its assigned port).\n# Dispatch + execution + scheduler spans are emitted automatically.\nns-workers trigger workers-plugin-health-check\n\n# then list recent executions\nns-workers executions --limit=10 --json"
   },
   {
-    label: "Hit the users service",
-    lang: "bash",
-    code: "# Users oRPC service — the request is traced at the service layer.\n# Replace <users-port> with the port assigned to your users service.\n# oRPC services are served under /api/rpc/* (not /rpc).\ncurl -s -X POST http://localhost:<users-port>/api/v1/users/list \\\n  -H 'content-type: application/json' \\\n  -d '{}'"
+    label: "Call the users service",
+    lang: "ts",
+    code: "import { createServiceClient } from '@netscript/sdk/client';\nimport { UsersContractV1 } from '@my-app/contracts';\n\n// In an Aspire-launched caller, discovery and trace context propagate through the SDK.\nconst users = createServiceClient({ contract: UsersContractV1, serviceName: 'users' });\nawait users.list({ page: 1, limit: 10, sortOrder: 'asc' });"
   },
   {
     label: "POST an inbound webhook",
     lang: "bash",
-    code: "# Triggers API on :8093 (raw Hono routes, not oRPC) — resolves the inbound\n# trigger, whose enqueueJob action enqueues the workers health-check job,\n# producing a connected dispatch + execution trace.\ncurl -s -X POST http://localhost:8093/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{}'"
+    code: "# Triggers API at the URL Aspire prints (raw webhook ingress plus oRPC management) — resolves the inbound\n# trigger, whose enqueueJob action enqueues the workers health-check job,\n# producing a connected dispatch + execution trace.\ncurl -s -X POST \"$TRIGGERS_URL/api/v1/webhooks/inbound/generic\" \\\n  -H 'content-type: application/json' \\\n  -d '{}'"
   }
 ] }) }}
 
@@ -134,8 +135,8 @@ AI agents and external tools that connect through the NetScript MCP telemetry se
 
 1. The explicit `--endpoint` option.
 2. The `NETSCRIPT_TELEMETRY_ENDPOINT` environment variable.
-3. The `ASPIRE_DASHBOARD_PORT` environment variable (e.g. `18888`).
-4. The default fallback endpoint, `http://localhost:18888`.
+3. The `ASPIRE_DASHBOARD_PORT` environment variable.
+4. A built-in fallback endpoint, which may not match the current run. Set the explicit endpoint to the URL Aspire prints.
 
 ## Step 3 — Add your own spans in a job handler
 
@@ -172,7 +173,7 @@ with the fluent builder and opt the RPC layer into trace context explicitly:
   {
     label: "Enable RPC trace context",
     lang: "ts",
-    code: "import { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// The plugin API services use the fluent builder. withRPC({ traceContext: true })\n// threads the incoming traceparent through to handlers. oRPC is served under\n// /api/rpc/* by default.\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDatabase(dbClient)\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .serve();"
+    code: "import { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// The plugin API services use the fluent builder. withRPC({ traceContext: true })\n// threads the incoming traceparent through to handlers. oRPC is served under\n// /api/rpc/* by default.\nawait createService(router, { name: 'workers', version: '1.0.0', port: Number(Deno.env.get('PORT')) }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDatabase(dbClient)\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .serve();"
   },
   {
     label: "One-shot service (defineService)",
@@ -181,8 +182,8 @@ with the fluent builder and opt the RPC layer into trace context explicitly:
   },
   {
     label: "Propagate across a call",
-    lang: "bash",
-    code: "# When one service calls another over HTTP, forward the W3C traceparent\n# header so both spans land in ONE trace in the dashboard.\n# Replace <users-port> with your service's assigned port.\ncurl -s http://localhost:<users-port>/api/v1/users/list \\\n  -X POST -H 'content-type: application/json' \\\n  -H 'traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01' \\\n  -d '{}'"
+    lang: "ts",
+    code: "import { createServiceClient } from '@netscript/sdk/client';\nimport { UsersContractV1 } from '@my-app/contracts';\n\n// In an Aspire-launched caller, discovery and trace context propagate through the SDK.\nconst users = createServiceClient({ contract: UsersContractV1, serviceName: 'users' });\nawait users.list({ page: 1, limit: 10, sortOrder: 'asc' });"
   }
 ] }) }}
 
@@ -192,13 +193,13 @@ fallback default; set the port there rather than editing this line.
 
 NetScript follows the W3C Trace Context standard. When an inbound request carries a `traceparent`
 header, the service continues that trace instead of starting a new one, and the worker dispatcher
-propagates `traceparent` / `tracestate` into the job subprocess. A webhook on `:8093` that enqueues a
+propagates `traceparent` / `tracestate` into the job subprocess. A webhook at the triggers URL Aspire prints that enqueues a
 job and the worker subprocess that runs it therefore appear as a **single correlated trace**. Forward
 `traceparent` on every service-to-service call.
 
 ## Step 5 — Read the traces
 
-In the dashboard at [https://localhost:18888](https://localhost:18888):
+In the dashboard at the URL Aspire prints:
 
 1. **Traces** shows every request and job as a waterfall of spans. Click a root span to drill into
    children, durations and attributes (the ones you set with `span.setAttribute(...)`). Job runs show
@@ -223,7 +224,7 @@ curl -s http://localhost:<auth-port>/health        # auth
 
 | Symptom | Fix |
 | --- | --- |
-| The **Traces** tab stays empty. | Spans are collected only while Aspire runs and the OTLP endpoint (`http://localhost:4318`) is reachable. A service started standalone with `--no-aspire` has nowhere to export. Start `aspire start` first. |
+| The **Traces** tab stays empty. | Spans are collected only while Aspire runs and the OTLP endpoint (`the OTLP URL Aspire prints`) is reachable. A service started standalone with `--no-aspire` has nowhere to export. Start `aspire start` first. |
 | `deno task aspire:otel -- traces <resource>` returns an empty array. | A healthy but idle AppHost has no traces yet. Generate traffic first. |
 
 ## Production notes

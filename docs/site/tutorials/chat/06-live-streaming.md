@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Live streaming
 templateEngine: [vento, md]
 prev: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" }
-next: { label: "Tutorials", href: "/tutorials/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
 # Live streaming
@@ -172,7 +172,7 @@ they land. Every part lives in the durable session rather than the browser, so i
 tabs and reloads. The same progression, from **one agreed message shape** to **durable delivery**
 to a **live stream**, underlies every NetScript real-time surface.
 
-## Where to go next
+## Next steps
 
 Use the durable-chat seams directly with the [Build a durable chat](/ai/how-to/build-a-durable-chat/)
 recipe. Related pages:
@@ -184,5 +184,3 @@ recipe. Related pages:
 - [AI engine](/ai/engine/): the provider-neutral model registry, agent loop, tool registry and MCP
   transports.
 - [fresh reference](/reference/fresh/): exact signatures.
-
-{{ comp.nextPrev({ prev: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" }, next: { label: "Tutorials", href: "/tutorials/" } }) }}

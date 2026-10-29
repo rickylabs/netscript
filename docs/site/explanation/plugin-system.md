@@ -1,13 +1,11 @@
 ---
 layout: layouts/base.vto
-title: The plugin system
+title: Plugin system
 templateEngine: [vento, md]
-prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }
-next: { label: "Auth model", href: "/explanation/auth-model/" }
 order: 3
 ---
 
-# The plugin system
+# Plugin system
 
 This page explains how a NetScript plugin works: the **core package** behind it, the typed
 **manifest** of contributions it declares, the generated **registries** that wire it into a host,
@@ -85,7 +83,7 @@ chained `.with*()` call adds a **contribution** along an **extension axis**.
     {
       label: "workers manifest",
       lang: "ts",
-      code: "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"" + releaseVersion + "\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\", port: 8091 /* note: your scaffold's port will differ */ })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();"
+      code: "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\nimport { WORKERS_API_DEFAULT_PORT } from \"../constants.ts\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"" + releaseVersion + "\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\", port: WORKERS_API_DEFAULT_PORT })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();"
     }
   ]
 }) }}
@@ -141,7 +139,7 @@ independently removable.
 {{ /comp }}
 
 The {{ comp.xref({ key: "howto:add-a-plugin", text: "add-a-plugin how-to" }) }} and the
-{{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }} cover the sequence:
+{{ comp.xref({ key: "cli:reference", text: "CLI cheat sheet" }) }} cover the sequence:
 `netscript plugin install …`, then the registry-generation step that makes the plugin visible to
 the runtime.
 
@@ -157,7 +155,7 @@ each processor as a Deno *background* resource:
     {
       label: "workers Aspire contribution",
       lang: "ts",
-      code: "// plugins/workers/src/aspire/workers-contribution.ts (abridged)\n// The API is a service resource; each processor is a SEPARATE background resource.\nconst api = builder.addDenoService(\"workers-api\", {\n  entrypoint: \"plugins/workers/services/src/main.ts\",\n  port: ctx.port(\"workers-api\", 8091), // note: your scaffold's port will differ\n  permissions: WORKERS_SERVICE_PERMISSIONS, // narrow: serve HTTP\n});\n\nconst combined = builder.addDenoBackground(\"workers-combined\", {\n  entrypoint: \"plugins/workers/bin/combined.ts\",\n  permissions: WORKERS_BACKGROUND_PERMISSIONS, // wider: queues, db\n});\n// …plus workers-scheduler and workers-worker, each its own resource\nreturn [api, combined, scheduler, worker];"
+      code: "// plugins/workers/src/aspire/workers-contribution.ts (abridged)\nimport { WORKERS_API_DEFAULT_PORT } from \"../constants.ts\";\n// The API is a service resource; each processor is a SEPARATE background resource.\nconst api = builder.addDenoService(\"workers-api\", {\n  entrypoint: \"plugins/workers/services/src/main.ts\",\n  port: ctx.port(\"workers-api\", WORKERS_API_DEFAULT_PORT), // note: your scaffold's port will differ\n  permissions: WORKERS_SERVICE_PERMISSIONS, // narrow: serve HTTP\n});\n\nconst combined = builder.addDenoBackground(\"workers-combined\", {\n  entrypoint: \"plugins/workers/bin/combined.ts\",\n  permissions: WORKERS_BACKGROUND_PERMISSIONS, // wider: queues, db\n});\n// …plus workers-scheduler and workers-worker, each its own resource\nreturn [api, combined, scheduler, worker];"
     }
   ]
 }) }}
@@ -226,7 +224,7 @@ The **auth** plugin applies every idea on this page and stretches the core/plugi
   backend, with a full OAuth/OIDC redirect flow), `@netscript/auth-workos`, and
   `@netscript/auth-better-auth` (both non-interactive).
 - `@netscript/plugin-auth` is the **composing plugin**: it carries the manifest, runs the
-  `auth-api` oRPC service on `:8094`, and selects exactly **one** active backend through
+  `auth-api` oRPC service at its allocated endpoint, and selects exactly **one** active backend through
   `NETSCRIPT_AUTH_BACKEND` (default `kv-oauth`).
 
 Behavior lives in the core and the adapters, the plugin only composes and declares, and the host
@@ -251,5 +249,3 @@ plugin contributes its services, background processors, schemas, and topics thro
 vocabulary, each running as its own isolated resource.
 
 Next: install one with [Add a plugin](/orchestration-runtime/how-to/add-a-plugin/).
-
-{{ comp.nextPrev({ prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }, next: { label: "Auth model", href: "/explanation/auth-model/" } }) }}

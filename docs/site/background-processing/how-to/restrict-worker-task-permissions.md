@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Restrict worker task permissions
+description: Give every Deno task explicit permissions, because an omitted permission object compiles to allow-all.
 templateEngine: [vento, md]
 order: 104
 oldUrl: /how-to/restrict-worker-task-permissions/
@@ -88,8 +89,3 @@ Set timeouts, retries and concurrency next in
 - [Add a task runtime adapter](/background-processing/how-to/add-a-task-runtime-adapter/): add a
   runtime with its own sandbox.
 - [workers reference](/reference/workers/): worker symbols and types.
-
-{{ comp.nextPrev({
-  prev: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" },
-  next: { label: "How-to guides", href: "/how-to/" }
-}) }}

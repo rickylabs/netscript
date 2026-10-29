@@ -204,5 +204,3 @@ A declared MCP server pool, a bridged tool the model calls like any other, and s
 `ui://` widgets rendered through the sandbox route and the copied `McpUiWidget` island: durable in
 the transcript, isolated on the page. Next, you make the transcript live, folding the model's
 chunks into the UI as they arrive instead of after each turn settles.
-
-{{ comp.nextPrev({ prev: { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" }, next: { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" } }) }}

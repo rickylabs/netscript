@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add authentication
+description: Install the auth plugin, pick one active backend, migrate, and sign in through the generated app.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/add-authentication/
@@ -40,7 +41,7 @@ Install `auth` the same way as the other official plugins (`workers`, `sagas`, `
 `streams`):
 
 ```sh
-netscript plugin install @netscript/plugin-auth --port 8094
+netscript plugin install @netscript/plugin-auth
 ```
 
 This installs the `@netscript/plugin-auth` dependency, emits the user-owned `auth/mod.ts` glue
@@ -50,20 +51,10 @@ installer pins exact alpha specifiers such as `jsr:@netscript/plugin-auth-core{{
 so the workspace gets matching dependencies, generated glue, registry entries and Aspire resources
 together.
 
-> [!IMPORTANT]
-> Pin the port your OAuth callback is registered on. An identity provider matches the redirect URI
-> exactly, port included, so the `auth-api` address in `NETSCRIPT_AUTH_REDIRECT_URI` must not move
-> between runs. `--port 8094` pins it.
-
-The installer writes `"HostPort": 8094` on the plugin's `NetScript.Plugins` entry in
-`appsettings.json`, and the generated AppHost registers the plugin with
-`withHttpEndpoint({ port: 8094, env: 'PORT' })`. To set or change the pin by hand, edit `HostPort` on
-that entry and regenerate with `netscript service generate`. The pin is operator-owned:
-`netscript plugin update` and a forced re-install without `--port` keep it, and only a new `--port`
-replaces it. Without a pin, Aspire allocates a fresh host port at every start, which suits a plugin
-nobody outside the graph calls but not a callback. A pinned port is a machine-global reservation:
-`aspire start --isolated` cannot randomise it, and a second workspace pinning the same port
-collides. Nothing is pinned unless you ask.
+The generated app's BFF owns the browser callback. Register `<app-origin>/auth/callback` with
+your provider, using the app URL Aspire prints. If that allocated URL changes, update the provider
+registration and redirect configuration together. For a stable external callback, configure a
+stable app origin in your deployment. The auth service itself needs no fixed host port.
 
 ## Step 2 — Choose a backend with the auth CLI
 
@@ -170,17 +161,17 @@ block directly. Ordinary workspace setup uses the source/export step above.
 {
 label: "kv-oauth (default, interactive)",
 lang: "sh",
-code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Stable subject: OIDC providers use the ID-token sub. A preset named by\n# NETSCRIPT_AUTH_PROVIDER_ID supplies its own default (github: userinfo id).\n# export NETSCRIPT_AUTH_SUBJECT_SOURCE=userinfo # id_token | userinfo\n# export NETSCRIPT_AUTH_SUBJECT_CLAIM=id\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret> # required for kv-oauth: missing key material is a startup error\n# Local HTTP only: export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true\n# TLS proxy only: export NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true\n# Direct TLS at the service: export NETSCRIPT_AUTH_COOKIE_SECURE=true\n# Outbound HTTP provider tests only: export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true\n\nexport PORT=8094"
+code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=\"$APP_URL/auth/callback\"\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=\"openid email profile\"\n\n# Stable subject: OIDC providers use the ID-token sub. A preset named by\n# NETSCRIPT_AUTH_PROVIDER_ID supplies its own default (github: userinfo id).\n# export NETSCRIPT_AUTH_SUBJECT_SOURCE=userinfo # id_token | userinfo\n# export NETSCRIPT_AUTH_SUBJECT_CLAIM=id\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret> # required for kv-oauth: missing key material is a startup error\n# Local HTTP only: export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true\n# TLS proxy only: export NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true\n# Direct TLS at the service: export NETSCRIPT_AUTH_COOKIE_SECURE=true\n# Outbound HTTP provider tests only: export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true\n\n# Aspire injects PORT; do not set a fixed listener port."
 },
 {
 label: "workos (non-interactive)",
 lang: "sh",
-code: "export NETSCRIPT_AUTH_BACKEND=workos\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\n# Configure the AuthKit issuer with the same cookie name.\n# Bound retained access tokens by the longest configured WorkOS duration.\nexport WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS=86400000\n\nexport WORKOS_API_KEY=sk_...\nexport WORKOS_CLIENT_ID=client_...\nexport WORKOS_COOKIE_PASSWORD=at-least-32-characters-of-entropy\n\n# signin/callback return AUTH_PROVIDER_ERROR on this backend.\n# It validates an existing WorkOS AuthKit session (session/me).\nexport PORT=8094"
+code: "export NETSCRIPT_AUTH_BACKEND=workos\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\n# Configure the AuthKit issuer with the same cookie name.\n# Bound retained access tokens by the longest configured WorkOS duration.\nexport WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS=86400000\n\nexport WORKOS_API_KEY=sk_...\nexport WORKOS_CLIENT_ID=client_...\nexport WORKOS_COOKIE_PASSWORD=at-least-32-characters-of-entropy\n\n# signin/callback return AUTH_PROVIDER_ERROR on this backend.\n# It validates an existing WorkOS AuthKit session (session/me).\n# Aspire injects PORT; do not set a fixed listener port."
 },
 {
 label: "better-auth (non-interactive)",
 lang: "sh",
-code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at-least-32-characters-of-entropy\nexport DB_PROVIDER=postgres\n\n# Persists users/sessions/accounts via auth.prisma (Step 3).\n# signin/callback return AUTH_PROVIDER_ERROR — validate-only.\nexport PORT=8094"
+code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at-least-32-characters-of-entropy\nexport DB_PROVIDER=postgres\n\n# Persists users/sessions/accounts via auth.prisma (Step 3).\n# signin/callback return AUTH_PROVIDER_ERROR — validate-only.\n# Aspire injects PORT; do not set a fixed listener port."
 }
 ] }) }}
 
@@ -211,7 +202,7 @@ With the Step 3 environment exported, start Aspire from the workspace root:
 ```
 
 If an AppHost is already running, stop it first with `(cd aspire && aspire stop)` so its replacement
-inherits the exported values. The dashboard is at <https://localhost:18888>. With Aspire running,
+inherits the exported values. The dashboard is at the URL Aspire prints. With Aspire running,
 generate and apply the migration as for any plugin schema:
 
 ```sh
@@ -226,7 +217,7 @@ workflow.
 
 ## Step 5 — Check the auth endpoints
 
-With Aspire running, `auth-api` answers on host port **8094** (pinned in Step 1) under the REST
+With Aspire running, `auth-api` answers at the URL Aspire prints under the REST
 prefix `/api/v1/auth/*`, with the oRPC mirror at `/api/rpc/v1/auth/*`, the `/health/live` and
 `/health/ready` probes and OpenAPI docs. It appears as the `auth-api` resource in the Aspire
 dashboard. [The service surface](/identity-access/auth/#the-service-surface) lists the six
@@ -241,15 +232,19 @@ operations and which ones need a credential.
 
 ### Direct auth service diagnostics
 
+This section checks HTTP cookie issuance and forwarding. For application calls, use the generated
+BFF and its typed session client in Step 6. Set `AUTH_URL` to the auth-api URL Aspire prints and
+`APP_URL` to the Fresh app URL before running these diagnostics.
+
 Confirm the service is up and the session endpoint responds. On a fresh, unauthenticated request,
 `session` reports no active session, which proves the endpoint is wired before you complete a login:
 
 ```sh
 # Service is alive
-curl http://localhost:8094/health/ready
+curl "$AUTH_URL/health/ready"
 
 # No session yet — confirms the endpoint is mounted and reachable
-curl http://localhost:8094/api/v1/auth/session
+curl "$AUTH_URL/api/v1/auth/session"
 ```
 
 On `kv-oauth`, the HTTP surface returns JSON redirect fields and emits the backend's `Set-Cookie`
@@ -284,21 +279,21 @@ callback POST:
 
 ```sh
 # Save the transaction cookie and read redirectUrl from the JSON response.
-curl -c cookies.txt -X POST http://localhost:8094/api/v1/auth/signin \
+curl -c cookies.txt -X POST "$AUTH_URL/api/v1/auth/signin" \
   -H 'Content-Type: application/json' -d '{}'
 
 # Visit redirectUrl and authenticate with the provider, then submit its code/state.
 # Send the transaction cookie and replace it with the issued session cookie.
-curl -b cookies.txt -c cookies.txt -X POST http://localhost:8094/api/v1/auth/callback \
+curl -b cookies.txt -c cookies.txt -X POST "$AUTH_URL/api/v1/auth/callback" \
   -H 'Content-Type: application/json' \
   -d '{"code":"PROVIDER_CODE","state":"PROVIDER_STATE"}'
 
 # Resolve the active session using only the cookie; no sessionId is needed.
-curl -b cookies.txt http://localhost:8094/api/v1/auth/session
-curl -b cookies.txt http://localhost:8094/api/v1/auth/me
+curl -b cookies.txt "$AUTH_URL/api/v1/auth/session"
+curl -b cookies.txt "$AUTH_URL/api/v1/auth/me"
 
 # On kv-oauth, revoke the session and expire the cookie in the jar.
-curl -b cookies.txt -c cookies.txt -X POST http://localhost:8094/api/v1/auth/signout \
+curl -b cookies.txt -c cookies.txt -X POST "$AUTH_URL/api/v1/auth/signout" \
   -H 'Content-Type: application/json' -d '{}'
 ```
 
@@ -316,10 +311,10 @@ the same cookie:
 
 ```sh
 # End this session
-curl -b cookies.txt -X POST http://localhost:8094/api/v1/auth/signout
+curl -b cookies.txt -X POST "$AUTH_URL/api/v1/auth/signout"
 # End every session of the signed-in subject
 curl -b cookies.txt -X POST -H 'content-type: application/json' \
-  -d '{"everywhere":true}' http://localhost:8094/api/v1/auth/signout
+  -d '{"everywhere":true}' "$AUTH_URL/api/v1/auth/signout"
 ```
 
 ## Step 6 — Sign in through the generated app
@@ -514,7 +509,7 @@ has the exact posture types and validation rules.
 | --- | --- | --- |
 | `signin` or `callback` returns `AUTH_PROVIDER_ERROR` | The active backend is `workos` or `better-auth`, which validate sessions but do not drive the login redirect. | Set `NETSCRIPT_AUTH_BACKEND=kv-oauth` for an interactive flow. |
 | `session` and `me` answer, but no real sign-in is possible | Provider environment (`NETSCRIPT_AUTH_CLIENT_ID`, `NETSCRIPT_AUTH_CLIENT_SECRET`, `NETSCRIPT_AUTH_REDIRECT_URI`) is missing, so `kv-oauth` booted on its non-functional local-default endpoints. That fallback suits scaffold smoke tests only. | Configure a real provider as in Step 3. |
-| A 404 on `:8094`, or a database error from `netscript db` | Orchestration is not running. | Start Aspire first: `cd aspire && aspire start`. |
+| A 404 from the allocated auth endpoint, or a database error from `netscript db` | Orchestration is not running. | Start Aspire first: `cd aspire && aspire start`. |
 
 ## Production notes
 
@@ -545,7 +540,7 @@ has the exact posture types and validation rules.
 
 ## Next steps
 
-[Operational session lifecycles](/identity-access/session-lifecycles/) shows how to wire sign-in,
+[Session lifecycles](/identity-access/session-lifecycles/) shows how to wire sign-in,
 callbacks and refreshed cookies into your own routes for each backend.
 
 - [Authentication](/identity-access/auth/): the `auth-api` surface and the three backends.

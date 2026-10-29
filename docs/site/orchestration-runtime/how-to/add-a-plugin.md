@@ -1,8 +1,9 @@
 ---
 layout: layouts/base.vto
 title: Add a plugin
+description: Install an official plugin, register it, and confirm it is healthy.
 templateEngine: [vento, md]
-order: 107
+order: 101
 oldUrl: /how-to/add-a-plugin/
 ---
 
@@ -17,7 +18,7 @@ A plugin scaffolds its own workspace folder, registers itself in your runtime an
 an API, runs as its own Aspire service beside your application service.
 [Plugin architecture](/explanation/plugin-system/) explains the model.
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -49,8 +50,8 @@ randomized port (>= 49152).
   rows: [
     ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "Background job scheduling, task execution and the worker API, traced through Aspire from scheduler to subprocess.", "<a href=\"/reference/workers/\">workers</a>"],
     ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "Durable saga orchestration with a <code>kv</code> or <code>prisma</code> store.", "<a href=\"/reference/sagas/\">sagas</a>"],
-    ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "Trigger ingress, scheduling and file watching over raw Hono routes.", "<a href=\"/reference/triggers/\">triggers</a>"],
-    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "An oRPC auth service (sign-in, callback, sign-out, session, me) with one backend: kv-oauth, WorkOS or better-auth.", "<a href=\"/capabilities/auth/\">auth</a>"],
+    ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "Raw webhook ingress, typed oRPC management, scheduling and file watching.", "<a href=\"/reference/triggers/\">triggers</a>"],
+    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "An oRPC auth service (sign-in, callback, sign-out, session, me) with one backend: kv-oauth, WorkOS or better-auth.", "<a href=\"/identity-access/auth/\">auth</a>"],
     ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "Durable change-data stream producers, served as their own Aspire service.", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}
@@ -106,9 +107,12 @@ In `appsettings.json`, set `Sagas.Projection.Backend` on both the saga API entry
 helpers forward it as `NETSCRIPT_SAGA_PROJECTION`, and that environment value takes precedence
 over settings.
 
-**Migration in 0.0.8:** re-run each plugin install with `--no-db --no-samples --force` and
-regenerate helpers to correct existing DB-dependent metadata. Preserve your user-owned
-configuration and samples when you apply the generated changes.
+> [!IMPORTANT]
+> **Changed in 0.0.8**
+>
+> Re-run each plugin install with `--no-db --no-samples --force` and regenerate helpers to
+> correct existing DB-dependent metadata. Preserve your user-owned configuration and samples
+> when you apply the generated changes.
 
 - Existing saga entries without a projection selector follow `Sagas.Store.Backend` (or
   `NETSCRIPT_SAGA_STORE`), and default to KV when neither is set.
@@ -182,12 +186,12 @@ configuration and samples when you apply the generated changes.
    ```bash
    # Bring the whole stack up and exercise the plugin's service
    cd aspire && aspire start
-   # Aspire dashboard: https://localhost:18888
+   # Aspire dashboard: the URL Aspire prints
    # auth-api:         http://localhost:<auth-port> (replace with your assigned auth port)
    ```
 
 Service-bearing plugins appear as resources in the
-[Aspire dashboard](https://localhost:18888). A green resource on the plugin's assigned port
+the dashboard at the URL Aspire prints. A green resource on the plugin's assigned port
 confirms the plugin is live end to end; the dashboard and the scaffold logs show the port.
 
 ## Manage plugins later
@@ -208,7 +212,7 @@ Inspect, update and remove an installed plugin without scaffolding again:
 
 Run `netscript plugin --help` for the complete command set of your installed version.
 
-## Next step
+## Next steps
 
 Give the plugin something to call: [Add a service](/services-sdk/how-to/add-a-service/). For
 each plugin's exported API, browse the [package reference](/reference/).

@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Contracts & type flow
 templateEngine: [vento, md]
-prev: { label: "Architecture", href: "/explanation/architecture/" }
-next: { label: "The plugin system", href: "/explanation/plugin-system/" }
 order: 2
 ---
 
@@ -13,7 +11,7 @@ This page explains how one versioned contract types the service handler, the cli
 document, and the UI island, so the public boundary between a server and its callers is defined
 once. For exact signatures, see [`reference/contracts/`](/reference/contracts/) and
 [`reference/service/`](/reference/service/); for the headline API, see the
-[services capability](/capabilities/services/).
+[services capability](/services-sdk/services/).
 
 ## One boundary definition
 
@@ -261,8 +259,8 @@ app:
   `defineService` or `createService` host.
 - **Workers and sagas** expose oRPC services built from contracts and served with the fluent
   `createService(...).serve()` builder, so dispatching a job or driving a saga is a typed client
-  call. See [background jobs](/capabilities/background-jobs/) and
-  [durable sagas](/capabilities/durable-sagas/).
+  call. See [background jobs](/background-processing/workers/) and
+  [durable sagas](/durable-workflows/sagas/).
 - **Triggers** serve a typed v1 oRPC contract for trigger and event introspection and management
   (fire, enable/disable, schedule preview, SSE event subscription). The exception is the
   *webhook ingress endpoint* (`POST /api/v1/webhooks/:triggerId`), which stays a raw route because
@@ -272,5 +270,3 @@ That exception marks where the model stops: contracts are for boundaries you *ow
 webhook is a boundary someone else owns.
 
 Next: build a contract-first service in the [Build a service tutorial](/tutorials/storefront/02-catalog-service/).
-
-{{ comp.nextPrev({ prev: { label: "Architecture", href: "/explanation/architecture/" }, next: { label: "The plugin system", href: "/explanation/plugin-system/" } }) }}

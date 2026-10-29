@@ -2,8 +2,6 @@
 layout: layouts/base.vto
 title: Durable sagas
 templateEngine: [vento, md]
-prev: { label: "Background jobs", href: "/background-processing/workers/" }
-next: { label: "Triggers & ingress", href: "/durable-workflows/triggers/" }
 order: 1
 ---
 
@@ -459,7 +457,7 @@ The instance lives in Deno KV or in your `saga_runtime_*` tables, depending on t
 ## Production notes
 
 {{ comp callout { type: "warning", title: "Start Aspire first" } }}
-The sagas service needs Postgres and Redis before it can persist and list instances. Run <code>cd aspire &amp;&amp; aspire start</code> (dashboard at <a href="https://localhost:18888"><code>https://localhost:18888</code></a>) before any <code>netscript db</code> command, and before you expect <code>/api/v1/sagas/instances</code> to return durable state. Both backends depend on it: <code>kv</code> needs Redis/KV, and <code>prisma</code> needs Postgres with the <code>saga_runtime_*</code> tables migrated.
+The sagas service needs Postgres and Redis before it can persist and list instances. Run <code>cd aspire &amp;&amp; aspire start</code> (dashboard at the URL Aspire prints) before any <code>netscript db</code> command, and before you expect <code>/api/v1/sagas/instances</code> to return durable state. Both backends depend on it: <code>kv</code> needs Redis/KV, and <code>prisma</code> needs Postgres with the <code>saga_runtime_*</code> tables migrated.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Handlers are synchronous and pure" } }}
@@ -475,8 +473,8 @@ A <code>SagaHandler</code> returns <code>readonly CascadedMessage[]</code>. It i
   no state between steps.
 - **Use a database transaction** for atomic work inside one handler. A saga does not replace it.
 
-## Next step
+## Next steps
 
 Build the checkout saga, with a compensation branch, in the
-[storefront tutorial](/tutorials/storefront/04-checkout-saga/). The full generated API is in the
+[storefront tutorial](/tutorials/storefront/04-checkout-saga/). The full API is in the
 {{ comp.xref({ key: "ref:sagas", text: "sagas reference" }) }}.

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Choose a queue provider
+description: Pick a queue backend, then let auto-discovery select it or pin it explicitly.
 templateEngine: [vento, md]
 order: 104
 oldUrl: /how-to/choose-a-queue-provider/
@@ -10,7 +11,7 @@ oldUrl: /how-to/choose-a-queue-provider/
 
 This recipe helps you pick a backend for `@netscript/queue` and select it, either through
 auto-discovery or by pinning one with `provider` and `connection`. For the enqueue, consume and cron
-mechanics, see [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
+mechanics, see [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/).
 
 A NetScript queue is provider-agnostic: the same `createQueue("jobs")` call runs on an in-memory
 adapter in a unit test, on Deno KV on your laptop and on a broker under Aspire. Only the backend the
@@ -100,7 +101,9 @@ discovery when omitted.
 ] }) }}
 
 > [!WARNING]
-> **Upgrading from 0.0.7:** the RabbitMQ adapter now uses amqplib 2, and an explicit `heartbeat=0`
+> **Changed in 0.0.8**
+>
+> The RabbitMQ adapter now uses amqplib 2, and an explicit `heartbeat=0`
 > in a connection URL disables heartbeats. To keep broker-negotiated heartbeats, remove that query
 > parameter from `AMQP_URL` or `connection.rabbitmq.url`. URLs generated through Aspire omit it and
 > keep negotiating with the broker. Keep `heartbeat=0` only when you mean to disable heartbeats; a
@@ -240,5 +243,3 @@ Enqueue and consume on the backend you chose with
   HTTP trigger) instead of a raw queue.
 - {{ comp.xref({ key: "ref:queue" }) }}: the `QueueProvider` enum, `QueueConnectionOptions`,
   `ParallelQueueOptions`, the `MessageQueue` interface and the `QueueError` hierarchy.
-
-{{ comp.nextPrev({ prev: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" }, next: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" } }) }}

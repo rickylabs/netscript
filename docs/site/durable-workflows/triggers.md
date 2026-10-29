@@ -1,13 +1,11 @@
 ---
 layout: layouts/base.vto
-title: Triggers & ingress
+title: Event triggers
 templateEngine: [vento, md]
-prev: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
-next: { label: "Durable streams", href: "/durable-workflows/streams/" }
-order: 3
+order: 2
 ---
 
-# Triggers & ingress
+# Event triggers
 
 This page covers the **triggers** plugin, which turns inbound webhooks, files dropped on disk, and
 cron schedules into durable background work. A trigger handler receives an event and returns a list
@@ -325,7 +323,7 @@ wire a custom host.
   ]
 }) }}
 
-The triggers API service is the HTTP edge: it hosts `createTriggerIngress` behind a raw Hono
+The triggers API service exposes a typed oRPC management contract and hosts `createTriggerIngress` behind a raw Hono
 router. Cron, file-watch, and DLQ processing run in a separate background processor entrypoint,
 `plugins/triggers/src/runtime/trigger-processor.ts`. `aspire start` runs both as resources,
 `triggers-api` and `trigger-processor`.
@@ -374,7 +372,7 @@ Without the install, run <code>deno x -A jsr:@netscript/plugin-workers{{ release
   {
     label: "Call it — curl",
     lang: "bash",
-    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST http://localhost:<triggers-port>/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:<triggers-port>/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
+    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST \"$TRIGGERS_URL/api/v1/webhooks/inbound/generic\" \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ndeno x -A jsr:@netscript/plugin-triggers" + releaseSpecifier + "/cli events --limit=10 --json\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
   }
 ] }) }}
 
@@ -400,8 +398,8 @@ The <code>'memory'</code> verifier accepts any POST. Before you expose a webhook
   not fire mid-copy. Use `forcePolling` on the underlying watcher for network filesystems that miss
   native events.
 
-## Next step
+## Next steps
 
 Build a verified shipping webhook end to end in the
-[storefront tutorial](/tutorials/storefront/05-shipping-webhook/). The full generated API is in the
+[storefront tutorial](/tutorials/storefront/05-shipping-webhook/). The full API is in the
 {{ comp.xref({ key: "ref:triggers", text: "triggers reference" }) }}.

@@ -37,7 +37,7 @@ to payment. You also write the `process-payment` worker job that a checkout trig
 From [chapter 3](/tutorials/storefront/03-cart-contracts/), check that:
 
 - `my-shop/` has the `products` service and the `cart` contract;
-- `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
+- `aspire start` is up (the dashboard answers at the URL Aspire prints).
   The saga registry and the durable instance store exist only while Aspire runs: Deno KV holds the
   registry, and KV or Postgres holds instance state. If you closed the `aspire start` terminal,
   restart it from `aspire/` before you run any `netscript` command in this chapter.
@@ -423,5 +423,3 @@ A durable checkout. A `CheckoutSaga` built with `defineSaga().state().correlate(
 an order to payment and cancels it through a `PaymentFailed` compensation branch. A trigger enqueues
 the `process-payment` worker job, which reports back with `createSagaPublisher`, and every instance
 is visible on the Sagas API. Next, you accept events from outside providers with a verified webhook.
-
-{{ comp.nextPrev({ prev: { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" }, next: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" } }) }}

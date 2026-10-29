@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Add a service
+description: Add a typed oRPC service to a workspace, serve it with defineService, and verify its REST and RPC surfaces.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/add-a-service/
@@ -15,7 +16,7 @@ version that explains why each piece exists, follow the
 [Build a service tutorial](/tutorials/storefront/02-catalog-service/). For the runtime API, see the
 [`@netscript/service` reference](/reference/service/).
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -312,7 +313,7 @@ await app.serve({ port: 3001 }); // note: your scaffold's port will differ</code
 
 The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic and ships
 static-credential and trusted-header authenticators and a scope authorizer. It is separate from the
-auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>. {{ /comp }}
+auth <strong>plugin</strong> backends; see <a href="/identity-access/auth/">Authentication</a>. {{ /comp }}
 
 ## 5. Run and verify
 
@@ -326,18 +327,18 @@ deno task --cwd services/users dev
 It binds on its assigned port. Check the health route over HTTP and the RPC surface that typed
 clients call:
 
-```bash
-# OpenAPI / HTTP surface (replace <port> with your assigned port)
-curl http://localhost:<port>/api/v1/users/health
-
-# RPC surface (replace <port> with your assigned port, what the generated typed client uses)
-curl -X POST http://localhost:<port>/api/rpc/v1/users/list \
-  -H 'content-type: application/json' -d '{"limit":10}'
+```sh
+netscript service list
+netscript contract inspect users
 ```
 
-A healthy service returns `{"status":"healthy","service":"users"}` from the health route and the
-seeded `items` array from `list`. A typed client imports `UsersContractV1` from `@my-app/contracts`
-and calls `.list(...)` with full input and output inference, with no code generation.
+For live discovery, call `list_api_services`, select the users resource, then call
+`list_service_operations` and `get_operation_schema`. In app code use the generated
+`apps/dashboard/lib/users.ts` client and query factories. The SDK handles discovery and transport;
+call `usersClient.list` with the input the inspected contract declares.
+
+The generated CRUD service returns `{ data, pagination }` from `list`. Its public liveness probe
+is `/health`; check its allocated endpoint in Aspire when diagnosing startup.
 
 ## Production pitfalls
 

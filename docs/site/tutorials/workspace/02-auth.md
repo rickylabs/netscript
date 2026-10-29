@@ -10,7 +10,7 @@ next: { label: '3 · Workspace data', href: '/tutorials/workspace/03-workspace-d
 
 In this chapter you give `my-workspace/` an identity layer: you add the official `auth` plugin,
 choose an authentication **backend**, run its database migration, and check the **session**
-endpoints of the `auth-api` service on `:8094`. You select the backend with one environment
+endpoints of the `auth-api` service at the URL Aspire prints. You select the backend with one environment
 variable, and the contract is identical for every backend, so switching providers later is a
 configuration change.
 
@@ -26,7 +26,7 @@ configuration change.
 ## What you will build
 
 The `auth` plugin installed, the interactive `kv-oauth` backend selected, the `auth.prisma`
-migration applied, and the `auth-api` service answering on `:8094`. At the end,
+migration applied, and the `auth-api` service answering at the URL Aspire prints. At the end,
 `GET /api/v1/auth/session` and `GET /api/v1/auth/me` report "no session yet" before login, which
 proves the backend is composed and the session endpoints are wired.
 
@@ -38,7 +38,8 @@ reach through the running graph. Check that the base is up:
 
 ```sh
 # In my-workspace/, with `aspire start` up in another terminal
-curl http://localhost:3001/health   # the workspace service from chapter 1
+netscript service list
+netscript plugin doctor
 ```
 
 ## Step 1 — Add the `auth` plugin
@@ -47,7 +48,7 @@ The `auth` plugin is an official plugin, installed the same way as `workers`, `s
 `triggers`. From the workspace root:
 
 ```sh
-netscript plugin install @netscript/plugin-auth --port 8094
+netscript plugin install @netscript/plugin-auth
 ```
 
 The installer scaffolds `@netscript/plugin-auth` into `plugins/`, registers it, and adds three
@@ -58,23 +59,11 @@ things to your workspace: a Prisma schema (`auth.prisma`), a service entry that 
 netscript plugin list
 ```
 
-`--port 8094` pins the service's host port. The `curl` commands in this chapter depend on it, and so
-does a real OAuth callback: the provider compares the redirect URI you register with the one the
-service sends, port included.
-
-- The flag writes `"HostPort": 8094` on the plugin's entry in `appsettings.json`, and the generated
-  AppHost passes it to `withHttpEndpoint`.
-- Without the flag, the installer writes no `HostPort` and Aspire allocates a different host port at
-  every start.
-- The pin is yours, not the installer's: `netscript plugin update` and a forced re-install without
-  `--port` keep it. Only a new `--port`, or editing `HostPort` by hand, changes it.
-
-{{ comp callout { type: "warning", title: "A pinned host port is machine-global" } }}
-<code>aspire start --isolated</code> can't randomize a pinned port away, and a second workspace that
-pins 8094 collides with this one. Pin a plugin only when something outside the graph records its
-address, as an identity provider does here. Otherwise omit <code>--port</code> and read the endpoint
-from the dashboard.
-{{ /comp }}
+Aspire allocates the service endpoint. Use the URL Aspire prints or `list_api_services` to find
+`auth-api`. The app's generated BFF owns the browser callback, so register
+`<app-origin>/auth/callback` with the provider. Use the app URL Aspire reports; update both the
+provider registration and the configured redirect URI if that URL changes. A fixed external
+callback origin is a deployment choice, not a framework port default.
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
 The <code>@netscript/plugin-auth</code> plugin composes a single active backend adapter at runtime, configured with <code>NETSCRIPT_AUTH_BACKEND</code>. Running several backends at once, or linking accounts across them, is not supported: one active backend keeps session verification simple and predictable. This tutorial configures one provider; in production, you switch providers at the environment level, not through runtime routing.
@@ -133,8 +122,7 @@ netscript db status              # confirm the migration is applied
 <code>auth_users</code>, <code>AuthSession</code> &rarr; <code>auth_sessions</code>,
 <code>AuthAccount</code> &rarr; <code>auth_accounts</code> and <code>AuthVerification</code> &rarr;
 <code>auth_verifications</code>. The migration always runs, but storage differs by backend:
-<strong>kv-oauth</strong> keeps sessions in Deno KV, <strong>workos</strong> is effectively
-stateless (sealed cookie), and <strong>better-auth</strong> reads and writes these tables through
+<strong>kv-oauth</strong> keeps sessions in Deno KV, <strong>workos</strong> verifies a sealed cookie and keeps durable revocation fences in KV, and <strong>better-auth</strong> reads and writes these tables through
 Prisma.
 {{ /comp }}
 
@@ -150,15 +138,14 @@ export NETSCRIPT_AUTH_BACKEND=kv-oauth
 # Provider credentials (e.g. a Google or GitHub OAuth app)
 export NETSCRIPT_AUTH_CLIENT_ID=your-client-id
 export NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret
-export NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback
+export NETSCRIPT_AUTH_REDIRECT_URI="$APP_URL/auth/callback"
 
 # Required for kv-oauth: missing key material is a startup error
 export NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret>
 ```
 
-There is no `PORT` here. Under `aspire start`, Aspire injects `PORT` into the service: it is the port
-the process binds inside the graph, not the `:8094` you browse to. `:8094` is the **host** port you
-pinned with `--port 8094`, and Aspire proxies it to the `PORT` it gave the process.
+Set `APP_URL` to the app URL Aspire prints. Under Aspire, the AppHost injects the listener's
+`PORT`; there is no fixed auth service port to export.
 
 {{ comp callout { type: "note", title: "Provider presets fill in the OIDC endpoints" } }}
 You rarely type issuer, authorization, token or userinfo URLs. The <code>kv-oauth</code> package
@@ -203,91 +190,39 @@ rows: [
 ]
 }) }}
 
-## Step 6 — Verify a session
+## Step 6 — Verify a session through the app
 
-With Aspire running, the `auth-api` service answers on its pinned host port **`:8094`** and mounts
-the five auth endpoints under `/api/v1/auth/*`.
+The auth contract has six operations: `signin`, `signout`, `revokeSession`, `callback`, `session`
+and `me`. Inspect the live service with `list_api_services` → `list_service_operations` →
+`get_operation_schema`, selecting the `auth-api` resource and its actual operation identifiers.
 
-### Check the endpoints before login
+Open the generated Fresh app at the URL Aspire prints. Visit `/auth/signin`; the app routes the
+provider's callback through `/auth/callback` and keeps the session cookie on its own origin.
+`/auth/session` reports the redacted session state. Before login it reports no active session;
+after login it reports the authenticated principal.
 
-On a fresh, unauthenticated request, `session` reports no active session. That proves the endpoint
-is wired before you complete a login:
-
-```sh
-# Service is alive
-curl http://localhost:8094/health/ready
-
-# No session yet — confirms the endpoint is mounted and reachable
-curl http://localhost:8094/api/v1/auth/session
-
-# Identity endpoint: { "authenticated": false } (HTTP 200) before login
-curl http://localhost:8094/api/v1/auth/me
-```
-
-### Allow the session cookie over plain HTTP
-
-For the plain-HTTP loopback recipe, set these host environment variables before you start or restart
-`auth-api`, alongside the provider configuration from Step 4:
+Server-side loaders call services with `createBrowserSessionClient` from the generated
+`auth/bff.ts`, passing `browserSessionContext(request)` for each incoming request. Keep the bearer
+on the server; chapter 5 uses that client for the guarded workspace operation.
 
 ```sh
-export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true
-export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
+netscript plugin doctor
+netscript contract list
+deno task check
 ```
 
-The unprefixed development name lets curl save the cookie over HTTP; clients reject an insecure
-`__Host-` cookie.
+- [ ] `auth-api` is healthy at its allocated endpoint in Aspire.
+- [ ] MCP discovery lists all six auth operations.
+- [ ] The generated app's `/auth/session` reports no session before login.
+- [ ] The provider returns through the app callback and the session becomes authenticated.
+- [ ] `deno task check` passes.
 
-{{ comp callout { type: "caution", title: "Local loopback only" } }}
-Both overrides are for explicit, insecure local development. Remove them and use HTTPS everywhere
-else, including production.
-{{ /comp }}
-
-### Sign in and read the session
-
-Follow the
-[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#direct-auth-service-diagnostics)
-for the full interactive round trip:
-
-1. `POST /api/v1/auth/signin` returns JSON containing `redirectUrl` and sets the transaction cookie.
-2. After the provider authenticates the user, post its `code` and `state` to
-   `POST /api/v1/auth/callback` with that cookie. The callback sets the session cookie.
-
-Your application must bridge the provider's GET redirect to that POST endpoint. Both REST and RPC
-preserve the backend cookie headers. Then read the session with the saved cookie jar:
-
-```sh
-# After callback, cookies.txt contains the session cookie saved with curl -c.
-# No session id in the body or query is needed.
-curl -b cookies.txt http://localhost:8094/api/v1/auth/session
-curl -b cookies.txt http://localhost:8094/api/v1/auth/me
-```
-
-After sign-in, `GET /api/v1/auth/me` returns `{ authenticated: true, user, session }`. The callback
-returns completion and redirect metadata without a `sessionId`. In the BFF topology, the app server
-owns the first-party cookie and forwards a bearer credential to services; browser callers use the
-cookie alone. See the
-[0.0.8 migration note](/identity-access/how-to/add-authentication/#008-cookie-migration).
-
-## Verify your progress
-
-- [ ] `netscript plugin list` shows the `auth` plugin.
-- [ ] `netscript db status` reports the `auth.prisma` migration applied.
-- [ ] `NETSCRIPT_AUTH_BACKEND=kv-oauth` and the provider env vars are set.
-- [ ] `curl http://localhost:8094/health/ready` succeeds.
-- [ ] `curl http://localhost:8094/api/v1/auth/me` returns `{ "authenticated": false }` before login.
-
-{{ comp callout { type: "tip", title: "Local smoke test without real credentials" } }}
-If the provider environment is missing, the <code>kv-oauth</code> backend falls back to a
-non-functional local-default endpoint set. The service still boots, and <code>/health</code>,
-<code>session</code> and <code>me</code> answer. Real <code>signin</code> and <code>callback</code>
-need genuine provider credentials: the fallback is a stub, not a working login.
-{{ /comp }}
+For HTTP cookie-jar diagnostics outside the app, follow the
+[auth recipe](/identity-access/how-to/add-authentication/#direct-auth-service-diagnostics).
 
 ## What you built
 
 An identity layer for your workspace: the `auth` plugin composed onto the interactive `kv-oauth`
-backend, the `auth.prisma` migration applied, and the `auth-api` service answering on `:8094` with
-the five-route contract. The app can now tell a signed-in team member from a stranger. Next, you give
+backend, the `auth.prisma` migration applied, and the `auth-api` service answering at the URL Aspire prints with
+the six-route contract. The app can now tell a signed-in team member from a stranger. Next, you give
 it something to protect: an isolated database for team records.
-
-{{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }, next: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" } }) }}
