@@ -172,6 +172,7 @@ docs/site/durable-workflows/triggers.md	doc:public-page	S11	prose sweep + #1000 
 docs/site/explanation/architecture.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/aspire.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
 docs/site/explanation/contracts.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/explanation/durability-model.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/index.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/observability.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/plugin-system.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint

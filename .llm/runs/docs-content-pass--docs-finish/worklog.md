@@ -33,3 +33,7 @@ Prose generation: PASS. Carrier has 202 stored entries; all 2 upstream non-site 
 ## Remaining carrier generation
 
 MCP export corpus: PASS, 35 packages, 301 subpaths, 8,926 symbols; corpus bytes unchanged. Asset barrel: PASS with no diff. Publish assets: PASS, refreshed MCP embedded docs for the content pass. No lock changes. Full requested checks are next.
+
+## Full checks
+
+All root check:* tasks ran. All passed except Aspire manifest freshness. Regenerated the existing manifest with aspire-surface-manifest.ts: one path added, zero unmatched paths, no ownership-rule or version change. Targeted parity recheck follows this commit. docs:links, docs:snippets, docs:accuracy, docs:exports-drift, docs:readme-fences and final site verify passed. See gates.md. Source follow-ups requested by the tracker are filed together in #2472; no duplicate open issue covered them.

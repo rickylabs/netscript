@@ -20,11 +20,11 @@
 ## Site-wide accuracy fixes at integration (cross-lane)
 - [x] **Fixed ports.** The dashboard `https://localhost:18888` and OTLP `http://localhost:4318` appear in ~49 files, but `generate-aspire-config.ts` binds both to port 0 (ephemeral). Replace them with "the URL Aspire prints" (verify in code first). Same for `:8093` triggers, `:8094` auth and `8091` workers.
 - [x] Dashboard "login token printed" vs `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true`: verify, then state one truth.
-- [ ] Remaining mentions of `createNetScriptMcpSandbox` (tutorials/chat/05-mcp.md:172 if still present; `packages/fresh/src/runtime/ai/README.md:183` is package-side, so file an issue).
+- [x] Follow-up #2472 for remaining mentions of `createNetScriptMcpSandbox` (tutorials/chat/05-mcp.md:172 if still present; `packages/fresh/src/runtime/ai/README.md:183` is package-side, so file an issue).
 - [x] Triggers "raw Hono" vs oRPC contract: verify, then unify.
 - [x] **callout-types_test.ts** requires >100 `comp callout` uses site-wide. Lanes that converted to GitHub alerts lower that count, so at integration either count alerts too (preferred, now that #2469 renders them as the same component) or keep enough comp callouts. Run that test.
 - [x] Links to the `/capabilities/*` redirect stubs (runtime-config `next`, add-a-plugin, deploy, publish-a-durable-stream) should point to their real targets.
-- [ ] Follow-up issue: `generate-child-health-docs.ts` emits process wording and a 0.0.8 migration section into the public child-health page.
+- [x] Follow-up issue #2472: `generate-child-health-docs.ts` emits process wording and a 0.0.8 migration section into the public child-health page.
 - [x] **Tutorial correctness pass** (verify against the scaffold before publishing): the tutorials-a items above. These are real bugs a reader hits, so verify by running the commands where feasible.
 - [x] One canonical CLI install command and `--help` group list across quickstart and every tutorial chapter 1.
 
@@ -34,4 +34,4 @@ Renderer #2469 merged as 26a0bb7 after independent MERGE and green CI. Main inte
 
 The current catalog scaffold already has typed notFound, repository/application handlers and data/page pagination. Corrected the tutorial accordingly, and kept the custom dashboard's items/offset contract distinct. Corrected the auth route count to six, moved job authoring to workers/jobs, used the public plugin install command, matched the default dashboard app path, corrected the RPC prefix, and replaced ordinary service curl calls with discovery plus typed clients. Current CLI help supplies one canonical group list including tokens and ui:init.
 
-Focused tests and site verify pass. Prose generation preserves both upstream non-site context entries. The remaining generated carriers, broad checks and independent content evaluation are still pending. The frozen legacy parity fixture is intentionally unchanged.
+Focused tests and site verify pass. Prose generation preserves both upstream non-site context entries. Remaining carriers and broad checks completed. Aspire manifest freshness needed a one-row native regeneration; final parity recheck and independent evaluation follow. Source-documentation follow-ups are tracked by #2472. The frozen legacy parity fixture is intentionally unchanged.

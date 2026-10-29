@@ -7,3 +7,5 @@ Main integration baseline: 26a0bb78ad85bf08eacf893b1d550ed4759bb452. Renderer la
 Source corrections and focused checks complete. Generate prose first and commit; then generate export corpus, asset barrel and publish assets. All broad checks and final independent review remain mandatory.
 
 Prose checkpoint is 10c640e. Remaining carrier generation succeeded; only MCP publish-assets changed. Run every root check:* task (review-threads with PR 2471 arguments), docs links/snippets/accuracy/exports and site links after the last builder. Then evaluate with Gemini before sign-off.
+
+Broad checks completed; only stale Aspire manifest needed repair (one row, zero unmatched). See gates.md. Source-documentation follow-up #2472 covers the stale package sandbox README and health generator wording. Independent Gemini review is next.
