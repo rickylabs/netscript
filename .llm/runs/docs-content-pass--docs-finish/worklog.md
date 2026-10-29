@@ -45,3 +45,5 @@ Round 1: FIX at 0341506. Removed the invisible HTML placeholder; completed fixed
 Additional local docs browser: PASS, 124 tests, four light/dark and 390/1280 combinations. Initial launch used the wrong dependency folder; pointing LD_LIBRARY_PATH at the existing project-owned Chromium libraries fixed it without system changes.
 
 Full CLI runtime one-pass attempt: UNPROVEN (Docker daemon unavailable at preflight; cleanup could not inspect Docker). No runtime behavior changed in this docs PR. Read-only leak-check ran; foreign resources left untouched. This is not reported as a passing runtime smoke.
+
+Review correction checkpoint: 9fe5fdb. The affected prose carrier was regenerated with the source repairs. MCP export corpus and asset barrel generation succeeded with no source delta; publish assets refreshed the affected public prose. Rechecking documentation freshness/links/snippets/accuracy/exports after this checkpoint, then the same Gemini reviewer gets round 2.
