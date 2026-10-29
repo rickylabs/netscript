@@ -9,3 +9,5 @@ Preceding content review exceeded the planned two-request budget because complet
 Root CI found the starter component’s bare Lume test import was not valid under the root import map. The necessary test bridge and standalone task inclusion expand the declared verification surface; no product/runtime scope changed.
 
 Source audit correction before final sign-off: separate the shared stream schema from the service producer so the Fresh island never constructs server transport code. Separate pricing contract, server router and client modules so the consumer imports no service implementation. These remain six scenarios; ten TS/TSX modules now implement their boundaries honestly. Regenerate and recheck affected carriers/source/browser evidence before final review.
+
+The reviewer’s first native invocation ended without a terminal verdict after waiting on a background task. A global dependency search was bounded after positive process ownership verification; no unrelated process was touched. Resume the same reviewer context with the already-validated browser prerequisite and foreground-only verification. Do not treat a waiting response as MERGE.
