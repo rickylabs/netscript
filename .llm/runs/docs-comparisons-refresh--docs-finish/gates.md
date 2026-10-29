@@ -35,3 +35,5 @@ Prose checkpoint 9a308f9, then mcp export corpus, assets barrel and publish asse
 Full CLI scaffold runtime remains UNPROVEN on this worker: Docker unavailable, as recorded during #2471. Runtime/scaffold CI is explicitly skipped for this docs-only slice; neither that selection nor static checks is claimed as runtime acceptance.
 
 CI reconciliation: docs browser preparation checks browser test files with the docs formatter config, while the original local format invocation inherited the tools/root config. Reformatted only the new comparisons.spec.ts using the exact CI config; structured CI formatter selection passes all three files. This is whitespace/quote style only; browser behavior is unchanged.
+
+CI test-shard reconciliation: root discovery compiled the carried picker fixture without the standalone Lume import map. Follow the existing markdown-render bridge: keep root-discovered scenario-picker_test.ts as a subprocess bridge, move both full rendering assertions to scenario-picker-fixture.ts, and include that fixture in the site test task. No tests deleted, skipped or weakened; both assertions run with the site’s authoritative import map.

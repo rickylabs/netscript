@@ -7,3 +7,6 @@
 - No-JS browser contexts must inherit the project's viewport and color scheme; otherwise a four-project report silently repeats desktop/light for those tests.
 
 - Browser test files under tools/fresh-ui-browser use docs/site/deno.json for format as CI explicitly selects it. Run the exact scoped wrapper from the docs workflow; the tools root formatter gives a conflicting quote style.
+
+- Site fixtures importing Lume need a root-discovered subprocess bridge with the site config, like markdown-render_test.ts. Use a non-discovered fixture filename and include it explicitly in the site test task; root and standalone-site checks must both reach the assertions.
+- Resource registry slice directories bind to one worktree. A later sibling worktree needs its own private resource-report subdirectory; do not repoint or overwrite another run’s registry.
