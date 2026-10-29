@@ -29,3 +29,7 @@ Focused structured test runner: PASS, 6 root results covering navigation, author
 The next generation commits are checkpoints, not implementation sign-off. Terminal sign-off remains gated on all requested checks and independent evaluation.
 
 Prose generation: PASS. Carrier has 202 stored entries; all 2 upstream non-site entries retain identical decoded bytes.
+
+## Remaining carrier generation
+
+MCP export corpus: PASS, 35 packages, 301 subpaths, 8,926 symbols; corpus bytes unchanged. Asset barrel: PASS with no diff. Publish assets: PASS, refreshed MCP embedded docs for the content pass. No lock changes. Full requested checks are next.
