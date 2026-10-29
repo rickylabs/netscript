@@ -1,3 +1,18 @@
+# Style-owned-file repair — local gate checkpoint
+
+The source commit carrying this record adds five ownership regressions and extends the real protocol fixture with two namespaced styles owning shared/retired CSS. Before repair, the new negative controls fail on the inactive style owner. After repair:
+
+- Integrated suite **362 passed,0 failed,0 skipped**, exit0.
+- Separate real CLI acceptance **2/0/0**, exit0; focused v2 installer suite **18/0/0**, exit0.
+- Structured check/lint/fmt covers all **83 changed TS/TSX files**:78 maintained source/test/tool files and5 generated carriers. All exit0, zero drops/refusals/findings.
+- Root quality:gate (quality plus architecture) and full workspace publish:dry-run PASS/exit0 against the working source. Clean-head durable receipts and docs/carrier freshness are collected after committing this source.
+
+Shared style targets now transfer ownership; unshared obsolete files/imports retire atomically. Independently shared files and transitive style dependencies survive. Edited rewritten/retired files refuse the entire transition even with --force; removal diffs do not write. Ordinary support styles participate in source remapping; the lock separately records completed component selection. No S3 component code/markup/CSS/contract changed.
+
+Final independent whole-change review remains pending on the retained exact-model/high-effort conversation after its reported reset. No final PASS or READY. Earlier runtime/Docker and full-component doc-lint limitations remain unchanged below.
+
+## Retained prior committed checkpoint
+
 # Current post-repair gate evidence
 
 Audited source checkpoint: **e0769490cc6c010fd1d0eb2952d39049ebaf7360**, including product repair d39ed87 and the actual CLI style-history regression. After fast-forward reconciliation, structured regressions pass **357/0/0**, separate native acceptance passes **2/0/0**, and check/lint/format covers all **76** source TS files with no drops/refusals/findings.

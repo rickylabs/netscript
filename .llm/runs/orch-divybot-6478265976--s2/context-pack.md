@@ -1,3 +1,11 @@
+# Style-owned CSS repair — current continuation
+
+Current working repair follows committed e076949/2f6ee1d. New negative controls expose a shared destination falsely owned by a retired component style. The staged installer now handles shared/retired files, strict edited-file refusal including --force, read-only removal diffs, independent/shared/transitively required owners, managed core outputs and remapped ordinary support styles. Optional lock appliedStyle/componentStyle metadata distinguishes successful component selection from editable config intent. Focused v2 tests18/0/0, separate native acceptance2/0/0, and83-file structured check/lint/fmt pass; combined regressions362/0/0 and workspace publication dry-run also pass; immutable post-commit receipts are pending at this checkpoint. New source files style-history.ts and tests/ui-style-files_test.ts are in the existing installer scope. Registry contributor docs and dated lesson explain the contract. No S3 code changed.
+
+The retained same-model Opus final review still has no verdict. Its single allowance-reset retry was stopped before edits; after clean commit/push and gate collection, repin it to the new exact head and resume at the already reported reset. Never self-certify or mark READY on green CI alone. Runtime/cleanup and123 unchanged component doc-lint findings remain disclosed. No READY handoff exists in this worktree.
+
+## Retained preceding state
+
 # Post-repair acceptance continuation
 
 Current audited source: e0769490cc6c010fd1d0eb2952d39049ebaf7360. Product repair d39ed87 was integrated through dbcaf92 by fast-forward. The actual CLI HTTP fixture now covers Utility -> @acme/fixture-style -> unnamed ui:update. It fails before repair and passes afterwards, verifying command success, retained configured style, exact component bytes and lock source identity. Both native acceptance tests pass 2/0/0; combined post-repair regressions 357/0/0; all 76 source TS files check/lint/format pass without drops. acceptance-audit.md maps the complete objective to concrete evidence and limitations. Durable post-commit quality, docs/corpus/carrier and full publication dry-run receipts all PASS/exit 0 at this exact source checkpoint. Review threads: 0 unanswered.

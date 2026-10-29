@@ -14,12 +14,16 @@ export const UiLockedFileSchema = z.object({
 /** Validate install history before trusting file ownership and edit detection. */
 export const UiLockSchema = z.object({
   version: z.literal(1),
+  /** Last applied selection, distinct from a user editing components.json. */
+  appliedStyle: z.string().min(1).optional(),
   items: z.record(
     z.string(),
     z.object({
       source: z.string().min(1),
       sourceHash: hash,
       type: z.string().startsWith('registry:'),
+      /** Source-map styles are exclusive selections; ordinary CSS styles remain independent. */
+      componentStyle: z.boolean().optional(),
       requested: z.boolean().default(false),
       files: z.array(UiLockedFileSchema),
       registryDependencies: z.array(z.string()).default([]),

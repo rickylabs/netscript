@@ -14,8 +14,30 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
   const requested: string[] = [];
   let version = 1;
   const payload = (name: string) =>
-    name === 'style-minimal'
-      ? { name, type: 'registry:style', meta: { components: { x: 'x-minimal' } } }
+    name === 'style-minimal' || name === 'style-variant'
+      ? {
+        name,
+        type: 'registry:style',
+        meta: { components: { x: name === 'style-minimal' ? 'x-minimal' : 'x-variant' } },
+        files: [
+          {
+            path: 'styles/skin.css',
+            type: 'registry:file',
+            target: '@assets/skin.css',
+            content: name === 'style-minimal'
+              ? '.skin { color: red; }\n'
+              : '.skin { color: blue; }\n',
+          },
+          ...(name === 'style-minimal'
+            ? [{
+              path: 'styles/retired.css',
+              type: 'registry:file',
+              target: '@assets/retired.css',
+              content: '.retired {}\n',
+            }]
+            : []),
+        ],
+      }
       : name === 'helper'
       ? {
         name,
@@ -43,7 +65,7 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
           type: 'registry:ui',
           target: '@ui/x.ts',
           content: `import { helper } from '../lib/helper.ts';\nexport const x = helper + ${
-            name === 'x-minimal' ? 20 : version
+            name === 'x-minimal' ? 20 : name === 'x-variant' ? 30 : version
           };\n`,
         }],
       };
@@ -175,6 +197,25 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
     assertStringIncludes(await fs.readFile(target), 'helper + 20');
     assertEquals(await fs.readFile(page), pageCode);
     await checkPage();
+    const retired = join(root, 'assets/retired.css');
+    const retiredBaseline = await fs.readFile(retired);
+    await fs.writeFile(retired, retiredBaseline + '// local style edit\n');
+    const beforeRetireFailure = await snapshot();
+    await run('ui:add', ['@acme/style-variant', '--force'], false);
+    assertEquals(await snapshot(), beforeRetireFailure);
+    await fs.writeFile(retired, retiredBaseline);
+    await run('ui:add', ['@acme/style-variant']);
+    assertStringIncludes(await fs.readFile(join(root, 'assets/skin.css')), 'blue');
+    assertEquals(await fs.exists(retired), false);
+    assertStringIncludes(await fs.readFile(target), 'helper + 30');
+    assertEquals(await fs.readFile(page), pageCode);
+    await checkPage();
+    await run('ui:update', []);
+    assertStringIncludes(await fs.readFile(target), 'helper + 30');
+    assertEquals(
+      JSON.parse(await fs.readFile(join(root, 'fresh-ui.lock.json'))).items['@acme/style-minimal'],
+      undefined,
+    );
     const beforeQueries = await snapshot();
     assert(
       JSON.parse(await run('ui:list', ['--registry', '@acme', '--json'])).items.some((
@@ -216,7 +257,7 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
     assertEquals(requested.filter((name) => name === 'x').length, fetchedX);
     assertEquals(await fs.exists(target), false);
     await run('ui:remove', ['@acme/helper']);
-    await run('ui:remove', ['@acme/style-minimal']);
+    await run('ui:remove', ['@acme/style-variant']);
     const beforeEmptyUpdate = await snapshot();
     await run('ui:update', []);
     assertEquals(await snapshot(), beforeEmptyUpdate);

@@ -16,7 +16,8 @@ import {
   type UiRegistryDependencies,
   type UiResolvedItem,
 } from './registry-client.ts';
-import { resolveUiStyleSources } from './style-sources.ts';
+import { isUiComponentStyle, resolveUiStyleSources } from './style-sources.ts';
+import { retireUiStyleFiles, uiRetiringComponentStyles } from './style-history.ts';
 import { planUiWrites, type UiWritePlan } from './ui-write-plan.ts';
 
 /** Comparison of installed baseline, current local bytes and the currently resolved registry. */
@@ -80,6 +81,7 @@ export async function prepareUiRegistryInstall(
   }
   let config = input.config ?? await readUiConfig(root, deps.fs);
   const previous = await readUiLock(root, deps.fs);
+  const previousStyle = previous?.appliedStyle ?? config.style;
   const styled = input.entries ? undefined : await resolveUiStyleSources({
     client: await createUiRegistryClient(config, deps),
     config,
@@ -89,8 +91,12 @@ export async function prepareUiRegistryInstall(
     selectStyle: input.selectStyle,
   });
   config = styled?.config ?? config;
-  const entries = input.entries ?? styled!.entries;
-  const strict = input.strict || styled?.changed;
+  const resolved = input.entries ?? styled!.entries;
+  const retiring = styled
+    ? uiRetiringComponentStyles(previous, previousStyle, config.style, resolved)
+    : new Set<string>();
+  const entries = resolved.filter((entry) => !retiring.has(entry.ref));
+  const strict = input.strict || styled?.changed || retiring.size > 0;
   if (styled?.changed && !previous) {
     const client = await createUiRegistryClient(config, deps);
     const untracked: string[] = [];
@@ -124,7 +130,7 @@ export async function prepareUiRegistryInstall(
   const diffs: UiRegistryDiff[] = [];
   const drifted = new Set<string>();
   const copiedFiles = new Set<string>();
-  const selected = new Set(entries.map((entry) => entry.ref));
+  const selected = new Set([...entries.map((entry) => entry.ref), ...retiring]);
   const replaceManaged = input.replaceManaged ??
     (!!input.theme ||
       entries.some((entry) =>
@@ -200,6 +206,7 @@ export async function prepareUiRegistryInstall(
       source: entry.source,
       sourceHash: await uiContentHash(JSON.stringify({ ...entry.item, files: entry.files })),
       type: entry.item.type,
+      ...(isUiComponentStyle(entry) ? { componentStyle: true } : {}),
       requested: input.names.includes(entry.ref) || previous?.items[entry.ref]?.requested || false,
       files: records,
       registryDependencies: entry.resolvedDependencies
@@ -215,6 +222,29 @@ export async function prepareUiRegistryInstall(
       cssImports: [...(css.imports.get(entry.ref) ?? [])],
     };
   }
+  await retireUiStyleFiles({
+    root,
+    previous,
+    lock,
+    retiring,
+    plan,
+    paths: deps.paths,
+    report: async (file, current) => {
+      const localHash = await uiContentHash(current);
+      const edited = !file.managed && localHash !== file.hash;
+      if (edited) drifted.add(file.target);
+      diffs.push({
+        path: file.target,
+        localEdited: edited,
+        baselineHash: file.hash,
+        localHash,
+        registryHash: await uiContentHash(''),
+        localDiff: uiFileDiff(file.content, current, file.target),
+        registryDiff: uiFileDiff(current, '', file.target, ['local', 'registry']),
+      });
+    },
+  });
+  if (styled) lock.appliedStyle = config.style;
   if (strict && drifted.size) throw new UiRegistryConflictError([...drifted], diffs);
   if (!input.diff) {
     await applyRegistryEffects({

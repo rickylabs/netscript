@@ -11,6 +11,12 @@ import {
 const componentMap = z.record(z.string(), z.string().min(1));
 const componentTypes = new Set(['registry:component', 'registry:ui', 'registry:block']);
 
+/** Recognize the source-map extension without treating ordinary stylesheet items as selections. */
+export function isUiComponentStyle(entry: UiResolvedItem): boolean {
+  return entry.item.type === 'registry:style' &&
+    componentMap.safeParse(entry.item.meta?.components).success;
+}
+
 /** Style sources keep logical item identity and explicit destinations over the shared contract. */
 export async function resolveUiStyleSources(input: {
   readonly client: UiRegistryClient;
@@ -35,7 +41,8 @@ export async function resolveUiStyleSources(input: {
     ? undefined
     : choices.find((entry) => entry.ref === input.config.style) ?? choices[0];
   const styleRef = chosen?.ref ?? input.config.style;
-  const changed = chosen !== undefined && styleRef !== input.config.style;
+  const changed = styleRef !== (previous?.appliedStyle ?? input.config.style) ||
+    (chosen !== undefined && styleRef !== input.config.style);
   const config = { ...input.config, style: styleRef };
   if (changed) {
     entries = await client.resolve([
@@ -59,8 +66,9 @@ export async function resolveUiStyleSources(input: {
   const aliases = new Map<string, string>();
   const replacements = new Map<string, UiResolvedItem>();
   const extras = new Map<string, UiResolvedItem>();
+  let mapped = false;
   for (const entry of entries) {
-    if (entry.item.type === 'registry:style' || entry.item.type === 'registry:theme') continue;
+    if (isUiComponentStyle(entry) || entry.item.type === 'registry:theme') continue;
     const compatible = styleRef !== UI_DEFAULT_STYLE || entry.source.startsWith('builtin:');
     const source = compatible ? map[entry.ref] ?? map[entry.item.name] : undefined;
     if (!source) {
@@ -69,6 +77,7 @@ export async function resolveUiStyleSources(input: {
       }
       continue;
     }
+    mapped = true;
     const ref = uiDependencyReference(style, source);
     if (ref === entry.ref) continue;
     const graph = await client.resolve([ref], theme);
@@ -90,7 +99,7 @@ export async function resolveUiStyleSources(input: {
     if (!aliases.has(extra.ref) && !selected.has(extra.ref)) selected.set(extra.ref, extra);
   }
   // The style itself is installed for provenance even when it declares no files.
-  if (chosen || styleRef !== UI_DEFAULT_STYLE) selected.set(style.ref, style);
+  if (chosen || mapped || styleRef !== UI_DEFAULT_STYLE) selected.set(style.ref, style);
   return {
     config,
     changed,

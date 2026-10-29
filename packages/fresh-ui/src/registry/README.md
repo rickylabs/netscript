@@ -95,3 +95,10 @@ To extend installation behavior, start at
 `packages/cli/src/kernel/application/ui/v2/install-registry.ts`; style resolution and token preset
 staging are its neighboring flows. Schema/build/theme-doc tests live in `packages/fresh-ui/tests/`,
 and the native command fixtures live in `packages/cli/src/public/features/ui/`.
+
+Component source styles also own their declared files and CSS imports. Selecting another style retires
+the old selection's unshared files; edited copies stop the whole plan, including files being retired.
+Shared dependencies, independent stylesheet items and generated core token assets are preserved.
+The lock's `appliedStyle` records the completed selection, so changing `components.json` cannot hide
+a pending regeneration. Per-item `componentStyle` identifies source-map styles separately from ordinary
+CSS style items. Token-only apply preserves that applied component-style baseline.
