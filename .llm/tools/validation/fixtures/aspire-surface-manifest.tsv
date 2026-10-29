@@ -158,6 +158,7 @@ docs/site/assets/diagrams/aspire-resource-graph.svg	doc:generated-asset	derived	
 docs/site/background-processing/how-to/tune-worker-runtime.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/background-processing/workers.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/cli-reference.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/comparisons/_data.ts	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/comparisons/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/data-persistence/database.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/data-persistence/how-to/choose-a-queue-provider.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
