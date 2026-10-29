@@ -1,3 +1,11 @@
+# Style-file repair final review — pending allowance reset
+
+Current audited source **b24baa33690fe54774a3deaca4961444a2e66fb2** includes both the prior style-history repair and the new shared/retired style-file ownership repair. Integrated362/0/0, native acceptance2/0/0, all83 TS/TSX source/generated wrappers and eight exact-source quality/docs/carrier/publication receipts pass. See final-gates.md and acceptance-audit.md.
+
+The required independent final review has no substantive verdict. A single retry is prepared for02:16UTC on the same retained Opus5.5 High native-provider conversation after its reported individual-quota reset. Closed stdin, read-only instructions and exact local/remote clean-head checks remain required. The prescribed native Claude command's weekly quota failure is not assigned an alternate-provider verdict. Availability failures are not terminal FAIL_FIX or PASS. No final sign-off or READY until the substantive review completes; no paid route, model substitution or guard bypass.
+
+## Retained earlier evaluation records
+
 # Post-repair final evaluation — still unavailable
 
 Current fully gated source checkpoint: **e0769490cc6c010fd1d0eb2952d39049ebaf7360**. Product repair d39ed87 fixes the partial independent finding about old style history being reselected by unnamed update. The actual CLI fixture reproduces failure before repair and passes afterwards, checking retained style, component bytes and source identity. Post-repair 357 integrated regressions, two native acceptance cases, all 76 source wrappers, broader quality/documentation/carriers and full publication dry-run pass. See final-gates.md and acceptance-audit.md.

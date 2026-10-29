@@ -1,3 +1,13 @@
+# Current style-file repair gate evidence
+
+Audited source checkpoint: **b24baa33690fe54774a3deaca4961444a2e66fb2**, pushed. New style ownership regression controls failed before repair; the integrated suite now passes **362/0/0**, separate native CLI acceptance **2/0/0**, and focused v2 tests **18/0/0**, all exit0. Structured check/lint/fmt covers all83 changed TS/TSX files:78 maintained source/test/tool files plus5 generated carriers, zero drops/refusals/findings.
+
+All eight clean-head durable allowlisted receipts identify this exact source checkpoint and record **PASS/exit0**: root quality-gate (including architecture), docs-accuracy (109/109 commands,174 recursive paths), exports-drift, mcp-export-corpus, assets-barrel, publish-assets, agent-docs-prose, and full workspace publish-dry-run. Generation leaves the checkout clean; no package was published. Review-thread gate reports0 current unanswered threads, exit0.
+
+The shared/retired CSS repair is described in the dated style-files lesson and acceptance audit. No actual S3 component source/markup/CSS/contract changed. Final whole-change Opus review remains pending after quota; a single retained-conversation retry is prepared for the reported reset at02:16UTC. It must verify the exact pushed clean head and remain read-only. No independent final PASS, supervisor sign-off or READY is claimed. Docker/.NET runtime prerequisites remain unavailable and123 unchanged full-component doc-lint findings remain disclosed.
+
+## Retained prior gate evidence
+
 # Style-owned-file repair — local gate checkpoint
 
 The source commit carrying this record adds five ownership regressions and extends the real protocol fixture with two namespaced styles owning shared/retired CSS. Before repair, the new negative controls fail on the inactive style owner. After repair:
