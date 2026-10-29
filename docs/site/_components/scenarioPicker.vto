@@ -1,0 +1,50 @@
+{{# Scenario selector. Every panel is server-rendered in order with its heading, so the page reads
+   completely without JavaScript. The inline script runs as the section is parsed: it reveals the
+   native select and shows one panel, so enhancement happens before first paint and nothing jumps.
+   Keep the output free of blank lines: Markdown ends an HTML block at the first blank line. #}}
+{{ set items = scenarios || [] }}
+{{ set gid = id || "ns-scenarios" }}
+<section class="ns-scenarios" data-ns-scenarios aria-label="{{ label || 'Scenarios' }}">
+<div class="ns-scenarios__picker" data-twin-ignore data-pagefind-ignore hidden>
+<label for="{{ gid }}-select">{{ label || "Scenario" }}</label>
+<select id="{{ gid }}-select" data-ns-scenarios-select>
+{{ for index, item of items }}<option value="{{ item.key }}"{{ if index === 0 }} selected{{ /if }}>{{ item.title }}</option>{{ /for }}
+</select>
+</div>
+{{ for item of items }}
+<article class="ns-scenarios__panel" id="{{ gid }}-{{ item.key }}" data-ns-scenario="{{ item.key }}" aria-label="{{ item.title }}">
+<h3 class="ns-scenarios__title">{{ item.title }}</h3>
+<p class="ns-scenarios__problem">{{ item.problem |> ic }}</p>
+<div class="ns-scenarios__solution">
+<p class="ns-eyebrow">NetScript</p>
+{{ comp.tabbedCode({ tabs: item.tabs }) }}
+</div>
+<div class="ns-scenarios__alternative">
+<p class="ns-eyebrow">{{ item.alternativeLabel || alternativeLabel || "Typical alternative" }}</p>
+<p>{{ item.alternative |> ic }}</p>
+</div>
+<p class="ns-scenarios__why"><strong>Why it matters:</strong> {{ item.why |> ic }}</p>{{ if item.href }}<p class="ns-scenarios__more"><a href="{{ item.href }}">{{ item.hrefLabel || "Build it step by step" }}</a></p>{{ /if }}
+</article>
+{{ /for }}
+<script>
+(function () {
+  var root = document.currentScript.parentElement;
+  var select = root.querySelector('[data-ns-scenarios-select]');
+  var panels = Array.prototype.slice.call(root.querySelectorAll('[data-ns-scenario]'));
+  if (!select || !panels.length) return;
+  function show() {
+    panels.forEach(function (panel) { panel.hidden = panel.dataset.nsScenario !== select.value; });
+  }
+  function followHash() {
+    var target = panels.filter(function (panel) { return '#' + panel.id === location.hash; })[0];
+    if (target) select.value = target.dataset.nsScenario;
+    show();
+  }
+  select.addEventListener('change', show);
+  addEventListener('hashchange', followHash);
+  select.parentElement.hidden = false;
+  root.classList.add('is-enhanced');
+  followHash();
+})();
+</script>
+</section>
