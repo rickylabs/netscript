@@ -10,8 +10,7 @@ order: 1
 The `auth` plugin adds sign-in, sessions and a typed `/api/v1/auth/*` surface to a workspace. This
 page covers its contract, its three backends and how other services trust the sessions it issues.
 
-`netscript plugin install @netscript/plugin-auth` adds an `auth-api` oRPC service that boots on port
-**8094** next to your workers, sagas and triggers. The plugin is backend-only: it owns the session
+`netscript plugin install @netscript/plugin-auth` adds an `auth-api` oRPC service alongside your workers, sagas and triggers. Read its allocated endpoint from Aspire. The plugin is backend-only: it owns the session
 lifecycle, the OAuth/OIDC redirect flow and the REST/RPC surface, and ships no UI. Exactly one
 backend is active, chosen by an environment variable, and the service contract is the same whichever
 backend runs. The installer pins `jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}` and its
@@ -94,7 +93,7 @@ server code.
 {
 label: "Browser / typed client flow",
 lang: "ts",
-code: "// app/sign-in.ts — drive the auth-api REST surface from the browser\nconst AUTH = 'http://localhost:8094/api/v1/auth';\n\n// 1. Begin sign-in. The kv-oauth backend responds with a provider redirect;\n// follow it to authenticate with the IdP.\nlocation.href = `${AUTH}/signin`;\n\n// 2. The IdP redirects back to /api/v1/auth/callback, which mints the\n// session and sets the __Host-ns_session cookie automatically.\n\n// 3. Resolve the current session on any later request (cookie is sent\n// automatically; the response is { authenticated, user, session }).\nconst me = await fetch(`${AUTH}/me`, { credentials: 'include' })\n .then((r) => r.json());\nif (me.authenticated) {\n console.log('signed in as', me.user.subject, '— state', me.session.state);\n}\n\n// 4. Sign out — the cookie authenticates the call; it revokes this session and clears the cookie.\nawait fetch(`${AUTH}/signout`, { method: 'POST', credentials: 'include' });"
+code: "// Use the generated app's same-origin browser route.\nlocation.assign('/auth/signin');\n// The provider returns through /auth/callback.\n// Server loaders use auth/bff.ts and its typed session client.\n// /auth/session returns a redacted view, without exposing a bearer.\n"
 },
 {
 label: "Server-side backend port",

@@ -35,13 +35,17 @@ read) that chapters 4 and 5 build the page on.
 ## Before you begin
 
 You need [chapter 2](/tutorials/live-dashboard/02-contract-to-service/)'s `orders` service answering
-on **3002**, the database seeded, and `aspire start` up. Confirm the read-model returns data:
+at its allocated endpoint, the database seeded, and `aspire start` up. Confirm the read-model returns data:
 
 ```sh
-curl 'http://localhost:3002/api/v1/orders/list?limit=1&offset=0'
+netscript service list
+netscript contract inspect orders
 ```
 
-You get one seeded order back. If `items` is empty, re-run `netscript db seed` from the workspace
+Use `list_api_services` → `list_service_operations` → `get_operation_schema` for the live
+operation. The typed client in Step 1 calls it with `{ limit: 1, offset: 0 }`.
+
+The query should return one seeded order. If `items` is empty, re-run `netscript db seed` from the workspace
 root.
 
 ## Step 1 — Create the typed service client

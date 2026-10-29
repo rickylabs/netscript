@@ -34,8 +34,7 @@ The command works in Bash and PowerShell. If your shell can't find `netscript` a
 directory that Deno prints to your `PATH`.
 
 {{ comp callout { type: "note", title: "Installing on a release day or a canary" } }}
-By default, Deno refuses dependencies published in the last ~24 hours. The <code>--minimum-dependency-age=0</code> flag above overrides that. To replace an existing global executable, add <code>-f</code>:
-<code>deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}</code>
+By default, Deno refuses dependencies published in the last ~24 hours. The <code>--minimum-dependency-age=0</code> flag above overrides that. Add <code>--force</code> when replacing an existing global executable.
 {{ /comp }}
 
 Check that the CLI is on your path:
@@ -44,9 +43,7 @@ Check that the CLI is on your path:
 netscript --help
 ```
 
-The output lists the public command groups: `agent`, `config`, `contract`, `db`, `deploy`,
-`generate`, `init`, `marketplace`, `plugin`, `service`, and the `ui:*` family (`ui:list`, `ui:add`,
-`ui:update`, `ui:remove`).
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`.
 
 ## 2. Scaffold the workspace
 
@@ -128,13 +125,13 @@ The next steps that the CLI prints recommend <code>deno task aspire:start</code>
 {{ /comp }}
 
 In an interactive terminal, `aspire start` keeps running: leave it open, then open the dashboard URL
-and login token that it prints. In a non-interactive shell, such as a CI job or an agent tool call,
+that it prints. In a non-interactive shell, such as a CI job or an agent tool call,
 `aspire start` detaches. It prints the AppHost PID and the dashboard URL, then returns while the
-resources keep running. The dashboard needs a browser and a login token, so read the running graph
+resources keep running. The dashboard needs a browser, so read the running graph
 from the shell instead:
 
 ```sh
-aspire describe --apphost ./aspire/apphost.mts --format Json --non-interactive --nologo
+aspire describe --apphost ./apphost.mts --format Json --non-interactive --nologo
 ```
 
 It prints every resource with its allocated endpoint: the Fresh app, the service, Postgres, and
@@ -216,7 +213,7 @@ change `schema.prisma`.
 Check every item before you customise anything. An unverified base makes every later failure look
 like a bug in your code.
 
-- [ ] `netscript --help` lists the public command groups (`agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `ui:*`).
+- [ ] `netscript --help` lists the public command groups shown above.
 - [ ] `my-app/` contains `apps/`, `contracts/`, `services/`, `database/`, `plugins/`, `aspire/`, and `tests/`.
 - [ ] Aspire is running, and the dashboard or `aspire describe --apphost ./aspire/apphost.mts --format Json` shows the Fresh app, the `users` service, Postgres, and Redis with endpoints. MCP `list_api_services` covers only the HTTP resources, the Fresh app and the service; Postgres and Redis publish `tcp://` endpoints and don't appear there.
 - [ ] `netscript db init --name init` succeeded and the initial migration exists.
@@ -332,13 +329,13 @@ If a coding agent will work in the project, install its local guidance and MCP c
 netscript agent init
 ```
 
-Add `--host claude|vscode|all`, `--editor none|zed|vscode`, or `--with-docs` as needed. Re-running
+Add `--host claude|vscode|opencode|all`, `--editor none|zed|vscode`, or `--with-docs` as needed. Re-running
 the command preserves unrelated host configuration.
 
 `agent init` configures the client to launch `netscript agent mcp`, a standard-input/output server
 that the client starts; you don't run it by hand. Reach for `doctor` first when the stack is red,
 `find_export` before you guess a package subpath, `list_api_services` to resolve runtime URLs
-without a browser, and `get_operation_schema` before you write a request with `curl`.
+without a browser, and `list_service_operations` and `get_operation_schema` before calling the service through its typed client.
 [Agent tooling](/ai/agent-tooling/) documents every tool, its schema, and its safety policy.
 
 ## Stop the workspace

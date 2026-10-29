@@ -35,7 +35,7 @@ From [chapter 4](/tutorials/storefront/04-checkout-saga/), check that:
 
 - `my-shop/` has the `products` service, the `cart` contract, and the `sagas` plugin with your
   `CheckoutSaga` and the `process-payment` worker job;
-- `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
+- `aspire start` is up (the dashboard answers at the URL Aspire prints).
   The triggers processor and its job hand-off depend on Deno KV and the workers runtime.
 
 ## Step 1 — Check the triggers plugin
@@ -220,7 +220,7 @@ export WEBHOOK_SHIPPING_SECRET=dev-shipping-secret
 ```
 
 Under `aspire start`, Aspire runs the triggers API and its background processor: look for the
-`triggers-api` and `triggers` resources in the [dashboard](https://localhost:18888). To run the API on
+`triggers-api` and `triggers` resources in the dashboard at the URL Aspire prints. To run the API on
 its own during development, start it from the plugin workspace:
 
 ```sh
@@ -264,7 +264,7 @@ no-signature verifier, so a bare <code>POST</code> is accepted. Switch back to
 
    ```sh
    # 1. The trigger recorded the inbound event (Hono ingress)
-   curl "<triggers-endpoint>/api/v1/events?limit=10"
+   deno x -A jsr:@netscript/plugin-triggers{{ releaseSpecifier }}/cli events --limit=10 --json
 
    # 2. The worker job it enqueued has executed (workers API; the CLI resolves it)
    ns-workers executions --limit=10 --json
@@ -290,7 +290,7 @@ runs.</li>
 worker job. The webhook accepts an unknown id, but there is nothing to run.</li>
 <li><strong>Processor errors.</strong> The background processor, not the API, applies the effects.
 Check the <code>triggers</code> resource in the Aspire
-<a href="https://localhost:18888">dashboard</a>.</li>
+the dashboard at the URL Aspire prints.</li>
 </ul>
 {{ /comp }}
 

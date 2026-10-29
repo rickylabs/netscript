@@ -35,7 +35,7 @@ UI loop:
   {
     label: "Under Aspire (recommended)",
     lang: "bash",
-    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at https://localhost:18888\ncd aspire && aspire start"
+    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at the URL Aspire prints\ncd aspire && aspire start"
   },
   {
     label: "Fresh app only",

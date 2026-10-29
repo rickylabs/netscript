@@ -36,7 +36,7 @@ You need:
 - **Aspire running** before any `netscript db` command or request to your plugin's endpoints. An
   API service or background processor runs as a resource in the Aspire graph beside Postgres and
   Redis: from the project root, run `cd aspire && aspire start` (dashboard at
-  [https://localhost:18888](https://localhost:18888)).
+  the dashboard at the URL Aspire prints).
 
 Run every command from the workspace root.
 
@@ -123,9 +123,9 @@ what category of contributions to expect. Pick the closest official match:
 {{ comp.apiTable({
   caption: "provider.kind by archetype (from the official scaffold.plugin.json files)",
   rows: [
-    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKERS_CONCURRENCY (default 2). The service port is assigned at scaffold time from the high range (49152+)." },
+    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint workers/runtime.ts, concurrencyEnvVar WORKERS_CONCURRENCY (default 2). The service port is assigned at scaffold time from the high range (49152+)." },
     { name: "saga", type: "background-processor", desc: "Durable message-driven sagas. defaultPermissions ['--unstable-kv','--allow-all'], concurrencyEnvVar SAGA_CONCURRENCY. The service port is assigned at scaffold time from the high range (49152+)." },
-    { name: "trigger", type: "ingress", desc: "Webhooks, schedules and file watchers. defaultEntrypoint src/runtime/trigger-processor.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10). The service port is assigned at scaffold time from the high range (49152+)." },
+    { name: "trigger", type: "background-processor", desc: "Webhooks, schedules and file watchers. defaultEntrypoint triggers/runtime.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10). The service port is assigned at scaffold time from the high range (49152+)." },
     { name: "stream", type: "utility / plugin", desc: "Infrastructure or utility plugin. requiresDb=false, requiresKv=false, portRangeKey PLUGIN_API: the installer allocates a randomized port from that range (>= 57344) at scaffold time." }
   ]
 }) }}
@@ -265,20 +265,14 @@ Regenerate whenever you add, rename or remove a contribution module, then restar
    netscript plugin doctor    # checks plugin health and reports wiring problems
    ```
 
-2. With Aspire running, exercise a contribution on your plugin's port. For the `notifier` worker
-   example on `:8095`:
+2. With Aspire running, inspect the plugin's registered service with `list_api_services`, then
+   `list_service_operations` and `get_operation_schema`. Select the operations your plugin actually
+   contributes. Call them with a client derived from that contract, or use the plugin's declared
+   CLI contribution when it supplies a trigger command.
 
-   ```sh
-   curl http://localhost:8095/health
-   curl http://localhost:8095/api/v1/notifier/jobs
-
-   curl -X POST http://localhost:8095/api/v1/notifier/jobs/send-notification/trigger \
-     -H 'content-type: application/json' \
-     -d '{ "payload": { "userId": "user-42" } }'
-   ```
-
-The jobs list shows the contribution, and an execution is recorded after you trigger it. Watch it
-live under your plugin's resource in the [Aspire dashboard](https://localhost:18888).
+The adapter scaffold does not promise a notifier-specific jobs HTTP path. Confirm the registered
+contribution with `netscript plugin info notifier` and watch its resource logs at the URL Aspire
+prints.
 
 ## Declare health through metadata
 

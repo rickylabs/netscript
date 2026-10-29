@@ -10,20 +10,28 @@
 | tutorials-a | docs/content-pass-tutorials-a | 4b3c98ab9 | done | 23 pages; comp callout; fixed false saga claims in storefront/04 and /05 and live-dashboard/05 and /06; stray </content></invoke> removed from 7 pages. Possibly stale (tutorial correctness, needs code check): workspace auth route count 5 vs 6; workspace/04 jobs path and contributor install command; workspace/06 curl path; CLI install flag forms differ across tracks; storefront /api/rpc/_ vs *; /v1 projection contradiction; storefront/06 .items vs {data,pagination} and apps/storefront vs apps/dashboard; live-dashboard install forms. Dups for IA: three chapter-1 setups and three deploy chapters could point to shared how-tos. |
 
 ## Integration checklist
-- [ ] PR #2469 (`docs/file-tree-component`, head 8823e0867) merged first: alerts and tree renderer, plus 8 tree conversions. Sent to Cockpit. Lanes then integrate on main.
-- [ ] Merge the lane branches; resolve tree-fence or info-string conflicts.
-- [ ] Apply the IA plan (`docs-ia-plan.md`).
+- [x] PR #2469 (`docs/file-tree-component`, merged head a4c8bc3) merged first: alerts and tree renderer, plus 8 tree conversions. Sent to Cockpit. Lanes then integrate on main.
+- [x] Merge the lane branches; resolve tree-fence or info-string conflicts.
+- [x] Apply the IA plan (`docs-ia-plan.md`).
 - [ ] Regenerate the carriers once and the legacy-carrier-parity digests; run every `check:*`.
 - [ ] Docs build, check:links, docs:links, docs:snippets, docs:readme-fences, docs.spec (via CI).
 - [ ] One PR for Cockpit review.
 
 ## Site-wide accuracy fixes at integration (cross-lane)
-- [ ] **Fixed ports.** The dashboard `https://localhost:18888` and OTLP `http://localhost:4318` appear in ~49 files, but `generate-aspire-config.ts` binds both to port 0 (ephemeral). Replace them with "the URL Aspire prints" (verify in code first). Same for `:8093` triggers, `:8094` auth and `8091` workers.
-- [ ] Dashboard "login token printed" vs `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true`: verify, then state one truth.
+- [x] **Fixed ports.** The dashboard `https://localhost:18888` and OTLP `http://localhost:4318` appear in ~49 files, but `generate-aspire-config.ts` binds both to port 0 (ephemeral). Replace them with "the URL Aspire prints" (verify in code first). Same for `:8093` triggers, `:8094` auth and `8091` workers.
+- [x] Dashboard "login token printed" vs `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true`: verify, then state one truth.
 - [ ] Remaining mentions of `createNetScriptMcpSandbox` (tutorials/chat/05-mcp.md:172 if still present; `packages/fresh/src/runtime/ai/README.md:183` is package-side, so file an issue).
-- [ ] Triggers "raw Hono" vs oRPC contract: verify, then unify.
-- [ ] **callout-types_test.ts** requires >100 `comp callout` uses site-wide. Lanes that converted to GitHub alerts lower that count, so at integration either count alerts too (preferred, now that #2469 renders them as the same component) or keep enough comp callouts. Run that test.
-- [ ] Links to the `/capabilities/*` redirect stubs (runtime-config `next`, add-a-plugin, deploy, publish-a-durable-stream) should point to their real targets.
+- [x] Triggers "raw Hono" vs oRPC contract: verify, then unify.
+- [x] **callout-types_test.ts** requires >100 `comp callout` uses site-wide. Lanes that converted to GitHub alerts lower that count, so at integration either count alerts too (preferred, now that #2469 renders them as the same component) or keep enough comp callouts. Run that test.
+- [x] Links to the `/capabilities/*` redirect stubs (runtime-config `next`, add-a-plugin, deploy, publish-a-durable-stream) should point to their real targets.
 - [ ] Follow-up issue: `generate-child-health-docs.ts` emits process wording and a 0.0.8 migration section into the public child-health page.
-- [ ] **Tutorial correctness pass** (verify against the scaffold before publishing): the tutorials-a items above. These are real bugs a reader hits, so verify by running the commands where feasible.
-- [ ] One canonical CLI install command and `--help` group list across quickstart and every tutorial chapter 1.
+- [x] **Tutorial correctness pass** (verify against the scaffold before publishing): the tutorials-a items above. These are real bugs a reader hits, so verify by running the commands where feasible.
+- [x] One canonical CLI install command and `--help` group list across quickstart and every tutorial chapter 1.
+
+## Finish evidence (2026-10-29)
+
+Renderer #2469 merged as 26a0bb7 after independent MERGE and green CI. Main integration is a merge commit (5f3f9d1). The finish run is `.llm/runs/docs-content-pass--docs-finish/`.
+
+The current catalog scaffold already has typed notFound, repository/application handlers and data/page pagination. Corrected the tutorial accordingly, and kept the custom dashboard's items/offset contract distinct. Corrected the auth route count to six, moved job authoring to workers/jobs, used the public plugin install command, matched the default dashboard app path, corrected the RPC prefix, and replaced ordinary service curl calls with discovery plus typed clients. Current CLI help supplies one canonical group list including tokens and ui:init.
+
+Focused tests and site verify pass. Prose generation preserves both upstream non-site context entries. The remaining generated carriers, broad checks and independent content evaluation are still pending. The frozen legacy parity fixture is intentionally unchanged.

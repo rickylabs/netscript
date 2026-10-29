@@ -348,23 +348,22 @@ The guard produces three distinct responses, each asserted in the framework's
 `builder-auth_test.ts`. With the service running under Aspire (`aspire start` from `aspire/`), call
 the route for team `ws-1`:
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "401 — no credential",
-    lang: "sh",
-    code: "# No Authorization header -> authn rejects before the handler runs.\ncurl -i http://localhost:3001/api/workspace/ws-1/members\n\n# HTTP/1.1 401 Unauthorized\n# { \"error\": \"UNAUTHORIZED\", \"message\": \"missing-credential\" }"
-  },
-  {
-    label: "403 — wrong scope",
-    lang: "sh",
-    code: "# 'write' authenticates (valid credential) but lacks workspace:read,\n# so authz denies the scope-guarded route.\ncurl -i -H 'authorization: Bearer write' \\\n  http://localhost:3001/api/workspace/ws-1/members\n\n# HTTP/1.1 403 Forbidden\n# { \"error\": \"FORBIDDEN\", \"message\": \"authz.missing-scope:workspace:read\" }"
-  },
-  {
-    label: "200 — authenticated + scoped",
-    lang: "sh",
-    code: "# 'read' carries workspace:read -> authn resolves the principal, authz allows it.\n# The contract parses ?limit=2 into a typed page.\ncurl -i -H 'authorization: Bearer read' \\\n  'http://localhost:3001/api/workspace/ws-1/members?limit=2'"
-  }
-] }) }}
+Inspect the live operation with `list_api_services` → `list_service_operations` →
+`get_operation_schema`. Then use the generated server-side session client from Step 4:
+
+```ts
+// Static credentials are a local fixture; production uses the current server session.
+const members = await workspaceClient.members(
+  { workspace: 'ws-1', limit: 2, offset: 0 },
+  { context: { accessToken: 'read' } },
+);
+```
+
+The app handler returns 401 when no session credential is present. With the static `write`
+credential, the service rejects the call with 403 because it lacks `workspace:read`. The `read`
+credential carries that scope and returns the typed result. The SDK may reject a required call
+without a bearer before sending it; that is separate from the app handler's HTTP 401 boundary.
+
 
 The `200` body echoes the values the contract parsed: the typed `workspace` path param, the typed
 `limit`/`offset` page, the authenticated `subject`, and the member rows from chapter 3:
@@ -392,8 +391,7 @@ The contract authorizer checks the flat scope and role strings declared in proce
 
 ## Verify your progress
 
-The three `curl` calls verify the service guard, and the Step 4 app handler verifies the same policy
-through the generated BFF client. Unauthenticated calls must fail closed and scoped calls must
+The typed SDK calls and the Step 4 app handler verify the service policy through the generated BFF client. Unauthenticated calls must fail closed and scoped calls must
 return typed member data:
 
 - [ ] `contracts/versions/v1/workspace.contract.ts` exports `WorkspaceContractV1` with typed input,

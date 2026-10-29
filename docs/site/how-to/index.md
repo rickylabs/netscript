@@ -15,7 +15,7 @@ guides that teach what its recipes assume.
 {{ comp callout { type: "important", title: "Start Aspire first" } }}
 Anything that touches Postgres, Redis or Garnet, or a plugin service needs Aspire running. From your
 workspace, run <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>netscript db</code> command or service
-call. It starts the dependencies and the dashboard on <a href="https://localhost:18888"><code>https://localhost:18888</code></a>.
+call. It starts the dependencies and the dashboard on the dashboard at the URL Aspire prints.
 The recipes repeat this where it matters, but it is the most common missing step.
 {{ /comp }}
 

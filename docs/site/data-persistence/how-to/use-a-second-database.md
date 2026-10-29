@@ -102,8 +102,8 @@ cd aspire
 aspire start
 ```
 
-Open the Aspire dashboard at [https://localhost:18888](https://localhost:18888) (`aspire start`
-prints the access token) and confirm that the new resource, `mysql`, `analytics` or whatever your
+Open the Aspire dashboard at the URL Aspire prints (`aspire start`
+prints the allocated URL) and confirm that the new resource, `mysql`, `analytics` or whatever your
 config key is, turns green beside `postgres` and `redis`.
 
 > [!WARNING]

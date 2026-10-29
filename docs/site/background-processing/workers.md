@@ -105,7 +105,7 @@ Without the install, run each command as
 `deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli <verb …>`.
 
 ```bash
-# Enqueue through the workers API (port 8091), without hand-writing HTTP.
+# Enqueue through the workers API (at the URL Aspire prints), without hand-writing HTTP.
 ns-workers trigger process-payment \
   --payload='{"orderId":"o_42","amountCents":4999}'
 

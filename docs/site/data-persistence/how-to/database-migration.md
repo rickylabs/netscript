@@ -93,8 +93,7 @@ Leave `aspire start` running in this terminal. It provisions Postgres and the Re
 and queue backend) as Docker containers; you need no `docker run` and no local Postgres install.
 When it settles:
 
-- The **Aspire dashboard** is at [https://localhost:18888](https://localhost:18888), with the access
-  token printed in the `aspire start` output. Confirm the `postgres` and `redis` resources are green.
+- The **Aspire dashboard** is at the URL Aspire prints, using the allocated URL from `aspire start`. The generated local profile allows anonymous access. Confirm the `postgres` and `redis` resources are green.
 - The graph also lists the per-capability services and processors (`workers-api`, `workers`,
   `sagas-api`, `sagas`, `triggers-api`, `triggers`). If you scaffolded auth and streams, `auth-api`
   and the streams service join the graph on their assigned ports.
@@ -162,7 +161,7 @@ Confirm the database is migrated and seeded, from most to least authoritative:
    sync. If it is green, the other checks only corroborate it.
 2. **Generated client.** `database/postgres/schema/.generated/` contains the Prisma client and the
    `zod` schemas, so your typed models are importable from application code.
-3. **Aspire dashboard.** The `postgres` resource at [https://localhost:18888](https://localhost:18888)
+3. **Aspire dashboard.** The `postgres` resource at the URL Aspire prints
    is green and shows recent activity from the migration and seed runs.
 
 When all three agree, import the generated client in a service or worker and read the rows the seed

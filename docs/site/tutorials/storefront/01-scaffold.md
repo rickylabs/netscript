@@ -41,20 +41,16 @@ You need a working local toolchain:
 Install the NetScript CLI from JSR:
 
 ```sh
-deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 ```
 
-`--minimum-dependency-age=0` lets the pinned release install on its publication day, and `-f`
-replaces an older global `netscript` executable. Confirm it resolves:
+`--minimum-dependency-age=0` lets the pinned release install on its publication day, and use `--force` when replacing an older global executable. Confirm it resolves:
 
 ```sh
 netscript --help
 ```
 
-You see the public groups: `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`,
-`marketplace`, `plugin`, `service`, and the `ui:*` group (`ui:list`, `ui:add`, `ui:update`,
-`ui:remove`). If `netscript` is not found, add Deno's install directory (printed by `deno install`)
-to your `PATH` and open a new terminal.
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
@@ -71,21 +67,21 @@ totals per phase. A clean dry run means you can scaffold for real.
 
 ## Step 2 — Create the workspace
 
-Scaffold `my-shop/` with an example service named `products` on port **3001** and a Postgres
+Scaffold `my-shop/` with an example service named `products` at its allocated endpoint and a Postgres
 database, which holds the catalog you build in the next chapter:
 
 ```sh
-netscript init my-shop --service --service-name products --service-port 3001 --db postgres
+netscript init my-shop --service --service-name products --db postgres
 cd my-shop
 ```
 
 The CLI scaffolds `my-shop/`, formats the output with `deno fmt`, initializes a git repository, and
 prints a **next steps** summary for your options. The steps below follow the same path.
 
-{{ comp callout { type: "note", title: "Pinned ports in this track" } }}
-This track pins the <code>products</code> service to port <code>3001</code> with
-<code>--service-port</code>. Without a pinned port, each scaffold gets its own randomized high-range
-ports.
+{{ comp callout { type: "note", title: "Use allocated endpoints" } }}
+Aspire allocates the service endpoint. Open the URL Aspire prints and read the service URL from
+the Resources view or <code>aspire describe</code>. Set <code>SERVICE_URL</code> to that URL before
+running a health probe; no fixed service port is required.
 {{ /comp }}
 
 This track uses Postgres. You can swap `--db postgres` for `mysql`, `mssql` or `sqlite` and the
@@ -94,7 +90,7 @@ scaffold wires Prisma for that engine instead; SQLite is file-backed, with no As
 ones:
 
 {{ comp.apiTable({ caption: "Common netscript init options", rows: [
-  { name: "--service --service-name <name> --service-port <port>", type: "flag group", desc: "Include an example oRPC service on the given port. We use products on 3001." },
+  { name: "--service --service-name <name> --service-port <port>", type: "flag group", desc: "Include an example oRPC service at the endpoint Aspire reports." },
   { name: "--db <engine>", type: "flag", desc: "Scaffold a Prisma-backed database workspace. First-class engines: postgres (default for this track), mysql, mssql, sqlite. Omit or use --db none to skip database tooling." },
   { name: "--no-aspire", type: "flag", desc: "Skip the Aspire orchestration files — you would then wire infrastructure yourself. Do NOT pass this for the track; we rely on aspire start." },
   { name: "--editor <none|zed|vscode>", type: "flag", desc: "Generate editor settings for the chosen editor." },
@@ -166,7 +162,7 @@ deno task aspire:start   # starts the AppHost and every declared resource
 
 `deno task aspire:start` is the wrapper the CLI's printed next steps recommend: it sets a 300-second
 cold-start budget while container images download on the first run. It brings up Postgres, the Redis
-cache and your `products` service, then prints a URL and a one-time login token for the **Aspire
+cache and your `products` service, then prints the allocated URL for the **Aspire
 dashboard**.
 
 In an interactive terminal, leave it running: it is your storefront's control plane for the rest of
@@ -201,10 +197,10 @@ adds catalog behavior.
 ## Verify your progress
 
 In the second terminal, with `aspire start` still running in the first, check that the example
-`products` service answers on port **3001**:
+`products` service answers at its allocated endpoint:
 
 ```sh
-curl http://localhost:3001/health
+curl "$SERVICE_URL/health"
 ```
 
 You get a healthy JSON response. Services answer over plaintext HTTP/1.1; HTTP/2 is opt-in and needs
@@ -222,7 +218,7 @@ box below is ticked: on an unverified base, every later failure looks like a bug
 - [ ] `aspire start` is up; its printed dashboard URL (or MCP `list_api_services`) shows `products`, `postgres`, and `redis`
       healthy.
 - [ ] `netscript db init --name init` succeeded and the initial migration exists.
-- [ ] `curl http://localhost:3001/health` returns healthy JSON.
+- [ ] `curl "$SERVICE_URL/health"` returns healthy JSON.
 - [ ] Opening the Fresh app URL from the dashboard (or MCP status) with `/design` appended renders the generated
       design reference (it returns an HTTP 302 redirect to `/design/composition`, so scripted checks require `curl -L`).
 - [ ] `deno task check` passes with no errors.

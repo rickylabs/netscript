@@ -63,7 +63,7 @@ hop. Each chapter adds one link:
 {{ comp.featureGrid({ items: [
   {
     title: "1 · Scaffold the workspace",
-    body: "Create <code>my-dashboard/</code> with <code>netscript init</code>, tour the Fresh app, and boot it under Aspire, with the Aspire dashboard on :18888.",
+    body: "Create <code>my-dashboard/</code> with <code>netscript init</code>, tour the Fresh app, and boot it under Aspire, with the Aspire dashboard on the URL Aspire prints.",
     href: "/tutorials/live-dashboard/01-scaffold/"
   },
   {

@@ -210,8 +210,8 @@ diagnostics, public documentation and the package-embedded public export corpus.
 project source code, environment-variable values, credentials or secrets.
 
 Telemetry requests go only to the resolved dashboard endpoint. Discovery uses, in order, the
-`--endpoint` option, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT` and the local default
-`http://localhost:18888`.
+`--endpoint` option, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT` then a built-in fallback. That fallback does not follow an allocated dashboard port. Pass the
+actual URL Aspire prints through `--endpoint` or `NETSCRIPT_TELEMETRY_ENDPOINT`.
 
 `execute_command` is default-deny. Explicit rules allow selected database, generation, contract,
 service-read, plugin and UI commands. Deny rules take priority: deployment, project initialization,
@@ -227,7 +227,7 @@ and failures may include a suggested fix.
 
 | Result | What to do |
 | --- | --- |
-| `telemetry` warns or fails | No telemetry endpoint is reachable. Check that the app is running, then check the discovery chain: `--endpoint`, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT` and the local default `http://localhost:18888`. While the endpoint is down, telemetry tools still respond: `get_app_status` reports `status: "warn"` with zero counts, the list and analytics tools return empty or zero-valued results, and `get_run` returns a structured `run_not_found` error. |
+| `telemetry` warns or fails | No telemetry endpoint is reachable. Check that the app is running, then check the discovery chain: `--endpoint`, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT` then a built-in fallback that may not match the current run. Set `--endpoint` to the URL Aspire prints. While the endpoint is down, telemetry tools still respond: `get_app_status` reports `status: "warn"` with zero counts, the list and analytics tools return empty or zero-valued results, and `get_run` returns a structured `run_not_found` error. |
 | `aspire` or `project` warns | The project root is wrong or the workspace is missing expected markers. Confirm that the `--project-root` in your host configuration points at the project, and re-run `netscript agent init` after you move a project. |
 | `plugins` warns or fails | Plugin diagnostics found an issue; the equivalent direct command is `netscript plugin doctor`. |
 | Docs tools return `docs_corpus_not_found` | The configured `--docs-root` or `NETSCRIPT_DOCS_ROOT` path does not exist. Fix the path, or remove the override to fall back to the packaged corpus. |

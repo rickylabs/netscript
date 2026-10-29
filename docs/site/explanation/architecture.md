@@ -110,7 +110,7 @@ The topology below is a fully loaded workspace, with every first-party plugin en
 ```text
                               ┌───────────────────────────────────┐
                               │            Aspire AppHost          │
-                              │   dashboard  https://localhost:18888│
+                              │   dashboard  the URL Aspire prints│
                               │  provisions Postgres + Redis (KV)  │
                               └───────────────┬───────────────────┘
                                               │ wires env, ports, resources
@@ -142,7 +142,7 @@ Read the picture in three bands. **Aspire** sits on top as the local orchestrato
 `cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or
 `deno-kv` are selectable via `--cache-backend`) and starts every service *before* any
 `netscript db` command runs. Traces, logs, and health land in the dashboard at
-`https://localhost:18888`. **Plugin services** sit in the middle, each owning exactly one service;
+`the URL Aspire prints`. **Plugin services** sit in the middle, each owning exactly one service;
 your scaffolded `users` service sits beside them and uses the same contract machinery. **The
 packages** sit underneath as the substrate every plugin composes. See
 [Orchestration with Aspire]({{ "explain:aspire" |> xref }}) for the control plane.
@@ -151,7 +151,7 @@ packages** sit underneath as the substrate every plugin composes. See
   title: "Workspace ports and surfaces",
   columns: ["Surface", "Port", "Protocol", "Owner"],
   rows: [
-    ["Aspire dashboard", ":18888", "HTTP (UI)", "Aspire AppHost"],
+    ["Aspire dashboard", "the URL Aspire prints", "HTTP (UI)", "Aspire AppHost"],
     ["Example service (users)", "Assigned (>= 49152)", "oRPC over <code>/api/rpc/*</code>", "your service"],
     ["Workers", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-workers</code>"],
     ["Sagas", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-sagas</code>"],
@@ -242,8 +242,7 @@ event-handler ladders. [Durable sagas]({{ "cap:durable-sagas" |> xref }}) are th
 a saga is a set of named phases with explicit correlation, persistence, and compensation, declared
 through a builder.
 
-{{ comp.codeBlock({ lang: "ts", code:
-"// plugins/sagas/user-registration.saga.ts\nimport { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (s, _message, _context) => {\n    s.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (s, _message, _context) => {\n    s.state = { status: \"complete\" };\n  })\n  .build();" }) }}
+{{ comp.codeBlock({ lang: "ts", code: "// plugins/sagas/user-registration.saga.ts\nimport { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (s, _message, _context) => {\n    s.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (s, _message, _context) => {\n    s.state = { status: \"complete\" };\n  })\n  .build();" }) }}
 
 Failure handling is explicit too. Handlers throw rich errors, and a supervisor, not a scatter of
 defensive `try/catch` blocks inside the handler, decides whether to restart or escalate and owns the

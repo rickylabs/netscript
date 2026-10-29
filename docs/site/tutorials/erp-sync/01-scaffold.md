@@ -24,8 +24,7 @@ a running system to build on.
 
 `my-erp/` on disk: a NetScript workspace with a Postgres database, the **workers** plugin at
 `plugins/workers/` (the background-job engine) and the **triggers** plugin at `plugins/triggers/`
-(the ingress engine), all running under one `aspire start`, with the Aspire dashboard live on
-`:18888`.
+(the ingress engine), all running under one `aspire start`, with the Aspire dashboard available at the URL Aspire prints.
 
 ## Before you begin
 
@@ -40,17 +39,11 @@ You need:
 Install the NetScript CLI from JSR once, then confirm it:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-You should see the public command groups, including `init`, `plugin`, `generate`, `db` and
-`deploy`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new
-terminal.
-
-{{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad hoc with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>. The rest of this track uses the installed <code>netscript</code> form.
-{{ /comp }}
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
@@ -141,11 +134,11 @@ aspire start       # starts the AppHost and every declared resource
 ```
 
 `aspire start` brings up Postgres, the Redis cache, the workers API and processor, and the
-triggers API and processor, then prints a URL and a one-time login token for the
+triggers API and processor, then prints the allocated URL for the
 **Aspire dashboard**:
 
 ```text
-https://localhost:18888
+the URL Aspire prints
 ```
 
 The dashboard's **Resources** tab is the authority for the port each resource bound. You installed
@@ -177,7 +170,7 @@ Leave `aspire start` running in this terminal. It is your control plane for the 
 
 - [ ] `my-erp/` exists with `plugins/workers/` and `plugins/triggers/` on disk.
 - [ ] `netscript plugin list` shows both `workers` and `triggers`.
-- [ ] `aspire start` is up; the dashboard on `:18888` lists `postgres`, `redis`, and both plugin APIs.
+- [ ] `aspire start` is up; the dashboard at the URL Aspire prints lists `postgres`, `redis`, and both plugin APIs.
 - [ ] `curl <workers-endpoint>/health` and `curl <triggers-endpoint>/health` both return healthy.
 - [ ] `deno task check` is clean.
 

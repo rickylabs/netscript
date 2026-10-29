@@ -11,7 +11,7 @@ This page explains why a NetScript app needs an orchestrator, how Aspire generat
 graph from your plugins instead of having you hand-wire it, and what one `aspire start` stands up.
 With that model, you can reason about the running system instead of treating it as a black box.
 
-{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Redis), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at :18888.", caption: "One `aspire start` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Redis), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at the URL Aspire prints.", caption: "One `aspire start` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
 
 ## Why an orchestrator
 
@@ -79,17 +79,12 @@ The current <code>netscript init</code> scaffold emits <code>13.5.3</code> for
 <code>13.5.3-preview.1.26425.3</code>. The CLI and AppHost SDK must stay on the same release train.
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral" } }}
-The generated <code>https</code> profile sets <code>applicationUrl</code>, the OTLP endpoint, and
-the resource-service endpoint to <code>localhost:0</code>, so Aspire binds a free port on each run
-instead of pinning the dashboard to <code>:18888</code> or the collector to <code>:4318</code>.
-<strong>Trust the URL <code>aspire start</code> prints</strong>, not a memorized port; this page uses
-<code>:18888</code> and <code>:4318</code> as the conventional Aspire defaults, but your run may
-differ. <code>aspire start --isolated</code> also randomizes ports and isolates user secrets, so
-several AppHosts can run without colliding on the default dashboard port. Container host ports are
-not guaranteed unique across isolated starts without explicit port configuration. Point telemetry
-backends at the endpoint the run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code>
-yourself to fix it.
+{{ comp callout { type: "important", title: "Use the URL Aspire prints" } }}
+The generated profile binds the dashboard, OTLP receiver and resource service to port zero, so
+Aspire allocates free ports at startup. Open the dashboard at the URL Aspire prints. Read resource
+endpoints with <code>aspire describe</code>; the AppHost injects the allocated OTLP endpoint into
+its resources. The generated local profile enables anonymous dashboard access. For a remote
+or shared deployment, configure the dashboard's authentication and network access explicitly.
 {{ /comp }}
 
 Two facts about the AppHost contradict what people expect from Aspire's .NET AppHost:
@@ -228,15 +223,15 @@ service-registry client.
    ┌─────────────────────────────┼─────────────────────────────────────┐
    ▼                             ▼                                       ▼
 (1) dashboard OTLP        (2) infrastructure                   (4) services
-    :18888 + :4318            ├─ postgres  (Container)           └─ users (service)
+    allocated endpoints           ├─ postgres  (Container)           └─ users (service)
                               └─ redis     (Container, cache)
                                  │
                                  ▼  pass 2: resolve references → inject env
     ┌──────────────────────────────────────────────────────────────────────────────┐
     │ (5) plugin APIs  workers-api        sagas-api        triggers-api               │
     │     auth-api         streams (port)                                             │
-    │ (6) background processors: workers, sagas (bin/combined.ts);                    │
-    │     triggers (src/runtime/trigger-processor.ts)                                 │
+    │ (6) background processors: workers/runtime.ts, sagas/runtime.ts;                    │
+    │     triggers/runtime.ts                                 │
     │ (7) apps:  dashboard (Fresh)        (8) tools                                   │
     └──────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -249,16 +244,16 @@ orientation.
 {{ comp.apiTable({
   caption: "The resource graph a single `aspire start` brings up",
   rows: [
-    { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
+    { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "The Aspire dashboard. The generated local profile allows anonymous dashboard access. Live resource list, logs, structured traces, and the OTLP collector (the OTLP URL Aspire prints) surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The recommended engine is Postgres (swap to `mysql` / `mssql` — also Containers — or file-backed `sqlite`, which has no container, via `--db`), persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap to `garnet` (also a Container) or app-level `deno-kv` via `--cache-backend`." },
     { name: "users", type: "assigned port", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
     { name: "workers-api", type: "assigned port", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
     { name: "sagas-api", type: "assigned port", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
-    { name: "triggers-api", type: "assigned port", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
+    { name: "triggers-api", type: "assigned port", desc: "Triggers plugin API: typed oRPC management with raw HMAC webhook ingress. POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
     { name: "auth-api", type: "assigned port", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,sessions/revoke,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
     { name: "streams", type: "assigned port", desc: "Durable-streams producer runtime. Served as its own Aspire Deno service; workers/auth/sagas mirror execution state into it." },
-    { name: "workers / sagas / triggers", type: "background processors", desc: "Separate from the APIs: workers and sagas run from bin/combined.ts; triggers from src/runtime/trigger-processor.ts. Declared under appsettings BackgroundProcessors." }
+    { name: "workers / sagas / triggers", type: "background processors", desc: "Separate from the APIs: the scaffold emits workers/runtime.ts, sagas/runtime.ts and triggers/runtime.ts. Declared under appsettings BackgroundProcessors." }
   ]
 }) }}
 
@@ -323,19 +318,19 @@ only at runtime as an FFI capability crash, not at generate time.
 
 ## The dashboard
 
-When `aspire start` finishes booting, it prints a URL and a one-time login token for the dashboard
-at `https://localhost:18888`. The dashboard covers the whole running graph:
+When `aspire start` finishes booting, it prints the allocated URL for the dashboard
+at the URL Aspire prints. The dashboard covers the whole running graph:
 
 - **Resources**: every container and executable above, with status, endpoints, and environment.
 - **Console logs**: stdout and stderr per resource, so a failing background processor is one click
   away instead of buried in a terminal.
-- **Structured logs and traces**: Aspire starts an OTLP collector at `http://localhost:4318`. The
+- **Structured logs and traces**: Aspire starts an OTLP collector at the OTLP URL Aspire prints. The
   spans and structured logs your handlers emit land here, correlated by `traceparent`, so a request
   that fans out across services is one trace instead of scattered log lines.
 
 Aspire already knows the topology, every resource and its OTEL environment, so it can attach
 telemetry to that topology. Each resource starts with its `OTEL_SERVICE_NAME` and an
-`OTEL_EXPORTER_OTLP_ENDPOINT` pointed at the dashboard collector (`http://localhost:4318`,
+`OTEL_EXPORTER_OTLP_ENDPOINT` pointed at the dashboard collector (`the OTLP URL Aspire prints`,
 `http/protobuf`). Job dispatch, job execution, scheduler runs, and subprocess task continuation
 therefore emit OpenTelemetry spans that appear here with **no extra wiring**, and the trace context
 reaches worker subprocesses over W3C `traceparent`. Inside a handler, the scaffold's
@@ -384,7 +379,7 @@ the generated Deno processes yourself and provide your own infrastructure connec
   {
     label: "Default — with Aspire",
     lang: "bash",
-    code: "netscript init my-app --db postgres --service --service-name users --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at https://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
+    code: "netscript init my-app --db postgres --service --service-name users --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at the URL Aspire prints\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
   },
   {
     label: "Escape hatch — --no-aspire",
@@ -396,7 +391,7 @@ the generated Deno processes yourself and provide your own infrastructure connec
 {{ comp callout { type: "warning", title: "What you lose when you opt out" } }}
 Without the orchestration layer there is <strong>no AppHost</strong> (<code>aspire/apphost.mts</code>
 is not generated), <strong>no automatic Postgres/Redis provisioning</strong>, <strong>no
-dashboard</strong> at <code>:18888</code>, and <strong>no automatic cross-process wiring</strong>.
+dashboard</strong> at <code>the URL Aspire prints</code>, and <strong>no automatic cross-process wiring</strong>.
 You hand every process its connection strings and its neighbours' endpoints yourself. The
 <code>netscript db</code> commands lose the AppHost they provision through, so the database
 workflow runs against your own database URL.

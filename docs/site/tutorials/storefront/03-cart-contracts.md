@@ -42,9 +42,9 @@ schemas here are hand-written Zod. You can generate them from Prisma later if yo
 
 From [chapter 2](/tutorials/storefront/02-catalog-service/), check that:
 
-- `my-shop/` has a working `products` service on `:3001` and a `contracts/versions/v1/` directory
+- `my-shop/` has a working `products` service at its allocated endpoint and a `contracts/versions/v1/` directory
   with `products.contract.ts` in it;
-- `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
+- `aspire start` is up (the dashboard answers at the URL Aspire prints).
 
 Confirm the contracts workspace is where you left it:
 

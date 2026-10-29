@@ -37,7 +37,7 @@ to payment. You also write the `process-payment` worker job that a checkout trig
 From [chapter 3](/tutorials/storefront/03-cart-contracts/), check that:
 
 - `my-shop/` has the `products` service and the `cart` contract;
-- `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
+- `aspire start` is up (the dashboard answers at the URL Aspire prints).
   The saga registry and the durable instance store exist only while Aspire runs: Deno KV holds the
   registry, and KV or Postgres holds instance state. If you closed the `aspire start` terminal,
   restart it from `aspire/` before you run any `netscript` command in this chapter.

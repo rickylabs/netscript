@@ -76,7 +76,7 @@ then adds authentication. If `netscript init` and `aspire start` are new to you,
   },
   {
     title: "2 · Auth",
-    body: "Add the <code>auth</code> plugin, choose the interactive <code>kv-oauth</code> backend, run the <code>auth.prisma</code> migration, and check the session endpoints on the <code>auth-api</code> service at :8094.",
+    body: "Add the <code>auth</code> plugin, choose the interactive <code>kv-oauth</code> backend, run the <code>auth.prisma</code> migration, and check the session endpoints on the <code>auth-api</code> service at its allocated endpoint.",
     href: "/tutorials/workspace/02-auth/"
   },
   {
@@ -96,7 +96,7 @@ then adds authentication. If `netscript init` and `aspire start` are new to you,
   },
   {
     title: "6 · Deploy",
-    body: "Run the whole workspace locally under Aspire, including the :8094 auth service, and read it from one dashboard.",
+    body: "Run the whole workspace locally under Aspire, including the auth service, and read it from one dashboard.",
     href: "/tutorials/workspace/06-deploy/"
   }
 ] }) }}

@@ -31,7 +31,7 @@ identifiers, the dashboard URL and the log file path:
   "appHostPath": "/path/to/my-app/aspire/apphost.mts",
   "appHostPid": 48219,
   "cliPid": 48218,
-  "dashboardUrl": "https://localhost:18888",
+  "dashboardUrl": "the URL Aspire prints",
   "logFile": "/path/to/logs/cli_apphost-48219.log"
 }
 ```
@@ -59,7 +59,7 @@ Output:
     "status": "running",
     "sdkVersion": "13.5.3",
     "cliPid": 48218,
-    "dashboardUrl": "https://localhost:18888",
+    "dashboardUrl": "the URL Aspire prints",
     "logFilePath": "/path/to/logs/cli_apphost-48219.log"
   }
 ]

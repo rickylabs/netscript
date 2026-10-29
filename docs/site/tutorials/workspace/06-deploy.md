@@ -9,7 +9,7 @@ next: { label: "Build", href: "/how-to/" }
 # Run the team workspace under Aspire
 
 In this chapter you run the whole team workspace as one system. A single `aspire start` brings up
-Postgres, the Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers
+Postgres, the Redis cache, your `workspace` service, the `auth-api` service at its allocated endpoint, the Workers
 API and every background processor, wired together and visible in one dashboard. `netscript init`
 generated the AppHost in chapter 1, and each plugin you installed since (`auth`, then `workers`)
 added its own service and processor to the resource graph, so there is no orchestration wiring to
@@ -28,7 +28,7 @@ maintain by hand.
 
 Your complete `my-workspace/` running under one Aspire AppHost: every service, plugin API,
 background processor and backing container in a single resource graph, observable from the dashboard
-on `:18888`, including the `:8094` auth service from chapter 2. At the end you can read the running
+at the URL Aspire prints, including the auth service from chapter 2. At the end you can read the running
 topology, with the exact port each resource bound, from one pane.
 
 {{ comp callout { type: "warning", title: "Aspire runs the local topology, not production" } }}
@@ -70,46 +70,44 @@ all of it: infrastructure first, then services, plugin APIs and background proce
 cross-references resolved into injected environment variables.
 
 ```sh
-# Still inside aspire/. Boots the whole graph; prints the dashboard URL + a login token.
+# Still inside aspire/. Boots the whole graph; prints the dashboard URL.
 aspire start
 ```
 
-When boot finishes, `aspire start` prints the dashboard address and a one-time login token. The graph
+When boot finishes, `aspire start` prints the allocated dashboard address. The graph
 it brings up:
 
 {{ comp.apiTable({
   caption: "The local resource graph aspire start brings up",
   rows: [
-    { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard — live resource list, console logs, structured logs, and traces. A login token is printed on start." },
-    { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint; framework spans (job dispatch/execution, scheduler runs) land here automatically." },
+    { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "The Aspire dashboard — live resource list, console logs, structured logs, and traces. The generated local profile allows anonymous dashboard access." },
+    { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint; framework spans (job dispatch/execution, scheduler runs) land here automatically." },
     { name: "postgres", type: "Container", desc: "The primary datasource — the auth.prisma migration from chapter 2 lives here." },
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
     { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 — /api/workspace requires a scoped principal, /health stays public." },
-    { name: "auth-api", type: ":8094 (pinned in chapter 2)", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, sessions/revoke, session, me)." },
+    { name: "auth-api", type: "allocated endpoint", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, sessions/revoke, session, me)." },
     { name: "workers-api", type: "allocated port", desc: "The Workers API from chapter 4 — triggers and inspects the provision-member job." },
     { name: "background processors", type: "executables (no port)", desc: "The workers processor that drains the job queue — a separate process, not a thread in the API." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-Two host ports are predictable because <em>you</em> pinned them: <code>workspace</code> on
-<code>:3001</code> (chapter 1's <code>--service-port</code>) and <code>auth-api</code> on
-<code>:8094</code> (chapter 2's <code>--port</code>). You installed the Workers API without
-<code>--port</code>, so its entry has no <code>HostPort</code> and Aspire allocates its host port at
-every start. Read the actual number from the dashboard's resource list.
+{{ comp callout { type: "note", title: "Read allocated endpoints" } }}
+Open the dashboard at the URL Aspire prints and read each resource's endpoint from its Resources
+view. The auth and worker APIs need no conventional host port. The generated app's BFF owns the
+browser callback; use the app origin configured with your identity provider.
 {{ /comp }}
 
 ## Step 3 — Use the dashboard
 
-Open `https://localhost:18888` and paste the login token `aspire start` printed:
+Open the URL Aspire prints (the generated local profile allows anonymous access):
 
 {{ comp.apiTable({
   caption: "Aspire dashboard surfaces",
   rows: [
     { name: "Resources", type: "tab", desc: "Every container and executable above with status, endpoints, and the resolved environment. The authority for which port each resource bound." },
     { name: "Console logs", type: "tab", desc: "stdout/stderr per resource — a failing auth-api or workers processor is one click away." },
-    { name: "Structured logs + Traces", type: "tab", desc: "Spans and structured logs correlated by traceparent across services — collected via the OTLP endpoint at :4318." }
+    { name: "Structured logs + Traces", type: "tab", desc: "Spans and structured logs correlated by traceparent across services — collected via the OTLP endpoint at the OTLP URL Aspire prints." }
   ]
 }) }}
 
@@ -118,22 +116,20 @@ Open `https://localhost:18888` and paste the login token `aspire start` printed:
 With the graph up, check the app end to end: the auth service, the guarded route and the job.
 
 ```sh
-# Auth service is up (chapter 2)
-curl http://localhost:8094/health/ready
-
-# The guarded route rejects an anonymous caller (chapter 5)
-curl -i http://localhost:3001/api/workspace            # 401 UNAUTHORIZED
-
-# ...and allows a correctly-scoped one
-curl -i -H 'authorization: Bearer read' http://localhost:3001/api/workspace   # 200
-
-# The Workers API is live (chapter 4)
-curl <workers-endpoint>/api/v1/workers/jobs            # provision-member appears
+netscript service list
+netscript contract inspect workspace
+netscript plugin doctor
+ns-workers executions --limit=10 --json
 ```
 
+Use `list_api_services` → `list_service_operations` → `get_operation_schema` to inspect the live
+`workspace.members` operation. Call it through the server-side session client from chapter 5 with
+`{ workspace: 'ws-1', limit: 20, offset: 0 }`. A request without a session returns 401; a session
+without `workspace:read` returns 403; a member with that scope receives the members list.
+
 - [ ] `aspire restore` and `aspire start` succeed from inside `aspire/`.
-- [ ] The dashboard on `:18888` lists `postgres`, `workspace` (db), `redis`, `workspace` (service), `auth-api`, and `workers-api` — all green.
-- [ ] `curl http://localhost:8094/health/ready` succeeds.
+- [ ] The dashboard at the URL Aspire prints lists `postgres`, `workspace` (db), `redis`, `workspace` (service), `auth-api`, and `workers-api` — all green.
+- [ ] Aspire reports the auth service ready at its allocated endpoint.
 - [ ] An anonymous `GET /api/workspace` returns `401`; `Bearer read` returns `200`.
 - [ ] `GET /api/v1/workers/jobs` lists `provision-member`.
 
@@ -145,10 +141,8 @@ database through Docker.</li>
 from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
 <li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> The dashboard uses <code>:18888</code>/<code>:18889</code> and OTLP
-<code>:4318</code>; your pinned <code>workspace</code> and <code>auth-api</code> use <code>:3001</code>
-and <code>:8094</code>, and the other plugin runtimes use allocated ports in
-<code>49152–65535</code>. A stale earlier run holding a port blocks boot.</li>
+<li><strong>Ports in use.</strong> Read allocated endpoints from Aspire. Stop an earlier run that
+owns a conflicting resource before starting another; a pinned endpoint is not isolated automatically.</li>
 </ul>
 {{ /comp }}
 
@@ -156,7 +150,7 @@ and <code>:8094</code>, and the other plugin runtimes use allocated ports in
 
 The complete authenticated team-workspace backend, running locally as one orchestrated system:
 Postgres, an isolated workspace database, Redis, the guarded `workspace` service, the `auth-api`
-service on `:8094`, and the Workers API with its processor, all in one Aspire resource graph. Across
+service at its allocated endpoint, and the Workers API with its processor, all in one Aspire resource graph. Across
 the track you added a pluggable auth backend, a session, team data in its own datasource, off-path
 provisioning and a route-authz seam that fails closed. The app is single-tenant by design, with org
 scoping as an app-level extension.

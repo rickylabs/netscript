@@ -239,7 +239,7 @@ With Aspire up, drop a matching CSV into the watched folder and watch the pipeli
 
    ```sh
    # 1. The trigger recorded the inbound file event.
-   curl '<triggers-endpoint>/api/v1/events?limit=10'
+   deno x -A jsr:@netscript/plugin-triggers{{ releaseSpecifier }}/cli events --limit=10 --json
 
    # 2. The job it enqueued executed.
    ns-workers executions --limit=10 --json
@@ -249,7 +249,7 @@ With Aspire up, drop a matching CSV into the watched folder and watch the pipeli
    `import-products` run whose result is `{ "fileName": "products_2024.csv", "rowCount": 2,
    "headers": ["material_no","description","price_cents"] }`.
 
-3. Open the `workers` resource logs in the [Aspire dashboard](https://localhost:18888) to read the
+3. Open the `workers` resource logs in the dashboard at the URL Aspire prints to read the
    job's structured log lines.
 
 - [ ] `.data/incoming/products/` exists and you dropped a `products_*.csv` into it.

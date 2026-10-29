@@ -23,9 +23,9 @@ Postgres database. Then you boot it under Aspire so the rest of the track has a 
 
 ## What you will build
 
-A `my-dashboard/` workspace: shared contracts, an example `orders` service on port **3002**, a
+A `my-dashboard/` workspace: shared contracts, an example `orders` service at its allocated endpoint, a
 [Fresh](/web-layer/) app and a Postgres database, all orchestrated by Aspire. At the end the Aspire
-dashboard at `:18888` shows every resource running, and you know which generated directory does
+dashboard at the URL Aspire prints shows every resource running, and you know which generated directory does
 what. Every later chapter builds on this workspace.
 
 ## Before you begin
@@ -34,13 +34,11 @@ You need the toolchain from the [track index](/tutorials/live-dashboard/). Confi
 installed and reachable:
 
 ```sh
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-You see the public command groups: `agent`, `config`, `deploy`, `init`, `contract`, `db`,
-`generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update` and
-`ui:remove`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new
-terminal.
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
@@ -58,27 +56,27 @@ engine, before any file exists.
 
 ## Step 2 — Create the workspace
 
-Scaffold for real, with an example service named `orders` on port **3002** and a Postgres database
+Scaffold for real, with an example service named `orders` at its allocated endpoint and a Postgres database
 for the dashboard to read:
 
 ```sh
-netscript init my-dashboard --service --service-name orders --service-port 3002 --db postgres
+netscript init my-dashboard --service --service-name orders --db postgres
 cd my-dashboard
 ```
 
 The CLI writes `my-dashboard/`, formats the output with `deno fmt`, initializes a git repository,
 and prints a **next steps** summary for your options.
 
-{{ comp callout { type: "note", title: "Pinned ports in this track" } }}
-This track pins the <code>orders</code> service to port <code>3002</code> with
-<code>--service-port</code>. Without a pinned port, each scaffold gets its own randomized high-range
-ports.
+{{ comp callout { type: "note", title: "Use allocated endpoints" } }}
+Aspire allocates the service endpoint. Open the URL Aspire prints and read the service URL from
+the Resources view or <code>aspire describe</code>. Set <code>SERVICE_URL</code> to that URL before
+running a health probe; no fixed service port is required.
 {{ /comp }}
 
 {{ comp.apiTable({
   caption: "init options this track uses (run netscript init --help for the full list)",
   rows: [
-    { name: "--service --service-name orders --service-port 3002", type: "flags", desc: "Include an example oRPC service named orders on port 3002 — the read-model the dashboard consumes." },
+    { name: "--service --service-name orders", type: "flags", desc: "Include an example oRPC service named orders — the read-model the dashboard consumes." },
     { name: "--db postgres", type: "flag", desc: "Scaffold a Postgres database workspace. The orders read-model is persisted here. Postgres is this track's stack; swap --db postgres for mysql, mssql, or sqlite for a different engine." },
     { name: "--dry-run", type: "flag", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
@@ -180,10 +178,10 @@ aspire start       # starts the AppHost and every declared resource
 ```
 
 `aspire start` brings up Postgres, the Redis cache, your `orders` service and the Fresh app, then
-prints a URL and login token for the **Aspire dashboard**:
+prints the allocated URL for the **Aspire dashboard**:
 
 ```text
-https://localhost:18888
+the URL Aspire prints
 ```
 
 Leave `aspire start` running in this terminal for the rest of the track.
@@ -200,7 +198,7 @@ In a second terminal, with `aspire start` still running in the first, check the 
 health endpoint:
 
 ```sh
-curl http://localhost:3002/health
+curl "$SERVICE_URL/health"
 ```
 
 You get a healthy JSON response. Then type-check the workspace from the project root:
@@ -213,8 +211,8 @@ A clean check confirms the scaffold, contracts, and service line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-dashboard/` exists with `apps/dashboard/`, `contracts/`, and `services/orders/`.
-- [ ] `aspire start` is up; the dashboard at `:18888` lists `postgres`, `redis`, and `orders`.
-- [ ] `curl http://localhost:3002/health` returns a healthy response.
+- [ ] `aspire start` is up; the dashboard at the URL Aspire prints lists `postgres`, `redis`, and `orders`.
+- [ ] `curl "$SERVICE_URL/health"` returns a healthy response.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
@@ -227,6 +225,6 @@ starting: wait a few seconds and retry.
 
 ## What you built
 
-A NetScript workspace, `my-dashboard/`, with a Fresh app, an `orders` service on `:3002` and a
-Postgres database, all orchestrated by Aspire and visible at `:18888`. Next, you shape the `orders`
+A NetScript workspace, `my-dashboard/`, with a Fresh app, an `orders` service at its allocated endpoint and a
+Postgres database, all orchestrated by Aspire and visible at the URL Aspire prints. Next, you shape the `orders`
 read-model that the dashboard displays.

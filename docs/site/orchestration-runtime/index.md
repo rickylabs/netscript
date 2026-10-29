@@ -14,7 +14,7 @@ process lifecycle.
 A NetScript app runs as several processes: services, plugin APIs, background processors, a database
 and a cache. `netscript init` scaffolds the workspace, plugin contributions become Aspire resources
 through generated registries, and one `aspire start` brings the whole graph up with its wiring
-resolved. Every resource in the Aspire dashboard at `:18888` comes from your declared services and
+resolved. Every resource in the Aspire dashboard at the URL Aspire prints comes from your declared services and
 plugin contributions, not from a hand-edited process list.
 
 {{ comp.cardsGrid({ columns: 3, cards: [

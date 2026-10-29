@@ -57,8 +57,8 @@ edit to `apphost.mts`. With workers and triggers installed, `aspire start` stand
 {{ comp.apiTable({
   caption: "What aspire start brings up for the ERP sync",
   rows: [
-    { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
-    { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
+    { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "Live resource list, console logs, structured logs and traces. The generated local profile allows anonymous dashboard access." },
+    { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Throwaway Docker Postgres. The database netscript db commands target — reachable only while Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache, the default `--cache-backend`; Redis-compatible. Backs the KV/queue workloads; auto-discovery resolves the queue to it once it is up." },
     { name: "workers API + processor", type: "allocated port + executable", desc: "The API enqueues; a separate background processor drains the queue and runs your import job." },
@@ -80,7 +80,7 @@ once per machine and start it, both from inside `aspire/`:
 ```sh
 cd aspire
 aspire restore   # one-time SDK restore (and after an SDK bump)
-aspire start       # boots the whole graph; prints the dashboard URL + a login token
+aspire start       # boots the whole graph; prints the dashboard URL
 ```
 
 `aspire start` brings up infrastructure first, then the plugin APIs and background processors,
@@ -114,7 +114,7 @@ The most common first-run error is running a <code>netscript db</code> command b
    mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
    ```
 
-2. Open `https://localhost:18888` and paste the login token `aspire start` printed.
+2. Open the URL Aspire prints (the generated local profile allows anonymous access).
 
 3. Read the run in the three dashboard surfaces:
 
@@ -127,7 +127,7 @@ The most common first-run error is running a <code>netscript db</code> command b
   ]
 }) }}
 
-Aspire starts each resource with an OTLP endpoint pointed at `http://localhost:4318`, so
+Aspire starts each resource with an OTLP endpoint pointed at the OTLP URL Aspire prints, so
 framework-level spans (job dispatch, job execution, scheduler runs) appear in the **Traces** view
 without extra setup.
 
@@ -161,7 +161,7 @@ Both health checks should return healthy JSON, and the executions feed should sh
 <ul>
 <li><strong>Docker is not running.</strong> Aspire provisions Postgres and Redis through Docker; without the daemon, nothing starts.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from <code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>
-<li><strong>Ports in use.</strong> The dashboard needs <code>:18888</code> and <code>:18889</code>, and OTLP needs <code>:4318</code>. A stale earlier run holding a port blocks boot; free it and retry.</li>
+<li><strong>Ports in use.</strong> The dashboard needs <code>the URL Aspire prints</code> and <code>the URL Aspire prints</code>, and OTLP needs <code>the OTLP URL Aspire prints</code>. A stale earlier run holding a port blocks boot; free it and retry.</li>
 </ul>
 {{ /comp }}
 

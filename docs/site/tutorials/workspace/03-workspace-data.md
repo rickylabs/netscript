@@ -86,7 +86,7 @@ cd aspire
 aspire start
 ```
 
-Open the dashboard at [https://localhost:18888](https://localhost:18888) and confirm the new
+Open the dashboard at the URL Aspire prints and confirm the new
 `workspace` resource goes green next to `postgres` and `redis`.
 
 {{ comp callout { type: "warning", title: "Don't skip the restart" } }}

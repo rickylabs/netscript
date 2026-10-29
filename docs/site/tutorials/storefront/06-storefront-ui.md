@@ -39,18 +39,18 @@ typed end to end against the cart contract from chapter 3.
 
 ## Before you begin
 
-- The `products` service on `:3001` from [chapter 2](/tutorials/storefront/02-catalog-service/), and
+- The `products` service at its allocated endpoint from [chapter 2](/tutorials/storefront/02-catalog-service/), and
   the `cart` contract and its typed client from
   [chapter 3](/tutorials/storefront/03-cart-contracts/).
 - `aspire start` up, so the `products` service is discoverable by name (the dashboard answers at
-  [https://localhost:18888](https://localhost:18888)).
+  the dashboard at the URL Aspire prints).
 - The route contract and query utilities ship in `@netscript/fresh/route`, `@netscript/sdk/client`
   and `@netscript/sdk/query-client`. None needs Aspire to type-check, but the live catalog query runs
   under Aspire.
 
 {{ comp callout { type: "note", title: "The cart page goes in your Fresh app" } }}
 Chapter 1 scaffolded a Fresh app next to the services; routes and islands live there. This chapter
-adds files under <code>apps/storefront/</code>: use your app's actual folder name. If you stopped
+uses the default <code>apps/dashboard/</code> app: use that folder throughout this chapter. If you stopped
 chapter 3 at the contract and have no running <code>cart</code> service, the checkout mutation still
 type-checks end to end, because the client is built from the contract alone. To run it live, serve
 the cart handlers with the <code>defineService</code> loop from chapter 2.
@@ -118,7 +118,7 @@ A client needs only a contract to be fully typed. Keep each service's client and
 factory together in `lib/<service>.ts`, the layout `service add <name> --with-client` generates:
 
 ```ts
-// apps/storefront/lib/products.ts
+// apps/dashboard/lib/products.ts
 import { ProductsContractV1 } from '@my-shop/contracts/versions/v1';
 import { createServiceClient } from '@netscript/sdk/client';
 import { createQueryFactories } from '@netscript/sdk/query';
@@ -133,7 +133,7 @@ export const productsQueries = createQueryFactories({
   products: { contract: ProductsContractV1, client: productsClient },
 }).products;
 
-// apps/storefront/lib/cart.ts follows the same generated shape:
+// apps/dashboard/lib/cart.ts follows the same generated shape:
 // cartClient + createQueryFactories({ cart: ... }).cart → cartQueries.
 ```
 
@@ -156,7 +156,7 @@ a cart. Both come from `@netscript/fresh/query`; island code imports query hooks
 from TanStack directly, so the dependency stays in one place:
 
 ```tsx
-// apps/storefront/islands/CheckoutIsland.tsx
+// apps/dashboard/islands/CheckoutIsland.tsx
 import {
   QueryIsland,
   useIslandMutation,
@@ -168,8 +168,8 @@ import { productsClient, productsQueries } from '../lib/products.ts';
 
 interface CheckoutIslandProps {
   customer: string;
-  input: { limit: number; offset: number };
-  initialProducts?: { items: Array<{ id: number; name: string }> };
+  input: { page: number; limit: number; sortOrder: 'asc' | 'desc' };
+  initialProducts?: Awaited<ReturnType<typeof productsClient.list>>;
 }
 
 function CheckoutInner({ customer, input, initialProducts }: CheckoutIslandProps) {
@@ -193,7 +193,7 @@ function CheckoutInner({ customer, input, initialProducts }: CheckoutIslandProps
       queryClient.invalidateQueries({ queryKey: cartQueries.list.clientKey() }),
   });
 
-  const products = catalog.data?.items ?? [];
+  const products = catalog.data?.data ?? [];
   return (
     <ul class='ns-stack'>
       {products.map((product) => (
@@ -254,9 +254,9 @@ resolved once per request; see [Request-scoped resources](/web-layer/resources/)
 guarantees:
 
 ```tsx
-// apps/storefront/routes/cart/[customer].tsx
+// apps/dashboard/routes/cart/[customer].tsx
 import { definePage } from '@app/utils.ts';
-import { cartRoute } from '../../../contracts/routes/cart-page.ts';
+import { cartRoute } from '../../../../contracts/routes/cart-page.ts';
 import CheckoutIsland from '../../islands/CheckoutIsland.tsx';
 import { productsClient } from '../../lib/products.ts';
 
@@ -264,13 +264,21 @@ const cartPage = definePage()
   .withRoute(cartRoute)
   .withResource('initialProducts', async (ctx) => {
     // Resolve the first page of products on the server side
-    const input = { limit: ctx.search.limit, offset: ctx.search.offset };
+    const input = {
+      page: Math.floor(ctx.search.offset / ctx.search.limit) + 1,
+      limit: ctx.search.limit,
+      sortOrder: 'asc' as const,
+    };
     return await productsClient.list(input);
   })
   .withLayer('checkout', CheckoutIsland, {
     loader: async (ctx) => ({
       customer: ctx.path.customer,
-      input: { limit: ctx.search.limit, offset: ctx.search.offset },
+      input: {
+        page: Math.floor(ctx.search.offset / ctx.search.limit) + 1,
+        limit: ctx.search.limit,
+        sortOrder: 'asc' as const,
+      },
       initialProducts: await ctx.resource('initialProducts'),
     }),
   })
@@ -291,7 +299,7 @@ builder bound to your app's `State` type, so every page shares one typed context
 `.withRoute(cartRoute)` hands the contract's schemas to the builder, so parsing happens before your
 loader runs: `ctx.path.customer` is a typed string, and `ctx.search` carries the
 `paginationSearchSchema` defaults, so `/cart/cust_1001` with no query string yields
-`{ limit: 12, offset: 0 }`. A link elsewhere builds the URL with
+`{ limit: 12, offset: 0 }`. The loader converts that offset to the catalog's page-based input with `Math.floor(offset / limit) + 1`. A link elsewhere builds the URL with
 `cartRoute.href({ path: { customer: 'cust_1001' } })`, so the pattern is written once, in the
 contract.
 
@@ -309,24 +317,23 @@ up with the chapter 2 and chapter 3 contracts. Then run the **catalog query** li
 `aspire start` up and at least one product created in chapter 2, the `products` service answers by
 discovery and the page's query returns real rows:
 
-```sh
-# The query the island runs, against the live products service.
-curl "http://localhost:3001/api/products?page=1&limit=12"
-```
+Use the app's generated typed client or the catalog check from chapter 2. For an agent, call
+`list_api_services`, `list_service_operations` and `get_operation_schema` to inspect the live
+`products.list` operation before running the typed query.
 
-You get the page-shaped catalog back, the same `items` the island renders. Open `/cart/cust_1001` in
+You get `{ data, pagination }` back; the island renders `catalog.data.data`. Open `/cart/cust_1001` in
 your Fresh app (its port is in the Aspire dashboard resource list): each product has an **Add to
 cart** button wired to the typed checkout mutation.
 
 - [ ] `contracts/routes/cart-page.ts` exports `cartRoute`, a bound route contract with a typed
       `{ customer }` param and pagination search.
-- [ ] `apps/storefront/lib/products.ts` and `lib/cart.ts` export their service-derived clients and
+- [ ] `apps/dashboard/lib/products.ts` and `lib/cart.ts` export their service-derived clients and
       query factories.
 - [ ] `CheckoutIsland.tsx` reads with `useIslandQuery` and mutates with `useIslandMutation`, keyed off
       the contract-derived helpers.
 - [ ] The page binds to the contract and loads initial products using `definePage` and a layer loader.
 - [ ] `deno task check` passes.
-- [ ] `curl` against `:3001/api/products` returns the catalog the island renders.
+- [ ] The typed catalog query returns `data` and `pagination`, and the island renders `data`.
 
 ## What you built
 

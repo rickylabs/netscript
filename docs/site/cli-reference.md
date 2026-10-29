@@ -18,7 +18,7 @@ vendored `packages/cli/...` path you may see in a local-source checkout is for c
 {{ comp callout { type: "important", title: "Database commands need Aspire running first" } }}
 The <code>netscript db ...</code> commands provision and reach your database <strong>through Aspire</strong>.
 Run <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>db</code> command: it starts Postgres and Redis in Docker
-and opens the dashboard at <a href="https://localhost:18888">:18888</a>. <code>sqlite</code> is the exception, because it is file-backed and
+and opens the dashboard at the URL Aspire prints. <code>sqlite</code> is the exception, because it is file-backed and
 has no container. With Aspire down, a <code>db</code> command can't find the database; the
 “aspire start failed: project file does not exist” error almost always means this. See the
 <a href="/data-persistence/how-to/database-migration/">database &amp; migration how-to</a>.
@@ -58,7 +58,7 @@ Most sessions follow the same order. Aspire (step 2) must be up before any `db` 
 1. **Scaffold.** `netscript init` lays down the whole workspace: contracts, an example service,
    plugins, and the Aspire layer.
 2. **Orchestrate.** `cd aspire && aspire start` brings up your database and Redis and opens the
-   dashboard at :18888.
+   dashboard at the URL Aspire prints.
 3. **Prepare the database.** Run `netscript db init`, `generate`, `migrate`, or `seed`.
 4. **Extend.** Run `netscript plugin install`, then `netscript generate plugins` to wire the
    registry.
@@ -182,7 +182,7 @@ once the scaffold exists.
 {{ comp.apiTable({
   caption: "Run and gate the workspace",
   rows: [
-    { name: "Orchestrate everything", type: "cd aspire && aspire start", desc: "Bring up the database, Redis, services, and plugin processors, with the dashboard at :18888." },
+    { name: "Orchestrate everything", type: "cd aspire && aspire start", desc: "Bring up the database, Redis, services, and plugin processors, with the dashboard at the URL Aspire prints." },
     { name: "Run the dashboard alone", type: "deno task --cwd apps/dashboard dev", desc: "Start the Fresh frontend directly (or let <code>aspire start</code> orchestrate it)." },
     { name: "Run a service alone", type: "deno task --cwd services/users dev", desc: "Start the example <code>users</code> oRPC service on its assigned port." },
     { name: "Check, lint, test", type: "deno task check · deno task lint · deno task fmt · deno task test", desc: "Type-check, lint, format, and test the whole workspace." }

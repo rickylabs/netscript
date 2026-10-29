@@ -8,11 +8,9 @@ next: { label: '3 · Cart contracts', href: '/tutorials/storefront/03-cart-contr
 
 # A typed catalog service
 
-In this chapter you read the typed CRUD catalog that the scaffold generated for `products`, prove it
-works through its OpenAPI projection, and make one change: a missing product returns a typed `404`
-instead of a `500`. Passing `--service --db postgres` in chapter 1 generated a contract whose schemas
-come from your Prisma model, Prisma-backed handlers and a `defineService` entry point, so you see
-NetScript's central rule on your own data: **the contract is the single source of truth**.
+Read the catalog that the scaffold generated: a shared contract, a repository, application logic
+and thin service handlers. Missing records already return a typed `NOT_FOUND`; there is no generic
+error to repair. You will inspect the contract and exercise it through a typed SDK client.
 
 {{ comp.learningPath({
   steps: [
@@ -28,328 +26,139 @@ NetScript's central rule on your own data: **the contract is the single source o
 
 ## What you will build
 
-You read the generated contract, a `createCrudContract` surface whose Zod schemas are **generated
-from Prisma**, and its Prisma-backed handlers. Then you `curl` the catalog through its OpenAPI
-projection: create a product, list it back, and watch the contract reject a malformed write with a
-typed `400` before any handler runs. Finally you change `getById` to return a typed
-`404 NOT_FOUND` instead of a generic `500`, and prove it with `curl`.
+A small catalog check that creates a product, reads a page and observes the typed not-found error.
+The seed from chapter 1 checks the connection but inserts no products.
 
-## Before you begin
+## Prerequisites
 
-From [chapter 1](/tutorials/storefront/01-scaffold/), check that:
-
-- `my-shop/` exists with `services/products/`, `contracts/` and `database/` directories;
-- `aspire start` is up from the `aspire/` folder, so the dashboard at
-  [https://localhost:18888](https://localhost:18888) is live and Postgres is online;
-- the database is initialized (`netscript db init`, `db generate` and `db seed` in chapter 1).
-
-The scaffolded seed script only checks the connection (`SELECT 1`); it inserts no rows. Your
-`products` table starts empty, and you create the first product through the API in
-[Verify your progress](#verify-your-progress).
-
-Confirm the service is reachable before you change anything:
-
-```sh
-curl http://localhost:3001/health
-```
-
-A healthy JSON response means the `products` service is up on port **3001**.
+Keep Aspire running from chapter 1 and finish `netscript db init`, `db generate` and `db seed`.
+Use `netscript service list` to confirm the `products` service is configured. For live endpoints,
+call the MCP tools `list_api_services`, `list_service_operations` and `get_operation_schema` in
+that order. Open the dashboard at the URL Aspire prints to check resource health.
 
 ## Step 1 — Read the generated contract
 
-Contracts are the typed seam between your service and every client. They live in `contracts/`,
-versioned under `versions/v1/`, and are built from [`@orpc/contract`](/explanation/contracts/) routes
-and [Zod](https://zod.dev) schemas. For a database-backed service you don't write the entity schema:
-it is **generated from your Prisma model** and re-exported from a `@database/zod` module, so the
-contract and the table can't drift. `createCrudContract` then generates the CRUD routes from those
-schemas.
-
-Open the generated `contracts/versions/v1/products.contract.ts`:
+Open `contracts/versions/v1/products.contract.ts`. The Prisma generator exports `ProductSchema`,
+`ProductCreateInput` and `ProductUpdateInput` through `@database/zod`. `createCrudContract` uses
+those schemas to declare `list`, `getById`, `create`, `update` and `delete`.
 
 ```ts
-// contracts/versions/v1/products.contract.ts (generated)
-import { implement } from '@orpc/server';
-import { baseContract } from '@netscript/contracts';
-import { createCrudContract } from '@netscript/contracts/crud';
-import { z } from 'zod';
-import { ProductCreateInput, ProductSchema, ProductUpdateInput } from '@database/zod';
-
-export const ProductsHealthSchemaV1 = z.object({
-  status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
-  service: z.string().describe('Service name'),
-  version: z.string().describe('Service version'),
-  timestamp: z.string().datetime().describe('ISO timestamp'),
-  uptime: z.number().int().nonnegative().optional().describe('Uptime in seconds'),
-});
-
-// The entity and input schemas are GENERATED from Prisma — no hand-written shape to drift.
-export const ProductsProductSchemaV1 = ProductSchema;
-export const ProductsProductCreateInputSchemaV1 = ProductCreateInput;
-export const ProductsProductUpdateInputSchemaV1 = ProductUpdateInput;
-
-// createCrudContract builds list/getById/create/update/delete routes on baseContract.
-export const ProductsCrudContractV1 = createCrudContract({
+// Excerpt from contracts/versions/v1/products.contract.ts.
+const demoCrud = createCrudContract({
   resource: 'products',
   entitySchema: ProductsProductSchemaV1,
   createSchema: ProductsProductCreateInputSchemaV1,
   updateSchema: ProductsProductUpdateInputSchemaV1,
 });
-
-export const ProductsContractV1 = {
-  health: {
-    check: baseContract
-      .route({ method: 'GET', path: '/products/health' })
-      .output(ProductsHealthSchemaV1),
-  },
-  ...ProductsCrudContractV1,
-};
-
-// implement() turns the contract object into a `.handler()`-bindable surface.
-export const ProductsV1 = implement(ProductsContractV1);
 ```
 
-Three ideas carry the pattern:
+The generated showcase marks the CRUD procedures public with access metadata. Its separate
+`session` procedure declares required authentication. Keep these choices explicit when extending
+the service; [route authorization](/services-sdk/how-to/protect-an-anonymous-route/) shows the
+policy boundary.
 
-1. **Schemas come from Prisma.** `ProductSchema`, `ProductCreateInput` and `ProductUpdateInput` are
-   generated into `@database/zod` from your `schema.prisma` (a `Product` with `id`, `name`,
-   `createdAt`, `updatedAt`). They are both runtime validators and the TypeScript types every
-   consumer uses: change a column, run `netscript db generate`, and every consumer re-type-checks.
-2. **`createCrudContract` generates the standard five routes.** From `resource`, `entitySchema`,
-   `createSchema` and `updateSchema`, it builds `list` (`GET /products`), `getById`
-   (`GET /products/{id}`), `create` (`POST /products`), `update` (`PATCH /products/{id}`) and
-   `delete` (`DELETE /products/{id}`). Each route is built on `baseContract` from
-   `@netscript/contracts`, so each inherits the typed `NOT_FOUND`, `VALIDATION_ERROR`,
-   `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED` and `SERVICE_UNAVAILABLE` errors.
-3. **`implement(ProductsContractV1)`** produces `ProductsV1`, whose `.handler(...)` is bound to the
-   schemas above. Return the wrong shape and `deno task check` fails.
+Inspect the registered contract from the workspace root:
 
-{{ comp callout { type: "tip", title: "Why a separate contracts/ workspace?" } }}
-Your service <em>and</em> your Fresh app import from the same <code>@my-shop/contracts</code> alias,
-so there is exactly one definition of a product. Change a field here and every consumer
-re-type-checks against it. See <a href="/explanation/contracts/">Contracts &amp; type flow</a>.
-{{ /comp }}
-
-## Step 2 — Read the Prisma-backed handlers
-
-A contract describes the shape; a handler supplies the behavior. Database-backed handlers need a
-Prisma client, which NetScript injects through a **typed context**: `v1.products.$context<{ db }>()`
-declares the context shape, and each `.handler(...)` receives it as `context`. Open the generated
-`services/products/src/routers/v1.ts`:
-
-```ts
-// services/products/src/routers/v1.ts (generated, condensed)
-import type { PrismaClient } from '@database';
-import { v1 } from '@my-shop/contracts';
-
-type ProductHandlerContext = { readonly db: PrismaClient };
-const productsV1 = v1.products.$context<ProductHandlerContext>();
-
-export const ProductsV1 = {
-  // list is PAGE-BASED: input { page, limit, sortBy?, sortOrder }.
-  list: productsV1.list.handler(async ({ input, context }) => {
-    const skip = (input.page - 1) * input.limit;
-    const [data, total] = await Promise.all([
-      context.db.product.findMany({ skip, take: input.limit }),
-      context.db.product.count(),
-    ]);
-    const totalPages = Math.ceil(total / input.limit);
-    return {
-      data,
-      pagination: {
-        page: input.page,
-        limit: input.limit,
-        total,
-        totalPages,
-        hasNext: input.page < totalPages,
-        hasPrev: input.page > 1,
-      },
-    };
-  }),
-
-  getById: productsV1.getById.handler(async ({ input, context }) => {
-    const record = await context.db.product.findUnique({ where: { id: input.id } });
-    if (!record) throw new Error(`Product ${input.id} not found`); // ← upgraded in Step 3
-    return record;
-  }),
-
-  create: productsV1.create.handler(async ({ input, context }) =>
-    await context.db.product.create({ data: input })
-  ),
-
-  update: productsV1.update.handler(async ({ input, context }) =>
-    await context.db.product.update({ where: { id: input.id }, data: input.data })
-  ),
-
-  delete: productsV1.delete.handler(async ({ input, context }) =>
-    await context.db.product.delete({ where: { id: input.id } })
-  ),
-};
+```sh
+netscript contract inspect products
 ```
 
-What the types guarantee:
+`list` takes page-based input: `page`, `limit`, optional `sortBy`, and `sortOrder`. Its result is
+`{ data, pagination }`, where pagination includes `page`, `limit`, `total`, `totalPages`,
+`hasNext` and `hasPrev`. The update input is `{ id, data }`.
 
-- `input` is already parsed and typed to the contract's input schema, so you never re-validate it.
-  `list` input is **page-based** (`{ page, limit, sortBy?, sortOrder }`, with `page` 1-indexed), and
-  its output is `{ data, pagination: { page, limit, total, totalPages, hasNext, hasPrev } }`. For
-  `update`, `createCrudContract` shapes the input as `{ id, data }`, so the handler reads `input.id`
-  and passes `input.data` to Prisma.
-- `context.db` is the Prisma client the service injects; `db.product.*` is the generated table API.
-- Each handler's return value must satisfy the contract's output schema. Drop a field and
-  `deno task check` rejects it.
+## Step 2 — Follow the implementation
 
-`getById` throws a **generic `Error`** when a row is missing, which reaches the client as a
-`500 INTERNAL_SERVER_ERROR`. A missing product is a client-addressable `404`, not a server fault.
-You fix that next.
+The generated files divide the work:
 
-## Step 3 — Upgrade the not-found to a typed 404
+- `domain/product.ts` owns list-query and pagination rules.
+- `application/product.ts` owns use cases and a repository interface.
+- `adapters/prisma-product-repository.ts` implements persistence.
+- `routers/v1.ts` binds contract procedures to the application.
+- `router.ts` creates the versioned router from the repository.
 
-Every `createCrudContract` route inherits the typed `NOT_FOUND` error from `baseContract`, and each
-handler receives an `errors` object with a constructor for it. In
-`services/products/src/routers/v1.ts`, change `getById` to throw the typed error:
+The generated get-by-id handler already uses the shared typed error helper:
 
 ```ts
-// services/products/src/routers/v1.ts — getById, upgraded
-getById: productsV1.getById.handler(async ({ input, context, errors }) => {
-  const record = await context.db.product.findUnique({ where: { id: input.id } });
-  if (!record) throw errors.NOT_FOUND({ message: `Product ${input.id} not found` });
+// Excerpt from services/products/src/routers/v1.ts.
+getById: v1.products.getById.handler(async ({ input, errors }) => {
+  const record = await application.getById(input.id);
+  if (!record) {
+    notFound({ errors, resourceId: input.id, message: `Product ${input.id} not found` });
+  }
   return record;
 }),
 ```
 
-`errors.NOT_FOUND(...)` raises the contract's own typed error: the client now receives a `404` with a
-typed `{ code: 'NOT_FOUND', ... }` body. Because the error vocabulary is part of the contract, client
-and server agree on it.
+`notFound` is imported from `@netscript/contracts`. A missing row becomes the contract's
+`NOT_FOUND` error, which maps to HTTP 404. The handler receives typed input and delegates business
+work to the application; it does not issue Prisma calls itself.
 
-The service router (`services/products/src/router.ts`) already aggregates these handlers and nests
-the generated `health` router under the `products` namespace. You don't need to change it:
+## Step 3 — Read the service entry point
+
+`services/products/src/main.ts` obtains the database client, constructs the Prisma repository,
+passes it to `createRouter`, and serves the result with `defineService`. Aspire injects the
+listener's `PORT` and the service's dependencies.
+
+The router nests the product procedures under `v1.products`. Typed clients use the
+`/api/rpc/v1/products` procedure prefix. The default OpenAPI handler mounts at `/api`; the contract's
+`/products` route becomes `/api/products`. The RPC namespace does not add `/v1` to a declared REST
+path. Use `get_operation_schema` to inspect the actual path instead of guessing it.
+
+## Step 4 — Call the typed catalog
+
+Inside the generated app, keep the client and query factories together in `lib/products.ts`, as
+shown in chapter 6. The SDK resolves `serviceName: 'products'` through Aspire's injected discovery
+values.
+
+For a terminal check, copy the product service's URL from `aspire describe` into `PRODUCTS_URL`.
+This explicit resolver is useful outside an Aspire-launched process, where discovery variables
+are not injected. Create `scripts/check-catalog.ts`:
 
 ```ts
-// services/products/src/router.ts (generated)
-import { health } from './routers/health.ts';
-import { ProductsV1 } from './routers/v1.ts';
+import { ProductsContractV1 } from '@my-shop/contracts/versions/v1';
+import { createServiceClient } from '@netscript/sdk/client';
 
-export const v1 = { products: { ...ProductsV1, health } };
-export const router = { v1 };
-export type Router = typeof router;
-```
-
-## Step 4 — How it is served
-
-The service entry point is `services/products/src/main.ts`. Because the service uses the database,
-it passes a Prisma client through the `db` option, and `defineService` makes that client available as
-the handler's `context.db`:
-
-```ts
-// services/products/src/main.ts (generated)
-import { defineService } from '@netscript/service';
-import { db } from '@database';
-import { router } from './router.ts';
-
-const database = await db.getClient();
-
-// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.
-await defineService(router, {
-  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
-  name: 'products',
-  version: '1.0.0',
-  port: parseInt(Deno.env.get('PORT') || '3001'),
-  db: database,
-  openapi: { title: 'Products API', description: 'products service' },
-  debug: true,
+const endpoint = Deno.env.get('PRODUCTS_URL');
+if (!endpoint) throw new Error('Set PRODUCTS_URL to the URL Aspire prints');
+const products = createServiceClient({
+  contract: ProductsContractV1,
+  serviceName: 'products',
+  resolveServiceUrl: () => endpoint,
 });
+
+const created = await products.create({ name: 'Desk chair' });
+const catalog = await products.list({ page: 1, limit: 10, sortOrder: 'asc' });
+console.log(created.id, catalog.data, catalog.pagination);
+
+// This intentionally rejects with the typed NOT_FOUND error.
+await products.getById({ id: 999999 });
 ```
 
-{{ comp callout { type: "note", title: "Where the port comes from" } }}
-<code>parseInt(Deno.env.get('PORT') || '3001')</code> is the runtime read, not the source of truth.
-Aspire <strong>injects</strong> <code>PORT</code> when it starts the service, and the typed
-<code>services.products.port</code> field in <code>netscript.config.ts</code> decides which port the
-scaffold injects. The <code>'3001'</code> fallback applies only when you run the entrypoint outside
-Aspire. To change the port, edit the typed config, not this line.
-{{ /comp }}
+Run it from the workspace root with the service URL in your environment:
 
-`defineService(router, { … })` is the one-call form the scaffold uses, and it covers a typical
-catalog. When you need to control middleware order, attach auth or run startup hooks, NetScript also
-offers a fluent `createService(router, { … })` builder; the
-[services capability](/services-sdk/services/) compares them. The service exposes this surface on
-port **3001**:
+```sh
+deno run --allow-env --allow-net scripts/check-catalog.ts
+```
 
-{{ comp.apiTable({
-  caption: "products service endpoints (port 3001)",
-  rows: [
-    { name: "/api/rpc/*", type: "POST", desc: "The typed oRPC surface. A typed client calls procedures (v1.products.list) under this prefix with end-to-end type safety." },
-    { name: "/api/products", type: "GET / POST", desc: "The OpenAPI/REST projection: GET lists (paginated), POST creates. getById/update/delete live at /api/products/{id}." },
-    { name: "/health", type: "GET", desc: "Liveness probe — the plain JSON health check you hit in chapter 1." },
-  ],
-}) }}
+The first calls print the created row and the page-shaped catalog. The final call exits with a
+`NOT_FOUND` error. A malformed write fails contract validation before the handler runs; the client
+also rejects an invalid input shape at type-check time.
 
 ## Verify your progress
 
-With `aspire start` running, the `products` service is live on `:3001` with your upgraded handler.
-The REST projection mounts under the `/api` prefix, with no `/v1` segment: `v1` is the RPC namespace,
-not part of the URL.
+```sh
+deno task check
+```
 
-1. Create a product, since the table started empty:
-
-   ```sh
-   curl -X POST http://localhost:3001/api/products \
-     -H 'content-type: application/json' \
-     -d '{ "name": "Aeron Chair" }'
-   ```
-
-   You get the created row back, with a numeric `id`.
-
-2. List the catalog. The output is page-shaped:
-
-   ```sh
-   curl "http://localhost:3001/api/products?page=1&limit=10"
-   ```
-
-   You see `{ "data": [ … ], "pagination": { "page": 1, "limit": 10, "total": 1, … } }`, the
-   contract's `list` output.
-
-3. Send a `create` without the required `name`:
-
-   ```sh
-   curl -X POST http://localhost:3001/api/products \
-     -H 'content-type: application/json' \
-     -d '{}'
-   ```
-
-   You get a `400` with `{ "code": "BAD_REQUEST", "message": "Input validation failed", ... }` before
-   any handler runs. This is the framework's automatic input-validation gate, distinct from the
-   handler-thrown `VALIDATION_ERROR` (`422`) you would raise for a semantic rule.
-
-4. Fetch an id that doesn't exist:
-
-   ```sh
-   curl -i http://localhost:3001/api/products/999999
-   ```
-
-   You see `HTTP/1.1 404` and a `{ "code": "NOT_FOUND", ... }` body: your Step 3 change.
-
-5. Type-check the workspace:
-
-   ```sh
-   deno task check
-   ```
-
-- [ ] `POST /api/products` creates a product; `GET /api/products` returns it under `data` with
-      `pagination`.
-- [ ] A `create` missing `name` returns `400 BAD_REQUEST` ("Input validation failed").
-- [ ] `GET /api/products/999999` returns a typed `404 NOT_FOUND` — your Step 3 upgrade.
-- [ ] `deno task check` passes — the handlers satisfy the generated output schemas.
-
-{{ comp callout { type: "note", title: "The RPC prefix is /api/rpc/_" } }}
-NetScript mounts the typed oRPC surface under <code>/api/rpc/_</code>; the
-<code>/api/products/*</code> paths you called are its OpenAPI projection under the <code>/api</code>
-prefix. A typed <code>@orpc/client</code> reads the base URL from the service, so you rarely type the
-RPC path by hand. See <a href="/explanation/contracts/">Contracts &amp; type flow</a>.
-{{ /comp }}
+- [ ] `netscript contract inspect products` lists the generated procedures.
+- [ ] The typed client creates a product and returns it under `catalog.data`.
+- [ ] Pagination reports page and total information.
+- [ ] A missing id returns `NOT_FOUND`, using the generated handler.
+- [ ] `deno task check` passes.
 
 ## What you built
 
-A running, typed catalog: a versioned contract generated with `createCrudContract` from
-Prisma-generated schemas, Prisma-backed handlers bound through `v1.products.$context<{ db }>()`, and
-a `defineService` entry point on port **3001**. Your one change, `errors.NOT_FOUND(...)`, turned a
-`500` into a typed `404`. Next, you apply the same contract-first loop to a domain that doesn't exist
-yet: a shopping cart.
+A catalog checked through the same contract that its service implements. The generated repository
+and application own persistence and list policy, the handlers own protocol bindings, and the SDK
+owns discovery and transport. Next, add a cart contract.

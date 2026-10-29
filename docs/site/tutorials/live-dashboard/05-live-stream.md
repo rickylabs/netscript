@@ -56,7 +56,7 @@ curl <streams-endpoint>/health
 The installer picked its host port, so the resource list is the only place to read it. A healthy
 response means the durable-streams producer runtime is live. If it doesn't answer, the sagas plugin
 (which brings the stream) isn't installed or Aspire hasn't finished booting it: check the resource
-list at `:18888`.
+list at the URL Aspire prints.
 
 {{ comp callout { type: "note", title: "HTTP/2 is opt-in for live subscriptions" } }}
 The live subscription is <strong>long-poll by default</strong> (SSE is opt-in) and runs over

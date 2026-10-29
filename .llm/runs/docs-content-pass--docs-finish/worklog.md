@@ -19,3 +19,13 @@ Owner grant, verbatim: "Claude is at its weekly limit." "Evaluate with Gemini 4 
 ## Main integration
 
 Renderer #2469 merged as 26a0bb78ad85bf08eacf893b1d550ed4759bb452 after independent MERGE at a4c8bc3 and fully green CI, including the docs browser. Merge main with --no-ff. Keep main's corrected alert renderer and fixtures; retain content wording around tree fences. Use main's generated prose/MCP carriers as the fixed input before the one final regeneration, preserving upstream non-site context.
+
+## Source checkpoint
+
+Corrected dashboard/OTLP allocation and anonymous local access; canonical install/help from live CLI (including tokens and ui:init); MCP discovery and typed calls; six auth operations and app BFF callback; worker authoring path; current generated repository/application catalog handlers; catalog data/page shape versus dashboard items/offset read-model; default dashboard app paths and pagination conversion; real redirect targets.
+
+Focused structured test runner: PASS, 6 root results covering navigation, authored callout corpus, renderer bridge and executable quickstart command parity. Site verify: PASS, 254 pages, 23,540 links, 13 caveat markers across 11 pages.
+
+The next generation commits are checkpoints, not implementation sign-off. Terminal sign-off remains gated on all requested checks and independent evaluation.
+
+Prose generation: PASS. Carrier has 202 stored entries; all 2 upstream non-site entries retain identical decoded bytes.

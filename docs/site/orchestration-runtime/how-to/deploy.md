@@ -62,7 +62,7 @@ first-party plugins installed, the graph looks like this:
 | `sagas-api` | plugin | Sagas API. Requires DB and KV. References `workers-api` and `streams`. |
 | `triggers-api` | plugin | Triggers API. A typed v1 oRPC contract for trigger and event introspection and management; the webhook ingress endpoint `POST /api/v1/webhooks/:triggerId` stays a raw HMAC-verifying route. Requires DB and KV. References `workers-api` and `streams`. |
 | `auth-api` | plugin, optional | Joins the graph when you add the auth plugin. An oRPC service with six endpoints under `/api/v1/auth/{signin,callback,signout,sessions/revoke,session,me}`, backed by one backend selected with `NETSCRIPT_AUTH_BACKEND` (default `kv-oauth`). |
-| `workers` / `sagas` | background processor | Entrypoint `bin/combined.ts`. Watch mode and telemetry on. Workers runtime pool via `WORKERS_CONCURRENCY`; sagas via `SAGA_CONCURRENCY`. |
+| `workers` / `sagas` | background processor | Generated entrypoints `workers/runtime.ts` and `sagas/runtime.ts`. Watch mode and telemetry on. Workers runtime pool via `WORKERS_CONCURRENCY`; sagas via `SAGA_CONCURRENCY`. |
 | `triggers` | background processor | Entrypoint `src/runtime/trigger-processor.ts`. Concurrency 10 via `TRIGGER_CONCURRENCY`. |
 | `dashboard` | app | Fresh frontend. References service `users`. |
 | `postgres` / `redis` | infrastructure | `Mode=Container` in development. `PrimaryDatabase=postgres`, `PrimaryCache=redis` (the default; `garnet` via `--cache-backend garnet`). |
@@ -126,7 +126,7 @@ normalizes engine-specific connection strings to a URL in `database/postgres/pri
   { name: "POSTGRES_URI", type: "string (url)", desc: "Primary Postgres connection. <code>DATABASE_URL</code> is the accepted fallback. Read by Prisma config." },
   { name: "REDIS_URI / cache url", type: "string", desc: "Redis-compatible cache endpoint for the <code>redis</code> KV/cache resource (the default backend). With <code>--cache-backend garnet</code> the key is <code>GARNET_URI</code> for the <code>garnet</code> resource (managed Redis or Garnet in prod)." },
   { name: "PORT", type: "number", desc: "Per-process listen port. Each service reads it and falls back to its default (assigned dynamically per project at scaffold time)." },
-  { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
+  { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. The AppHost injects the allocated local collector endpoint (http/protobuf)." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
   { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
   { name: "WORKERS_CONCURRENCY", type: "number", desc: "Workers runtime process pool size (default 2)." },
@@ -151,7 +151,7 @@ Pick based on whether your target understands Aspire:
   {
     label: "Keep Aspire",
     lang: "bash",
-    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at https://localhost:18888\n\n# Aspire 13.x can publish/deploy target artifacts from the same AppHost.\nnetscript deploy kubernetes plan --project-root .\nnetscript deploy kubernetes up --project-root ."
+    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at the URL Aspire prints\n\n# Aspire 13.x can publish/deploy target artifacts from the same AppHost.\nnetscript deploy kubernetes plan --project-root .\nnetscript deploy kubernetes up --project-root ."
   },
   {
     label: "Drop Aspire (--no-aspire)",
@@ -163,7 +163,7 @@ Pick based on whether your target understands Aspire:
 `aspire/apphost.mts` is a generated TypeScript/Node AppHost (language `typescript/nodejs`, Aspire
 SDK 13.x, package `Aspire.Hosting.PostgreSQL`), isolated in `aspire/` so its Node dependency graph
 never leaks into the Deno root. `netscript.config.ts` records the same path under `aspire.appHost`
-(`'aspire/apphost.mts'`). The dashboard binds `:18888` and the OTLP collector listens on `:4318`.
+(`'aspire/apphost.mts'`). Aspire allocates the dashboard and OTLP endpoints at startup; use the URL Aspire prints.
 
 ### Aspire cloud targets
 
@@ -252,11 +252,11 @@ deno run \
 The background processor that executes jobs runs its own entrypoint:
 
 ```bash
-# Workers + sagas background processors share bin/combined.ts; triggers uses its own.
+# Start the generated runtime entry for the chosen background processor.
 WORKERS_CONCURRENCY=2 \
 deno run \
   --unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run \
-  workers/bin/combined.ts
+  workers/runtime.ts
 ```
 
 Repeat this for every enabled resource and you have a container-free deployment. To containerize,
@@ -280,14 +280,14 @@ host and each service's assigned port.
 | `POST /api/v1/webhooks/inbound/generic` | Triggers API | An inbound webhook enqueues the workers health-check job. |
 | `GET /api/v1/events?limit=10` | Triggers API | Recent trigger events. |
 | `GET /api/v1/auth/session` | Auth API | Auth session probe, only if the auth plugin is installed. |
-| `https://localhost:18888` | Aspire dashboard | Every resource, health, logs and distributed traces (Aspire path only). |
+| `the URL Aspire prints` | Aspire dashboard | Every resource, health, logs and distributed traces (Aspire path only). |
 
 ```bash
 # Smoke a deployed graph (replace ports with the ones assigned to your services).
 curl -fsS http://localhost:<workers-port>/health
 curl -fsS http://localhost:<sagas-port>/health/live
 curl -fsS http://localhost:<triggers-port>/health
-curl -fsS "http://localhost:<workers-port>/api/v1/workers/jobs"
+ns-workers executions --limit=10 --json
 ```
 
 If every health endpoint responds and `/api/v1/workers/jobs` lists your jobs, the processes are

@@ -25,7 +25,7 @@ job and the route guards in later chapters all attach to this app.
 
 A `my-workspace/` directory with a typed `workspace` service on its own port, a Postgres database,
 and the Aspire orchestration that provisions Postgres and the Redis cache. At the end, the Aspire
-dashboard at `https://localhost:18888` shows the service, database and cache running, and
+dashboard at the URL Aspire prints shows the service, database and cache running, and
 `deno task check` passes.
 
 ## Before you begin
@@ -42,19 +42,11 @@ docker info        # prints engine details, not a connection error
 Install the NetScript CLI from JSR, then confirm it is on your `PATH`:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-`netscript --help` lists the command groups `agent`, `config`, `deploy`, `init`, `contract`, `db`,
-`generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update` and
-`ui:remove`. If `netscript` is not found, add Deno's install directory (printed by `deno install`)
-to your `PATH` and open a new terminal.
-
-{{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>.
-The rest of this track uses the installed <code>netscript</code> form.
-{{ /comp }}
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold
 
@@ -62,7 +54,7 @@ The rest of this track uses the installed <code>netscript</code> form.
 disk:
 
 ```sh
-netscript init my-workspace --service --service-name workspace --service-port 3001 --db postgres --dry-run
+netscript init my-workspace --service --service-name workspace --db postgres --dry-run
 ```
 
 A clean dry run confirms your flags are valid. The CLI rejects bad combinations, such as an unknown
@@ -76,23 +68,23 @@ This track uses `--db postgres`, the recommended default. You can swap it for `m
 Run the same command without `--dry-run`:
 
 ```sh
-netscript init my-workspace --service --service-name workspace --service-port 3001 --db postgres
+netscript init my-workspace --service --service-name workspace --db postgres
 cd my-workspace
 ```
 
 The CLI scaffolds `my-workspace/`, formats the output with `deno fmt`, initializes a git repository,
 and prints a **next steps** summary for your options.
 
-{{ comp callout { type: "note", title: "Pinned ports in this track" } }}
-This track pins the <code>workspace</code> service to port <code>3001</code> with
-<code>--service-port</code>. Without a pinned port, each scaffold gets its own randomized high-range
-ports.
+{{ comp callout { type: "note", title: "Use allocated endpoints" } }}
+Aspire allocates the service endpoint. Open the URL Aspire prints and read the service URL from
+the Resources view or <code>aspire describe</code>. Set <code>SERVICE_URL</code> to that URL before
+running a health probe; no fixed service port is required.
 {{ /comp }}
 
 {{ comp.apiTable({
   caption: "netscript init options used here",
   rows: [
-    { name: "--service --service-name workspace --service-port 3001", type: "example service", desc: "Include an example oRPC service named 'workspace' on port 3001. You protect it in chapter 5." },
+    { name: "--service --service-name workspace", type: "example service", desc: "Include an example oRPC service named 'workspace' on port 3001. You protect it in chapter 5." },
     { name: "--db postgres", type: "database workspace", desc: "Scaffold a Postgres database workspace. The auth plugin's auth.prisma migration (chapter 2) aggregates into this primary datasource." },
     { name: "--dry-run", type: "plan only", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
@@ -138,10 +130,10 @@ aspire start       # starts the AppHost and every declared resource
 ```
 
 `aspire start` brings up Postgres, Redis and your `workspace` service, then prints the **Aspire
-dashboard** URL and a one-time login token. Open the dashboard:
+dashboard** URL. The generated local profile allows anonymous dashboard access. Open the dashboard:
 
 ```text
-https://localhost:18888
+the URL Aspire prints
 ```
 
 Leave `aspire start` running in this terminal for the rest of the track. The dashboard's resource
@@ -160,7 +152,7 @@ In a second terminal, with `aspire start` still running in the first, check the 
 and type-check the workspace:
 
 ```sh
-curl http://localhost:3001/health
+curl "$SERVICE_URL/health"
 deno task check
 ```
 
@@ -168,8 +160,8 @@ deno task check
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-workspace/` exists with `services/workspace/`, `plugins/`, `database/`, and `aspire/`.
-- [ ] `aspire start` is up; `postgres` and `redis` are green in the dashboard at `https://localhost:18888`.
-- [ ] `curl http://localhost:3001/health` returns a healthy response.
+- [ ] `aspire start` is up; `postgres` and `redis` are green in the dashboard at the URL Aspire prints.
+- [ ] `curl "$SERVICE_URL/health"` returns a healthy response.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
@@ -181,7 +173,7 @@ failed <code>curl</code> usually means the service is still starting: wait a few
 
 ## What you built
 
-A NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`, shared contracts,
+A NetScript workspace at `my-workspace/`: a typed `workspace` service at its allocated endpoint, shared contracts,
 a Postgres database and a Redis cache, all orchestrated by Aspire and visible in one dashboard. The
 service still answers anyone. Next, you add an identity layer so the app can tell a team member from
 a stranger.

@@ -323,7 +323,7 @@ wire a custom host.
   ]
 }) }}
 
-The triggers API service is the HTTP edge: it hosts `createTriggerIngress` behind a raw Hono
+The triggers API service exposes a typed oRPC management contract and hosts `createTriggerIngress` behind a raw Hono
 router. Cron, file-watch, and DLQ processing run in a separate background processor entrypoint,
 `plugins/triggers/src/runtime/trigger-processor.ts`. `aspire start` runs both as resources,
 `triggers-api` and `trigger-processor`.
@@ -372,7 +372,7 @@ Without the install, run <code>deno x -A jsr:@netscript/plugin-workers{{ release
   {
     label: "Call it — curl",
     lang: "bash",
-    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST http://localhost:<triggers-port>/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:<triggers-port>/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
+    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST \"$TRIGGERS_URL/api/v1/webhooks/inbound/generic\" \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ndeno x -A jsr:@netscript/plugin-triggers" + releaseSpecifier + "/cli events --limit=10 --json\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
   }
 ] }) }}
 
