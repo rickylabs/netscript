@@ -1026,6 +1026,13 @@
 .ns-prose .ns-scenarios .ns-scenarios__problem {
   margin-bottom: 16px;
 }
+.ns-prose .ns-scenarios .ns-scenarios__setup {
+  margin-bottom: 16px;
+}
+.ns-prose .ns-scenarios .ns-scenarios__sources {
+  margin-top: 8px;
+  font-size: 14px;
+}
 .ns-scenarios__solution .ns-tabbed {
   margin: 0;
 }

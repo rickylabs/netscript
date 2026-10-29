@@ -15,6 +15,7 @@
 <article class="ns-scenarios__panel" id="{{ gid }}-{{ item.key }}" data-ns-scenario="{{ item.key }}" aria-label="{{ item.title }}">
 <h3 class="ns-scenarios__title">{{ item.title }}</h3>
 <p class="ns-scenarios__problem">{{ item.problem |> ic }}</p>
+{{ if item.setup }}<p class="ns-scenarios__setup">{{ item.setup |> ic }}</p>{{ /if }}
 <div class="ns-scenarios__solution">
 <p class="ns-eyebrow">NetScript</p>
 {{ comp.tabbedCode({ tabs: item.tabs }) }}
@@ -22,6 +23,7 @@
 <div class="ns-scenarios__alternative">
 <p class="ns-eyebrow">{{ item.alternativeLabel || alternativeLabel || "Typical alternative" }}</p>
 <p>{{ item.alternative |> ic }}</p>
+{{ if item.sources }}<p class="ns-scenarios__sources">Sources: {{ for index, source of item.sources }}{{ if index > 0 }} · {{ /if }}<a href="{{ source.href }}">{{ source.label }}</a>{{ /for }}</p>{{ /if }}
 </div>
 <p class="ns-scenarios__why"><strong>Why it matters:</strong> {{ item.why |> ic }}</p>{{ if item.href }}<p class="ns-scenarios__more"><a href="{{ item.href }}">{{ item.hrefLabel || "Build it step by step" }}</a></p>{{ /if }}
 </article>
@@ -34,13 +36,23 @@
   if (!select || !panels.length) return;
   function show() {
     panels.forEach(function (panel) { panel.hidden = panel.dataset.nsScenario !== select.value; });
+    var active = panels.filter(function (panel) { return !panel.hidden; })[0];
+    if (active) select.setAttribute('aria-controls', active.id);
   }
   function followHash() {
-    var target = panels.filter(function (panel) { return '#' + panel.id === location.hash; })[0];
+    var id;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (_) { return; }
+    var anchor = document.getElementById(id);
+    var target = anchor && anchor.closest('[data-ns-scenario]');
+    if (target && !root.contains(target)) target = null;
     if (target) select.value = target.dataset.nsScenario;
     show();
   }
-  select.addEventListener('change', show);
+  select.addEventListener('change', function () {
+    show();
+    var active = panels.filter(function (panel) { return !panel.hidden; })[0];
+    if (active) history.replaceState(null, '', '#' + active.id);
+  });
   addEventListener('hashchange', followHash);
   select.parentElement.hidden = false;
   root.classList.add('is-enhanced');
