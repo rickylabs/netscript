@@ -13,3 +13,5 @@ Broad checks completed; only stale Aspire manifest needed repair (one row, zero 
 Round-1 evaluator FIX groups repaired in 9fe5fdb; prose regenerated. Remaining carriers regenerated in order. Local docs browser passed all 124 tests; CLI runtime remains unproven because Docker is unreachable. Same reviewer round 2 remains required.
 
 All affected docs checks and final site verify pass after repair (see gates.md). Local browser 124/124 passes; full CLI runtime unproven only because Docker is unavailable. Independent round 2 remains the final content review gate.
+
+CI reconciliation: measured shards found missing reserved-mode wording, exact-retrieval wording, and an MCP-incompatible oldUrl array. Restore the two statements and use one scalar alias plus two explicit compatibility redirects. No framework implementation or tests weakened. Reconfirm the amended CI-only repair with the existing independent reviewer.

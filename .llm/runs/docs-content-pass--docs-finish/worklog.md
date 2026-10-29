@@ -49,3 +49,5 @@ Full CLI runtime one-pass attempt: UNPROVEN (Docker daemon unavailable at prefli
 Review correction checkpoint: 9fe5fdb. The affected prose carrier was regenerated with the source repairs. MCP export corpus and asset barrel generation succeeded with no source delta; publish assets refreshed the affected public prose. Rechecking documentation freshness/links/snippets/accuracy/exports after this checkpoint, then the same Gemini reviewer gets round 2.
 
 Review repair recheck: all ten affected root documentation tasks and final site verify PASS. No remaining conventional service port or plugin implementation authoring path claims in the tutorial flow. Restored docs/site/deno.lock after the final builder; root lock unchanged. Round 2 independent confirmation follows this evidence commit.
+
+CI reconciliation: measured shards found missing reserved-mode wording, exact-retrieval wording, and an MCP-incompatible oldUrl array. Restore the two statements and use one scalar alias plus two explicit compatibility redirects. No framework implementation or tests weakened. Reconfirm the amended CI-only repair with the existing independent reviewer.

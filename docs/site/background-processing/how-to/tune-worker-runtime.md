@@ -13,7 +13,8 @@ This recipe tunes queue concurrency, per-topic scaling, task timeouts and retrie
 cleanup budget without changing a job handler.
 
 Jobs execute in-process in the background worker service. Concurrency overlaps asynchronous I/O; it
-does not create Web Worker isolates or parallelize synchronous CPU work (see
+does not create Web Worker isolates or parallelize synchronous CPU work. Other runner modes are
+reserved; only `in-process` is implemented (see
 [worker runtime modes](/background-processing/workers/#worker-runtime-modes-worker_runtimes)). The
 settings live in `config/official-plugins/mod.ts` (`defineWorkers(...)`), in per-task runtime
 config, or in an environment variable that the worker entrypoint reads. For handler authoring, see

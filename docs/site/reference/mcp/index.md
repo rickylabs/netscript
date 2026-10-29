@@ -26,7 +26,7 @@ MCP fit together. The complete symbol list is in
 
 > [!TIP]
 > Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task and follow
-> its ordered citations. Use `search_docs` for literal lookup and `get_doc` for a known document or
+> its ordered citations. Use `search_docs` for literal lookup and `get_doc` for exact retrieval of a known document or
 > section; check `mode` and pass `full: true` with `nextCursor` for the complete text.
 
 ## Server composition
