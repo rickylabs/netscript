@@ -15,3 +15,7 @@ PLAN-EVAL: N/A — owner-defined corrections and fixed integration sequence, no 
 ## Routing override
 
 Owner grant, verbatim: "Claude is at its weekly limit." "Evaluate with Gemini 4 Argon, read-only: agy -p --mode plan --model gemini-4-argon-high, given the PR diff and these acceptance points, blockers only. Fix once and re-evaluate." Matrix feature row was queried during bootstrap; separate-session and different-family evaluation retained.
+
+## Main integration
+
+Renderer #2469 merged as 26a0bb78ad85bf08eacf893b1d550ed4759bb452 after independent MERGE at a4c8bc3 and fully green CI, including the docs browser. Merge main with --no-ff. Keep main's corrected alert renderer and fixtures; retain content wording around tree fences. Use main's generated prose/MCP carriers as the fixed input before the one final regeneration, preserving upstream non-site context.

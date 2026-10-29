@@ -224,7 +224,7 @@ Deno.test('each alert type renders the callout markup', () => {
 Deno.test('an alert and comp.callout produce byte-identical markup for the same inputs', async () => {
   const content = '<p>Body text.</p>\n';
   for (const [marker, kind] of ALERTS) {
-    for (const title of [undefined, 'Use `deno task`']) {
+    for (const title of [undefined, 'Before you migrate']) {
       const head = title ? `> [!${marker}]\n> **${title}**\n>\n` : `> [!${marker}]\n`;
       const alert = site().render(`${head}> Body text.\n`)
         .replace(` ${ALERT_ATTRIBUTE}="${marker}"`, '');
@@ -283,6 +283,71 @@ Deno.test('quotes GitHub does not render as alerts stay plain blockquotes and wa
     ok(warnings[0].startsWith(`${PAGE}:`), warnings[0]);
     ok(warnings[0].includes(reason), warnings[0]);
   }
+});
+
+Deno.test('alerts inside HTML containers stay plain and warn until the container closes', () => {
+  for (
+    const container of [
+      '<details>\n<summary>More</summary>',
+      '<div>',
+      '<section>\n<div data-label="a > b">',
+      '<custom-panel>',
+      '<div>\n<script>const markup = "</div>";</script>',
+    ]
+  ) {
+    const closing = container.startsWith('<details>')
+      ? '</details>'
+      : container.startsWith('<section>')
+      ? '</div>\n</section>'
+      : container.startsWith('<custom')
+      ? '</custom-panel>'
+      : '</div>';
+    const warnings: string[] = [];
+    const html = site(warnings).render(
+      `${container}\n\n> [!NOTE]\n> Inside.\n\n${closing}\n\n> [!TIP]\n> Outside.\n`,
+    );
+    const root = article(html);
+    ok(root.querySelector('blockquote')?.textContent?.includes('[!NOTE]'), html);
+    strictEqual(root.querySelectorAll('aside').length, 1, html);
+    strictEqual(root.querySelector('aside')?.getAttribute('data-alert'), 'TIP');
+    strictEqual(warnings.length, 1);
+    ok(warnings[0].startsWith(`${PAGE}:`), warnings[0]);
+    ok(warnings[0].includes('cannot be nested'), warnings[0]);
+  }
+});
+
+Deno.test('void tags, closed tags and HTML comments do not contain later alerts', () => {
+  for (const html of ['<hr>', '<div>Closed</div>', '<!-- <details> -->']) {
+    const warnings: string[] = [];
+    const output = site(warnings).render(`${html}\n\n> [!NOTE]\n> Body.\n`);
+    ok(article(output).querySelector('aside'), output);
+    strictEqual(warnings.length, 0);
+  }
+});
+
+Deno.test('escaped strong delimiters and extra inline tokens stay in the body', () => {
+  for (const gap of ['', '>\n']) {
+    for (
+      const [source, expected] of [
+        ['**Not bold\\**', '<p>*<em>Not bold*</em></p>'],
+        ['**Title***', '<p><strong>Title</strong>*</p>'],
+        ['**Title *emphasis***', '<p><strong>Title <em>emphasis</em></strong></p>'],
+        ['**Title `code`**', '<p><strong>Title <code>code</code></strong></p>'],
+      ]
+    ) {
+      const html = site().render(`> [!NOTE]\n${gap}> ${source}\n>\n> Body.\n`);
+      const callout = article(html).querySelector('aside')!;
+      strictEqual(callout.querySelector('.ns-callout__label')?.textContent, 'Note');
+      strictEqual(callout.querySelector('.ns-callout__body > p')?.outerHTML, expected);
+    }
+  }
+});
+
+Deno.test('a parsed text title is escaped without interpreting its text again', () => {
+  const html = site().render('> [!NOTE]\n> **Use &lt;tag&gt; and \\*text\\***\n>\n> Body.\n');
+  const label = article(html).querySelector('.ns-callout__label')!;
+  strictEqual(label.textContent, 'Use <tag> and *text*');
+  strictEqual(label.querySelectorAll('*').length, 0);
 });
 
 Deno.test('ordinary blockquotes are untouched and do not warn', () => {
