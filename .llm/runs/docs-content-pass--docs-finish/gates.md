@@ -23,3 +23,20 @@
 | `docs/site verify` | PASS | 0 |
 
 Durable receipts for allowlisted gates were produced with `.llm/tools/gates/run-gate.ts`. The initial Aspire parity failure was manifest freshness only; the native manifest generator added one maintained docs path with an existing ownership rule (zero unmatched paths). Recheck recorded separately. CI must still pass at the final head.
+
+## Review repair recheck
+
+- `check:agent-docs-prose`: PASS (exit 0).
+- `check:mcp-export-corpus`: PASS (exit 0).
+- `check:assets-barrel`: PASS (exit 0).
+- `check:publish-assets`: PASS (exit 0).
+- `check:aspire-version-parity`: PASS (exit 0).
+- `docs:links`: PASS (exit 0).
+- `docs:snippets`: PASS (exit 0).
+- `docs:accuracy`: PASS (exit 0).
+- `docs:exports-drift`: PASS (exit 0).
+- `docs:readme-fences`: PASS (exit 0).
+- `docs/site verify`: PASS (exit 0).
+
+Local docs browser: PASS, 124 tests across four theme/viewport combinations.
+Full CLI runtime attempt: UNPROVEN, Docker daemon unreachable at preflight; cleanup could not inspect Docker. This is not a passing runtime result. Read-only leak-check reviewed 24 unproven foreign entries and mutated none.

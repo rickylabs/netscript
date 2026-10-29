@@ -11,3 +11,5 @@ Prose checkpoint is 10c640e. Remaining carrier generation succeeded; only MCP pu
 Broad checks completed; only stale Aspire manifest needed repair (one row, zero unmatched). See gates.md. Source-documentation follow-up #2472 covers the stale package sandbox README and health generator wording. Independent Gemini review is next.
 
 Round-1 evaluator FIX groups repaired in 9fe5fdb; prose regenerated. Remaining carriers regenerated in order. Local docs browser passed all 124 tests; CLI runtime remains unproven because Docker is unreachable. Same reviewer round 2 remains required.
+
+All affected docs checks and final site verify pass after repair (see gates.md). Local browser 124/124 passes; full CLI runtime unproven only because Docker is unavailable. Independent round 2 remains the final content review gate.
