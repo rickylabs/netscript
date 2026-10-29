@@ -42,3 +42,5 @@ Local docs browser: PASS, 124 tests across four theme/viewport combinations.
 Full CLI runtime attempt: UNPROVEN, Docker daemon unreachable at preflight; cleanup could not inspect Docker. This is not a passing runtime result. Read-only leak-check reviewed 24 unproven foreign entries and mutated none.
 
 CI repair verification: structured regression test passed 27/27. Prose checkpoint d5f7149; remaining three carriers regenerated in order. Prose/publish freshness, docs accuracy/links/exports drift and site verify all pass. Explicit redirect pages preserve both historical LSP URLs while scalar oldUrl restores MCP alias resolution.
+
+Final late-CI reconciliation: seven regression results pass after regenerated prose/publish inputs, including real auth bootstrap and exact deterministic guidance across both adapters. Prose/publish freshness, docs accuracy/links/exports drift and site verify pass. Previous exact ranking expectations were corpus-specific; retained all eight cases and both adapters. Independent reviewer must explicitly classify the stale expectations and confirm semantic quality at the amended head. No test skipped or removed.
