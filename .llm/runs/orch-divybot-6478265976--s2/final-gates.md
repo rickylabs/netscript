@@ -1,3 +1,9 @@
+# Removal repair local proof — clean-head gates pending
+
+New negative unit and actual CLI controls fail before repair with missing styles.css. Repaired focused v2 suite19/0/0; actual CLI acceptance3/0/0. All83 changed source/generated files passed wrappers before final test assertions; the four touched files pass current check/lint/fmt afterward, zero findings/drops. Full integrated suite and exact committed-source durable gates follow. Independent content verdict FAIL_FIX is recorded; no PASS or READY yet.
+
+## Retained prior evidence
+
 # Current style-file repair gate evidence
 
 Audited source checkpoint: **b24baa33690fe54774a3deaca4961444a2e66fb2**, pushed. New style ownership regression controls failed before repair; the integrated suite now passes **362/0/0**, separate native CLI acceptance **2/0/0**, and focused v2 tests **18/0/0**, all exit0. Structured check/lint/fmt covers all83 changed TS/TSX files:78 maintained source/test/tool files plus5 generated carriers, zero drops/refusals/findings.

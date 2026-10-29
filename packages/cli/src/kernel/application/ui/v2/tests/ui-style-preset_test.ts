@@ -5,7 +5,7 @@ import type { TokenEnginePort } from '../../../../ports/token-engine-port.ts';
 import { encodeUiPreset } from '../../../../domain/ui/ui-preset.ts';
 import { installUiRegistry, UiRegistryConflictError } from '../install-registry.ts';
 import { applyUiPreset } from '../apply-preset.ts';
-import { updateUiRegistry } from '../registry-lifecycle.ts';
+import { removeUiRegistry, updateUiRegistry } from '../registry-lifecycle.ts';
 import { buildAppTokens } from '../../../tokens/build-app-tokens.ts';
 import { readUiConfig, readUiLock } from '../config-lock.ts';
 
@@ -111,6 +111,38 @@ async function presetFixture() {
   };
   return { fs, tokenEngine, calls };
 }
+
+Deno.test('removing an applied theme preserves custom stylesheet content and compiled token outputs', async () => {
+  for (const only of ['theme', undefined]) {
+    const deps = await presetFixture();
+    const custom = "@import './app.css';\n.app { color: rebeccapurple; }\n";
+    await deps.fs.writeFile('/app/assets/styles.css', custom);
+    await deps.fs.writeFile('/app/assets/fonts.json', 'app font metadata');
+    await applyUiPreset({ root: '/app', preset: 'studio-utility', only }, deps);
+    const stylesheet = await deps.fs.readFile('/app/assets/styles.css');
+    const before = new Map(
+      [...deps.fs.getFiles()].filter(([path]) => path.startsWith('/app/assets/')),
+    );
+    const config = await deps.fs.readFile('/app/tokens.config.json');
+    const removed = await removeUiRegistry('/app', 'theme-studio-utility', deps);
+    assertEquals(await deps.fs.readFile('/app/assets/styles.css'), stylesheet);
+    assertStringIncludes(stylesheet, "@import './app.css';");
+    assertStringIncludes(stylesheet, '.app { color: rebeccapurple; }');
+    for (const [path, content] of before) {
+      if (path.endsWith('/styles.css')) continue;
+      assertEquals(await deps.fs.readFile(path), content, path);
+      assertEquals(removed.includes(path), false);
+    }
+    assertEquals(await deps.fs.readFile('/app/tokens.config.json'), config);
+    assertEquals((await readUiLock('/app', deps.fs))!.items['theme-studio-utility'], undefined);
+    assertEquals(
+      await deps.fs.exists('/app/.agents/skills/fresh-ui-theme-studio-utility/DESIGN.md'),
+      false,
+    );
+    await buildAppTokens({ root: '/app' }, deps);
+    assertEquals(deps.calls.at(-1)!.preset, 'studio-utility');
+  }
+});
 
 Deno.test('token-only preset application delegates to S1 and preserves app code, fonts, source and semantic overrides', async () => {
   const deps = await presetFixture();

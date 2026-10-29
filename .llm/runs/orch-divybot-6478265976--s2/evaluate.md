@@ -1,3 +1,9 @@
+# Final review FAIL_FIX — one removal repair pending confirmation
+
+Final retained-conversation response at5849936 gives one substantive FAIL_FIX: removal can delete app styles.css and token outputs. Captured transport status is ERROR/quota alongside that response, not clean PASS. Negative unit/native controls reproduce it. Current repair applies the shared managed-core preservation predicate, with focused19/0/0 and native3/0/0 passing. Same evaluator must inspect the repair once after complete clean-head gates. Other scope was confirmed in the response; readiness still requires an actual exact-source final PASS. See final-review-remove-core.md.
+
+## Retained prior evidence
+
 # Style-file repair final review — pending allowance reset
 
 Current audited source **b24baa33690fe54774a3deaca4961444a2e66fb2** includes both the prior style-history repair and the new shared/retired style-file ownership repair. Integrated362/0/0, native acceptance2/0/0, all83 TS/TSX source/generated wrappers and eight exact-source quality/docs/carrier/publication receipts pass. See final-gates.md and acceptance-audit.md.

@@ -8,6 +8,7 @@ import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
 import { installUiRegistry } from './install-registry.ts';
 import { reconcileUiStyles } from './registry-effects.ts';
 import type { UiRegistryDependencies } from './registry-client.ts';
+import { isUiManagedCoreFile } from './style-history.ts';
 import { planUiWrites } from './ui-write-plan.ts';
 
 /** Update only baseline-matching copies; an existing empty lock never falls back to file discovery. */
@@ -52,6 +53,7 @@ export async function removeUiRegistry(
   const removed: string[] = [];
   const edited: string[] = [];
   for (const file of entry.files) {
+    if (isUiManagedCoreFile(file)) continue;
     if (
       Object.values(lock.items).some((item) =>
         item.files.some((other) => other.target === file.target)

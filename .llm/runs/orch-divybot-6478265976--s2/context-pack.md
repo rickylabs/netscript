@@ -1,3 +1,9 @@
+# Removal blocker repaired — awaiting full gates and review
+
+One substantive final FAIL_FIX at5849936 identifies ui:remove deleting managed app core files. Both unit and actual CLI negative controls reproduce it. Current repair shares the existing isUiManagedCoreFile rule between retirement/removal; theme docs/records and removable imports still drop, while stylesheet/token outputs/config survive. Focused19/0/0, native3/0/0 and current source check/lint/fmt pass. Integrated suite and clean-head quality/docs/carrier/publication receipts are pending. Resume the SAME retained Opus5.5 High conversation for repair confirmation/full S2 PASS; no final sign-off or READY. Transport envelope ERROR with substantive FAIL_FIX is preserved in final-review-remove-core.md; do not infer PASS from exit0. Runtime/Docker/.NET and123 unchanged component doc-lint limitations remain.
+
+## Retained prior evidence
+
 # Current pushed style-file repair checkpoint
 
 Audited product source b24baa33690fe54774a3deaca4961444a2e66fb2 is pushed to PR2468. It adds atomic shared/retired style-owned CSS handling, remapped support styles, applied component-selection lock metadata and five regressions plus actual CLI switching coverage. Integrated362/0/0, native acceptance2/0/0, focused v218/0/0 and all83 maintained/generated TS/TSX check/lint/fmt pass. Eight exact-source quality/architecture/docs/carrier/publication dry-run receipts PASS; generation leaves source clean and review threads have0 unanswered. No S3 component source changed.

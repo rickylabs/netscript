@@ -8,6 +8,11 @@ import type { UiWritePlan } from './ui-write-plan.ts';
 
 const managedCore = new Set(['styles.css', ...APP_TOKEN_FILES]);
 
+/** Keep app-level styles and compiler outputs when an item's ownership record is removed. */
+export function isUiManagedCoreFile(file: UiLockedFile): boolean {
+  return file.managed && managedCore.has(basename(file.target));
+}
+
 /** Retire obsolete selections while retaining any style still required by the resulting graph. */
 export function uiRetiringComponentStyles(
   previous: UiLock | undefined,
@@ -55,7 +60,7 @@ export async function retireUiStyleFiles(input: {
     for (const file of previous?.items[ref]?.files ?? []) {
       if (seen.has(file.target)) continue;
       seen.add(file.target);
-      if (file.managed && managedCore.has(basename(file.target))) continue;
+      if (isUiManagedCoreFile(file)) continue;
       if (
         Object.values(lock.items).some((item) =>
           item.files.some((copy) => copy.target === file.target)

@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertMatch, assertStringIncludes } from '@std/assert';
 import { walk } from '@std/fs';
 import { fromFileUrl, join, relative } from '@std/path';
+import { APP_TOKEN_FILES } from '@netscript/fresh-ui/token-config';
 
 const root = fromFileUrl(new URL('../../../../../../../', import.meta.url));
 const cli = join(root, 'packages/cli/bin/netscript-dev.ts');
@@ -178,6 +179,42 @@ Deno.test('actual preset init and apply reuse S1, install docs and preserve comp
       'tonal',
     );
     assertEquals(await copies(), before);
+  } finally {
+    await Deno.remove(app, { recursive: true });
+  }
+});
+
+Deno.test('actual theme removal preserves a legacy app stylesheet and compiled token files', async () => {
+  const app = await Deno.makeTempDir({ prefix: 'netscript-s2-theme-removal-' });
+  try {
+    await Deno.writeTextFile(join(app, 'deno.json'), '{"imports":{}}\n');
+    await Deno.mkdir(join(app, 'routes'));
+    await Deno.mkdir(join(app, 'assets'));
+    const custom = "@import './app.css';\n.app { color: rebeccapurple; }\n";
+    await Deno.writeTextFile(join(app, 'assets/styles.css'), custom);
+    await Deno.writeTextFile(join(app, 'assets/fonts.json'), '{"appFont":true}\n');
+    await runCli(app, ['ui:apply', '--preset', 'tonal', '--only', 'theme']);
+    const stylesheet = await Deno.readTextFile(join(app, 'assets/styles.css'));
+    const tokens = new Map(
+      await Promise.all(
+        APP_TOKEN_FILES.map(async (name) =>
+          [name, await Deno.readTextFile(join(app, 'assets', name))] as const
+        ),
+      ),
+    );
+    const config = await Deno.readTextFile(join(app, 'tokens.config.json'));
+    await runCli(app, ['ui:remove', 'theme-tonal']);
+    assertEquals(await Deno.readTextFile(join(app, 'assets/styles.css')), stylesheet);
+    assertStringIncludes(stylesheet, "@import './app.css';");
+    assertStringIncludes(stylesheet, '.app { color: rebeccapurple; }');
+    for (const [name, content] of tokens) {
+      assertEquals(await Deno.readTextFile(join(app, 'assets', name)), content, name);
+    }
+    assertEquals(await Deno.readTextFile(join(app, 'tokens.config.json')), config);
+    assertEquals(
+      JSON.parse(await Deno.readTextFile(join(app, 'fresh-ui.lock.json'))).items['theme-tonal'],
+      undefined,
+    );
   } finally {
     await Deno.remove(app, { recursive: true });
   }

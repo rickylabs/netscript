@@ -102,3 +102,5 @@ Shared dependencies, independent stylesheet items and generated core token asset
 The lock's `appliedStyle` records the completed selection, so changing `components.json` cannot hide
 a pending regeneration. Per-item `componentStyle` identifies source-map styles separately from ordinary
 CSS style items. Token-only apply preserves that applied component-style baseline.
+
+Removing a theme drops its registry ownership and installed theme documents. App-level `styles.css` and the S1 compiler outputs remain on disk because token configuration and custom CSS outlive an individual registry record. Removal reconciles the removed item's stylesheet imports and preserves the existing app content.
