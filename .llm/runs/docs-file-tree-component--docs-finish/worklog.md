@@ -23,3 +23,12 @@ Matrix queried with agentic:matrix --tier feature --json. Owner-selected evaluat
 - Scoped check/lint/format wrappers: PASS, two selected files, no findings.
 - Site verify: PASS, 254 HTML pages, 24,225 internal links, 15 caveat markers.
 - Initial regression run exposed an old fixture expecting code inside a bold title; that conflicts with the new exact-token acceptance. Changed the parity title to plain text and kept an explicit negative inline-code regression.
+
+- Final renderer regressions: PASS (13 root test results, including the 17-case site fixture bridge). Source-format independent run: 35 passed.
+- Prose freshness, MCP corpus, publish assets and root docs links: PASS. No generated carrier or lock change.
+- Independent Gemini evaluation: MERGE, no blockers; substantive slice review completed before sign-off commit.
+- Raw-text HTML contents cannot close an outer container; script-string regression passes.
+
+## Reconcile
+
+Baseline remains PR #2469 at 3a9b8f37a. The correction changes only the renderer, its fixture and this run. Existing authored page output remains carrier-fresh.
