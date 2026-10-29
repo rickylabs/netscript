@@ -1,3 +1,13 @@
+# Removal repair — final confirmation unavailable
+
+Product source **dd4e793462420733f281036c48e963f661f1f9aa** fixes the one substantive FAIL_FIX returned by the retained final review at5849936. Both pre-repair negative controls fail; after repair focused19/0/0, native3/0/0 and integrated364/0/0 pass, all source wrappers and8 exact-clean-source durable gates pass. See final-review-remove-core.md and final-gates.md.
+
+The SAME retained Opus5.5 High native-provider conversation was asked to confirm the repair/full S2 objective with a fresh exact-head receipt. It returned **ERROR, exit3, empty response, no receipt**, individual quota reset162h47m56s. Exact prescribed native Claude was then attempted in its retained session at this head, high effort, closed stdin and only read-only tools; it returned **weekly quota, exit1, no verdict**, resetting Oct30 at23:00 Europe/Zurich. Both attempts left source unchanged. Availability errors are not terminal FAIL_FIX or PASS.
+
+Disposition: **draft only; final confirmation/sign-off/READY remain unproven**. No new evaluator/model, paid inference or routing bypass. The single concrete blocker was fixed once; resume the retained evaluator when available. No scheduled worker remains active. Earlier content/transport discrepancy is preserved rather than converted into a clean PASS. Runtime and component doclint limitations remain disclosed.
+
+## Retained prior evidence
+
 # Final review FAIL_FIX — one removal repair pending confirmation
 
 Final retained-conversation response at5849936 gives one substantive FAIL_FIX: removal can delete app styles.css and token outputs. Captured transport status is ERROR/quota alongside that response, not clean PASS. Negative unit/native controls reproduce it. Current repair applies the shared managed-core preservation predicate, with focused19/0/0 and native3/0/0 passing. Same evaluator must inspect the repair once after complete clean-head gates. Other scope was confirmed in the response; readiness still requires an actual exact-source final PASS. See final-review-remove-core.md.

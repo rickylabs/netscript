@@ -1,3 +1,16 @@
+# Current removal repair gate evidence
+
+Audited clean pushed product source: **dd4e793462420733f281036c48e963f661f1f9aa**. It repairs the independent finding that explicit theme removal can delete app CSS/compiler outputs. Before repair both unit and actual public CLI controls fail with missing styles.css. After repair:
+
+- Integrated suite **364/0/0**, exit0; separate actual CLI acceptance run **3/0/0**, exit0; focused v2 suite **19/0/0**, exit0. These are command results, not an added total of disjoint test cases.
+- Structured wrappers cover83 changed maintained/generated TS/TSX files; the four changed files pass a final current-source check/lint/fmt after assertion normalization. Zero findings/drops/refusals.
+- Eight durable allowlisted receipts at this exact unchanged clean head all **PASS/exit0**: quality-gate (including architecture), docs-accuracy109/109 commands174 recursive, exports-drift, mcp-export-corpus, assets-barrel, publish-assets, agent-docs-prose, and full workspace publish-dry-run. Generation leaves source clean; no package published.
+- Review threads:0 unanswered, exit0.
+
+The final independent content finding was repaired once. Same retained native-provider confirmation atdd4e793 returned quota/empty response, exit3. Prescribed native Claude confirmation returned weekly quota, exit1, no verdict. **No final PASS, supervisor sign-off or READY.** No review worker remains queued. Required runtime/cleanup remain unproven withDocker/.NET unavailable; unchanged full-component doclint baseline123 remains disclosed. Resume the retained evaluator after availability returns.
+
+## Retained prior evidence
+
 # Removal repair local proof — clean-head gates pending
 
 New negative unit and actual CLI controls fail before repair with missing styles.css. Repaired focused v2 suite19/0/0; actual CLI acceptance3/0/0. All83 changed source/generated files passed wrappers before final test assertions; the four touched files pass current check/lint/fmt afterward, zero findings/drops. Full integrated suite and exact committed-source durable gates follow. Independent content verdict FAIL_FIX is recorded; no PASS or READY yet.
