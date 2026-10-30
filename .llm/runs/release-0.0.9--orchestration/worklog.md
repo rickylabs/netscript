@@ -33,3 +33,7 @@
   - Before each post, confirm no `state=started` binding on that issue, and that the previous launch started.
 - 22:58Z: #1667 and #1668 closed as completed after the opposite-family acceptance evaluation (Codex, `receipts/g1-step0/eval-1667-1668.md`, all boxes MET).
 - 22:59Z: #2477 (#2165) PLAN-EVAL APPROVED (leaf's Opus evaluator); implementing.
+- 23:00Z: #1364 closed as completed after the Codex acceptance evaluation (`receipts/g1-step0/eval-1364.md`); its observational Wave-7 criterion is routed to #1381.
+- 23:14Z: #2477 (#2165) READY at `c313a62`. Gate: Opus IMPL-EVAL MERGE at the exact head; CI 20 success / 33 skipped, no failures; review threads 0 unanswered; diff limited to plugin-triggers-core and tests. **expensive-gate.acquired**: e2e-cli scaffold.runtime on #2477 via `e2e-cli-gate`.
+- 23:15Z: #2477 (#2165) READY at `c313a62`. Gate: Opus IMPL-EVAL MERGE at the exact head; CI 20 success / 33 skipped, no failures; review threads 0 unanswered; diff limited to plugin-triggers-core and tests. **expensive-gate.acquired**: e2e-cli scaffold.runtime on #2477 via `e2e-cli-gate`.
+- 23:31Z: **merged** #2477 (`7907293f3`) for #2165 after e2e-cli was green on both runtime tiers at `c313a62` (65/65 checks); #2165 closed with evidence; expensive gate released. #2187 must merge main into its branch (function ownership in trigger-processor.ts).
