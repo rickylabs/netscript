@@ -117,11 +117,17 @@
     },
     {
       "number": 1667,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "receipts/g1-step0/eval-1667-1668.md"
+      ]
     },
     {
       "number": 1668,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "receipts/g1-step0/eval-1667-1668.md"
+      ]
     },
     {
       "number": 1912,
@@ -497,7 +503,10 @@
     },
     "progress": {
       "mergedPullRequests": [],
-      "closedIssues": [],
+      "closedIssues": [
+        1667,
+        1668
+      ],
       "newIssues": [
         2478
       ],

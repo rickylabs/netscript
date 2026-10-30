@@ -18,7 +18,7 @@
 - 22:48Z: #2438 → PR #2476 (draft), #2165 → PR #2477 (draft); addenda reposted on both PRs; leaves recorded (implementing). Validator green.
 - 22:58Z: PLAN-EVAL round 2 (`receipts/plan-eval-2.md`): round-1 blockers 1–4 RESOLVED. New blockers: #2151 conditional native-only proof, and #2159 crash-safe atomic commit (release-on-failure is not crash-safe). Both repaired in flight in the unposted briefs, plus #2161 doctor/fixture notes and the merge-gate E2E note. Plan APPROVED with in-flight repair (feature-tier policy).
 - 22:52Z: Cockpit relay: the #2187, #2144 and #2396 launches never started. The Cockpit hourly cap (6/h) held them as "Needs you" (hourly_cap_reached), and in-app approval is broken (cockpit #937). Plan: re-post each as a new `/swarm` comment with tag `mc009d-r1-<n>` after 23:40Z, spaced about 10 min apart, each after confirming no `state=started` binding. Relaunch briefs `briefs/<n>.r1.md` fold in addendum-1.
-- 23:08Z: G1 Step 0 re-check. Correction or narrowing comments posted on #1364, #1655, #1667, #1668, #1912, #1366, #2068, #2185 and #2233 (texts in `receipts/g1-step0/`). Findings:
+- 22:54Z: G1 Step 0 re-check. Correction or narrowing comments posted on #1364, #1655, #1667, #1668, #1912, #1366, #2068, #2185 and #2233 (texts in `receipts/g1-step0/`). Findings:
   - #1668: done.
   - #1364: done once a row is added to #1381.
   - #1667: evidence only; an opposite-family evaluator rules on boxes 1 and 3 (Codex run started).
@@ -28,6 +28,8 @@
   - #2068: cold-consumer persistence/replay check on published 0.0.8.
   - #2185: a local-Docker `scaffold.runtime` run.
   - #2233: owner decision on box 1 vs box 6 (`MANIFEST.md`); the `status:impl` label is stale.
-- 23:12Z: Re-intake checkpoint. Eric approved new leaf #2478 (H02, repo-wide Code quality red on main since #2469), filed directly into 0.0.9. Added to the intake (release-critical, owner-ratified), the inventory (internals, group H02), the DAG (W1) and cluster state; validator green.
+- 22:56Z: Re-intake checkpoint. Eric approved new leaf #2478 (H02, repo-wide Code quality red on main since #2469), filed directly into 0.0.9. Added to the intake (release-critical, owner-ratified), the inventory (internals, group H02), the DAG (W1) and cluster state; validator green.
   - Launch plan within the Cockpit hourly cap and the 5-builder cap: #2187-r1 at 23:40Z, #2478 about 23:50Z, #2144-r1 about 00:00Z, then #2396-r1 at the next free builder slot.
   - Before each post, confirm no `state=started` binding on that issue, and that the previous launch started.
+- 22:58Z: #1667 and #1668 closed as completed after the opposite-family acceptance evaluation (Codex, `receipts/g1-step0/eval-1667-1668.md`, all boxes MET).
+- 22:59Z: #2477 (#2165) PLAN-EVAL APPROVED (leaf's Opus evaluator); implementing.

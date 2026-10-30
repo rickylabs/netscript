@@ -9,7 +9,7 @@
 - D1 #2396 cap-held → relaunch r1 (adopt #2421–#2423); #2367 #2115 #2290 #2259: W3
 - E1 #2392 #2394 #2401: W4 · E2 #2155 #2385 #1491 #1364(docs): W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6
-- G1 (Step 0 re-check posted 23:08Z): #1668 done → close after Codex eval; #1667 eval running; #1364 add row to #1381 then close; leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
-- H02 #2478 (Code quality red on main): admitted 23:12Z, launch ~23:50Z
+- G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 add row to #1381 then close; leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
+- H02 #2478 (Code quality red on main): admitted 22:56Z, launch ~23:50Z
 - Open for Eric: #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; orchid automerge on netscript?
 - PLAN-EVAL: APPROVED with in-flight repair at round 2 (22:58Z). Leaves: #2476 (#2438), #2477 (#2165) open drafts.
