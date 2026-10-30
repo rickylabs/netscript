@@ -50,7 +50,8 @@
         2406,
         2409,
         2411,
-        2438
+        2438,
+        2478
       ]
     },
     {
@@ -305,6 +306,10 @@
     {
       "number": 2438,
       "state": "open"
+    },
+    {
+      "number": 2478,
+      "state": "open"
     }
   ],
   "leaves": [
@@ -493,13 +498,15 @@
     "progress": {
       "mergedPullRequests": [],
       "closedIssues": [],
-      "newIssues": [],
+      "newIssues": [
+        2478
+      ],
       "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
     },
     "scope": {
-      "openIssueCount": 53,
-      "ownedIssueCount": 53,
-      "scheduledIssueCount": 53,
+      "openIssueCount": 54,
+      "ownedIssueCount": 54,
+      "scheduledIssueCount": 54,
       "unscheduledIssueNumbers": [],
       "openPullRequestCount": 3
     },

@@ -6,7 +6,7 @@
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
   "ownerRatifiedAt": "2026-10-30T22:00:00.000Z",
   "scopeNote": "Coordinator scope = open 0.0.9 issues minus label epic:design-system (19 issues, Fresh UI lane) and tracking issue #2474.",
-  "targetIssueCount": 53,
+  "targetIssueCount": 54,
   "issues": [
     {
       "number": 1364,
@@ -378,6 +378,13 @@
       "disposition": "active",
       "lane": "internals",
       "group": "H01"
+    },
+    {
+      "number": 2478,
+      "title": "fix(docs-site): Code quality red on main since #2469 (unsafe-cast in markdown-render-fixture)",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "H02"
     }
   ]
 }

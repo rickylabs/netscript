@@ -1,12 +1,15 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
-- H01 #2438: dispatched 22:37Z (codex sol high)
-- A1 #2165 #2187: dispatched 22:38Z (parallel, split ownership)
+- H01 #2438 → PR #2476 (implementing)
+- A1 #2165 → PR #2477 (implementing); #2187 cap-held → relaunch r1 after 23:40Z
 - A2 #2395 → #2351: W2 / W3
-- A3 #2144 dispatched 22:38Z; #2400 #2151 #2161: W2
+- A3 #2144 cap-held → relaunch r1; #2400 #2151 #2161: W2
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
-- B2 #2162 #2149 → #2108; #2369: W3–W4
-- C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (W6)
-- D1 #2396 dispatched (adopt #2421–#2423); #2367 #2115 #2290 #2259: W3
-- E1 #2392 #2394 #2401: W4 · E2 #2268 #2269 #2155 #2385 #1491: W5
-- F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 · G1: W7
-- Open for Eric: #2465 placement; code-quality red issue; PRs #2424/#2433; failed-canary policy; DS1 stable gate; orchid automerge on netscript?
+- B2 #2162 (after #2161) #2149: W3; #2369: W4; #2108 (after B2 pair + all B1): W7
+- C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (after all B1): W7
+- D1 #2396 cap-held → relaunch r1 (adopt #2421–#2423); #2367 #2115 #2290 #2259: W3
+- E1 #2392 #2394 #2401: W4 · E2 #2155 #2385 #1491 #1364(docs): W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
+- F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6
+- G1 (Step 0 re-check posted 23:08Z): #1668 done → close after Codex eval; #1667 eval running; #1364 add row to #1381 then close; leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
+- H02 #2478 (Code quality red on main): admitted 23:12Z, launch ~23:50Z
+- Open for Eric: #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; orchid automerge on netscript?
+- PLAN-EVAL: APPROVED with in-flight repair at round 2 (22:58Z). Leaves: #2476 (#2438), #2477 (#2165) open drafts.

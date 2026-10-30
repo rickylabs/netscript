@@ -373,6 +373,13 @@
       "issueNumber": 2438,
       "lane": "internals",
       "title": "deps(telemetry): OpenTelemetry API 1.10 / instrumentation 0.300 breaks command-postgres on main"
+    },
+    {
+      "id": "issue:2478",
+      "kind": "issue",
+      "issueNumber": 2478,
+      "lane": "internals",
+      "title": "fix(docs-site): Code quality red on main since #2469 (unsafe-cast in markdown-render-fixture)"
     }
   ],
   "edges": [
@@ -470,13 +477,14 @@
   "waves": [
     {
       "index": 1,
-      "title": "W1 canary.1 core: main CI green (H01), scheduled/file-watch dedup (A1), in-process maxRetries, #2396 adoption",
+      "title": "W1 canary.1 core: main CI green (H01), scheduled/file-watch dedup (A1), in-process maxRetries, #2396 adoption; H02 #2478 Code quality green on main (re-intake)",
       "nodeIds": [
         "issue:2438",
         "issue:2165",
         "issue:2187",
         "issue:2144",
-        "issue:2396"
+        "issue:2396",
+        "issue:2478"
       ]
     },
     {

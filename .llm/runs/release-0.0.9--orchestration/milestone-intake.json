@@ -610,6 +610,19 @@
         "https://github.com/rickylabs/netscript/issues/2465"
       ],
       "ownerRatified": true
+    },
+    {
+      "number": 2478,
+      "title": "fix(docs-site): Code quality red on main since #2469 (unsafe-cast in markdown-render-fixture)",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Re-intake 2026-10-30: Eric approved a new 0.0.9 leaf (Cockpit relay); filed directly into 0.0.9 at 22:55Z. Repo-wide Code quality red on main since #2469.",
+      "admissionPredicate": "release-critical",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2478"
+      ],
+      "ownerRatified": true,
+      "reintakeAt": "2026-10-30T23:12:00.000Z"
     }
   ]
 }
