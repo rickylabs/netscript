@@ -7,9 +7,12 @@ Implementation: assigned Codex session, feature tier. Independent review: Claude
 
 - `.llm/runs/orch-divybot-6534973379--2438/**` (run evidence and memory).
 - Root dependency catalog / import map and `deno.lock`, only if the selected compatibility fix requires them.
-- `packages/telemetry/deno.json`, dependency policy only.
+- `packages/telemetry/deno.json`, `packages/telemetry/package.json` and the oRPC tracing module, explicit instrumentation peer policy only.
 - Database command generated-client fixtures under `packages/database/tests/`.
 - Saga generated-client fixture support under `packages/plugin-sagas-core/tests/`.
+- Database/saga provider template imports and `packages/cli/tests/fixtures/postgres-normalizer/**`.
+- Streams resource/native-example test fixtures and the CLI postgres-normalizer test fixture.
+- Necessary maintained reference locks and database test devDependency manifest.
 - A focused repository test-support module and regression tests, if shared lock policy is needed.
 - `.divybot-final-report.md` (excluded publication handoff).
 
@@ -22,3 +25,7 @@ Owner instruction verbatim: "Run PLAN-EVAL before implementing and IMPL-EVAL aft
 Matrix queried through `deno task agentic:matrix --tier feature --json`; implementation primary sol/xhigh; plan evaluation glm_5_3 with fable_5_1 fallback; implementation evaluation muse_spark_1_3 with opus_5 fallback. Explicit owner evaluator override above takes precedence. Feature limits: 2 PLAN-EVAL and 5 IMPL-EVAL rounds, same evaluator resumed across repairs. Different session and vendor family remain mandatory.
 
 Specific operator directives take precedence over generic dispatcher completion boilerplate: keep draft, body starts Refs, no closing keywords. Final canonical report uses Orchid file handoff.
+
+## Coordinator CI-flow update
+
+Owner/coordinator addendum: https://github.com/rickylabs/netscript/pull/2476#issuecomment-6535146563. It explicitly supersedes the original keep-draft rule: implementation must be complete and blocker-free IMPL-EVAL must precede marking ready; then fix current CI failures and review the exact final head. Only coordinator merges. No local scaffold.runtime or label changes.

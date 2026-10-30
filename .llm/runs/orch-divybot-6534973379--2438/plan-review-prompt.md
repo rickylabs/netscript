@@ -1,1 +1,4 @@
 Read-only PLAN-EVAL for NetScript issue 2438. Use only read tools and read-only shell commands; never edit files, commit, push, post comments, or run mutating dependency commands. Do not read or follow target repository profiles/ files. Read .llm/runs/orch-divybot-6534973379--2438/{research,plan,worklog,supervisor}.md and .llm/harness/gates/plan-gate.md; spot-check load-bearing files. Owner requires API 1.10.x or instrumentation <0.300 plus frozen temporary fixtures. Consider published consumers, exact lock compatibility, negative controls and gates. Blockers only, concise. Return PASS or FAIL_PLAN with actionable blockers. This is a separate evaluator session, Claude Opus 5.5 high effort.
+
+## SKILL
+Use netscript-harness, netscript-doctrine, netscript-tools and netscript-deno-toolchain. The explicit chapter was added after round 1; round 2 already included it.

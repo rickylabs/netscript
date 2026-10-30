@@ -1,25 +1,28 @@
-# Plan & Design — READY FOR REVIEW
+# H01 plan — instrumentation bound and frozen fixture resolution
 
-Issue #2438 / H01. Archetype 2 integration dependency maintenance, with archetype 3 saga and archetype 5 plugin test consumers. No production implementation redesign.
+Issue #2438, feature tier; baseline main `30c800958dbf512a4951d640f08748703a8b59e3`.
+Archetype 2 dependency integration, with archetype 3/5 saga and plugin test consumers. No scaffold generator or runtime wiring changes.
 
-## Locked decisions
+## Final decisions
 
-Move the shared API catalog to ^1.10.0 instead of constraining a transitive oRPC peer. Existing ^1.9.x consumer ranges admit 1.10.0; prove one resolved API in the new lock. Keep all other resolved dependency versions unchanged. Freeze generated-client fixtures against private copies of the committed lock and explicitly select --lock with --frozen. Do not mutate the repository lock from a test. Reuse local file URL source mapping. For missing fixture-only exact specifiers, add legitimate needed resolution to the committed lock with native Deno and review the delta rather than silently resolve at test time.
+- Keep API 1.9.1 and the existing OpenTelemetry SDK stack. Declare instrumentation 0.223.0 in the root catalog and telemetry package dependency map; explicitly import it in the oRPC tracing module so the published graph retains the bounded peer. The already-approved API 1.10 alternative was rejected after native resolution exposed existing SDK peers requiring <1.10 and two API versions. No SDK/oRPC upgrades.
+- Freeze both Prisma generation and test/check execution. The shared test policy uses recorded root/Fresh UI dependency graphs, plus a dedicated published normalizer reference when required. Native Deno adapts consumer metadata and peer IDs; temporary npm overrides and exact JSR mappings keep recorded versions. Every resulting npm/JSR version and integrity and every remote hash must be recorded before frozen execution can begin.
+- Retain first-party file URL mappings. Replace stale provider adapter 7.8 literals with the existing workspace adapter mapping (7.10, matching generated clients).
+- Declare the already-used exact Prisma CLI 7.10.0 as a database test devDependency. Root/Fresh UI lock changes freeze that previously unlocked CLI graph and keep workspace metadata synchronized. Retained package-version integrity hashes are unchanged. Native resolution moves driver-adapter-utils from debug 7.8 to debug 7.10, prunes debug 7.8, and changes client/better-auth peer contexts now that the Prisma CLI and its React peers are present. The complete native CLI closure and script metadata are disclosed in lock-delta.json.
+- Keep all fixture configs inventoried. Database/saga, two streams probes, normalizer, and the crash-replay child use frozen resolution. Existing Flow-B/desktop frozen probes remain unchanged. Synthetic parser/CLI configs and npm tarball consumer installs retain their intended contracts.
 
-## Slices
+## Slices and gates
 
-1. Bootstrap run artifacts and draft PR (this plan; PLAN-EVAL required before source changes).
-2. Update API catalog and necessary lock resolution, add shared frozen fixture policy and negative controls, adopt in all four generated-client config writers; record inventory of other temp-config writers. Files: deno.json, necessary maintained locks, .llm/tools/testing/locked-fixture.ts and tests, database command tests, saga provider fixture and run artifacts. Gates: structured check/test/lint/fmt, native command-postgres script, deps checks, quality:gate, publish:dry-run, JSR audit as applicable.
-3. Evidence handoff: record exact pushed head review, review-thread check, CI snapshot and dated lesson. Keep PR draft. No merge/tag/release.
+1. Bootstrap plan and draft PR (done).
+2. Dependency bound, shared fixture policy, provider source alignment, resolving fixture adoption, normalizer reference, and run evidence. Prove with the structured check/test/lint/fmt wrappers, full native command-postgres script, telemetry tests, clean consumer positive/negative controls, publish:dry-run, architecture/dependency checks and JSR audit. Full quality/doc-lint failures must be compared with baseline, never called green.
+3. Independent review, commit/push, exact pushed-head final review and coordinator handoff. No label/milestone changes; keep draft. Final report via excluded Orchid file handoff. No merge/tag/release.
 
-## Risks and mitigations
+## Risks and scope
 
-- Native lock migration may rewrite peer IDs: inspect versions and integrities; avoid unrelated upgrades.
-- Temp configs differ from workspace metadata: private lock copy can omit workspace metadata, while preserving exact external graph; frozen missing entries must fail closed.
-- Generated Prisma dependencies may not be in lock: verify actual provider gate and populate reviewed fixture dependencies only if needed.
-- Main acceptance cannot be proven before merge: leave it explicitly unproven; coordinator owns merge and post-merge main run.
-- Root quality/publish may expose baseline failures: report accurately and compare with main when needed.
+Consumer peers and JSR ranges can drift even without direct manifest changes; allow only committed package versions/hashes, then execute frozen. Existing test-generated metadata differs from root workspace metadata; delegate normalization to Deno. Type graphs reach Fresh UI and require its existing maintained lock. The generated normalizer intentionally exercises published packages and dotenv 16, so it has an explicit fixture authority and refresh recipe.
 
-## Open decisions
+Acceptance on main is post-merge and cannot be proven by a draft leaf. CI state and global baseline failures are reported truthfully. Local scaffold.runtime is intentionally not run, per owner direction for this test/dependency-only change. No new architecture debt accepted. No unresolved implementation decision remains.
 
-No unresolved architecture decision. Inventory may reveal other external-resolving fixture configs; safe bounded follow-up within this test-only scope. No unrelated dependency upgrades, scaffold output changes, local scaffold.runtime, labels or milestones. No new architecture debt planned.
+## Evaluation provenance
+
+Round 1 FAIL_PLAN and round 2 PASS are preserved verbatim in plan-eval-round-1.md and plan-eval.md. The successful round-2 plan initially chose API 1.10; subsequent dependency evidence selected the brief's other authorized option. All material implementation differences are appended to drift.md and require independent implementation review.
