@@ -189,14 +189,14 @@
       "id": "issue:2268",
       "kind": "issue",
       "issueNumber": 2268,
-      "lane": "docs",
+      "lane": "internals",
       "title": "fix(mcp): performance and status tools return zero samples instead of a binding error when not bound to the live AppHost"
     },
     {
       "id": "issue:2269",
       "kind": "issue",
       "issueNumber": 2269,
-      "lane": "docs",
+      "lane": "internals",
       "title": "docs(mcp): get_doc misses KV, telemetry, workers and streams pages; find_guidance routes read-model intents to unrelated pages"
     },
     {
@@ -423,6 +423,48 @@
       "to": "issue:2390",
       "kind": "requires",
       "reason": "re-check the canary.8 saga stall after compensation ordering is fixed"
+    },
+    {
+      "from": "issue:2161",
+      "to": "issue:2162",
+      "kind": "requires",
+      "reason": "serialize: installed runtime registry generator (scan/exclude rules, then empty sagas registry)"
+    },
+    {
+      "from": "issue:2382",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof qualifies the finished B1 saga fixes"
+    },
+    {
+      "from": "issue:2374",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof qualifies the finished B1 saga fixes"
+    },
+    {
+      "from": "issue:2159",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof qualifies the finished B1 saga fixes"
+    },
+    {
+      "from": "issue:2382",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after all of B1"
+    },
+    {
+      "from": "issue:2374",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after all of B1"
+    },
+    {
+      "from": "issue:2159",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after all of B1"
     }
   ],
   "waves": [
@@ -464,12 +506,11 @@
     },
     {
       "index": 4,
-      "title": "W4 canary.2: saga compensation, discovery, KV-only proof (after #2162/#2149), outbox schema, C1 ordering/restart, E1 logging",
+      "title": "W4 canary.2: saga compensation, discovery, outbox schema, C1 ordering/restart, E1 logging",
       "nodeIds": [
         "issue:2383",
         "issue:2374",
         "issue:2369",
-        "issue:2108",
         "issue:2267",
         "issue:2132",
         "issue:2338",
@@ -496,10 +537,9 @@
     },
     {
       "index": 6,
-      "title": "W6 canary.3: Prisma projection (after #2160), #2390 re-check after B1, F1 scaffold/CLI fixes",
+      "title": "W6 canary.3: Prisma projection (after #2160), F1 scaffold/CLI fixes",
       "nodeIds": [
         "issue:2382",
-        "issue:2390",
         "issue:2406",
         "issue:2409",
         "issue:2379",
@@ -510,7 +550,7 @@
     },
     {
       "index": 7,
-      "title": "W7 canary.3: G1 0.0.8 carry-overs closed with evidence or narrowed",
+      "title": "W7 canary.2/.3: KV-only consumer proof #2108 and #2390 re-check after all of B1; G1 0.0.8 carry-overs",
       "nodeIds": [
         "issue:1667",
         "issue:1668",
@@ -518,7 +558,9 @@
         "issue:1655",
         "issue:1912",
         "issue:2068",
-        "issue:2233"
+        "issue:2233",
+        "issue:2108",
+        "issue:2390"
       ]
     }
   ]

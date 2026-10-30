@@ -21,8 +21,6 @@
         1364,
         1491,
         2155,
-        2268,
-        2269,
         2385
       ]
     },
@@ -39,6 +37,8 @@
         2185,
         2233,
         2259,
+        2268,
+        2269,
         2290,
         2367,
         2373,
@@ -544,8 +544,9 @@
       "commentId": 6534973379,
       "postedAt": "2026-10-30T22:37:28Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "posted",
-      "pr": null
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-30T22:44:34Z"
     },
     {
       "issue": 2165,
@@ -553,8 +554,9 @@
       "commentId": 6534990556,
       "postedAt": "2026-10-30T22:38:40Z",
       "route": "codex gpt-6.1-sol xhigh",
-      "state": "posted",
-      "pr": null
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-30T22:44:31Z"
     },
     {
       "issue": 2187,
@@ -583,5 +585,6 @@
       "state": "posted",
       "pr": null
     }
-  ]
+  ],
+  "coordinatorArtifactPr": 2475
 }

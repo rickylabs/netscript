@@ -194,14 +194,14 @@
       "number": 2268,
       "title": "fix(mcp): performance and status tools return zero samples instead of a binding error when not bound to the live AppHost",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "internals",
       "group": "E2"
     },
     {
       "number": 2269,
       "title": "docs(mcp): get_doc misses KV, telemetry, workers and streams pages; find_guidance routes read-model intents to unrelated pages",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "internals",
       "group": "E2"
     },
     {

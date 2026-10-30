@@ -8,3 +8,10 @@
 - 22:30Z: intake (53 include + #2465 defer), inventory (53 active), DAG (53 nodes, 8 requires edges, 7 waves) and cluster state written; render + validate with live PR export: `{"ok": true, "errors": [], "findings": []}`.
 - 22:35Z: owner via Cockpit: dates approved as deadlines; start dispatching now; post canary readiness the moment a canary is ready.
 - 22:37Z: dispatched #2438 (H01). 22:38Z: dispatched #2165, #2187 (A1, split by file ownership), #2144 (A3), #2396 (D1, adopts #2421–#2423).
+- 22:44Z: #2438 and #2165 started (orchid binding `state=started`, codex gpt-6.1-sol). Dispatch comments are granted without owner action (`approval: bypass`).
+- 22:45Z: PLAN-EVAL round 1 (Codex gpt-6.1-sol high; `receipts/plan-eval-1.md`): **CHANGES**, 4 blockers. (0) The first attempt ran in Codex's read-only sandbox, which cannot start on this host (bwrap namespaces), and inspected nothing (`receipts/plan-eval-0-sandbox-failed.md`). The rerun used no sandbox and read-only-by-prompt instructions; git status was clean afterwards.
+  1. CI skips drafts and e2e-cli needs `e2e-cli-gate`, so "keep draft" deadlocks merge. Fixed: brief template and addenda now say mark ready after a clean IMPL-EVAL, and the coordinator arms `e2e-cli-gate` one PR at a time.
+  2. #2108 and #2390 were not gated on all of B1. Fixed: edges from #2159, #2374 and #2382 to both; both moved to W7.
+  3. #2268 needs `packages/**` changes, which the docs lane forbids. Fixed: #2268 and #2269 moved to internals.
+  4. #2144 retry semantics. Fixed: one initial attempt plus `maxRetries` retries, zero-retry case; DLQ proof conditional on slice 2.
+  Addenda posted on #2438, #2165, #2187, #2144 and #2396 (`briefs/<n>.addendum-1.md`); they are reposted on each leaf PR once it exists, since orchid relays PR comments. Validator green.
