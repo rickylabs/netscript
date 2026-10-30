@@ -1,0 +1,587 @@
+{
+  "schemaVersion": 2,
+  "milestone": "0.0.9",
+  "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
+  "currentMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
+  "coordinator": {
+    "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009d",
+    "trackingIssue": 2474
+  },
+  "limits": {
+    "activeImplementationSlicesPerLane": 2,
+    "activeEvaluatorsPerLane": 1,
+    "globalExpensiveGates": 1,
+    "releaseWriters": 1
+  },
+  "lanes": [
+    {
+      "id": "docs",
+      "orchestratorAgentId": "coord-0.0.9/docs-lane@claude-opus-5-5-xhigh/mc009d",
+      "issueNumbers": [
+        1364,
+        1491,
+        2155,
+        2268,
+        2269,
+        2385
+      ]
+    },
+    {
+      "id": "internals",
+      "orchestratorAgentId": "coord-0.0.9/internals-lane@claude-opus-5-5-xhigh/mc009d",
+      "issueNumbers": [
+        1366,
+        1655,
+        1667,
+        1668,
+        2068,
+        2115,
+        2185,
+        2233,
+        2259,
+        2290,
+        2367,
+        2373,
+        2375,
+        2379,
+        2392,
+        2394,
+        2401,
+        2406,
+        2409,
+        2411,
+        2438
+      ]
+    },
+    {
+      "id": "fixes",
+      "orchestratorAgentId": "coord-0.0.9/fixes-lane@claude-opus-5-5-xhigh/mc009d",
+      "issueNumbers": [
+        1367,
+        2132,
+        2149,
+        2159,
+        2160,
+        2161,
+        2162,
+        2165,
+        2187,
+        2267,
+        2338,
+        2374,
+        2377,
+        2382,
+        2383,
+        2390,
+        2395,
+        2400
+      ]
+    },
+    {
+      "id": "features",
+      "orchestratorAgentId": "coord-0.0.9/features-lane@claude-opus-5-5-xhigh/mc009d",
+      "issueNumbers": [
+        1912,
+        2108,
+        2144,
+        2151,
+        2351,
+        2369,
+        2384,
+        2396
+      ]
+    }
+  ],
+  "watchers": [],
+  "committedIssues": [
+    {
+      "number": 1364,
+      "state": "open"
+    },
+    {
+      "number": 1366,
+      "state": "open"
+    },
+    {
+      "number": 1367,
+      "state": "open"
+    },
+    {
+      "number": 1491,
+      "state": "open"
+    },
+    {
+      "number": 1655,
+      "state": "open"
+    },
+    {
+      "number": 1667,
+      "state": "open"
+    },
+    {
+      "number": 1668,
+      "state": "open"
+    },
+    {
+      "number": 1912,
+      "state": "open"
+    },
+    {
+      "number": 2068,
+      "state": "open"
+    },
+    {
+      "number": 2108,
+      "state": "open"
+    },
+    {
+      "number": 2115,
+      "state": "open"
+    },
+    {
+      "number": 2132,
+      "state": "open"
+    },
+    {
+      "number": 2144,
+      "state": "open"
+    },
+    {
+      "number": 2149,
+      "state": "open"
+    },
+    {
+      "number": 2151,
+      "state": "open"
+    },
+    {
+      "number": 2155,
+      "state": "open"
+    },
+    {
+      "number": 2159,
+      "state": "open"
+    },
+    {
+      "number": 2160,
+      "state": "open"
+    },
+    {
+      "number": 2161,
+      "state": "open"
+    },
+    {
+      "number": 2162,
+      "state": "open"
+    },
+    {
+      "number": 2165,
+      "state": "open"
+    },
+    {
+      "number": 2185,
+      "state": "open"
+    },
+    {
+      "number": 2187,
+      "state": "open"
+    },
+    {
+      "number": 2233,
+      "state": "open"
+    },
+    {
+      "number": 2259,
+      "state": "open"
+    },
+    {
+      "number": 2267,
+      "state": "open"
+    },
+    {
+      "number": 2268,
+      "state": "open"
+    },
+    {
+      "number": 2269,
+      "state": "open"
+    },
+    {
+      "number": 2290,
+      "state": "open"
+    },
+    {
+      "number": 2338,
+      "state": "open"
+    },
+    {
+      "number": 2351,
+      "state": "open"
+    },
+    {
+      "number": 2367,
+      "state": "open"
+    },
+    {
+      "number": 2369,
+      "state": "open"
+    },
+    {
+      "number": 2373,
+      "state": "open"
+    },
+    {
+      "number": 2374,
+      "state": "open"
+    },
+    {
+      "number": 2375,
+      "state": "open"
+    },
+    {
+      "number": 2377,
+      "state": "open"
+    },
+    {
+      "number": 2379,
+      "state": "open"
+    },
+    {
+      "number": 2382,
+      "state": "open"
+    },
+    {
+      "number": 2383,
+      "state": "open"
+    },
+    {
+      "number": 2384,
+      "state": "open"
+    },
+    {
+      "number": 2385,
+      "state": "open"
+    },
+    {
+      "number": 2390,
+      "state": "open"
+    },
+    {
+      "number": 2392,
+      "state": "open"
+    },
+    {
+      "number": 2394,
+      "state": "open"
+    },
+    {
+      "number": 2395,
+      "state": "open"
+    },
+    {
+      "number": 2396,
+      "state": "open"
+    },
+    {
+      "number": 2400,
+      "state": "open"
+    },
+    {
+      "number": 2401,
+      "state": "open"
+    },
+    {
+      "number": 2406,
+      "state": "open"
+    },
+    {
+      "number": 2409,
+      "state": "open"
+    },
+    {
+      "number": 2411,
+      "state": "open"
+    },
+    {
+      "number": 2438,
+      "state": "open"
+    }
+  ],
+  "leaves": [
+    {
+      "id": "D1-2396-u1",
+      "lane": "features",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2421,
+      "headSha": "a197f8a8c3a1f2b2bc07a7444c2c356b22494da6",
+      "issueNumbers": [
+        2396
+      ],
+      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "receiptRefs": [],
+      "note": "Pre-existing U1 draft (build red). Adopted by the #2396 leaf; reconcile or supersede, never duplicate."
+    },
+    {
+      "id": "D1-2396-svc",
+      "lane": "features",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2422,
+      "headSha": "d59531b55863c69edf20f6c93fbefb9b9b124d3c",
+      "issueNumbers": [
+        2396
+      ],
+      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "receiptRefs": [],
+      "note": "Pre-existing service-policy PR (close-gate red). Adopted by the #2396 leaf."
+    },
+    {
+      "id": "D1-2396-hdr",
+      "lane": "features",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2423,
+      "headSha": "ab990e05c7c5763f6eb533dcacd65d2630939ac7",
+      "issueNumbers": [
+        2396
+      ],
+      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "receiptRefs": [],
+      "note": "Pre-existing browser stream headers PR (quality, breaking-migration, close-gate red; conflicting). Adopted by the #2396 leaf."
+    },
+    {
+      "id": "F1-2406-pr2408",
+      "lane": "internals",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2408,
+      "headSha": "6aa14bd70114c675d8f377076ea04a8129984d66",
+      "issueNumbers": [
+        2406
+      ],
+      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "receiptRefs": [],
+      "note": "Fresh UI lane PR (Closes #2406), conflicting with main. Fresh UI lane rebases; F1 does not re-implement."
+    },
+    {
+      "id": "X-pr2424",
+      "lane": "internals",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2424,
+      "headSha": "728c0a52f48cc5e440df273783c2e03134b745b8",
+      "issueNumbers": [],
+      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "receiptRefs": [],
+      "note": "In 0.0.9 with no linked issue (Windows qualification docs; quality red). Owner decision: link an issue or leave 0.0.9."
+    },
+    {
+      "id": "X-pr2433",
+      "lane": "internals",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2433,
+      "headSha": "21cf6d700fd575b3580c9770c38a76ae5305dcf3",
+      "issueNumbers": [],
+      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "receiptRefs": [],
+      "note": "In 0.0.9 with no linked issue (Aspire skill bundle; close-gate red). Owner decision: link an issue or leave 0.0.9."
+    }
+  ],
+  "expensiveGates": [],
+  "canaryCheckpoints": [
+    {
+      "id": "0.0.9-canary.1",
+      "state": "planned",
+      "targetDate": "2026-11-02",
+      "rationale": "H01 main CI green, A1-A3 silent job/queue loss, D1 #2396 guarded plugin services (waves 1-3 critical path)."
+    },
+    {
+      "id": "0.0.9-canary.2",
+      "state": "planned",
+      "targetDate": "2026-11-06",
+      "rationale": "B1 saga retry/compensation/read model on KV, B2 KV-only proof, C1 ordering and restart safety, E1 structured logging, rest of D1."
+    },
+    {
+      "id": "0.0.9-canary.3",
+      "state": "planned",
+      "targetDate": "2026-11-08",
+      "rationale": "E2 MCP/docs truth, F1 scaffold/CLI fixes, G1 carry-overs closed with evidence or moved."
+    },
+    {
+      "id": "0.0.9-canary.4",
+      "state": "planned",
+      "targetDate": "2026-11-11",
+      "rationale": "Freeze + terminal canary: merged candidate incl. DS1 (Fresh UI lane); every 0.0.9 issue closed or moved with reason."
+    }
+  ],
+  "reporting": {
+    "cadenceMinutes": 60,
+    "lastReportAt": "2026-10-30T22:30:00.000Z",
+    "nextReportDueAt": "2026-10-30T23:30:00.000Z",
+    "lastReportRef": "worklog.md#step-0",
+    "headline": "Step 0: 53 issues frozen in 4 lanes / 7 waves at baseline 30c800958; wave 1 (H01 #2438 first) dispatches after the validator passes.",
+    "currentMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
+    "canary": {
+      "target": "0.0.9-canary.1",
+      "state": "planned",
+      "eta": {
+        "window": "2026-11-02 18:00 Europe/Paris",
+        "confidence": "medium",
+        "basis": "Re-based plan dates (day 1 = 2026-10-31); depends on H01 landing first so PR CI can go green."
+      },
+      "criticalPath": [
+        {
+          "id": "#2438",
+          "state": "dispatching",
+          "impact": "command-postgres red on main blocks green PR CI for every leaf",
+          "nextAction": "dispatch H01 leaf now"
+        },
+        {
+          "id": "#2165+#2187",
+          "state": "dispatching",
+          "impact": "scheduled and file-watch events silently dropped (A1)",
+          "nextAction": "dispatch both leaves in wave 1"
+        },
+        {
+          "id": "#2395->#2351",
+          "state": "queued",
+          "impact": "Redis stranded claims never return; concurrency ignored (A2)",
+          "nextAction": "dispatch #2395 in wave 2"
+        },
+        {
+          "id": "#2144,#2400,#2151,#2161",
+          "state": "queued",
+          "impact": "in-process retries, listener restart budget, watch restart, registry excludes (A3)",
+          "nextAction": "#2144 in wave 1, rest in wave 2"
+        },
+        {
+          "id": "#2396",
+          "state": "dispatching",
+          "impact": "EIS Chat cannot adopt guarded plugin services",
+          "nextAction": "adopt PRs #2421-#2423, no duplicate"
+        }
+      ]
+    },
+    "progress": {
+      "mergedPullRequests": [],
+      "closedIssues": [],
+      "newIssues": [],
+      "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
+    },
+    "scope": {
+      "openIssueCount": 53,
+      "ownedIssueCount": 53,
+      "scheduledIssueCount": 53,
+      "unscheduledIssueNumbers": [],
+      "openPullRequestCount": 3
+    },
+    "mergeQueue": [],
+    "orchestratorMatrix": [
+      {
+        "lane": "docs",
+        "state": "queued",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
+        "blocker": null,
+        "nextAction": "Hold E2 until wave 5; no docs builder before the critical path is staffed."
+      },
+      {
+        "lane": "internals",
+        "state": "queued",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
+        "blocker": null,
+        "nextAction": "Dispatch H01 #2438 first (main command-postgres red)."
+      },
+      {
+        "lane": "fixes",
+        "state": "queued",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
+        "blocker": null,
+        "nextAction": "Dispatch A1 leaves #2165 and #2187 in wave 1."
+      },
+      {
+        "lane": "features",
+        "state": "queued",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
+        "blocker": null,
+        "nextAction": "Dispatch #2144; adopt PRs #2421-#2423 for #2396."
+      }
+    ],
+    "blockers": [],
+    "environment": {
+      "checkedAt": "2026-10-30T22:30:00.000Z",
+      "aspireApplications": 0,
+      "dockerContainers": 0,
+      "dockerCustomNetworks": 0
+    },
+    "ownerDecisions": []
+  },
+  "exactMainEvidence": {
+    "gitHead": "30c800958dbf512a4951d640f08748703a8b59e3",
+    "surface": "repository",
+    "expectedGateIds": [],
+    "receipts": []
+  },
+  "existingReleaseLease": false,
+  "releaseWriters": [],
+  "releaseCaptain": {
+    "state": "inactive",
+    "agentId": null,
+    "leaseId": null,
+    "contentSha": null,
+    "evidence": []
+  },
+  "updatedAt": "2026-10-30T22:40:00.000Z",
+  "dispatches": [
+    {
+      "issue": 2438,
+      "lane": "internals",
+      "commentId": 6534973379,
+      "postedAt": "2026-10-30T22:37:28Z",
+      "route": "codex gpt-6.1-sol high",
+      "state": "posted",
+      "pr": null
+    },
+    {
+      "issue": 2165,
+      "lane": "fixes",
+      "commentId": 6534990556,
+      "postedAt": "2026-10-30T22:38:40Z",
+      "route": "codex gpt-6.1-sol xhigh",
+      "state": "posted",
+      "pr": null
+    },
+    {
+      "issue": 2187,
+      "lane": "fixes",
+      "commentId": 6534990846,
+      "postedAt": "2026-10-30T22:38:40Z",
+      "route": "codex gpt-6.1-sol xhigh",
+      "state": "posted",
+      "pr": null
+    },
+    {
+      "issue": 2144,
+      "lane": "features",
+      "commentId": 6534991233,
+      "postedAt": "2026-10-30T22:38:40Z",
+      "route": "codex gpt-6.1-sol xhigh",
+      "state": "posted",
+      "pr": null
+    },
+    {
+      "issue": 2396,
+      "lane": "features",
+      "commentId": 6534991540,
+      "postedAt": "2026-10-30T22:38:40Z",
+      "route": "codex gpt-6.1-sol xhigh",
+      "state": "posted",
+      "pr": null
+    }
+  ]
+}

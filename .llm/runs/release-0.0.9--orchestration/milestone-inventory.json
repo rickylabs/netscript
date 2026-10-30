@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 1,
+  "repo": "rickylabs/netscript",
+  "milestone": "0.0.9",
+  "capturedAt": "2026-10-30T22:30:00.000Z",
+  "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
+  "ownerRatifiedAt": "2026-10-30T22:00:00.000Z",
+  "scopeNote": "Coordinator scope = open 0.0.9 issues minus label epic:design-system (19 issues, Fresh UI lane) and tracking issue #2474.",
+  "targetIssueCount": 53,
+  "issues": [
+    {
+      "number": 1364,
+      "title": "docs(orchestration-runtime): outbound webhook delivery has no recipe or template \u2014 triggers ship inbound ingress only, so every product hand-rolls signing, retry and dead-lettering",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "G1"
+    },
+    {
+      "number": 1366,
+      "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 1367,
+      "title": "fix(streams): STREAMS_DATA_DIR is set by nothing the framework generates, so \"durable streams\" is always in-memory",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "C1"
+    },
+    {
+      "number": 1491,
+      "title": "[command C10] Publish command and relay guides with executable examples",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "E2"
+    },
+    {
+      "number": 1655,
+      "title": "chore(workers): eliminate 20 private-type-ref diagnostics from the published export surface",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 1667,
+      "title": "test(queue): eliminate typed-queue DLQ timing flake",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 1668,
+      "title": "chore(mcp): export-surface corpus is stale on main and no branch can see it",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 1912,
+      "title": "feat(cli): expose non-mutating plugin and Aspire generated-surface parity",
+      "disposition": "active",
+      "lane": "features",
+      "group": "G1"
+    },
+    {
+      "number": 2068,
+      "title": "fresh/ai: createNetScriptChatConnection.send narrows UIMessages to text, blocking adoption of the #1583 single-subscriber fix",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 2108,
+      "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers",
+      "disposition": "active",
+      "lane": "features",
+      "group": "B2"
+    },
+    {
+      "number": 2115,
+      "title": "auth-kv-oauth: parseCookieHeader throws on one undecodable foreign cookie and loses the whole header",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "D1"
+    },
+    {
+      "number": 2132,
+      "title": "kv: RedisKvAdapter.list start is inclusive and pages are not globally ordered (SCAN batches sorted individually), unlike Deno KV",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "C1"
+    },
+    {
+      "number": 2144,
+      "title": "feat(workers): per-handler retry policy with backoff, and a dead-letter queue for jobs",
+      "disposition": "active",
+      "lane": "features",
+      "group": "A3"
+    },
+    {
+      "number": 2149,
+      "title": "fix(auth): the kv-oauth backend should not install the better-auth tables",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B2"
+    },
+    {
+      "number": 2151,
+      "title": "feat(watchers): a native-only strategy without silent polling fallback",
+      "disposition": "active",
+      "lane": "features",
+      "group": "A3"
+    },
+    {
+      "number": 2155,
+      "title": "docs: contradictions found while mapping a production app onto workers, sagas, triggers and streams",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "E2"
+    },
+    {
+      "number": 2159,
+      "title": "fix(sagas): persist the applied key, the transition and its effects atomically, and dispatch effects recoverably",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B1"
+    },
+    {
+      "number": 2160,
+      "title": "fix(sagas): keep business state in the read model and look one instance up directly",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B1"
+    },
+    {
+      "number": 2161,
+      "title": "fix(plugins): triggers/workers registries load every *.ts in triggers/ and workers/jobs/ with no way to exclude a factory module",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "A3"
+    },
+    {
+      "number": 2162,
+      "title": "fix(cli): generate plugins refuses an installed sagas plugin with an empty registry (--no-samples)",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B2"
+    },
+    {
+      "number": 2165,
+      "title": "fix(triggers): scheduled event ids restart at scheduled_1 per process, so runs are dropped as duplicates for 24 h after a restart",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "A1"
+    },
+    {
+      "number": 2185,
+      "title": "ci(e2e): make scaffold.runtime tiers robust to slow container image pulls and Aspire convergence on GitHub runners",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 2187,
+      "title": "fix(triggers): file-watch events dedup by payload hash for 24 h, so a second modify of the same path is dropped",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "A1"
+    },
+    {
+      "number": 2233,
+      "title": "refactor(tooling): make generated carriers deterministic and line-mergeable",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "G1"
+    },
+    {
+      "number": 2259,
+      "title": "security(aspire): aspire describe exposes resolved database connection strings with the real password",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "D1"
+    },
+    {
+      "number": 2267,
+      "title": "fix(kv): MemoryKvAdapter.atomic exposes partial commits between awaited mutations",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "C1"
+    },
+    {
+      "number": 2268,
+      "title": "fix(mcp): performance and status tools return zero samples instead of a binding error when not bound to the live AppHost",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "E2"
+    },
+    {
+      "number": 2269,
+      "title": "docs(mcp): get_doc misses KV, telemetry, workers and streams pages; find_guidance routes read-model intents to unrelated pages",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "E2"
+    },
+    {
+      "number": 2290,
+      "title": "service/auth: an unknown or retired contract procedure answers 403 no-contract-procedure; clients cannot tell a retired version from a permission denial",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "D1"
+    },
+    {
+      "number": 2338,
+      "title": "fix(streams): stable producer IDs acknowledge new documents as duplicates after restart",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "C1"
+    },
+    {
+      "number": 2351,
+      "title": "perf(workers): honor Redis listener concurrency and expose bounded dispatch latency",
+      "disposition": "active",
+      "lane": "features",
+      "group": "A2"
+    },
+    {
+      "number": 2367,
+      "title": "database: refuse duplicate or aliased PostgreSQL connection-string keys before normalization",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "D1"
+    },
+    {
+      "number": 2369,
+      "title": "feat(commands): ship outbox Prisma schema and bounded saga replay/outbox retention",
+      "disposition": "active",
+      "lane": "features",
+      "group": "B2"
+    },
+    {
+      "number": 2373,
+      "title": "test(kv): Redis debounce-abort contract test uses a 150 ms wall-clock budget and flakes under load",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "C1"
+    },
+    {
+      "number": 2374,
+      "title": "fix(sagas): discover explicitly declared self-composing saga modules instead of silently omitting factory exports",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B1"
+    },
+    {
+      "number": 2375,
+      "title": "test(deps): the combined CLI/database suite adds npm:pg@^8.21.0 to the root lock",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F1"
+    },
+    {
+      "number": 2377,
+      "title": "fix(kv): WatchableKvBridge needs an initial state when the wrapped adapter ignores initial",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "C1"
+    },
+    {
+      "number": 2379,
+      "title": "fix(cli): retry transient JSR errors when installing plugins (a 502 fails the install)",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F1"
+    },
+    {
+      "number": 2382,
+      "title": "fix(sagas): the Prisma projection lists compensating, compensated and failed instances as running",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B1"
+    },
+    {
+      "number": 2383,
+      "title": "fix(sagas): a write failure on a non-atomic store can strand an instance in compensating",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "B1"
+    },
+    {
+      "number": 2384,
+      "title": "feat(cli): report skipped and divergent browser-auth files during reconciliation",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F1"
+    },
+    {
+      "number": 2385,
+      "title": "docs(cli): plugin update guide uses rejected package-specifier syntax",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "E2"
+    },
+    {
+      "number": 2390,
+      "title": "investigate(sagas/workers): canary.8 projected atomic saga stalls after background receipt publication failure",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "C1"
+    },
+    {
+      "number": 2392,
+      "title": "workers: lifecycle messages bypass the structured logger and log levels",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "E1"
+    },
+    {
+      "number": 2394,
+      "title": "logging: plugin service entrypoints do not forward requestLevel/responseLevel",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "E1"
+    },
+    {
+      "number": 2395,
+      "title": "queue: Redis adapter has no visibility timeout, stranded processing claims never return",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "A2"
+    },
+    {
+      "number": 2396,
+      "title": "feat(plugins): expose host auth, CORS and listener options for workers/streams startup",
+      "disposition": "active",
+      "lane": "features",
+      "group": "D1"
+    },
+    {
+      "number": 2400,
+      "title": "plugin-workers: listener restart count never resets, so a transient KV outage fails listeners permanently",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "A3"
+    },
+    {
+      "number": 2401,
+      "title": "Aspire 13.5.3: every CLI call leaks two resource watches in the AppHost server, so CLI polling grows it without bound",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "E1"
+    },
+    {
+      "number": 2406,
+      "title": "web: new pages miss the scaffold nav and app-wide theme; agent guidance doesn't cover it (0.0.8)",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F1"
+    },
+    {
+      "number": 2409,
+      "title": "fresh(route): page-binding pass adds a second .withRoute to pages that already bind a route",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F1"
+    },
+    {
+      "number": 2411,
+      "title": "ai: chat client drops a provider's 429/503 status and Retry-After; withRetryingChatClient never retries it",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F1"
+    },
+    {
+      "number": 2438,
+      "title": "deps(telemetry): OpenTelemetry API 1.10 / instrumentation 0.300 breaks command-postgres on main",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "H01"
+    }
+  ]
+}

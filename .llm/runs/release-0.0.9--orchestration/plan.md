@@ -1,0 +1,38 @@
+# Wave plan — 0.0.9
+
+Source of truth for groups, dates and acceptance: `Milestone 0.0.9 Plan 2026-10-30`. This file records the issue-level order the coordinator dispatches; `milestone-dependency-dag.json` is its machine form.
+
+## Lanes (exclusive)
+| Lane | Issues | Rationale |
+| --- | --- | --- |
+| fixes | 2165 2187 2395 2400 2161 2159 2383 2160 2382 2374 2162 2149 2267 2132 2338 1367 2377 2390 | Runtime correctness on default paths (A1, A2, A3 bugs, B1, B2 bugs, C1). |
+| features | 2144 2151 2351 2108 2369 2396 1912 2384 | Feature-shaped deliverables (retry/DLQ, native watch strategy, Redis concurrency, KV-only proof, outbox schema, host policy, CLI parity/reconcile). |
+| internals | 2438 2185 2367 2115 2290 2259 2373 2392 2394 2401 2406 2409 2379 2375 2411 1667 1668 1366 1655 2068 2233 | Deps/CI health (H01), D1 rest, E1, F1, G1, test-only C1 item. |
+| docs | 1364 1491 2155 2268 2269 2385 | E2 and the webhook recipe carry-over. |
+
+## Waves
+| Wave | Issues | Canary | Gate before dispatch |
+| --- | --- | --- | --- |
+| W1 | 2438 2165 2187 2144 2396 | .1 | validator green (done) |
+| W2 | 2395 2400 2151 2161 2185 | .1 | a W1 builder slot frees; launches ≤ 6/h |
+| W3 | 2351 (after 2395) 2159 2162 2149 2367 2115 2290 2259 | .1/.2 | #2395 merged for #2351 |
+| W4 | 2383 (after 2159) 2374 2369 2108 (after 2162+2149) 2267 2132 2338 1367 2377 2373 2392 2394 2401 | .2 | edges merged |
+| W5 | 2160 (after 2383) 2268 2269 2155 2385 1491 1364 | .2/.3 | #2269 needs the embedded-docs decision in its brief |
+| W6 | 2382 (after 2160) 2390 (after 2160+2383) 2406 2409 2379 2375 2411 2384 | .3 | #2406: Fresh UI PR #2408 first |
+| W7 | 1667 1668 1366 1655 1912 2068 2233 | .3 | G1 carry-over comments corrected |
+
+Waves are a priority order, not a barrier: a free builder slot takes the highest-priority dispatchable issue whose `requires` edges are merged. Builder cap 5, lane cap 2 implementing, ≤ 6 launches per hour.
+
+## Canary points (deadlines, 18:00 Europe/Paris)
+| Canary | Deadline | Content |
+| --- | --- | --- |
+| .1 | 2026-11-02 | H01, A1–A3, D1 #2396 |
+| .2 | 2026-11-06 | B1, B2, C1, E1, rest of D1 |
+| .3 | 2026-11-08 | E2, F1, G1 |
+| .4 (freeze, terminal) | 2026-11-11 | merged candidate incl. DS1; every 0.0.9 issue closed or moved |
+| stable | 2026-11-14 | Eric cuts after qualification |
+
+Readiness is posted on #2474 the moment a canary's contents are merged and green; actual membership comes from first-parent merge history. Cut order if late: F1, then E2, then DS1 follow-ups (Eric's call). Never A or B.
+
+## Merge gate (per PR)
+READY on the issue · IMPL-EVAL `VERDICT: MERGE <sha>` from an opposite-family session at the exact head · CI fully green at that head (latest run per check) · review threads answered · issue Acceptance evidenced · diff audit (no new lint ignores / unsafe casts outside `.llm/runs/**`; docs-lane PRs touch no `packages/**`/`plugins/**`). Squash-merge with `--match-head-commit <sha>`. Then close the issue with the evidence comment when every box is met.

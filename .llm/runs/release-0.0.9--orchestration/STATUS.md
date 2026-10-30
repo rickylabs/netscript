@@ -1,0 +1,12 @@
+# STATUS — 0.0.9 (one line per group; reread first after a compact)
+- H01 #2438: dispatched 22:37Z (codex sol high)
+- A1 #2165 #2187: dispatched 22:38Z (parallel, split ownership)
+- A2 #2395 → #2351: W2 / W3
+- A3 #2144 dispatched 22:38Z; #2400 #2151 #2161: W2
+- B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
+- B2 #2162 #2149 → #2108; #2369: W3–W4
+- C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (W6)
+- D1 #2396 dispatched (adopt #2421–#2423); #2367 #2115 #2290 #2259: W3
+- E1 #2392 #2394 #2401: W4 · E2 #2268 #2269 #2155 #2385 #1491: W5
+- F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 · G1: W7
+- Open for Eric: #2465 placement; code-quality red issue; PRs #2424/#2433; failed-canary policy; DS1 stable gate; orchid automerge on netscript?
