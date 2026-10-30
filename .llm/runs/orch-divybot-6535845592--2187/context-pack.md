@@ -1,0 +1,3 @@
+# Context pack
+
+Issue #2187, coordinator #2474, feature-tier leaf on orch/divybot-6535845592 from main 7907293f3dad3aeb557923809ddcd3435adae151. S0 research/design complete; implementation must wait for separate native Claude PLAN-EVAL PASS. Authorized surface in supervisor.md; design/risks/gates in plan.md and worklog.md. Preserve #2165 resolveKey and definition-key precedence. Next: independent PLAN-EVAL, then adapter-key + zero-default-TTL correction and real adapter/disk-KV regressions with negative controls. Final report via excluded atomic file handoff, final review exact pushed head, no merge/tag/release or taxonomy mutation.

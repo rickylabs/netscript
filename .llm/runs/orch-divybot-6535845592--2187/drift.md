@@ -1,0 +1,5 @@
+# Drift
+
+- Environment: RTK absent (same as #2165); use focused raw commands and structured wrappers.
+- Instruction reconciliation: owner-specific controls take precedence for Refs opening, readiness, no labels/milestones, prohibited local scaffold runtime and final READY report. Generic dispatcher also requires a final tracking closure line; preserve it at the end of the PR body without changing the Refs opening.
+- Privacy: public run artifacts use repo-relative paths and role identities only. Raw logs and evaluator session state remain outside Git.
