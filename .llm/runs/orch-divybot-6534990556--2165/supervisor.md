@@ -11,6 +11,7 @@ Coordinator: #2474, milestone 0.0.9, group A1.
 - `packages/plugin-triggers-core/src/stores/` idempotency implementation and tests.
 - `packages/plugin-triggers-core/src/runtime/trigger-processor.ts` and scheduled persistence regression tests.
 - `plugins/triggers/src/runtime/scheduled-idempotency_test.ts` (integration proof only).
+- `packages/plugin-triggers-core/src/testing/memory-trigger-idempotency-store.ts` (fallback parity).
 - `packages/plugin-triggers-core/README.md` for contributor-facing identity semantics.
 - Excluded assignment and final-report handoff files, never committed.
 

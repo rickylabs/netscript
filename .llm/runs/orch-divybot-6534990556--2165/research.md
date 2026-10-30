@@ -14,3 +14,5 @@ NetScript MCP `find_guidance(intent)` followed by `search_docs(query)` consulted
 Archetype 3 runtime/behavior with integration-adapter concerns; no plugin composition redesign. Existing lifecycle, cancellation, atomic claims, retry and DLQ remain in scope for regression gates. Doctrine thesis, layering, runtime/state/failure, archetype gates and JSR audit guidance reviewed.
 
 JSR planned surface audit: exports, imports and configuration remain unchanged; public types already encode event keys and callback. No new package/API dependency, no new slow-type exposure, no permission expansion. Existing package metadata and publish exclusions are retained; doc lint and package audit/dry-run will prove available static bars.
+
+PLAN-EVAL correction: packages/cron/adapters/_shared.ts createJobContext uses one execution start Date for scheduledTime and actualTime. Do not treat it as a nominal slot without canonicalizing to five-field minute resolution. Memory and Deno providers share that helper. Existing doctrine classifies trigger core as Archetype 3, Keep; its old slow-type carve-out is recorded closed.
