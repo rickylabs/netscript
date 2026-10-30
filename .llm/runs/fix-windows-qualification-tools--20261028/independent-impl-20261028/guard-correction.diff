@@ -1,0 +1,128 @@
+diff --git a/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common.ts b/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common-corrected.ts
+index 19d53313e..4ece4fcf5 100644
+--- a/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common.ts
++++ b/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common-corrected.ts
+@@ -61,7 +61,7 @@ export async function environment(): Promise<Record<string,string>> {
+   return await prepareOpenCodeProjectEnvironment(env, { cwd:host, receiptPath:`${directory}/mcp.jsonl` });
+ }
+ export async function credential(): Promise<string> {
+-  const key = Deno.env.get('OPENROUTER_API_KEY') ?? parseCredentialAssignment(
++  const key = parseCredentialAssignment(
+     await Deno.readTextFile('C:/Users/ericc/source/repos/eis-chat/.env'), 'OPENROUTER_API_KEY');
+   if (!key?.trim()) throw new Error('Selected EIS OPENROUTER assignment unavailable.');
+   return key;
+
+diff --git a/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver.ts b/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver-corrected.ts
+index 5596b92b4..f0d554113 100644
+--- a/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver.ts
++++ b/C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver-corrected.ts
+@@ -2,8 +2,10 @@ import { runOpenCode } from '../../tools/agentic/opencode/opencode-run.ts';
+ import { evaluateSubscriptionExpense } from '../../tools/agentic/runtime/subscription-expense.ts';
+ import { captureOwnedCommand } from './owned-capture.ts';
+ import { audit } from './review-audit.ts';
++import { PublicEventCapture } from './public-events-corrected.ts';
++import { OwnedSpawn } from './owned-spawn-corrected.ts';
+ import { allowance, credential, decode, digest, directory, environment, executable, guard, hash, host,
+-  json, model, price, expectedHead, dbHead, steps } from './common.ts';
++  json, model, price, expectedHead, dbHead, steps } from './common-corrected.ts';
+ 
+ const mode = Deno.args[0];
+ if (!['--prepare', '--launch'].includes(mode)) throw new Error('Explicit preparation or authorized launch required.');
+@@ -15,7 +17,7 @@ const key = await credential();
+ const client = Deno.createHttpClient({ proxy:{url:'http://127.0.0.1:3128'} });
+ async function sealGuard() {
+   await guard();
+-  const preparation = JSON.parse(await Deno.readTextFile(`${directory}/preparation.json`));
++  const preparation = JSON.parse(await Deno.readTextFile(`${directory}/preparation-corrected.json`));
+   for (const [path, expected] of Object.entries(preparation.seals)) {
+     if (await hash(path) !== expected) throw new Error(`Packet seal changed: ${path}`);
+   }
+@@ -81,8 +83,8 @@ try {
+       authority.sourceHead !== expectedHead || authority.model !== model || authority.steps !== steps ||
+       authority.dbHead !== dbHead || authority.distinctLeafVerdicts !== 2 ||
+       authority.variant !== 'provider_default' || authority.newSession !== true ||
+-      authority.driverSha256 !== await hash(`${directory}/implementation-driver.ts`) ||
+-      authority.preparationSha256 !== await hash(`${directory}/preparation.json`) ||
++      authority.driverSha256 !== await hash(`${directory}/implementation-driver-corrected.ts`) ||
++      authority.preparationSha256 !== await hash(`${directory}/preparation-corrected.json`) ||
+       authority.estimateUsd !== prepared.estimateUsd || authority.otherOwnedReservationUsd !== 0 ||
+       !Number.isFinite(Date.parse(authority.authorizedAt)) ||
+       Date.now() - Date.parse(authority.authorizedAt) > 15*60000 || Date.parse(authority.authorizedAt) > Date.now()) {
+@@ -105,20 +107,18 @@ try {
+     const cancellations:Promise<void>[]=[];const cleanupFailures:string[]=[];
+     let deadline: ReturnType<typeof setTimeout> | undefined;
+     let escalation: ReturnType<typeof setTimeout> | undefined;
+-    let failure: string | undefined; let pending=''; const streamDecoder=new TextDecoder();
++    let failure: string | undefined;
++    const owner=new OwnedSpawn();
+     function stop(message: string) {
+       failure ??= message;
+       try { owned?.kill('SIGTERM'); } catch { /* Already settled. */ }
+       if(stderrReader&&!stderrDone)cancellations.push(stderrReader.cancel().catch(()=>{cleanupFailures.push('Owned stderr cancellation failed.');}));
+       escalation ??= setTimeout(() => {if(!settled){try{owned?.kill('SIGKILL');}catch{/* Settled. */}}},1000);
+     }
+-    async function publicLine(line: string) {
+-      if(!line.trim())return;
+-      const event=JSON.parse(line);
+-      if(event.type==='reasoning'||event.part?.type==='reasoning')return; // Never persist private reasoning.
+-      const bytes=new TextEncoder().encode(`${line}\n`); written+=bytes.length;
++    const publicCapture=new PublicEventCapture(async(text)=>{
++      const bytes=new TextEncoder().encode(text);written+=bytes.length;
+       let offset=0; while(offset<bytes.length)offset+=await raw.write(bytes.subarray(offset));
+-    }
++    });
+     try {
+       const result=await runOpenCode({message:await Deno.readTextFile(`${directory}/prompt.md`),model,
+         variant:'provider_default',cwd:host,format:'json',workloadTier:'straightforward',
+@@ -133,21 +133,19 @@ try {
+         async writeStdout(bytes){
+           received+=bytes.length;
+           if(received>24*1024*1024){stop('Native stdout streaming bound exceeded.');throw new Error(failure);}
+-          try{pending+=streamDecoder.decode(bytes,{stream:true}); let index:number;
+-            while((index=pending.indexOf('\n'))>=0){await publicLine(pending.slice(0,index));pending=pending.slice(index+1);}
+-          }catch{stop('Owned public framing/write failed.');throw new Error(failure);}
++          try{await publicCapture.add(bytes);}catch{stop('Owned public framing/write failed.');throw new Error(failure);}
+           return bytes.length;
+         },
+         spawn(binary,options){
+           if(binary!==executable)throw new Error('Normative executable mismatch.');
+-          const child=new Deno.Command(binary,{...options,clearEnv:true,stderr:'piped'}).spawn();owned=child;
++          const child=owner.spawn(()=>new Deno.Command(binary,{...options,clearEnv:true,stderr:'piped'}).spawn());owned=child;
+           void child.status.then(()=>{settled=true;stderrDeadline=setTimeout(()=>{if(!stderrDone)stop('Owned stderr drain deadline.');},1000);});
+           const reader=child.stderr.getReader();stderrReader=reader;
+           stderrDrain=(async()=>{try{while(true){const next=await reader.read();if(next.done)break;stderrBytes+=next.value.length;if(stderrBytes>65536){stop('Native stderr streaming bound exceeded.');break;}}}catch{stop('Native stderr pipe failed.');}finally{stderrDone=true;reader.releaseLock();}})();
+           deadline=setTimeout(()=>stop('Native finite wall deadline.'),1200000); return child;
+         }
+       });
+-      pending+=streamDecoder.decode();if(pending.trim())await publicLine(pending);
++      await publicCapture.finish();
+       await stderrDrain;
+       await Promise.all(cancellations);
+       await json('result.json',{code:result.code,failure:result.failure??failure??null,stdoutReceivedBytes:received,
+@@ -157,17 +155,20 @@ try {
+       await audit(env); await sealGuard(); Deno.exitCode=result.code;
+     } finally {
+       if(deadline!==undefined)clearTimeout(deadline);
+-      if(owned&&!settled){stop('Owned run interrupted.');await owned.status;}
+-      await stderrDrain;
+-      await Promise.all(cancellations);
++      if(owned&&!settled)stop('Owned run interrupted.');
++      const settlement=await owner.settle(async()=>{
++        await stderrDrain;await Promise.all(cancellations);
++        if(owned&&!stderrDone)throw new Error('Owned stderr settlement incomplete.');
++      });
+       if(stderrDeadline!==undefined)clearTimeout(stderrDeadline);
+       if(escalation!==undefined)clearTimeout(escalation);
+       try{raw.close();}catch{/* Closed after capture. */}
+-      const failures:string[]=[...cleanupFailures];
++      const failures:string[]=[...cleanupFailures,...settlement.failures];
+       try{await sealGuard();}catch(error){failures.push(String(error));}
+       try{await json('allowance-after.json',await allowance(client,key));}catch(error){failures.push(String(error));}
+-      await json('final-guards.json',{at:new Date().toISOString(),nativeChildStatusAwaited:settled,
+-        stderrPipeAwaited:stderrDrain!==undefined,failures,sourceAcceptance:false});
++      await json('final-guards.json',{at:new Date().toISOString(),nativeChildStatusAwaited:settlement.statusAwaited,
++        ownedSettlement:settlement,stderrPipeAwaited:stderrDone,publicEvents:publicCapture.publicEvents,
++        omittedPrivateUnknownEvents:publicCapture.omittedEvents,failures,sourceAcceptance:false});
+       if(failures.length)Deno.exitCode=2;
+     }
+   }

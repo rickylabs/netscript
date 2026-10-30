@@ -169,7 +169,7 @@ function declarationKind(kind: unknown): 'value' | 'type' | 'class' {
 
 function sourcePath(repositoryRoot: string, filename: string): string {
   const path = filename.startsWith('file:') ? fromFileUrl(filename) : filename;
-  return normalize(relative(repositoryRoot, path));
+  return normalize(relative(repositoryRoot, path)).replaceAll('\\', '/');
 }
 
 function symbolExamples(
@@ -319,7 +319,7 @@ function moduleExampleOwner(file: PublishedSourceFile, repositoryRoot: string): 
   return {
     memberName: file.member.name,
     memberRoot: file.member.root,
-    sourcePath: normalize(relative(repositoryRoot, file.path)),
+    sourcePath: normalize(relative(repositoryRoot, file.path)).replaceAll('\\', '/'),
     kind: 'module',
   };
 }
@@ -350,7 +350,7 @@ export async function analyzeJsdocExamples(
   const blocks: JsdocExampleBlock[] = [];
   const findings: JsdocExampleFinding[] = [];
   const publishedPaths = new Set(
-    files.map((file) => normalize(relative(repositoryRoot, file.path))),
+    files.map((file) => normalize(relative(repositoryRoot, file.path)).replaceAll('\\', '/')),
   );
   for (const file of files) {
     const module = docModule(await getDoc(file.path), file.path);
