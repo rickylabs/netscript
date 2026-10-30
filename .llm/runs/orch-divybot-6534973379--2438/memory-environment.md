@@ -1,0 +1,3 @@
+# Environment / 2026-10-30
+
+Deno 2.9.7 and native PostgreSQL tools are available. RTK is unavailable; use plain commands and structured repo wrappers. NetScript MCP is connected: find_guidance then search_docs were consulted. No external memory connector is exposed; prior committed run memory was read before code inspection. `deps:latest --filter` takes a wildcard glob, not a regular expression. `deps:why` currently reports empty provenance because its Deno subprocess fails; do not interpret that as proof of graph absence. Confirm provenance from the committed lock and native graph inspection.
