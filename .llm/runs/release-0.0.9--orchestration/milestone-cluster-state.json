@@ -387,6 +387,32 @@
       "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
       "receiptRefs": [],
       "note": "In 0.0.9 with no linked issue (Aspire skill bundle; close-gate red). Owner decision: link an issue or leave 0.0.9."
+    },
+    {
+      "id": "H01-2438",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2476,
+      "headSha": "a4cb31810f103ada0d511943f162aadea0b268bb",
+      "issueNumbers": [
+        2438
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2438",
+      "receiptRefs": []
+    },
+    {
+      "id": "A1-2165",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2477,
+      "headSha": "9e7fe99cac746e16423e03aa9203fe04e3014907",
+      "issueNumbers": [
+        2165
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2165",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [],
@@ -536,7 +562,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-30T22:40:00.000Z",
+  "updatedAt": "2026-10-30T22:49:47.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -544,8 +570,8 @@
       "commentId": 6534973379,
       "postedAt": "2026-10-30T22:37:28Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "started",
-      "pr": null,
+      "state": "pr-open",
+      "pr": 2476,
       "startedAt": "2026-10-30T22:44:34Z"
     },
     {
@@ -554,8 +580,8 @@
       "commentId": 6534990556,
       "postedAt": "2026-10-30T22:38:40Z",
       "route": "codex gpt-6.1-sol xhigh",
-      "state": "started",
-      "pr": null,
+      "state": "pr-open",
+      "pr": 2477,
       "startedAt": "2026-10-30T22:44:31Z"
     },
     {

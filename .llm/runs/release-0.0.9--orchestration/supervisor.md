@@ -18,6 +18,8 @@
 ## PLAN-EVAL decision
 Eric ordered dispatch to start immediately (Cockpit relay, 2026-10-30 ~22:35Z) after approving the dates. Wave 1 (#2438, #2165, #2187, #2144, #2396) was dispatched on a green milestone validator, with the opposite-family PLAN-EVAL (Codex gpt-6.1-sol high, read-only) launched in parallel. Its findings apply from wave 2 on; a FAIL on a wave-1 item is re-steered on that leaf's issue. Recorded in `drift.md`.
 
+**Outcome:** round 1 CHANGES (4 blockers, all fixed); round 2 RESOLVED all four and raised 2 new fixable blockers (#2151 proof made conditional on slice 3; #2159 requires a crash-safe atomic commit, not release-on-failure). Both were repaired in flight at round 2, per the feature-tier PLAN-EVAL policy (max 2 roundtrips, repair in flight at round 2), before either brief was posted. Plan treated as **APPROVED with in-flight repair**. Receipts: `receipts/plan-eval-{1,2}.md`.
+
 ## Decisions log
 - 2026-10-30 22:30Z: Step 0 artifacts written at baseline `30c800958`; validator green with live PR reconciliation.
 - 22:37Z: H01 #2438 dispatched first (Cockpit: "start with #2438").

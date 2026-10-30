@@ -15,3 +15,5 @@
   3. #2268 needs `packages/**` changes, which the docs lane forbids. Fixed: #2268 and #2269 moved to internals.
   4. #2144 retry semantics. Fixed: one initial attempt plus `maxRetries` retries, zero-retry case; DLQ proof conditional on slice 2.
   Addenda posted on #2438, #2165, #2187, #2144 and #2396 (`briefs/<n>.addendum-1.md`); they are reposted on each leaf PR once it exists, since orchid relays PR comments. Validator green.
+- 22:48Z: #2438 → PR #2476 (draft), #2165 → PR #2477 (draft); addenda reposted on both PRs; leaves recorded (implementing). Validator green.
+- 22:58Z: PLAN-EVAL round 2 (`receipts/plan-eval-2.md`): round-1 blockers 1–4 RESOLVED. New blockers: #2151 conditional native-only proof, and #2159 crash-safe atomic commit (release-on-failure is not crash-safe). Both repaired in flight in the unposted briefs, plus #2161 doctor/fixture notes and the merge-gate E2E note. Plan APPROVED with in-flight repair (feature-tier policy).
