@@ -12,3 +12,6 @@ PLAN-EVAL round 1 returned FAIL_PLAN. Four plan-only fixes are recorded in plan.
 supervisor.md and drift.md. Round 2 must PASS before product edits. Exact new integration,
 legacy and guide paths are locked; saga/trigger review is read-only. CI label arming belongs
 to the coordinator; production CLI graph proof remains post-publish debt, not a dry-run claim.
+
+PLAN-EVAL round 2: PASS, separate Anthropic session on the owner-requested model.
+Implementation may begin. Next: S1 on original branch fix/native-service-policy.

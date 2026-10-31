@@ -33,3 +33,6 @@ FAIL_PLAN; report preserved verbatim in plan-eval-round-1.md. Corrected the four
 plan gaps, verified workflow push capability without storing credentials, and recorded
 exact added paths before implementation. All three native review-thread gates pass (0 threads).
 Re-steering the same independent evaluator for round 2. No product edits.
+
+PLAN-EVAL round 2: PASS, separate Anthropic session on the owner-requested model.
+Implementation may begin. Next: S1 on original branch fix/native-service-policy.
