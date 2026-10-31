@@ -13,3 +13,5 @@ Independent Claude Opus 5.5 evaluator returned PASS on code correctness after re
 Companion docs PR #2554 remains OPEN. Its pages match web-layer/how-to/theme-your-app and web-layer/how-to/customize-fresh-ui; no docs/carrier source touched here. Assignment requires final PR body line Closes rickylabs/netscript#2552; do not mark status:ready-merge while issue acceptance (including docs) remains unverified.
 
 Never commit .divybot-goal.md. Do not merge or wait for remote CI; owner/orchestrator handles integration.
+
+Combined acceptance audit completed: see acceptance-audit.md. Every docs/site verify, docs links/accuracy/snippets/contract-derivation and agent-docs-prose/MCP export/publish/assets-barrel freshness command passes on companion bb2bd43 + code a0dee5d. Actual compressed docs corpus content/hashes verified. Both PRs still open; do not close goal or issue on combined local evidence alone. Runtime and owner merge remain outstanding. Detached sibling acceptance checkout retained for evidence/resumption.

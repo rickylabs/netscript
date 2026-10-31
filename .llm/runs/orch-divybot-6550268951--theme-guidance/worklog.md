@@ -53,3 +53,9 @@ PR #2555 exists as draft on assigned branch; companion #2554 remains OPEN. Origi
 Independent Claude Opus 5.5/high requested, observed model claude-opus-5-5: **PASS on code correctness**; no blocking changes. Independently repeated 35 tests and scoped fmt, and verified a fresh scaffold. See evaluate.md for advisories and merge limitations. Review observed bootstrap PR/worklog during execution; implementation evidence and final PR checklist are reconciled before sign-off commit.
 
 Final diff review: four product files, scoped harness artifacts only; no imports, exports, dependency pins or generated carriers changed. git diff --check passes. Review thread gate: PASS, 0 threads.
+
+## Combined acceptance audit
+
+Verified exact companion docs head bb2bd43 plus reviewed four-file implementation in isolated detached sibling checkout. Docs build/links/snippets/contract-derivation and all four carrier freshness tasks PASS, including check:assets-barrel. Decoded actual corpus entries and verified hashes and recipe content. See acceptance-audit.md for requirement-by-requirement evidence and command coverage limits. No product changes or source fixes needed.
+
+Reconcile: both PRs OPEN, original issue OPEN/unverified. Merge owner remains Cockpit; full runtime remains unproven. No issue boxes ticked or ready-merge label applied.
