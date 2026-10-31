@@ -35,7 +35,14 @@ import { desktop_1 } from './catalog/desktop/1.ts';
 import { desktop_2 } from './catalog/desktop/2.ts';
 import { docs_kit_1 } from './catalog/docs-kit/1.ts';
 
-/** Shared contracts for shipped components and the six built Figma categories. */
+import { layout_blocks_4 } from './catalog/layout-blocks/4.ts';
+import { ai_4 } from './catalog/ai/4.ts';
+import { ai_5 } from './catalog/ai/5.ts';
+import { docs_kit_2 } from './catalog/docs-kit/2.ts';
+import { docs_kit_3 } from './catalog/docs-kit/3.ts';
+import { docs_kit_4 } from './catalog/docs-kit/4.ts';
+
+/** Shared contracts for shipped components and every completed Figma category. */
 export const componentContracts: ComponentContractCatalog = {
   schemaVersion: 1,
   components: [
@@ -74,5 +81,11 @@ export const componentContracts: ComponentContractCatalog = {
     ...desktop_1,
     ...desktop_2,
     ...docs_kit_1,
+    ...layout_blocks_4,
+    ...ai_4,
+    ...ai_5,
+    ...docs_kit_2,
+    ...docs_kit_3,
+    ...docs_kit_4,
   ],
 };

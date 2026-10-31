@@ -24,8 +24,20 @@ implementation, separate read-only Claude Opus 5.5 high as the owner specifies.
 4. Registry additions use main's manifest; no new installer/schema. Regenerate
    assets barrel after registry edits, including the CLI's embedded assets.
    When #2468 lands, merge origin/main and reconcile generated carriers.
-5. The style test provider supplies actual renders, prop metadata and keyboard
-   scenarios; discover every registered source style. Token-only presets are
+5. Lock the fixture seam before category work in slice 1. Extend
+   ContractStyleProvider with `contracts: readonly ComponentContract[]` and
+   `keyboard: readonly ContractKeyboardFixture[]`; each keyboard fixture has
+   `component`, `scenario`, `keys: readonly string[]`, and `expectation: string`.
+   ContractRenderFixture gains `props: readonly string[]` describing the real
+   caller API exercised. Preserve existing rendering backends. Providers live
+   in tests/contracts/styles.ts (the only source-style registration table),
+   with Utility initially. `registeredContractStyles` is the declared source
+   style ID list, separate from the provider table; each ID must have exactly
+   one complete provider. Registry `kind: style` CSS support items and token
+   presets are explicitly excluded. Browser fixtures consume the same keyboard
+   scenario identifiers, and tests require each shipped interactive contract's
+   operations to have a matching browser assertion. Discover every registered
+   source style from this explicit registration table. Token-only presets are
    not source styles. Reject missing/extra prop, part, value and keyboard
    changes using independent canonical contracts. Mutants exercise each axis.
    No claim of per-style implementations before S4–S6.
@@ -37,22 +49,26 @@ implementation, separate read-only Claude Opus 5.5 high as the owner specifies.
 ## Ordered slices
 
 Each source slice includes worklog/context updates and generated carriers.
+Each category slice (2–7 and9–11) also edits registry.manifest.ts, regenerates
+registry.generated.ts, CLI embedded.generated.ts and publish assets; consumer
+installation is then verified against that slice. Slice8 is reconciliation,
+docs and evidence only, following the same pattern as phase2b.
 Each requires independent read-only review before its signoff commit.
 
 | Slice | Files and scope | Proof |
 | --- | --- | --- |
-| 1 | src/contracts/catalog/{layout-blocks,ai,docs-kit}, catalog.ts, contracts.json, contract tests/README | inventory104, unique IDs, lossless JSON, typed check/lint/fmt |
+| 1 | src/contracts/catalog/{layout-blocks,ai,docs-kit}, catalog.ts, contracts.json, contract tests/README, style-provider.ts and styles.ts registration | inventory104, unique IDs, lossless JSON, typed check/lint/fmt |
 | 2 | Actions registry TSX/CSS and fixtures/tests | real renders, press/arrow keyboard behavior, installed sources |
 | 3 | Forms radio/input-group/OTP/slider sources, CSS, fixtures/tests | native form/keyboard behavior, props and contract renders |
 | 4 | Forms calendar/date-picker sources, CSS, fixtures/tests | date arithmetic, leap/month boundaries, disabled/range and browser keys |
 | 5 | Navigation components, CSS, fixtures/tests | native links/current marker, menu focus/escape and stepper keys |
 | 6 | Overlays sources/runtime composition, CSS, fixtures/tests | focus entry/return, escape, alert dismissal policy and context-menu keys |
 | 7 | Data display gaps, CSS, fixtures/tests; audit existing Feedback/docs gap axes | collapse, carousel arrows/bounds, chart accessible labels and renders |
-| 8 | Registry manifest, generated carriers, public docs, phase2a evidence | complete package/quality/publication/docs/consumer/runtime gates and IMPL-EVAL |
+| 8 | Registry reconciliation, public docs, phase2a evidence | complete package/quality/publication/docs/consumer/runtime gates and IMPL-EVAL |
 | 9 | Layout sources/CSS/registry and fixtures/tests | native scroll, ratio, RTL, resizable arrows and renders |
 | 10 | AI sources/CSS/registry and fixtures/tests | disclosure keys, questionnaire form interactions and renders |
 | 11 | Desktop audit and Docs kit sources/CSS/registry/fixtures | disclosure/link/copy behavior and contract renders |
-| 12 | style-provider/checker/registered-style tests, docs/carriers and final evidence | every source style, missing-style refusal, all four negative mutations, full gates/IMPL-EVAL |
+| 12 | style checker/registered-style tests, docs/carriers and final evidence | every source style, missing-style refusal, all four negative mutations, full gates/IMPL-EVAL |
 
 Split a slice further only to keep the reviewed file surface below thirty;
 category boundaries and complete behavior remain the unit of delivery.
@@ -91,3 +107,30 @@ Any docs-gap component enhancements still required must be implemented in the
 category slice or explicitly listed as incomplete in its PR, not marked done.
 No new architectural debt is accepted. Contributor entry remains
 packages/fresh-ui/src/contracts/README.md.
+
+## Browser and issue decisions locked after PLAN-EVAL
+
+The new component keyboard gate is a dedicated Playwright suite:
+`tools/fresh-ui-browser/gap-tests/*.spec.ts`, `gap-fixture.tsx`,
+`gap.playwright.config.ts` and a local fixture server/bundle under the same
+browser tool. Use native `deno bundle` with the Fresh UI import map to bundle
+real Preact sources; serve only the dedicated test fixture, shut it down after
+the suite. The installed-source check separately runs ui:add for every new
+registry item, validates emitted source/type/lint and demonstrates the fixture
+imports match the installed source bytes after documented import relocation.
+The browser spec contains actual keypress and focus/ARIA/value assertions;
+metadata alone never proves keyboard behavior. No scaffold gallery route
+changes are planned, so its fixed axe targets and baseline remain unchanged.
+Every new standalone fixture must have zero serious/critical axe findings;
+never loosen axe-baseline.json. Screenshot captures are review artifacts,
+compared with handoff renders for anatomy/token treatment. They are labeled
+local Linux captures; a future pixel gate needs baseline and test from the
+same CI-pinned image. No cross-environment pixel identity is claimed.
+
+Neither 2a nor2b closes #2416. The owner explicitly requires Refs only, and
+2b delivers the style-contract harness while real alternate-style sources
+remain S4–S6; the issue's full every-style acceptance cannot be claimed by
+this phase alone. Existing phase1 acceptance proof is retained, not rewritten.
+Cockpit retargets the stacked2b PR to main after merging2a; normal merges only,
+no force push. The canonical final handoff follows the phase-specific operator
+directive (Refs only), not the contradictory generic issue-closing template.
