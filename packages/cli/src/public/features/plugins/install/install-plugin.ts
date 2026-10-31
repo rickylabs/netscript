@@ -57,7 +57,10 @@ import {
   jsrPackageSchemaSearchPath,
 } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
 import { selectPluginDatabaseRequirement } from './plugin-database-requirement.ts';
-import { resolvePluginSchemaFragments } from './plugin-schema-fragments.ts';
+import {
+  requiresPackageSchemaFragments,
+  resolvePluginSchemaFragments,
+} from './plugin-schema-fragments.ts';
 import { installUiRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 
 export interface PluginOwnedScaffoldDependencies {
@@ -205,7 +208,8 @@ export async function installPlugin(
     {
       overwrite: plan.overwrite,
       packageFragments: packageSchemaFragments,
-      schemaDeclared: resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
+      schemaDeclared: requiresPackageSchemaFragments(resolvedPlugin) &&
+        resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
       packageSearchPath: resolvedPlugin.source.kind === 'jsr'
         ? jsrPackageSchemaSearchPath(resolvedPlugin.descriptor)
         : undefined,

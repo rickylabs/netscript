@@ -33,7 +33,10 @@ import {
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
 } from '../../../../public/features/plugins/install/install-plugin.ts';
-import { resolvePluginSchemaFragments } from '../../../../public/features/plugins/install/plugin-schema-fragments.ts';
+import {
+  requiresPackageSchemaFragments,
+  resolvePluginSchemaFragments,
+} from '../../../../public/features/plugins/install/plugin-schema-fragments.ts';
 import { planPluginInstall } from '../../../../public/features/plugins/install/plan-plugin-install.ts';
 import { resolvePluginPackageSpec } from '../../../../public/features/plugins/install/plugin-package-resolver.ts';
 import { renderPluginSupport } from '../../../../public/features/plugins/install/render-plugin.ts';
@@ -172,7 +175,9 @@ export async function installLocalPlugin(
     {
       overwrite: plan.overwrite,
       packageFragments,
-      schemaDeclared: resolvedPlugin?.descriptor.manifest.capabilities.hasDatabaseMigrations,
+      schemaDeclared: resolvedPlugin !== undefined &&
+        requiresPackageSchemaFragments(resolvedPlugin) &&
+        resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
     },
   );
   await dependencies.workspaceMutator.updateAppsettings(

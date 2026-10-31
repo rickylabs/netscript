@@ -1,3 +1,11 @@
+# Resume — SQLite CI regression repair in progress
+
+Coordinator authorized round 4 at ce431da; same Opus session returned exact-head MERGE and evidence is published on PR2519. Review checkbox proven. Direct READY phase comment made the coordinator handoff visible; the coordinator armed e2e-cli-gate. Runtime run 41200678341 fails SQLite database.codegen on raw PostgreSQL-native types copied from ordinary plugin packages. Main run 41197676281 at base15c passes the same SQLite gate/full job. Latest user asks to fix and push. Do not waive runtime or reuse ce431da review at the upcoming source fix SHA.
+
+Fix contract: preserve scaffold-owned SQL selection for ordinary local packages; source-package fallback is for backend-selecting local metadata and integrity-verified JSR packages. Regression adds real local/public SQLite consumers running db:generate. Both fail before the fix and all 55 focused tests pass after. Structured check/lint/fmt cover all four changed sources, quality:gate passes. Evidence is sqlite-repair-evidence.json. Ready for normal commit/push; source acceptance at the resulting SHA remains unproven. Record the final head and arrange the required exact-head same-session delta review. No local full runtime, labels, merge/release, rebase or force-push.
+
+## Historical context
+
 # Resume — CI carrier repair; new-head acceptance required
 
 Latest user CI activity identified quality failure at b798a187636da64e90dff28d42fcac5170527854. The failed job's receipt names mcp-export-corpus freshness; preceding quality gates passed and main15c quality passed. Canonical export/publish generation fixes it. Exactly plugin root, plugin ./protocol and plugin-auth ./scaffold export rows change, plus the MCP fallback prose from the changed llms index. check:mcp-export-corpus, check:assets-barrel, check:publish-assets and whitespace checks pass. No authored implementation or gate changed. Push this asset-refresh commit normally; its new exact head supersedes the pending acceptance request at b798.

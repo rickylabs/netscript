@@ -3189,10 +3189,10 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **ID:** `CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE`
 - **Reason:** Issue #2149 adds backend-dependent SQL selection before install planning. The existing
-  public install module grows from 712 to 754 lines, above the 500-line F-1 warning threshold, and
+  public install module grows from 712 to 758 lines, above the 500-line F-1 warning threshold, and
   its existing over-cap directory grows from 15 to 18 immediate children. The selector, schema
   resolver and colocated regression remain named, focused modules rather than further inlining.
-- **Cost:** Three additional sibling entries and 42 orchestration lines in an already oversized
+- **Cost:** Three additional sibling entries and 46 orchestration lines in an already oversized
   feature; no new runtime process, service abstraction or per-request work.
 - **Why deferred:** Splitting unrelated installer confirmation, metadata persistence and dispatch
   responsibilities would widen the auth persistence fix beyond its consumer acceptance proof.

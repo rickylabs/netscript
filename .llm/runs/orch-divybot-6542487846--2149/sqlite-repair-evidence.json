@@ -1,0 +1,70 @@
+{
+  "change": "preserve scaffold-owned SQL selection for ordinary local plugins; package fallback remains for backend-selecting local metadata and integrity-verified JSR sources",
+  "regressionCI": {
+    "leafJob": "https://github.com/rickylabs/netscript/actions/runs/41200678341/job/124535823006",
+    "failure": "database.codegen: PostgreSQL native types unsupported by SQLite",
+    "mainJob": "https://github.com/rickylabs/netscript/actions/runs/41197676281/job/124527157504",
+    "mainResult": "PASS"
+  },
+  "records": [
+    {
+      "name": "actual SQLite consumer regression before fix",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 2
+      }
+    },
+    {
+      "name": "focused installer/selector/consumer suite after fix",
+      "exitCode": 0,
+      "summary": {
+        "passed": 55,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 55,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "scoped source type-check",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    {
+      "name": "scoped source lint",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      }
+    },
+    {
+      "name": "scoped source format",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 4,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    }
+  ],
+  "qualityGate": {
+    "command": "deno task quality:gate",
+    "exitCode": 0
+  },
+  "fullRuntime": "UNPROVEN at the new source head; CI-only rerun required",
+  "independentAcceptance": "UNPROVEN at new source head; prior round-4 MERGE applies only to ce431da325ca66bb89bab7c64c5073dbfe69ad89"
+}

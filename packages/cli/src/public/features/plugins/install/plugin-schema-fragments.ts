@@ -7,12 +7,19 @@ import {
 } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
 import type { ResolvedPluginBeforePlanning } from './install-plugin.ts';
 
+/** Ordinary local plugins select SQL through their scaffold, not all package files. */
+export function requiresPackageSchemaFragments(plugin: ResolvedPluginBeforePlanning): boolean {
+  return plugin.source.kind === 'jsr' ||
+    plugin.descriptor.manifest.databaseRequirement !== undefined;
+}
+
 /** Read selected source-package schemas, retaining integrity verification for JSR packages. */
 export async function resolvePluginSchemaFragments(
   plugin: ResolvedPluginBeforePlanning,
   fs: FileSystemPort,
   fetcher?: JsrPackageFileFetcher,
 ): Promise<readonly ResolvedPluginSchemaFragment[]> {
+  if (!requiresPackageSchemaFragments(plugin)) return [];
   if (plugin.source.kind === 'jsr') {
     return await fetchJsrPackageSchemaFragments(plugin.descriptor, fetcher);
   }

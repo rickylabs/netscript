@@ -18,3 +18,5 @@
 - Latest direct user instruction explicitly requested rebase/force-push for the new merge conflict. Used a preserved old tip and exact-SHA force-with-lease. Sole conflict was the prose carrier, regenerated canonically; incoming main source/docs retained. New-head independent acceptance remains unproven after exhausting authorized round 3.
 
 - CI quality found stale generated public API metadata after the new installer contract. Expand write surface only to packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts and packages/mcp/src/publish-assets.generated.ts. Canonical generators update exactly the three affected export rows and changed fallback prose. No authored implementation or gate change. Freshness checks pass. New-head acceptance remains unproven pending coordinator authorization.
+
+CI identified overbroad local package SQL fallback: it imported unrelated raw PostgreSQL schemas into the SQLite runtime tier. Restore ordinary local plugin scaffold selection and scope package fallback to backend-selecting local plugins; verified main passes the same runtime gate. The accepted auth contract and runtime gate are unchanged.

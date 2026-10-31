@@ -26,7 +26,7 @@ async function run(
 
 async function withProject(
   probe: (root: string) => Promise<void>,
-  options: { readonly public?: boolean } = {},
+  options: { readonly public?: boolean; readonly db?: 'none' | 'sqlite' } = {},
 ): Promise<void> {
   const scratch = join(REPO, '.llm/tmp', `auth-database-${crypto.randomUUID()}`);
   await Deno.mkdir(scratch, { recursive: true });
@@ -37,7 +37,7 @@ async function withProject(
       '--path',
       scratch,
       '--db',
-      'none',
+      options.db ?? 'none',
       '--app-name',
       'web',
       '--ci',
@@ -153,3 +153,36 @@ Deno.test('better-auth preserves four tables and switching to KV adds no schema 
     await run(['generate', 'runtime-schemas', '--project-root', root]);
   });
 });
+
+for (const publicInstall of [false, true]) {
+  Deno.test(`SQLite consumer preserves ordinary ${publicInstall ? 'public' : 'local'} plugin schema selection`, async () => {
+    await withProject(async (root) => {
+      await run([
+        'plugin',
+        'install',
+        'workers',
+        '--name',
+        'workers',
+        '--project-root',
+        root,
+        '--local-path',
+        join(REPO, 'plugins/workers'),
+      ], { public: publicInstall });
+      // Ordinary local packages keep their scaffold-owned SQL selection. Reading every
+      // database file from their source package injects PostgreSQL types into SQLite.
+      const result = await new Deno.Command(Deno.execPath(), {
+        args: ['task', 'db:generate'],
+        cwd: join(root, 'database/sqlite'),
+        env: { DATABASE_URL: 'file:./sqlite.db', SQLITE_URI: 'file:./sqlite.db' },
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      const output = new TextDecoder().decode(result.stdout) +
+        new TextDecoder().decode(result.stderr);
+      assertEquals(result.code, 0, output);
+      assertFalse(
+        (await prismaFiles(root)).some((path) => path.endsWith('/workers/workers.prisma')),
+      );
+    }, { public: publicInstall, db: 'sqlite' });
+  });
+}
