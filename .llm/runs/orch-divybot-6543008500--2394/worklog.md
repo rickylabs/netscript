@@ -90,3 +90,19 @@ See evaluate-round-1.md. Its code acceptance explicitly does not certify scaffol
 Reconcile before sign-off: no new PR review threads (thread gate PASS0/0), all negative-control
 mutations restored, no lock changes, assignment file excluded. Commit and push this coherent
 source/test/docs/run-evidence slice; final exact pushed-head evaluation follows in same session.
+
+## Postcommit source verification
+
+Source slice54bc1f15550cef4e8bd50da9734e186f974e66fa pushed. Committed-head durable receipts
+all PASS/exit0: assets-barrel, quality-gate, mcp-export-corpus, agent-docs-prose, publish-assets.
+Canonical generators leave the tracked tree clean. Sanitized provenance is in gate-summary.json.
+
+This final evidence checkpoint changes only run records, not implementation, tests or generated
+assets. Exact-head reviewer will compare it to the reviewed source slice. Draft PR phase
+comments carry bootstrap and implementation commit evidence. No review threads unanswered.
+Reconcile: requirement for coordinator-owned scaffold.runtime CI remains explicitly unchecked;
+no merge, tag, release, issue close, label/milestone mutation or local E2E performed.
+
+Next: mark2523 ready so required checks start, then resume the same implementation evaluator
+for final exact pushed-head verdict. Publish that immutable-head verdict in a PR phase comment
+and excluded final report; committing the final verdict itself would move its reviewed head.

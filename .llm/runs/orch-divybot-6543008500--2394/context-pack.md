@@ -1,18 +1,21 @@
-# Resume
+# Resume / coordinator handoff
 
-Issue #2394, E1 under #2474. Draft PR #2523. Baseline includes #2421.
-PLAN-EVAL PASS before implementation. Five service factories plus legacy workers/triggers
-startup now forward optional native requestLevel/responseLevel fields; omitted fields debug.
-No new exported names; workers23/streams22 native facade closure unchanged, doc-lint0 each.
+Issue2394 E1 under2474, PR2523. Source slice54bc1f15550cef4e8bd50da9734e186f974e66fa
+is implemented, independently reviewed PASS, committed and pushed. This evidence checkpoint
+changes run records only. Native request/response levels independently default debug and
+accept info overrides across five API services plus legacy workers/triggers delegation.
+No new exported names, facade inventories23/22; native facade doc-lint0. No lock churn.
 
-Captured HTTP tests7/0/0; existing service regressions20/0/0; all seven forwarding-removal
-negative controls fail on record-level assertions and source is restored. Scoped check/lint/fmt
-pass; quality gate PASS with receipt; JSR audits0 FAIL with inherited warnings. Full doc-lint
-baseline/current counts2/2,3/3,12/12,30/30,27/27 (workers/streams/auth/sagas/triggers).
-Canonical prose and MCP corpus regenerated; assets freshness needs postcommit recheck because
-it compares to HEAD. Independent read-only Claude Opus5.5 high-effort slice review PASS, no blockers; see evaluate-round-1.md.
+All seven logging tests and20 existing service regressions pass; all seven removal controls
+fail as expected, then restore. Scoped check/lint/fmt pass. On committed source head, durable
+quality, assets-barrel, MCP export corpus, agent prose and publish-assets receipts all PASS.
+JSR audits0 FAIL with inherited warnings. Full-package doc-lint findings match baseline exactly
+(workers2,streams3,auth12,sagas30,triggers27), including owning files and entrypoint counts.
 
-Next: commit/push reviewed slice, per-slice PR evidence, recheck freshness, ready PR,
-final exact pushed-head review using same implementation evaluator session. Coordinator owns
-scaffold.runtime CI label/merge/issue closure. Never run local E2E or alter labels/milestones.
-Canonical final READY report is written atomically to excluded .divybot-final-report.md.
+PLAN-EVAL and implementation slice review: separate Claude Opus5.5 high-effort, read-only.
+Final exact pushed-head evaluation follows in the SAME implementation evaluator session after
+PR readiness. Its final verdict belongs on the PR, avoiding an evidence-only commit changing
+the hash being approved. Coordinator-owned scaffold.runtime CI is still REQUIRED/UNPROVEN;
+request e2e-cli-gate in READY. Do not run local E2E, change labels/milestones, merge or release.
+Canonical READY report handoff is excluded .divybot-final-report.md; writing queues publication
+and does not prove GitHub accepted it. Final gate state/verdict must be captured there.

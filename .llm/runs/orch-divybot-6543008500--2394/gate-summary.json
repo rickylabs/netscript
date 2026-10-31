@@ -191,5 +191,52 @@
       "totalResults": 7,
       "uniqueFailures": 0
     }
+  },
+  "committedSourceGates": {
+    "assets-barrel": {
+      "gateId": "assets-barrel",
+      "gitHead": "54bc1f15550cef4e8bd50da9734e186f974e66fa",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3846,
+      "requestHash": "7af65112c964f5d82dbf72ff48156f4f59559bc697b082109f2cb1f92e5cad60"
+    },
+    "quality-gate": {
+      "gateId": "quality-gate",
+      "gitHead": "54bc1f15550cef4e8bd50da9734e186f974e66fa",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 20352,
+      "requestHash": "4b83cbd698234bce6b351c4948bab3dead2c1bbdd5167fc2b2ca6eb204d7cfcf"
+    },
+    "mcp-export-corpus": {
+      "gateId": "mcp-export-corpus",
+      "gitHead": "54bc1f15550cef4e8bd50da9734e186f974e66fa",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14161,
+      "requestHash": "a9588393a02fe4e62ac584b06d82340a973e7b91589fb4408fed8890e81feda9"
+    },
+    "agent-docs-prose": {
+      "gateId": "agent-docs-prose",
+      "gitHead": "54bc1f15550cef4e8bd50da9734e186f974e66fa",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18557,
+      "requestHash": "4e17062558912e169794ba24ba4eda1d606df5e97707f2672b9cf3349a09f1b2"
+    },
+    "publish-assets": {
+      "gateId": "publish-assets",
+      "gitHead": "54bc1f15550cef4e8bd50da9734e186f974e66fa",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 802,
+      "requestHash": "614361915e721896eae84d97157bd49f952443b39cfd2538ec3b977b4f9a6919"
+    }
+  },
+  "reviewThreads": {
+    "outcome": "PASS",
+    "threads": 0,
+    "unanswered": 0
   }
 }
