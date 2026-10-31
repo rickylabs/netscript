@@ -357,7 +357,7 @@
       "id": "issue:2409",
       "kind": "issue",
       "issueNumber": 2409,
-      "lane": "internals",
+      "lane": "fixes",
       "title": "fresh(route): page-binding pass adds a second .withRoute to pages that already bind a route"
     },
     {

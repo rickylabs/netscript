@@ -278,3 +278,6 @@
 - 14:03:10Z: Continuation: the #2384 worker claimed #2268's live-AppHost proof at 14:02Z, after #2384 closed at 13:59Z. Teardown risk; checking its workspace.
 - 14:06:02Z: **merged** #2529 (`da8151643`) for #2269 (E2): the prose carrier now lives in packages/mcp (`@netscript/mcp/docs`); open PRs touching the old carrier path must merge main and regenerate. #2269 close is held while its worker is live. #1366 started 14:04Z.
 - 14:06:29Z: #2379 continuation → PR #2533 (adopted).
+- 14:10:07Z: #1366 → PR #2542.
+- 14:16:06Z: **merged** #2534 (`19a677ece`) for #2390 (C1 investigation; no longer reproduces). The expensive gate is free.
+- 14:16:44Z: dispatched #2409 (F1, moved internals → fixes; drift recorded), comment 6544556745. Validator green.

@@ -362,7 +362,7 @@
       "number": 2409,
       "title": "fresh(route): page-binding pass adds a second .withRoute to pages that already bind a route",
       "disposition": "active",
-      "lane": "internals",
+      "lane": "fixes",
       "group": "F1"
     },
     {

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "da815164373a4cf7c24ea2097573440f34e4f98b",
+  "currentMainSha": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -48,7 +48,6 @@
         2400,
         2401,
         2406,
-        2409,
         2411,
         2438,
         2478
@@ -70,7 +69,8 @@
         2383,
         2390,
         2395,
-        2108
+        2108,
+        2409
       ]
     },
     {
@@ -352,7 +352,10 @@
     },
     {
       "number": 2390,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2534 19a677ece"
+      ]
     },
     {
       "number": 2392,
@@ -1149,7 +1152,7 @@
     {
       "id": "C1-2390",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2534,
       "headSha": "bb876fa44e345c253dc40ebbab746136332fd4d1",
@@ -1158,7 +1161,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2390",
       "receiptRefs": [],
-      "note": "READY: stall no longer reproduces on main; repro tests added; Opus MERGE bb876fa; e2e queued"
+      "note": "READY: stall no longer reproduces; repro tests; Opus MERGE; 27/27 incl both runtime tiers",
+      "mergeCommit": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+      "mergedAt": "2026-10-31T14:16:01Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2390"
     },
     {
       "id": "B2-2108",
@@ -1179,7 +1185,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2537,
-      "headSha": "bcefeaa33ce3d8971ff3dad3dbfb6e7686e21439",
+      "headSha": "71b2241a4fb996ca6dae9d976bc77c8173a7dd28",
       "issueNumbers": [
         1912
       ],
@@ -1245,6 +1251,19 @@
         2379
       ],
       "implementerAgentId": "codex-gpt-6.1-sol (continuation of the #2373 worker)",
+      "receiptRefs": []
+    },
+    {
+      "id": "G1-1366",
+      "lane": "features",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2542,
+      "headSha": "d5a3c5717dbbe595bd34e4ed93939bc0e01d8dc1",
+      "issueNumbers": [
+        1366
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1366",
       "receiptRefs": []
     }
   ],
@@ -1584,11 +1603,13 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2534,
       "headSha": "bb876fa44e345c253dc40ebbab746136332fd4d1",
       "startedAt": "2026-10-31T13:58:58Z",
-      "via": "label e2e-cli-gate"
+      "via": "label e2e-cli-gate",
+      "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
+      "completedAt": "2026-10-31T14:14:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1620,11 +1641,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:06:02Z",
-    "nextReportDueAt": "2026-10-31T15:06:02Z",
+    "lastReportAt": "2026-10-31T14:16:15Z",
+    "nextReportDueAt": "2026-10-31T15:16:15Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2529 (#2269)",
-    "currentMainSha": "da815164373a4cf7c24ea2097573440f34e4f98b",
+    "headline": "merged #2534 (#2390); C1 complete; canary .2 waits on #2108",
+    "currentMainSha": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1810,7 +1831,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:06:29Z",
+  "updatedAt": "2026-10-31T14:16:44Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2239,8 +2260,8 @@
       "commentId": 6544332029,
       "postedAt": "2026-10-31T13:59:25Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "started",
-      "pr": null,
+      "state": "pr-open",
+      "pr": 2542,
       "startedAt": "2026-10-31T14:04:15Z"
     },
     {
@@ -2261,6 +2282,15 @@
       "route": "codex gpt-6.1-sol (continuation chain of the #2373 worker)",
       "state": "blocked-decided",
       "pr": 2539
+    },
+    {
+      "issue": 2409,
+      "lane": "fixes",
+      "commentId": 6544556745,
+      "postedAt": "2026-10-31T14:16:44Z",
+      "route": "codex gpt-6.1-sol medium",
+      "state": "posted",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475,
