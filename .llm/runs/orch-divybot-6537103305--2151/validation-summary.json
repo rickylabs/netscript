@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "scope": "#2151 integrated pre-sign-off validation; final pushed-head attestation is recorded in PR phase comments",
+  "tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 55,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 55,
+      "uniqueFailures": 0
+    }
+  },
+  "source": {
+    "check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 19,
+        "batches": 3,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    }
+  },
+  "durableGates": [
+    {
+      "gateId": "quality-gate",
+      "invocationId": "watch-2151-integrated-quality",
+      "gitHead": "5e53d13441653fbce87be09b6de068c591e41339",
+      "requestHash": "c1ba236f6c7c282b506a07c3dae25790d59c2330f2ed4f14fe992dfe9ec2c880",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 23751
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "invocationId": "watch-2151-integrated-corpus",
+      "gitHead": "5e53d13441653fbce87be09b6de068c591e41339",
+      "requestHash": "6d712a6bb4cfc19530813c8a17174770a57ae6a180b05f944f5cd26d7a2922ed",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 27673
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "invocationId": "watch-2151-integrated-prose",
+      "gitHead": "5e53d13441653fbce87be09b6de068c591e41339",
+      "requestHash": "83d7ad554e575eddd2d1896b2688fde4e52022f1a48242e40180c3954b30319b",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 25698
+    },
+    {
+      "gateId": "publish-assets",
+      "invocationId": "watch-2151-integrated-assets",
+      "gitHead": "5e53d13441653fbce87be09b6de068c591e41339",
+      "requestHash": "b499532ce70f8512f5bc6b7e78b0b9f38a71266084ddcbd7ac6d20248bda45d1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 923
+    }
+  ],
+  "docLint": {
+    "watchers": {
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 0,
+        "totalPrivateTypeRef": 0,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "baseline": 0
+    },
+    "core": {
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 3,
+        "totalPrivateTypeRef": 3,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "baseline": 3
+    },
+    "plugin": {
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 27,
+        "totalPrivateTypeRef": 27,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "baseline": 27
+    }
+  },
+  "negativeControls": [
+    {
+      "name": "s1-negative-retry",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s1-negative-root-loss",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s1-negative-processor-hook",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s1-negative-listener",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s2-negative-runtime-health",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s2-negative-generated-health",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s3-negative-native-selection",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    },
+    {
+      "name": "s3-negative-error-event",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      }
+    }
+  ],
+  "publishDryRun": {
+    "watchers": 0,
+    "triggers-core": 0,
+    "triggers-plugin": 0
+  },
+  "runtimeCI": "Required e2e-cli verdict not yet proven; coordinator enables its gate label. Local full scaffold.runtime prohibited by assignment."
+}

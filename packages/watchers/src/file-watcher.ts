@@ -12,6 +12,8 @@
 import type { WatcherOptions, WatchEvent, WatchFilter, WatchStrategyHandler } from './types.ts';
 import { PollingStrategy } from './strategies/polling.ts';
 import { HybridStrategy } from './strategies/hybrid.ts';
+import { NativeStrategy } from './strategies/native.ts';
+import { WATCH_STRATEGIES } from './types.ts';
 import { GlobFilter } from './filters/glob.ts';
 import { DebounceFilter } from './filters/debounce.ts';
 import { StabilityFilter } from './filters/stability.ts';
@@ -118,25 +120,27 @@ async function resolveAndValidatePaths(paths: readonly string[]): Promise<string
 /**
  * Create the appropriate watch strategy based on options.
  *
- * Selection logic:
- * 1. `forcePolling: true` → {@linkcode PollingStrategy}
- * 2. Any network path detected → {@linkcode PollingStrategy}
- * 3. Otherwise → {@linkcode HybridStrategy} (native with polling fallback)
+ * Explicit strategies bypass automatic selection. With no strategy, forcePolling and
+ * network paths select polling; local paths use native notifications with polling fallback.
  */
 function createStrategy(options: WatcherOptions): WatchStrategyHandler {
-  if (options.forcePolling) {
-    return new PollingStrategy({
+  if (
+    options.strategy !== undefined && !WATCH_STRATEGIES.some((value) => value === options.strategy)
+  ) {
+    throw new TypeError(`Unsupported watch strategy: ${options.strategy}`);
+  }
+  if (options.strategy === 'native') {
+    return new NativeStrategy({
       paths: options.paths,
-      patterns: options.patterns,
       events: options.events,
-      pollIntervalMs: options.pollIntervalMs,
       signal: options.signal,
       onReady: options.onReady,
     });
   }
-
-  const hasNetworkPaths = options.paths.some(isNetworkPath);
-  if (hasNetworkPaths) {
+  if (
+    options.strategy === 'polling' ||
+    (options.strategy === undefined && (options.forcePolling || options.paths.some(isNetworkPath)))
+  ) {
     return new PollingStrategy({
       paths: options.paths,
       patterns: options.patterns,
@@ -192,6 +196,9 @@ function buildFilters(options: WatcherOptions, signal?: AbortSignal): WatchFilte
  * - Local paths → native OS notifications with polling fallback
  * - Network paths → polling
  * - `forcePolling: true` → polling
+ * - `strategy: 'native'` → native notifications, with failures reported and rethrown
+ *
+ * Create a fresh instance for each watch session or recovery attempt; stop is terminal.
  *
  * @example
  * ```ts
@@ -375,6 +382,19 @@ export class FileWatcher {
 
         yield event;
       }
+    } catch (error: unknown) {
+      if (this.abortController.signal.aborted) return;
+      try {
+        await this.options.onError?.(Object.freeze({
+          type: 'error',
+          paths: Object.freeze([...this.options.paths]),
+          error,
+          timestamp: new Date(),
+        }));
+      } catch {
+        // A diagnostic sink must not hide the original watch failure.
+      }
+      throw error;
     } finally {
       this._running = false;
       this.options.signal?.removeEventListener('abort', this.onExternalAbort);

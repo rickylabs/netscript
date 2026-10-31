@@ -17,8 +17,22 @@ export type KnownEventKind = 'create' | 'modify' | 'remove';
 /** File system event kind. New runtime kinds require doctrine review before use. */
 export type EventKind = KnownEventKind | (string & Record<never, never>);
 
+/**
+ * Built-in strategies accepted by the watcher factory.
+ * @example
+ * ```ts
+ * import { WATCH_STRATEGIES } from '@netscript/watchers';
+ * console.log(WATCH_STRATEGIES.includes('native'));
+ * ```
+ */
+export const WATCH_STRATEGIES: readonly ['native', 'polling', 'hybrid'] = [
+  'native',
+  'polling',
+  'hybrid',
+];
+
 /** Built-in watch strategies for detecting file changes. */
-export type KnownWatchStrategy = 'native' | 'polling' | 'hybrid';
+export type KnownWatchStrategy = typeof WATCH_STRATEGIES[number];
 
 /** Watch strategy identifier. Built-in factory values remain runtime validated. */
 export type WatchStrategy = KnownWatchStrategy | (string & Record<never, never>);
@@ -64,6 +78,28 @@ export interface WatchEvent {
   readonly timestamp: Date;
 }
 
+/**
+ * Failure diagnostic emitted separately from file events before the watch iterator rejects.
+ *
+ * @example
+ * ```ts
+ * import type { WatcherErrorEvent } from '@netscript/watchers';
+ * function report(event: WatcherErrorEvent): void {
+ *   console.error(event.type, event.error);
+ * }
+ * ```
+ */
+export interface WatcherErrorEvent {
+  /** Diagnostic kind; never delivered through the file-event filter pipeline. */
+  readonly type: 'error';
+  /** Configured watch roots at the time of failure. */
+  readonly paths: readonly string[];
+  /** Original failure, also propagated by the iterator. */
+  readonly error: unknown;
+  /** Time the failure was observed. */
+  readonly timestamp: Date;
+}
+
 // ============================================================================
 // STABILITY OPTIONS
 // ============================================================================
@@ -105,7 +141,11 @@ export interface WatcherOptions {
   readonly contentHash?: boolean;
   /** Scan existing files on startup and emit them as `create` events. @default false */
   readonly processExisting?: boolean;
-  /** Force polling strategy instead of the native filesystem strategy. @default false */
+  /** Explicit strategy; native reports errors without polling fallback. Overrides forcePolling and network heuristics. */
+  readonly strategy?: WatchStrategy;
+  /** Receive a failure diagnostic before watch() rejects; hook failures cannot replace the original error. */
+  readonly onError?: (event: WatcherErrorEvent) => void | Promise<void>;
+  /** Force polling when strategy is omitted. @default false */
   readonly forcePolling?: boolean;
   /** Polling interval in milliseconds for the polling strategy. Minimum 500. @default 5000 */
   readonly pollIntervalMs?: number;
