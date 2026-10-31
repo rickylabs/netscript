@@ -1,6 +1,6 @@
 {
   "fileKey": "pGRLnkPPRZJZy74evNcQBr",
-  "exportDate": "2026-10-28",
+  "exportDate": "2026-10-31",
   "collections": [
     {
       "collection": "Primitives",
@@ -25,7 +25,7 @@
         "Tactile",
         "Pixel"
       ],
-      "variableCount": 146
+      "variableCount": 340
     },
     {
       "collection": "Base accent",
@@ -48,7 +48,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 399
+      "variableCount": 462
     },
     {
       "collection": "Density",
@@ -60,7 +60,7 @@
         "Airy",
         "Chunky"
       ],
-      "variableCount": 15
+      "variableCount": 19
     },
     {
       "collection": "Base gray",
@@ -85,7 +85,30 @@
         "Atelier",
         "Signal"
       ],
-      "variableCount": 198
+      "variableCount": 214
+    },
+    {
+      "collection": "Theme B",
+      "file": "theme-b.json",
+      "modes": [
+        "Bloom",
+        "Cupertino",
+        "Liquid",
+        "Terminal",
+        "macOS 27",
+        "Apple Classic",
+        "Fluent 2 Web"
+      ],
+      "variableCount": 340
+    },
+    {
+      "collection": "Theme set",
+      "file": "theme-set.json",
+      "modes": [
+        "A",
+        "B"
+      ],
+      "variableCount": 340
     }
   ]
 }
