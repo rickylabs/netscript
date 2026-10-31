@@ -15,6 +15,8 @@ import { abortableDelay } from './backoff.ts';
 const DEFAULT_INITIAL_DELAY_MS = 100;
 const DEFAULT_MAX_DELAY_MS = 5_000;
 const DEFAULT_FACTOR = 2;
+const MAX_TIMER_DELAY_MS = 2 ** 31 - 1;
+const BUSY_HTTP_STATUSES = new Set([429, 503]);
 
 /** Opt-in bounded retry policy for AI provider calls. */
 export interface AiRetryPolicy {
@@ -22,7 +24,7 @@ export interface AiRetryPolicy {
   readonly maxAttempts: number;
   /** Base exponential delay in milliseconds. Defaults to 100. */
   readonly initialDelayMs?: number;
-  /** Maximum delay in milliseconds. Defaults to 5,000. */
+  /** Wait ceiling in milliseconds (default 5,000). A longer Retry-After fails without retrying. */
   readonly maxDelayMs?: number;
   /** Exponential multiplier. Defaults to 2. */
   readonly factor?: number;
@@ -53,6 +55,10 @@ export function withRetryingChatClient(
         let emitted = false;
         try {
           for await (const event of client.stream(request, options)) {
+            if (!emitted && event.type === 'error') {
+              const cause = event.cause ?? new Error(event.message);
+              if (isRateLimit(cause, policy)) throw cause;
+            }
             emitted = true;
             yield event;
           }
@@ -101,18 +107,25 @@ async function retryOrThrow(
   if (!isRateLimit(error, policy)) throw error;
 
   const retryAfterMs = readRetryAfterMs(error);
-  if (attempt >= policy.maxAttempts) {
-    throw new AiRateLimitError('AI provider rate limit retries exhausted.', {
-      cause: error,
-      attempts: attempt,
-      retryAfterMs,
-    });
+  const maxDelayMs = Math.min(policy.maxDelayMs ?? DEFAULT_MAX_DELAY_MS, MAX_TIMER_DELAY_MS);
+  const exceedsWait = retryAfterMs !== undefined && retryAfterMs > maxDelayMs;
+  if (attempt >= policy.maxAttempts || exceedsWait) {
+    throw new AiRateLimitError(
+      exceedsWait
+        ? 'AI provider Retry-After exceeds the retry wait ceiling.'
+        : 'AI provider rate limit retries exhausted.',
+      {
+        cause: error,
+        attempts: attempt,
+        retryAfterMs,
+        status: isRecord(error) && typeof error.status === 'number' ? error.status : undefined,
+      },
+    );
   }
 
-  const maxDelayMs = policy.maxDelayMs ?? DEFAULT_MAX_DELAY_MS;
   const delayMs = retryAfterMs === undefined
     ? jitteredDelay(attempt, policy, maxDelayMs)
-    : Math.min(maxDelayMs, retryAfterMs);
+    : retryAfterMs;
   await (policy.sleep ?? abortableDelay)(delayMs, signal);
 }
 
@@ -127,11 +140,11 @@ function jitteredDelay(attempt: number, policy: AiRetryPolicy, maxDelayMs: numbe
 function isRateLimit(error: unknown, policy: AiRetryPolicy): boolean {
   if (error instanceof AiRateLimitError) return true;
   if (policy.isRateLimitError?.(error)) return true;
-  return isRecord(error) && error.status === 429;
+  return isRecord(error) && typeof error.status === 'number' &&
+    BUSY_HTTP_STATUSES.has(error.status);
 }
 
 function readRetryAfterMs(error: unknown): number | undefined {
-  if (error instanceof AiRateLimitError) return error.retryAfterMs;
   if (!isRecord(error)) return undefined;
   const direct = error.retryAfterMs;
   if (typeof direct === 'number' && Number.isFinite(direct) && direct >= 0) return direct;
