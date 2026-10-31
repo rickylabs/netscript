@@ -264,3 +264,6 @@ publication preflight/docs accuracy111 PASS. Registry doc-order repaired to matc
 native metadata; targeted design/doc-drift gate9/9 PASS. Source/fixture/spec
 check/lint/fmt PASS. No token/dependency/lock changes. Final carriers and push
 complete this slice before Overlays starts.
+
+Slice5 source de67b38 signed off; all four carrier freshness checks PASS after
+clean-source MCP regeneration. No lock churn. Push/comment closes this slice.
