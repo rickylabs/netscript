@@ -7,7 +7,7 @@ export const forms_4: readonly ComponentContract[] = [
     'specId': 'F10',
     'category': 'Forms',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'length': {
         'kind': 'enum',
@@ -23,14 +23,6 @@ export const forms_4: readonly ComponentContract[] = [
           '2',
         ],
       },
-      'content': {
-        'kind': 'enum',
-        'values': [
-          'empty',
-          'value',
-          'caret',
-        ],
-      },
       'state': {
         'kind': 'enum',
         'values': [
@@ -40,26 +32,44 @@ export const forms_4: readonly ComponentContract[] = [
           'invalid',
         ],
       },
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'value': {
+        'kind': 'text',
+      },
+      'defaultValue': {
+        'kind': 'text',
+      },
+      'onValueChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'required': {
+        'kind': 'boolean',
+      },
+      'name': {
+        'kind': 'text',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'group',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'slot',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'separator',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -81,6 +91,9 @@ export const forms_4: readonly ComponentContract[] = [
           'value',
           'caret',
         ],
+        'parts': [
+          'slot',
+        ],
       },
       'data-state': {
         'values': [
@@ -91,12 +104,29 @@ export const forms_4: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'root',
+          'slot',
+        ],
       },
     },
     'booleans': [],
     'slots': [],
     'apg': 'native one-time-code input',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'ArrowLeft/ArrowRight/Home/End',
+        'action': 'Move the native input selection',
+      },
+      {
+        'key': 'Backspace/Delete',
+        'action': 'Edit the native code input',
+      },
+      {
+        'key': 'Paste',
+        'action': 'Replace the native selection with sanitized digits',
+      },
+    ],
     'tokenRoles': [
       'border/input',
       'destructive/default',
@@ -105,7 +135,8 @@ export const forms_4: readonly ComponentContract[] = [
       'text/fg',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.',
+      'One real text input handles selection, autofill and form value; grouped slots are aria-hidden mirrors. content is slot anatomy, not a caller prop. Paste normalizes ASCII digits and preserves native selection replacement.',
     ],
   },
   {
@@ -113,7 +144,7 @@ export const forms_4: readonly ComponentContract[] = [
     'specId': 'F11',
     'category': 'Forms',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'orientation': {
         'kind': 'enum',
@@ -141,37 +172,65 @@ export const forms_4: readonly ComponentContract[] = [
       'value': {
         'kind': 'boolean',
       },
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'labels': {
+        'kind': 'collection',
+      },
+      'name': {
+        'kind': 'text',
+      },
+      'min': {
+        'kind': 'number',
+        'default': 0,
+      },
+      'max': {
+        'kind': 'number',
+        'default': 100,
+      },
+      'step': {
+        'kind': 'number',
+        'default': 1,
+      },
+      'values': {
+        'kind': 'collection',
+      },
+      'defaultValues': {
+        'kind': 'collection',
+      },
+      'onValuesChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'track',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'range',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'thumb',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'value-label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -219,7 +278,9 @@ export const forms_4: readonly ComponentContract[] = [
       'surface/card',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.',
+      'value is the design value-label visibility boolean; numeric positions use values/defaultValues. One/two native range inputs keep shared min/max geometry and clamp crossing requests.',
+      'Coincident upper-half thumbs put the lower native input on top; at the lower half the upper input stays on top, so pointer users can separate endpoint thumbs.',
     ],
   },
   {
