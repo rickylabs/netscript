@@ -59,17 +59,17 @@ function migrateLiterals(source: string, input: string): VariantMigrationResult 
   let content = source;
   const edits: { start: number; end: number; replacement: string }[] = [];
   const diagnostics: string[] = [];
-  let hasSpreadOnlyTag = false;
+  let hasClassSpread = false;
   for (const tag of [...openingTags(source)].reverse()) {
     const text = source.slice(tag.start, tag.end);
     const attributes = readAttributes(text);
     const classes = attributes.find((attribute) =>
       attribute.name === 'class' || attribute.name === 'className'
     );
-    if (!classes) {
-      hasSpreadOnlyTag ||= attributes.some((attribute) => attribute.name === '...');
-      continue;
-    }
+    hasClassSpread ||= attributes.some((attribute) =>
+      attribute.name === '...' && (!classes || attribute.start > classes.start)
+    );
+    if (!classes) continue;
     if (!classes.literal) {
       if (
         hasComponentModifiers(classes.value) ||
@@ -126,11 +126,12 @@ function migrateLiterals(source: string, input: string): VariantMigrationResult 
     content = content.slice(0, edit.start) + edit.replacement + content.slice(edit.end);
   }
   // Reviewed hunks and literal edits consume supported producers. Remaining legacy vocabulary
-  // with a spread-only tag cannot be safely assigned to attributes without evaluating user code.
+  // with a spread that can override the class cannot be safely assigned to attributes
+  // without evaluating user code.
   const tokens = content.match(/[\w-]+/g) ?? [];
   const classContext = tokens.join(' ');
   if (
-    hasSpreadOnlyTag &&
+    hasClassSpread &&
     (hasComponentModifiers(content) || tokens.some((token) => stateRule(token, classContext)))
   ) {
     diagnostics.push(

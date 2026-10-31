@@ -1,0 +1,19 @@
+{
+  "source": {
+    "mode": "selection",
+    "cwd": "."
+  },
+  "command": "deno check --unstable-kv --frozen <files>",
+  "selection": {
+    "filesSelected": 262,
+    "batches": 3,
+    "failedBatches": 0
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueCodes": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

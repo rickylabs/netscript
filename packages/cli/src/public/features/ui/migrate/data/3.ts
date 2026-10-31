@@ -97,7 +97,7 @@ export const variants3: readonly VariantFileMigration[] = [
         'before':
           "  const content = createMarkdownProcessor({ activeCite, onCite }).processSync(source).result;\n\n  return (\n    <div class={className ? `ns-markdown ${className}` : 'ns-markdown'}>\n      {content}\n    </div>\n  );\n",
         'after':
-          '  const content = createMarkdownProcessor({ activeCite, onCite }).processSync(source).result;\n\n  return (\n    <div class={className ? `ns-markdown ${className}` : "ns-markdown"} data-part="root" data-scope=\'prose\'>\n      {content}\n    </div>\n  );\n',
+          "  const content = createMarkdownProcessor({ activeCite, onCite }).processSync(source).result;\n\n  return (\n    <div\n      class={className ? `ns-markdown ${className}` : 'ns-markdown'}\n      data-part='root'\n      data-scope='prose'\n    >\n      {content}\n    </div>\n  );\n",
       },
     ],
   },

@@ -12,6 +12,10 @@
       "exitCode": 0
     },
     {
+      "step": "consumer-install-markdown",
+      "exitCode": 0
+    },
+    {
       "step": "consumer-dry-run",
       "exitCode": 0
     },

@@ -350,12 +350,12 @@ Run the same command without `--dry-run` to apply, then run the app's `deno task
 `--project-root <path>` accepts a workspace or Fresh app; `--app <name>` selects an app in a workspace.
 The migration preserves custom classes, base/element hooks, strings and comments. Customized
 structural edits or detected unsupported dynamic classes stop preflight before any writes and need a
-manual merge. This includes spread-only JSX tags when the file still contains legacy component
-modifiers or state classes: convert the spread's class producer to data attributes first. Indirect
+manual merge. This includes JSX spreads without a later explicit class when the file still contains
+legacy component modifiers or state classes: convert the spread's class producer to data attributes first. Indirect
 class producers imported from other files require manual review; the migration does not evaluate
 JavaScript. CSS state selectors match component classes in either order, including
-`.is-active.ns-citation`. Controlled component overrides require conversion to their public props; layout utility
-aliases remain supported. Use the matching CLI and Fresh UI release together. Dependency copies
+`.is-active.ns-citation`. Controlled component overrides require conversion to their public props;
+layout utility aliases remain supported. Use the matching CLI and Fresh UI release together. Dependency copies
 and registry ownership hashes remain untouched.
 
 ## `deploy` — cloud and container targets
