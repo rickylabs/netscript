@@ -67,11 +67,24 @@ product code, especially the owner’s new additive-extension boundary.
    meta.netscriptStyleExtensions: readonly StyleExtension[]. Absence reads as[]
    for compatibility; style-utility declares an explicit empty array. A
    production registry validation adapter checks this publisher namespace and
-   style type. The pinned upstream schemas already allow metadata; no schema
+   source-style eligibility: registry:style plus meta.components. The field is
+   invalid on CSS support styles, themes and every other item type; add both
+   CSS-support and non-style negative tests. The harness additionally requires
+   that the item appears in the source-style registration table, and validates
+   every registered item through getStyleExtensions, including absence-as-empty.
+   The portable production adapter never imports test registration code.
+   The pinned upstream schemas already allow metadata; no schema
    snapshot or legacy projection exception is needed.
 7. Every entry has exactly component, name, type, default and maps-to. Names
    start x- (camel-case Figma names remain legal); mapped attributes/part names
-   use portable lower-kebab identifiers. Presentational types boolean/string/
+   use portable lower-kebab identifiers. Normalize name by inserting '-' between
+   a lowercase/digit and uppercase letter, and between an uppercase acronym and
+   following Capitalized word, then lowercase ASCII; only x- followed by ASCII
+   letters/digits separated by single hyphens is legal after normalization.
+   maps-to MUST equal data- + normalized name for scalars, slot: + normalized
+   name for slots, or block:<declaring-style-item>/ + normalized name for blocks.
+   Reject mismatched mappings and distinct names normalizing to the same target;
+   duplicate/promotion checks use component plus normalized name. Presentational types boolean/string/
    number map to data-x-* attributes and have matching scalar defaults (finite
    numbers). Structural type slot maps to slot:x-name; type block maps to
    block:<declaring-style-item>/x-name. Structural defaults are null/empty and
@@ -102,7 +115,13 @@ product code, especially the owner’s new additive-extension boundary.
    separate module. Every registered ID must have exactly one complete source
    provider; missing/extra/duplicate providers and wrong registry type fail.
    Canonical base contracts are independent of each provider’s declarations.
-10. Render/base tests iterate every registered provider, not index0. Validate
+10. From slice9a onward, EVERY NEW identity must pass the same strict base
+    render checker before becoming shipped: no unclassified data attributes,
+    and no data-x-* before a valid extension declaration. Introduce the reusable
+    component+part+purpose classification seam in9a; new identities cannot use
+    a permissive fallback. Slice12b extends that same checker/table to all27
+    existing private-binding scopes, with no broad exemption.
+    Render/base tests iterate every registered provider, not index0. Validate
     provider API/part/variant/slot/keyboard declarations against the canonical
     base plus only its registry-declared additions, and actual rendered parts/
     axes against that same authority. Existing private runtime payload/layout
@@ -122,9 +141,14 @@ product code, especially the owner’s new additive-extension boundary.
     Only Utility is registered today; no real S4–S6 style implementation is
     fabricated. Token presets remain a separate axis, and colour certification
     must state the actual tested preset scope.
-12. Extension fixtures run only for their declaring provider. Positive fixture
-    styles cover a declared x attribute and optional slot/block with empty
-    defaults. Negative controls include each original prop/part/variant-value/
+12. Extension fixtures are synthetic UNREGISTERED checker inputs constructed
+    from the real Utility provider plus declarations and declared additions.
+    Pass them directly to registry adapter and base/extension checker; never
+    put them in styles.ts or browser projects. Positive fixtures cover a
+    declared x attribute and optional slot/block with empty defaults, enabled
+    only for their declaring synthetic provider. The real registered Utility
+    path with explicit [] must pass end to end from registry metadata through
+    getStyleExtensions to the checker. Negative controls include each original prop/part/variant-value/
     keyboard mutation, an undeclared addition (including an unregistered x
     attribute), malformed declarations, missing style/provider/browser adapter,
     base mutation disguised as an extension and nonempty structural defaults.
@@ -138,11 +162,15 @@ independent substantive review, source commit, committed-source carrier checks,
 evidence commit, zero public audit, push/PR comment and reconcile note. Target
 fewer than30 source files per commit; split a category into complete units when
 needed. Never start the next implementation slice before its predecessor is
-terminal. Run/context notes accompany every slice.
+terminal. Run/context notes accompany every slice. If9c exceeds the file
+budget, split the completed responsive shell behavior from the StatsGrid/DataTable
+metadata/audit unit. If12b exceeds it, split complete strict-existing-provider
+coverage from complete browser routing/extension regression coverage; each split
+still receives its own gates/review/carriers and must not loosen the invariant.
 
 | Slice | Complete unit and primary source surface | Proof |
 | --- | --- | --- |
-| 9a | ScrollArea/AspectRatio/Direction, typed/JSON catalog, registry/style/collections, real fixtures/tests and docs | native scrolling/ratios/local RTL, child tab behavior, real installed copies, strict axe/Utility captures |
+| 9a | Strict-new-identity render checker/classification seam and ScrollArea/AspectRatio/Direction, typed/JSON catalog, registry/style/collections, real fixtures/tests and docs | native scrolling/ratios/local RTL, child tab behavior, real installed copies, strict axe/Utility captures |
 | 9b | Resizable and its typed API/state constraints, registry and fixtures | pointer/touch capture, both axes/RTL, bounds/Home/End, refusal/resize cleanup, ARIA and child focus |
 | 9c | Single AppShell/Sidebar/TopBar family and StatsGrid/DataTable audit | actual page shell/slots, mobile modal focus/Escape/resize, docs/chat geometry, responsive topbar and archetype mapping, consumer compatibility |
 | 10a | Marker/Trace/Attachment, catalog/registry/fixtures | native disclosure, status/action/controlled refusal, native child controls, all states |
