@@ -47,8 +47,14 @@
   "lockfilesChanged": false,
   "visualDeviation": "Tinted diff/highlight syntax uses text/fg until code syntax contrast pairs are certified on those backgrounds; drift.md records evidence and restoration cost.",
   "independentReview": "PASS after legacy-header correction",
-  "cleanSourceCarriers": "PENDING",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  },
   "finalPhaseGates": "PENDING",
   "phaseReady": false,
-  "legacyHeaderCompatibility": "none/title/tabs SSR plus real browser copy of tabs-without-files fallback"
+  "legacyHeaderCompatibility": "none/title/tabs SSR plus real browser copy of tabs-without-files fallback",
+  "sourceHead": "d9b7d3f041b5de051313f340ca166ee072a43aeb"
 }
