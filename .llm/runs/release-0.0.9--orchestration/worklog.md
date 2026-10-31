@@ -351,3 +351,5 @@
 - 21:26:31Z: #2549 (#2548 residue fix) merged 21:25:51Z → main `f4aa307b5` (Cockpit: independent Opus MERGE; canary dry run exit 0). The gated recut script waits for green push CI at that sha, then dispatches release-canary.
 - 21:40:36Z: **Recut dispatched** (Eric-approved): release-canary.yml target 0.0.9 from main `f4aa307b5` (push CI green), run 41244658746, 21:40:20Z.
 - 22:06:58Z: **0.0.9-canary.1 PUBLISHED** (run 41244658746 success; canary-pair success; pinned e2e-cli-prod 41245117092 success). #2396 published-graph proof passed (consumer deno check exit 0 against the published workers and streams ./service graph); #2396 closed with evidence.
+- 22:16:17Z: #2406 split per Eric (relayed by the design session; reversible, veto window on #2474): closed on #2407's evidence, docs boxes moved to #2552 (epic:design-system, Fresh UI lane). #2408 untouched.
+- 22:17:11Z: Status 7: **all non-design 0.0.9 issues closed or moved**; canary.1 published. Stable gated on DS1 (Fresh UI lane), terminal canary and qualification matrix. Final owner decisions posted (#2465, PRs #2424/#2433, failed-canary policy, DS1 gate, qualification owners).

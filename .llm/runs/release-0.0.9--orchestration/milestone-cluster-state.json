@@ -434,7 +434,10 @@
     },
     {
       "number": 2406,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2407 (boxes 1, 4); boxes 2-3 \u2192 #2552 (design lane)"
+      ]
     },
     {
       "number": 2409,
@@ -1830,10 +1833,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T22:07:20Z",
-    "nextReportDueAt": "2026-10-31T23:07:20Z",
+    "lastReportAt": "2026-10-31T22:17:10Z",
+    "nextReportDueAt": "2026-10-31T23:17:10Z",
     "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
-    "headline": "0.0.9-canary.1 published; left: #2406 decision",
+    "headline": "non-design scope complete; stable gated on DS1, terminal canary, qualification",
     "currentMainSha": "f4aa307b5340bd3de8029c11778a38bbca451ba1",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -2020,7 +2023,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T22:07:38Z",
+  "updatedAt": "2026-10-31T22:17:10Z",
   "dispatches": [
     {
       "issue": 2438,
