@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "02a66ba6dd62b34c69a245e16d3d640b751a28a1",
+  "currentMainSha": "20583c83c1e9af52ab8ac206c328aed67085cab7",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -304,7 +304,10 @@
     },
     {
       "number": 2383,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2512 20583c83c"
+      ]
     },
     {
       "number": 2384,
@@ -387,7 +390,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2421,
-      "headSha": "4771da92972ac90c9cb4188ef9d043c628e1e73c",
+      "headSha": "76bf7ee14921cb86f9c0d7f6363a1f8b88185021",
       "issueNumbers": [
         2396
       ],
@@ -852,21 +855,52 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2392",
       "receiptRefs": [],
-      "note": "READY da298f8; Opus MERGE; e2e REQUIRED (direct @netscript/logger import in plugins/workers; lock files updated); queued behind #2510/#2482"
+      "note": "READY da298f8, carrier refresh 7d7cec2 with Opus MERGE at 7d7cec2; e2e armed at 7d7cec2"
     },
     {
       "id": "B1-2383",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2512,
-      "headSha": "5eece17b6ac3782296495a70b9ed4247351de1ce",
+      "headSha": "fc13a8872dfc87b1b2125877dd8fe9f13610d341",
       "issueNumbers": [
         2383
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2383",
       "receiptRefs": [],
-      "note": "READY 5eece17; Opus MERGE; e2e required; queued after #2482"
+      "note": "READY 5eece17 + steered follow-up fc13a88 (Garnet CI prep root-cause fix); Opus MERGE r5 at fc13a88; 30/30 incl both runtime tiers",
+      "mergeCommit": "20583c83c1e9af52ab8ac206c328aed67085cab7",
+      "mergedAt": "2026-10-31T10:19:36Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2383"
+    },
+    {
+      "id": "E2-1491",
+      "lane": "docs",
+      "phase": "gating",
+      "baseBranch": "main",
+      "prNumber": 2514,
+      "headSha": "267c8a68acc4e12d106cdbb7925b6740266f0ea8",
+      "issueNumbers": [
+        1491
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1491",
+      "receiptRefs": [],
+      "note": "READY 267c8a6; Opus MERGE; docs lane, required CI only"
+    },
+    {
+      "id": "E1-2401",
+      "lane": "internals",
+      "phase": "gating",
+      "baseBranch": "main",
+      "prNumber": 2515,
+      "headSha": "42aa0622366f117221155bae8c05cedd636e207a",
+      "issueNumbers": [
+        2401
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2401",
+      "receiptRefs": [],
+      "note": "READY 42aa062; Opus MERGE; e2e required; upstream microsoft/aspire report ready-to-file in run record (owner files)"
     }
   ],
   "expensiveGates": [
@@ -1052,10 +1086,21 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2512,
-      "headSha": "5eece17b6ac3782296495a70b9ed4247351de1ce",
+      "headSha": "fc13a8872dfc87b1b2125877dd8fe9f13610d341",
       "startedAt": "2026-10-31T09:36:26Z",
+      "via": "label e2e-cli-gate",
+      "note": "superseded 5eece17 (Garnet flake, rerun cancelled by push); now at fc13a88",
+      "result": "SUCCESS at fc13a88 (scaffold-runtime + scaffold-runtime-sqlite) with the Garnet prep fix",
+      "completedAt": "2026-10-31T10:18:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2511,
+      "headSha": "7d7cec2c34dfa14dedbec1088273aa4333b2d872",
+      "startedAt": "2026-10-31T10:20:14Z",
       "via": "label e2e-cli-gate"
     }
   ],
@@ -1087,11 +1132,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T09:36:26Z",
-    "nextReportDueAt": "2026-10-31T10:36:26Z",
+    "lastReportAt": "2026-10-31T10:20:14Z",
+    "nextReportDueAt": "2026-10-31T11:20:14Z",
     "lastReportRef": "worklog.md",
-    "headline": "A3 complete (#2482 merged); canary .1 left: #2421 (#2396 r4)",
-    "currentMainSha": "02a66ba6dd62b34c69a245e16d3d640b751a28a1",
+    "headline": "merged #2512 (#2383, Garnet fix); e2e on #2511; canary .1 left: #2421",
+    "currentMainSha": "20583c83c1e9af52ab8ac206c328aed67085cab7",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1277,7 +1322,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T09:37:35Z",
+  "updatedAt": "2026-10-31T10:21:08Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1532,8 +1577,9 @@
       "commentId": 6541665501,
       "postedAt": "2026-10-31T09:25:11Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "posted",
-      "pr": null
+      "state": "pr-open",
+      "pr": 2514,
+      "startedAt": "2026-10-31T09:45:08Z"
     },
     {
       "issue": 1367,
@@ -1550,6 +1596,16 @@
       "lane": "internals",
       "commentId": 6541778987,
       "postedAt": "2026-10-31T09:37:34Z",
+      "route": "codex gpt-6.1-sol high",
+      "state": "pr-open",
+      "pr": 2515,
+      "startedAt": "2026-10-31T09:47:15Z"
+    },
+    {
+      "issue": 2160,
+      "lane": "fixes",
+      "commentId": 6542166103,
+      "postedAt": "2026-10-31T10:21:08Z",
       "route": "codex gpt-6.1-sol high",
       "state": "posted",
       "pr": null

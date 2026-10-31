@@ -167,3 +167,16 @@
 - 09:36:26Z: **merged** #2482 (`02a66ba6d`) for #2400; #2400 closed with evidence. **A3 complete.** Canary .1 now waits only on #2421 (#2396 r4). **expensive-gate.acquired** on #2512 (#2383) at `5eece17`.
 - 09:36:54Z: #2396 r3 worker is live again: orchid delivered a follow-up goal and it is executing the 09:24Z decision (independent debt re-review PASS at exactly 23/22; gates green; combined suite running before commit). r4 (`briefs/2396.r4.md`) NOT posted; kept as fallback.
 - 09:37:35Z: dispatched #2401 (E1, internals; upstream Aspire leak: NetScript-side follow stream + docs; upstream report drafted for the owner), comment 6541778987. Validator green before posting.
+- 09:46:42Z: #1491 started 09:45Z.
+- 09:48:31Z: #2401 started 09:47Z.
+- 09:50:55Z: #2512 (#2383) e2e Postgres tier FAIL at aspire-start: the same Garnet start-up flake (third time today). Rerun queued for when run 41189386045 completes. Asked Eric on #2474 whether to file a 0.0.9 CI issue (recommended).
+- 09:50:59Z: #1491 → PR #2514.
+- 09:53:03Z: #2401 → PR #2515.
+- 10:00:03Z: #2509 (#2162) new head `d0ae582` with Opus MERGE (fix for the e2e/test reds); waiting for re-READY.
+- 10:04:12Z: #2512 (#2383) worker pushed `fc13a88`: the Garnet flake root cause is that runtime tiers never restored the pinned Garnet dotnet tool; bounded restore added in the shared tier prep (scope extension; accept if the final exact-head eval covers it). e2e running at the new head (label kept). Update posted to Eric. #2421 head moved to `76bf7ee` (r3 progressing).
+- 10:06:26Z: #2512 final Opus round 5 MERGE at `fc13a88` explicitly covers the Garnet prep repair. #2515 (#2401) Opus MERGE at `42aa062`; waiting for READY.
+- 10:08:25Z: #2401 READY at `42aa062` (PR #2515), Opus MERGE; e2e required. No upstream microsoft/aspire issue exists; the leaf left a ready-to-file report in its run record for Eric. e2e queue: #2512 (running) → #2511 → #2515. #2514 (#1491) Opus MERGE at `267c8a6`; waiting for READY.
+- 10:10:28Z: #1491 READY at `267c8a6` (PR #2514), Opus MERGE; docs lane (docs, docs tooling, generated carriers), so required CI only; waiting for CI.
+- 10:19:59Z: **merged** #2512 (`20583c83c`) for #2383 (B1); #2383 closed with evidence. Includes the root-cause fix for the Postgres-tier Garnet flake (CI prep restores the pinned Garnet tool). #2160 is unblocked.
+- 10:20:14Z: **expensive-gate.acquired** on #2511 (#2392) at `7d7cec2`. merge-tree of #2511, #2515, #2514, #2509 against main `20583c8`: clean.
+- 10:21:08Z: dispatched #2160 (B1, fixes; requires #2383 merged), comment 6542166103. Validator green before posting.
