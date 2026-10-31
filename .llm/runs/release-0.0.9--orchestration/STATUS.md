@@ -8,7 +8,7 @@
 - C1 (features lane) #2267 started 06:13Z; #2132 06:22Z; #2338 #1367 #2377; #2373 internals (W4), #2390 (after all B1): W7
 - D1 #2396: #2422 MERGED 727542963, #2423 MERGED 204a71b1e, #2421 (final) awaiting READY at new head 94393bc then e2e; post-canary published-graph proof owed; #2367 MERGED #2485 (closed); #2115 MERGED #2498 (closed); #2290 MERGED #2492 (closed); #2259 BLOCKED (spike: no masking on Aspire 13.5.3) → Eric decision on #2474
 - E1 #2392 #2394 #2401: W4 · E2 #2385 MERGED #2489 (closed); #2155 → PR #2494 (implementing); #1491: W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
-- F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6
+- F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 — CHECK #2406/#2409 vs Fresh UI S6a (#2419 studio-utility default preset) before dispatch; flag Cockpit on conflict
 - G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
 - H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
 - Open for Eric: #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate

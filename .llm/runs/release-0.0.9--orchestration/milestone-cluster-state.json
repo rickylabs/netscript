@@ -369,7 +369,7 @@
     {
       "id": "D1-2396-u1",
       "lane": "features",
-      "phase": "ready",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2421,
       "headSha": "c875e3893458f92a701239ff10461df2c56c2c9f",
@@ -378,7 +378,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "READY at a4dc705 (source MERGE); landing order #2422 -> #2423 -> #2421; e2e pending"
+      "note": "c875e38 faithful per coordinator Opus eval; conflicts with main in 3 non-source files; steered to merge main + regenerate"
     },
     {
       "id": "D1-2396-svc",
@@ -1114,7 +1114,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T06:14:15.000Z",
+  "updatedAt": "2026-10-31T06:17:13.000Z",
   "dispatches": [
     {
       "issue": 2438,
