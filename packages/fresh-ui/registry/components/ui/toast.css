@@ -84,7 +84,7 @@
 :where(.ns-toast)[data-type='error'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-destructive) 18%, transparent);
   background: color-mix(in srgb, var(--ns-destructive) 8%, transparent);
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
 :where(.ns-toast)[data-type='warning'] .ns-toast__symbol {
@@ -125,7 +125,7 @@
 }
 
 :where(.ns-toast)[data-type='error'] .ns-toast__eyebrow {
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
 :where(.ns-toast)[data-type='warning'] .ns-toast__eyebrow {

@@ -1,3 +1,9 @@
+import { DenoKvAdapter } from '@netscript/kv';
+import { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from '@netscript/plugin-sagas-core/stores';
+import { SagaRuntimeSupervisor } from 'REPO_URLplugins/sagas/src/runtime/saga-supervisor.ts';
+import type { SagaState } from '@netscript/plugin-sagas-core/domain';
+import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import { stderrTail } from 'REPO_URLpackages/plugin-sagas-core/tests/fixtures/transition-store/provider-process.ts';
 import { PrismaClient, type Prisma } from './.generated/client.ts';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
@@ -6,12 +12,14 @@ import { defineSaga } from '@netscript/plugin-sagas-core';
 import { workerJobEffect } from '@netscript/plugin-sagas-core/integration/workers';
 import { defineJob } from '@netscript/plugin-workers-core';
 import { z } from 'zod';
-import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
+import { isPrismaSagaStoreClient, type PrismaSagaStoreClient, PrismaSagaStore, createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
 import type { PostgresCommandClient, TransactionClientPort } from '@netscript/database/commands/postgres';
 import { assertAtomicTransitionConformance, transitionRequest } from 'REPO_URLpackages/plugin-sagas-core/tests/transition-conformance.ts';
 
 type Tx = Omit<Prisma.TransactionClient, '$transaction'|'$connect'|'$disconnect'|'$on'|'$use'|'$extends'>;
 const root = new PrismaClient({ adapter: new PrismaPg({ host: Deno.env.get('COMMAND_POSTGRES_SOCKET'), database: 'postgres', user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }) });
+if (!isPrismaSagaStoreClient(root)) throw new Error('Generated client lacks required saga delegates');
+const ordinaryClient: PrismaSagaStoreClient = root;
 let callbacks = 0;
 let faultAfter: string | undefined;
 let controller: AbortController | undefined;
@@ -43,6 +51,7 @@ const bridge: PostgresCommandClient & TransactionClientPort<Tx> = {
   },
 };
 const store = createPrismaSagaTransitionStore(bridge, { transactionTimeoutMs: 5000 });
+if (Deno.args[0] === 'atomic-child') { await atomicChild(); Deno.exit(0); }
 const tables = ['saga_runtime_command_applied_key','netscript_command_outbox','saga_runtime_transition','saga_runtime_correlation','saga_runtime_state'] as const;
 async function reset() {
   for (const table of tables) await root.$executeRawUnsafe(`DELETE FROM ${table}`);
@@ -172,4 +181,127 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
       await nextRuntime.dispose();
     }
   } finally { await root.$disconnect(); }
+});
+
+// The real generated client exercises both production PostgreSQL adapters at the process boundary.
+async function atomicChild(): Promise<void> {
+  const [, adapter, folder, phase] = Deno.args;
+  Deno.env.set('NETSCRIPT_SAGA_KV_PATH', folder + '/supervisor.db');
+  const kv = new DenoKvAdapter(await Deno.openKv(folder + '/markers.db'));
+  const canonical = adapter === 'ordinary' ? new PrismaSagaStore({ prisma: ordinaryClient })
+    : store;
+  const definition = defineSaga('postgres-crash').state<SagaState>({ count: 0 }).on('start' as string, saga => {
+    Deno.writeTextFileSync(folder + '/calls.txt', 'handled\n', { append: true });
+    saga.state = { count: Number(saga.state.count) + 1 };
+    return [];
+  }).build();
+  const wrapped = new Proxy(canonical, { get(target, key) {
+    const member = Reflect.get(target, key);
+    if (phase === 'crash' && (key === 'commitTransition' || key === 'save')) return async () => {
+      await Deno.stdout.write(new TextEncoder().encode('PAUSED_AFTER_HANDLER\n'));
+      await new Promise(() => setInterval(() => undefined, 60_000));
+    };
+    return typeof member === 'function' ? member.bind(target) : member;
+  } });
+  const ready = Promise.withResolvers<SagaRuntime>();
+  const waiting = Promise.withResolvers<void>();
+  const supervisor = new SagaRuntimeSupervisor({
+    definitions: [definition],
+    runtimeOptions: { native: { store: wrapped, idempotency: new KvSagaIdempotencyStore({ kv }), engineOptions: { appliedKeys: new KvSagaAppliedKeyStore({ kv }) } } },
+    delivery: {
+      start(runtime) { ready.resolve(runtime); return Promise.resolve(); },
+      stop() { waiting.resolve(); return Promise.resolve(); },
+      wait() { return waiting.promise; },
+    },
+  });
+  try {
+    await supervisor.start();
+    const runtime = await ready.promise;
+    const message = { type: 'start', payload: {}, correlationKey: transitionRequest().correlation.correlationKey, idempotencyKey: 'postgres-message' };
+    await runtime.publish(message);
+    await runtime.publish(message);
+    const instanceId = 'postgres-crash:one' as Parameters<typeof canonical.load>[0];
+    assertEquals((await canonical.load(instanceId))?.state, { count: 1 });
+    assertEquals((await canonical.transitions(instanceId)).length, 1);
+    assertEquals((await canonical.load(instanceId))?.metadata.version, 1);
+  } finally {
+    await supervisor.stop();
+    await kv.close();
+    await root.$disconnect();
+  }
+}
+
+for (const adapter of ['ordinary', 'command']) {
+  Deno.test(`PostgreSQL ${adapter} production supervisor SIGKILL after handler retries and commits once`, async () => {
+    const folder = await Deno.makeTempDir();
+    const args = (phase: string) => ['run', '--frozen', '--unstable-kv', '--config', new URL('./deno.json', import.meta.url).pathname, '-A', new URL(import.meta.url).pathname, 'atomic-child', adapter, folder, phase];
+    try {
+      await reset();
+      const child = new Deno.Command(Deno.execPath(), { args: args('crash'), stdin: 'null', stdout: 'piped', stderr: 'piped' }).spawn();
+      const errors = stderrTail(child.stderr);
+      const reader = child.stdout.pipeThrough(new TextDecoderStream()).getReader();
+      let output = '';
+      const deadline = setTimeout(() => { try { child.kill('SIGKILL'); } catch {} }, 30_000);
+      try {
+        while (!output.includes('PAUSED_AFTER_HANDLER')) {
+          const part = await reader.read();
+          if (part.done) throw new Error('Child exited before commit pause: ' + await errors);
+          output += part.value;
+        }
+        child.kill('SIGKILL');
+        assertEquals((await child.status).signal, 'SIGKILL');
+      } finally {
+        clearTimeout(deadline);
+        try { child.kill('SIGKILL'); } catch {}
+        await child.status;
+        await reader.cancel(); reader.releaseLock(); await errors;
+      }
+      assertEquals(await counts(), [0,0,0,0,0]);
+      const resumed = await new Deno.Command(Deno.execPath(), { args: args('resume'), stdin: 'null', stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(30_000) }).output();
+      assertEquals(resumed.code, 0, new TextDecoder().decode(resumed.stderr));
+      assertEquals(await counts(), [1,0,1,1,1]);
+      assertEquals((await Deno.readTextFile(folder + '/calls.txt')).trim().split('\n').length, 2);
+    } finally {
+      await Deno.remove(folder, { recursive: true });
+      await reset();
+      await root.$disconnect();
+    }
+  });
+}
+
+Deno.test('ordinary PostgreSQL marker, state, correlation and history roll back together at every write', async () => {
+  try {
+    for (const step of ['marker', 'state', 'correlation', 'history']) {
+      await reset();
+      const fault = new AbortController();
+      const client = new Proxy(ordinaryClient, { get(target,key) {
+        if (key === '$transaction') return <T>(work: (tx: import('@netscript/plugin-sagas-core/stores').PrismaSagaStoreTransaction) => Promise<T>) => target.$transaction(async tx => {
+          const observed = new Proxy(tx, { get(native, field) {
+            const delegate = Reflect.get(native, field);
+            const seam = ({ sagaRuntimeCommandAppliedKey: ['createMany','marker'], sagaRuntimeState: ['create','state'], sagaRuntimeCorrelation: ['upsert','correlation'], sagaRuntimeTransition: ['create','history'] } as Record<string, string[]>)[String(field)];
+            if (!seam) return typeof delegate === 'function' ? delegate.bind(native) : delegate;
+            return new Proxy(delegate, { get(owner, method) {
+              const operation = Reflect.get(owner, method);
+              if (method === seam[0]) return async (...args: unknown[]) => {
+                const value = await Reflect.apply(operation, owner, args);
+                if (step === seam[1]) fault.abort(new Error('actual write fault'));
+                return value;
+              };
+              return typeof operation === 'function' ? operation.bind(owner) : operation;
+            } });
+          } });
+          return await work(observed);
+        });
+        const member = Reflect.get(target,key);
+        return typeof member === 'function' ? member.bind(target) : member;
+      } });
+      const ordinary = new PrismaSagaStore({ prisma: client });
+      const request = { ...transitionRequest(), commands: [] };
+      await assertRejects(() => ordinary.commitTransition(request, fault.signal), Error, 'actual write fault');
+      assertEquals(await counts(), [0,0,0,0,0]);
+      assertEquals(await ordinary.commitTransition(request), { committed: true });
+      assertEquals(await ordinary.commitTransition(request), { committed: false });
+      assertEquals(await counts(), [1,0,1,1,1]);
+    }
+  } finally { await reset(); await root.$disconnect(); }
 });

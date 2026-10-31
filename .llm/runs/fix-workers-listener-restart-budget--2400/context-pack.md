@@ -48,3 +48,20 @@ regenerated prose completed before merge signoff. Supervisor signs off merge com
 No runtime source changes beyond the already-reviewed listener implementation.
 Final pushed SHA, committed-HEAD corpus test and CI snapshot will be in PR comments
 and assignment report; no subsequent commit is intended.
+
+## R3 continuation (2026-10-31)
+
+Integrated main f683946 into reviewed dfa2502be, pending signoff/commit. Only prose
+carrier conflicted; canonical prose/publish/export generation resolves it, with
+combined tuning page preserving both upstream scheduler guidance and restart budget.
+Worker source/tests unchanged from prior approval, protected files/locks match main.
+R3 independent plan PASS. All local gates PASS: listener21/0/0 with real stores,
+workers check136, lint/fmt8, quality/docs/all3 freshness; bundle3+MCP consumer8 tests.
+Review threads1answered/0unanswered. See r3-gate-summary.json and r3-plan-eval.md.
+Next: independent slice review, commit/push, committed export regression, final
+exact-head IMPL-EVAL, PR verdict and READY report publication file. Leave final
+review/CI on PR so no evidence-only commit invalidates exact reviewed head.
+
+R3 independent precommit signoff PASS in r3-evaluate.md. Supervisor signs off merge
+commit and pushes existing branch. Final exact-head evaluator and committed corpus
+regression results belong on the PR and assignment report; no later commit intended.

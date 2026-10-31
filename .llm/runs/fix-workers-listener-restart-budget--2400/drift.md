@@ -36,3 +36,13 @@ as running; default60s reset exceeds default30s drain. Shared crash-loop health
 remains independent. Advisory accepted as an existing composition interaction;
 no new failure/health protocol in this integration slice. Upstream now removes
 Redis abort callbacks in finally, superseding the earlier deferred risk.
+
+## R3 merge continuation
+
+No implementation/design drift or new architectural debt. Dispatcher checkout had
+narrow refs, shallow history and no local committer identity; explicit destination
+fetch, deeper history, no-track branch adoption and existing authenticated owner's
+public noreply identity enabled normal merge. RTK absent; wrappers used directly.
+First private Redis launch lacked its extracted libraries; no test executed then.
+Child-only library path repaired it; final21 listener tests all execute and pass,
+and the run-owned process was stopped. No shared resource mutation.

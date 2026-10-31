@@ -129,7 +129,7 @@ normalizes engine-specific connection strings to a URL in `database/postgres/pri
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. The AppHost injects the allocated local collector endpoint (http/protobuf)." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
   { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
-  { name: "WORKERS_CONCURRENCY", type: "number", desc: "Workers runtime process pool size (default 2)." },
+  { name: "WORKERS_CONCURRENCY", type: "number", desc: "Concurrent in-process job executions per queue consumer. Aspire injects 2; a bare runtime defaults to 1. This does not create processes or schedulers." },
   { name: "SAGA_CONCURRENCY", type: "number", desc: "Sagas background processor concurrency (default 2)." },
   { name: "TRIGGER_CONCURRENCY", type: "number", desc: "Triggers background processor concurrency (default 10)." }
 ] }) }}

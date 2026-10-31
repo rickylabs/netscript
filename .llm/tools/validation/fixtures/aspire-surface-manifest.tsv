@@ -224,6 +224,7 @@ docs/site/tutorials/chat/04-tool-call.md	doc:public-page	S11	prose sweep + #1000
 docs/site/tutorials/chat/05-mcp.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/tutorials/chat/06-live-streaming.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/tutorials/chat/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/tutorials/eis-chat/03-deliver-worker.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/tutorials/erp-sync/01-scaffold.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/tutorials/erp-sync/02-import-job.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/tutorials/erp-sync/03-polyglot-transform.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -909,6 +910,7 @@ plugins/sagas/tests/aspire/sagas-contribution_test.ts	plugin:sagas	S5	SagaPublis
 plugins/sagas/tests/e2e/sagas-gates_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/public/deprecated-default-port_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/public/manifest_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/tests/runtime/generated-saga-health_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/runtime/saga-publisher_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/streams/factory-discovery_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/verify-plugin.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)

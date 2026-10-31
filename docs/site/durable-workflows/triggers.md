@@ -99,6 +99,9 @@ export default paymentStatusWebhook;
   ]
 }) }}
 
+`retry` belongs to the returned definition, not this builder spec. See
+[per-trigger retry policy](#per-trigger-retry-policy) for the supported override and discovery limit.
+
 The handler receives a `TriggerEvent<'webhook', WebhookTriggerPayload>`. The payload carries the
 captured HTTP request: `body` (parsed/raw), `headers`, `method` (always `"POST"`), `path`, and an
 optional `remoteAddr`. The event envelope also carries `idempotencyKey`,
@@ -186,6 +189,9 @@ export default productImportWatch;
     { name: "metadata", type: "Readonly<Record<string, unknown>>?", desc: "Arbitrary structured metadata." }
   ]
 }) }}
+
+`retry` belongs to the returned definition, not this builder spec. See
+[per-trigger retry policy](#per-trigger-retry-policy) for the supported override and discovery limit.
 
 The handler receives a `TriggerEvent<'file-watch', FileWatchTriggerPayload>`. The payload carries
 `path`, `kind` (the lifecycle event), and, when the watcher could read them, `size`, `modifiedAt`,
@@ -305,6 +311,49 @@ export default nightlyReconcile;
     { name: "metadata", type: "Readonly<Record<string, unknown>>?", desc: "Arbitrary structured metadata." }
   ]
 }) }}
+
+`DefineScheduledTriggerSpec` likewise does not accept `retry`. Use the same
+[definition-level retry override](#per-trigger-retry-policy) as webhook and file-watch triggers.
+
+## Per-trigger retry policy
+
+The processor reads `TriggerDefinition.retry`, a full `TriggerRetryPolicy`; if it is absent, it
+uses `defaultRetryPolicy()`. The three builder specs (`WebhookSpec`, `FileWatchSpec`, and
+`DefineScheduledTriggerSpec`) currently expose no `retry` input and do not copy one into their
+results. Adding it to a builder's second argument is not a supported override.
+
+Keep the builder result private and export only the configured definition. All five required
+policy fields are explicit because a definition policy replaces the default; it is not merged:
+
+```ts
+// triggers/retrying-webhook.ts
+import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+import type { TriggerRetryPolicy } from '@netscript/plugin-triggers-core/domain';
+
+const retryPolicy = Object.freeze({
+  maxAttempts: 4,
+  initialDelayMs: 250,
+  maxDelayMs: 5000,
+  backoffMultiplier: 2,
+  jitter: true,
+}) satisfies TriggerRetryPolicy;
+
+const base = defineWebhook(
+  () => Promise.resolve([]), // Replace with the handler that enqueues your work.
+  { id: 'retrying-webhook', path: 'retrying', verifier: 'memory' },
+);
+
+// Export one definition per id; exporting base as well could overwrite this policy.
+export default Object.freeze({ ...base, retry: retryPolicy }) satisfies typeof base;
+```
+
+The `'memory'` verifier is only for local development; use HMAC verification for external callers.
+Put the module directly in `triggers/` and run `netscript generate plugins` to refresh the runtime
+registry. That registry loads the default export, so the override reaches the processor. Static
+contribution discovery recognizes direct exported builder calls and does not list this wrapped
+export in its contribution counts. A manual barrel fallback must explicitly re-export a default
+as a named export (`export { default as retryingWebhook } from './retrying-webhook.ts'`);
+`export *` omits defaults. The generated runtime registry is the normal path.
 
 ## Supported trigger actions
 

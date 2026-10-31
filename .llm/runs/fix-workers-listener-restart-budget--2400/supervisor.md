@@ -37,3 +37,18 @@ and execution belong to main. Canonical generators alone resolve carrier conflic
 No dependency updates or independent lock edits. Same independent Opus 5.5/high
 read-only evaluator is resumed; raw handles/logs remain outside this checkout.
 The owner explicitly reserves local scaffold.runtime and E2E labels for coordinator.
+
+## R3 documentation merge continuation (2026-10-31)
+
+Codex implements feature leaf for existing PR2482, baseline
+dfa2502be5fbb9ec275452738de0915f87dc1d3a; main to integrate:
+f6839463668c5dae4ca7234d26909e74e10b89c0. Authored write surface:
+docs/site/background-processing/how-to/tune-worker-runtime.md;
+packages/cli/src/kernel/assets/agent-docs-prose.generated.ts;
+packages/mcp/src/publish-assets.generated.ts;
+packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts;
+this run directory. Upstream merge carries its own files unchanged.
+Runtime code and lock files remain unchanged by this continuation.
+Owner explicitly requests independent Claude Opus5.5/high PLAN and IMPL review,
+read-only, closed stdin. Final review names the exact pushed head; no later
+commit moves it. No local scaffold.runtime, labels, milestones, merge or release.

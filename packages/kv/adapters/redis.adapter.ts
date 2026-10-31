@@ -40,7 +40,8 @@ import {
   type WatchMessage,
 } from './redis/codec.ts';
 import { RedisConnectionManager } from './redis/connection.ts';
-import { keyToRedisKey, redisKeyToKey } from './redis/serialization.ts';
+import { listEntries, scanEntries } from './redis/list-entries.ts';
+import { keyToRedisKey } from './redis/serialization.ts';
 import { WatchBatchQueue } from './redis/watch-batch-queue.ts';
 import { WatchSubscriptions } from './redis/watch-subscriptions.ts';
 import {
@@ -48,7 +49,6 @@ import {
   DEFAULT_REDIS_URL,
   REDIS_ATOMIC_MAX_ATTEMPTS,
   REDIS_MGET_BATCH_SIZE,
-  REDIS_SCAN_COUNT,
   type StoredValue,
   WATCH_CHANNEL_SUFFIX,
 } from './redis/types.ts';
@@ -238,204 +238,23 @@ export class RedisKvAdapter implements WatchableKv {
   // ---------------------------------------------------------------------------
 
   /**
-   * List entries under a prefix or range.
+   * List globally ordered entries with exclusive bounds and bounded key selection memory.
    *
-   * Uses a two-strategy approach depending on ordering:
-   *
-   * **Forward (`reverse: false`, default)** — streaming SCAN + MGET.
-   * Each SCAN batch is sorted lexicographically, values are fetched via
-   * `MGET` in sub-batches of {@linkcode REDIS_MGET_BATCH_SIZE}, and entries
-   * are yielded immediately. Early termination is respected: once `limit`
-   * entries have been yielded, remaining sub-batches and SCAN iterations
-   * are skipped.
-   *
-   * **Reverse (`reverse: true`)** — two-phase SCAN-all-keys then MGET-tail.
-   * Because Redis `SCAN` returns keys in hash-table order (not
-   * lexicographic), correct global reverse ordering requires collecting
-   * **all** matching key names first. The adapter therefore:
-   *
-   * 1. Runs SCAN to completion, collecting only key names (cheap — no
-   *    value fetching).
-   * 2. Sorts all key names lexicographically in reverse.
-   * 3. Applies `start`/`end` range filters on the sorted key list.
-   * 4. `MGET`s only the keys that will be yielded (respecting `limit`),
-   *    in sub-batches for bounded memory.
-   *
-   * This ensures the bridge layer (and any consumer) receives correctly
-   * ordered reverse results without the previous N+1 GET anti-pattern
-   * and without fetching values for keys that will be discarded.
+   * Each output window scans the keyspace before fetching selected values. See the
+   * package README for the repeated-scan cost of large or unlimited iterations.
    *
    * @param options - Selector and pagination options
    * @returns Async iterable of matching entries
    */
   async *list<T = unknown>(options: KvListOptions): AsyncIterable<KvEntry<T>> {
     const client = await this.connection.ensureClient();
-    const pattern = `${keyToRedisKey(options.prefix, this.namespace)}:*`;
-    const limit = options.limit ?? Number.POSITIVE_INFINITY;
-
-    // Hoist start/end serialization — loop-invariant.
-    const startStr = options.start ? keyToString(options.start) : undefined;
-    const endStr = options.end ? keyToString(options.end) : undefined;
-
-    if (options.reverse) {
-      yield* this.listReverse<T>(client, pattern, limit, startStr, endStr);
-    } else {
-      yield* this.listForward<T>(client, pattern, limit, startStr, endStr);
-    }
+    yield* listEntries<T>(client, this.namespace, options);
   }
 
-  /**
-   * Forward list: streaming SCAN → per-batch sort → MGET sub-batches → yield.
-   *
-   * Terminates as soon as `limit` entries have been yielded.
-   */
-  private async *listForward<T>(
-    client: import('ioredis').Redis,
-    pattern: string,
-    limit: number,
-    startStr: string | undefined,
-    endStr: string | undefined,
-  ): AsyncIterable<KvEntry<T>> {
-    let count = 0;
-    let cursor = '0';
-
-    do {
-      const [nextCursor, keys] = await client.scan(
-        cursor,
-        'MATCH',
-        pattern,
-        'COUNT',
-        REDIS_SCAN_COUNT,
-      );
-      cursor = nextCursor;
-
-      if (keys.length === 0) continue;
-
-      const sortedKeys = [...keys].sort();
-
-      // MGET in sub-batches with early termination
-      for (
-        let batchStart = 0;
-        batchStart < sortedKeys.length && count < limit;
-        batchStart += REDIS_MGET_BATCH_SIZE
-      ) {
-        const batchEnd = Math.min(batchStart + REDIS_MGET_BATCH_SIZE, sortedKeys.length);
-        const batchKeys = sortedKeys.slice(batchStart, batchEnd);
-        const values = await client.mget(...batchKeys);
-
-        for (let i = 0; i < batchKeys.length; i++) {
-          if (count >= limit) break;
-
-          const data = values[i];
-          if (data === null) continue;
-
-          try {
-            const stored = decodeEnvelope<StoredValue<T>>(data);
-            const key = redisKeyToKey(batchKeys[i], this.namespace);
-
-            if (startStr && keyToString(key) < startStr) continue;
-            if (endStr && keyToString(key) >= endStr) continue;
-
-            yield { key, value: stored.value, versionstamp: stored.versionstamp };
-            count += 1;
-          } catch {
-            logger.warn('Skipping malformed Redis KV entry during list()', {
-              redisKey: batchKeys[i],
-            });
-          }
-        }
-      }
-    } while (cursor !== '0' && count < limit);
-  }
-
-  /**
-   * Reverse list: two-phase SCAN-all-keys → global reverse sort → MGET tail.
-   *
-   * Phase 1 collects only key names (no value fetching) so the full SCAN is
-   * cheap. Phase 2 MGET-fetches values only for the keys that will actually
-   * be yielded, respecting `limit` and range filters.
-   *
-   * This eliminates the previous pathological behaviour where a
-   * `reverse: true, limit: 1` query would fetch every value in the prefix.
-   */
-  private async *listReverse<T>(
-    client: import('ioredis').Redis,
-    pattern: string,
-    limit: number,
-    startStr: string | undefined,
-    endStr: string | undefined,
-  ): AsyncIterable<KvEntry<T>> {
-    // --- Phase 1: SCAN all matching key names (no values) ---
-    const allKeys: string[] = [];
-    let cursor = '0';
-
-    do {
-      const [nextCursor, keys] = await client.scan(
-        cursor,
-        'MATCH',
-        pattern,
-        'COUNT',
-        REDIS_SCAN_COUNT,
-      );
-      cursor = nextCursor;
-      if (keys.length > 0) {
-        allKeys.push(...keys);
-      }
-    } while (cursor !== '0');
-
-    if (allKeys.length === 0) return;
-
-    // Global reverse-lexicographic sort — gives correct ordering that
-    // per-batch sorting could not guarantee across SCAN iterations.
-    allKeys.sort();
-    allKeys.reverse();
-
-    // --- Pre-filter by start/end range on key names ---
-    // This avoids MGET-fetching values for keys outside the requested range.
-    let filteredKeys: string[];
-    if (startStr || endStr) {
-      filteredKeys = [];
-      for (const redisKey of allKeys) {
-        const key = redisKeyToKey(redisKey, this.namespace);
-        const keyStr = keyToString(key);
-        if (startStr && keyStr < startStr) continue;
-        if (endStr && keyStr >= endStr) continue;
-        filteredKeys.push(redisKey);
-      }
-    } else {
-      filteredKeys = allKeys;
-    }
-
-    // --- Phase 2: MGET sub-batches, yielding up to `limit` entries ---
-    let count = 0;
-    for (
-      let batchStart = 0;
-      batchStart < filteredKeys.length && count < limit;
-      batchStart += REDIS_MGET_BATCH_SIZE
-    ) {
-      const batchEnd = Math.min(batchStart + REDIS_MGET_BATCH_SIZE, filteredKeys.length);
-      const batchKeys = filteredKeys.slice(batchStart, batchEnd);
-      const values = await client.mget(...batchKeys);
-
-      for (let i = 0; i < batchKeys.length; i++) {
-        if (count >= limit) break;
-
-        const data = values[i];
-        if (data === null) continue;
-
-        try {
-          const stored = decodeEnvelope<StoredValue<T>>(data);
-          const key = redisKeyToKey(batchKeys[i], this.namespace);
-
-          yield { key, value: stored.value, versionstamp: stored.versionstamp };
-          count += 1;
-        } catch {
-          logger.warn('Skipping malformed Redis KV entry during list()', {
-            redisKey: batchKeys[i],
-          });
-        }
-      }
-    }
+  /** Watch discovery needs one unordered SCAN pass, regardless of prefix cardinality. */
+  private async *scanPrefix<T>(prefix: KvKey): AsyncIterable<KvEntry<T>> {
+    const client = await this.connection.ensureClient();
+    yield* scanEntries<T>(client, this.namespace, prefix);
   }
 
   // ---------------------------------------------------------------------------
@@ -758,7 +577,7 @@ export class RedisKvAdapter implements WatchableKv {
     };
     const release = await this.subscriptions.acquire(channel, messageHandler);
     try {
-      for await (const entry of this.list<T>({ prefix })) {
+      for await (const entry of this.scanPrefix<T>(prefix)) {
         const keyStr = keyToString(entry.key);
         const versionstamp = entry.versionstamp ?? generateVersionstamp();
         // Buffered writes own this key's startup history. Yielding a newer
@@ -813,7 +632,7 @@ export class RedisKvAdapter implements WatchableKv {
 
         const seenKeys = new Set<string>();
 
-        for await (const entry of this.list<T>({ prefix })) {
+        for await (const entry of this.scanPrefix<T>(prefix)) {
           const keyStr = keyToString(entry.key);
           const versionstamp = entry.versionstamp ?? generateVersionstamp();
           seenKeys.add(keyStr);

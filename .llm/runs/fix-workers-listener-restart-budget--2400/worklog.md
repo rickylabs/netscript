@@ -173,3 +173,55 @@ The main-carried historical run has3 trailing-whitespace lines in its existing
 plan-eval.md; no authored whitespace finding, no unrelated artifact cleanup.
 Next exact pushed-head verdict and committed-HEAD regression are PR comments to
 avoid a trailing commit moving the reviewed implementation.
+
+## R3 routing and design checkpoint
+
+Queried feature matrix using `deno task agentic:matrix --tier feature --json`.
+Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after,
+both in a separate session with claude -p --model claude-opus-5-5 --effort high,
+read-only, stdin closed, blockers only.” Different session/vendor from Codex;
+feature max2 PLAN/max5 IMPL, same session retained across rounds within each phase.
+RTK absent; use focused raw reads and repository structured wrappers.
+Seven design items: (1) existing public worker options/health only; (2) existing
+healthy window, burst budget, cumulative count and safe cause vocabulary;
+(3) existing clock/queue/signal seams; (4) no new constants;
+(5) one merge/docs/generated-assets slice on supervisor.md declared surface, gates
+in R3 plan; (6) runtime redesign and local shared E2E deferred per owner;
+(7) contributor entry listener-supervisor.ts and tuning guide unchanged.
+No source edits before independent R3 plan evaluation.
+
+## R3 merged tree gates and reconciliation
+
+Independent plan PASS in r3-plan-eval.md before merge. Main f683946 merged without
+rewriting history; only generated prose conflicted. Read full combined tuning page:
+process layout/single scheduler ownership and restart recovery sections coexist,
+with no duplicated or contradictory guidance. Regenerated via all three canonical
+tasks in order; publish/export outputs already matched the correct auto-merged
+state, and prose was staged after regeneration. Sidecars and policy stayed stable.
+
+Focused listener tests21 PASS/0 FAIL/0 ignored with real Redis; private owned process
+stopped in finally. Deno KV persisted recovery and actual Redis ACL refusal recovery
+both executed. Structured workers check136 files PASS; explicit eight-file lint/fmt
+PASS. Full quality/architecture/dependency gate, docs accuracy and prose/publish/
+export freshness PASS with durable receipts. Carrier bundle3 and MCP consumer8 tests
+PASS, zero ignores. Review threads1 answered/0 unanswered. r3-gate-summary.json
+preserves safe totals and raw-report hashes; raw receipts identify premerge HEAD
+and pending merge tree, not the future clean commit. Existing R2 reset-revert
+controls still apply because worker runtime/tests are byte-identical to dfa2502be.
+Queue/dispatcher/execution/locks match main. No new debt or public surface.
+
+Reconcile: existing PR2482 remains ready, issue2400 open and reference-only;
+main still f683946 at gate completion. No competing work or unanswered threads.
+Next independent precommit signoff, merge commit/push, committed corpus regression,
+exact-pushed-head review and READY via the assignment report file. No local E2E,
+labels/milestones, merge/tag/release. Coordinator owns both exact-head runtime gates.
+
+## R3 slice signoff
+
+Retained independent Opus5.5/high evaluator gives PASS in r3-evaluate.md.
+Reviewer compares staged tree to read-only trial merge, verifies all protected files
+and locks, decodes prose row and reads the whole guide; independently reruns publish
+and export freshness checks. Test execution remains supervisor-run receipts, clearly
+identified. Supervisor signs off the merge commit after this substantive review.
+Final exact pushed-head IMPL-EVAL will be posted on the PR; no later evidence-only
+commit is intended. All source and run evidence staged after final regeneration.

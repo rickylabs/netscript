@@ -1,6 +1,6 @@
 import { loadSagaRetention } from './load-saga-retention.ts';
 import {
-  isSagaTransitionStore,
+  isSagaAtomicStore,
   type SagaTransitionCommitRequest,
   type SagaTransitionCommitResult,
   type SagaTransitionStore,
@@ -183,7 +183,7 @@ export function createProjectingSagaStore(
   delegate: SagaStorePort,
   projection: SagaInstanceProjectionPort,
 ): SagaStorePort {
-  return isSagaTransitionStore(delegate)
+  return isSagaAtomicStore(delegate)
     ? new AtomicProjectingSagaStore(delegate, projection)
     : new ProjectingSagaStore(delegate, projection);
 }
@@ -300,6 +300,11 @@ class AtomicProjectingSagaStore implements SagaTransitionStore {
       });
     }
     return result;
+  }
+
+  /** Preserve the delegate's committed-replay fast path without exposing legacy markers. */
+  hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return this.#delegate.hasAppliedTransition?.(instanceId, keyHash) ?? Promise.resolve(false);
   }
 
   load<TState extends SagaState>(

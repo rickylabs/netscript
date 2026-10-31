@@ -70,6 +70,8 @@ export type { KvSagaStoreOptions } from './kv-saga-store.ts';
 export type {
   PrismaSagaStoreClient,
   PrismaSagaStoreOptions,
+  PrismaSagaStoreTransaction,
+  SagaRuntimeAppliedKeyDelegate,
   SagaRuntimeCorrelationDelegate,
   SagaRuntimeCorrelationRow,
   SagaRuntimeCorrelationWrite,

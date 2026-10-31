@@ -28,6 +28,11 @@ The track uses three NetScript packages:
 A `chat-app/` Fresh workspace whose home screen is a working chat. The same project grows
 chapter by chapter, so do the chapters in order.
 
+For separate queued work that publishes a result to a stream, follow
+[Deliver a result from a worker](/tutorials/eis-chat/03-deliver-worker/). The chat chapters below
+keep the model turn in the session route; a durable transcript alone does not make that route's
+execution survive process termination.
+
 ## Before you begin
 
 - **Deno 2.x, the Aspire CLI and Docker.** The [quickstart](/quickstart/) covers installing

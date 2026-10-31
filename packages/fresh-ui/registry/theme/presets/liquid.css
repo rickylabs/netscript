@@ -112,13 +112,13 @@
 
   --ns-primary: var(--ns-copper-6);
   --ns-primary-fg: var(--ns-gray-12);
-  --ns-primary-hover: var(--ns-copper-7);
+  --ns-primary-hover: oklch(58.5% 0.105 52);
   --ns-primary-subtle: rgba(200, 149, 108, 0.1);
   --ns-primary-border: rgba(200, 149, 108, 0.25);
 
   --ns-secondary: var(--ns-slate-5);
   --ns-secondary-fg: var(--ns-gray-12);
-  --ns-secondary-hover: var(--ns-slate-6);
+  --ns-secondary-hover: oklch(57.5% 0.028 255);
   --ns-secondary-subtle: rgba(144, 152, 166, 0.1);
   --ns-secondary-border: rgba(144, 152, 166, 0.2);
 
@@ -140,7 +140,7 @@
   --ns-warning-subtle: rgba(224, 174, 79, 0.1);
   --ns-warning-border: rgba(224, 174, 79, 0.2);
 
-  --ns-destructive: var(--ns-red-5);
+  --ns-destructive: oklch(58% 0.165 28);
   --ns-destructive-fg: #ffffff;
   --ns-destructive-subtle: rgba(224, 69, 69, 0.1);
   --ns-destructive-border: rgba(224, 69, 69, 0.2);
@@ -148,8 +148,8 @@
   --ns-border: rgba(0, 0, 0, 0.08);
   --ns-border-hover: rgba(0, 0, 0, 0.14);
   --ns-border-strong: rgba(0, 0, 0, 0.22);
-  --ns-input-border: var(--ns-gray-4);
-  --ns-ring: var(--ns-copper-6);
+  --ns-input-border: var(--ns-gray-6);
+  --ns-ring: var(--ns-copper-7);
 
   --ns-font-sans: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --ns-font-mono: 'DM Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
@@ -268,7 +268,7 @@
   --ns-border: rgba(235, 228, 210, 0.06);
   --ns-border-hover: rgba(235, 228, 210, 0.12);
   --ns-border-strong: rgba(235, 228, 210, 0.18);
-  --ns-input-border: rgba(235, 228, 210, 0.1);
+  --ns-input-border: var(--ns-gray-6);
 
   --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
   --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -430,9 +430,9 @@
   --ns-cupertino-warning-bg: #fff2c7;
   --ns-cupertino-warning-text: #624200;
   --ns-destructive-border: #fdbdbe;
-  --ns-destructive: #e5484d;
+  --ns-destructive: #ce2c31;
   --ns-destructive-fg: #ffffff;
-  --ns-destructive-hover: #dc3e42;
+  --ns-destructive-hover: #c62a30;
   --ns-destructive-subtle: #feebec;
   --ns-destructive-text: #641723;
   --ns-control-shadow-color: #0000002e;
@@ -512,7 +512,7 @@
   --ns-fluent-text-on-accent-secondary: #ffffff;
   --ns-fluent-text-primary: #000000e4;
   --ns-fluent-text-secondary: #0000009e;
-  --ns-fluent-text-tertiary: #00000072;
+  --ns-fluent-text-tertiary: #0000008b;
   --ns-fluent-wallpaper-base: #d7e6f4;
   --ns-fluent-wallpaper-blue: #6fa8e6;
   --ns-fluent-wallpaper-deep: #3c7bd0;
@@ -525,9 +525,9 @@
   --ns-important-subtle: #f4f0fe;
   --ns-important-text: #2f265f;
   --ns-info-border: #acd8fc;
-  --ns-info: #0090ff;
+  --ns-info: #0d74ce;
   --ns-info-fg: #ffffff;
-  --ns-info-hover: #0588f0;
+  --ns-info-hover: #0d6fc6;
   --ns-info-subtle: #e6f4fe;
   --ns-info-text: #113264;
   --ns-ink-fg: #fcfcfd;
@@ -559,7 +559,7 @@
   --ns-liquid-material-glass-float: #f7f7f8b8;
   --ns-liquid-material-glass-sheet: #f5f5f7b8;
   --ns-liquid-material-glass-sidebar: #f3f3f694;
-  --ns-liquid-material-segment-thumb: #00000017;
+  --ns-liquid-material-segment-thumb: #ffffffd1;
   --ns-liquid-material-tinted-primary: #0063e1f0;
   --ns-liquid-primary-default: #0063e1;
   --ns-liquid-primary-fg: #ffffff;
@@ -569,7 +569,7 @@
   --ns-liquid-state-hover-overlay: #1d1d1f0f;
   --ns-liquid-status-shipped-fg: #005fbe;
   --ns-liquid-success-bg: #e8f7ec;
-  --ns-liquid-success-text: #1e7b34;
+  --ns-liquid-success-text: #1d7632;
   --ns-liquid-surface-bg: #ffffff;
   --ns-liquid-surface-card: #f5f5f7;
   --ns-liquid-surface-raised: #e8e8ed;
@@ -635,7 +635,7 @@
   --ns-studio-badge-solid-info-fg: #f9f9fb;
   --ns-studio-badge-solid-neutral-bg: #60646c;
   --ns-studio-badge-solid-neutral-fg: #f9f9fb;
-  --ns-studio-badge-solid-success-bg: #2a7e3b;
+  --ns-studio-badge-solid-success-bg: #203c25;
   --ns-studio-badge-solid-success-fg: #f9f9fb;
   --ns-studio-badge-solid-warning-bg: #4f3422;
   --ns-studio-badge-solid-warning-fg: #f9f9fb;
@@ -659,7 +659,7 @@
   --ns-studio-primary-bg: #0d74ce;
   --ns-studio-primary-bg-hover: #0d6fc6;
   --ns-studio-primary-fg: #ffffff;
-  --ns-studio-primary-stroke: #0d74ce;
+  --ns-studio-primary-stroke: #0d6fc6;
   --ns-studio-signal-brand: #da291c;
   --ns-studio-signal-marker: #1c2024;
   --ns-studio-signal-underline: #b9bbc6;
@@ -678,11 +678,11 @@
   --ns-studio-topbar-bg: #ffffff;
   --ns-studio-topbar-rule: #e0e1e6;
   --ns-success-border: #b2ddb5;
-  --ns-success: #46a758;
+  --ns-success: #2a7e3b;
   --ns-success-fg: #ffffff;
-  --ns-success-hover: #3e9b4f;
+  --ns-success-hover: #297939;
   --ns-success-subtle: #e9f6e9;
-  --ns-success-text: #2a7e3b;
+  --ns-success-text: #203c25;
   --ns-bg: #f0f0f3;
   --ns-card: #f9f9fb;
   --ns-container: #ffffff94;
@@ -707,7 +707,7 @@
   --ns-tabs-sel-bg: #ffffffd1;
   --ns-tabs-sel-border: #d9d9e0;
   --ns-tabs-track: #f0f0f3;
-  --ns-tactile-accent: #1e7bff;
+  --ns-tactile-accent: #1a6fe8;
   --ns-tactile-concave-end: #e2e6ed;
   --ns-tactile-concave-start: #ccd4df;
   --ns-tactile-convex-end: #d5dce5;
@@ -1522,7 +1522,7 @@
   --ns-block-green: #bdee63;
   --ns-block-fg: #000000;
   --ns-block-pink: #e54d2e;
-  --ns-block-purple: #6e56cf;
+  --ns-block-purple: #7d66d9;
   --ns-block-yellow: #ffc53d;
   --ns-bloom-butter: #352f14;
   --ns-bloom-canvas: #0f0e0d;
@@ -1616,7 +1616,7 @@
   --ns-cupertino-warning-text: #ffdb8a;
   --ns-destructive-border: #72232d;
   --ns-destructive: #e5484d;
-  --ns-destructive-fg: #ffffff;
+  --ns-destructive-fg: #111113;
   --ns-destructive-hover: #ec5d5e;
   --ns-destructive-subtle: #3b1219;
   --ns-destructive-text: #ff9592;
@@ -1697,7 +1697,7 @@
   --ns-fluent-text-on-accent-secondary: #000000;
   --ns-fluent-text-primary: #ffffff;
   --ns-fluent-text-secondary: #ffffffc5;
-  --ns-fluent-text-tertiary: #ffffff87;
+  --ns-fluent-text-tertiary: #ffffff96;
   --ns-fluent-wallpaper-base: #07111f;
   --ns-fluent-wallpaper-blue: #0f3b78;
   --ns-fluent-wallpaper-deep: #0a2c5c;
@@ -1711,11 +1711,11 @@
   --ns-important-text: #baa7ff;
   --ns-info-border: #104d87;
   --ns-info: #0090ff;
-  --ns-info-fg: #ffffff;
+  --ns-info-fg: #111113;
   --ns-info-hover: #3b9eff;
   --ns-info-subtle: #0d2847;
   --ns-info-text: #70b8ff;
-  --ns-ink-fg: #edeef0;
+  --ns-ink-fg: #111113;
   --ns-kpi-bg-1: #212225;
   --ns-kpi-bg-2: #212225;
   --ns-kpi-bg-3: #212225;
@@ -1744,12 +1744,12 @@
   --ns-liquid-material-glass-float: #2c2c2eb2;
   --ns-liquid-material-glass-sheet: #262629cc;
   --ns-liquid-material-glass-sidebar: #1c1c1f85;
-  --ns-liquid-material-segment-thumb: #ffffff24;
+  --ns-liquid-material-segment-thumb: #2b2e36c7;
   --ns-liquid-material-tinted-primary: #0058d0f0;
   --ns-liquid-primary-default: #0058d0;
   --ns-liquid-primary-fg: #ffffff;
   --ns-liquid-primary-hover: #004fbd;
-  --ns-liquid-primary-text: #409cff;
+  --ns-liquid-primary-text: #439eff;
   --ns-liquid-sidebar-selection: #ffffff1a;
   --ns-liquid-state-hover-overlay: #f5f5f714;
   --ns-liquid-status-shipped-fg: #409cff;
@@ -1757,7 +1757,7 @@
   --ns-liquid-success-text: #30d158;
   --ns-liquid-surface-bg: #1e1e1e;
   --ns-liquid-surface-card: #2a2a2c;
-  --ns-liquid-surface-raised: #3a3a3c;
+  --ns-liquid-surface-raised: #313133;
   --ns-liquid-surface-well: #333336;
   --ns-liquid-surface-zebra: #262628;
   --ns-liquid-switch-off-track: #39393d;
@@ -1824,7 +1824,7 @@
   --ns-studio-badge-solid-success-fg: #71d083;
   --ns-studio-badge-solid-warning-bg: #4d3000;
   --ns-studio-badge-solid-warning-fg: #ffca16;
-  --ns-studio-brand: #e5332a;
+  --ns-studio-brand: #da291c;
   --ns-studio-brand-on: #ffffff;
   --ns-studio-button-shadow: #00000000;
   --ns-studio-card-bg: #00000000;
@@ -1845,7 +1845,7 @@
   --ns-studio-primary-bg-hover: #3b9eff;
   --ns-studio-primary-fg: #111113;
   --ns-studio-primary-stroke: #777b84;
-  --ns-studio-signal-brand: #e5332a;
+  --ns-studio-signal-brand: #da291c;
   --ns-studio-signal-marker: #edeef0;
   --ns-studio-signal-underline: #5a6169;
   --ns-studio-table-bg: #00000000;
@@ -1864,7 +1864,7 @@
   --ns-studio-topbar-rule: #2e3135;
   --ns-success-border: #2d5736;
   --ns-success: #46a758;
-  --ns-success-fg: #ffffff;
+  --ns-success-fg: #111113;
   --ns-success-hover: #53b365;
   --ns-success-subtle: #1b2a1e;
   --ns-success-text: #71d083;
@@ -1892,7 +1892,7 @@
   --ns-tabs-sel-bg: #2b2e36c7;
   --ns-tabs-sel-border: #363a3f;
   --ns-tabs-track: #212225;
-  --ns-tactile-accent: #3b8bff;
+  --ns-tactile-accent: #1a6fe8;
   --ns-tactile-concave-end: #2b2f34;
   --ns-tactile-concave-start: #1b1d20;
   --ns-tactile-convex-end: #222428;
@@ -2714,8 +2714,8 @@
   --ns-border: rgba(0, 0, 0, 0.08);
   --ns-border-hover: rgba(0, 0, 0, 0.14);
   --ns-ink: var(--ns-fg);
-  --ns-input-border: var(--ns-gray-4);
-  --ns-ring: var(--ns-copper-6);
+  --ns-input-border: var(--ns-gray-6);
+  --ns-ring: var(--ns-copper-7);
   --ns-border-strong: rgba(0, 0, 0, 0.22);
   --ns-border-subtle: var(--ns-border);
   --ns-brand: var(--ns-primary);
@@ -2738,7 +2738,7 @@
   --ns-code-syntax-type: #008573;
   --ns-control-ink: var(--ns-fg);
   --ns-destructive-border: rgba(224, 69, 69, 0.2);
-  --ns-destructive: var(--ns-red-5);
+  --ns-destructive: #c9493f;
   --ns-destructive-fg: #ffffff;
   --ns-destructive-hover: var(--ns-red-6);
   --ns-destructive-subtle: rgba(224, 69, 69, 0.1);
@@ -2776,7 +2776,7 @@
   --ns-primary-container: var(--ns-primary-subtle);
   --ns-primary: var(--ns-copper-6);
   --ns-primary-fg: var(--ns-gray-12);
-  --ns-primary-hover: var(--ns-copper-7);
+  --ns-primary-hover: #ac693d;
   --ns-primary-on-container: var(--ns-fg);
   --ns-primary-stroke: var(--ns-primary-border);
   --ns-primary-subtle: rgba(200, 149, 108, 0.1);
@@ -2785,7 +2785,7 @@
   --ns-secondary-border: rgba(144, 152, 166, 0.2);
   --ns-secondary: var(--ns-slate-5);
   --ns-secondary-fg: var(--ns-gray-12);
-  --ns-secondary-hover: var(--ns-slate-6);
+  --ns-secondary-hover: #6e7a8a;
   --ns-secondary-subtle: rgba(144, 152, 166, 0.1);
   --ns-secondary-text: var(--ns-slate-7);
   --ns-state-disabled-container: var(--ns-muted);
@@ -3120,8 +3120,8 @@
   --ns-border: rgba(235, 228, 210, 0.06);
   --ns-border-hover: rgba(235, 228, 210, 0.12);
   --ns-ink: var(--ns-fg);
-  --ns-input-border: rgba(235, 228, 210, 0.1);
-  --ns-ring: var(--ns-copper-6);
+  --ns-input-border: var(--ns-gray-6);
+  --ns-ring: var(--ns-copper-7);
   --ns-border-strong: rgba(235, 228, 210, 0.18);
   --ns-border-subtle: var(--ns-border);
   --ns-brand: var(--ns-primary);
@@ -3144,11 +3144,11 @@
   --ns-code-syntax-type: #0bd8b6;
   --ns-control-ink: var(--ns-fg);
   --ns-destructive-border: rgba(224, 69, 69, 0.16);
-  --ns-destructive: var(--ns-red-5);
+  --ns-destructive: #c9493f;
   --ns-destructive-fg: #ffffff;
   --ns-destructive-hover: var(--ns-red-6);
   --ns-destructive-subtle: rgba(224, 69, 69, 0.08);
-  --ns-destructive-text: var(--ns-destructive);
+  --ns-destructive-text: var(--ns-red-5);
   --ns-control-shadow-color: var(--ns-shadow-color);
   --ns-shadow-color: var(--ns-gray-12);
   --ns-shadow-overlay-color: var(--ns-shadow-color);
@@ -3182,7 +3182,7 @@
   --ns-primary-container: var(--ns-primary-subtle);
   --ns-primary: var(--ns-copper-6);
   --ns-primary-fg: var(--ns-gray-12);
-  --ns-primary-hover: var(--ns-copper-7);
+  --ns-primary-hover: #ac693d;
   --ns-primary-on-container: var(--ns-fg);
   --ns-primary-stroke: var(--ns-primary-border);
   --ns-primary-subtle: rgba(200, 149, 108, 0.08);
@@ -3191,7 +3191,7 @@
   --ns-secondary-border: rgba(144, 152, 166, 0.14);
   --ns-secondary: var(--ns-slate-5);
   --ns-secondary-fg: var(--ns-gray-12);
-  --ns-secondary-hover: var(--ns-slate-6);
+  --ns-secondary-hover: #6e7a8a;
   --ns-secondary-subtle: rgba(144, 152, 166, 0.07);
   --ns-secondary-text: var(--ns-secondary);
   --ns-state-disabled-container: var(--ns-muted);
@@ -3592,9 +3592,9 @@
   --ns-cupertino-warning-bg: oklch(96.0745% 0.057287 93.197647);
   --ns-cupertino-warning-text: oklch(40.5039% 0.084579 77.508942);
   --ns-destructive-border: oklch(85.6904% 0.074072 17.676141);
-  --ns-destructive: oklch(62.5565% 0.19334 23.02606);
+  --ns-destructive: oklch(55.7003% 0.19743 25.168143);
   --ns-destructive-fg: oklch(100% 0 0);
-  --ns-destructive-hover: oklch(59.9021% 0.194656 24.035343);
+  --ns-destructive-hover: oklch(54.0986% 0.191452 24.797035);
   --ns-destructive-subtle: oklch(95.5471% 0.020718 13.856633);
   --ns-destructive-text: oklch(33.8991% 0.108908 16.60013);
   --ns-control-shadow-color: oklch(0% 0 0 / 0.180392);
@@ -3674,7 +3674,7 @@
   --ns-fluent-text-on-accent-secondary: oklch(100% 0 0);
   --ns-fluent-text-primary: oklch(0% 0 0 / 0.894118);
   --ns-fluent-text-secondary: oklch(0% 0 0 / 0.619608);
-  --ns-fluent-text-tertiary: oklch(0% 0 0 / 0.447059);
+  --ns-fluent-text-tertiary: oklch(0% 0 0 / 0.545098);
   --ns-fluent-wallpaper-base: oklch(91.7912% 0.024972 246.213164);
   --ns-fluent-wallpaper-blue: oklch(71.7352% 0.109059 251.482902);
   --ns-fluent-wallpaper-deep: oklch(58.379% 0.146034 256.718898);
@@ -3687,9 +3687,9 @@
   --ns-important-subtle: oklch(96.2275% 0.019056 299.070232);
   --ns-important-text: oklch(31.2809% 0.097486 286.565417);
   --ns-info-border: oklch(86.3266% 0.068203 243.31582);
-  --ns-info: oklch(64.9294% 0.19304 251.779887);
+  --ns-info: oklch(55.575% 0.16222 252.194706);
   --ns-info-fg: oklch(100% 0 0);
-  --ns-info-hover: oklch(62.2299% 0.18312 251.703791);
+  --ns-info-hover: oklch(53.901% 0.157676 252.370222);
   --ns-info-subtle: oklch(95.9677% 0.020061 238.662643);
   --ns-info-text: oklch(32.3963% 0.096382 258.8162);
   --ns-ink-fg: oklch(99.1348% 0.001318 286.375551);
@@ -3721,7 +3721,7 @@
   --ns-liquid-material-glass-float: oklch(97.6419% 0.001323 286.375089 / 0.721569);
   --ns-liquid-material-glass-sheet: oklch(97.0714% 0.002651 286.35014 / 0.721569);
   --ns-liquid-material-glass-sidebar: oklch(96.5001% 0.003983 286.324749 / 0.580392);
-  --ns-liquid-material-segment-thumb: oklch(0% 0 0 / 0.090196);
+  --ns-liquid-material-segment-thumb: oklch(100% 0 0 / 0.819608);
   --ns-liquid-material-tinted-primary: oklch(53.2222% 0.207348 259.104182 / 0.941176);
   --ns-liquid-primary-default: oklch(53.2222% 0.207348 259.104182);
   --ns-liquid-primary-fg: oklch(100% 0 0);
@@ -3731,7 +3731,7 @@
   --ns-liquid-state-hover-overlay: oklch(23.1576% 0.003805 286.098818 / 0.058824);
   --ns-liquid-status-shipped-fg: oklch(49.5973% 0.167391 255.687293);
   --ns-liquid-success-bg: oklch(96.1972% 0.021474 154.127871);
-  --ns-liquid-success-text: oklch(51.3429% 0.136299 147.198523);
+  --ns-liquid-success-text: oklch(49.859% 0.13173 147.235991);
   --ns-liquid-surface-bg: oklch(100% 0 0);
   --ns-liquid-surface-card: oklch(97.0714% 0.002651 286.35014);
   --ns-liquid-surface-raised: oklch(93.2432% 0.006701 286.268969);
@@ -3797,7 +3797,7 @@
   --ns-studio-badge-solid-info-fg: oklch(98.2679% 0.002642 286.350894);
   --ns-studio-badge-solid-neutral-bg: oklch(50.2489% 0.013621 264.444953);
   --ns-studio-badge-solid-neutral-fg: oklch(98.2679% 0.002642 286.350894);
-  --ns-studio-badge-solid-success-bg: oklch(52.6232% 0.129407 147.197137);
+  --ns-studio-badge-solid-success-bg: oklch(32.6585% 0.05302 148.593859);
   --ns-studio-badge-solid-success-fg: oklch(98.2679% 0.002642 286.350894);
   --ns-studio-badge-solid-warning-bg: oklch(35.2189% 0.048633 54.168604);
   --ns-studio-badge-solid-warning-fg: oklch(98.2679% 0.002642 286.350894);
@@ -3821,7 +3821,7 @@
   --ns-studio-primary-bg: oklch(55.575% 0.16222 252.194706);
   --ns-studio-primary-bg-hover: oklch(53.901% 0.157676 252.370222);
   --ns-studio-primary-fg: oklch(100% 0 0);
-  --ns-studio-primary-stroke: oklch(55.575% 0.16222 252.194706);
+  --ns-studio-primary-stroke: oklch(53.901% 0.157676 252.370222);
   --ns-studio-signal-brand: oklch(57.4601% 0.212639 29.553023);
   --ns-studio-signal-marker: oklch(24.113% 0.009691 248.229022);
   --ns-studio-signal-underline: oklch(79.3843% 0.015601 277.788985);
@@ -3840,11 +3840,11 @@
   --ns-studio-topbar-bg: oklch(100% 0 0);
   --ns-studio-topbar-rule: oklch(91.0418% 0.006846 277.155679);
   --ns-success-border: oklch(85.6259% 0.070956 146.770656);
-  --ns-success: oklch(65.1236% 0.146785 147.391783);
+  --ns-success: oklch(52.6232% 0.129407 147.197137);
   --ns-success-fg: oklch(100% 0 0);
-  --ns-success-hover: oklch(61.5233% 0.142234 147.186226);
+  --ns-success-hover: oklch(51.156% 0.124682 147.211888);
   --ns-success-subtle: oklch(95.9885% 0.021995 145.401329);
-  --ns-success-text: oklch(52.6232% 0.129407 147.197137);
+  --ns-success-text: oklch(32.6585% 0.05302 148.593859);
   --ns-bg: oklch(95.599% 0.003993 286.323863);
   --ns-card: oklch(98.2679% 0.002642 286.350894);
   --ns-container: oklch(100% 0 0 / 0.580392);
@@ -3869,7 +3869,7 @@
   --ns-tabs-sel-bg: oklch(100% 0 0 / 0.819608);
   --ns-tabs-sel-border: oklch(88.735% 0.009507 286.204339);
   --ns-tabs-track: oklch(95.599% 0.003993 286.323863);
-  --ns-tactile-accent: oklch(60.795% 0.21365 258.810153);
+  --ns-tactile-accent: oklch(56.5371% 0.199279 258.856431);
   --ns-tactile-concave-end: oklch(92.3909% 0.010415 261.788347);
   --ns-tactile-concave-start: oklch(86.7087% 0.017528 256.288276);
   --ns-tactile-convex-end: oklch(89.1785% 0.014488 254.612453);
@@ -4283,7 +4283,7 @@
   --ns-block-green: oklch(88.7418% 0.17473 126.088642);
   --ns-block-fg: oklch(0% 0 0);
   --ns-block-pink: oklch(62.7076% 0.193584 33.338987);
-  --ns-block-purple: oklch(54.168% 0.179028 288.033214);
+  --ns-block-purple: oklch(58.8623% 0.169221 289.354063);
   --ns-block-yellow: oklch(85.3697% 0.157207 84.129977);
   --ns-bloom-butter: oklch(30.4546% 0.043206 97.070944);
   --ns-bloom-canvas: oklch(16.4547% 0.002666 67.640808);
@@ -4377,7 +4377,7 @@
   --ns-cupertino-warning-text: oklch(90.4439% 0.107588 86.337533);
   --ns-destructive-border: oklch(38.144% 0.110816 16.803229);
   --ns-destructive: oklch(62.5565% 0.19334 23.02606);
-  --ns-destructive-fg: oklch(100% 0 0);
+  --ns-destructive-fg: oklch(17.8529% 0.004066 285.980658);
   --ns-destructive-hover: oklch(66.3385% 0.177389 22.850757);
   --ns-destructive-subtle: oklch(25.105% 0.064935 12.692452);
   --ns-destructive-text: oklch(78.0414% 0.128116 22.139494);
@@ -4458,7 +4458,7 @@
   --ns-fluent-text-on-accent-secondary: oklch(0% 0 0);
   --ns-fluent-text-primary: oklch(100% 0 0);
   --ns-fluent-text-secondary: oklch(100% 0 0 / 0.772549);
-  --ns-fluent-text-tertiary: oklch(100% 0 0 / 0.529412);
+  --ns-fluent-text-tertiary: oklch(100% 0 0 / 0.588235);
   --ns-fluent-wallpaper-base: oklch(17.6154% 0.032999 256.391514);
   --ns-fluent-wallpaper-blue: oklch(36.105% 0.114619 257.958435);
   --ns-fluent-wallpaper-deep: oklch(30.0274% 0.094397 258.121831);
@@ -4472,11 +4472,11 @@
   --ns-important-text: oklch(77.7832% 0.124625 293.194243);
   --ns-info-border: oklch(41.6028% 0.113257 252.006219);
   --ns-info: oklch(64.9294% 0.19304 251.779887);
-  --ns-info-fg: oklch(100% 0 0);
+  --ns-info-fg: oklch(17.8529% 0.004066 285.980658);
   --ns-info-hover: oklch(68.8383% 0.169325 251.404033);
   --ns-info-subtle: oklch(27.447% 0.066289 253.931507);
   --ns-info-text: oklch(76.422% 0.125747 249.464396);
-  --ns-ink-fg: oklch(94.8921% 0.002888 264.541781);
+  --ns-ink-fg: oklch(17.8529% 0.004066 285.980658);
   --ns-kpi-bg-1: oklch(25.214% 0.005821 271.181646);
   --ns-kpi-bg-2: oklch(25.214% 0.005821 271.181646);
   --ns-kpi-bg-3: oklch(25.214% 0.005821 271.181646);
@@ -4505,12 +4505,12 @@
   --ns-liquid-material-glass-float: oklch(29.3901% 0.003582 286.177242 / 0.698039);
   --ns-liquid-material-glass-sheet: oklch(26.9819% 0.005498 286.025458 / 0.8);
   --ns-liquid-material-glass-sidebar: oklch(22.7713% 0.005742 285.934914 / 0.521569);
-  --ns-liquid-material-segment-thumb: oklch(100% 0 0 / 0.141176);
+  --ns-liquid-material-segment-thumb: oklch(30.1507% 0.015064 269.182767 / 0.780392);
   --ns-liquid-material-tinted-primary: oklch(49.5679% 0.199027 259.702791 / 0.941176);
   --ns-liquid-primary-default: oklch(49.5679% 0.199027 259.702791);
   --ns-liquid-primary-fg: oklch(100% 0 0);
   --ns-liquid-primary-hover: oklch(46.0889% 0.185609 259.759692);
-  --ns-liquid-primary-text: oklch(68.5444% 0.16985 252.992564);
+  --ns-liquid-primary-text: oklch(69.0669% 0.166932 252.678507);
   --ns-liquid-sidebar-selection: oklch(100% 0 0 / 0.101961);
   --ns-liquid-state-hover-overlay: oklch(97.0714% 0.002651 286.35014 / 0.078431);
   --ns-liquid-status-shipped-fg: oklch(68.5444% 0.16985 252.992564);
@@ -4518,7 +4518,7 @@
   --ns-liquid-success-text: oklch(75.5551% 0.208246 146.983596);
   --ns-liquid-surface-bg: oklch(23.5031% 0 0);
   --ns-liquid-surface-card: oklch(28.5796% 0.003607 286.169233);
-  --ns-liquid-surface-raised: oklch(34.9196% 0.003429 286.22077);
+  --ns-liquid-surface-raised: oklch(31.3925% 0.003522 286.195025);
   --ns-liquid-surface-well: oklch(32.2233% 0.005255 286.101099);
   --ns-liquid-surface-zebra: oklch(26.9409% 0.003662 286.151349);
   --ns-liquid-switch-off-track: oklch(34.6087% 0.006888 286.034312);
@@ -4585,7 +4585,7 @@
   --ns-studio-badge-solid-success-fg: oklch(77.9656% 0.141882 148.484653);
   --ns-studio-badge-solid-warning-bg: oklch(33.6319% 0.071673 72.89763);
   --ns-studio-badge-solid-warning-fg: oklch(86.1667% 0.172974 89.017711);
-  --ns-studio-brand: oklch(60.2406% 0.214656 28.503876);
+  --ns-studio-brand: oklch(57.4601% 0.212639 29.553023);
   --ns-studio-brand-on: oklch(100% 0 0);
   --ns-studio-button-shadow: oklch(0% 0 0 / 0);
   --ns-studio-card-bg: oklch(0% 0 0 / 0);
@@ -4606,7 +4606,7 @@
   --ns-studio-primary-bg-hover: oklch(68.8383% 0.169325 251.404033);
   --ns-studio-primary-fg: oklch(17.8529% 0.004066 285.980658);
   --ns-studio-primary-stroke: oklch(58.2514% 0.014543 266.626021);
-  --ns-studio-signal-brand: oklch(60.2406% 0.214656 28.503876);
+  --ns-studio-signal-brand: oklch(57.4601% 0.212639 29.553023);
   --ns-studio-signal-marker: oklch(94.8921% 0.002888 264.541781);
   --ns-studio-signal-underline: oklch(48.9318% 0.015513 251.690839);
   --ns-studio-table-bg: oklch(0% 0 0 / 0);
@@ -4625,7 +4625,7 @@
   --ns-studio-topbar-rule: oklch(31.1775% 0.008302 255.560089);
   --ns-success-border: oklch(41.6368% 0.072437 149.328848);
   --ns-success: oklch(65.1236% 0.146785 147.391783);
-  --ns-success-fg: oklch(100% 0 0);
+  --ns-success-fg: oklch(17.8529% 0.004066 285.980658);
   --ns-success-hover: oklch(68.9358% 0.144968 147.800777);
   --ns-success-subtle: oklch(26.7256% 0.030116 150.15507);
   --ns-success-text: oklch(77.9656% 0.141882 148.484653);
@@ -4653,7 +4653,7 @@
   --ns-tabs-sel-bg: oklch(30.1507% 0.015064 269.182767 / 0.780392);
   --ns-tabs-sel-border: oklch(34.6552% 0.010288 253.971089);
   --ns-tabs-track: oklch(25.214% 0.005821 271.181646);
-  --ns-tactile-accent: oklch(64.7811% 0.189373 258.190726);
+  --ns-tactile-accent: oklch(56.5371% 0.199279 258.856431);
   --ns-tactile-concave-end: oklch(30.3261% 0.01064 253.997553);
   --ns-tactile-concave-start: oklch(22.9893% 0.006535 258.363897);
   --ns-tactile-convex-end: oklch(25.9906% 0.008037 264.425969);
@@ -5046,6 +5046,9 @@
   --ns-code-syntax-punctuation: oklch(50.3229% 0 0);
   --ns-code-syntax-string: oklch(52.6232% 0.129407 147.197137);
   --ns-code-syntax-type: oklch(55.2073% 0.101007 178.794228);
+  --ns-destructive: oklch(58% 0.165 28);
+  --ns-primary-hover: oklch(58.5% 0.105 52);
+  --ns-secondary-hover: oklch(57.5% 0.028 255);
   --ns-amber-4: oklch(81.5% 0.13 78);
   --ns-amber-5: oklch(73.5% 0.13 78);
   --ns-amber-6: oklch(65.5% 0.13 78);
@@ -5105,6 +5108,9 @@
   --ns-code-syntax-punctuation: oklch(76.9931% 0 0);
   --ns-code-syntax-string: oklch(77.9656% 0.141882 148.484653);
   --ns-code-syntax-type: oklch(78.8562% 0.146697 175.727258);
+  --ns-destructive: oklch(58% 0.165 28);
+  --ns-primary-hover: oklch(58.5% 0.105 52);
+  --ns-secondary-hover: oklch(57.5% 0.028 255);
   --ns-amber-4: oklch(81.5% 0.13 78);
   --ns-amber-5: oklch(73.5% 0.13 78);
   --ns-amber-6: oklch(65.5% 0.13 78);

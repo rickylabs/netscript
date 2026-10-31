@@ -59,3 +59,20 @@ Publish/doc checks will disclose inherited debt if unchanged. No accepted new de
 Obtain independent plan confirmation before merge, precommit signoff, and final
 exact-pushed-head IMPL-EVAL. Publish READY with current CI snapshot and coordinator
 request for both runtime tiers at that head. Stop; no merge/tag/release.
+
+## R3 — Plan & Design — READY FOR REVIEW
+
+One integration slice: merge origin/main f683946 into reviewed PR head dfa2502be,
+read the combined tuning page and preserve upstream E2 guidance and restart budget
+guidance. Take one generated prose carrier side provisionally and regenerate through
+gen:agent-docs-prose, gen:publish-assets, gen:mcp-export-corpus --allow-dirty.
+Run all three freshness checks, quality:gate, focused listener supervisor/recovery/
+health tests, scoped workers check/lint/fmt and corpus regressions. Preserve upstream
+Redis, dispatcher, execution and lock bytes. Existing API and JSR debt are unchanged;
+no new public surface, dependencies, ports or constants. Scope overlays: docs and
+inherited plugin/runtime (Archetype5/3), generated carriers only in CLI/MCP.
+Risk: losing either documentation side or stale carriers; mitigated by full page
+read, canonical regeneration and freshness checks. No unresolved design decisions.
+Deferred: runtime redesign, inherited doclint findings, unrelated main changes,
+local runtime E2E (owner reserves CI). Independent plan PASS before merge, independent
+slice signoff before commit, then push and final exact-head IMPL-EVAL.

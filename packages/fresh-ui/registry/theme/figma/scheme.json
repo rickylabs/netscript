@@ -581,7 +581,7 @@
           "alias": "Primitives/color/violet/l/5"
         },
         "Dark": {
-          "alias": "Primitives/color/violet/d/9"
+          "alias": "Primitives/color/violet/d/10"
         }
       }
     },
@@ -1951,7 +1951,7 @@
       "codeSyntax": "var(--ns-destructive)",
       "values": {
         "Light": {
-          "alias": "Primitives/color/red/l/9"
+          "alias": "Primitives/color/red/l/11"
         },
         "Dark": {
           "alias": "Primitives/color/red/d/9"
@@ -1972,7 +1972,7 @@
           "alias": "Primitives/color/white"
         },
         "Dark": {
-          "alias": "Primitives/color/white"
+          "alias": "Theme set/gray/d/1"
         }
       }
     },
@@ -1985,9 +1985,7 @@
       ],
       "codeSyntax": "var(--ns-destructive-hover)",
       "values": {
-        "Light": {
-          "alias": "Primitives/color/red/l/10"
-        },
+        "Light": "#c62a30",
         "Dark": {
           "alias": "Primitives/color/red/d/10"
         }
@@ -3056,8 +3054,8 @@
       ],
       "codeSyntax": "var(--ns-fluent-text-tertiary)",
       "values": {
-        "Light": "#00000072",
-        "Dark": "#ffffff87"
+        "Light": "#0000008b",
+        "Dark": "#ffffff96"
       }
     },
     {
@@ -3253,7 +3251,7 @@
       "codeSyntax": "var(--ns-info)",
       "values": {
         "Light": {
-          "alias": "Primitives/color/blue/l/9"
+          "alias": "Primitives/color/blue/l/11"
         },
         "Dark": {
           "alias": "Primitives/color/blue/d/9"
@@ -3274,7 +3272,7 @@
           "alias": "Primitives/color/white"
         },
         "Dark": {
-          "alias": "Primitives/color/white"
+          "alias": "Theme set/gray/d/1"
         }
       }
     },
@@ -3288,7 +3286,7 @@
       "codeSyntax": "var(--ns-info-hover)",
       "values": {
         "Light": {
-          "alias": "Primitives/color/blue/l/10"
+          "alias": "Primitives/color/blue/l/11-hover"
         },
         "Dark": {
           "alias": "Primitives/color/blue/d/10"
@@ -3343,7 +3341,7 @@
           "alias": "Theme set/gray/l/1"
         },
         "Dark": {
-          "alias": "Theme set/gray/d/12"
+          "alias": "Theme set/ink/d-fg"
         }
       }
     },
@@ -3775,8 +3773,8 @@
       "codeSyntax": "var(--ns-liquid-material-segment-thumb)",
       "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #000000@0.09, dark #FFFFFF@0.14.",
       "values": {
-        "Light": "#00000017",
-        "Dark": "#ffffff24"
+        "Light": "#ffffffd1",
+        "Dark": "#2b2e36c7"
       }
     },
     {
@@ -3854,7 +3852,7 @@
       "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #0066CC, dark #409CFF.",
       "values": {
         "Light": "#0066cc",
-        "Dark": "#409cff"
+        "Dark": "#439eff"
       }
     },
     {
@@ -3927,7 +3925,7 @@
       "codeSyntax": "var(--ns-liquid-success-text)",
       "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #1E7B34, dark #30D158.",
       "values": {
-        "Light": "#1e7b34",
+        "Light": "#1d7632",
         "Dark": "#30d158"
       }
     },
@@ -3970,7 +3968,7 @@
       "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #E8E8ED, dark #3A3A3C.",
       "values": {
         "Light": "#e8e8ed",
-        "Dark": "#3a3a3c"
+        "Dark": "#313133"
       }
     },
     {
@@ -5699,7 +5697,7 @@
       "codeSyntax": "var(--ns-success)",
       "values": {
         "Light": {
-          "alias": "Primitives/color/grass/l/9"
+          "alias": "Primitives/color/grass/l/11"
         },
         "Dark": {
           "alias": "Primitives/color/grass/d/9"
@@ -5720,7 +5718,7 @@
           "alias": "Primitives/color/white"
         },
         "Dark": {
-          "alias": "Primitives/color/white"
+          "alias": "Theme set/gray/d/1"
         }
       }
     },
@@ -5733,9 +5731,7 @@
       ],
       "codeSyntax": "var(--ns-success-hover)",
       "values": {
-        "Light": {
-          "alias": "Primitives/color/grass/l/10"
-        },
+        "Light": "#297939",
         "Dark": {
           "alias": "Primitives/color/grass/d/10"
         }
@@ -5769,7 +5765,7 @@
       "codeSyntax": "var(--ns-success-text)",
       "values": {
         "Light": {
-          "alias": "Primitives/color/grass/l/11"
+          "alias": "Primitives/color/grass/l/12"
         },
         "Dark": {
           "alias": "Primitives/color/grass/d/11"
@@ -6201,8 +6197,8 @@
       ],
       "codeSyntax": "var(--ns-tactile-accent)",
       "values": {
-        "Light": "#1e7bff",
-        "Dark": "#3b8bff"
+        "Light": "#1a6fe8",
+        "Dark": "#1a6fe8"
       }
     },
     {

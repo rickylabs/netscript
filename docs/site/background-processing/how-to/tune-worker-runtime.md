@@ -76,6 +76,28 @@ export const workers = defineWorkers({
 });
 ```
 
+## Choose the process layout
+
+The default workers graph starts its HTTP API and **one combined background process**, which runs
+both the scheduler and the queue consumer. A generated project starts this through
+`workers/runtime.ts`; the packaged plugin's Aspire contribution uses `bin/combined.ts`. The manifest
+also lists `bin/worker.ts` and `bin/scheduler.ts` as alternative entrypoints, not extra default
+resources.
+
+Choose one layout for a job set:
+
+| Layout | Processes to start | Scheduler ownership |
+| --- | --- | --- |
+| Combined (default) | One combined runner | The combined runner owns the schedules. |
+| Distributed | One scheduler-only process plus worker-only consumers | The scheduler process owns the schedules; consumers only execute queued jobs. |
+
+Do not start a scheduler-only process alongside a combined runner for the same jobs. Both register
+cron schedules and can enqueue the same tick; this is not a deduplicating deployment arrangement.
+When scaling consumers across processes, keep one scheduler owner and use worker-only consumers.
+`WORKERS_CONCURRENCY` increases asynchronous job concurrency within a consumer; it does not create
+more processes or elect a scheduler leader. The per-topic `scaling.mode` below describes the layout;
+changing a definition does not itself launch or retire processes in an already-running AppHost.
+
 ## Step 2 — Scale per topic
 
 A `WorkerGroup` binds a queue `topic` to its own `scaling` policy, so a hot `webhooks` topic can run

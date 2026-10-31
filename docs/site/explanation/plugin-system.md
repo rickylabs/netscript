@@ -83,7 +83,7 @@ chained `.with*()` call adds a **contribution** along an **extension axis**.
     {
       label: "workers manifest",
       lang: "ts",
-      code: "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\nimport { WORKERS_API_DEFAULT_PORT } from \"../constants.ts\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"" + releaseVersion + "\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\", port: WORKERS_API_DEFAULT_PORT })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();"
+      code: "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"" + releaseVersion + "\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\" })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();"
     }
   ]
 }) }}
@@ -148,14 +148,15 @@ the runtime.
 "One plugin" is a packaging unit, not a runtime unit. The AppHost materializes a plugin's **HTTP
 API** and its **background work** as *distinct* Aspire resources, each with its own entrypoint and
 permission set. The workers plugin's Aspire contribution registers the API as a Deno *service* and
-each processor as a Deno *background* resource:
+one combined worker/scheduler as a Deno *background* resource. The manifest also advertises
+worker-only and scheduler-only entrypoints; listing them does not mean all three start by default:
 
 {{ comp.tabbedCode({
   tabs: [
     {
       label: "workers Aspire contribution",
       lang: "ts",
-      code: "// plugins/workers/src/aspire/workers-contribution.ts (abridged)\nimport { WORKERS_API_DEFAULT_PORT } from \"../constants.ts\";\n// The API is a service resource; each processor is a SEPARATE background resource.\nconst api = builder.addDenoService(\"workers-api\", {\n  entrypoint: \"plugins/workers/services/src/main.ts\",\n  port: ctx.port(\"workers-api\", WORKERS_API_DEFAULT_PORT), // note: your scaffold's port will differ\n  permissions: WORKERS_SERVICE_PERMISSIONS, // narrow: serve HTTP\n});\n\nconst combined = builder.addDenoBackground(\"workers-combined\", {\n  entrypoint: \"plugins/workers/bin/combined.ts\",\n  permissions: WORKERS_BACKGROUND_PERMISSIONS, // wider: queues, db\n});\n// …plus workers-scheduler and workers-worker, each its own resource\nreturn [api, combined, scheduler, worker];"
+      code: "// plugins/workers/src/aspire/workers-contribution.ts (abridged)\n// The API is a service resource; each processor is a SEPARATE background resource.\nconst api = builder.addDenoService(\"workers-api\", {\n  entrypoint: \"plugins/workers/services/src/main.ts\",\n  port: ctx.port(\"workers-api\"), // allocated per project\n  permissions: WORKERS_SERVICE_PERMISSIONS, // narrow: serve HTTP\n});\n\nconst combined = builder.addDenoBackground(\"workers-combined\", {\n  entrypoint: \"plugins/workers/bin/combined.ts\",\n  permissions: WORKERS_BACKGROUND_PERMISSIONS, // wider: queues, db\n});\n// The default graph has one scheduler owner, inside combined.\nreturn [api, combined];"
     }
   ]
 }) }}
@@ -166,11 +167,18 @@ Every scaffolded plugin ships its background entrypoints:
   caption: "Where each plugin's background work runs",
   columns: ["Plugin", "Background entrypoint", "AppHost resource"],
   rows: [
-    ["workers", "<code>bin/combined.ts</code> (also <code>worker.ts</code>, <code>scheduler.ts</code>)", "Deno background, separate from <code>workers-api</code>."],
+    ["workers", "<code>bin/combined.ts</code>", "Deno background <code>workers-combined</code>, separate from <code>workers-api</code>."],
     ["sagas", "<code>src/runtime/saga-runner.ts</code>", "Deno background <code>saga-runner</code>."],
     ["triggers", "<code>src/runtime/trigger-processor.ts</code>", "Deno background <code>trigger-processor</code>."]
   ]
 }) }}
+
+These are the packaged plugin entrypoints. A generated project's AppHost instead starts the
+application wrappers `workers/runtime.ts`, `sagas/runtime.ts` and `triggers/runtime.ts`, under
+resources named `workers`, `sagas` and `triggers`. The workers wrapper calls `startCombinedProcess`,
+which starts both the scheduler and the queue consumer. Keep one scheduler owner per job set;
+starting `scheduler.ts` alongside a combined runner registers those schedules twice. See
+[the deployment choices](/background-processing/how-to/tune-worker-runtime/#choose-the-process-layout).
 
 The split is structural for three reasons:
 
