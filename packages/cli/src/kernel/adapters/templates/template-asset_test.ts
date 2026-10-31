@@ -1,4 +1,4 @@
-import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertFalse, assertMatch, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl, join } from '@std/path';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
@@ -59,7 +59,7 @@ Deno.test('app and service templates emit lint-clean generated contracts', () =>
   );
   const health = readTemplateAssetSync(TEMPLATE_KEYS.serviceRoutersHealth);
 
-  assertStringIncludes(layout, 'f-client-nav class=');
+  assertMatch(layout, /f-client-nav\s+class=/);
   assertFalse(layout.includes('f-client-nav={true}'));
   assertStringIncludes(telemetry, 'key={span.spanId}');
   assertStringIncludes(telemetry, 'key={trace.traceId}');

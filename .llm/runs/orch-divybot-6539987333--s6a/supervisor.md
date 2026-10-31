@@ -22,3 +22,5 @@ The queried feature matrix selects Sol/Muse for implementation, GLM/Fable for pl
 - Private logs/screenshots outside Git in the project run/artifact storage; final report in the excluded assignment handoff file.
 
 No merge, release, force-push, labels, session ids in public artifacts, or assignment-file commit.
+
+CI repair surface: `tools/fresh-ui-browser/` test matrix, README and reviewed accessibility baseline migration for the new default; no workflow or production changes inferred.

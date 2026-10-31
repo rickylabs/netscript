@@ -78,3 +78,15 @@ S6 merged-source gate completion:333package testsPASS; packagecheck/lint and all
 Mandatory independent whole-PR IMPL-EVAL and S6 review: PASS. All 92 source hashes and four evidence-helper hashes verified. Reviewer confirmed the scoped layout/focus repairs, stronger test assertions, JSON audit correction, carrier freshness, merged contrast gate with zero exclusions, and actual copied CodeBlock Fresh/Vite proof. Corrected the two stale receipt-head references to the frozen 8e5e8b1 receipts. All S6 source changes, including DataTable CSS, will be staged together. Reconcile: no unreviewed source edits; documentation/evidence bookkeeping only after PASS.
 
 Runtime and leak hygiene remain UNPROVEN locally; 53 dependency advisories are pre-existing. Next is commit/push and normal PR CI. Most workflows skip drafts, so the reviewed PR must become non-draft to materialize those checks. This is a review-state transition, not a READY announcement. Required checks must be green at the exact final head before READY; Cockpit owns merge.
+
+## CI repair after e501f41
+
+Normal CI passed package quality, core check/browser, docs browser and quality; three test shards and the design browser exposed stale assertions. Repair is test/evidence only: nav filter contract, whitespace-tolerant boolean attribute assertion, and four identical hashes for the reviewed semantic query island. The browser matrix now covers the real Utility default plus explicit legacy previews (20 scans, 12 navigation cases). Exact baseline mapping preserves all 8 legacy cases, removes 172 stale contrast allowances from default routes and introduces no rule/target/count allowance. Legacy scheme aliases run in an isolated NS One stylesheet frame, as an existing app would. Final local replay and independent review pending.
+
+CI repair local verdict: PASS. 32 browser tests (20 axe scans, 12 navigation cases), 32 focused CLI tests, 5 accessibility validator tests, source check/lint/fmt and broad quality gate. Independent same-session review running; source frozen in ci-repair-source-hashes.json.
+
+CI repair review round 1: FAIL_FIX for vacuous iframe colors using nonexistent token roles. Bind --ns-bg/--ns-fg and add nontransparent, opposite-scheme and disabled-stylesheet negative assertions. All baseline and CLI test repairs independently verified correct. Failure streak 1; full replay and same-session re-review required before commit.
+
+CI repair round 2 replay: PASS, all 32 browser tests and all 5 baseline validator contracts. Real token-role colors now pass nontransparent, opposite-scheme, parity and disabled-sheet assertions. Same evaluator re-review running; no commit or READY before terminal sign-off.
+
+CI repair independent re-review: PASS. Same evaluator verified every frozen hash, actual role declarations, non-vacuous alias assertions, 32-test replay and unchanged baseline mapping. Failure streak reset to zero. Sign-off commit includes all seven repair files and run evidence. Production remains the S6-reviewed 92-file candidate. Push next; exact-head CI still required before READY.

@@ -389,7 +389,9 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(output, 'export default define.layout(');
     assertStringIncludes(output, 'if (!rendersAppChrome(url.pathname)) {');
-    assertStringIncludes(output, 'appNavigation.map((item) => (');
+    assertStringIncludes(output, 'appNavigation.filter((item) =>');
+    assertStringIncludes(output, "!item.developmentOnly || import.meta.env.MODE === 'development'");
+    assertStringIncludes(output, ').map((item) => (');
     assertStringIncludes(
       output,
       "aria-current={isCurrentNavigation(item, url.pathname) ? 'page' : undefined}",

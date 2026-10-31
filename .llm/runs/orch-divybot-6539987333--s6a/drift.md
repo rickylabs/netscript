@@ -46,3 +46,7 @@ S6 complete package tests initially328PASS/2FAIL: Avatar presence assertion used
 Integrated main1d274c1 via merge8e5e8b1. Contrast burn-down7ee9c3e supplies approved Figma values and destructive-text bindings, plus zero source exclusions. Shared CSS merged cleanly; generated registry conflict resolved by regeneration. S6 authored source survived stash/reapply byte-for-byte. Prior330-test and304-fixture/1820-measurementPASS evidence is pre-merge; affected full/token/carrier/browser gates refresh against the merged source before review.
 
 S6 manual final image inspection caught a DataTable header order dependency: later shared Card CSS reset its flex axis to column while end alignment remained, pushing the heading right. An explicit Utility contract selector restores row/center alignment, independent of import order. A new browser assertion covers the axis; only DataTable needs the supplemental recapture because this selector targets that part exclusively. Full304-case merged pass remains the evidence for other scopes.
+
+## CI repair — default-aware design browser matrix
+
+CI at e501f41 exposed design-browser assertions that still assume the scaffold defaults to NS One. Extend the write surface to `tools/fresh-ui-browser/` to cover the actual Studio Utility default and retain explicit NS One preview coverage. The baseline migration must preserve existing legacy findings, permit no new contrast exclusions, and be independently reviewed with complete axe reports. Core test shard failures are also under investigation; no READY claim.

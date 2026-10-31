@@ -7,7 +7,7 @@ export const WIDTHS = [390, 1280] as const;
 export const THEME_STORAGE_KEY = 'ns-theme';
 export const ROUTES: readonly string[] = (
   process.env.FRESH_UI_ROUTES ??
-    '/design/tokens,/design/components,/design/tokens?preset=studio-utility'
+    '/design/tokens,/design/components,/design/tokens?preset=studio-utility,/design/tokens?preset=ns-one,/design/components?preset=ns-one'
 ).split(',').map((route) => route.trim());
 if (!ROUTES.length || ROUTES.some((route) => !route.startsWith('/') || route.startsWith('//'))) {
   throw new Error('FRESH_UI_ROUTES must contain comma-separated app-relative paths');
