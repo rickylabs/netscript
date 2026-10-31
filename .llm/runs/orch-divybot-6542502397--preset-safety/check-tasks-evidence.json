@@ -66,7 +66,11 @@
       "durationSeconds": 0.83
     }
   ],
-  "assetsBarrel": "Pending post-commit freshness check",
+  "assetsBarrel": {
+    "task": "check:assets-barrel",
+    "exitCode": 0,
+    "gitHead": "4407df52b65c9a8a559b35e26980a66373fa58e0"
+  },
   "siteTasks": [
     {
       "task": "check:source-format",

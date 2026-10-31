@@ -51,3 +51,9 @@ Final advisory-follow-up test passed scoped check/lint/fmt again. After the reco
 ## Implementation slice sign-off
 
 Full selected CLI test wrapper completed: exit 0, 43 passed, zero failures/ignores. The later remote-cache advisory test additionally passed in the focused 10-result regression run. Same independent evaluator returned final implementation PASS after reviewing both advisories and public gate summaries; it independently ran the two retained-payload tests (2 passed). Its report predates completion of the full CLI suite; that pending item is now resolved by cli-tests-evidence.json. Supervisor accepts the substantive independent slice review and commits the implementation. Runtime stays UNPROVEN for unavailable Docker. Remaining: post-commit assets-barrel, exact-head CI, final handoff.
+
+## Post-commit reconcile
+
+Implementation slice 4407df5 committed and pushed; PR implementation phase comment records scope, hash and evidence. check:assets-barrel PASS (exit 0) against that committed carrier. Thus every root check:* task (14 total) and all four site checks passed. Git diff shows no docs/site/deno.lock churn or generated-asset drift. Final evidence commit changes only run artifacts; implementation code and generated carrier remain identical to the reviewed/tested slice.
+
+Transition PR out of draft solely to materialize required CI. No READY claim, no merge, no labels. Runtime remains UNPROVEN because Docker is unavailable; acceptance beyond the first two issue requirements remains excluded.
