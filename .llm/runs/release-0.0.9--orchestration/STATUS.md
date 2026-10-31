@@ -5,7 +5,7 @@
 - A3 #2144 MERGED #2481 4aa734e2b (closed); #2400 PR #2482 READY 6597b64 (e2e queued); #2151 MERGED #2484 (closed); #2161 MERGED #2497 (closed)
 - B1 #2159 → PR #2499 e2e RED (sagas runner unhealthy) → fixing → #2383 → #2160 → #2382; #2374: W4
 - B2 #2162 (after #2161) #2149: W3; #2369 MERGED #2487 (closed); #2108 (after B2 pair + all B1): W7
-- C1 (features lane) #2267 MERGED #2502 (closed); #2132 started 06:39Z (auto-released); #2338 #1367 #2377; #2373 internals (W4), #2390 (after all B1): W7
+- C1 (features lane) #2267 MERGED #2502 (closed); #2132 → PR #2505; #2338 #1367 #2377; #2373 internals (W4), #2390 (after all B1): W7
 - D1 #2396: #2422 MERGED 727542963, #2423 MERGED 204a71b1e, #2421 (final) awaiting READY at new head 94393bc then e2e; post-canary published-graph proof owed; #2367 MERGED #2485 (closed); #2115 MERGED #2498 (closed); #2290 MERGED #2492 (closed); #2259 BLOCKED (spike: no masking on Aspire 13.5.3) → Eric decision on #2474
 - E1 #2392 #2394 #2401: W4 · E2 #2385 MERGED #2489 (closed); #2155 → PR #2494 (implementing); #1491: W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 — CHECK #2406/#2409 vs Fresh UI S6a (#2419 studio-utility default preset) before dispatch; flag Cockpit on conflict

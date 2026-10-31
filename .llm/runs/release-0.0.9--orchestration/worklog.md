@@ -131,3 +131,4 @@
 - 06:36Z: #2502 (#2267) READY at `29626e4`, Opus MERGE; memory KV adapter and tests only, so required CI suffices.
 - 06:39:18Z: #2132 started; the held launch auto-released after about 17 min.
 - 06:42Z: **merged** #2502 (`59902cf6f`) for #2267; #2267 closed.
+- 06:42Z: #2132 → PR #2505.
