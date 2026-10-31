@@ -1,0 +1,38 @@
+{
+  "slice": 2,
+  "components": [
+    "button-group",
+    "toggle",
+    "toggle-group"
+  ],
+  "catalogEntries": 104,
+  "shipped": 69,
+  "unshipped": 35,
+  "focusedTests": {
+    "passed": 107,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 20,
+    "failed": 0,
+    "projects": [
+      "light-390",
+      "light-1280",
+      "dark-390",
+      "dark-1280"
+    ],
+    "newSeriousCriticalViolations": 0,
+    "freshBundle": "rebuilt before every run",
+    "negativeFocusMutation": "expected exit1; source restored before final20-case pass",
+    "staleBundle": "poisoned output overwritten before successful run",
+    "provenance": "local Linux; not a pinned CI pixel baseline"
+  },
+  "qualityGate": "PASS",
+  "releasePreflight": "PASS",
+  "docsAccuracy": "PASS99/99",
+  "independentReview": [
+    "FAIL_FIX",
+    "PASS"
+  ],
+  "localLockChanges": false
+}
