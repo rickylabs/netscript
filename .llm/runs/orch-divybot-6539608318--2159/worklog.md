@@ -105,3 +105,9 @@ still pass after that merge. Real isolated Redis startup/health proof also passe
 finds the Aspire surface inventory stale because of the new diagnostic and generated-runner test;
 native regeneration adds exactly those two paths. Repaired parity checks 994 paths with zero failures.
 Keep this inventory repair local until the running diagnostic E2E completes so its evidence survives.
+
+Hosted diagnostic SQLite proof repeats the doctor failure with a concrete transport TimeoutError
+for the saga child, while Aspire still reports that child Healthy. Other children return full valid
+ready payloads. The next diagnostic also compares the target listener using Aspire's resolved PORT
+and retains console lifecycle/error categories only. It preserves the failed doctor verdict and
+does not increase readiness timeouts. Seven focused tests pass; scoped check/lint pass.

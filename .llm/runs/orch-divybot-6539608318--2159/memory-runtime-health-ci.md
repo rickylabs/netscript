@@ -22,3 +22,8 @@ Postgres/SQLite runtime checks, a more recent comparison than the older main-bra
 Adding an Aspire-related diagnostic or test changes the tracked surface inventory. Regenerate with
 aspire-surface-manifest.ts and run check:aspire-version-parity; the two added paths are the entire
 generated diff. Local repaired parity is fresh, 994 paths checked, zero failures. No version bump.
+
+Extended isolated Redis proof probes the actual generated process every second for two minutes:
+120 strict health reads remain ready. The owned provider and child are reaped. This is focused
+startup/steady-process evidence; it does not substitute for the full hosted runtime verdict.
+At diagnostic head, 16 of 17 quality receipts pass; the sole failure is the repaired inventory.

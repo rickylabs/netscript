@@ -1,5 +1,18 @@
 import { assert, assertEquals } from '@std/assert';
-import { childPayloadShape } from '../../../src/application/gates/scaffold/runtime/diagnose-plugin-health.ts';
+import {
+  childConsoleEvents,
+  childPayloadShape,
+} from '../../../src/application/gates/scaffold/runtime/diagnose-plugin-health.ts';
+
+Deno.test('child console evidence exposes lifecycle categories without log values', () => {
+  const events = childConsoleEvents(
+    'Watcher Process started.\nListening on secret-endpoint\n' +
+      'Background child failed: QueueError secret-token\nstack private-path',
+  );
+  assertEquals(events, ['process-started', 'http-listening', 'child-failed', 'queue-error']);
+  assert(!JSON.stringify(events).includes('secret'));
+  assert(!JSON.stringify(events).includes('private'));
+});
 
 Deno.test('child health diagnostic reports missing fields without copying secret values', () => {
   const evidence = childPayloadShape({
