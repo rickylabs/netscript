@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
+  "currentMainSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -1181,16 +1181,19 @@
     {
       "id": "B2-2108",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2535,
-      "headSha": "d92acd5ba42ed4d282f4f18d3ab8a9133f312fd1",
+      "headSha": "5281ba8b4c24b513779a122119bdce3bf93aa5da",
       "issueNumbers": [
         2108
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2108",
       "receiptRefs": [],
-      "note": "e2e red at d92acd5: flow-b-fixture workers-api --config; steered"
+      "note": "KV-only capstone: --no-db workers/sagas/triggers + auth kv-oauth; 11 resources healthy; runner store resolver + projection setting; READY + flow-b fix 5281ba8; Opus MERGE; 34/34 incl both runtime tiers; lock +1 workspace line",
+      "mergeCommit": "7feb24c7d09518a045c3955555967dbbde51e92a",
+      "mergedAt": "2026-10-31T16:02:56Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2108"
     },
     {
       "id": "G1-1912",
@@ -1693,6 +1696,24 @@
       "via": "label e2e-cli-gate (re-armed after fmt fix)",
       "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
       "completedAt": "2026-10-31T15:22:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "complete",
+      "prNumber": 2535,
+      "headSha": "5281ba8b4c24b513779a122119bdce3bf93aa5da",
+      "startedAt": "2026-10-31T15:45:40Z",
+      "via": "label e2e-cli-gate (re-armed after flow-b fix)",
+      "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
+      "completedAt": "2026-10-31T16:00:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": null,
+      "headSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
+      "startedAt": "2026-10-31T16:03:10Z",
+      "via": "workflow_dispatch on main (canary .2 control run 41217778710)"
     }
   ],
   "canaryCheckpoints": [
@@ -1707,7 +1728,8 @@
       "id": "0.0.9-canary.2",
       "state": "planned",
       "targetDate": "2026-11-06",
-      "rationale": "B1 saga retry/compensation/read model on KV, B2 KV-only proof, C1 ordering and restart safety, E1 structured logging, rest of D1."
+      "rationale": "B1 saga retry/compensation/read model on KV, B2 KV-only proof, C1 ordering and restart safety, E1 structured logging, rest of D1.",
+      "note": "code contents merged at 16:02Z (candidate 7feb24c7d09518a045c3955555967dbbde51e92a); main control runs in progress; Eric-held: #2159 follow-up placement, #2259"
     },
     {
       "id": "0.0.9-canary.3",
@@ -1724,11 +1746,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T15:24:50Z",
-    "nextReportDueAt": "2026-10-31T16:24:50Z",
+    "lastReportAt": "2026-10-31T16:03:25Z",
+    "nextReportDueAt": "2026-10-31T17:03:25Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2542 (#1366 box 6)",
-    "currentMainSha": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
+    "headline": "canary .2 code complete; main control runs at 7feb24c7d",
+    "currentMainSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1914,7 +1936,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T15:24:50Z",
+  "updatedAt": "2026-10-31T16:03:26Z",
   "dispatches": [
     {
       "issue": 2438,

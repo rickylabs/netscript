@@ -306,3 +306,6 @@
 - 15:07:35Z: #2535 (#2108) e2e RED at `d92acd5`: SQLite tier runtime.flow-b-fixture (workers-api resource lacks the Deno config argument). Steered the worker, removed the label; **expensive-gate.released**.
 - 15:07:46Z: **expensive-gate.acquired** on #2542 (#1366) at `0a945ea`.
 - 15:24:50Z: **merged** #2542 (`7312ba498`) for #1366 box 6; #1366 stays open (box 5 and consumer proof with Eric). The gate is free.
+- 15:45:40Z: #2535 (#2108) fix `5281ba8` with Opus MERGE; **expensive-gate.acquired** on #2535.
+- 16:02:46Z: Cockpit 16:05Z: orchid 83b160a fixed the conflict relay (merge + plain push). Codex weekly is at 89% with 20 runs active: **no new Codex leaves unless they block a canary**; finish the running ones.
+- 16:03:01Z: **merged** #2535 (`7feb24c7d`) for #2108 (B2 capstone). **B2 complete; canary .2 code complete** except the Eric-held items (#2159 follow-up, #2259).
