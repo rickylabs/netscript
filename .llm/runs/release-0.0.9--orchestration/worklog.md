@@ -189,3 +189,17 @@
 - 10:53:21Z: **merged** #2515 (`0af1d65b2`) for #2401 (E1); #2401 closed with evidence. **expensive-gate.acquired** on #2421 (#2396) at `32264fc` before its READY (canary .1 critical path; merge still waits for READY).
 - 10:55:04Z: **merged** #2509 (`da3d08f3d`) for #2162 (B2); #2162 closed with evidence. Note: per the worker, an intermediate PR commit carried generated local paths (no credentials). The final tree is clean (privacy scan of the full diff). History is not rewritten (no-force-push rule). Continuation claims #1367 and #2268 are orphaned: both claimant workspaces are gone and no PRs exist; re-dispatching.
 - 10:56:19Z: dispatched #2149 (B2, fixes), comment 6542487846. Validator green (after refreshing the reporting heartbeat).
+- 10:57:11Z: #2421 head moved `32264fc` → `c1f9c10` at 10:55Z (r3 worker); e2e running at the new head; a fresh exact-head MERGE and READY are needed.
+- 11:00:46Z: #2149 started 10:59Z.
+- 11:02:15Z: re-dispatched orphaned continuation #1367 (features), comment 6542543055.
+- 11:07:01Z: #2149 → PR #2519. Re-dispatched orphaned #1367 (features), comment 6542543055. The #2268 post was held by the validator gate (new design-system PR #2518 from #2516 was unrecorded); v.sh now auto-excludes orch PRs whose source issue is epic:design-system.
+- 11:07:04Z: re-dispatched orphaned continuation #2268 (internals), comment 6542589669. Validator green before posting.
+- 11:07:30Z: #1367 started 11:06:18Z (one second after a transient 'refused reason=profile-unavailable' binding on the same comment; not reposted).
+- 11:11:09Z: #2268 started 11:09Z. #2421 e2e both runtime tiers green at `c1f9c10`; close-gate red until boxes are ticked; exact-head MERGE and READY pending (r3 worker live). Builders 5/5.
+- 11:11:23Z: #1367 → PR #2520.
+- 11:13:14Z: #2517 (#2160) Opus MERGE at `3fe6b60`; waiting for READY.
+- 11:16:45Z: #2160 READY (PR #2517, Opus MERGE at `3fe6b60`); **expensive-gate.acquired** on #2517. #2421 e2e completed green at `c1f9c10`. #2268 → PR #2521.
+- 11:22:06Z: #2421 head `2f4b66e` (11:17Z) with Opus MERGE at that head; its e2e re-ran on push (label kept) concurrently with #2517's. Drift recorded; new rule: drop the label when a PR's e2e completes and re-arm at READY. The validator is red (two gates) until one finishes, so no dispatch until then.
+- 11:29:02Z: #2520 (#1367) Opus MERGE at `57193c4`; waiting for READY.
+- 11:33:30Z: **merged** #2517 (`462f15c09`) for #2160 (B1); #2160 auto-closed, evidence posted. #2421 e2e green at `2f4b66e`; label removed (new rule). No expensive gate running. #2382 unblocked.
+- 11:33:54Z: dispatched #2382 (B1, fixes; last B1 leaf; requires #2160 merged), comment 6542833423. Validator green before posting.
