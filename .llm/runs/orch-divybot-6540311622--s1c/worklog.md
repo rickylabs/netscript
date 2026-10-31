@@ -28,3 +28,21 @@ Independent same-evaluator repair review: **SLICE APPROVED** (slice-review.md). 
 Release preflight, docs accuracy, quality/architecture and eight static root check tasks pass (static-gates.json). Prose/corpus/assets/publish generated; clean-source final checks pending this checkpoint. Runtime is UNPROVEN as explicitly allowed; see runtime-verdict.md and resource-verdict.json. Whole-package doclint remains the baseline 124 diagnostics (96 private type refs / 28 missing JSDoc); JSR audit retains preexisting contracts.json module-tag and slow-type/banner advisories. No debt added.
 
 Reconcile: related PRs cover only dependency export/inactive policy/default switch; no default selection or labels changed. No root/docs-site lock churn. Source checkpoint is ready for clean corpus regeneration and final immutable-head receipts. Full root structured check emitted 4,015 files and zero findings; its task exit needs re-verification through the receipt runner before being claimed green.
+
+## Committed-source gate receipts
+
+All eight receipt-runner gates PASS at source checkpoint 082b3bb6e184ff70884af747a9505bbae8094745: root check, quality:gate, docs:accuracy, MCP export corpus, assets barrel, agent-docs prose, publish assets, frozen token outputs. Root check raw exit is verified 0 by the immutable-head receipt; the earlier shell-session discrepancy is superseded. Clean corpus regeneration (without --allow-dirty) produced the same hash and no carrier diff. Review threads PASS: zero threads / zero unanswered. Together with static-gates.json these cover all 13 root check tasks. No lock churn. Native package payload: 142 files / 4,292,450 bytes under 5,000,000.
+
+A local Chromium matrix is additionally checking the gallery because contrast fixes remove old axe allowances. Preliminary scans contain only fixed findings; any baseline refresh will delete only proven stale entries and preserve every remaining count.
+
+## Browser baseline burn-down
+
+Complete initial Chromium capture found exactly 12 stale color-contrast allowances and no new or increased findings. The removed nodes are destructive button labels (4), the token swatch label (4), light error text (2), and light subtle destructive badge text (2). Engine/browser match the reviewed baseline. `browser-baseline-diff.json` enumerates every removed rule/node/count. Every remaining allowance is unchanged and all Utility preview cases still allow zero. Baseline narrowed; full matrix rerun and independent final review pending.
+
+Canonical final browser gate PASS, exit 0, fresh child report: **24 tests passed, zero skipped/failed**, covering 12 axe/screenshot/keyboard cases plus navigation. Exact-baseline contract PASS, 5 tests. See browser-verdict.json. This is browser evidence for the shipped token and component changes; no default-preset change.
+
+## Final local sign-off
+
+Mandatory same-session Anthropic IMPL-EVAL **PASS** in evaluate.md. Requested and observed model: claude-opus-5-5; effort high. It independently verified the source snapshot, actual component consumers, zero-failure/disabled counts, measured 9080 uses, fixed-only browser baseline delta and private canonical browser receipts. No source changes follow its source sign-off. Final resource audit still reports zero owned survivors; 24 unknown-owner entries left untouched, Docker inspection unavailable.
+
+This commit narrows the browser test baseline and records final evidence only. Origin/main remains the original baseline after explicit fetch, so no coordination merge is needed. PR milestone matches issue 0.0.9; labels remain empty. Next: push final evidence, open for review to schedule actual CI (draft jobs are policy-skipped), verify exact-head required checks, then publish READY through the assignment report handoff. No merge.

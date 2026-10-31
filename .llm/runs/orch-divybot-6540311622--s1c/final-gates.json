@@ -1,0 +1,82 @@
+[
+  {
+    "gate": "check",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 116541,
+    "requestHash": "d8948f292f10052f638bafd30163ae910db27d4fcb3a407936d6df3996db98bd"
+  },
+  {
+    "gate": "quality-gate",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 14001,
+    "requestHash": "d0039c9d4d2fd82d3bf72044059c4da21f9200b459e03229073c74e953cd375d"
+  },
+  {
+    "gate": "docs-accuracy",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 5814,
+    "requestHash": "b7080cd45142e77fbc2402e97060e4852d6ca306a9bd33d7d69b7b19e1c6f61b"
+  },
+  {
+    "gate": "mcp-export-corpus",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 8243,
+    "requestHash": "fbe003c0c5e907a94cc6d49be17dd6cfb1be8e617a2785ae6713b0b16c083c5c"
+  },
+  {
+    "gate": "assets-barrel",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 2679,
+    "requestHash": "03789aaf04e1ec6c83cf03607cc52291c0a6d5fdadf0d67d106fa3856d324e6f"
+  },
+  {
+    "gate": "agent-docs-prose",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 14478,
+    "requestHash": "3be08c069f5d283986d6134e1f4243bf7cbd2cd0e78cc3f2b68415cf9e235a13"
+  },
+  {
+    "gate": "publish-assets",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 511,
+    "requestHash": "a22dcc220fd1f7279b20f06287408b98333b2aba0efdb91c1ec6c8517b79e44c"
+  },
+  {
+    "gate": "fresh-ui-tokens",
+    "launcherExitCode": 0,
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "actualGitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 18562,
+    "requestHash": "44ec8a8e80d9fd07b2db91e22b497ec5f66a9dd9f14ddf14b8b51dbf4c8892f3"
+  }
+]

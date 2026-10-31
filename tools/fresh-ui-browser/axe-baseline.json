@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "capturedAt": "2026-10-28T21:46:13.260Z",
-  "sourceHead": "bc9c8f14fe1488253df49588c24e599932fa91f8",
+  "capturedAt": "2026-10-31T07:16:19.563Z",
+  "sourceHead": "082b3bb6e184ff70884af747a9505bbae8094745",
   "engine": {
     "name": "axe-core",
     "version": "4.11.4"
   },
   "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
-  "review": "Reviewed S3 structural selector migration: re-key existing nodes after BEM/anatomy attribute changes. Every case retains identical rule/impact/count totals; all four Utility preview cases retain zero allowances. No new, increased or decreased finding allowance accepted. Captured from the source changes in PR #2467 on top of sourceHead.",
+  "review": "S1c contrast burn-down: remove exactly 12 proven stale color-contrast allowances after the #2506 value pass, owned NS One fill corrections and destructive-text consumer repair. Complete 12-case Chromium/axe matrix uses the same engine and browser. No new, increased or changed remaining allowance; Utility previews retain zero allowances. See .llm/runs/orch-divybot-6540311622--s1c/browser-baseline-diff.json.",
   "debt": {
     "color-contrast": "Existing theme/gallery contrast: tokens v2 in design-system epic #2412.",
     "aria-required-children": "Existing DesktopTrayMenu semantics: design-system component slice in epic #2412.",
@@ -16,7 +16,6 @@
   "cases": {
     "/design/components|dark-1280": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-btn[data-variant=\\\"destructive\\\"][data-size=\\\"md\\\"] > span[data-scope=\\\"button\\\"][data-part=\\\"label\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(1) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(2) > .ns-badge[data-variant=\\\"secondary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -31,7 +30,6 @@
     },
     "/design/components|dark-390": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-btn[data-variant=\\\"destructive\\\"][data-size=\\\"md\\\"] > span[data-scope=\\\"button\\\"][data-part=\\\"label\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(1) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(2) > .ns-badge[data-variant=\\\"secondary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -44,8 +42,6 @@
     },
     "/design/components|light-1280": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-badge[data-variant=\\\"destructive\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-btn[data-variant=\\\"destructive\\\"][data-size=\\\"md\\\"] > span[data-scope=\\\"button\\\"][data-part=\\\"label\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-cluster--md > .ns-badge[data-variant=\\\"primary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-dashboard__sidebar-header > .ns-badge[data-variant=\\\"secondary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -53,7 +49,6 @@
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(2) > .ns-badge[data-variant=\\\"secondary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(3) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-desktop-notification__action\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-error-text\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-gallery-demo > .ns-gallery-row > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-gallery-demo > .ns-gallery-row > .ns-badge[data-variant=\\\"warning\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-gallery-row > .ns-badge[data-variant=\\\"primary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -122,15 +117,12 @@
     },
     "/design/components|light-390": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-badge[data-variant=\\\"destructive\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-btn[data-variant=\\\"destructive\\\"][data-size=\\\"md\\\"] > span[data-scope=\\\"button\\\"][data-part=\\\"label\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-cluster--md > .ns-badge[data-variant=\\\"primary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(1) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(2) > .ns-badge[data-variant=\\\"secondary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(3) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-desktop-notification__action\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\".ns-error-text\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-gallery-demo > .ns-gallery-row > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-gallery-demo > .ns-gallery-row > .ns-badge[data-variant=\\\"warning\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-gallery-row > .ns-badge[data-variant=\\\"primary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -201,7 +193,6 @@
     "/design/tokens?preset=studio-utility|light-390": {},
     "/design/tokens|dark-1280": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > strong\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"div:nth-child(1) > .ns-dashboard__nav-group[data-part=\\\"nav-group\\\"][role=\\\"list\\\"] > .ns-dashboard__nav-group-label[data-part=\\\"nav-group-label\\\"][data-scope=\\\"sidebar\\\"]\"]]": 1,
@@ -209,13 +200,11 @@
     },
     "/design/tokens|dark-390": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > strong\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1
     },
     "/design/tokens|light-1280": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > strong\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"div:nth-child(1) > .ns-dashboard__nav-group[data-part=\\\"nav-group\\\"][role=\\\"list\\\"] > .ns-dashboard__nav-group-label[data-part=\\\"nav-group-label\\\"][data-scope=\\\"sidebar\\\"]\"]]": 1,
@@ -225,7 +214,6 @@
     },
     "/design/tokens|light-390": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
-      "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > strong\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"span[data-variant=\\\"primary\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1
