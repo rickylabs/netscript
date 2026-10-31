@@ -85,3 +85,25 @@ publish assets and MCP export corpus in order. No docs/site/deno.lock churn.
 Reconcile: source and carrier slice complete; final check:* freshness checks,
 publication gates, formal IMPL-EVAL and exact-head non-draft CI remain before
 READY. Runtime and actual Figma host acceptance remain UNPROVEN as documented.
+
+
+## S6d — final evidence and implementation evaluation
+
+Formal IMPL-EVAL PASS by the retained independent native Opus5.5/high evaluator;
+full verdict preserved in evaluate.md. All local root check:* tasks pass, final
+quality and token receipts pass, workspace publication and native payload budget
+pass. Explicit inherited JSR/doc-lint findings and runtime/host UNPROVEN limits
+remain visible. Added dated lesson and memory recipes. Pinned upstream LICENSE
+bytes separately verified with GitHub at the exact NOTICE SHA.
+
+Generated Aspire manifest adds two new helper/test rows and the archival lesson
+row using existing rules; parity PASS after staging the lesson. Source tree is
+unchanged since S6c. Parent-head receipts explicitly refer to the S6c working
+tree; no exact-final-head claim is made from them. Supplementary scoped CLI lint
+uses plugin config because repository policy excludes CLI; required CI remains
+a separate gate. Public absolute-path scan0 findings; no goal file or docs-site
+lock tracked. Temporary baseline audit worktree removed after comparisons.
+
+Reconcile: all implementation/local-evidence slices complete. Next mark PR ready
+for review to materialize non-draft CI; do not report READY until exact final
+head's required checks are green. Cockpit owns merge. No Code Connect scope.

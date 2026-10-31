@@ -25,3 +25,9 @@
   stops Aspire preflight and cleanup inspection. Runtime verdict is UNPROVEN.
   Read-only leak reporting found24 unproven survivors and0 proven-owned survivors;
   none were mutated. Public leak-report.md contains only verdict/counts.
+
+- Final parity check required regeneration of the tracked Aspire surface
+  manifest: two new init/test paths plus the dated archival lesson, all classified by its rules.
+  Extend the carrier write surface to that generated fixture; no pin changes.
+- Optional Chromium UI smoke cannot launch because libnspr4.so is missing;
+  browser UI execution is UNPROVEN in addition to actual Figma host execution.
