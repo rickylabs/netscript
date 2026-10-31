@@ -68,3 +68,11 @@ Independent IMPL-EVAL round 1 approved source/evidence at pushed 125a5902df43d6e
 Owner then directed rebase/force-push due merge conflicts. New base: 2f426b970d7a00bdbeb09c59b72b49478b839a5a. Conflict resolution preserves upstream connection-string changelog plus this feature's entry; generated prose rebuilt from merged docs. Range-diff verifies S0/S1/S1-fix/S2 replay unchanged. The earlier evaluation is historical, not an exact-head certificate for the rebased commit; final same-session evaluation follows the push.
 
 Rebase gates: full native PostgreSQL conformance exit0 again (all seven outer tests); quality/architecture exit0; regenerated assets, publish assets and corpus freshness pass. No implementation changes or lock churn. Force-with-lease push now; final JSDoc/corpus regression and exact-head IMPL-EVAL follow on the rebased head.
+
+## S4 consumer import CI repair
+
+Ready-state CI test-5 and test-6 found a real consumer regression: the new migration helper relied on root-only @std/path. The aggregate check-test failure follows those shards. Fixed the import to the same literal jsr:@std/path@1 used by sibling published scripts; no version, signature or lock change.
+
+Both no-Aspire database lifecycle tests and both generated-handler tests now pass locally (4 total), plus all 17 migration regressions. Structured check/lint/fmt, quality/architecture and corpus freshness pass. Independent S4 supervisor PASS. See CI jobs https://github.com/rickylabs/netscript/actions/runs/41165454816/job/124432040530 and https://github.com/rickylabs/netscript/actions/runs/41165454816/job/124432040509 for the prior red controls.
+
+The prior exact-head verdict at b48b556 is historical after this fix; final same-session IMPL-EVAL will certify the next pushed head. Close-gate's sole remaining unchecked claim is coordinator-required scaffold.runtime, which is intentionally unproven until the coordinator arms CI. No box is falsely ticked.

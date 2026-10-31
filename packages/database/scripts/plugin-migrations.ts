@@ -1,6 +1,6 @@
 /** Migration-time delivery of immutable SQL sidecars from installed schema contributions. */
 import { walk } from 'jsr:@std/fs@^1/walk';
-import { join, relative } from '@std/path';
+import { join, relative } from 'jsr:@std/path@1';
 
 /** One pending SQL asset and its durable content identity. */
 export type PluginMigration = Readonly<{ marker: string; sql: string }>;
