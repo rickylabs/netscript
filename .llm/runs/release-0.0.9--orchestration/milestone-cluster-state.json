@@ -773,15 +773,16 @@
     {
       "id": "C1-2132",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2505,
-      "headSha": "05b2357b80c87fc0dff1ec9ad2b9f9b4df7c54c1",
+      "headSha": "a75d6314cf281291687bf3ffc755c7ea69ab7abc",
       "issueNumbers": [
         2132
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2132",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY a75d631; Opus MERGE; e2e armed (Redis/Garnet KV in scaffold)"
     }
   ],
   "expensiveGates": [
@@ -914,6 +915,14 @@
       "via": "label e2e-cli-gate",
       "result": "FAILURE both tiers: behavior.plugins-health (sagas runner unhealthy) at da931b7",
       "completedAt": "2026-10-31T06:28:41Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2505,
+      "headSha": "a75d6314cf281291687bf3ffc755c7ea69ab7abc",
+      "startedAt": "2026-10-31T07:35:55.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1134,7 +1143,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T06:42:49.000Z",
+  "updatedAt": "2026-10-31T07:35:55.000Z",
   "dispatches": [
     {
       "issue": 2438,

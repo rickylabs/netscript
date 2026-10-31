@@ -132,3 +132,4 @@
 - 06:39:18Z: #2132 started; the held launch auto-released after about 17 min.
 - 06:42Z: **merged** #2502 (`59902cf6f`) for #2267; #2267 closed.
 - 06:42Z: #2132 → PR #2505.
+- 07:35Z: #2505 (#2132) READY at `a75d631`, Opus MERGE; **expensive-gate.acquired** (Redis/Garnet KV is used by the scaffold). #2482 and #2421 show no response to the merge-main steers after 1.5 h: their workers end their runs after READY, and steering reaches only a live job's own PR. Re-dispatching focused merge-main leaves.
