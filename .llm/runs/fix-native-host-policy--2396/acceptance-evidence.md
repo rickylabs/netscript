@@ -21,3 +21,17 @@ streams3 and prerequisite Fresh45; normalized exact-main findings match, with no
 Read-only sibling review: sagas keeps its existing context-taking KV/DB projection seam;
 triggers keeps its bootstrap and HMAC webhook ingress. No new sibling startup API is needed
 for the named workers/streams seam. #829 and #2364 remain outside this implementation.
+
+## Current-main reconciliation
+
+Final source integrates main4aa734e2b6ca93119462ec2e0cd34b729df51bfd, including the
+reviewed telemetry/locked-fixture and worker retry/dead-letter changes. Only generated carrier
+conflicts occurred; no authored runtime/test conflict. All carriers were canonically refreshed.
+Current union root check3857/33 PASS; combined service/plugin/Fresh/workers/streams/native SDK
+and inherited worker retry tests1504 passed,0 failed,4 ignored. The four ignored cases are
+main's Redis adapter variants without local NETSCRIPT_TEST_REDIS_URL; CI supplies owned Redis.
+All333 service/plugin TypeScript lint/fmt targets pass with no drops. Quality/architecture,
+six published-member dry-runs, four canonical freshness checks,479 JSDoc examples and export
+drift pass. Current native JSR included list93 has no tests/helper. Current-main normalized
+doc findings remain workers2/streams3/Fresh45 with native service0 and both factory paths0.
+See doc-lint-baseline-refreshed.json and latestValidation in gate-summary.json.

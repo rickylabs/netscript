@@ -1,8 +1,9 @@
 {
   "command": "deno publish --dry-run --allow-dirty --log-level debug",
+  "mainBaseline": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
   "package": "@netscript/plugin-workers",
   "exitCode": 0,
-  "includedFileCount": 92,
+  "includedFileCount": 93,
   "includedFiles": [
     "README.md",
     "bin/combined.ts",
@@ -79,6 +80,7 @@
     "streams/producer.ts",
     "streams/schema.ts",
     "streams/server.ts",
+    "worker/job-dead-letters.ts",
     "worker/job-dispatcher.ts",
     "worker/job-execution.ts",
     "worker/job-runner-pool.ts",
@@ -98,5 +100,5 @@
     "worker/worker.ts"
   ],
   "testAndFixturePathsIncluded": false,
-  "scope": "Native JSR dry-run included-file list, not an actual published graph"
+  "scope": "Native JSR dry-run included-file list; actual published consumer graph remains unproven"
 }

@@ -1,0 +1,124 @@
+{
+  "mainHead": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
+  "packages": {
+    "workers": {
+      "current": {
+        "totalPackages": 1,
+        "totalErrors": 2,
+        "totalPrivateTypeRef": 2,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "main": {
+        "totalPackages": 1,
+        "totalErrors": 2,
+        "totalPrivateTypeRef": 2,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "sameNormalizedFindings": true,
+      "findings": [
+        {
+          "path": "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0
+        }
+      ],
+      "singularServiceFindings": 0
+    },
+    "streams": {
+      "current": {
+        "totalPackages": 1,
+        "totalErrors": 3,
+        "totalPrivateTypeRef": 1,
+        "totalMissingJSDoc": 2,
+        "totalOther": 0
+      },
+      "main": {
+        "totalPackages": 1,
+        "totalErrors": 3,
+        "totalPrivateTypeRef": 1,
+        "totalMissingJSDoc": 2,
+        "totalOther": 0
+      },
+      "sameNormalizedFindings": true,
+      "findings": [
+        {
+          "path": "packages/plugin/src/config/domain/plugin-contributions.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "plugins/streams/src/cli/streams-cli.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 2,
+          "other": 0
+        }
+      ],
+      "singularServiceFindings": 0
+    },
+    "fresh": {
+      "current": {
+        "totalPackages": 1,
+        "totalErrors": 45,
+        "totalPrivateTypeRef": 28,
+        "totalMissingJSDoc": 17,
+        "totalOther": 0
+      },
+      "main": {
+        "totalPackages": 1,
+        "totalErrors": 45,
+        "totalPrivateTypeRef": 28,
+        "totalMissingJSDoc": 17,
+        "totalOther": 0
+      },
+      "sameNormalizedFindings": true,
+      "findings": [
+        {
+          "path": "packages/fresh/src/application/builders/mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "packages/fresh/src/application/query/hooks.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "packages/fresh/src/application/query/query-types.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "packages/fresh/src/application/route/_internal/contract-types.ts",
+          "privateTypeRef": 8,
+          "missingJSDoc": 17,
+          "other": 0
+        },
+        {
+          "path": "packages/fresh/src/runtime/ai/create-chat-connection.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "packages/fresh/src/runtime/streams/mod.ts",
+          "privateTypeRef": 7,
+          "missingJSDoc": 0,
+          "other": 0
+        }
+      ]
+    }
+  }
+}

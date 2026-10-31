@@ -1,59 +1,44 @@
-# Issue2396 final source handoff
+# Issue2396 final current-main handoff
 
-Original PRs/landing order: #2422 service, #2423 reader headers, #2421 final factory integration.
-Only the coordinator merges. No duplicate PR, force push, label/milestone edit, merge, tag,
-release or local scaffold.runtime. Main baseline6a71cd0599673d70cd6311de3bb20b2d6a9dde2c.
+PR order:2422 service →2423 reader headers →2421 final integrated factories. All original
+branches retained, no force push. Only the coordinator merges and arms e2e-cli-gate. No label/
+milestone edits, local scaffold.runtime, merge to main, tag or release is authorized here.
 
-All implementation source is complete. Independent same-session round2 returned
-VERDICT: MERGE ac50f54502dd5d2f07a62cdd2b562094eb5dee21.
-This checkpoint only records that report and final resume state. evaluate-round-1.md preserves
-its single real publish-helper blocker; evaluate-round-2.md verifies the complete correction.
-Current source/tests equal the accepted source. Both newly recorded debt entries are accepted;
-existing workers22/streams21 closure bounds and2026-11-10 deadline remain unchanged.
+Final source checkpointa45a1db4014e3a8f987497a80a8bb2d7875af693 integrates latest fetched
+main4aa734e2b6ca93119462ec2e0cd34b729df51bfd. Root/member/fixture locks equal incoming
+main. No authored runtime/test conflict; canonical carrier conflicts were regenerated. GitHub
+reports MERGEABLE. This checkpoint updates only run evidence and must be the final pushed head
+for same-session independent round4; source remains unchanged from the validated merge.
 
-Proof: gate-summary.json, publish-file-list.json, doc-lint-baseline.json and acceptance-evidence.md.
-Root check3849/33 plus targeted relocated test/helper checks; complete workers/streams231/0/0,
-post-fix workers148/0/0 with unchanged streams83, SDK137/0/0; lint/fmt204/204 plus workers131
-post-fix; quality/architecture;479 JSDoc examples;26 site snippets;3 new guide examples;
-six-member dry-runs; four canonical freshness gates. Native JSR included list92 files has
-both service subpaths/legacy source and no test/helper. Actual published consumers are
-UNPROVEN until the first0.0.9canary, release-owned beforestable, not a premerge waiver.
-Full-package doc lint stays FAIL at main workers2/streams3/Fresh45; each new factory path0.
-Workers OpenAPI500 is exact-main baseline and is preserved, not repaired by this seam.
+Latest local proof: gate-summary.json latestValidation; root3857/33, combined1504 passed,
+0 failed,4 inherited Redis cases ignored without local test Redis URL;333-file lint/fmt;
+quality/architecture; six member dry-runs; four freshness checks;479 JSDoc examples and export
+drift. Native JSR list93 intended files excludes all tests/helpers. New source had no added
+skip, cast, suppression, publish filter or scope waiver. See acceptance-evidence.md and
+publish-file-list.json. Doc-lint-baseline-refreshed.json matches current main: workers2,
+streams3,Fresh45, service0; both new factory paths0. The initial6a71cd05 comparison remains
+history. Workers OpenAPI500 was measured on that original main and factory parity remains
+characterized; no healthy-document claim is made.
 
-#2423 stable7421a60f2ec0395a7e0f0ce76cbe9a24dd25980b: independent MERGE and actual green
-core/build/quality/close plus both scaffold runtime tiers. Its READY comment is authoritative.
-#2422 stableb2e31245020b651a32eb3b476c61a8198a1b42c0: no code blockers, but two terminal
-CHANGES for coordinator-unarmed runtime proof end its evaluator loop. Both decisions were
-surfaced on its PR and #2474; do not run a third S1 review or move that branch.
+Independent same-session history: round1 CHANGES for a genuinely published worker test helper;
+round2 MERGE ac50f545 after the byte-identical move under existing test_utils exclusion;
+round3 CHANGES2a9efb05 because main advanced and blocked core CI. Source/debt remained accepted.
+The current main merge fixes round3. Round4 is next; another terminal CHANGES ends this leaf's
+two-consecutive-failure loop even though the feature maximum is5. Terminal verdict/current CI
+are posted on the PR and canonical handoff; do not create a later commit solely for the final
+verdict, because its exact-head binding would then be invalid.
 
-Final immediate actions after this push: mark original #2421 ready, notify #2474 of exact
-head/e2e-cli-gate requirement, run the final same-session read-only review at that exact head,
-and snapshot current CI/review threads without waiting for CI. Final verdicts/CI states are
-recorded in PR comments and the final handoff; later commits solely to record a terminal
-verdict would invalidate its exact-head binding. Consult those terminal reports first.
+Stable prereqs:2423 head7421a60f2ec0395a7e0f0ce76cbe9a24dd25980b has independent MERGE
+and actual green core/build/quality/close plus both runtime tiers.2422 head
+b2e31245020b651a32eb3b476c61a8198a1b42c0 has no code blockers but two external-gate
+CHANGES ended its evaluator loop; coordinator runtime arming remains unproven. Do not start
+a third S1 review. Both prerequisite PRs reported mergeable when main advanced.
 
-Canonical final issue text starts READY and is handed off by writing .divybot-final-report.tmp
-then renaming to .divybot-final-report.md. Never commit either report or .divybot-goal.md.
-Do not directly post the canonical issue report. Every acceptance entry needs evidence and
-any unproven reason. #2421 is the final implementation PR; required CI and postpublish proof
-remain their own gates. No downstream deployment or whole-issue closure is certified early.
+All accepted debt bounds/date remain fixed. Actual published consumer graph/e2e-cli-prod is
+release-owned on the first exact0.0.9canary beforestable, not a premerge runtime waiver.
 
-IMPL round3 CHANGES at2a9efb05bcb49e38f5c6bbba454e0a51db5b595c: source remains
-accepted, but current main advanced and conflicts prevent core pull_request CI from starting.
-Fetched current main4aa734e2b6ca93119462ec2e0cd34b729df51bfd (telemetry/locked fixture
-repair #2476 and worker retry/dead-letter #2481). Merge conflicts affect only canonical prose
-and publish-asset carriers. No authored runtime conflict. Resolve carriers from incoming main
-then regenerate canonically over the union; also regenerate the auto-merged export corpus.
-Incoming root/member/fixture lock changes are exact main, not local dependency churn. Both
-prerequisite PRs still merge cleanly, so their stable reviewed heads are not rewritten.
-Broaden final union validation for the new worker runtime and telemetry interactions. Record
-current-main documentation baseline separately; preserve initial6a71cd05 comparison history.
-
-Current-main merge source reconciliation:4aa734e2b6ca93119462ec2e0cd34b729df51bfd is
-integrated with no authored runtime/test conflict. Canonical prose regeneration and both
-asset generators pass over both main's worker retry docs and the host guide. Only generated
-carrier conflicts needed resolution; incoming source/locks were retained exactly. Commit the
-merge locally so the export-corpus generator can inspect a clean source tree, regenerate its
-auto-merged carrier, then push the complete coherent union. Local runtime/tests/quality and
-publication gates must be refreshed for new main before the final same-session evaluation.
+After final exact-head review and honest CI/thread snapshot, post one qualified READY per
+remaining PR and queue the canonical READY via .divybot-final-report.tmp →
+.divybot-final-report.md. Neither report nor .divybot-goal.md is committed. Do not directly
+post the canonical issue2396 final comment. Every acceptance entry needs evidence and limits.
+#2421 is the final implementation PR after prerequisites; no early issue closure certification.

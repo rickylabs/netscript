@@ -191,3 +191,13 @@ carrier conflicts needed resolution; incoming source/locks were retained exactly
 merge locally so the export-corpus generator can inspect a clean source tree, regenerate its
 auto-merged carrier, then push the complete coherent union. Local runtime/tests/quality and
 publication gates must be refreshed for new main before the final same-session evaluation.
+
+Current-main union validation PASS at sourcea45a1db4014e3a8f987497a80a8bb2d7875af693:
+root3857/33, combined tests1504/0/4, lint/fmt333/333 with no drops, quality/architecture,
+six member publication dry-runs, four canonical freshness gates,479 JSDoc examples and export
+drift. Four ignored tests are unchanged main Redis retry variants requiring an explicit test
+Redis URL; no skip was added by this lane. Native JSR includes93 intended files/no helper.
+Full doc findings exactly match refreshed main4aa734e2 (service0,workers2,streams3,Fresh45);
+both new factory paths0. Native mergeability confirms MERGEABLE, so the prior conflict blocker
+is fixed. Main was fetched again and remains4aa734e2. Only run evidence changes next; final
+same-session round4 must review the exact pushed head and current CI without waiting for CI.
