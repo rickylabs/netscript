@@ -38,3 +38,6 @@ README and memory-browser.md. No changed lock files/caches allowed.
 Phase2b remains: Layout4, AI5, Docs8 + Desktop audit and all-style harness.
 The current style ID table is still Utility-only; phase2b must derive native
 source-style registrations, reject missing providers and all4 contract mutants.
+
+Slice5 source de67b38 signed off; all four carrier freshness checks PASS after
+clean-source MCP regeneration. No lock churn. Push/comment closes this slice.
