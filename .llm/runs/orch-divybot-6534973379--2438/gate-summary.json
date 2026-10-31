@@ -1,0 +1,157 @@
+{
+  "context": "Local implementation working tree before sign-off commit; summaries, not command receipts.",
+  "baseline": "30c800958dbf512a4951d640f08748703a8b59e3",
+  "tests": {
+    "fixtures": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 17,
+        "uniqueFailures": 0
+      },
+      "rawSha256": "ac6a86251108bd3216e1449be7ac1da814511d05ec3188d4cf8fdca90e3fb444"
+    },
+    "telemetry": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 66,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 66,
+        "uniqueFailures": 0
+      },
+      "rawSha256": "c5361ad238400db6ee8fad2c18914a9545fe8a051c0b18f95a856c652b770fb2"
+    },
+    "commandPostgres": {
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": 5,
+      "ignored": 0,
+      "rawSha256": "6b2a8fbf2d0196f8e6fa95d3f2bb2d6d9d1cae174fa093df5847c44e40a38b69"
+    },
+    "coldCommandPostgres": {
+      "freshCache": true,
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": 5,
+      "ignored": 0,
+      "rawSha256": "0bb3ed4d1317ddb8ebf03cf03d39d7a992b31cfa1ab5c1c44dd4cebc1b537d12"
+    },
+    "ciRepair": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 15,
+        "uniqueFailures": 0
+      }
+    }
+  },
+  "checks": {
+    "typecheck": {
+      "selection": {
+        "filesSelected": 308,
+        "batches": 3,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "lint": {
+      "selection": {
+        "filesSelected": 12,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      }
+    },
+    "fmt": {
+      "selection": null,
+      "summary": {
+        "filesSelected": 12,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "architecture": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "rawSha256": "68c434d0232e6c8a83009dc93840cef861b2985dc571afd73fe10ec40cbc9f3e"
+    },
+    "frameworkQuality": {
+      "ok": true
+    },
+    "fullQuality": {
+      "outcome": "FAIL",
+      "finding": "docs/site/_plugins/markdown-render-fixture.ts:48 unsafe cast; identical at baseline"
+    },
+    "docLint": {
+      "current": {
+        "totalPackages": 1,
+        "totalErrors": 7,
+        "totalPrivateTypeRef": 6,
+        "totalMissingJSDoc": 1,
+        "totalOther": 0
+      },
+      "baseline": {
+        "totalPackages": 1,
+        "totalErrors": 7,
+        "totalPrivateTypeRef": 6,
+        "totalMissingJSDoc": 1,
+        "totalOther": 0
+      },
+      "outcome": "Unchanged baseline failure"
+    },
+    "publish": {
+      "outcome": "PASS",
+      "scope": "full workspace publish:dry-run",
+      "rawSha256": "f858112a0d5db61574a1f0add6669ddb5929f092e8ed1cecb4754b739ca04245"
+    },
+    "referenceProbe": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "referenceReproducibility": {
+      "exitCode": 0,
+      "unchanged": true,
+      "sha256": "79801f5d2e88471db47d5d636184a5b04d182d664df3e18c92c1c39d5a75cd81"
+    }
+  },
+  "consumerControl": {
+    "bounded": {
+      "api": "1.9.1",
+      "orpcOtel": "1.16.1",
+      "instrumentation": "0.223.0",
+      "exitCode": 0
+    },
+    "negative": {
+      "instrumentation": "0.300.0",
+      "exitCode": 1,
+      "missingLogs": true
+    }
+  },
+  "lockDelta": "lock-delta.json"
+}

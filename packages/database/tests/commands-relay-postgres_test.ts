@@ -1,3 +1,4 @@
+import { prepareLockedFixture } from '../../../.llm/tools/testing/locked-fixture.ts';
 import { assertEquals } from '@std/assert';
 
 Deno.test({
@@ -7,11 +8,25 @@ Deno.test({
     const fixture = 'packages/database/tests/fixtures/command-store/';
     const temp = await Deno.makeTempDir();
     try {
+      await Deno.writeTextFile(
+        temp + '/deno.json',
+        JSON.stringify({
+          compilerOptions: { strict: true, isolatedDeclarations: false },
+          imports: {
+            '@prisma/client': 'npm:@prisma/client@^7.10.0',
+            '@prisma/adapter-pg': 'npm:@prisma/adapter-pg@^7.10.0',
+            prisma: 'npm:prisma@7.10.0',
+          },
+        }),
+      );
+      let frozen = await prepareLockedFixture(temp);
       await Deno.copyFile(fixture + 'schema.prisma', temp + '/schema.prisma');
       const generated = await new Deno.Command(Deno.execPath(), {
         args: [
           'run',
-          '--no-lock',
+          ...frozen,
+          '--config',
+          temp + '/deno.json',
           '-A',
           'npm:prisma@7.10.0',
           'generate',
@@ -33,18 +48,13 @@ Deno.test({
             ),
         );
       }
-      await Deno.writeTextFile(
-        temp + '/deno.json',
-        JSON.stringify({
-          compilerOptions: { strict: true, isolatedDeclarations: false },
-          imports: { '@prisma/client': 'npm:@prisma/client@7.10.0' },
-        }),
-      );
+
+      frozen = await prepareLockedFixture(temp, [temp + '/relay-conformance_test.ts']);
       const filter = Deno.env.get('COMMAND_POSTGRES_TEST_FILTER');
       const tested = await new Deno.Command(Deno.execPath(), {
         args: [
           'test',
-          '--no-lock',
+          ...frozen,
           '--config',
           temp + '/deno.json',
           '--allow-all',

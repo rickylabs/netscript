@@ -7,6 +7,8 @@
  * @module
  */
 
+// Keep oRPC's open-ended peer on the API 1.9-compatible SDK line in the published graph.
+import '@opentelemetry/instrumentation';
 import { type Span, SpanStatusCode, trace } from '@opentelemetry/api';
 import { ORPCInstrumentation, type ORPCInstrumentationConfig } from '@orpc/otel';
 import type { Attributes, AttributeValue } from '../application/mod.ts';
