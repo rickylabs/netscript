@@ -36,6 +36,44 @@ binds them to a NetScript host.
 - **Aspire-native** — `./aspire` contributes the worker resources to the AppHost, so local
   orchestration and deployment see workers as first-class processes.
 
+## Excluding helpers from generated registries
+
+`netscript generate plugins` selects definition modules from `workers/jobs/*.ts` and plugin-provided
+job directories. Keep a helper or a dependency-injected factory beside those definitions by putting
+this exact comment on its first line:
+
+```ts
+// @netscript-registry-ignore
+export function scopedId(scope: string, name: string): string {
+  return `${scope}.${name}`;
+}
+```
+
+For example, add it to `workers/jobs/helper.ts`. The directive is shared by all plugin runtime
+registries and standalone registry compilers. It excludes the whole module before generating
+imports; ordinary imports from your application keep working. Use a separate module for a top-level
+job definition that should remain registered.
+
+The marker must be the complete first-line comment, before any license header or code. Indentation,
+a UTF-8 BOM and CRLF are accepted; a later comment, a string containing the marker, or extra text on
+the line does not opt out. Existing manifest suffix and filename exclusions still apply.
+
+Regenerate and inspect the result:
+
+```sh
+netscript generate plugins
+netscript plugin doctor
+```
+
+Doctor names eligible modules carrying the directive as `Explicitly excluded registry modules`, on
+both healthy and stale registries. Remove the directive and regenerate to register the module again.
+Unmarked modules retain the plugin's existing definition validation. Keep the CLI, shared plugin
+package and installed plugins on matching release versions so their selector and inspection protocol
+agree.
+
+A workers config entry pointing at an excluded job remains an unmatched-path error. Remove that
+config entry or restore a registrable module; exclusion does not silently disable configured jobs.
+
 ## Architecture
 
 ```mermaid
@@ -64,10 +102,11 @@ this worker owns and stops supplied queues as it does the defaults.
 ## Job retries and dead letters
 
 Declare `retry: { maxRetries, backoff, delayMs, maxDelayMs }` on a discovered schema-backed handler
-with `Object.assign(handler, { id, retry })`, or use the core builder's `.retry(...)` method. Handler
-fields override definition defaults, and both registry generators preserve the policy. In-process
-and polyglot jobs share one bounded retry executor: `maxRetries` counts retries after the initial
-attempt, and zero still runs once. Timeout is terminal; shutdown requeues without a job dead letter.
+with `Object.assign(handler, { id, retry })`, or use the core builder's `.retry(...)` method.
+Handler fields override definition defaults, and both registry generators preserve the policy.
+In-process and polyglot jobs share one bounded retry executor: `maxRetries` counts retries after the
+initial attempt, and zero still runs once. Timeout is terminal; shutdown requeues without a job dead
+letter.
 
 Exhausted jobs are stored through `Worker.deadLetters` before the transport acknowledges them. Its
 default is a KV-backed specialization of the queue's canonical dead-letter port in a separate
@@ -77,7 +116,8 @@ durable depth, and a storage outage makes dependency readiness unavailable. Job 
 delivery, so size visibility and active-claim leases for the full retry budget and make effects
 idempotent across transport redelivery.
 
-See [Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/)
+See
+[Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/)
 for handler examples, backoff formulas, precedence, replay, and time-budget sizing.
 
 ## Install

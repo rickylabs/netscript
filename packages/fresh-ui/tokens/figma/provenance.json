@@ -1,0 +1,15 @@
+{
+  "pullRequest": 2493,
+  "commit": "dd442e82794c4b960e51529f1c7ac534afda75ea",
+  "collections": {
+    "primitives.json": "b679081bdbd65432a0f422bdfb6fa7c6931b680a00a8bf76d445ffb30648ded7",
+    "theme.json": "98bbf3a0172ac6a4717e46f3e0bb65f53e3ee112f1327e7894d58fe1a148f67c",
+    "base-accent.json": "07b2ddde43d33563a26c77b543321d255b8042fe87125ba2607be1892ccb84bd",
+    "scheme.json": "6af62135d33423915211de1a0035b84c48f7cb4afc41ee5196d5ad55bfd56bd0",
+    "density.json": "f15d5e648299807130206b683ac8b31452fcda4bbc369660c138ce26d2d1a544",
+    "base-gray.json": "61a73e0abf00f4887d758dde3bb9c5262f6f5309c40f251e1d6d963407feddd2",
+    "studio-flavor.json": "c3579e0a945077a239fefadb90a5d9d4cc2bfd911eb968f86caa54d52bd1a552",
+    "theme-b.json": "f5caf3e20f154d4e5bb87e003a94a88705acbe6d4aaa6aa0c062764ecff4937f",
+    "theme-set.json": "c0979d84eca5ac47414deb5d89591b70cd7091dd78becdf3f8fd4d14d28afa40"
+  }
+}

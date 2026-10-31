@@ -11,6 +11,9 @@ import {
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import { registerGeneratedJobRegistry } from '../../../../../../../plugins/workers/src/runtime/generated-jobs.ts';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
+import { compileTriggerRegistry } from '../../../../../../../plugins/triggers/src/cli/trigger-registry-compiler.ts';
+import { compileWorkersRegistry } from '../../../../../../../plugins/workers/src/cli/registry-compiler.ts';
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../..', import.meta.url));
@@ -34,6 +37,147 @@ if (import.meta.main) {
   await startCombinedProcess();
 }
 `;
+
+const VALID_JOB = `
+const payloadSchema = {
+  '~standard': { version: 1, vendor: 'test', validate: (value: unknown) => ({ value }) },
+} as const;
+export default Object.assign(async () => undefined, { payloadSchema });
+`;
+
+Deno.test('installed registry generators and plugin rewrites exclude marked factories consistently', async () => {
+  await withTempProject(async (projectRoot) => {
+    const ignored = '// @netscript-registry-ignore\n' +
+      'throw new Error("excluded factory must never be imported");\n' +
+      'export function factory() { return {}; }\n';
+    await writeWorkspaceProject(
+      projectRoot,
+      ['plugin-triggers', 'plugin-workers', 'plugin-sagas'],
+      {
+        'triggers/valid.ts': VALID_TRIGGER,
+        'triggers/factory.ts': ignored,
+        'workers/jobs/valid.ts': VALID_JOB,
+        'workers/jobs/factory.ts': ignored,
+        'plugins/workers/jobs/factory.ts': ignored,
+        'plugins/triggers/jobs/factory.ts': ignored,
+        'sagas/valid-saga.ts': `
+function defineSaga(id: string) {
+  return { id, durability: 't1', initialState: {}, handledMessageTypes: [], handlers: new Map() };
+}
+export default defineSaga('valid-saga');
+`,
+        'sagas/factory-saga.ts': ignored +
+          'export function createSaga() { return defineSaga("helper"); }\n',
+      },
+    );
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace manifest must win')),
+    });
+    await generate({ dryRun: false, projectRoot });
+    const inspected = await generate({ dryRun: true, projectRoot });
+    for (
+      const [path, helpers] of [
+        [TRIGGER_REGISTRY_PATH, ['triggers/factory.ts']],
+        [WORKERS_REGISTRY_PATH, [
+          'workers/jobs/factory.ts',
+          'plugins/workers/jobs/factory.ts',
+          'plugins/triggers/jobs/factory.ts',
+        ]],
+        [SAGAS_REGISTRY_PATH, ['sagas/factory-saga.ts']],
+      ] as const
+    ) {
+      const registry = inspected.find((entry) => entry.path === path);
+      assertEquals(registry?.excludedSourceFiles, helpers);
+      assertEquals(registry?.sourceFiles?.length, 1);
+      const source = await Deno.readTextFile(join(projectRoot, path));
+      for (const helper of helpers) assertEquals(source.includes(helper), false);
+      const loaded = await import(`${toFileUrl(join(projectRoot, path)).href}?opt-out`);
+      assert(loaded.registry instanceof Map);
+      assertEquals(loaded.registry.size, 1);
+    }
+    const files = new LocalProjectFiles(projectRoot);
+    const triggers = await compileTriggerRegistry(files);
+    const workers = await compileWorkersRegistry(files);
+    assertEquals(
+      triggers.files,
+      inspected.find((entry) => entry.path === TRIGGER_REGISTRY_PATH)?.sourceFiles,
+    );
+    assertEquals(
+      workers.jobs,
+      inspected.find((entry) => entry.path === WORKERS_REGISTRY_PATH)?.sourceFiles,
+    );
+    for (const path of [TRIGGER_REGISTRY_PATH, WORKERS_REGISTRY_PATH]) {
+      const loaded = await import(`${toFileUrl(join(projectRoot, path)).href}?plugin-rewrite`);
+      assertEquals(loaded.registry.size, 1);
+      assertEquals(
+        (await Deno.readTextFile(join(projectRoot, path))).includes('factory.ts'),
+        false,
+      );
+    }
+  });
+});
+
+Deno.test('unmarked factory modules retain path-specific trigger and worker load failures', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, ['plugin-triggers', 'plugin-workers'], {
+      'triggers/valid.ts': VALID_TRIGGER,
+      'workers/jobs/valid.ts': VALID_JOB,
+      'triggers/factory.ts': 'export function createTrigger() { return {}; }\n',
+      'workers/jobs/factory.ts': 'export function createJob() { return {}; }\n',
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace manifest must win')),
+    });
+    await generate({ dryRun: false, projectRoot });
+    for (
+      const [path, message] of [
+        [
+          TRIGGER_REGISTRY_PATH,
+          'Trigger module triggers/factory.ts does not export a TriggerDefinition.',
+        ],
+        [
+          WORKERS_REGISTRY_PATH,
+          'Worker job module workers/jobs/factory.ts must export a schema-backed handler',
+        ],
+      ]
+    ) {
+      await assertRejects(
+        () => import(`${toFileUrl(join(projectRoot, path)).href}?unmarked-factory`),
+        Error,
+        message,
+      );
+    }
+  });
+});
+
+Deno.test('both worker writers reject configuration pointing at an excluded module', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
+      'workers/jobs/valid.ts': VALID_JOB,
+      'workers/jobs/factory.ts': '// @netscript-registry-ignore\nexport function factory() {}\n',
+      'netscript.config.ts': `export default {
+  name: 'excluded-policy', databases: { config: [] },
+  workers: { jobs: [{ id: 'factory', name: 'Factory', entrypoint: './factory.ts', source: 'local' }] },
+};`,
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace manifest must win')),
+    });
+    const message = 'unmatched project path "workers/jobs/factory.ts"';
+    await assertRejects(() => generate({ dryRun: false, projectRoot }), Error, message);
+    await assertRejects(
+      () => compileWorkersRegistry(new LocalProjectFiles(projectRoot)),
+      Error,
+      message,
+    );
+  });
+});
 
 Deno.test('generated trigger registry loads definitions and excludes control-plane and runtime modules', async () => {
   await withTempProject(async (projectRoot) => {

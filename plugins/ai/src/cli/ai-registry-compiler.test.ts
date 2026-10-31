@@ -8,6 +8,7 @@ import {
   compileAiRegistry,
   exportsReadyAiToolDefinition,
   inspectAiRegistries,
+  renderAiRegistry,
 } from './ai-registry-compiler.ts';
 
 const TOOLS_TARGET: AiRegistryTarget = {
@@ -29,6 +30,30 @@ const AGENTS_TARGET: AiRegistryTarget = {
   varPrefix: 'agent',
   typeImport: { name: 'AgentLoop', from: '@netscript/ai/agent' },
 };
+
+Deno.test('AI registry generation and inspection honor explicit opt-out before shape selection', async () => {
+  const files = new MemoryProjectFiles(
+    new Map([
+      ['ai/tools/valid.ts', "export const tool = defineAiTool('valid').server(() => ({}));"],
+      [
+        'ai/tools/factory.ts',
+        '// @netscript-registry-ignore\nexport function factory() { return {}; }',
+      ],
+      ['ai/agents/valid.ts', 'export default () => ({});'],
+      ['ai/agents/factory.ts', '// @netscript-registry-ignore\nexport default () => ({});'],
+    ]),
+  );
+  for (const target of [TOOLS_TARGET, AGENTS_TARGET]) {
+    const rendered = await renderAiRegistry(files, target);
+    const compiled = await compileAiRegistry(files, target);
+    assertEquals(rendered.sourceFiles, [`${target.dir}/valid.ts`]);
+    assertEquals(rendered.excludedSourceFiles, [`${target.dir}/factory.ts`]);
+    assertEquals(compiled.files, rendered.sourceFiles);
+    assertEquals(rendered.content?.includes('factory.ts'), false);
+    const inspected = await inspectAiRegistries(files, [target]);
+    assertEquals(inspected.registries[0].sourceFiles, rendered.sourceFiles);
+  }
+});
 
 Deno.test('compileAiRegistry emits a name-keyed tool registry', async () => {
   const files = new MemoryProjectFiles([

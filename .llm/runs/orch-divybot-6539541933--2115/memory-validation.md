@@ -1,0 +1,3 @@
+# Validation memory — 2026-10-31
+
+Package suite: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all packages/auth-kv-oauth/tests/` (55 pass after #2115). Scoped check wrapper enables unstable-kv by default. quality:gate also runs deps:check/reference locks and architecture. Member publish dry-run passes. audit-jsr-package does not support --help (it runs against cwd); always specify --root. It counts the ordinary slow-type check banner as one warning; trust the real member publish result. Doc lint on auth-kv-oauth currently inherits a private-type-ref from packages/kv/types/watchable-kv.ts, reproduced using unchanged baseline parser. Record as baseline failure, never as green.

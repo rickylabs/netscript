@@ -17,6 +17,8 @@ export interface TokenContrastPair {
   readonly minimum: typeof TEXT_CONTRAST_MINIMUM | typeof CONTROL_CONTRAST_MINIMUM;
   /** Omit for all presets; language packs name their actual consumers. */
   readonly presets?: readonly string[];
+  /** Explicit l/d source roles are measured only in their matching scheme. */
+  readonly schemes?: readonly TokenScheme[];
 }
 
 /** Pair coverage and narrowly explained color roles whose names describe decoration. */

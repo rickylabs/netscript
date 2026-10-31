@@ -1,3 +1,4 @@
+import { TOKEN_SCHEMES } from './token-contract.ts';
 import type { TokenContextOutput } from './token-output.ts';
 import type {
   TokenContrastCoverage,
@@ -22,10 +23,13 @@ const PACK_PREFIXES = [
 const REQUIRED_CONTROL_ROLES = ['ring', 'input-border', 'border-control'];
 
 function applies(pair: TokenContrastPair, context: TokenContextOutput): boolean {
-  return !pair.presets || pair.presets.includes(context.preset.id);
+  return (!pair.presets || pair.presets.includes(context.preset.id)) &&
+    (!pair.schemes || pair.schemes.includes(context.scheme));
 }
 
 function ownedRole(name: string, context: TokenContextOutput): boolean {
+  const scheme = name.match(/(?:^|-)(l|d)-/);
+  if (scheme && scheme[1] !== (context.scheme === 'light' ? 'l' : 'd')) return false;
   if (name.startsWith('component-key-') && context.preset.language !== 'terminal') return false;
   const pack = PACK_PREFIXES.find((prefix) => name.startsWith(`${prefix}-`));
   return !pack || pack === context.preset.language;
@@ -36,7 +40,8 @@ function foregroundRole(name: string, context: TokenContextOutput): boolean {
   if (token.type !== 'color' || token.path[0] === 'color' || !ownedRole(name, context)) {
     return false;
   }
-  return /(^|-)(fg|text|on)(-|$)/.test(name);
+  return /(^|-)(fg|text|on)(-|$)/.test(name) || name.startsWith('code-syntax-') ||
+    /^tooltip-(?:(?:l|d)-)?muted$/.test(name);
 }
 
 function backgroundRole(name: string, context: TokenContextOutput): boolean {
@@ -44,7 +49,8 @@ function backgroundRole(name: string, context: TokenContextOutput): boolean {
   if (token.type !== 'color' || token.path[0] === 'color' || !ownedRole(name, context)) {
     return false;
   }
-  return name === 'bg' || /-bg(?:-hover|-\d+)?$/.test(name) ||
+  return /^tooltip-(?:(?:l|d)-)?kbd$/.test(name) || name === 'bg' ||
+    /-bg(?:-hover|-\d+)?$/.test(name) ||
     PACK_PREFIXES.some((pack) =>
       name.startsWith(`${pack}-surface-`) || name.startsWith(`${pack}-material-`)
     );
@@ -70,6 +76,13 @@ export function assertContrastCoverage(
     if (
       pair.presets && (!pair.presets.length || pair.presets.some((preset) => !presets.has(preset)))
     ) throw new Error(`Unknown contrast preset: ${pair.id}`);
+    if (
+      pair.schemes && (!pair.schemes.length ||
+        new Set(pair.schemes).size !== pair.schemes.length ||
+        pair.schemes.some((scheme) => !TOKEN_SCHEMES.includes(scheme)))
+    ) {
+      throw new Error(`Unknown or empty contrast schemes: ${pair.id}`);
+    }
   }
   const decorations = new Set<string>();
   for (const context of contexts) {
@@ -87,6 +100,45 @@ export function assertContrastCoverage(
         foregroundRole(pair.foreground, context) && !coverage.decorativeRoles[pair.foreground] &&
         pair.minimum !== TEXT_CONTRAST_MINIMUM
       ) throw new Error(`Text contrast threshold must be 4.5: ${pair.id}`);
+    }
+    // Chart surfaces follow the Figma palette design method, including translucent cards.
+    const chartSurfaces = ['bg', 'card-bg', 'card'];
+    const packSurfaces: Readonly<Record<string, readonly string[]>> = {
+      cupertino: [
+        'cupertino-surface-bg',
+        'cupertino-surface-card',
+        'cupertino-surface-raised',
+        'cupertino-surface-well',
+      ],
+      liquid: [
+        'liquid-surface-bg',
+        'liquid-surface-card',
+        'liquid-surface-raised',
+        'liquid-surface-well',
+        'liquid-surface-zebra',
+      ],
+      fluent: ['fluent-solid-base'],
+    };
+    chartSurfaces.push(...(packSurfaces[context.preset.language] ?? []));
+    for (const name of Object.keys(context.tokens).filter((name) => ownedRole(name, context))) {
+      const chart = /^(?:studio-)?chart-(?:(?:l|d)-)?[1-5]$/.test(name);
+      const syntax = name.startsWith('code-syntax-');
+      if (!chart && !syntax) continue;
+      for (const background of chart ? chartSurfaces : ['code-bg']) {
+        if (
+          !coverage.pairs.some((pair) =>
+            applies(pair, context) && pair.foreground === name &&
+            pair.background.length === 1 && pair.background[0] === background &&
+            pair.minimum === (chart ? CONTROL_CONTRAST_MINIMUM : TEXT_CONTRAST_MINIMUM)
+          )
+        ) {
+          throw new Error(
+            `Missing ${
+              chart ? 'chart' : 'syntax'
+            } contrast coverage: ${context.preset.id}/${name}/${background}`,
+          );
+        }
+      }
     }
     for (const role of REQUIRED_CONTROL_ROLES) {
       if (

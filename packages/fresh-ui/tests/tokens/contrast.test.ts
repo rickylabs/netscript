@@ -147,3 +147,146 @@ Deno.test('coverage rejects missing foregrounds, backgrounds, focus checks and w
     'No contrast contexts',
   );
 });
+
+Deno.test('scheme filters reject malformed applicability and never measure the opposite source scheme', () => {
+  for (const schemes of [[], ['invalid'], ['light', 'light']]) {
+    const malformed = structuredClone(coverage);
+    Object.assign(malformed.pairs[0], { schemes });
+    assertThrows(
+      () => evaluateTokenContrast([context()], malformed, [], tokenContrastColor),
+      Error,
+      'contrast schemes',
+    );
+  }
+  const darkOnly: TokenContrastCoverage = {
+    ...coverage,
+    pairs: [...coverage.pairs, {
+      id: 'dark-only-failure',
+      foreground: 'bg',
+      background: ['bg'],
+      minimum: 3,
+      schemes: ['dark'],
+    }],
+  };
+  assertEquals(
+    evaluateTokenContrast([context()], darkOnly, [], tokenContrastColor).failures.length,
+    0,
+  );
+  const dark = { ...context(), scheme: 'dark' as const };
+  assertEquals(evaluateTokenContrast([dark], darkOnly, [], tokenContrastColor).failures.length, 1);
+});
+
+Deno.test('chart and syntax coverage cannot disappear or weaken behind generic name heuristics', () => {
+  for (const name of ['chart-1', 'chart-l-1', 'code-syntax-comment']) {
+    const base = context();
+    const extra = {
+      ...base,
+      tokens: {
+        ...base.tokens,
+        [name]: { ...base.tokens.fg, cssVar: `--ns-${name}` },
+        'code-bg': { ...base.tokens.bg, cssVar: '--ns-code-bg' },
+        card: { ...base.tokens.bg, cssVar: '--ns-card' },
+        'card-bg': { ...base.tokens.bg, cssVar: '--ns-card-bg' },
+      },
+    };
+    const chart = name.startsWith('chart-');
+    const pairs = (chart ? ['bg', 'card-bg', 'card'] : ['code-bg']).map((background) => ({
+      id: `${name}/${background}`,
+      foreground: name,
+      background: [background],
+      minimum: chart ? 3 as const : 4.5 as const,
+    }));
+    const complete: TokenContrastCoverage = {
+      ...coverage,
+      pairs: [
+        ...coverage.pairs,
+        { id: 'fg/code-bg', foreground: 'fg', background: ['code-bg'], minimum: 4.5 },
+        { id: 'fg/card-bg', foreground: 'fg', background: ['card-bg'], minimum: 4.5 },
+        ...pairs,
+      ],
+    };
+    assertTokenContrast(evaluateTokenContrast([extra], complete, [], tokenContrastColor));
+    for (const pair of pairs) {
+      const removed = {
+        ...complete,
+        pairs: complete.pairs.filter((candidate) => candidate.id !== pair.id),
+      };
+      assertThrows(
+        () => evaluateTokenContrast([extra], removed, [], tokenContrastColor),
+        Error,
+        `Missing ${chart ? 'chart' : 'syntax'} contrast coverage`,
+      );
+    }
+    const weakened = {
+      ...complete,
+      pairs: complete.pairs.map((pair) =>
+        pair.foreground === name ? { ...pair, minimum: chart ? 4.5 as const : 3 as const } : pair
+      ),
+    };
+    assertThrows(() => evaluateTokenContrast([extra], weakened, [], tokenContrastColor));
+  }
+});
+
+Deno.test('owning language chart surfaces and Studio intermediates cannot be omitted', () => {
+  const packs: Readonly<Record<string, readonly string[]>> = {
+    cupertino: [
+      'cupertino-surface-bg',
+      'cupertino-surface-card',
+      'cupertino-surface-raised',
+      'cupertino-surface-well',
+    ],
+    liquid: [
+      'liquid-surface-bg',
+      'liquid-surface-card',
+      'liquid-surface-raised',
+      'liquid-surface-well',
+      'liquid-surface-zebra',
+    ],
+    fluent: ['fluent-solid-base'],
+    'studio-utility': [],
+  };
+  for (const [preset, extra] of Object.entries(packs)) {
+    const base = context();
+    const foreground = preset === 'studio-utility' ? 'studio-chart-l-1' : 'chart-1';
+    const backgrounds = ['bg', 'card-bg', 'card', ...extra];
+    const candidate = {
+      ...base,
+      preset: tokenPreset(preset),
+      tokens: {
+        ...base.tokens,
+        [foreground]: { ...base.tokens.fg, cssVar: `--ns-${foreground}` },
+        ...Object.fromEntries(
+          backgrounds.map((name) => [name, { ...base.tokens.bg, cssVar: `--ns-${name}` }]),
+        ),
+      },
+    };
+    const chartPairs = backgrounds.map((name) => ({
+      id: `${foreground}/${name}`,
+      foreground,
+      background: [name],
+      minimum: 3 as const,
+    }));
+    const complete = { ...coverage, pairs: [...coverage.pairs, ...chartPairs] };
+    assertTokenContrast(evaluateTokenContrast([candidate], complete, [], tokenContrastColor));
+    for (const pair of chartPairs) {
+      assertThrows(
+        () =>
+          evaluateTokenContrast(
+            [candidate],
+            { ...complete, pairs: complete.pairs.filter((entry) => entry.id !== pair.id) },
+            [],
+            tokenContrastColor,
+          ),
+        Error,
+        'Missing chart contrast coverage',
+      );
+    }
+    const weakened = structuredClone(complete);
+    Object.assign(weakened.pairs.at(-1)!, { minimum: 2 });
+    assertThrows(
+      () => evaluateTokenContrast([candidate], weakened, [], tokenContrastColor),
+      Error,
+      'Invalid contrast pair',
+    );
+  }
+});

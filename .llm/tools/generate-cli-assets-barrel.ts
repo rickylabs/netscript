@@ -185,7 +185,7 @@ async function renderFreshUiRegistryContent(): Promise<string> {
         ...freshUiRegistryJson.items.filter((item) => item.type === 'registry:theme')
           .flatMap((item) =>
             (item.files ?? [])
-              .filter((file) => file.path.startsWith('docs/design-system/themes/'))
+              .filter((file) => file.target?.startsWith('.agents/skills/fresh-ui-theme-'))
               .map((file) => `../../${file.path}`)
           ),
       ],

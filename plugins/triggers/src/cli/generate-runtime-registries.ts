@@ -1,4 +1,8 @@
-import { renderRegistryModule } from '@netscript/plugin/cli';
+import {
+  LocalProjectFiles,
+  renderRegistryModule,
+  selectRegistrySources,
+} from '@netscript/plugin/cli';
 
 interface Args {
   readonly inspect?: boolean;
@@ -73,15 +77,24 @@ async function renderTriggerRegistry(
   {
     readonly registryPath: string;
     readonly sourceFiles: readonly string[];
+    readonly excludedSourceFiles?: readonly string[];
     readonly content: string;
   }
 > {
   const files = await listRootFiles(projectRoot, options.dir, options.fileSuffixes);
-  const triggerFiles = files.filter((file) => isIncludedSourcePath(file.relativePath, options));
+  const selection = await selectRegistrySources(
+    new LocalProjectFiles(projectRoot),
+    files.filter((file) => isIncludedSourcePath(file.relativePath, options))
+      .map((file) => file.relativePath),
+  );
+  const triggerFiles = selection.sourceFiles.map((relativePath) => ({ relativePath }));
   const source = renderTriggerRegistrySource(options.registryPath, triggerFiles);
   return {
     registryPath: options.registryPath,
     sourceFiles: triggerFiles.map((file) => file.relativePath),
+    ...(selection.excludedSourceFiles.length
+      ? { excludedSourceFiles: selection.excludedSourceFiles }
+      : {}),
     content: source,
   };
 }

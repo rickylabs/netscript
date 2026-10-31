@@ -1,6 +1,266 @@
 {
   "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
   "semantic": {
+    "accent-solid-hover": {
+      "$type": "color",
+      "$value": "{context.light.accent-solid-hover}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-accent-solid-hover",
+          "category": [
+            "semantic",
+            "accent-solid-hover"
+          ]
+        }
+      }
+    },
+    "badge-height": {
+      "$type": "dimension",
+      "$value": "{context.light.badge-height}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-height",
+          "category": [
+            "semantic",
+            "badge-height"
+          ]
+        }
+      }
+    },
+    "badge-padding-x": {
+      "$type": "dimension",
+      "$value": "{context.light.badge-padding-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-padding-x",
+          "category": [
+            "semantic",
+            "badge-padding-x"
+          ]
+        }
+      }
+    },
+    "card-padding": {
+      "$type": "dimension",
+      "$value": "{context.light.card-padding}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-padding",
+          "category": [
+            "semantic",
+            "card-padding"
+          ]
+        }
+      }
+    },
+    "control-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.control-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-gap",
+          "category": [
+            "semantic",
+            "control-gap"
+          ]
+        }
+      }
+    },
+    "control-height": {
+      "$type": "dimension",
+      "$value": "{context.light.control-height}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-height",
+          "category": [
+            "semantic",
+            "control-height"
+          ]
+        }
+      }
+    },
+    "control-height-lg": {
+      "$type": "dimension",
+      "$value": "{context.light.control-height-lg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-height-lg",
+          "category": [
+            "semantic",
+            "control-height-lg"
+          ]
+        }
+      }
+    },
+    "control-height-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.control-height-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-height-sm",
+          "category": [
+            "semantic",
+            "control-height-sm"
+          ]
+        }
+      }
+    },
+    "control-height-xs": {
+      "$type": "dimension",
+      "$value": "{context.light.control-height-xs}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-height-xs",
+          "category": [
+            "semantic",
+            "control-height-xs"
+          ]
+        }
+      }
+    },
+    "control-padding-x": {
+      "$type": "dimension",
+      "$value": "{context.light.control-padding-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-padding-x",
+          "category": [
+            "semantic",
+            "control-padding-x"
+          ]
+        }
+      }
+    },
+    "control-padding-x-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.control-padding-x-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-padding-x-sm",
+          "category": [
+            "semantic",
+            "control-padding-x-sm"
+          ]
+        }
+      }
+    },
+    "inline-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.inline-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-inline-gap",
+          "category": [
+            "semantic",
+            "inline-gap"
+          ]
+        }
+      }
+    },
+    "page-padding-x": {
+      "$type": "dimension",
+      "$value": "{context.light.page-padding-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-page-padding-x",
+          "category": [
+            "semantic",
+            "page-padding-x"
+          ]
+        }
+      }
+    },
+    "page-padding-y": {
+      "$type": "dimension",
+      "$value": "{context.light.page-padding-y}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-page-padding-y",
+          "category": [
+            "semantic",
+            "page-padding-y"
+          ]
+        }
+      }
+    },
+    "section-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.section-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-section-gap",
+          "category": [
+            "semantic",
+            "section-gap"
+          ]
+        }
+      }
+    },
+    "sidebar-width": {
+      "$type": "dimension",
+      "$value": "{context.light.sidebar-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-sidebar-width",
+          "category": [
+            "semantic",
+            "sidebar-width"
+          ]
+        }
+      }
+    },
+    "stack-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.stack-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-stack-gap",
+          "category": [
+            "semantic",
+            "stack-gap"
+          ]
+        }
+      }
+    },
+    "table-cell-padding-x": {
+      "$type": "dimension",
+      "$value": "{context.light.table-cell-padding-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-cell-padding-x",
+          "category": [
+            "semantic",
+            "table-cell-padding-x"
+          ]
+        }
+      }
+    },
+    "table-row-height": {
+      "$type": "dimension",
+      "$value": "{context.light.table-row-height}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-row-height",
+          "category": [
+            "semantic",
+            "table-row-height"
+          ]
+        }
+      }
+    },
+    "topbar-height": {
+      "$type": "dimension",
+      "$value": "{context.light.topbar-height}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-height",
+          "category": [
+            "semantic",
+            "topbar-height"
+          ]
+        }
+      }
+    },
     "accent-border": {
       "$type": "color",
       "$value": "{context.light.accent-border}",
@@ -166,6 +426,136 @@
           "category": [
             "semantic",
             "aurora-4"
+          ]
+        }
+      }
+    },
+    "badge-solid-destructive-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-destructive-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-destructive-bg",
+          "category": [
+            "semantic",
+            "badge-solid-destructive-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-destructive-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-destructive-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-destructive-fg",
+          "category": [
+            "semantic",
+            "badge-solid-destructive-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-info-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-info-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-info-bg",
+          "category": [
+            "semantic",
+            "badge-solid-info-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-info-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-info-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-info-fg",
+          "category": [
+            "semantic",
+            "badge-solid-info-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-neutral-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-neutral-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-neutral-bg",
+          "category": [
+            "semantic",
+            "badge-solid-neutral-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-neutral-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-neutral-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-neutral-fg",
+          "category": [
+            "semantic",
+            "badge-solid-neutral-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-success-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-success-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-success-bg",
+          "category": [
+            "semantic",
+            "badge-solid-success-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-success-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-success-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-success-fg",
+          "category": [
+            "semantic",
+            "badge-solid-success-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-warning-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-warning-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-warning-bg",
+          "category": [
+            "semantic",
+            "badge-solid-warning-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-warning-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-warning-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-warning-fg",
+          "category": [
+            "semantic",
+            "badge-solid-warning-fg"
           ]
         }
       }
@@ -911,6 +1301,240 @@
         }
       }
     },
+    "brand": {
+      "$type": "color",
+      "$value": "{context.light.brand}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-brand",
+          "category": [
+            "semantic",
+            "brand"
+          ]
+        }
+      }
+    },
+    "brand-fg": {
+      "$type": "color",
+      "$value": "{context.light.brand-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-brand-fg",
+          "category": [
+            "semantic",
+            "brand-fg"
+          ]
+        }
+      }
+    },
+    "card-bg": {
+      "$type": "color",
+      "$value": "{context.light.card-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-bg",
+          "category": [
+            "semantic",
+            "card-bg"
+          ]
+        }
+      }
+    },
+    "card-border": {
+      "$type": "color",
+      "$value": "{context.light.card-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-border",
+          "category": [
+            "semantic",
+            "card-border"
+          ]
+        }
+      }
+    },
+    "card-footer": {
+      "$type": "color",
+      "$value": "{context.light.card-footer}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-footer",
+          "category": [
+            "semantic",
+            "card-footer"
+          ]
+        }
+      }
+    },
+    "chart-1": {
+      "$type": "color",
+      "$value": "{context.light.chart-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-1",
+          "category": [
+            "semantic",
+            "chart-1"
+          ]
+        }
+      }
+    },
+    "chart-2": {
+      "$type": "color",
+      "$value": "{context.light.chart-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-2",
+          "category": [
+            "semantic",
+            "chart-2"
+          ]
+        }
+      }
+    },
+    "chart-3": {
+      "$type": "color",
+      "$value": "{context.light.chart-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-3",
+          "category": [
+            "semantic",
+            "chart-3"
+          ]
+        }
+      }
+    },
+    "chart-4": {
+      "$type": "color",
+      "$value": "{context.light.chart-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-4",
+          "category": [
+            "semantic",
+            "chart-4"
+          ]
+        }
+      }
+    },
+    "chart-5": {
+      "$type": "color",
+      "$value": "{context.light.chart-5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-5",
+          "category": [
+            "semantic",
+            "chart-5"
+          ]
+        }
+      }
+    },
+    "code-bg": {
+      "$type": "color",
+      "$value": "{context.light.code-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-bg",
+          "category": [
+            "semantic",
+            "code-bg"
+          ]
+        }
+      }
+    },
+    "code-syntax-comment": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-comment}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-comment",
+          "category": [
+            "semantic",
+            "code-syntax-comment"
+          ]
+        }
+      }
+    },
+    "code-syntax-function": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-function}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-function",
+          "category": [
+            "semantic",
+            "code-syntax-function"
+          ]
+        }
+      }
+    },
+    "code-syntax-keyword": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-keyword}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-keyword",
+          "category": [
+            "semantic",
+            "code-syntax-keyword"
+          ]
+        }
+      }
+    },
+    "code-syntax-number": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-number}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-number",
+          "category": [
+            "semantic",
+            "code-syntax-number"
+          ]
+        }
+      }
+    },
+    "code-syntax-punctuation": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-punctuation}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-punctuation",
+          "category": [
+            "semantic",
+            "code-syntax-punctuation"
+          ]
+        }
+      }
+    },
+    "code-syntax-string": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-string}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-string",
+          "category": [
+            "semantic",
+            "code-syntax-string"
+          ]
+        }
+      }
+    },
+    "code-syntax-type": {
+      "$type": "color",
+      "$value": "{context.light.code-syntax-type}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-code-syntax-type",
+          "category": [
+            "semantic",
+            "code-syntax-type"
+          ]
+        }
+      }
+    },
     "control-ink": {
       "$type": "color",
       "$value": "{context.light.control-ink}",
@@ -1353,6 +1977,19 @@
         }
       }
     },
+    "control-shadow-color": {
+      "$type": "color",
+      "$value": "{context.light.control-shadow-color}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-control-shadow-color",
+          "category": [
+            "semantic",
+            "control-shadow-color"
+          ]
+        }
+      }
+    },
     "shadow-color": {
       "$type": "color",
       "$value": "{context.light.shadow-color}",
@@ -1362,6 +1999,19 @@
           "category": [
             "shadow",
             "color"
+          ]
+        }
+      }
+    },
+    "shadow-overlay-color": {
+      "$type": "color",
+      "$value": "{context.light.shadow-overlay-color}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-overlay-color",
+          "category": [
+            "shadow",
+            "overlay-color"
           ]
         }
       }
@@ -2432,6 +3082,58 @@
         }
       }
     },
+    "hero-bg": {
+      "$type": "color",
+      "$value": "{context.light.hero-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-hero-bg",
+          "category": [
+            "semantic",
+            "hero-bg"
+          ]
+        }
+      }
+    },
+    "important-border": {
+      "$type": "color",
+      "$value": "{context.light.important-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-important-border",
+          "category": [
+            "semantic",
+            "important-border"
+          ]
+        }
+      }
+    },
+    "important-subtle": {
+      "$type": "color",
+      "$value": "{context.light.important-subtle}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-important-subtle",
+          "category": [
+            "semantic",
+            "important-subtle"
+          ]
+        }
+      }
+    },
+    "important-text": {
+      "$type": "color",
+      "$value": "{context.light.important-text}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-important-text",
+          "category": [
+            "semantic",
+            "important-text"
+          ]
+        }
+      }
+    },
     "info-border": {
       "$type": "color",
       "$value": "{context.light.info-border}",
@@ -2519,6 +3221,84 @@
           "category": [
             "semantic",
             "ink-fg"
+          ]
+        }
+      }
+    },
+    "kpi-bg-1": {
+      "$type": "color",
+      "$value": "{context.light.kpi-bg-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-bg-1",
+          "category": [
+            "semantic",
+            "kpi-bg-1"
+          ]
+        }
+      }
+    },
+    "kpi-bg-2": {
+      "$type": "color",
+      "$value": "{context.light.kpi-bg-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-bg-2",
+          "category": [
+            "semantic",
+            "kpi-bg-2"
+          ]
+        }
+      }
+    },
+    "kpi-bg-3": {
+      "$type": "color",
+      "$value": "{context.light.kpi-bg-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-bg-3",
+          "category": [
+            "semantic",
+            "kpi-bg-3"
+          ]
+        }
+      }
+    },
+    "kpi-bg-4": {
+      "$type": "color",
+      "$value": "{context.light.kpi-bg-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-bg-4",
+          "category": [
+            "semantic",
+            "kpi-bg-4"
+          ]
+        }
+      }
+    },
+    "kpi-border": {
+      "$type": "color",
+      "$value": "{context.light.kpi-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-border",
+          "category": [
+            "semantic",
+            "kpi-border"
+          ]
+        }
+      }
+    },
+    "link-underline": {
+      "$type": "color",
+      "$value": "{context.light.link-underline}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-link-underline",
+          "category": [
+            "semantic",
+            "link-underline"
           ]
         }
       }
@@ -3238,6 +4018,19 @@
         }
       }
     },
+    "marker": {
+      "$type": "color",
+      "$value": "{context.light.marker}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-marker",
+          "category": [
+            "semantic",
+            "marker"
+          ]
+        }
+      }
+    },
     "material-fill": {
       "$type": "color",
       "$value": "{context.light.material-fill}",
@@ -3286,6 +4079,19 @@
           "category": [
             "semantic",
             "material-track"
+          ]
+        }
+      }
+    },
+    "nav-active": {
+      "$type": "color",
+      "$value": "{context.light.nav-active}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-nav-active",
+          "category": [
+            "semantic",
+            "nav-active"
           ]
         }
       }
@@ -3537,6 +4343,19 @@
         }
       }
     },
+    "primary-stroke": {
+      "$type": "color",
+      "$value": "{context.light.primary-stroke}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-stroke",
+          "category": [
+            "semantic",
+            "primary-stroke"
+          ]
+        }
+      }
+    },
     "primary-subtle": {
       "$type": "color",
       "$value": "{context.light.primary-subtle}",
@@ -3559,6 +4378,19 @@
           "category": [
             "semantic",
             "primary-text"
+          ]
+        }
+      }
+    },
+    "scrollbar-thumb": {
+      "$type": "color",
+      "$value": "{context.light.scrollbar-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-scrollbar-thumb",
+          "category": [
+            "semantic",
+            "scrollbar-thumb"
           ]
         }
       }
@@ -4525,6 +5357,162 @@
         }
       }
     },
+    "switch-thumb": {
+      "$type": "color",
+      "$value": "{context.light.switch-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-switch-thumb",
+          "category": [
+            "semantic",
+            "switch-thumb"
+          ]
+        }
+      }
+    },
+    "table-cell-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-cell-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-cell-rule",
+          "category": [
+            "semantic",
+            "table-cell-rule"
+          ]
+        }
+      }
+    },
+    "table-head": {
+      "$type": "color",
+      "$value": "{context.light.table-head}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-head",
+          "category": [
+            "semantic",
+            "table-head"
+          ]
+        }
+      }
+    },
+    "table-head-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-head-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-head-rule",
+          "category": [
+            "semantic",
+            "table-head-rule"
+          ]
+        }
+      }
+    },
+    "table-hover": {
+      "$type": "color",
+      "$value": "{context.light.table-hover}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-hover",
+          "category": [
+            "semantic",
+            "table-hover"
+          ]
+        }
+      }
+    },
+    "table-row-bg": {
+      "$type": "color",
+      "$value": "{context.light.table-row-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-row-bg",
+          "category": [
+            "semantic",
+            "table-row-bg"
+          ]
+        }
+      }
+    },
+    "table-row-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-row-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-row-rule",
+          "category": [
+            "semantic",
+            "table-row-rule"
+          ]
+        }
+      }
+    },
+    "table-zebra": {
+      "$type": "color",
+      "$value": "{context.light.table-zebra}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-zebra",
+          "category": [
+            "semantic",
+            "table-zebra"
+          ]
+        }
+      }
+    },
+    "tabs-idle-border": {
+      "$type": "color",
+      "$value": "{context.light.tabs-idle-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-idle-border",
+          "category": [
+            "semantic",
+            "tabs-idle-border"
+          ]
+        }
+      }
+    },
+    "tabs-sel-bg": {
+      "$type": "color",
+      "$value": "{context.light.tabs-sel-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-sel-bg",
+          "category": [
+            "semantic",
+            "tabs-sel-bg"
+          ]
+        }
+      }
+    },
+    "tabs-sel-border": {
+      "$type": "color",
+      "$value": "{context.light.tabs-sel-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-sel-border",
+          "category": [
+            "semantic",
+            "tabs-sel-border"
+          ]
+        }
+      }
+    },
+    "tabs-track": {
+      "$type": "color",
+      "$value": "{context.light.tabs-track}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-track",
+          "category": [
+            "semantic",
+            "tabs-track"
+          ]
+        }
+      }
+    },
     "tactile-accent": {
       "$type": "color",
       "$value": "{context.light.tactile-accent}",
@@ -5110,6 +6098,97 @@
         }
       }
     },
+    "tooltip-bg": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-bg",
+          "category": [
+            "semantic",
+            "tooltip-bg"
+          ]
+        }
+      }
+    },
+    "tooltip-border": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-border",
+          "category": [
+            "semantic",
+            "tooltip-border"
+          ]
+        }
+      }
+    },
+    "tooltip-fg": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-fg",
+          "category": [
+            "semantic",
+            "tooltip-fg"
+          ]
+        }
+      }
+    },
+    "tooltip-kbd": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-kbd}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-kbd",
+          "category": [
+            "semantic",
+            "tooltip-kbd"
+          ]
+        }
+      }
+    },
+    "tooltip-muted": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-muted}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-muted",
+          "category": [
+            "semantic",
+            "tooltip-muted"
+          ]
+        }
+      }
+    },
+    "topbar-bg": {
+      "$type": "color",
+      "$value": "{context.light.topbar-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-bg",
+          "category": [
+            "semantic",
+            "topbar-bg"
+          ]
+        }
+      }
+    },
+    "topbar-rule": {
+      "$type": "color",
+      "$value": "{context.light.topbar-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-rule",
+          "category": [
+            "semantic",
+            "topbar-rule"
+          ]
+        }
+      }
+    },
     "warning-border": {
       "$type": "color",
       "$value": "{context.light.warning-border}",
@@ -5188,838 +6267,6 @@
         }
       }
     },
-    "font-data": {
-      "$type": "fontFamily",
-      "$value": "{context.light.font-data}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-font-data",
-          "category": [
-            "font",
-            "data"
-          ]
-        }
-      }
-    },
-    "font-heading": {
-      "$type": "fontFamily",
-      "$value": "{context.light.font-heading}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-font-heading",
-          "category": [
-            "font",
-            "heading"
-          ]
-        }
-      }
-    },
-    "font-kpi": {
-      "$type": "fontFamily",
-      "$value": "{context.light.font-kpi}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-font-kpi",
-          "category": [
-            "font",
-            "kpi"
-          ]
-        }
-      }
-    },
-    "font-label": {
-      "$type": "fontFamily",
-      "$value": "{context.light.font-label}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-font-label",
-          "category": [
-            "font",
-            "label"
-          ]
-        }
-      }
-    },
-    "font-mono": {
-      "$type": "fontFamily",
-      "$value": "{context.light.font-mono}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-font-mono",
-          "category": [
-            "font",
-            "mono"
-          ]
-        }
-      }
-    },
-    "font-sans": {
-      "$type": "fontFamily",
-      "$value": "{context.light.font-sans}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-font-sans",
-          "category": [
-            "font",
-            "sans"
-          ]
-        }
-      }
-    },
-    "radius-badge": {
-      "$type": "dimension",
-      "$value": "{context.light.radius-badge}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-radius-badge",
-          "category": [
-            "radius",
-            "badge"
-          ]
-        }
-      }
-    },
-    "radius-card": {
-      "$type": "dimension",
-      "$value": "{context.light.radius-card}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-radius-card",
-          "category": [
-            "radius",
-            "card"
-          ]
-        }
-      }
-    },
-    "radius-control": {
-      "$type": "dimension",
-      "$value": "{context.light.radius-control}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-radius-control",
-          "category": [
-            "radius",
-            "control"
-          ]
-        }
-      }
-    },
-    "radius-input": {
-      "$type": "dimension",
-      "$value": "{context.light.radius-input}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-radius-input",
-          "category": [
-            "radius",
-            "input"
-          ]
-        }
-      }
-    },
-    "leading-body": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-body}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-body",
-          "category": [
-            "leading",
-            "body"
-          ]
-        }
-      }
-    },
-    "text-body": {
-      "$type": "dimension",
-      "$value": "{context.light.text-body}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-body",
-          "category": [
-            "text",
-            "body"
-          ]
-        }
-      }
-    },
-    "weight-body": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-body}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-body",
-          "category": [
-            "semantic",
-            "weight-body"
-          ]
-        }
-      }
-    },
-    "tracking-body": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-body}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-body",
-          "category": [
-            "tracking",
-            "body"
-          ]
-        }
-      }
-    },
-    "leading-caption": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-caption}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-caption",
-          "category": [
-            "leading",
-            "caption"
-          ]
-        }
-      }
-    },
-    "text-caption": {
-      "$type": "dimension",
-      "$value": "{context.light.text-caption}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-caption",
-          "category": [
-            "text",
-            "caption"
-          ]
-        }
-      }
-    },
-    "weight-caption": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-caption}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-caption",
-          "category": [
-            "semantic",
-            "weight-caption"
-          ]
-        }
-      }
-    },
-    "tracking-caption": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-caption}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-caption",
-          "category": [
-            "tracking",
-            "caption"
-          ]
-        }
-      }
-    },
-    "leading-display": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-display}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-display",
-          "category": [
-            "leading",
-            "display"
-          ]
-        }
-      }
-    },
-    "text-display": {
-      "$type": "dimension",
-      "$value": "{context.light.text-display}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-display",
-          "category": [
-            "text",
-            "display"
-          ]
-        }
-      }
-    },
-    "weight-display": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-display}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-display",
-          "category": [
-            "semantic",
-            "weight-display"
-          ]
-        }
-      }
-    },
-    "tracking-display": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-display}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-display",
-          "category": [
-            "tracking",
-            "display"
-          ]
-        }
-      }
-    },
-    "leading-heading": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-heading}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-heading",
-          "category": [
-            "leading",
-            "heading"
-          ]
-        }
-      }
-    },
-    "text-heading": {
-      "$type": "dimension",
-      "$value": "{context.light.text-heading}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-heading",
-          "category": [
-            "text",
-            "heading"
-          ]
-        }
-      }
-    },
-    "weight-heading": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-heading}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-heading",
-          "category": [
-            "semantic",
-            "weight-heading"
-          ]
-        }
-      }
-    },
-    "tracking-heading": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-heading}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-heading",
-          "category": [
-            "tracking",
-            "heading"
-          ]
-        }
-      }
-    },
-    "leading-kpi-sm": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-kpi-sm}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-kpi-sm",
-          "category": [
-            "leading",
-            "kpi-sm"
-          ]
-        }
-      }
-    },
-    "text-kpi-sm": {
-      "$type": "dimension",
-      "$value": "{context.light.text-kpi-sm}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-kpi-sm",
-          "category": [
-            "text",
-            "kpi-sm"
-          ]
-        }
-      }
-    },
-    "leading-kpi": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-kpi}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-kpi",
-          "category": [
-            "leading",
-            "kpi"
-          ]
-        }
-      }
-    },
-    "text-kpi": {
-      "$type": "dimension",
-      "$value": "{context.light.text-kpi}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-kpi",
-          "category": [
-            "text",
-            "kpi"
-          ]
-        }
-      }
-    },
-    "weight-kpi": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-kpi}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-kpi",
-          "category": [
-            "semantic",
-            "weight-kpi"
-          ]
-        }
-      }
-    },
-    "tracking-kpi": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-kpi}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-kpi",
-          "category": [
-            "tracking",
-            "kpi"
-          ]
-        }
-      }
-    },
-    "leading-label": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-label}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-label",
-          "category": [
-            "leading",
-            "label"
-          ]
-        }
-      }
-    },
-    "text-label": {
-      "$type": "dimension",
-      "$value": "{context.light.text-label}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-label",
-          "category": [
-            "text",
-            "label"
-          ]
-        }
-      }
-    },
-    "weight-label": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-label}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-label",
-          "category": [
-            "semantic",
-            "weight-label"
-          ]
-        }
-      }
-    },
-    "tracking-label": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-label}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-label",
-          "category": [
-            "tracking",
-            "label"
-          ]
-        }
-      }
-    },
-    "leading-small": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-small}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-small",
-          "category": [
-            "leading",
-            "small"
-          ]
-        }
-      }
-    },
-    "text-small": {
-      "$type": "dimension",
-      "$value": "{context.light.text-small}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-small",
-          "category": [
-            "text",
-            "small"
-          ]
-        }
-      }
-    },
-    "weight-small": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-small}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-small",
-          "category": [
-            "semantic",
-            "weight-small"
-          ]
-        }
-      }
-    },
-    "tracking-small": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-small}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-small",
-          "category": [
-            "tracking",
-            "small"
-          ]
-        }
-      }
-    },
-    "leading-strong": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-strong}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-strong",
-          "category": [
-            "leading",
-            "strong"
-          ]
-        }
-      }
-    },
-    "text-strong": {
-      "$type": "dimension",
-      "$value": "{context.light.text-strong}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-strong",
-          "category": [
-            "text",
-            "strong"
-          ]
-        }
-      }
-    },
-    "weight-strong": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-strong}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-strong",
-          "category": [
-            "semantic",
-            "weight-strong"
-          ]
-        }
-      }
-    },
-    "tracking-strong": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-strong}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-strong",
-          "category": [
-            "tracking",
-            "strong"
-          ]
-        }
-      }
-    },
-    "leading-title": {
-      "$type": "dimension",
-      "$value": "{context.light.leading-title}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-leading-title",
-          "category": [
-            "leading",
-            "title"
-          ]
-        }
-      }
-    },
-    "text-title": {
-      "$type": "dimension",
-      "$value": "{context.light.text-title}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-text-title",
-          "category": [
-            "text",
-            "title"
-          ]
-        }
-      }
-    },
-    "weight-title": {
-      "$type": "fontWeight",
-      "$value": "{context.light.weight-title}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-weight-title",
-          "category": [
-            "semantic",
-            "weight-title"
-          ]
-        }
-      }
-    },
-    "tracking-title": {
-      "$type": "dimension",
-      "$value": "{context.light.tracking-title}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-tracking-title",
-          "category": [
-            "tracking",
-            "title"
-          ]
-        }
-      }
-    },
-    "badge-height": {
-      "$type": "dimension",
-      "$value": "{context.light.badge-height}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-badge-height",
-          "category": [
-            "semantic",
-            "badge-height"
-          ]
-        }
-      }
-    },
-    "badge-padding-x": {
-      "$type": "dimension",
-      "$value": "{context.light.badge-padding-x}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-badge-padding-x",
-          "category": [
-            "semantic",
-            "badge-padding-x"
-          ]
-        }
-      }
-    },
-    "card-padding": {
-      "$type": "dimension",
-      "$value": "{context.light.card-padding}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-card-padding",
-          "category": [
-            "semantic",
-            "card-padding"
-          ]
-        }
-      }
-    },
-    "control-gap": {
-      "$type": "dimension",
-      "$value": "{context.light.control-gap}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-control-gap",
-          "category": [
-            "semantic",
-            "control-gap"
-          ]
-        }
-      }
-    },
-    "control-height": {
-      "$type": "dimension",
-      "$value": "{context.light.control-height}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-control-height",
-          "category": [
-            "semantic",
-            "control-height"
-          ]
-        }
-      }
-    },
-    "control-height-sm": {
-      "$type": "dimension",
-      "$value": "{context.light.control-height-sm}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-control-height-sm",
-          "category": [
-            "semantic",
-            "control-height-sm"
-          ]
-        }
-      }
-    },
-    "control-padding-x": {
-      "$type": "dimension",
-      "$value": "{context.light.control-padding-x}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-control-padding-x",
-          "category": [
-            "semantic",
-            "control-padding-x"
-          ]
-        }
-      }
-    },
-    "inline-gap": {
-      "$type": "dimension",
-      "$value": "{context.light.inline-gap}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-inline-gap",
-          "category": [
-            "semantic",
-            "inline-gap"
-          ]
-        }
-      }
-    },
-    "page-padding-x": {
-      "$type": "dimension",
-      "$value": "{context.light.page-padding-x}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-page-padding-x",
-          "category": [
-            "semantic",
-            "page-padding-x"
-          ]
-        }
-      }
-    },
-    "page-padding-y": {
-      "$type": "dimension",
-      "$value": "{context.light.page-padding-y}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-page-padding-y",
-          "category": [
-            "semantic",
-            "page-padding-y"
-          ]
-        }
-      }
-    },
-    "section-gap": {
-      "$type": "dimension",
-      "$value": "{context.light.section-gap}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-section-gap",
-          "category": [
-            "semantic",
-            "section-gap"
-          ]
-        }
-      }
-    },
-    "stack-gap": {
-      "$type": "dimension",
-      "$value": "{context.light.stack-gap}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-stack-gap",
-          "category": [
-            "semantic",
-            "stack-gap"
-          ]
-        }
-      }
-    },
-    "table-cell-padding-x": {
-      "$type": "dimension",
-      "$value": "{context.light.table-cell-padding-x}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-table-cell-padding-x",
-          "category": [
-            "semantic",
-            "table-cell-padding-x"
-          ]
-        }
-      }
-    },
-    "table-row-height": {
-      "$type": "dimension",
-      "$value": "{context.light.table-row-height}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-table-row-height",
-          "category": [
-            "semantic",
-            "table-row-height"
-          ]
-        }
-      }
-    },
-    "topbar-height": {
-      "$type": "dimension",
-      "$value": "{context.light.topbar-height}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-topbar-height",
-          "category": [
-            "semantic",
-            "topbar-height"
-          ]
-        }
-      }
-    },
-    "accent-solid-hover": {
-      "$type": "color",
-      "$value": "{context.light.accent-solid-hover}",
-      "$extensions": {
-        "netscript": {
-          "cssVar": "--ns-accent-solid-hover",
-          "category": [
-            "semantic",
-            "accent-solid-hover"
-          ]
-        }
-      }
-    },
     "studio-avatar-radius": {
       "$type": "dimension",
       "$value": "{context.light.studio-avatar-radius}",
@@ -6094,6 +6341,162 @@
           "category": [
             "semantic",
             "studio-card-border-top"
+          ]
+        }
+      }
+    },
+    "studio-chart-d-1": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-d-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-d-1",
+          "category": [
+            "semantic",
+            "studio-chart-d-1"
+          ]
+        }
+      }
+    },
+    "studio-chart-d-2": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-d-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-d-2",
+          "category": [
+            "semantic",
+            "studio-chart-d-2"
+          ]
+        }
+      }
+    },
+    "studio-chart-d-3": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-d-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-d-3",
+          "category": [
+            "semantic",
+            "studio-chart-d-3"
+          ]
+        }
+      }
+    },
+    "studio-chart-d-4": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-d-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-d-4",
+          "category": [
+            "semantic",
+            "studio-chart-d-4"
+          ]
+        }
+      }
+    },
+    "studio-chart-d-5": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-d-5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-d-5",
+          "category": [
+            "semantic",
+            "studio-chart-d-5"
+          ]
+        }
+      }
+    },
+    "studio-chart-l-1": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-l-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-l-1",
+          "category": [
+            "semantic",
+            "studio-chart-l-1"
+          ]
+        }
+      }
+    },
+    "studio-chart-l-2": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-l-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-l-2",
+          "category": [
+            "semantic",
+            "studio-chart-l-2"
+          ]
+        }
+      }
+    },
+    "studio-chart-l-3": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-l-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-l-3",
+          "category": [
+            "semantic",
+            "studio-chart-l-3"
+          ]
+        }
+      }
+    },
+    "studio-chart-l-4": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-l-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-l-4",
+          "category": [
+            "semantic",
+            "studio-chart-l-4"
+          ]
+        }
+      }
+    },
+    "studio-chart-l-5": {
+      "$type": "color",
+      "$value": "{context.light.studio-chart-l-5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-chart-l-5",
+          "category": [
+            "semantic",
+            "studio-chart-l-5"
+          ]
+        }
+      }
+    },
+    "studio-deco-marker": {
+      "$type": "number",
+      "$value": "{context.light.studio-deco-marker}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-deco-marker",
+          "category": [
+            "semantic",
+            "studio-deco-marker"
+          ]
+        }
+      }
+    },
+    "studio-font-eyebrow": {
+      "$type": "fontFamily",
+      "$value": "{context.light.studio-font-eyebrow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-font-eyebrow",
+          "category": [
+            "semantic",
+            "studio-font-eyebrow"
           ]
         }
       }
@@ -6488,6 +6891,19 @@
         }
       }
     },
+    "studio-radius-checkbox": {
+      "$type": "dimension",
+      "$value": "{context.light.studio-radius-checkbox}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-radius-checkbox",
+          "category": [
+            "semantic",
+            "studio-radius-checkbox"
+          ]
+        }
+      }
+    },
     "studio-shadow-x": {
       "$type": "dimension",
       "$value": "{context.light.studio-shadow-x}",
@@ -6731,6 +7147,3191 @@
           "category": [
             "semantic",
             "studio-topbar-shadow-y"
+          ]
+        }
+      }
+    },
+    "studio-weight-em": {
+      "$type": "fontWeight",
+      "$value": "{context.light.studio-weight-em}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-weight-em",
+          "category": [
+            "semantic",
+            "studio-weight-em"
+          ]
+        }
+      }
+    },
+    "studio-weight-eyebrow": {
+      "$type": "fontWeight",
+      "$value": "{context.light.studio-weight-eyebrow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-weight-eyebrow",
+          "category": [
+            "semantic",
+            "studio-weight-eyebrow"
+          ]
+        }
+      }
+    },
+    "studio-weight-mono-strong": {
+      "$type": "fontWeight",
+      "$value": "{context.light.studio-weight-mono-strong}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-weight-mono-strong",
+          "category": [
+            "semantic",
+            "studio-weight-mono-strong"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-destructive-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-destructive-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-destructive-bg",
+          "category": [
+            "semantic",
+            "badge-solid-d-destructive-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-destructive-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-destructive-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-destructive-fg",
+          "category": [
+            "semantic",
+            "badge-solid-d-destructive-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-info-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-info-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-info-bg",
+          "category": [
+            "semantic",
+            "badge-solid-d-info-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-info-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-info-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-info-fg",
+          "category": [
+            "semantic",
+            "badge-solid-d-info-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-neutral-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-neutral-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-neutral-bg",
+          "category": [
+            "semantic",
+            "badge-solid-d-neutral-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-neutral-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-neutral-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-neutral-fg",
+          "category": [
+            "semantic",
+            "badge-solid-d-neutral-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-success-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-success-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-success-bg",
+          "category": [
+            "semantic",
+            "badge-solid-d-success-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-success-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-success-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-success-fg",
+          "category": [
+            "semantic",
+            "badge-solid-d-success-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-warning-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-warning-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-warning-bg",
+          "category": [
+            "semantic",
+            "badge-solid-d-warning-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-d-warning-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-d-warning-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-d-warning-fg",
+          "category": [
+            "semantic",
+            "badge-solid-d-warning-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-destructive-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-destructive-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-destructive-bg",
+          "category": [
+            "semantic",
+            "badge-solid-l-destructive-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-destructive-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-destructive-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-destructive-fg",
+          "category": [
+            "semantic",
+            "badge-solid-l-destructive-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-info-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-info-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-info-bg",
+          "category": [
+            "semantic",
+            "badge-solid-l-info-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-info-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-info-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-info-fg",
+          "category": [
+            "semantic",
+            "badge-solid-l-info-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-neutral-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-neutral-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-neutral-bg",
+          "category": [
+            "semantic",
+            "badge-solid-l-neutral-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-neutral-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-neutral-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-neutral-fg",
+          "category": [
+            "semantic",
+            "badge-solid-l-neutral-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-success-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-success-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-success-bg",
+          "category": [
+            "semantic",
+            "badge-solid-l-success-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-success-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-success-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-success-fg",
+          "category": [
+            "semantic",
+            "badge-solid-l-success-fg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-warning-bg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-warning-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-warning-bg",
+          "category": [
+            "semantic",
+            "badge-solid-l-warning-bg"
+          ]
+        }
+      }
+    },
+    "badge-solid-l-warning-fg": {
+      "$type": "color",
+      "$value": "{context.light.badge-solid-l-warning-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-badge-solid-l-warning-fg",
+          "category": [
+            "semantic",
+            "badge-solid-l-warning-fg"
+          ]
+        }
+      }
+    },
+    "brand-d-default": {
+      "$type": "color",
+      "$value": "{context.light.brand-d-default}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-brand-d-default",
+          "category": [
+            "semantic",
+            "brand-d-default"
+          ]
+        }
+      }
+    },
+    "brand-d-fg": {
+      "$type": "color",
+      "$value": "{context.light.brand-d-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-brand-d-fg",
+          "category": [
+            "semantic",
+            "brand-d-fg"
+          ]
+        }
+      }
+    },
+    "brand-l-default": {
+      "$type": "color",
+      "$value": "{context.light.brand-l-default}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-brand-l-default",
+          "category": [
+            "semantic",
+            "brand-l-default"
+          ]
+        }
+      }
+    },
+    "brand-l-fg": {
+      "$type": "color",
+      "$value": "{context.light.brand-l-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-brand-l-fg",
+          "category": [
+            "semantic",
+            "brand-l-fg"
+          ]
+        }
+      }
+    },
+    "card-border-bottom": {
+      "$type": "dimension",
+      "$value": "{context.light.card-border-bottom}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-border-bottom",
+          "category": [
+            "semantic",
+            "card-border-bottom"
+          ]
+        }
+      }
+    },
+    "card-border-side": {
+      "$type": "dimension",
+      "$value": "{context.light.card-border-side}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-border-side",
+          "category": [
+            "semantic",
+            "card-border-side"
+          ]
+        }
+      }
+    },
+    "card-border-top": {
+      "$type": "dimension",
+      "$value": "{context.light.card-border-top}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-border-top",
+          "category": [
+            "semantic",
+            "card-border-top"
+          ]
+        }
+      }
+    },
+    "card-d-bg": {
+      "$type": "color",
+      "$value": "{context.light.card-d-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-d-bg",
+          "category": [
+            "semantic",
+            "card-d-bg"
+          ]
+        }
+      }
+    },
+    "card-d-border": {
+      "$type": "color",
+      "$value": "{context.light.card-d-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-d-border",
+          "category": [
+            "semantic",
+            "card-d-border"
+          ]
+        }
+      }
+    },
+    "card-d-footer": {
+      "$type": "color",
+      "$value": "{context.light.card-d-footer}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-d-footer",
+          "category": [
+            "semantic",
+            "card-d-footer"
+          ]
+        }
+      }
+    },
+    "card-l-bg": {
+      "$type": "color",
+      "$value": "{context.light.card-l-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-l-bg",
+          "category": [
+            "semantic",
+            "card-l-bg"
+          ]
+        }
+      }
+    },
+    "card-l-border": {
+      "$type": "color",
+      "$value": "{context.light.card-l-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-l-border",
+          "category": [
+            "semantic",
+            "card-l-border"
+          ]
+        }
+      }
+    },
+    "card-l-footer": {
+      "$type": "color",
+      "$value": "{context.light.card-l-footer}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-l-footer",
+          "category": [
+            "semantic",
+            "card-l-footer"
+          ]
+        }
+      }
+    },
+    "chart-d-1": {
+      "$type": "color",
+      "$value": "{context.light.chart-d-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-d-1",
+          "category": [
+            "semantic",
+            "chart-d-1"
+          ]
+        }
+      }
+    },
+    "chart-d-2": {
+      "$type": "color",
+      "$value": "{context.light.chart-d-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-d-2",
+          "category": [
+            "semantic",
+            "chart-d-2"
+          ]
+        }
+      }
+    },
+    "chart-d-3": {
+      "$type": "color",
+      "$value": "{context.light.chart-d-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-d-3",
+          "category": [
+            "semantic",
+            "chart-d-3"
+          ]
+        }
+      }
+    },
+    "chart-d-4": {
+      "$type": "color",
+      "$value": "{context.light.chart-d-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-d-4",
+          "category": [
+            "semantic",
+            "chart-d-4"
+          ]
+        }
+      }
+    },
+    "chart-d-5": {
+      "$type": "color",
+      "$value": "{context.light.chart-d-5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-d-5",
+          "category": [
+            "semantic",
+            "chart-d-5"
+          ]
+        }
+      }
+    },
+    "chart-l-1": {
+      "$type": "color",
+      "$value": "{context.light.chart-l-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-l-1",
+          "category": [
+            "semantic",
+            "chart-l-1"
+          ]
+        }
+      }
+    },
+    "chart-l-2": {
+      "$type": "color",
+      "$value": "{context.light.chart-l-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-l-2",
+          "category": [
+            "semantic",
+            "chart-l-2"
+          ]
+        }
+      }
+    },
+    "chart-l-3": {
+      "$type": "color",
+      "$value": "{context.light.chart-l-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-l-3",
+          "category": [
+            "semantic",
+            "chart-l-3"
+          ]
+        }
+      }
+    },
+    "chart-l-4": {
+      "$type": "color",
+      "$value": "{context.light.chart-l-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-l-4",
+          "category": [
+            "semantic",
+            "chart-l-4"
+          ]
+        }
+      }
+    },
+    "chart-l-5": {
+      "$type": "color",
+      "$value": "{context.light.chart-l-5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-chart-l-5",
+          "category": [
+            "semantic",
+            "chart-l-5"
+          ]
+        }
+      }
+    },
+    "deco-blockbars": {
+      "$type": "number",
+      "$value": "{context.light.deco-blockbars}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-deco-blockbars",
+          "category": [
+            "semantic",
+            "deco-blockbars"
+          ]
+        }
+      }
+    },
+    "deco-marker": {
+      "$type": "number",
+      "$value": "{context.light.deco-marker}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-deco-marker",
+          "category": [
+            "semantic",
+            "deco-marker"
+          ]
+        }
+      }
+    },
+    "deco-sparkline": {
+      "$type": "number",
+      "$value": "{context.light.deco-sparkline}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-deco-sparkline",
+          "category": [
+            "semantic",
+            "deco-sparkline"
+          ]
+        }
+      }
+    },
+    "deco-ticks": {
+      "$type": "number",
+      "$value": "{context.light.deco-ticks}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-deco-ticks",
+          "category": [
+            "semantic",
+            "deco-ticks"
+          ]
+        }
+      }
+    },
+    "effect-d-control-shadow": {
+      "$type": "color",
+      "$value": "{context.light.effect-d-control-shadow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-effect-d-control-shadow",
+          "category": [
+            "semantic",
+            "effect-d-control-shadow"
+          ]
+        }
+      }
+    },
+    "effect-l-control-shadow": {
+      "$type": "color",
+      "$value": "{context.light.effect-l-control-shadow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-effect-l-control-shadow",
+          "category": [
+            "semantic",
+            "effect-l-control-shadow"
+          ]
+        }
+      }
+    },
+    "focus-ring-offset": {
+      "$type": "dimension",
+      "$value": "{context.light.focus-ring-offset}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-focus-ring-offset",
+          "category": [
+            "semantic",
+            "focus-ring-offset"
+          ]
+        }
+      }
+    },
+    "focus-ring-width": {
+      "$type": "dimension",
+      "$value": "{context.light.focus-ring-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-focus-ring-width",
+          "category": [
+            "semantic",
+            "focus-ring-width"
+          ]
+        }
+      }
+    },
+    "font-data": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-data}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-data",
+          "category": [
+            "font",
+            "data"
+          ]
+        }
+      }
+    },
+    "font-eyebrow": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-eyebrow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-eyebrow",
+          "category": [
+            "font",
+            "eyebrow"
+          ]
+        }
+      }
+    },
+    "font-heading": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-heading}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-heading",
+          "category": [
+            "font",
+            "heading"
+          ]
+        }
+      }
+    },
+    "font-kpi": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-kpi}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-kpi",
+          "category": [
+            "font",
+            "kpi"
+          ]
+        }
+      }
+    },
+    "font-label": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-label}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-label",
+          "category": [
+            "font",
+            "label"
+          ]
+        }
+      }
+    },
+    "font-mono": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-mono}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-mono",
+          "category": [
+            "font",
+            "mono"
+          ]
+        }
+      }
+    },
+    "font-sans": {
+      "$type": "fontFamily",
+      "$value": "{context.light.font-sans}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-sans",
+          "category": [
+            "font",
+            "sans"
+          ]
+        }
+      }
+    },
+    "frame-inset": {
+      "$type": "dimension",
+      "$value": "{context.light.frame-inset}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-frame-inset",
+          "category": [
+            "semantic",
+            "frame-inset"
+          ]
+        }
+      }
+    },
+    "hero-d-bg": {
+      "$type": "color",
+      "$value": "{context.light.hero-d-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-hero-d-bg",
+          "category": [
+            "semantic",
+            "hero-d-bg"
+          ]
+        }
+      }
+    },
+    "hero-l-bg": {
+      "$type": "color",
+      "$value": "{context.light.hero-l-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-hero-l-bg",
+          "category": [
+            "semantic",
+            "hero-l-bg"
+          ]
+        }
+      }
+    },
+    "hero-pad": {
+      "$type": "dimension",
+      "$value": "{context.light.hero-pad}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-hero-pad",
+          "category": [
+            "semantic",
+            "hero-pad"
+          ]
+        }
+      }
+    },
+    "icon-stroke-width": {
+      "$type": "dimension",
+      "$value": "{context.light.icon-stroke-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-icon-stroke-width",
+          "category": [
+            "semantic",
+            "icon-stroke-width"
+          ]
+        }
+      }
+    },
+    "input-d": {
+      "$type": "color",
+      "$value": "{context.light.input-d}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-input-d",
+          "category": [
+            "semantic",
+            "input-d"
+          ]
+        }
+      }
+    },
+    "input-l": {
+      "$type": "color",
+      "$value": "{context.light.input-l}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-input-l",
+          "category": [
+            "semantic",
+            "input-l"
+          ]
+        }
+      }
+    },
+    "kpi-border-bottom": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-border-bottom}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-border-bottom",
+          "category": [
+            "semantic",
+            "kpi-border-bottom"
+          ]
+        }
+      }
+    },
+    "kpi-border-left": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-border-left}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-border-left",
+          "category": [
+            "semantic",
+            "kpi-border-left"
+          ]
+        }
+      }
+    },
+    "kpi-border-right": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-border-right}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-border-right",
+          "category": [
+            "semantic",
+            "kpi-border-right"
+          ]
+        }
+      }
+    },
+    "kpi-border-top": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-border-top}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-border-top",
+          "category": [
+            "semantic",
+            "kpi-border-top"
+          ]
+        }
+      }
+    },
+    "kpi-d-bg-1": {
+      "$type": "color",
+      "$value": "{context.light.kpi-d-bg-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-d-bg-1",
+          "category": [
+            "semantic",
+            "kpi-d-bg-1"
+          ]
+        }
+      }
+    },
+    "kpi-d-bg-2": {
+      "$type": "color",
+      "$value": "{context.light.kpi-d-bg-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-d-bg-2",
+          "category": [
+            "semantic",
+            "kpi-d-bg-2"
+          ]
+        }
+      }
+    },
+    "kpi-d-bg-3": {
+      "$type": "color",
+      "$value": "{context.light.kpi-d-bg-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-d-bg-3",
+          "category": [
+            "semantic",
+            "kpi-d-bg-3"
+          ]
+        }
+      }
+    },
+    "kpi-d-bg-4": {
+      "$type": "color",
+      "$value": "{context.light.kpi-d-bg-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-d-bg-4",
+          "category": [
+            "semantic",
+            "kpi-d-bg-4"
+          ]
+        }
+      }
+    },
+    "kpi-d-border": {
+      "$type": "color",
+      "$value": "{context.light.kpi-d-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-d-border",
+          "category": [
+            "semantic",
+            "kpi-d-border"
+          ]
+        }
+      }
+    },
+    "kpi-first-left": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-first-left}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-first-left",
+          "category": [
+            "semantic",
+            "kpi-first-left"
+          ]
+        }
+      }
+    },
+    "kpi-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-gap",
+          "category": [
+            "semantic",
+            "kpi-gap"
+          ]
+        }
+      }
+    },
+    "kpi-l-bg-1": {
+      "$type": "color",
+      "$value": "{context.light.kpi-l-bg-1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-l-bg-1",
+          "category": [
+            "semantic",
+            "kpi-l-bg-1"
+          ]
+        }
+      }
+    },
+    "kpi-l-bg-2": {
+      "$type": "color",
+      "$value": "{context.light.kpi-l-bg-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-l-bg-2",
+          "category": [
+            "semantic",
+            "kpi-l-bg-2"
+          ]
+        }
+      }
+    },
+    "kpi-l-bg-3": {
+      "$type": "color",
+      "$value": "{context.light.kpi-l-bg-3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-l-bg-3",
+          "category": [
+            "semantic",
+            "kpi-l-bg-3"
+          ]
+        }
+      }
+    },
+    "kpi-l-bg-4": {
+      "$type": "color",
+      "$value": "{context.light.kpi-l-bg-4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-l-bg-4",
+          "category": [
+            "semantic",
+            "kpi-l-bg-4"
+          ]
+        }
+      }
+    },
+    "kpi-l-border": {
+      "$type": "color",
+      "$value": "{context.light.kpi-l-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-l-border",
+          "category": [
+            "semantic",
+            "kpi-l-border"
+          ]
+        }
+      }
+    },
+    "kpi-pad-x": {
+      "$type": "dimension",
+      "$value": "{context.light.kpi-pad-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-kpi-pad-x",
+          "category": [
+            "semantic",
+            "kpi-pad-x"
+          ]
+        }
+      }
+    },
+    "link-d-underline": {
+      "$type": "color",
+      "$value": "{context.light.link-d-underline}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-link-d-underline",
+          "category": [
+            "semantic",
+            "link-d-underline"
+          ]
+        }
+      }
+    },
+    "link-l-underline": {
+      "$type": "color",
+      "$value": "{context.light.link-l-underline}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-link-l-underline",
+          "category": [
+            "semantic",
+            "link-l-underline"
+          ]
+        }
+      }
+    },
+    "marker-d-default": {
+      "$type": "color",
+      "$value": "{context.light.marker-d-default}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-marker-d-default",
+          "category": [
+            "semantic",
+            "marker-d-default"
+          ]
+        }
+      }
+    },
+    "marker-l-default": {
+      "$type": "color",
+      "$value": "{context.light.marker-l-default}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-marker-l-default",
+          "category": [
+            "semantic",
+            "marker-l-default"
+          ]
+        }
+      }
+    },
+    "nav-d-active": {
+      "$type": "color",
+      "$value": "{context.light.nav-d-active}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-nav-d-active",
+          "category": [
+            "semantic",
+            "nav-d-active"
+          ]
+        }
+      }
+    },
+    "nav-l-active": {
+      "$type": "color",
+      "$value": "{context.light.nav-l-active}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-nav-l-active",
+          "category": [
+            "semantic",
+            "nav-l-active"
+          ]
+        }
+      }
+    },
+    "nav-pad": {
+      "$type": "dimension",
+      "$value": "{context.light.nav-pad}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-nav-pad",
+          "category": [
+            "semantic",
+            "nav-pad"
+          ]
+        }
+      }
+    },
+    "nav-radius": {
+      "$type": "dimension",
+      "$value": "{context.light.nav-radius}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-nav-radius",
+          "category": [
+            "semantic",
+            "nav-radius"
+          ]
+        }
+      }
+    },
+    "primary-d-stroke": {
+      "$type": "color",
+      "$value": "{context.light.primary-d-stroke}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-d-stroke",
+          "category": [
+            "semantic",
+            "primary-d-stroke"
+          ]
+        }
+      }
+    },
+    "primary-l-stroke": {
+      "$type": "color",
+      "$value": "{context.light.primary-l-stroke}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-l-stroke",
+          "category": [
+            "semantic",
+            "primary-l-stroke"
+          ]
+        }
+      }
+    },
+    "prose-body-line": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-body-line}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-body-line",
+          "category": [
+            "semantic",
+            "prose-body-line"
+          ]
+        }
+      }
+    },
+    "prose-body-size": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-body-size}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-body-size",
+          "category": [
+            "semantic",
+            "prose-body-size"
+          ]
+        }
+      }
+    },
+    "prose-code-line": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-code-line}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-code-line",
+          "category": [
+            "semantic",
+            "prose-code-line"
+          ]
+        }
+      }
+    },
+    "prose-code-size": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-code-size}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-code-size",
+          "category": [
+            "semantic",
+            "prose-code-size"
+          ]
+        }
+      }
+    },
+    "prose-h2-line": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h2-line}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h2-line",
+          "category": [
+            "semantic",
+            "prose-h2-line"
+          ]
+        }
+      }
+    },
+    "prose-h2-size": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h2-size}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h2-size",
+          "category": [
+            "semantic",
+            "prose-h2-size"
+          ]
+        }
+      }
+    },
+    "prose-h2-tracking": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h2-tracking}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h2-tracking",
+          "category": [
+            "semantic",
+            "prose-h2-tracking"
+          ]
+        }
+      }
+    },
+    "prose-h3-line": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h3-line}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h3-line",
+          "category": [
+            "semantic",
+            "prose-h3-line"
+          ]
+        }
+      }
+    },
+    "prose-h3-size": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h3-size}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h3-size",
+          "category": [
+            "semantic",
+            "prose-h3-size"
+          ]
+        }
+      }
+    },
+    "prose-h3-tracking": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h3-tracking}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h3-tracking",
+          "category": [
+            "semantic",
+            "prose-h3-tracking"
+          ]
+        }
+      }
+    },
+    "prose-h4-line": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h4-line}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h4-line",
+          "category": [
+            "semantic",
+            "prose-h4-line"
+          ]
+        }
+      }
+    },
+    "prose-h4-size": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-h4-size}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-h4-size",
+          "category": [
+            "semantic",
+            "prose-h4-size"
+          ]
+        }
+      }
+    },
+    "prose-lede-line": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-lede-line}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-lede-line",
+          "category": [
+            "semantic",
+            "prose-lede-line"
+          ]
+        }
+      }
+    },
+    "prose-lede-size": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-lede-size}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-lede-size",
+          "category": [
+            "semantic",
+            "prose-lede-size"
+          ]
+        }
+      }
+    },
+    "prose-measure": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-measure}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-measure",
+          "category": [
+            "semantic",
+            "prose-measure"
+          ]
+        }
+      }
+    },
+    "prose-wide": {
+      "$type": "dimension",
+      "$value": "{context.light.prose-wide}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-prose-wide",
+          "category": [
+            "semantic",
+            "prose-wide"
+          ]
+        }
+      }
+    },
+    "radius-avatar": {
+      "$type": "dimension",
+      "$value": "{context.light.radius-avatar}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-radius-avatar",
+          "category": [
+            "radius",
+            "avatar"
+          ]
+        }
+      }
+    },
+    "radius-badge": {
+      "$type": "dimension",
+      "$value": "{context.light.radius-badge}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-radius-badge",
+          "category": [
+            "radius",
+            "badge"
+          ]
+        }
+      }
+    },
+    "radius-card": {
+      "$type": "dimension",
+      "$value": "{context.light.radius-card}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-radius-card",
+          "category": [
+            "radius",
+            "card"
+          ]
+        }
+      }
+    },
+    "radius-checkbox": {
+      "$type": "dimension",
+      "$value": "{context.light.radius-checkbox}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-radius-checkbox",
+          "category": [
+            "radius",
+            "checkbox"
+          ]
+        }
+      }
+    },
+    "radius-control": {
+      "$type": "dimension",
+      "$value": "{context.light.radius-control}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-radius-control",
+          "category": [
+            "radius",
+            "control"
+          ]
+        }
+      }
+    },
+    "radius-input": {
+      "$type": "dimension",
+      "$value": "{context.light.radius-input}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-radius-input",
+          "category": [
+            "radius",
+            "input"
+          ]
+        }
+      }
+    },
+    "scrollbar-d-thumb": {
+      "$type": "color",
+      "$value": "{context.light.scrollbar-d-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-scrollbar-d-thumb",
+          "category": [
+            "semantic",
+            "scrollbar-d-thumb"
+          ]
+        }
+      }
+    },
+    "scrollbar-l-thumb": {
+      "$type": "color",
+      "$value": "{context.light.scrollbar-l-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-scrollbar-l-thumb",
+          "category": [
+            "semantic",
+            "scrollbar-l-thumb"
+          ]
+        }
+      }
+    },
+    "shadow-control-x": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-control-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-control-x",
+          "category": [
+            "shadow",
+            "control-x"
+          ]
+        }
+      }
+    },
+    "shadow-control-y": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-control-y}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-control-y",
+          "category": [
+            "shadow",
+            "control-y"
+          ]
+        }
+      }
+    },
+    "shadow-overlay-blur": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-overlay-blur}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-overlay-blur",
+          "category": [
+            "shadow",
+            "overlay-blur"
+          ]
+        }
+      }
+    },
+    "shadow-overlay-y": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-overlay-y}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-overlay-y",
+          "category": [
+            "shadow",
+            "overlay-y"
+          ]
+        }
+      }
+    },
+    "shadow-x": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-x}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-x",
+          "category": [
+            "shadow",
+            "x"
+          ]
+        }
+      }
+    },
+    "size-avatar-lg": {
+      "$type": "dimension",
+      "$value": "{context.light.size-avatar-lg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-avatar-lg",
+          "category": [
+            "semantic",
+            "size-avatar-lg"
+          ]
+        }
+      }
+    },
+    "size-avatar-md": {
+      "$type": "dimension",
+      "$value": "{context.light.size-avatar-md}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-avatar-md",
+          "category": [
+            "semantic",
+            "size-avatar-md"
+          ]
+        }
+      }
+    },
+    "size-avatar-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.size-avatar-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-avatar-sm",
+          "category": [
+            "semantic",
+            "size-avatar-sm"
+          ]
+        }
+      }
+    },
+    "size-checkbox": {
+      "$type": "dimension",
+      "$value": "{context.light.size-checkbox}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-checkbox",
+          "category": [
+            "semantic",
+            "size-checkbox"
+          ]
+        }
+      }
+    },
+    "size-icon-lg": {
+      "$type": "dimension",
+      "$value": "{context.light.size-icon-lg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-icon-lg",
+          "category": [
+            "semantic",
+            "size-icon-lg"
+          ]
+        }
+      }
+    },
+    "size-icon-md": {
+      "$type": "dimension",
+      "$value": "{context.light.size-icon-md}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-icon-md",
+          "category": [
+            "semantic",
+            "size-icon-md"
+          ]
+        }
+      }
+    },
+    "size-icon-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.size-icon-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-icon-sm",
+          "category": [
+            "semantic",
+            "size-icon-sm"
+          ]
+        }
+      }
+    },
+    "size-kbd": {
+      "$type": "dimension",
+      "$value": "{context.light.size-kbd}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-kbd",
+          "category": [
+            "semantic",
+            "size-kbd"
+          ]
+        }
+      }
+    },
+    "size-kbd-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.size-kbd-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-kbd-sm",
+          "category": [
+            "semantic",
+            "size-kbd-sm"
+          ]
+        }
+      }
+    },
+    "size-switch-height": {
+      "$type": "dimension",
+      "$value": "{context.light.size-switch-height}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-switch-height",
+          "category": [
+            "semantic",
+            "size-switch-height"
+          ]
+        }
+      }
+    },
+    "size-switch-height-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.size-switch-height-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-switch-height-sm",
+          "category": [
+            "semantic",
+            "size-switch-height-sm"
+          ]
+        }
+      }
+    },
+    "size-switch-thumb": {
+      "$type": "dimension",
+      "$value": "{context.light.size-switch-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-switch-thumb",
+          "category": [
+            "semantic",
+            "size-switch-thumb"
+          ]
+        }
+      }
+    },
+    "size-switch-thumb-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.size-switch-thumb-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-switch-thumb-sm",
+          "category": [
+            "semantic",
+            "size-switch-thumb-sm"
+          ]
+        }
+      }
+    },
+    "size-switch-width": {
+      "$type": "dimension",
+      "$value": "{context.light.size-switch-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-switch-width",
+          "category": [
+            "semantic",
+            "size-switch-width"
+          ]
+        }
+      }
+    },
+    "size-switch-width-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.size-switch-width-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-size-switch-width-sm",
+          "category": [
+            "semantic",
+            "size-switch-width-sm"
+          ]
+        }
+      }
+    },
+    "state-disabled-opacity": {
+      "$type": "number",
+      "$value": "{context.light.state-disabled-opacity}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-state-disabled-opacity",
+          "category": [
+            "semantic",
+            "state-disabled-opacity"
+          ]
+        }
+      }
+    },
+    "state-hover-opacity": {
+      "$type": "number",
+      "$value": "{context.light.state-hover-opacity}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-state-hover-opacity",
+          "category": [
+            "semantic",
+            "state-hover-opacity"
+          ]
+        }
+      }
+    },
+    "state-pressed-opacity": {
+      "$type": "number",
+      "$value": "{context.light.state-pressed-opacity}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-state-pressed-opacity",
+          "category": [
+            "semantic",
+            "state-pressed-opacity"
+          ]
+        }
+      }
+    },
+    "switch-d-thumb": {
+      "$type": "color",
+      "$value": "{context.light.switch-d-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-switch-d-thumb",
+          "category": [
+            "semantic",
+            "switch-d-thumb"
+          ]
+        }
+      }
+    },
+    "switch-l-thumb": {
+      "$type": "color",
+      "$value": "{context.light.switch-l-thumb}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-switch-l-thumb",
+          "category": [
+            "semantic",
+            "switch-l-thumb"
+          ]
+        }
+      }
+    },
+    "table-cell-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.table-cell-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-cell-rule-width",
+          "category": [
+            "semantic",
+            "table-cell-rule-width"
+          ]
+        }
+      }
+    },
+    "table-d-cell-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-d-cell-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-cell-rule",
+          "category": [
+            "semantic",
+            "table-d-cell-rule"
+          ]
+        }
+      }
+    },
+    "table-d-head": {
+      "$type": "color",
+      "$value": "{context.light.table-d-head}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-head",
+          "category": [
+            "semantic",
+            "table-d-head"
+          ]
+        }
+      }
+    },
+    "table-d-head-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-d-head-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-head-rule",
+          "category": [
+            "semantic",
+            "table-d-head-rule"
+          ]
+        }
+      }
+    },
+    "table-d-hover": {
+      "$type": "color",
+      "$value": "{context.light.table-d-hover}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-hover",
+          "category": [
+            "semantic",
+            "table-d-hover"
+          ]
+        }
+      }
+    },
+    "table-d-row-bg": {
+      "$type": "color",
+      "$value": "{context.light.table-d-row-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-row-bg",
+          "category": [
+            "semantic",
+            "table-d-row-bg"
+          ]
+        }
+      }
+    },
+    "table-d-row-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-d-row-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-row-rule",
+          "category": [
+            "semantic",
+            "table-d-row-rule"
+          ]
+        }
+      }
+    },
+    "table-d-zebra": {
+      "$type": "color",
+      "$value": "{context.light.table-d-zebra}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-d-zebra",
+          "category": [
+            "semantic",
+            "table-d-zebra"
+          ]
+        }
+      }
+    },
+    "table-head-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.table-head-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-head-rule-width",
+          "category": [
+            "semantic",
+            "table-head-rule-width"
+          ]
+        }
+      }
+    },
+    "table-inset": {
+      "$type": "dimension",
+      "$value": "{context.light.table-inset}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-inset",
+          "category": [
+            "semantic",
+            "table-inset"
+          ]
+        }
+      }
+    },
+    "table-l-cell-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-l-cell-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-cell-rule",
+          "category": [
+            "semantic",
+            "table-l-cell-rule"
+          ]
+        }
+      }
+    },
+    "table-l-head": {
+      "$type": "color",
+      "$value": "{context.light.table-l-head}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-head",
+          "category": [
+            "semantic",
+            "table-l-head"
+          ]
+        }
+      }
+    },
+    "table-l-head-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-l-head-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-head-rule",
+          "category": [
+            "semantic",
+            "table-l-head-rule"
+          ]
+        }
+      }
+    },
+    "table-l-hover": {
+      "$type": "color",
+      "$value": "{context.light.table-l-hover}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-hover",
+          "category": [
+            "semantic",
+            "table-l-hover"
+          ]
+        }
+      }
+    },
+    "table-l-row-bg": {
+      "$type": "color",
+      "$value": "{context.light.table-l-row-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-row-bg",
+          "category": [
+            "semantic",
+            "table-l-row-bg"
+          ]
+        }
+      }
+    },
+    "table-l-row-rule": {
+      "$type": "color",
+      "$value": "{context.light.table-l-row-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-row-rule",
+          "category": [
+            "semantic",
+            "table-l-row-rule"
+          ]
+        }
+      }
+    },
+    "table-l-zebra": {
+      "$type": "color",
+      "$value": "{context.light.table-l-zebra}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-l-zebra",
+          "category": [
+            "semantic",
+            "table-l-zebra"
+          ]
+        }
+      }
+    },
+    "table-row-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.table-row-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-row-gap",
+          "category": [
+            "semantic",
+            "table-row-gap"
+          ]
+        }
+      }
+    },
+    "table-row-radius": {
+      "$type": "dimension",
+      "$value": "{context.light.table-row-radius}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-row-radius",
+          "category": [
+            "semantic",
+            "table-row-radius"
+          ]
+        }
+      }
+    },
+    "table-row-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.table-row-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-table-row-rule-width",
+          "category": [
+            "semantic",
+            "table-row-rule-width"
+          ]
+        }
+      }
+    },
+    "tabs-d-idle-border": {
+      "$type": "color",
+      "$value": "{context.light.tabs-d-idle-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-d-idle-border",
+          "category": [
+            "semantic",
+            "tabs-d-idle-border"
+          ]
+        }
+      }
+    },
+    "tabs-d-sel-bg": {
+      "$type": "color",
+      "$value": "{context.light.tabs-d-sel-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-d-sel-bg",
+          "category": [
+            "semantic",
+            "tabs-d-sel-bg"
+          ]
+        }
+      }
+    },
+    "tabs-d-sel-border": {
+      "$type": "color",
+      "$value": "{context.light.tabs-d-sel-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-d-sel-border",
+          "category": [
+            "semantic",
+            "tabs-d-sel-border"
+          ]
+        }
+      }
+    },
+    "tabs-d-track": {
+      "$type": "color",
+      "$value": "{context.light.tabs-d-track}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-d-track",
+          "category": [
+            "semantic",
+            "tabs-d-track"
+          ]
+        }
+      }
+    },
+    "tabs-gap": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-gap}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-gap",
+          "category": [
+            "semantic",
+            "tabs-gap"
+          ]
+        }
+      }
+    },
+    "tabs-idle-stroke": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-idle-stroke}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-idle-stroke",
+          "category": [
+            "semantic",
+            "tabs-idle-stroke"
+          ]
+        }
+      }
+    },
+    "tabs-item-pad": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-item-pad}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-item-pad",
+          "category": [
+            "semantic",
+            "tabs-item-pad"
+          ]
+        }
+      }
+    },
+    "tabs-item-radius": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-item-radius}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-item-radius",
+          "category": [
+            "semantic",
+            "tabs-item-radius"
+          ]
+        }
+      }
+    },
+    "tabs-l-idle-border": {
+      "$type": "color",
+      "$value": "{context.light.tabs-l-idle-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-l-idle-border",
+          "category": [
+            "semantic",
+            "tabs-l-idle-border"
+          ]
+        }
+      }
+    },
+    "tabs-l-sel-bg": {
+      "$type": "color",
+      "$value": "{context.light.tabs-l-sel-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-l-sel-bg",
+          "category": [
+            "semantic",
+            "tabs-l-sel-bg"
+          ]
+        }
+      }
+    },
+    "tabs-l-sel-border": {
+      "$type": "color",
+      "$value": "{context.light.tabs-l-sel-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-l-sel-border",
+          "category": [
+            "semantic",
+            "tabs-l-sel-border"
+          ]
+        }
+      }
+    },
+    "tabs-l-track": {
+      "$type": "color",
+      "$value": "{context.light.tabs-l-track}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-l-track",
+          "category": [
+            "semantic",
+            "tabs-l-track"
+          ]
+        }
+      }
+    },
+    "tabs-pad": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-pad}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-pad",
+          "category": [
+            "semantic",
+            "tabs-pad"
+          ]
+        }
+      }
+    },
+    "tabs-radius": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-radius}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-radius",
+          "category": [
+            "semantic",
+            "tabs-radius"
+          ]
+        }
+      }
+    },
+    "tabs-sel-bottom": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-sel-bottom}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-sel-bottom",
+          "category": [
+            "semantic",
+            "tabs-sel-bottom"
+          ]
+        }
+      }
+    },
+    "tabs-sel-box": {
+      "$type": "dimension",
+      "$value": "{context.light.tabs-sel-box}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tabs-sel-box",
+          "category": [
+            "semantic",
+            "tabs-sel-box"
+          ]
+        }
+      }
+    },
+    "tooltip-d-bg": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-d-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-d-bg",
+          "category": [
+            "semantic",
+            "tooltip-d-bg"
+          ]
+        }
+      }
+    },
+    "tooltip-d-border": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-d-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-d-border",
+          "category": [
+            "semantic",
+            "tooltip-d-border"
+          ]
+        }
+      }
+    },
+    "tooltip-d-fg": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-d-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-d-fg",
+          "category": [
+            "semantic",
+            "tooltip-d-fg"
+          ]
+        }
+      }
+    },
+    "tooltip-d-kbd": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-d-kbd}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-d-kbd",
+          "category": [
+            "semantic",
+            "tooltip-d-kbd"
+          ]
+        }
+      }
+    },
+    "tooltip-d-muted": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-d-muted}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-d-muted",
+          "category": [
+            "semantic",
+            "tooltip-d-muted"
+          ]
+        }
+      }
+    },
+    "tooltip-l-bg": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-l-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-l-bg",
+          "category": [
+            "semantic",
+            "tooltip-l-bg"
+          ]
+        }
+      }
+    },
+    "tooltip-l-border": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-l-border}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-l-border",
+          "category": [
+            "semantic",
+            "tooltip-l-border"
+          ]
+        }
+      }
+    },
+    "tooltip-l-fg": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-l-fg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-l-fg",
+          "category": [
+            "semantic",
+            "tooltip-l-fg"
+          ]
+        }
+      }
+    },
+    "tooltip-l-kbd": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-l-kbd}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-l-kbd",
+          "category": [
+            "semantic",
+            "tooltip-l-kbd"
+          ]
+        }
+      }
+    },
+    "tooltip-l-muted": {
+      "$type": "color",
+      "$value": "{context.light.tooltip-l-muted}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tooltip-l-muted",
+          "category": [
+            "semantic",
+            "tooltip-l-muted"
+          ]
+        }
+      }
+    },
+    "topbar-d-bg": {
+      "$type": "color",
+      "$value": "{context.light.topbar-d-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-d-bg",
+          "category": [
+            "semantic",
+            "topbar-d-bg"
+          ]
+        }
+      }
+    },
+    "topbar-d-rule": {
+      "$type": "color",
+      "$value": "{context.light.topbar-d-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-d-rule",
+          "category": [
+            "semantic",
+            "topbar-d-rule"
+          ]
+        }
+      }
+    },
+    "topbar-l-bg": {
+      "$type": "color",
+      "$value": "{context.light.topbar-l-bg}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-l-bg",
+          "category": [
+            "semantic",
+            "topbar-l-bg"
+          ]
+        }
+      }
+    },
+    "topbar-l-rule": {
+      "$type": "color",
+      "$value": "{context.light.topbar-l-rule}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-l-rule",
+          "category": [
+            "semantic",
+            "topbar-l-rule"
+          ]
+        }
+      }
+    },
+    "topbar-radius": {
+      "$type": "dimension",
+      "$value": "{context.light.topbar-radius}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-radius",
+          "category": [
+            "semantic",
+            "topbar-radius"
+          ]
+        }
+      }
+    },
+    "topbar-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.topbar-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-rule-width",
+          "category": [
+            "semantic",
+            "topbar-rule-width"
+          ]
+        }
+      }
+    },
+    "topbar-shadow-blur": {
+      "$type": "dimension",
+      "$value": "{context.light.topbar-shadow-blur}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-shadow-blur",
+          "category": [
+            "semantic",
+            "topbar-shadow-blur"
+          ]
+        }
+      }
+    },
+    "topbar-shadow-y": {
+      "$type": "dimension",
+      "$value": "{context.light.topbar-shadow-y}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-topbar-shadow-y",
+          "category": [
+            "semantic",
+            "topbar-shadow-y"
+          ]
+        }
+      }
+    },
+    "leading-body": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-body}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-body",
+          "category": [
+            "leading",
+            "body"
+          ]
+        }
+      }
+    },
+    "text-body": {
+      "$type": "dimension",
+      "$value": "{context.light.text-body}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-body",
+          "category": [
+            "text",
+            "body"
+          ]
+        }
+      }
+    },
+    "weight-body": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-body}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-body",
+          "category": [
+            "semantic",
+            "weight-body"
+          ]
+        }
+      }
+    },
+    "tracking-body": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-body}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-body",
+          "category": [
+            "tracking",
+            "body"
+          ]
+        }
+      }
+    },
+    "leading-caption": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-caption}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-caption",
+          "category": [
+            "leading",
+            "caption"
+          ]
+        }
+      }
+    },
+    "text-caption": {
+      "$type": "dimension",
+      "$value": "{context.light.text-caption}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-caption",
+          "category": [
+            "text",
+            "caption"
+          ]
+        }
+      }
+    },
+    "weight-caption": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-caption}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-caption",
+          "category": [
+            "semantic",
+            "weight-caption"
+          ]
+        }
+      }
+    },
+    "tracking-caption": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-caption}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-caption",
+          "category": [
+            "tracking",
+            "caption"
+          ]
+        }
+      }
+    },
+    "leading-code": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-code}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-code",
+          "category": [
+            "leading",
+            "code"
+          ]
+        }
+      }
+    },
+    "text-code": {
+      "$type": "dimension",
+      "$value": "{context.light.text-code}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-code",
+          "category": [
+            "text",
+            "code"
+          ]
+        }
+      }
+    },
+    "leading-display": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-display}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-display",
+          "category": [
+            "leading",
+            "display"
+          ]
+        }
+      }
+    },
+    "text-display": {
+      "$type": "dimension",
+      "$value": "{context.light.text-display}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-display",
+          "category": [
+            "text",
+            "display"
+          ]
+        }
+      }
+    },
+    "weight-display": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-display}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-display",
+          "category": [
+            "semantic",
+            "weight-display"
+          ]
+        }
+      }
+    },
+    "tracking-display": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-display}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-display",
+          "category": [
+            "tracking",
+            "display"
+          ]
+        }
+      }
+    },
+    "weight-em": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-em}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-em",
+          "category": [
+            "semantic",
+            "weight-em"
+          ]
+        }
+      }
+    },
+    "weight-eyebrow": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-eyebrow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-eyebrow",
+          "category": [
+            "semantic",
+            "weight-eyebrow"
+          ]
+        }
+      }
+    },
+    "leading-heading": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-heading}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-heading",
+          "category": [
+            "leading",
+            "heading"
+          ]
+        }
+      }
+    },
+    "text-heading": {
+      "$type": "dimension",
+      "$value": "{context.light.text-heading}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-heading",
+          "category": [
+            "text",
+            "heading"
+          ]
+        }
+      }
+    },
+    "weight-heading": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-heading}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-heading",
+          "category": [
+            "semantic",
+            "weight-heading"
+          ]
+        }
+      }
+    },
+    "tracking-heading": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-heading}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-heading",
+          "category": [
+            "tracking",
+            "heading"
+          ]
+        }
+      }
+    },
+    "leading-kpi-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-kpi-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-kpi-sm",
+          "category": [
+            "leading",
+            "kpi-sm"
+          ]
+        }
+      }
+    },
+    "text-kpi-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.text-kpi-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-kpi-sm",
+          "category": [
+            "text",
+            "kpi-sm"
+          ]
+        }
+      }
+    },
+    "weight-kpi-sm": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-kpi-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-kpi-sm",
+          "category": [
+            "semantic",
+            "weight-kpi-sm"
+          ]
+        }
+      }
+    },
+    "tracking-kpi-sm": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-kpi-sm}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-kpi-sm",
+          "category": [
+            "tracking",
+            "kpi-sm"
+          ]
+        }
+      }
+    },
+    "leading-kpi": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-kpi}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-kpi",
+          "category": [
+            "leading",
+            "kpi"
+          ]
+        }
+      }
+    },
+    "text-kpi": {
+      "$type": "dimension",
+      "$value": "{context.light.text-kpi}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-kpi",
+          "category": [
+            "text",
+            "kpi"
+          ]
+        }
+      }
+    },
+    "weight-kpi": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-kpi}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-kpi",
+          "category": [
+            "semantic",
+            "weight-kpi"
+          ]
+        }
+      }
+    },
+    "tracking-kpi": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-kpi}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-kpi",
+          "category": [
+            "tracking",
+            "kpi"
+          ]
+        }
+      }
+    },
+    "type-label-strong-style": {
+      "$type": "fontWeight",
+      "$value": "{context.light.type-label-strong-style}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-type-label-strong-style",
+          "category": [
+            "semantic",
+            "type-label-strong-style"
+          ]
+        }
+      }
+    },
+    "leading-label": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-label}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-label",
+          "category": [
+            "leading",
+            "label"
+          ]
+        }
+      }
+    },
+    "text-label": {
+      "$type": "dimension",
+      "$value": "{context.light.text-label}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-label",
+          "category": [
+            "text",
+            "label"
+          ]
+        }
+      }
+    },
+    "weight-label": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-label}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-label",
+          "category": [
+            "semantic",
+            "weight-label"
+          ]
+        }
+      }
+    },
+    "tracking-label": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-label}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-label",
+          "category": [
+            "tracking",
+            "label"
+          ]
+        }
+      }
+    },
+    "weight-mono-strong": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-mono-strong}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-mono-strong",
+          "category": [
+            "semantic",
+            "weight-mono-strong"
+          ]
+        }
+      }
+    },
+    "type-mono-style": {
+      "$type": "fontWeight",
+      "$value": "{context.light.type-mono-style}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-type-mono-style",
+          "category": [
+            "semantic",
+            "type-mono-style"
+          ]
+        }
+      }
+    },
+    "leading-small": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-small}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-small",
+          "category": [
+            "leading",
+            "small"
+          ]
+        }
+      }
+    },
+    "text-small": {
+      "$type": "dimension",
+      "$value": "{context.light.text-small}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-small",
+          "category": [
+            "text",
+            "small"
+          ]
+        }
+      }
+    },
+    "weight-small": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-small}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-small",
+          "category": [
+            "semantic",
+            "weight-small"
+          ]
+        }
+      }
+    },
+    "tracking-small": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-small}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-small",
+          "category": [
+            "tracking",
+            "small"
+          ]
+        }
+      }
+    },
+    "leading-strong": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-strong}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-strong",
+          "category": [
+            "leading",
+            "strong"
+          ]
+        }
+      }
+    },
+    "text-strong": {
+      "$type": "dimension",
+      "$value": "{context.light.text-strong}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-strong",
+          "category": [
+            "text",
+            "strong"
+          ]
+        }
+      }
+    },
+    "weight-strong": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-strong}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-strong",
+          "category": [
+            "semantic",
+            "weight-strong"
+          ]
+        }
+      }
+    },
+    "tracking-strong": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-strong}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-strong",
+          "category": [
+            "tracking",
+            "strong"
+          ]
+        }
+      }
+    },
+    "leading-title": {
+      "$type": "dimension",
+      "$value": "{context.light.leading-title}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-leading-title",
+          "category": [
+            "leading",
+            "title"
+          ]
+        }
+      }
+    },
+    "text-title": {
+      "$type": "dimension",
+      "$value": "{context.light.text-title}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-title",
+          "category": [
+            "text",
+            "title"
+          ]
+        }
+      }
+    },
+    "weight-title": {
+      "$type": "fontWeight",
+      "$value": "{context.light.weight-title}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-weight-title",
+          "category": [
+            "semantic",
+            "weight-title"
+          ]
+        }
+      }
+    },
+    "tracking-title": {
+      "$type": "dimension",
+      "$value": "{context.light.tracking-title}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tracking-title",
+          "category": [
+            "tracking",
+            "title"
           ]
         }
       }
