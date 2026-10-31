@@ -623,6 +623,18 @@
       ],
       "ownerRatified": true,
       "reintakeAt": "2026-10-30T22:56:00.000Z"
+    },
+    {
+      "number": 2547,
+      "title": "fix(release): canary prep leaves 0.0.8 residue in Fresh UI registry v2 artifacts",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "release-critical: blocks the 0.0.9 canary cut (run 41237263834); filed during the owner-approved cut",
+      "evidence": [
+        "release-canary run 41237263834"
+      ],
+      "ownerRatified": true,
+      "predicate": "release-critical"
     }
   ]
 }

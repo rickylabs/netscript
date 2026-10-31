@@ -50,7 +50,8 @@
         2406,
         2411,
         2438,
-        2478
+        2478,
+        2547
       ]
     },
     {
@@ -461,6 +462,13 @@
       "evidence": [
         "https://github.com/rickylabs/netscript/pull/2480",
         "https://github.com/rickylabs/netscript/actions/runs/41148483243"
+      ]
+    },
+    {
+      "number": 2547,
+      "state": "closed",
+      "evidence": [
+        "duplicate of #2548"
       ]
     }
   ],
@@ -2017,7 +2025,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T19:22:35Z",
+  "updatedAt": "2026-10-31T20:11:01Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2502,6 +2510,15 @@
       "state": "pr-open",
       "pr": 2546,
       "startedAt": "2026-10-31T18:52:14Z"
+    },
+    {
+      "issue": 2547,
+      "lane": "internals",
+      "commentId": 6548545618,
+      "postedAt": "2026-10-31T20:10:34Z",
+      "route": "codex gpt-6.1-sol high",
+      "state": "cancelled-duplicate",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475,
