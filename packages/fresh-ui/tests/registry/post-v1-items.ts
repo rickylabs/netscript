@@ -19,6 +19,8 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'item',
   'kbd',
   'collapsible',
+  'chart',
+  'carousel',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */

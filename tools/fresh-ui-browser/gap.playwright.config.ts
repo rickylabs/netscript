@@ -26,7 +26,7 @@ export default defineConfig({
     ),
     {
       name: 'touch-light-390',
-      testMatch: '**/overlays.spec.ts',
+      testMatch: ['**/overlays.spec.ts', '**/display-motion.spec.ts'],
       grep: /@touch/,
       use: { hasTouch: true, colorScheme: 'light', viewport: { width: 390, height: 900 } },
     },

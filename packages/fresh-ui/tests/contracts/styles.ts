@@ -1,3 +1,4 @@
+import { displayMotionFixtures, displayMotionKeyboard } from './utility-display-motion.tsx';
 import { displayBasicFixtures, displayBasicKeyboard } from './utility-display-basics.tsx';
 import { overlayFixtures, overlayKeyboard } from './utility-overlays.tsx';
 import { navigationFixtures, navigationKeyboard } from './utility-navigation.tsx';
@@ -26,6 +27,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...navigationFixtures,
     ...overlayFixtures,
     ...displayBasicFixtures,
+    ...displayMotionFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -35,5 +37,6 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...navigationKeyboard,
     ...overlayKeyboard,
     ...displayBasicKeyboard,
+    ...displayMotionKeyboard,
   ],
 }];
