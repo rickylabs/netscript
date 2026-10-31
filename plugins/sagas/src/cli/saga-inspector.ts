@@ -1,9 +1,17 @@
-import type { ProjectFiles } from '@netscript/plugin/cli';
+import { type ProjectFiles, selectRegistrySources } from '@netscript/plugin/cli';
+import {
+  readSagaDeclarations,
+  SAGA_CONFIG_SUFFIX,
+  SAGA_ROOT_CONFIG,
+  type SagaRuntimeDeclaration,
+} from './saga-declarations.ts';
 
 /** Options for inspecting saga source files. */
 export interface InspectSagasOptions {
   /** Project-relative roots to scan. */
   readonly roots?: readonly string[];
+  /** Manifest filename exclusions, including inactive config companions. */
+  readonly exclude?: readonly string[];
 }
 
 /** Static saga definition discovered in project source. */
@@ -14,6 +22,8 @@ export interface SagaInspectionEntry {
   readonly sagaIds: readonly string[];
   /** Saga ids passed to `defineSagaConfig(...)` in this file. */
   readonly configIds: readonly string[];
+  /** Explicit runtime entrypoints declared by a config companion or root config. */
+  readonly runtimeDeclarations?: readonly SagaRuntimeDeclaration[];
 }
 
 /** Result returned by `ns-sagas inspect`. */
@@ -35,8 +45,10 @@ export async function inspectSagasProject(
   const sourceFiles = (await Promise.all(
     roots.map((root) => files.listFiles(root, ['.ts', '.tsx'])),
   )).flat();
+  const paths = [...new Set([...sourceFiles.map((file) => file.relativePath), SAGA_ROOT_CONFIG])]
+    .sort();
   const entries = await Promise.all(
-    sourceFiles.map((file) => inspectFile(files, file.relativePath)),
+    paths.map((path) => inspectFile(files, path, options)),
   );
 
   return Object.freeze({
@@ -47,12 +59,22 @@ export async function inspectSagasProject(
   });
 }
 
-async function inspectFile(files: ProjectFiles, path: string): Promise<SagaInspectionEntry> {
+async function inspectFile(
+  files: ProjectFiles,
+  path: string,
+  options: InspectSagasOptions,
+): Promise<SagaInspectionEntry> {
   const content = await files.readTextFile(path) ?? '';
+  const config = path === SAGA_ROOT_CONFIG || path.endsWith(SAGA_CONFIG_SUFFIX);
+  const excluded = options.exclude?.includes(path.replaceAll('\\', '/').split('/').at(-1) ?? '');
+  const active = config && !excluded &&
+    (await selectRegistrySources(files, [path])).sourceFiles.length > 0;
+  const runtimeDeclarations = active ? readSagaDeclarations(content, path) : [];
   return Object.freeze({
     sourcePath: path,
-    sagaIds: Object.freeze(extractDefinitionIds(content, 'defineSaga')),
-    configIds: Object.freeze(extractDefinitionIds(content, 'defineSagaConfig')),
+    sagaIds: Object.freeze(config ? [] : extractDefinitionIds(content, 'defineSaga')),
+    configIds: Object.freeze(runtimeDeclarations.map((declaration) => declaration.id)),
+    ...(runtimeDeclarations.length ? { runtimeDeclarations } : {}),
   });
 }
 

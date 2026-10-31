@@ -53,6 +53,73 @@ its configured dependencies available, the background runner starts idle and rep
 zero definitions. Add your first definition and run `netscript generate plugins` again. Removing
 the last definition and regenerating keeps a valid empty registry.
 
+## Declaring a self-composing saga module
+
+Keep the saga definition in your application core:
+
+```ts
+// packages/operations-core/src/application/agent-action-saga.ts
+import { defineSaga } from '@netscript/plugin-sagas-core';
+
+export function defineAgentActionSaga() {
+  return defineSaga('agent-action').durability('t1')
+    .state({ operationId: '' }).on('ActionAdmitted', () => []).build();
+}
+```
+
+A runtime module can default-export that composed definition without repeating the native builder
+or using the conventional `-saga.ts` filename:
+
+```ts
+// sagas/agent-action.ts
+import { defineAgentActionSaga } from '../packages/operations-core/src/application/agent-action-saga.ts';
+
+export default defineAgentActionSaga();
+```
+
+Declare its id and runtime entrypoint with the existing config-time builder:
+
+```ts
+// sagas/agent-action.config.ts
+import { defineSagaConfig } from '@netscript/plugin-sagas-core/config';
+
+export default defineSagaConfig('agent-action', 'sagas/agent-action.ts').build();
+```
+
+`defineSagaConfig(id, entrypoint)` is the canonical explicit declaration. Registry generation reads
+literal calls in `.config.ts` companions below the manifest's scan roots and in the root
+`netscript.config.ts`. Entrypoints are project-relative, even in nested companions; a root-config
+entrypoint such as `./plugins/sagas/order-saga.ts` is also supported. Explicit paths can name authored
+`.ts` or `.tsx` modules anywhere inside the project, independent of conventional scan roots and
+filename suffixes. Config modules themselves are never imported into the runtime registry.
+
+Discovery reads source text; it does not execute configs, import application modules or invoke
+factories. Use nonempty quoted string literals (single/double quotes or a template without
+interpolation) for both arguments. Named import aliases are supported. Computed arguments and
+unsupported string escapes fail with a declaration-file diagnostic; use a direct literal with
+forward slashes. Runtime modules must export the composed `SagaDefinition` as `default`, `saga` or
+`definition`, including export-list aliases and re-exports. The generated registry validates the
+runtime value when imported; static discovery cannot prove a factory's return type or runtime id.
+
+Run `netscript generate plugins`, then `netscript plugin doctor`. Both use the same selected runtime
+paths, so doctor reports a stale empty or partial registry that omits a declaration. A missing,
+escaping, generated or config-file target, a target without a supported runtime export, conflicting
+ids/entrypoints, or an active declaration pointing at a manifest-excluded or registry-ignored module
+fails generation with remediation before replacing the registry. Remove the declaration when
+intentionally removing its runtime module. An ignored or manifest-excluded config companion is
+inactive; zero active declarations and zero conventionally discovered definitions still produce a
+valid empty registry.
+
+`update-saga` and `remove-saga` refuse to mutate a saga declared in the shared root
+`netscript.config.ts`, even if a companion also declares it. Edit that root declaration manually
+first; these commands leave every source file unchanged on refusal. Offline `inspect` and local
+source-management commands report invalid active declarations as errors with the same remediation.
+
+Standalone `generate-registry` also reads these declarations. The `generateSagaRegistry` API accepts
+`roots`, `fileSuffixes` and `exclude` options; the installed root command supplies the manifest's
+policy, while standalone generation uses its selected roots and defaults. First-line ignore
+directives apply to both paths.
+
 ## Excluding helpers from generated registries
 
 `netscript generate plugins` selects definition modules from `sagas/*-saga.ts`. Keep a helper or a

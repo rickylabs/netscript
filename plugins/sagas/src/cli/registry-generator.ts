@@ -5,6 +5,7 @@ import {
   selectRegistrySources,
 } from '@netscript/plugin/cli';
 import { inspectSagasProject } from './saga-inspector.ts';
+import { hasSagaRuntimeExport, SAGA_CONFIG_SUFFIX, SAGA_ROOT_CONFIG } from './saga-declarations.ts';
 
 /** Options for generating the static saga registry. */
 export interface GenerateSagaRegistryOptions {
@@ -52,11 +53,30 @@ export async function renderSagaRegistry(
   }
 > {
   const registryPath = options.registryPath ?? SAGAS_REGISTRY_PATH;
-  const inspected = await inspectSagasProject(files, { roots: options.roots });
-  const sourcePaths = inspected.entries.map((entry) => entry.sourcePath).filter((path) =>
-    isIncludedSourcePath(path, options)
-  );
-  const selection = await selectRegistrySources(files, sourcePaths);
+  const inspected = await inspectSagasProject(files, options);
+  const sourcePaths = inspected.entries.filter((entry) => entry.sagaIds.length > 0)
+    .map((entry) => entry.sourcePath).filter((path) => isIncludedSourcePath(path, options));
+  const declaredIds = new Map<string, string>();
+  const declaredPaths = new Map<string, string>();
+  for (const entry of inspected.entries) {
+    for (const declaration of entry.runtimeDeclarations ?? []) {
+      const diagnostic = `Saga "${declaration.id}" declared in ${entry.sourcePath}`;
+      const path = await resolveDeclaredSaga(files, declaration.entrypoint, diagnostic, options);
+      if (
+        (declaredIds.has(declaration.id) && declaredIds.get(declaration.id) !== path) ||
+        (declaredPaths.has(path) && declaredPaths.get(path) !== declaration.id)
+      ) {
+        throw new Error(
+          `${diagnostic} conflicts with another saga declaration for ${path}. Use one id per runtime module.`,
+        );
+      }
+      declaredIds.set(declaration.id, path);
+      declaredPaths.set(path, declaration.id);
+      sourcePaths.push(path);
+    }
+  }
+  sourcePaths.sort();
+  const selection = await selectRegistrySources(files, [...new Set(sourcePaths)]);
   const sagaFiles = await toEntries(files, selection.sourceFiles);
   const source = renderSagaRegistrySource(registryPath, sagaFiles);
   return Object.freeze({
@@ -138,20 +158,66 @@ async function toEntries(
   const uniquePaths = Object.freeze([...new Set(paths)]);
   const entries = await Promise.all(uniquePaths.map(async (path) => {
     const content = await files.readTextFile(path);
-    return content === undefined
-      ? undefined
-      : Object.freeze({ path: files.resolve(path), relativePath: path, size: content.length });
+    if (content === undefined) {
+      throw new Error(
+        `Saga source ${path} disappeared. Run generate plugins again after restoring the module.`,
+      );
+    }
+    return Object.freeze({ path: files.resolve(path), relativePath: path, size: content.length });
   }));
-  return Object.freeze(entries.filter(isProjectFileEntry));
+  return Object.freeze(entries);
 }
 
-function isProjectFileEntry(entry: ProjectFileEntry | undefined): entry is ProjectFileEntry {
-  return entry !== undefined;
+/** Explicit declarations bypass naming conventions, but never exclusion or project boundaries. */
+async function resolveDeclaredSaga(
+  files: ProjectFiles,
+  entrypoint: string,
+  diagnostic: string,
+  options: GenerateSagaRegistryOptions,
+): Promise<string> {
+  const input = entrypoint.replaceAll('\\', '/');
+  if (/^(?:\/|[A-Za-z][\w+.-]*:)/.test(input) || /[?#]/.test(input) || input.includes('\0')) {
+    throw new Error(
+      `${diagnostic} has invalid entrypoint "${entrypoint}". Use a project-relative TypeScript module.`,
+    );
+  }
+  const path = files.relative(files.resolve(input)).replaceAll('\\', '/');
+  if (
+    path === '..' || path.startsWith('../') || path.startsWith('/') ||
+    path.startsWith('.netscript/generated/') || !/\.tsx?$/.test(path) ||
+    path.endsWith(SAGA_CONFIG_SUFFIX) || path === SAGA_ROOT_CONFIG
+  ) {
+    throw new Error(
+      `${diagnostic} cannot resolve "${entrypoint}". Use an authored runtime .ts/.tsx module inside the project, not a config or generated module.`,
+    );
+  }
+  if (options.exclude?.includes(basename(path))) {
+    throw new Error(
+      `${diagnostic} points to excluded module ${path}. Remove the declaration or the manifest filename exclusion.`,
+    );
+  }
+  const source = await files.readTextFile(path);
+  if (source === undefined) {
+    throw new Error(
+      `${diagnostic} points to missing module ${path}. Create it or correct the declaration entrypoint, then run generate plugins.`,
+    );
+  }
+  if ((await selectRegistrySources(files, [path])).excludedSourceFiles.length) {
+    throw new Error(
+      `${diagnostic} points to ignored module ${path}. Remove the declaration or its first-line registry-ignore directive.`,
+    );
+  }
+  if (!hasSagaRuntimeExport(source)) {
+    throw new Error(
+      `${diagnostic} points to ${path}, which has no runtime export. Export the SagaDefinition as default, saga or definition.`,
+    );
+  }
+  return path;
 }
 
 function isIncludedSourcePath(path: string, options: GenerateSagaRegistryOptions): boolean {
   const fileName = basename(path);
-  if (fileName.endsWith('.config.ts')) return false;
+  if (fileName.endsWith(SAGA_CONFIG_SUFFIX) || path === SAGA_ROOT_CONFIG) return false;
   const suffixes = options.fileSuffixes;
   if (suffixes && !suffixes.some((suffix) => fileName.endsWith(suffix))) {
     return false;
