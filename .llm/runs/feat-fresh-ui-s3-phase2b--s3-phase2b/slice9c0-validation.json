@@ -85,6 +85,33 @@
     "pending": 13,
     "nativeRegistryItems": 119
   },
-  "carriers": "PENDING_AFTER_SOURCE_COMMIT",
-  "wholePhase2b": "IN_PROGRESS"
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "wholePhase2b": "IN_PROGRESS",
+  "sourceCommit": "216a55f6",
+  "independentEvidenceReview": "PASS"
 }
