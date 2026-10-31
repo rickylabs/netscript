@@ -24,5 +24,11 @@
   "captures": "review/",
   "nativeDisclosureBeforeHydration": "Native summary remains toggleable; state refusal and disabled activation blocking require hydration.",
   "finalPhaseGates": "PENDING",
-  "phaseReady": false
+  "phaseReady": false,
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
 }
