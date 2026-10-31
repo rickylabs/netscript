@@ -90,3 +90,11 @@ CI repair review round 1: FAIL_FIX for vacuous iframe colors using nonexistent t
 CI repair round 2 replay: PASS, all 32 browser tests and all 5 baseline validator contracts. Real token-role colors now pass nontransparent, opposite-scheme, parity and disabled-sheet assertions. Same evaluator re-review running; no commit or READY before terminal sign-off.
 
 CI repair independent re-review: PASS. Same evaluator verified every frozen hash, actual role declarations, non-vacuous alias assertions, 32-test replay and unchanged baseline mapping. Failure streak reset to zero. Sign-off commit includes all seven repair files and run evidence. Production remains the S6-reviewed 92-file candidate. Push next; exact-head CI still required before READY.
+
+## Coordinator follow-up: generated destructive text
+
+Owner-routed finding extends S6a: `design.css.template` rules-dont text must use --ns-destructive-text; its border keeps the solid role. Widen the existing component-colors regression to all CLI asset CSS templates recursively, with nonempty scan guards and repo-relative findings. Prove the actual old declaration makes the test fail, restore the fix, regenerate affected carriers, run focused validation and independent same-session review. No token values/API/layering changes; CLI archetype 6, existing asset adapter surface. Earlier READY at 5fbc309 is superseded until the follow-up passes exact-head CI. PR2507 (7ee9c3ed0) already included; origin/main fetched.
+
+Destructive follow-up local gates PASS: actual reverted declaration exits 1 and names the nested CLI template; restored declaration exits 0. Scoped check/lint/fmt, 13 root check tasks, quality gate, docs accuracy, token validation and release preflight pass. Generated carrier regenerated; no lock/token/exclusion changes. Full current source frozen in current-source-hashes.json (101 paths); same evaluator review running.
+
+Destructive follow-up independent review: PASS. Reviewer verified all101 current hashes, exactly one -text insertion in the embedded carrier, recursive nested-template coverage, intentional border/fill preservation and the actual negative/positive reports. Sign-off commit/push next; READY requires new exact-head CI. Failure streak remains zero.
