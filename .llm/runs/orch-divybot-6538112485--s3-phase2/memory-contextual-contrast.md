@@ -29,3 +29,10 @@ The canonical scaffold.runtime --cleanup one-pass attempt failed Aspire
 preflight and Docker cleanup inspection here; runtime behavior never started.
 Keep that gate UNPROVEN. Read-only leak-check results may retain only verdict
 and counts in the public run; do not publish process/resource matched lines.
+
+`maint:leak-check` writes leak-report.md into its slice directory even when
+stdout is redirected. Inspect that side effect before an audit/push. Preserve
+raw material only in the private project run, then retain verdict/counts only
+in the public report. A failed whole-run audit must stop the push control flow;
+never run audit and push as independent unconditional calls. The committed
+added-line audit remained zero, and the untracked raw report was never pushed.
