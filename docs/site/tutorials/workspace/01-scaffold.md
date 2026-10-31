@@ -142,7 +142,7 @@ list shows the exact port each resource bound.
 {{ comp callout { type: "important", title: "Database commands need Aspire running" } }}
 The Postgres container exists only while <code>aspire start</code> is up. Run
 <code>netscript db init</code>, <code>db generate</code> and <code>db seed</code>, which you use from
-chapter 2 onward, <strong>after</strong> Aspire has started. Without Aspire, a db command fails fast:
+chapter 3 onward, <strong>after</strong> Aspire has started. Without Aspire, a db command fails fast:
 there is no Postgres for it to reach.
 {{ /comp }}
 

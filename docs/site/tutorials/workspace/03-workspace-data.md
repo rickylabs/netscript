@@ -37,7 +37,6 @@ too:
 
 ```sh
 # In my-workspace/, with `aspire start` up in another terminal
-netscript db status        # primary datasource is migrated (chapter 2)
 docker info                # Docker engine is running
 ```
 

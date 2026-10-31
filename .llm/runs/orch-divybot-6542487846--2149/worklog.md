@@ -53,3 +53,11 @@ Round 1 FAIL_FIX: dependent docs still claimed unconditional auth migrations; re
 The assignment and run-loop terminate a leaf after two consecutive terminal failures. Stop the fix/evaluation loop; no third review, no passing exact-head attestation, no ready transition. The print-mode evaluator has completed; there is no live evaluator process or leased resource to retain. Preserve and push S2 as work awaiting review, not a sign-off commit. The PR remains draft. Coordinator decision requested: take over the two docs corrections and arrange final exact-head review, or dispatch a fresh remediation leaf. Recommend coordinator takeover for this small remainder. Full scaffold.runtime CI remains unproven and must be armed by the coordinator.
 
 Reconcile: no labels/milestones changed, no runtime resources started, no lock/cache churn, no unrelated work folded in. Remaining source acceptance is implemented and locally proven, but documentation acceptance and final independent review are not complete. Do not mark READY or merge.
+
+## Continued goal — concrete documentation repair
+
+On continuation, revalidated the clean branch at ed58293a2ccc44d062c9d22f16c2884ad28d19c3 and live PR/issue/coordinator state. No coordinator acceptance or evaluator-cap override was present. The previous turn made progress by implementing/pushing the consumer proof and preserving both verdicts; it did not complete the goal.
+
+Completed the two explicitly requested text repairs: removed chapter 3's primary-db-status precheck that assumed a chapter 2 migration; chapter 1 now says database commands begin in chapter 3. Canonical prose generation passed and changed exactly the two corresponding chapter rows, with no unrelated rows. Docs accuracy, internal links (zero broken links/anchors), built-site freshness and git whitespace checks pass. This is a documentation-only delta; prior functional tests remain historical evidence for unchanged framework code.
+
+The continuation authorizes progressing the concrete repair; it does not waive the two-failure evaluator cap. No third evaluation, sign-off claim or ready transition. Preserve this correction on the same draft PR and request coordinator acceptance/final-head review. Full scaffold.runtime remains unproven and coordinator-controlled.

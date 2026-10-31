@@ -192,5 +192,36 @@
     "round2": "FAIL_FIX",
     "status": "STOPPED_AT_TWO_CONSECUTIVE_FAILURES",
     "exactHeadMergeAttestation": "UNPROVEN"
+  },
+  "documentationRepair": {
+    "status": "CORRECTED_AFTER_ROUND_2",
+    "newEvaluation": "NOT_RUN_CAP_REMAINS",
+    "checks": [
+      {
+        "name": "gen:agent-docs-prose",
+        "exitCode": 0
+      },
+      {
+        "name": "docs:accuracy",
+        "exitCode": 0
+      },
+      {
+        "name": "docs:links",
+        "exitCode": 0
+      },
+      {
+        "name": "built-site prose freshness",
+        "exitCode": 0
+      },
+      {
+        "name": "git diff --check",
+        "exitCode": 0
+      }
+    ],
+    "changedCarrierPages": [
+      "pages/tutorials/workspace/01-scaffold/index.md",
+      "pages/tutorials/workspace/03-workspace-data/index.md"
+    ],
+    "unrelatedCarrierRowsChanged": false
   }
 }
