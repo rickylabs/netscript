@@ -108,3 +108,6 @@
 - 05:33Z: #2400 r1 READY at `6597b64` (PR #2482 resumed; main merged without rewrite). #2115 r1 started 05:31Z. #2161 → PR #2497.
 - 05:33Z: dispatched #2159 (B1 head, fixes), comment 6539608318.
 - 05:36Z: #2115 → PR #2498. #2482 has an Opus MERGE at `6597b64`.
+- 05:37:59Z: #2159 started.
+- 05:42Z: #2159 → PR #2499.
+- 05:42Z: **merged** #2496 (`67d4704b4`) for #2351; **A2 complete.** Next expensive gate: #2482 (#2400).

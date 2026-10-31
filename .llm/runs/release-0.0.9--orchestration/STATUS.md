@@ -1,9 +1,9 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
 - H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
 - A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
-- A2 #2395 MERGED #2483 1c9da73d0 (closed); #2351 → PR #2496 (implementing)
+- A2 DONE: #2395 (#2483), #2351 (#2496 67d4704b4)
 - A3 #2144 MERGED #2481 4aa734e2b (closed); #2400 PR #2482 READY 6597b64 (e2e queued); #2151 MERGED #2484 (closed); #2161 → PR #2497 (implementing)
-- B1 #2159 started 05:3xZ (fixes) → #2383 → #2160 → #2382; #2374: W4
+- B1 #2159 → PR #2499 (implementing) → #2383 → #2160 → #2382; #2374: W4
 - B2 #2162 (after #2161) #2149: W3; #2369 MERGED #2487 (closed); #2108 (after B2 pair + all B1): W7
 - C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (after all B1): W7
 - D1 #2396: #2422 MERGED 727542963, #2423 MERGED 204a71b1e, #2421 (final) awaiting READY at new head 94393bc then e2e; post-canary published-graph proof owed; #2367 MERGED #2485 (closed); #2115 → PR #2498 (implementing); #2290 MERGED #2492 (closed); #2259: W3
