@@ -56,5 +56,57 @@
       "inheritedSource": "packages/kv/types/watchable-kv.ts private-type-ref"
     },
     "jsrDryRun": "PASS"
+  },
+  "S2": {
+    "proof": {
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0
+    },
+    "negative": {
+      "behaviorTestsFailed": 9,
+      "compatibilityTestsPassed": 1
+    },
+    "mutants": {
+      "variants": 6,
+      "expectedFailedTests": 14,
+      "allExpectedFailuresObserved": true
+    },
+    "check": "PASS",
+    "lint": "PASS",
+    "fmt": "PASS",
+    "qualityGate": "PASS",
+    "corpusFreshness": "PASS",
+    "publishAssetsFreshness": "PASS",
+    "agentDocsProseFreshness": "PASS",
+    "assetsBarrel": "Registry/token and deterministic generation PASS; final git diff requires S2 commit, then rerun before READY",
+    "combinedRuntime": {
+      "exitCode": 0,
+      "durationMs": 171429,
+      "passed": 193,
+      "failed": 0,
+      "ignored": 3,
+      "totalResults": 196,
+      "uniqueFailures": 0,
+      "scope": [
+        "full queue suite",
+        "worker Redis/Garnet lease and survival regressions",
+        "worker heartbeat tests",
+        "telemetry consumer/parenting tests",
+        "MCP corpus/flow tests"
+      ]
+    },
+    "docLint": {
+      "newDiagnostics": 0,
+      "inheritedDiagnostics": 1
+    },
+    "jsrDryRun": "PASS",
+    "independentReview": "PASS round 3",
+    "resources": "owned Redis/Garnet stopped and test children joined",
+    "reviewThreads": {
+      "threads": 0,
+      "unanswered": 0,
+      "outcome": "PASS"
+    }
   }
 }

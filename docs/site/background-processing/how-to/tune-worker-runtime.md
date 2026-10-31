@@ -341,14 +341,16 @@ configuration error before consumption. If scoped `--allow-env` permissions deny
 variables, Redis uses defaults; explicit options do not need those permissions. Other queue adapters
 keep their existing polling behavior.
 
-For a free slot on a healthy backend with no delayed backlog, the polling contribution to ready
+For a free slot on a healthy backend with established queue/promotion connections and no delayed
+backlog, the polling contribution to ready
 pickup is at most `pollIntervalMs`. After a delayed message becomes eligible, it is at most
 `delayedPollIntervalMs + pollIntervalMs`. Add Redis command latency, server/client clock differences
 and event-loop scheduling. At the example's settings the polling contributions are **20 ms** and
 **40 ms**, compared with the defaults' **50 ms** and **1050 ms**. These are conditional polling
 bounds, not a guaranteed end-to-end latency. Saturation, reconnects, synchronous work, promotion
 contention, invalid delayed entries and backlogs beyond the existing 1000-member promotion pass can
-exceed them. Smaller intervals increase idle Redis traffic; measure under your actual load.
+exceed them. Promotion connects lazily, so startup/reconnect can miss a pass while establishing the
+connection. Smaller intervals increase idle Redis traffic; measure under your actual load.
 
 Abort stops new admission and drains the in-flight set, including a claim that committed during
 abort, within the listener's `visibilityTimeout` (default 30 seconds). `stop()` waits for the same

@@ -196,10 +196,13 @@ Invalid values fail before connections are allocated. If a scoped environment pe
 access, defaults apply; explicit values require no access to these environment variables. Other
 providers ignore these Redis-specific intervals.
 
-With a free slot, healthy backend, no promotion backlog and a responsive event loop, the polling
+With a free slot, healthy backend, established queue/promotion connections, no promotion backlog and
+a responsive event loop, the polling
 contribution to ready pickup is at most `pollIntervalMs`; delayed pickup after eligibility adds at
 most `delayedPollIntervalMs + pollIntervalMs`. Redis command time, clock differences and event-loop
-scheduling are additional. This is not an unconditional wall-clock SLA: saturated workers, outages,
+scheduling are additional. Promotion connects lazily; startup or reconnect can miss a promotion
+pass while the connection is being established. This is not an unconditional wall-clock SLA:
+saturated workers, outages,
 large or invalid delayed backlogs and blocked synchronous JavaScript have no fixed pickup bound.
 See [Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/).
 
