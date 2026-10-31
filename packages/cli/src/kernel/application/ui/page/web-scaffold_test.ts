@@ -462,7 +462,13 @@ Deno.test('top-level pages are linked in the scaffold navigation and render insi
   assertStringIncludes(page, '{slots.dataScreen()}');
   assertStringIncludes(page, ".withMeta(() => ({ title: 'Data Screen' }))");
   assert(result.nextSteps.some((step) => step.includes('routes/_layout.tsx')));
-  assert(result.nextSteps.some((step) => step.includes('assets/tokens.css')));
+  const themeGuidance = result.nextSteps.find((step) =>
+    step.includes('web-layer/how-to/theme-your-app')
+  );
+  assert(themeGuidance);
+  assertStringIncludes(themeGuidance, 'netscript ui:apply --preset <id>');
+  assertStringIncludes(themeGuidance, 'netscript tokens build');
+  assert(!result.nextSteps.some((step) => step.includes('Restyle app-wide through')));
 });
 
 Deno.test('nested pages stay out of the navigation unless --nav asks for a label', async () => {
