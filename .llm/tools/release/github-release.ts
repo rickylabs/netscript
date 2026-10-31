@@ -548,6 +548,7 @@ export async function assertPreparedReleaseGeneratedOutputsFresh(
   await dependencies.runDeno(root, ['task', 'check:agent-docs-prose']);
   await dependencies.runDeno(root, ['task', 'gen:publish-assets', '--check']);
   await dependencies.runDeno(root, ['task', 'check:mcp-export-corpus']);
+  await dependencies.runDeno(root, ['task', '--cwd', 'packages/fresh-ui', 'registry:embed:check']);
   await dependencies.runDeno(root, [
     'run',
     '--no-lock',

@@ -1,0 +1,32 @@
+[
+  {
+    "gateId": "quality-gate",
+    "gitHead": "a14d9681aa307116ad1e6ac88fadeaf8210179d1",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "startedAt": "2026-10-31T20:16:38.435Z",
+    "finishedAt": "2026-10-31T20:16:59.922Z",
+    "durationMs": 21486,
+    "receiptSha256": "69efa16a94f96b6829abfa4e30574283373406bfffbf2480d01f1a88e619d9d9"
+  },
+  {
+    "gateId": "assets-barrel",
+    "gitHead": "a14d9681aa307116ad1e6ac88fadeaf8210179d1",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "startedAt": "2026-10-31T20:16:56.955Z",
+    "finishedAt": "2026-10-31T20:17:00.184Z",
+    "durationMs": 3228,
+    "receiptSha256": "ae2ea17d69f9e34582463779b980b3b973f0119b912fa3646b8b0a485a1b0c0e"
+  },
+  {
+    "gateId": "mcp-export-corpus",
+    "gitHead": "a14d9681aa307116ad1e6ac88fadeaf8210179d1",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "startedAt": "2026-10-31T20:16:56.950Z",
+    "finishedAt": "2026-10-31T20:17:09.489Z",
+    "durationMs": 12539,
+    "receiptSha256": "aef4c9814fb4f7c7a218938e0cb791052eb61e1cb2401c806e257134f86b3a0a"
+  }
+]

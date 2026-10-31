@@ -40,6 +40,17 @@ To add a component, author its item, files and dependencies in `registry.json`, 
 appropriate collection and style map, and regenerate the embedded registry carrier. To extend a
 style, change its source map and supply items with the same public component contract.
 
+First-party `jsr:@netscript/*` dependencies use the exact workspace release version, including
+export subpaths. The coordinated stable/canary bump owns these pins through
+`RELEASE_ASSET_VERSION_FILES` in `.llm/tools/deps/bump-version.ts`; release preparation then rebuilds
+the embedded carriers and docs-site `r/*.json` copies from this source, and stages the compressed
+registry carrier with the release commit. Never edit built copies.
+Stable publication also checks the carrier against its authoring source before verifying downstream
+barrels when reusing canary evidence.
+`deno task check:netscript-jsr-specifiers` scans the authored JSON and rejects stale or range pins.
+The historical `tests/registry/legacy-v1.json` fixture uses `0.0.0-fixture` to keep captured contracts
+independent of release residue; its comparison test substitutes the current package version.
+
 ## Static hosting
 
 Build a registry whose file paths are relative to its source directory:

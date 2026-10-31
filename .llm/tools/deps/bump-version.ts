@@ -36,6 +36,11 @@ export const GENERATED_CONSUMER_VERSION_FILES: readonly string[] = [
   '.agents/generated/consumer-skills/.mcp.json',
 ];
 
+/** Canonical authored assets whose first-party dependencies follow the release train. */
+export const RELEASE_ASSET_VERSION_FILES: readonly string[] = [
+  'packages/fresh-ui/registry.json',
+];
+
 /** Live frozen resolution contexts checked by deps:check:reference-locks, including fixtures. */
 export const MAINTAINED_REFERENCE_LOCK_FILES: readonly string[] = [
   'deno.lock',
@@ -207,7 +212,11 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
     }
   }
   for (
-    const relativePath of [...GENERATED_CONSUMER_VERSION_FILES, ...MAINTAINED_REFERENCE_LOCK_FILES]
+    const relativePath of [
+      ...GENERATED_CONSUMER_VERSION_FILES,
+      ...RELEASE_ASSET_VERSION_FILES,
+      ...MAINTAINED_REFERENCE_LOCK_FILES,
+    ]
   ) {
     const path = normalize(join(root, relativePath));
     if (await includesTrackedOrExistingFile(path, trackedFiles)) files.add(path);
