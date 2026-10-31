@@ -1,0 +1,88 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback-style-builder (Terminal, Pixel, Brutal)",
+  "date": "2026-10-31",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "theme": "terminal",
+  "page": "39:2",
+  "status": "done",
+  "category": {
+    "frame": "558:74342",
+    "sectionLabel": "558:74343",
+    "sets": "558:74347",
+    "strip": "560:35415",
+    "parent": "Style components 460:9622 (Theme set B, Theme B Terminal, Density Compact, Scheme Dark)"
+  },
+  "sets": [
+    {"name": "Terminal/Alert", "id": "558:74348", "baseId": "450:422", "variants": 12},
+    {"name": "Terminal/Inline notice", "id": "558:74521", "baseId": "451:56561", "variants": 6},
+    {"name": "Terminal/Toast", "id": "558:74604", "baseId": "452:245", "variants": 6},
+    {"name": "Terminal/Progress", "id": "559:62109", "baseId": "453:6139", "variants": 30},
+    {"name": "Terminal/Progress circular", "id": "559:62320", "baseId": "453:6280", "variants": 30},
+    {"name": "Terminal/Spinner", "id": "460:9704", "baseId": "252:11837", "variants": 18, "note": "existing set (Actions); restyled in place: the static … frame now takes the tone role (primary/text, text/muted, <tone>/text)"},
+    {"name": "Terminal/Skeleton", "id": "559:62541", "baseId": "454:975", "variants": 12},
+    {"name": "Terminal/Skeleton preset", "id": "559:62566", "baseId": "454:1072", "variants": 4},
+    {"name": "Terminal/Empty state", "id": "559:62663", "baseId": "454:2671", "variants": 18}
+  ],
+  "anatomy": {
+    "Alert": "1px pane (radius/card 8, surface/bg, border/strong; strong = 1px edge in the tone text role). One alerts-pane line: 6ch level column (NOTE INFO OK WARN ERR ATTN, T.grid-strong <tone>/text, box height = type/strong/line 24) + label T.grid-strong + dim description on the label column.",
+    "Inline notice": "alerts-pane line with no box: level column + label + dim description.",
+    "Toast": "Lip Gloss pane, level column, dim message, Default key action, × close; 2px timer rule inside the pane.",
+    "Progress": "block bar (variant text role) over a dithered ░ remainder (theme-only part dither); value is still the track padding.",
+    "Progress circular": "derived: no rings; bracketed percentage on the grid (sm 64%, md [64%], lg [ 64% ]); loading shows the static … frame.",
+    "Skeleton": "dithered ░ bone in text/muted, square.",
+    "Skeleton preset": "nests Terminal/Skeleton; table = head rule + 24px rows, no avatars; cards are panes.",
+    "Empty state": "solid Lip Gloss pane; media icon is one character (◆ / ✗); keys without shortcuts; action row wraps."
+  },
+  "swapTest": "13/13 pass (Light): Alert warning strong, Alert info, Inline notice success, Toast error, Toast loading, Progress md (labelText, valueText, track padding), Progress sm loading, Progress circular x3, Spinner, Skeleton preset table, Empty state no-results (title, descriptionText)",
+  "sweep": {
+    "Terminal/Table": "67 Skeleton + 2 Empty state base instances -> Terminal sets (sizes and sizing modes kept)",
+    "Terminal/Data table": "inherits through its nested Terminal/Table; empty variants' nested Empty state overrides (type=no-results, title, description, keys) replayed from base"
+  },
+  "defectsFixed": [
+    "Border titles clipped: 69 pane variants in 11 sets (Card, Stat card, Data table, Sidebar, Field set, Dropzone, Dialog, Alert dialog, Sheet, Drawer, Popover) now draw their edge on a theme-only absolute part pane-edge 10px below the top, so the title patch sits inside the component bounds; title patches hug their title (16 Card titles were fixed-width and wrapped).",
+    "Emails overrun Status: Terminal/Table cell text types (15 variants) truncate with … on one line; avatar cells clip and truncate the secondary (email) line.",
+    "Top bar fixed tab '2:orders': the tab line now follows the screen's breadcrumb (Dashboard and Command 1:overview, Orders 2:orders, Settings none); the set keeps 2:orders as its default.",
+    "Table rows lost per-row badge tones (also hit Terminal): Terminal/Table badge tones and labels replayed from the base Table (Paid success, Awaiting payment warning, Shipped info, Paid success, Refunded neutral). No disabled rows exist in the Terminal tables.",
+    "Avatar group clipping: no Avatar group in the Terminal screens; not observed."
+  ],
+  "screens": {
+    "group": "538:47957",
+    "swapped": "Alert x4, Inline notice x2, Progress x2, Toast x6 (light + dark)",
+    "overlays": "Sign-in and onboarding fit overlays re-fitted (slot paddingBottom) and re-snapped; Orders sheet pin overlay re-snapped after the pane-edge change",
+    "screenPolish": [
+      "Default ctrl+s shortcut dropped from 22 keys that are not Save; 8 pictogram icons (no Terminal glyph) hidden on keys",
+      "darkKey set on 7 primary keys in the dark screens (T.save-dark, no lime slab key in dark)",
+      "Orders sheet key row wraps inside the 334px body",
+      "Table avatar initials corrected from the customer name (12)",
+      "Dashboard/Command KPI strip stacked as four metric lines (the Terminal Stat card is a 742px metrics line; four side by side overlapped)",
+      "Command toast stack lifted 38px so all three toasts fit"
+    ],
+    "png": [
+      "review/screens/terminal/dashboard-light.png",
+      "review/screens/terminal/dashboard-dark.png",
+      "review/screens/terminal/orders-light.png",
+      "review/screens/terminal/orders-dark.png",
+      "review/screens/terminal/settings-light.png",
+      "review/screens/terminal/settings-dark.png",
+      "review/screens/terminal/sign-in-light.png",
+      "review/screens/terminal/sign-in-dark.png",
+      "review/screens/terminal/command-light.png",
+      "review/screens/terminal/command-dark.png"
+    ]
+  },
+  "png": ["review/styles/terminal/feedback.png", "review/styles/terminal/feedback-strip.png"],
+  "deviations": [
+    "Alert and Inline notice tone titles are lowercased (note, info, success, warning, error, important); the level word sits in the icon box, so the default reads WARN  warning until an instance sets a custom title.",
+    "Important tone level word is ATTN (no documented Terminal word).",
+    "Hidden base Icon glyph instances (info, circle-check, bell, file-text) stay inside the level/media boxes, hidden: they have no Terminal character.",
+    "Progress circular is a text readout, not a ring (derived).",
+    "Pane-edge restructure makes every titled pane 10px taller (the title patch is now inside the bounds); instances in other layouts move content down 10px."
+  ],
+  "ownerShouldLook": [
+    "The pane-edge change across 11 Terminal sets (title patch now inside bounds; +10px height).",
+    "Sidebar in Dashboard/Command: the selected item shows a base globe pictogram and the Orders index reads 1: (pre-existing screen overrides, not changed).",
+    "Stat card delta=down glyph renders as a left-pointing triangle (pre-existing).",
+    "Sign-in card: the fit slot keeps 18px below the shorter Terminal alert (slot height did not shrink)."
+  ]
+}

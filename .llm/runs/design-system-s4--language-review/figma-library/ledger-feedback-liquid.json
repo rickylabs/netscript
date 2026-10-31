@@ -1,0 +1,168 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback style pass (Liquid)",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "page": "93:735",
+  "modes": "inherited from Style components 464:302461 (Theme set B 239:8 · Theme B Liquid 239:2 · Density Comfortable 3:2); sets carry no explicit modes",
+  "frames": {
+    "Feedback": "573:195932",
+    "sectionLabel": "573:195933",
+    "Feedback · sets": "573:195937",
+    "review": "575:143318 (Light 575:143319, Dark 575:145022)",
+    "strip": "575:145110 (Light 575:145111, Dark 575:145751)"
+  },
+  "sets": [
+    {
+      "name": "Liquid/Alert",
+      "id": "573:195938",
+      "baseId": "450:422",
+      "variants": 12
+    },
+    {
+      "name": "Liquid/Inline notice",
+      "id": "573:196569",
+      "baseId": "451:56561",
+      "variants": 6
+    },
+    {
+      "name": "Liquid/Toast",
+      "id": "573:196886",
+      "baseId": "452:245",
+      "variants": 6
+    },
+    {
+      "name": "Liquid/Progress",
+      "id": "574:52656",
+      "baseId": "453:6139",
+      "variants": 30
+    },
+    {
+      "name": "Liquid/Progress circular",
+      "id": "574:52837",
+      "baseId": "453:6280",
+      "variants": 30
+    },
+    {
+      "name": "Liquid/Spinner",
+      "id": "464:302479",
+      "baseId": "252:11837",
+      "variants": 18,
+      "note": "existing Actions set reused (tone x size)"
+    },
+    {
+      "name": "Liquid/Skeleton",
+      "id": "574:52948",
+      "baseId": "454:975",
+      "variants": 12
+    },
+    {
+      "name": "Liquid/Skeleton preset",
+      "id": "574:52961",
+      "baseId": "454:1072",
+      "variants": 4
+    },
+    {
+      "name": "Liquid/Empty state",
+      "id": "574:53058",
+      "baseId": "454:2671",
+      "variants": 18
+    }
+  ],
+  "png": [
+    "review/styles/liquid/feedback.png",
+    "review/styles/liquid/feedback-strip.png"
+  ],
+  "swapTest": "5/5 pass (Alert title+descriptionText+action+close, Inline notice descriptionText+close, Toast title+descriptionText+progress, Progress labelText+valueText+track padding, Empty state title+secondaryAction)",
+  "anatomy": [
+    "Alert: the crafted content banner (95:785): r12, <tone>/subtle fill, no stroke, no material or shadow; padding 13/14/14/14 and gap 10 (literal, the 44px one-line banner); 16px glyph in the Apple system hue (neutral liquid/tag/gray, info liquid/accent/system, success /green, warning /orange, destructive /red, important /purple); label Medium 13/17 text/fg; description text/muted; action Liquid/Button sm link (primary/text); close Liquid/Icon button xs secondary (material/track circle, the L.close motif). strong (derived): the same banner plus a 1px <tone>/border rim and the label in <tone>/text Semi Bold; base rule hidden.",
+    "Inline notice: DESIGN 'status is a 7px dot plus a word': opaque surface/muted platter row at r8, no stroke; glyph part kept hidden, a theme-only 7px 'dot' in the hue sits in the icon box (icon boolean); word text/fg Medium, description text/muted; Liquid/Button xs link, Liquid/Icon button xs secondary.",
+    "Toast: L.float bar weight copied from Liquid/Action bar floating (liquid/material/glass-float, specular-tint rim, 0.5 outline, top highlight, inner glow 20, 0 8 24 shadow, GLASS); radius 22; root padding 0/14, content 14/2. Tone = glyph hue (default text/muted, loading Liquid/Spinner) and the timer bar (default/loading liquid/accent/system); title text/fg, message text/muted; action Liquid/Button sm link; close Liquid/Icon button xs secondary. Timer: 3px full-pill material/track rail inset 16, theme-only timer-gap 12 (visible = progress).",
+    "Progress: macOS bar: full-pill material/track rail 4/6/8 (sm/md/lg) with a full-pill fill (primary liquid/accent/system, secondary text/muted, status liquid/tag/green|orange|red); label L.body 13/17 text/fg; value font/sans (no mono). Value still = track padding.",
+    "Progress circular (derived): material/track ring, round-capped arc in the same hues, strokes 2/3/4; value font/sans.",
+    "Skeleton: material/track bones (reads on content and glass); lines and avatars radius/control (pills, circles), blocks radius/card 14.",
+    "Skeleton preset: table = the Liquid table (30 header with the liquid/state/hover-overlay hairline, 40 rows at r8, zebra surface/muted on even rows, no row rules); stats = KPI platters (surface/muted, radius/card, no stroke); detail/form keep the base bone layout (no container in base). Bones are Liquid/Skeleton.",
+    "Empty state: border on = an opaque platter (surface/muted, radius/card 14, no stroke, dashes removed); media a 40 material/track circle with the glyph in liquid/accent/system (first-use), text/muted (no-results), liquid/tag/red (error); image media r12; title L.window-title text/fg, description text/muted; actions Liquid/Button md primary (L.prominent) + secondary (material/track pill)."
+  ],
+  "sweep": {
+    "swapped": 71,
+    "detail": "Data display 1: 67 Skeleton + 4 Empty state (Liquid/Table, Liquid/Data table loading/empty; 2 of them deep nested overrides)",
+    "leftBaseFeedbackInLiquidSets": 0
+  },
+  "defectsFixed": [
+    "Owner note 2026-10-31 (row tones, 'check the others'): checked. Liquid/Table and Liquid/Data table rows already carry the base tones (Paid success, Awaiting payment warning, Shipped info, Paid success, Refunded neutral); 0 changes needed.",
+    "Button fill-opacity overrides (the Cupertino defect, same G2 builder): 36 Liquid/Button / lg primary instances had their root fill (liquid/primary/default) overridden to 20% opacity, so Save/Confirm read pale and disabled-looking: Liquid/Dialog 6, Liquid/Alert dialog 2, Liquid/Sheet 8, Liquid/Drawer 4, Liquid/Card 16. Root fills reset to the main component's.",
+    "Strip: the Skeleton preset stats instances resized to the 598 column so the four platters are not clipped."
+  ],
+  "screens": {
+    "group": "577:150238",
+    "rows": {
+      "Light": "577:150240",
+      "Dark": "577:150380"
+    },
+    "modes": "copied from Liquid Style components: Theme set B 239:8 · Theme B Liquid 239:2 · Density Comfortable 3:2 · Scheme Light 3:0 / Dark 3:1",
+    "screenIds": {
+      "Dashboard": [
+        "577:150243",
+        "577:153103"
+      ],
+      "Orders": [
+        "577:150268",
+        "577:155326"
+      ],
+      "Settings": [
+        "577:150299",
+        "577:157071"
+      ],
+      "Sign-in": [
+        "577:150327",
+        "577:157766"
+      ],
+      "Command": [
+        "577:150349",
+        "577:161209"
+      ]
+    },
+    "method": "Utility group cloned, Liquid modes set on each light screen, every mapped base instance swapped breadth-first (map built by name from the Liquid page), part names repaired, authored overrides re-applied, texts restored, Field inner labels filled, activity and row initials re-set, row badge tones re-applied, overlay bodies re-snapped, dark screens re-cloned from the light ones. The build reply was lost to a dropped MCP connection; counts below come from a read-only audit afterwards.",
+    "feedbackSwapped": {
+      "Alert": 2,
+      "Inline notice": 1,
+      "Progress": 1,
+      "Toast": 3,
+      "perMode": true
+    },
+    "audit": {
+      "styleInstances": 2844,
+      "sharedGlyphs": 1298,
+      "leftoverBase": {
+        ".Slot": 6
+      },
+      "autoNamedParts": 0,
+      "dashboardRowTones": "success, warning, info, success, neutral"
+    },
+    "fixes": [
+      "Orders sheet: Email and Tracking number rows fit (no trim needed)",
+      "No opaque scrim (Liquid sheet scrim is surface/overlay)"
+    ],
+    "png": [
+      "review/screens/liquid/dashboard-light.png",
+      "review/screens/liquid/dashboard-dark.png",
+      "review/screens/liquid/orders-light.png",
+      "review/screens/liquid/orders-dark.png",
+      "review/screens/liquid/settings-light.png",
+      "review/screens/liquid/settings-dark.png",
+      "review/screens/liquid/sign-in-light.png",
+      "review/screens/liquid/sign-in-dark.png",
+      "review/screens/liquid/command-light.png",
+      "review/screens/liquid/command-dark.png"
+    ],
+    "pngNote": "each PNG is the 1440x900 screen cropped from the row render (cells carry a 28px caption above the screen)"
+  },
+  "ownerReview": [
+    "Status hues: Alert/Toast glyphs, Inline notice dots and Progress fills use the Apple system hues (liquid/tag/*), as the theme's status dots and nav tints do. As graphics they are below 3:1 on the tinted fills in Light (e.g. orange #ff9500 on warning/subtle); the tone word or label carries the meaning. Same trade-off as the table status dots.",
+    "Alert subtle and strong both use the tinted banner (the crafted 95:785 look); strong adds the tone rim and a Semi Bold tone label. The one-line banner keeps the action under the label (the base body column), not inline at the right as in the crafted banner.",
+    "Inline notice is a neutral platter with a dot and a word, not a tinted row: Liquid's documented status language. Toasts are float glass (tone only in the glyph and the timer).",
+    "Screens: the Liquid Top bar shows its fixture window title 'Orders · 3,182 orders · last 30 days' on every screen (not driven by props), like the Cupertino large title was. Screens sit on the flat page background, not on a wallpaper, so the glass reads as translucent grey; DESIGN asks for a desktop behind glass.",
+    "Dark-screen audit note: 8 secondary Icon buttons in the dark screens were flagged by an opacity diff that is only the mode-dependent alpha of material/track (12% Light / 24% Dark), not an override; their fills were reassigned to the same bound role. A bound paint takes the variable's alpha at render (confirmed in the Bloom pass: a 25% paint opacity on a bound role rendered opaque), so the Dark alpha is unchanged."
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback-style-builder (Terminal, Pixel, Brutal)",
+  "date": "2026-10-31",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "theme": "brutal",
+  "page": "33:8",
+  "status": "done",
+  "category": {
+    "frame": "572:59563",
+    "sectionLabel": "572:59564",
+    "sets": "572:59568",
+    "strip": "572:116296",
+    "parent": "Style components 465:55033 (Theme Brutal 14:2, Theme set A, Density Comfortable, Scheme Light)"
+  },
+  "sets": [
+    {"name": "Brutal/Alert", "id": "572:59569", "baseId": "450:422", "variants": 12, "note": "variant grid re-laid out (taller variants with Slab L overlapped)"},
+    {"name": "Brutal/Inline notice", "id": "572:59727", "baseId": "451:56561", "variants": 6},
+    {"name": "Brutal/Toast", "id": "572:59802", "baseId": "452:245", "variants": 6},
+    {"name": "Brutal/Progress", "id": "572:115220", "baseId": "453:6139", "variants": 30},
+    {"name": "Brutal/Progress circular", "id": "572:115401", "baseId": "453:6280", "variants": 30},
+    {"name": "Brutal/Spinner", "id": "465:55049", "baseId": "252:11837", "variants": 18, "note": "existing set (Actions); reused unchanged"},
+    {"name": "Brutal/Skeleton", "id": "572:115512", "baseId": "454:975", "variants": 12},
+    {"name": "Brutal/Skeleton preset", "id": "572:115525", "baseId": "454:1072", "variants": 4},
+    {"name": "Brutal/Empty state", "id": "572:115622", "baseId": "454:2671", "variants": 18}
+  ],
+  "anatomy": {
+    "Alert": "sticker-book notice (35:151): 2px border/ink, radius/card 12, Slab L 6/6 (copied from Brutal/Card). subtle = surface/raised panel with a tone disc (block fill, 2px ink, pill); strong = the block itself (info blue, success green, warning yellow, destructive pink, important purple, neutral ink) with the ink disc. 24px disc = B.heading line; Space Grotesk 18/24 Bold title; body on the title column; underlined Space Mono link.",
+    "Inline notice": "flat printed block (no slab): tone block (neutral surface/raised), 2px ink, radius/control 8; ink glyph; Space Grotesk 14/20 Bold label; T.small description.",
+    "Toast": "B.float (surface/raised, 2px ink, r12, Slab L); 24px tone disc (loading keeps Brutal/Spinner); timer = 10px pill track (surface/card, 2px ink) with a block bar.",
+    "Progress": "sticker bar: pill track surface/card + 2px ink outline, block fill (primary/warning yellow, success green, destructive pink, secondary ink), 12/16/24 tall.",
+    "Progress circular": "round sticker: surface/card disc, ink ring, block-coloured arc (square cap), Slab S 3/3.",
+    "Skeleton": "flat bones: surface/muted, line = pill, block = r12 + 2px border/default, avatar = r6 + 2px border/default.",
+    "Skeleton preset": "nests Brutal/Skeleton; table = surface/card panel with 2px ink and the ink header band.",
+    "Empty state": "empty slot in the Brutal dashed rule (2px ink, 6/4, r12, no fill); 48px block sticker disc with Slab S (first-use yellow, no-results blue, error pink); Space Grotesk title; Primary + Secondary keys; action row wraps."
+  },
+  "swapTest": "13/13 pass (Light): Alert destructive strong (action, close, description, custom title), Alert warning subtle, Inline notice success, Toast info, Toast loading, Progress md (labelText, valueText, track padding), Progress sm loading, Progress circular x3, Spinner, Skeleton preset table, Empty state no-results",
+  "sweep": {
+    "Brutal/Table": "67 Skeleton + 2 Empty state base instances -> Brutal sets",
+    "Brutal/Data table": "2 nested Empty state instances -> Brutal/Empty state (properties and title kept)"
+  },
+  "defectsFixed": [
+    "Table rows lost per-row badge tones: Brutal/Table (3) and Brutal/Data table (3) badges replayed from the base; the main reads Paid success, Awaiting payment warning, Shipped info, Paid success, Refunded neutral, and the Dashboard/Orders screens now show the five sticker colours.",
+    "Avatar group clipping: checked sm/md/lg, no initials overflow.",
+    "Disabled rows keep full-colour badges: no disabled rows in the Brutal tables.",
+    "Subtle alerts disappeared on dark cards (same #191918 face, black ink and slab): subtle Alert and neutral Inline notice faces now bind surface/raised (white in light, one step up in dark)."
+  ],
+  "screens": {
+    "group": "544:85631",
+    "swapped": "Alert x4, Inline notice x2, Progress x2, Toast x6 (light + dark); Sign-in fit overlays re-fitted; Command toast stack lifted 60px so the three Brutal toasts (Slab L) fit",
+    "png": [
+      "review/screens/brutal/dashboard-light.png",
+      "review/screens/brutal/dashboard-dark.png",
+      "review/screens/brutal/orders-light.png",
+      "review/screens/brutal/orders-dark.png",
+      "review/screens/brutal/settings-light.png",
+      "review/screens/brutal/settings-dark.png",
+      "review/screens/brutal/sign-in-light.png",
+      "review/screens/brutal/sign-in-dark.png",
+      "review/screens/brutal/command-light.png",
+      "review/screens/brutal/command-dark.png"
+    ]
+  },
+  "png": ["review/styles/brutal/feedback.png", "review/styles/brutal/feedback-strip.png"],
+  "deviations": [
+    "Glyphs stay the shared base Icon instances (Brutal has no glyph set), tinted block/ink-text, ink/fg or text/fg by their face.",
+    "Warning and primary share block/yellow (Brutal's selection and Awaiting payment colour); destructive is block/pink, the only red.",
+    "Toast faces are never tinted: the tone lives in the disc and the timer bar (a tinted float would read as a strong alert)."
+  ],
+  "ownerShouldLook": [
+    "Dark: the strong destructive alert is the dark block/pink (#e54d2e) with black text, per Brutal's accent policy.",
+    "Progress circular is a ring sticker with a slab; check it reads at sm (24px)."
+  ]
+}

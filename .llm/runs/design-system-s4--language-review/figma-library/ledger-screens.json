@@ -1,0 +1,455 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "screens-builder",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "page": {
+  "Screens · Archetypes": "514:94470",
+  "after": "★ Studio · Utility — NetScript default",
+  "pageHeader": "514:94471"
+ },
+ "method": "Screens are 1440x900 frames composed from base component instances; layout frames carry no styling except the page background (VariableID:3:3). Multi-part bodies inside Card and Sheet use 'overlay' layout frames named overlay·<fit|pin>·<host>/<path>, snapped onto the host's body slot (fit = the .Slot reserves the overlay height through paddingBottom; pin = inset into the body frame). Each style group is a clone of the Utility group with the light screens swapped and the dark screens re-cloned from them.",
+ "content": "Northwind commerce admin; user Elena Brandt; Orders fixture SO-10478..SO-10482 (Maya Rossi, Jonas Weber, Aiko Tanaka, Lucas Martin, Priya Shah).",
+ "styles": {
+  "utility": {
+   "group": "514:94479",
+   "modes": "Theme set A 239:7 · Theme Studio 2:1 · Studio flavor Utility 121:0 · Base gray Neutral 50:0 · Base accent Ink 2:8 · Density Compact 3:3 · Scheme Light 3:0 / Dark 3:1",
+   "screens": {
+    "Dashboard": {
+     "light": "514:94536",
+     "dark": "521:30984"
+    },
+    "Orders": {
+     "light": "514:96002",
+     "dark": "521:32004"
+    },
+    "Settings": {
+     "light": "515:3161",
+     "dark": "521:32995"
+    },
+    "Sign-in": {
+     "light": "515:4689",
+     "dark": "521:33628"
+    },
+    "Command": {
+     "light": "516:4217",
+     "dark": "521:33934"
+    }
+   },
+   "png": [
+    "review/screens/utility/dashboard-light.png",
+    "review/screens/utility/dashboard-dark.png",
+    "review/screens/utility/orders-light.png",
+    "review/screens/utility/orders-dark.png",
+    "review/screens/utility/settings-light.png",
+    "review/screens/utility/settings-dark.png",
+    "review/screens/utility/sign-in-light.png",
+    "review/screens/utility/sign-in-dark.png",
+    "review/screens/utility/command-light.png",
+    "review/screens/utility/command-dark.png"
+   ],
+   "status": "done"
+  },
+  "tonal": {
+   "group": "533:104114",
+   "modes": "Theme set A 239:7 · Theme Tonal 14:0 · Density Comfortable 3:2 · Scheme Light/Dark",
+   "screens": {
+    "Dashboard": {
+     "light": "533:104119",
+     "dark": "533:107632"
+    },
+    "Orders": {
+     "light": "533:104144",
+     "dark": "533:110070"
+    },
+    "Settings": {
+     "light": "533:104175",
+     "dark": "533:111646"
+    },
+    "Sign-in": {
+     "light": "533:104203",
+     "dark": "533:112317"
+    },
+    "Command": {
+     "light": "533:104225",
+     "dark": "533:115994"
+    }
+   },
+   "swap": {
+    "swapped": 192,
+    "perScreen": {
+     "Dashboard": 36,
+     "Orders": 35,
+     "Settings": 47,
+     "Sign-in": 19,
+     "Command": 55
+    },
+    "alreadyStyleNested": 1089,
+    "sharedGlyphs": 677,
+    "partNamesRepaired": 239,
+    "textsRestored": 26,
+    "innerLabelsFilled": 9
+   },
+   "unswapped": {
+    "Alert": 2,
+    "Inline notice": 1,
+    "Progress": 1,
+    "Toast": 3,
+    ".Slot": 3
+   },
+   "png": [
+    "review/screens/tonal/dashboard-light.png",
+    "review/screens/tonal/dashboard-dark.png",
+    "review/screens/tonal/orders-light.png",
+    "review/screens/tonal/orders-dark.png",
+    "review/screens/tonal/settings-light.png",
+    "review/screens/tonal/settings-dark.png",
+    "review/screens/tonal/sign-in-light.png",
+    "review/screens/tonal/sign-in-dark.png",
+    "review/screens/tonal/command-light.png",
+    "review/screens/tonal/command-dark.png"
+   ]
+  },
+  "tactile": {
+   "group": "534:47202",
+   "modes": "Theme set A 239:7 · Theme Tactile 52:1 · Density Comfortable 3:2 · Scheme Light/Dark",
+   "screens": "names '<Screen> · Tactile · Light|Dark' inside the group (ids not captured: the run's reply was lost after it completed)",
+   "swap": {
+    "swapped": "not captured (run completed, reply lost)",
+    "styleInstancesLight": {
+     "Dashboard": 288,
+     "Orders": 335,
+     "Settings": 187,
+     "Sign-in": 77,
+     "Command": 376
+    },
+    "sharedGlyphsLight": 601
+   },
+   "screenFixes": [
+    "Orders: Sheet backdrop overridden with the base scrim fill (VariableID:3:10 @40%)",
+    "Orders: Email and Tracking number rows hidden so the overlay fits (need 764 > 660)"
+   ],
+   "unswapped": {
+    "Alert": 2,
+    "Inline notice": 1,
+    "Progress": 1,
+    "Toast": 3,
+    ".Slot": 3
+   },
+   "png": [
+    "review/screens/tactile/dashboard-light.png",
+    "review/screens/tactile/dashboard-dark.png",
+    "review/screens/tactile/orders-light.png",
+    "review/screens/tactile/orders-dark.png",
+    "review/screens/tactile/settings-light.png",
+    "review/screens/tactile/settings-dark.png",
+    "review/screens/tactile/sign-in-light.png",
+    "review/screens/tactile/sign-in-dark.png",
+    "review/screens/tactile/command-light.png",
+    "review/screens/tactile/command-dark.png"
+   ]
+  },
+  "terminal": {
+   "group": "538:47957",
+   "modes": "Theme set B 239:8 · Theme B Terminal 239:3 · Density Compact 3:3 · Scheme Light/Dark (Dark primary)",
+   "screens": {
+    "Dashboard": {
+     "light": "538:47962",
+     "dark": "538:52597"
+    },
+    "Orders": {
+     "light": "538:47987",
+     "dark": "538:56060"
+    },
+    "Settings": {
+     "light": "538:48018",
+     "dark": "538:57963"
+    },
+    "Sign-in": {
+     "light": "538:48046",
+     "dark": "538:58794"
+    },
+    "Command": {
+     "light": "538:48068",
+     "dark": "538:63151"
+    }
+   },
+   "swap": {
+    "swapped": 117,
+    "perScreen": {
+     "Dashboard": 19,
+     "Orders": 25,
+     "Settings": 25,
+     "Sign-in": 19,
+     "Command": 29
+    },
+    "alreadyStyleNested": 1700,
+    "sharedGlyphs": 150,
+    "partNamesRepaired": 96,
+    "textsRestored": 119
+   },
+   "screenFixes": [
+    "Orders: Email and Tracking number rows hidden (need 660 > 650)"
+   ],
+   "unswapped": {
+    "Alert": 2,
+    "Inline notice": 1,
+    "Progress": 1,
+    "Toast": 3,
+    ".Slot": 3
+   },
+   "png": [
+    "review/screens/terminal/dashboard-light.png",
+    "review/screens/terminal/dashboard-dark.png",
+    "review/screens/terminal/orders-light.png",
+    "review/screens/terminal/orders-dark.png",
+    "review/screens/terminal/settings-light.png",
+    "review/screens/terminal/settings-dark.png",
+    "review/screens/terminal/sign-in-light.png",
+    "review/screens/terminal/sign-in-dark.png",
+    "review/screens/terminal/command-light.png",
+    "review/screens/terminal/command-dark.png"
+   ]
+  },
+  "cupertino": {
+   "group": "539:70148",
+   "modes": "Theme set B 239:8 · Theme B Cupertino 239:1 · Density Comfortable 3:2 · Scheme Light/Dark",
+   "screens": {
+    "Dashboard": {
+     "light": "539:70153",
+     "dark": "539:74383"
+    },
+    "Orders": {
+     "light": "539:70178",
+     "dark": "539:77457"
+    },
+    "Settings": {
+     "light": "539:70209",
+     "dark": "539:79265"
+    },
+    "Sign-in": {
+     "light": "539:70237",
+     "dark": "539:80004"
+    },
+    "Command": {
+     "light": "539:70259",
+     "dark": "539:84004"
+    }
+   },
+   "swap": {
+    "swapped": 116,
+    "perScreen": {
+     "Dashboard": 19,
+     "Orders": 24,
+     "Settings": 25,
+     "Sign-in": 19,
+     "Command": 29
+    },
+    "alreadyStyleNested": 1211,
+    "sharedGlyphs": 655,
+    "partNamesRepaired": 11,
+    "textsRestored": 15
+   },
+   "screenFixes": [
+    "Dashboard, Command, Settings: Cupertino Top bar large title/subtitle retitled by text override (fixture said 'Orders · 128 orders this week')"
+   ],
+   "unswapped": {
+    "Alert": 2,
+    "Inline notice": 1,
+    "Progress": 1,
+    "Toast": 3,
+    ".Slot": 3,
+    "icon/package (style-local glyph inside Cupertino/Sidebar, not a base gap)": 4
+   },
+   "png": [
+    "review/screens/cupertino/dashboard-light.png",
+    "review/screens/cupertino/dashboard-dark.png",
+    "review/screens/cupertino/orders-light.png",
+    "review/screens/cupertino/orders-dark.png",
+    "review/screens/cupertino/settings-light.png",
+    "review/screens/cupertino/settings-dark.png",
+    "review/screens/cupertino/sign-in-light.png",
+    "review/screens/cupertino/sign-in-dark.png",
+    "review/screens/cupertino/command-light.png",
+    "review/screens/cupertino/command-dark.png"
+   ]
+  },
+  "pixel": {
+   "group": "541:71602",
+   "modes": "Theme set A 239:7 · Theme Pixel 52:2 · Density Comfortable 3:2 · Scheme Light/Dark",
+   "screens": {
+    "Dashboard": {
+     "light": "541:71607",
+     "dark": "541:78875"
+    },
+    "Orders": {
+     "light": "541:71632",
+     "dark": "541:85377"
+    },
+    "Settings": {
+     "light": "541:71663",
+     "dark": "541:88592"
+    },
+    "Sign-in": {
+     "light": "541:71691",
+     "dark": "541:90092"
+    },
+    "Command": {
+     "light": "541:71713",
+     "dark": "541:96358"
+    }
+   },
+   "swap": {
+    "swapped": 176,
+    "perScreen": {
+     "Dashboard": 38,
+     "Orders": 38,
+     "Settings": 34,
+     "Sign-in": 17,
+     "Command": 49
+    },
+    "alreadyStyleNested": 1582,
+    "sharedGlyphs": 88,
+    "note": "counts from the first Pixel pass; the final pass (override-restore) used the same tree, its reply was lost on a dropped connection"
+   },
+   "screenFixes": [
+    "Settings: Radio group and Input OTP re-swapped into their Fields by hand (the Pixel Field set dropped the control swaps)",
+    "Orders: Email and Tracking number rows hidden (need 682 > 656)"
+   ],
+   "unswapped": {
+    "Alert": 2,
+    "Inline notice": 1,
+    "Progress": 1,
+    "Toast": 3,
+    ".Slot": 3
+   },
+   "png": [
+    "review/screens/pixel/dashboard-light.png",
+    "review/screens/pixel/dashboard-dark.png",
+    "review/screens/pixel/orders-light.png",
+    "review/screens/pixel/orders-dark.png",
+    "review/screens/pixel/settings-light.png",
+    "review/screens/pixel/settings-dark.png",
+    "review/screens/pixel/sign-in-light.png",
+    "review/screens/pixel/sign-in-dark.png",
+    "review/screens/pixel/command-light.png",
+    "review/screens/pixel/command-dark.png"
+   ]
+  },
+  "brutal": {
+   "group": "544:85631",
+   "modes": "Theme set A 239:7 · Theme Brutal 14:2 · Density Comfortable 3:2 · Scheme Light/Dark",
+   "screens": {
+    "Dashboard": {
+     "light": "544:85636",
+     "dark": "544:89681"
+    },
+    "Orders": {
+     "light": "544:85661",
+     "dark": "544:92617"
+    },
+    "Settings": {
+     "light": "544:85692",
+     "dark": "544:94274"
+    },
+    "Sign-in": {
+     "light": "544:85720",
+     "dark": "544:95000"
+    },
+    "Command": {
+     "light": "544:85742",
+     "dark": "544:98823"
+    }
+   },
+   "swap": {
+    "swapped": 116,
+    "perScreen": {
+     "Dashboard": 19,
+     "Orders": 24,
+     "Settings": 25,
+     "Sign-in": 19,
+     "Command": 29
+    },
+    "alreadyStyleNested": 1179,
+    "sharedGlyphs": 580,
+    "partNamesRepaired": 36,
+    "textsRestored": 0,
+    "overridesReapplied": 1
+   },
+   "screenFixes": [
+    "Orders: Email and Tracking number rows hidden (need 670 > 668)"
+   ],
+   "unswapped": {
+    "Alert": 2,
+    "Inline notice": 1,
+    "Progress": 1,
+    "Toast": 3,
+    ".Slot": 3
+   },
+   "png": [
+    "review/screens/brutal/dashboard-light.png",
+    "review/screens/brutal/dashboard-dark.png",
+    "review/screens/brutal/orders-light.png",
+    "review/screens/brutal/orders-dark.png",
+    "review/screens/brutal/settings-light.png",
+    "review/screens/brutal/settings-dark.png",
+    "review/screens/brutal/sign-in-light.png",
+    "review/screens/brutal/sign-in-dark.png",
+    "review/screens/brutal/command-light.png",
+    "review/screens/brutal/command-dark.png"
+   ]
+  }
+ },
+ "findings": [
+  "Base library: a Card or Sheet body is a .Slot instance swap; multi-part content (forms, detail rows) cannot be placed in it without detaching, so the screens use snapped overlay frames. A real slot mechanism (Figma slots, or a 'body' frame that accepts children) would remove the workaround.",
+  "Base Sheet scrim=false: the content frame is FIXED 640 tall and cannot be resized in an instance; a full-height right sheet needs scrim=true (viewport resizes by constraints to 1440x900).",
+  "Base Table inside a Card at 776 px: the Customer column collapses and overlaps Status; the Dashboard hides the Date column (header + 5 cells) to fit.",
+  "Base Tabs list fixtures ship with counts on and the last trigger disabled; screens set count off / state rest where needed.",
+  "Base Command palette and Dropdown menu fixtures carry docs/IDE copy (install, Panel position); the Command screen overrides the text for the commerce product.",
+  "Swap mechanics: swapComponent keeps overrides only where part names match. Style sets whose nested parts lost their names (the resetOverrides trap) re-map or drop overrides: Tonal/Sidebar + Tonal/Nav group (first two nav items named 'Nav item' -> group label became '12', labels shuffled), Tonal/Field inside Tonal/Field set (control part named 'Input'), Pixel/Field set (dropped every nested control swap and description boolean). The swap script repairs names and re-applies overrides; the sets themselves should get their part names back.",
+  "Feedback has no style sets in any finished style: Alert, Inline notice, Toast and Progress stay Utility on every style screen (most visible in Terminal, Pixel and Brutal).",
+  "Tonal/Field hides the external Label and shows an inner 'field-label' text fixed to 'Label' with no property; screens copy the Field label in. With non-text controls (Switch, Radio group, Slider, Input OTP, Checkbox) the Tonal Field shows no label at all (Payments, Low-stock alerts, Verification code, Staff sign-in disappear).",
+  "Tonal Comfortable table rows (72) push the Dashboard 'Recent orders' card past 900: 4 of 5 rows visible.",
+  "Tactile/Sheet scrim=true backdrop is bound to an opaque surface variable (VariableID:119:743 at 100%) instead of surface/overlay at 40%; it hides the whole page. Screens override the instance backdrop.",
+  "Tactile: wells/keys are taller than Utility, so the Orders sheet overflowed (two rows hidden) and the Button group overflows a 367 px column; Data table toggle group shows '12' on Table/Board/Closed; image avatars in table rows render as initials ('MR' for Aiko Tanaka); Settings danger zone falls below the fold.",
+  "Terminal: Top bar carries a fixed tab line (2:orders active on every screen) and status-line fixture not driven by props; Card/Sheet titles sit on the top border and truncate ('Sign in to', 'Set up your') or clip at the screen edge (Sheet); Table at 776 px lets the customer email run into Status; Stat cards collapse to inline key/value rows that crowd each other.",
+  "Cupertino: Top bar is a large-title toolbar with fixture text (title, subtitle, Filter/Export/New Order) not driven by props; the base page header then repeats the title (a Cupertino composition would drop the page header). Cupertino/Button / md primary (rest) renders pale, disabled-looking, in light (Create order, Save changes, Sign in) but solid in dark and in the Top bar.",
+  "Pixel: the display font breaks the 'fi' ligature ('Notiﬁcations' heading in Settings).",
+  "Brutal: cleanest swap of the six (no texts restored, one property re-applied); only the Orders sheet needed two rows trimmed."
+ ],
+ "unswappedNote": "Feedback has no style sets yet: Alert (Orders sheet, Sign-in card), Inline notice (Settings), Progress (onboarding), Toast x3 (Command). .Slot is the private body placeholder (hidden). Their nested Buttons/Icon buttons were swapped individually.",
+ "swapMethod": [
+  "Clone the Utility group; set the style's explicit modes on each light screen.",
+  "Walk instances breadth-first (outermost first); swapComponent to the style set with the same name and identical variantProperties; keep the layer name.",
+  "Repair part names: nested instances auto-named after their component (e.g. 'Nav item', 'Input') are renamed to the base main's part name at the same position.",
+  "Re-apply authored overrides from instance.overrides (nested control swaps, variant/boolean/text properties, visibility) where the swap dropped them.",
+  "Restore text characters by part path; copy Field labels into style inner input labels that read 'Label'; re-set activity avatar initials.",
+  "Re-snap the overlay bodies; fit the Orders sheet (trim two rows on overflow; replace an opaque scrim with the base scrim); clone the light screen to dark with Scheme Dark."
+ ],
+ "bestScreensPerStyle": {
+  "tonal": [
+   "Dashboard",
+   "Sign-in"
+  ],
+  "tactile": [
+   "Dashboard",
+   "Sign-in"
+  ],
+  "terminal": [
+   "Dashboard (dark)",
+   "Command (dark)"
+  ],
+  "cupertino": [
+   "Dashboard",
+   "Command"
+  ],
+  "pixel": [
+   "Dashboard",
+   "Settings"
+  ],
+  "brutal": [
+   "Dashboard",
+   "Orders"
+  ]
+ },
+ "status": "Step 1 done (Utility light+dark). Step 2 done for tonal, tactile, terminal, cupertino, pixel, brutal. 70 PNGs."
+}

@@ -1,0 +1,804 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "style-builder-G5 (filigrane + terminal)",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "pages": {
+  "terminal": "39:2",
+  "filigrane": "37:6"
+ },
+ "terminal": {
+  "styleComponents": "460:9622",
+  "modes": "Theme set B 239:8, Theme B Terminal 239:3, Density Compact 3:3, Scheme Dark 3:1 (explicit on Style components)",
+  "categoryFrames": {
+   "Actions": "460:9623",
+   "Forms": "460:9629",
+   "Navigation": "460:9635",
+   "Overlays": "460:9641",
+   "Data display 1": "460:9647"
+  },
+  "setsFrames": {
+   "Actions": "460:9628",
+   "Forms": "460:9634",
+   "Navigation": "460:9640",
+   "Overlays": "460:9646",
+   "Data display 1": "460:9652"
+  },
+  "kitsRenamed": {
+   "39:15": "Terminal/Specimen kit/Key",
+   "39:37": "Terminal/Specimen kit/Prompt field",
+   "39:48": "Terminal/Specimen kit/Status",
+   "39:57": "Terminal/Specimen kit/Check",
+   "39:64": "Terminal/Specimen kit/Tab"
+  },
+  "sets": [
+   {
+    "name": "Terminal/Icon/<glyph>",
+    "count": 20,
+    "ids": {
+     "check": "460:9654",
+     "minus": "460:9656",
+     "plus": "460:9658",
+     "x": "460:9660",
+     "chevron-right": "460:9662",
+     "arrow-right": "460:9664",
+     "chevron-down": "460:9666",
+     "arrow-down": "460:9668",
+     "chevron-up": "460:9670",
+     "arrow-up": "460:9672",
+     "chevron-left": "460:9674",
+     "arrow-left": "460:9676",
+     "more-horizontal": "460:9678",
+     "search": "460:9680",
+     "corner-down-left": "460:9682",
+     "hash": "460:9684",
+     "alert-circle": "460:9686",
+     "alert-triangle": "460:9688",
+     "circle": "460:9690",
+     "dot": "460:9692"
+    }
+   },
+   {
+    "name": "Terminal/Icon",
+    "id": "460:9694",
+    "baseId": "252:11798",
+    "variants": 3
+   },
+   {
+    "name": "Terminal/Spinner",
+    "id": "460:9704",
+    "baseId": "252:11837",
+    "variants": 18
+   },
+   {
+    "name": "Terminal/.Focus ring",
+    "id": "460:9777",
+    "baseId": "252:11805",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/.State layer",
+    "id": "460:9778",
+    "baseId": "252:11806",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Kbd",
+    "id": "460:9779",
+    "baseId": "403:28",
+    "variants": 4,
+    "note": "built early (Actions) because the Hint key nests it; lives in the Data display 1 frame"
+   },
+   {
+    "name": "Terminal/Button / md",
+    "id": "460:30073",
+    "baseId": "253:372",
+    "variants": 30
+   },
+   {
+    "name": "Terminal/Button / lg",
+    "id": "460:30649",
+    "baseId": "254:721",
+    "variants": 30
+   },
+   {
+    "name": "Terminal/Button / sm",
+    "id": "460:31225",
+    "baseId": "254:371",
+    "variants": 30
+   },
+   {
+    "name": "Terminal/Button / xs",
+    "id": "460:31801",
+    "baseId": "254:1071",
+    "variants": 30
+   },
+   {
+    "name": "Terminal/Icon button / md",
+    "id": "460:44516",
+    "baseId": "255:262",
+    "variants": 25
+   },
+   {
+    "name": "Terminal/Icon button / lg",
+    "id": "460:44854",
+    "baseId": "255:740",
+    "variants": 25
+   },
+   {
+    "name": "Terminal/Icon button / sm",
+    "id": "460:45210",
+    "baseId": "255:501",
+    "variants": 25
+   },
+   {
+    "name": "Terminal/Icon button / xs",
+    "id": "460:45562",
+    "baseId": "255:979",
+    "variants": 25
+   },
+   {
+    "name": "Terminal/Toggle / md",
+    "id": "460:53564",
+    "baseId": "256:281",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Toggle / sm",
+    "id": "460:53751",
+    "baseId": "256:437",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Toggle / lg",
+    "id": "460:53933",
+    "baseId": "256:593",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Icon toggle / md",
+    "id": "460:54114",
+    "baseId": "276:8291",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Icon toggle / sm",
+    "id": "460:54267",
+    "baseId": "276:8431",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Icon toggle / lg",
+    "id": "460:54419",
+    "baseId": "276:8571",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/.Action bar / actions",
+    "id": "461:73148",
+    "baseId": "258:544",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Button group",
+    "id": "461:73230",
+    "baseId": "257:839",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Toggle group",
+    "id": "461:73885",
+    "baseId": "257:528",
+    "variants": 12
+   },
+   {
+    "name": "Terminal/Action bar",
+    "id": "461:74654",
+    "baseId": "258:663",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Theme toggle",
+    "id": "461:62406",
+    "baseId": "258:742",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Label",
+    "id": "461:130672",
+    "baseId": "278:45",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Input",
+    "id": "461:130703",
+    "baseId": "279:312",
+    "variants": 24
+   },
+   {
+    "name": "Terminal/Textarea",
+    "id": "461:130992",
+    "baseId": "280:597",
+    "variants": 12
+   },
+   {
+    "name": "Terminal/Select",
+    "id": "461:131120",
+    "baseId": "281:1023",
+    "variants": 24
+   },
+   {
+    "name": "Terminal/Select content",
+    "id": "461:131361",
+    "baseId": "281:826",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Checkbox",
+    "id": "461:131367",
+    "baseId": "283:1470",
+    "variants": 15
+   },
+   {
+    "name": "Terminal/Radio",
+    "id": "461:131543",
+    "baseId": "284:1828",
+    "variants": 10
+   },
+   {
+    "name": "Terminal/Radio group",
+    "id": "461:170681",
+    "baseId": "284:1885",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Switch",
+    "id": "461:131664",
+    "baseId": "285:2329",
+    "variants": 20
+   },
+   {
+    "name": "Terminal/Field",
+    "id": "461:170798",
+    "baseId": "287:2656",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Field set",
+    "id": "461:171025",
+    "baseId": "287:2743",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Input group",
+    "id": "461:171184",
+    "baseId": "297:3861",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/OTP slot",
+    "id": "461:171844",
+    "baseId": "301:4385",
+    "variants": 12
+   },
+   {
+    "name": "Terminal/Input OTP",
+    "id": "461:171917",
+    "baseId": "301:4490",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Slider",
+    "id": "461:172114",
+    "baseId": "303:5022",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Combobox",
+    "id": "462:102782",
+    "baseId": "305:5623",
+    "variants": 10
+   },
+   {
+    "name": "Terminal/Calendar day",
+    "id": "462:103440",
+    "baseId": "307:6154",
+    "variants": 30
+   },
+   {
+    "name": "Terminal/Calendar",
+    "id": "462:103561",
+    "baseId": "309:8620",
+    "variants": 8
+   },
+   {
+    "name": "Terminal/Date picker",
+    "id": "462:107910",
+    "baseId": "313:14889",
+    "variants": 10
+   },
+   {
+    "name": "Terminal/Search",
+    "id": "462:109317",
+    "baseId": "316:16426",
+    "variants": 8
+   },
+   {
+    "name": "Terminal/Dropzone",
+    "id": "462:109558",
+    "baseId": "319:16832",
+    "variants": 7
+   },
+   {
+    "name": "Terminal/Location marker",
+    "id": "463:128216",
+    "baseId": "337:22",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Breadcrumb item",
+    "id": "463:128221",
+    "baseId": "338:92",
+    "variants": 9
+   },
+   {
+    "name": "Terminal/Breadcrumb",
+    "id": "463:128317",
+    "baseId": "338:161",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Page key",
+    "id": "463:128434",
+    "baseId": "339:270",
+    "variants": 20
+   },
+   {
+    "name": "Terminal/Pager tile",
+    "id": "463:129058",
+    "baseId": "339:319",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Pagination",
+    "id": "463:129117",
+    "baseId": "339:379",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Tab / horizontal",
+    "id": "463:129243",
+    "baseId": "342:402",
+    "variants": 24
+   },
+   {
+    "name": "Terminal/Tab / vertical",
+    "id": "463:129464",
+    "baseId": "342:599",
+    "variants": 24
+   },
+   {
+    "name": "Terminal/Tabs list",
+    "id": "463:129685",
+    "baseId": "343:424",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Tabs",
+    "id": "463:130428",
+    "baseId": "343:489",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/.Brand logo",
+    "id": "463:190126",
+    "baseId": "344:410",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Sidebar toggle",
+    "id": "463:190128",
+    "baseId": "344:462",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Nav item",
+    "id": "463:190207",
+    "baseId": "345:601",
+    "variants": 20
+   },
+   {
+    "name": "Terminal/Nav group",
+    "id": "463:190413",
+    "baseId": "346:611",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Sidebar",
+    "id": "463:190773",
+    "baseId": "347:994",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Nav menu item",
+    "id": "463:191829",
+    "baseId": "349:1036",
+    "variants": 10
+   },
+   {
+    "name": "Terminal/.Nav menu link",
+    "id": "463:191928",
+    "baseId": "348:1108",
+    "variants": 3
+   },
+   {
+    "name": "Terminal/Navigation menu",
+    "id": "463:191947",
+    "baseId": "349:1132",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Menubar trigger",
+    "id": "463:192155",
+    "baseId": "349:1153",
+    "variants": 5
+   },
+   {
+    "name": "Terminal/Menubar",
+    "id": "463:192176",
+    "baseId": "349:1236",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Step",
+    "id": "463:192319",
+    "baseId": "352:1355",
+    "variants": 8
+   },
+   {
+    "name": "Terminal/Stepper",
+    "id": "463:192402",
+    "baseId": "352:1424",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Top bar",
+    "id": "463:211781",
+    "baseId": "351:1349",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Menu item",
+    "id": "463:283439",
+    "baseId": "371:587",
+    "variants": 30
+   },
+   {
+    "name": "Terminal/Menu label",
+    "id": "463:284280",
+    "baseId": "373:35",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Menu separator",
+    "id": "463:284283",
+    "baseId": "373:38",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Menu group",
+    "id": "463:284285",
+    "baseId": "373:248",
+    "variants": 3
+   },
+   {
+    "name": "Terminal/Menu content",
+    "id": "463:284653",
+    "baseId": "373:256",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Dropdown menu",
+    "id": "463:284975",
+    "baseId": "374:382",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Context menu",
+    "id": "463:285398",
+    "baseId": "374:653",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Tooltip",
+    "id": "463:285786",
+    "baseId": "381:1030",
+    "variants": 12
+   },
+   {
+    "name": "Terminal/Dialog",
+    "id": "463:302393",
+    "baseId": "378:743",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Alert dialog",
+    "id": "463:303075",
+    "baseId": "378:880",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Sheet",
+    "id": "463:303450",
+    "baseId": "379:1004",
+    "variants": 8
+   },
+   {
+    "name": "Terminal/Drawer",
+    "id": "463:304355",
+    "baseId": "379:1150",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Popover",
+    "id": "463:304736",
+    "baseId": "381:937",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Hover card",
+    "id": "463:304844",
+    "baseId": "381:1093",
+    "variants": 4
+   },
+   {
+    "name": "Terminal/Command item",
+    "id": "463:304905",
+    "baseId": "382:1015",
+    "variants": 9
+   },
+   {
+    "name": "Terminal/Command palette",
+    "id": "463:305107",
+    "baseId": "383:1355",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Kbd group",
+    "id": "464:278984",
+    "baseId": "403:96",
+    "variants": 8
+   },
+   {
+    "name": "Terminal/Badge",
+    "id": "464:279065",
+    "baseId": "405:180",
+    "variants": 20
+   },
+   {
+    "name": "Terminal/Badge / kind",
+    "id": "464:279256",
+    "baseId": "405:211",
+    "variants": 10
+   },
+   {
+    "name": "Terminal/Avatar presence",
+    "id": "464:279307",
+    "baseId": "406:43",
+    "variants": 3
+   },
+   {
+    "name": "Terminal/Avatar",
+    "id": "464:279314",
+    "baseId": "406:95",
+    "variants": 12
+   },
+   {
+    "name": "Terminal/Avatar group",
+    "id": "464:279375",
+    "baseId": "406:150",
+    "variants": 3
+   },
+   {
+    "name": "Terminal/.Item icon tile",
+    "id": "464:279496",
+    "baseId": "408:82",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/.Item image",
+    "id": "464:279500",
+    "baseId": "408:85",
+    "variants": 0
+   },
+   {
+    "name": "Terminal/Item",
+    "id": "464:335385",
+    "baseId": "408:792",
+    "variants": 27
+   },
+   {
+    "name": "Terminal/Item group",
+    "id": "464:336520",
+    "baseId": "408:996",
+    "variants": 2
+   },
+   {
+    "name": "Terminal/Card",
+    "id": "464:336819",
+    "baseId": "409:951",
+    "variants": 16
+   },
+   {
+    "name": "Terminal/Stat card",
+    "id": "464:338564",
+    "baseId": "409:1270",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Table header cell",
+    "id": "464:371310",
+    "baseId": "410:546",
+    "variants": 27
+   },
+   {
+    "name": "Terminal/Table cell",
+    "id": "464:371524",
+    "baseId": "410:383",
+    "variants": 27
+   },
+   {
+    "name": "Terminal/Table row",
+    "id": "464:371714",
+    "baseId": "412:1187",
+    "variants": 20
+   },
+   {
+    "name": "Terminal/Table",
+    "id": "464:373423",
+    "baseId": "413:1367",
+    "variants": 6
+   },
+   {
+    "name": "Terminal/Data table",
+    "id": "464:374635",
+    "baseId": "416:4605",
+    "variants": 10
+   }
+  ],
+  "categories": {
+   "Actions": {
+    "status": "done",
+    "sets": 23,
+    "strip": "461:96084",
+    "png": [
+     "review/styles/terminal/actions.png",
+     "review/styles/terminal/actions-strip.png"
+    ],
+    "swapTest": "28/28 pass (Light+Dark)",
+    "deviations": [
+     "Terminal/Kbd built early (needed by the Hint key); lives in the Data display 1 frame",
+     "Button and Icon button add a theme-only TEXT property shortcutText (keeps the main and dark-face shortcut layers in sync); the brief lists only theme-only booleans",
+     "Icon button adds theme-only boolean word (shows the label as a short word when the glyph has no character, e.g. [dark], [nav])",
+     "Toggle: icon-start hidden and unbound from iconStart (base default filter has no character); marker hidden",
+     "Toggle selected underline is a theme-only absolute part 'underline' (2px border/ring) so outline keeps its 1px border/strong edge",
+     "Glyph advance renders 9px per character in Figma (auto-width text rounds up), so keys are ~4% wider than the 8.4px ch grid",
+     "Icon button sm is 31 wide (3 characters cannot fit a 26 square)",
+     "Button group and Toggle group items hug; Button group items default to shortcut off",
+     "Instance-swap defaults for icon parts now point at Terminal/Icon glyphs; swapped base instances keep their base Icon value, which composites remap (or switch the part off when the glyph has no character)"
+    ]
+   },
+   "Forms": {
+    "status": "done",
+    "sets": 21,
+    "strip": "462:113730",
+    "png": [
+     "review/styles/terminal/forms.png",
+     "review/styles/terminal/forms-strip.png"
+    ],
+    "swapTest": "38/38 strip swaps keep overrides after the default fix (resize, kbd, iconStart re-verified)",
+    "contractCheck": "property names, types, variant options and BOOLEAN/TEXT defaults equal to base for all 43 Terminal sets built so far",
+    "pendingSwaps": [
+     "Select content and Combobox rows -> Terminal/Menu item (after Overlays)",
+     "Combobox chips -> Terminal/Badge (after Data display 1)",
+     "Date picker open wrapper -> Terminal/Popover (after Overlays)"
+    ],
+    "deviations": [
+     "Input md/sm is 288 wide (32ch) so value + inline status fit",
+     "Switch: the base track stays as an unpainted container holding toggle-text so the focus ring keeps its place; thumb hidden",
+     "Slider/Dropzone progress: the \u2591 dither remainder is approximated by primary/text at 30% (the crafted bar is block characters)",
+     "Search adds a theme-only text part 'label'; kbd moved before the label and swapped to Terminal/Kbd sm; in focus/open the kbd is unbound and hidden",
+     "Dropzone hover derived as a border/input edge",
+     "Textarea resize-handle hidden and unbound (default kept true)",
+     "Toggle iconStart unbound (default kept true): filter has no character"
+    ]
+   },
+   "Navigation": {
+    "status": "done",
+    "sets": 23,
+    "strip": "463:229089",
+    "png": [
+     "review/styles/terminal/navigation.png",
+     "review/styles/terminal/navigation-strip.png"
+    ],
+    "swapTest": "20/20 pass",
+    "pendingSwaps": [
+     "Tab and Nav item count -> Terminal/Badge plain (after Data display 1)",
+     "Menubar open menu -> Terminal/Menu content (after Overlays)"
+    ],
+    "deviations": [
+     "Top bar: topbar-start/topbar-end stay inside the base 'bar' frame (the base never had them as direct root children); bar becomes the vertical stack",
+     "Top bar: the '? help' keycap is a theme-only Kbd sm + label (render) instead of the notifications Icon button, which is hidden",
+     "Tab adds a theme-only count-gap spacer (NBSP) bound to the count boolean",
+     "Sidebar: floating and inset draw the same titled pane",
+     "Step indicator brackets are theme-only texts"
+    ]
+   },
+   "Overlays": {
+    "status": "done",
+    "sets": 16,
+    "strip": "463:316095",
+    "png": [
+     "review/styles/terminal/overlays.png",
+     "review/styles/terminal/overlays-strip.png"
+    ],
+    "swapTest": "18/18 pass",
+    "pendingSwaps": [
+     "Hover card avatar -> Terminal/Avatar (after Data display 1)",
+     "Forms: Select content / Combobox rows -> Terminal/Menu item; Date picker wrapper -> Terminal/Popover; Navigation: Menubar open menu -> Terminal/Menu content"
+    ],
+    "deviations": [
+     "Dialog/Alert/Sheet/Drawer/Popover: the title text moves into a theme-only title-patch on the top border (layer name and text property kept; its parent changes)",
+     "Footer keys: cancel = Default key with ' esc', action = Primary key with ' \u23ce' (Alert sm cancel has no shortcut so the footer fits 320)",
+     "Menu content fixed at 264 wide (192 min in the brief) so checkbox rows do not wrap",
+     "Tooltip/Popover/Hover card arrows: hidden and unbound so the arrow default stays true",
+     "Command palette footer uses T.help as a literal 13/20 SemiBold on font/mono"
+    ]
+   },
+   "Data display 1": {
+    "status": "done",
+    "sets": 18,
+    "strip": "464:415399",
+    "png": [
+     "review/styles/terminal/data-display-1.png",
+     "review/styles/terminal/data-display-1-strip.png"
+    ],
+    "swapTest": "38/38 pass",
+    "deviations": [
+     "Card footer wraps (meta + two keys exceed the 360 card)",
+     "Table cell: value + secondary sit on one line (email as its own column) instead of the base two-line stack",
+     "Data table filter selects fixed at 168 so the toolbar fits 1040",
+     "Avatar image variant: a theme-only initials text bound to the initials property shows on the cap",
+     "Table keeps base Feedback sets Empty state and Skeleton in its empty/loading variants (Feedback is not in the G5 scope)"
+    ]
+   }
+  },
+  "nestedNameFix": "Instance swaps use resetOverrides(), which resets nested layer names; every composite gets a renameFromBase pass (nested instance names copied from the base set)",
+  "sweeps": {
+   "crossCategory": "107 nested base instances swapped in Terminal mains (Select content/Combobox rows -> Terminal/Menu item, Tab/Nav item counts and Combobox chips -> Terminal/Badge, Menubar menu -> Terminal/Menu content, Hover card avatar -> Terminal/Avatar, Data table columns menu, Command palette)",
+   "instanceSwapProps": "6 instance-swap values remapped to Terminal sets (Item media etc.)",
+   "notDone": "Date picker open wrapper stays a styled frame (the base has no Popover instance there)"
+  },
+  "finalCheck": {
+   "setsChecked": 101,
+   "contractIssues": 0,
+   "note": "property names, types, variant options, variant counts and BOOLEAN/TEXT defaults equal the base for all 101 Terminal sets; plus 20 Terminal/Icon/<glyph> components",
+   "leftoverBaseInstances": {
+    "Terminal/Table": "Empty state (2), Skeleton (67) from Components \u00b7 Feedback"
+   }
+  },
+  "status": "complete: Actions, Forms, Navigation, Overlays, Data display 1"
+ },
+ "filigrane": {
+  "status": "not started",
+  "page": "37:6",
+  "modes": "Theme set A 239:7, Theme Filigrane 2:6",
+  "note": "no node on the Filigrane page was touched"
+ },
+ "remaining": "Filigrane: all five categories (Actions, Forms, Navigation, Overlays, Data display 1). Resume from style-briefs/filigrane.md; the Terminal scripts' helpers (clone + flat/pane/patch/sweep/renameFromBase/regrid/strip) port directly.",
+ "lessons": [
+  "resetOverrides() on a swapped nested instance resets its layer name; rename after setProperties (or run a renameFromBase pass)",
+  "setting visible=false on a layer bound to a boolean property changes the property default; unbind first, then hide",
+  "hidden instances expose no children until made visible",
+  "auto-width text rounds to whole pixels: Geist Mono 14 reads 9px per character in Figma"
+ ]
+}

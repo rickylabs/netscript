@@ -1,0 +1,63 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback style pass (Bloom)",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "page": "102:808",
+  "modes": "inherited from Style components 464:335306 (Theme set B 239:8 · Theme B Bloom 239:0 · Theme Tonal 14:0 · Density Comfortable 3:2); sets carry no explicit modes",
+  "frames": {"Feedback": "581:34525", "Feedback · sets": "581:34530", "review": "582:34879 (Light 582:34880, Dark 582:36523)", "strip": "582:36611 (Light 582:36612, Dark 582:37324)"},
+  "sets": [
+    {"name": "Bloom/Alert", "id": "581:34531", "baseId": "450:422", "variants": 12},
+    {"name": "Bloom/Inline notice", "id": "581:35154", "baseId": "451:56561", "variants": 6},
+    {"name": "Bloom/Toast", "id": "581:35477", "baseId": "452:245", "variants": 6},
+    {"name": "Bloom/Progress", "id": "581:35791", "baseId": "453:6139", "variants": 30},
+    {"name": "Bloom/Progress circular", "id": "581:35972", "baseId": "453:6280", "variants": 30},
+    {"name": "Bloom/Spinner", "id": "464:335328", "baseId": "252:11837", "variants": 18, "note": "existing Actions set reused (tone x size)"},
+    {"name": "Bloom/Skeleton", "id": "581:36083", "baseId": "454:975", "variants": 12},
+    {"name": "Bloom/Skeleton preset", "id": "581:36096", "baseId": "454:1072", "variants": 4},
+    {"name": "Bloom/Empty state", "id": "581:36193", "baseId": "454:2671", "variants": 18}
+  ],
+  "png": ["review/styles/bloom/feedback.png", "review/styles/bloom/feedback-strip.png"],
+  "swapTest": "5/5 pass (Alert title+descriptionText+action+close, Inline notice descriptionText+close, Toast title+descriptionText+progress, Progress labelText+valueText+track padding, Empty state title+secondaryAction)",
+  "bindings": "bloom/* colour roles only (no core status families, no Tonal-seed roles); radius/type/size through Theme set; literal geometry per the brief",
+  "anatomy": [
+    "Alert: flat widget card (B.flat), radius/card 32, padding 20, gap 12. subtle = the tone pastel (neutral bloom/surface-high, info sky, success mint, warning butter, destructive rose, important lavender). The icon box is a 28 disc (= the 28 line of the B.heading title, owner header rule): bloom/surface disc with a 14 glyph in the status ink (bloom/success|warn|error, else bloom/fg). Title B.heading (Funnel Display 22/28 Regular) bloom/fg; description bloom/muted. strong (derived) = the notched-ink-card material: bloom/ink-card, bloom/on-ink-card title and 80% description, the tone pastel moves onto the disc; base rule hidden. Action Bloom/Button sm outline (B.outline 40 pill), close Bloom/Icon button xs outline disc; on the ink card both re-inked in bloom/on-ink-card.",
+    "Inline notice: B.chip language: transparent, 1px bloom/outline, radius/badge 15; theme-only 6px status dot (fills copied from Bloom/Badge per tone; important bloom/muted) in the label-line icon box (glyph hidden); word B.small Regular bloom/fg, description bloom/muted; Bloom/Button xs link, Bloom/Icon button xs ghost.",
+    "Toast: one ink float like the selection bar: bloom/hero, radius/input 28, no stroke, B.float shadow (effects copied from Bloom/Action bar). 28 tone-pastel disc on the B.heading title line (default/loading bloom/peach; loading Bloom/Spinner), glyph bloom/fg; title bloom/on-hero, message bloom/on-hero at 80%; action and close re-inked in bloom/on-hero. Timer = B.track on ink: 4px pill, rail bloom/field-edge, bar bloom/on-hero, inset 20, theme-only timer-gap 16 (visible = progress).",
+    "Progress: B.track: full-pill bloom/outline rail, ink done part (primary bloom/fg, secondary bloom/muted, status bloom/success|warn|error), 3/4/6 tall; label B.body bloom/fg; value Funnel Sans bloom/muted. Value still = track padding.",
+    "Progress circular (derived): bloom/outline ring, round-capped ink arc in the same roles; value Funnel Sans.",
+    "Skeleton: bloom/line bones; pill lines and round avatars (radius/control), capsule blocks radius/input 28 (lg radius/card 32).",
+    "Skeleton preset: table = Bloom order rows (bloom/surface rows at radius/input 28, 64 tall, 6 apart, no header or row rules); stats = white widgets (bloom/surface, radius/card 32); detail/form keep the base bone layout. Bones are Bloom/Skeleton.",
+    "Empty state: border on = flat white widget (bloom/surface, radius/card 32, no stroke or dashes); media a 48 disc (sm 40): first-use bloom/peach, no-results outline disc (1px bloom/control-outline), error bloom/rose with a bloom/error glyph; title B.heading, description bloom/muted; actions Bloom/Button md primary (ink pill) + outline pill."
+  ],
+  "sweep": {"swapped": 71, "detail": "Data display 1: 67 Skeleton + 4 Empty state (Bloom/Table, Bloom/Data table; 2 deep nested overrides)", "leftBaseFeedbackInBloomSets": 0},
+  "defectsFixed": [
+    "Owner note 2026-10-31 (row tones, 'check the others'): checked. Bloom/Table and Bloom/Data table rows already carry the base tones (Paid success, Awaiting payment warning, Shipped info, Paid success, Refunded neutral); 0 changes needed.",
+    "Button fill-opacity overrides (Cupertino/Liquid defect): none in Bloom sets (0 of 358 Button/Icon button instances).",
+    "In-pass fix: swapped Bloom/Button instances inside the new Feedback sets kept the base size (28-32 tall, label overflowing the pill); 60 instances re-sized to their Bloom main height (sm 40, md 48) and set to hug.",
+    "In-pass fix: Toast timer rail first used bloom/on-hero at 25%, but a bound paint takes the variable's alpha, so it rendered opaque; and pastel bars disappear on the Dark ink. Rail is now bloom/field-edge and the bar bloom/on-hero, readable in both schemes."
+  ],
+  "screens": {
+    "group": "585:161463",
+    "rows": {"Light": "585:161465", "Dark": "585:161605"},
+    "modes": "copied from Bloom Style components: Theme set B 239:8 · Theme B Bloom 239:0 · Theme Tonal 14:0 · Density Comfortable 3:2 · Scheme Light 3:0 / Dark 3:1",
+    "screenIds": {"Dashboard": ["585:161468", "585:164379"], "Orders": ["585:161493", "585:166469"], "Settings": ["585:161524", "585:167940"], "Sign-in": ["585:161552", "585:168649"], "Command": ["585:161574", "585:172057"]},
+    "method": "same as Liquid (ledger-screens swapMethod); the build reply was lost to a dropped MCP connection, counts come from a read-only audit afterwards",
+    "feedbackSwapped": {"Alert": 2, "Inline notice": 1, "Progress": 1, "Toast": 3, "perMode": true},
+    "audit": {"styleInstances": 2776, "sharedGlyphs": 1206, "leftoverBase": {".Slot": 6}, "autoNamedParts": 0, "dashboardRowTones": "success, warning, info, success, neutral"},
+    "fixes": [
+      "Bloom capsule inner field-labels (theme-only text, defaults Email/Status/Note) re-filled from each Field's label: 22 (Customer, Shipping address, Carrier, Tracking number, Store name, Currency, Confirmation note, Work email, Password, Country) plus 12 standalone selects/searches (Status, Period, Search)",
+      "Orders sheet: Email and Tracking number rows hidden by the fit rule (as in the other groups)"
+    ],
+    "png": ["review/screens/bloom/dashboard-light.png", "review/screens/bloom/dashboard-dark.png", "review/screens/bloom/orders-light.png", "review/screens/bloom/orders-dark.png", "review/screens/bloom/settings-light.png", "review/screens/bloom/settings-dark.png", "review/screens/bloom/sign-in-light.png", "review/screens/bloom/sign-in-dark.png", "review/screens/bloom/command-light.png", "review/screens/bloom/command-dark.png"]
+  },
+  "ownerReview": [
+    "Alert and Toast titles are B.heading (Funnel Display 22/28) so the 28 disc equals the label line (owner header rule with Bloom's smallest disc). In the narrow sign-in card the alert title wraps to two lines.",
+    "Strong alerts use the notched-ink-card material (ink with a pastel disc) rather than a darker pastel; toasts are ink floats like the selection bar, with tone only on the disc.",
+    "Status pastels map neutral surface-high, info sky, success mint, warning butter, destructive rose, important lavender (lavender is also the selection colour).",
+    "Toast timer rail binds bloom/field-edge, the only constant mid-grey role that reads on ink in both schemes (semantic stretch, pending a bloom track-on-ink role).",
+    "Screens: Orders sheet button group (Print label, Refund, Duplicate, More) overflows the sheet column; Dashboard Recent orders shows 3 of 5 Bloom rows (84px rows); both are density/geometry, not Feedback.",
+    "Bloom/Page key: its two disabled outline Button instances carry opacity 1 over a 38% disabled main (left as is: likely deliberate to avoid double dimming under the Page key's own disabled opacity; confirm).",
+    "Not addressed here (2026-10-31 follow-ups for all styles): small Avatar group clipping initials; disabled table rows keeping full-colour badges."
+  ]
+}
