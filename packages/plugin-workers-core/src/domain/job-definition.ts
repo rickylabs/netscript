@@ -1,3 +1,4 @@
+import { MAX_JOB_RETRIES } from './job-retry-policy.ts';
 import { z } from 'zod';
 import type { JobHandler } from './job-handler.ts';
 import type { JobPayloadSchema } from './public-schema.ts';
@@ -38,7 +39,7 @@ const JobEditableShapeValue: JobEditableShape = {
   schedule: z.string().optional().describe('Cron schedule'),
   timezone: z.string().default('UTC').describe('Schedule timezone'),
   timeout: z.number().int().positive().default(300000).describe('Timeout in ms'),
-  maxRetries: z.number().int().nonnegative().default(3).describe('Max retries'),
+  maxRetries: z.number().int().min(0).max(MAX_JOB_RETRIES).default(3).describe('Max retries'),
   priority: z.number().int().min(0).max(100).default(50).describe('Job priority'),
   enabled: z.boolean().default(true).describe('Job enabled'),
   tags: z.array(z.string()).default([]).describe('Job tags'),
