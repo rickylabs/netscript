@@ -1,0 +1,9 @@
+# Prose source and browser evidence
+
+Markdown is copy-only: registry/components/ui/markdown.tsx.template accepts children:string, streaming, activeCite, onCite and class. The phase-one level/element/state/anchor root metadata was research geometry, never executable API. X1 now records that correction explicitly. Native parts and CSS interaction remain the contract; heading IDs/anchors, kbd and arbitrary host HTML are not falsely attributed to the sanitized renderer. Native host markup can use ns-markdown, ns-lede and ns-heading-anchor; keyboard focus reveals a hidden heading anchor.
+
+ledger-desktop-docs.json wins: lede uses prose measure, not640. Existing emitted Studio prose aliases provide body16/26, lede19/30, h226/34 and measure544; the Figma Theme-set twins do not justify inventing runtime token definitions. The CSS uses existing aliases with shared role fallbacks. Syntax colors use existing code/bg pairs, not saturated status/default roles.
+
+Use native square markers sized through existing spacing roles. The8px marker font produced measured2px squares in Chromium;16px produced5px squares. The final12px marker font gives a measured4×4 square in the fixture. Marker metrics are native/font-owned across environments. Keep native list-style semantics rather than replacing lists with decorative wrappers.
+
+Browser gap-build now renders actual installed Markdown through tests/contracts/utility-prose.ts before bundling, writing ignored test-results/prose-fixture.ts. The real ui:add path installs consumer-only dependencies into a temporary workspace; native node_modules mode avoids global fresh-Preact cache graph failures. The browser fixture separates this exact sanitized SSR from host-native anchor/kbd/lede examples. Parent build spawns a narrowly capable Deno helper; no product parser/sanitizer change. Exported helper constants and defaulted parameters need explicit types under isolatedDeclarations even when the browser bundler succeeds.

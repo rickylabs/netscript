@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 /** Build real registry/runtime sources with the workspace's current dependency catalog. */
 const configUrl = new URL('./gap.deno.json', import.meta.url);
 const config: { imports: Record<string, string>; catalog?: unknown } = JSON.parse(
@@ -15,6 +17,23 @@ for (const [name, target] of Object.entries(config.imports)) {
 await Deno.mkdir('test-results', { recursive: true });
 const generatedConfig = 'test-results/gap.bundle.deno.json';
 await Deno.writeTextFile(generatedConfig, JSON.stringify(config));
+// Render the copy-only Markdown template through a real temporary consumer first.
+const prose = await new Deno.Command(Deno.execPath(), {
+  args: [
+    'run',
+    '--no-lock',
+    '--config',
+    fileURLToPath(new URL('../../deno.json', import.meta.url)),
+    '--allow-read',
+    '--allow-write',
+    '--allow-run',
+    'gap-prose-build.ts',
+  ],
+}).output();
+if (!prose.success) {
+  await Deno.stderr.write(prose.stderr);
+  Deno.exit(prose.code);
+}
 const result = await new Deno.Command(Deno.execPath(), {
   args: [
     'bundle',

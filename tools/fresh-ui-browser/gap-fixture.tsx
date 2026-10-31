@@ -1,3 +1,4 @@
+import { ProseExamples } from './gap-prose-fixture.tsx';
 import { Alerts } from './gap-alert-fixture.tsx';
 import { DocsPrimitives } from './gap-docs-primitives-fixture.tsx';
 import { CodeBlocks } from './gap-code-block-fixture.tsx';
@@ -65,6 +66,7 @@ function Actions() {
       <CodeBlocks />
       <DocsPrimitives />
       <Alerts />
+      <ProseExamples />
     </main>
   );
 }

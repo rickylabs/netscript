@@ -1,200 +1,228 @@
 .ns-markdown {
+  max-inline-size: var(--ns-studio-prose-wide, 100%);
   color: var(--ns-fg);
   font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-sm);
-  line-height: 1.65;
+  font-size: var(--ns-studio-prose-body-size, var(--ns-text-body));
+  line-height: var(--ns-studio-prose-body-line, var(--ns-leading-body));
+  font-weight: var(--ns-weight-body);
   overflow-wrap: anywhere;
 }
-
-.ns-markdown > :first-child {
-  margin-top: 0;
+.ns-markdown :is(p, ul, ol, blockquote, h1, h2, h3, h4) {
+  max-inline-size: var(--ns-studio-prose-measure, 100%);
 }
-
-.ns-markdown > :last-child {
-  margin-bottom: 0;
+.ns-markdown :is(p, ul, ol, blockquote, pre, table) {
+  margin-block: var(--ns-space-4);
 }
-
-.ns-markdown p,
-.ns-markdown ul,
-.ns-markdown ol,
-.ns-markdown blockquote,
-.ns-markdown pre,
-.ns-markdown table {
-  margin-block: var(--ns-space-3);
+.ns-markdown :is(h1, h2, h3, h4) {
+  font-family: var(--ns-font-heading, var(--ns-font-sans));
+  font-weight: var(--ns-weight-label);
+  margin-block: var(--ns-space-8) var(--ns-space-3);
 }
-
-.ns-markdown h1,
-.ns-markdown h2,
-.ns-markdown h3,
-.ns-markdown h4 {
-  margin-block: var(--ns-space-4) var(--ns-space-2);
-  font-weight: 600;
-  line-height: 1.3;
-}
-
 .ns-markdown h1 {
-  font-size: var(--ns-text-lg);
+  font-size: var(--ns-text-title);
+  line-height: var(--ns-leading-title);
+  letter-spacing: var(--ns-tracking-title);
 }
-
-.ns-markdown h2,
-.ns-markdown h3,
+.ns-markdown h2 {
+  font-size: var(--ns-studio-prose-h2-size, var(--ns-text-heading));
+  line-height: var(--ns-studio-prose-h2-line, var(--ns-leading-heading));
+  letter-spacing: var(--ns-studio-prose-h2-tracking, var(--ns-tracking-heading));
+  margin-block-start: calc(var(--ns-space-7) * 2);
+}
+.ns-markdown h3 {
+  font-size: var(--ns-studio-prose-h3-size, var(--ns-text-heading));
+  line-height: var(--ns-studio-prose-h3-line, var(--ns-leading-heading));
+  letter-spacing: var(--ns-studio-prose-h3-tracking, var(--ns-tracking-heading));
+}
 .ns-markdown h4 {
-  font-size: var(--ns-text-sm);
+  font-size: var(--ns-studio-prose-h4-size, var(--ns-text-strong));
+  line-height: var(--ns-studio-prose-h4-line, var(--ns-leading-strong));
 }
-
+.ns-markdown .ns-lede,
+.ns-markdown.ns-lede > p:first-of-type {
+  font-size: var(--ns-studio-prose-lede-size, var(--ns-text-heading));
+  line-height: var(--ns-studio-prose-lede-line, var(--ns-leading-heading));
+  max-inline-size: var(--ns-studio-prose-measure, 100%);
+}
 .ns-markdown a {
-  color: var(--ns-primary);
+  color: var(--ns-fg);
+  font-weight: var(--ns-weight-label);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ns-studio-signal-underline, var(--ns-muted-fg));
+  text-underline-offset: var(--ns-space-1);
 }
-
 .ns-markdown a:hover {
-  color: color-mix(in srgb, var(--ns-primary) 80%, var(--ns-fg));
+  text-decoration-color: var(--ns-studio-signal-marker, var(--ns-marker));
 }
-
-/* Own the list markers: host resets (Tailwind preflight, Fresh scaffolds)
-   zero out list-style, which silently drops bullets from rendered prose. */
-.ns-markdown ul,
-.ns-markdown ol {
+.ns-markdown a:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+/* Host-generated heading anchors stay discoverable with keyboard focus too. */
+.ns-markdown :is(h1, h2, h3, h4) a.ns-heading-anchor {
+  margin-inline-start: var(--ns-space-2);
+  opacity: 0;
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+}
+.ns-markdown :is(h1, h2, h3, h4):hover a.ns-heading-anchor,
+.ns-markdown a.ns-heading-anchor:focus-visible {
+  opacity: 1;
+}
+/* Own native markers: host resets must not erase list meaning or geometry. */
+.ns-markdown :is(ul, ol) {
   list-style-position: outside;
   padding-inline-start: var(--ns-space-5);
 }
-
 .ns-markdown ul {
-  list-style-type: disc;
+  list-style-type: square;
 }
-
 .ns-markdown ol {
   list-style-type: decimal;
 }
-
-.ns-markdown li::marker {
-  color: var(--ns-muted-fg);
+.ns-markdown ul > li::marker {
+  color: var(--ns-fg);
+  font-size: var(--ns-space-3);
 }
-
+.ns-markdown ol > li::marker {
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-caption);
+}
 .ns-markdown li {
-  margin-block: var(--ns-space-1);
+  margin-block: var(--ns-space-2);
 }
-
 .ns-markdown blockquote {
-  padding-inline-start: var(--ns-space-3);
-  border-inline-start: 2px solid var(--ns-primary-border);
+  margin-inline: 0;
+  padding-inline-start: var(--ns-space-4);
+  border-inline-start: 2px solid var(--ns-studio-signal-marker, var(--ns-marker));
   color: var(--ns-muted-fg);
+  font-style: normal;
 }
-
+.ns-markdown strong {
+  font-weight: var(--ns-weight-strong);
+}
+.ns-markdown em {
+  font-style: italic;
+}
 .ns-markdown code {
   font-family: var(--ns-font-mono);
-  font-size: 0.85em;
+  font-size: var(--ns-studio-prose-code-size, var(--ns-text-caption));
 }
-
 .ns-markdown :not(pre) > code {
-  padding: var(--ns-space-px) var(--ns-space-1);
-  border: 1px solid var(--ns-border);
-  border-radius: var(--ns-radius-sm);
-  background: color-mix(in srgb, var(--ns-muted-fg) 12%, transparent);
-}
-
-.ns-markdown pre {
-  padding: var(--ns-space-3);
-  border: 1px solid var(--ns-border);
-  border-radius: var(--ns-radius-md);
+  padding: 0 0.25em;
+  border: 0;
+  border-radius: var(--ns-radius-badge);
   background: var(--ns-surface);
-  overflow-x: auto;
+  color: var(--ns-fg);
 }
-
+.ns-markdown kbd {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  block-size: var(--ns-space-5);
+  min-inline-size: var(--ns-space-5);
+  padding-inline: 5px;
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-badge);
+  background: var(--ns-card);
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-caption);
+  line-height: 1;
+}
+.ns-markdown pre {
+  max-inline-size: 100%;
+  padding: var(--ns-card-padding);
+  border: var(--ns-border-width) solid var(--ns-border-subtle);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-code-bg);
+  color: var(--ns-fg);
+  line-height: var(--ns-studio-prose-code-line, var(--ns-leading-code));
+  overflow-x: auto;
+  overflow-wrap: normal;
+}
 .ns-markdown pre code {
   padding: 0;
   border: 0;
   background: transparent;
 }
-
 .ns-markdown table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--ns-text-xs);
+  font-size: var(--ns-text-small);
 }
-
-.ns-markdown th,
-.ns-markdown td {
+.ns-markdown :is(th, td) {
   padding: var(--ns-space-2) var(--ns-space-3);
-  border: 1px solid var(--ns-border);
+  border: 0;
+  border-bottom: var(--ns-border-width) solid var(--ns-studio-table-row-rule,
+    var(--ns-border-subtle));
   text-align: start;
 }
-
 .ns-markdown th {
-  background: color-mix(in srgb, var(--ns-muted-fg) 8%, transparent);
-  font-weight: 600;
+  border-bottom-color: var(--ns-studio-table-head-rule, var(--ns-border));
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-caption);
+  font-weight: var(--ns-weight-caption);
 }
-
+.ns-markdown img {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  block-size: auto;
+  border: var(--ns-border-width) solid var(--ns-border-subtle);
+  border-radius: 0;
+}
 .ns-markdown hr {
-  margin-block: var(--ns-space-4);
+  margin-block: var(--ns-space-12);
   border: 0;
-  border-top: 1px solid var(--ns-border);
+  border-block-start: var(--ns-border-width) solid var(--ns-studio-topbar-rule,
+    var(--ns-border-subtle));
 }
-
 .ns-markdown .katex-display {
   margin-block: var(--ns-space-3);
   overflow-x: auto;
   overflow-y: hidden;
 }
-
-/* Syntax highlighting palette for rehype-highlight output. Registry-owned and
-   token-driven so code colors follow the active theme — a stock highlight.js
-   stylesheet is theme-fixed and breaks contrast on the opposite theme. */
-.ns-markdown .hljs-comment,
-.ns-markdown .hljs-quote,
-.ns-markdown .hljs-meta {
-  color: var(--ns-muted-fg);
+/* Use the existing code/bg syntax pairs, shared with CodeBlock. */
+.ns-markdown :is(.hljs-comment, .hljs-quote, .hljs-meta) {
+  color: var(--ns-code-syntax-comment);
   font-style: italic;
 }
-
-.ns-markdown .hljs-keyword,
-.ns-markdown .hljs-selector-tag,
-.ns-markdown .hljs-doctag,
-.ns-markdown .hljs-tag,
-.ns-markdown .hljs-name {
-  color: var(--ns-primary);
+.ns-markdown :is(.hljs-keyword, .hljs-selector-tag, .hljs-doctag, .hljs-tag, .hljs-name) {
+  color: var(--ns-code-syntax-keyword);
 }
-
-.ns-markdown .hljs-string,
-.ns-markdown .hljs-regexp,
-.ns-markdown .hljs-addition {
-  color: var(--ns-success);
+.ns-markdown :is(.hljs-string, .hljs-regexp, .hljs-addition) {
+  color: var(--ns-code-syntax-string);
 }
-
-.ns-markdown .hljs-number,
-.ns-markdown .hljs-literal,
-.ns-markdown .hljs-symbol,
-.ns-markdown .hljs-bullet,
-.ns-markdown .hljs-link {
-  color: var(--ns-warning);
+.ns-markdown :is(.hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet, .hljs-link) {
+  color: var(--ns-code-syntax-number);
 }
-
-.ns-markdown .hljs-title,
-.ns-markdown .hljs-section,
-.ns-markdown .hljs-attr,
-.ns-markdown .hljs-attribute,
-.ns-markdown .hljs-selector-id,
-.ns-markdown .hljs-selector-class,
-.ns-markdown .hljs-template-variable,
-.ns-markdown .hljs-variable {
-  color: var(--ns-secondary);
+.ns-markdown :is(.hljs-title, .hljs-section, .hljs-attr, .hljs-attribute, .hljs-selector-id, .hljs-selector-class, .hljs-template-variable, .hljs-variable) {
+  color: var(--ns-code-syntax-function);
 }
-
-.ns-markdown .hljs-built_in,
-.ns-markdown .hljs-type,
-.ns-markdown .hljs-class {
-  color: color-mix(in srgb, var(--ns-secondary) 60%, var(--ns-fg));
+.ns-markdown :is(.hljs-built_in, .hljs-type, .hljs-class) {
+  color: var(--ns-code-syntax-type);
 }
-
 .ns-markdown .hljs-deletion {
   color: var(--ns-destructive-text);
 }
-
 .ns-markdown .hljs-emphasis {
   font-style: italic;
 }
-
 .ns-markdown .hljs-strong {
-  font-weight: 600;
+  font-weight: var(--ns-weight-strong);
+}
+.ns-markdown > :first-child {
+  margin-block-start: 0;
+}
+.ns-markdown > :last-child {
+  margin-block-end: 0;
+}
+@media (max-width: 40rem) {
+  .ns-markdown h1 {
+    font-size: var(--ns-studio-prose-h1-sm-size, var(--ns-text-title));
+    line-height: var(--ns-studio-prose-h1-sm-line, var(--ns-leading-title));
+  }
 }
