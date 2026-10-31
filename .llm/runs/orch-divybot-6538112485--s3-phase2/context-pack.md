@@ -58,3 +58,5 @@ CI build repair complete locally: reviewed source f21bff4; all four carrier
 freshness checks PASS, no additional generated change after prose refresh.
 Exports/snippets/build/links/caveats all PASS. Push triggers fresh Pages CI;
 remote success remains pending. Resume Overlay slice after push/comment.
+
+Coordinator public-repository requirement: every committed run log/receipt/JSON must use portable paths. The added-line audit at c644a44596623fd93be1dc0cd77897f76d88a399 found zero forbidden absolute paths. Follow memory-public-path-hygiene.md for all new logs and repeat the whole-PR origin/main...HEAD added-line audit at the final READY head; include its zero-hit result in READY. This audit does not mark unfinished implementation complete.

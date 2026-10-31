@@ -288,3 +288,7 @@ CI build repair complete locally: reviewed source f21bff4; all four carrier
 freshness checks PASS, no additional generated change after prose refresh.
 Exports/snippets/build/links/caveats all PASS. Push triggers fresh Pages CI;
 remote success remains pending. Resume Overlay slice after push/comment.
+
+## Coordinator public-path audit
+
+Audited all added lines against current origin/main, including every added run artifact, at c644a44596623fd93be1dc0cd77897f76d88a399: zero forbidden absolute home/ephemeral/temp-root paths. Existing run artifacts are already portable; no replacement was needed. Added memory-public-path-hygiene.md to preserve normalization rules for future logs and require an explicit zero-hit statement in final-head READY. Repository-relative scratch paths remain valid. Re-run the whole-PR added-line audit after this note and again before eventual READY; implementation slice status is unchanged.
