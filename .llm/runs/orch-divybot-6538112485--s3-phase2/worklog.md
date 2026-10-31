@@ -605,3 +605,21 @@ lexical state across interleaved old/new display rows; explicit content override
 it. No maintained source change after review. Commit the16source/carrier files and
 run evidence, then all4carriers/current-sourcequality/publication/evidence review
 before exact-lease parent push and required child restack. No READY.
+
+Recovery7 source602a5bd8 committed after integration SOURCE PASS. All6generation/
+freshness commands PASS after source, including all4carrier checks. Raw git status
+was clean before these evidence edits: no post-source generated delta. Refreshed
+quality receipt matches actual602a5bd8 and native publication refresh PASS with
+0slow types. Same evidence review next, then privacy-audited exact-lease parent
+force-push and required child restack. No source change except requested README
+note since source review; full assignment11b/12/13 remains required, no READY.
+
+Recovery7 same independent committed-source evidence PASS at602a5bd8, failure
+streak0. All4carriers/quality/nativepublication reconcile, measuredgenerateddelta0.
+Main subsequently advanced to f4aa307b (#2549): release-pin coordination and
+historical fixture version normalization only; integrate it before pushing.
+Preserve its fixture exactly and normalize only first-party comparison versions,
+retaining all legacy/runtime/syntax guards. Prove unchanged UI/browser bytes and
+root import maps, rerun affected package/release/carrier/quality checks and obtain
+the same integration review. No push yet; exactremotelease remains71d8df6f.
+Childd0d8d922 restack and full11b/12/13 still required, no READY.

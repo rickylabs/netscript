@@ -88,7 +88,7 @@
   "qualityArchitecture": {
     "verdict": "PASS",
     "exitCode": 0,
-    "scope": "Working tree; committed-source receipt follows source commit"
+    "sourceCommit": "602a5bd875fdbd42e48a09a95ee98d8d99a35266"
   },
   "preflight": "PASS",
   "docsAccuracy": "PASS",
@@ -101,13 +101,38 @@
     "verdict": "PASS",
     "exitCode": 0,
     "slowTypes": 0,
-    "scope": "Working tree; refresh follows source commit"
+    "sourceCommit": "602a5bd875fdbd42e48a09a95ee98d8d99a35266"
   },
   "publicationAudit": "recovery7-publication-audit.json",
   "independentDesignReview": "PASS",
   "independentSourceReview": "PASS",
-  "independentEvidenceReview": "PENDING",
-  "carriers": "FOLLOW_SOURCE_COMMIT",
+  "independentEvidenceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
   "reviewThreads": {
     "pr": 2488,
     "verdict": "PASS",
@@ -117,5 +142,7 @@
   "requiredRemoteCI": "PENDING",
   "ready": false,
   "wholeAssignment": "IN_PROGRESS",
-  "remaining": "Child restack,11b Docs/Desktop,12 declared extensions/all-style,13 final"
+  "remaining": "Child restack,11b Docs/Desktop,12 declared extensions/all-style,13 final",
+  "sourceCommit": "602a5bd875fdbd42e48a09a95ee98d8d99a35266",
+  "generatedCarriersAfterSource": []
 }
