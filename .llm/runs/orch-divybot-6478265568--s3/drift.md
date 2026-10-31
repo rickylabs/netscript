@@ -25,3 +25,7 @@ Final migration safety repair: actual 0.0.8 state selector names differ from pub
 ## Resume integration drift — 2026-10-31
 
 The merged main introduced an `as unknown as Element` in docs/site/_plugins/markdown-render-fixture.ts. Required quality:gate fails there before arch:check. Extend the integration surface to this one test fixture and replace its direct parser/cast with Lume's existing Page.create document surface. Preserve the original render assertions; no scanner suppression or allowance changes. Regenerate the MCP export corpus and prose/publish carriers after merging main; freshness is checked only after committing the generated result. The canonical scaffold.runtime attempt exits 1 during Aspire/Docker preflight; Docker daemon is unavailable and no scaffold runtime starts.
+
+## Independent implementation repair — 2026-10-31
+
+IMPL-EVAL round 1 is FAIL_FIX with one blocker: ActionMenu's forced dropdown-menu scope breaks the existing app-owned floating.css selectors. One permitted repair retains the delegated popover scope on trigger/content and uses it for item/separator, records the delegation in contract notes/JSON/naming decisions, updates the style fixture, and adds an actual-render regression. Expand the owned browser parity tool to include ActionMenu and open native popovers so positioning is exercised. Regenerate the existing contract/registry/corpus/prose carriers as needed. Re-review stays in the same Claude session.

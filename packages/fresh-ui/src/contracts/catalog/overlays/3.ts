@@ -300,6 +300,7 @@ export const overlays_3: readonly ComponentContract[] = [
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
       'Dropdown menu is the contract name; ActionMenu is the compatible runtime API.',
+      'Utility ActionMenu delegates all parts to the popover scope so existing app-owned floating.css retains positioning and visibility behavior.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },

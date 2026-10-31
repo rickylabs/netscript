@@ -238,5 +238,13 @@ add('data-grid/bulk-selection', Grid, {
 });
 const Palette = await component('command-palette', 'CommandPalette');
 add('command-palette', Palette, { open: true, groups: [{ id: 'pages', label: 'Pages', items: [{ id: 'one', label: 'One' }] }] });
+const ActionMenu = (await import(toFileUrl(`${root}/src/runtime/action-menu/ActionMenu.tsx`).href)).ActionMenu;
+add('action-menu/open', ActionMenu.Root, { defaultOpen: true }, [
+  h(ActionMenu.Trigger, { class: 'ns-btn' }, 'Actions'),
+  h(ActionMenu.Content, { class: 'ns-panel' }, [
+    h(ActionMenu.Item, { class: 'ns-btn' }, 'Edit'),
+    h(ActionMenu.Separator, {}),
+  ]),
+]);
 await Deno.writeTextFile(output, JSON.stringify(cases));
 console.log(cases.length + ' render cases');

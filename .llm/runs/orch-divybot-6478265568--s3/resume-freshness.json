@@ -1,0 +1,35 @@
+{
+  "sourceHead": "ac2f1e440d4e42d652f977011815c7f31aefe232",
+  "checks": [
+    {
+      "command": "deno task check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "command": "versioned migration data regeneration + git diff --exit-code",
+      "exitCode": 0
+    },
+    {
+      "command": "Fresh UI targeted export/reference drift",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:review-threads -- --repo rickylabs/netscript --pr 2467 --pretty",
+      "exitCode": 0
+    }
+  ],
+  "lockfileChanges": [],
+  "retainedProofInputs": "Fresh UI/migration/parity product inputs are identical to 1cac8f994"
+}

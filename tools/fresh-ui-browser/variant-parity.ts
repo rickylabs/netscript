@@ -27,7 +27,10 @@ async function readSpecimens(path: string): Promise<Specimen[]> {
 }
 
 async function registryCss(root: string): Promise<string> {
-  const files = [join(root, 'registry/styles/layouts.css')];
+  const files = [
+    join(root, 'registry/theme/tokens.css'),
+    join(root, 'registry/styles/layouts.css'),
+  ];
   for (const folder of ['registry/components/ui', 'registry/islands']) {
     for (const entry of (await readdir(join(root, folder))).sort()) {
       if (entry.endsWith('.css')) files.push(join(root, folder, entry));
@@ -42,6 +45,11 @@ async function registryCss(root: string): Promise<string> {
 const PROPERTIES = [
   'display',
   'position',
+  'z-index',
+  'top',
+  'right',
+  'bottom',
+  'left',
   'width',
   'height',
   'color',
@@ -135,6 +143,13 @@ async function main(): Promise<void> {
                 ).join('')
               }</body></html>`,
             );
+            // Native popovers need the top layer before floating position can be compared.
+            await page.evaluate(() => {
+              const openPopovers = document.querySelectorAll<HTMLElement>(
+                '[popover][data-state="open"]',
+              );
+              for (const element of openPopovers) element.showPopover();
+            });
             const styles: Record<string, string> = {};
             const client = await page.context().newCDPSession(page);
             await client.send('DOM.enable');

@@ -125,10 +125,10 @@ values. Original S0 screenshots remain untouched.
 
 ## Variant migration parity
 
-`render-variant-cases.mjs` renders 187 cases from a supplied Fresh UI source root, including every
+`render-variant-cases.mjs` renders 188 cases from a supplied Fresh UI source root, including every
 migrated modifier family, native disabled/error/checked combinations, both toggle islands and the
-app shell, selection toolbar and command palette. `variant-parity.ts` compares baseline and migrated HTML with their actual registry CSS
-and identical Studio Utility token bytes. It measures computed styles in rest, hover, focus and
+app shell, selection toolbar, command palette and an open ActionMenu. Native popovers are promoted to the top layer before measuring floating position. `variant-parity.ts` compares baseline and migrated HTML with their actual registry CSS
+the shipped base tokens, and identical Studio Utility token bytes. Floating geometry and stacking order are included in computed comparisons. It measures computed styles in rest, hover, focus and
 pressed states, at 390/1280 in light/dark, and also requires identical full-page PNG bytes. It
 records input hashes, the browser version, comparison counts, differences and screenshot hashes in `parity.json`.
 The runner closes its browser on success and failure.

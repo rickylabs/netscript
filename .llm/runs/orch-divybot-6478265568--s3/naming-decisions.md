@@ -11,7 +11,7 @@
 | Native Select / custom listbox | Preserve the native select and browser keyboard map. Content/listbox is planned, not an ARIA imitation. |
 | Field / FormField | Contract identity Field; existing FormField remains supported. Add Field as a compatible source alias only where needed. |
 | Empty / EmptyState | Contract Empty state; source EmptyState stays canonical. |
-| ActionMenu / DropdownMenu | Contract Dropdown menu; source ActionMenu stays compatible and uses `intent`, not `variant`. |
+| ActionMenu / DropdownMenu | Contract Dropdown menu; source ActionMenu stays compatible and uses `intent`, not `variant`. Utility retains the delegated `popover` scope on all parts so app-owned floating.css continues to position and hide the menu. |
 | Toggle state / selection | Selection is its own boolean axis; pressed is pointer activation. |
 | Tabs selected / interaction state | Selection is distinct from disabled/focus/hover; preserve existing runtime APIs and document attribute compatibility. |
 | Panel tone / Chart tone | Panel's visual choice becomes variant with a compatibility tone prop. Chart/Donut keep semantic tone. |

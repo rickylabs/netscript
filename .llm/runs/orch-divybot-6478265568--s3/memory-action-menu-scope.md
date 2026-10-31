@@ -1,0 +1,3 @@
+# ActionMenu floating-style compatibility
+
+ActionMenu is package-owned but floating.css is copied into apps. Its trigger/content must retain the popover runtime's data-scope; forcing the design identity dropdown-menu drops existing CSS hooks. Contract identity and implementation scope may differ, like Drawer/dialog. Keep item/separator on the same delegated scope for the style provider. Browser parity must open native popovers and include shipped base tokens and stacking/geometry properties: current Chromium can preserve layout despite the broken selector, while the lost z-index still detects the regression. The old-scope negative control exits 1 on that mismatch.

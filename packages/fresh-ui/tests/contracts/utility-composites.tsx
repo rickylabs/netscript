@@ -296,7 +296,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   {
     component: 'dropdown-menu',
     scenario: 'open',
-    scope: 'dropdown-menu',
+    scope: 'popover',
     render: () => (
       <ActionMenu.Root defaultOpen>
         <ActionMenu.Trigger>Menu</ActionMenu.Trigger>
