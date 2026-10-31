@@ -448,6 +448,8 @@ Chart uses an explicit `locale` (`en-US` by default) for consistent server/clien
 
 ## Embedded registry
 
+Items that import package-owned runtime subpaths declare the matching Fresh UI package dependency, so `ui:add` contributes its root import mapping in a clean Deno project.
+
 Exported from `@netscript/fresh-ui/registry`. It embeds the copy-source manifest and file contents
 used by the Fresh UI installer, so consumers can inspect the manifest without reading package files
 at runtime.
