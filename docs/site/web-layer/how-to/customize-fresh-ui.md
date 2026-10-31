@@ -159,7 +159,8 @@ localStorage key, falling back to the OS preference. `ThemeToggle` changes the s
 language, density and Studio flavor. `assets/theme-preset.json` supplies those fixed preset axes, and
 `assets/fonts.json` supplies the font stylesheet requests.
 
-NS One is the default preset. To select Studio Utility in one app, run:
+Studio Utility (Neutral × Ink) is the default for new apps. Existing apps keep their configured
+preset. To select Studio Utility in an existing app, run:
 
 ```sh
 netscript tokens init --app dashboard --preset studio-utility
@@ -172,6 +173,10 @@ not hand-edit generated CSS or JSON. Add `--previews` to the build command to ge
 development preset stylesheets. The
 [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) covers
 precedence, validation and cleanup.
+
+NS One remains selectable with `netscript ui:apply --app dashboard --preset ns-one`.
+`tokens init` without `--preset` retains its legacy NS One default; pass the app’s preset explicitly
+when creating editable token sources. `tokens build` preserves the configured preset.
 
 To preview a generated preset without changing the app default, run
 `netscript tokens build --app dashboard --previews` (or install `ui:add theme-previews`), then open

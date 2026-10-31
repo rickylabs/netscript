@@ -169,7 +169,7 @@ console.log(build.files['tokens.css']);
 ```
 
 All 24 presets, both schemes and both requested density contexts build through
-Style Dictionary. Presets fix their own geometry. NS One stays the default;
+Style Dictionary. Presets fix their own geometry. Studio Utility is the default for new applications; NS One remains a legacy preset;
 Studio Utility is available as `theme-studio-utility` in the registry. The
 three-tier source and extension guide is [tokens/README.md](tokens/README.md).
 

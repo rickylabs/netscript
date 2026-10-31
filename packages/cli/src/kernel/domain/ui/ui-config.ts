@@ -6,6 +6,8 @@ export const UI_CONFIG_FILE = 'components.json';
 export const UI_LOCK_FILE = 'fresh-ui.lock.json';
 /** Default component sources, shared by all token-only Utility presets. */
 export const UI_DEFAULT_STYLE = 'style-utility';
+/** Theme installed for a new application; existing token configuration remains authoritative. */
+export const UI_DEFAULT_THEME = 'theme-studio-utility';
 /** Path aliases resolve to local directories inside the selected Fresh application. */
 export const UI_DEFAULT_ALIASES = {
   components: 'components',

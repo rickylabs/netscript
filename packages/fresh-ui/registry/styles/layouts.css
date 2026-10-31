@@ -266,8 +266,10 @@
   position: sticky;
   top: 0;
   z-index: var(--ns-z-sticky);
-  height: 52px;
+  min-height: 52px;
   display: flex;
+  flex-wrap: wrap;
+  padding-block: var(--ns-space-2);
   align-items: center;
   justify-content: space-between;
   gap: var(--ns-space-4);

@@ -103,11 +103,14 @@ function assertDataScreenPlan(files: readonly PlannedFile[]): void {
       'useIslandQuery',
       'initialData: props.initialData',
       'initialDataUpdatedAt: props.cachedAt',
-      'JSON.stringify(query.data',
+      'QueryResult value={query.data}',
+      "role='status'",
+      "role='alert'",
     ]
   ) {
     assertStringIncludes(source, fragment);
   }
+  assertFalse(source.includes('JSON.stringify(query.data'));
   assertFalse(source.includes('useSignal(0)'));
   assertFalse(source.includes('queryLoaders = {}'));
 }
@@ -447,7 +450,7 @@ Deno.test('top-level pages are linked in the scaffold navigation and render insi
   const navigation = await fs.readFile(NAVIGATION_PATH);
   assertStringIncludes(
     navigation,
-    "  { href: appRoutes.design.href(), label: 'Design', match: 'prefix' },\n" +
+    "  { href: appRoutes.design.href(), label: 'Design', match: 'prefix', developmentOnly: true },\n" +
       "  { href: appRoutes['data-screen'].href(), label: 'Data Screen', match: 'prefix' },\n];",
   );
   const page = await fs.readFile(`${APP_ROOT}/routes/data-screen/index.tsx`);
@@ -544,5 +547,32 @@ Deno.test('generated pages and navigation entries are already in deno fmt canoni
         );
       }
     }
+  }
+});
+
+Deno.test('edited app and resource templates emit canonical generated source', async () => {
+  const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
+  const templates = [
+    'app/routes/_layout.tsx.template',
+    'app/routes/(_components)/health-view.tsx.template',
+    'resource-slice/(_islands)/ResourceIsland.tsx.template',
+  ];
+  const values: Readonly<Record<string, string>> = {
+    name: 'shop',
+    appName: 'dashboard',
+    resource: 'orders',
+    resourcePascalCase: 'Orders',
+    queryFactoryName: 'ordersQueries',
+    queryFactory: 'ordersQueries.list',
+    clientModuleSpecifier: '../(_lib)/orders.ts',
+  };
+  for (const template of templates) {
+    const source = await Deno.readTextFile(new URL(`../../../assets/${template}`, import.meta.url));
+    const rendered = source.replace(/\{\{(\w+)\}\}/g, (_, name: string) => {
+      const value = values[name];
+      if (value === undefined) throw new Error(`Missing template value: ${name}`);
+      return value;
+    });
+    assertEquals(await formatter.formatContent('fixture.tsx', rendered), rendered, template);
   }
 });
