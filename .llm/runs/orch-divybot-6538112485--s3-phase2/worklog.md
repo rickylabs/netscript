@@ -219,3 +219,48 @@ and retained under review/. No cross-platform pixel-identity claim.
 Slice4 source committed; clean-source MCP corpus and all four carrier freshness
 checks PASS. Docs build253 HTML/97 registry artifacts; no docs lock churn.
 Push/comment completes this slice; next is Navigation.
+
+## Slice5 — Navigation
+
+Native NavigationMenu links/exclusive details, decorative LocationMarker, ordered
+Stepper links/status and Menubar with shared copied action/checkbox/radio/submenu
+content. New helper menu-items is a support item, not another public Figma identity.
+79 shipped/25 gaps;13 new registry components and2 support items;101 native items.
+Every new item maps through style-utility; navigation collection documented.
+
+Related ActionMenu runtime updates: caller-owned checkbox/radio roles, optional
+closeOnSelect, first/last entry, scoped traversal/typeahead. Native popovers
+promote in layout, avoiding rapid-key loss; menu entry uses native autofocus
+and the same edge in the layout/toggle paths. Outside/programmatic dismissal
+keeps its destination focus; Escape/explicit close return to the trigger.
+No new global listeners or second popover engine.
+
+Initial142 focused tests pass, including native registry/legacy guard and actual
+consumer copies. Browser found native blur does not bubble (use focusout), a
+function-component ref was not a native button (query the private DOM wrapper),
+and rapid submenu arrows exposed deferred native promotion. Those real failures
+are being corrected, including directional submenu placement. Current source
+check6 then3, lint9 and all new CSS token references pass. Full browser/quality
+and independent review follow; do not start Overlays until terminal PASS.
+
+Navigation gates:142 focused tests,108 full browser cases (strict axe), scoped
+source/fixture/spec wrappers and broad quality PASS. Global interactive doc-lint
+123 errors exactly reproduced in pre-slice c788023 full checkout by code/message/
+relative-file, zero introduced/removed. Final source review is in flight with
+the same independent evaluator; no Overlays work starts before terminal signoff.
+
+Independent slice5 review FAIL_FIX: a closed NavigationMenu swallowed Escape and
+blocked an enclosing native Dialog's cancel request. Actual browser negative
+control reproduced the dialog remaining visible. The handler now cancels Escape
+only when a native disclosure is open; new modal tests cover both boundary levels
+and trigger/summary focus return. Nonblocking notes also addressed: panel links
+accept current/aria-current and runtime autofocus marks clear with open lifetime.
+Corrected112 browser and142 focused tests are running before corrective review.
+
+Slice5 terminal PASS: same independent reviewer FAIL_FIX -> real native dialog
+negative control -> focused Escape correction -> PASS. Corrected112/112 browser
+and142/142 focused tests pass. Corrected broader quality receipt PASS/exit0;
+publication preflight/docs accuracy111 PASS. Registry doc-order repaired to match
+native metadata; targeted design/doc-drift gate9/9 PASS. Source/fixture/spec
+check/lint/fmt PASS. No token/dependency/lock changes. Final carriers and push
+complete this slice before Overlays starts.

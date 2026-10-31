@@ -3623,93 +3623,66 @@
       "specId": "N6",
       "category": "Navigation",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "trigger": {
-          "kind": "enum",
-          "values": [
-            "link",
-            "menu"
-          ]
+        "label": {
+          "kind": "text",
+          "required": true
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "selected",
-            "open"
-          ]
-        },
-        "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "items": {
+          "kind": "collection",
+          "required": true,
+          "description": "Unique IDs, labels and either href or a list of navigation links; current marks the active lane."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "list",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "item",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "marker",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "chevron",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "viewport",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "link",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "indicator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -3717,6 +3690,9 @@
           "values": [
             "link",
             "menu"
+          ],
+          "parts": [
+            "item"
           ]
         },
         "data-state": {
@@ -3727,7 +3703,10 @@
             "selected",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "item"
+          ]
         },
         "data-open": {
           "values": [
@@ -3743,6 +3722,14 @@
         {
           "key": "Enter/Space",
           "action": "Toggle disclosure"
+        },
+        {
+          "key": "Escape",
+          "action": "Close disclosure and return focus to its summary."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Follow native link/summary order; focus exit closes disclosure."
         }
       ],
       "tokenRoles": [
@@ -3751,7 +3738,8 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native details/name exclusivity works before hydration; island adds Escape and focus-exit dismissal. Open/trigger/state are derived from the native disclosure and item records.",
+        "Current links, including disclosure-panel links, own aria-current=page; their decorative marker has no tab stop. Escape is handled only while a disclosure is open, preserving outer native dismissal."
       ]
     },
     {
@@ -3759,39 +3747,42 @@
       "specId": "N7",
       "category": "Navigation",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "open",
-            "disabled"
-          ]
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "menus": {
+          "kind": "collection",
+          "required": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -3803,7 +3794,14 @@
             "open",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "trigger",
+            "content"
+          ],
+          "compatibilityValues": [
+            "closed"
+          ]
         }
       },
       "booleans": [],
@@ -3821,6 +3819,26 @@
         {
           "key": "Escape",
           "action": "Close menu"
+        },
+        {
+          "key": "Home/End",
+          "action": "Move to first/last enabled trigger or menu item."
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Open a menu, activate actions or change caller-owned checkbox/radio state."
+        },
+        {
+          "key": "ArrowRight/ArrowLeft in submenu",
+          "action": "Open/close nested menu, respecting direction."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Close the menu and leave through the roving trigger."
+        },
+        {
+          "key": "Printable character",
+          "action": "Find the next matching menu item."
         }
       ],
       "tokenRoles": [
@@ -3830,7 +3848,9 @@
         "surface/hover"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Roving native application menu triggers delegate popovers and collection keys to public ActionMenu; source must hydrate in an island.",
+        "Menu records contain app callbacks and controlled choice state. Nested menu items use private copied menu-items support, not a second public component identity.",
+        "Trigger/content preserve runtime open/closed; disabled/hover/focus are native properties and CSS. value/null controls the open menu."
       ]
     },
     {
@@ -3838,7 +3858,7 @@
       "specId": "N8",
       "category": "Navigation",
       "priority": "P0",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "size": {
           "kind": "enum",
@@ -3850,8 +3870,7 @@
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         }
       ],
       "attributes": {
@@ -3870,7 +3889,7 @@
         "deco/marker"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Decorative aria-hidden square; parent owns aria-current. No focus stop. Existing Studio marker token with foreground fallback; no token changes."
       ]
     },
     {
@@ -3878,17 +3897,8 @@
       "specId": "N9",
       "category": "Navigation",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "status": {
-          "kind": "enum",
-          "values": [
-            "complete",
-            "current",
-            "upcoming",
-            "error"
-          ]
-        },
         "orientation": {
           "kind": "enum",
           "values": [
@@ -3901,37 +3911,40 @@
         },
         "connector": {
           "kind": "boolean"
+        },
+        "steps": {
+          "kind": "collection",
+          "required": true,
+          "description": "Unique IDs, titles, descriptions, status and optional native href. At most one current step."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "indicator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "connector",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "step",
+          "when": "one per supplied step"
         }
       ],
       "attributes": {
@@ -3941,6 +3954,9 @@
             "current",
             "upcoming",
             "error"
+          ],
+          "parts": [
+            "step"
           ]
         },
         "data-orientation": {
@@ -3966,7 +3982,7 @@
         "topbar/rule"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Ordered list presentation; status belongs to each step record. Native links are optional, no composite key manager. Current step owns aria-current=step and every status has readable text."
       ]
     },
     {
@@ -4985,6 +5001,15 @@
       "priority": "P0",
       "shipped": true,
       "props": {
+        "initialFocus": {
+          "kind": "enum",
+          "values": [
+            "first",
+            "last"
+          ],
+          "default": "first",
+          "description": "ActionMenu.Content entry edge for ArrowDown/ArrowUp."
+        },
         "open": {
           "kind": "enum",
           "values": [
@@ -5035,6 +5060,20 @@
         },
         "checked": {
           "kind": "boolean"
+        },
+        "role": {
+          "kind": "enum",
+          "values": [
+            "menuitem",
+            "menuitemcheckbox",
+            "menuitemradio"
+          ],
+          "description": "ActionMenu.Item semantic role; choice state supplied with native aria-checked."
+        },
+        "closeOnSelect": {
+          "kind": "boolean",
+          "default": true,
+          "description": "ActionMenu.Item may stay open for repeated choice adjustments."
         }
       },
       "parts": [
@@ -5181,7 +5220,8 @@
         "Native DOM attributes pass through where the implementation accepts them.",
         "Dropdown menu is the contract name; ActionMenu is the compatible runtime API.",
         "Utility ActionMenu delegates all parts to the popover scope so existing app-owned floating.css retains positioning and visibility behavior.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.",
+        "Item traversal includes checkable roles and typeahead, excludes nested menus, and respects native disabled. Outside dismissal preserves its focus destination."
       ]
     },
     {

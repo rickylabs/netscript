@@ -1,41 +1,40 @@
 # Resume S3 phase 2
 
-Read plan.md, research.md and worklog.md. Branch orch/divybot-6538112485,
-draft PR2488, baseline now main ad252e8. Operator says Refs #2416 only, no
-labels/session IDs, no tokens/lock churn, stop at READY; Cockpit merges.
-Never commit assignment/final-report files. Same separate Claude Opus5.5 high
-read-only evaluator has reviewed each slice; final IMPL-EVAL remains required.
+Branch orch/divybot-6538112485; draft PR2488; base main ad252e8.
+Read plan.md/research.md/worklog.md. Owner says Refs #2416 only, no labels or
+session IDs, never commit assignment/final-report files, stop at READY; Cockpit
+merges. Two review units:2a core categories, then2b Layout/AI/Desktop/Docs/harness.
+Same separate read-only Claude Opus5.5 high reviewer is required; final IMPL-EVAL
+still pending. Review transport/private identity stays in external project runs.
 
-Completed and independently PASS: all104 typed/JSON contracts;3 Actions gap
-components;4 native Forms gap controls; migration onto main's S2 registry.json.
-73 shipped/31 gaps remain. Legacy-v1 snapshot unchanged; explicit post-v1 item
-allowlist has7 components and no support items. Keep that list, native registry
-count, style-utility maps and collection docs current for each new item.
+Terminal PASS: all104 typed/JSON contracts; Actions3; Forms6 including Calendar/
+DatePicker; Navigation4 including Menubar.79 shipped/25 remaining. Native
+registry101 = baseline86 +13 reviewed components +2 copied support items.
+Author registry.json and style-utility maps/collections, preserve compatibility
+projection and frozen legacy-v1.json. Keep post-v1 allowlist/counts current.
 
-Rebase repair gates:130 focused tests,60 real browser cases, quality,
-release preflight, docs accuracy111, four carrier checks pass. Full package
-run347 passed/1 stale design-sync count, corrected with targeted9/9 PASS;
-repeat whole suite at phase final. Required CI skipped on draft, no READY.
-Latest main advanced after first force push; six commits replayed cleanly onto
-ad252e8. Push using explicit lease8d093a9, confirm mergeable, then continue.
+Navigation slice5 terminal PASS after one closed-Escape boundary correction.
+112 full rebuilt-source browser cases,142 focused tests, quality, preflight,
+docs accuracy111, source/spec wrappers PASS. Runtime ActionMenu supports choices,
+first/last entry, scoped traversal/typeahead, layout native popovers; outside
+focus is preserved and submenu Escape stays at its own level. Interactive
+Deno doc-lint123 diagnostics exactly match pre-slice c788023 full checkout by
+code/message/relative file; no new diagnostics.9 design/doc-drift tests pass.
+Final clean-source corpus/carrier refresh + push/comment completes slice5.
 
-Slice4 terminal PASS: Calendar/DatePicker shipped,75 total/29 gaps. Native
-registry96 includes calendar-date support item and9 total new components.
-Focused123, browser84 plus final24, source/spec wrappers, quality, preflight,
-docs accuracy111 PASS. Whole package356 PASS before focused corrections.
-Independent same reviewer FAIL_FIX range-middle color -> computed-color negative
-proof -> corrected PASS. Controlled cancel/refusal and reopen focus tested;
-browser-forced repeated Escape limitation documented. No architecture debt.
-Next: commit source with evidence, regenerate clean-source MCP corpus, check
-all carriers/push/comment, then Navigation slice5. Do not mark READY yet.
+Next slice6: AlertDialog, HoverCard, ContextMenu; compose existing native runtime
+and reuse menu-items helper. Then slice7: Item/Kbd/Chart/Collapsible/Carousel,
+CodeBlock tabs/line/diff and Feedback/Label/PageHeader/docs-gap audit. Phase2a
+needs full package/quality/JSR/preflight/docs/carrier/runtime gates and mandatory
+same-session final IMPL-EVAL. Only exact-head required green CI allows READY.
 
-Browser instructions in tools/fresh-ui-browser/README.md; suite rebuilds current
-source automatically. System Chromium libs from a read-only existing project
-run must be supplied only to npm/Playwright, not restricted Deno spawn wrappers.
-Review transport/private identity is outside repository in project's run folder.
-Remaining phase2a: Navigation, Overlays, Data display + Feedback/docs gap audit.
-Then stacked phase2b: Layout, AI, Desktop, Docs kit and all-style harness.
+Browser: tools/fresh-ui-browser/gap.playwright.config.ts rebuilds current sources
+through gap-build.ts; it derives root catalog into ignored generated config.
+Use that generated config for fixture type checks; Node specs use docs.deno.json.
+Chromium needs existing project-run system libraries in LD_LIBRARY_PATH only for
+Playwright; restricted Deno spawn wrappers reject that inherited env. See browser
+README and memory-browser.md. No changed lock files/caches allowed.
 
-Slice4 source committed; clean-source MCP corpus and all four carrier freshness
-checks PASS. Docs build253 HTML/97 registry artifacts; no docs lock churn.
-Push/comment completes this slice; next is Navigation.
+Phase2b remains: Layout4, AI5, Docs8 + Desktop audit and all-style harness.
+The current style ID table is still Utility-only; phase2b must derive native
+source-style registrations, reject missing providers and all4 contract mutants.

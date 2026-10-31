@@ -1,4 +1,8 @@
-:where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content']) {
+:where(
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content'],
+  [data-scope='menubar'][data-part='content']
+) {
   position: fixed;
   inset: var(
     --ns-floating-fallback-inset,
@@ -8,11 +12,19 @@
   margin: 0;
 }
 
-:where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content'])[data-state='closed'] {
+:where(
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content'],
+  [data-scope='menubar'][data-part='content']
+)[data-state='closed'] {
   display: none;
 }
 
-:where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content']):popover-open {
+:where(
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content'],
+  [data-scope='menubar'][data-part='content']
+):popover-open {
   display: block;
 }
 
@@ -21,7 +33,11 @@
     anchor-name: var(--ns-floating-anchor-name);
   }
 
-  :where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content']) {
+  :where(
+    [data-scope='popover'][data-part='content'],
+    [data-scope='tooltip'][data-part='content'],
+    [data-scope='menubar'][data-part='content']
+  ) {
     inset: auto;
     position-anchor: var(--ns-floating-anchor-name);
     position-area: var(--ns-floating-position-area, bottom);

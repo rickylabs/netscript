@@ -1,0 +1,5 @@
+.ns-menubar { display: inline-flex; flex-wrap: wrap; padding: var(--ns-space-1); border: var(--ns-border-width) solid var(--ns-border); border-radius: var(--ns-radius-input); background: var(--ns-bg); }
+.ns-menubar [data-scope='menubar'][data-part='trigger'] { min-block-size: var(--ns-control-height-sm); padding-inline: var(--ns-control-padding-x); border: 0; border-radius: var(--ns-radius-control); background: transparent; color: var(--ns-fg); font: inherit; font-size: var(--ns-text-small); font-weight: var(--ns-weight-strong); cursor: pointer; }
+.ns-menubar [data-part='trigger']:is(:enabled:hover,[data-state='open']) { background: var(--ns-hover); }
+.ns-menubar [data-part='trigger']:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-menubar [data-part='trigger']:disabled { opacity: 0.38; cursor: not-allowed; }
