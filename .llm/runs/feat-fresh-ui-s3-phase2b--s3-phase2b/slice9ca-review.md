@@ -1,5 +1,7 @@
 # Independent9c-a source review
 
+Final committed source1de3962b: PASS, including the navLabel/desktop-toggle delta. Full final-delta verdict is retained below.
+
 PASS (slice 9c-a source review: the responsive SidebarShell family)
 
 I found no blockers in the uncommitted shell family. It implements the reviewed checkpoint with native ownership, real refusal handling and clean lifetimes.
