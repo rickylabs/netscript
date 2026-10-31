@@ -1,6 +1,6 @@
-import { validateFigmaSnapshot } from '../../../packages/fresh-ui/src/tokens/domain/figma-snapshot.ts';
-import { assertFigmaAliasCycles } from '../../../packages/fresh-ui/src/tokens/domain/figma-alias-cycles.ts';
-import { assertFigmaTokenNames } from '../../../packages/fresh-ui/src/tokens/adapters/figma-token-names.ts';
+import { validateFigmaSnapshot } from '../../../packages/fresh-ui/src/tokens/domain/figma/figma-snapshot.ts';
+import { assertFigmaAliasCycles } from '../../../packages/fresh-ui/src/tokens/domain/figma/figma-alias-cycles.ts';
+import { assertFigmaTokenNames } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-token-names.ts';
 import type {
   CollectionHandle,
   FigmaValue,

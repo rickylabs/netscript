@@ -1,5 +1,5 @@
 import { verifiedFigmaProvenance } from './figma-provenance.ts';
-import { figmaTokenSources } from '../src/tokens/adapters/figma-token-sources.ts';
+import { figmaTokenSources } from '../src/tokens/adapters/figma/figma-token-sources.ts';
 import type { FigmaCollection } from '../src/tokens/domain/token-contract.ts';
 import { TOKEN_PRESETS } from '../src/tokens/domain/token-presets.ts';
 

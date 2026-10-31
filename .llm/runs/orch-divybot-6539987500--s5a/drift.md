@@ -13,3 +13,15 @@
 
 - S4 extends writes to .llm/tools/gates/catalog.ts for the required figma-ci
   allowlist entry. This is necessary to preserve durable CI gate evidence.
+
+- Final JSR fitness audit exposed new F-16 cardinality warnings in token adapter
+  and domain roots. S6 is split into bounded source-organization and carrier/gate
+  commits. Group Figma adapters and raw Figma domain contracts into cohesive
+  figma/ folders; public exports and output bytes stay stable. No new debt.
+- The same audit on the exact detached baseline confirms its existing
+  F-JSR-2 complaint that contracts.json lacks a JSDoc module tag. JSON cannot
+  carry JSDoc; retain the matching baseline finding separately from source gates.
+- Runtime smoke was executed as one canonical command; Docker daemon absence
+  stops Aspire preflight and cleanup inspection. Runtime verdict is UNPROVEN.
+  Read-only leak reporting found24 unproven survivors and0 proven-owned survivors;
+  none were mutated. Public leak-report.md contains only verdict/counts.

@@ -162,3 +162,17 @@ acceptance all pass. Reconcile: no labels; issue milestone0.0.9 mirrored to PR.
 S6 will document context selection on imported sources, remove empty retired
 portable theme lock entries, reuse the app-directory constant, regenerate
 carriers, run remaining gates and obtain final IMPL-EVAL.
+
+## S6a — Figma folder fitness
+
+The final audit initially added cardinality warnings (adapters16, domain14).
+Grouped Figma transport/import adapters and raw Figma contracts into actual
+feature folders, restoring both parent roots to12 or fewer children. Import-only
+moves preserve public tokens exports, all fixture/source bytes and the shared
+resolver. figma:ci PASS:15 source files and12 tests; tokens:sources:check PASS
+with96 inputs. Current and exact-baseline audits now have the same7 findings:
+one existing contracts.json module-tag false positive plus existing warnings.
+Independent S6a source review pending. Native fresh-app proof remains green;
+full Aspire/Docker tier is explicitly UNPROVEN.
+
+S6a terminal PASS: independent organization review plus fixture/source, plugin and matching-baseline fitness evidence. Next bounded CLI organization slice.

@@ -37,11 +37,11 @@ export type {
 export { TOKEN_PRESETS } from './src/tokens/domain/token-presets.ts';
 export { TOKEN_DENSITIES, TOKEN_SCHEMES } from './src/tokens/domain/token-contract.ts';
 
-export { figmaTokenSources } from './src/tokens/adapters/figma-token-sources.ts';
+export { figmaTokenSources } from './src/tokens/adapters/figma/figma-token-sources.ts';
 export type { FigmaCollection, FigmaVariable } from './src/tokens/domain/token-contract.ts';
 export {
   exportFigmaTokenBundle,
   importFigmaTokenBundle,
-} from './src/tokens/adapters/figma-round-trip.ts';
-export type { FigmaTokenBundle } from './src/tokens/domain/figma-token-bundle.ts';
-export { assertFigmaTokenNames } from './src/tokens/adapters/figma-token-names.ts';
+} from './src/tokens/adapters/figma/figma-round-trip.ts';
+export type { FigmaTokenBundle } from './src/tokens/domain/figma/figma-token-bundle.ts';
+export { assertFigmaTokenNames } from './src/tokens/adapters/figma/figma-token-names.ts';

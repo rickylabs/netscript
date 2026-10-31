@@ -1,6 +1,6 @@
 import { z } from 'npm:zod@^4.6.5';
-import { importFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma-round-trip.ts';
-import { canonical } from '../../../packages/fresh-ui/src/tokens/adapters/parse-figma-round-trip.ts';
+import { importFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
+import { canonical } from '../../../packages/fresh-ui/src/tokens/adapters/figma/parse-figma-round-trip.ts';
 
 const itemSchema = z.object({
   type: z.literal('registry:theme'),

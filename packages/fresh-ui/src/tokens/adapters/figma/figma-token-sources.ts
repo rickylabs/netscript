@@ -1,8 +1,8 @@
-import { legacy } from '../assets/legacy.generated.ts';
-import type { FigmaCollection, TokenDocument } from '../domain/token-contract.ts';
-import { assertSemanticAliases, type TokenSources } from '../domain/resolve-tokens.ts';
-import { createTokenResolver } from '../domain/token-resolver.ts';
-import { defaultTokenSources } from './default-token-sources.ts';
+import { legacy } from '../../assets/legacy.generated.ts';
+import type { FigmaCollection, TokenDocument } from '../../domain/token-contract.ts';
+import { assertSemanticAliases, type TokenSources } from '../../domain/resolve-tokens.ts';
+import { createTokenResolver } from '../../domain/token-resolver.ts';
+import { defaultTokenSources } from '../default-token-sources.ts';
 import { importFigmaTokens } from './figma-token-source.ts';
 
 const FORMAT_SCHEMA = 'https://www.designtokens.org/schemas/2025.10/format.json';

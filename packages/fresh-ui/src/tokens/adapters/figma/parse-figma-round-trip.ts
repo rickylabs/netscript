@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import type { DesignToken, TokenDocument } from '../domain/token-contract.ts';
+import type { DesignToken, TokenDocument } from '../../domain/token-contract.ts';
 import {
   dtcgType,
   FIGMA_DTCG_SCHEMA,
   figmaModeFile,
   type FigmaTokenBundle,
   figmaVariableResolver,
-} from '../domain/figma-token-bundle.ts';
+} from '../../domain/figma/figma-token-bundle.ts';
 
 const metadata = z.object({
   name: z.string().min(1),

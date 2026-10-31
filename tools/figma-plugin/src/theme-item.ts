@@ -2,7 +2,7 @@ import { registryJson } from '../../../packages/fresh-ui/src/registry/assets/reg
 import { FRESH_UI_REGISTRY_CONTENT } from '../../../packages/fresh-ui/registry.generated.ts';
 import type { RegistryItem } from '../../../packages/fresh-ui/src/registry/registry-contract.ts';
 import { TOKEN_PRESETS } from '../../../packages/fresh-ui/src/tokens/domain/token-presets.ts';
-import { exportFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma-round-trip.ts';
+import { exportFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 import type { FigmaCollection } from '../../../packages/fresh-ui/src/tokens/domain/token-contract.ts';
 
 /** Build a portable source theme; the CLI compiles it through the existing token engine. */

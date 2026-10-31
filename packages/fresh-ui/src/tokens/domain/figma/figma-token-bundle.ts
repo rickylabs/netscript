@@ -1,5 +1,5 @@
-import type { FigmaVariable, TokenResolver } from './token-contract.ts';
-import type { TokenSources } from './resolve-tokens.ts';
+import type { FigmaVariable, TokenResolver } from '../token-contract.ts';
+import type { TokenSources } from '../resolve-tokens.ts';
 
 /** Official format URI shared by variable documents and their parser. */
 export const FIGMA_DTCG_SCHEMA = 'https://www.designtokens.org/schemas/2025.10/format.json';

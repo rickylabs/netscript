@@ -9,7 +9,7 @@ import { collections } from '../../../packages/fresh-ui/src/tokens/assets/figma.
 import {
   exportFigmaTokenBundle,
   importFigmaTokenBundle,
-} from '../../../packages/fresh-ui/src/tokens/adapters/figma-round-trip.ts';
+} from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 import { validateRegistryItem } from '../../../packages/fresh-ui/registry-v2.ts';
 import { importSnapshot } from '../src/import-snapshot.ts';
 import { exportSnapshot } from '../src/snapshot.ts';

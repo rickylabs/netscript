@@ -1,8 +1,8 @@
 import Color from 'npm:colorjs.io@0.5.2';
 import { z } from 'zod';
-import type { FigmaCollection, TokenDocument } from '../domain/token-contract.ts';
-import { validateFigmaSnapshot } from '../domain/figma-snapshot.ts';
-import { assertFigmaAliasCycles } from '../domain/figma-alias-cycles.ts';
+import type { FigmaCollection, TokenDocument } from '../../domain/token-contract.ts';
+import { validateFigmaSnapshot } from '../../domain/figma/figma-snapshot.ts';
+import { assertFigmaAliasCycles } from '../../domain/figma/figma-alias-cycles.ts';
 import { assertFigmaTokenNames } from './figma-token-names.ts';
 import { parseFigmaTokenBundle } from './parse-figma-round-trip.ts';
 
@@ -12,7 +12,7 @@ import {
   figmaModeFile,
   type FigmaTokenBundle,
   figmaVariableResolver,
-} from '../domain/figma-token-bundle.ts';
+} from '../../domain/figma/figma-token-bundle.ts';
 /** Convert a complete variable snapshot to DTCG 2025.10, retaining oklch in extensions. */
 export function exportFigmaTokenBundle(input: readonly FigmaCollection[]): FigmaTokenBundle {
   const collections = validateFigmaSnapshot(input);

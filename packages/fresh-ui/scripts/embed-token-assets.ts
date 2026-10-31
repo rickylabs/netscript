@@ -163,7 +163,7 @@ await emit(
 );
 await emit(
   assets + 'legacy.generated.ts',
-  "import type { LegacyTokenSource } from '../adapters/figma-token-source.ts';",
+  "import type { LegacyTokenSource } from '../adapters/figma/figma-token-source.ts';",
   [
     {
       name: 'legacy',

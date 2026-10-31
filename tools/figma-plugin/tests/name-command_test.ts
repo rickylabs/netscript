@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { collections } from '../../../packages/fresh-ui/src/tokens/assets/figma.generated.ts';
-import { exportFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma-round-trip.ts';
+import { exportFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 
 Deno.test('CI name command checks actual exported files and rejects unknown WEB names with origin', async () => {
   const file = await Deno.makeTempFile({ suffix: '.json' });

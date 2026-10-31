@@ -47,3 +47,11 @@ acceptance all pass. Reconcile: no labels; issue milestone0.0.9 mirrored to PR.
 S6 will document context selection on imported sources, remove empty retired
 portable theme lock entries, reuse the app-directory constant, regenerate
 carriers, run remaining gates and obtain final IMPL-EVAL.
+
+Final fitness: Figma helpers moved into adapters/figma and domain/figma;
+figma:ci and source freshness pass. Exact-baseline JSR audit confirms only the
+existing JSON module-tag failure remains, no new folder warning. Await S6a
+review, then group CLI URL helpers, finish carriers and final gates. Docker
+daemon unavailable; canonical runtime suite exited1 in preflight, UNPROVEN.
+
+S6a terminal PASS: independent organization review plus fixture/source, plugin and matching-baseline fitness evidence. Next bounded CLI organization slice.

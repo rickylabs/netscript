@@ -3,8 +3,8 @@ import { collections } from '../../../packages/fresh-ui/src/tokens/assets/figma.
 import {
   exportFigmaTokenBundle,
   importFigmaTokenBundle,
-} from '../../../packages/fresh-ui/src/tokens/adapters/figma-round-trip.ts';
-import { assertFigmaTokenNames } from '../../../packages/fresh-ui/src/tokens/adapters/figma-token-names.ts';
+} from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
+import { assertFigmaTokenNames } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-token-names.ts';
 import { resolveTokenSources } from '../../../packages/fresh-ui/src/tokens/domain/resolve-tokens.ts';
 import { Ajv } from 'npm:ajv@8.20.0';
 import {

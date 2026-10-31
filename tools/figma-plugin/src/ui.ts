@@ -1,7 +1,7 @@
 import { z } from 'npm:zod@^4.6.5';
 import { TOKEN_PRESETS } from '../../../packages/fresh-ui/src/tokens/domain/token-presets.ts';
-import { importFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma-round-trip.ts';
-import { validateFigmaSnapshot } from '../../../packages/fresh-ui/src/tokens/domain/figma-snapshot.ts';
+import { importFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
+import { validateFigmaSnapshot } from '../../../packages/fresh-ui/src/tokens/domain/figma/figma-snapshot.ts';
 import { snapshotFiles } from './snapshot.ts';
 import { themeItem } from './theme-item.ts';
 import { pushThemePullRequest } from './github-export.ts';

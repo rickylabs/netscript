@@ -84,7 +84,7 @@ for authenticated registry references. Export itself uses download or the explic
 Start here, then follow these boundaries:
 
 - `src/snapshot.ts` owns exact snapshot serialization and the narrow Plugin API port.
-- Fresh UI's `figma-round-trip.ts` and `domain/figma-token-bundle.ts` own DTCG transport.
+- Fresh UI's `figma-round-trip.ts` and `domain/figma/figma-token-bundle.ts` own DTCG transport.
 - Fresh UI's `figma-token-names.ts` owns the independent name check. Its synchronous generated
   inventory is produced by `packages/fresh-ui/scripts/embed-token-assets.ts` for sandbox support.
 - `src/import-snapshot.ts` owns two-pass native import and preflight.
@@ -134,3 +134,9 @@ jobs:
 Pin the NetScript checkout to your plugin's release commit when retaining an older
 code vocabulary. The plugin refuses unknown names before push, this CI command
 uses that same checker, and the CLI checks again before installation.
+
+After installing a URL theme, selecting a built-in preset code changes the context within the
+app's installed sources. It retains `sourceRoot` and the Figma-owned values; it does not reset
+those sources to the bundled catalog. `init --dry-run --preset` previews the scaffold and skips
+remote fetch/application. With a real init, preset application follows scaffold creation; if a
+URL fails, repair it and use `ui:apply --preset` on the generated app to finish configuration.

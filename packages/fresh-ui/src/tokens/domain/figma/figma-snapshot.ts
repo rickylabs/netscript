@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { FigmaCollection } from './token-contract.ts';
+import type { FigmaCollection } from '../token-contract.ts';
 
 const variable = z.object({
   name: z.string().min(1),

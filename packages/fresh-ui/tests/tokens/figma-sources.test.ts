@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { figmaTokenSources } from '../../src/tokens/adapters/figma-token-sources.ts';
+import { figmaTokenSources } from '../../src/tokens/adapters/figma/figma-token-sources.ts';
 import { figmaCollections } from '../../src/tokens/adapters/figma-collections.ts';
 import { defaultTokenSources } from '../../src/tokens/adapters/default-token-sources.ts';
 import { TOKEN_PRESETS } from '../../src/tokens/domain/token-presets.ts';

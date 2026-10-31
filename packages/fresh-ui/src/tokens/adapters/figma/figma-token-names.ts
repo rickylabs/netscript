@@ -2,8 +2,8 @@ import {
   figmaNameInventory as inventory,
   figmaNameMigrations,
   figmaRegisteredNames,
-} from '../assets/figma-names.generated.ts';
-import type { FigmaCollection } from '../domain/token-contract.ts';
+} from '../../assets/figma-names.generated.ts';
+import type { FigmaCollection } from '../../domain/token-contract.ts';
 
 /** Enforce code-owned variable identities and WEB names before export or installation. */
 export function assertFigmaTokenNames(collections: readonly FigmaCollection[]): void {

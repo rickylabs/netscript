@@ -1,4 +1,4 @@
-import type { FigmaCollection, FigmaVariable } from './token-contract.ts';
+import type { FigmaCollection, FigmaVariable } from '../token-contract.ts';
 
 /** Reject an alias cycle in any consistent selection of active collection modes. */
 export function assertFigmaAliasCycles(collections: readonly FigmaCollection[]): void {

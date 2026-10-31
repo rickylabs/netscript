@@ -124,3 +124,13 @@ check:* tasks, regenerated prose/corpus/barrel/publish carriers, jsr audits,
 publish-size, fixture roundtrip/name negative controls, URL command acceptance,
 one-command clean scaffold + deno task check, full scaffold.runtime command
 (Docker unavailable => UNPROVEN), PLAN-EVAL and IMPL-EVAL using owner route.
+
+## Final gate-driven slice refinement
+
+S6a groups five Figma adapter files and three raw Figma domain files under
+cohesive figma/ folders, with import/reference updates and one regenerated type
+carrier (under30 files); prove with canonical source bytes, figma:ci, and audit
+showing no new cardinality finding. S6b groups URL preset operations in CLI to
+avoid deepening its existing folder counts, with focused URL/init gates. S6c
+regenerates carriers and records final gates/IMPL-EVAL. This is required fitness
+repair within the approved surfaces, not new feature scope.
