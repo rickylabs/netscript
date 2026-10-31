@@ -26,6 +26,8 @@ import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
 export interface PluginWorkspaceMutationOptions {
   /** Resolved database requirement for this installation. */
   readonly requiresDb?: boolean;
+  /** Selected non-secret plugin configuration persisted for runtime and diagnostics. */
+  readonly environment?: Readonly<Record<string, string>>;
   /** Whether the new config entry should be enabled. */
   readonly enabled?: boolean;
   /** Optional service references for the generated appsettings entry. */
@@ -369,7 +371,11 @@ export class PluginWorkspaceMutator {
       const builtEntry = buildPluginEntry(scaffoldResult, provider, options);
       if (builtEntry !== undefined) {
         raw.NetScript.Plugins ??= {};
-        entry = carryHostPortPin(builtEntry, raw.NetScript.Plugins[scaffoldResult.configKey]);
+        const previous = raw.NetScript.Plugins[scaffoldResult.configKey];
+        if (previous?.Environment || options.environment) {
+          builtEntry.Environment = { ...previous?.Environment, ...options.environment };
+        }
+        entry = carryHostPortPin(builtEntry, previous);
         raw.NetScript.Plugins[scaffoldResult.configKey] = entry;
       }
     } else {

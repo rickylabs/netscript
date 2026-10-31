@@ -14,6 +14,8 @@ const PROJECT_ROOT_WORKDIR = '.';
 interface PluginWorkspaceMutationOptions {
   /** Resolved database requirement for this installation. */
   readonly requiresDb?: boolean;
+  /** Selected non-secret plugin configuration persisted for runtime and diagnostics. */
+  readonly environment?: Readonly<Record<string, string>>;
   readonly enabled?: boolean;
   readonly serviceReferences?: readonly string[];
   readonly pluginReferences?: readonly string[];
@@ -94,6 +96,7 @@ export function buildBackgroundProcessorEntry(
     WatchMode: true,
     RequiresDb: options.requiresDb ?? provider.defaultRequiresDb,
     RequiresKv: provider.defaultRequiresKv,
+    ...(options.environment ? { Environment: { ...options.environment } } : {}),
     Permissions: [...provider.defaultPermissions],
   };
 
@@ -134,12 +137,11 @@ function buildBasePluginEntry(
   const entry: PluginEntry = {
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
-    ...(scaffoldResult.hostPort !== undefined
-      ? { HostPort: scaffoldResult.hostPort }
-      : {}),
+    ...(scaffoldResult.hostPort !== undefined ? { HostPort: scaffoldResult.hostPort } : {}),
     Entrypoint: entrypoint,
     Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,
+    ...(options.environment ? { Environment: { ...options.environment } } : {}),
     RequiresDb: options.requiresDb ?? provider.defaultRequiresDb,
     Permissions: [...provider.defaultPermissions],
   };

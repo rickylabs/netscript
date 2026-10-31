@@ -9,17 +9,16 @@ oldUrl: /how-to/add-authentication/
 
 # Add authentication
 
-This recipe installs the `auth` plugin in an existing workspace, selects a backend, runs the auth
-database migration and signs in through the generated Fresh app. You finish with a working
+This recipe installs the `auth` plugin in an existing workspace, selects a backend and signs in
+through the generated Fresh app. Only the alternative `better-auth` backend needs an auth SQL migration. You finish with a working
 OAuth/OIDC sign-in on the default `kv-oauth` backend.
 
 ## Prerequisites
 
-- **A workspace with a database.** The `auth` plugin sets `requiresDb: true` and
-  `requiresKv: true`, so the Aspire graph needs a database and KV (Redis). Postgres is the
-  recommended engine; `mysql`, `mssql` and `sqlite` also work, selected at scaffold time with
-  `netscript init --db <engine>`. Postgres, MySQL and SQL Server run as Aspire container resources;
-  SQLite is file-backed. If you have no workspace yet, scaffold one with the tutorials first.
+- **A NetScript workspace with KV.** The default `kv-oauth` backend needs KV for sessions and no
+  SQL database. Only `better-auth` requires SQL and contributes Prisma tables; installation can
+  provision its database if needed. Postgres is recommended for that backend; `mysql`, `mssql`
+  and `sqlite` also work. If you have no workspace yet, scaffold one with the tutorials first.
 - **The `netscript` CLI on your `PATH`.** Install it with
   `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}` and
   confirm with `netscript --help`.
@@ -32,7 +31,7 @@ Run every command from the workspace root.
 > [!IMPORTANT]
 > Configure and export the provider environment (Step 3) before you start Aspire (Step 4), and
 > start Aspire before any `netscript db` command or auth request. The `auth-api` service and its
-> database and KV dependencies are resources in the Aspire graph; see
+> backend-selected database and KV dependencies are resources in the Aspire graph; see
 > [the Aspire explanation](/explanation/aspire/).
 
 ## Step 1 — Add the `auth` plugin
@@ -46,7 +45,8 @@ netscript plugin install @netscript/plugin-auth
 
 This installs the `@netscript/plugin-auth` dependency, emits the user-owned `auth/mod.ts` glue
 barrel and registers it. The plugin composes one active backend behind the `auth-api` oRPC service
-and contributes the `auth.prisma` schema, the service entry and the `/api/v1/auth/*` routes. The
+and contributes the service entry and the `/api/v1/auth/*` routes. Only the `better-auth` backend
+contributes the `auth.prisma` schema; the default `kv-oauth` backend needs no SQL database. The
 installer pins exact alpha specifiers such as `jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}`,
 so the workspace gets matching dependencies, generated glue, registry entries and Aspire resources
 together.
@@ -171,15 +171,15 @@ code: "export NETSCRIPT_AUTH_BACKEND=workos\nexport NETSCRIPT_AUTH_COOKIE_NAME=_
 {
 label: "better-auth (non-interactive)",
 lang: "sh",
-code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at-least-32-characters-of-entropy\nexport DB_PROVIDER=postgres\n\n# Persists users/sessions/accounts via auth.prisma (Step 3).\n# signin/callback return AUTH_PROVIDER_ERROR — validate-only.\n# Aspire injects PORT; do not set a fixed listener port."
+code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at-least-32-characters-of-entropy\nexport DB_PROVIDER=postgres\n\n# Persists users/sessions/accounts via auth.prisma (Step 4).\n# signin/callback return AUTH_PROVIDER_ERROR — validate-only.\n# Aspire injects PORT; do not set a fixed listener port."
 }
 ] }) }}
 
-## Step 4 — Start Aspire and run the auth database migration
+## Step 4 — Start Aspire (migrate auth tables only for better-auth)
 
-The plugin's package-provided **`auth.prisma`** schema is aggregated into your project's database
-schema at `db generate`. Its models persist through Prisma, so they follow whichever engine you
-scaffolded with `--db`. It defines four better-auth-shaped models:
+When `better-auth` is selected, the plugin's package-provided **`auth.prisma`** schema is copied
+into your project's database schema during installation. Its models persist through Prisma, so
+they follow whichever engine you scaffolded with `--db`. That backend defines four models:
 
 {{ comp.apiTable({
 caption: "auth.prisma models → your database tables",
@@ -191,9 +191,12 @@ rows: [
 ]
 }) }}
 
-Every install provisions these tables so the schema stays consistent, but only `better-auth` reads
-and writes them. `kv-oauth` stores sessions in Deno KV, and WorkOS verifies sealed cookies and keeps
-revocation fences, outbox jobs and per-session tombstones in host KV.
+Only a `better-auth` install provisions these tables. This recipe uses `kv-oauth`, which stores
+sessions in Deno KV and contributes no Prisma schema or database requirement. WorkOS also
+contributes no SQL schema; it verifies sealed cookies and keeps revocation fences, outbox jobs
+and per-session tombstones in host KV. When switching an installed backend to `better-auth`,
+select it first and reinstall with `netscript plugin install auth --name auth --force` so its
+schema and database wiring are added. Existing tables are preserved when switching away.
 
 With the Step 3 environment exported, start Aspire from the workspace root:
 
@@ -202,14 +205,17 @@ With the Step 3 environment exported, start Aspire from the workspace root:
 ```
 
 If an AppHost is already running, stop it first with `(cd aspire && aspire stop)` so its replacement
-inherits the exported values. The dashboard is at the URL Aspire prints. With Aspire running,
-generate and apply the migration as for any plugin schema:
+inherits the exported values. The dashboard is at the URL Aspire prints. Skip the auth migration
+for `kv-oauth` and `workos`. If you selected and reinstalled `better-auth`, generate and apply its
+migration with Aspire running:
 
 ```sh
-netscript db init --name init    # first time only — create the migration
-netscript db generate            # generate Prisma client + Zod schemas from the aggregated schema
-netscript db seed                # optional seed data
-netscript db status              # confirm the migration is applied
+if [ "${NETSCRIPT_AUTH_BACKEND:-kv-oauth}" = better-auth ]; then
+  netscript db init --name init    # first time only — create the migration
+  netscript db generate            # generate Prisma client + Zod schemas
+  netscript db seed                # optional seed data
+  netscript db status              # confirm the migration is applied
+fi
 ```
 
 [Run a database migration](/data-persistence/how-to/database-migration/) covers the full database
@@ -547,4 +553,4 @@ callbacks and refreshed cookies into your own routes for each backend.
 - {{ comp.xref({ key: "explain:auth-model", text: "The authentication model" }) }}: why the backend
   is an adapter behind `AuthBackendPort`.
 - [Run a database migration](/data-persistence/how-to/database-migration/): the full `db` workflow
-  that applies `auth.prisma`.
+  that applies `auth.prisma` for the `better-auth` backend.

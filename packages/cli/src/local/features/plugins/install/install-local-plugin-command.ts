@@ -74,7 +74,11 @@ export function createLocalPluginInstallCommand(
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,
-      }, dependencies.installPluginDependencies);
+      }, {
+        ...dependencies.installPluginDependencies,
+        readEnvironment: dependencies.installPluginDependencies.readEnvironment ??
+          ((key) => Deno.env.get(key)),
+      });
 
       print(
         `Installed ${result.plugin.kind} plugin "${result.plugin.configKey}" on port ${result.plugin.servicePort}.`,

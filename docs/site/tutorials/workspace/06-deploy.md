@@ -82,7 +82,7 @@ it brings up:
   rows: [
     { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "The Aspire dashboard — live resource list, console logs, structured logs, and traces. The generated local profile allows anonymous dashboard access." },
     { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint; framework spans (job dispatch/execution, scheduler runs) land here automatically." },
-    { name: "postgres", type: "Container", desc: "The primary datasource — the auth.prisma migration from chapter 2 lives here." },
+    { name: "postgres", type: "Container", desc: "The primary datasource from chapter 1. Chapter 2 uses kv-oauth sessions in KV and adds no auth SQL tables." },
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
     { name: "workspace (service)", type: "allocated endpoint", desc: "Your guarded oRPC service from chapter 5 — /api/workspace/{workspace}/members requires a scoped principal, /health stays public." },

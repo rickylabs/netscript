@@ -12,6 +12,23 @@ const shippedManifestPaths = [
 
 const ATOMIC_SERVICE_SHAPE_ERROR = 'PLUGIN_OFFICIAL_SOURCE_SERVICE_SHAPE_INCOMPLETE';
 
+Deno.test('database requirements validate the finite selector and its default', async () => {
+  const auth = JSON.parse(
+    await Deno.readTextFile(new URL(shippedManifestPaths[1], import.meta.url)),
+  );
+  assertEquals(parsePluginManifest(auth).ok, true);
+  for (
+    const databaseRequirement of [
+      { ...auth.databaseRequirement, defaultValue: 'missing' },
+      { ...auth.databaseRequirement, environmentVariable: 'NOT A VARIABLE' },
+      { ...auth.databaseRequirement, appsettingsPaths: [[]] },
+      { ...auth.databaseRequirement, values: { 'kv-oauth': 'false' } },
+    ]
+  ) {
+    assertEquals(parsePluginManifest({ ...auth, databaseRequirement }).ok, false);
+  }
+});
+
 function serviceShapeManifest(fields: {
   readonly providerEntrypoint: boolean;
   readonly sourceEntrypoint: boolean;

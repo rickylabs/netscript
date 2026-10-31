@@ -1,0 +1,45 @@
+# Resume — auth runtime collaborator fix
+
+Current reviewed head3b219fd has all ordinary CI and full SQLite runtime PASS (113 gates,0failed,0skipped, cleanup included). PostgreSQL full runtime run41202168922 fails runtime.aspire-start: auth service main unconditionally calls ctx.db.getClient despite KV RequiresDb:false, so the host correctly provides no SQL URI and auth exits. Main15c passes the same full runtime. No flaky rerun or discovery change is justified.
+
+Repair contract: use canonical backend resolution with identical appsettings/env precedence to select SQL only for better-auth; omit service DB context otherwise. Strengthen real KV cookie-jar and WorkOS main tests with throwing SQL seams and retain a better-auth control requiring one SQL client request. Both new throwing SQL seams fail before the fix; focused15 and all99 auth service tests pass after. Structured source check/lint/fmt cover all5 changed files; quality:gate and MCP export-corpus freshness pass. Evidence is auth-bootstrap-evidence.json. Ready for normal commit/push. No local full runtime, label edits, rebase/force-push or merge.
+
+Review accounting:5 IMPL-EVAL rounds are now spent; latest exact MERGE3b219fd is historical once source changes. The coordinator has now explicitly authorized one bounded review of this new PostgreSQL CI-repair delta: see review-authorization.md and PR comment6543624351. Initial five rounds remain recorded; the next review is round6 in the same independent read-only Opus session at the new exact pushed head. This is a recorded new owner decision, not silent counter reset or general approval for further loops. Runtime acceptance remains unchecked until the corrected head's actual suite and cleanup pass.
+
+## Historical context
+
+# Resume — SQLite CI regression repair in progress
+
+Coordinator authorized round 4 at ce431da; same Opus session returned exact-head MERGE and evidence is published on PR2519. Review checkbox proven. Direct READY phase comment made the coordinator handoff visible; the coordinator armed e2e-cli-gate. Runtime run 41200678341 fails SQLite database.codegen on raw PostgreSQL-native types copied from ordinary plugin packages. Main run 41197676281 at base15c passes the same SQLite gate/full job. Latest user asks to fix and push. Do not waive runtime or reuse ce431da review at the upcoming source fix SHA.
+
+Fix contract: preserve scaffold-owned SQL selection for ordinary local packages; source-package fallback is for backend-selecting local metadata and integrity-verified JSR packages. Regression adds real local/public SQLite consumers running db:generate. Both fail before the fix and all 55 focused tests pass after. Structured check/lint/fmt cover all four changed sources, quality:gate passes. Evidence is sqlite-repair-evidence.json. Ready for normal commit/push; source acceptance at the resulting SHA remains unproven. Record the final head and arrange the required exact-head same-session delta review. No local full runtime, labels, merge/release, rebase or force-push.
+
+## Historical context
+
+# Resume — CI carrier repair; new-head acceptance required
+
+Latest user CI activity identified quality failure at b798a187636da64e90dff28d42fcac5170527854. The failed job's receipt names mcp-export-corpus freshness; preceding quality gates passed and main15c quality passed. Canonical export/publish generation fixes it. Exactly plugin root, plugin ./protocol and plugin-auth ./scaffold export rows change, plus the MCP fallback prose from the changed llms index. check:mcp-export-corpus, check:assets-barrel, check:publish-assets and whitespace checks pass. No authored implementation or gate changed. Push this asset-refresh commit normally; its new exact head supersedes the pending acceptance request at b798.
+
+Close-gate currently fails for two unproven claims: independent acceptance of the new head after rebase and required scaffold.runtime CI. Coordinator has been asked to authorize one same-session delta review (round 3's extra grant is spent) and arm e2e-cli-gate. Do not relabel old MERGE or tick unproven boxes. Keep current head concrete and stable for the coordinator. No fourth round has been launched. No local expensive E2E, labels/milestones or merge/release action.
+
+## Previous integration record
+
+# Resume — conflict resolved on latest main; new-head acceptance required
+
+Latest direct user instruction explicitly requested rebasing and force-pushing the merge-conflict repair, superseding the earlier merge-only rule. Five leaf commits rebased onto main 15cffa2; sole conflict was generated agent-docs prose carrier and it was canonically regenerated. All 20 owned framework/test TypeScript blobs match prior reviewed head 2f02788071fd4d8088b7b9e21dfa2394d04f2bc5. Current integration evidence: 27 focused tests pass, 21-file check passes, docs build/accuracy/links/carrier freshness pass. See rebase-source-equivalence.json, rebase-evidence.json and newest worklog entry. Preserve incoming main and the original historical review records.
+
+Round 3 returned MERGE for the OLD exact head and the PR was marked ready before main advanced. The rebase produces a new head; its independent exact-head attestation is UNPROVEN. No fourth review is authorized yet. Push with an explicit lease expecting old remote 2f02788071fd4d8088b7b9e21dfa2394d04f2bc5, then request coordinator authorization for one same-session delta review or independent acceptance on the concrete new head. Keep full scaffold.runtime unproven until coordinator arms e2e-cli-gate and CI proves it. No label/milestone edits, local runtime resources, merge/tag/release.
+
+## Historical pre-integration record
+
+# Resume — documentation repaired; final review authorized
+
+Issue 2149, B2, coordinator 2474/mc009e. Branch orch/divybot-6542487846, draft PR 2519. Main baseline 851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2. S1 committed/pushed at 02ba3bafc13aae2cdafc07b4d9fb9aa9a77724b2 after PLAN-EVAL and independent slice-review PASS. S2 is preserved in the next commit for review, without sign-off.
+
+Implemented: optional validated plugin-owned database selector resolved before provisioning; kv-oauth/workos no SQL schema or default DB requirement; better-auth four tables retained; selected backend persisted; local composing-package export aliases so actual generate/doctor work. Tests pass: 81 install regressions, 14 final selector/local/real consumer tests, 19 auth recipe/command tests. Structured source check/lint/fmt covers 21 files; quality:gate, docs accuracy/links/build/carrier freshness and changed protocol/scaffold doc-lint pass. CLI/auth JSR audits and all publish dry-runs pass. Core JSR audit has three unchanged module-doc omissions; whole-package doc-lint retains unrelated private-type-ref findings.
+
+Independent IMPL-EVAL rounds 1 and 2 returned FAIL_FIX. Both full verdicts remain in evaluate-round-1.md and evaluate.md. A continued goal turn completed the two round-2 text corrections: chapter 3's stale primary-db-migrated precheck is removed and chapter 1 says database commands begin in chapter 3. Canonical generation changed exactly those two carrier rows. Docs accuracy/links/build/freshness and git whitespace checks pass. No framework code changed in the continuation.
+
+The coordinator has now explicitly authorized exactly one more IMPL-EVAL round (round 3) in the same separate read-only Opus session at the exact new pushed head, lifting the consecutive-failure stop for this round only. Source and verbatim decision are in review-authorization.md; both earlier FAIL_FIX verdicts remain unchanged. No new source fixes are required. Push the authorization/run-state commit, run round 3 at its exact head, then mark PR 2519 ready if MERGE and inspect required CI. Full scaffold.runtime remains coordinator-owned and must be requested in READY. Exact-head final attestation is published on the PR without changing the reviewed commit.
+
+Shape debt CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE records existing install-module/directory growth, with owner/target/closing gate. No local runtime resources started. No labels/milestones, lock/cache deletion, merge/tag/release. Full scaffold.runtime remains UNPROVEN and coordinator must arm e2e-cli-gate. The earlier BLOCKED report is historical. Replace the excluded atomic report handoff with READY only after the authorized review passes; report any unproven CI gate honestly. Publication acceptance is not attested merely by writing the file.

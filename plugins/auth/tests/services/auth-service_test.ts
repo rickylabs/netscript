@@ -45,6 +45,30 @@ import {
   syntheticProviderFetch,
 } from '../testing/auth-fixtures.ts';
 import { principalForSession } from '../testing/auth-service-fixture.ts';
+import createAuthService from '../../services/src/main.ts';
+
+Deno.test('better-auth service bootstrap still requests the host SQL client', async () => {
+  await using kv = new MemoryKvAdapter();
+  let calls = 0;
+  await assertRejects(
+    () =>
+      createAuthService({
+        env: { PORT: '0', NETSCRIPT_AUTH_BACKEND: 'better-auth' },
+        kv,
+        db: {
+          getClient: () => {
+            calls++;
+            throw new Error('SQL client required by better-auth.');
+          },
+        },
+        contracts: {},
+        logger: {},
+      }),
+    Error,
+    'SQL client required by better-auth.',
+  );
+  assertEquals(calls, 1);
+});
 
 Deno.test('kv-oauth handlers complete signin callback session me signout round-trip', async () => {
   const registry = await createInMemoryKvOAuthRegistry({

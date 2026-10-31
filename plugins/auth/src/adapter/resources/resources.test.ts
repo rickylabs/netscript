@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
-import { authAdapterPlugin } from '../plugin.ts';
+import { authAdapterPlugin, createAuthAdapterPlugin } from '../plugin.ts';
 import { authBarrelScaffolder, DEFAULT_AUTH_BARREL_INPUT } from './mod.ts';
 import { authBarrelStub } from './barrel/barrel.stub.ts';
 
@@ -70,8 +70,14 @@ Deno.test('auth SDK starter is explicit, typed, and contains no credential mater
   assertEquals(text.includes('document.cookie'), false);
 });
 
-Deno.test('auth install records the Prisma contract without emitting database files', () => {
-  assertEquals(authAdapterPlugin.install.prismaContract, 'database/auth.prisma');
+Deno.test('auth install contributes a Prisma contract only for better-auth', () => {
+  assertEquals(authAdapterPlugin.install.prismaContract, undefined);
+  assertEquals(createAuthAdapterPlugin('kv-oauth').install.prismaContract, undefined);
+  assertEquals(createAuthAdapterPlugin('workos').install.prismaContract, undefined);
+  assertEquals(
+    createAuthAdapterPlugin('better-auth').install.prismaContract,
+    'database/auth.prisma',
+  );
   assertEquals(
     collectInstallArtifacts(authAdapterPlugin).some((artifact) =>
       artifact.path.includes('.prisma')

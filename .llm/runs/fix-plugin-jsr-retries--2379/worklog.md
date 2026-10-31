@@ -41,3 +41,7 @@ Reconcile: baseline e4875a5, current branch from main, no deno.lock changes. No 
 Independent source review PASS, no blockers. Both real composition paths confirmed; evaluator correctly leaves runtime CI unproven. Applied optional json() contract improvement: cached asynchronous parse promise outside retry, then rerun affected focused/scoped gates.
 
 Final json() refinement: focused47 with network denied, scoped5-file check/lint/fmt all pass. evidence.json hashes updated. Ready to push source-reviewed slice; required runtime proof remains explicitly unproven.
+
+## Main integration and runtime execution
+
+Core CI at d22b983 passed all source/test/build/quality jobs; close-gate remained red for the unproven runtime/final-review claim. The current canonical E2E workflow supports manual branch dispatch with per-PR/ref groups and isolated GitHub-hosted VMs. Dispatched run41207893689 without labels/local resources. Main then advanced with auth backend prerequisite #2519 at a9620a3; merged that exact main normally, preserving all five JSR source hashes. The manual runtime run is superseded by validation of the integrated head. No rebase or force push. This corrects the plan's overly narrow assumption that label arming was the only authorized execution path. No coordinator-owned labels/milestones or release actions changed.

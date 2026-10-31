@@ -37,6 +37,15 @@ export const authStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: authSdkClientScaffolder, input: DEFAULT_AUTH_SDK_CLIENT_INPUT },
 ];
 
+/** Backend selector shared with the auth service's environment seam. */
+export const AUTH_BACKEND_ENV = 'NETSCRIPT_AUTH_BACKEND';
+/** Auth's default storage stays entirely in KV. */
+export const DEFAULT_AUTH_BACKEND = 'kv-oauth';
+/** The one backend whose provider data is stored in SQL. */
+export const AUTH_DATABASE_BACKEND = 'better-auth';
+/** Package-relative schema contributed by the SQL backend. */
+export const AUTH_PRISMA_CONTRACT = 'database/auth.prisma';
+
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */
 export const authAdapterPlugin: NetScriptPlugin = {
   name: '@netscript/plugin-auth',
@@ -45,8 +54,7 @@ export const authAdapterPlugin: NetScriptPlugin = {
   install: {
     dependencySpecifier: `jsr:@netscript/plugin-auth@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: authStarterResources,
-    configParams: ['NETSCRIPT_AUTH_BACKEND'],
-    prismaContract: 'database/auth.prisma',
+    configParams: [AUTH_BACKEND_ENV],
     wiringEntry: '@netscript/plugin-auth/services',
   },
   doctor: {
@@ -71,3 +79,14 @@ export const authAdapterPlugin: NetScriptPlugin = {
   },
   resources: [],
 };
+
+/** Select install contributions for the active backend without reading ambient configuration. */
+export function createAuthAdapterPlugin(backend: string = DEFAULT_AUTH_BACKEND): NetScriptPlugin {
+  return {
+    ...authAdapterPlugin,
+    install: {
+      ...authAdapterPlugin.install,
+      ...(backend === AUTH_DATABASE_BACKEND ? { prismaContract: AUTH_PRISMA_CONTRACT } : {}),
+    },
+  };
+}
