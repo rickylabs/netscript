@@ -72,6 +72,10 @@ export function createUiRemoveCommand(deps: {
           throw new Error('Page path, --dry-run and --client are supported only for page removal.');
         }
         const removed = await removeUiRegistry(root, kind, deps.installDependencies);
+        if (!removed.length) {
+          print(`Nothing to remove for registry item '${kind}'.`);
+          return;
+        }
         print(`Removed ${removed.length} files and pruned deno.json imports.`);
       },
     );

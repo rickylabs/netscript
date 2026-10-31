@@ -67,6 +67,11 @@ export function planUiCopies(
   items: readonly UiResolvedItem[],
   config: UiConfig,
 ): readonly UiCopyFile[] {
+  // Match nested upstream aliases before their parents, regardless of config schema order.
+  const aliases = Object.entries(config.aliases).flatMap(([alias, directory]) =>
+    [`@${alias}/`, `@/${alias === 'ui' ? 'components/ui' : alias}/`]
+      .map((prefix) => ({ prefix, directory }))
+  ).sort((a, b) => b.prefix.length - a.prefix.length);
   const scopes = new Map<string, Map<string, string>>();
   for (const entry of items) {
     const key = sourceScope(entry);
@@ -99,22 +104,18 @@ export function planUiCopies(
         content = content.replace(
           /(\b(?:from|import)\s*(?:\(\s*)?['"])([^'"]+)(['"])/g,
           (_match, open: string, specifier: string, close: string) => {
-            let next = specifier;
-            for (const [alias, directory] of Object.entries(config.aliases)) {
-              const prefixes = [`@${alias}/`, `@/${alias === 'ui' ? 'components/ui' : alias}/`];
-              const prefix = prefixes.find((value) => specifier.startsWith(value));
-              if (!prefix) continue;
-              let mapped = resolve(root, directory, specifier.slice(prefix.length));
-              if (!allTargets.has(mapped)) {
-                mapped =
-                  ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx'].map((extension) =>
-                    mapped + extension
-                  ).find((candidate) => allTargets.has(candidate)) ?? mapped;
-              }
-              next = relative(dirname(resolve(root, target)), mapped).replaceAll('\\', '/');
-              if (!next.startsWith('.')) next = `./${next}`;
-              break;
+            const alias = aliases.find(({ prefix }) => specifier.startsWith(prefix));
+            if (!alias) return open + specifier + close;
+            let mapped = resolve(root, alias.directory, specifier.slice(alias.prefix.length));
+            if (!allTargets.has(mapped)) {
+              mapped = ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx'].map((extension) =>
+                mapped + extension
+              ).find((candidate) =>
+                allTargets.has(candidate)
+              ) ?? mapped;
             }
+            let next = relative(dirname(resolve(root, target)), mapped).replaceAll('\\', '/');
+            if (!next.startsWith('.')) next = `./${next}`;
             return open + next + close;
           },
         );

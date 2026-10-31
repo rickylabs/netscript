@@ -1,4 +1,5 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { dirname, resolve } from '@std/path';
 import type { Registry } from '@netscript/fresh-ui/registry-v2';
 import { MemoryFileSystemAdapter } from '../../../../adapters/scaffold/memory-fs.ts';
 import { UiConfigSchema } from '../../../../domain/ui/ui-config.ts';
@@ -102,3 +103,64 @@ Deno.test('builtin installs retain compiled dark mode without redundant registry
   assertEquals(styles.includes("@import './registry/"), false);
   assertStringIncludes(await fs.readFile('/app/assets/tokens.css'), "[data-theme='dark']");
 });
+
+for (const ui of ['client/widgets', 'components/ui']) {
+  Deno.test(`copy imports prefer the most specific alias with ui=${ui}`, async () => {
+    const fs = new MemoryFileSystemAdapter();
+    const config = UiConfigSchema.parse({
+      aliases: ui === 'components/ui' ? {} : { components: 'client/components', ui },
+    });
+    const registry: Registry = {
+      items: [{
+        name: 'consumer',
+        type: 'registry:component',
+        registryDependencies: ['x', 'shell'],
+        files: [{
+          path: 'consumer.ts',
+          type: 'registry:component',
+          target: '@components/consumer.ts',
+          content: [
+            "import { x } from '@/components/ui/x';",
+            "export { x } from '@/components/ui/x.ts';",
+            "export const load = () => import('@/components/ui/x');",
+            "export { shell } from '@/components/shell';",
+            "export { x as short } from '@ui/x';",
+            "export { other } from '@/components/uikit/other';",
+            '',
+          ].join('\n'),
+        }],
+      }, {
+        name: 'x',
+        type: 'registry:ui',
+        files: [{
+          path: 'x.ts',
+          type: 'registry:ui',
+          target: '@ui/x.ts',
+          content: 'export const x = 1;\n',
+        }],
+      }, {
+        name: 'shell',
+        type: 'registry:component',
+        files: [{
+          path: 'shell.ts',
+          type: 'registry:component',
+          target: '@components/shell.ts',
+          content: 'export const shell = 1;\n',
+        }],
+      }],
+    };
+    await installUiRegistry({ root: '/app', names: ['consumer'], config }, {
+      fs,
+      builtin: () => Promise.resolve({ registry, content: {} }),
+    });
+    const consumer = resolve('/app', config.aliases.components, 'consumer.ts');
+    const content = await fs.readFile(consumer);
+    const specifiers = [...content.matchAll(/(?:from|import\()\s*['"]([^'"]+)['"]/g)]
+      .map((match) => resolve(dirname(consumer), match[1]));
+    assertEquals(specifiers.slice(0, 3), Array(3).fill(resolve('/app', ui, 'x.ts')));
+    assertEquals(specifiers[3], resolve('/app', config.aliases.components, 'shell.ts'));
+    assertEquals(specifiers[4], resolve('/app', ui, 'x.ts'));
+    assertEquals(specifiers[5], resolve('/app', config.aliases.components, 'uikit/other'));
+    for (const path of specifiers.slice(0, 5)) assertEquals(await fs.exists(path), true, path);
+  });
+}

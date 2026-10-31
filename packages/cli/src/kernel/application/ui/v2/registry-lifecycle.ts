@@ -18,6 +18,11 @@ export async function updateUiRegistry(
   deps: UiRegistryDependencies,
 ): Promise<{ readonly updated: readonly string[]; readonly drifted: readonly string[] }> {
   const lock = await readUiLock(root, deps.fs);
+  for (const name of names) {
+    if (!lock || !Object.hasOwn(lock.items, name)) {
+      throw new Error(`Registry item '${name}' is not installed. Use ui:add to install it first.`);
+    }
+  }
   if (!lock) return await updateUiRegistryItems(root, names, deps.fs);
   const selected = names.length ? names : Object.keys(lock.items);
   if (!selected.length) return { updated: [], drifted: [] };
@@ -39,7 +44,7 @@ export async function removeUiRegistry(
   const previous = await readUiLock(root, deps.fs);
   if (!previous) return await removeUiRegistryItem(root, ref, deps.fs);
   const entry = previous.items[ref];
-  if (!entry) return [];
+  if (!entry) throw new Error(`Registry item '${ref}' is not installed.`);
   const dependents = Object.entries(previous.items).filter(([name, item]) =>
     name !== ref && item.registryDependencies.includes(ref)
   ).map(([name]) => name);
