@@ -180,3 +180,12 @@
 - 10:19:59Z: **merged** #2512 (`20583c83c`) for #2383 (B1); #2383 closed with evidence. Includes the root-cause fix for the Postgres-tier Garnet flake (CI prep restores the pinned Garnet tool). #2160 is unblocked.
 - 10:20:14Z: **expensive-gate.acquired** on #2511 (#2392) at `7d7cec2`. merge-tree of #2511, #2515, #2514, #2509 against main `20583c8`: clean.
 - 10:21:08Z: dispatched #2160 (B1, fixes; requires #2383 merged), comment 6542166103. Validator green before posting.
+- 10:22:08Z: **merged** #2514 (`abe9d3e43`) for #1491 (E2, docs); #1491 closed with evidence. merge-tree of #2511, #2515, #2509 against the new main: clean.
+- 10:25:51Z: #2160 started 10:25Z. Continuation: the #1491 worker claimed #2268 (internals, MCP telemetry tools) at 10:25Z; adopted. Internals has 2 gating (#2392, #2401); #2511 should merge before #2268 opens a PR. If not, record a lane-cap drift. Watch for source-closed teardown (#1491 closed 10:21Z).
+- 10:29:17Z: #2160 → PR #2517.
+- 10:37:17Z: **merged** #2511 (`aec75e4d9`) for #2392 (E1); #2392 auto-closed, evidence posted. #2421 (#2396 r3) Opus MERGE at `32264fc` via the literal-union source path; waiting for READY.
+- 10:37:19Z: **expensive-gate.acquired** on #2515 (#2401) at `42aa062` (merge-tree with main clean).
+- 10:37:49Z: #2421 required CI green at `32264fc` (e2e skipped, not labelled). It gets the e2e gate right after #2515 once READY is posted.
+- 10:53:21Z: **merged** #2515 (`0af1d65b2`) for #2401 (E1); #2401 closed with evidence. **expensive-gate.acquired** on #2421 (#2396) at `32264fc` before its READY (canary .1 critical path; merge still waits for READY).
+- 10:55:04Z: **merged** #2509 (`da3d08f3d`) for #2162 (B2); #2162 closed with evidence. Note: per the worker, an intermediate PR commit carried generated local paths (no credentials). The final tree is clean (privacy scan of the full diff). History is not rewritten (no-force-push rule). Continuation claims #1367 and #2268 are orphaned: both claimant workspaces are gone and no PRs exist; re-dispatching.
+- 10:56:19Z: dispatched #2149 (B2, fixes), comment 6542487846. Validator green (after refreshing the reporting heartbeat).
