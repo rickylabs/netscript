@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "{\"row\":\"empty\",\"nativeError\":{\"name\":\"Error\",\"message\":\"STREAMS_DATA_DIR must name an existing directory.\"}}\n{\"observations\":{\"row\":\"empty\",\"mode\":\"file\",\"nativeError\":{\"name\":\"Error\",\"message\":\"STREAMS_DATA_DIR must name an existing directory.\"}},\"reboundPorts\":[50251,50252]}\ns6f-streams: storage assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n",
+  "pid": 89496,
+  "startedAt": "2026-10-28T05:23:33.691Z",
+  "finishedAt": "2026-10-28T05:23:35.004Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

@@ -1,0 +1,63 @@
+{
+  "workers": {
+    "count": 23,
+    "symbols": [
+      "AuthenticatorPort",
+      "AuthnOptions",
+      "AuthnRequest",
+      "AuthnResult",
+      "AuthorizerPort",
+      "AuthzDecision",
+      "AuthzOptions",
+      "AuthzRequest",
+      "CorsOptions",
+      "PluginServiceContext",
+      "Principal",
+      "ProcedureErrorCode",
+      "RunningService",
+      "RunningServiceAddress",
+      "ServeOptions",
+      "ServiceApp",
+      "ServiceAuthPolicy",
+      "ServiceEnvironment",
+      "ServiceGuardedAuthPolicy",
+      "ServicePublicAuthPolicy",
+      "ServiceTlsOptions",
+      "WorkersServiceOptions",
+      "startWorkersService"
+    ],
+    "runtimeSymbols": [
+      "startWorkersService"
+    ]
+  },
+  "streams": {
+    "count": 22,
+    "symbols": [
+      "AuthenticatorPort",
+      "AuthnOptions",
+      "AuthnRequest",
+      "AuthnResult",
+      "AuthorizerPort",
+      "AuthzDecision",
+      "AuthzOptions",
+      "AuthzRequest",
+      "CorsOptions",
+      "Principal",
+      "ProcedureErrorCode",
+      "RunningService",
+      "RunningServiceAddress",
+      "ServeOptions",
+      "ServiceApp",
+      "ServiceAuthPolicy",
+      "ServiceEnvironment",
+      "ServiceGuardedAuthPolicy",
+      "ServicePublicAuthPolicy",
+      "ServiceTlsOptions",
+      "StreamsServiceOptions",
+      "startStreamsService"
+    ],
+    "runtimeSymbols": [
+      "startStreamsService"
+    ]
+  }
+}

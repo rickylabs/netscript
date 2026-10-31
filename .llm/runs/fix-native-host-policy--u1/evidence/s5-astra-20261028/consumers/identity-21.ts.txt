@@ -1,0 +1,32 @@
+import type * as Public from '@netscript/plugin-streams/service';
+import type * as Native from '@netscript/service';
+import type * as Auth from '@netscript/service/auth';
+import type * as Implementation from './service.ts';
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+type Check<T extends true> = T;
+export type IdentityChecks = [
+  Check<Equal<Public.CorsOptions, Native.CorsOptions>>,
+  Check<Equal<Public.RunningService, Native.RunningService>>,
+  Check<Equal<Public.RunningServiceAddress, Native.RunningServiceAddress>>,
+  Check<Equal<Public.ServeOptions, Native.ServeOptions>>,
+  Check<Equal<Public.ServiceApp, Native.ServiceApp>>,
+  Check<Equal<Public.ServiceEnvironment, Native.ServiceEnvironment>>,
+  Check<Equal<Public.ServiceTlsOptions, Native.ServiceTlsOptions>>,
+  Check<Equal<Public.AuthenticatorPort, Auth.AuthenticatorPort>>,
+  Check<Equal<Public.AuthnOptions, Auth.AuthnOptions>>,
+  Check<Equal<Public.AuthnRequest, Auth.AuthnRequest>>,
+  Check<Equal<Public.AuthnResult, Auth.AuthnResult>>,
+  Check<Equal<Public.AuthorizerPort, Auth.AuthorizerPort>>,
+  Check<Equal<Public.AuthzDecision, Auth.AuthzDecision>>,
+  Check<Equal<Public.AuthzOptions, Auth.AuthzOptions>>,
+  Check<Equal<Public.AuthzRequest, Auth.AuthzRequest>>,
+  Check<Equal<Public.Principal, Auth.Principal>>,
+  Check<Equal<Public.ServiceAuthPolicy, Auth.ServiceAuthPolicy>>,
+  Check<Equal<Public.ServiceGuardedAuthPolicy, Auth.ServiceGuardedAuthPolicy>>,
+  Check<Equal<Public.ServicePublicAuthPolicy, Auth.ServicePublicAuthPolicy>>,
+  Check<Equal<Public.StreamsServiceOptions, Implementation.StreamsServiceOptions>>,
+  Check<Equal<typeof Public.startStreamsService, typeof Implementation.startStreamsService>>
+];
+export function compose(auth: Auth.ServiceAuthPolicy, serve: Native.ServeOptions, cors: Native.CorsOptions): Public.StreamsServiceOptions {
+  return { auth, serve, cors };
+}

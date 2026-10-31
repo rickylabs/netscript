@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "05:23:32.056 INF netscript·services·streams Service listening\n05:23:32.068 INF netscript·services·streams HTTP request started\n05:23:32.071 INF netscript·services·streams HTTP request completed\n05:23:32.072 INF netscript·services·streams HTTP request started\n05:23:32.073 INF netscript·services·streams HTTP request completed\n05:23:32.074 INF netscript·services·streams HTTP request started\n05:23:32.075 INF netscript·services·streams HTTP request completed\n05:23:32.087 INF netscript·services·streams Service shutdown completed\n{\"observations\":{\"row\":\"writer\",\"mode\":\"memory\",\"storage\":{\"mode\":\"memory\",\"durable\":false,\"probe\":\"not-applicable\",\"message\":\"Streams storage is ephemeral; events are lost on process restart.\"},\"snapshot\":{\"status\":200,\"bytes\":[98,101,102,111,114,101,124,97,102,116,101,114],\"offset\":\"0000000000000000_0000000000000022\"},\"upstream\":{\"status\":200,\"bytes\":[98,101,102,111,114,101,124,97,102,116,101,114],\"offset\":\"0000000000000000_0000000000000022\"}},\"reboundPorts\":[61311,58921]}\ns6f-replay:{\"firstOffset\":\"0000000000000000_0000000000000012\",\"finalOffset\":\"0000000000000000_0000000000000022\",\"bytes\":[98,101,102,111,114,101,124,97,102,116,101,114]}\ns6f-streams: storage assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n",
+  "pid": 86680,
+  "startedAt": "2026-10-28T05:23:30.777Z",
+  "finishedAt": "2026-10-28T05:23:32.126Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

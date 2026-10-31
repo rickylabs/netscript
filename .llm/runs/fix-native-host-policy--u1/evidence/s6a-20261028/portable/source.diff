@@ -1,0 +1,562 @@
+diff --git a/plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts b/plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts
+new file mode 100644
+index 000000000..9baf1ffab
+--- /dev/null
++++ b/plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts
+@@ -0,0 +1,294 @@
++/**
++ * Bounded runtime children for streams factory qualification. Native addons are trusted
++ * native code; these explicit Deno grants are test authority, not process confinement. No product
++ * import or test registration occurs here. The S4 denied-all fixture remains unchanged.
++ * @module
++ */
++import { assert } from 'jsr:@std/assert@^1';
++import { DELIMITER, dirname, fromFileUrl, join } from 'jsr:@std/path@^1';
++
++const CHILD_DEADLINE_MS = 30_000;
++const SETTLE_GRACE_MS = 2_000;
++const CHILD_OUTPUT_CAP = 32 * 1024;
++
++export interface ChildRun {
++  readonly code: number;
++  readonly stdout: string;
++  readonly stderr: string;
++}
++
++interface RuntimeOptions {
++  readonly cwd: string;
++  readonly preferredPorts: readonly number[];
++  readonly denyAllocator?: boolean;
++  readonly denyFfi?: boolean;
++}
++
++interface Sandbox extends AsyncDisposable {
++  readonly scratch: string;
++  readonly addonPaths: readonly string[];
++  run(source: string, options: RuntimeOptions): Promise<ChildRun>;
++}
++
++/** Uses Deno's actual cache and upstream's pinned native resolver, never guessed cache paths. */
++export async function createRuntimeSandbox(label: string): Promise<Sandbox> {
++  if (!/^[a-z-]+$/.test(label)) throw new Error('Invalid evidence label');
++  const evidenceRoot = Deno.env.get('NETSCRIPT_S6A_EVIDENCE_DIR');
++  const evidence = evidenceRoot === undefined ? undefined : join(evidenceRoot, label);
++  if (evidence !== undefined) await Deno.mkdir(evidence, { recursive: true });
++  async function record(name: string, value: unknown): Promise<void> {
++    if (evidence !== undefined) {
++      await Deno.writeTextFile(join(evidence, name + '.json'), JSON.stringify(value, null, 2), {
++        createNew: true,
++      });
++    }
++  }
++  const cwd = fromFileUrl(new URL('../../../../', import.meta.url));
++  const info = await runChild(['info', '--json'], cwd);
++  await record('cache-info', { ...info, explicitDenoDir: Deno.env.has('DENO_DIR') });
++  assert(info.code === 0, info.stderr);
++  const cache: unknown = JSON.parse(info.stdout);
++  assert(typeof cache === 'object' && cache !== null && 'denoDir' in cache && 'npmCache' in cache);
++  assert(typeof cache.denoDir === 'string' && cache.denoDir.length > 0);
++  assert(typeof cache.npmCache === 'string' && cache.npmCache.length > 0);
++  const toolchain = dirname(Deno.execPath());
++  const scratch = await Deno.makeTempDir({ prefix: 'streams-service-runtime-' });
++  const ownedPath = await Deno.realPath(scratch);
++  const env: Record<string, string> = { DENO_DIR: cache.denoDir, NO_COLOR: '1' };
++  const profileKeys = 'HOME USERPROFILE APPDATA LOCALAPPDATA TMP TEMP TMPDIR ' +
++    'XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME';
++  for (const name of profileKeys.split(' ')) env[name] = scratch;
++  const systemRoot = Deno.build.os === 'windows' ? Deno.env.get('SystemRoot') : undefined;
++  if (systemRoot !== undefined) env.SystemRoot = systemRoot;
++  env.PATH = [toolchain, ...(systemRoot ? [join(systemRoot, 'System32'), systemRoot] : [])].join(
++    DELIMITER,
++  );
++  env.PATHEXT = '.COM;.EXE;.BAT;.CMD';
++  let sequence = 0;
++  const reads = [
++    scratch,
++    cache.npmCache,
++    toolchain,
++    ...(Deno.build.os === 'linux' ? ['/proc/self/exe', '/usr/bin/ldd'] : []),
++  ];
++  const base = ['run', '--check', '--frozen', '--cached-only', '--ext=ts'];
++  base.push('--allow-env', `--allow-read=${reads.join(',')}`, '--allow-sys', '--deny-run');
++  async function cleanup(): Promise<void> {
++    if (await Deno.realPath(scratch) !== ownedPath) {
++      throw new Error('Owned scratch identity changed');
++    }
++    const entries = Array.from(Deno.readDirSync(scratch), (entry) => entry.name);
++    await Deno.remove(scratch, { recursive: true });
++    await record('cleanup', { scratch, ownedPath, entries, removed: true });
++  }
++  let addons: unknown;
++  let addonPaths: string[];
++  try {
++    const args = [...base, '--deny-net', '--deny-ffi', '-'];
++    await record('discovery-input', { args, cwd, clearEnv: true, env, source: NATIVE_DISCOVERY });
++    const result = await runChild(args, cwd, env, NATIVE_DISCOVERY);
++    await record('discovery-result', result);
++    assert(result.code === 0, result.stderr);
++    addons = JSON.parse(result.stdout);
++    assert(Array.isArray(addons) && addons.length === 2);
++    addonPaths = addons.map((addon: unknown) => {
++      assert(typeof addon === 'object' && addon !== null && 'path' in addon);
++      assert(typeof addon.path === 'string' && addon.path.length > 0);
++      return addon.path;
++    });
++  } catch (error) {
++    try {
++      await cleanup();
++    } catch (secondary) {
++      throw new AggregateError([error, secondary]);
++    }
++    throw error;
++  }
++  return {
++    scratch,
++    addonPaths,
++    async run(source, options) {
++      for (const port of options.preferredPorts) {
++        if (!Number.isInteger(port) || port < 1 || port > 65535) {
++          throw new Error('Preferred upstream ports must be owned positive port numbers');
++        }
++      }
++      const net = [
++        '127.0.0.1',
++        ...(options.denyAllocator
++          ? []
++          : ['0.0.0.0:0', ...options.preferredPorts.map((port) => `0.0.0.0:${port}`)]),
++      ];
++      const args = [
++        ...base,
++        `--allow-net=${net.join(',')}`,
++        `--allow-write=${scratch}`,
++        options.denyFfi ? '--deny-ffi' : `--allow-ffi=${addonPaths.join(',')}`,
++        '-',
++      ];
++      const name = `child-${++sequence}`;
++      await record(name + '-input', {
++        args,
++        cwd: options.cwd,
++        clearEnv: true,
++        env,
++        addons,
++        source,
++      });
++      try {
++        const result = await runChild(args, options.cwd, env, source);
++        await record(name + '-result', result);
++        return result;
++      } catch (error) {
++        await record(name + '-failure', { error: describe(error) });
++        throw error;
++      }
++    },
++    [Symbol.asyncDispose]: cleanup,
++  };
++}
++
++/** Retains the actual child handle; deadline/pipe failures terminate only that owned process. */
++async function runChild(
++  args: string[],
++  cwd: string,
++  env?: Record<string, string>,
++  source?: string,
++): Promise<ChildRun> {
++  const child = new Deno.Command(Deno.execPath(), {
++    args,
++    cwd,
++    env,
++    clearEnv: env !== undefined,
++    stdin: source === undefined ? 'null' : 'piped',
++    stdout: 'piped',
++    stderr: 'piped',
++  }).spawn();
++  const startedAt = new Date().toISOString();
++  const problems: string[] = [];
++  let exited = false;
++  const abort = (problem: string): void => {
++    problems.push(problem);
++    if (exited) return;
++    try {
++      child.kill();
++    } catch (error) {
++      problems.push(`kill failed: ${describe(error)}`);
++    }
++  };
++  const watchdog = setTimeout(() => abort(`exceeded ${CHILD_DEADLINE_MS}ms`), CHILD_DEADLINE_MS);
++  const settled = Promise.all([
++    child.status.then((status) => {
++      exited = true;
++      return status.code;
++    }),
++    readCapped(child.stdout).catch((error): string => {
++      abort(`stdout: ${describe(error)}`);
++      return '';
++    }),
++    readCapped(child.stderr).catch((error): string => {
++      abort(`stderr: ${describe(error)}`);
++      return '';
++    }),
++    source === undefined ? Promise.resolve() : new Blob([source]).stream().pipeTo(child.stdin)
++      .catch((error) => abort(`stdin: ${describe(error)}`)),
++  ]);
++  let grace: ReturnType<typeof setTimeout> | undefined;
++  const unsettled = new Promise<undefined>((resolve) => {
++    grace = setTimeout(resolve, CHILD_DEADLINE_MS + SETTLE_GRACE_MS, undefined);
++  });
++  try {
++    const outcome = await Promise.race([settled, unsettled]);
++    if (outcome === undefined) {
++      throw new Error(
++        `Child pid ${child.pid} did not settle within ${CHILD_DEADLINE_MS + SETTLE_GRACE_MS}ms: ` +
++          problems.join('; '),
++      );
++    }
++    const [code, stdout, stderr] = outcome;
++    const result = {
++      code,
++      stdout,
++      stderr,
++      pid: child.pid,
++      startedAt,
++      finishedAt: new Date().toISOString(),
++      statusSettled: true,
++      pipesSettled: true,
++      stdinSettled: true,
++    };
++    if (problems.length > 0) {
++      throw new Error(`${problems.join('; ')}\n${JSON.stringify(result)}`);
++    }
++    return result;
++  } finally {
++    clearTimeout(watchdog);
++    clearTimeout(grace);
++  }
++}
++
++async function readCapped(stream: ReadableStream<Uint8Array>): Promise<string> {
++  const decoder = new TextDecoder();
++  let bytes = 0;
++  let text = '';
++  for await (const chunk of stream) {
++    bytes += chunk.byteLength;
++    if (bytes > CHILD_OUTPUT_CAP) throw new Error(`exceeded ${CHILD_OUTPUT_CAP} bytes`);
++    text += decoder.decode(chunk, { stream: true });
++  }
++  return text + decoder.decode();
++}
++
++function describe(error: unknown): string {
++  return error instanceof Error ? error.message : String(error);
++}
++
++/** Resolve only: upstream owns ABI/libc selection; manifests bound the permitted native owner. */
++const NATIVE_DISCOVERY = `import { createRequire } from 'node:module';
++import { dirname, isAbsolute, join, relative, sep } from 'node:path';
++import process from 'node:process';
++function assert(value: unknown, message: string): asserts value {
++  if (!value) throw new Error(message);
++}
++const require = createRequire(import.meta.resolve('@durable-streams/server'));
++const entries = [require.resolve('lmdb'),
++  createRequire(require.resolve('msgpackr')).resolve('msgpackr-extract')];
++const addons = [];
++for (const [index, entry] of entries.entries()) {
++  const name = index === 0 ? 'lmdb' : 'msgpackr-extract';
++  const version = index === 0 ? '3.5.7' : '3.0.4';
++  const directory = index === 0 ? dirname(dirname(entry)) : dirname(entry);
++  const manifest: unknown = JSON.parse(await Deno.readTextFile(join(directory, 'package.json')));
++  assert(typeof manifest === 'object' && manifest !== null && 'name' in manifest &&
++    'version' in manifest && manifest.name === name && manifest.version === version &&
++    'optionalDependencies' in manifest, 'Native package identity changed');
++  const optional = manifest.optionalDependencies;
++  const packageName = '@' + name + '/' + name + '-' + process.platform + '-' + process.arch;
++  assert(typeof optional === 'object' && optional !== null && packageName in optional &&
++    Reflect.get(optional, packageName) === version, 'Pinned optional dependency changed');
++  const nativeRequire = createRequire(entry);
++  const packagePath = nativeRequire.resolve(packageName + '/package.json');
++  const platformManifest: unknown = JSON.parse(await Deno.readTextFile(packagePath));
++  assert(typeof platformManifest === 'object' && platformManifest !== null &&
++    'name' in platformManifest && platformManifest.name === packageName &&
++    'version' in platformManifest && platformManifest.version === version &&
++    'os' in platformManifest && Array.isArray(platformManifest.os) &&
++    platformManifest.os.includes(process.platform) && 'cpu' in platformManifest &&
++    Array.isArray(platformManifest.cpu) && platformManifest.cpu.includes(process.arch),
++    'Native platform manifest mismatch');
++  const loader: unknown = nativeRequire('node-gyp-build-optional-packages');
++  assert(typeof loader === 'function', 'Native loader is not callable');
++  const resolve: unknown = Reflect.get(loader, 'resolve');
++  assert(typeof resolve === 'function', 'Native resolver is absent');
++  const selected: unknown = resolve(directory);
++  assert(typeof selected === 'string', 'Native resolver returned a non-path');
++  const owner = await Deno.realPath(dirname(packagePath)), path = await Deno.realPath(selected);
++  const within = relative(owner, path);
++  assert(within !== '' && !isAbsolute(within) && within !== '..' &&
++    !within.startsWith('..' + sep) && (await Deno.stat(path)).isFile, 'Native addon escaped owner');
++  const bytes = await Deno.readFile(path);
++  const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)),
++    (byte) => byte.toString(16).padStart(2, '0')).join('');
++  addons.push({ path, owner, bytes: bytes.length, sha256, manifest, platformManifest });
++}
++console.log(JSON.stringify(addons));`;
+diff --git a/plugins/streams/services/src/service-runtime_test.ts b/plugins/streams/services/src/service-runtime_test.ts
+new file mode 100644
+index 000000000..f8bb75ea3
+--- /dev/null
++++ b/plugins/streams/services/src/service-runtime_test.ts
+@@ -0,0 +1,256 @@
++/** Real streams factory permission, policy, proxy and owned-listener qualification. @module */
++import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
++import { fromFileUrl } from 'jsr:@std/path@^1';
++import { type ChildRun, createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
++
++const PUBLIC_SUBPATH = '@netscript/plugin-streams/service';
++const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
++const MARKER = 's6a-streams: assertions and native cleanup settled';
++
++Deno.test({
++  name: 'streams runtime permissions: native allocator/addon grants and fresh precise refusals',
++  sanitizeResources: true,
++  sanitizeOps: true,
++  sanitizeExit: true,
++  async fn() {
++    for (const mode of ['approved', 'allocator-denied', 'ffi-denied']) {
++      await using sandbox = await createRuntimeSandbox(mode);
++      const ports = choosePorts();
++      const run = await sandbox.run(probe(sandbox.scratch, ports, permissionBody()), {
++        cwd: PLUGIN_ROOT,
++        preferredPorts: ports,
++        denyAllocator: mode === 'allocator-denied',
++        denyFfi: mode === 'ffi-denied',
++      });
++      if (mode === 'approved') {
++        assertSuccess(run);
++      } else {
++        assertEquals(run.code, 1, `${mode}\n${run.stderr}`);
++        assertEquals(run.stdout.includes(MARKER), false, run.stdout);
++        assertStringIncludes(run.stderr, 'NotCapable: Requires ');
++        assertStringIncludes(
++          run.stderr,
++          mode === 'allocator-denied' ? `net access to "0.0.0.0:${ports[0]}"` : 'ffi access to ',
++        );
++        if (mode === 'ffi-denied') {
++          assertStringIncludes(run.stderr, `ffi access to "${sandbox.addonPaths[0]}"`);
++        }
++        assertEquals(/TS\d{4}|exceeded \d+ms|AggregateError/.test(run.stderr), false, run.stderr);
++      }
++    }
++  },
++});
++
++Deno.test({
++  name: 'streams HTTP: native guarded/public instances preserve identities, bytes and both ports',
++  sanitizeResources: true,
++  sanitizeOps: true,
++  sanitizeExit: true,
++  async fn() {
++    await using sandbox = await createRuntimeSandbox('http');
++    const ports = choosePorts();
++    const run = await sandbox.run(probe(sandbox.scratch, ports, httpBody()), {
++      cwd: PLUGIN_ROOT,
++      preferredPorts: ports,
++    });
++    assertSuccess(run);
++  },
++});
++
++/** Hold both selections concurrently so the two intended upstream ports cannot coincide. */
++function choosePorts(): number[] {
++  using first = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++  using second = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++  return [first.addr.port, second.addr.port];
++}
++
++function assertSuccess(run: ChildRun): void {
++  assertEquals(run.code, 0, `exit ${run.code}\n${run.stderr}\n${run.stdout}`);
++  assertEquals(run.stdout.split(MARKER).length - 1, 1, run.stdout);
++  assertEquals(run.stdout.trimEnd().endsWith(MARKER), true, run.stdout);
++}
++
++/** All resource-producing factory work is inside primary-first cleanup protection. */
++function probe(scratch: string, ports: readonly number[], body: string): string {
++  return `import { assert, assertEquals, assertStrictEquals } from 'jsr:@std/assert@^1';
++import type {
++  AuthenticatorPort, AuthnRequest, AuthnResult, AuthorizerPort, AuthzDecision, AuthzRequest,
++  Principal, RunningService,
++} from '${PUBLIC_SUBPATH}';
++
++const scratch = ${JSON.stringify(scratch)};
++const ports: readonly number[] = ${JSON.stringify(ports)};
++const handles: RunningService[] = [];
++const releasedPorts: number[] = [];
++const failures: unknown[] = [];
++const serve = { hostname: '127.0.0.1', port: 0, handleSignals: false };
++function retain(handle: RunningService, upstream: number): RunningService {
++  handles.push(handle);
++  releasedPorts.push(handle.addr.port, upstream);
++  assertEquals([handle.addr.hostname, handle.addr.transport], ['127.0.0.1', 'tcp']);
++  assert(Number.isInteger(handle.addr.port) && handle.addr.port > 0);
++  return handle;
++}
++function rebind(port: number): void {
++  Deno.listen({ hostname: '127.0.0.1', port }).close();
++}
++async function request(port: number, path: string, init?: RequestInit): Promise<[number, string]> {
++  const response = await fetch(\`http://127.0.0.1:\${port}\${path}\`, init);
++  return [response.status, await response.text()];
++}
++try {
++  Deno.chdir(scratch);
++  Deno.env.set('PORT', 'ambient-port-must-not-win');
++  Deno.env.set('STREAMS_PORT', 'fallback-port-must-not-win');
++  const { startStreamsService } = await import('${PUBLIC_SUBPATH}');
++  ${body}
++} catch (error) {
++  failures.push(error);
++}
++for (const handle of handles) {
++  try { await handle.stop(); } catch (error) { failures.push(error); }
++}
++for (const port of releasedPorts) {
++  try { rebind(port); } catch (error) { failures.push(error); }
++}
++if (failures.length === 1) throw failures[0];
++if (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));
++console.log(JSON.stringify({ reboundPorts: releasedPorts }));
++console.log('${MARKER}');
++`;
++}
++
++function permissionBody(): string {
++  return `Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[0]));
++  const running = retain(await startStreamsService({
++    auth: { public: true, reason: 'S6a explicit native permission control' }, serve,
++  }), ports[0]);
++  const [status, body] = await request(running.addr.port, '/');
++  assertEquals(status, 200);
++  const info: unknown = JSON.parse(body);
++  assert(typeof info === 'object' && info !== null && 'service' in info);
++  assertEquals(info.service, 'streams');
++  const [upstreamStatus] = await request(ports[0], '/');
++  assert(upstreamStatus < 500, 'expected selected loopback upstream is reachable');
++  await running.stop();
++  await running.stop();
++  rebind(running.addr.port);
++  rebind(ports[0]);`;
++}
++
++function httpBody(): string {
++  return `const path = '/v1/stream/s6a-' + crypto.randomUUID();
++  const allowed: Principal = {
++    subject: 'fixture:allowed', scopes: ['streams:read-write'], roles: ['fixture'],
++    scheme: 'custom', claims: { fixture: 'allowed' },
++  };
++  const denied: Principal = { ...allowed, subject: 'fixture:denied', scopes: [] };
++  const issued: Principal[] = [];
++  const authnCalls: { self: unknown; method: string; path: string }[] = [];
++  const authzCalls: { self: unknown; request: AuthzRequest }[] = [];
++  const authenticator: AuthenticatorPort = {
++    authenticate(request: AuthnRequest): AuthnResult {
++      authnCalls.push({ self: this, method: request.method, path: request.path });
++      const token = request.header('x-fixture-token');
++      if (token === 'outage') throw new Error('synthetic-authenticator-outage');
++      if (token === undefined) return { ok: false, reason: 'missing-credential' };
++      const principal = token === 'allowed' ? allowed : token === 'denied' ? denied : undefined;
++      if (principal === undefined) return { ok: false, reason: 'invalid-credential' };
++      issued.push(principal);
++      return { ok: true, principal };
++    },
++  };
++  const authorizer: AuthorizerPort = {
++    authorize(request: AuthzRequest): AuthzDecision {
++      authzCalls.push({ self: this, request });
++      return request.principal.scopes.includes('streams:read-write')
++        ? { allow: true } : { allow: false, reason: 'scope-missing' };
++    },
++  };
++  async function guardedCall(token?: string): Promise<[number, unknown]> {
++    const [status, text] = await request(guarded.addr.port, path, {
++      headers: token === undefined ? {} : { 'x-fixture-token': token },
++    });
++    return [status, JSON.parse(text)];
++  }
++  const credential = { 'x-fixture-token': 'allowed' };
++  Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[0]));
++  const guarded = retain(await startStreamsService({
++    auth: {
++      authn: { authenticator, protect: ['/'], allowAnonymous: ['/health'] },
++      authz: { authorizer },
++    }, serve,
++  }), ports[0]);
++  assertEquals(await guardedCall(), [401, { error: 'UNAUTHORIZED', message: 'missing-credential' }]);
++  assertEquals(await guardedCall('wrong'), [401, { error: 'UNAUTHORIZED', message: 'invalid-credential' }]);
++  assertEquals(await guardedCall('outage'), [503, { error: 'SERVICE_UNAVAILABLE', message: 'Authentication service unavailable' }]);
++  assertEquals(await guardedCall('denied'), [403, { error: 'FORBIDDEN', message: 'scope-missing' }]);
++  const [created] = await request(guarded.addr.port, path, {
++    method: 'PUT', headers: { ...credential, 'content-type': 'text/plain' }, body: 'before-',
++  });
++  assertEquals(created, 201);
++  const [appended] = await request(guarded.addr.port, path, {
++    method: 'POST', headers: { ...credential, 'content-type': 'text/plain' }, body: 'after',
++  });
++  assertEquals(appended, 204);
++  const front = await request(guarded.addr.port, path + '?offset=-1', { headers: credential });
++  assertEquals(front, [200, 'before-after']);
++  assertEquals(await request(ports[0], path + '?offset=-1'), front, 'real loopback proxy bytes');
++  // Native service-info is registered before auth: this public metadata is not a guarded raw route.
++  const beforeMetadata = [authnCalls.length, authzCalls.length];
++  const [rootStatus, rootText] = await request(guarded.addr.port, '/');
++  const root: unknown = JSON.parse(rootText);
++  assertEquals(rootStatus, 200);
++  assert(typeof root === 'object' && root !== null && 'service' in root);
++  assertEquals(root.service, 'streams');
++  assertEquals([authnCalls.length, authzCalls.length], beforeMetadata);
++  const [healthStatus, healthText] = await request(guarded.addr.port, '/health');
++  const health: unknown = JSON.parse(healthText);
++  assertEquals(healthStatus, 200);
++  assert(typeof health === 'object' && health !== null && 'status' in health && 'checks' in health);
++  assertEquals(health.status, 'healthy');
++  assert(Array.isArray(health.checks));
++  const storage: unknown = health.checks.find((check: unknown) =>
++    typeof check === 'object' && check !== null && 'name' in check && check.name === 'streams-storage');
++  assert(typeof storage === 'object' && storage !== null && 'storage' in storage);
++  const details = storage.storage;
++  assert(typeof details === 'object' && details !== null);
++  assert('mode' in details && 'durable' in details && 'probe' in details);
++  assertEquals(details.mode, 'memory');
++  assertEquals(details.durable, false);
++  assertEquals(details.probe, 'not-applicable');
++  assertEquals('dataDir' in details, false);
++  assertEquals(authnCalls.map((c) => [c.self === authenticator, c.method, c.path]), [
++    ...Array.from({ length: 4 }, () => [true, 'GET', path]),
++    [true, 'PUT', path], [true, 'POST', path], [true, 'GET', path],
++  ]);
++  assertEquals(authzCalls.length, 4);
++  for (const [index, call] of authzCalls.entries()) {
++    assertStrictEquals(call.self, authorizer);
++    assertStrictEquals(call.request.principal, issued[index]);
++    assertStrictEquals(issued[index], index === 0 ? denied : allowed);
++  }
++  const callCount = authnCalls.length;
++  Deno.env.set('STREAMS_INTERNAL_PORT', String(ports[1]));
++  const open = retain(await startStreamsService({
++    auth: { public: true, reason: 'S6a independent public factory control' }, serve,
++  }), ports[1]);
++  assert(open.addr.port !== guarded.addr.port && ports[0] !== ports[1]);
++  assertEquals((await request(open.addr.port, path + '?offset=-1'))[0], 404);
++  assertEquals((await request(open.addr.port, path, {
++    method: 'PUT', headers: { 'content-type': 'text/plain' }, body: 'independent',
++  }))[0], 201);
++  assertEquals(await request(open.addr.port, path + '?offset=-1'), [200, 'independent']);
++  assertEquals(await request(ports[1], path + '?offset=-1'), [200, 'independent']);
++  assertEquals(await request(guarded.addr.port, path + '?offset=-1', { headers: credential }), front);
++  assertEquals(authnCalls.length, callCount + 1, 'public requests never call the guarded ports');
++  await guarded.stop();
++  await guarded.stop();
++  rebind(guarded.addr.port);
++  rebind(ports[0]);
++  assertEquals(await request(open.addr.port, path + '?offset=-1'), [200, 'independent']);
++  await open.stop();
++  await open.stop();
++  rebind(open.addr.port);
++  rebind(ports[1]);`;
++}

@@ -368,3 +368,6 @@ Call this service from an app or another service with [Typed SDK & client](/serv
 also the [Add a service](/services-sdk/how-to/add-a-service/) recipe and the
 [`@netscript/service`](/reference/service/) and [`@netscript/contracts`](/reference/contracts/)
 references.
+
+For plugin startup controlled by an application host, see
+[Host workers and streams services](/services-sdk/how-to/host-plugin-services/).

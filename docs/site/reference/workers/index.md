@@ -23,6 +23,7 @@ streams and Aspire process wiring. It binds the host plugin system to the worker
 | `@netscript/plugin-workers/jobs/health-check.ts` | `./jobs/health-check.ts` | Health-check job definition and its context, handler, and result contracts. |
 | `@netscript/plugin-workers/runtime` | `./bin/runtime.ts` | Generated job-registry loading and registration plus worker, scheduler, and combined-process start helpers. |
 | `@netscript/plugin-workers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
+| `@netscript/plugin-workers/service` | `./services/mod.ts` | [Inert caller-policy factory](#sub-path-service). |
 | `@netscript/plugin-workers/services` | `./services/src/main.ts` | [Workers API service entrypoint](#netscriptplugin-workersservices). |
 | `@netscript/plugin-workers/streams` | `./streams/mod.ts` | [Browser-facing StreamDB factory and entity schemas](#netscriptplugin-workersstreams). |
 | `@netscript/plugin-workers/streams/server` | `./streams/server.ts` | [Server-side durable stream producer wiring](#netscriptplugin-workersstreamsserver). |
@@ -149,6 +150,27 @@ request-body `id` is optional and ignored, and a missing id returns a typed `VAL
 
 See the [background jobs guide](/background-processing/workers/#trigger-a-job-from-a-typed-client)
 for the typed-client walkthrough.
+
+## `@netscript/plugin-workers/service` {#sub-path-service}
+
+| Symbol                  | Kind      | Signature                                                                                                     | Description                                                                          |
+| ----------------------- | --------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `startWorkersService`   | function  | `startWorkersService(context: PluginServiceContext, options: WorkersServiceOptions): Promise<RunningService>` | Start the existing Workers API with explicit native auth, CORS and listener options. |
+| `WorkersServiceOptions` | interface | `auth: ServiceAuthPolicy; cors?: CorsOptions; serve?: ServeOptions`                                           | Caller-selected policy and listener configuration.                                   |
+
+Import is inert; policy validation precedes factory I/O. `serve.port`, including zero, wins over
+`context.env.PORT` and process `PORT`. The returned native handle drains its listener without
+closing host-owned global KV. See
+[Host workers and streams services](/services-sdk/how-to/host-plugin-services/) for typed
+composition, discovery, credential ownership and the legacy adoption boundary.
+
+The public signature also re-exports the native `PluginServiceContext` from `@netscript/plugin/sdk`;
+`CorsOptions`, `RunningService`, `RunningServiceAddress`, `ServeOptions`, `ServiceApp`,
+`ServiceEnvironment`, `ServiceTlsOptions` from `@netscript/service`; and `AuthenticatorPort`,
+`AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`, `AuthzDecision`, `AuthzOptions`,
+`AuthzRequest`, `Principal`, `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`,
+`ServicePublicAuthPolicy` from `@netscript/service/auth`. These retain their native identity;
+application code can import those contracts directly from their owning modules.
 
 ## `@netscript/plugin-workers/services`
 

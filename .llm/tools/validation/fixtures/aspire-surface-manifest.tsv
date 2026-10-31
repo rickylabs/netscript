@@ -216,6 +216,7 @@ docs/site/services-sdk/how-to/add-a-service.md	doc:public-page	S11	prose sweep +
 docs/site/services-sdk/how-to/call-internal-procedures.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/discover-services.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/expose-openapi-scalar.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/services-sdk/how-to/host-plugin-services.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/sdk.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/services.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/tutorials/chat/01-scaffold.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint

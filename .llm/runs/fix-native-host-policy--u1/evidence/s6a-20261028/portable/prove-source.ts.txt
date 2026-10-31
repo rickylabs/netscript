@@ -1,0 +1,67 @@
+const root = 'C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out = root + '/.llm/tmp/native-host-policy-u1-s6a-portable-20261028';
+const old = root + '/.llm/tmp/native-host-policy-u1-s6a-astra-20261028';
+const decoder = new TextDecoder();
+const read = async (path: string) => JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/, ''));
+const sha = async (path: string) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await Deno.readFile(path))), b => b.toString(16).padStart(2, '0')).join('');
+const protectedRows = [];
+for (const row of (await read(old + '/protected-before.json')).rows) {
+  const actual = await sha(root + '/' + row.path);
+  protectedRows.push({ ...row, actual, matches: actual === row.expected });
+}
+const paths = ['plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts', 'plugins/streams/services/src/service-runtime_test.ts'];
+const owners = [];
+let diff = '', revisionDiff = '';
+for (const [index, path] of paths.entries()) {
+  const bytes = await Deno.readFile(root + '/' + path);
+  const kind = index === 0 ? 'fixture' : 'runtime';
+  owners.push({ path, sha256: await sha(root + '/' + path), bytes: bytes.length, lines: decoder.decode(bytes).trimEnd().split('\n').length, cap: index === 0 ? 300 : 430 });
+  await Deno.writeFile(out + '/' + kind + '.final.ts', bytes, { createNew: true });
+  for (const previous of ['/dev/null', out + '/' + kind + '.before.ts']) {
+    const result = await new Deno.Command('git', { args: ['diff', '--no-index', '--', previous, path], cwd: root, stdout: 'piped', stderr: 'piped' }).output();
+    if (result.code !== 1 || result.stderr.length) throw new Error('Source diff failed: ' + decoder.decode(result.stderr));
+    if (previous === '/dev/null') diff += decoder.decode(result.stdout); else revisionDiff += decoder.decode(result.stdout);
+  }
+}
+await Deno.writeTextFile(out + '/source.diff', diff, { createNew: true });
+await Deno.writeTextFile(out + '/revision.diff', revisionDiff, { createNew: true });
+const cleanup = [], children = [], native = [];
+async function checkCleanup(path: string, key: 'profile' | 'scratch') {
+  const entry = await read(path);
+  let absent = false;
+  try { await Deno.stat(entry[key]); } catch (error) { if (error instanceof Deno.errors.NotFound) absent = true; else throw error; }
+  cleanup.push({ receipt: path, ...entry, absentVerified: absent });
+}
+await checkCleanup(out + '/gates/cleanup.json', 'profile');
+await checkCleanup(out + '/absent-cache/cleanup.json', 'profile');
+const oldAddons = (await read(old + '/gates-3/children/approved/child-1-input.json')).addons;
+for (const label of ['approved', 'allocator-denied', 'ffi-denied', 'http', 'absent-cache']) {
+  const folder = label === 'absent-cache' ? out + '/absent-cache/absent-cache' : out + '/gates/children/' + label;
+  await checkCleanup(folder + '/cleanup.json', 'scratch');
+  for (const name of ['cache-info', 'discovery-result', ...(label === 'absent-cache' ? [] : ['child-1-result'])]) {
+    const result = await read(folder + '/' + name + '.json');
+    children.push({ label, name, ...result, stdoutBytes: new TextEncoder().encode(result.stdout).length, stderrBytes: new TextEncoder().encode(result.stderr).length });
+    if (name === 'discovery-result' && label !== 'absent-cache') {
+      const addons = JSON.parse(result.stdout);
+      for (const [i, addon] of addons.entries()) {
+        native.push({ label, ...addon, expectedSha256: oldAddons[i].sha256, expectedBytes: oldAddons[i].bytes,
+          matchesPrevious: addon.sha256 === oldAddons[i].sha256 && addon.bytes === oldAddons[i].bytes && addon.path === oldAddons[i].path });
+      }
+    }
+  }
+}
+const historical = [];
+for (const path of ['REPORT.md', 'source-proof.json', 'fixture.final.ts', 'runtime.final.ts', 'gates/tests.report.json', 'gates/types.report.json', 'gates/arch.stderr.log', 'gates-2/tests.report.json', 'gates-2/arch.report.json']) historical.push({ path: old + '/' + path, sha256: await sha(old + '/' + path) });
+const git = await new Deno.Command('git', { args: ['diff', '--name-only'], cwd: root, stdout: 'piped', stderr: 'piped' }).output();
+const summary = {
+  head: '816fcf7ea7b20efb398bc0640f5b60f283248c08', owners,
+  protectedCount: protectedRows.length, protectedMatched: protectedRows.filter(row => row.matches).length, protectedRows,
+  trackedDiff: decoder.decode(git.stdout), sourceDiffSha256: await sha(out + '/source.diff'), revisionDiffSha256: await sha(out + '/revision.diff'),
+  tests: await read(out + '/gates/tests.report.json'), types: await read(out + '/gates/types.report.json'),
+  lint: await read(out + '/gates/lint.report.json'), fmt: await read(out + '/gates/fmt.report.json'), quality: await read(out + '/gates/quality-new.stdout.log'),
+  native, children, cleanup, historical, absentCacheBoundary: await read(out + '/absent-cache/boundary.json'),
+  limitations: ['Linux native HTTP qualification PENDING genuine CI; no portable PASS or checkpoint', 'Absent-DENO_DIR cache-info succeeds; deliberately empty cache discovery fails Cannot find module lmdb. Audit script exits 1 because cache-error wording regex was too narrow; retained without rerun.', 'Historical scoped architecture report only: 0 fail / 5 warn / 1 info; no composite arch:check or architecture rerun'],
+};
+await Deno.writeTextFile(out + '/source-proof.json', JSON.stringify(summary, null, 2), { createNew: true });
+if (summary.protectedMatched !== 113 || summary.protectedCount !== 113 || summary.trackedDiff || owners.some(row => row.lines > row.cap) || cleanup.some(row => !row.absentVerified) || native.some(row => !row.matchesPrevious) || children.some(row => !row.statusSettled || !row.pipesSettled || !row.stdinSettled || row.stdoutBytes > 32768 || row.stderrBytes > 32768)) throw new Error('Source/native/cleanup/protected proof failed');
+console.log(JSON.stringify({ owners, protectedMatched: summary.protectedMatched, children: children.length, cleanups: cleanup.length, nativeMatches: native.length, tests: summary.tests.summary, sourceDiffSha256: summary.sourceDiffSha256, revisionDiffSha256: summary.revisionDiffSha256, proofSha256: await sha(out + '/source-proof.json') }));

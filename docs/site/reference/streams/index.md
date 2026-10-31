@@ -22,7 +22,29 @@ producers, telemetry, testing and diagnostics live in
 | `@netscript/plugin-streams/cli` | `./src/cli/composition/main.ts` | [Plugin CLI command group](#sub-path-cli). |
 | `@netscript/plugin-streams/e2e` | `./src/e2e/mod.ts` | [End-to-end gate definitions](#sub-path-e2e). |
 | `@netscript/plugin-streams/aspire` | `./src/aspire/mod.ts` | [Aspire AppHost contribution](#sub-path-aspire) for the Durable Streams service. |
+| `@netscript/plugin-streams/service` | `./services/mod.ts` | [Inert caller-policy streams factory](#sub-path-service). |
 | `@netscript/plugin-streams/services` | `./services/src/main.ts` | Executable Durable Streams proxy service. |
+
+## `@netscript/plugin-streams/service` {#sub-path-service}
+
+| Symbol                  | Kind      | Signature                                                                      | Description                                                                                    |
+| ----------------------- | --------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `startStreamsService`   | function  | `startStreamsService(options: StreamsServiceOptions): Promise<RunningService>` | Start the existing storage/proxy runtime with caller-owned native policy and listener options. |
+| `StreamsServiceOptions` | interface | `auth: ServiceAuthPolicy; cors?: CorsOptions; serve?: ServeOptions`            | Explicit auth and optional native CORS/listener configuration.                                 |
+
+Import is inert. Auth validation runs before environment, storage or listener access. Explicit
+`serve.port`, including zero, wins over `PORT` then `STREAMS_PORT`. `stop()` drains the front
+listener and stops the factory-owned upstream. Guard raw stream paths with native `authn.protect`;
+omitted CORS origins use the workspace allowlist while protocol methods/headers remain supplied. The
+plural `./services` CLI entrypoint keeps its authored public and wildcard policy. See
+[Host workers and streams services](/services-sdk/how-to/host-plugin-services/).
+
+Native signature types are re-exported unchanged: `CorsOptions`, `RunningService`,
+`RunningServiceAddress`, `ServeOptions`, `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`
+from `@netscript/service`; and `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`,
+`AuthorizerPort`, `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ServiceAuthPolicy`,
+`ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy` from `@netscript/service/auth`. Application
+code can import those native contracts from their owning modules.
 
 ## Plugin manifest
 

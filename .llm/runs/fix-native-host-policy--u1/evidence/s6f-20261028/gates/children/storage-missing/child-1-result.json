@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "{\"row\":\"missing\",\"nativeError\":{\"name\":\"Error\",\"message\":\"STREAMS_DATA_DIR must name an existing directory.\",\"cause\":{\"name\":\"NotFound\",\"message\":\"Le fichier spécifié est introuvable. (os error 2): stat 'C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-a56705f679c07d95\\\\data'\"}}}\n{\"observations\":{\"row\":\"missing\",\"mode\":\"file\",\"nativeError\":{\"name\":\"Error\",\"message\":\"STREAMS_DATA_DIR must name an existing directory.\",\"cause\":{\"name\":\"NotFound\",\"message\":\"Le fichier spécifié est introuvable. (os error 2): stat 'C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-a56705f679c07d95\\\\data'\"}}},\"reboundPorts\":[57885,57886]}\ns6f-streams: storage assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n",
+  "pid": 30708,
+  "startedAt": "2026-10-28T05:23:35.255Z",
+  "finishedAt": "2026-10-28T05:23:36.582Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

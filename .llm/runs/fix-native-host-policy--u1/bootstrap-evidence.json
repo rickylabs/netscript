@@ -1,0 +1,152 @@
+{
+    "capturedAt":  "2026-10-27T16:51:57.9482731Z",
+    "baseline":  "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+    "carriedBaseline":  "a833dfa8a3095bb6434cf7ae8bf24f954cf2f1bd",
+    "scopedWorkersStreamsServiceDiff":  [
+
+                                        ],
+    "rebaseline":  [
+                       {
+                           "path":  "AGENTS.md",
+                           "carriedSha256":  "e1c1cffa65b1718792435911589b3a4c7f0616256247d97e729182c3fc45a741",
+                           "currentSha256":  "e1c1cffa65b1718792435911589b3a4c7f0616256247d97e729182c3fc45a741",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\workers\\deno.json",
+                           "carriedSha256":  "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+                           "currentSha256":  "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\workers\\services\\src\\main.ts",
+                           "carriedSha256":  "bcca447d35bc131bd1309e4441e4a99dfe48b61624c739aa7845189215404152",
+                           "currentSha256":  "bcca447d35bc131bd1309e4441e4a99dfe48b61624c739aa7845189215404152",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\workers\\services\\src\\service-runtime.ts",
+                           "carriedSha256":  "e1200546637cf50db606f8dd049edae0e260e67516e80de26f1fe48ee62b1453",
+                           "currentSha256":  "e1200546637cf50db606f8dd049edae0e260e67516e80de26f1fe48ee62b1453",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\workers\\streams\\factory.ts",
+                           "carriedSha256":  "c80961baf322b8369c9e0fba71f5d5379fefbd3daa3a5708ea3b7cc74d447b92",
+                           "currentSha256":  "c80961baf322b8369c9e0fba71f5d5379fefbd3daa3a5708ea3b7cc74d447b92",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\workers\\streams\\mod.ts",
+                           "carriedSha256":  "2692919e148f7ea1ba14c2195e6cada3bc16fcf61e6b0984412dddc819b31d8d",
+                           "currentSha256":  "2692919e148f7ea1ba14c2195e6cada3bc16fcf61e6b0984412dddc819b31d8d",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\streams\\deno.json",
+                           "carriedSha256":  "647bdf32fa2400139c20e384ec7993435e9c13d85d9c3971cd88118bfdfb8147",
+                           "currentSha256":  "647bdf32fa2400139c20e384ec7993435e9c13d85d9c3971cd88118bfdfb8147",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "plugins\\streams\\services\\src\\main.ts",
+                           "carriedSha256":  "4e7b9fc48b83b197f11286a78e0f2d16f4bc90413bf48c801ae8252093c4d72e",
+                           "currentSha256":  "4e7b9fc48b83b197f11286a78e0f2d16f4bc90413bf48c801ae8252093c4d72e",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\plugin\\src\\service\\presentation\\create-plugin-service.ts",
+                           "carriedSha256":  "508ba9a9edc6000bbe869221b7e5493bfae10d1ae9f31bd5b054219477dfd9a7",
+                           "currentSha256":  "508ba9a9edc6000bbe869221b7e5493bfae10d1ae9f31bd5b054219477dfd9a7",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\deno.json",
+                           "carriedSha256":  "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70",
+                           "currentSha256":  "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\auth\\mod.ts",
+                           "carriedSha256":  "e003b7760a681469f5c52fa06e6ff07e8477a60a36759b9d939af3713fea3571",
+                           "currentSha256":  "e003b7760a681469f5c52fa06e6ff07e8477a60a36759b9d939af3713fea3571",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\auth\\options.ts",
+                           "carriedSha256":  "67b2894abf0b6b421e46ba912bf163ca1cb80e53f82afe434ad7434dd95b136e",
+                           "currentSha256":  "67b2894abf0b6b421e46ba912bf163ca1cb80e53f82afe434ad7434dd95b136e",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\auth\\service-auth-policy.ts",
+                           "carriedSha256":  "ac2b72d52b0c7e2d20cfc5006ba8838984fcc37311b46da7a88ebd89470c963b",
+                           "currentSha256":  "ac2b72d52b0c7e2d20cfc5006ba8838984fcc37311b46da7a88ebd89470c963b",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\auth\\auth-middleware.ts",
+                           "carriedSha256":  "00f33679f046e803fb3f6c26afbbe43a0e1676753f92db4aef8b6d789c5d23e1",
+                           "currentSha256":  "00f33679f046e803fb3f6c26afbbe43a0e1676753f92db4aef8b6d789c5d23e1",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\auth\\internal-credential\\internal-credential-authenticator.ts",
+                           "carriedSha256":  "dde49e3ae811d2659238178fcedf0c756f92799aedee13c976f7a90242a7bad8",
+                           "currentSha256":  "dde49e3ae811d2659238178fcedf0c756f92799aedee13c976f7a90242a7bad8",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\auth\\contract\\contract-raw-routes.ts",
+                           "carriedSha256":  "86cb12940e6e587c2b6752d914dd38d5b715f20b75d1387db4eda8f92d8436b2",
+                           "currentSha256":  "86cb12940e6e587c2b6752d914dd38d5b715f20b75d1387db4eda8f92d8436b2",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\types.ts",
+                           "carriedSha256":  "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+                           "currentSha256":  "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\middleware\\service-cors.ts",
+                           "carriedSha256":  "a34a7f6339dc3bc0af0a6b9573200c3d70424298e3818cbd361fc16034928198",
+                           "currentSha256":  "a34a7f6339dc3bc0af0a6b9573200c3d70424298e3818cbd361fc16034928198",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\primitives\\handlers.ts",
+                           "carriedSha256":  "2018901610c13b62acfef93ceba7328edc7047e0441539d8ed487ef89357f2e0",
+                           "currentSha256":  "2018901610c13b62acfef93ceba7328edc7047e0441539d8ed487ef89357f2e0",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\builder\\service-builder-impl.ts",
+                           "carriedSha256":  "c81161994461703ce6028075f6128a56efb33a1a9e1d3a3d5b7d19c7bc69cbe7",
+                           "currentSha256":  "c81161994461703ce6028075f6128a56efb33a1a9e1d3a3d5b7d19c7bc69cbe7",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\service\\src\\builder\\service-listener.ts",
+                           "carriedSha256":  "76da3884e47614b1ffffaa202403a392cb8b775cf3caaac27d2fc363b01f72dc",
+                           "currentSha256":  "76da3884e47614b1ffffaa202403a392cb8b775cf3caaac27d2fc363b01f72dc",
+                           "matches":  true
+                       },
+                       {
+                           "path":  "packages\\plugin-streams-core\\src\\application\\stream-url-resolver.ts",
+                           "carriedSha256":  "953f1be682810dadfa6b3e403a46bd59063556c791428f35c04ea7e113a0fa95",
+                           "currentSha256":  "953f1be682810dadfa6b3e403a46bd59063556c791428f35c04ea7e113a0fa95",
+                           "matches":  true
+                       }
+                   ],
+    "rootLockBlob":  "1665f7e40afa576deab4dd25b2c408e647383d8c",
+    "headRootLockBlob":  "1665f7e40afa576deab4dd25b2c408e647383d8c",
+    "nativeAuth":  {
+                       "loggedIn":  true,
+                       "authMethod":  "claude.ai",
+                       "personalFieldsOmitted":  true,
+                       "subscriptionType":  "max"
+                   },
+    "nativeModelEffortSupport":  "unattested until actual turn",
+    "paidInferenceLaunched":  false
+}

@@ -1,0 +1,12 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6f-astra-20261028';
+const prior=await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/run-gates.ts');
+let script=prior.replaceAll('s6e-astra','s6f-astra');
+const start=script.indexOf('const owners='),end=script.indexOf('const selected=',start);
+if(start<0||end<0)throw new Error('Existing gate selection missing');
+script=script.slice(0,start)+"const owners=['plugins/streams/services/src/service-storage_test.ts','plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts'];\nconst files=[...owners,'plugins/streams/services/src/service-runtime_test.ts','plugins/streams/services/src/service_test.ts','plugins/streams/services/src/service.ts','plugins/streams/services/mod.ts','plugins/streams/services/src/service-tls_test.ts','plugins/streams/services/src/service-lifecycle_test.ts'];\n"+script.slice(end);
+script=script.replace('files[3],files[2],files[6],owners[0]','files[3],files[2],files[6],files[7],owners[0]');
+await Deno.writeTextFile(out+'/run-gates.ts',script,{createNew:true});
+const baseline=JSON.parse(await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6f-proposal-20261028/proposal-bindings.json'));
+await Deno.writeTextFile(out+'/protected-bindings.json',JSON.stringify({head:baseline.head,fixtureException:baseline.rows.find(row=>row.path===owners[1]),rows:baseline.rows.filter(row=>row.path!==owners[1])},null,2),{createNew:true});
+console.log(JSON.stringify({owners,staticFiles:files.length,protectedBindings:baseline.rows.length-1}));

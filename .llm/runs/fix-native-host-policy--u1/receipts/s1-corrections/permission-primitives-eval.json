@@ -1,0 +1,96 @@
+{
+  "deno": "2.9.7",
+  "denoDir": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache",
+  "args": [
+    "--cached-only",
+    "--deny-read",
+    "--deny-env",
+    "--deny-net",
+    "--deny-write",
+    "--deny-run",
+    "--deny-sys",
+    "--deny-ffi"
+  ],
+  "results": [
+    {
+      "id": "P1 static local import under --deny-read",
+      "expect": "exit 0, silent",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "N1 dynamic local import under --deny-read",
+      "expect": "NotCapable (read)",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "N2 runtime readTextFile at import under --deny-read",
+      "expect": "NotCapable (read)",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "N3 env read under --deny-env",
+      "expect": "NotCapable (env)",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "N4 listen under --deny-net",
+      "expect": "NotCapable (net)",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "P2 workspace bare resolution under --deny-read (no load)",
+      "expect": "resolved file URL",
+      "code": 1,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in promise) TypeError: Import \"@netscript/workers/services\" not a dependency and not in import map from \"file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/$deno$eval.mts\"\nconsole.log(import.meta.resolve(\"@netscript/workers/services\"));\n\u001b[0m\u001b[31m                        ^\u001b[0m"
+    },
+    {
+      "id": "P3 cached jsr static import under --deny-read",
+      "expect": "exit 0, silent",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "P4 workspace member static import under --deny-read",
+      "expect": "exit 0, silent",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "R1 public ./service subpath (expected RED before S2)",
+      "expect": "resolution error",
+      "code": 1,
+      "timedOut": false,
+      "stdout": "",
+      "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Import \"@netscript/workers/service\" not a dependency and not in import map from \"file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/$deno$eval.mts\"\n  \u001b[0m\u001b[36mhint:\u001b[0m If you want to use a JSR or npm package, try running `deno add jsr:@netscript/workers/service` or `deno add npm:@netscript/workers/service`"
+    },
+    {
+      "id": "N5 missing-subpath import.meta.resolve",
+      "expect": "throws or unresolved",
+      "code": 0,
+      "timedOut": false,
+      "stdout": "THROWS TypeError Import \"@netscript/workers/service\" not a dependency and not in import map from \"file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/$deno$eval.mts\"",
+      "stderr": ""
+    }
+  ]
+}

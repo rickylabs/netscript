@@ -1,0 +1,259 @@
+{
+  "baselineAcceptedHead": "32264fc11dbc3b1bbd044ba8010c0f4848fab506",
+  "incomingMain": "abe9d3e4303411544502ceb519f39a09d3723fcd",
+  "sourceSha256": {
+    ".llm/harness/debt/arch-debt.md": "07f7b35f4c79135db0a0fc667f6192697160e91dd093dee49c742c9674ea6171",
+    ".llm/tools/docs/command-guide-example_test.ts": "50d102b6298540f3b11f97eea5e1273afb1567fc3844deb5fab73a93c678172f",
+    ".llm/tools/docs/snippet-extractor_test.ts": "bdae9cbb92b8e68c96e2dc3e18552bf571ce8da3b8d4d930731f151d2ec021fb",
+    ".llm/tools/docs/snippet-policy.ts": "6ad58f6a3cdcfdc5844722b123854b6709a30ea6bc916b3a8965d05c69a25ea2",
+    ".llm/tools/e2e/prepull-runtime-images.ts": "513ff60411c11549b8b0bb7dacc88a35981436b7f780830187f837b23f137977",
+    ".llm/tools/e2e/prepull-runtime-images_test.ts": "995233d85494ca23df9f273b8242430536531bca487669585bd0e092ba67ff78",
+    "docs/site/orchestration-runtime/how-to/outbound-webhooks.md": "244117cf3e44646e2765d483689dfec07d70f9fcf70f3859656753a48d0a8fcc",
+    "docs/site/reference/service/index.md": "ddd7309944a3c72a7b22e00327a8be4b4aeb2c67883aee5681dd1a06071d8bb4",
+    "docs/site/services-sdk/command-compatibility.md": "d60ebc821204b412ca6a0d019f62979a5e6dd5969b902b267925664c68d70e6d",
+    "docs/site/services-sdk/command-operations.md": "a134a5b00bd91e2554212d79a6133318a7748a0cbb96b77ba56a95921b6b7214",
+    "docs/site/services-sdk/command-relay.md": "23483394516b9610748a13676f646a0000ab83432055cb91c6d89006aafae219",
+    "docs/site/services-sdk/command-security.md": "7ae16406b2e1de2680c21beefe134ff43f27669a2bbb04f5a8004c516ed9200d",
+    "docs/site/services-sdk/commands.md": "4061756156c48fdace1c9eb9baa1bd62c61524ec4cf9add93c26e5220f1050b0",
+    "docs/site/services-sdk/index.md": "5d360d886b2df858afd7d8c3f9946767520d67f26d9ae4c0051e1450519f9bb3",
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts": "d8d876ed951fe2bf6030f4112bdc7cf1d6db5a84410656a73bb7bbc82fcad9dd",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts": "459350b1d79d319fc2b7331306d102405d8bc6e0ebb351b8a80af61e62566a3f",
+    "packages/mcp/src/publish-assets.generated.ts": "208e780cb0ba1002c22406d9e0303512b8593153b56871d740330eb5083257ff",
+    "packages/plugin-sagas-core/tests/fixtures/compensation-retry.ts": "823b9b095a9eba9d5f99a958f1005f00b02676dcb9186986b5f22db74efb70b8",
+    "packages/plugin-sagas-core/tests/fixtures/transition-store/postgres-conformance.ts.template": "b1ce78730f6bc3877f9ff95e117959c6b11c24a1d147b870e66d675bcd70e311",
+    "packages/plugin-sagas-core/tests/runtime/saga-compensation-retry_test.ts": "322e57911545df339172a17108e2b4adf5cb53409fce3d388eef6e351d73a578",
+    "packages/service/README.md": "3aa9c83f11c11694ca7605e56d0d27014f91fc52e34d702d391845f7b1ebc2b7",
+    "packages/service/src/auth/types.ts": "b0f5bc3a97af6e4ee4b11f17606e065131cfc30bc258eddcc8c30f737730f68d",
+    "packages/service/src/primitives/scalar.generated.ts": "38e7fd81fe48a98fb58a73c35966987857bd26aab5f44fc478ed5d4fc84ebdf2",
+    "packages/service/tests/auth/procedure-availability_test.ts": "80f0ce4a5ba12b94ede856df87dd42195f72f2fa298aef537c2d445213d0c020",
+    "plugins/sagas/README.md": "901dcf01944b8eb3ed5b45651802be8335139c328500b11c281fb4c8546b23ad",
+    "plugins/streams/services/mod.ts": "04b622895c983127531a0989c2647e1acd5b6bf3977a6e92ee957451d461f5b7",
+    "plugins/workers/services/mod.ts": "04d0af14c7f298da223f3e741c14be7b9d52a8b546de4cc5ffd6ce6e794cc7d2"
+  },
+  "incomingPaths": 58,
+  "mainSourceExceptions": [
+    "docs/site/reference/service/index.md",
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "exceptionMeaning": "existing native union wording retained in service reference; canonical prose and publish assets regenerated, no authored runtime resolution",
+  "gates": [
+    {
+      "evidence": "check",
+      "gateId": "check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 107708,
+      "requestHash": "ca94fa0bb1b973b2a9f3d8fef221db8a871516de7fd527a02ad207408bebcad1"
+    },
+    {
+      "evidence": "quality-gate",
+      "gateId": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 16584,
+      "requestHash": "a094ec6e135586a0ed9a99026cde12fa57c8801fdf0a66a2187d29f93df639e5"
+    },
+    {
+      "evidence": "docs-accuracy",
+      "gateId": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7472,
+      "requestHash": "11607c5265ffd78dc485c37af43699dfef443f5c0335baa83fca8ad4e94fcc81"
+    },
+    {
+      "evidence": "aspire-version-parity",
+      "gateId": "aspire-version-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 323,
+      "requestHash": "6f73127f81afde5eb9e6edd2017f986852ee0bceaa2eeb16669c75f9eea6a9d6"
+    },
+    {
+      "evidence": "mcp-export-corpus",
+      "gateId": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9235,
+      "requestHash": "1fe3f9c7252e5dca6f4e47b878140bc55ccc828fcc9e86e7cc6d10f0673dfcd2"
+    },
+    {
+      "evidence": "agent-docs-prose",
+      "gateId": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13987,
+      "requestHash": "a9758f33480106764f590ec3113c1c994f656d3e200d35462a0445b219131b39"
+    },
+    {
+      "evidence": "assets-barrel",
+      "gateId": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2412,
+      "requestHash": "09ed62e413fae5314520e02cb1b70c6c5d0fc6f9de2ca535a116a29a12cd6e3a"
+    },
+    {
+      "evidence": "publish-assets",
+      "gateId": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 471,
+      "requestHash": "61bbe554971a589c6530477fc2e1827983386a8c64518416934f3eb0577839d5"
+    },
+    {
+      "evidence": "service-doc",
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1346,
+      "requestHash": "d910988713d769d41afaca61f3344b709272456222b62d616fdaa229c6fe8680"
+    },
+    {
+      "evidence": "workers-doc",
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1519,
+      "requestHash": "b09bceee4b1fc8a668e741a1629580f6f10e8f65bf029c85311f8f7c8a5a8790"
+    },
+    {
+      "evidence": "streams-doc",
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 413,
+      "requestHash": "a16db6c1993ab8e931c853f043023ca62c3ae234c27c5949cbda074ca35eb790"
+    },
+    {
+      "evidence": "publish-packages-service",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7203,
+      "requestHash": "ed2658b527c07417a3def52ddcac7b83d9c36e11da63fce8df052ea84f419225"
+    },
+    {
+      "evidence": "publish-plugins-workers",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11742,
+      "requestHash": "0c82094bfe20130898be550737b5b52b736ff2075d76cddba5326238653ec488"
+    },
+    {
+      "evidence": "publish-plugins-streams",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7377,
+      "requestHash": "35d22747c99a122a49e7bf3bba62ec63d695b3340038a353398d88c1bbf216c6"
+    },
+    {
+      "evidence": "publish-packages-mcp",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3988,
+      "requestHash": "f442ca81969f0580be908f43bf8720d334177f7f7b6df1207e64d9220a3b490b"
+    },
+    {
+      "evidence": "publish-packages-cli",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11604,
+      "requestHash": "d503f180d57a01fd7312ab009a3e3fe03420c946263f3ded5e1b6090601f6c2e"
+    },
+    {
+      "evidence": "delta-tests-exec-tmp",
+      "gateId": "test",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3689,
+      "requestHash": "1692cddfd3eb494f59a96b0a248a569c70e3a32e8dd738bec9123c48fd170c46"
+    }
+  ],
+  "rootCheck": {
+    "selection": {
+      "filesSelected": 4050,
+      "batches": 34,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "completeRuntimeEvidence": {
+    "state": "REUSED_BY_EXACT_SOURCE_IDENTITY",
+    "testedAt": "32264fc11dbc3b1bbd044ba8010c0f4848fab506",
+    "summary": {
+      "passed": 1897,
+      "failed": 0,
+      "ignored": 19
+    },
+    "prescribedRoots": [
+      "packages/service",
+      "packages/plugin",
+      "packages/fresh",
+      "packages/fresh-ui",
+      "plugins/workers",
+      "plugins/streams",
+      "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+      "packages/sdk/tests/internal-credential-contribution_test.ts",
+      "packages/sdk/tests/client-contribution-validation_test.ts",
+      "packages/sdk/tests/client-contribution-observability_test.ts",
+      "packages/sdk/tests/integration/client-contribution-adapter_test.ts",
+      "packages/sdk/tests/discovery/env-ordering_test.ts",
+      "packages/kv/tests/list-contract_test.ts",
+      "packages/kv/tests/bridge-list_test.ts",
+      "packages/plugin-streams-core/tests/application/producer-session_test.ts"
+    ],
+    "rootGitObjects": {
+      "packages/service": "cc83fe433c635f6c5de2c9a035410f969b62f09c",
+      "packages/plugin": "59734397c4d51bf8a6e969d06c906ffb25c6fdde",
+      "packages/fresh": "89f672bf5254a4f3585bf09d9ac3edd8bb354a01",
+      "packages/fresh-ui": "d5d16d9648a94678971fe90bc212690a9dc1db48",
+      "plugins/workers": "fc89afe280d65294a8aa5a6da24c9c3ffbe99cfa",
+      "plugins/streams": "5d318d56148fd165d8d8358c7c79759864121b2e",
+      "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts": "d13deb71eb433e972ef29b21075a0c77c273a1d3",
+      "packages/sdk/tests/internal-credential-contribution_test.ts": "0d67a764135f53ed96158f8d1baee5cec4a43b21",
+      "packages/sdk/tests/client-contribution-validation_test.ts": "544e8d73b05ca44f279e97e7794d341d1eabbf7e",
+      "packages/sdk/tests/client-contribution-observability_test.ts": "fa80ff5e642302188ba03a50bd391a7533e65368",
+      "packages/sdk/tests/integration/client-contribution-adapter_test.ts": "55bf5e7ebdaabb46e5ed556f9af041b5695ebef9",
+      "packages/sdk/tests/discovery/env-ordering_test.ts": "75f97e95ad9b0f6ac596f86eb4a2acdfa1065f28",
+      "packages/kv/tests/list-contract_test.ts": "3628045b86a4507b68d2aa4d95de70328c5722b5",
+      "packages/kv/tests/bridge-list_test.ts": "7b4f7d240faba82bdd658d377af077fc659c82bb",
+      "packages/plugin-streams-core/tests/application/producer-session_test.ts": "1f1ad00b71bfd3cd29e9ae285df31d848354402f"
+    },
+    "verification": "git diff of ALL15 entire prescribed runtime/test roots is empty; root/workspace manifests, lock and test runner unchanged; no production runtime changes in incoming main; changed docs/e2e helpers are not imported by the prescribed roots. Canonical data outputs have fresh root/docs/publication gates. No new complete-suite execution is claimed.",
+    "documentReadException": "Worker webhook-delivery resource test reads outbound-webhooks.md. Incoming edit adds prose links outside TS fences; the same two executable samples and asserted phrases are unchanged (independently reviewed)."
+  },
+  "freshDeltaTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 36,
+      "failed": 0,
+      "ignored": 6,
+      "totalResults": 42,
+      "uniqueFailures": 0
+    },
+    "durationMs": 3552,
+    "paths": [
+      ".llm/tools/docs/command-guide-example_test.ts",
+      ".llm/tools/docs/snippet-extractor_test.ts",
+      ".llm/tools/e2e/prepull-runtime-images_test.ts",
+      "packages/plugin-sagas-core/tests/runtime/saga-compensation-retry_test.ts"
+    ],
+    "environment": "task-local executable TMPDIR; default temp mount is noexec, proven by exact unchanged startup fixture; same assertions/deadlines/permissions/ignores",
+    "earlierDefaultTempAttempts": "35 passed/1 failed/6 ignored twice; sole fake-git-start assertion, preserved raw reports"
+  },
+  "nativeRepair": "byte-identical native code/test/facades/debt; exact23/22, unchanged2026-11-10; original same-session debt and source reviews retained",
+  "locks": "unchanged",
+  "hostedCI": "UNPROVEN until current-head jobs run; coordinator controls required e2e arming and merge",
+  "publishedConsumerGraph": "UNPROVEN; accepted release-owned first-canary debt before stable"
+}

@@ -1,0 +1,9 @@
+# Root S3e source acceptance
+
+Root reviewed the complete 109-line new lifecycle owner and the two pre-existing conformance introductory comment changes. Accepted source SHA256: c416cf59fc7570746a9b92b5d88da3eab265b6f6f5a469cf21bcc2731646145b. No production or helper change.
+
+The actual positive child consumes a real describe response, aborts the caller signal and rebinds the allocated loopback port before manual stop. The fresh signal-omitted child differs only in signal forwarding and must fail with the exact ABORT_DID_NOT_RELEASE error. Both complete idempotent listener stop, rebind and caller-owned KV survival/close; primary errors retain ordering. Every parent sanitizer is explicit. The fixed monotonic deadline retries only AddrInUse.
+
+Root independently read final four-file test/type/lint/format reports: 9 passed, 0 failed, 0 ignored in24596ms; all four selected type/lint/format files processed without findings or dropped files. Root recomputed all22 protected bindings and5 committed debt/verdict hashes with no mismatches. New-owner quality scan reports zero findings and allowances. Earlier ANSI comparison, PATH/PATHEXT setup, lint and format failures remain retained separately; no fabricated initial RED or product change is claimed.
+
+Authorized: checkpoint the two source owners and scoped run provenance/raw evidence, verify staged byte preservation, push and update existing draft PR2421. Preserve historical bundles and verdicts. No merge, readiness, issue closure or independent IMPL acceptance. Then prepare an exact next in-flight drain/legacy/streams scope proposal; no next production implementation before root reviews that scope. Public documentation baseline failures, Windows path checker, broader package/consumer/security and independent evaluation remain open.

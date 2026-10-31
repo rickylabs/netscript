@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "[info] [FileBackedStreamStore] Starting recovery...\n[info] [FileBackedStreamStore] Recovery complete: 0 streams, 0 reconciled, 0 errors\n05:23:29.067 INF netscript·services·streams Service listening\n05:23:29.081 INF netscript·services·streams HTTP request started\n05:23:29.094 INF netscript·services·streams HTTP request completed\n05:23:29.095 INF netscript·services·streams HTTP request started\n05:23:29.099 INF netscript·services·streams HTTP request completed\n05:23:29.099 INF netscript·services·streams HTTP request started\n05:23:29.102 INF netscript·services·streams HTTP request completed\n05:23:29.123 INF netscript·services·streams Service shutdown completed\n{\"observations\":{\"row\":\"writer\",\"mode\":\"file\",\"storage\":{\"mode\":\"file\",\"durable\":true,\"probe\":\"passed\",\"message\":\"Streams file storage passed the startup write/read probe; orderly restart replay is supported.\"},\"snapshot\":{\"status\":200,\"bytes\":[98,101,102,111,114,101,124,97,102,116,101,114],\"offset\":\"0000000000000000_0000000000000022\"},\"upstream\":{\"status\":200,\"bytes\":[98,101,102,111,114,101,124,97,102,116,101,114],\"offset\":\"0000000000000000_0000000000000022\"}},\"reboundPorts\":[57539,63336]}\ns6f-replay:{\"firstOffset\":\"0000000000000000_0000000000000012\",\"finalOffset\":\"0000000000000000_0000000000000022\",\"bytes\":[98,101,102,111,114,101,124,97,102,116,101,114]}\ns6f-streams: storage assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n",
+  "pid": 91964,
+  "startedAt": "2026-10-28T05:23:27.745Z",
+  "finishedAt": "2026-10-28T05:23:29.154Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

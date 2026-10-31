@@ -365,7 +365,7 @@ Parameterized retirement is unsupported; unmatched concrete paths under guard st
 Clients inspecting HTTP responses can map `procedure_retired` to “client too old” and offer an
 upgrade without treating it as a permission denial. These are pre-dispatch middleware errors,
 not contract-defined oRPC errors. Use the response JSON `code`, not its human-readable message.
-`PROCEDURE_ERROR_CODES` and the derived `ProcedureErrorCode` type are available at the root and
+`PROCEDURE_ERROR_CODES` and the `ProcedureErrorCode` union are available at the root and
 `./auth`; `AuthzDecision.code` is optional so existing authorizers preserve their 403 responses.
 The matched branch of `ProcedurePolicyResolution` has an optional `retired?: true` marker;
 contract-overlay authorizers never set it and retain their current fallback semantics.
