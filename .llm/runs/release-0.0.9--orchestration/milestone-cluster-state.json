@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "462f15c099c3d2d4600c4442111dce51edf0d4b2",
+  "currentMainSha": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -402,7 +402,7 @@
     {
       "id": "D1-2396-u1",
       "lane": "features",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2421,
       "headSha": "2f4b66e63403664c57b8552e22ae2eaccfc154f9",
@@ -411,7 +411,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "head 2f4b66e (11:17), Opus MERGE at 2f4b66e; e2e running; READY pending"
+      "note": "r3 READY (queued) at 2f4b66e; Opus MERGE; 32/32 incl both runtime tiers + close-gate after coordinator evidence box; literal-union closure 23/22; #2396 stays open for release-owned published-graph proof",
+      "mergeCommit": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+      "mergedAt": "2026-10-31T11:37:50Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2396-r3"
     },
     {
       "id": "D1-2396-svc",
@@ -952,12 +955,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2519,
-      "headSha": "4f3ba434b98273bcae22dffaa7a566f8b5fa8937",
+      "headSha": "2f02788071fd4d8088b7b9e21dfa2394d04f2bc5",
       "issueNumbers": [
         2149
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2149",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "BLOCKED after 2 doc-only IMPL-EVAL FAIL_FIX; coordinator authorized round 3 after fixing the two tutorial lines; steered the live worker"
     },
     {
       "id": "C1-1367",
@@ -965,7 +969,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2520,
-      "headSha": "57193c427042a6fdbc1ee1bcff6e61d2d55bf1ea",
+      "headSha": "aecbe4022e7fa92b84bd761bfdb875e76a68d05e",
       "issueNumbers": [
         1367
       ],
@@ -1228,6 +1232,14 @@
       "via": "label e2e-cli-gate kept; push-triggered (concurrent with #2517)",
       "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
       "completedAt": "2026-10-31T11:32:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": null,
+      "headSha": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+      "startedAt": "2026-10-31T11:38:10Z",
+      "via": "workflow_dispatch on main (canary .1 control run 41197676281)"
     }
   ],
   "canaryCheckpoints": [
@@ -1235,7 +1247,8 @@
       "id": "0.0.9-canary.1",
       "state": "planned",
       "targetDate": "2026-11-02",
-      "rationale": "H01 main CI green, A1-A3 silent job/queue loss, D1 #2396 guarded plugin services (waves 1-3 critical path)."
+      "rationale": "H01 main CI green, A1-A3 silent job/queue loss, D1 #2396 guarded plugin services (waves 1-3 critical path).",
+      "note": "contents merged at 11:37Z (candidate 15cffa2fe); main control runs in progress; Eric cuts (publishing/complete are release-captain states)"
     },
     {
       "id": "0.0.9-canary.2",
@@ -1258,11 +1271,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T11:33:30Z",
-    "nextReportDueAt": "2026-10-31T12:33:30Z",
+    "lastReportAt": "2026-10-31T11:38:48Z",
+    "nextReportDueAt": "2026-10-31T12:38:48Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2517 (#2160); canary .1 left: #2421 READY pending (e2e green at 2f4b66e)",
-    "currentMainSha": "462f15c099c3d2d4600c4442111dce51edf0d4b2",
+    "headline": "canary .1 contents all merged (candidate 15cffa2fe); main control runs in progress",
+    "currentMainSha": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1448,7 +1461,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T11:33:54Z",
+  "updatedAt": "2026-10-31T11:38:50Z",
   "dispatches": [
     {
       "issue": 2438,
