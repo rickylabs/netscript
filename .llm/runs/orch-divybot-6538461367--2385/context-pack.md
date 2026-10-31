@@ -1,0 +1,3 @@
+# Resume from here
+
+Issue #2385, coordinator #2474, docs lane E2 for 0.0.9. Branch orch/divybot-6538461367 from main 2f426b970d7a00bdbeb09c59b72b49478b839a5a. Read plan.md and worklog.md Design. S0 bootstrap complete; PLAN-EVAL pending, no implementation yet. Keep all writes within docs/site, .llm/tools/docs, this run directory. No package/plugin source or generated-carrier changes, lock churn, labels/milestones or merge. Independent Claude reviews as specified in supervisor.md. Final report goes through the dispatcher file handoff. S1 gates include real main CLI update and a red regression control. See research.md for carrier-freshness scope risk.
