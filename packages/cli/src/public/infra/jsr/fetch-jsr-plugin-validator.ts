@@ -1,3 +1,4 @@
+import { JsrRequestError, readJsrResource } from './read-jsr-resource.ts';
 import { parsePluginManifest } from '@netscript/plugin/protocol';
 import { compare, parse } from '@std/semver';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../kernel/constants/jsr-specifiers.ts';
@@ -21,6 +22,17 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
 
   /** Resolve JSR metadata and parse `scaffold.plugin.json` without executing plugin code. */
   async validate(resolvedPackage: ResolvedPluginPackageSpec): Promise<JsrPluginValidationResult> {
+    try {
+      return await this.validatePackage(resolvedPackage);
+    } catch (error) {
+      if (error instanceof JsrRequestError) return invalidMetadata(error.message);
+      throw error;
+    }
+  }
+
+  private async validatePackage(
+    resolvedPackage: ResolvedPluginPackageSpec,
+  ): Promise<JsrPluginValidationResult> {
     const packageUrl = jsrPackageMetaUrl(resolvedPackage);
     const packageResponse = await this.http.fetch(packageUrl, { headers: JSON_HEADERS });
     if (packageResponse.status === 404) {
@@ -155,12 +167,22 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
 
 /** Web Fetch implementation for the JSR validator HTTP port. */
 export class WebFetchJsrHttpClient implements JsrHttpClient {
+  constructor(private readonly fetcher: typeof fetch = fetch) {}
+
   /** Fetch a JSON resource. */
-  fetch(
+  async fetch(
     url: string,
     init?: { readonly headers?: Readonly<Record<string, string>> },
   ): Promise<JsrHttpResponse> {
-    return fetch(url, init);
+    const resource = await readJsrResource(url, init ?? {}, this.fetcher);
+    let json: Promise<unknown> | undefined;
+    return {
+      status: resource.status,
+      ok: resource.ok,
+      // Parsing cannot turn malformed JSON into a retriable transport failure.
+      json: () =>
+        json ??= Promise.resolve().then(() => JSON.parse(new TextDecoder().decode(resource.bytes))),
+    };
   }
 }
 
