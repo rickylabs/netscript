@@ -135,6 +135,18 @@ export interface PluginManifestLinking {
   readonly consumers: PluginManifestLinkingConsumers;
 }
 
+/** Database requirement selected from a plugin's finite configuration values. */
+export interface PluginDatabaseRequirement {
+  /** Environment variable selecting the backend or storage mode. */
+  readonly environmentVariable: string;
+  /** Value used when neither the environment nor project configuration selects one. */
+  readonly defaultValue: string;
+  /** Ordered property paths into appsettings.json, after the project .env. */
+  readonly appsettingsPaths: readonly (readonly string[])[];
+  /** Supported selector values and whether each requires SQL/schema contributions. */
+  readonly values: Readonly<Record<string, boolean>>;
+}
+
 /** Published `scaffold.plugin.json` contract consumed by NetScript installers. */
 export interface PluginInstallerManifest {
   /** Published protocol schema version. */
@@ -161,7 +173,18 @@ export interface PluginInstallerManifest {
   readonly officialSource?: PluginManifestOfficialSource;
   /** Resource links reconciled generically for first- and third-party plugins. */
   readonly linking?: PluginManifestLinking;
+  /** Optional configuration-dependent SQL requirement, resolved before installation. */
+  readonly databaseRequirement?: PluginDatabaseRequirement;
 }
+
+const databaseRequirementSchema: z.ZodType<PluginDatabaseRequirement> = z.object({
+  environmentVariable: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/),
+  defaultValue: z.string().min(1),
+  appsettingsPaths: z.array(z.array(z.string().min(1)).min(1).readonly()).readonly(),
+  values: z.record(z.string().min(1), z.boolean()),
+}).strict().refine((value) => Object.hasOwn(value.values, value.defaultValue), {
+  message: 'The default database selector must be declared in values.',
+});
 
 const permissionValuesSchema: z.ZodType<readonly string[]> = z.array(z.string().min(1)).readonly();
 
@@ -284,6 +307,7 @@ export const PluginInstallerManifestSchema: PluginInstallerManifestValidator = z
   provider: providerSchema.optional(),
   officialSource: officialSourceSchema.optional(),
   linking: linkingSchema.optional(),
+  databaseRequirement: databaseRequirementSchema.optional(),
 }).strict().superRefine((manifest, context) => {
   const serviceIdentityFields = [
     manifest.officialSource?.serviceEntrypoint,

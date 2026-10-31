@@ -17,3 +17,15 @@ Owner grant verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after, 
 ## Intake
 
 Memory and guidance consulted. Main baseline verified. No pre-existing changes. S0 plan ready for evaluation; implementation has not started. Assignment and report files will not be committed.
+
+## S1 validation
+
+- PLAN-EVAL round 1: PASS before implementation; sanitized review in plan-eval.md.
+- Structured contract tests: 24 passed (protocol, auth resources/manifest, selector).
+- Structured install/local/dispatch/mutator suites: 81 passed after restoring legacy scaffold payload shape; focused dispatch rerun: 13 passed.
+- Structured changed-source check and lint: zero findings. Root fmt excludes CLI, so use a private scoped config preserving root style and the structured formatter's processed-file coverage; 17/17 files processed.
+- quality:gate: pass; baseline also passed.
+- Actual maintainer init --db none, then auth install with kv-oauth: no database declaration, RequiresDb=false, selected backend persisted, no root Prisma files. Better-auth on a second DB-free scaffold: SQL provisioned and all four mapped auth tables copied. No runtime resources started.
+- Consumer generate runtime-schemas/doctor exposed the pre-existing local plugin package import gap: local scaffolder emits auth/plugin.ts importing @netscript/plugin-auth, but local init copies core packages only. S2 will reconcile selected local package exports with root imports; this is necessary for the requested clean generate/doctor acceptance. Record bounded drift and test the real path.
+- Auth JSR audit passes. Core plugin audit reports three unchanged entrypoint @module omissions (abstracts/config/testing); its publish dry-run passes. These are baseline findings, not newly accepted debt or a green full JSR audit.
+- S1 independent slice review: PASS, see slice-review.md. Reconcile: PR 2519 still draft; no label/milestone edits, no unrelated source changes or lock churn. Proceed to S2 with the bounded local import correction and consumer evidence.

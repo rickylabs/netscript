@@ -33,6 +33,7 @@ import {
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
 } from '../../../../public/features/plugins/install/install-plugin.ts';
+import { resolvePluginSchemaFragments } from '../../../../public/features/plugins/install/plugin-schema-fragments.ts';
 import { planPluginInstall } from '../../../../public/features/plugins/install/plan-plugin-install.ts';
 import { resolvePluginPackageSpec } from '../../../../public/features/plugins/install/plugin-package-resolver.ts';
 import { renderPluginSupport } from '../../../../public/features/plugins/install/render-plugin.ts';
@@ -76,6 +77,8 @@ export interface InstallLocalPluginDependencies {
   readonly pluginValidator?: JsrPluginValidatorPort;
   /** Process runner reserved for plugin-owned scaffold execution. */
   readonly processRunner?: ProcessPort;
+  /** Environment accessor supplied by the command edge. */
+  readonly readEnvironment?: (key: string) => string | undefined;
   /** JSR file fetcher used for plugin-owned scaffold integrity checks. */
   readonly packageFileFetcher?: JsrPackageFileFetcher;
   /** Discover a first-party plugin source checkout. */
@@ -104,6 +107,7 @@ export async function installLocalPlugin(
     registry,
     dependencies.pluginValidator,
     dependencies.fs,
+    dependencies.readEnvironment,
   );
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? descriptorRequest
@@ -149,12 +153,26 @@ export async function installLocalPlugin(
       serviceReferences: plan.serviceReferences,
     };
 
-  const schemaCopies = await copyPluginSchemasToRootDb(
+  const contributesSchemas =
+    resolvedPlugin?.descriptor.manifest.databaseRequirement === undefined ||
+    resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations;
+  const packageFragments = resolvedPlugin && plan.dbDetection.requiresDb && contributesSchemas
+    ? await resolvePluginSchemaFragments(
+      resolvedPlugin,
+      dependencies.fs,
+      dependencies.packageFileFetcher,
+    )
+    : [];
+  const schemaCopies = !contributesSchemas ? [] : await copyPluginSchemasToRootDb(
     plan.projectRoot,
     plan.pluginName,
     plan.dbDetection,
     { fs: dependencies.fs, scaffolder: dependencies.scaffolder },
-    { overwrite: plan.overwrite },
+    {
+      overwrite: plan.overwrite,
+      packageFragments,
+      schemaDeclared: resolvedPlugin?.descriptor.manifest.capabilities.hasDatabaseMigrations,
+    },
   );
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,
@@ -164,6 +182,7 @@ export async function installLocalPlugin(
       serviceReferences: mergeUniqueReferences(plan.serviceReferences, rendered.serviceReferences),
       pluginReferences: mergeUniqueReferences(plan.pluginReferences, rendered.pluginReferences),
       requiresDb: plan.dbDetection.requiresDb,
+      environment: resolvedPlugin?.configuration,
       sagaStoreBackend: plan.sagaStoreBackend,
     },
   );

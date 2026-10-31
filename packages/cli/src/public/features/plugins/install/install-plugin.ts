@@ -53,15 +53,19 @@ import {
   type PluginScaffoldDispatchSource,
 } from '../dispatch/dispatch-plugin-verb.ts';
 import {
-  fetchJsrPackageSchemaFragments,
   type JsrPackageFileFetcher,
   jsrPackageSchemaSearchPath,
 } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
+import { selectPluginDatabaseRequirement } from './plugin-database-requirement.ts';
+import { resolvePluginSchemaFragments } from './plugin-schema-fragments.ts';
 import { installUiRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 
 export interface PluginOwnedScaffoldDependencies {
   /** Process runner used for plugin-owned scaffold and post-script dispatch. */
   readonly processRunner?: ProcessPort;
+
+  /** Environment accessor supplied by the command edge. */
+  readonly readEnvironment?: (key: string) => string | undefined;
 
   /** JSR package file fetcher used for integrity verification. */
   readonly packageFileFetcher?: JsrPackageFileFetcher;
@@ -71,6 +75,7 @@ export interface ResolvedPluginBeforePlanning {
   readonly descriptor: ValidatedPluginDescriptor;
   readonly planningKind?: string;
   readonly source: PluginScaffoldDispatchSource;
+  readonly configuration?: Readonly<Record<string, string>>;
 }
 
 /** Dependencies used by the public install-plugin flow. */
@@ -122,6 +127,7 @@ export async function installPlugin(
     registry,
     dependencies.pluginValidator,
     dependencies.fs,
+    dependencies.readEnvironment,
   );
   if (resolvedPlugin !== undefined) {
     await confirmPluginInstall({
@@ -182,14 +188,16 @@ export async function installPlugin(
       resolvedPlugin.descriptor.manifest.officialSource?.pluginReferences ?? [],
     );
 
-  const packageSchemaFragments = resolvedPlugin.source.kind === 'jsr' &&
-      plan.dbDetection.requiresDb
-    ? await fetchJsrPackageSchemaFragments(
-      resolvedPlugin.descriptor,
+  const contributesSchemas = resolvedPlugin.descriptor.manifest.databaseRequirement === undefined ||
+    resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations;
+  const packageSchemaFragments = plan.dbDetection.requiresDb && contributesSchemas
+    ? await resolvePluginSchemaFragments(
+      resolvedPlugin,
+      dependencies.fs,
       dependencies.packageFileFetcher,
     )
     : [];
-  const schemaCopies = await copyPluginSchemasToRootDb(
+  const schemaCopies = !contributesSchemas ? [] : await copyPluginSchemasToRootDb(
     plan.projectRoot,
     plan.pluginName,
     plan.dbDetection,
@@ -197,8 +205,7 @@ export async function installPlugin(
     {
       overwrite: plan.overwrite,
       packageFragments: packageSchemaFragments,
-      schemaDeclared: resolvedPlugin.source.kind === 'jsr' &&
-        resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
+      schemaDeclared: resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
       packageSearchPath: resolvedPlugin.source.kind === 'jsr'
         ? jsrPackageSchemaSearchPath(resolvedPlugin.descriptor)
         : undefined,
@@ -212,6 +219,7 @@ export async function installPlugin(
       serviceReferences: plan.serviceReferences,
       pluginReferences,
       requiresDb: plan.dbDetection.requiresDb,
+      environment: resolvedPlugin.configuration,
       sagaStoreBackend: plan.sagaStoreBackend,
       packageSpecifier: resolvedPlugin.descriptor.package.packageSpecifier,
       packageVersion: resolvedPlugin.descriptor.version,
@@ -365,7 +373,40 @@ async function readManagedInstallFiles(
   return files;
 }
 
+/** Resolve static metadata and specialize its declared database selector before planning. */
 export async function resolvePluginDescriptorBeforePlanning(
+  request: InstallPluginInput,
+  registry: PluginKindRegistry,
+  validator: JsrPluginValidatorPort | undefined,
+  fs: FileSystemPort,
+  readEnvironment?: (key: string) => string | undefined,
+): Promise<ResolvedPluginBeforePlanning | undefined> {
+  const resolved = await resolveUnconfiguredPluginDescriptor(request, registry, validator, fs);
+  if (resolved === undefined) return undefined;
+  const selected = await selectPluginDatabaseRequirement(
+    resolved.descriptor.manifest,
+    request.projectRoot,
+    fs,
+    readEnvironment,
+  );
+  if (
+    request.noDb && selected.manifest.provider?.defaultRequiresDb &&
+    selected.manifest.databaseRequirement !== undefined
+  ) {
+    throw new ScaffoldValidationError(
+      'The selected plugin backend requires a database; remove --no-db.',
+    );
+  }
+  const provider = normalizeManifestProvider(selected.manifest.provider);
+  if (provider !== undefined) registry.register(provider.kind, provider);
+  return {
+    ...resolved,
+    configuration: selected.configuration,
+    descriptor: { ...resolved.descriptor, manifest: selected.manifest },
+  };
+}
+
+async function resolveUnconfiguredPluginDescriptor(
   request: InstallPluginInput,
   registry: PluginKindRegistry,
   validator: JsrPluginValidatorPort | undefined,
@@ -488,6 +529,7 @@ export async function runPluginOwnedScaffold(
     pluginName: plan.pluginName,
     dryRun: request.dryRun === true,
     includeSamples: plan.includeSamples,
+    configuration: resolvedPlugin.configuration,
     scaffoldArgs: request.mcp === true ? ['--mcp'] : [],
     permissionFlags,
     processRunner,
