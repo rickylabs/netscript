@@ -117,3 +117,28 @@ S3 publication correction: the read-only leak reporter wrote a report into this 
 It was accidentally included in the slice stage selection. Replaced operational details with a
 public ownership summary immediately; raw evidence is retained privately. No credentials were
 present. This correction changes evidence only, and a new exact-head review follows.
+
+## Focused actual Aspire acceptance
+
+Docker-less targeted proof used supported native Garnet config and real streams in the owned
+no-DB/no-samples project, helpers regenerated through CLI, frontend disabled. Selecting the
+installed .NET SDK in the fixture and restoring its pinned tool resolved a local shim setup
+failure. All three background resources became Running/Healthy with actual healthy HTTP checks;
+HTTP /health returned 200, state ready, registryReady/dependencyReady true, restartCount 0.
+Generated saga/worker/trigger maps and worker definitions all contain zero entries. Doctor exits
+0 with three empty warnings, zero errors. Exact-path stop preserved the pre-existing AppHost;
+post-stop resource report has zero owned fixture survivors. No local full runtime suite was run.
+See aspire-proof.md; detailed operational logs remain private.
+
+## S4 — CLI check semantics regression
+
+Full runtime workflow 41187600253 at f13b14c passed Postgres 120/0/0, SQLite 113/0/0 and all
+static suites. Core test-2 had exactly one failure: historical expectation deleting last workers
+output. Replaced that test with zero-size maps, retained producer/output inventory, read-only
+check and missing-output negative control. Other inactive AI and foreign-owner cases unchanged.
+Full plugin-check file: 29 passed / 0 failed / 0 ignored; scoped check/lint/fmt and quality:gate
+pass. Independent same-session Opus S4 slice review PASS before sign-off; evaluator explicitly classified the old assertion as stale and confirmed stronger checks. No implementation code changed.
+
+S4 reconcile: one open PR #2509, same issue #2162, coordinator-owned label remains. Runtime
+proof at the reviewed parent is retained; after pushing S4 its exact-head CI and final evaluator
+must be renewed. No lock changes, no test skips or weakened acceptance.

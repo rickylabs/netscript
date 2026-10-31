@@ -13,3 +13,8 @@
 - S3 CI found one stale E2E fixture title expectation outside the original source-file list.
   Expanding validation-fixture scope only; no test assertion removed or relaxed. Coordinator
   has applied e2e-cli-gate. This invalidates the old exact-head attestation when S3 is pushed.
+
+- S4: full CI exposed a second historical expectation, in plugin-check-command_test.ts, that
+  contradicts retained empty workers output. Replaced it with stronger retained-map/inventory
+  assertions while preserving missing-output failure. Both runtime CI tiers already passed the
+  unchanged runtime source, and actual zero-definition Aspire proof is now complete.

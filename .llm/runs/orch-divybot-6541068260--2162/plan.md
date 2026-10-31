@@ -48,3 +48,12 @@ requiring the old "is non-empty" check title. Update only that expectation to "i
 retain healthy status, registry content, declared-job registration and permissions assertions.
 Run the actual package-backed fixture, focused wrappers and quality:gate; independent slice
 review before commit, then exact-pushed-head evaluation again. No source behavior redesign.
+
+## S4 — CLI check regression expectation
+
+Core CI's last shard found the historical test that requires deleting the last workers registry
+after its final source is removed. The approved empty-registry contract requires retaining it.
+Replace that expectation with runtime zero-size checks for both maps, explicit output/producer
+inventory membership, read-only parity and missing-output negative control. No runtime source
+changes. Run the full plugin-check test file, scoped wrappers and quality gate, then independent
+slice review, commit/push and renewed final-head evaluation.

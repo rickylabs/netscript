@@ -377,15 +377,25 @@ async function assertMissing(root: string, path: string) {
   assert(missing, 'inactive producer-owned output should be removed');
 }
 
-Deno.test('plugin generation removes the last workers registry when its source disappears', async () => {
+Deno.test('plugin generation retains a checked empty workers registry when its last source disappears', async () => {
   await withProject(async (root) => {
     await Deno.remove(join(root, 'workers/jobs/custom.ts'));
     assertEquals((await inspect(root)).status, 'drift');
     assertEquals((await command(root, false)).code, 0);
-    await assertMissing(root, '.netscript/generated/plugin-workers/job-registry.ts');
+    const path = '.netscript/generated/plugin-workers/job-registry.ts';
+    const registry = await import(toFileUrl(join(root, path)).href);
+    assertEquals(registry.registry.size, 0);
+    assertEquals(registry.jobDefinitions.size, 0);
     const before = await snapshot(root);
-    assertEquals((await inspect(root)).status, 'current');
+    const report = await inspect(root);
+    assertEquals(report.status, 'current');
+    assertEquals(report.outputs.map((output) => output.path), [path]);
+    assertEquals(report.producers[0].outputs, [path]);
     assertEquals(await snapshot(root), before);
+    await Deno.remove(join(root, path));
+    const missing = await inspect(root);
+    assertEquals(missing.status, 'drift');
+    assert(missing.drift.some((finding) => finding.path === path && finding.kind === 'missing'));
   }, ['workers']);
 });
 

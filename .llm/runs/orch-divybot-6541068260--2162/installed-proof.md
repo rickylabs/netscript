@@ -1,7 +1,7 @@
 # Installed empty-plugin acceptance
 
-A fresh no-database local-source project was initialized with Aspire files present. No AppHost
-was restored/started and no local full runtime suite was run. Commands used the maintainer CLI
+A fresh no-database local-source project was initialized with Aspire files present. The initial isolated-API test did not start an AppHost; the subsequent focused real Aspire
+proof is recorded in aspire-proof.md. No local full runtime suite was run. Commands used the maintainer CLI
 `deno run -A packages/cli/bin/netscript-dev.ts` from the repository root.
 
 | Step (each uses the generated project via --project-root) | Result |
@@ -31,8 +31,8 @@ awaited runtime completion, KV close and streams shutdown release owned resource
 
 Workers requires a streams reference even with zero jobs: the test supplies an isolated HTTP
 streams test double. This proves empty-registry production startup and dependency/readiness
-handling; it does not prove durable streams behavior or Aspire orchestration. **Aspire acceptance
-and the full scaffold.runtime CI verdict remain unproven until coordinator-armed CI supplies them.**
+handling; it does not prove durable streams behavior or Aspire orchestration. **The subsequent focused real Aspire proof closes Aspire acceptance; full runtime CI at f13b14c
+also passed both tiers. S4 is a test-only follow-up and requires its own final-head CI verdict.**
 
 An earlier scratch fixture was polluted by sync plugin copying official sample jobs; it was not
 used as the final empty proof. Fresh init + no-samples installs avoids this. The failed intermediate
