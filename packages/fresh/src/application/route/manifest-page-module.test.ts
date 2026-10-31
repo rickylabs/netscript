@@ -352,3 +352,55 @@ function stripStaticImports(source: string): string {
     '',
   );
 }
+
+for (const form of ['default', 'sidecar'] as const) {
+  for (
+    const binding of [
+      'appRoutes.home',
+      "appRoutes['notes']",
+      'routes.previous.$route',
+    ]
+  ) {
+    Deno.test(`computePageModuleRewrite preserves authored ${form} binding ${binding}`, () => {
+      const source = [
+        "import { appRoutes, routes } from '@app/router.ts';",
+        "import { definePage } from '@app/utils.ts';",
+        'export const page = definePage()',
+        `  .withRoute (${binding})`,
+        '  .withMeta(() => ({}))',
+        '  .build();',
+      ].join('\n');
+      let content = source;
+      for (let pass = 0; pass < 2; pass += 1) {
+        const result = computePageModuleRewrite({
+          source: content,
+          form,
+          routeKey: 'notes.$route',
+          manifestImportSpecifier: MANIFEST_SPECIFIER,
+          routesImportSpecifier: ROUTES_SPECIFIER,
+        });
+        assert(!result.changed, 'Expected explicit binding to remain author-owned');
+        assert(result.content === source, 'Expected source and imports byte-for-byte unchanged');
+        content = result.content;
+      }
+    });
+  }
+}
+
+Deno.test('computePageModuleRewrite preserves the scaffold router-owned routes import', () => {
+  const source = [
+    "import { routes } from '@app/router.ts';",
+    "import { definePage } from '@app/utils.ts';",
+    'export const page = definePage()',
+    '  .withRoute(routes.examples.crud.$route)',
+    '  .build();',
+  ].join('\n');
+  const result = computePageModuleRewrite({
+    source,
+    form: 'default',
+    routeKey: 'examples.crud.$route',
+    manifestImportSpecifier: MANIFEST_SPECIFIER,
+    routesImportSpecifier: ROUTES_SPECIFIER,
+  });
+  assert(!result.changed && result.content === source, 'Expected existing router import preserved');
+});

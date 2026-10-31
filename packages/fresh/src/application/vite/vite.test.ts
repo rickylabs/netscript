@@ -2,6 +2,7 @@ import { resolve } from '@std/path';
 import {
   build,
   type ConfigEnv,
+  createServer,
   defineConfig,
   normalizePath,
   type Plugin,
@@ -619,3 +620,59 @@ Deno.test('route manifest watch resyncs when helper TypeScript files move under 
     }, 75);
   });
 });
+
+for (const phase of ['dev', 'build'] as const) {
+  Deno.test(`Vite ${phase} preserves one authored route binding per page`, async () => {
+    const appRoot = Deno.makeTempDirSync({ prefix: 'netscript-vite-authored-binding-' });
+    try {
+      Deno.mkdirSync(resolve(appRoot, 'routes/notes'), { recursive: true });
+      const pages = [
+        ['index.tsx', 'appRoutes.home'],
+        ['dashboard.tsx', 'appRoutes.dashboard'],
+        ['health.tsx', 'appRoutes.health'],
+        ['notes/index.tsx', "appRoutes['notes']"],
+      ];
+      const sources = new Map<string, string>();
+      for (const [file, binding] of pages) {
+        const source = [
+          "import { appRoutes } from '@app/router.ts';",
+          "import { definePage } from '@app/utils.ts';",
+          `export const page = definePage().withRoute(${binding}).build();`,
+        ].join('\n');
+        const path = resolve(appRoot, 'routes', file);
+        sources.set(path, source);
+        Deno.writeTextFileSync(path, source);
+      }
+      Deno.writeTextFileSync(resolve(appRoot, 'entry.ts'), 'export const fixture = true;');
+      for (let pass = 0; pass < 2; pass += 1) {
+        if (phase === 'dev') {
+          // Real Vite lifecycle: configureServer runs without starting a listening server.
+          const server = await createServer({
+            root: appRoot,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [createNetScriptVitePlugin({ appRoot, routeManifest: {} })],
+            server: { middlewareMode: true, watch: null, ws: false },
+            optimizeDeps: { noDiscovery: true, include: [] },
+          });
+          await server.close();
+        } else {
+          await build({
+            root: appRoot,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [createNetScriptVitePlugin({ appRoot, routeManifest: {} })],
+            build: { write: false, rollupOptions: { input: resolve(appRoot, 'entry.ts') } },
+          });
+        }
+        for (const [path, source] of sources) {
+          const actual = Deno.readTextFileSync(path);
+          assert(actual === source, `${phase} generation changed authored page: ${path}`);
+          assert(actual.match(/\.withRoute\s*\(/g)?.length === 1, 'Expected exactly one binding');
+        }
+      }
+    } finally {
+      Deno.removeSync(appRoot, { recursive: true });
+    }
+  });
+}
