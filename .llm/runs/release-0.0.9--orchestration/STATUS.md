@@ -1,8 +1,8 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
-- H01 #2438 MERGED #2476 a410a815c 00:37Z; close after main command-postgres green
+- H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
 - A1 #2165 MERGED #2477 7907293f3 23:31Z (closed); #2187 r1 → PR #2479 (implementing)
 - A2 #2395 brief ready, HOLD until Cockpit says both Fresh UI fixes (#2415, #2416) started; then #2351 (W3)
-- A3 #2144 → PR #2481 (implementing); #2400 #2151 #2161: W2
+- A3 #2144 → PR #2481 (implementing); #2400 → PR #2482 (continuation of #2438 worker); #2151 #2161: W2
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
 - B2 #2162 (after #2161) #2149: W3; #2369: W4; #2108 (after B2 pair + all B1): W7
 - C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (after all B1): W7
@@ -13,3 +13,4 @@
 - H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
 - Open for Eric: #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; orchid automerge on netscript?
 - PLAN-EVAL: APPROVED with in-flight repair at round 2 (22:58Z). Leaves: #2476 (#2438), #2477 (#2165) open drafts.
+- Dispatch rule: before posting any /swarm, check the issue for a claim comment or an open PR (orchid continuation workers self-claim plan issues).

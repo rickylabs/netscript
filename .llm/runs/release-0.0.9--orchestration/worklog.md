@@ -49,3 +49,5 @@
 - 00:26Z: Cockpit: a second Fresh UI fix (#2416, 00:25:45Z) is held too. Stopped the scripted #2395 post (nothing was posted). #2395 now waits for Cockpit's explicit go, after both Fresh UI fixes have started (about 00:52Z).
 - 00:37Z: **merged** #2476 (`a410a815c`) for #2438 (H01). 49/49 checks green, including command-postgres and e2e-cli on both runtime tiers at `1684e82`; expensive gate released. #2438 closes after command-postgres is green on main.
 - 00:38Z: #2144 → PR #2481 (draft), implementing.
+- 00:48Z: command-postgres is green on main (dispatch run 41152000845 at `a410a815c`; the workflow runs on PRs and dispatch only, not on push). #2438 closed with evidence. Main CI is fully green again.
+- 00:49Z: **orchid continuation.** After #2476 merged, the #2438 worker claimed #2400 from the wave plan (claim comment at 00:39Z) and opened draft PR #2482 from briefs/2400.md. Adopted as leaf A3-2400 (fixes). This costs no launch slot. Fixes lane is now at its 2-implementing cap (#2479, #2482), so #2395 also waits for a fixes slot. Continuation workers must post a claim before taking an issue; the coordinator checks claims before every dispatch.
