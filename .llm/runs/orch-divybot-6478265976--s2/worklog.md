@@ -1,5 +1,7 @@
 # Worklog
 
+2026-10-31 publish-source repair local gates: replaced the three forbidden JSON imports with a16 KB compressed typed TypeScript carrier; generator/check tasks wire into existing root assets generation/freshness. Exact parity and stale/missing negative controls pass. Structured S2 suite366/0/0, real CLI3/0/0, publish-size1/0/0;5-file check/lint/fmt, root quality/architecture, release:preflight, four carriers and workspace publication dry-run pass. Native payload2,341,743 bytes/100 files,114,063 fewer than pre-repair, unchanged5,000,000 cap. Raw JSON stays authoritative in repo and its duplicate publication is removed; upstream license stays shipped. No component or dependency-version changes in the repair. New main's dependency/lock changes are retained only by normal merge. Independent repair review and final-head required CI quality remain pending; no renewed READY. See2026-10-31-publish-source-repair.md.
+
 ## Coordinator publish-source repair — design checkpoint, 2026-10-31
 
 Prior READY is superseded: required CI run41148772405 fails Release preflight on three JSON import attributes in publishable registry code. Owner comment6536722286 explicitly authorizes the fix and now requires quality green at the new head before the renewed READY. Do not reinterpret a dry-run or source-review PASS as that CI proof.

@@ -32,8 +32,6 @@
       "deno.json",
       "README.md",
       "tokens/README.md",
-      "registry.json",
-      "src/registry/schemas/*.json",
       "src/registry/README.md",
       "src/registry/schemas/LICENSE"
     ],
@@ -56,7 +54,9 @@
     "tokens:sources:check": "deno task tokens:embed:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/import-figma-tokens.ts --check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/validate-token-sources.ts",
     "tokens:report": "deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/check-tokens.ts --report",
     "tokens:embed": "deno run --lock=deno.lock --frozen --allow-read=. --allow-write=. --allow-run=deno scripts/embed-token-assets.ts",
-    "tokens:embed:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check"
+    "tokens:embed:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check",
+    "registry:embed": "deno run --lock=deno.lock --frozen --allow-read=. --allow-write=src/registry/assets --allow-run=deno scripts/embed-registry-assets.ts",
+    "registry:embed:check": "deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-registry-assets.ts --check"
   },
   "compilerOptions": {
     "lib": [

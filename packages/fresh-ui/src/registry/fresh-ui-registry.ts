@@ -1,4 +1,4 @@
-import registryJson from '../../registry.json' with { type: 'json' };
+import { registryJson } from './assets/registry.generated.ts';
 import type { Registry } from './registry-contract.ts';
 import { validateRegistry } from './validate-registry.ts';
 

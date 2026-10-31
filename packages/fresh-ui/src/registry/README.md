@@ -18,6 +18,16 @@ Compatibility reference: shadcn CLI **4.23.0**, source commit
 The snapshots retain their upstream MIT license. Ajv's bundled draft-07 dialect uses the equivalent
 HTTP metaschema URI; the validation adapter normalizes that URI without altering either snapshot.
 
+Registry authoring and the pinned schemas are embedded as compressed TypeScript constants in
+`assets/registry.generated.ts`, following the existing token-asset pattern. Run
+`deno task --cwd packages/fresh-ui registry:embed` after changing any JSON source;
+`registry:embed:check` checks exact freshness without writing. Root `gen:assets-barrel` regenerates
+the embedding, and `check:assets-barrel` checks it before regeneration so CI rejects stale or
+missing assets. Published modules import only TypeScript and need no filesystem or network reads
+for these assets; JSON import attributes remain prohibited by `release:preflight`.
+The JSON authoring files stay in the repository; publication includes the generated TypeScript
+and upstream license instead of duplicating the raw JSON payloads.
+
 NetScript extensions live in metadata:
 
 - Catalog `meta.collections` holds named item groups used by the existing scaffold.

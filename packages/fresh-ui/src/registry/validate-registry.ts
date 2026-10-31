@@ -1,6 +1,5 @@
 import { Ajv } from 'npm:ajv@8.20.0';
-import itemSchema from './schemas/registry-item.json' with { type: 'json' };
-import registrySchema from './schemas/registry.json' with { type: 'json' };
+import { itemSchema, registrySchema } from './assets/registry.generated.ts';
 import type { Registry, RegistryItem } from './registry-contract.ts';
 
 /** Upstream schema URI used by authoring registries and static catalogs. */
