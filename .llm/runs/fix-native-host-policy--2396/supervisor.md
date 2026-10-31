@@ -88,3 +88,5 @@ reconciliation review, not a sixth source-feature evaluation. The source review 
 Both evaluator phases use independent Anthropic sessions and read-only tools; private
 execution metadata stays outside Git. No labels/milestones, local scaffold.runtime, rebase,
 force-push, main merge, tag, release or new PR.
+
+Follow-up merge scope: integrate1d274c16bd3163eb72a40ea3f2e3f0523861159f verbatim, including KV source and Aspire manifest. Only canonical prose/publish conflicts require regeneration. No factory source or debt bounds may change.

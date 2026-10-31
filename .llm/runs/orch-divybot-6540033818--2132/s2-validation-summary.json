@@ -1,0 +1,64 @@
+{
+  "scope": "S2 generated MCP corpus correction; KV implementation unchanged from 85dc6199a8c98ebd86902573338d1c58bf8df775",
+  "changedRows": [
+    {
+      "package": "kv",
+      "subpath": "./redis",
+      "oldSymbols": 15,
+      "newSymbols": 15,
+      "change": "normalized RedisKvAdapter signature replaces private listForward/listReverse with scanPrefix"
+    }
+  ],
+  "generator": "deno task gen:mcp-export-corpus",
+  "gates": {
+    "corpus-tests.json": {
+      "summary": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 7,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0,
+      "sha256": "ebd6bff39cdab74b3bcbba5ac5f1d4c329dcedbf64dc0584dc5fa854b0669cd0"
+    },
+    "corpus-check-types.json": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "exitCode": 0,
+      "sha256": "713d36a755d8c60f7c70c65003309461e0fe0d762cf01cb776a83340424068e4"
+    },
+    "corpus-lint.json": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "exitCode": 0,
+      "sha256": "138d9bda08086d14c17036b3ee4b7fa47bd47dafa665b188db3647022e7b4f9d"
+    },
+    "corpus-fmt.json": {
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "exitCode": 0,
+      "sha256": "a6bdea427f77976f4399e6f807095766ac3d4f77129eadef07bc63f19ae55c4a"
+    }
+  },
+  "freshness": {
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:publish-assets": 0
+  },
+  "qualityGateExitCode": 0,
+  "initialCloseGateCorrection": "PR final-review checklist updated after exact-head verdict; live close-gate PASS. New pushed head requires a new final verdict."
+}

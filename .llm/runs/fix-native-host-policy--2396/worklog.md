@@ -305,3 +305,39 @@ entrypoint doc lint, private-type-ref: native AuthzDecision now references Proce
 bound is changed. Both factories still preserve their reviewed source. This merge-only brief
 expressly forbids reimplementation; closure repair would grow the exact22/21 named surfaces
 and requires coordinator disposition. Report acceptance8 and complete-suite proof as unproven.
+
+Slice1 committed/pushed2d62297b0 with root4034/34/zero diagnostics. Reconciled PR comment and review-thread gate. Slice2 merges main1d274c16bd3163eb72a40ea3f2e3f0523861159f normally: only prose/publish generated conflicts. Incoming KV source/lock state preserved exactly. Regenerate same four carriers; rerun root/combined union tests and freshness/quality gates.
+
+Structured singular-factory doc lint reproduced the integration defect in BOTH workers and streams: one private-type-ref each, zero missing JSDoc. No test or source changed. Final source union retains incoming KV byte-for-byte; no source conflict or leaf lock churn. Updated four-carrier and quality/Aspire/docs checks all PASS after the follow-up merge.
+
+
+## Final reconciliation source checkpoint — mc009d-r2-2396
+
+Current main1d274c16bd3163eb72a40ea3f2e3f0523861159f integrated normally; first merge
+2d62297b0db8b85be3c5ad9a7ba1f95d8bc9d4e3 already pushed/commented. Second merge only
+needed generated prose/publish resolution; all four canonical generators rerun. Factory
+runtime/export/test source unchanged; incoming KV and lockfiles match main exactly. Debt rows
+from both parents and exact22/21 facade bounds retained unchanged. No goal/report file tracked.
+
+Final gates: root4039 files/34 batches/zero diagnostics; all four freshness gates;
+quality/architecture; Aspire parity; docs accuracy PASS. Release preflight PASS on this
+reconciliation (incoming follow-up has no import-attribute changes). Scoped lint/fmt365/365,
+zero findings/no dropped targets. Final combined suite1872 passed/1 failed/18 ignored,
+exit1, duration691998ms. All actual runtime/lifecycle/SDK/FreshUI/KV controls passed; the sole
+failure is workers non-contract entrypoint doc lint at type-refs_test.ts. Independently
+reproduced BOTH singular factory doc-lint checks: one private-type-ref each, zero missing
+JSDoc. AuthzDecision references main's new ProcedureErrorCode. No diagnostic suppression,
+assertion removal, export addition or debt-cap change was made. This is an actual integration
+blocker, not a dependency warning. See memory-authz-doc-closure.md and reconciliation-gates.json.
+
+Acceptance1–7 retain their runtime evidence and original limits; acceptance8 remains unproven
+for native documentation closure as well as the separately retained published graph debt.
+Hosted scaffold runtime and required same-head CI remain unproven; coordinator alone arms
+runtime/labels and merges. No local scaffold.runtime, new PR, rebase, force-push, release or tag.
+
+Next: push this source checkpoint and run only the one explicitly owner-authorized independent
+merge-delta evaluation at the exact pushed head. Publish its truthful verdict on PR2421. The
+final verdict and CI snapshot belong on the exact-head PR comment and canonical report; do not
+create another commit solely to store them, which would invalidate their head binding.
+Use the final-report file handoff for the canonical issue reply; queueing is not publication
+confirmation. Every acceptance entry must retain its stated limitations.

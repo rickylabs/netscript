@@ -203,7 +203,7 @@ the trigger and stream archetypes:
   {
     label: "Trigger archetype (typed contract + raw ingress)",
     lang: "ts",
-    code: "import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\n\n// A webhook contribution: returns an array of enqueueJob effects that\n// bind inbound HTTP to worker jobs. The triggers service serves a typed\n// v1 oRPC contract for trigger/event introspection and management; the\n// webhook ingress route (POST /api/v1/webhooks/:triggerId) stays a raw\n// signature-verifying endpoint by design. enqueueJob is the only live\n// action; a defer action throws and routes to the DLQ.\nexport const inbound = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(jobRef, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  { id: 'notifier-inbound', path: 'inbound/notify', verifier: 'memory', tags: ['webhook'] },\n);\nexport default inbound;"
+    code: "import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\n\n// A webhook contribution: returns an array of enqueueJob effects that\n// bind inbound HTTP to worker jobs. The triggers service serves a typed\n// v1 oRPC contract for trigger/event introspection and management; the\n// webhook ingress route (POST /api/v1/webhooks/:triggerId) stays a raw\n// signature-verifying endpoint by design. enqueueJob dispatches worker\n// work; defer schedules one-shot replay of the trigger event.\nexport const inbound = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(jobRef, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  { id: 'notifier-inbound', path: 'inbound/notify', verifier: 'memory', tags: ['webhook'] },\n);\nexport default inbound;"
   },
   {
     label: "Stream producer (real runtime)",

@@ -114,3 +114,5 @@ entrypoint doc lint, private-type-ref: native AuthzDecision now references Proce
 bound is changed. Both factories still preserve their reviewed source. This merge-only brief
 expressly forbids reimplementation; closure repair would grow the exact22/21 named surfaces
 and requires coordinator disposition. Report acceptance8 and complete-suite proof as unproven.
+
+Slice1 committed/pushed2d62297b0 with root4034/34/zero diagnostics. Reconciled PR comment and review-thread gate. Slice2 merges main1d274c16bd3163eb72a40ea3f2e3f0523861159f normally: only prose/publish generated conflicts. Incoming KV source/lock state preserved exactly. Regenerate same four carriers; rerun root/combined union tests and freshness/quality gates.
