@@ -62,11 +62,10 @@ package; import the runtime from `@netscript/fresh` directly.
 The app entry is one `defineFreshApp` call, which keeps the static-file and file-system-route
 bootstrap framework-managed:
 
-{{ comp.codeBlock({ filename: "apps/dashboard/main.ts", lang: "ts", code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire start` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010'); // note: your scaffold's port will differ\nconsole.log(`[dashboard] listening on http://localhost:${port}`);" }) }}
+{{ comp.codeBlock({ filename: "apps/dashboard/main.ts", lang: "ts", code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });" }) }}
 
-Aspire injects `PORT` at runtime. The typed source of truth is the `apps.<name>.port` field in
-`netscript.config.ts`, which the scaffold wires as the fallback default. Set the port there rather
-than editing this line.
+Aspire assigns the app's port when it starts it. Open the URL that `aspire start` prints, or the
+address in the dev server's startup banner, instead of pinning a port in your code.
 
 ## Edit a route
 

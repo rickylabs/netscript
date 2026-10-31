@@ -28,7 +28,6 @@ apps/dashboard/
 ├── lib/theme.ts                  # [owned] reads theme-preset.json and fonts.json
 ├── assets/
 │   ├── styles.css                # [owned] Tailwind, tokens, component CSS
-│   ├── ui/                       # [owned] one stylesheet per component
 │   ├── tokens.css                # [generated] the --ns-* tokens, light and dark
 │   ├── theme-bridge.css          # [generated] Tailwind utilities such as bg-ns-surface
 │   ├── theme-preset.json         # [generated] the preset's language, density, and flavor
@@ -45,8 +44,8 @@ apps/dashboard/
    stamps the attributes below on `<html>`, and links the font stylesheets from `assets/fonts.json`.
 3. `assets/tokens.css` selects on those attributes, so one stamp restyles the whole app.
 4. A script in `<head>` sets `data-scheme` before first paint, from `ns-theme` in `localStorage` or
-   else the OS preference. `ThemeToggle` flips `data-scheme` and writes `ns-theme`. It leaves the
-   language, flavor, and density alone.
+   else the OS preference. `ThemeToggle` flips `data-scheme` and writes `ns-theme`, keeping the
+   language.
 
 | Attribute | Value |
 | --- | --- |
@@ -70,8 +69,7 @@ A preset is one design language with its type, colors, shape, and density. NetSc
 | --- | --- |
 | Studio flavors | `studio-utility` (default), `studio-cloud`, `studio-workshop`, `studio-playful`, `studio-ledger`, `studio-atelier`, `studio-signal` |
 | Other languages | `ledger`, `signal`, `glass`, `tonal`, `fluent`, `brutal`, `filigrane`, `pixel`, `tactile`, `bloom`, `cupertino`, `liquid`, `terminal` |
-| Platform copies | `macos-27`, `apple-classic`, `fluent-2-web` |
-| Earlier default | `ns-one` |
+| Platform copies and the earlier default | `macos-27`, `apple-classic`, `fluent-2-web`, `ns-one` |
 
 Switch the whole app with `ui:apply`:
 
@@ -93,8 +91,8 @@ before any file changes.
 | A share link: an HTTPS URL with a `?preset=` code, decoded locally | `https://example.com/?preset=ns1_...` |
 | An HTTPS URL to preset JSON or to a `registry:theme` item | `https://example.com/themes/acme.json` |
 
-`netscript ui:preset url --theme studio-cloud` prints a share link, and
-`netscript ui:preset decode <code>` reads a code.
+`netscript ui:preset url --theme studio-cloud` prints a share link, and `ui:preset decode <code>`
+reads a code.
 
 A new app takes the same flag:
 
@@ -103,7 +101,7 @@ netscript init my-app --preset studio-cloud
 ```
 
 To compare presets first, run `netscript tokens build --previews`, start the app in development,
-and open `/design/tokens?preset=<id>`. Only `/design/` shows the preview.
+and open `/design/tokens?preset=<id>`.
 
 > [!NOTE]
 > Switch presets with `ui:apply`, not `ui:add theme-<id>`. The second command copies the theme's
@@ -111,18 +109,19 @@ and open `/design/tokens?preset=<id>`. Only `/design/` shows the preview.
 
 ## Fine-tune a preset
 
-An override reassigns a semantic role to another token of the same type. Create the override file
-once, naming your current preset, because `tokens init` defaults to NS One:
+An override reassigns a semantic role to another token of the same type. Create
+`tokens/semantic.tokens.json` with `{ "semantic": {} }`. If the app has a `tokens.config.json`, which
+`ui:apply` and `init --preset` write, add `"override": "tokens/semantic.tokens.json"` to it, because
+`tokens build` ignores an override the config does not name. `ui:apply` keeps that key when you
+switch presets. An app without a `tokens.config.json` needs nothing more: `tokens build` finds the
+file.
 
-```sh
-netscript tokens init --preset studio-utility
-```
+`netscript tokens init` is not the way in after `ui:apply`. It refuses to run without `--force`,
+which replaces `tokens/source/` and resets the override file.
 
-Add `--force` when `tokens.config.json` already exists, as it does after `ui:apply`. `--force`
-also resets `tokens/semantic.tokens.json`, so run it before you edit.
-
-Edit `tokens/semantic.tokens.json`. This example gives Studio Utility a blue primary, with text
-that reads at 4.5:1 or better in both schemes, and rounder medium corners:
+Edit the override file. This example gives Studio Utility a blue primary, with text that reads at
+4.5:1 or better in both schemes, and pill-shaped controls. `radius-control` shapes buttons, progress
+bars, and other controls, and Studio Utility sets it to 0:
 
 ```json
 {
@@ -131,18 +130,19 @@ that reads at 4.5:1 or better in both schemes, and rounder medium corners:
     "primary-fg": { "$type": "color", "$value": "{semantic.gray-1}" },
     "primary-hover": { "$type": "color", "$value": "{semantic.blue-12}" },
     "primary-stroke": { "$type": "color", "$value": "{semantic.blue-12}" },
-    "radius-md": { "$type": "dimension", "$value": "{semantic.radius-lg}" }
+    "radius-control": { "$type": "dimension", "$value": "{semantic.radius-full}" }
   }
 }
 ```
 
 Then run `netscript tokens build`. An override can only alias an existing semantic role. A raw value
-such as `#0057ff`, an unknown role, or a changed type fails before any file is replaced. The ramp
-steps resolve per scheme, so one override covers light and dark. The build does not check the
-contrast of your overrides, so check text on `primary` in both schemes yourself. It replaces the
-generated files, so keep edits in the override file. The
-[`tokens` reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) has the
-details.
+such as `#0057ff`, an unknown role, or a changed type fails before any file is replaced. One
+override covers light and dark, because ramp steps resolve per scheme. The build does not check
+contrast, so check text on `primary` in both schemes yourself. Each preset shapes through its own
+roles: in Studio Utility, `radius-md` and `radius-lg` follow roles that are already 0, so aliasing
+them changes nothing. Keep edits in the override file, because every build replaces the generated
+files. The [`tokens` reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) has
+the details.
 
 ## Registry theme items
 
@@ -152,10 +152,9 @@ such as `theme-studio-utility`. An item carries the six theme files in `assets/`
 `.agents/skills/fresh-ui-theme-<preset-id>/`. `netscript ui:list` shows the items, and
 `netscript init` copies the `theme-studio-utility` files into a new app.
 
-Your own registry can publish `registry:theme` or `registry:base` items the same way: register it
-with `netscript ui:registry add`, publish it with `netscript ui:build`, and apply an item by URL
-with `ui:apply --preset <url>`. The [`ui:*` reference](/reference/cli/commands/#ui-fresh-ui-registry)
-lists every registry command.
+Your own registry can publish `registry:theme` and `registry:base` items, and
+`ui:apply --preset <url>` applies one. The [`ui:*` reference](/reference/cli/commands/#ui-fresh-ui-registry)
+lists the registry commands.
 
 ## Add a page that inherits the chrome and theme
 
@@ -239,7 +238,7 @@ data-attribute contract the current styles use. Preview it with `--dry-run`.
 
 In development, open `/design/components` and `/design/tokens` to see the components and tokens
 under the active preset. Then open the pages you changed, flip `ThemeToggle`, and check light and
-dark, including the empty, loading, and error states. The `/design` routes exist in development only.
+dark, including the empty, loading, and error states.
 
 ## Next steps
 
