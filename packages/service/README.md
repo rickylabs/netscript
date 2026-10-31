@@ -154,7 +154,8 @@ replaces that default; matched contract access declarations still take precedenc
 entries throw `TypeError` when middleware is constructed, before requests or a listener. `OPTIONS`
 is not an exact anonymous method; configure `withCors()` for native preflight handling.
 
-Health is now installed after authentication. A custom nonempty legacy list excluding `/health`
+Health is now installed during `build()`, after authentication and body limits.
+Middleware registered with `use()` also runs before health, even when added after `withHealth()`. A custom nonempty legacy list excluding `/health`
 previously let health GET/HEAD return 200 by registration order; a rejecting authenticator now
 returns 401. Add `'/health'` to retain the prefix capability, or use the six exact entries above.
 Omitted, empty and `['/health']` lists preserve public health. Configure health checks before
@@ -697,8 +698,9 @@ exclude envelope identities, keys, hashes, payloads and correlation IDs.
 ## Anonymous route rate limits
 
 Use the existing middleware seam to reject requests before routing. Selected routes share a
-fixed-window quota per key; the default key is the socket client address. Install this stage before
-immediate health/info routes if those routes should also be limited.
+fixed-window quota per key; the default key is the socket client address. Health routes are
+installed at `build()`, so registered middleware runs before them. Install the limiter before
+`withServiceInfo()` if the immediate service-info route should also be limited.
 
 ```ts
 import { createService } from '@netscript/service';

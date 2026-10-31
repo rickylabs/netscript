@@ -35,3 +35,6 @@ entrypoints and export maps are read-only review scope, with results recorded in
 S1 branch: fix/native-service-policy; PR #2422. Prior source head:
 `d59531b55863c69edf20f6c93fbefb9b9b124d3c`. This branch-specific run resumes
 the approved common adoption plan; no independent evaluator session ID is published.
+
+S1 bounded review follow-up write scope: docs/site/reference/service/index.md and required
+canonical prose carriers. Runtime code remains unchanged.

@@ -58,3 +58,16 @@ PR bodies now start with Refs and service/reader breaking migrations are explici
 release/EIS checklist claims are outside this bounded leaf; they are not asserted complete.
 Coordinator notified of 2422's missing runtime opt-in. Independent exact-head review is next;
 required runtime CI remains unproven, and no release or merge readiness is claimed yet.
+
+Independent implementation round 1 found no code blockers and returned CHANGES on exact head
+7dd579d78bb7fe0cd498618b45f65f64e640ee69 because runtime/CI proof is pending. Verbatim
+report is evaluate-round-1.md. Corrected its stale immediate-health documentation finding in
+the service README, CHANGELOG and reference pipeline/rate-limit guide. No runtime source
+change. Canonical prose regeneration and exact next-head evidence are required. This terminal
+review leaves external gate proof pending; the independent S2 reader lane can proceed.
+
+S1 documentation repair complete: README and reference guide now distinguish deferred health
+from immediate service-info, and CHANGELOG describes middleware/body-limit ordering. Canonical
+prose/build, assets-barrel and publish-assets generation succeeded; only the expected prose
+carrier changed. Runtime source remains byte-identical to the already tested source merge.
+Continue S2 while service runtime CI remains coordinator-owned and unproven.
