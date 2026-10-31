@@ -96,3 +96,10 @@ PASS from the same independent evaluator before any implementation. See plan-eva
 - Independent export-corpus review: PASS. The evaluator independently ran the freshness check; structured type and explicit generated-file format checks also pass. No locks or runtime source change in this slice.
 - The generator tests deliberately clone committed HEAD. A pre-commit run confirmed it still sees the old artifact (12 passed, two stale-corpus failures); this is not evidence against the uncommitted refresh. Commit and push the reviewed artifact before the decisive rerun.
 - Reconcile: original implementation scope is complete, all review findings addressed, PR temporarily draft. New-head CI and exact-pushed-head evaluation remain before READY; scaffold.runtime remains coordinator-owned and unproven.
+
+## Final evidence reconciliation
+
+- Export artifact committed and pushed as `cac2b7292a5b2f30562ece7c29d36a1d20360bb3`. The decisive post-commit generator regression passes all 14 tests, zero failures/ignored. Working-tree freshness passes at the same canonical hash. Structured generated type/format checks pass.
+- All six review-correction source files pass the structured lint wrapper with complete coverage and no exclusions. The earlier combined generated/source lint refusal is retained transparently in review-corrections-validation.json; final-validation.json contains the decisive source-only verdict. The generated prose file is excluded by its package policy and separately passes explicit formatting and type checking.
+- Latest main remains `a410a815ce1401d533b18f2a85eb75e266de94a5`; no lock delta against main and no listener-supervisor edits. All three review threads are answered. No further implementation scope remains.
+- Record this final evidence and prompt in one run-only commit, push it, then obtain exact-head evaluation. Update the PR's final checkbox before ready. Post-ready attestation and current-head CI state go in the PR phase comment and atomic READY handoff to avoid changing an already evaluated commit. Shared scaffold.runtime/Redis CI proof remains explicit; only the coordinator arms the E2E gate and merges.
