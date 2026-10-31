@@ -16,9 +16,11 @@ import type {
 import { normalizePath } from './contract-path.ts';
 import { bindProcedureIndex, compileProcedures } from './contract-procedure-index.ts';
 import { compileRawRoutes } from './contract-raw-routes.ts';
+import { compileRetiredPaths, RETIRED_PROCEDURE_POLICY } from './retired-procedures.ts';
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
 import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
 import type { AuthzDecision, AuthzRequest } from '../types.ts';
+import { PROCEDURE_ERROR_CODES } from '../types.ts';
 
 const RAW_ROUTE_OVERLAP_ERROR =
   '[netscript.service.contract-policy] raw route overlaps the contract projection';
@@ -31,9 +33,11 @@ const RAW_ROUTE_OVERLAP_ERROR =
  * and `access.audience: 'internal'` admits only internal service callers. To guard a few marked
  * procedures in an otherwise-public or session-guarded service, use
  * `createContractOverlayAuthorizer` instead.
+ * Authenticated unmatched requests return 404 `procedure_not_found`; exact `retiredPaths`
+ * return 410 `procedure_retired`. Neither discloses availability before authentication.
  *
  * @param contract - Metadata-bearing contract router to traverse at construction.
- * @param options - Optional match-aware legacy fallback and internal-caller predicate.
+ * @param options - Optional legacy fallback, raw routes, retired paths and internal predicate.
  * @returns An authorizer that binds to the service builder's actual REST and RPC paths.
  * @throws {Error} When a procedure declares optional authentication, an unknown audience, or an
  *   anonymous internal audience.
@@ -66,6 +70,7 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
 ): ContractPolicyAuthorizerPort {
   const procedures = compileProcedures(contract);
   const rawRoutes = compileRawRoutes(options.rawRoutes ?? []);
+  const retiredPaths = compileRetiredPaths(options.retiredPaths ?? []);
   const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
   let resolver: ProcedurePolicyResolver | undefined;
 
@@ -85,7 +90,12 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
           const rawPolicy = rawRoutes.get(normalizePath(request.routePath ?? request.path));
           if (rawPolicy) return { matched: true, policy: rawPolicy };
           const guarded = index.findInternalGuard(request);
-          return guarded ? { matched: true, policy: guarded.policy } : { matched: false };
+          if (guarded) return { matched: true, policy: guarded.policy };
+          // Use the undecoded path: retirement never expands to encoded or sibling spellings.
+          if (retiredPaths.has(request.path)) {
+            return { matched: true, policy: RETIRED_PROCEDURE_POLICY, retired: true };
+          }
+          return { matched: false };
         },
       });
       return resolver;
@@ -102,7 +112,18 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
         routePath: request.path,
       });
       if (!resolution.matched) {
-        return deny('authz.no-contract-procedure');
+        return {
+          allow: false,
+          reason: 'authz.no-contract-procedure',
+          code: PROCEDURE_ERROR_CODES.NOT_FOUND,
+        };
+      }
+      if (resolution.retired) {
+        return {
+          allow: false,
+          reason: 'authz.procedure-retired',
+          code: PROCEDURE_ERROR_CODES.RETIRED,
+        };
       }
 
       if (!resolution.policy) {

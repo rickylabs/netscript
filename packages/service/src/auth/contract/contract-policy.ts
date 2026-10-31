@@ -60,6 +60,8 @@ export type ProcedurePolicyResolution =
     readonly matched: true;
     /** Access metadata on the matched procedure, or undefined when the contract declares none. */
     readonly policy: ProcedureAccessPolicy | undefined;
+    /** Declared retired path requiring authentication; never set by an overlay authorizer. */
+    readonly retired?: true;
   };
 
 /** Resolves request paths to policy carried by their matched contract procedure. */

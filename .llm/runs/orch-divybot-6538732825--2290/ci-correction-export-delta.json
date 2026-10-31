@@ -1,0 +1,35 @@
+[
+  {
+    "package": "plugin",
+    "subpath": "./service",
+    "addedSymbols": [],
+    "removedSymbols": [],
+    "changedSymbols": [
+      "AuthzDecision"
+    ]
+  },
+  {
+    "package": "service",
+    "subpath": ".",
+    "addedSymbols": [
+      "PROCEDURE_ERROR_CODES",
+      "ProcedureErrorCode"
+    ],
+    "removedSymbols": [],
+    "changedSymbols": [
+      "AuthzDecision",
+      "ContractAuthorizerOptions",
+      "createContractAuthorizer"
+    ]
+  },
+  {
+    "package": "service",
+    "subpath": "./auth",
+    "addedSymbols": [
+      "PROCEDURE_ERROR_CODES",
+      "ProcedureErrorCode"
+    ],
+    "removedSymbols": [],
+    "changedSymbols": []
+  }
+]
