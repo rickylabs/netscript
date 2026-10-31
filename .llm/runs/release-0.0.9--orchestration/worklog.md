@@ -90,3 +90,7 @@
 - 04:11:07Z: dispatched #2155 (E2, docs), comment 6538837985; started 04:15:23Z.
 - 04:23Z: #2492 (#2290) READY at `4d1ebfb` (packages/service auth only: 404 procedure_not_found / 410 procedure_retired for authenticated callers). e2e queued after #2487's gate (service runtime is in every generated service).
 - 04:24Z: dispatched #2351 (A2, features), comment 6538963429; #2115 moved back to internals (drift.md).
+- 04:27:35Z: #2351 started.
+- 04:32Z: **second rule violation:** the #2369 leaf force-pushed PR #2487 (03:40Z, 04:19Z; rebase onto main). Posted a no-force-push / merge-not-rebase reminder on live leaf PRs #2479, #2482 and #2494 (orchid relays PR comments). Leaves without a PR yet (#2115, #2351) got the tightened brief only if dispatched after the template change (#2351 yes; #2115 is a continuation).
+- 04:33Z: #2351 → PR #2496 (draft).
+- 04:35Z: **merged** #2487 (`8902e1a58`) for #2369 (B2); #2369 closed. Next expensive gate: #2492 (#2290).
