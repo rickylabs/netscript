@@ -17,3 +17,19 @@ Consulted previous run memory before code; RTK unavailable. Queried NetScript MC
 ## Reconcile S0
 
 Issue remains open. Coordinator owns metadata and merge. Specific operator directive to use Refs supersedes the generic closing-keyword footer; labels/milestones untouched. No unrelated changes were present.
+
+## Plan gate
+
+Independent PLAN-EVAL round 1 PASS before source changes. Review notes that production host cookie parsing is its own concern; backend tests exercise the existing public AuthnRequest.cookie seam without claiming a production host change.
+
+## S1 gate results
+
+See validation.md and compact JSON reports: package 55/55; revert negative control 5 failures; restored 55/55. Scoped check/lint/fmt, full quality:gate (including dependency gates), member publication and JSR audit pass. Doc lint exit 1 is a baseline KV private-type reference, reproduced without parser patch; no doc-green claim. Independent same-session slice review pending before sign-off.
+
+## Reconcile S1
+
+Draft PR #2498 targets main, issue still open; no metadata mutations or unrelated source/lock changes. Acceptance is unchanged. Public README distinguishes shared flow parser from host-provided AuthnRequest.cookie.
+
+## S1 independent sign-off
+
+Same-session independent Opus review returned PASS with no blockers. Reviewer substantively checked parser correctness, compatibility, backend/flow coverage, revert evidence, scope and baseline doc failure. Confirmed lock is clean before sign-off commit. Implementation patch is authorized for commit; ready transition follows push and review evidence comment. Final exact pushed-head review still required.
