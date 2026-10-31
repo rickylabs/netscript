@@ -22,3 +22,5 @@ Docs verify: 253 pages, 23,829 links, all caveats resolve. Normal snippets compi
 The live issue has no Acceptance checkboxes and was not edited. Existing API gap: trigger builder specs omit definition-level retry; docs provide a checked full-policy single-export workaround with static-discovery caveat. Architectural debt is not newly introduced.
 
 Final report goes through excluded `.divybot-final-report.md` for Orchid publication. Replace the old BLOCKED report with READY only when the new-head gates and final review prove it. Include all twelve items, local results, CI state, exact verdict line, and each regenerated file/generator. Run review-thread checker and answer every current thread. Only coordinator merges.
+
+Main integration in progress: origin/main 8902e1a normal merge; only CLI prose carrier conflicts, resolved using incoming generated corpus as baseline then canonical regeneration. Saga reference auto-merged incoming retention additions and this leaf's message-boundary corrections. Revalidate and review the new merged head; b902c3d clean-tree gates remain historical.

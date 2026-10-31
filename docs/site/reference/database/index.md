@@ -261,7 +261,35 @@ settlement, so crashes redeliver and downstream operations must remain idempoten
 | `CommandOutboxPublication`              | type alias | `type CommandOutboxPublication`                                                          | One live-token publication and receipt write.           |
 | `CommandOutboxRelease`                  | type alias | `type CommandOutboxRelease`                                                              | Retry or retained terminal state.                       |
 | `CommandOutboxRelayStore`               | interface  | `interface CommandOutboxRelayStore`                                                      | Raw claim/mark/release port.                            |
-| `createPostgresCommandOutboxRelayStore` | function   | `function createPostgresCommandOutboxRelayStore(root, options): CommandOutboxRelayStore` | Callback-bound PostgreSQL lease and settlement adapter. |
+| `createPostgresCommandOutboxRelayStore` | function   | `function createPostgresCommandOutboxRelayStore(root, options): CommandOutboxRelayStore & CommandOutboxRetentionStore` | Callback-bound PostgreSQL lease and settlement adapter. |
+
+### Bounded outbox retention
+
+The sagas plugin installs `NetScriptCommandOutbox` and its SQL CHECK contribution through the
+existing schema contribution mechanism. The normal database migration command appends pending
+`*.migration.sql` assets before deploying the generated Prisma migration. See the
+[saga schema and retention recipe](../plugin-sagas-core/index.md#installed-outbox-schema-and-postgresql-retention)
+for fresh installation, adoption of copied models and migration ownership.
+
+The PostgreSQL relay store also implements the separate `CommandOutboxRetentionStore` contract.
+Call `pruneSettled({ now, limit, completedRetentionDays, afterId })` from the host's background
+maintenance job. Days default to seven; `limit` must be 1–100. A primary-key page examines at most
+that many rows, including pending rows, and deletes only selected published/terminal records
+strictly older than the cutoff with both lease fields empty. Every predicate is repeated at deletion.
+Persist `nextAfterId` for the next invocation; absence finishes the sweep, and the next scheduled
+sweep starts without a cursor. `scanned` and `deleted` report actual work. All leases, including
+expired leases, protect rows. No cleanup timer or runtime DDL is created.
+
+For atomic saga replay keys, use `createPrismaSagaCommandRetention` from the saga stores subpath;
+it composes this outbox seam with canonical terminal-state and per-definition retention checks.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `COMMAND_RETENTION_DEFAULT_DAYS` | const | Seven-day completed-record default. |
+| `COMMAND_RETENTION_MAX_PAGE_SIZE` | const | Maximum 100 examined rows per family. |
+| `CommandOutboxRetentionRequest` | type alias | Explicit clock, page size, window and primary-key cursor. |
+| `CommandOutboxRetentionResult` | type alias | Scanned/deleted counts and next primary-key cursor. |
+| `CommandOutboxRetentionStore` | interface | Optional bounded `pruneSettled` contract independent of relay fakes. |
 
 ### Bound PostgreSQL command writer
 

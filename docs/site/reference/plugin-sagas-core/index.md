@@ -215,6 +215,107 @@ Durable Streams server. Progress survives storage/server restart; completion use
 demonstrates source integration; deploy the capability only when the producer and its command-outbox
 relay prerequisites are available together in the application's pinned release.
 
+### Installed outbox schema and PostgreSQL retention
+
+Installing the sagas plugin with Prisma contributes `SagaRuntimeCommandAppliedKey` and
+`NetScriptCommandOutbox` through `database/sagas.prisma`. Installation places the model fragment
+and `command-outbox.migration.sql` beside it under
+`database/postgres/schema/plugins/sagas/`. The outbox model includes the reviewed due index,
+timestamp types, lease fields and acceptance fields. The SQL contribution adds the nonnegative
+attempt-count check and paired lease/acceptance checks that Prisma schema cannot express.
+
+Run the normal application migration workflow after installation:
+
+```sh
+netscript db migrate --db postgres --name saga-command-outbox
+```
+
+The database migration runner generates the Prisma change with `--create-only`, appends pending
+`*.migration.sql` contributions before deployment, then verifies migration status. Contributions
+are recorded by path and a line-ending-normalized content hash; publish a new migration name when
+changing SQL already recorded in migration history. Construction and retention perform no DDL.
+
+Applications that copied the original fixture model can adopt the contribution without dropping the
+existing table. Keep their applied migration history, align the copied model with the contributed
+model and install the plugin. Equivalent declarations are deduplicated; conflicting models require
+an explicit application migration to align them. Run the new migration normally. Existing fixture
+CHECK constraints are preserved by the idempotent SQL contribution. Optionally, to transfer model
+ownership to the plugin after deduplication, remove the copied declaration and reinstall with
+`--force` before running the migration. Confirm the installed fragment now contains the single
+outbox declaration; perform both source edits before migrating so Prisma never sees a table removal.
+Baseline an existing table through the application's usual Prisma migration process if it has no
+migration history.
+
+`createPrismaSagaCommandRetention` from `@netscript/plugin-sagas-core/stores` is the first-party
+cleanup seam for the host's existing background job. Build its per-definition policy map from the
+same saga groups' `retention.completedDays` used by the runtime:
+
+```ts
+import { loadConfig } from '@netscript/config';
+import {
+  createPrismaSagaCommandRetention,
+  type SagaCommandRetentionCursor,
+} from '@netscript/plugin-sagas-core/stores';
+import type {
+  PostgresCommandClient,
+  TransactionClientPort,
+} from '@netscript/database/commands/postgres';
+
+declare const root: TransactionClientPort<PostgresCommandClient>;
+declare function loadRetentionCursor(): Promise<SagaCommandRetentionCursor | undefined>;
+declare function saveRetentionCursor(cursor: SagaCommandRetentionCursor | undefined): Promise<void>;
+
+const config = await loadConfig();
+const completedRetentionDaysBySaga: Record<string, number> = {};
+for (const group of config.sagas?.groups ?? []) {
+  for (const saga of group.sagas) {
+    completedRetentionDaysBySaga[saga.id] = group.retention?.completedDays ?? 7;
+  }
+}
+const retention = createPrismaSagaCommandRetention(root, {
+  transactionTimeoutMs: 5000,
+  completedRetentionDaysBySaga,
+});
+// One page per background invocation. Persist the cursor so retained rows cannot stall progress.
+const page = await retention.prune({
+  now: new Date(),
+  limit: 50,
+  cursor: await loadRetentionCursor(),
+});
+await saveRetentionCursor(page.nextCursor);
+// An absent nextCursor ends this sweep; start the next scheduled sweep without a cursor.
+```
+
+Unlisted sagas use `completedRetentionDays`, default seven days. Applied keys expire only for
+`completed`, `failed`, `cancelled` or `compensated` canonical state, measured from `completedAt`
+(or its terminal `updatedAt` fallback), regardless of key creation time. Pending, running and
+compensating sagas retain every marker. Missing or malformed canonical metadata is retained.
+Keep canonical state until its applied markers have been removed; deleting it first leaves markers
+without proof of terminal completion, so this API conservatively retains them.
+
+The shared outbox defaults to the largest configured saga window because an outbox row does not
+identify its owning saga. `outboxRetentionDays` can explicitly select a separate host policy.
+Only published or terminal rows strictly older than that window are deleted. Pending work and any
+row with a lease survive, including an expired lease. Rows exactly at the cutoff remain until a
+later sweep.
+
+Each call examines and deletes at most `limit` rows per family (1–100, at most 200 total). It uses
+primary-key cursors before eligibility checks, so retained rows do not cause a full-table scan or
+block progress. Replay cleanup locks only the bounded candidate parents, rechecks fresh status,
+completion and version, and compares the exact PostgreSQL envelope text again at deletion. Outbox
+deletion repeats the settlement, age and lease predicates. Locked parents are deferred to the next
+sweep. Outbox and replay pages commit independently with finite transaction deadlines; retrying a
+failed page is safe. The host supplies scheduling, cursor persistence, connections and shutdown.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createPrismaSagaCommandRetention` | function | Compose bounded PostgreSQL outbox and atomic replay cleanup. |
+| `PrismaSagaCommandRetentionOptions` | type alias | Finite transaction deadline and default/per-saga/outbox windows. |
+| `PrismaSagaCommandRetention` | interface | Explicit-clock `prune` page operation with cancellation. |
+| `SagaCommandRetentionCursor` | type alias | Progress across both primary-key scans. |
+| `SagaCommandRetentionResult` | type alias | Per-family scanned/deleted counts and the next cursor. |
+| `CommandOutboxRetentionResult` | type alias | Shared outbox page result re-exported from the database contract. |
+
 ## KV retention
 
 Topic groups declare `retention.completedDays` (default 7) and `retention.archiveToDb` (default

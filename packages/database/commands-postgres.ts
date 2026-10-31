@@ -52,3 +52,13 @@ export {
   bindPostgresCommandOutbox,
   type PostgresCommandOutboxWriter,
 } from './src/commands/adapters/bind-postgres-command-outbox.ts';
+
+export {
+  COMMAND_RETENTION_DEFAULT_DAYS,
+  COMMAND_RETENTION_MAX_PAGE_SIZE,
+} from './ports/command-outbox-retention.ts';
+export type {
+  CommandOutboxRetentionRequest,
+  CommandOutboxRetentionResult,
+  CommandOutboxRetentionStore,
+} from './ports/command-outbox-retention.ts';

@@ -1,4 +1,9 @@
 import {
+  COMMAND_RETENTION_DEFAULT_DAYS,
+  COMMAND_RETENTION_MAX_PAGE_SIZE,
+  type CommandOutboxRetentionStore,
+} from '../../../ports/command-outbox-retention.ts';
+import {
   type ClaimedCommandOutboxRow,
   COMMAND_RELAY_FAILURE_CLASSES,
   type CommandOutboxRelayStore,
@@ -46,7 +51,7 @@ function identity(value: string): string {
 export function createPostgresCommandOutboxRelayStore<TTx extends PostgresCommandClient>(
   root: TransactionClientPort<TTx>,
   options: PostgresCommandStoreOptions,
-): CommandOutboxRelayStore {
+): CommandOutboxRelayStore & CommandOutboxRetentionStore {
   const timeout = options.transactionTimeoutMs;
   if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 60000) {
     throw new TypeError('[netscript.command.relay.store] finite transaction timeout required');
@@ -71,7 +76,44 @@ export function createPostgresCommandOutboxRelayStore<TTx extends PostgresComman
       return result;
     }, { timeout, isolationLevel: 'ReadCommitted' });
   }
-  return Object.freeze<CommandOutboxRelayStore>({
+  return Object.freeze<CommandOutboxRelayStore & CommandOutboxRetentionStore>({
+    async pruneSettled(request, signal) {
+      const now = instant(request.now);
+      const days = request.completedRetentionDays ?? COMMAND_RETENTION_DEFAULT_DAYS;
+      if (
+        !Number.isFinite(days) || days <= 0 || !Number.isSafeInteger(request.limit) ||
+        request.limit < 1 || request.limit > COMMAND_RETENTION_MAX_PAGE_SIZE
+      ) {
+        throw new RangeError(
+          'Command retention requires positive finite days and a page of 1..100.',
+        );
+      }
+      const cutoff = instant(new Date(now.getTime() - days * 86_400_000));
+      const after = request.afterId === undefined ? '' : identity(request.afterId);
+      return await transaction(async (tx) => {
+        // Page before testing eligibility so pending rows cannot cause an unbounded scan.
+        const page = await tx.$queryRawUnsafe<{ id: string }[]>(
+          'SELECT id FROM netscript_command_outbox WHERE id > $1 ORDER BY id LIMIT $2',
+          after,
+          request.limit,
+        );
+        checkpoint(signal);
+        const deleted = page.length
+          ? await tx.$executeRawUnsafe(
+            `DELETE FROM netscript_command_outbox WHERE id = ANY($1::text[])
+ AND (published_at < $2 OR terminal_at < $2)
+ AND claim_token IS NULL AND claim_until IS NULL`,
+            page.map((row) => row.id),
+            cutoff,
+          )
+          : 0;
+        return Object.freeze({
+          scanned: page.length,
+          deleted,
+          ...(page.length === request.limit ? { nextAfterId: page.at(-1)!.id } : {}),
+        });
+      }, signal);
+    },
     async claim(request, signal) {
       const now = instant(request.now), token = identity(request.claimToken);
       if (

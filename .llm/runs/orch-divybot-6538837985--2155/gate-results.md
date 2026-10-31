@@ -57,3 +57,5 @@ Both files match the separately generated preview byte-for-byte; hashes and auth
 - `check:assets-barrel`: its canonical generation produced no additional changed file, but the precommit task exits 1 because its final git diff detects the pending prose-carrier update. Rerun after commit for the authoritative verdict.
 - Structured TS check of the two generated files: exit 0, 2 selected files, no findings.
 - `quality:gate` (quality scan + architecture): exit 0; existing warning-only findings remain.
+
+Current-main integration required a normal merge of 8902e1a, with one generated prose conflict. The saga reference auto-merge retains the incoming retention section and this audit's corrections. Regenerated the same two authorized carriers through the same canonical commands. Prior b902c3d clean-tree carrier gates passed; merged-head gates will be revalidated before final review. No authored package/plugin delta exists relative to the new main.

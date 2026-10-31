@@ -79,7 +79,11 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
       'packages/database/tests/fixtures/command-store/schema.prisma',
     );
     const sagaSchema = await Deno.readTextFile('plugins/sagas/database/sagas.prisma');
-    await Deno.writeTextFile(temp + '/schema.prisma', commandSchema + '\n' + sagaSchema);
+    await Deno.writeTextFile(
+      temp + '/schema.prisma',
+      commandSchema.slice(0, commandSchema.indexOf('model NetScriptCommandOutbox {')) + '\n' +
+        sagaSchema,
+    );
     await retryPrismaGenerate(() =>
       new Deno.Command(Deno.execPath(), {
         args: [

@@ -1,0 +1,19 @@
+**VERDICT: PASS.** The revised plan resolves all seven round-1 blockers, and nothing left would force a redesign. I spot-checked two things the plan relies on. The installer's schema deduplication exists: `assertCompatibleDeclaration` and `removePrismaDeclarations` in `prisma-schema-writer.ts`. The migration runner the plan extends (`packages/database/scripts/migrate.ts`) exists too.
+
+**Round-1 findings against the revised plan**
+
+1. **Constraints reaching consumers: resolved.** `*.migration.sql` sidecars are copied by the existing schema-copy step. The migration runner then generates with `--create-only`, appends any pending SQL, and deploys. Each contribution gets a hash marker, and an edited contribution that was already applied fails with guidance. That is a real delivery path, proven by an actual deploy plus regression tests. Editing the migration before it is applied is Prisma's documented way to customise one.
+2. **Bounded work per run: resolved.** Each call pages through at most `limit` rows by primary key and only then checks eligibility. It returns the next cursor, so retained rows can't stall progress. No new index is needed.
+3. **Invalid timestamps aborting the batch: resolved.** Envelope metadata is parsed and validated in TypeScript with no SQL casts. A malformed row survives on its own, and the clock starts from `completedAt` or the terminal `updatedAt`, never from when the marker was created.
+4. **Mixed group policies: resolved.** Retention days come from a per-saga map with a default. The outbox uses one window: the largest configured value, or an explicit one. It is pruned once per call. Since outbox rows aren't linked to a saga, using the largest window is the safe choice.
+5. **Deterministic race proof: resolved.** A test-only transaction wrapper changes real rows from a second connection between selection and delete. Each guard is mapped to a negative control. Race safety holds: parent rows are locked in a fixed order with `FOR UPDATE SKIP LOCKED`, the fresh state is re-read, and version and envelope must match inside the DELETE. Together with the transition store's version-checked UPDATE, that blocks a saga being revived mid-prune.
+6. **CI proof: resolved.** `command-postgres-conformance.sh` is in S2 and runs the install and retention tests before the existing suites. The scope expansion is recorded in the supervisor and drift files.
+7. **Consumers who already copied the outbox model: resolved at design level.** Identical copies go through the existing deduplication, conflicting variants keep the current collision error, and the adoption steps are documented and tested.
+
+**Conditions for IMPL-EVAL (not blockers, but checked at implementation review)**
+
+- **Adopters who already have the constraints.** Someone who copied the fixture SQL (the cockpit interim case) already has `command_outbox_lease` and `command_outbox_acceptance`. Their migrations don't carry the contribution's hash marker, so the runner would append `ADD CONSTRAINT` again and the deploy would fail. Either make the sidecar SQL check `pg_constraint` before adding each constraint, or document and test exactly how an adopter records the contribution as already applied. The equivalent-copy installation test should include this case.
+- **Cursor persistence.** Each call restarts from the first page unless the caller passes the cursor back. A host that doesn't persist it will rescan the same retained rows forever. The docs example must show cursor round-tripping, and one test should show progress across calls only when the cursor is supplied.
+- **CI trigger paths.** The `command-postgres` workflow's path filter doesn't include `packages/cli/**`, so a later CLI-only change to sidecar copying won't re-run the install proof. Either add the path or explain the omission in the run record.
+
+VERDICT: PASS

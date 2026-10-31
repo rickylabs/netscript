@@ -49,3 +49,13 @@ export type {
   CommandOutboxRelease,
   CommandRelayFailureClass,
 } from './ports/command-outbox-relay.ts';
+
+export {
+  COMMAND_RETENTION_DEFAULT_DAYS,
+  COMMAND_RETENTION_MAX_PAGE_SIZE,
+} from './ports/command-outbox-retention.ts';
+export type {
+  CommandOutboxRetentionRequest,
+  CommandOutboxRetentionResult,
+  CommandOutboxRetentionStore,
+} from './ports/command-outbox-retention.ts';
