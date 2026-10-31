@@ -1,0 +1,47 @@
+{
+  "base": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+  "rebasedHeadBeforeColorFix": "44dae7227d1b053b33b78efd03d8fcf4f0aaf519",
+  "sourceEquivalenceBeforeColorFix": {
+    "filesCompared": 161,
+    "changed": 0
+  },
+  "generatedDocsConflicts": 5,
+  "conflictResolution": "Regenerated from combined259-page site after a parseable seed; no stale carrier accepted",
+  "mainChangesPreserved": true,
+  "fullBrowserMatrix": {
+    "passed": 274,
+    "failed": 0,
+    "strictAxeAllowancesAdded": false
+  },
+  "initialFullPackage": {
+    "passed": 600,
+    "failed": 1,
+    "failure": "Existing measured destructive text guard found menu-items.css solid-fill text binding"
+  },
+  "integrationCorrection": "Bind menu destructive labels to existing destructive/text role; add actual destructive menu action/contrast/activation fixture",
+  "correctedFullPackage": {
+    "passed": 601,
+    "failed": 0,
+    "ignored": 0,
+    "exitCode": 0
+  },
+  "menuBrowserRerun": {
+    "passed": 57,
+    "failed": 0,
+    "strictAxeSeriousOrCritical": 0
+  },
+  "wrappers": "PASS;changed fixture/spec, no dropped files",
+  "qualityAndArchitecture": "PASS",
+  "preflightDocsAccuracyAndExportDrift": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 259
+  },
+  "independentIntegrationReview": "PASS;source and finalized package/browser/wrapper/quality/docs evidence signed off; carrier freshness follows source commit",
+  "ready": false,
+  "fullGoalComplete": false,
+  "existingColorGuard": {
+    "passed": 1,
+    "failed": 0
+  }
+}

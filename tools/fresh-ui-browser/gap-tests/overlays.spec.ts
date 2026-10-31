@@ -193,3 +193,33 @@ test('context-menu/native-context-region', async ({ page }, info) => {
   await expect(page.locator('#after-context')).toBeFocused();
   await expect(menu).not.toBeVisible();
 });
+
+test('context-menu/destructive-text-role-and-activation', async ({ page }) => {
+  const region = page.getByRole('group', { name: 'Order context', exact: true });
+  await region.focus();
+  await page.keyboard.press('Shift+F10');
+  const menu = page.getByRole('menu', { name: 'Order context', exact: true });
+  const action = menu.getByRole('menuitem', { name: 'Delete order', exact: true });
+  expect(
+    await action.evaluate((element) => {
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--ns-destructive-text)';
+      element.append(probe);
+      const expected = getComputedStyle(probe).color;
+      probe.remove();
+      return getComputedStyle(element).color === expected;
+    }),
+  ).toBe(true);
+  const result = await new AxeBuilder({ page }).include(
+    '[data-scope="context-menu"][data-part="content"]',
+  ).analyze();
+  expect(
+    result.violations.filter((entry) => entry.impact === 'critical' || entry.impact === 'serious'),
+  ).toEqual([]);
+  await menu.screenshot({ path: test.info().outputPath('destructive-menu.png') });
+  await action.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByLabel('Context action')).toHaveText('delete');
+  await expect(menu).not.toBeVisible();
+  await expect(region).toBeFocused();
+});
