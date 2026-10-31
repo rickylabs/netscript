@@ -1,7 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Customize Fresh UI
-description: Edit a route, add an island, restyle a component, install more UI primitives, and re-theme the scaffolded app.
+description: Edit a route, add an island, restyle a component, and install more UI primitives in the scaffolded app.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/customize-fresh-ui/
@@ -10,10 +10,11 @@ oldUrl: /how-to/customize-fresh-ui/
 # Customize Fresh UI
 
 This recipe makes the scaffolded frontend yours: edit a route, add an island, restyle components,
-install more UI from the registry, and re-theme the app. NetScript scaffolds a
-[Fresh](https://fresh.deno.dev) 2 application at `apps/dashboard/`, built on the
-[`@netscript/fresh`](/reference/fresh/) meta-framework, and its UI components live in your
-repository as copied source. [Fresh UI & design](/web-layer/fresh-ui/) explains that model.
+and install more UI from the registry. NetScript scaffolds a [Fresh](https://fresh.deno.dev) 2
+application at `apps/dashboard/`, built on the [`@netscript/fresh`](/reference/fresh/)
+meta-framework, and its UI components live in your repository as copied source.
+[Fresh UI & design](/web-layer/fresh-ui/) explains that model. To change the look of the whole app,
+or to see how a new page gets the app chrome, read [Theme your app](/web-layer/how-to/theme-your-app/).
 
 ## Prerequisites
 
@@ -92,9 +93,11 @@ data):
 ] }) }}
 
 The HTML shell (`<html>`, `<head>`, fonts, the theme-seed script) is `routes/_app.tsx`. The top bar
-and navigation around content pages is `routes/_layout.tsx`. Both use the `define.page(...)` /
-`define.layout(...)` helpers from `createDefine<State>()`. Edit them to change the global frame
-instead of repeating markup per page.
+and navigation around content pages is `routes/_layout.tsx`, and its links come from `navigation.ts`.
+Both use the `define.page(...)` / `define.layout(...)` helpers from `createDefine<State>()`. Edit
+them to change the global frame instead of repeating markup per page. [Theme your
+app](/web-layer/how-to/theme-your-app/#add-a-page-that-inherits-the-chrome-and-theme) covers the
+navigation flags of `ui:add page`.
 
 {{ comp callout { type: "tip", title: "Co-location folders don't become URLs" } }}
 Folders in parentheses, such as <code>(_components)</code>, <code>(_shared)</code>,
@@ -150,68 +153,18 @@ Styling has three layers. Pick the lightest one that does the job:
 
 | Layer | Use it when | How |
 | --- | --- | --- |
-| Design tokens | The change should re-theme the whole app. | Run `netscript tokens init`, edit the final semantic alias layer, then run `netscript tokens build`. The generated `--ns-*` custom properties drive colors, type, radius, geometry, borders, shadows and motion. `data-theme` selects the language; `data-scheme` selects light or dark. |
+| Design tokens | The change should re-theme the whole app. | Switch the preset with `netscript ui:apply --preset <id>`, or alias semantic roles in `tokens/semantic.tokens.json` and run `netscript tokens build`. [Theme your app](/web-layer/how-to/theme-your-app/) covers both. |
 | Tailwind utilities | One element needs its own layout or spacing. | Tailwind v4 is wired through Vite (`@tailwindcss/vite`). Use utility classes in JSX. The scaffold also defines layout helpers (`ns-shell`, `ns-section`, `ns-stack`, `ns-cluster`) in `assets/layouts.css`. |
 | Component CSS | One primitive should look different everywhere. | Each copied primitive has its own stylesheet under `assets/ui/` (`button.css`, `card.css`, `badge.css`, …), imported by `assets/styles.css`. Edit that file. |
 
-Theme switching is already wired. `routes/_app.tsx` seeds `data-scheme` from the `ns-theme`
-localStorage key, falling back to the OS preference. `ThemeToggle` changes the scheme and keeps the
-language, density and Studio flavor. `assets/theme-preset.json` supplies those fixed preset axes, and
-`assets/fonts.json` supplies the font stylesheet requests.
+The generated token files (`assets/tokens.css`, `theme-bridge.css`, `tokens.json`, `fonts.json`, and
+`theme-preset.json`) are replaced on every build, so never hand-edit them.
 
-Studio Utility (Neutral × Ink) is the default for new apps. Existing apps keep their configured
-preset. To select Studio Utility in an existing app, run:
-
-```sh
-netscript tokens init --app dashboard --preset studio-utility
-netscript tokens build --app dashboard
-```
-
-For a semantic override, edit `tokens/semantic.tokens.json` using aliases only, then rebuild. The
-source copies and `tokens.config.json` are app-owned; the five core web assets are generated, so do
-not hand-edit generated CSS or JSON. Add `--previews` to the build command to generate 24 separate
-development preset stylesheets. The
-[tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) covers
-precedence, validation and cleanup.
-
-NS One remains selectable with `netscript ui:apply --app dashboard --preset ns-one`.
-`tokens init` without `--preset` retains its legacy NS One default; pass the app’s preset explicitly
-when creating editable token sources. `tokens build` preserves the configured preset.
-
-To preview a generated preset without changing the app default, run
-`netscript tokens build --app dashboard --previews` (or install `ui:add theme-previews`), then open
-`/design/tokens?preset=studio-utility`. The preset query applies only under `/design/`; ordinary app
-routes keep the configured preset.
-
-{{ comp callout { type: "warning", title: "Edit tokens, not magic numbers" } }}
-Use a raw hex color or pixel value only when no token fits. Hard-coded values drift from the theme
-and break the light/dark switch, while one token edit re-themes every surface.
-{{ /comp }}
-
-### Migrate existing app-owned copies
-
-Existing `[data-theme='dark']` and `[data-theme='light']` selectors still resolve NS One, and every
-old `--ns-*` property remains available, so existing apps can migrate when they choose. No
-`ui:migrate` step is needed. To adopt the new attributes:
-
-1. Run `netscript tokens init --app dashboard` and `netscript tokens build --app dashboard`. Keep
-   NS One unless you choose another preset. Merge any previous customizations into the semantic
-   alias layer before rebuilding.
-2. Update the app shell to read `assets/theme-preset.json` and `assets/fonts.json`. Stamp
-   `data-theme={preset.language}`, `data-density={preset.density}`, and
-   `data-flavor={preset.flavor ?? undefined}` on `<html>`. Set `data-scheme` to light or dark, and
-   map `fonts.imports[preset.id]` to stylesheet links. A new scaffold's `lib/theme.ts` loads only
-   this metadata; development design middleware resolves previews through its own manifest helper
-   and passes the result to the shell as request state.
-3. Change the existing preference seed script to set `data-scheme`, keeping the `ns-theme` storage
-   key. Update ThemeToggle and the light `color-scheme` CSS selector to use `data-scheme`; the
-   shipped toggle also supports legacy hosts.
-4. Merge updated registry copies with `netscript ui:update --app dashboard`. Review drift in locally
-   edited files before replacing them. Carry over the generated design-token helper and view when
-   you adopt output-driven gallery ramps, and keep app-specific route changes.
-
-Preset density is fixed by the selected language; editing a density attribute does not select
-unsupported geometry.
+> [!WARNING]
+> **Edit tokens, not magic numbers**
+>
+> Use a raw hex color or pixel value only when no token fits. Hard-coded values drift from the
+> theme and break the light/dark switch, while one token edit re-themes every surface.
 
 ## Install more UI from the registry
 
@@ -242,7 +195,8 @@ collection catalog.
 
 - `--project-root <path>`: target a workspace other than the current directory.
 - `--theme <name>`: install against a specific theme registry item instead of the default official
-  theme.
+  theme. To change the preset of an existing app, use
+  [`netscript ui:apply --preset <id>`](/web-layer/how-to/theme-your-app/#pick-a-preset) instead.
 - `--registry-root <path>`: override the Fresh UI package root (advanced or local development).
 - `--force`: overwrite existing copied UI files when re-running. This replaces your local edits to
   those files.
@@ -274,6 +228,7 @@ With the app running:
 
 ## Next steps
 
-Give the UI a typed backend with [Add a service](/services-sdk/how-to/add-a-service/). See also
+Change the look of the whole app in [Theme your app](/web-layer/how-to/theme-your-app/). Give the UI
+a typed backend with [Add a service](/services-sdk/how-to/add-a-service/). See also
 [Fresh UI & design](/web-layer/fresh-ui/), the [`@netscript/fresh-ui` reference](/reference/fresh-ui/),
 and the [contracts explanation](/explanation/contracts/).
