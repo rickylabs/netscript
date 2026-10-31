@@ -348,3 +348,5 @@
 - 20:11:59Z: Posted the canary failure outcome on #2474; asked Cockpit to cancel the held #2547 launch.
 - 20:12:22Z: Cockpit: orchid refused the #2547 duplicate launch at 20:11:47Z (source-issue-closed), so no second worker. #2548 bound at 20:11:46Z; Cockpit merges it at READY; #2488 stays held. Re-cut only on Eric's go.
 - 20:55:51Z: **Eric (in session): 'Recut approved'.** Dispatching release-canary.yml (target 0.0.9) from main once #2549 (the #2548 residue fix) has merged and main push CI is green at that sha; a recut before the fix would fail the same residue check.
+- 21:26:31Z: #2549 (#2548 residue fix) merged 21:25:51Z → main `f4aa307b5` (Cockpit: independent Opus MERGE; canary dry run exit 0). The gated recut script waits for green push CI at that sha, then dispatches release-canary.
+- 21:40:36Z: **Recut dispatched** (Eric-approved): release-canary.yml target 0.0.9 from main `f4aa307b5` (push CI green), run 41244658746, 21:40:20Z.

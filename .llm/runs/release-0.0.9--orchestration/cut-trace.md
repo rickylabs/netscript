@@ -57,3 +57,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 19:22 | `43aa891ec` | #2546 | #2233 | W7 (G1) | option (b) per owner |
 | 2026-10-31 20:0x | `43aa891ec` | — | — | canary | design-session dispatch 41237108380 cancelled at checkout (nothing minted); awaiting Eric's direct go for the coordinator to dispatch |
 | 2026-10-31 20:05 | `43aa891ec` | — | — | canary 0.0.9-canary.N | **cut** on Eric's direct approval: coordinator dispatched release-canary.yml run 41237263834 |
+| 2026-10-31 21:40 | `f4aa307b5` | — | — | canary 0.0.9-canary.N | **re-cut** on Eric's approval after the #2549 fix: release-canary run 41244658746 |
