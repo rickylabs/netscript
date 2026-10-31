@@ -6,7 +6,7 @@
  */
 import { deepStrictEqual, ok, strictEqual } from 'node:assert/strict';
 import { markdownIt } from 'lume/deps/markdown_it.ts';
-import { DOMParser } from 'lume/deps/dom.ts';
+import { DOMParser, Element as DOMElement } from 'lume/deps/dom.ts';
 import { autotrim, engine } from 'lume/deps/vento.ts';
 import {
   CALLOUT_TYPES,
@@ -38,14 +38,19 @@ function site(warnings: string[] = []) {
   return { render: (source: string) => md.render(source, { filename: PAGE }) };
 }
 
+/** The Markdown serializer consumes elements from Lume's server DOM. */
+function isFixtureElement(value: unknown): value is Element {
+  return value instanceof DOMElement;
+}
+
 function article(html: string): Element {
   const document = new DOMParser().parseFromString(
     `<!doctype html><html><body><article class="ns-prose">${html}</article></body></html>`,
     'text/html',
   );
   const element = document?.querySelector('article.ns-prose');
-  if (!element) throw new Error('Could not parse rendered fixture');
-  return element as unknown as Element;
+  if (!isFixtureElement(element)) throw new Error('Could not parse rendered fixture');
+  return element;
 }
 
 function twin(html: string): string {
