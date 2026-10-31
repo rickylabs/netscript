@@ -33,3 +33,5 @@ IMPL-EVAL round 1 is FAIL_FIX with one blocker: ActionMenu's forced dropdown-men
 Final remote reconciliation: main advanced to 6a71cd059 through #2480, an independently reviewed fix of the same docs fixture. Keep main's canonical fixture in the merge conflict; the earlier local Page.create change is superseded. Reviewed Fresh UI/CLI/parity product code is unchanged. Only docs fixture and quality evidence require refresh.
 
 Coordinator follow-up expands this run's tooling/docs surface to ratify the ui:migrate census and reference entries. The previous local source/quality gates did not include docs:accuracy, so they were insufficient to prove the required remote quality job; use the complete requested docs gate set and verify the actual quality job at the repaired head before READY.
+
+2026-10-31: Required main reconciliation imports #2476 telemetry locks/fixture hardening and #2481 workers retries as upstream commits. No local dependency/lock edits. Regenerate and verify merged carriers in their existing order.
