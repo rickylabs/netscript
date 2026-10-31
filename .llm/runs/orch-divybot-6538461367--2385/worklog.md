@@ -22,7 +22,7 @@
 
 Independent read-only Claude plan review: PASS, zero blockers. Full sanitized verdict in plan-eval.md. Adopted package-placeholder guard, exact S1 file list and terminology alignment. Generated-carrier freshness remains a known, expected coordinator-owned blocker to merge under this docs-only scope.
 
-## S1 validation (in progress)
+## S1 validation (complete)
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
@@ -52,3 +52,33 @@ Agent-bundle derivation proof: called `buildAgentDocsProseFromSite` with a scrat
 Independent read-only Claude IMPL-EVAL returned **Scope review verdict: PASS**, no S1 implementation blockers; full report in evaluate.md. It substantively checked the exact file surface, current public CLI contract, tests, negative controls, and gate evidence before this sign-off commit. It separately confirms the generated-carrier dependency blocks merge and must remain visible. No terminal implementation failure or rescope.
 
 Reconcile: issue remains open, no competing PR found, draft #2489 has no review comments/threads; the read-only review-thread gate exits 0 (threads=0, unanswered=0). Preserve the owner's no-closing-keyword, no-label/milestone, no-merge instructions. All changed files are in the declared surface; git diff --check passes; packages/plugins and lockfile diffs against baseline are empty. S1 is ready to commit/push. S2 final review is resumed at that exact pushed SHA, and its verdict plus CI snapshot will be published in PR comments/final report without another commit that would invalidate the reviewed head.
+
+## S2 — repair the reported CI close-gate
+
+Owner follow-up requests CI fixes and a green PR. Scope amendment recorded in plan.md/drift.md/supervisor.md allows only the necessary generated prose carrier under packages/cli. The ordinary generator changes exactly two compressed page rows: add-a-plugin and reference/cli/commands. Decoded old/new comparison shows those two pages and their derived llms-full aggregate are the complete semantic delta. No additional metadata, runtime, scaffold, export, dependency or lock changes were necessary.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Canonical docs carrier generation and read-only freshness check | PASS, exit 0 | fresh=true, stalePaths=[]; exactly two generated page rows changed. |
+| Structured carrier type check | PASS, exit 0 | One explicit generated TS input; --unstable-kv; zero findings. |
+| Carrier regression tests (structured wrapper) | PASS, exit 0 | 9 passed, 0 failed, 0 ignored across build-agent-docs-bundle_test.ts, mergeable-carriers_test.ts, carrier-parity_test.ts. |
+| Full quality:gate | PASS, exit 0 | Repository quality scan plus architecture gates pass; existing advisory warnings do not become new debt. |
+| Publish-asset freshness | PASS, exit 0 | check:publish-assets requires no dependent generated update. |
+| Generated asset consistency | Pending post-commit comparison | check:assets-barrel regenerated no extra files; its git-diff step sees only the intentional uncommitted two-row carrier refresh. Repeat against committed HEAD. |
+| Shipped docs command policy | PASS, exit 0 | All 203 decoded corpus entries pass checkCliExamples; guide and command reference both contain corrected installed-name example. |
+
+Close-gate diagnosis is verified from the failing job log: the only finding is the unchecked custom PR body item combining generated-carrier freshness with “required CI green”. After independently proving freshness, revise that item to the actual deliverable and check it. Required CI remains an enforced merge prerequisite and is reported separately, avoiding a self-dependent assertion involving close-gate's own result. No issue acceptance boxes or gate checks are removed.
+
+Canonical full `deno task check:agent-docs-prose` also PASS, exit 0, including child-health docs check, source-format, Lume build, rendered-output, and semantic carrier freshness (fresh=true, stalePaths=[]). This resolves the previously reported generated-carrier dependency.
+
+S2 independent read-only review: **PASS**, no implementation blockers; see evaluate-s2.md. The reviewer confirms the decoded pages, source alignment, metadata-only nature and non-circular checklist fix. It explicitly requires the PR disclose the generated packages/cli change to the coordinator; final body and phase comment do so. Superseded S1 out-of-scope statements now point to the S2 amendment.
+
+S2 reconcile: same owner-requested issue and PR, same evaluator session re-steered; no new product source or lock changes. Gate results confirm only the generated two-row payload is needed. Commit/push this signed-off fix, then update PR completion evidence and run local close-gate plus post-commit assets comparison. Required CI and final exact-SHA verdict will remain external so no commit invalidates that review.
+
+## S3 — requested rebase onto current main
+
+Owner explicitly requests rebase, conflict resolution and force-push; use an exact-head lease. New main baseline: `6b7f152f6ac2bbdddcd5f4eb896b3d9f8aaf2db4`. Replaying S0/S1 is clean; S2 conflicts only in the generated prose carrier. Resolve by keeping new main's carrier as input, rebuilding combined docs, then canonical regeneration. No handcrafted compressed-data merge.
+
+Rebased gates: docs verify PASS (253 HTML pages, **23,734** resolving internal links, 13 caveat markers); docs:snippets PASS (669 scanned, 26 compiled); combined structured tests **33 passed, 0 failed, 0 ignored**; structured check **5 selected inputs, zero findings**; semantic prose freshness **fresh=true, stalePaths=[]**; publish-assets freshness PASS; real current-main public CLI `plugin update workers` exits 0 (`Updated workers to 0.0.8; generated 0 registries.`). The policy/integration/tests and guide source are byte-identical to the previously reviewed head. Decoder comparison against the new main corpus proves exactly two page entries differ plus their derived aggregate; all 203 entries pass the command policy, with all upstream pages preserved.
+
+Reconcile: previous final-SHA verdicts and CI refer to superseded history. Preserve review and gate provenance in this run, but obtain final independent evaluation at the newly pushed SHA. No labels, milestones, lockfiles, runtime/scaffold implementation or issue acceptance change. The only new functional bytes from resolving the conflict are canonical generated docs data.

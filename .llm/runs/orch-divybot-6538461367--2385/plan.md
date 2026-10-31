@@ -8,7 +8,7 @@ Scope: SCOPE-docs; no package/plugin architectural changes, no JSR audit needed.
 2. Extend the existing docs:snippets source scan with a small CLI-example policy. Inspect full Markdown/Vento source so inline code, HTML tables and fenced commands all receive the guard across every page, independent of the TypeScript coverage floor. Reject scoped package specifiers and jsr:-prefixed specifiers after plugin update, including quoted operands and wrapped whitespace; allow installed names, placeholders, flags, and package specifiers for install.
 3. Cover the policy with source-analysis integration tests in the existing snippet-extractor test entrypoint. Add a named negative fixture to the existing snippets CLI and document it in snippet-coverage.md.
 4. Verify against the unchanged main public CLI in an isolated scratch project, with no services started. Record actual update exit and generated registry evidence. Use help output to verify spelling.
-5. Preserve docs-only scope including run artifacts. Do not regenerate or commit package carriers. Report freshness conflict if CI requires the excluded carrier update; never weaken a gate.
+5. Original S1 restriction (superseded for the generated prose payload by the S2 owner-follow-up amendment below): preserve docs-only scope including run artifacts. Do not regenerate or commit package carriers. Report freshness conflict if CI requires the excluded carrier update; never weaken a gate.
 
 ## Slices and gates
 
@@ -31,3 +31,11 @@ No unresolved design decisions. Carrier publication is safe to defer to coordina
 ## PLAN-EVAL refinements before implementation
 
 PASS, no blockers. Adopt N2: reject `<pkg>`, `<package>`, `<specifier>` placeholders including HTML entities. N3 exact S1 files: docs/site/orchestration-runtime/how-to/add-a-plugin.md; docs/site/reference/cli/commands.md; .llm/tools/docs/{cli-example-policy.ts,snippet-policy.ts,snippet-extractor_test.ts,check-snippets-worker.ts,snippet-coverage.md}; .llm/tools/docs/fixtures/plugin-update-package-specifier/docs/site/page.md. N4 terminology is source-aligned to public CLI help (“installed plugin”). N1 carrier freshness is expected to fail until a coordinator-authorized refresh; a READY delivery is not a merge-ready claim while it fails.
+
+## S2 amendment — owner follow-up to fix failing CI
+
+Expand the previously excluded generated artifact surface to `packages/cli/src/kernel/assets/agent-docs-prose.generated.ts` only, plus strictly necessary dependent generated metadata if the repository generator proves it stale. The owner follow-up requests CI fixes and a green PR; refresh only the two docs pages corrected by S1. Decoded comparison against a scratch corpus proves exactly those two page entries differ; llms-full is derived, not separately stored. No runtime code, schemas, exports, package versions or dependencies change. The same independent evaluator reviews the generated payload and updated evidence before sign-off, then the exact final pushed head. Gates: canonical prose generation/check, generated-asset and publish-asset freshness, carrier decoder regressions, quality:gate, structured carrier check; original S1 source gates remain valid because those files are unchanged. Required CI is reported separately from the non-circular completion checklist.
+
+## S3 integration — requested rebase
+
+Rebase onto main `6b7f152f6ac2bbdddcd5f4eb896b3d9f8aaf2db4`; resolve only the generated docs-carrier conflict by canonical regeneration. Preserve all upstream corpus pages. Prove the PR's semantic carrier delta against the new base is still exactly the two corrected pages (plus derived aggregate); verify docs build/links, snippets, carrier decoder regression and freshness; push using a lease bound to the previously observed remote head, then obtain a new exact-SHA final verdict. No new behavior or API changes.
