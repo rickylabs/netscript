@@ -9,43 +9,26 @@ export const docs_kit_1: readonly ComponentContract[] = [
     'priority': 'P1',
     'shipped': true,
     'props': {
-      'level': {
-        'kind': 'enum',
-        'values': [
-          'h1',
-          'h2',
-          'h3',
-          'h4',
-        ],
-      },
-      'element': {
-        'kind': 'enum',
-        'values': [
-          'lede',
-          'p',
-          'blockquote',
-          'ul',
-          'ol',
-          'hr',
-          'link',
-          'code',
-          'kbd',
-          'strong',
-          'em',
-        ],
-      },
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'hover',
-        ],
-      },
-      'anchor': {
-        'kind': 'boolean',
-      },
       'children': {
-        'kind': 'slot',
+        'kind': 'text',
+        'required': true,
+        'description': 'Raw Markdown source; sanitizer is mandatory and not caller-configurable.',
+      },
+      'streaming': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'activeCite': {
+        'kind': 'number',
+        'description': 'Active citation index; callback behavior belongs to the hydrated caller.',
+      },
+      'onCite': {
+        'kind': 'callback',
+        'description': 'Reports activation of a nested native CitationChip.',
+      },
+      'class': {
+        'kind': 'text',
+        'description': 'Wrapper classes; ns-lede opts into first-paragraph lede styling.',
       },
     },
     'parts': [
@@ -123,50 +106,21 @@ export const docs_kit_1: readonly ComponentContract[] = [
         'when': 'matching CSS interaction or variant',
       },
     ],
-    'attributes': {
-      'data-level': {
-        'values': [
-          'h1',
-          'h2',
-          'h3',
-          'h4',
-        ],
-      },
-      'data-element': {
-        'values': [
-          'lede',
-          'p',
-          'blockquote',
-          'ul',
-          'ol',
-          'hr',
-          'link',
-          'code',
-          'kbd',
-          'strong',
-          'em',
-        ],
-      },
-      'data-state': {
-        'values': [
-          'rest',
-          'hover',
-        ],
-        'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
-      },
-    },
-    'booleans': [
-      'anchor',
-    ],
-    'slots': [
-      {
-        'name': 'children',
-        'part': 'root',
-      },
-    ],
+    'attributes': {},
+    'booleans': [],
+    'slots': [],
     'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action':
+          'Traverse native content links and nested citation controls; prose adds no composite focus manager.',
+      },
+      {
+        'key': 'Enter',
+        'action': 'Follow native links, including host-generated heading anchors.',
+      },
+    ],
     'tokenRoles': [
       'SF:prose/code/size',
       'SF:prose/h2|h3|h4/size|line|tracking',
@@ -184,8 +138,13 @@ export const docs_kit_1: readonly ComponentContract[] = [
       'type/strong/style',
     ],
     'notes': [
-      'Native DOM attributes pass through where the implementation accepts them.',
+      'Copied Markdown accepts exactly its documented renderer props; native DOM attributes do not pass through.',
+      'Phase-one metadata correction: removed nonfunctional level, element, state and anchor root props and data-level/data-element/data-state axes. They were never accepted or emitted by the published Markdown renderer; native semantic styling remains available.',
+      'Design level/element/state axes are native semantic elements and CSS pseudo-classes, not invented root props or data attributes.',
       'Sanitized Markdown inner anatomy is native semantic HTML. Styles target those semantics without forcing extra wrapper nodes.',
+      'The public ns-markdown stylesheet also supports host-authored lede, kbd and heading-anchor markup. The copied renderer does not generate heading IDs/anchors or allow raw HTML; those remain host-owned.',
+      'Native list markers retain list semantics and square bullets; glyph metrics remain browser/font-owned.',
+      'The handoff Theme-set prose twins correspond to existing Studio prose CSS aliases. No token values change; lede uses prose measure as the latest ledger specifies.',
     ],
   },
 ];
