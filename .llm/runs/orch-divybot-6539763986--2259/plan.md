@@ -15,7 +15,7 @@ a bounded, reproducible capability spike, with no package exports or shipped cod
    plaintext value to prove the scan detects embedded credential bytes.
 4. Do not start an AppHost, database, dashboard, or scaffold.runtime suite for this diagnostic.
    SDK environment resolution is not a claim of database connectivity.
-5. If either supported composed binding exposes bytes, record BLOCKED and stop product
+5. If every tested supported composition exposes bytes, record BLOCKED and stop product
    implementation, exactly as the owner directs. Preserve all issue acceptance boxes unchecked.
 6. Only if the prerequisite succeeds, declare exact product write paths, extend this plan,
    and get PLAN-EVAL approval for implementation before touching shipped source.
@@ -26,7 +26,8 @@ a bounded, reproducible capability spike, with no package exports or shipped cod
    worklog, context pack, drift, and plan evaluation. Gate: independent PLAN-EVAL.
 2. Reproduce capability and record the decision. Files: this run's `spike/Program.cs`,
    `spike/MaskingProbe.csproj`, `spike/result.txt`, research/worklog/context/drift/lessons.
-   Gate: pinned dotnet SDK diagnostic, requiring all behavioral assertions and process exit 0.
+   Gate: pinned dotnet SDK diagnostic with valid controls, a recorded capability verdict, and
+   process exit 0. This exit code proves diagnostic validity, not successful masking.
    Independent read-only evaluator reviews the proof and blocker decision before handoff.
 
 Commit and push each completed slice. Open a draft PR with the first meaningful commit.
@@ -59,3 +60,20 @@ No new architecture debt is accepted. The existing upstream security limitation 
 under #2259. No database, service, Prisma Studio, or dashboard success is inferred.
 
 Contributor entry: this file, then `spike/Program.cs` for the reproduction.
+
+## Diagnostic verdict contract
+
+`spike/result.txt` records assertion names and the verdict, never credential values.
+
+- **INVALID**: nonzero exit and no capability claim if any control fails, reflection cannot
+  bind the expected pinned redactor, or any composed runtime value lacks the synthetic bytes.
+  The direct parameter must be secret and must be masked by the actual redactor; a clean
+  value must stay clean; a planted plaintext substring must be detected by the credential scan.
+- **BLOCKED**: exit 0, all controls pass, every tested composition retains the synthetic
+  credential at runtime, and every corresponding redactor output still contains it.
+- **CAPABLE**: exit 0, all controls pass, and at least one supported composition retains the
+  synthetic credential at runtime while its redactor output contains none of those bytes.
+
+BLOCKED is relative to the tested supported secret-reference mechanisms and the corroborating
+pinned source contract. It is not a proof that no alternative design could exist. CAPABLE is
+only a prerequisite for further live verification, never a full acceptance verdict.

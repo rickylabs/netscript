@@ -40,3 +40,16 @@ backchannel environment redactor while retaining those bytes in the runtime envi
 This is a capability diagnostic, not a database or dashboard acceptance verdict. A CLI leak
 alone disproves the combined acceptance. A positive result would additionally require live
 whole-snapshot/dashboard and runtime checks before any acceptance could be checked.
+
+## Fresh spike result
+
+The standalone pinned diagnostic exited 0 with `CAPABILITY: BLOCKED`; all validity controls
+passed. The direct secret became null under the actual installed backchannel redactor.
+Each of the four composed environment bindings retained the synthetic credential both in the
+resolved consumer value and after redaction. This covers ReferenceExpression directly and
+the AddConnectionString expression overload. See spike/result.txt and spike/README.md.
+
+The result independently reproduces the earlier report, corroborated by the pinned upstream
+source. It disproves the masking prerequisite for these supported composition paths. It does
+not establish live dashboard behavior, a full describe snapshot, database connectivity, or
+regression freedom. The owner explicitly directs stopping after this negative spike.

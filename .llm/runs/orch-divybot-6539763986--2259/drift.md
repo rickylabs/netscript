@@ -9,3 +9,6 @@
   supervisor uses branch, baseline, role, and repo-relative write scope only.
 - 2026-10-31: The first commit attempt found no configured Git author. Use the authenticated
   GitHub account's public noreply identity for this invocation, with no global config changes.
+- 2026-10-31: Fresh pinned-SDK proof returned BLOCKED. Follow the explicit negative-spike
+  branch: stop product implementation and keep all issue acceptance items unproven. The
+  draft PR preserves the reproduction rather than claiming a security fix.

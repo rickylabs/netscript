@@ -1,0 +1,22 @@
+PASS: pinned SDK identity
+SDK: Aspire.Hosting 13.5.3
+PASS: parameter is secret
+PASS: runtime environment resolves without errors
+PASS: direct runtime binding retains credential
+PASS: direct secret is masked by pinned redactor
+PASS: null remains null
+PASS: clean value is preserved
+PASS: clean byte-scan control
+PASS: hostile plaintext byte-scan control
+PASS: expression overload resource type
+PASS: composed resource is outside secret-parameter collection
+PASS: runtime composed binding retains credential: DATABASE_URL
+EXPOSED: DATABASE_URL
+PASS: runtime composed binding retains credential: POSTGRES_URI
+EXPOSED: POSTGRES_URI
+PASS: runtime composed binding retains credential: PROBE_DB_URI
+EXPOSED: PROBE_DB_URI
+PASS: runtime composed binding retains credential: ConnectionStrings__probe-db
+EXPOSED: ConnectionStrings__probe-db
+VALID: all diagnostic controls passed; exit zero is not a masking acceptance pass.
+CAPABILITY: BLOCKED

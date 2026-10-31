@@ -35,3 +35,67 @@ RTK is unavailable; use plain git/gh with bounded output and structured wrappers
 
 Reconcile: no product implementation exists in the prior PR; the scope remains the owner's
 spike-first decision. No acceptance, labels, milestone, lock, or cache has been modified.
+
+## PLAN-EVAL round 1
+
+Independent read-only Opus returned FAIL_PLAN: distinguish all tested compositions leaking
+from one leaking; define INVALID/BLOCKED/CAPABLE and what a zero exit means; fail closed on
+bad controls. Corrected plan.md accordingly. No implementation was started.
+Draft PR #2501 is open with bootstrap commit `756149e`.
+
+## PLAN-EVAL round 2
+
+Same independent evaluator returned PASS. The corrected diagnostic contract is approved.
+Read-only tooling and closed stdin were preserved in both rounds. No shipped source changed.
+
+## Capability spike
+
+The first diagnostic compile failed because GetValueAsync requires a cancellation token.
+Added CancellationToken.None and reran. No product code or dependency pin changed.
+The final probe also rejects a null resolved parameter explicitly. Restore reports the
+pinned SDK's transitive MessagePack advisory; no package upgrade or audit claim is made.
+
+| Command / evidence | Result | Meaning |
+| --- | --- | --- |
+| Installed SDK diagnostic; invocation in spike/README.md | exit 0 | Valid diagnostic, CAPABILITY: BLOCKED |
+| Direct secret, null, clean-value, clean-scan, hostile-scan controls | all pass | Redactor and local byte detector operate as expected |
+| Four composed runtime bindings | all retain credential | SDK environment resolution is intact; no connectivity claim |
+| Four actual backchannel-redactor outputs | all EXPOSED | Neither tested composition masks the password |
+| Package and runtime acceptance gates | unrun / unproven | Product work stops under the assignment's negative-spike rule |
+
+No AppHost, executable, database, dashboard, or container was started. Build output and raw
+compiler logs remain outside Git. result.txt contains no credential values or private identity.
+The diagnostic uses the real installed redactor, not a local replacement. Its local hostile
+control is not the requested runtime gate's negative control; that acceptance remains unproven.
+
+Reconcile: all three issue acceptance items remain unchecked. No generated AppHost output,
+credential-scan exemption, labels, milestone, lock, or cache is changed. Pending independent
+review of the proof, preserve the BLOCKED decision in the draft PR and issue handoff.
+
+## Handoff checks
+
+`git diff --check` passed. `deno task check:review-threads -- --repo rickylabs/netscript
+--pr 2501 --pretty` exited 0: zero review threads and zero unanswered. The initial draft-head
+CI jobs are all SKIPPED, consistent with draft policy; no passing CI verdict is claimed.
+The final pushed head's check state will be reported in the issue comment.
+
+No uncertain live-resource ownership arose: the probe starts no runtime resources, so there
+is nothing from this run requiring teardown or a resource-ownership escalation.
+
+## Independent spike review and decision
+
+The same read-only Anthropic evaluator returned **PASS FOR SPIKE EVIDENCE, ISSUE
+IMPLEMENTATION BLOCKED**. See evaluate.md. The review checked the actual redactor invocation,
+runtime resolution, both supported composition paths, validity controls, all-versus-any logic,
+and the explicitly disclosed limits. The final null guard was included in the reviewed source;
+the final rerun again exited 0 with identical BLOCKED assertions.
+
+The owner-directed outcome is BLOCKED. Preserve this evidence in the draft PR, obtain the
+exact pushed-head verdict, and attach it to the issue decision record. Recommend deferring
+D1 to the already separate #2278 work until a supported masking mechanism is proven. Any
+upgrade or alternative credential-delivery design requires a new coordinator scope decision.
+The whole-snapshot gate, database workflows, service/Studio connectivity, and live dashboard
+acceptance remain unproven; they have not been weakened, checked, or represented as passing.
+
+Reconcile: no other PR supplies the missing implementation. #2275 is closed/unmerged, and
+#2179 only records the explicit security exemption. This branch adds research evidence only.
