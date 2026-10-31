@@ -1,0 +1,13 @@
+# Plan & Design — READY FOR REVIEW
+
+SCOPE-docs, describing existing archetype 4 command definitions and archetype 3 relay lifecycle. No framework contract or implementation changes; JSR package audit is N/A. Doctrine public-surface and explicit-crash-boundary rules guide claims.
+
+Locked: publish services-sdk/commands.md, command-relay.md, command-operations.md, command-security.md and command-compatibility.md. Extend reference/service/index.md with links and precise envelope/policy tables. Add guide links to services-sdk/index.md and outbound-webhooks.md. Use only public service/database/worker exports. Consumer-provided provider bridges and inspectors are explicitly interfaces, not imaginary framework helpers. A complete runnable memory command example proves CAS, receipt replay, audit/outbox atomicity and failure rollback; relay composition uses an explicitly supplied durable store and checked sink.
+
+Slices: (1) command/relay documentation, navigation, Tier-1 enrollment and semantic snippet validation; (2) canonical carrier regeneration, full docs gates and final evidence. Every slice updates worklog/context-pack, receives independent substantive review, commits, pushes and gets a PR comment.
+
+Gates: site verify (build, rendered output, internal links, caveats); root docs:links, docs:snippets, docs:accuracy, docs:exports-drift; snippet policy tests if tooling changes; execute the self-contained command fence through a clean public consumer config; check:agent-docs-prose, check:publish-assets, check:assets-barrel and check:mcp-export-corpus. Scoped structured check/lint/fmt wrappers for touched tooling TypeScript. Independent PLAN-EVAL before implementation and IMPL-EVAL after; final evaluation at exact pushed head. No local scaffold.runtime per owner. Embedded prose only does not change runtime scaffold output.
+
+Risks: unsupported export → report to coordinator, do not patch framework. Changed persisted command identity → compatibility guidance preserves old definitions/receipts. Duplicate downstream effect → document at-least-once and durable sink dedupe. False snippet coverage → add source pages to Tier-1; retain existing floor/exemption budget. Generated carrier drift → canonical tasks only. Public metadata privacy → keep raw evaluator streams and absolute operational paths outside Git.
+
+Open decisions: none requiring owner input. Safe to defer: service-specific HTTP status mapping, production provider composition, reconciliation query implementation and retry retention sizing, which depend on consumer policy. No new architecture debt accepted. Runtime, release, label and milestone changes are deferred to coordinator.
