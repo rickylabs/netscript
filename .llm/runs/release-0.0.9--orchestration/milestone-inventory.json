@@ -341,7 +341,7 @@
       "number": 2400,
       "title": "plugin-workers: listener restart count never resets, so a transient KV outage fails listeners permanently",
       "disposition": "active",
-      "lane": "fixes",
+      "lane": "internals",
       "group": "A3"
     },
     {

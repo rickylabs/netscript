@@ -1,7 +1,7 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
 - H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
 - A1 #2165 MERGED #2477 7907293f3 23:31Z (closed); #2187 r1 → PR #2479 (implementing)
-- A2 #2395 brief ready, HOLD until Cockpit says both Fresh UI fixes (#2415, #2416) started; then #2351 (W3)
+- A2 #2395 started 00:58Z (fixes); then #2351 (W3)
 - A3 #2144 → PR #2481 (implementing); #2400 → PR #2482 (continuation of #2438 worker); #2151 #2161: W2
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
 - B2 #2162 (after #2161) #2149: W3; #2369: W4; #2108 (after B2 pair + all B1): W7

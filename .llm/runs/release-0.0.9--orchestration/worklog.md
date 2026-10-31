@@ -51,3 +51,7 @@
 - 00:38Z: #2144 → PR #2481 (draft), implementing.
 - 00:48Z: command-postgres is green on main (dispatch run 41152000845 at `a410a815c`; the workflow runs on PRs and dispatch only, not on push). #2438 closed with evidence. Main CI is fully green again.
 - 00:49Z: **orchid continuation.** After #2476 merged, the #2438 worker claimed #2400 from the wave plan (claim comment at 00:39Z) and opened draft PR #2482 from briefs/2400.md. Adopted as leaf A3-2400 (fixes). This costs no launch slot. Fixes lane is now at its 2-implementing cap (#2479, #2482), so #2395 also waits for a fixes slot. Continuation workers must post a claim before taking an issue; the coordinator checks claims before every dispatch.
+- 00:50Z: status 2 posted on #2474.
+- 00:54Z: Cockpit: both Fresh UI fixes run as follow-ups in their existing runs, so they take no slot. #2400 moved fixes → internals (drift.md). Dispatched #2395 (A2), comment 6536806908. Cockpit: orchid will not start a new /swarm on an issue whose earlier run is still alive (registration_failed); steer the existing run for follow-up work.
+- 00:55Z: Cockpit correction: there is no one-run-per-issue rule; the blocked S2 repost was a Codex start failure (spawn.remote-control-identity). If a dispatch comes back blocked, do not repost; report the binding state to Cockpit.
+- 00:58:18Z: #2395 binding `state=started` (codex gpt-6.1-sol). Five builders: #2187, #2144, #2396, #2400 (continuation), #2395.
