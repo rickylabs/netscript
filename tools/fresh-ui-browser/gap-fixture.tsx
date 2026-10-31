@@ -1,3 +1,4 @@
+import { CodeBlocks } from './gap-code-block-fixture.tsx';
 import { DisplayMotion } from './gap-display-motion-fixture.tsx';
 import { DisplayBasics } from './gap-display-basics-fixture.tsx';
 import { Overlays } from './gap-overlays-fixture.tsx';
@@ -59,6 +60,7 @@ function Actions() {
       <Overlays />
       <DisplayBasics />
       <DisplayMotion />
+      <CodeBlocks />
     </main>
   );
 }

@@ -43,7 +43,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         },
       }),
     );
-    for (const name of names) {
+    for (const name of [...names, 'code-block']) {
       await run(repo, [
         'run',
         '-A',
@@ -70,7 +70,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
     installedConfig.imports['@netscript/fresh-ui/primitives'] =
       toFileUrl(join(repo, 'packages/fresh-ui/primitives.tsx')).href;
     await Deno.writeTextFile(join(root, 'deno.json'), JSON.stringify(installedConfig));
-    for (const name of names) {
+    for (const name of [...names, 'code-block']) {
       const installed = await Deno.readTextFile(join(root, 'components/ui', name + '.tsx'));
       const source = await Deno.readTextFile(
         join(repo, 'packages/fresh-ui/registry/components/ui', name + '.tsx'),
@@ -82,12 +82,12 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
     await run(root, [
       'check',
       '--unstable-kv',
-      ...names.map((name) => `components/ui/${name}.tsx`),
+      ...[...names, 'code-block'].map((name) => `components/ui/${name}.tsx`),
     ]);
     await run(root, [
       'lint',
       '--rules-include=jsx-curly-braces',
-      ...names.map((name) => `components/ui/${name}.tsx`),
+      ...[...names, 'code-block'].map((name) => `components/ui/${name}.tsx`),
     ]);
   } finally {
     await Deno.remove(root, { recursive: true });

@@ -29,7 +29,7 @@ export const POST_V1_COMPONENTS: readonly string[] = [
 export const POST_V1_SUPPORT: readonly string[] = ['calendar-date', 'menu-items'];
 
 /** Existing copies missing only their actual package runtime dependency. */
-export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = ['command-palette'] as const;
+export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = ['command-palette', 'code-block'] as const;
 
 /** The registry and its package-owned runtime must install at the same release. */
 export const FRESH_UI_RUNTIME_DEPENDENCY: string =
