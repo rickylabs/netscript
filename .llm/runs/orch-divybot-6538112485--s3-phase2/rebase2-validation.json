@@ -1,5 +1,5 @@
 {
-  "base": "d25f65b",
+  "base": "3d83caf1ca50695a0064529113ea00eab52426dd",
   "focusedTests": {
     "passed": 135,
     "failed": 0
@@ -24,5 +24,12 @@
     "forbiddenRootHits": 0,
     "finalHeadRepeatRequired": true
   },
-  "phaseReady": false
+  "phaseReady": false,
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  },
+  "broaderPackageTests": "RUNNING"
 }
