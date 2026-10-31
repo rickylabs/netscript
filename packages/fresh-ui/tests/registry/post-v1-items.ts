@@ -36,12 +36,18 @@ export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = [
   'pagination',
 ] as const;
 
+/** Explicit new copied dependencies for audited existing components. */
+export const LEGACY_REGISTRY_DEPENDENCY_REPAIRS: Readonly<Record<string, readonly string[]>> = {
+  'command-palette': ['kbd', 'spinner'],
+};
+
 /** The registry and its package-owned runtime must install at the same release. */
 export const FRESH_UI_RUNTIME_DEPENDENCY: string =
   `jsr:@netscript/fresh-ui@${FRESH_UI_PACKAGE_VERSION}`;
 
 /** Updated baseline copies also receive real consumer install/type-check coverage. */
 export const AUDITED_BASELINE_COMPONENTS: readonly string[] = [
+  'command-palette',
   'alert',
   'code-block',
   'label',

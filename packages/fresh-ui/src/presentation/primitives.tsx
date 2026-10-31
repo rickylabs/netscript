@@ -10,7 +10,7 @@ import { h } from 'preact';
 import type { ComponentChildren, JSX } from 'preact';
 
 /*!
- * arrow-left, arrow-right, bell, circle-check and circle-alert paths: Lucide / Feather.
+ * arrow-left, arrow-right, bell, circle-check, circle-alert, corner-down-left and file-text paths: Lucide / Feather.
  * https://github.com/lucide-icons/lucide/tree/main/icons
  *
  * ISC License
@@ -64,6 +64,7 @@ export const ICON_PATHS = {
   'chevron-up': ['M18 15l-6-6-6 6'],
   'circle-alert': ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z', 'M12 8v4', 'M12 16h.01'],
   'circle-check': ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z', 'm16 9-5.5 5.5L8 12'],
+  'corner-down-left': ['M20 4v7a4 4 0 0 1-4 4H4', 'm9 10-5 5 5 5'],
   copy: [
     'M8 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z',
     'M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2',
@@ -73,6 +74,13 @@ export const ICON_PATHS = {
     'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
     'M15 3h6v6',
     'M10 14 21 3',
+  ],
+  'file-text': [
+    'M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z',
+    'M14 2v5a1 1 0 0 0 1 1h5',
+    'M10 9H8',
+    'M16 13H8',
+    'M16 17H8',
   ],
   info: ['M12 16v-4', 'M12 8h.01', 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z'],
   menu: ['M4 6h16', 'M4 12h16', 'M4 18h16'],

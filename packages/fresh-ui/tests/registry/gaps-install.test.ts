@@ -107,7 +107,9 @@ import { Label } from './components/ui/label.tsx';
 import { Card } from './components/ui/card.tsx';
 import { Pagination } from './components/ui/pagination.tsx';
 import { Alert } from './components/ui/alert.tsx';
+import { CommandPalette } from './components/ui/command-palette.tsx';
 console.log(JSON.stringify({
+  'command-palette': render(h(CommandPalette, { scrim: false, groups: [{id: 'docs', label: 'Docs', items: [{id: 'start', label: 'Start', type: 'page', excerpt: 'Read the guide', shortcut: 'Enter'}]}] })),
   'code-block': render(h(CodeBlock, { tabs: [{ value: 'source', label: 'Source', code: 'x' }] })),
   label: render(h(Label, { children: 'Email', variant: 'eyebrow', optional: true })),
   card: render(h(Card, { children: 'Card', variant: 'rule', size: 'sm' })),

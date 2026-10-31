@@ -1,3 +1,4 @@
+import { CommandPalettes } from './gap-command-palette-fixture.tsx';
 import { ProseExamples } from './gap-prose-fixture.tsx';
 import { Alerts } from './gap-alert-fixture.tsx';
 import { DocsPrimitives } from './gap-docs-primitives-fixture.tsx';
@@ -67,6 +68,7 @@ function Actions() {
       <DocsPrimitives />
       <Alerts />
       <ProseExamples />
+      <CommandPalettes />
     </main>
   );
 }
