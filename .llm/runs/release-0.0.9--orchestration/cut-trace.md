@@ -13,3 +13,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 03:07 | `1d467c669` | #2484 | #2151 | W2 (A3) | all 3 slices; both tiers green |
 | 2026-10-31 03:26 | `2f426b970` | #2485 | #2367 | W3 (D1) | PR-event e2e green incl. desktop job |
 | 2026-10-31 04:12 | `1c9da73d0` | #2483 | #2395 | W2 (A2) | re-planned after 2x FAIL_PLAN; both tiers green |
+| 2026-10-31 04:13 | `ad252e8c8` | #2489 | #2385 | W5 (E2) | leaf force-pushed (rebase) at 04:00Z; fresh verdict at new head |

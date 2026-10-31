@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "1c9da73d0b87dac9f80d6561e03f1a5cee9da504",
+  "currentMainSha": "ad252e8c8ce14b05390d70d94fa876ae81376958",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009d",
     "trackingIssue": 2474
@@ -282,7 +282,10 @@
     },
     {
       "number": 2385,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/pull/2489"
+      ]
     },
     {
       "number": 2390,
@@ -599,7 +602,7 @@
     {
       "id": "E2-2385",
       "lane": "docs",
-      "phase": "ready",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2489,
       "headSha": "c3f2c464a0341e918ee6ca6a0461b17dd795398d",
@@ -608,7 +611,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2385",
       "receiptRefs": [],
-      "note": "READY at 42f6d98; Opus MERGE; docs + generated carrier only; CI running"
+      "note": "leaf force-pushed (rebase) at 04:00:47Z against the brief; fresh MERGE at new head",
+      "mergeCommit": "ad252e8c8ce14b05390d70d94fa876ae81376958",
+      "mergedAt": "2026-10-31T04:13:39Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2385"
     },
     {
       "id": "D1-2290",
@@ -724,11 +730,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T04:12:56.000Z",
-    "nextReportDueAt": "2026-10-31T05:12:56.000Z",
+    "lastReportAt": "2026-10-31T04:13:58.000Z",
+    "nextReportDueAt": "2026-10-31T05:13:58.000Z",
     "lastReportRef": "worklog.md",
     "headline": "H01 merged (#2476); A1 #2165 and H02 #2478 closed; #2187, #2144, #2396 building; #2395 held for the shared launch cap.",
-    "currentMainSha": "1c9da73d0b87dac9f80d6561e03f1a5cee9da504",
+    "currentMainSha": "ad252e8c8ce14b05390d70d94fa876ae81376958",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -780,7 +786,8 @@
         2481,
         2483,
         2484,
-        2485
+        2485,
+        2489
       ],
       "closedIssues": [
         1364,
@@ -790,6 +797,7 @@
         2151,
         2165,
         2367,
+        2385,
         2395,
         2438,
         2478
@@ -800,11 +808,11 @@
       "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
     },
     "scope": {
-      "openIssueCount": 44,
-      "ownedIssueCount": 44,
-      "scheduledIssueCount": 44,
+      "openIssueCount": 43,
+      "ownedIssueCount": 43,
+      "scheduledIssueCount": 43,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 9
+      "openPullRequestCount": 8
     },
     "mergeQueue": [
       {
@@ -822,23 +830,13 @@
         "state": "ready",
         "nextGate": "e2e-cli or exact-head verdict",
         "nextAction": "READY at 5fdab9b; needs e2e after #2483 gate"
-      },
-      {
-        "prNumber": 2489,
-        "lane": "docs",
-        "headSha": "c3f2c464a0341e918ee6ca6a0461b17dd795398d",
-        "state": "ready",
-        "nextGate": "e2e-cli or exact-head verdict",
-        "nextAction": "READY at 42f6d98; Opus MERGE; docs + generated carrier only; CI running"
       }
     ],
     "orchestratorMatrix": [
       {
         "lane": "docs",
         "state": "active",
-        "activeItems": [
-          "#2489"
-        ],
+        "activeItems": [],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
         "blocker": null,
         "nextAction": "Hold E2 until wave 5; no docs builder before the critical path is staffed."
@@ -900,7 +898,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T04:12:56.000Z",
+  "updatedAt": "2026-10-31T04:13:58.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1029,7 +1027,7 @@
       "commentId": 6538461367,
       "postedAt": "2026-10-31T03:33:22.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "pr-open",
+      "state": "merged",
       "pr": 2489
     },
     {
