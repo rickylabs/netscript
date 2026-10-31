@@ -44,3 +44,15 @@ No locks/deps/labels/milestones/resources changed. Independent slice review pend
 Independent S1 slice sign-off: IMPL round1 PASS; reviewer reran43 Fresh tests (50 combined includes7
 public CLI command tests). Source supervision verified guard follows canonical import repair;
 no unsafe casts/dependencies or inline conflict changes. Source/derived diff is scoped. S1 can commit.
+
+## S2 final local evidence
+
+Source commit104dea8dd pushed with independent slice PASS. Clean-source native export corpus
+regenerated successfully with no diff; no signature change. Native prose, corpus and publish-assets
+checks all pass. Actual no-Aspire generated workspace plus ui:add proof:10 bound pages, all unchanged,
+one binding each through CLI, real dev initialization and full production build. Repeated CLI
+preserves all route TSX bytes. Native Vite server closed. deps:audit critical PASS.
+
+Reconcile: source remains exactly reviewed; S2 adds run evidence only. No labels/milestones or foreign
+changes. PR2536 will be readied for real CI; coordinator asked on #2474 to schedule full runtime.
+No duplicate sibling issues: unfinished cells already tracked/claimed or gated on owner decisions.

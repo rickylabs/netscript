@@ -1,10 +1,12 @@
 # Resume
 
-#2409, PR #2536, fix/fresh-authored-route-binding from main eb9a129. PLAN round 1 PASS. Implemented
-six-line guard preserving existing noncanonical binding; canonical import repair and A/B/C behavior
-retained. Added unit/disk/real Vite dev/build regressions; tests 50/50, negative control9 intended
-failures then restored50. Static wrappers15/15, quality and publish dry-run pass; full doclint45
-matches baseline (not green). Independent S1 slice review pending. Native prose/assets refreshed;
-MCP export corpus to regenerate after source commit, obeying clean-source guard. Focused real local
-no-Aspire scaffold proof in progress; no full local scaffold.runtime. Coordinator owns runtime CI.
-No labels/milestones/merge/release. User asks continuing independent tracker work after this leaf.
+#2409, PR2536, fix/fresh-authored-route-binding from main eb9a129. PLAN1 PASS, IMPL1 source/slice PASS.
+Source104dea8dd independently reviewed; final commit adds local evidence only. Pure guard preserves
+explicit noncanonical bindings after canonical import repair. No templates/Fresh UI/deps/locks.
+Tests50/50, negative9 intended failures restored50, structured wrappers15/15, quality/audit/publish and
+all native doc freshness gates pass. Doclint45 unchanged baseline (not green).
+Actual generated app+ui:add proof passes CLI, real dev and full production build:10 bound pages,
+unchanged bytes and exactly one binding each. No running server/AppHost/container created.
+Next: ready PR for core CI; coordinator requested full scaffold.runtime scheduling on #2474. No local
+full runtime. Exact final pushed-head same-session review after required CI. No labels/milestones or
+merge/release authority. Other unfinished tracker leaves already have owners or explicit decisions.
