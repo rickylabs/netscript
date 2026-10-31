@@ -1,12 +1,12 @@
 import { relative, resolve } from '@std/path';
-import { TOKEN_CONFIG_FILE } from '../../../domain/tokens/token-config.ts';
-import { uiContentHash } from '../../../domain/ui/ui-lock.ts';
-import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
-import { createUiRegistryClient, type UiRegistryDependencies } from './registry-client.ts';
-import { prepareUiRegistryInstall } from './install-registry.ts';
-import { planUiWrites } from './ui-write-plan.ts';
+import { TOKEN_CONFIG_FILE } from '../../../../domain/tokens/token-config.ts';
+import { uiContentHash } from '../../../../domain/ui/ui-lock.ts';
+import { readUiConfig, readUiLock, writeUiMetadata } from '../config-lock.ts';
+import { createUiRegistryClient, type UiRegistryDependencies } from '../registry-client.ts';
+import { prepareUiRegistryInstall } from '../install-registry.ts';
+import { planUiWrites } from '../ui-write-plan.ts';
 import { figmaThemeFiles, transferThemeBaselines } from './figma-theme-files.ts';
-import { uiTargetPath } from './copy-files.ts';
+import { uiTargetPath } from '../copy-files.ts';
 import type { UiPresetApplyInput } from './apply-preset.ts';
 
 /** Apply fetched registry theme/base through S2's schema, path, local-edit and lock write plan. */
@@ -64,6 +64,16 @@ export async function applyRemoteUiPreset(
       hash: await uiContentHash(compiled.config),
       managed: false,
     });
+    for (const [ref, item] of Object.entries(install.lock.items)) {
+      if (
+        ref !== url && ['registry:theme', 'registry:base'].includes(item.type) &&
+        !item.files.length && !item.registryDependencies.length && !item.dependencies?.length &&
+        !item.cssImports?.length &&
+        !Object.entries(install.lock.items).some(([dependentRef, dependent]) =>
+          dependentRef !== ref && dependent.registryDependencies.includes(ref)
+        )
+      ) delete install.lock.items[ref];
+    }
     await writeUiMetadata(root, install.config, install.lock, plan.fs);
   }
   await plan.commit(deps.paths);

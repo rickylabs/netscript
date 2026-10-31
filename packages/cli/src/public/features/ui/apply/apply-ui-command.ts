@@ -1,5 +1,5 @@
 import { Command } from '@cliffy/command';
-import { applyUiPreset } from '../../../../kernel/application/ui/v2/apply-preset.ts';
+import { applyUiPreset } from '../../../../kernel/application/ui/v2/presets/apply-preset.ts';
 import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/support.ts';

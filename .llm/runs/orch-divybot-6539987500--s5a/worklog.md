@@ -176,3 +176,19 @@ Independent S6a source review pending. Native fresh-app proof remains green;
 full Aspire/Docker tier is explicitly UNPROVEN.
 
 S6a terminal PASS: independent organization review plus fixture/source, plugin and matching-baseline fitness evidence. Next bounded CLI organization slice.
+
+## S6b — CLI preset grouping and review refinements
+
+Grouped URL/encoded preset application and the shared init applier under
+ui/v2/presets. Parent v2 and scaffold folder counts return to their baseline
+levels rather than deepening existing warnings. Public commands/ports remain
+unchanged. Reuse SCAFFOLD_DIRS.APPS, remove fully empty retired portable-theme
+lock entries after ownership transfer, and document that built-in codes select
+contexts in the installed sources. Init preview/failure recovery is documented.
+Focused URL/native/init rerun and independent source review in progress.
+
+S6b terminal PASS after dependent-aware empty-entry cleanup. Focused URL/native/
+init rerun14/0/0, new dependent retention control1/0/0; 16-file source wrappers
+pass. Existing preset-tokens moved too, restoring v2 to12entries. Independent
+repair review confirms S2 dependent protection, grouping and documentation.
+Next S6c: complete source JSDoc, DTCG download links, carriers and final gates.

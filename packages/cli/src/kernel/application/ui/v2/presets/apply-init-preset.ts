@@ -1,7 +1,8 @@
+import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { resolve } from '@std/path';
-import { deriveDefaultAppName } from '../../domain/scaffold/app-name.ts';
-import { applyUiPreset } from '../ui/v2/apply-preset.ts';
-import type { UiRegistryDependencies } from '../ui/v2/registry-client.ts';
+import { deriveDefaultAppName } from '../../../../domain/scaffold/app-name.ts';
+import { applyUiPreset } from './apply-preset.ts';
+import type { UiRegistryDependencies } from '../registry-client.ts';
 
 /** Generated-app identity required to apply an init preset without guessing workspace paths. */
 export interface InitPresetInput {
@@ -17,7 +18,11 @@ export async function applyInitPreset(
   deps: UiRegistryDependencies,
 ): Promise<void> {
   await applyUiPreset({
-    root: resolve(input.projectRoot, 'apps', input.appName ?? deriveDefaultAppName(input.name)),
+    root: resolve(
+      input.projectRoot,
+      SCAFFOLD_DIRS.APPS,
+      input.appName ?? deriveDefaultAppName(input.name),
+    ),
     preset: input.preset,
   }, deps);
 }

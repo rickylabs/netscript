@@ -1,4 +1,4 @@
-import type { InitPresetInput } from '../../../kernel/application/scaffold/apply-init-preset.ts';
+import type { InitPresetInput } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { resolve } from '@std/path';
 
 import type { DbEngineChoice } from '../../../kernel/domain/db-engine.ts';

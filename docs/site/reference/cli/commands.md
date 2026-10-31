@@ -363,7 +363,7 @@ following registry and preset commands complete the setup and discovery workflow
 | `netscript ui:preset` | Group for offline preset decoding and shareable URL generation. |
 | `netscript ui:preset decode <code>` | Decode a versioned preset, shared URL or plain token preset id without a network request. |
 | `netscript ui:preset url [code] --theme studio-utility` | Construct a shareable URL; optional `--style`, `--font`, and `--icon-library` set those preset fields. |
-| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder; a theme/preset JSON URL is also accepted. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
+| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder; preset-JSON URLs also work with `--only`; registry theme URLs apply as a whole without `--only`. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
 
 A portable Figma theme installs in one command:
 
@@ -383,6 +383,14 @@ Figma exports retain their DTCG source under `tokens/source` and select it with
 The S2 `fresh-ui.lock.json` records source files, generated assets and theme docs. Existing semantic
 overrides are retained and compiled; a custom source root or edited installed sources block a
 replacement before writes. A second URL theme can replace sources owned by the previous theme.
+
+After installing a URL theme, selecting a built-in preset code changes the context within the
+app's installed sources. It retains `sourceRoot` and the Figma-owned values; it does not reset
+those sources to the bundled catalog. `init --dry-run --preset` previews the scaffold and skips
+remote fetch/application. With a real init, preset application follows scaffold creation; if a
+URL fails, repair it and use `ui:apply --preset` on the generated app to finish configuration. Agent setup was skipped after that failure; run
+`netscript agent init --project-root .` from the generated workspace after applying the theme.
+
 The [plugin contributor guide](https://github.com/rickylabs/netscript/blob/main/tools/figma-plugin/README.md)
 explains Figma import/export, token scopes, the values-only PR contract and the shared CI name check.
 

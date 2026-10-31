@@ -2,12 +2,12 @@ import { resolve } from '@std/path';
 import { z } from 'zod';
 import { resolveUiPreset } from './resolve-preset.ts';
 import { applyRemoteUiPreset } from './apply-remote-preset.ts';
-import { uiContentHash } from '../../../domain/ui/ui-lock.ts';
-import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
-import { prepareUiRegistryInstall } from './install-registry.ts';
-import { createUiRegistryClient, type UiRegistryDependencies } from './registry-client.ts';
+import { uiContentHash } from '../../../../domain/ui/ui-lock.ts';
+import { readUiConfig, readUiLock, writeUiMetadata } from '../config-lock.ts';
+import { prepareUiRegistryInstall } from '../install-registry.ts';
+import { createUiRegistryClient, type UiRegistryDependencies } from '../registry-client.ts';
 import { stageUiPresetTokens } from './preset-tokens.ts';
-import { planUiWrites } from './ui-write-plan.ts';
+import { planUiWrites } from '../ui-write-plan.ts';
 
 const presetMetadata = z.object({ id: z.string() }).passthrough();
 

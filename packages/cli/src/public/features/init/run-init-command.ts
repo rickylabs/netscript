@@ -37,7 +37,7 @@ export interface InitCommandDependencies {
   readonly prompt: PromptPort;
   /** Apply UI choices after scaffold output exists, before agent setup. */
   readonly applyPreset?: (
-    input: import('../../../kernel/application/scaffold/apply-init-preset.ts').InitPresetInput,
+    input: import('../../../kernel/application/ui/v2/presets/apply-init-preset.ts').InitPresetInput,
   ) => Promise<void>;
 }
 

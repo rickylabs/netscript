@@ -1,6 +1,6 @@
-import { decodeUiPreset, type UiPreset, UiPresetSchema } from '../../../domain/ui/ui-preset.ts';
-import { parseUiRegistryJson, uiRegistryUrl } from '../../../domain/ui/ui-config.ts';
-import type { UiRegistryDependencies } from './registry-client.ts';
+import { decodeUiPreset, type UiPreset, UiPresetSchema } from '../../../../domain/ui/ui-preset.ts';
+import { parseUiRegistryJson, uiRegistryUrl } from '../../../../domain/ui/ui-config.ts';
+import type { UiRegistryDependencies } from '../registry-client.ts';
 
 /** Distinguish local share links from fetched preset JSON and portable registry items. */
 export async function resolveUiPreset(input: string, deps: UiRegistryDependencies): Promise<

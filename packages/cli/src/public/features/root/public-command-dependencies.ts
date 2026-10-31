@@ -1,4 +1,4 @@
-import { applyInitPreset } from '../../../kernel/application/scaffold/apply-init-preset.ts';
+import { applyInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { FetchUiRegistry } from '../../../kernel/adapters/ui/fetch-ui-registry.ts';
 import type { UiRegistryDependencies } from '../../../kernel/application/ui/v2/registry-client.ts';
 import { DenoUiRegistryPaths } from '../../../kernel/adapters/ui/deno-ui-registry-paths.ts';

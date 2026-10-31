@@ -55,3 +55,14 @@ review, then group CLI URL helpers, finish carriers and final gates. Docker
 daemon unavailable; canonical runtime suite exited1 in preflight, UNPROVEN.
 
 S6a terminal PASS: independent organization review plus fixture/source, plugin and matching-baseline fitness evidence. Next bounded CLI organization slice.
+
+S6b groups five CLI preset helpers under ui/v2/presets. Shared app-directory
+constant and empty retired-lock cleanup addressed S5 recommendations. Await
+focused gates/review before carrier commit. Prose generation already succeeded;
+its pending carrier is intentionally reserved for S6c.
+
+S6b terminal PASS after dependent-aware empty-entry cleanup. Focused URL/native/
+init rerun14/0/0, new dependent retention control1/0/0; 16-file source wrappers
+pass. Existing preset-tokens moved too, restoring v2 to12entries. Independent
+repair review confirms S2 dependent protection, grouping and documentation.
+Next S6c: complete source JSDoc, DTCG download links, carriers and final gates.

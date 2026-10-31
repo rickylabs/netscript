@@ -1,7 +1,8 @@
+import type { TokenEnginePort } from '../../../../ports/token-engine-port.ts';
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { MemoryFileSystemAdapter } from '../../../../adapters/scaffold/memory-fs.ts';
 import { FreshUiTokenEngine } from '../../../../adapters/tokens/fresh-ui-token-engine.ts';
-import { applyUiPreset } from '../apply-preset.ts';
+import { applyUiPreset } from '../presets/apply-preset.ts';
 import { readUiLock } from '../config-lock.ts';
 import { buildAppTokens } from '../../../tokens/build-app-tokens.ts';
 import { themeItem } from '../../../../../../../../tools/figma-plugin/src/theme-item.ts';
@@ -63,7 +64,7 @@ Deno.test('URL Figma theme installs persistent sources, docs and lock, and later
       file.target === 'tokens/source/primitives.tokens.json'
     ),
   );
-  assert(!next.items[URL].files.some((file) => file.target.startsWith('tokens/source/')));
+  assertEquals(next.items[URL], undefined);
 });
 
 Deno.test('bad URL, JSON, schema, item type and name failures leave every file unchanged', async () => {
@@ -167,4 +168,35 @@ Deno.test('generic published-schema themes and preset JSON URLs use S2, while sh
     }`,
   }, deps);
   assertEquals(deps.calls(), calls);
+});
+
+Deno.test('an emptied previous theme remains locked while an installed item depends on it', async () => {
+  const deps = await fixture();
+  const tokenEngine: TokenEnginePort = {
+    defaults: () =>
+      Promise.resolve({ preset: 'studio-utility', presets: ['studio-utility'], sources: {} }),
+    outputFiles: () => Promise.resolve(['tokens.css']),
+    figmaSources: () =>
+      Promise.resolve({ 'tokens.resolver.json': '{}', 'primitives.tokens.json': '{}' }),
+    build: () => Promise.resolve({ preset: 'studio-utility', files: { 'tokens.css': ':root {}' } }),
+  };
+  const fast = { ...deps, tokenEngine };
+  await applyUiPreset({ root: '/app', preset: URL }, fast);
+  const previous = (await readUiLock('/app', deps.fs))!;
+  previous.items.dependent = {
+    ...previous.items[URL],
+    source: 'builtin:dependent',
+    type: 'registry:component',
+    files: [],
+    registryDependencies: [URL],
+  };
+  await deps.fs.writeFile('/app/fresh-ui.lock.json', JSON.stringify(previous, null, 2) + '\n');
+  await applyUiPreset(
+    { root: '/app', preset: 'https://theme.test/dependent-replacement.json' },
+    fast,
+  );
+  const current = (await readUiLock('/app', deps.fs))!;
+  assert(current.items[URL]);
+  assertEquals(current.items[URL].files, []);
+  assertEquals(current.items.dependent.registryDependencies, [URL]);
 });

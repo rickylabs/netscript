@@ -6,11 +6,11 @@ import {
   TOKEN_OVERRIDE_FILE,
   TOKEN_RESOLVER_FILE,
   TOKEN_SOURCE_DIR,
-} from '../../../domain/tokens/token-config.ts';
-import { uiContentHash, type UiLock } from '../../../domain/ui/ui-lock.ts';
-import { readTokenConfig, readTokenOverride } from '../../tokens/token-files.ts';
-import type { UiRegistryDependencies, UiResolvedItem } from './registry-client.ts';
-import type { UiWritePlan } from './ui-write-plan.ts';
+} from '../../../../domain/tokens/token-config.ts';
+import { uiContentHash, type UiLock } from '../../../../domain/ui/ui-lock.ts';
+import { readTokenConfig, readTokenOverride } from '../../../tokens/token-files.ts';
+import type { UiRegistryDependencies, UiResolvedItem } from '../registry-client.ts';
+import type { UiWritePlan } from '../ui-write-plan.ts';
 
 /** Compile portable Figma values with the existing engine and retain their editable source/config. */
 export async function figmaThemeFiles(
