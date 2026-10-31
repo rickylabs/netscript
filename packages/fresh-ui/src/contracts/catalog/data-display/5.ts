@@ -7,36 +7,51 @@ export const data_display_5: readonly ComponentContract[] = [
     'specId': 'D13',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'open': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+        'kind': 'boolean',
+      },
+      'defaultOpen': {
+        'kind': 'boolean',
+      },
+      'onOpenChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'label': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'children': {
+        'kind': 'slot',
+        'required': true,
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'trigger',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'content',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'label',
+      },
+      {
+        'name': 'indicator',
       },
     ],
     'attributes': {
@@ -46,9 +61,24 @@ export const data_display_5: readonly ComponentContract[] = [
           'true',
         ],
       },
+      'data-state': {
+        'values': [
+          'rest',
+          'disabled',
+        ],
+      },
     },
     'booleans': [],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'label',
+        'part': 'label',
+      },
+      {
+        'name': 'children',
+        'part': 'content',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/',
     'keyboard': [
       {
@@ -58,9 +88,12 @@ export const data_display_5: readonly ComponentContract[] = [
     ],
     'tokenRoles': [
       'space/stack/gap',
+      'text/muted',
+      'radius/control',
+      'state/disabled-opacity',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native details/summary retains no-JavaScript disclosure behavior. After hydration, controlled refusal preserves open and disabled summary prevents activation. Before hydration, native disclosure remains toggleable, including aria-disabled summaries. No global listeners.',
     ],
   },
   {

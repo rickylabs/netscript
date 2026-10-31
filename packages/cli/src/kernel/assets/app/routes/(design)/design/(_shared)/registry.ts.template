@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 109,
+  'total': 112,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -735,6 +735,24 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Pointer and keyboard context region with native shared menu content.',
   },
+  {
+    'name': 'item',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Presentation row with native content and action slots.',
+  },
+  {
+    'name': 'kbd',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native keyboard notation and grouped shortcut keys.',
+  },
+  {
+    'name': 'collapsible',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native details disclosure with controlled or uncontrolled open state.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -917,6 +935,15 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'alert-dialog',
       'hover-card',
       'context-menu',
+    ],
+  },
+  {
+    'name': 'data-display',
+    'items': [
+      'theme-seed',
+      'item',
+      'kbd',
+      'collapsible',
     ],
   },
 ];

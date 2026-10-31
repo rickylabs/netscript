@@ -16,6 +16,9 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'alert-dialog',
   'hover-card',
   'context-menu',
+  'item',
+  'kbd',
+  'collapsible',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
