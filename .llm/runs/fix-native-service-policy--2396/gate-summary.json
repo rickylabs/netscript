@@ -77,5 +77,73 @@
     "root": "packages/service",
     "files": 126,
     "exitCode": 0
+  },
+  "finalSourceHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+  "finalSourceReceipts": [
+    {
+      "gateId": "check",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 98310
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4075
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5995
+    },
+    {
+      "gateId": "quality-gate",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17308
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 23629
+    },
+    {
+      "gateId": "assets-barrel",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2273
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 19228
+    },
+    {
+      "gateId": "publish-assets",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 724
+    }
+  ],
+  "finalSourceTests": {
+    "passed": 824,
+    "failed": 0,
+    "ignored": 0
+  },
+  "finalSourceDocLint": {
+    "entrypoints": 8,
+    "findings": 0
   }
 }
