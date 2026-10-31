@@ -555,3 +555,19 @@ Recovery6: latest main7feb24c7 advanced after the completed shell slice. Owner-a
 
 
 Recovery6 integration review PASS; failure streak0. Source36ac76ab on latestmain7feb24c7 preserves611framework/browser file blobs (only inherited main private lock excluded); rootcatalog/npm/jsrmaps unchanged and topiclockdelta0. Full608package/all4committed-source carriers/qualityPASS. Evidence and derivedpublish carrier only since source. Mandatoryprivacy audit then parentleasedpush against037d048b; nextrestackchild2cd89188 and validatebeforeitsleasedpush. Browser unchanged-source proof is historical, final-headbrowser/runtime/requiredCI still needed beforeREADY.
+
+## Recovery7 design before latest-main integration
+
+Docs11a delivered on child dbcb96ff/d0d8d922 with same independent source/evidence
+PASS (104/100/4/129). Parent71d8df6f now conflicts with main43aa891e. Private
+baselines retain612parent/675child files and exact remote heads; local tracking
+refs were refreshed explicitly before lease selection. The seven-item
+recovery7-checkpoint.md preserves main's maintained Utility/highlighter changes
+and richer phase2 behavior, with full fresh validation rather than a false
+unchanged-source claim. Same design review is next; no rebase/product mutation yet.
+
+Recovery7 same independent design PASS, failure streak0. Before rebase, commit
+the checkpoint and verdict. Protect hook order with an independently mounted
+CodeRows child per tab or a single stable memo, never hooks inside a map. Test
+runtime tab additions/removals, trusted-only highlight injection and hostile
+source, deterministic recognized-language fallback and contextual contrast.

@@ -88,3 +88,17 @@ Recovery6: latest main7feb24c7 advanced after the completed shell slice. Owner-a
 
 
 Recovery6 integration review PASS; failure streak0. Source36ac76ab on latestmain7feb24c7 preserves611framework/browser file blobs (only inherited main private lock excluded); rootcatalog/npm/jsrmaps unchanged and topiclockdelta0. Full608package/all4committed-source carriers/qualityPASS. Evidence and derivedpublish carrier only since source. Mandatoryprivacy audit then parentleasedpush against037d048b; nextrestackchild2cd89188 and validatebeforeitsleasedpush. Browser unchanged-source proof is historical, final-headbrowser/runtime/requiredCI still needed beforeREADY.
+
+Recovery7 design is recorded before mutation. Current branch is parent71d8df6f,
+child d0d8d922 is safely pushed and clean. Main43aa891e changes284files,26overlap
+paths including maintained Utility CSS and automatic CodeBlock highlighting.
+Private source baselines612parent/675child and exact remote heads are retained.
+Use recovery7-checkpoint.md for the seven-item preservation/validation contract;
+same independent design PASS is required before rebase and source reconciliation.
+Remaining full assignment11b/12/13 remains active; no READY/final report.
+
+Recovery7 same independent design PASS, failure streak0. Before rebase, commit
+the checkpoint and verdict. Protect hook order with an independently mounted
+CodeRows child per tab or a single stable memo, never hooks inside a map. Test
+runtime tab additions/removals, trusted-only highlight injection and hostile
+source, deterministic recognized-language fallback and contextual contrast.
