@@ -152,7 +152,7 @@ Deno.test('flow rejects open redirects before creating an authorization redirect
   );
 });
 
-Deno.test('flow performs sign-in and callback with single-use state', async () => {
+Deno.test('flow performs sign-in and callback with single-use state and a malformed foreign cookie', async () => {
   const store = await createKvOAuthStore({ kv: new MemoryKvAdapter(), encryptionKey: testKey });
   const flow = createKvOAuthFlow({
     provider: provider(),
@@ -208,10 +208,10 @@ Deno.test('flow performs sign-in and callback with single-use state', async () =
 
   const callback = await flow.handleCallback(
     request(
-      `https://app.example.test/auth/callback?txn=${secondLocation.searchParams.get('txn')}&state=${
+      `https://app.example.test/auth/callback?state=${
         secondLocation.searchParams.get('state')
       }&code=code_test`,
-      secondTxnCookie,
+      `other=%E0%A4%A; ${secondTxnCookie}; another=%FF`,
     ),
   );
   assertEquals(callback.response.status, 302);
@@ -361,4 +361,44 @@ Deno.test('backend reports token endpoint refresh failures as typed errors', asy
     KvOAuthError,
   );
   assertEquals(failure.code, 'refresh_failed');
+});
+
+Deno.test('#2115 backend session reads and signout tolerate malformed foreign cookies', async () => {
+  for (const name of ['__Host-ns_session', 'custom_session']) {
+    const store = await createKvOAuthStore({ kv: new MemoryKvAdapter(), encryptionKey: testKey });
+    const backend = await createKvOAuthBackend({
+      provider: provider(),
+      store,
+      cookie: { name },
+    });
+    const session = await backend.sessions.createSession({
+      userId: 'user_test',
+      subject: 'user_test',
+      expiresAt: new Date(Date.now() + 60 * 60_000).toISOString(),
+    });
+    for (
+      const cookie of [
+        `other=%E0%A4%A; ${name}=${session.id}`,
+        `${name}=${session.id}; other=%E0%A4%A`,
+        `other=%; ${name}=${session.id}; another=%FF`,
+      ]
+    ) {
+      const input = authnRequest(cookie);
+      const authenticated = await backend.authenticate(input);
+      assert(authenticated.ok);
+      assertEquals(authenticated.principal.subject, session.subject);
+      assertEquals((await backend.sessions.getSession({ request: input }))?.id, session.id);
+      assertEquals(await backend.getSessionId(request(undefined, cookie)), session.id);
+    }
+    assertEquals(await backend.authenticate(authnRequest(`other=%; ${name}=%FF`)), {
+      ok: false,
+      reason: 'kv_oauth_session_missing',
+    });
+    const signedOut = await backend.signOut(
+      request(undefined, `other=%E0%A4%A; ${name}=${session.id}; another=%FF`),
+    );
+    assertEquals(signedOut.status, 302);
+    assertStringIncludes(signedOut.headers.get('set-cookie')!, 'Max-Age=0');
+    assertEquals(await store.getSession(session.id), null);
+  }
 });

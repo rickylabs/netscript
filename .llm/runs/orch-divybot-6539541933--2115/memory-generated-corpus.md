@@ -1,0 +1,3 @@
+# Generated corpus memory — 2026-10-31
+
+A public JSDoc-only change updates the compressed ./cookies row in the MCP export corpus. Run gen:mcp-export-corpus and check:mcp-export-corpus, then gen:publish-assets/check:publish-assets. Here publish generation changes no dependent carrier. Diff compressed rows by JSON parsing and raw deflate decoding (Python zlib.decompress(...,-15)); only auth-kv-oauth ./cookies changed, with the parser description and matching hash/size. This is generated documentation, not scaffold/runtime wiring. CI quality includes this freshness gate separately from quality:gate.
