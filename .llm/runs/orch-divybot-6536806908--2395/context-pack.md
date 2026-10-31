@@ -1,17 +1,12 @@
-# Resume — implementation complete, preliminary IMPL-EVAL PASS
+# Resume — ready PR, generated API corpus CI fix
 
-PR #2483; branch orch/divybot-6536806908. Same independent evaluator passed round3,
-including independently reproduced busy-handler outages on Redis and Garnet. All earlier
-verdicts retained in evaluate.md and plan-eval.md.
+PR #2483 is READY, no merge. Runtime implementation and 192 local tests passed. Independent
+round4 MERGE was at bd31d2d494091be987d9756320542b1a9cdcc7d0, with 43 independent real-backend
+tests. CI quality then required the MCP generated export corpus refresh. Only that generated
+file plus run evidence change; native freshness, 7 corpus tests and dependent assets pass.
+Push generated-data slice and run final exact-head review round5 in the same evaluator session.
 
-Implemented atomic Lua leases/heartbeat/fenced ack/nack, expiry+grace and legacy recovery,
-durable DLQ/outbox/counters, outage continuity, CLI Garnet flags, docs and real-backend tests.
-Local combined queue+generator suite192pass, 2 CI-only skips; negative control10/10 core tests
-red on old adapter. Structured check68files, queue lint/fmt66files and CLI2files pass.
-Changed Redis+ports doc lint exits0; full-package single KV diagnostic equals verified baseline.
-Quality+architecture/deps passed; explicit F16 navigation debt recorded.
-
-Next: commit/push, mark ready, run final exact-head IMPL-EVAL (round4) in same evaluator.
-Post exact-head evidence and read CI/review-thread state. Coordinator must arm e2e-cli-gate
-because generator output changed. No local scaffold.runtime, labels/milestones, merge or release.
-Canonical final READY report uses excluded atomic .divybot-final-report.md handoff.
+Close-gate has only honest outstanding completion boxes. Keep final-review checkbox unchecked
+until new-head verdict, and scaffold-runtime checkbox unchecked until coordinator arms its
+e2e-cli-gate and the runtime CI passes. No local scaffold suite, label/milestone/lock/cache
+mutation, merge/tag/release. Canonical READY report uses excluded atomic final-report file.

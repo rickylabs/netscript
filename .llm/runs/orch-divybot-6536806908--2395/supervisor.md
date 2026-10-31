@@ -26,3 +26,7 @@ Garnet launch arms. Record rescope and require coordinator-owned scaffold-runtim
 
 Additional evidence-only write surface: .llm/harness/debt/arch-debt.md, recording the
 pre-existing adapters cardinality advisory growing from 15 to 19 due to four cohesive modules.
+
+CI-followup write surface: packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts,
+the repository-generated public API corpus, plus run evidence. CI quality identified its
+required freshness delta after the new queue public API; no hand editing of generated rows.

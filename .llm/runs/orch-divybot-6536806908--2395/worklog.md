@@ -139,3 +139,17 @@ Reconcile before implementation sign-off: PR #2483 is still draft; no labels/mil
 locks/caches or foreign resources changed. Commit/push implementation and run evidence;
 mark ready now that preliminary independent review has no blockers. Required scaffold-runtime
 CI is coordinator-armed; final evaluator must inspect the exact pushed head. No merge here.
+
+## CI follow-up slice — generated MCP public API corpus
+
+CI quality failed solely at MCP export corpus freshness after lint/fmt/docs/prose checks passed.
+Run the canonical deno task gen:mcp-export-corpus on clean committed package sources.
+Exactly three generated rows change: queue root, queue Redis adapter and the worker surface
+that references queue types. No runtime or test source changes and no manual generated edits.
+Freshness durable gate PASS, 7 embedded-corpus/flow tests PASS, assets-barrel and publish-assets
+freshness PASS. No lock changes. Push this necessary generated-data slice and run exact-head
+IMPL-EVAL round5; keep the independent-evaluation checkbox unproven until its new verdict.
+
+Reconcile: PR remains ready, not draft. Coordinator-owned e2e-cli-gate still absent; required
+scaffold-runtime CI remains unproven and its acceptance stays unchecked. No labels/milestones
+changed, no local scaffold runtime and no merge/release.

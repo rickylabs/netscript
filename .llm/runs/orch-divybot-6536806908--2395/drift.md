@@ -18,3 +18,8 @@ private-type-ref in packages/kv/types/watchable-kv.ts; new Redis diagnostics fix
 JSR audit identifies pre-existing F-16 adapters cardinality worsening from 15 to 19. Record
 the added navigation cost and closing gate in redis-lease-cardinality debt; do not hide it
 behind the green quality/architecture exit status. No functional acceptance was weakened.
+
+Ready-head CI quality failed on MCP export corpus freshness, after lint/fmt/docs checks passed.
+Refresh through deno task gen:mcp-export-corpus and verify dependent generated carriers.
+This necessary generated-data delta was omitted from the initial public-surface gate list;
+record it explicitly and re-evaluate the new exact head. No runtime source change is needed.

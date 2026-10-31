@@ -83,3 +83,15 @@ The findings from earlier rounds that I recorded as no blocker all still hold, a
 This round reviewed the uncommitted working tree. The final review still has to run against the exact pushed commit after the sign-off commit.
 
 **PASS**
+
+## Round 4 — exact implementation head
+
+Independent evaluator verified local/remote/PR head equality and clean working tree.
+It reran 43 Redis/Garnet lease/outage/safety/compatibility tests, zero failures, one CI-only
+sentinel skipped. No implementation blockers. Live CI was still running; scaffold gate absent.
+Confirmed close-gate cause is unchecked final-evaluation/runtime-CI boxes, not issue linkage.
+
+VERDICT: MERGE bd31d2d494091be987d9756320542b1a9cdcc7d0
+
+A subsequent CI-required generated MCP API corpus refresh moves the head. Final round5
+must inspect that exact new head; round4 is retained historical evidence.
