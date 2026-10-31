@@ -425,6 +425,7 @@ packages/cli/e2e/tests/application/gates/background-children-health_test.ts	e2e	
 packages/cli/e2e/tests/application/gates/background-health-coverage_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/configure-published-workers-block_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/credential-readiness_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/fixtures/aspire-describe-follow-13.5.3-capture.ndjson	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-13.5.3.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)

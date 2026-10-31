@@ -64,3 +64,7 @@ After readiness, the full Aspire parity gate requires refreshing its generated s
 S3 also refreshes `packages/mcp/src/publish-assets.generated.ts` after CI identified its docs-corpus wrapper as stale. Gate: canonical gen/check:publish-assets; independent supplemental artifact review before the same S3 commit. No executable behavior changes.
 
 S3 CI regression support also declares the existing BFF cookie alias in the root test import map and updates the empty-tools pipeline expectation to its current Promise no-op contract. Run all twelve files named by the five failing shard reports; retain cookie/CORS/public-route and generated-browser negative controls unchanged.
+
+## S4 runtime CI fixture repair
+
+Repair the existing Flow-B fixture for formatted local-source launch metadata. Contract: change only the Deno config value, preserve the exact expected source entrypoint, retain published-mode recency behavior and legacy local-alias resolution, reject missing config and wrong service source, and remain idempotent. Use the real generator plus Deno formatter in the targeted regression. Gates: affected fixture/locator/frozen-probe tests, scoped check/lint/fmt, quality:gate, Aspire parity; full runtime suites run only in CI. Separate same-session supervisor review before commit and exact-pushed-head review after repair.

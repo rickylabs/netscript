@@ -1,0 +1,7 @@
+# Flow-B fixture after local plugin services use source paths
+
+Both scaffold.runtime tiers failed at runtime.flow-b-fixture after49 passing gates, before Aspire runtime startup: the local fixture rewrote only a compact `['run', '--config', 'deno.json',` sequence and required a published service string. Real absolute local source paths make Deno format the argument array across lines. Reuse the published fixture's existing whitespace-independent config-value rewrite; validate the exact expected local service entrypoint and preserve it. Continue supporting legacy pinned JSR fixtures via the declared local alias. Keep wrong-source and missing-config guards.
+
+The focused regression should invoke the real register-plugins generator, format its complete module with Deno, locate workers-api, then apply the fixture rewrite. Handwritten compact fixtures alone missed this integration. Do not run full scaffold.runtime locally: the operator reserves that CI gate. Compare latest main's same gate before attributing failure; main run41197676281 at15cffa2 passed both runtime tiers.
+
+Native Windows: build the expected service path with the same platform resolver as the installer. The helper now receives sourceRoot and resolves the shared relative service constant inside the tested path. Test that construction with @std/path/windows resolve, not a precomputed matching entrypoint; replacing the resolver with POSIX concatenation produces a semantic failure.
