@@ -1,0 +1,21 @@
+# Supervisor
+
+Issue: #2548. Branch: `orch/divybot-6548543767`.
+Baseline: `43aa891ec0782a646c0986b5d5546b83a5774ca0`.
+Implementation: Codex, feature tier, owner-requested high effort.
+Matrix queried with `deno task agentic:matrix --tier feature --json`: implementation sol → muse_spark_1_3; implementation evaluation muse_spark_1_3 → opus_5; max rounds 5, with leaf stop after two consecutive terminal failures.
+Owner override (verbatim): `IMPL-EVAL: claude -p --model claude-opus-5-5 --effort high`, read-only. Separate Anthropic evaluator; no session identifiers in public artifacts.
+
+## Authorized write surface
+
+- `.llm/runs/orch-divybot-6548543767--2548/` (run artifacts, memory, evaluation, lesson).
+- `.llm/tools/release/` (coordinated bump and residue regression).
+- `.llm/tools/validation/check-netscript-jsr-specifiers*` (registry policy and tests).
+- `packages/fresh-ui/registry.json`, `packages/fresh-ui/tests/registry/`, `packages/fresh-ui/registry.generated.ts`.
+- Generated carriers under `packages/cli/src/kernel/assets/`, `packages/mcp/src/infrastructure/docs/`, `packages/plugin/src/kernel/assets/`, `packages/service/src/primitives/` only as required by generators.
+- Relevant release/registry contributor documentation only if needed.
+
+Disposable rehearsal is a separate clone under the project runs directory, never a worktree or the active checkout. Generated docs-site output is regenerated, not hand-edited; docs-site lock churn is restored.
+Draft PR uses `Refs #2548` only, no labels. No publication or merge.
+
+Scope correction before implementation: release bump implementation lives in `.llm/tools/deps/bump-version.ts`, not `.llm/tools/release/`. Add `.llm/tools/deps/bump-version.ts` and `.llm/tools/deps/bump-version_test.ts` to the write surface. Registry contributor guide: `packages/fresh-ui/src/registry/README.md`.
