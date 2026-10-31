@@ -39,3 +39,16 @@ Deno.test('sagasPlugin manifest exposes dependencies, service, schema, contract,
   assertEquals(verification.ok, true);
   assertEquals(verification.findings, []);
 });
+
+Deno.test('sagas declares the shipped outbox constraint migration', async () => {
+  const contribution = sagasPlugin.contributions.migrations?.find((entry) =>
+    entry.name === 'command-outbox'
+  );
+  assertEquals(contribution?.path, './database/command-outbox.migration.sql');
+  const sql = await Deno.readTextFile(
+    new URL('../../database/command-outbox.migration.sql', import.meta.url),
+  );
+  for (
+    const constraint of ['command_outbox_lease', 'command_outbox_acceptance', 'attempt_count >= 0']
+  ) assert(sql.includes(constraint));
+});

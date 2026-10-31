@@ -1,0 +1,89 @@
+# Worklog
+
+## Owner routing override
+
+> Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Feature-tier loop: at most 2 PLAN-EVAL rounds and 5 IMPL-EVAL rounds. The final IMPL-EVAL must review the exact pushed head and end with one line: VERDICT: MERGE <full sha> or VERDICT: CHANGES <full sha>.
+
+## Bootstrap
+
+Baseline equals current fetched main. No triage comment or existing PR referencing #2369; broader outbox-retention search returns older relay/projection PRs, not this delivery. Consulted committed environment/Postgres memories and shared memory index before source inspection. MCP find_guidance then search_docs consulted. RTK absent; focused raw commands and structured wrappers will be used. No local scaffold.runtime run: coordinator must arm CI gate.
+
+## Design
+
+1. Public surface: installed outbox model+declared constraint migration; independent relay pruneSettled and saga command retention factory/prune.
+2. Vocabulary: settled=published or terminal outbox, unleased=no token/until; terminal saga=completed/failed/cancelled/compensated, replay marker=atomic instance/hash.
+3. Ports: existing PostgresCommandClient + TransactionClientPort; separate optional retention contract preserves relay fakes.
+4. Constants: default completed-retention seven days; one day=86400000ms; maximum page 100; finite terminal status set and fixed SQL identifiers.
+5. Commit slices: S0 plan; S1 contribution/migration + install Postgres proof; S2 retention + real guard/negative tests; S3 docs/carriers/final gates. Gates and files are in plan.
+6. Deferred scope: scheduling/canonical state cleanup/receipt-audit retention/engine path/local full E2E/merge; outside requested seam or owner prohibits.
+7. Contributor path: prisma-saga-command-retention.ts plus linked schema/migration recipe.
+
+Public additions use named typed exports on existing database commands/postgres and saga stores subpaths, explicit return annotations and JSDoc examples; no new entrypoints, dependencies or slow-type carveouts.
+
+## Plan repair
+
+Round 1 FAIL_PLAN recorded. Revised seven-item design follows plan.md: public cursor/scanned/deleted contracts; *.migration.sql sidecars installed by existing schema mechanism; migration runner appends pending immutable contributions before deploy; keyset scans bound examined records; TypeScript metadata validation; policy map and conservative outbox max; query-interception test seam; CI entry and copied-model adoption. Scope extension is within owner-authorized full delivery; no approval pause. Baseline quality:gate exit 0. Isolated native PostgreSQL startup/cleanup probe exit 0. Draft PR #2487 opened.
+
+PLAN-EVAL round 2 PASS; implementation begins only after this verdict. Latest main command-postgres run is green: https://github.com/rickylabs/netscript/actions/runs/41152000845 . Prior memory of a provider failure is stale.
+
+## S1 gates
+
+- Structured migration/schema tests: 33 passed, 0 failed, exit 0.
+- Structured real PostgreSQL installed schema: 1 outer conformance passed, exit 0. Actual contribution copy/dedup -> Prisma migrate diff with datasource config -> pending contribution append -> migrate deploy -> generated Prisma client. Catalog parity proves exact fixture columns/indexes/CHECKs; constraint rejection and idempotent existing-constraint adoption pass. Native database created/dropped by test, server cleaned by gate.
+- Scoped database, CLI-configured, and saga type checks exit 0. Scoped lint and format exit 0 (CLI excludes removed only in temporary validation config, keeping canonical rules). Quality/architecture final slice gate running.
+- Reconcile: issue remains open, draft PR #2487 targets main; no labels/milestones changed. Native diff exits zero without output if datasource config is omitted; proof now demands generated file and provides config. See memory-migration-delivery.md.
+
+S1 sign-off: independent substantive supervisor review PASS after fresh-install and line-ending repairs. Final real PostgreSQL: 2 passed (fresh contribution and copied-model adoption); 33 unit regressions pass; scoped check/lint/fmt and quality:gate exit 0. CI registration/path filters included. No engine or lock changes.
+
+## S1 CI repair
+
+PR command-postgres run https://github.com/rickylabs/netscript/actions/runs/41163470858 passed both install modes and existing command/relay, then failed P1012 duplicate outbox model in the provider fixture. Compared latest main run 41152000845 (green). Provider fixture now omits only the final copied outbox model before appending shipped saga schema. Independent supervisor PASS; real native PostgreSQL atomic-transition conformance passes, exit 0; scoped format exit 0. Pushing isolated correction while S2 remains in progress.
+
+Reconcile: read new PR activity and addressed CI finding; no review threads or external review comments yet.
+
+## S2 bounded retention
+
+Implemented independent relay retention contract and composed Prisma saga-command retention, with capped primary-key pages and resumable cursors, per-saga policy map, conservative shared outbox window, terminal completion anchoring, fail-closed metadata handling, ordered parent locks, fresh status/deadline/version checks and target-side rechecks. No engine edits. Independent slice review PASS. The review's numeric-precision observation was improved by comparing exact PostgreSQL envelope text; added a real integer-above-2^53 case.
+
+Real fresh/adoption install scenarios pass; fresh case runs nine retention tests (ten child tests including schema parity), all pass. Twelve semantic PostgreSQL guard-removal controls pass the negative bar; see negative-controls.md. Every retention test goes red under its guard control; sources restored. Final full native PostgreSQL conformance and post-restoration gates are running before sign-off commit.
+
+Reconcile: S1 CI repair now green at 1f07678, https://github.com/rickylabs/netscript/actions/runs/41163838807 . No unresolved review threads.
+
+S2 sign-off: full canonical native PostgreSQL conformance script exit 0 (new install/retention, existing command/relay, atomic transitions, saga-relay cohort and runtime publisher); all seven outer tests passed, with nine new retention child tests. Post-restoration structured check/lint/format exit 0; quality:gate exit 0. Independent final slice confirmation PASS. JSR dry-runs are OK; audit surfaced pre-existing missing module tags on saga backend and plugin doctor entrypoints; repair those documentation tags in S3 before final audit. No accepted debt.
+
+## S3 docs and public surface
+
+Documented schema/SQL installation, normal migration and optional copied-model adoption, group policy map, persisted cursors, canonical parent lifetime, strict cutoff, leased/pending safety, bounded work and independent page commits in saga reference and database/service relay docs. READMEs/changelogs updated. Independent substantive S3 review PASS. Added missing module tags surfaced by JSR audit and a MigrationOptions summary. Re-exported the new referenced database result type to remove the one introduced doc-lint finding.
+
+Docs exports coverage PASS. All 475 JSDoc examples compile (zero enforced failures). Documentation snippet gate exit 0. Database doc-lint clean; saga core/plugin full-export doc-lint matches isolated main baseline exactly (7/30 inherited private references), see doclint-baseline.md; these are not claimed green. Generated corpus/prose/assets refreshed with repository generators; final freshness checks follow. Baseline verification worktree cleaned.
+
+S3 gate completion: structured source check/lint/format exit 0; quality:gate exit 0; docs:exports-drift PASS; docs snippet gate exit0; all 475 JSDoc examples PASS. JSR audits/dry-runs pass for database, saga core, saga plugin and affected CLI, with existing warnings only. Corpus freshness, prose freshness (253 rendered HTML pages), assets-barrel direct freshness and publish-assets checks pass. Corpus was generated with the explicit --allow-dirty development flag before commit; clean committed regeneration/regression follows. Review-thread gate PASS, zero threads/unanswered. S3 independent supervisor PASS; no newly introduced doc-lint errors; inherited findings remain explicitly unproven as documented.
+
+Reconcile: PR remains draft while final evaluation is pending; no taxonomy changes or engine/lock churn. Required scaffold.runtime will be requested in READY for coordinator-controlled CI.
+
+## Rebase and preliminary IMPL-EVAL
+
+Independent IMPL-EVAL round 1 approved source/evidence at pushed 125a5902df43d6e692d8b3b4e4ecaace1a1a8a40, explicitly leaving required CI and coordinator-reserved scaffold.runtime unproven. The committed corpus regression subsequently passed all fourteen tests and root assets-barrel passed.
+
+Owner then directed rebase/force-push due merge conflicts. New base: 2f426b970d7a00bdbeb09c59b72b49478b839a5a. Conflict resolution preserves upstream connection-string changelog plus this feature's entry; generated prose rebuilt from merged docs. Range-diff verifies S0/S1/S1-fix/S2 replay unchanged. The earlier evaluation is historical, not an exact-head certificate for the rebased commit; final same-session evaluation follows the push.
+
+Rebase gates: full native PostgreSQL conformance exit0 again (all seven outer tests); quality/architecture exit0; regenerated assets, publish assets and corpus freshness pass. No implementation changes or lock churn. Force-with-lease push now; final JSDoc/corpus regression and exact-head IMPL-EVAL follow on the rebased head.
+
+## S4 consumer import CI repair
+
+Ready-state CI test-5 and test-6 found a real consumer regression: the new migration helper relied on root-only @std/path. The aggregate check-test failure follows those shards. Fixed the import to the same literal jsr:@std/path@1 used by sibling published scripts; no version, signature or lock change.
+
+Both no-Aspire database lifecycle tests and both generated-handler tests now pass locally (4 total), plus all 17 migration regressions. Structured check/lint/fmt, quality/architecture and corpus freshness pass. Independent S4 supervisor PASS. See CI jobs https://github.com/rickylabs/netscript/actions/runs/41165454816/job/124432040530 and https://github.com/rickylabs/netscript/actions/runs/41165454816/job/124432040509 for the prior red controls.
+
+The prior exact-head verdict at b48b556 is historical after this fix; final same-session IMPL-EVAL will certify the next pushed head. Close-gate's sole remaining unchecked claim is coordinator-required scaffold.runtime, which is intentionally unproven until the coordinator arms CI. No box is falsely ticked.
+# S5 — active remote CI remediation
+
+The owner's follow-up requested inspecting the live failed logs and repairing every red check. `gh pr checks` and `gh run view --log-failed` identify the only original failure as the unchecked required scaffold.runtime verdict. Started supported remote workflow_dispatch run41167274033 at the reviewed head, preserving coordinator-owned labels and the ban on local scaffold.runtime.
+
+The dispatch also selected desktop native packaging. Its failure matches main's inherited missing-evidence failure; inspection and a real `.deb` reproduced the underlying nonexistent launcher path. The native E2E driver now discovers the isolated package's unique `usr/bin` launcher independently of the runtime library filename. No production packaging or command-retention behavior changes.
+
+Two filesystem regression tests, structured check/lint/format, quality/architecture and independent slice review PASS. Isolated real dpkg installation exits 0 and the discovered relative launcher symlink resolves to a regular executable; the old derived launcher does not exist. See s5-ci-review.md and memory-native-launcher.md. Push this concrete repair, obtain new-head remote runtime/native proof, then run final exact-head IMPL-EVAL. Keep the runtime DoD unticked until the remote report passes.
+
+Rebase reconciliation: owner requested another latest-main rebase. Base ad252e8c8ce14b05390d70d94fa876ae81376958 already includes the independently implemented native launcher repair and regression in merged #2483 (1c9da73). Retained that upstream implementation byte-for-byte and removed this lane's overlapping helper/test. The previous S5 real-package proof remains historical; rerun the upstream regression and exact-head remote workflow on the combined head. No authored retention/schema source conflict.
+
+Rebased verification PASS: 28 focused migration/schema/integrity tests, upstream native launcher regression and real isolated package lookup. MCP export corpus, embedded prose, assets and publish-carrier freshness PASS. Native driver is byte-identical to main; authored database/saga implementation is byte-identical to the previous reviewed head. Force-with-lease targets the exact remote b0794202fa3ceaeb04e1f067488e661e3530d1b9. New exact-head CI and final same-session IMPL-EVAL remain required.
