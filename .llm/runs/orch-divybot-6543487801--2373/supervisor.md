@@ -6,3 +6,5 @@ Allowed writes: this run directory; `packages/kv/src/testing/watchable-kv-contra
 Public artifacts omit private environment and session identifiers. Coordinator owns merge, labels, milestones, and issue closure.
 
 Negative-control allowance: isolated source snapshot under the private project run, including an intentionally broken Redis abort delay; never committed or applied to the worktree.
+
+CI-repair surface authorized by the follow-up: packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts, regenerated documentation metadata only. No production behavior changes.

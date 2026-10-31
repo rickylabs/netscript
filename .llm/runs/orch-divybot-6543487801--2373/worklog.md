@@ -52,3 +52,9 @@ Independent substantive slice review / IMPL-EVAL round 1 PASS, no blockers. Appl
 The first final-source rerun was launched after the run-owned Redis had already been stopped; that launch failed connection setup and is excluded from the proof set. Restarted the same isolated provider, then ran the complete 20+4 proof set afresh. This is test environment setup, not a production defect. Run-owned CPU workers are terminated in the proof runner's finally block; the isolated Redis is shut down after validation.
 
 Final-source rerun complete: focused 90/90, all 24 stress processes 9/9 with no ignored tests, scoped check/lint/fmt pass, isolated negative control 0 passed / 2 expected TimeoutError failures. Evidence source hashes match final bytes. Review-thread gate PASS: 0 threads, 0 unanswered.
+
+## CI repair
+
+Quality job 124543121594 in run 41203196640 failed at mcp-export-corpus (freshness), not test discovery. Requested gh run view --log-failed was unavailable while the parent run remained active; fetched the completed job log through the GitHub jobs logs API. Reproduced check:mcp-export-corpus exit 1 locally. Ran canonical gen:mcp-export-corpus: only kv ./testing generated row changes. Decoded before/after rows confirm same symbols, kinds and signatures, with only the intentional one-line contract JSDoc change. This generated documentation artifact was omitted from the first push. No KV implementation or test bytes change; existing final-source 20+4 stress evidence remains applicable.
+
+CI-repair validation: run-gate mcp-export-corpus PASS (exit 0) on repaired tree; structured MCP export-surface-flows and mirror-free suites 6 passed, 0 failed, 0 ignored; scoped structured generated-file check/lint/fmt all exit 0. Original KV test-source hashes unchanged. The run-gate receipt identifies the pre-repair HEAD because the regeneration was uncommitted; re-run at pushed repair head for immutable-head evidence.
