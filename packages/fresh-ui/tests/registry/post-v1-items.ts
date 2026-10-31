@@ -1,3 +1,5 @@
+import { FRESH_UI_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
+
 /** Deliberately reviewed additions; the historical v1 compatibility snapshot stays frozen. */
 export const POST_V1_COMPONENTS: readonly string[] = [
   'button-group',
@@ -25,3 +27,10 @@ export const POST_V1_COMPONENTS: readonly string[] = [
 
 /** Non-component support items added after the frozen v1 baseline. */
 export const POST_V1_SUPPORT: readonly string[] = ['calendar-date', 'menu-items'];
+
+/** Existing copies missing only their actual package runtime dependency. */
+export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = ['command-palette'] as const;
+
+/** The registry and its package-owned runtime must install at the same release. */
+export const FRESH_UI_RUNTIME_DEPENDENCY: string =
+  `jsr:@netscript/fresh-ui@${FRESH_UI_PACKAGE_VERSION}`;

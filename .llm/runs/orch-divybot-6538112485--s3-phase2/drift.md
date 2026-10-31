@@ -47,3 +47,5 @@ fill is therefore an explicit temporary visual deviation from the handoff;
 visual proof once that pair passes. No axe allowance is added.
 
 Data display slice7 split into7a (Item/Kbd/Collapsible),7b (Chart/Carousel),7c (CodeBlock/Feedback/docs audit) solely to bound the reviewed source surface. Scope, native-first policy and phase2a acceptance are unchanged.
+
+Dependency metadata correction discovered during7c: local runtime aliases made component consumer checks insufficient to prove installer-added Fresh UI package mappings. Added an explicit mapping assertion and source-import dependency guard. Only command-palette/render-ui historical dependency lists are extended through named, exact expected additions; original dependencies and the frozen fixture remain intact.

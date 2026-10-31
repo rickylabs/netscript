@@ -2720,7 +2720,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "search",
@@ -4844,6 +4847,9 @@
         "cn",
         "calendar-date",
         "calendar"
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
       ]
     },
     {
@@ -5003,7 +5009,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "menubar",
@@ -5045,7 +5054,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "alert-dialog",
@@ -5086,7 +5098,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "hover-card",
@@ -5128,7 +5143,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "context-menu",
@@ -5170,7 +5188,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "item",
