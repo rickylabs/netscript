@@ -77,6 +77,30 @@ S0 captures screenshots as review evidence; it does not fail on pixel difference
 comparison gate must generate its expected images inside the same pinned CI image as its tests.
 Local Linux captures and CI captures have separate provenance and may differ in font rendering.
 
+## Component gap keyboard suite
+
+The S3 suite bundles real Preact component sources and serves an isolated fixture. It runs actual
+keypress/focus/value assertions at 390 and 1280 pixels in light and dark, and requires zero
+serious/critical axe findings on new fixtures. It preserves the gallery allowance baseline.
+Run from this directory:
+
+```sh
+npx playwright test --config gap.playwright.config.ts
+```
+
+Each run rebuilds the current fixture and component sources before starting the server. Bundling
+failure fails the suite; an existing `test-results/gap-fixture.js` is overwritten.
+The bundle config uses automatic Preact JSX; the package's server precompile setting emits classic
+calls under the current experimental Deno bundler. Its npm imports match the root catalog. The
+fixture server binds loopback and Playwright owns shutdown. Install Chromium's libraries with the
+normal Playwright setup above. Minimal workers may reuse project-managed libraries through a scoped
+`LD_LIBRARY_PATH` for the npm run.
+
+`gap-tests/actions.spec.ts` names the scenarios declared in
+`packages/fresh-ui/tests/contracts/utility-actions.tsx`. New categories add their own spec and real
+fixture cases. Screenshots under `test-results/gaps` are local review evidence. This is a separate
+local gate; the default gallery CI config does not run it implicitly.
+
 To save a new, dated baseline after a successful run:
 
 ```sh

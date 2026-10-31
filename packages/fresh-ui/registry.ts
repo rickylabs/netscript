@@ -72,7 +72,7 @@ export type FreshUiRegistryManifest = {
  *
  * Runtime behaviour ships from `/interactive`, `/primitives` and `DataGrid`; visual components and blocks are **copied into your app** — inspect `components/ui/mod.ts` and `/design`, or run `ui:add`.
  *
- * The registry contains 66 items total; enumerate all items via `freshUiRegistryManifest.items`.
+ * The registry contains components, blocks, islands, styles and supporting items; enumerate all items via `freshUiRegistryManifest.items`.
  *
  * Collections:
  * - `foundation`: theme-seed, sheet-styles, button, icon-button, input, textarea, checkbox, switch, label, select, form-field, card, panel, badge, separator, alert, inline-notice, spinner, progress, skeleton, breadcrumb, sidebar-shell, page-header, filter-form, stats-grid, detail-layout, data-table, responsive-table, pagination, empty-state, section-divider, sidebar-toggle, theme-toggle, toast-support, toast, avatar, code-block, chart-block, donut, dropzone, desktop-tray-menu, desktop-dialog, desktop-notification, desktop-window-chrome, desktop-update-prompt, desktop-only

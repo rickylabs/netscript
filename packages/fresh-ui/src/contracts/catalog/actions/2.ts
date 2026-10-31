@@ -7,7 +7,7 @@ export const actions_2: readonly ComponentContract[] = [
     'specId': 'A4',
     'category': 'Actions',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'variant': {
         'kind': 'enum',
@@ -25,11 +25,7 @@ export const actions_2: readonly ComponentContract[] = [
         ],
       },
       'selected': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+        'kind': 'boolean',
       },
       'state': {
         'kind': 'enum',
@@ -49,38 +45,51 @@ export const actions_2: readonly ComponentContract[] = [
       'label': {
         'kind': 'boolean',
       },
+      'defaultSelected': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'onSelectedChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'children': {
+        'kind': 'slot',
+      },
+      'iconStartGlyph': {
+        'kind': 'slot',
+      },
+      'iconEndGlyph': {
+        'kind': 'slot',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'icon-start',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'icon-end',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'state-layer',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -119,7 +128,20 @@ export const actions_2: readonly ComponentContract[] = [
       'iconEnd',
       'label',
     ],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'children',
+        'part': 'label',
+      },
+      {
+        'name': 'iconStartGlyph',
+        'part': 'icon-start',
+      },
+      {
+        'name': 'iconEndGlyph',
+        'part': 'icon-end',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/button/',
     'keyboard': [
       {
@@ -135,7 +157,7 @@ export const actions_2: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior.',
     ],
   },
   {
@@ -143,7 +165,7 @@ export const actions_2: readonly ComponentContract[] = [
     'specId': 'A5',
     'category': 'Actions',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'variant': {
         'kind': 'enum',
@@ -174,16 +196,34 @@ export const actions_2: readonly ComponentContract[] = [
           'multiple',
         ],
       },
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'items': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'value': {
+        'kind': 'collection',
+      },
+      'defaultValue': {
+        'kind': 'collection',
+      },
+      'onValueChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'track',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
+        'when': 'variant=segmented',
       },
     ],
     'attributes': {
@@ -234,7 +274,7 @@ export const actions_2: readonly ComponentContract[] = [
       'space/inline/gap',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior.',
     ],
   },
   {
