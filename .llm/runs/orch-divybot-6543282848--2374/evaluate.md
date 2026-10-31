@@ -78,3 +78,28 @@ VERDICT: PASS
 ## Final head review
 
 The same evaluator will review the exact pushed head after this commit and the ready transition. Its full-SHA MERGE/CHANGES verdict is recorded in PR #2526 phase comments and the READY issue reply; do not append another commit solely to transcribe that verdict and invalidate its head. Full scaffold.runtime remains an external coordinator-owned merge gate.
+
+## Round 4 — CI-quality repair PASS
+
+No blockers in this CI-quality repair. It changes only the README example, the generated MCP export corpus and run records; runtime source is unchanged since the MERGE verdict on `621f5df9…`.
+
+**README fix**
+- **New fence:** the application-core factory now has its own checked fence. It uses the existing first-line file-path convention at the exact path the runtime fence imports.
+- **Unchanged examples:** the runtime module and the config declaration fences are as before.
+- **Builder use:** the factory uses the published `defineSaga` from `@netscript/plugin-sagas-core`, with the same builder chain the installed integration test already runs.
+- **Gate result:** the README fence receipt shows PASS, exit 0, `ts_like=112`, `exempt=0`, `checked=112`, `syntax_invalid=0`. It still has `type_errors=5` across 4 READMEs, which is the stated baseline, so this fix adds no new error, exemption or ratchet change.
+- The receipt was taken against the precommit working tree at the old head. It proves the command ran, not the new head. That's acceptable before commit, and round 5 will cover the pushed head.
+
+**MCP export corpus**
+- **Only one row changed:** in the diff, `plugin-sagas` / `./cli` is the only modified row. The neighbouring `./aspire` and `./contracts` rows are unchanged context, and the decoded delta lists only that row.
+- **Counts:** the row's size moves 9174 → 9439 and its symbol count 44 → 45. That fits one new exported type (`SagaRuntimeDeclaration`) plus the two optional inspector fields.
+- **No hand edits:** it was regenerated with the native generator, and drift.md records the write-surface extension and the deliberate dirty-read-set override.
+
+**Run records**
+- drift.md, worklog.md, evidence.md and context-pack.md each record the follow-up.
+- They say the earlier `621f5df9…` verdict covers only that old head.
+- They keep the full `scaffold.runtime` run as coordinator-owned and unproven.
+
+VERDICT: PASS
+
+Round 5 renews the final full-SHA verdict after this follow-up commit is pushed. The prior 621f5df9 verdict remains a historical source-review record, not the new-head verdict.

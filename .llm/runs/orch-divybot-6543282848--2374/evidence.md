@@ -37,3 +37,11 @@ Every modified source byte was restored before the final positive suite.
 ## Remaining external evidence
 
 Full exact-head `e2e-cli` scaffold.runtime CI is required. The owner prohibits a local run and assigns the e2e-cli-gate label to the coordinator. Local source selection, registry load and doctor tests do not certify the full generated-app runtime. Final pushed-head review and CI snapshot are linked in PR phase comments and the READY issue reply.
+
+## CI quality follow-up
+
+The initial ready head's quality job failed README fence integrity on the new app-owned factory import (one additional TS2307). The complete example now contains a checked application-core factory fence at the actual imported path, using the existing snippet compiler's first-line file convention. No exemption or ratchet change: `readme-fences` exits 0 with 36 READMEs, 112/112 TypeScript-like fences checked, zero exempt, zero syntax failures, and the unchanged baseline five type errors in four other READMEs.
+
+The follow-on `check:mcp-export-corpus` was stale from the new saga CLI metadata. Native `gen:mcp-export-corpus --allow-dirty` regenerated the embedded API data. The dirty read set was only the reviewed README; runtime source was committed and unchanged. Decoding and comparing the generated data proves the only changed row is `plugin-sagas` / `./cli`, adding SagaRuntimeDeclaration and the two updated inspector fields. No other API row changed.
+
+Follow-up gates: `check:mcp-export-corpus`, `check:agent-docs-prose`, `check:assets-barrel`, `check:publish-assets` all exit 0. The emitted-samples receipt passes: 48 TypeScript samples from 38 artifact paths. Structured MCP corpus source check has zero diagnostics; eight existing embedded-corpus/flow/mirror tests pass. Runtime source and the earlier 81-test saga proof remain unchanged.

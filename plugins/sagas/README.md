@@ -55,8 +55,20 @@ the last definition and regenerating keeps a valid empty registry.
 
 ## Declaring a self-composing saga module
 
-A runtime module can default-export a saga composed in your application core without repeating the
-native builder or using the conventional `-saga.ts` filename:
+Keep the saga definition in your application core:
+
+```ts
+// packages/operations-core/src/application/agent-action-saga.ts
+import { defineSaga } from '@netscript/plugin-sagas-core';
+
+export function defineAgentActionSaga() {
+  return defineSaga('agent-action').durability('t1')
+    .state({ operationId: '' }).on('ActionAdmitted', () => []).build();
+}
+```
+
+A runtime module can default-export that composed definition without repeating the native builder
+or using the conventional `-saga.ts` filename:
 
 ```ts
 // sagas/agent-action.ts
