@@ -6,3 +6,7 @@
 - Matrix implementation evaluation: `muse_spark_1_3` xhigh, then `opus_5` xhigh. Owner override: "IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only." Different vendor family and separate session required.
 - Write surface: this run directory; existing preset helpers under `packages/cli/src/kernel/application/ui/v2/presets/`; preset tests under `packages/cli/src/kernel/application/ui/v2/tests/`; public init and UI apply tests; public/maintainer init and their root dependency wiring; `docs/site/reference/cli/commands.md`; generated CLI documentation carriers under `packages/cli/src/kernel/assets/`; dated lesson `.llm/2026-10-31-preset-import-safety.md`.
 - No labels or session identifiers in public artifacts. Draft PR references `#2516` only. No merge; READY requires green required checks at the exact head.
+
+## CI repair scope
+
+Owner steering: "New activity on your PR — address each item, push fixes, keep the PR green: CI quality: FAILURE". Add `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv` to the allowed write surface for generated manifest freshness only. No parity policy, workflow, pins or labels change.

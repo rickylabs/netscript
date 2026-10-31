@@ -9,3 +9,7 @@ Risk: deferred remote schema validation could still create a scaffold; validate 
 Gates: red/green regression tests, CLI init/apply/preset tests, scoped structured check/lint/fmt, quality:gate, release:preflight, docs:accuracy, carrier generation and all check:* tasks, full scaffold.runtime with cleanup (UNPROVEN if Docker unavailable), independent IMPL-EVAL, exact-head remote required checks before READY.
 
 Deferred: remaining issue boxes, broader registry transport/redirect policy, new export surface and scaffold redesign. No open decisions; no new debt.
+
+## Owner-directed CI repair slice
+
+Regenerate the tracked Aspire inventory after the new regression test becomes tracked. Public behavior, vocabulary, ports and constants remain unchanged. Contributor path: `.llm/tools/validation/aspire-surface-manifest.ts`. Files: its existing TSV fixture and run evidence. Gates: phase-1 parity, 26 existing parity tests, deterministic regeneration and carrier freshness. Same independent evaluator reviews the row before commit. No broader Aspire changes are authorized or needed.

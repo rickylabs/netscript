@@ -57,3 +57,13 @@ Full selected CLI test wrapper completed: exit 0, 43 passed, zero failures/ignor
 Implementation slice 4407df5 committed and pushed; PR implementation phase comment records scope, hash and evidence. check:assets-barrel PASS (exit 0) against that committed carrier. Thus every root check:* task (14 total) and all four site checks passed. Git diff shows no docs/site/deno.lock churn or generated-asset drift. Final evidence commit changes only run artifacts; implementation code and generated carrier remain identical to the reviewed/tested slice.
 
 Transition PR out of draft solely to materialize required CI. No READY claim, no merge, no labels. Runtime remains UNPROVEN because Docker is unavailable; acceptance beyond the first two issue requirements remains excluded.
+
+## CI repair slice: tracked Aspire manifest
+
+Current-head CI quality failure: `Aspire version parity (phase 1)`, manifest freshness only (one failing finding). All earlier quality steps, including corpus/carrier freshness, passed. Reproduced locally after the implementation commit: check:aspire-version-parity reports manifestFresh=false, one failure, zero missing paths. Root cause: generator inventories tracked files, while the new init test was untracked at the original local check. Add the generated row using the existing generator, prove parity and deterministic regeneration, retain code/tests unchanged, and have the same independent evaluator review this repair before committing it.
+
+CI repair validation: canonical generator adds exactly one row for init-preset-safety_test.ts; parity PASS with manifestFresh=true; second regeneration byte-identical. Existing parity tests: 26 passed, zero failed/ignored. check:assets-barrel and check:publish-assets both PASS. The initial test invocation named a nonexistent companion test module and failed before selecting tests; rerun used the actual check-aspire-version-parity_test.ts file and its structured report is the verdict. Same independent evaluator review is in progress. No framework source or regression test changed in this repair.
+
+Same independent read-only Claude evaluator returned CI repair PASS and independently reran parity: 998 checked, zero failures, manifestFresh=true. Supervisor accepts that substantive one-row repair review. Commit and push this slice with its run evidence, then verify current-head hosted quality. No labels, workflow or pin changes.
+
+Reconcile: the repeated owner notification refers to quality job 124522662224 on 411c058. This repair addresses its sole manifest-freshness finding. PR remains open with Refs #2516; no issue scope expansion or READY claim.
