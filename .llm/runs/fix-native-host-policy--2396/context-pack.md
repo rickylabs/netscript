@@ -42,3 +42,34 @@ remaining PR and queue the canonical READY via .divybot-final-report.tmp →
 .divybot-final-report.md. Neither report nor .divybot-goal.md is committed. Do not directly
 post the canonical issue2396 final comment. Every acceptance entry needs evidence and limits.
 #2421 is the final implementation PR after prerequisites; no early issue closure certification.
+
+2026-10-31 continuation: previous goal turn made implementation progress and published the
+READY handoff. Current-state audit found one newly completed CI failure at exacta4dc7053:
+quality job124412622901 fails only Aspire manifest freshness (phase1, expected13.5.3).
+Current main4aa734e2 quality job124403708041 passes that same parity step. CI's durable
+quality receipt confirms no pin violation; inventory freshness is the sole failure. The
+remaining test shard has now succeeded. No source/milestone/label change is inferred.
+
+Exact scope addition before regeneration: .llm/tools/validation/fixtures/aspire-surface-manifest.tsv,
+through its existing aspire-surface-manifest.ts generator only, plus this run's evidence.
+No checker, scan scope, classification, toolchain pin, fixture compatibility rule or runtime
+gate may be weakened. Apply aspire-upgrade's canonical inventory procedure without a version
+bump. Reproduce native parity, inspect the exact diff, then run all remaining quality steps
+that CI skipped after parity so the final fifth evaluator round is not spent prematurely.
+The fourth implementation verdict is MERGE at a4dc70531c3e3a8c3139ecfa16419126c9551463;
+only one owner-authorized feature evaluation round remains. Reuse the same independent session.
+
+Continuation quality repair complete: canonical Aspire inventory adds exactly one S11
+public-doc row for the new host guide. No framework source, checker, scan exclusion, pin,
+manifest classifier or runtime gate changed. Native parity PASS: expected13.5.3,993 paths,
+0 failures, unchanged14 deferred/4 informational/3 skipped, fresh=true. Full workspace publish
+dry-run, cold AI peers and critical advisory audit all PASS with durable receipts. Parent
+CI now has all core test/check/browser shards and check-test SUCCESS; quality failed only
+at the stale inventory step. Its earlier steps all passed and its skipped trailing steps
+are now proven locally. See continuation-quality-evidence.json; no skipped runtime is green.
+
+Reconcile: this one-row maintained-inventory correction plus run evidence is the only delta
+from accepted a4dc7053. Push the coherent correction, keep both prerequisite heads stable,
+and re-steer the same evaluator for feature round5 at the exact new head. This is the final
+allowed round; no fresh evaluator or sixth review is authorized. Existing runtime opt-in
+and postpublish proof remain coordinator-owned and unproven.

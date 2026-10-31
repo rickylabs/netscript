@@ -1,0 +1,65 @@
+{
+  "parentHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+  "sourceDelta": [
+    ".llm/tools/validation/fixtures/aspire-surface-manifest.tsv"
+  ],
+  "inventoryDelta": "One generator-owned public-doc row for docs/site/services-sdk/how-to/host-plugin-services.md",
+  "checkerOrPinChanges": false,
+  "ciFailure": {
+    "runId": 41159058130,
+    "jobId": 124412622901,
+    "gate": "aspire-version-parity",
+    "reason": "manifest freshness only; expected pin13.5.3 correct"
+  },
+  "mainControl": {
+    "head": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
+    "runId": 41156251506,
+    "jobId": 124403708041,
+    "parityStep": "SUCCESS"
+  },
+  "parentCiTests": "check-test and all six test shards plus check/browser PASS at the parent head",
+  "manifest": {
+    "expectedVersion": "13.5.3",
+    "checked": 993,
+    "fail": 0,
+    "deferred": 14,
+    "info": 4,
+    "skipped": 3,
+    "fresh": true
+  },
+  "receipts": [
+    {
+      "gateId": "aspire-version-parity",
+      "gitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "actualGitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 319
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "actualGitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 49317
+    },
+    {
+      "gateId": "ai-peer-resolution",
+      "gitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "actualGitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14085
+    },
+    {
+      "gateId": "audit-critical",
+      "gitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "actualGitHead": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 415
+    }
+  ],
+  "validationScope": "Feature/runtime source byte-identical to independent round4. Parent CI already passed every quality step preceding parity. The repaired parity and every skipped trailing quality step pass locally. Required exact-head CI/runtime still needs proof."
+}
