@@ -182,6 +182,8 @@ To preview a generated preset without changing the app default, run
 `netscript tokens build --app dashboard --previews` (or install `ui:add theme-previews`), then open
 `/design/tokens?preset=studio-utility`. The preset query applies only under `/design/`; ordinary app
 routes keep the configured preset.
+If the requested preset's preview stylesheet is not installed, the design page ignores the query
+and keeps the configured theme and fonts without requesting a missing stylesheet.
 
 {{ comp callout { type: "warning", title: "Edit tokens, not magic numbers" } }}
 Use a raw hex color or pixel value only when no token fits. Hard-coded values drift from the theme
