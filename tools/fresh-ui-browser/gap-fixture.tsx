@@ -1,3 +1,4 @@
+import { Overlays } from './gap-overlays-fixture.tsx';
 import { Navigation } from './gap-navigation-fixture.tsx';
 import { Calendars } from './gap-calendar-fixture.tsx';
 import { Forms } from './gap-forms-fixture.tsx';
@@ -53,6 +54,7 @@ function Actions() {
       <Forms />
       <Calendars />
       <Navigation />
+      <Overlays />
     </main>
   );
 }

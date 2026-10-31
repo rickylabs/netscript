@@ -300,3 +300,57 @@ Replayed the reviewed Actions, Forms, Calendar and Navigation slices and both co
 Latest-base integration independently reviewed PASS (rebase2-review.md). All112 rebuilt-source browser cases PASS; release preflight and docs accuracy PASS. Registry/source/prose assets regenerated from combined source. Remaining clean-source corpus refresh and carrier freshness checks precede the recovery push. This is recovery of reviewed slices, not phase completion.
 
 Recovery source4d9a356 includes latest main3d83caf (auth cookie fix) without additional conflicts. All four generated carrier freshness checks PASS; clean-source MCP corpus is unchanged after regeneration. Focused135/browser112/quality/publication/docs gates and independent integration review PASS. Full Fresh UI package regression suite is still running and is not claimed green by this recovery push. Phase implementation continues; draft remains incomplete.
+
+Coordinator public-path instruction acknowledged: final READY audit must include
+all added lines, with run evidence using repository-relative/shorthand paths.
+Current audit found zero prohibited absolute path hits across1260 added run
+lines and across the complete diff. Repeat at the exact final head. New public
+notes/logs use relative paths; opaque local transport remains uncommitted.
+
+## Slice6 — Overlays
+
+AlertDialog composes native Dialog (cancel focus, explicit actions, outside-click
+non-dismissal); HoverCard composes Popover with focusOnOpen=false and a pointer
+transfer grace; ContextMenu reuses ActionMenu/menu-items with native region keys,
+client coordinates and viewport clamping. Added two needed curated L0 paths
+(calendar/alert triangle), no icon library or token changes.82 shipped/22 gaps;
+native104 items,16 reviewed component additions and2 support items.
+
+Initial source4 check PASS. Render tests exposed nested Button label anatomy;
+contract now declares label and optional spinner, with a pending render case.
+Strict browser axe exposed existing destructive-white contrast3.91; one scoped
+existing-role pair inversion preserves AA and records the visual deviation in
+drift. No palette/global Button or axe-baseline changes. Other browser gates
+and same-session review remain pending; do not start Data display yet.
+
+Overlay gates:158 focused tests and132 full rebuilt-source browser cases PASS,
+including native modal boundaries, controlled rejection, hover pointer transfer,
+context keys/submenus/viewport bounds and strict axe. Broad quality PASS; source
+4 check/7 lint/8 fmt, browser fixture/spec checks and lint2 PASS. Exports-drift
+PASS; current remote Pages build also SUCCESS atc644a44. Full package compilation
+exposed Node Timeout vs browser number in the private hover timer; changed its
+type to native ReturnType<typeof setTimeout> and reran full package/focused proof.
+No runtime behavior changed in that correction.
+
+Full package378/378 PASS after native timer handle type fix. Final focused143,
+actual installed-source1 and final hover8 cases PASS; prior full browser132 and
+expanded158 focused include the same behavior. Local light/dark captures reviewed
+against handoff anatomy; default Avatar square uses existing control radius,
+custom slot unaffected. Same independent slice review is running.
+
+Independent Overlay review FAIL_FIX: touch tap opened on pointer-enter/focus and
+then click immediately closed the preview. Actual hasTouch browser negative
+control reproduced the hidden card after tap. Only mouse pointer-enter/leave
+now previews; a pointer press suppresses separate focus opening until click,
+so touch/pen activation toggles once. Mouse click after hover deliberately
+closes; this choice is documented. Dedicated touch case stays open beyond grace,
+uses its link and closes on second tap. Corrected25 Overlay cases PASS across
+four desktop projects plus touch, with zero skips via device-specific selection.
+Added explicit destructive hover selector and actual hover axe check. Final137
+full browser/158 focused/quality proof is running before corrective review.
+
+Post-rebase baseline full Fresh UI suite PASS372/372. Saved Overlay source restored, preserving recovery/coordinator notes and main Theme B registrations; native inventory110 (92 main +16 new components +2 supports), shipped82/104. The corrected Overlay snapshot under independent review matches restored sources; rerun current-base gates before signoff.
+
+Overlay corrective review PASS (overlays-review-round2.md), scoped to the actual saved source; verified eleven restored source/test files byte-for-byte against that snapshot. The touch negative control failed before correction and the full old-base corrected matrix passed137. On current main, focused contracts/runtime/registry/installed-consumer tests PASS192; source and browser fixture/spec type/lint/fmt wrappers PASS; quality/architecture PASS. Docs export inventory and fresh prose build PASS. Current-base complete browser matrix remains in flight. Rebased baseline full package PASS372; final whole-phase package/runtime/IMPL-EVAL still required.
+
+Current-base full Overlay/browser regression matrix PASS137/137 (four light/dark desktop viewport projects plus actual touch). Captures refreshed from this source. Independent corrective review PASS and192 focused tests/source-browser wrappers/quality/docs exports/prose PASS. No token values or lockfiles changed. Final publication/docs accuracy and clean-source generated carrier checks precede the slice push. Evidence scope and pending whole-phase gates are explicit in overlays-validation.json.

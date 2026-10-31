@@ -13,6 +13,8 @@ import type { ComponentChildren, JSX } from 'preact';
  * Curated stroke-SVG paths supported by the package-owned icon primitive.
  */
 export const ICON_PATHS = {
+  'alert-triangle': ['M12 3 22 21H2Z', 'M12 9v4', 'M12 17h.01'],
+  calendar: ['M3 5h18v16H3Z', 'M8 3v4', 'M16 3v4', 'M3 11h18'],
   check: ['M20 6 9 17l-5-5'],
   'chevron-down': ['M6 9l6 6 6-6'],
   'chevron-left': ['M15 18l-6-6 6-6'],
