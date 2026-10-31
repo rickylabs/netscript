@@ -7,6 +7,42 @@ import type { UiRegistryItem, UiRegistryManifest } from './registry.ts';
 /** Marker after which `assets/styles.css` belongs to the app and survives every `ui:add`. */
 export const APP_CUSTOM_STYLES_MARKER = '/* App-specific custom styles below. */';
 
+/** Boundary of registry-managed stylesheet imports. */
+export const REGISTRY_IMPORTS_MARKER = '/* Per-item CSS - ui:init writes these @import lines. */';
+
+/** Merge registry stylesheet imports while retaining the app-owned custom tail. */
+export function renderUiRegistryStyles(
+  existing: string,
+  added: readonly string[],
+  removed: readonly string[] = [],
+  themeBase?: string,
+): string {
+  const previous = splitAppCustomStyles(existing);
+  const marker = REGISTRY_IMPORTS_MARKER;
+  let base = themeBase ?? previous.managed;
+  let imports: readonly string[] = themeBase === undefined
+    ? []
+    : readExistingPerItemImports(previous.managed, themeBase);
+  const offset = previous.managed.indexOf(marker);
+  if (themeBase === undefined && offset >= 0) {
+    const lines = previous.managed.slice(offset + marker.length).split('\n');
+    let index = 0;
+    const entries: string[] = [];
+    while (
+      index < lines.length && (!lines[index].trim() || lines[index].trim().startsWith('@import '))
+    ) {
+      if (lines[index].trim()) entries.push(lines[index].trim());
+      index++;
+    }
+    imports = entries;
+    base = previous.managed.slice(0, offset) + lines.slice(index).join('\n');
+  }
+  const excluded = new Set(removed);
+  return composeStylesAggregator(base, [
+    ...new Set([...imports.filter((line) => !excluded.has(line)), ...added]),
+  ], previous.custom);
+}
+
 /** Write the target app's Fresh UI stylesheet aggregator. */
 export async function writeStylesAggregator(input: {
   readonly registryRoot?: string;
@@ -108,7 +144,7 @@ function composeStylesAggregator(
   const importBlock = [
     ...importLines,
     '',
-    '/* Per-item CSS - ui:init writes these @import lines. */',
+    REGISTRY_IMPORTS_MARKER,
     ...cssImports,
     '',
   ].join('\n');

@@ -139,8 +139,8 @@ export const COMMAND_REFERENCE_PATHS: readonly string[] = [
   'docs/site/cli-reference.md',
 ];
 
-/** Ratified root/direct-child census, including ui:migrate and ui:migrate variants. */
-export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 99;
+/** Ratified S2 plus ui:migrate root/direct-child census. */
+export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 111;
 
 export interface GoldenPathDocsResult {
   readonly pageCount: number;

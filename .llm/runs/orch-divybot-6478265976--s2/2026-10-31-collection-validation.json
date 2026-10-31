@@ -1,0 +1,135 @@
+{
+  "sourceHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+  "repairBaseline": "259374b0a11d99791daa294d9876dd2f9c38fc20",
+  "mainHead": "204a71b1ef0133faa07ce5c191e4170b5cb76171",
+  "mergeParents": [
+    "bcb8db6b20ebde65a9f741c9ba696e7bea660b1f",
+    "204a71b1ef0133faa07ce5c191e4170b5cb76171"
+  ],
+  "before": {
+    "passed": 2,
+    "failed": 2,
+    "ignored": 0
+  },
+  "focusedAfter": {
+    "passed": 9,
+    "failed": 0,
+    "ignored": 0
+  },
+  "mergedRegressions": {
+    "passed": 220,
+    "failed": 0,
+    "ignored": 0
+  },
+  "streamIntegration": {
+    "passed": 9,
+    "failed": 0,
+    "ignored": 0
+  },
+  "embeddingPublishRegression": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0
+  },
+  "wrappers": {
+    "filesSelected": 7,
+    "checkFindings": 0,
+    "lintFindings": 0,
+    "fmtFindings": 0,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "docsAccuracy": {
+    "outcome": "PASS",
+    "directCommands": 111,
+    "recursivePaths": 176
+  },
+  "releasePreflight": "PASS: zero findings",
+  "reviewThreads": {
+    "total": 0,
+    "unanswered": 0,
+    "outcome": "PASS"
+  },
+  "gates": [
+    {
+      "gate": "quality-gate",
+      "gitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "actualGitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "04e12b54d14a9e1f1f45f5820fbf1eb040f5c983319826dd16d07f5870356ba3"
+    },
+    {
+      "gate": "assets-barrel",
+      "gitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "actualGitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "a2e814852e1a742a50a83e84a6227d2f379830918cd5fd99107b3b427904e1b6"
+    },
+    {
+      "gate": "publish-assets",
+      "gitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "actualGitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "11d6f07e2e377dbf221e1f1c58c24e43b81a00d6a1d6f3b9adac4bf2a22b09e1"
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "gitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "actualGitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "bb1741f075755d6b5e948a67ff1596f5fa3bde8a1b36ab105a9fe130b7c336d3"
+    },
+    {
+      "gate": "agent-docs-prose",
+      "gitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "actualGitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "021c0a843380b8f4f833e62d9463920769de7cc5ade75e900ec8d19a9b7f72bc"
+    },
+    {
+      "gate": "publish-dry-run",
+      "gitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "actualGitHead": "609e648132d9bfa73542d1ad10592f6f1d404ba1",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "a23eb42ba733184398474eab6a9ba601dbe37396699b572288b4314425cc828c"
+    }
+  ],
+  "doclint": {
+    "outcome": "FAIL: existing upstream baseline",
+    "total": 124,
+    "privateTypeRef": 96,
+    "missingJsDoc": 28,
+    "exactMainComparison": {
+      "mainHead": "204a71b1ef0133faa07ce5c191e4170b5cb76171",
+      "sameFindingCountsByFileAndEntrypoint": true,
+      "extraEntrypointsWithoutFindings": [
+        "./registry-v2.ts"
+      ],
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 124,
+        "totalPrivateTypeRef": 96,
+        "totalMissingJSDoc": 28,
+        "totalOther": 0
+      }
+    }
+  },
+  "independentReview": {
+    "requestedModel": "claude-opus-5-5",
+    "requestedEffort": "high",
+    "observedModelUsage": [
+      "claude-opus-5-5"
+    ],
+    "exitCode": 0,
+    "sourceCleanUnchanged": true,
+    "verdict": "PASS for source/local evidence",
+    "reviewerExecutedCommands": false
+  },
+  "finalRemoteCi": "PENDING at final evidence head: both whole workflows, actual8 shards/check-test/quality, scaffold-static and both executed full runtime/cleanup suites SUCCESS. deps-report policy skip distinct."
+}

@@ -4,5 +4,6 @@ export interface UiInitCommandInput {
   readonly app?: string;
   readonly registryRoot?: string;
   readonly theme?: string;
+  readonly preset?: string;
   readonly force?: boolean;
 }

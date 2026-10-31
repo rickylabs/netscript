@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add bounded UI registry list/search/view tools and a structured ui:add command tool, with an
+  injectable catalog port and an offline embedded Fresh UI adapter.
+
 - Keep legacy project-doctor failures visible even with a service filter. A declared runtime with a
   stopped or unavailable AppHost intentionally reports `fail`, rather than `warn`, while keeping
   telemetry.

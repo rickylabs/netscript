@@ -6,9 +6,9 @@ templateEngine: [vento, md]
 
 # `@netscript/mcp`
 
-The Model Context Protocol server for NetScript workspaces. It publishes 22 token-bounded MCP tools
+The Model Context Protocol server for NetScript workspaces. It publishes 26 token-bounded MCP tools
 that let a coding agent monitor a running app, debug a correlated execution, read telemetry, run the
-doctor, search the documentation, discover package exports and trigger allowlisted CLI commands,
+doctor, search the documentation, discover package exports inspect UI registries and trigger allowlisted CLI commands,
 over newline-delimited JSON-RPC on stdio, with no npm MCP SDK in the dependency graph.
 
 Most consumers never import this package: `netscript agent init` installs it as an MCP server and
@@ -34,7 +34,7 @@ MCP fit together. The complete symbol list is in
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createMcpServer` | function | Create the MCP server with `initialize` / `tools/list` / `tools/call` support. |
-| `createToolRegistry` | function | Immutable, enumerable definitions of the 22 tools. |
+| `createToolRegistry` | function | Immutable, enumerable definitions of the 26 tools. |
 | `McpServer` | interface | Callable server subset: `handle(message)` plus the registered `tools`. |
 | `McpServerOptions` | interface | Composition seams: `probe`, `environment`, `flows`, `truncation`. |
 | `MCP_PROTOCOL_VERSION` | const | The MCP protocol version the runner implements (`2025-11-25`). |
@@ -43,13 +43,13 @@ MCP fit together. The complete symbol list is in
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `TOOL_NAMES` | const | The 22 tool names, in registry order. |
+| `TOOL_NAMES` | const | The 26 tool names, in registry order. |
 | `TOOL_INPUT_SCHEMAS` | const | Standard Schema input contract per tool. |
 | `TOOL_OUTPUT_SCHEMAS` | const | Standard Schema output contract per tool. |
 | `validateSchema` | function | Validate a value against a tool schema, throwing on drift. |
 | `ToolDefinition` | interface | A tool's name, contracts, and flow. |
 | `ToolFlow` | type alias | The function a tool executes; depends only on ports. |
-| `ToolName` | type alias | Union of the 22 tool names. |
+| `ToolName` | type alias | Union of the 26 tool names. |
 
 ### Per-tool field overview
 
@@ -320,3 +320,23 @@ same shared package, so other consumers can use the identical roll-up.
 The package forwards `PluginHealthDeclaration`, `PluginHealthStatus`, `PluginHealthSummary`, and
 `PluginResourceHealth` to document the types used by `DoctorCheck.runtimeHealth`. Their contract and
 aggregation implementation remain owned by `@netscript/plugin/health`.
+
+## UI registry discovery
+
+`list_registry_items` returns item metadata with `limit` (at most 20) and `offset`;
+`search_registry_items` adds a required `query`. Both return `items`, `total` and an optional
+`nextOffset`. `view_registry_item` accepts `name` and returns a portable item with copy bytes.
+The standalone server uses the embedded Fresh UI registry without a network request.
+Hosts can inject `McpCliOptions.uiRegistryCatalog` for a selected app's registries.
+
+`get_registry_add_command` accepts a name, `@namespace/name`, or HTTP(S) item URL and returns
+`{command: "netscript", args: ["ui:add", name]}`. It does not execute the command. Pass the
+arguments directly to a process API after reviewing the installation; never join them into shell text.
+
+Registry metadata uses the server's normal output bounds. Views preserve exact file contents and
+fail with `tool_result_too_large` when the complete JSON-RPC response exceeds 64 KiB. Use
+`netscript ui:view <name>` for larger items.
+
+Registry composition exports: `createUiRegistryFlows` composes the four tools;
+`UI_REGISTRY_PAGE_LIMIT` is their page bound. `UiRegistryCatalogPort` defines host registry
+reads and `UiRegistryItemSummary` defines metadata entries.

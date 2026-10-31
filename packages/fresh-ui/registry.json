@@ -1,0 +1,4142 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "fresh-ui-foundation",
+  "homepage": "https://rickylabs.github.io/netscript/",
+  "items": [
+    {
+      "name": "theme-ns-one",
+      "author": "NetScript",
+      "description": "ns-one language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "ns-one",
+          "language": "ns-one",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "ns-one"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/ns-one.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/ns-one.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-utility",
+      "author": "NetScript",
+      "description": "studio-utility language preset; fixed compact density (Compact Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-utility",
+          "language": "studio",
+          "flavor": "utility",
+          "density": "compact",
+          "sourceDensity": "Compact"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-utility.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-utility.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-utility/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-utility/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-cloud",
+      "author": "NetScript",
+      "description": "studio-cloud language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-cloud",
+          "language": "studio",
+          "flavor": "cloud",
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-cloud.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-cloud.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-cloud/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-cloud/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-workshop",
+      "author": "NetScript",
+      "description": "studio-workshop language preset; fixed comfortable density (Chunky Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-workshop",
+          "language": "studio",
+          "flavor": "workshop",
+          "density": "comfortable",
+          "sourceDensity": "Chunky"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-workshop.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-workshop.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-workshop/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-workshop/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-playful",
+      "author": "NetScript",
+      "description": "studio-playful language preset; fixed comfortable density (Chunky Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-playful",
+          "language": "studio",
+          "flavor": "playful",
+          "density": "comfortable",
+          "sourceDensity": "Chunky"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-playful.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-playful.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-playful/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-playful/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-ledger",
+      "author": "NetScript",
+      "description": "studio-ledger language preset; fixed compact density (Dense Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-ledger",
+          "language": "studio",
+          "flavor": "ledger",
+          "density": "compact",
+          "sourceDensity": "Dense"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-ledger.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-ledger.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-ledger/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-ledger/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-atelier",
+      "author": "NetScript",
+      "description": "studio-atelier language preset; fixed comfortable density (Airy Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-atelier",
+          "language": "studio",
+          "flavor": "atelier",
+          "density": "comfortable",
+          "sourceDensity": "Airy"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-atelier.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-atelier.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-atelier/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-atelier/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-studio-signal",
+      "author": "NetScript",
+      "description": "studio-signal language preset; fixed compact density (Dense Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "studio-signal",
+          "language": "studio",
+          "flavor": "signal",
+          "density": "compact",
+          "sourceDensity": "Dense"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "studio"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-signal.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-signal.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-signal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-studio-signal/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-tonal",
+      "author": "NetScript",
+      "description": "tonal language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "tonal",
+          "language": "tonal",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "tonal"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/tonal.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/tonal.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/tonal/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tonal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/tonal/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tonal/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-bloom",
+      "author": "NetScript",
+      "description": "bloom language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "bloom",
+          "language": "bloom",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "bloom"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/bloom.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/bloom.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/bloom/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-bloom/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/bloom/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-bloom/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-cupertino",
+      "author": "NetScript",
+      "description": "cupertino language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "cupertino",
+          "language": "cupertino",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "cupertino"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/cupertino.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/cupertino.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/cupertino/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-cupertino/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/cupertino/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-cupertino/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-liquid",
+      "author": "NetScript",
+      "description": "liquid language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "liquid",
+          "language": "liquid",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "liquid"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/liquid.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/liquid.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/liquid/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-liquid/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/liquid/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-liquid/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-fluent",
+      "author": "NetScript",
+      "description": "fluent language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "fluent",
+          "language": "fluent",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "fluent"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/fluent.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/fluent.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/fluent/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-fluent/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/fluent/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-fluent/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-brutal",
+      "author": "NetScript",
+      "description": "brutal language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "brutal",
+          "language": "brutal",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "brutal"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/brutal.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/brutal.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/brutal/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-brutal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/brutal/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-brutal/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-filigrane",
+      "author": "NetScript",
+      "description": "filigrane language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "filigrane",
+          "language": "filigrane",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "filigrane"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/filigrane.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/filigrane.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/filigrane/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-filigrane/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/filigrane/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-filigrane/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-terminal",
+      "author": "NetScript",
+      "description": "terminal language preset; fixed compact density (Compact Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "terminal",
+          "language": "terminal",
+          "flavor": null,
+          "density": "compact",
+          "sourceDensity": "Compact"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "terminal"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/terminal.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/terminal.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/terminal/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-terminal/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/terminal/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-terminal/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-pixel",
+      "author": "NetScript",
+      "description": "pixel language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "pixel",
+          "language": "pixel",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "pixel"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/pixel.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/pixel.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/pixel/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-pixel/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/pixel/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-pixel/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "theme-tactile",
+      "author": "NetScript",
+      "description": "tactile language preset; fixed comfortable density (Comfortable Figma geometry).",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "meta": {
+        "preset": {
+          "version": 2,
+          "id": "tactile",
+          "language": "tactile",
+          "flavor": null,
+          "density": "comfortable",
+          "sourceDensity": "Comfortable"
+        },
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "tokens",
+            "tactile"
+          ]
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/tactile.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/tactile.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/tactile/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tactile/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/tactile/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-tactile/SKILL.md"
+        }
+      ]
+    },
+    {
+      "name": "cn",
+      "description": "Shared class-name merge helper for copied registry components.",
+      "author": "NetScript",
+      "dependencies": [
+        "npm:clsx@^2.1.1",
+        "npm:tailwind-merge@^3.7.0"
+      ],
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@lib/cn.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "lib",
+            "class-names",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "public-types",
+      "description": "Shared renderable and component result types for copied registry components.",
+      "author": "NetScript",
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/public-types.ts",
+          "type": "registry:lib",
+          "target": "@lib/public-types.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "lib",
+            "types",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "control-props",
+      "description": "Control-prop narrowing helpers used by registry verification and form seams.",
+      "author": "NetScript",
+      "type": "registry:file",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/control-props.ts",
+          "type": "registry:file",
+          "target": "@ui/control-props.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "support",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "descriptors",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "form-control-styles",
+      "description": "Shared input, select, and textarea control CSS blocks.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/form-control-styles.css",
+          "type": "registry:file",
+          "target": "@assets/ui/form-control-styles.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "styles",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/form-control-styles.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "choice-styles",
+      "description": "Shared choice-control CSS blocks for checkbox and switch seams.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/choice-styles.css",
+          "type": "registry:file",
+          "target": "@assets/ui/choice-styles.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "selection",
+            "styles",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/choice-styles.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "surface-styles",
+      "description": "Shared card and panel surface CSS blocks.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/surface-styles.css",
+          "type": "registry:file",
+          "target": "@assets/ui/surface-styles.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "surface",
+            "styles",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/surface-styles.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "sheet-styles",
+      "description": "Platform dialog sheet CSS blocks for package-owned sheet runtime.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/sheet.css",
+          "type": "registry:file",
+          "target": "@assets/ui/sheet.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "surface",
+            "sheet",
+            "styles",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/sheet.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "floating-styles",
+      "description": "Popover API and CSS anchor-positioning styles with fixed/inset fallback for package-owned floating runtimes.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/floating.css",
+          "type": "registry:file",
+          "target": "@assets/ui/floating.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "surface",
+            "popover",
+            "tooltip",
+            "styles",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/floating.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "alert-styles",
+      "description": "Shared alert and inline-notice feedback CSS blocks.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/alert-styles.css",
+          "type": "registry:file",
+          "target": "@assets/ui/alert-styles.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "feedback",
+            "styles",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/alert-styles.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "theme-seed",
+      "description": "NS One theme: DTCG-generated token artifacts plus base element styles. Components consume only the semantic --ns-* vocabulary this theme provides.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "cn",
+        "public-types"
+      ],
+      "cssVars": {
+        "theme": {
+          "--ns-bg": "var(--ns-gray-12)",
+          "--ns-fg": "var(--ns-gray-1)",
+          "--ns-primary": "var(--ns-copper-6)",
+          "--ns-ring": "var(--ns-copper-6)"
+        },
+        "light": {
+          "--ns-bg": "var(--ns-gray-1)",
+          "--ns-fg": "var(--ns-gray-12)"
+        }
+      },
+      "type": "registry:theme",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/styles.css",
+          "type": "registry:file",
+          "target": "@assets/styles.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.css",
+          "type": "registry:file",
+          "target": "@assets/tokens.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-bridge.css",
+          "type": "registry:file",
+          "target": "@assets/theme-bridge.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/tokens.json",
+          "type": "registry:theme",
+          "target": "@assets/tokens.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/fonts.json",
+          "type": "registry:theme",
+          "target": "@assets/fonts.json"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/theme-preset.json",
+          "type": "registry:theme",
+          "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/SKILL.md"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "theme",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "ns-one",
+            "tailwind-v4",
+            "tokens",
+            "style-dictionary-ready"
+          ]
+        }
+      }
+    },
+    {
+      "name": "theme-previews",
+      "description": "Opt-in stylesheets for development-only design preset previews.",
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/ns-one.css",
+          "type": "registry:file",
+          "target": "static/presets/ns-one.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-utility.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-utility.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-cloud.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-cloud.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-workshop.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-workshop.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-playful.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-playful.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-ledger.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-ledger.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-atelier.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-atelier.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/studio-signal.css",
+          "type": "registry:file",
+          "target": "static/presets/studio-signal.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/tonal.css",
+          "type": "registry:file",
+          "target": "static/presets/tonal.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/bloom.css",
+          "type": "registry:file",
+          "target": "static/presets/bloom.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/cupertino.css",
+          "type": "registry:file",
+          "target": "static/presets/cupertino.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/liquid.css",
+          "type": "registry:file",
+          "target": "static/presets/liquid.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/fluent.css",
+          "type": "registry:file",
+          "target": "static/presets/fluent.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/brutal.css",
+          "type": "registry:file",
+          "target": "static/presets/brutal.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/filigrane.css",
+          "type": "registry:file",
+          "target": "static/presets/filigrane.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/terminal.css",
+          "type": "registry:file",
+          "target": "static/presets/terminal.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/pixel.css",
+          "type": "registry:file",
+          "target": "static/presets/pixel.css"
+        },
+        {
+          "path": "packages/fresh-ui/registry/theme/presets/tactile.css",
+          "type": "registry:file",
+          "target": "static/presets/tactile.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "tags": [
+            "theme",
+            "preview",
+            "development"
+          ],
+          "kind": "lib",
+          "copyOwnership": "app-owned-after-copy"
+        }
+      }
+    },
+    {
+      "name": "layout-objects",
+      "description": "Theme-independent CSS layout objects \u2014 Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold \u2014 consuming only semantic spacing and color tokens.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:style",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/styles/layouts.css",
+          "type": "registry:file",
+          "target": "@assets/layouts.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "style",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "styles",
+            "css-only",
+            "composition",
+            "dashboard-foundation"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './layouts.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "button",
+      "description": "Generic action primitive using semantic theme classes.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "spinner"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/button.tsx",
+          "type": "registry:component",
+          "target": "@ui/button.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/button.css",
+          "type": "registry:file",
+          "target": "@assets/ui/button.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "actions",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/button.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "icon-button",
+      "description": "Accessible icon-only action button built on the shared Button seam.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "button"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/icon-button.tsx",
+          "type": "registry:component",
+          "target": "@ui/icon-button.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "actions",
+            "primitive",
+            "icon"
+          ]
+        }
+      }
+    },
+    {
+      "name": "input",
+      "description": "Generic text input with token-driven error styling.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "form-control-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/input.tsx",
+          "type": "registry:component",
+          "target": "@ui/input.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "primitive"
+          ]
+        }
+      }
+    },
+    {
+      "name": "textarea",
+      "description": "Generic multi-line text input with the shared field styling contract.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "form-control-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/textarea.tsx",
+          "type": "registry:component",
+          "target": "@ui/textarea.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/textarea.css",
+          "type": "registry:file",
+          "target": "@assets/ui/textarea.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/textarea.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "checkbox",
+      "description": "CSS-first native checkbox seam with inline label and helper copy.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "choice-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/checkbox.tsx",
+          "type": "registry:component",
+          "target": "@ui/checkbox.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/checkbox.css",
+          "type": "registry:file",
+          "target": "@assets/ui/checkbox.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "selection",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/checkbox.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "switch",
+      "description": "CSS-first native switch seam for binary dashboard settings.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "choice-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/switch.tsx",
+          "type": "registry:component",
+          "target": "@ui/switch.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/switch.css",
+          "type": "registry:file",
+          "target": "@assets/ui/switch.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "selection",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/switch.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "label",
+      "description": "Accessible field label with required-state support.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/label.tsx",
+          "type": "registry:component",
+          "target": "@ui/label.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/label.css",
+          "type": "registry:file",
+          "target": "@assets/ui/label.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/label.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "select",
+      "description": "Native select wrapper with semantic token styling.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "form-control-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/select.tsx",
+          "type": "registry:component",
+          "target": "@ui/select.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "primitive"
+          ]
+        }
+      }
+    },
+    {
+      "name": "form-field",
+      "description": "Composed field wrapper for labels, help text, and errors.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "label"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/form-field.tsx",
+          "type": "registry:component",
+          "target": "@ui/form-field.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/form-field.css",
+          "type": "registry:file",
+          "target": "@assets/ui/form-field.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "composed"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/form-field.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "card",
+      "description": "Primary content surface with header/body/footer sub-seams for dashboard composition.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "surface-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/card.tsx",
+          "type": "registry:component",
+          "target": "@ui/card.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/card.css",
+          "type": "registry:file",
+          "target": "@assets/ui/card.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "surface",
+            "container",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/card.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "panel",
+      "description": "Dense secondary surface for filters, rails, and grouped operational controls.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "surface-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/panel.tsx",
+          "type": "registry:component",
+          "target": "@ui/panel.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/panel.css",
+          "type": "registry:file",
+          "target": "@assets/ui/panel.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "surface",
+            "container",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/panel.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "badge",
+      "description": "Compact semantic status seam for tags, counts, and entity state labels.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/badge.tsx",
+          "type": "registry:component",
+          "target": "@ui/badge.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/badge.css",
+          "type": "registry:file",
+          "target": "@assets/ui/badge.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "status",
+            "feedback",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/badge.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "avatar",
+      "description": "Identity chip for a person or agent \u2014 initials or image with size, presence, and agent variants.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/avatar.tsx",
+          "type": "registry:component",
+          "target": "@ui/avatar.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/avatar.css",
+          "type": "registry:file",
+          "target": "@assets/ui/avatar.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "identity",
+            "presence",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/avatar.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "citation-chip",
+      "description": "Inline per-claim source marker [n] that pairs with a sources list \u2014 the grounded-agent citation UX.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/citation-chip.tsx",
+          "type": "registry:component",
+          "target": "@ui/citation-chip.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/citation-chip.css",
+          "type": "registry:file",
+          "target": "@assets/ui/citation-chip.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "citation",
+            "ai",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/citation-chip.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "code-block",
+      "description": "Fenced code surface with filename/language header and a copy affordance for assistant messages.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/code-block.tsx",
+          "type": "registry:component",
+          "target": "@ui/code-block.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/code-block.css",
+          "type": "registry:file",
+          "target": "@assets/ui/code-block.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "code",
+            "ai",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/code-block.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "model-selector",
+      "description": "Disclosure-backed model/provider picker for the prompt composer (native <details>).",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/model-selector.tsx",
+          "type": "registry:component",
+          "target": "@ui/model-selector.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/model-selector.css",
+          "type": "registry:file",
+          "target": "@assets/ui/model-selector.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "model",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/model-selector.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "tool-call-card",
+      "description": "Inline MCP/tool invocation + result as a native <details> disclosure with status badge and IO panel.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "badge",
+        "spinner"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/tool-call-card.tsx",
+          "type": "registry:component",
+          "target": "@ui/tool-call-card.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/tool-call-card.css",
+          "type": "registry:file",
+          "target": "@assets/ui/tool-call-card.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "tool",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/tool-call-card.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "chart-block",
+      "description": "Inline token-driven metric chart \u2014 horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/chart-block.tsx",
+          "type": "registry:component",
+          "target": "@ui/chart-block.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/chart-block.css",
+          "type": "registry:file",
+          "target": "@assets/ui/chart-block.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "chart",
+            "analytics",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/chart-block.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "donut",
+      "description": "Token-driven donut/pie chart \u2014 SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/donut.tsx",
+          "type": "registry:component",
+          "target": "@ui/donut.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/donut.css",
+          "type": "registry:file",
+          "target": "@assets/ui/donut.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "chart",
+            "analytics",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/donut.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "prompt-input",
+      "description": "Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "model-selector"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/prompt-input.tsx",
+          "type": "registry:component",
+          "target": "@ui/prompt-input.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/prompt-input.css",
+          "type": "registry:file",
+          "target": "@assets/ui/prompt-input.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "composer",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/prompt-input.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "message",
+      "description": "Chat message: author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "avatar",
+        "citation-chip",
+        "chart-block",
+        "code-block",
+        "tool-call-card"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/message.tsx",
+          "type": "registry:component",
+          "target": "@ui/message.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/message.css",
+          "type": "registry:file",
+          "target": "@assets/ui/message.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "chat",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/message.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "markdown",
+      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output \u2014 direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "citation-chip"
+      ],
+      "dependencies": [
+        "npm:unified@^11",
+        "npm:remark-parse@^11",
+        "npm:remark-rehype@^11",
+        "npm:remark-gfm@^4",
+        "npm:remark-math@^6",
+        "npm:rehype-react@^8",
+        "npm:rehype-katex@^7",
+        "npm:rehype-highlight@^7",
+        "npm:rehype-sanitize@^6",
+        "npm:katex@^0.16",
+        "npm:highlight.js@^11"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/markdown.tsx.template",
+          "type": "registry:component",
+          "target": "@ui/markdown.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/markdown-pipeline.ts",
+          "type": "registry:component",
+          "target": "@ui/markdown-pipeline.ts"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/markdown.css",
+          "type": "registry:file",
+          "target": "@assets/ui/markdown.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "chat",
+            "markdown",
+            "component"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/markdown.css';"
+            },
+            {
+              "layer": "components",
+              "content": "@import 'katex/dist/katex.min.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "command-palette",
+      "description": "Modal \u2318K command palette \u2014 the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/command-palette.tsx",
+          "type": "registry:component",
+          "target": "@ui/command-palette.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/command-palette.css",
+          "type": "registry:file",
+          "target": "@assets/ui/command-palette.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "command",
+            "palette",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/command-palette.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "search",
+      "description": "Compact nav search affordance \u2014 a button styled as an input with a \u2318K hint that opens the command palette.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/search.tsx",
+          "type": "registry:component",
+          "target": "@ui/search.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/search.css",
+          "type": "registry:file",
+          "target": "@assets/ui/search.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "search",
+            "navigation",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/search.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "dropzone",
+      "description": "File-drop affordance \u2014 a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/dropzone.tsx",
+          "type": "registry:component",
+          "target": "@ui/dropzone.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/dropzone.css",
+          "type": "registry:file",
+          "target": "@assets/ui/dropzone.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "upload",
+            "forms",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/dropzone.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "separator",
+      "description": "Lightweight divider seam for cards, forms, panels, and toolbars.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/separator.tsx",
+          "type": "registry:component",
+          "target": "@ui/separator.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/separator.css",
+          "type": "registry:file",
+          "target": "@assets/ui/separator.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "surface",
+            "layout",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/separator.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "alert",
+      "description": "Persistent section-level feedback banner for success, warning, info, and error states.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "alert-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/alert.tsx",
+          "type": "registry:component",
+          "target": "@ui/alert.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/alert.css",
+          "type": "registry:file",
+          "target": "@assets/ui/alert.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "feedback",
+            "status",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/alert.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "inline-notice",
+      "description": "Compact contextual feedback seam for inline guidance inside forms and panels.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "alert-styles"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/inline-notice.tsx",
+          "type": "registry:component",
+          "target": "@ui/inline-notice.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/inline-notice.css",
+          "type": "registry:file",
+          "target": "@assets/ui/inline-notice.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "feedback",
+            "status",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/inline-notice.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "spinner",
+      "description": "Small loading indicator for async actions and deferred regions.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/spinner.tsx",
+          "type": "registry:component",
+          "target": "@ui/spinner.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/spinner.css",
+          "type": "registry:file",
+          "target": "@assets/ui/spinner.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "feedback",
+            "loading",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/spinner.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "progress",
+      "description": "Determinate or indeterminate progress seam for jobs, uploads, and background work.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/progress.tsx",
+          "type": "registry:component",
+          "target": "@ui/progress.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/progress.css",
+          "type": "registry:file",
+          "target": "@assets/ui/progress.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "feedback",
+            "loading",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/progress.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "skeleton",
+      "description": "Generic dashboard loading scaffold for table, stats, detail, and form surfaces.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/skeleton.tsx",
+          "type": "registry:component",
+          "target": "@ui/skeleton.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/skeleton.css",
+          "type": "registry:file",
+          "target": "@assets/ui/skeleton.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "feedback",
+            "loading",
+            "primitive"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/skeleton.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "breadcrumb",
+      "description": "Accessible breadcrumb block for dashboard drill-down navigation.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/breadcrumb.tsx",
+          "type": "registry:block",
+          "target": "@ui/breadcrumb.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "dashboard",
+            "block"
+          ]
+        }
+      }
+    },
+    {
+      "name": "sidebar-shell",
+      "description": "Reusable dashboard sidebar shell that accepts app-owned IA, breadcrumbs, and topbar actions.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects",
+        "breadcrumb"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/sidebar-shell.tsx",
+          "type": "registry:block",
+          "target": "@ui/sidebar-shell.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "dashboard",
+            "shell",
+            "block"
+          ]
+        }
+      }
+    },
+    {
+      "name": "page-header",
+      "description": "Composed page-intro block with shared badge, action, and status-row layout seams.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/page-header.tsx",
+          "type": "registry:block",
+          "target": "@ui/page-header.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/page-header.css",
+          "type": "registry:file",
+          "target": "@assets/ui/page-header.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "header",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/page-header.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "filter-form",
+      "description": "Card-backed filter block for search, faceting, and action rails above directory tables.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "card"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/filter-form.tsx",
+          "type": "registry:block",
+          "target": "@ui/filter-form.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/filter-form.css",
+          "type": "registry:file",
+          "target": "@assets/ui/filter-form.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "filters",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/filter-form.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "stats-grid",
+      "description": "Responsive summary-metric grid for dashboard overview and route-level status cards.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects",
+        "card"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/stats-grid.tsx",
+          "type": "registry:block",
+          "target": "@ui/stats-grid.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/stats-grid.css",
+          "type": "registry:file",
+          "target": "@assets/ui/stats-grid.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "stats",
+            "dashboard",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/stats-grid.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "detail-layout",
+      "description": "Two-column detail block for record pages with a primary flow and supporting side rail.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/detail-layout.tsx",
+          "type": "registry:block",
+          "target": "@ui/detail-layout.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/detail-layout.css",
+          "type": "registry:file",
+          "target": "@assets/ui/detail-layout.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "detail",
+            "layout",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/detail-layout.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "data-table",
+      "description": "Composed table/list block with a shared header, row body, and footer seam.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "card"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/data-table.tsx",
+          "type": "registry:block",
+          "target": "@ui/data-table.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/data-table.css",
+          "type": "registry:file",
+          "target": "@assets/ui/data-table.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "table",
+            "list",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/data-table.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "responsive-table",
+      "description": "Semantic table block that collapses dense operational rows into labeled mobile cells.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "public-types"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/responsive-table.tsx",
+          "type": "registry:block",
+          "target": "@ui/responsive-table.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/responsive-table.css",
+          "type": "registry:file",
+          "target": "@assets/ui/responsive-table.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "table",
+            "responsive",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/responsive-table.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "pagination",
+      "description": "Shared pagination meta/actions block for directory and activity lists.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/pagination.tsx",
+          "type": "registry:block",
+          "target": "@ui/pagination.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/pagination.css",
+          "type": "registry:file",
+          "target": "@assets/ui/pagination.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "pagination",
+            "navigation",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/pagination.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "empty-state",
+      "description": "Shared empty-state callout block for list rails, table gaps, and detail sidebars.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/empty-state.tsx",
+          "type": "registry:block",
+          "target": "@ui/empty-state.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/empty-state.css",
+          "type": "registry:file",
+          "target": "@assets/ui/empty-state.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "empty-state",
+            "feedback",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/empty-state.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "section-divider",
+      "description": "Editorial section label + rule block for detail and form pages.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/section-divider.tsx",
+          "type": "registry:block",
+          "target": "@ui/section-divider.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/section-divider.css",
+          "type": "registry:file",
+          "target": "@assets/ui/section-divider.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "block",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "section",
+            "editorial",
+            "block"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/section-divider.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "theme-toggle",
+      "description": "Small, generic Fresh island for dark/light theme switching.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/islands/ThemeToggle.tsx",
+          "type": "registry:component",
+          "target": "@islands/ThemeToggle.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/islands/theme-toggle.css",
+          "type": "registry:file",
+          "target": "@assets/ui/theme-toggle.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "island",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "theme",
+            "island"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/theme-toggle.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "sidebar-toggle",
+      "description": "Responsive mobile drawer toggle island for sidebar-shell consumers.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects",
+        "sidebar-shell",
+        "button"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/islands/SidebarToggle.tsx",
+          "type": "registry:component",
+          "target": "@islands/SidebarToggle.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "island",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "dashboard",
+            "navigation",
+            "island"
+          ]
+        }
+      }
+    },
+    {
+      "name": "toast-support",
+      "description": "Query-string helpers for redirect-flash toasts.",
+      "author": "NetScript",
+      "type": "registry:file",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/toast.ts",
+          "type": "registry:file",
+          "target": "@lib/ui/toast.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "support",
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "toast",
+            "helpers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "toast",
+      "description": "Global notification island for redirect-flash feedback.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "toast-support"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/islands/Toast.tsx",
+          "type": "registry:component",
+          "target": "@islands/Toast.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toast.css",
+          "type": "registry:file",
+          "target": "@assets/ui/toast.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "island",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "toast",
+            "feedback",
+            "island"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/toast.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "chat-render",
+      "description": "Curated generative-UI block parser: projects fenced chart/donut/table/stats/line markdown into a typed RenderPart[] tree with a reload-fidelity inverse projection.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "chart-block",
+        "donut",
+        "data-table",
+        "stats-grid"
+      ],
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/src/chat/parse-blocks.ts",
+          "type": "registry:lib",
+          "target": "@lib/chat/parse-blocks.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "chat",
+            "generative-ui",
+            "lib"
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop-tray-menu",
+      "description": "Declarative tray and application-menu preview that emits stable action IDs.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-tray-menu.tsx",
+          "type": "registry:component",
+          "target": "@ui/desktop-tray-menu.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-tray-menu.css",
+          "type": "registry:file",
+          "target": "@assets/ui/desktop-tray-menu.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "desktop",
+            "tray",
+            "menu",
+            "actions"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/desktop-tray-menu.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop-dialog",
+      "description": "Side-effect-free alert, confirm, and prompt intents for a desktop controller.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-dialog.tsx",
+          "type": "registry:component",
+          "target": "@ui/desktop-dialog.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-dialog.css",
+          "type": "registry:file",
+          "target": "@assets/ui/desktop-dialog.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "desktop",
+            "dialog",
+            "actions"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/desktop-dialog.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop-notification",
+      "description": "Side-effect-free native notification preview and explicit host request control.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-notification.tsx",
+          "type": "registry:component",
+          "target": "@ui/desktop-notification.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-notification.css",
+          "type": "registry:file",
+          "target": "@assets/ui/desktop-notification.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "desktop",
+            "notification",
+            "feedback"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/desktop-notification.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop-window-chrome",
+      "description": "Accessible title-bar actions limited to documented Deno Desktop window operations.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-window-chrome.tsx",
+          "type": "registry:component",
+          "target": "@ui/desktop-window-chrome.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-window-chrome.css",
+          "type": "registry:file",
+          "target": "@assets/ui/desktop-window-chrome.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "desktop",
+            "window",
+            "chrome",
+            "actions"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/desktop-window-chrome.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop-update-prompt",
+      "description": "Exhaustive update-ready UX for automatic restart and Windows manual installer paths.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "dependencies": [
+        "jsr:@netscript/sdk@0.0.8/auto-update"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-update-prompt.tsx",
+          "type": "registry:component",
+          "target": "@ui/desktop-update-prompt.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/desktop-update-prompt.css",
+          "type": "registry:file",
+          "target": "@assets/ui/desktop-update-prompt.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "desktop",
+            "updates",
+            "feedback"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/desktop-update-prompt.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop-only",
+      "description": "Hydration-safe content gate that no-ops without the NetScript Deno Desktop RPC binding.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "dependencies": [
+        "jsr:@netscript/sdk@0.0.8/desktop",
+        "npm:preact@^10.29.2"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/islands/DesktopOnly.tsx",
+          "type": "registry:component",
+          "target": "@islands/DesktopOnly.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "island",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "desktop",
+            "island",
+            "feature-detection"
+          ]
+        }
+      }
+    },
+    {
+      "name": "mcp-ui-widget",
+      "description": "Themed sandboxed MCP ui:// widget frame \u2014 an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/islands/McpUiWidget.tsx",
+          "type": "registry:component",
+          "target": "@islands/McpUiWidget.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/islands/mcp-ui-widget.css",
+          "type": "registry:file",
+          "target": "@assets/ui/mcp-ui-widget.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "island",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "mcp-ui",
+            "iframe"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/mcp-ui-widget.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "render-ui",
+      "description": "Safe recursive render_ui payload renderer with depth and block-vocabulary guards for Fresh UI generative surfaces.",
+      "author": "NetScript",
+      "registryDependencies": [
+        "theme-seed",
+        "layout-objects",
+        "chart-block",
+        "stats-grid",
+        "data-table",
+        "card"
+      ],
+      "dependencies": [
+        "jsr:@netscript/ai@0.0.8",
+        "npm:preact@^10.29.2"
+      ],
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/src/ai/render-ui.tsx",
+          "type": "registry:lib",
+          "target": "@lib/ai/render-ui.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "generative-ui",
+            "renderer",
+            "security"
+          ]
+        }
+      }
+    },
+    {
+      "name": "style-utility",
+      "type": "registry:style",
+      "title": "Utility",
+      "description": "Utility component sources over the shared Fresh UI contract.",
+      "meta": {
+        "components": {
+          "cn": "cn",
+          "public-types": "public-types",
+          "control-props": "control-props",
+          "form-control-styles": "form-control-styles",
+          "choice-styles": "choice-styles",
+          "surface-styles": "surface-styles",
+          "sheet-styles": "sheet-styles",
+          "floating-styles": "floating-styles",
+          "alert-styles": "alert-styles",
+          "theme-previews": "theme-previews",
+          "layout-objects": "layout-objects",
+          "button": "button",
+          "icon-button": "icon-button",
+          "input": "input",
+          "textarea": "textarea",
+          "checkbox": "checkbox",
+          "switch": "switch",
+          "label": "label",
+          "select": "select",
+          "form-field": "form-field",
+          "card": "card",
+          "panel": "panel",
+          "badge": "badge",
+          "avatar": "avatar",
+          "citation-chip": "citation-chip",
+          "code-block": "code-block",
+          "model-selector": "model-selector",
+          "tool-call-card": "tool-call-card",
+          "chart-block": "chart-block",
+          "donut": "donut",
+          "prompt-input": "prompt-input",
+          "message": "message",
+          "markdown": "markdown",
+          "command-palette": "command-palette",
+          "search": "search",
+          "dropzone": "dropzone",
+          "separator": "separator",
+          "alert": "alert",
+          "inline-notice": "inline-notice",
+          "spinner": "spinner",
+          "progress": "progress",
+          "skeleton": "skeleton",
+          "breadcrumb": "breadcrumb",
+          "sidebar-shell": "sidebar-shell",
+          "page-header": "page-header",
+          "filter-form": "filter-form",
+          "stats-grid": "stats-grid",
+          "detail-layout": "detail-layout",
+          "data-table": "data-table",
+          "responsive-table": "responsive-table",
+          "pagination": "pagination",
+          "empty-state": "empty-state",
+          "section-divider": "section-divider",
+          "theme-toggle": "theme-toggle",
+          "sidebar-toggle": "sidebar-toggle",
+          "toast-support": "toast-support",
+          "toast": "toast",
+          "chat-render": "chat-render",
+          "desktop-tray-menu": "desktop-tray-menu",
+          "desktop-dialog": "desktop-dialog",
+          "desktop-notification": "desktop-notification",
+          "desktop-window-chrome": "desktop-window-chrome",
+          "desktop-update-prompt": "desktop-update-prompt",
+          "desktop-only": "desktop-only",
+          "mcp-ui-widget": "mcp-ui-widget",
+          "render-ui": "render-ui"
+        }
+      }
+    }
+  ],
+  "meta": {
+    "name": "fresh-ui-foundation",
+    "version": "0.1.0",
+    "packageName": "@netscript/fresh-ui",
+    "model": "copy-based-registry",
+    "schemaVersion": 2,
+    "tokenSourceStrategy": "style-dictionary-dtcg-source",
+    "collections": [
+      {
+        "name": "foundation",
+        "description": "Expanded enterprise dashboard foundation: theme seed, installable A seams, and the first feedback/theme islands.",
+        "items": [
+          "theme-seed",
+          "sheet-styles",
+          "button",
+          "icon-button",
+          "input",
+          "textarea",
+          "checkbox",
+          "switch",
+          "label",
+          "select",
+          "form-field",
+          "card",
+          "panel",
+          "badge",
+          "separator",
+          "alert",
+          "inline-notice",
+          "spinner",
+          "progress",
+          "skeleton",
+          "breadcrumb",
+          "sidebar-shell",
+          "page-header",
+          "filter-form",
+          "stats-grid",
+          "detail-layout",
+          "data-table",
+          "responsive-table",
+          "pagination",
+          "empty-state",
+          "section-divider",
+          "sidebar-toggle",
+          "theme-toggle",
+          "toast-support",
+          "toast",
+          "avatar",
+          "code-block",
+          "chart-block",
+          "donut",
+          "dropzone",
+          "desktop-tray-menu",
+          "desktop-dialog",
+          "desktop-notification",
+          "desktop-window-chrome",
+          "desktop-update-prompt",
+          "desktop-only"
+        ]
+      },
+      {
+        "name": "ai",
+        "description": "AI / chat surface seams: grounded-agent citations, message thread, composer, model picker, and tool-call disclosure.",
+        "items": [
+          "theme-seed",
+          "avatar",
+          "citation-chip",
+          "code-block",
+          "chart-block",
+          "model-selector",
+          "tool-call-card",
+          "prompt-input",
+          "message",
+          "command-palette",
+          "search",
+          "markdown",
+          "chat-render",
+          "mcp-ui-widget",
+          "render-ui"
+        ]
+      },
+      {
+        "name": "forms-core",
+        "description": "Core action and form-control seams for CRUD pages, settings, and operational forms.",
+        "items": [
+          "theme-seed",
+          "button",
+          "icon-button",
+          "input",
+          "textarea",
+          "checkbox",
+          "switch",
+          "label",
+          "select",
+          "form-field"
+        ]
+      },
+      {
+        "name": "surface-core",
+        "description": "Reusable dashboard surface seams for cards, rails, separators, and status labels.",
+        "items": [
+          "theme-seed",
+          "card",
+          "panel",
+          "badge",
+          "separator"
+        ]
+      },
+      {
+        "name": "feedback-core",
+        "description": "Reusable persistent and transient feedback seams, including loading affordances.",
+        "items": [
+          "theme-seed",
+          "alert",
+          "inline-notice",
+          "spinner",
+          "progress",
+          "skeleton",
+          "toast-support",
+          "toast"
+        ]
+      },
+      {
+        "name": "layout-foundations",
+        "description": "CSS-first B seams shipped as the layout-objects style item: Stack, Cluster, Grid, Toolbar, Section, Split, and ScrollRegion.",
+        "items": [
+          "layout-objects"
+        ]
+      },
+      {
+        "name": "dashboard-blocks",
+        "description": "Layer-3 dashboard blocks for shell, page-intro, tables, stats, detail rails, and empty states.",
+        "items": [
+          "theme-seed",
+          "breadcrumb",
+          "sidebar-shell",
+          "sidebar-toggle",
+          "page-header",
+          "filter-form",
+          "stats-grid",
+          "detail-layout",
+          "data-table",
+          "responsive-table",
+          "pagination",
+          "empty-state",
+          "section-divider"
+        ]
+      },
+      {
+        "name": "desktop",
+        "description": "Desktop-gated window chrome and update-ready surfaces for NetScript Fresh applications.",
+        "items": [
+          "theme-seed",
+          "desktop-tray-menu",
+          "desktop-dialog",
+          "desktop-notification",
+          "desktop-window-chrome",
+          "desktop-update-prompt",
+          "desktop-only"
+        ]
+      }
+    ]
+  }
+}
