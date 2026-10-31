@@ -19,3 +19,9 @@ root-catalog npm versions. This avoids injecting a fake React global. Named
 `{ AxeBuilder }` is required by the structured Deno check even if Node's default
 interop happens to run.20-case Actions matrix passes with zero serious/critical
 axe findings using the real bundle; preserve existing gallery baseline.
+
+2026-10-31 Public runtime imports in a standalone browser config need the root
+workspace catalog. gap-build.ts derives it into ignored test-results config each
+run before bundling; use the generated config for fixture type checks. Never
+check in another catalog or stale bundle. Scope fixture layout CSS to outer
+examples: a broad section rule distorts nested Calendar month sections.

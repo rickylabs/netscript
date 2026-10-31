@@ -222,3 +222,11 @@ baseline using the actual CLI transformer. Run it with `deno run -A --no-config 
 then supply that fixture as the after-root to `variant-parity.ts` with migrated HTML. This checks
 the CLI's selector mapping independently of the authored component CSS. Preserve both parity
 reports and their input hashes.
+
+S3 date-control fixtures use the public package runtime entry. `gap-build.ts` derives
+the workspace dependency catalog into ignored `test-results/gap.bundle.deno.json`
+before every browser run, then bundles current source. It never modifies a lock
+or maintains a second catalog. Use that generated config for scoped fixture type
+checks after building. Native modal boundary tests allow Chromium's BODY sentinel
+when focus visits browser chrome, require re-entry into the dialog, and prove
+background controls cannot receive focus while `:modal` is active.

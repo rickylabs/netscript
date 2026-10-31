@@ -7,7 +7,9 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'input-group',
   'input-otp',
   'slider',
+  'calendar',
+  'date-picker',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
-export const POST_V1_SUPPORT: readonly string[] = [];
+export const POST_V1_SUPPORT: readonly string[] = ['calendar-date'];
