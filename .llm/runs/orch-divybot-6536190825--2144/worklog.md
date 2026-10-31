@@ -88,3 +88,11 @@ PASS from the same independent evaluator before any implementation. See plan-eva
 - Independent corrections review: PASS; evaluator independently ran 44 focused tests, zero failures, four unavailable Redis cases skipped. Full local regression now passes 142 tests, with seven Redis integrations unavailable. Structured check/lint/source-fmt pass, and quality:gate passes.
 - The prose carrier is intentionally excluded by the nearest CLI formatter config. The structured formatter correctly refused partial coverage, so it was checked separately with the same root formatting settings and no exclusion; that explicit generated-file check passes. No formatter suppression or file mutation was added.
 - Commit these reviewed sources and the regenerated prose now; then regenerate the public export corpus from the required clean package/plugin read set before marking ready again.
+
+## Export corpus correction
+
+- Sources and prose were committed and pushed as `15608953cf8329da36227f93151f70986c4c18c5`. All three review threads now have replies; the repository thread gate passes with zero unanswered threads.
+- Regenerated the canonical MCP export corpus from that clean committed source. Only four generated rows change: workers runtime/worker and workers-core builders/runtime. Freshness reports 35 packages, 301 subpaths, 8,941 symbols and SHA-256 `8db7224a5a2a512f08257918de0e21c48ac66d25e36e053ddcc8d9d7b104c761`.
+- Independent export-corpus review: PASS. The evaluator independently ran the freshness check; structured type and explicit generated-file format checks also pass. No locks or runtime source change in this slice.
+- The generator tests deliberately clone committed HEAD. A pre-commit run confirmed it still sees the old artifact (12 passed, two stale-corpus failures); this is not evidence against the uncommitted refresh. Commit and push the reviewed artifact before the decisive rerun.
+- Reconcile: original implementation scope is complete, all review findings addressed, PR temporarily draft. New-head CI and exact-pushed-head evaluation remain before READY; scaffold.runtime remains coordinator-owned and unproven.
