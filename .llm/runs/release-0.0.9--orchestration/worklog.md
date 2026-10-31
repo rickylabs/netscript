@@ -82,3 +82,6 @@
 - 03:37Z: #2385 started.
 - 03:43Z: #2385 → PR #2489 (draft).
 - 03:57Z: #2483 (#2395, A2) READY at `002ce25`, Opus MERGE at the head (after the authorized re-plan: CHANGES at `1edb71e`, then MERGE). The Redis lease uses private modules for atomic scripts, receipts and recovery. Extra files: e2e startup diagnostics, the native-desktop driver and a small Aspire register template change (CI reliability; evaluator-approved). Advisory debt: redis-lease-cardinality (F-16). **expensive-gate.acquired** on #2483.
+- 04:00Z: #2489 (#2385) READY at `42f6d98`, Opus MERGE. Docs-lane diff audit: only docs/site, docs tooling, and a 2-line regeneration of the generated `agent-docs-prose` carrier in packages/cli (required by the freshness gate; not framework source), accepted. #2487 (#2369) READY at `5fdab9b`; e2e queued behind #2483.
+- 04:00:42Z: dispatched #2290 (D1, internals), comment 6538732825; started 04:03:59Z. #2155 (docs) is scripted for ~04:11Z after a claim check.
+- 04:12Z: **merged** #2483 (`1c9da73d0`) for #2395 (A2); #2395 closed; #2351 is unblocked (requires edge satisfied).
