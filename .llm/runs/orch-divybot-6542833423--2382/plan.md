@@ -5,18 +5,18 @@
 1. Add SagaInstance.status as required String @default("running") plus [sagaName,status] index. Keep isCompleted for existing cleanup compatibility. Reuse canonical TS union; avoid a provider-specific Prisma enum. Persist metadata.status on both create and update.
 2. Replace JSON/boolean list filtering with scalar status equality through buildSagaInstanceWhere and existing findMany/count. Extend existing v1-types only; preserve instance-query/direct-GET seams.
 3. Prefer validated scalar row.status in shared mapping; absent legacy columns still use existing v2/flat mapping. Never interpret business fields as runtime state in v2.
-4. Add immutable status.migration.sql sidecar, appended after Prisma column/index creation by existing database tooling. Backfill all pre-fix rows: v2 validated state.status first; otherwise is_completed -> completed; otherwise valid flat state.status; else running. Do not alter JSON state, versions, dates, identifiers or old SQL sidecars. Add a canonical-values CHECK constraint. Migration runs once with immutable marker, not at runtime.
+4. Add immutable instance-status.migration.sql sidecar, appended after Prisma column/index creation by existing database tooling. Backfill all pre-fix rows: v2 validated state.status first; otherwise is_completed -> completed; otherwise valid flat state.status; else running. Do not alter JSON state, versions, dates, identifiers or old SQL sidecars. Add a conditional canonical-values CHECK constraint, matching existing sidecar style. Migration runs once with immutable marker, not at runtime.
 5. Upgrade: synchronize plugin assets, generate/apply normal app DB migration, regenerate Prisma client before deploying writer/read service; stop older binaries during migration (no mixed-version writes to required defaulted column). Legacy rows remain readable before rewrite via mapper; post-migration list filters use backfilled column. State-only business values unavailable in legacy rows are not invented.
 
 ## Slices
 
 - S0: plan/research/design/run bootstrap and draft PR; validate complete design, baseline, scope.
-- S1: schema/sidecar, writer/mapper/filter and types, regression suite, README, run evidence. Gates: structured check/test/lint/fmt, negative controls, quality:scan + arch:check, doc-lint/JSR audit; independent Claude slice review before sign-off commit; push and phase comment.
+- S1: schema/sidecar/manifest, writer/mapper/filter and types, regression suite and PostgreSQL upgrade helper, README, run evidence. Gates: structured check/test/lint/fmt, negative controls, quality:scan + arch:check, doc-lint/JSR audit; independent Claude slice review before sign-off commit; push and phase comment.
 - S2: closure evidence/run context and dated lesson, separate review. Exact pushed-head final IMPL-EVAL after ready transition; preserve full SHA without changing the head after verdict.
 
 ## Regression proof
 
-Exercise same canonical fixtures through real KV and Prisma projection classes and actual list API for every SAGA_INSTANCE_STATUSES entry. Verify create AND update persist status; filtered lists/count/pagination use scalar canonical status and preserve business state. Test legacy flat/v2 rows and scalar-authoritative migrated pre-fix rows. Negative controls restore baseline production writer/mapper/filter (tests retained) and require parity and pre-fix tests to fail, then restore fix. Verify sidecar discovered/appended once through existing migration tooling; execute backfill against isolated PostgreSQL if available, otherwise explicitly unproven.
+Exercise same canonical fixtures through real KV and Prisma projection classes and actual list API for every SAGA_INSTANCE_STATUSES entry. Verify create AND update persist status; filtered lists/count/pagination use scalar canonical status and preserve business state. Test legacy flat/v2 rows and scalar-authoritative migrated pre-fix rows. Negative controls restore baseline production writer/mapper/filter (tests retained) and require parity and pre-fix tests to fail, then restore fix. Declare the new sidecar in the existing plugin manifest and verify it in the manifest test. Extend the existing packages/database/tests/saga-command-postgres_test.ts (already run by command-postgres.yml) to deploy a pre-fix schema (remove only the new scalar/index and withhold the new sidecar), seed legacy flat/v2 rows in all canonical states including conflicting completion flags and unknown/missing status, then upgrade via runMigrationWithArtifacts with real Prisma create-only -> append contributions -> deploy. New helper packages/database/tests/saga-status-upgrade.ts owns fixture seeding/upgrade/assertions. Verify canonical statuses and unchanged JSON/version/updated_at/ids, invalid scalar rejection, no pending sidecars after application. Add a negative control that clears only the new sidecar content before the upgrade and requires a failed status assertion (restore within finally). The PostgreSQL suite remains an explicit CI verdict request until observed green; locally a portable SQLite execution of the exact backfill UPDATE can provide additional row-compatibility/negative-control evidence, without claiming PostgreSQL proof.
 
 ## Gates and open decisions
 
@@ -24,7 +24,7 @@ Run smallest scoped source wrappers (include --unstable-kv); relevant saga servi
 
 PLAN-EVAL mandatory before code (separate Anthropic session, owner-selected claude-opus-5-5/high). IMPL-EVAL mandatory, same evaluator restear; no blockers before ready; final reviews exact pushed head. Feature limits 2 plan/5 implementation, two consecutive terminal failures escalate.
 
-Open-decision sweep: no design questions outstanding. PostgreSQL availability is a validation detail safe to resolve during S1; cannot replace required CI runtime verdict.
+Open-decision sweep: no design questions outstanding. Local PostgreSQL availability is a validation detail safe to defer: the required real PostgreSQL upgrade regression is wired into the existing CI job. Until its result is observed, mark it unproven. No skipped test counts as a passed PostgreSQL verdict.
 
 ## Risks / mitigations
 

@@ -20,3 +20,13 @@ Owner override (verbatim): "Run PLAN-EVAL before implementing and IMPL-EVAL afte
 - `.divybot-final-report.tmp` → `.divybot-final-report.md`: excluded final publication handoff.
 
 No assignment file or lock changes may be committed. No labels/milestones, local scaffold.runtime, merge, tag or release. Public artifacts use repository-relative paths and omit machine/session identifiers. Runtime E2E is coordinator-owned CI.
+
+## PLAN-EVAL scope correction (before implementation)
+
+Necessary migration-delivery and acceptance coverage additionally permits:
+- `plugins/sagas/services/src/routers/v1-types.ts`: scalar query/read contract.
+- `plugins/sagas/src/public/mod.ts` and `plugins/sagas/tests/public/manifest_test.ts`: declare and verify the shipped sidecar.
+- `packages/database/tests/saga-command-postgres_test.ts` and `packages/database/tests/saga-status-upgrade.ts`: upgrade proof in the existing PostgreSQL job.
+No CI workflow or shell gate change is needed because the current suite already runs the parent test.
+
+IMPL-EVAL round 1 correction permits `packages/plugin-sagas-core/tests/fixtures/transition-store/postgres-conformance.ts.template`: align its hand-written projection table and assertions with the generated schema. Test-only collateral required by the same triggered CI job, no core runtime change.

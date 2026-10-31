@@ -242,6 +242,8 @@ export type SagaInstanceWhereInput = {
   sagaName?: string;
   /** Correlation identifier. */
   correlationId?: string;
+  /** Canonical runtime lifecycle status, independently of business JSON. */
+  status?: SagaInstanceApiStatus;
   /** Completion flag stored on the saga instance row. */
   isCompleted?: boolean;
   /** JSON state filter for non-completed statuses. */
@@ -266,6 +268,8 @@ export interface PrismaRecord {
   version: number;
   /** Completion flag. */
   isCompleted: boolean;
+  /** Canonical lifecycle column; absent only on pre-migration read-model fixtures. */
+  status?: SagaInstanceStatus | null;
   /** Persisted saga state. */
   state: Record<string, unknown>;
   /** Creation timestamp. */

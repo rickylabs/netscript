@@ -135,7 +135,7 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
   } };
   try {
     await reset();
-    await root.$executeRawUnsafe('CREATE TABLE IF NOT EXISTS saga_instances (id varchar(100) NOT NULL, saga_name varchar(100) NOT NULL, correlation_id varchar(100) NOT NULL, version integer NOT NULL, is_completed boolean NOT NULL, state jsonb NOT NULL, created_at timestamp(3) NOT NULL, updated_at timestamp(3) NOT NULL, PRIMARY KEY (saga_name,id))');
+    await root.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS saga_instances (id varchar(100) NOT NULL, saga_name varchar(100) NOT NULL, correlation_id varchar(100) NOT NULL, version integer NOT NULL, is_completed boolean NOT NULL, status varchar(20) NOT NULL DEFAULT 'running', state jsonb NOT NULL, created_at timestamp(3) NOT NULL, updated_at timestamp(3) NOT NULL, PRIMARY KEY (saga_name,id))`);
     await root.$executeRawUnsafe('DELETE FROM saga_instances');
     const durable = await createDurableSagaRuntime({ store, projection: guardedProjection });
     try {
@@ -156,6 +156,7 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
     await projection.upsert({ ...request.correlation, envelope, transition: history[0] });
     const row = await root.sagaInstance.findUniqueOrThrow({ where: { sagaName_id: { sagaName: 'document', id: request.correlation.instanceId } } });
     assertEquals(row.version, 1);
+    assertEquals(row.status, 'running');
     z.object({ projectionVersion: z.literal(SAGA_INSTANCE_PROJECTION_VERSION) }).parse(row.state);
     const firstProjection = parseSagaInstanceReadModel(row.state);
     assertEquals(firstProjection.state, { count: 1, status: 'business-pending' });
@@ -180,6 +181,7 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
       assertEquals(await counts(), [2,2,2,1,1]);
       const next = await root.sagaInstance.findUniqueOrThrow({ where: { sagaName_id: { sagaName: 'document', id: request.correlation.instanceId } } });
       assertEquals(next.version, 2);
+      assertEquals(next.status, 'running');
       const nextProjection = parseSagaInstanceReadModel(next.state);
       assertEquals(nextProjection.state, { count: 2, status: 'business-pending' });
       assertEquals(nextProjection.status, 'running');
