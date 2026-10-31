@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "cecf7762124bdb50cb3f9c81bffbf0b696411ef5",
+  "currentMainSha": "d54879b8d645554155c54af2f26c86d2232afda5",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -303,7 +303,10 @@
     },
     {
       "number": 2375,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2532 40c59ace8"
+      ]
     },
     {
       "number": 2377,
@@ -397,7 +400,10 @@
     },
     {
       "number": 2411,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2527 d54879b8d"
+      ]
     },
     {
       "number": 2438,
@@ -1173,6 +1179,40 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1912",
       "receiptRefs": []
+    },
+    {
+      "id": "F1-2375",
+      "lane": "internals",
+      "phase": "merged",
+      "baseBranch": "main",
+      "prNumber": 2532,
+      "headSha": "8778c877c39cdf68b63f4963100b9125e3d37faa",
+      "issueNumbers": [
+        2375
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol (continuation chain of the #2268 worker)",
+      "receiptRefs": [],
+      "note": "adopted continuation; READY; Opus MERGE at head; CI green; no e2e needed",
+      "mergeCommit": "40c59ace89eac2f050a31a9ed177f76c0be6807b",
+      "mergedAt": "2026-10-31T14:01:03Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2375"
+    },
+    {
+      "id": "F1-2411",
+      "lane": "internals",
+      "phase": "merged",
+      "baseBranch": "main",
+      "prNumber": 2527,
+      "headSha": "a529bc2f68590f64ee0892ae12c14a2fd35803d1",
+      "issueNumbers": [
+        2411
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol (continuation of the #2268 worker)",
+      "receiptRefs": [],
+      "note": "adopted continuation; READY; Opus MERGE at head; CI green; no e2e needed",
+      "mergeCommit": "d54879b8d645554155c54af2f26c86d2232afda5",
+      "mergedAt": "2026-10-31T14:01:10Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2411"
     }
   ],
   "expensiveGates": [
@@ -1547,11 +1587,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T13:58:58Z",
-    "nextReportDueAt": "2026-10-31T14:58:58Z",
+    "lastReportAt": "2026-10-31T14:01:15Z",
+    "nextReportDueAt": "2026-10-31T15:01:15Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2530 (#2384); e2e on #2534",
-    "currentMainSha": "cecf7762124bdb50cb3f9c81bffbf0b696411ef5",
+    "headline": "merged #2532 (#2375) #2527 (#2411)",
+    "currentMainSha": "d54879b8d645554155c54af2f26c86d2232afda5",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1737,7 +1777,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T13:59:25Z",
+  "updatedAt": "2026-10-31T14:01:28Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2168,6 +2208,16 @@
       "route": "codex gpt-6.1-sol high",
       "state": "posted",
       "pr": null
+    },
+    {
+      "issue": 2068,
+      "lane": "internals",
+      "commentId": null,
+      "postedAt": "2026-10-31T13:59:19Z",
+      "route": "codex gpt-6.1-sol (continuation chain)",
+      "state": "claimed-continuation",
+      "pr": null,
+      "claimRef": "#2474 comment 6544330900"
     }
   ],
   "coordinatorArtifactPr": 2475,

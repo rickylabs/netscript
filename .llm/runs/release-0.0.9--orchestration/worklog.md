@@ -271,3 +271,6 @@
 - 13:58:44Z: **merged** #2530 (`cecf77621`) for #2384 (F1). Issue close pending the worker continuation check.
 - 13:58:58Z: #2384 closed with evidence. **expensive-gate.acquired** on #2534 (#2390) at `bb876fa`.
 - 13:59:25Z: dispatched #1366 box 6 (G1, moved internals → features; drift recorded), comment 6544332029; box 4 accepted as met (redacted marker plus timestamp). Validator green.
+- 14:00:20Z: Adopted continuation PRs (from the #2268 worker's chain): #2527 (#2411, F1) and #2532 (#2375, F1), both READY with Opus MERGE at their heads and green CI. #2411 was placed in features (internals at cap). The chain also claimed #2068 (G1 cold-consumer check).
+- 14:01:07Z: **merged** #2532 (`40c59ace8`) for #2375 (F1, adopted continuation).
+- 14:01:14Z: **merged** #2527 (`d54879b8d`) for #2411 (F1, adopted continuation).

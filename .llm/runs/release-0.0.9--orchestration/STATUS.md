@@ -3,13 +3,13 @@
 - A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
 - A2 DONE: #2395 (#2483), #2351 (#2496 67d4704b4)
 - A3 DONE: #2144 #2151 #2161 #2400 (#2482 02a66ba6d) all closed
-- B1 #2159 slice 1 MERGED (issue OPEN for Eric follow-up); #2383 #2160 #2382 MERGED (closed); #2374 → PR #2526 (implementing); #2390 after all B1
-- B2 #2162 #2369 MERGED (closed); #2149 → PR #2519 at 3b219fd (SQLite repair) e2e RUNNING; #2108 after #2149 + #2374
-- C1 #2267 #2132 #2338 MERGED (closed); #1367 PR #2520 READY (e2e queued); #2377 PR #2525 READY (required CI); #2373 dispatched 12:41Z (orphaned claim); #2390 after B1
+- B1 DONE except #2159 follow-up (Eric): #2499 #2512 #2517 #2522 #2526 merged
+- B2 #2162 #2369 #2149 MERGED (closed); #2108 → PR #2535 (implementing, capstone)
+- C1 #2267 #2132 #2338 #1367 #2377 MERGED (closed); #2373 merged #2528 (issue open while its worker continues #2379); #2390 PR #2534 READY (stall no longer reproduces), e2e RUNNING
 - D1 #2396 all 3 PRs MERGED; issue OPEN for release-owned published-graph proof on canary .1; #2259 BLOCKED → Eric
-- E1 DONE: #2392 #2401 #2394 (closed) · E2 #2385 #2155 #1491 MERGED (closed); #2268 MERGED partial #2521 (box 1 live-AppHost proof owed); #2269 dispatched 12:44Z (embedded-docs decision in brief)
-- F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 — CHECK #2406/#2409 vs Fresh UI S6a (#2419 studio-utility default preset) before dispatch; flag Cockpit on conflict
-- G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
+- E1 DONE · E2 #2385 #2155 #1491 MERGED; #2268 partial (live-AppHost proof owed); #2269 PR #2529 head 3d2b6db re-MERGE, CI pending (carrier moved to @netscript/mcp/docs)
+- F1 #2384 #2375 #2411 MERGED (closed); #2379 (continuation, #2373 worker); #2406 (Fresh UI PR #2408); #2409 (check vs S6a)
+- G1 #1912 → PR #2537 (published smoke); #1366 box 6 dispatched (features); #2068 claimed by continuation chain; #1655, #2185 (local docker), #2233 (Eric) remain; Eric asked about #1366 box5/consumer proof and #2068 consumer box
 - H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
 - Open for Eric: #2159 follow-up; #2259 options; #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; #2421 debt FYI (veto window); Garnet CI issue (likely moot); file upstream Aspire report (#2401 run record)
 - CANARY .1 READY TO CUT at 15cffa2fe (posted 11:52Z, comment 6542998232); Eric cuts. One expensive gate at a time; drop the label when a PR e2e completes.
