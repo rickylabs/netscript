@@ -85,12 +85,25 @@ export async function startTriggerProcessorRuntime(
     options.health?.failed();
     throw cause;
   } finally {
-    await Promise.all([
-      scheduler?.stop({ drainTimeoutMs: options.drainTimeoutMs }),
-      fileWatcher?.stop(),
-      processor?.stop({ drainTimeoutMs: options.drainTimeoutMs }),
-    ]);
+    await drainTriggerRuntime(scheduler, fileWatcher, processor, options.drainTimeoutMs);
     if (options.signal?.aborted) options.health?.stopped();
+  }
+}
+
+/** Drain source event construction before processor admission closes, even if a source stop fails. */
+async function drainTriggerRuntime(
+  scheduler: TriggerSchedulerPort | undefined,
+  fileWatcher: FileWatcherPort | undefined,
+  processor: TriggerProcessorPort | undefined,
+  drainTimeoutMs: number | undefined,
+): Promise<void> {
+  const sources = await Promise.allSettled([
+    scheduler?.stop({ drainTimeoutMs }),
+    fileWatcher?.stop(),
+  ]);
+  await processor?.stop({ drainTimeoutMs });
+  for (const source of sources) {
+    if (source.status === 'rejected') throw source.reason;
   }
 }
 

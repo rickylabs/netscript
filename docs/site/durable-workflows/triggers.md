@@ -197,6 +197,24 @@ The handler receives a `TriggerEvent<'file-watch', FileWatchTriggerPayload>`. Th
 `path`, `kind` (the lifecycle event), and, when the watcher could read them, `size`, `modifiedAt`,
 and `stableChecks`.
 
+File-watch triggers default to **in-flight deduplication**: their completed deduplication TTL is
+`0`, rather than the 24-hour default for webhook and scheduled triggers. Concurrent observations
+of the same change share an active claim, so only one handler runs. Once processing completes,
+another observation is eligible again, even if its metadata is unchanged.
+
+When both modification time and size are available, the adapter sets `event.idempotencyKey` to a
+bounded SHA-256 identity of `(triggerId, path, kind, modifiedAt, size)`. A different path, lifecycle
+kind, modification time, size, or trigger gets a different key. When either metadata field is
+missing, each observation gets a UUID key; identical payloads cannot establish that two changes
+are duplicates. Callback timestamps and process-local event counters are not change identities.
+An explicit `deduplication.ttlMs` on a composed `FileWatchDefinition` overrides the default;
+`deduplication.key(event)` retains precedence over the adapter key.
+
+The CSV example deliberately sets the worker action's key to the path for one import per file
+path within the worker's deduplication window. To enqueue work for each distinct change, use
+`event.idempotencyKey`, or omit the action key to inherit it. Worker deduplication and the
+underlying watcher's debounce, stability, and content-hash filters have their own policies.
+
 ### The underlying watcher
 
 For standalone file watching outside the trigger pipeline, call `createWatcher(options)` from

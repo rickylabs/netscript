@@ -28,6 +28,7 @@ import type {
   ProcedurePolicyResolver,
 } from './contract/contract-policy.ts';
 import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
+import { PROCEDURE_ERROR_CODES } from './types.ts';
 
 /** Default path prefixes guarded by auth middleware. */
 export const DEFAULT_PROTECTED_PREFIXES: readonly string[] = ['/api'];
@@ -137,6 +138,12 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
           principal,
           reason: decision.reason,
         });
+        if (decision.code === PROCEDURE_ERROR_CODES.NOT_FOUND) {
+          return c.json({ error: 'NOT_FOUND', message: decision.reason, code: decision.code }, 404);
+        }
+        if (decision.code === PROCEDURE_ERROR_CODES.RETIRED) {
+          return c.json({ error: 'GONE', message: decision.reason, code: decision.code }, 410);
+        }
         return forbidden(c, decision.reason);
       }
 

@@ -1,0 +1,3 @@
+# Async file-key construction is inside the producer drain boundary
+
+WatchersFileWatcherAdapter.stop waits its running dispatch tasks, including async SHA-256 event construction. The background runtime must settle watcher/scheduler stops before calling processor.stop; concurrent stop closes admission too early and silently routes the observation to the adapter error hook. Use allSettled for source stops so one failure does not end the drain early, then stop the processor and propagate source errors. Private drain policy helper avoids throwing directly in finally (no-unsafe-finally lint). The deterministic plugin runtime regression stubs crypto.subtle.digest and uses disk KV; both normal and failed source stops are covered.

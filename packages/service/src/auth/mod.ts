@@ -99,4 +99,6 @@ export type {
   AuthzRequest,
   MatchAwareAuthorizerPort,
   Principal,
+  ProcedureErrorCode,
 } from './types.ts';
+export { PROCEDURE_ERROR_CODES } from './types.ts';

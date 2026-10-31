@@ -171,12 +171,36 @@ export const authorizer = createContractAuthorizer(WorkspaceContractV1);
   caption: "@netscript/service/auth — the route-authz surface",
   rows: [
     { name: "createStaticCredentialAuthenticator(opts)", type: "AuthenticatorPort", desc: "Maps bearer tokens to principals — each credential carries a subject, scopes, and roles. Good for tests and machine-to-machine callers." },
-    { name: "createContractAuthorizer(contract, { fallback?, rawRoutes? })", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and binds it to the builder's real REST/RPC paths and aliases. rawRoutes declares exact, authentication-required raw routes; any other unmatched route is denied." },
+    { name: "createContractAuthorizer(contract, { fallback?, rawRoutes?, retiredPaths? })", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and binds it to the builder's real REST/RPC paths and aliases. rawRoutes declares exact, authentication-required raw routes. Unknown guarded requests return typed 404 after authentication; retiredPaths declares exact paths returning 410." },
     { name: "createScopeAuthorizer(opts)", type: "MatchAwareAuthorizerPort", desc: "Supported legacy path-rule authorizer; standalone, or a fallback only when a matched procedure has no metadata." },
     { name: ".withAuthn({ authenticator, protect?, allowAnonymous? })", type: "builder stage", desc: "protect defaults to ['/api']; allowAnonymous defaults to ['/health']." },
     { name: ".withAuthz({ authorizer, denyByDefault? })", type: "builder stage", desc: "denyByDefault defaults to true — fail closed when no decision is reachable." }
   ]
 }) }}
+
+### Distinguish a missing endpoint from a permission denial
+
+Once authentication succeeds, an unknown procedure under a guarded prefix returns HTTP **404**
+with JSON `code: "procedure_not_found"`. For an endpoint you deliberately removed, pass exact
+mounted paths to `createContractAuthorizer(WorkspaceContractV1, { retiredPaths: ['/api/v1/workspace',
+'/api/rpc/v1/workspace/members'] })`. Those paths return **410** with
+`{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }`.
+HTTP clients can use that stable code to show “client too old” and ask the user to upgrade.
+These middleware errors occur before oRPC dispatch; inspect the HTTP JSON code rather than assume
+a contract-defined oRPC error or parse the message.
+
+An anonymous request to either path still gets the existing **401** refusal, without a procedure
+code. A retired declaration requires authentication even outside `protect` or inside
+`allowAnonymous`. Existing procedures, raw-route policies and internal audience guards win over
+retirement: insufficient scopes/roles still return **403**, and public procedures remain public.
+
+Retired declarations are exact canonical absolute paths, apply to every method and ignore query
+strings. List REST, RPC and aliases separately. Parameters, wildcards, encoded paths, trailing
+slashes, dot segments, duplicate declarations and query/fragment syntax are rejected at
+construction. A declared path does not include siblings or descendants. Undeclared paths outside
+protected coverage keep their current behavior. See the
+[service reference](/reference/service/#unknown-and-retired-procedures) for response
+shapes and `PROCEDURE_ERROR_CODES` / `ProcedureErrorCode` exports.
 
 `defineService()` requires an explicit `auth` policy and refuses to start without one. With auth
 installed, `netscript service add` wires `browserAuthenticator` and

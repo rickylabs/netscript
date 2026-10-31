@@ -1,26 +1,18 @@
-# Resume — issue 2155 / E2
+# Resume — issue2155 / E2 follow-up
 
 PR: https://github.com/rickylabs/netscript/pull/2494
-Branch: `orch/divybot-6538837985`, target `main`. All twelve documentation findings are reconciled in acceptance.md with shipped source, main verdict and final fix. Docs content was independently approved, including final historical review at 7bc4f21.
+Branch: orch/divybot-6538837985; target main. All twelve findings are reconciled in acceptance.md. The source docs, examples and generated carriers were independently approved at c37a625, with full CI and close-gate green and round3 MERGE; that head's READY report was queued.
 
-## Current authorization and integration
+## Current integration
 
-The former package-edit blocker is resolved by the coordinator: https://github.com/rickylabs/netscript/pull/2494#issuecomment-6539166396. Only generated documentation carriers required by canonical freshness tasks may change under packages; no hand edits, authored framework/plugin source or lock changes. Use merge-main if needed; never force-push or rebase.
+Current main 4060d1e61da0a8324e77ed351b05a343d746a188 is now normally merged after a new conflict notification. Exactly one conflict, the generated CLI prose carrier, is resolved through canonical regeneration using incoming main's corpus as baseline. The trigger guide retains incoming file-watch change identity/deduplication guidance and this audit's retry section. Service reference and workspace authz changes are exact incoming main.
 
-S3 generated exactly two files: CLI agent-docs-prose.generated.ts via `deno task gen:agent-docs-prose`, and MCP publish-assets.generated.ts via `deno task gen:publish-assets`. generated-carriers.json records full paths, generators, hashes and preview equivalence. The READY report must name both files and commands.
+Package delta relative to current main is only the two coordinator-authorized generated files: CLI agent-docs-prose.generated.ts via `deno task gen:agent-docs-prose`; MCP publish-assets.generated.ts via `deno task gen:publish-assets`. Commands, hashes and integrated main are in generated-carriers.json. Authority: PR comment6539166396. No hand edits, authored framework/plugin changes or lock delta. No rebase or force push; only coordinator merges.
 
-Local prose/publish freshness, generated-file type checking and quality/architecture gate pass after regeneration. assets-barrel generated no extra changes; its final diff check must be rerun after the pending generated commit. Gate history is in gate-results.md; earlier stale failures are historical.
+## Remaining proof at the new head
 
-## Remaining completion work
+Run clean-tree prose/publish/assets/export freshness, docs build/links/snippets/accuracy and focused examples/corpus/runtime tests, including incoming file-watch deduplication tests. Obtain passing current-head CI. Re-steer the same Claude Opus5.5 high evaluator for round4 of at most5; the old round3 MERGE does not certify the new SHA. Final exact-head verdict and completed CI evidence belong in PR phase comments so recording them does not invalidate the head. Check its review-completion DoD box only after the new review, then rerun hosted close-gate on unchanged SHA.
 
-Commit/push S3 with this run evidence. Run clean-tree assets-barrel and the complete required freshness set; fix any reported generated-only stale outputs through canonical generators. Obtain green required CI at the resulting head, and re-steer the same independent Claude Opus 5.5 high evaluator for the new exact pushed head. Record its final verdict as a PR phase comment rather than a self-invalidating verdict commit. Historical 7bc4f21 CHANGES does not certify the new head. Do not merge/tag/release or edit labels/milestones.
+The live issue has no Acceptance checkboxes. Existing trigger builder retry parity remains a coordinator follow-up; no runtime patch is requested for this docs issue. Worker lesson is source-traced/type-checked, not claimed scaffold-E2E tested. No local scaffold.runtime, AppHost or container run is authorized or needed for this docs/generated-only delta. Do not change labels/milestones or merge/tag/release.
 
-## Proof already established
-
-Docs verify: 253 pages, 23,829 links, all caveats resolve. Normal snippets compile 26 fences. The new focused guard compiles actual worker/retry examples; main negative control fails. Existing compensation/projection/defer regressions plus the guard pass 34/34. Docs accuracy, generated manifest parity and scoped TS checks pass. Worker recipe is source-traced and type-checked; no scaffold.runtime E2E was run or claimed. No runtime resources or cleanup are pending.
-
-The live issue has no Acceptance checkboxes and was not edited. Existing API gap: trigger builder specs omit definition-level retry; docs provide a checked full-policy single-export workaround with static-discovery caveat. Architectural debt is not newly introduced.
-
-Final report goes through excluded `.divybot-final-report.md` for Orchid publication. Replace the old BLOCKED report with READY only when the new-head gates and final review prove it. Include all twelve items, local results, CI state, exact verdict line, and each regenerated file/generator. Run review-thread checker and answer every current thread. Only coordinator merges.
-
-Main integration in progress: origin/main 8902e1a normal merge; only CLI prose carrier conflicts, resolved using incoming generated corpus as baseline then canonical regeneration. Saga reference auto-merged incoming retention additions and this leaf's message-boundary corrections. Revalidate and review the new merged head; b902c3d clean-tree gates remain historical.
+Final issue report uses excluded .divybot-final-report.md for Orchid publication. Replace the previous READY with a new exact-head READY only after proof; include all12 findings, local/CI results, final MERGE line, and each generated file/command. Verify current state through the PR's latest phase comments and checks; those are the final head/verdict authority.
