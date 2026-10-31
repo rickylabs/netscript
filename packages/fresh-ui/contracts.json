@@ -404,7 +404,7 @@
       "specId": "A3",
       "category": "Actions",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -426,22 +426,26 @@
         },
         "text": {
           "kind": "boolean"
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
+        },
+        "textContent": {
+          "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "separator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "text",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         }
       ],
       "attributes": {
@@ -463,7 +467,16 @@
         "separator",
         "text"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "textContent",
+          "part": "text"
+        }
+      ],
       "apg": "native buttons and links",
       "keyboard": [
         {
@@ -481,7 +494,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior."
       ]
     },
     {
@@ -489,7 +502,7 @@
       "specId": "A4",
       "category": "Actions",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -507,11 +520,7 @@
           ]
         },
         "selected": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean"
         },
         "state": {
           "kind": "enum",
@@ -530,39 +539,52 @@
         },
         "label": {
           "kind": "boolean"
+        },
+        "defaultSelected": {
+          "kind": "boolean",
+          "default": false
+        },
+        "onSelectedChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "iconStartGlyph": {
+          "kind": "slot"
+        },
+        "iconEndGlyph": {
+          "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "icon-start",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "icon-end",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "state-layer",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -600,7 +622,20 @@
         "iconEnd",
         "label"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "label"
+        },
+        {
+          "name": "iconStartGlyph",
+          "part": "icon-start"
+        },
+        {
+          "name": "iconEndGlyph",
+          "part": "icon-end"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
       "keyboard": [
         {
@@ -616,7 +651,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior."
       ]
     },
     {
@@ -624,7 +659,7 @@
       "specId": "A5",
       "category": "Actions",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -654,17 +689,35 @@
             "single",
             "multiple"
           ]
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "items": {
+          "kind": "collection",
+          "required": true
+        },
+        "value": {
+          "kind": "collection"
+        },
+        "defaultValue": {
+          "kind": "collection"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "track",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "variant=segmented"
         }
       ],
       "attributes": {
@@ -715,7 +768,7 @@
         "space/inline/gap"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior."
       ]
     },
     {

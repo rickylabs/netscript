@@ -60,3 +60,37 @@ and render drift separately, document CSS-transient states when components land.
 Full Fresh UI package suite completed:300 passed,0 failed,0 ignored (168104ms).
 Asset-barrel generation completed with zero generated-source diff. No lock churn.
 Slice1 is terminal PASS with independent review; proceed to category slices.
+
+## Slice2 — Actions and browser fixture
+
+ButtonGroup, Toggle and ToggleGroup implemented; typed contracts now69 shipped,
+35 explicit gaps. Actions render cases cover orientations/sizes/variants and
+conditional parts. Controlled/local pressed state; roving single/multiple toolbar
+focus with disabled skipping, wrap, Home/End and RTL; native form behavior stays
+on buttons. Registry entries and embedded carriers generated in the same slice.
+Dedicated native Deno bundle + Playwright fixture added; no gallery baseline edit.
+Initial browser startup found missing shared libraries and Deno precompile bundle
+emitting classic React calls. Reused existing project-managed libraries read-only
+and added a react-jsx fixture config. Browser matrix20/20 PASS across light/dark
+and390/1280, zero serious/critical axe violations. Further typography refinement
+uses existing strong roles; final rerun follows. Local screenshots are review
+artifacts, not cross-environment pixel baselines. Contract suite100/0; registry
+carrier/doc projection tests6/0. Real copied-source consumer check is in flight.
+Main1d467c6 merged normally before this slice (upstream watcher changes including
+reviewed upstream lock updates); no local dependency/lock edits.
+
+Independent slice2 review FAIL_FIX: manual browser bundle could be stale.
+One corrective pass: Playwright's webServer command now builds current sources
+before serving; failure stops startup; output is the ordinary ignored test-results
+bundle, not run-specific scratch. Poisoned old output before rerunning all20
+cases to prove a stale bundle is replaced. Also applied the review's Utility
+marker/island documentation corrections. Same reviewer re-review is next.
+
+Slice2 corrected final evidence:107 focused tests pass (100 contracts,6 carrier/
+projection,1 actual install/type/lint). New browser20/20 passes after rebuilding
+from restored current source, zero serious/critical axe. Actual broken-focus
+source control exits1; restoration is byte-identical and final suite auto-rebuilds.
+Same reviewer round2 PASS. Source checks16 package files +2 browser spec/config
++2 fixture/server pass;23-file fmt and focused lint pass. quality:gate, release
+preflight and docs:accuracy99/99 pass. No local lock changes. Utility light/dark
+captures retained; no pixel identity with Figma/CI claimed. Slice2 terminal PASS.
