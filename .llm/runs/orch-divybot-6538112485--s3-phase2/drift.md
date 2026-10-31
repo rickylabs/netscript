@@ -1,0 +1,7 @@
+# Drift
+
+- 2026-10-31: S2 and handoff are still open, contrary to an assumption that
+  they might already be merged. Read handoff from its branch and use existing
+  registry until main advances. No implementation scope changed.
+- 2026-10-31: RTK is not installed. Use raw focused commands and repository
+  structured wrappers; retained phase1 memory confirms the same limitation.
