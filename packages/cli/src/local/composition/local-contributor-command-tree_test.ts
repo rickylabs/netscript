@@ -30,6 +30,7 @@ describe('local contributor CLI composition', () => {
       'ui:init',
       'ui:list',
       'ui:update',
+      'ui:migrate',
       'ui:remove',
     ]);
   });
