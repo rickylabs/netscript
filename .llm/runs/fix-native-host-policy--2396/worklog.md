@@ -102,3 +102,16 @@ the singular factory keeps native workspace defaults. The combined worker fixtur
 stream server and producer; no fake transport, cast or suppression was added. All new test flags
 are opt-in and do not change permission-negative defaults. Source and evidence are preserved
 on the adopted branch; no assignment/lock/private transcript is staged.
+
+Final union root check PASS:3849 selected TypeScript files,33 batches,0 diagnostics.
+Canonical export-corpus regeneration PASS:35 packages,303 subpaths,8977 symbols. New singular
+service entrypoints are in the public corpus; no export-facade closure cap was increased.
+Integrated the original service branch's final record-only head
+b2e31245020b651a32eb3b476c61a8198a1b42c0; its source equals the already integrated37f26c1d.
+S1 independent round2 still found no code/architecture/migration blocker and returned
+VERDICT: CHANGES b2e31245020b651a32eb3b476c61a8198a1b42c0 because coordinator runtime
+CI was unarmed. Round1 was also CHANGES on7dd579d7 for external proof; prescribed two-terminal
+failure limit ends S1 evaluator loop. Both decisions were surfaced on its PR and coordinator.
+S2 exact7421a60f2 now has real green core/build/quality/close and both runtime tiers, plus
+its independent exact-head MERGE. The existing READY comment was updated, without moving head.
+Final factory publication/freshness gates and independent source review remain next.
