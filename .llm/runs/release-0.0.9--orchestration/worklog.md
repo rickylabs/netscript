@@ -294,3 +294,7 @@
 - 14:38:33Z: Closed #2149 and #2373 with evidence (workers done).
 - 14:40:35Z: #2185 BLOCKED: the leaf environment has no local Docker daemon, so the run did not happen. **expensive-gate.released.** Decision for Eric posted (recommend accepting the CI runner's local-engine run 41197676281 as box 5 evidence). Next gate: #2542 (#1366).
 - 14:40:48Z: **expensive-gate.acquired** on #2542 (#1366) at `e1c68e5`.
+- 14:41:41Z: #2542 (#1366) test-5 shard red at `e1c68e5`; steered the live worker. e2e continues as evidence.
+- 14:43:35Z: #2542 pushed `99cda63` (test-5 fix); e2e re-running at the new head.
+- 14:45:21Z: #2542 Opus MERGE at `99cda63`; e2e running.
+- 14:49:30Z: **merged** #2541 (`8a2cbc1f3`) for #2068 (partial). The issue auto-closed through the linked-issue reference and was reopened with an explanation (EIS-Chat box pending Eric).

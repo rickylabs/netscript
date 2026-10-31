@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "45c7d58803dc2659f4a81e628729488f0b569bd9",
+  "currentMainSha": "8a2cbc1f34501e7b6137397877a7ed5b9a013102",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -1279,13 +1279,30 @@
       "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2542,
-      "headSha": "e1c68e5e7a666ab2abc9d8ba728375ef6d8417b0",
+      "headSha": "99cda632399925cf2431a1ba391b50e53de23f55",
       "issueNumbers": [
         1366
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1366",
       "receiptRefs": [],
-      "note": "READY box 6; Opus MERGE e1c68e5; e2e queued after the #2185 local gate"
+      "note": "test-5 fix pushed 99cda63; needs exact-head MERGE + re-READY; e2e re-running"
+    },
+    {
+      "id": "G1-2068",
+      "lane": "internals",
+      "phase": "merged",
+      "baseBranch": "main",
+      "prNumber": 2541,
+      "headSha": "c84e2ca919313ec34374c2b7159b06374afe9a87",
+      "issueNumbers": [
+        2068
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol (continuation chain)",
+      "receiptRefs": [],
+      "mergeCommit": "8a2cbc1f34501e7b6137397877a7ed5b9a013102",
+      "mergedAt": "2026-10-31T14:49:10Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2068",
+      "note": "partial: in-repo published cold-consumer proof; EIS-Chat box pending Eric; issue reopened after auto-close"
     }
   ],
   "expensiveGates": [
@@ -1646,9 +1663,10 @@
       "id": "e2e-cli/scaffold.runtime",
       "state": "running",
       "prNumber": 2542,
-      "headSha": "e1c68e5e7a666ab2abc9d8ba728375ef6d8417b0",
+      "headSha": "99cda632399925cf2431a1ba391b50e53de23f55",
       "startedAt": "2026-10-31T14:40:48Z",
-      "via": "label e2e-cli-gate"
+      "via": "label e2e-cli-gate",
+      "note": "e1c68e5 run cancelled by fix push; re-running at 99cda63"
     }
   ],
   "canaryCheckpoints": [
@@ -1680,11 +1698,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:40:48Z",
-    "nextReportDueAt": "2026-10-31T15:40:48Z",
+    "lastReportAt": "2026-10-31T14:49:30Z",
+    "nextReportDueAt": "2026-10-31T15:49:30Z",
     "lastReportRef": "worklog.md",
-    "headline": "e2e on #2542; Eric asked about #1655 and #2185",
-    "currentMainSha": "45c7d58803dc2659f4a81e628729488f0b569bd9",
+    "headline": "merged #2541 (#2068 partial)",
+    "currentMainSha": "8a2cbc1f34501e7b6137397877a7ed5b9a013102",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1870,7 +1888,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:40:49Z",
+  "updatedAt": "2026-10-31T14:49:31Z",
   "dispatches": [
     {
       "issue": 2438,
