@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "id": "studio-workshop",
+  "language": "studio",
+  "flavor": "workshop",
+  "density": "comfortable",
+  "sourceDensity": "Chunky"
+}

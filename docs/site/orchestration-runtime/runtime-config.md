@@ -2,73 +2,44 @@
 layout: layouts/base.vto
 title: Runtime configuration
 templateEngine: [vento, md]
-prev: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }
-next: { label: "Capabilities", href: "/capabilities/" }
 order: 2
 ---
 
 # Runtime configuration
 
-NetScript splits configuration into two layers: a **typed project config** you author
-once in `netscript.config.ts` and load at startup (`@netscript/config`), and a
-**hot-reloadable runtime override layer** that operators roll out without redeploying
-(`@netscript/runtime-config`). Together they give you one validated, type-safe view of how
-the app is wired — defaults baked into the schema, values pulled from a config file and the
-environment, and last-mile operational overrides applied at runtime.
+This page explains NetScript's two configuration layers, shows how to load each one, and lists the
+types and functions you work with.
+
+NetScript splits configuration into a **typed project config** that you author once in
+`netscript.config.ts` and load at startup (`@netscript/config`), and a **hot-reloadable runtime
+override layer** that operators roll out without redeploying (`@netscript/runtime-config`).
+Defaults come from the schema, values from the config file and the environment, and last-mile
+operational overrides apply at runtime.
 
 {{ comp.diagram({ src: "/assets/diagrams/runtime-config-resolution.svg", alt: "Configuration resolution chain: schema defaults flow into the loaded config file, environment variables override typed values via resolveEnv, and hot-reloadable runtime override files apply last to produce a frozen resolved config.", caption: "Resolution chain — schema defaults → config file (defineConfig / loadConfig) → environment (resolveEnv / getEnv) → runtime override files (loadRuntimeConfig) → the validated config the framework reads." }) }}
 
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for <strong>project config</strong> (<code>@netscript/config</code>) when you need to
-declare <em>how the app is built and wired</em> — services, ports, databases, plugins,
-paths — once, with full TypeScript inference and Zod validation. Reach for
-<strong>runtime overrides</strong> (<code>@netscript/runtime-config</code>) when an
-<em>operator</em> needs to toggle a feature flag, disable a job/saga/trigger, or add a task
-<strong>without a redeploy</strong>. For one-off typed reads of a single environment
-variable, use <a href="/orchestration-runtime/runtime-config/"><code>getEnv</code></a>. See also
-<a href="/explanation/architecture/">architecture</a>.
-{{ /comp }}
+## Two layers
 
-## What it is
+| | Project config | Runtime overrides |
+| --- | --- | --- |
+| Package | `@netscript/config` | `@netscript/runtime-config` |
+| Source | `netscript.config.ts`, authored with `defineConfig` (or `defineConfigAsync` when the shape depends on mode or command) and validated against a Zod schema. Environment variables feed in through `resolveEnv` / `getEnv`, which coerce and default typed values per call. | Versioned JSON files (jobs, sagas, triggers, features, tasks) under a `runtime/` directory, selected by a `current` version pointer. |
+| Read with | `loadConfig` / `initConfig`, which resolve the file into a typed `NetScriptConfig` | `loadRuntimeConfig`, which returns a `RuntimeConfig` snapshot; `watchRuntimeConfig` reloads on change |
+| Changed by | You, as the static, schema-validated topology of the app | An operator, without a redeploy |
+| Use it for | Services, ports, databases, plugins and paths, with full TypeScript inference and Zod validation | Toggling a feature flag, disabling a job, saga or trigger, or adding a task |
+| When values are missing | Schema defaults fill omitted fields | Missing files produce empty defaults, so startup never blocks on overrides that aren't rolled out yet |
 
-Project config is the **static, schema-validated topology** of a NetScript app. You author
-it with `defineConfig` (or `defineConfigAsync` when the shape depends on mode/command),
-NetScript validates it against a Zod schema, and `loadConfig` / `initConfig` resolve the
-authored file into a fully typed `NetScriptConfig`. Environment variables feed into this
-layer through `resolveEnv` / `getEnv`, which coerce and default typed values per call.
-
-Runtime config is a **separate, dynamic override layer**. It lives under a `runtime/`
-directory of versioned JSON files (jobs, sagas, triggers, features, tasks) selected by a
-`current` version pointer. `loadRuntimeConfig` reads it into a `RuntimeConfig` snapshot;
-`watchRuntimeConfig` reloads on change. Missing files produce **empty defaults** so startup
-never blocks on overrides that have not been rolled out yet. The two packages are
-deliberately distinct: `@netscript/config` owns the build-time contract, and
-`@netscript/runtime-config` owns the hot-reloadable operational layer.
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Architecture",
-    body: "How project config, the workspace layout, and the plugin system fit together at startup.",
-    href: "/explanation/architecture/",
-    icon: "◎"
-  },
-  {
-    title: "Do — Choose a queue provider",
-    body: "A config-driven decision recipe: pick and wire a queue backend through project config.",
-    href: "/data-persistence/how-to/choose-a-queue-provider/",
-    icon: "◆"
-  }
-] }) }}
+`@netscript/config` owns the build-time contract and `@netscript/runtime-config` owns the
+hot-reloadable operational layer. For a one-off typed read of a single environment variable, use
+`getEnv`.
 
 ## Minimal example
 
-Author the project config once, then load and inspect it at startup. The `runtimeConfig`
-section of the project config controls where the **generated** runtime schema/output lives —
-`netscript generate runtime-schemas` derives those schemas from registered plugin metadata
-(see [CLI & scaffold](/orchestration-runtime/cli-scaffold/)); the live overrides are read
-separately by `@netscript/runtime-config`.
+Author the project config once, then load and inspect it at startup. The `runtimeConfig` section of
+the project config sets where the generated runtime schema output lives:
+`netscript generate runtime-schemas` derives those schemas from registered plugin metadata (see
+[CLI & scaffold](/orchestration-runtime/cli-scaffold/)). `@netscript/runtime-config` reads the live
+overrides separately.
 
 ```ts
 // netscript.config.ts
@@ -104,10 +75,10 @@ const rolloutOn = isFeatureEnabled(runtime, 'worker-rollout', false);
 console.log(config.name, config.services?.api?.port, rolloutOn);
 ```
 
-## Key types first
+## Key types
 
-The project config you author is `NetScriptConfigInput`; what `loadConfig` / `initConfig`
-return is the fully validated `NetScriptConfig`. These are the load-bearing fields.
+You author `NetScriptConfigInput`; `loadConfig` and `initConfig` return the fully validated
+`NetScriptConfig`. These are its load-bearing fields:
 
 {{ comp.apiTable({
   caption: "NetScriptConfig — the validated project config (returned by loadConfig / initConfig / getConfig)",
@@ -126,8 +97,8 @@ return is the fully validated `NetScriptConfig`. These are the load-bearing fiel
   ]
 }) }}
 
-The runtime override snapshot is a separate type — `RuntimeConfig` — returned by
-`loadRuntimeConfig()`. Each field is an array loaded from one topic directory.
+`loadRuntimeConfig()` returns the separate `RuntimeConfig` override snapshot. Each field is an
+array loaded from one topic directory:
 
 {{ comp.apiTable({
   caption: "RuntimeConfig — the hot-reloadable override snapshot (returned by loadRuntimeConfig)",
@@ -142,8 +113,7 @@ The runtime override snapshot is a separate type — `RuntimeConfig` — returne
 
 ## Resolution & precedence
 
-There is no single monolithic merge function — resolution happens across the two packages,
-each with its own precedence. The order below is the conceptual chain the diagram depicts.
+Each package resolves values with its own precedence. The diagram shows the conceptual chain:
 
 {{ comp.apiTable({
   caption: "How a value is resolved (lowest precedence first)",
@@ -155,39 +125,57 @@ each with its own precedence. The order below is the conceptual chain the diagra
   ]
 }) }}
 
+{{ comp callout { type: "warning", title: "No single merge function" } }}
+No function merges defaults, file, environment and runtime overrides into one object. <code>@netscript/config</code> validates and loads the project config, environment coercion is explicit through <code>resolveEnv</code> / <code>getEnv</code>, and <code>@netscript/runtime-config</code> is a separate layer your code reads with <code>loadRuntimeConfig</code> and applies per id. A runtime override file never changes your <code>NetScriptConfig</code> by itself; you read and apply the override explicitly.
+{{ /comp }}
+
+Typed environment reads look like this:
+
+```ts
+// src/env.ts
+import { getEnv, resolveEnv } from '@netscript/config';
+
+const port = getEnv('PORT', { type: 'number', default: 3000 }); // note: your scaffold's ports will differ
+
+const env = resolveEnv({
+  DATABASE_URL: { env: 'DB_URL', required: true },
+  DEBUG: { type: 'boolean', default: false },
+});
+```
+
 {{ comp.apiTable({
   caption: "@netscript/config — primary functions",
   rows: [
-    { name: "defineConfig(input)", type: "(NetScriptConfigInput) => NetScriptConfig", desc: "Type-safe, validated config definition for netscript.config.ts. The 80% path." },
-    { name: "defineConfigAsync(fn)", type: "((env: ConfigEnv) => …) => () => Promise<NetScriptConfig>", desc: "Async/env-aware config when the shape depends on { mode, command }." },
-    { name: "loadConfig(options?)", type: "(LoadConfigOptions?) => Promise<NetScriptConfig>", desc: "Find, import, and validate the config file. Options: { cwd?, configFile? }." },
-    { name: "initConfig(options?)", type: "(LoadConfigOptions?) => Promise<NetScriptConfig>", desc: "Load once and cache; call at startup. Then read synchronously via getConfig()." },
-    { name: "getConfig()", type: "() => NetScriptConfig", desc: "Synchronous access to the cached config; throws if initConfig() has not run." },
-    { name: "isConfigLoaded() / clearConfigCache()", type: "() => boolean / () => void", desc: "Inspect or reset the config cache (clearConfigCache is for tests/reload)." },
-    { name: "resolveEnv(schema) / getEnv(name, opts?)", type: "typed env readers", desc: "Coerce env vars (string|number|boolean|json) with defaults; getEnv reads one variable." },
-    { name: "getMode() / isDev() / isProd() / isTest() / hasEnv(name)", type: "env helpers", desc: "Current mode (DENO_ENV/NODE_ENV) and presence checks." },
-    { name: "discoverWorkspace(root?) / findWorkspaceRoot(dir) / findMember(ws, name)", type: "workspace", desc: "Classify and locate Deno workspace members." },
-    { name: "inspectConfig(target)", type: "(Partial<NetScriptConfig> | string) => InspectionReport", desc: "JSON-stable diagnostic report for CLI rendering." }
+    { kind: "function", name: "defineConfig(input)", type: "(NetScriptConfigInput) => NetScriptConfig", desc: "Type-safe, validated config definition for netscript.config.ts. The 80% path." },
+    { kind: "function", name: "defineConfigAsync(fn)", type: "((env: ConfigEnv) => …) => () => Promise<NetScriptConfig>", desc: "Async/env-aware config when the shape depends on { mode, command }." },
+    { kind: "function", name: "loadConfig(options?)", type: "(LoadConfigOptions?) => Promise<NetScriptConfig>", desc: "Find, import, and validate the config file. Options: { cwd?, configFile? }." },
+    { kind: "function", name: "initConfig(options?)", type: "(LoadConfigOptions?) => Promise<NetScriptConfig>", desc: "Load once and cache; call at startup. Then read synchronously via getConfig()." },
+    { kind: "function", name: "getConfig()", type: "() => NetScriptConfig", desc: "Synchronous access to the cached config; throws if initConfig() has not run." },
+    { kind: "function", name: "isConfigLoaded() / clearConfigCache()", type: "() => boolean / () => void", desc: "Inspect or reset the config cache. Use clearConfigCache() to force a reload between test cases." },
+    { kind: "function", name: "resolveEnv(schema) / getEnv(name, opts?)", type: "typed env readers", desc: "Coerce env vars (string|number|boolean|json) with defaults; getEnv reads one variable." },
+    { kind: "function", name: "getMode() / isDev() / isProd() / isTest() / hasEnv(name)", type: "env helpers", desc: "Current mode (DENO_ENV/NODE_ENV) and presence checks." },
+    { kind: "function", name: "discoverWorkspace(root?) / findWorkspaceRoot(dir) / findMember(ws, name)", type: "workspace", desc: "Classify and locate Deno workspace members." },
+    { kind: "function", name: "inspectConfig(target)", type: "(Partial<NetScriptConfig> | string) => InspectionReport", desc: "JSON-stable diagnostic report for CLI rendering." }
   ]
 }) }}
 
 {{ comp.apiTable({
   caption: "@netscript/runtime-config — primary functions",
   rows: [
-    { name: "loadRuntimeConfig()", type: "() => Promise<RuntimeConfig>", desc: "Load overrides from the runtime dir via the 'current' pointer; empty defaults when files are missing." },
-    { name: "watchRuntimeConfig(onChange, opts?)", type: "(cb, { signal?, prefix? }) => void", desc: "Watch the runtime config files and invoke onChange after debounced reloads." },
-    { name: "isFeatureEnabled(config, flagId, defaultValue)", type: "(RuntimeConfig, string, boolean) => boolean", desc: "Read a feature flag, falling back when the flag is absent." },
-    { name: "getJobOverride / getSagaOverride / getTriggerOverride", type: "(RuntimeConfig, id) => …Override | undefined", desc: "Look up a single override by id." },
-    { name: "getRuntimeTask(config, taskId)", type: "(RuntimeConfig, string) => RuntimeTask | undefined", desc: "Get a runtime task definition by id." },
-    { name: "summarizeRuntimeConfig(config, prefix?)", type: "(RuntimeConfig, string?) => RuntimeConfigSummary", desc: "Structured summary of active overrides (disabled jobs/sagas/triggers/features, message lines) for caller-owned presentation." },
-    { name: "RUNTIME_CONFIG_TOPICS", type: "('jobs'|'sagas'|'triggers'|'features'|'tasks')[]", desc: "The topic names backed by versioned JSON files." }
+    { kind: "function", name: "loadRuntimeConfig()", type: "() => Promise<RuntimeConfig>", desc: "Load overrides from the runtime dir via the 'current' pointer; empty defaults when files are missing." },
+    { kind: "function", name: "watchRuntimeConfig(onChange, opts?)", type: "(cb, { signal?, prefix? }) => void", desc: "Watch the runtime config files and invoke onChange after debounced reloads." },
+    { kind: "function", name: "isFeatureEnabled(config, flagId, defaultValue)", type: "(RuntimeConfig, string, boolean) => boolean", desc: "Read a feature flag, falling back when the flag is absent." },
+    { kind: "function", name: "getJobOverride / getSagaOverride / getTriggerOverride", type: "(RuntimeConfig, id) => …Override | undefined", desc: "Look up a single override by id." },
+    { kind: "function", name: "getRuntimeTask(config, taskId)", type: "(RuntimeConfig, string) => RuntimeTask | undefined", desc: "Get a runtime task definition by id." },
+    { kind: "function", name: "summarizeRuntimeConfig(config, prefix?)", type: "(RuntimeConfig, string?) => RuntimeConfigSummary", desc: "Structured summary of active overrides (disabled jobs/sagas/triggers/features, message lines) for caller-owned presentation." },
+    { kind: "const", name: "RUNTIME_CONFIG_TOPICS", type: "('jobs'|'sagas'|'triggers'|'features'|'tasks')[]", desc: "The topic names backed by versioned JSON files." }
   ]
 }) }}
 
 ## Runtime override layout
 
-The runtime override directory is resolved from the environment, then read through the
-`current` pointer that names the active version of each topic file.
+The runtime override directory is resolved from the environment, then read through the `current`
+pointer that names the active version of each topic file.
 
 {{ comp.fileTree({ tree: {
   name: "runtime",
@@ -202,85 +190,27 @@ The runtime override directory is resolved from the environment, then read throu
   ]
 } }) }}
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "Read a feature flag at startup",
-    lang: "ts",
-    code: "// src/feature-gate.ts\nimport { isFeatureEnabled, loadRuntimeConfig } from '@netscript/runtime-config';\n\nconst runtime = await loadRuntimeConfig();\n\n// Third arg is the fallback when the flag file/entry is absent.\nif (isFeatureEnabled(runtime, 'worker-rollout', false)) {\n  // run the gated path\n}"
-  },
-  {
-    label: "Hot-reload on change",
-    lang: "ts",
-    code: "// src/runtime-watch.ts\nimport { summarizeRuntimeConfig, watchRuntimeConfig } from '@netscript/runtime-config';\n\nconst controller = new AbortController();\n\nwatchRuntimeConfig(async (config) => {\n  const summary = summarizeRuntimeConfig(config);\n  // re-apply overrides; summary.messages is presentation-ready\n  console.log(summary.messages.join('\\n'));\n}, { signal: controller.signal });"
-  },
-  {
-    label: "Typed env reads",
-    lang: "ts",
-    code: "// src/env.ts\nimport { getEnv, resolveEnv } from '@netscript/config';\n\nconst port = getEnv('PORT', { type: 'number', default: 3000 }); // note: your scaffold's ports will differ\n\nconst env = resolveEnv({\n  DATABASE_URL: { env: 'DB_URL', required: true },\n  DEBUG: { type: 'boolean', default: false },\n});"
-  }
-] }) }}
-
-## Production notes
-
-{{ comp callout { type: "warning", title: "Two packages, two precedence rules — not one merge" } }}
-There is <strong>no single function</strong> that merges defaults, file, env, and runtime
-overrides into one object. <code>@netscript/config</code> validates and loads the
-<em>project</em> config; per-variable env coercion is explicit via <code>resolveEnv</code> /
-<code>getEnv</code>; and <code>@netscript/runtime-config</code> is a <em>separate</em>
-hot-reloadable layer your code reads with <code>loadRuntimeConfig</code> and applies per id.
-Don't expect a runtime override file to silently change your <code>NetScriptConfig</code> —
-you read and apply the override explicitly.
+{{ comp callout { type: "warning", title: "A wrong directory reads empty overrides" } }}
+A missing directory, pointer or topic file is not an error: <code>loadRuntimeConfig</code> returns empty defaults so startup proceeds while operators roll overrides out independently. Make sure your deployment sets <code>NETSCRIPT_RUNTIME_CONFIG_DIR</code> (or the working directory) you expect, or the process silently reads no overrides.
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Runtime dir resolution & missing files" } }}
-The runtime override directory is resolved as
-<code>NETSCRIPT_RUNTIME_CONFIG_DIR</code> → else the parent of
-<code>NETSCRIPT_TASKS_DIR</code> → else <code>./runtime</code>. A missing directory,
-pointer, or topic file is <strong>not an error</strong> — <code>loadRuntimeConfig</code>
-returns empty defaults so startup proceeds while operators roll overrides out
-independently. Make sure your deployment sets the env var (or the working directory) you
-expect, or you may silently read empty overrides.
-{{ /comp }}
+Read a flag at startup:
 
-{{ comp callout { type: "note", title: "getConfig() must follow initConfig()" } }}
-<code>getConfig()</code> returns the cached config and <strong>throws</strong> if
-<code>initConfig()</code> has not run. Call <code>initConfig()</code> once at startup, then
-read synchronously anywhere. In tests, use <code>clearConfigCache()</code> to force a
-reload between cases.
-{{ /comp }}
+```ts
+// src/feature-gate.ts
+import { isFeatureEnabled, loadRuntimeConfig } from '@netscript/runtime-config';
 
-## Reference →
+const runtime = await loadRuntimeConfig();
 
-This hub is intentionally thin — the full generated API surface for both packages lives in
-the reference.
+// Third arg is the fallback when the flag file/entry is absent.
+if (isFeatureEnabled(runtime, 'worker-rollout', false)) {
+  // run the gated path
+}
+```
 
-{{ comp.xref({ key: "ref:runtime-config" }) }}
+## Next steps
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — @netscript/runtime-config",
-    body: "loadRuntimeConfig, watchRuntimeConfig, the override types, and the topic helpers.",
-    href: "/reference/runtime-config/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — @netscript/config",
-    body: "defineConfig, loadConfig/initConfig, resolveEnv/getEnv, the NetScriptConfig schema, and workspace helpers.",
-    href: "/reference/config/",
-    icon: "≡"
-  },
-  {
-    title: "Understand — Architecture",
-    body: "Where project config, the workspace, and the plugin system sit in the framework.",
-    href: "/explanation/architecture/",
-    icon: "◎"
-  },
-  {
-    title: "Browse — Capabilities",
-    body: "All NetScript capabilities: services, jobs, sagas, triggers, database, and more.",
-    href: "/capabilities/",
-    icon: "◆"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }, next: { label: "Capabilities", href: "/capabilities/" } }) }}
+To publish, watch and roll back overrides in a running deployment, follow
+[Roll out runtime overrides](/orchestration-runtime/how-to/roll-out-runtime-overrides/). For every
+symbol, see the generated [`@netscript/config`](/reference/config/) and
+[`@netscript/runtime-config`](/reference/runtime-config/) references.

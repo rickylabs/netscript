@@ -1,0 +1,911 @@
+{
+  "collection": "Base accent",
+  "modes": [
+    "Ink",
+    "Blue",
+    "Violet",
+    "Orange",
+    "Indigo",
+    "Tomato",
+    "Lime"
+  ],
+  "variables": [
+    {
+      "name": "accent/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/1"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/1"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/1"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/1"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/1"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/1"
+        }
+      }
+    },
+    {
+      "name": "accent/d/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/ink-hover"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/10"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/10"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/10"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/10"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/10"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/10"
+        }
+      }
+    },
+    {
+      "name": "accent/d/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/11"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/11"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/11"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/11"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/11"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/11"
+        }
+      }
+    },
+    {
+      "name": "accent/d/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/12"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/12"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/12"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/12"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/12"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/12"
+        }
+      }
+    },
+    {
+      "name": "accent/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/2"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/2"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/2"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/2"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/2"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/2"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/2"
+        }
+      }
+    },
+    {
+      "name": "accent/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/3"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/3"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/3"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/3"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/3"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/3"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/3"
+        }
+      }
+    },
+    {
+      "name": "accent/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/4"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/4"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/4"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/4"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/4"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/4"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/4"
+        }
+      }
+    },
+    {
+      "name": "accent/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/5"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/5"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/5"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/5"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/5"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/5"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/5"
+        }
+      }
+    },
+    {
+      "name": "accent/d/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/6"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/6"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/6"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/6"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/6"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/6"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/6"
+        }
+      }
+    },
+    {
+      "name": "accent/d/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/7"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/7"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/7"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/7"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/7"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/7"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/7"
+        }
+      }
+    },
+    {
+      "name": "accent/d/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/8"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/8"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/8"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/8"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/8"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/8"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/8"
+        }
+      }
+    },
+    {
+      "name": "accent/d/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/9"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/9"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/9"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/9"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/9"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/9"
+        }
+      }
+    },
+    {
+      "name": "accent/d/contrast",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Blue": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Violet": {
+          "alias": "Primitives/color/white"
+        },
+        "Orange": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/white"
+        },
+        "Tomato": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/11"
+        }
+      }
+    },
+    {
+      "name": "accent/d/ring",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/10"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/11"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/11"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/11"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/11"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/11"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/9"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/5"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/d/9"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/9"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/d/9"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/9"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/9"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/3"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/12"
+        },
+        "Blue": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Violet": {
+          "alias": "Primitives/color/white"
+        },
+        "Orange": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/white"
+        },
+        "Tomato": {
+          "alias": "Theme set/gray/d/1"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/11"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-accent-solid-hover)",
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/d/6"
+        },
+        "Blue": {
+          "alias": "Base accent/accent/d/10"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/d/9-hover"
+        },
+        "Orange": {
+          "alias": "Base accent/accent/d/10"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/d/9-hover"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/d/10"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/d/4"
+        }
+      }
+    },
+    {
+      "name": "accent/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/1"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/1"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/1"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/1"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/1"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/1"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/1"
+        }
+      }
+    },
+    {
+      "name": "accent/l/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/ink-hover"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/10"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/10"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/10"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/10"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/10"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/10"
+        }
+      }
+    },
+    {
+      "name": "accent/l/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/11"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/11"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/11"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/11"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/11"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/11"
+        }
+      }
+    },
+    {
+      "name": "accent/l/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/12"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/12"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/12"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/12"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/12"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/12"
+        }
+      }
+    },
+    {
+      "name": "accent/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/2"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/2"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/2"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/2"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/2"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/2"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/2"
+        }
+      }
+    },
+    {
+      "name": "accent/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/3"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/3"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/3"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/3"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/3"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/3"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/3"
+        }
+      }
+    },
+    {
+      "name": "accent/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/4"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/4"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/4"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/4"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/4"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/4"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/4"
+        }
+      }
+    },
+    {
+      "name": "accent/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/5"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/5"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/5"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/5"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/5"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/5"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/5"
+        }
+      }
+    },
+    {
+      "name": "accent/l/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/6"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/6"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/6"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/6"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/6"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/6"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/6"
+        }
+      }
+    },
+    {
+      "name": "accent/l/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/7"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/7"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/7"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/7"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/7"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/7"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/7"
+        }
+      }
+    },
+    {
+      "name": "accent/l/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/8"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/8"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/8"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/8"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/8"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/8"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/8"
+        }
+      }
+    },
+    {
+      "name": "accent/l/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/9"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/9"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/9"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/9"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/9"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/9"
+        }
+      }
+    },
+    {
+      "name": "accent/l/contrast",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/1"
+        },
+        "Blue": {
+          "alias": "Primitives/color/white"
+        },
+        "Violet": {
+          "alias": "Primitives/color/white"
+        },
+        "Orange": {
+          "alias": "Primitives/color/white"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/white"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/white"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/12"
+        }
+      }
+    },
+    {
+      "name": "accent/l/solid",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/12"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/11"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/9"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/11"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/9"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/11"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/9"
+        }
+      }
+    },
+    {
+      "name": "accent/l/solid-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Ink": {
+          "alias": "Theme set/gray/l/ink-hover"
+        },
+        "Blue": {
+          "alias": "Primitives/color/blue/l/11-hover"
+        },
+        "Violet": {
+          "alias": "Primitives/color/violet/l/10"
+        },
+        "Orange": {
+          "alias": "Primitives/color/orange/l/11-hover"
+        },
+        "Indigo": {
+          "alias": "Primitives/color/indigo/l/10"
+        },
+        "Tomato": {
+          "alias": "Primitives/color/tomato/l/11-hover"
+        },
+        "Lime": {
+          "alias": "Primitives/color/lime/l/10"
+        }
+      }
+    }
+  ]
+}

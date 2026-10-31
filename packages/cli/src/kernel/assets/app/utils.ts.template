@@ -1,7 +1,11 @@
 import { createDefine } from 'fresh';
 import { definePage as createDefinePage } from '@netscript/fresh/builders';
 
-export type State = Record<string, never>;
+import type { AppTheme } from '@app/lib/theme.ts';
+
+export interface State {
+  themePreview?: AppTheme;
+}
 
 export const define = createDefine<State>();
 

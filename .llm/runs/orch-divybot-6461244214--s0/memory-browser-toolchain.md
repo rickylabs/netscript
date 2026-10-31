@@ -1,0 +1,5 @@
+# Browser toolchain memory
+
+Use a direct exact `playwright-core` dev dependency alongside `@playwright/test` to satisfy `@axe-core/playwright`’s broad peer without installing a newer, type-incompatible second core. This slice pins both to 1.63.0, whose Chromium is 153.0.8010.12, and axe-core to 4.11.4. Deno can type-check the Node browser toolchain with the structured check wrapper, `--cwd tools/fresh-ui-browser --root .`, and forwarded `--no-config --no-lock --node-modules-dir=manual`; Node types resolve from that cwd. Browser-evaluated code also needs DOM lib references. Use the named AxeBuilder export for Node/Deno type compatibility.
+
+The local environment lacks Chromium shared libraries and cannot install system packages interactively. Existing project-managed libraries can be used through LD_LIBRARY_PATH for npm-only browser runs. Do not leak that environment into narrow-permission Deno gate runners: Deno forbids subprocess spawning with inherited library-path overrides unless it has unrestricted run permission. CI installs system libraries with Playwright instead.

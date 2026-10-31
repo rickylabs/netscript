@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "sourceBytes": 284489,
+  "maxBytes": 294912,
+  "baselineBytes": 282886,
+  "documentCount": 14,
+  "designSystemTwins": 15,
+  "generatedAssetWrites": "temporary audit fixture only; published carriers unchanged"
+}

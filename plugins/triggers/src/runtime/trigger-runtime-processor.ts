@@ -41,7 +41,7 @@ import {
 import {
   type Context,
   contextWithSpan,
-  extractFromTraceContext,
+  resolveParentContextFromHeaders,
   withContextAsync,
 } from '@netscript/telemetry/context';
 import {
@@ -237,17 +237,16 @@ class TracedTriggerProcessor implements TriggerProcessorPort {
     event: TriggerEvent,
     definition: TDefinition,
   ): Promise<TriggerProcessResult> {
-    // Re-establish the inbound trace as the parent so ingress -> detect ->
-    // process share one trace, even though processing runs in a detached
-    // microtask after the 202 ack (the async context no longer carries the
-    // request span). The captured `traceparent`/`tracestate` are the durable
-    // link; without this the process span started a brand-new, orphaned trace.
-    const parentContext = event.traceparent
-      ? extractFromTraceContext({
-        traceparent: event.traceparent,
-        tracestate: event.tracestate,
-      })
-      : undefined;
+    // Each delivery follows its durable carrier, never the processor's lifetime.
+    // Without a valid carrier ingress starts a root; detect/process stay beneath it.
+    const parentContext = resolveParentContextFromHeaders(
+      event.traceparent
+        ? {
+          traceparent: event.traceparent,
+          ...(event.tracestate ? { tracestate: event.tracestate } : {}),
+        }
+        : undefined,
+    );
 
     const attributes = {
       [TriggerAttributes.TRIGGER_ID]: String(event.triggerId),

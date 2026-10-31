@@ -1,12 +1,16 @@
 ---
 layout: layouts/base.vto
-title: Recipes
+title: Observability recipes
+nav_title: Recipes
+description: Task-oriented recipes for telemetry, one problem each.
 templateEngine: [vento, md]
 order: 100
 ---
 
-# Observability — recipes
+# Observability recipes
 
-Task-oriented recipes for this area. Each one solves a single concrete problem and assumes you know
-the basics from the guides above it in the sidebar. The full cross-area catalog lives at
-[All how-to recipes]({{ "howto:index" |> xref |> url }}).
+Each recipe here solves one tracing or logging task. It assumes the guides above it in the sidebar.
+
+{{ for recipe of nav.menu(url, navQuery, navSort)?.children ?? [] -}}
+- [{{ recipe.data.title }}]({{ recipe.data.url }}){{ recipe.data.description ? ": " + recipe.data.description : "" }}
+{{ /for }}

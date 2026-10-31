@@ -5,33 +5,31 @@ title: '@netscript/database'
 
 # `@netscript/database`
 
-Database adapter contracts, Prisma driver helpers, tracing, and schema tooling for NetScript
-packages. This page is written against the package's public surface reported by `deno doc`. For the
-full index of packages and plugins return to the [reference overview](/reference/).
+Database adapter contracts, Prisma driver adapters, JSON extensions, tracing and schema tooling for
+NetScript. Use it to connect Prisma to PostgreSQL, SQL Server or MySQL, generate Zod schemas, run
+migrations, and persist command receipts and outbox rows.
 
-The root entrypoint (`@netscript/database`) re-exports the port contracts, the PostgreSQL adapter,
-the JSON extension helpers, and the OTEL instrumentation toggle. The remaining sub-path exports
-carry the per-driver adapters, the Prisma extensions, the schema/codegen scripts, the tracing
-surface, and the test contract harness:
+## Sub-path exports
 
-- [`@netscript/database/commands`](#command-persistence) — bound command transactions and logical
-  rows.
-- [`@netscript/database/ports`](#ports) — adapter contracts and shared types.
-- [`@netscript/database/adapters`](#adapters) — PostgreSQL adapter (default driver surface).
-- [`@netscript/database/adapters/postgres`](#postgresql-adapter) — PostgreSQL driver adapter.
-- [`@netscript/database/connection-strings/postgres`](#postgresql-connection-strings) —
-  dependency-free connection-string normalization.
-- [`@netscript/database/adapters/mssql`](#sql-server-adapter) — SQL Server driver adapter.
-- [`@netscript/database/adapters/mysql`](#mysql-adapter) — MySQL driver adapter.
-- [`@netscript/database/extensions`](#extensions) — Prisma JSON serialization extensions.
-- [`@netscript/database/scripts`](#scripts) — Prisma/Zod codegen and migration runners.
-- [`@netscript/database/tracing`](#tracing) — Prisma OpenTelemetry tracing helpers.
-- [`@netscript/database/testing`](#testing) — mock adapter and shared port contract tests.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/database` | `./mod.ts` | Root surface: [ports](#ports), PostgreSQL adapter, JSON helpers, instrumentation toggle ([root extras](#root-extras)). |
+| `@netscript/database/ports` | `./ports/mod.ts` | [Adapter contracts and shared types](#ports). |
+| `@netscript/database/adapters` | `./adapters/mod.ts` | [PostgreSQL adapter](#adapters) (default driver surface). |
+| `@netscript/database/adapters/postgres` | `./adapters/postgres.adapter.ts` | [PostgreSQL driver adapter](#postgresql-adapter). |
+| `@netscript/database/adapters/mssql` | `./adapters/mssql.adapter.ts` | [SQL Server driver adapter](#sql-server-adapter). |
+| `@netscript/database/adapters/mysql` | `./adapters/mysql.adapter.ts` | [MySQL driver adapter](#mysql-adapter). |
+| `@netscript/database/connection-strings/postgres` | `./connection-strings/postgres.ts` | [Dependency-free PostgreSQL connection-string normalization](#postgresql-connection-strings). |
+| `@netscript/database/extensions` | `./extensions/mod.ts` | [Prisma JSON serialization extensions](#extensions). |
+| `@netscript/database/scripts` | `./scripts/mod.ts` | [Prisma/Zod codegen and migration runners](#scripts). |
+| `@netscript/database/tracing` | `./prisma-tracing.ts` | [Prisma OpenTelemetry tracing helpers](#tracing). |
+| `@netscript/database/commands` | `./commands.ts` | [Bound command port and logical rows](#command-persistence). |
+| `@netscript/database/commands/postgres` | `./commands-postgres.ts` | [Callback-bound PostgreSQL command store](#postgresql-command-adapter). |
+| `@netscript/database/testing` | `./testing/mod.ts` | [Mock adapter and shared port contract tests](#testing). |
 
 ## Ports
 
-Exported from the root (`@netscript/database`) and from `@netscript/database/ports`. These are the
-provider-agnostic adapter contracts.
+Provider-agnostic adapter contracts, exported from the root and from `@netscript/database/ports`.
 
 | Symbol                      | Kind       | Signature                             | Description                                     |
 | --------------------------- | ---------- | ------------------------------------- | ----------------------------------------------- |
@@ -46,23 +44,22 @@ provider-agnostic adapter contracts.
 
 ## Root extras
 
-Additional symbols re-exported from the root entrypoint (`@netscript/database`) beyond the port
-contracts and the PostgreSQL adapter.
+Root-only symbols beyond the port contracts and the PostgreSQL adapter.
 
-| Symbol                          | Kind     | Signature                                                | Description                                                                                                                          |
-| ------------------------------- | -------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `enableInstrumentation`         | function | `function enableInstrumentation(): boolean`              | Enable Prisma OTEL instrumentation for database tracing. Call before creating any Prisma clients; only active when `OTEL_DENO=true`. |
-| `withTransaction`               | function | `function withTransaction(client, fn, options): Promise` | Execute operations within a transaction.                                                                                             |
-| `parseConnectionString`         | function | `function parseConnectionString(connectionString)`       | Parse a database connection string.                                                                                                  |
-| `buildPostgresConnectionString` | function | `function buildPostgresConnectionString(parts): string`  | Build a PostgreSQL connection string from parts.                                                                                     |
-| `buildMssqlConnectionString`    | function | `function buildMssqlConnectionString(parts): string`     | Build a SQL Server connection string from parts.                                                                                     |
-| `jsonUtils`                     | variable | `const jsonUtils`                                        | JSON serialization utilities for manual use.                                                                                         |
-| `registerJsonFields`            | function | `function registerJsonFields(model, fields): void`       | Register additional JSON fields for a model at runtime.                                                                              |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `enableInstrumentation` | function | `function enableInstrumentation(): boolean` | Enable Prisma OTEL instrumentation for database tracing. Call before creating any Prisma clients; only active when `OTEL_DENO=true`. |
+| `withTransaction` | function | `function withTransaction(client, fn, options): Promise` | Execute operations within a transaction. |
+| `parseConnectionString` | function | `function parseConnectionString(connectionString)` | Parse a database connection string. |
+| `buildPostgresConnectionString` | function | `function buildPostgresConnectionString(parts): string` | Build a PostgreSQL connection string from parts. |
+| `buildMssqlConnectionString` | function | `function buildMssqlConnectionString(parts): string` | Build a SQL Server connection string from parts. |
+| `jsonUtils` | const | `const jsonUtils` | JSON serialization utilities for manual use. |
+| `registerJsonFields` | function | `function registerJsonFields(model, fields): void` | Register additional JSON fields for a model at runtime. |
 
 ## Adapters
 
-Exported from `@netscript/database/adapters` (and re-exported from the root). This is the default
-PostgreSQL driver surface.
+The default PostgreSQL driver surface, exported from `@netscript/database/adapters` and re-exported
+from the root.
 
 | Symbol                      | Kind      | Signature                                                  | Description                             |
 | --------------------------- | --------- | ---------------------------------------------------------- | --------------------------------------- |
@@ -128,27 +125,27 @@ Exported from `@netscript/database/adapters/mysql`.
 
 ## Extensions
 
-Exported from `@netscript/database/extensions`. Prisma extensions that automatically handle JSON
-serialization across SQL databases.
+Exported from `@netscript/database/extensions`. Prisma extensions that handle JSON serialization
+across SQL databases.
 
-| Symbol                    | Kind       | Signature                                                  | Description                                                              |
-| ------------------------- | ---------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `sqlJsonExtension`        | function   | `function sqlJsonExtension(Prisma, options): ReturnType`   | Create a Prisma extension that automatically handles JSON serialization. |
-| `mysqlJsonExtension`      | function   | `function mysqlJsonExtension(Prisma, options): ReturnType` | Create a Prisma extension for MySQL JSON serialization.                  |
-| `registerJsonFields`      | function   | `function registerJsonFields(model, fields): void`         | Register additional JSON fields for a model at runtime.                  |
-| `jsonUtils`               | variable   | `const jsonUtils`                                          | JSON serialization utilities for manual use.                             |
-| `SqlJsonExtensionOptions` | interface  | `interface SqlJsonExtensionOptions`                        | Options for creating the SQL JSON extension.                             |
-| `PrismaExtensionConfig`   | interface  | `interface PrismaExtensionConfig`                          | Prisma extension configuration generated by SQL JSON helpers.            |
-| `PrismaQueryContext`      | interface  | `interface PrismaQueryContext`                             | Query context passed by Prisma to extension handlers.                    |
-| `JsonField`               | type alias | `type JsonField`                                           | JSON field values.                                                       |
-| `JsonFieldConfig`         | type alias | `type JsonFieldConfig`                                     | Configuration for JSON fields per model.                                 |
-| `PrismaQueryHandler`      | type alias | `type PrismaQueryHandler`                                  | Query handler used by Prisma extension configuration.                    |
-| `SqlDatabaseType`         | type alias | `type SqlDatabaseType`                                     | Supported database types for JSON handling.                              |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `sqlJsonExtension` | function | `function sqlJsonExtension(Prisma, options): ReturnType` | Create a Prisma extension that automatically handles JSON serialization. |
+| `mysqlJsonExtension` | function | `function mysqlJsonExtension(Prisma, options): ReturnType` | Create a Prisma extension for MySQL JSON serialization. |
+| `registerJsonFields` | function | `function registerJsonFields(model, fields): void` | Register additional JSON fields for a model at runtime. |
+| `jsonUtils` | const | `const jsonUtils` | JSON serialization utilities for manual use. |
+| `SqlJsonExtensionOptions` | interface | `interface SqlJsonExtensionOptions` | Options for creating the SQL JSON extension. |
+| `PrismaExtensionConfig` | interface | `interface PrismaExtensionConfig` | Prisma extension configuration generated by SQL JSON helpers. |
+| `PrismaQueryContext` | interface | `interface PrismaQueryContext` | Query context passed by Prisma to extension handlers. |
+| `JsonField` | type alias | `type JsonField` | JSON field values. |
+| `JsonFieldConfig` | type alias | `type JsonFieldConfig` | Configuration for JSON fields per model. |
+| `PrismaQueryHandler` | type alias | `type PrismaQueryHandler` | Query handler used by Prisma extension configuration. |
+| `SqlDatabaseType` | type alias | `type SqlDatabaseType` | Supported database types for JSON handling. |
 
 ## Scripts
 
-Exported from `@netscript/database/scripts`. Codegen and migration runners (each ships a `*Cli`
-runner for command-line use).
+Exported from `@netscript/database/scripts`. Each codegen and migration runner has a `*Cli` variant
+for command-line use.
 
 | Symbol                     | Kind      | Signature                                                             | Description                                                             |
 | -------------------------- | --------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -186,8 +183,8 @@ span/tracer shapes they consume.
 
 ## Testing
 
-Exported from `@netscript/database/testing`. A mock adapter and the shared port contract test suite,
-plus the port types they reference.
+Exported from `@netscript/database/testing`. A mock adapter, the shared port contract test suite,
+and the port types they reference.
 
 | Symbol                           | Kind       | Signature                                                          | Description                                                  |
 | -------------------------------- | ---------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -199,45 +196,18 @@ plus the port types they reference.
 | `DatabaseConnectionStatus`       | interface  | `interface DatabaseConnectionStatus`                               | Database connection status (re-exported from ports).         |
 | `DatabaseProvider`               | type alias | `type DatabaseProvider`                                            | Database provider types (re-exported from ports).            |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. Their symbols are documented in
-the sections above.
-
-| Export                                  | Entrypoint                       | Purpose                                                                        |
-| --------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------ |
-| `@netscript/database`                   | `./mod.ts`                       | Root surface: ports, PostgreSQL adapter, JSON helpers, instrumentation toggle. |
-| `@netscript/database/ports`             | `./ports/mod.ts`                 | Adapter contracts and shared types.                                            |
-| `@netscript/database/adapters`          | `./adapters/mod.ts`              | PostgreSQL adapter (default driver surface).                                   |
-| `@netscript/database/adapters/postgres` | `./adapters/postgres.adapter.ts` | PostgreSQL driver adapter.                                                     |
-| `@netscript/database/adapters/mssql`    | `./adapters/mssql.adapter.ts`    | SQL Server driver adapter.                                                     |
-| `@netscript/database/adapters/mysql`    | `./adapters/mysql.adapter.ts`    | MySQL driver adapter.                                                          |
-| `@netscript/database/extensions`        | `./extensions/mod.ts`            | Prisma JSON serialization extensions.                                          |
-| `@netscript/database/scripts`           | `./scripts/mod.ts`               | Prisma/Zod codegen and migration runners.                                      |
-| `@netscript/database/tracing`           | `./prisma-tracing.ts`            | Prisma OpenTelemetry tracing helpers.                                          |
-| `@netscript/database/commands/postgres` | `./commands-postgres.ts`         | Callback-bound PostgreSQL command store.                                       |
-| `@netscript/database/commands`          | `./commands.ts`                  | Bound command port and logical rows.                                           |
-| `@netscript/database/testing`           | `./testing/mod.ts`               | Mock adapter and shared port contract tests.                                   |
-
-Connection-string utility:
-
-| Export                                            | Entrypoint                         | Purpose                                   |
-| ------------------------------------------------- | ---------------------------------- | ----------------------------------------- |
-| `@netscript/database/connection-strings/postgres` | `./connection-strings/postgres.ts` | Dependency-free PostgreSQL normalization. |
-
----
-
-Back to the [reference overview](/reference/).
-
 ## Command persistence
 
 `@netscript/database/commands` exports `createCommandStoreCapabilities`, `CommandStoreCapabilities`,
 `CommandTransactionRequest`, `CommandStorePort`, `CommandTransaction`, `ReceiptClaim`,
 `ReceiptClaimResult`, `ReceiptCompletion`, `StoredCommandReceipt`, `CommandReceiptRow`,
-`StoredCommandAudit` and `StoredCommandOutbox`. The raw port has no service dependency. All
-side-record methods share the provider callback's business handle. The provider must construct that
-binding and invoke work at most once; capability metadata alone does not certify atomicity. Busy is
-terminal until rollback.
+`StoredCommandAudit` and `StoredCommandOutbox`.
+
+- The raw port has no service dependency.
+- All side-record methods share the provider callback's business handle. The provider must
+  construct that binding and invoke work at most once.
+- Capability metadata alone does not certify atomicity.
+- Busy is terminal until rollback.
 
 `CommandStoreError` is the exported raw provider failure class, with `CommandStoreFailure` carrying
 bounded store phase/retryability, cancellation or receipt corruption. It has no dependency on
@@ -252,9 +222,8 @@ preserves this callback type independently of the root type without a root-clien
 `@netscript/database/commands/postgres` exports `createPostgresCommandStore`,
 `PostgresCommandStoreOptions` and `PostgresCommandClient`. Supply the consumer's generated callback
 bridge and a finite `transactionTimeoutMs`. The consumer owns Prisma models, generated client,
-migrations and connections. The reviewed fixture in
-`packages/database/tests/fixtures/command-store/` provides the schema, SQL checks/indexes and
-explicit bridge; CLI generation remains RFC stage 8. The bridge excludes and hides nested
+migrations and connections. The fixture in `packages/database/tests/fixtures/command-store/`
+provides the schema, SQL checks/indexes and explicit bridge. The bridge excludes and hides nested
 transaction and root lifecycle methods.
 
 Every claim, completion, audit and outbox insert uses that same callback. Receipt claims use
@@ -265,10 +234,7 @@ before commit. Serialization/deadlock failures are retryable without callback re
 cancellation checks framework boundaries and the finite provider timeout bounds in-flight work. Raw
 diagnostics stay in the trusted cause.
 
-The isolated native provider command is `bash .llm/tools/command-postgres-conformance.sh`. Its
-dedicated CI workflow runs Deno 2.9.7 and exercises the real generated-client lock/fault matrix. A
-skipped provider suite is not provider conformance evidence. Package import/construction runs no DDL
-and has no queue dependency.
+Package import and construction run no DDL and have no queue dependency.
 
 ### Command outbox relay
 
@@ -276,7 +242,7 @@ The raw `CommandOutboxRelayStore` contains no decoded payload, service, worker o
 `createPostgresCommandOutboxRelayStore` uses the consumer-owned migration and true transaction
 callback. It claims due unpublished/nonterminal rows with bounded SKIP LOCKED leases; publication
 and release fence the live token and expiry. Publication and normalized acceptance identity/time
-share one CAS write. The consumer must apply the reviewed incremental acceptance migration;
+share one CAS write. The consumer must apply the incremental acceptance migration;
 framework code never runs DDL. Retry/terminal rows retain stable IDs. Sink acceptance precedes
 settlement, so crashes redeliver and downstream operations must remain idempotent.
 
@@ -296,7 +262,7 @@ settlement, so crashes redeliver and downstream operations must remain idempoten
 
 | Symbol                        | Kind      | Description                                                                                           |
 | ----------------------------- | --------- | ----------------------------------------------------------------------------------------------------- |
-| `bindPostgresCommandOutbox`   | function  | Binds the existing reviewed outbox append SQL to a live callback client without a nested transaction. |
+| `bindPostgresCommandOutbox`   | function  | Binds the outbox append SQL to a live callback client without a nested transaction. |
 | `PostgresCommandOutboxWriter` | interface | Detached outbox-only append boundary.                                                                 |
 
 Atomic producers such as the saga transition store bind this writer inside their existing physical

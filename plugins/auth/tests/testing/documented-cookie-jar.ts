@@ -86,7 +86,7 @@ export async function proveDocumentedCookieJar(recipe: string): Promise<void> {
     let sessionCookie = '';
     for (const [index, command] of steps.entries()) {
       const script = command.replace('curl ', 'curl --silent --show-error --max-time 10 ')
-        .replaceAll('http://localhost:8094', origin)
+        .replaceAll('$AUTH_URL', origin)
         .replace('PROVIDER_CODE', code).replace('PROVIDER_STATE', state);
       const result = await new Deno.Command('sh', {
         args: ['-c', script],
@@ -166,17 +166,18 @@ export async function proveDocumentedCookieJar(recipe: string): Promise<void> {
 
 /** Verify the tutorial uses the same HTTP cookie policy and cookie-only session reads. */
 export function verifyCookieJarTutorial(recipe: string, tutorial: string): void {
-  assert(
-    tutorial.includes('export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true'),
-    'Tutorial must enable HTTP cookie issuance, not only insecure OAuth requests.',
-  );
-  assertStringIncludes(tutorial, 'export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev');
-  const sessionCommands = tutorial.split('\n').filter((line) =>
+  assertStringIncludes(tutorial, '/auth/signin');
+  assertStringIncludes(tutorial, '/auth/session');
+  assertStringIncludes(tutorial, '/auth/callback');
+  assertStringIncludes(tutorial, 'createBrowserSessionClient');
+  assertStringIncludes(tutorial, 'browserSessionContext');
+  // The tutorial uses the generated BFF. The how-to still proves raw cookie transport.
+  const sessionCommands = recipe.split('\n').filter((line) =>
     line.startsWith('curl ') && /\/auth\/(session|me)/.test(line) && line.includes('cookies.txt')
   );
   assertEquals(sessionCommands.length, 2);
   for (const command of sessionCommands) {
-    assertStringIncludes(recipe, command);
+    assertStringIncludes(command, '$AUTH_URL');
     assert(!/sessionId|[?]| -d |[Aa]uthorization/.test(command));
   }
 }

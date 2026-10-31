@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "theme": "tonal",
+  "toc": [
+    "Light and dark",
+    "Theme values",
+    "Values: Colors",
+    "Values: Typography",
+    "Values: Radii",
+    "Values: Spacing",
+    "Values: Component recipes",
+    "Overview",
+    "Colors",
+    "Typography",
+    "Layout",
+    "Elevation & Depth",
+    "Shapes",
+    "Components",
+    "Do's and Don'ts",
+    "Iconography & Imagery",
+    "Motion & States",
+    "Accessibility",
+    "NetScript Mapping",
+    "Sources"
+  ],
+  "linkedStylesheet": true,
+  "galleryImages": 68,
+  "thumbnailMaxWidth": 480,
+  "responsiveWidths": [
+    390,
+    1440
+  ],
+  "errors": []
+}

@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Customize Fresh UI
+description: Edit a route, add an island, restyle a component, install more UI primitives, and re-theme the scaffolded app.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/customize-fresh-ui/
@@ -8,49 +9,33 @@ oldUrl: /how-to/customize-fresh-ui/
 
 # Customize Fresh UI
 
-**Goal:** make the scaffolded frontend yours — edit a route, add an interactive
-island, restyle a component, install more UI primitives, and re-theme the app —
-without fighting the framework. NetScript scaffolds a real
-[Fresh](https://fresh.deno.dev) 2 application at `apps/dashboard/`, powered by the
-[`@netscript/fresh`](/reference/fresh/) meta-framework, and the UI components live
-in *your* repository as copied source. After the copy, that code is yours to change.
+This recipe makes the scaffolded frontend yours: edit a route, add an island, restyle components,
+install more UI from the registry, and re-theme the app. NetScript scaffolds a
+[Fresh](https://fresh.deno.dev) 2 application at `apps/dashboard/`, built on the
+[`@netscript/fresh`](/reference/fresh/) meta-framework, and its UI components live in your
+repository as copied source. [Fresh UI & design](/web-layer/fresh-ui/) explains that model.
 
-This is a task-oriented recipe. It assumes you already have a NetScript workspace
-(created with `netscript init`) whose `apps/dashboard/` app type-checks and runs.
-For the full generated API of the building blocks, follow the reference links at
-the end — this page never duplicates the [reference](/reference/fresh-ui/).
-
-{{ comp callout { type: "note", title: "The ownership model in one sentence" } }}
-The Fresh runtime (<code>@netscript/fresh</code>) and the UI registry
-(<code>@netscript/fresh-ui</code>) are framework packages, but every component you
-render is <strong>copied into <code>apps/dashboard/components/ui/</code></strong> by
-<code>netscript ui:init</code> / <code>ui:add</code> — so editing the UI is editing
-your own files, not patching a dependency.
-{{ /comp }}
-
-## Before you start
+## Prerequisites
 
 You need:
 
-- An existing NetScript workspace with the scaffolded `apps/dashboard/` Fresh app.
-  If you do not have one yet, create it first (`netscript init`) — see the
-  [Quickstart](/quickstart/) or the [Storefront tutorial](/tutorials/storefront/).
+- A NetScript workspace with the scaffolded `apps/dashboard/` Fresh app. To create one, run
+  `netscript init` as shown in the [Quickstart](/quickstart/) or the
+  [Storefront tutorial](/tutorials/storefront/).
 - The `netscript` command on your path. Run `netscript --help` to confirm, and
-  `netscript ui:init --help` / `netscript ui:add --help` for the exact option
-  spelling in your installed version. If `netscript` is not found, install it with
+  `netscript ui:init --help` / `netscript ui:add --help` for the exact option spelling in your
+  installed version. If `netscript` is not found, install it with
   `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}`.
 
-Run the app while you work so you can see each change live. Aspire is step 2 of the
-normal startup flow — it brings up your database (Postgres is the recommended engine; or `mysql` /
-`mssql` / `sqlite` chosen at scaffold time via `--db`) and Redis before any
-`netscript db` command and orchestrates the dashboard for you. You can also run the Fresh app on
-its own when you only need the UI loop:
+Run the app while you work so you see each change. Aspire starts your database (the engine chosen
+with `--db` at scaffold time), Redis, and the dashboard. The Fresh app on its own is enough for the
+UI loop:
 
 {{ comp.tabbedCode({ tabs: [
   {
     label: "Under Aspire (recommended)",
     lang: "bash",
-    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at https://localhost:18888\ncd aspire && aspire start"
+    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at the URL Aspire prints\ncd aspire && aspire start"
   },
   {
     label: "Fresh app only",
@@ -60,79 +45,38 @@ its own when you only need the UI loop:
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Start at /design" } }}
-Before changing anything, open the scaffolded <code>/design</code>
-showcase in the running app. It renders the live component gallery
-(<code>/design/components</code>), the token reference (<code>/design/tokens</code>),
-and composition rules (<code>/design/composition</code>) against the active theme —
-all from the app-owned copies, so it is the fastest way to feel what you already have.
+Open the scaffolded <code>/design</code> showcase in the running app before you change anything. It
+renders the component gallery (<code>/design/components</code>), the token reference
+(<code>/design/tokens</code>), and the composition rules (<code>/design/composition</code>) from your
+app's own copies, against the active theme.
 {{ /comp }}
 
 ## Where the app lives
 
-Everything for the frontend is under `apps/dashboard/`. The layout follows Fresh 2
-file-system routing, with NetScript conventions layered on top:
+Everything for the frontend is under `apps/dashboard/`, laid out by Fresh 2 file-system routing.
+[The scaffolded app](/web-layer/fresh-ui/#the-scaffolded-app-appsdashboard) maps each path. Import
+UI from your own `@app/components/ui/mod.ts` barrel, not from the `@netscript/fresh-ui` registry
+package; import the runtime from `@netscript/fresh` directly.
 
-{{ comp.apiTable({
-  caption: "apps/dashboard/ — what each path owns",
-  rows: [
-    { name: "main.ts", type: "app entry", desc: "Bootstraps the Fresh app with defineFreshApp from @netscript/fresh/server. Reads PORT and prints the startup banner you see in aspire start logs." },
-    { name: "routes/", type: "pages + layouts", desc: "File-system routes. index.tsx, dashboard.tsx, health.tsx, examples/, plus _app.tsx (HTML shell) and _layout.tsx (chrome). Groups like (_components)/, (_shared)/, and (_islands)/ are non-routing co-location folders." },
-    { name: "islands/", type: "client interactivity", desc: "Hydrated Preact components (ThemeToggle, SidebarToggle, Toast). Everything else renders on the server only." },
-    { name: "components/ui/", type: "app-owned UI", desc: "The copied @netscript/fresh-ui primitives — Button, Card, Badge, PageHeader, StatsGrid, and friends. Edit these freely; they are yours after the copy. Barrel at components/ui/mod.ts." },
-    { name: "assets/", type: "styling + tokens", desc: "tokens.css / tokens.json (the --ns-* design tokens), styles.css, design.css, and per-component CSS under assets/ui/. Tailwind v4 is wired through Vite." },
-    { name: "lib/", type: "app helpers", desc: "cn.ts (class merge), example-service.ts, public-types.ts — non-UI utilities the routes import." },
-    { name: "router.ts / utils.ts", type: "typed wiring", desc: "router.ts exposes typed route references (appRoutes); utils.ts exports the createDefine<State>() define helper and the definePage() builder." },
-    { name: "vite.config.ts / deno.json", type: "build + deps", desc: "Vite + Fresh + Tailwind plugins and the @app/* aliases; deno.json pins fresh, preact, @preact/signals, tailwindcss, and the @netscript/fresh* imports." }
-  ]
-}) }}
+The app entry is one `defineFreshApp` call, which keeps the static-file and file-system-route
+bootstrap framework-managed:
 
-The app entry is one call — `defineFreshApp` keeps the static-file and
-filesystem-route bootstrap framework-managed, so you only author routes, islands,
-and components:
+{{ comp.codeBlock({ filename: "apps/dashboard/main.ts", lang: "ts", code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire start` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010'); // note: your scaffold's port will differ\nconsole.log(`[dashboard] listening on http://localhost:${port}`);" }) }}
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "apps/dashboard/main.ts",
-    lang: "ts",
-    code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire start` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010'); // note: your scaffold's port will differ\nconsole.log(`[dashboard] listening on http://localhost:${port}`);"
-  }
-] }) }}
-
-Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
-of truth is your `netscript.config.ts` `apps.<name>.port` field, which the scaffold wires as the
-fallback default — set the port there rather than editing this line.
-
-{{ comp callout { type: "note", title: "Two import roots, two jobs" } }}
-<code>@netscript/fresh</code> is the <strong>runtime meta-framework</strong>: it
-ships the app bootstrap (<code>/server</code>), route and page builders, and a typed
-data layer (<code>/query</code>), alongside <code>/builders</code>,
-<code>/route</code>, <code>/form</code>, <code>/defer</code>, and
-<code>/interactive</code> subpaths. <code>@netscript/fresh-ui</code> is the
-<strong>component registry</strong> the CLI copies from. You import the runtime
-directly; you import UI from your own <code>@app/components/ui/mod.ts</code> barrel,
-not from the registry package.
-{{ /comp }}
-
-{{ comp callout { type: "note", title: "Meta-framework vs scaffolded app" } }}
-Keep two ideas distinct: <code>@netscript/fresh</code> is the reusable
-<strong>meta-framework</strong> (server/islands/query primitives that any Fresh app
-can import), while <code>apps/dashboard/</code> is <strong>your scaffolded
-instance</strong> of it. The concept hub on <a href="/capabilities/fresh-ui/">Fresh UI</a>
-explains how the two relate and where each layer's responsibilities begin and end.
-{{ /comp }}
+Aspire injects `PORT` at runtime. The typed source of truth is the `apps.<name>.port` field in
+`netscript.config.ts`, which the scaffold wires as the fallback default. Set the port there rather
+than editing this line.
 
 ## Edit a route
 
-Create a typed page first with `netscript ui:add page status --route status --island`, then
-customize its generated view. This writes `routes/status/index.tsx` with `definePage()`; `--island`
-also creates colocated `(_islands)/` and `(_shared)/query-loaders.ts` seams. The Vite route
-generator discovers it on the next build.
+Create a typed page with `netscript ui:add page status --route status --island`. It writes
+`routes/status/index.tsx` with `definePage()`; `--island` also creates colocated `(_islands)/` and
+`(_shared)/query-loaders.ts` seams. The Vite route generator picks the page up on the next build.
 
-Routes are plain `.tsx` files under `routes/`. The scaffold uses the `definePage()`
-builder (from `@app/utils.ts`) so a page declares its route, metadata, and the view
-it renders in one typed chain. To change the home page, edit
-`routes/(_components)/home-view.tsx` (the presentational view) and/or
-`routes/index.tsx` (the page declaration and its data):
+Routes are `.tsx` files under `routes/`. A page uses the `definePage()` builder from `@app/utils.ts`
+to declare its route, metadata, and view in one typed chain. To change the home page, edit
+`routes/(_components)/home-view.tsx` (the view) or `routes/index.tsx` (the page declaration and its
+data):
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -147,38 +91,35 @@ it renders in one typed chain. To change the home page, edit
   }
 ] }) }}
 
-The HTML shell (`<html>`, `<head>`, fonts, the theme-seed script) is
-`routes/_app.tsx`; the top bar / navigation chrome wrapping content pages is
-`routes/_layout.tsx`. Both use the `define.page(...)` / `define.layout(...)` helpers
-from `createDefine<State>()`. Edit those to change the global frame rather than
-repeating markup per page.
+The HTML shell (`<html>`, `<head>`, fonts, the theme-seed script) is `routes/_app.tsx`. The top bar
+and navigation around content pages is `routes/_layout.tsx`. Both use the `define.page(...)` /
+`define.layout(...)` helpers from `createDefine<State>()`. Edit them to change the global frame
+instead of repeating markup per page.
 
 {{ comp callout { type: "tip", title: "Co-location folders don't become URLs" } }}
-Folders wrapped in parentheses — <code>(_components)</code>,
-<code>(_shared)</code>, <code>(_islands)</code>, <code>(design)</code> — are Fresh
-<strong>route groups</strong>: they organize files next to the route that uses them
-without adding a path segment. Keep a page's view, loader, and demo islands beside
-the route file and the URL stays clean.
+Folders in parentheses, such as <code>(_components)</code>, <code>(_shared)</code>,
+<code>(_islands)</code> and <code>(design)</code>, are Fresh <strong>route groups</strong>. They keep
+a page's view, loader, and islands beside the route file without adding a path segment.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Add typed route references in router.ts" } }}
-When you add a permanent page, register it in <code>apps/dashboard/router.ts</code>
-so <code>appRoutes</code> exposes a typed <code>.href()</code> for it. The CLI registers a string-literal pattern in <code>appRoutes</code>; moving a
-route directory does not update that pattern. Reconcile <code>router.ts</code>
-and its consumers using the <a href="/web-layer/route/#renaming-or-moving-a-route">rename/move checklist</a>.
+Register a permanent page in <code>apps/dashboard/router.ts</code> so <code>appRoutes</code> exposes a
+typed <code>.href()</code> for it. The CLI registers a string-literal pattern in
+<code>appRoutes</code>, and moving a route directory does not update that pattern. Reconcile
+<code>router.ts</code> and its consumers with the
+<a href="/web-layer/route/#renaming-or-moving-a-route">rename/move checklist</a>.
 {{ /comp }}
 
 ## Add interactivity with an island
 
-Generate a standalone signals island with `netscript ui:add island Counter`. Add `--query` for a
-`QueryIsland` provider wired to `@netscript/fresh/query`, then import the generated island from the
-route where it should hydrate.
+Generate a signals island with `netscript ui:add island Counter`. Add `--query` for a `QueryIsland`
+provider wired to `@netscript/fresh/query`, then import the island from the route where it should
+hydrate.
 
-Server-rendered routes ship zero client JavaScript. When you need state in the
-browser — a toggle, a form, a live panel — add an **island** under `islands/`.
-Islands are the only components Fresh hydrates on the client. The scaffold ships
-`ThemeToggle`, `SidebarToggle`, and `Toast` under `islands/ui/` as working
-examples; model new ones on them using Preact signals:
+Server-rendered routes ship no client JavaScript. When you need browser state (a toggle, a form, a
+live panel), add an island under `islands/`: islands are the only components Fresh hydrates on the
+client. The scaffold's `ThemeToggle`, `SidebarToggle`, and `Toast` under `islands/ui/` are working
+examples that use Preact signals:
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -193,69 +134,86 @@ examples; model new ones on them using Preact signals:
   }
 ] }) }}
 
-A few rules keep islands cheap and correct: keep them small and leaf-shaped; pass
-plain serializable props in (the island boundary is the hydration boundary); and
-declare interactive event handlers with arrow functions, as in the scaffolded
-`ThemeToggle`. Anything that does not need browser state should stay a plain
-component in `components/` so it ships no JS.
+Keep islands small and leaf-shaped. Pass plain serializable props, because the island boundary is
+the hydration boundary. Declare event handlers with arrow functions, as the scaffolded `ThemeToggle`
+does. A component that needs no browser state stays in `components/` and ships no JavaScript.
 
-{{ comp callout { type: "note", title: "Fetch typed data with @netscript/fresh/query" } }}
-When an island or route needs server data, prefer the runtime's typed query layer
-(<code>@netscript/fresh/query</code>) over hand-rolled <code>fetch</code> calls — it
-carries the oRPC contract types through to the client so a renamed service field
-surfaces as a type error. See <a href="/reference/fresh/"><code>@netscript/fresh</code></a>
-for the query builders, and <a href="/services-sdk/how-to/add-a-service/">Add a service</a> for
-the backend half of that contract.
-{{ /comp }}
+When an island or route needs server data, use the typed query layer in `@netscript/fresh/query`
+instead of hand-rolled `fetch` calls. It carries the oRPC contract types to the client, so a renamed
+service field becomes a type error. See the [`@netscript/fresh` reference](/reference/fresh/) for the
+query builders and [Add a service](/services-sdk/how-to/add-a-service/) for the backend half of the
+contract.
 
 ## Restyle: tokens, Tailwind, and component CSS
 
-NetScript styling has three layers, lightest-touch first:
+Styling has three layers. Pick the lightest one that does the job:
 
-{{ comp.card({
-  title: "1 · Design tokens (theme-wide)",
-  body: "Edit the CSS custom properties in assets/tokens.css (mirrored in tokens.json). Tokens are named --ns-* (e.g. surface, border, foreground, accent) and drive every component plus the light/dark themes selected by the data-theme attribute. Change a token once and the whole app re-themes."
-}) }}
+| Layer | Use it when | How |
+| --- | --- | --- |
+| Design tokens | The change should re-theme the whole app. | Run `netscript tokens init`, edit the final semantic alias layer, then run `netscript tokens build`. The generated `--ns-*` custom properties drive colors, type, radius, geometry, borders, shadows and motion. `data-theme` selects the language; `data-scheme` selects light or dark. |
+| Tailwind utilities | One element needs its own layout or spacing. | Tailwind v4 is wired through Vite (`@tailwindcss/vite`). Use utility classes in JSX. The scaffold also defines layout helpers (`ns-shell`, `ns-section`, `ns-stack`, `ns-cluster`) in `assets/layouts.css`. |
+| Component CSS | One primitive should look different everywhere. | Each copied primitive has its own stylesheet under `assets/ui/` (`button.css`, `card.css`, `badge.css`, …), imported by `assets/styles.css`. Edit that file. |
 
-{{ comp.card({
-  title: "2 · Tailwind utilities (per element)",
-  body: "Tailwind v4 is wired through Vite (@tailwindcss/vite). Use utility classes in JSX for one-off layout and spacing. The scaffold also defines NetScript layout helpers (ns-shell, ns-section, ns-stack, ns-cluster) in assets/layouts.css for consistent page rhythm."
-}) }}
+Theme switching is already wired. `routes/_app.tsx` seeds `data-scheme` from the `ns-theme`
+localStorage key, falling back to the OS preference. `ThemeToggle` changes the scheme and keeps the
+language, density and Studio flavor. `assets/theme-preset.json` supplies those fixed preset axes, and
+`assets/fonts.json` supplies the font stylesheet requests.
 
-{{ comp.card({
-  title: "3 · Component CSS (one primitive)",
-  body: "Each copied primitive has its own stylesheet under assets/ui/ (button.css, card.css, badge.css, …). To restyle just one component everywhere, edit its file there — it is app-owned source, imported by assets/styles.css."
-}) }}
+NS One is the default preset. To select Studio Utility in one app, run:
 
-Pick the lightest layer that does the job: reach for a **token** when the change
-should re-theme the whole app, a **Tailwind utility** for one-off element layout,
-and **component CSS** when one primitive should look different everywhere it appears.
+```sh
+netscript tokens init --app dashboard --preset studio-utility
+netscript tokens build --app dashboard
+```
 
-Theme switching is already wired: `routes/_app.tsx` seeds `data-theme` from the
-`ns-theme` localStorage key (falling back to the OS preference), and the
-`ThemeToggle` island flips it at runtime. To ship a different default, change the
-`data-theme` attribute on `<html>` in `_app.tsx` and adjust the token values for
-that theme in `assets/tokens.css`.
+For a semantic override, edit `tokens/semantic.tokens.json` using aliases only, then rebuild. The
+source copies and `tokens.config.json` are app-owned; the five core web assets are generated, so do
+not hand-edit generated CSS or JSON. Add `--previews` to the build command to generate 18 separate
+development preset stylesheets. The
+[tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) covers
+precedence, validation and cleanup.
+
+To preview a generated preset without changing the app default, run
+`netscript tokens build --app dashboard --previews` (or install `ui:add theme-previews`), then open
+`/design/tokens?preset=studio-utility`. The preset query applies only under `/design/`; ordinary app
+routes keep the configured preset.
 
 {{ comp callout { type: "warning", title: "Edit tokens, not magic numbers" } }}
-Reach for a raw hex color or pixel value only when no token fits. Hard-coded values
-drift away from the theme and break the light/dark switch — the whole point of the
-<code>--ns-*</code> tokens is that one edit re-themes every surface consistently.
+Use a raw hex color or pixel value only when no token fits. Hard-coded values drift from the theme
+and break the light/dark switch, while one token edit re-themes every surface.
 {{ /comp }}
+
+### Migrate existing app-owned copies
+
+Existing `[data-theme='dark']` and `[data-theme='light']` selectors still resolve NS One, and every
+old `--ns-*` property remains available, so existing apps can migrate when they choose. No
+`ui:migrate` step is needed. To adopt the new attributes:
+
+1. Run `netscript tokens init --app dashboard` and `netscript tokens build --app dashboard`. Keep
+   NS One unless you choose another preset. Merge any previous customizations into the semantic
+   alias layer before rebuilding.
+2. Update the app shell to read `assets/theme-preset.json` and `assets/fonts.json`. Stamp
+   `data-theme={preset.language}`, `data-density={preset.density}`, and
+   `data-flavor={preset.flavor ?? undefined}` on `<html>`. Set `data-scheme` to light or dark, and
+   map `fonts.imports[preset.id]` to stylesheet links. A new scaffold's `lib/theme.ts` loads only
+   this metadata; development design middleware resolves previews through its own manifest helper
+   and passes the result to the shell as request state.
+3. Change the existing preference seed script to set `data-scheme`, keeping the `ns-theme` storage
+   key. Update ThemeToggle and the light `color-scheme` CSS selector to use `data-scheme`; the
+   shipped toggle also supports legacy hosts.
+4. Merge updated registry copies with `netscript ui:update --app dashboard`. Review drift in locally
+   edited files before replacing them. Carry over the generated design-token helper and view when
+   you adopt output-driven gallery ramps, and keep app-specific route changes.
+
+Preset density is fixed by the selected language; editing a density attribute does not select
+unsupported geometry.
 
 ## Install more UI from the registry
 
-When you need a primitive the scaffold didn't copy in, pull it from the
-`@netscript/fresh-ui` registry with the CLI. Two commands do the work, and both
-**copy source files into your app** rather than adding a runtime dependency:
-
-{{ comp.apiTable({
-  caption: "Fresh UI CLI commands",
-  rows: [
-    { name: "netscript ui:init", type: "install the foundation", desc: "Installs the NetScript Fresh UI foundation set into an app workspace. Run once when setting up UI in an app that doesn't have it yet (the scaffold runs the equivalent for you)." },
-    { name: "netscript ui:add <name>", type: "add one item or collection", desc: "Copies a single registry item or a named collection into the app workspace — component files go to apps/dashboard/components/ui/, island files to islands/ui/, lib helpers to lib/, and assets to assets/ui/ — then wires the CSS and merges any required deno.json imports." }
-  ]
-}) }}
+When you need a primitive the scaffold did not copy in, add it from the `@netscript/fresh-ui`
+registry. `ui:add` copies source files into your app: components to
+`apps/dashboard/components/ui/`, islands to `islands/ui/`, helpers to `lib/`, and assets to
+`assets/ui/`. It then wires the CSS and merges any required `deno.json` imports.
 
 ```bash
 # Add one component (or a named collection) to the dashboard app
@@ -268,130 +226,49 @@ netscript ui:add message
 netscript ui:add ai
 ```
 
-### Available components
-
-Every item below is something you can `ui:add <name>` by its registry id. They fall
-into four groups. **Interactive namespaces** ship from the
-`@netscript/fresh-ui/interactive` sub-path (stateful, accessible compound
-components); the rest are copy-source registry items.
-
-{{ comp.apiTable({
-  caption: "Interactive namespaces (@netscript/fresh-ui/interactive)",
-  rows: [
-    { name: "Accordion", type: "disclosure", desc: "Compound accordion with root + item subcomponents." },
-    { name: "Dialog", type: "overlay", desc: "Modal dialog with structural subcomponents." },
-    { name: "Drawer", type: "overlay", desc: "Edge-docked drawer with structural subcomponents." },
-    { name: "Popover", type: "floating", desc: "Anchored popover with positioning subcomponents." },
-    { name: "Sheet", type: "overlay", desc: "Side-docked inspection panel." },
-    { name: "Tabs", type: "navigation", desc: "Tabs with list, trigger, and content subcomponents." },
-    { name: "Tooltip", type: "floating", desc: "Anchored tooltip with positioning subcomponents." },
-    { name: "Combobox", type: "headless L1", desc: "Headless combobox seam (useCombobox + getRootProps/getInputProps/getContentProps/getItemProps) — the keyboard/selection engine behind the command palette and autocomplete inputs." }
-  ]
-}) }}
-
-{{ comp.apiTable({
-  caption: "L0 primitives (@netscript/fresh-ui/primitives)",
-  rows: [
-    { name: "Show", type: "control flow", desc: "Conditionally renders children without an extra DOM wrapper." },
-    { name: "VisuallyHidden", type: "a11y", desc: "Renders content for assistive tech while keeping it visually hidden." },
-    { name: "SrOnly", type: "a11y", desc: "Screen-reader-named alias for VisuallyHidden." }
-  ]
-}) }}
-
-{{ comp.apiTable({
-  caption: "AI / workspace primitives (ui:add <name>)",
-  rows: [
-    { name: "avatar", type: "identity", desc: "Identity chip for a person or agent — initials or image with size, presence, and agent variants." },
-    { name: "citation-chip", type: "ai", desc: "Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX." },
-    { name: "code-block", type: "ai", desc: "Fenced code surface with filename/language header and a copy affordance for assistant messages." },
-    { name: "model-selector", type: "ai", desc: "Disclosure-backed model/provider picker for the prompt composer (native details)." },
-    { name: "tool-call-card", type: "ai", desc: "Inline MCP/tool invocation + result as a native details disclosure with a status badge and IO panel." },
-    { name: "chart-block", type: "analytics", desc: "Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents." },
-    { name: "donut", type: "analytics", desc: "Token-driven donut/pie chart — SVG arc segments with a center total and legend." },
-    { name: "prompt-input", type: "ai composer", desc: "Chat composer: a CSS auto-grow textarea (native field-sizing: content, no JS handler) with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send." },
-    { name: "message", type: "ai chat", desc: "Chat message with author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator." },
-    { name: "dropzone", type: "upload", desc: "File-ingest affordance — a dashed drop target with built-in drag-drop, clipboard-paste, and file-picker ingest; filters by accept / multiple and reports results through onFile / onFiles / onReject." }
-  ]
-}) }}
-
-{{ comp.apiTable({
-  caption: "Command & search utilities (ui:add <name>)",
-  rows: [
-    { name: "command-palette", type: "palette", desc: "Modal ⌘K command palette (.ns-cmdk) — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts." },
-    { name: "search", type: "navigation", desc: "Compact nav search affordance (.ns-search) — a button styled as an input with a ⌘K hint that opens the command palette." }
-  ]
-}) }}
-
-{{ comp callout { type: "tip", title: "Collections copy a whole set at once" } }}
-Named <strong>collections</strong> are also valid <code>ui:add</code> targets. For
-example <code>netscript ui:add ai</code> installs the AI surface set (citation-chip,
-model-selector, tool-call-card, prompt-input, message, command-palette, search) with
-their theme seed in one command; <code>foundation</code> installs the full dashboard
-set. See the <a href="/reference/fresh-ui/">reference</a> for the complete item and
+Named collections are valid `ui:add` targets: `ai` installs the AI surface set (citation-chip,
+model-selector, tool-call-card, prompt-input, message, command-palette, search) with its theme
+seed, and `foundation` installs the full dashboard set.
+[What the registry ships](/web-layer/fresh-ui/#the-design-system-owned-components) lists the
+groups, and the [`@netscript/fresh-ui` reference](/reference/fresh-ui/) has the full item and
 collection catalog.
-{{ /comp }}
 
-Both commands accept the same useful flags (run `--help` for the version-accurate
-list):
+`ui:init` and `ui:add` share these flags (run `--help` for the list in your version):
 
-- `--project-root <path>` — target a workspace other than the current directory.
-- `--theme <name>` — install against a specific theme registry item instead of the
-  default official theme.
-- `--registry-root <path>` — override the Fresh UI package root (advanced/local
-  development).
-- `--force` — overwrite existing copied UI files when re-running.
+- `--project-root <path>`: target a workspace other than the current directory.
+- `--theme <name>`: install against a specific theme registry item instead of the default official
+  theme.
+- `--registry-root <path>`: override the Fresh UI package root (advanced or local development).
+- `--force`: overwrite existing copied UI files when re-running. This replaces your local edits to
+  those files.
 
-After the copy, the new component is regular source under `components/ui/` (and its
-styles under `assets/ui/`). Import it through the `@app/components/ui/mod.ts`
-barrel like the rest, then edit it however you like — there is no upstream patch to
-keep in sync.
-
-{{ comp callout { type: "important", title: "Copy-source, not a dependency" } }}
-This is the deliberate ownership tradeoff: <code>ui:add</code> gives you the code,
-so you carry it. When the registry ships an upstream fix you want, re-run
-<code>ui:add … --force</code> to re-copy — but expect to re-apply any local edits,
-exactly as you would with any vendored source.
-{{ /comp }}
+The new component is ordinary source under `components/ui/`, with its styles under `assets/ui/`.
+Import it through the `@app/components/ui/mod.ts` barrel and edit it as you like.
 
 ## Verify your changes
 
-With the app running, confirm the loop end to end:
+With the app running:
 
-1. Watch the Vite dev server (or `aspire start` logs) recompile on save — Fresh hot
+1. Save a file and watch the Vite dev server (or the `aspire start` logs) recompile. Fresh hot
    module replacement updates the page without a full reload.
-2. Open `/design/components` to see restyled primitives render against the active
-   theme, and `/design/tokens` to confirm token edits took effect.
-3. Toggle the theme (the `ThemeToggle` in the top bar) to check both light and dark
-   look right after token changes.
+2. Open `/design/components` to see restyled primitives against the active theme, and
+   `/design/tokens` to confirm token edits.
+3. Toggle the theme with `ThemeToggle` in the top bar and check both light and dark.
 4. Type-check the app before committing:
 
-```bash
-deno task --cwd apps/dashboard check
-```
+   ```bash
+   deno task --cwd apps/dashboard check
+   ```
 
-That task runs `deno fmt --check`, `deno lint`, and `deno check` over the app, so a
-clean run means your routes, islands, and edited components still type and lint.
+   The task runs `deno fmt --check`, `deno lint`, and `deno check` over the app.
 
-{{ comp callout { type: "tip", title: "Type-check is your guardrail" } }}
-Run the <code>check</code> task before committing to catch missing imports and
-type drift in routes, islands, and UI primitives. After a route move, refresh the
-generated route modules first, then check navigation and the new URL in the app:
-a green type-check does not prove <code>router.ts</code> string literals match
-the filesystem.
-{{ /comp }}
+> [!NOTE]
+> A green type-check does not prove that `router.ts` string literals match the filesystem. After a
+> route move, refresh the generated route modules first, then check navigation and the new URL in
+> the app.
 
 ## Next steps
 
-- Capability hub: [Fresh UI](/capabilities/fresh-ui/) — the concept, the headline
-  API, and the Learn / Do / Reference triplet for the dashboard app.
-- Reference: the generated API for the UI registry and the Fresh runtime —
-  [`@netscript/fresh-ui`](/reference/fresh-ui/) and
-  [`@netscript/fresh`](/reference/fresh/). These are the authority for every export
-  (the `/server`, `/query`, and sibling subpaths included); this guide never
-  duplicates them.
-- Related recipes: [Add a service](/services-sdk/how-to/add-a-service/) to give your UI a typed
-  oRPC backend, and [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) to trace it.
-- Concepts: the [contracts](/explanation/contracts/) explanation shows how a typed
-  contract flows from service to client to island.
-
-{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" }, next: { label: "Build a durable chat", href: "/ai/how-to/build-a-durable-chat/" } }) }}
+Give the UI a typed backend with [Add a service](/services-sdk/how-to/add-a-service/). See also
+[Fresh UI & design](/web-layer/fresh-ui/), the [`@netscript/fresh-ui` reference](/reference/fresh-ui/),
+and the [contracts explanation](/explanation/contracts/).

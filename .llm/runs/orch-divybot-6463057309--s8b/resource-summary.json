@@ -1,0 +1,25 @@
+{
+  "status": "READ_ONLY",
+  "ownedResources": 0,
+  "foreignOrUnknown": 24,
+  "counts": [
+    {
+      "kind": "apphost",
+      "ownership": "unproven",
+      "count": 1
+    },
+    {
+      "kind": "process",
+      "ownership": "unproven",
+      "count": 23
+    }
+  ],
+  "probes": {
+    "aspire": "ok",
+    "docker": "failed",
+    "volumes": "failed",
+    "networks": "failed",
+    "process": "ok"
+  },
+  "action": "Left all foreign/unknown-owner resources untouched; runtime suite failed before generating its AppHost. Browser server owned by this run will be stopped after capture."
+}

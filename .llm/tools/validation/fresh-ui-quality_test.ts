@@ -79,6 +79,13 @@ Deno.test('Fresh UI workflow trigger paths cover every private-lock input on bot
     'plugins/*/deno.json',
     'plugins/*/deno.jsonc',
     'deno.lock',
+    'tools/fresh-ui-browser/**',
+    'packages/fresh/**',
+    'packages/cli/src/kernel/assets/app/**',
+    'packages/cli/src/kernel/assets/embedded.generated.ts',
+    'packages/cli/src/kernel/assets/publish-assets.generated.ts',
+    '.llm/tools/run-deno-test.ts',
+    '.llm/tools/gates/catalog.ts',
   ];
 
   assertEquals(pullRequestPaths, pushPaths, 'pull_request and push paths must stay synchronized');
@@ -128,4 +135,35 @@ Deno.test('frozen Fresh UI check rejects lock drift without rewriting the lock',
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('Fresh UI CI preserves quality gates and captures the real gallery matrix', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/fresh-ui-quality.yml');
+  for (
+    const gate of [
+      'check',
+      'lint',
+      'fresh-ui-lock-regression',
+      'clean-worktree',
+      'test',
+      'fresh-ui-token-build',
+      'fresh-ui-tokens',
+      'fresh-ui-browser',
+    ]
+  ) {
+    assertStringIncludes(workflow, `--gate ${gate} `);
+  }
+  assertEquals(
+    workflow.indexOf('--gate fresh-ui-tokens ') < workflow.indexOf('--gate fresh-ui-token-build '),
+    true,
+    'freshness must run before a build can repair a tracked hand edit',
+  );
+  assertStringIncludes(workflow, '--app-name dashboard --db none');
+  assertStringIncludes(workflow, '--no-aspire --no-git --editor none --ci --yes');
+  assertStringIncludes(workflow, 'npm ci --ignore-scripts');
+  assertStringIncludes(workflow, 'npx playwright install --with-deps chromium');
+  assertStringIncludes(workflow, '--child-report test-results/results.json');
+  assertStringIncludes(workflow, "if: always() && env.RUN == 'true'");
+  assertStringIncludes(workflow, 'tools/fresh-ui-browser/test-results/');
+  assertStringIncludes(workflow, 'if-no-files-found: error');
 });

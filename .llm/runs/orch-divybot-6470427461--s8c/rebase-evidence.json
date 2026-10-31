@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "oldRemoteFeatureTip": "ae2f4002b671937da936571926408b2ad0fa8b4c",
+  "targetMain": "0825bd0f421c83757234044235ae4ed00323d0fd",
+  "authorization": "latest user explicitly requested rebase/force-push; exact lease to old remote tip",
+  "independentPlan": "FAIL_PLAN repaired once to PASS",
+  "independentImplEval": "PASS, accepted for review only",
+  "sourceComparison": "rebase-source-comparison.json",
+  "carrierComparison": "rebase-carrier-comparison.json",
+  "conflicts": [
+    "generated CLI prose at replay9769d7b91",
+    "generated CLI prose at replayae2f4002b"
+  ],
+  "conflictSide": "fixed upstream0825bd0f4",
+  "commitsReplayed": 15,
+  "commitsSkipped": 0,
+  "allAuthoredFeatureSourcePreserved": true,
+  "allFiveUpstreamCanonicalDocsPreserved": true,
+  "allUpstreamCarrierPagesPreserved": true,
+  "allUpstreamNonSiteBytesPreserved": true,
+  "browser": {
+    "passed": 116,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "receipt": {
+      "requestHash": "5f6b101e586a46c0a111c85fe947b897d809cca22be52eea329e348097cfc48e",
+      "outcome": "PASS",
+      "durationMs": 106759,
+      "exitCode": 0
+    }
+  },
+  "toolTests": 12,
+  "typedCheckLintFmt": "PASS",
+  "generatedTypeCheck": "PASS",
+  "docsBuild": "PASS",
+  "links": {
+    "count": 24219,
+    "pages": 254,
+    "outcome": "PASS",
+    "emptyOverlappingScan": "discarded; no evidence credit"
+  },
+  "caveatRefs": 15,
+  "exportsDrift": "PASS",
+  "snippetFences": 668,
+  "quality": "PASS",
+  "repro": {
+    "html": 254,
+    "twins": 205,
+    "outcome": "PASS",
+    "exception": "known upstream Pagefind metadata only, strict default retained"
+  },
+  "negativeControls": {
+    "raw-colour": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "raw-custom": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "red-role": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "red-outside-state",
+      "diagnosticFound": true
+    }
+  },
+  "generationOrder": [
+    "prose",
+    "MCP exports --allow-dirty, generated-only read set",
+    "assets barrel",
+    "publish assets"
+  ],
+  "proseMcpPublishFreshness": "PASS",
+  "mcpBudget": {
+    "sourceBytes": 283750,
+    "maxBytes": 294912,
+    "count": 14
+  },
+  "docsLockMatchesMain": true,
+  "postCommitAssetsBarrel": "pending after commit",
+  "remotePush": "pending exact force-with-lease",
+  "hostedCurrentHead": "pending push, final PR report records latest CI/artifact",
+  "runtimeLimitation": "unchanged; no merge certification"
+}

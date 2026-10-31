@@ -1,4 +1,4 @@
 ---
 layout: layouts/redirect.vto
-redirectTo: /
+redirectTo: /how-to/
 ---

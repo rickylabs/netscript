@@ -2,40 +2,25 @@
 layout: layouts/base.vto
 title: Request-scoped resources
 templateEngine: [vento, md]
-order: 13
+order: 3
 ---
 
 # Request-scoped resources
 
-A page is rarely one query. A dashboard route wants the signed-in session for its header, the same
-session's tenant id to scope the orders table, and the tenant's currency to format the totals. Three
-regions, one request, and — if you fetch inside each region — three round trips for data that could
-not have changed between them.
+This page explains `withResource(key, factory)`: a named value that `definePage()` resolves once
+while the page pipeline prepares, before any layer runs. Every layer loader, the layout, the
+metadata resolver and every later resource read the same resolved value. A dashboard that needs the
+signed-in session for its header, its orders table and its totals fetches the session once.
 
-`withResource(key, factory)` is `definePage()`'s answer: a named value resolved once while the page
-pipeline prepares, then readable by every layer loader, the layout, the metadata resolver, and every
-later resource. The contract worth holding onto is the lifecycle — resources resolve before layers,
-a later factory can consume an earlier one, and every region of the page reads the same prepared
-store. This page is about that lifecycle: what the runtime does, what it costs you in bare Fresh, and
-where the guarantee stops.
+It assumes you know the [builder chain](/web-layer/builders/).
 
-The builder-chain overview lives in [Pages and the define-page builder](/web-layer/builders/); this
-page assumes it.
+## Compared with bare Fresh
 
-## What bare Fresh makes you write
-
-Fresh 2 gives you a request context and nothing above it. To share one session between two regions of
-one page you write, at minimum:
-
-1. A `State` interface in `utils.ts`, hand-maintained, listing everything you intend to stash on
-   `ctx.state`.
-2. A `routes/_middleware.ts` that loads the session and assigns `ctx.state.session`, because the
-   route handler runs too late for a layout to see it.
-3. A `define.handlers({ async GET(ctx) { … } })` in the route module that fetches everything else the
-   page needs, in one function, in hand-sequenced `await` order.
-4. A `{ data: … }` return carrying one props bag — `Context.render()` takes a VNode, not a data
-   object — then prop-drilling that bag from `define.page()` down through each child component that
-   needs a slice of it.
+Fresh 2 gives you a request context and nothing above it. To share one session between two regions
+of one page, you hand-maintain a `State` interface, load the session in `routes/_middleware.ts`
+(the route handler runs too late for a layout to see it), fetch everything else in one
+`define.handlers({ GET })` function, and prop-drill the returned `{ data }` bag down to each child
+component:
 
 ```tsx
 // routes/_middleware.ts — bare Fresh
@@ -57,26 +42,21 @@ export const handler = define.handlers({
 export default define.page<typeof handler>(({ data }) => <OrdersView {...data} />);
 ```
 
-Three things are worth naming precisely, because they are the costs the resource store removes.
+The resource store removes three costs:
 
-**The state bag is a promise, not a proof.** `ctx.state.session` is typed by whatever the `State`
-interface asserts. Nothing checks that the middleware which populates it actually ran on this route,
-so a route mounted outside that middleware's subtree type-checks fine and throws at runtime.
-
-**Sharing across a boundary means memoizing by hand.** The moment a second thing — a layout, an
-error handler, another middleware — wants the same session, you either fetch it again or write the
-memo yourself: a `WeakMap` keyed on `ctx.req`, plus the discipline to route every caller through it.
-That memo reaches exactly as far as one request. A partial route fetched separately arrives as a new
-`Request` and misses the key entirely, so anything shared with it needs a real cross-request cache or
-session store.
-
-**Ordering lives in one function.** Dependent fetches are correct only because they sit in the right
-order inside a single handler body. Split a region out and the ordering guarantee goes with it.
+- **The state bag is a promise, not a proof.** `ctx.state.session` is typed by whatever `State`
+  asserts. Nothing checks that the middleware ran on this route, so a route mounted outside its
+  subtree type-checks and throws at runtime.
+- **Sharing means memoizing by hand.** When a layout or error handler wants the same session, you
+  fetch it again or write a `WeakMap` keyed on `ctx.req`. A partial route arrives as a new `Request`
+  and misses that key.
+- **Ordering lives in one function.** Dependent fetches are correct only because they sit in the
+  right order in one handler body. Split a region out and the guarantee goes with it.
 
 ## The mechanism
 
 `definePage()` collects resources as descriptors and resolves them in one place, before any layer
-runs. This is the whole of it, from
+runs. This is the loop, from
 `packages/fresh/src/application/builders/define-page/runtime/handlers.ts`:
 
 ```ts
@@ -95,45 +75,43 @@ for (const descriptor of config.resources) {
 }
 ```
 
-The loop establishes four observable properties:
+The loop has four observable properties:
 
 1. **Params parse first.** `resolvePathParams` and `resolveSearchParams` run before the loop, so
-   `ctx.path` and `ctx.search` are already typed and parsed inside every resource factory. A resource
-   is URL-aware for free.
-2. **Resources resolve sequentially, in declaration order,** each one awaited before the next starts.
-   The order you write the chain in *is* the dependency order.
-3. **They resolve into a shared store** that the runtime context wraps. `ctx.resources` is that
-   record; `ctx.resource(key)` is a synchronous accessor that reads one entry with the key's own
-   type. Every layer loader, the layout, and the metadata resolver receive that same context — so the
-   store is the dedup. One declaration, one fetch, N readers.
-4. **Declaration order is both a runtime and a type contract.** A factory's context exposes only the
-   resources registered earlier in the chain, so the ordinary typed builder rejects a swapped
-   dependency: read a not-yet-registered key and the value types as `never`, and the first property
-   access on it fails `deno check`. Pass that `never` straight through without touching its shape and
-   the type system stays quiet — which is what the runtime guard is for.
+   `ctx.path` and `ctx.search` are already parsed and typed inside every resource factory.
+2. **Resources resolve sequentially, in declaration order.** Each one is awaited before the next
+   starts, so the order you write the chain in is the dependency order.
+3. **They resolve into a shared store.** `ctx.resources` is that record, and `ctx.resource(key)` is a
+   synchronous accessor that reads one entry with the key's own type. Every layer loader, the layout
+   and the metadata resolver receive the same context, so one declaration means one fetch for any
+   number of readers.
+4. **Declaration order is a runtime and a type contract.** A factory's context exposes only the
+   resources registered earlier in the chain. Read a not-yet-registered key and the value types as
+   `never`, so the first property access on it fails `deno check`. Pass that `never` through without
+   touching its shape and the type checker stays quiet; the runtime guard covers that case.
 
 Each resolution is wrapped in a `page.resource.<key>` span carrying `page.route` and
 `page.resource.key`, unless the page turned telemetry off with `withTelemetry({ enabled: false })`.
-That is how dedup becomes observable rather than asserted.
 
-The runtime guard is `resolveResource`, and it throws when a key is missing from the store:
+The runtime guard is `resolveResource`. It throws when a key is missing from the store:
 
 ```text
 definePage() could not resolve resource "sesion"
 ```
 
-Read it as "not yet", not only as "not there" — after type erasure, a dynamic key, or a cast, an
+Read it as "not yet" as well as "not there": after type erasure, a dynamic key or a cast, an
 out-of-order read reaches this check instead of the type checker.
 
-**Where the guarantee stops.** The store is built by `prepareRequestState`, and each page-pipeline
-preparation builds its own. A custom method handler registered with `withHandler()` prepares its own
-request state too, so a `POST` handler that resolves resources and then renders the page resolves
-them again. Treat "resolved once" as a property of one page render, not as cross-handler
-memoization.
+### Where the guarantee stops
+
+The store is built by `prepareRequestState`, and each page-pipeline preparation builds its own. A
+custom method handler registered with `withHandler()` prepares its own request state too, so a
+`POST` handler that resolves resources and then renders the page resolves them again. "Resolved
+once" holds for one page render, not across handlers.
 
 ## Shared substrate, local props
 
-The canonical shape. Declare the session once; each region takes what it needs from it.
+Declare the session once; each region takes what it needs from it.
 
 ```tsx
 export const ordersPage = definePage()
@@ -155,19 +133,18 @@ export const ordersPage = definePage()
 ```
 
 `loadSession` runs once. Both loaders get the resolved value, and `ctx.resource('session')` returns
-`Session` — not `unknown`, not `Session | undefined` — because the key was registered on the builder's
-type state by `withResource`. Misspell the key and the value collapses to `never`, so the first thing
-the loader does with it fails `deno check`.
+`Session` (not `unknown` or `Session | undefined`) because `withResource` registered the key on the
+builder's type state. Misspell the key and the value collapses to `never`, so the loader's first use
+of it fails `deno check`.
 
-This is also the division of labour worth internalising: **resources are the shared substrate, layers
-are the per-region refinement.** The header does not need the tenant id and the table does not need
-the role list; each loader narrows the same resolved value into its own props. Nothing is drilled,
-because nothing is passed — the context is the transport.
+**Resources are the shared substrate; layers are the per-region refinement.** The header does not
+need the tenant id and the table does not need the role list, so each loader narrows the same value
+into its own props. Nothing is prop-drilled, because the context carries the value.
 
-## Dependent resources encode request scope
+## Dependent resources
 
-The session resource is not only data, it is the *scope* every later fetch runs in. Because resources
-resolve in order, a later resource can build on the resolved auth context rather than re-deriving it:
+The session resource is also the *scope* every later fetch runs in. Because resources resolve in
+order, a later resource can build on the resolved auth context instead of re-deriving it:
 
 ```tsx
 export const dependentPage = definePage()
@@ -187,37 +164,34 @@ export const dependentPage = definePage()
   .build('/orders');
 ```
 
-`settings` depends on `session`, and that dependency is expressed by writing it second — the `for…of`
-loop guarantees the rest. Swap the two lines and `ctx.resource('session')` inside the `settings`
-factory types as `never`, so `session.tenantId` fails `deno check` before the page ever runs. The
-ordering rule is enforced, not merely conventional.
+`settings` depends on `session`, and you express that by declaring it second; the `for…of` loop does
+the rest. Swap the two lines and `ctx.resource('session')` inside the `settings` factory types as
+`never`, so `session.tenantId` fails `deno check` before the page runs.
 
-Tenant scoping, feature flags keyed on a plan, and per-user permission sets all take this shape: the
-authoritative value is resolved once during the page-pipeline preparation, and every consumer downstream is
-reading, not re-fetching. Pair it with `withPolicy` when the page's defer behaviour should also depend
+Tenant scoping, plan-based feature flags and per-user permission sets take the same shape: the
+authoritative value resolves once per page-pipeline preparation, and every consumer reads it
+instead of re-fetching. Pair it with `withPolicy` when the page's defer behaviour should also depend
 on who is asking.
 
-## Parsed route state enters before resources
+## Route state in resources
 
-Because params parse before the loop, a resource can be a function of the route's typed state rather
-than of raw strings. `ctx.search` is the parsed schema output, so a paginated list resource reads
-`ctx.search.limit` and `ctx.search.offset` directly — no `URLSearchParams.get()`, no `Number()`, no
-clamping in the loader. The scaffolded orders page in the
-[live dashboard tutorial](/tutorials/live-dashboard/04-definePage-QueryIsland/) does exactly this,
-feeding `ctx.search` into a cached SDK read that two layers then share.
+Because params parse before the loop, a resource can depend on the route's typed state instead of
+raw strings. `ctx.search` is the parsed schema output, so a paginated list resource reads
+`ctx.search.limit` and `ctx.search.offset` directly, with no `URLSearchParams.get()`, `Number()` or
+clamping in the loader. The orders page in the
+[live dashboard tutorial](/tutorials/live-dashboard/04-definePage-QueryIsland/) feeds `ctx.search`
+into a cached SDK read that two layers then share.
 
-The consequence worth stating: a URL-aware resource is *also* deduped. A page whose table and whose
-hydration seed both depend on the same page-and-filter combination reads it once, for that render.
-The store is not a cache keyed on the URL — it is rebuilt for every page-pipeline preparation, so
-changing the filter produces another request and another store rather than a cache invalidation.
+A URL-aware resource is deduped too: a table and a hydration seed that depend on the same page and
+filter read it once per render. The store is not a cache keyed on the URL. It is rebuilt for every
+page-pipeline preparation, so changing the filter produces another request and another store.
 
-Where the params themselves come from — schemas, defaults, `paginationSearchSchema()` — is
-[Routing and route contracts](/web-layer/route/).
+[Routing and route contracts](/web-layer/route/) covers where the params come from: schemas,
+defaults and `paginationSearchSchema()`.
 
 ## Grouping independent factories
 
-When several values have no relationship to each other, declare them as one object instead of one
-call per line:
+When several values are unrelated, declare them as one object instead of one call each:
 
 ```tsx
 export const batchPage = definePage()
@@ -229,10 +203,9 @@ export const batchPage = definePage()
 ```
 
 `withResources` appends one descriptor per entry, in `Object.entries` order, onto the same
-`config.resources` array. It is a grouping convenience, **not** a concurrency primitive: the runtime
-loop still awaits them one at a time. If two genuinely independent fetches are both slow, resolve them
-inside a single resource with `Promise.all` and return the pair — that is the only way to overlap
-them today, and it keeps the trace honest, since you will see one span instead of two.
+`config.resources` array. It groups declarations; it does **not** run them concurrently. To overlap
+two slow, independent fetches, resolve them inside a single resource with `Promise.all` and return
+the pair. The trace then shows one span for both.
 
 ## Reading resources elsewhere
 
@@ -242,14 +215,13 @@ them today, and it keeps the trace honest, since you will see one span instead o
 | Child component of a routed page | the page's `hooks.useResource(key)`, or the standalone `useDefinePageResource(key)` |
 | Anywhere you want the whole record | `ctx.resources`, typed as the accumulated key map |
 
-The hooks come from a routed `build()` — a page built with a route pattern exposes `hooks`, and those
-hooks are how a component reads a resource without a prop path. The full hook list is in
-[Pages and the define-page builder](/web-layer/builders/).
+The hooks come from a routed `build()`: a page built with a route pattern exposes `hooks`, which let
+a component read a resource without a prop path.
 
 ## What to watch for
 
-- **A resource is not a cache.** The store lives for one page-pipeline preparation. Cross-request
-  caching is the SDK's `getCachedEntry()` and the query layer — see
+- **A resource is not a cache.** The store lives for one page-pipeline preparation. For
+  cross-request caching, use the SDK's `getCachedEntry()` and the query layer; see
   [Data loading and the query cache](/web-layer/query/).
 - **Sequential by design.** Ten resources are ten awaits. Keep the chain short and push parallelism
   inside a factory.
@@ -258,15 +230,8 @@ hooks are how a component reads a resource without a prop path. The full hook li
 - **Span names are keys.** `page.resource.session` is only as readable as the key you chose; name
   resources after the domain value, not after the call.
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [
-  { title: "Pages and the define-page builder", body: "The full builder chain this page zooms into.", href: "/web-layer/builders/" },
-  { title: "Partials and deferred regions", body: "Refresh one region without the page around it.", href: "/web-layer/partials/" },
-  { title: "Routing and route contracts", body: "Where ctx.path and ctx.search come from.", href: "/web-layer/route/" },
-  { title: "Data loading and the query cache", body: "Caching that outlives a single request.", href: "/web-layer/query/" },
-  { title: "Live dashboard tutorial", body: "Resources, layers, and a QueryIsland end to end.", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" },
-  { title: "Testing pages", body: "Assert on a built page definition.", href: "/web-layer/testing/" }
-] }) }}
-
-See the [Web Layer overview](/web-layer/) for the full pillar map.
+Continue with [Layers, layout, and slots](/web-layer/layers/), the concurrent half of the page that
+reads these resources. See also [Partials](/web-layer/partials/) to refresh one region without the
+page around it.

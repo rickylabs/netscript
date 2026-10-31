@@ -1,0 +1,75 @@
+{
+  "command": "FRESH_UI_AXE_NEGATIVE_CONTROL=new-rule,new-target,duplicate,stale npm test -- --project light-390 --grep /design/tokens",
+  "exitCode": 1,
+  "expectedFailures": 4,
+  "cases": [
+    {
+      "control": "new-rule",
+      "status": "failed",
+      "changes": [
+        {
+          "fingerprint": [
+            "button-name",
+            "critical",
+            [
+              "#axe-negative-control"
+            ]
+          ],
+          "expected": 0,
+          "actual": 1
+        }
+      ]
+    },
+    {
+      "control": "new-target",
+      "status": "failed",
+      "changes": [
+        {
+          "fingerprint": [
+            "color-contrast",
+            "serious",
+            [
+              "#axe-negative-control"
+            ]
+          ],
+          "expected": 0,
+          "actual": 1
+        }
+      ]
+    },
+    {
+      "control": "duplicate",
+      "status": "failed",
+      "changes": [
+        {
+          "fingerprint": [
+            "color-contrast",
+            "serious",
+            [
+              ".ns-badge--primary"
+            ]
+          ],
+          "expected": 1,
+          "actual": 2
+        }
+      ]
+    },
+    {
+      "control": "stale",
+      "status": "failed",
+      "changes": [
+        {
+          "fingerprint": [
+            "color-contrast",
+            "serious",
+            [
+              ".ns-badge--primary"
+            ]
+          ],
+          "expected": 1,
+          "actual": 0
+        }
+      ]
+    }
+  ]
+}

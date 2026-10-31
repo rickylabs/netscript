@@ -1,0 +1,3 @@
+# Publish budget and runtime carriers
+
+Native `deno publish --dry-run --allow-dirty` enumerates actual file URLs and display sizes. Sum `Deno.stat(new URL(url)).size` for exact bytes; human-readable sizes are rounded. The five-MB regression fails baseline at 28,186,585 bytes. Publish includes must ship generated TS carriers only for source JSON/copy assets; raw registry CSS/JSON and token source JSON duplicate their carriers. Root runtime still imports registry/lib/cn.ts and toast.ts, so retain those two raw runtime modules. Web CompressionStream/DecompressionStream gzip keeps exact copy bytes and avoids JSR import attributes/filesystem reads. CLI registry imports must occur inside commands. RTK is unavailable here.

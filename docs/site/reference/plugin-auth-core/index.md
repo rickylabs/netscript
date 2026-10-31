@@ -5,9 +5,25 @@ title: "@netscript/plugin-auth-core"
 
 # `@netscript/plugin-auth-core`
 
-Auth plugin contracts, backend ports, stream schemas, config schemas, telemetry
-primitives, and testing primitives for NetScript auth plugins. This page is written against the
-package's public surface reported by `deno doc`.
+Auth contracts, backend ports, schemas, telemetry and testing primitives shared by the NetScript
+auth plugin and its backend adapters. Use it to implement an auth backend or to type code against
+the auth contract.
+
+## Sub-path exports
+
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-auth-core` | `./mod.ts` | Root contract, port, schema, stream, and telemetry surface. |
+| `@netscript/plugin-auth-core/sdk` | `./src/sdk/mod.ts` | Universal typed bearer contribution factory and option types. |
+| `@netscript/plugin-auth-core/domain` | `./src/domain/mod.ts` | Domain types and schemas. |
+| `@netscript/plugin-auth-core/ports` | `./src/ports/mod.ts` | [Backend, provider, session, and interactive-flow ports](#backend-ports-and-errors). |
+| `@netscript/plugin-auth-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Versioned [auth contract](#contracts-schemas-and-constants). |
+| `@netscript/plugin-auth-core/telemetry` | `./src/telemetry/mod.ts` | Auth telemetry attributes and helpers. |
+| `@netscript/plugin-auth-core/streams` | `./src/streams/mod.ts` | Auth stream schema and event types. |
+| `@netscript/plugin-auth-core/config` | `./src/config/mod.ts` | Runtime config schemas and backend resolution helpers. |
+| `@netscript/plugin-auth-core/presets` | `./src/presets/mod.ts` | Backend preset registry helpers. |
+| `@netscript/plugin-auth-core/testing` | `./src/testing/mod.ts` | Testing primitives for auth adapters and plugins. |
+| `@netscript/plugin-auth-core/authenticator` | `./src/adapters/mod.ts` | Server-side [remote session verification](#remote-session-verification) through the native SDK. |
 
 ## Backend ports and errors
 
@@ -41,19 +57,19 @@ package's public surface reported by `deno doc`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `authContract` | constant | Root auth contract export. |
-| `authContractV1` | constant | Versioned v1 auth contract export. |
-| `authStreamSchema` | constant | Stream schema for auth events. |
-| `AuthConfigSchema` | constant | Schema for auth runtime configuration. |
-| `AuthProviderConfigSchema` | constant | Schema for provider configuration. |
-| `AuthSessionPolicySchema` | constant | Schema for session policy configuration. |
-| `AuthSessionSchema` | constant | Schema for auth sessions. |
-| `AuthUserSchema` | constant | Schema for auth user payloads. |
-| `AccountSchema` | constant | Schema for auth account payloads. |
-| `AUTH_SESSION_STATES` | constant | Supported auth session states. |
-| `AUTH_ACCOUNT_STATES` | constant | Supported account states. |
-| `AUTH_STREAM_EVENT_TYPES` | constant | Supported auth stream event types. |
-| `DEFAULT_AUTH_BACKEND_NAME` | constant | Default backend name used by config and registries. |
+| `authContract` | const | Root auth contract export. |
+| `authContractV1` | const | Versioned v1 auth contract export. |
+| `authStreamSchema` | const | Stream schema for auth events. |
+| `AuthConfigSchema` | const | Schema for auth runtime configuration. |
+| `AuthProviderConfigSchema` | const | Schema for provider configuration. |
+| `AuthSessionPolicySchema` | const | Schema for session policy configuration. |
+| `AuthSessionSchema` | const | Schema for auth sessions. |
+| `AuthUserSchema` | const | Schema for auth user payloads. |
+| `AccountSchema` | const | Schema for auth account payloads. |
+| `AUTH_SESSION_STATES` | const | Supported auth session states. |
+| `AUTH_ACCOUNT_STATES` | const | Supported account states. |
+| `AUTH_STREAM_EVENT_TYPES` | const | Supported auth stream event types. |
+| `DEFAULT_AUTH_BACKEND_NAME` | const | Default backend name used by config and registries. |
 
 ## Common types
 
@@ -76,38 +92,22 @@ package's public surface reported by `deno doc`.
 
 ## Remote session verification
 
-Import these symbols from the `./authenticator` leaf. The factory requires `serviceName` and
-`timeoutMs`; it returns the native `AuthenticatorPort`. It forwards bearer credentials only and
-retains no principal cache. Authorization remains a separate service policy.
+Exported from `@netscript/plugin-auth-core/authenticator`. The factory requires `serviceName` and
+`timeoutMs` and returns the native `AuthenticatorPort`. It forwards bearer credentials only and
+keeps no principal cache. Authorization remains a separate service policy.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createAuthServiceAuthenticator` | function | Verify an active, unexpired session through the native auth SDK. |
-| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type | Canonical service authentication types re-exported for the complete public signature. |
+| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type alias | Canonical service authentication types re-exported for the complete public signature. |
 | `AuthServiceAuthenticatorOptions` | interface | Required discovery name and timeout, optional router/protocol and explicit cleartext policy. |
 | `readBearerCredential` | function | Read a single strict bearer credential; reject ambiguous headers. |
-| `REMOTE_SESSION_REJECTIONS` | constant | Stable missing, unauthorized, inactive and expired denial reasons. |
+| `REMOTE_SESSION_REJECTIONS` | const | Stable missing, unauthorized, inactive and expired denial reasons. |
 | `RemoteSessionVerificationError` | class | Redacted transport, timeout, malformed response or remote error diagnostics. |
 
-Native middleware returns 401 for denial and 503 for verifier unavailability. Native claims are
-preserved and can contain sensitive session metadata; do not log them wholesale. Backend bearer
-support is provider-dependent; KV-OAuth and WorkOS accept token lookup, while better-auth retains
-its own request-header resolution.
+Native middleware returns 401 for denial and 503 when the verifier is unavailable. Bearer support
+depends on the backend: KV-OAuth and WorkOS accept token lookup, while better-auth keeps its own
+request-header resolution.
 
-## Sub-path exports
-
-| Export | Path | Purpose |
-| --- | --- | --- |
-| `@netscript/plugin-auth-core` | `./mod.ts` | Root contract, port, schema, stream, and telemetry surface. |
-| `@netscript/plugin-auth-core/sdk` | `./src/sdk/mod.ts` | Universal typed bearer contribution factory and option types. |
-| `@netscript/plugin-auth-core/domain` | `./src/domain/mod.ts` | Domain types and schemas. |
-| `@netscript/plugin-auth-core/ports` | `./src/ports/mod.ts` | Backend, provider, session, and interactive-flow ports. |
-| `@netscript/plugin-auth-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Versioned auth contract. |
-| `@netscript/plugin-auth-core/telemetry` | `./src/telemetry/mod.ts` | Auth telemetry attributes and helpers. |
-| `@netscript/plugin-auth-core/streams` | `./src/streams/mod.ts` | Auth stream schema and event types. |
-| `@netscript/plugin-auth-core/config` | `./src/config/mod.ts` | Runtime config schemas and backend resolution helpers. |
-| `@netscript/plugin-auth-core/presets` | `./src/presets/mod.ts` | Backend preset registry helpers. |
-| `@netscript/plugin-auth-core/testing` | `./src/testing/mod.ts` | Testing primitives for auth adapters and plugins. |
-| `@netscript/plugin-auth-core/authenticator` | `./src/adapters/mod.ts` | Server-side remote session verification through the native SDK. |
-
-Back to the [auth reference hub](/reference/auth/).
+> [!CAUTION]
+> Native claims are preserved and can contain sensitive session metadata. Don't log them wholesale.

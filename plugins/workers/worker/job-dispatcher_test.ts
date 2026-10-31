@@ -2,6 +2,7 @@ import {
   assert,
   assertEquals,
   assertInstanceOf,
+  assertNotEquals,
   assertRejects,
   assertStrictEquals,
 } from 'jsr:@std/assert@^1';
@@ -32,14 +33,20 @@ import type {
   WorkerTaskResult,
 } from './worker-options.ts';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
-import { context as otelContext, propagation } from 'npm:@opentelemetry/api@^1.9.1';
+import { context as otelContext, propagation, trace } from 'npm:@opentelemetry/api@^1.9.1';
+import {
+  BasicTracerProvider,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
 import { W3CTraceContextPropagator } from 'npm:@opentelemetry/core@^2.5.0';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
 import { getParentContextFromHeaders } from '@netscript/telemetry/context';
 
 const MESSAGE_TRACE_ID = '0af7651916cd43dd8448eb211c80319c';
-const MESSAGE_TRACEPARENT = `00-${MESSAGE_TRACE_ID}-b7ad6b7169203331-01`;
+const MESSAGE_PARENT_ID = 'b7ad6b7169203331';
+const MESSAGE_TRACEPARENT = `00-${MESSAGE_TRACE_ID}-${MESSAGE_PARENT_ID}-01`;
 const MESSAGE_TRACESTATE = 'vendor=message';
 const ACTIVE_TRACE_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 const ACTIVE_TRACEPARENT = `00-${ACTIVE_TRACE_ID}-bbbbbbbbbbbbbbbb-01`;
@@ -914,6 +921,56 @@ Deno.test({
       await Deno.remove(scriptDir, { recursive: true });
     }
   },
+});
+
+Deno.test('direct job dispatch isolates untraced runs and honors message parents under an active worker', async () => {
+  const restore = installTracePropagation();
+  const exporter = new InMemorySpanExporter();
+  const provider = new BasicTracerProvider({
+    spanProcessors: [new SimpleSpanProcessor(exporter)],
+  });
+  trace.setGlobalTracerProvider(provider);
+  try {
+    await using kv = new MemoryKvAdapter();
+    const executionState = new MemoryExecutionState();
+    const taskExecutor = new CountingTaskExecutor([]);
+    const dispatch = dispatchContext({
+      kv,
+      executionState,
+      taskExecutor,
+      job: polyglotJob('isolated-job'),
+    });
+    await otelContext.with(
+      getParentContextFromHeaders({ traceparent: ACTIVE_TRACEPARENT }),
+      async () => {
+        for (
+          const [index, traceparent] of [undefined, 'malformed', MESSAGE_TRACEPARENT].entries()
+        ) {
+          await processWorkerJob(dispatch, {
+            jobId: 'isolated-job',
+            topic: 'jobs',
+            triggeredBy: 'manual',
+            traceparent,
+          }, messageContext(`isolated-${index}`));
+          assertEquals(trace.getActiveSpan()?.spanContext().traceId, ACTIVE_TRACE_ID);
+        }
+      },
+    );
+    const jobs = exporter.getFinishedSpans().filter((span) => span.name === 'job.execute');
+    assertEquals(jobs.length, 3);
+    assertEquals(new Set(jobs.map((span) => span.spanContext().traceId)).size, 3);
+    for (const [index, job] of jobs.entries()) {
+      assertNotEquals(job.spanContext().traceId, ACTIVE_TRACE_ID);
+      assertEquals(job.parentSpanContext?.spanId, index === 2 ? MESSAGE_PARENT_ID : undefined);
+      if (index === 2) assertEquals(job.spanContext().traceId, MESSAGE_TRACE_ID);
+      assert(String(taskExecutor.options[index]?.traceparent).includes(job.spanContext().traceId));
+    }
+    assertEquals(executionState.completed.length, 3);
+  } finally {
+    await provider.shutdown();
+    trace.disable();
+    restore();
+  }
 });
 
 function installTracePropagation(): () => void {

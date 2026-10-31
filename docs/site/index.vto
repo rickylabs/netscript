@@ -6,7 +6,7 @@ templateEngine: [vento, md]
 
 {{ comp.hero({
   tagline: "Define the public boundary once. NetScript carries it through the stack.",
-  subhead: "NetScript is a meta-framework for Deno. It composes Fresh, Hono, oRPC, and Aspire into one workspace, where a database-backed shape can flow from a generated model schema into a versioned contract, then through the service to the rendered page — and the whole system runs as one observed resource graph.",
+  subhead: "NetScript is a meta-framework for Deno. It composes Fresh, Hono, oRPC, and Aspire into one workspace. A database-backed shape can flow from a generated model schema into a versioned contract, through the service, to the rendered page, and the whole system runs as one observed resource graph.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true },
     { label: "Why NetScript", href: "/why/" }
@@ -14,76 +14,52 @@ templateEngine: [vento, md]
 }) }}
 
 <p class="ns-lede">
-Frameworks can supply the web layer, the service layer, and the orchestrator while leaving their
-boundaries to the application. Those boundaries are where request types diverge, where durable
-work is reduced to local retry loops, and where incident evidence splits across disconnected logs,
-resource state, and traces. NetScript gives an operation one versioned public contract—narrowed or
-extended from a generated model schema when one exists, authored directly when it does not—then
-uses it to type the handler and client and generate the OpenAPI description. What is derived from
-the contract cannot drift from it.
+Frameworks supply the web layer, the service layer, or the orchestrator, and leave the boundaries
+between them to the application. At those boundaries, request types diverge, durable work shrinks
+to a local retry loop, and incident evidence splits across logs, resource state, and traces.
+NetScript gives each operation one versioned public contract. It types the handler and the client
+from that contract and generates the OpenAPI description from it, so nothing derived from the
+contract can drift from it. The contract narrows or extends a generated model schema when one
+exists; otherwise you write it directly.
 </p>
 
 {{ comp.featureGrid({ items: [
   {
+    eyebrow: "Contract",
+    linkLabel: "How the type flow works",
     title: "The contract is the spine",
-    body: "When generated schemas exist, a model schema is narrowed into the versioned public shape; without a database, that shape is authored directly, then an oRPC route defines the operation once while its handler, OpenAPI, and SDK client share that boundary.",
+    body: "An oRPC route defines each operation once, and its handler, OpenAPI document, and SDK client share that boundary. The public shape narrows a generated model schema, or you write it directly when there is no database.",
     href: "/explanation/contracts/"
   },
   {
+    eyebrow: "Workspace",
+    linkLabel: "Orchestration and runtime",
     title: "The workspace is the unit",
-    body: "Apps, services, databases, cache, and background processors form one generated Aspire graph. One command starts it; one dashboard carries its health, logs, and traces.",
+    body: "Apps, services, databases, cache, and background processors form one generated Aspire graph. One command starts it, and one dashboard shows its health, logs, and traces.",
     href: "/orchestration-runtime/"
   },
   {
+    eyebrow: "Runtimes",
+    linkLabel: "Durable workflows",
     title: "Runtimes for work that outlives a request",
-    body: "Workers, sagas, triggers, and streams plug into the same workspace and the same telemetry, so durable work is part of the system rather than a sidecar you integrate yourself.",
+    body: "Workers, sagas, triggers, and streams plug into the same workspace and the same telemetry, so durable work is part of the system, not a sidecar you integrate yourself.",
     href: "/durable-workflows/"
   }
 ] }) }}
 
-## One definition, carried end to end
+<section class="docs-home-split">
+  <div><p class="ns-eyebrow">Quickstart</p><h2>Scaffold and run a workspace</h2><p>Scaffold a Fresh app, a typed oRPC service, a database, and a shared cache, then start the resource graph with Aspire. You learn where the files live and which generators to use before you write a feature by hand.</p><p><a href="{{ '/quickstart/' |> url }}">Read the quickstart →</a></p></div>
+  <div>{{ comp.tabbedRuntime({ tabs: [{"label": "postgres", "lang": "bash", "filename": "my-app/ — workspace root", "code": "# 1 · Scaffold the workspace\nnetscript init my-app --db postgres --yes\ncd my-app\nnetscript service add --name users --with-client\n\n# 2 · Bring up the resource graph\ncd aspire\naspire restore\naspire start"}, {"label": "mysql", "lang": "bash", "filename": "my-app/ — workspace root", "code": "# 1 · Scaffold the workspace\nnetscript init my-app --db mysql --yes\ncd my-app\nnetscript service add --name users --with-client\n\n# 2 · Bring up the resource graph\ncd aspire\naspire restore\naspire start"}, {"label": "mssql", "lang": "bash", "filename": "my-app/ — workspace root", "code": "# 1 · Scaffold the workspace\nnetscript init my-app --db mssql --yes\ncd my-app\nnetscript service add --name users --with-client\n\n# 2 · Bring up the resource graph\ncd aspire\naspire restore\naspire start"}, {"label": "sqlite", "lang": "bash", "filename": "my-app/ — workspace root", "code": "# 1 · Scaffold the workspace\nnetscript init my-app --db sqlite --yes\ncd my-app\nnetscript service add --name users --with-client\n\n# 2 · Bring up the resource graph\ncd aspire\naspire restore\naspire start"}] }) }}</div>
+</section>
 
-{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "An optional DB-backed predecessor flows from a database model through db generate and @database/zod into a narrowed or extended versioned API schema. That schema and its oRPC route type the service handler, generated OpenAPI document, derived SDK client, page loader, and island. DB-less products can start at the versioned API schema.", caption: "DB-backed products normally narrow or extend generated model schemas before defining the public contract; DB-less products start at the versioned API schema. From the contract onward, the handler, OpenAPI document, SDK, and page share its types.", wide: true }) }}
-
-The same operation at four points in a DB-backed stack. Tab 0 is the optional generation and
-narrowing step; DB-less products begin at tab 1. The contract owns the public input and output
-shapes; the handler and page remain application code, but their boundary types come from it.
-
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "0 · The database (optional)",
-    lang: "ts",
-    code: "// From the workspace root:\n// netscript db generate --db postgres\n\n// contracts/versions/v1/users.schemas.ts\nimport { UserSchema as DatabaseUserSchema } from '@database/zod';\nimport { z } from 'zod';\n\nexport const UsersListItemSchemaV1 = DatabaseUserSchema\n  .pick({ id: true, name: true })\n  .extend({\n    status: z.enum(['active', 'invited']),\n  });"
-  },
-  {
-    label: "1 · The contract",
-    lang: "ts",
-    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\nimport { UsersListItemSchemaV1 } from './users.schemas.ts'; // derived in tab 0, or hand-authored without a database\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
-  },
-  {
-    label: "2 · The service",
-    lang: "ts",
-    code: "// services/users/src/routers/v1.ts\nimport { UsersV1 as usersContract } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: usersContract.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { auth: { public: true, reason: 'Public example service; add guards before exposing private data' }, name: 'users', version: '1.0.0' });"
-  },
-  {
-    label: "3 · The page",
-    lang: "tsx",
-    code: "// apps/dashboard/lib/users.ts\nimport { createServiceClient } from '@netscript/sdk/client';\nimport { createQueryFactories } from '@netscript/sdk/query';\nimport { UsersContractV1 } from '@my-app/contracts';\n\nexport const usersName = 'users';\nexport const usersRouterName = 'users';\nexport const usersContract = UsersContractV1;\nexport const usersClient = createServiceClient<typeof usersContract>({\n  contract: usersContract,\n  serviceName: usersName,\n  routerName: usersRouterName,\n});\nexport const usersQueries = createQueryFactories({\n  service: { contract: usersContract, client: usersClient },\n}).service;\n\n// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { z } from 'zod';\nimport { usersQueries } from '@app/lib/users.ts';\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withSearchParams(z.object({\n    limit: z.coerce.number().int().positive().max(100).default(20),\n  }))\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      const input = { limit: ctx.search.limit };\n      // Server-only: the action owns cache policy; getCachedEntry then\n      // reads the persisted pair (null if the write did not land).\n      const users = await usersQueries.list(input, { preferFreshOnStale: true });\n      const entry = await usersQueries.list.getCachedEntry(input);\n      return entry\n        ? { users: entry.data, cachedAt: entry.cachedAt }\n        : { users, cachedAt: Date.now() };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();\n\nexport const { default: page } = usersPage;\nexport { page as default };"
-  }
-] }) }}
-
-<p class="ns-lede">
-Change the database model and regenerate in tab 0, or change the public schema in tab 1: incompatible
-handler code in tab 2 stops compiling, the OpenAPI document updates, and the loader in tab 3 sees
-the new types before anything reaches a browser. That propagation is the meta-framework: not a
-bigger library, but ownership of the seams between the libraries you already know.
-<a href="{{ '/explanation/contracts/' |> url }}">How the type flow works</a> ·
-<a href="{{ '/web-layer/' |> url }}">how pages consume it</a>.
-</p>
+<section class="docs-home-section">
+  <p class="ns-eyebrow">Copy-source</p><h2>Know what you own</h2><p>Every scaffolded file carries an ownership tag. <code>[owned]</code> files hold your product code, a generator rewrites <code>[generated]</code> files, and <code>[guidance]</code> files describe the local conventions for people and coding agents. The <a href="{{ '/quickstart/#know-what-you-own' |> url }}">quickstart</a> shows the full tree.</p>
+  <div class="docs-home-ownership">{{ comp.fileTree({ items: [{"name": "my-app/", "children": [{"name": "AGENTS.md", "ownership": "guidance"}, {"name": "apps/dashboard/", "children": [{"name": "components/ui/", "ownership": "owned", "children": [{"name": "button.tsx", "ownership": "owned"}]}, {"name": "routes/", "ownership": "owned"}, {"name": "assets/tokens.css", "ownership": "owned"}, {"name": ".generated/", "ownership": "generated"}]}, {"name": "contracts/versions/v1/", "ownership": "owned"}, {"name": "services/users/src/", "ownership": "owned"}, {"name": "database/postgres/", "children": [{"name": "schema/schema.prisma", "ownership": "owned"}, {"name": "schema/.generated/", "ownership": "generated"}]}, {"name": "aspire/apphost.mts", "ownership": "generated"}, {"name": "deno.json", "ownership": "owned", "comment": "workspace config"}]}] }) }}{{ comp.codeBlock({ lang: "ts", filename: "apps/dashboard/components/ui/button.tsx", code: "/**\n * @component Button\n * @layer 2\n * @depends theme-seed\n * @description Generic action primitive for forms and navigation.\n */\n\nexport type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';\n\nexport type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';\n\nexport type ButtonElementType = 'button' | 'submit' | 'reset';" }) }}</div>
+</section>
 
 ## What the framework carries for you
 
-{{ comp.cardsGrid({ columns: 3, cards: [
+{{ comp.cardsGrid({ columns: 4, cards: [
   {
     title: "Pages arrive with their data",
     body: "definePage composes route state, server loaders, and layered resources before an island hydrates, so the browser starts from useful HTML instead of rebuilding the page contract.",
@@ -143,16 +119,63 @@ a request, compare
 <a class="ns-md-link" href="{{ '/background-processing/workers/' |> url }}">worker jobs</a> with
 <a class="ns-md-link" href="{{ '/durable-workflows/streams/' |> url }}">durable streams</a>. Follow a
 running system in the
-<a class="ns-md-link" href="{{ '/quickstart/aspire/' |> url }}">Aspire dashboard</a> or expose its
+<a class="ns-md-link" href="{{ '/quickstart/#3-start-the-resource-graph' |> url }}">Aspire dashboard</a> or expose its
 contract through the
 <a class="ns-md-link" href="{{ '/services-sdk/how-to/expose-openapi-scalar/' |> url }}">Scalar task</a>.
+
+<section class="docs-home-section"><p class="ns-eyebrow">Learn</p><h2>Build a real system</h2><p>The storefront tutorial builds one system end to end, chapter by chapter.</p>{{ comp.learningPath({ steps: [{"label": "Scaffold the storefront", "href": "/tutorials/storefront/01-scaffold/"}, {"label": "A typed catalog service", "href": "/tutorials/storefront/02-catalog-service/"}, {"label": "Cart, contract-first", "href": "/tutorials/storefront/03-cart-contracts/"}, {"label": "Durable checkout", "href": "/tutorials/storefront/04-checkout-saga/"}, {"label": "A verified shipping webhook", "href": "/tutorials/storefront/05-shipping-webhook/"}, {"label": "The storefront page", "href": "/tutorials/storefront/06-storefront-ui/"}, {"label": "Run the storefront under Aspire", "href": "/tutorials/storefront/07-deploy/"}] }) }}</section>
+
+<details class="docs-contract-details"><summary>Explore the contract flow</summary>
+
+## One definition, carried end to end
+
+{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "An optional DB-backed predecessor flows from a database model through db generate and @database/zod into a narrowed or extended versioned API schema. That schema and its oRPC route type the service handler, generated OpenAPI document, derived SDK client, page loader, and island. DB-less products can start at the versioned API schema.", caption: "DB-backed products normally narrow or extend generated model schemas before defining the public contract; DB-less products start at the versioned API schema. From the contract onward, the handler, OpenAPI document, SDK, and page share its types.", wide: true }) }}
+
+The tabs show one operation at four points in a DB-backed stack. Tab 0 is the optional generation
+and narrowing step; DB-less products start at tab 1. The contract owns the public input and output
+shapes. The handler and the page stay application code, but their boundary types come from the
+contract.
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "0 · The database (optional)",
+    lang: "ts",
+    code: "// From the workspace root:\n// netscript db generate --db postgres\n\n// contracts/versions/v1/users.schemas.ts\nimport { UserSchema as DatabaseUserSchema } from '@database/zod';\nimport { z } from 'zod';\n\nexport const UsersListItemSchemaV1 = DatabaseUserSchema\n  .pick({ id: true, name: true })\n  .extend({\n    status: z.enum(['active', 'invited']),\n  });"
+  },
+  {
+    label: "1 · The contract",
+    lang: "ts",
+    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\nimport { UsersListItemSchemaV1 } from './users.schemas.ts'; // derived in tab 0, or hand-authored without a database\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
+  },
+  {
+    label: "2 · The service",
+    lang: "ts",
+    code: "// services/users/src/routers/v1.ts\nimport { UsersV1 as usersContract } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: usersContract.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { auth: { public: true, reason: 'Public example service; add guards before exposing private data' }, name: 'users', version: '1.0.0' });"
+  },
+  {
+    label: "3 · The page",
+    lang: "tsx",
+    code: "// apps/dashboard/lib/users.ts\nimport { createServiceClient } from '@netscript/sdk/client';\nimport { createQueryFactories } from '@netscript/sdk/query';\nimport { UsersContractV1 } from '@my-app/contracts';\n\nexport const usersName = 'users';\nexport const usersRouterName = 'users';\nexport const usersContract = UsersContractV1;\nexport const usersClient = createServiceClient<typeof usersContract>({\n  contract: usersContract,\n  serviceName: usersName,\n  routerName: usersRouterName,\n});\nexport const usersQueries = createQueryFactories({\n  service: { contract: usersContract, client: usersClient },\n}).service;\n\n// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { z } from 'zod';\nimport { usersQueries } from '@app/lib/users.ts';\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withSearchParams(z.object({\n    limit: z.coerce.number().int().positive().max(100).default(20),\n  }))\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      const input = { limit: ctx.search.limit };\n      // Server-only: the action owns cache policy; getCachedEntry then\n      // reads the persisted pair (null if the write did not land).\n      const users = await usersQueries.list(input, { preferFreshOnStale: true });\n      const entry = await usersQueries.list.getCachedEntry(input);\n      return entry\n        ? { users: entry.data, cachedAt: entry.cachedAt }\n        : { users, cachedAt: Date.now() };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();\n\nexport const { default: page } = usersPage;\nexport { page as default };"
+  }
+] }) }}
+
+<p class="ns-lede">
+Change the database model and regenerate in tab 0, or change the public schema in tab 1. Handler
+code in tab 2 that no longer matches stops compiling, the OpenAPI document updates, and the loader
+in tab 3 sees the new types before anything reaches a browser. That propagation is what the
+meta-framework adds: it owns the seams between libraries you already know.
+<a href="{{ '/explanation/contracts/' |> url }}">How the type flow works</a> ·
+<a href="{{ '/web-layer/' |> url }}">how pages consume it</a>.
+</p>
+
+</details>
 
 ## Where to go
 
 <nav class="ns-destination-list" aria-label="Choose the next page">
   <ul>
     <li><a href="{{ '/quickstart/' |> url }}">Scaffold and run a workspace</a></li>
-    <li><a href="{{ '/concepts/' |> url }}">The five-layer mental model</a></li>
+    <li><a href="{{ '/explanation/' |> url }}">The five-layer mental model</a></li>
     <li><a href="{{ '/why/' |> url }}">The argument, with trade-offs</a></li>
     <li><a href="{{ '/tutorials/storefront/' |> url }}">Build a real system</a></li>
     <li><a href="{{ '/reference/' |> url }}">Package reference</a></li>

@@ -2,8 +2,79 @@ import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/
 import { dirname, fromFileUrl, join } from '@std/path';
 import { extractFencedBlocks } from './snippet-extractor.ts';
 import { analyzeSnippetSite } from './snippet-policy.ts';
+import { kill } from 'node:process';
 
 const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
+
+Deno.test({
+  name: 'interrupted Git ignore probe aborts the source walk',
+  ignore: Deno.build.os === 'windows',
+  fn: async () => {
+    const temp = await Deno.makeTempDir({ prefix: 'snippet-walk-interruption-' });
+    const ready = join(temp, 'ready');
+    const bin = join(temp, 'bin');
+    const site = join(temp, 'site');
+    await Deno.mkdir(bin);
+    await Deno.mkdir(join(site, 'article'), { recursive: true });
+    await Deno.writeTextFile(join(site, 'article/page.md'), '```ts\nconst value = 1;\n```\n');
+    const git = join(bin, 'git');
+    await Deno.writeTextFile(
+      git,
+      '#!/usr/bin/env -S deno run --no-config --allow-write\n' +
+        `await Deno.writeTextFile(${JSON.stringify(ready)}, String(Deno.pid));\n` +
+        'setInterval(() => {}, 1_000);\n',
+    );
+    await Deno.chmod(git, 0o755);
+    const policyUrl = new URL('./snippet-policy.ts', import.meta.url).href;
+    const child = new Deno.Command(Deno.execPath(), {
+      args: [
+        'eval',
+        `import { analyzeSnippetSite } from ${JSON.stringify(policyUrl)};
+          await analyzeSnippetSite(${JSON.stringify(site)}, { enforceCoverage: false });`,
+      ],
+      env: { PATH: `${bin}:${Deno.env.get('PATH') ?? ''}` },
+      stdin: 'null',
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+    const output = child.output();
+    const guard = setTimeout(() => {
+      try {
+        child.kill('SIGKILL');
+      } catch { /* Already exited. */ }
+    }, 5_000);
+    let probePid: number | undefined;
+    try {
+      const until = performance.now() + 2_000;
+      while (performance.now() < until) {
+        try {
+          probePid = Number(await Deno.readTextFile(ready));
+          break;
+        } catch (error) {
+          if (!(error instanceof Deno.errors.NotFound)) throw error;
+          await new Promise((done) => setTimeout(done, 20));
+        }
+      }
+      assert(probePid, 'the ignore probe must be active before cancellation');
+      child.kill('SIGTERM');
+      const result = await output;
+      assertEquals(result.success, false, 'an interrupted probe must not resume source scanning');
+      assertStringIncludes(new TextDecoder().decode(result.stderr), 'snippet process interrupted');
+    } finally {
+      clearTimeout(guard);
+      if (probePid) {
+        try {
+          kill(-probePid, 'SIGKILL');
+        } catch { /* The owned probe was already terminated. */ }
+      }
+      try {
+        child.kill('SIGKILL');
+      } catch { /* Already exited. */ }
+      await output;
+      await Deno.remove(temp, { recursive: true });
+    }
+  },
+});
 
 Deno.test('extractor preserves provenance and treats typescript as checked ts', () => {
   const blocks = extractFencedBlocks(
@@ -80,7 +151,6 @@ Deno.test('real corpus census recognizes TS aliases and enforces Tier-1 invarian
         'services-sdk/sdk.md',
         'services-sdk/how-to/add-a-service.md',
         'web-layer/query.md',
-        'web-layer/examples.md',
         'web-layer/interactive.md',
         'web-layer/form.md',
         'web-layer/query-bridge.md',
@@ -140,6 +210,9 @@ Deno.test('empty-reason fixture exits the actual CLI non-zero and names its fenc
     args: [
       'run',
       '--allow-read',
+      '--allow-write',
+      '--allow-run',
+      '--allow-env',
       '.llm/tools/docs/check-snippets.ts',
       '--negative',
       'empty-exemption-reason',

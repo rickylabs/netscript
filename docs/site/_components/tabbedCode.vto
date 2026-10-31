@@ -1,36 +1,21 @@
-{{# Lume component — docs/site/_components/tabbedCode.vto
-   Tabbed code block. Invoke:
-     {{ comp.tabbedCode({ tabs: [{ label: "Deno", lang: "ts", code: "…\n…" }, …] }) }}
-   Progressive enhancement: with JS disabled ALL panels render visible (no panel is hidden
-   until script.js confirms it can run and reveals the tab UI). CSP-safe: no inline handlers,
-   wired via data attributes + addEventListener. Vanilla JS, no React/islands.
-   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{# Compatible code tabs; filename is optional. Every panel remains visible without JavaScript. #}}
 {{ set items = tabs || [] }}
-{{ set gid = "nstab-" + Math.random().toString(36).slice(2, 9) }}
-<div class="ns-tabbed">
-  <div class="ns-tabbed__tablist" role="tablist" aria-label="Code examples">
-    {{ for index, tab of items }}
-      <button
-        type="button"
-        class="ns-tabbed__tab{{ if index === 0 }} is-active{{ /if }}"
-        role="tab"
-        id="{{ gid }}-tab-{{ index }}"
-        aria-controls="{{ gid }}-panel-{{ index }}"
-        aria-selected="{{ if index === 0 }}true{{ else }}false{{ /if }}"
-        tabindex="{{ if index === 0 }}0{{ else }}-1{{ /if }}"
-      >{{ tab.label }}</button>
-    {{ /for }}
+{{# Final page URL/local-index ids are assigned before search indexing and twin extraction. #}}
+{{ set gid = "nstab" }}
+<div class="ns-tabbed"{{ if runtime }} data-ns-runtime-group{{ /if }}>
+  <div class="ns-tabbed__header ns-code-header" data-twin-ignore data-pagefind-ignore>
+    <div class="ns-tabbed__tablist" role="tablist" aria-label="{{ runtime ? 'Runtime examples' : 'Code examples' }}">
+      {{ for index, tab of items }}
+        <button type="button" class="ns-tabbed__tab" role="tab" id="{{ gid }}-tab-{{ index }}" aria-controls="{{ gid }}-panel-{{ index }}" aria-selected="{{ index === 0 ? 'true' : 'false' }}" tabindex="{{ index === 0 ? '0' : '-1' }}" data-code-language="{{ (tab.lang || 'text') |> languageLabel }}" data-code-filename="{{ tab.filename || tab.path || '' }}"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>{{ tab.label || tab.filename || tab.path }}</button>
+      {{ /for }}
+    </div>
+    <span class="ns-code-path" data-tab-filename title="{{ items[0]?.filename || items[0]?.path || '' }}">{{ items[0]?.filename || items[0]?.path || '' }}</span>
+    <span class="ns-code-language" data-tab-language>{{ (items[0]?.lang || 'text') |> languageLabel }}</span>
+    <button type="button" class="ns-copy-btn js-only" data-code-copy data-tab-copy aria-label="Copy selected code">Copy</button>
   </div>
-{{ for index, tab of items }}
-{{ set code = (tab.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
-<div
-  class="ns-tabbed__panel"
-  role="tabpanel"
-  id="{{ gid }}-panel-{{ index }}"
-  aria-labelledby="{{ gid }}-tab-{{ index }}"
-  tabindex="0"
->
-<pre><code class="language-{{ tab.lang }}">{{ code }}</code></pre>
-</div>
-{{ /for }}
+  {{ for index, tab of items }}
+    <div class="ns-tabbed__panel" role="tabpanel" id="{{ gid }}-panel-{{ index }}" aria-labelledby="{{ gid }}-tab-{{ index }}" tabindex="0"{{ if runtime }} data-ns-runtime="{{ tab.label }}"{{ /if }}>
+      {{ comp.codeBlock({ code: tab.code, lang: tab.lang, filename: tab.filename || tab.path, tabLabel: tab.label }) }}
+    </div>
+  {{ /for }}
 </div>

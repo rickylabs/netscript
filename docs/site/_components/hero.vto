@@ -1,16 +1,13 @@
-{{# Lume component — docs/site/_components/hero.vto
-   Hero band: large tagline, optional subhead, CTA buttons (primary styled distinctly).
-   Invoke:  {{ comp.hero({ tagline: "…", subhead: "…", ctas: [{ label, href, primary? }] }) }}
-   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{# Display thesis plus install/copy-source aside. Existing tagline/subhead/ctas remain stable. #}}
 {{ set buttons = ctas || [] }}
 <section class="ns-hero">
-  <h1 class="ns-hero__tagline">{{ tagline |> ic }}</h1>
-  {{ if subhead }}<p class="ns-hero__subhead">{{ subhead }}</p>{{ /if }}
-  {{ if buttons.length }}
-    <div class="ns-hero__ctas">
-      {{ for cta of buttons }}
-        <a class="ns-hero__cta{{ if cta.primary }} ns-hero__cta--primary{{ /if }}" href="{{ cta.href |> url }}">{{ cta.label }}</a>
-      {{ /for }}
-    </div>
-  {{ /if }}
+  <div class="ns-hero__main"><p class="ns-eyebrow">Deno meta-framework · v{{ releaseVersion }}</p><h1 class="ns-hero__tagline">{{ tagline |> ic }}</h1>{{ if subhead }}<p class="ns-hero__subhead">{{ subhead }}</p>{{ /if }}
+    <div class="ns-hero__ctas">{{ for cta of buttons }}<a class="ns-hero__cta" data-variant="{{ cta.primary ? 'primary' : 'outline' }}" href="{{ cta.href |> url }}">{{ cta.label }}</a>{{ /for }}</div>
+  </div>
+  <aside class="ns-hero__aside" aria-label="Install and own the source">
+    <p class="ns-eyebrow">Install the CLI</p>
+    {{ comp.codeBlock({ lang: "bash", filename: "bash", code: ["deno install -g -A -n netscript \\", "  jsr:@netscript/cli@" + releaseVersion, "netscript init my-app \\", "  --db postgres --yes"].join("\n") }) }}
+    <p class="ns-eyebrow">You own every file</p>
+    <div class="ns-path-stack">{{ comp.filePathChip({ path: "components/ui/button.tsx" }) }}{{ comp.filePathChip({ path: "assets/tokens.css" }) }}{{ comp.filePathChip({ path: "routes/(design)/index.tsx" }) }}{{ comp.filePathChip({ path: "contracts/versions/v1/users.contract.ts" }) }}</div>
+  </aside>
 </section>
