@@ -81,7 +81,7 @@
     "type": "registry:component",
     "scope": "badge",
     "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-badge.png",
-    "result": "Locked authority: transparent status outlines, leading6px dot, sans11px label; seven shipped tones. No separate emphasis axis added."
+    "result": "Owner follow-up: variant subtle fills and semantic borders now win; leading6px dot and sans11px label retained across seven tones. Earlier transparent-outline captures are historical; the current 52-case gallery and computed-style matrix verify the correction. No separate emphasis axis added."
   },
   {
     "item": "avatar",

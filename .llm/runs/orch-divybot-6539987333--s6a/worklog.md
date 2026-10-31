@@ -189,3 +189,22 @@ Hydration round2 independent IMPL-EVAL:PASS. Actual resource render path and unc
 canonical island/loader fixture verified; all118hashes and final44browser/41focused/14root
 checks verified. Failure streak reset0. Sign-off commit/push next; require newfullPostgreSQL
 andSQLite CI runtime results plus requiredchecks beforeREADY. No further code changes pending.
+
+## Owner badge follow-up — 2026-10-31
+
+Baseline c9c6e88; prior READY is superseded for this requested round. Public surface is the existing
+Badge CSS contract: each Utility variant owns its background/border, and info falls back to the
+secondary text role when info roles are absent. Vocabulary/ports/constants remain the existing
+variant names, data-scope/data-part attributes and semantic CSS custom properties; no new API.
+One commit slice fixes badge.css, adds computed-style Chromium regressions with red/green evidence,
+regenerates affected carriers and updates this run. Contributor path: badge.css plus
+`tools/fresh-ui-browser/tests/badge.spec.ts`. Same independent evaluator must sign off before commit;
+required CI and full runtime must pass at the new head before renewed READY. CSS-size growth and
+QueryResult duplication are explicitly deferred to a separate issue by the owner; no work on them
+in this round. Existing doctrine archetype/layering unchanged: L2 copied registry CSS, no new imports.
+
+Badge result:8red ->4variantgreen/4fallbackred ->8green; full52browser and335package testsPASS.
+All14rootchecks, scopedcheck/lint/fmt, quality/architecture, docsaccuracy, releasepreflight and
+carrier freshnessPASS. Same Opus evaluatorPASS; requested visual evidence descriptions corrected
+and package test completion verified before commit.119sourcehashes match; failurestreak0.
+Only badge CSS plus its carrier/test/docs changed; excluded scope untouched.

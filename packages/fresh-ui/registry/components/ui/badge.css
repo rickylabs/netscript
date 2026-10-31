@@ -71,7 +71,7 @@
 
 /* Legacy themes without info roles retain their secondary palette for this additive tone. */
 :where(.ns-badge)[data-variant='info'] {
-  color: var(--ns-info-text, var(--ns-secondary));
+  color: var(--ns-info-text, var(--ns-secondary-text));
   background: var(--ns-info-subtle, var(--ns-secondary-subtle));
   border: var(--ns-border-width, 1px) solid var(--ns-info-border, var(--ns-secondary-border));
 }
@@ -146,8 +146,6 @@
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant] {
   font-family: var(--ns-font-label);
   gap: var(--ns-space-1-5);
-  background: transparent;
-  border-color: currentColor;
 }
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='dot'] {
   display: inline-block;

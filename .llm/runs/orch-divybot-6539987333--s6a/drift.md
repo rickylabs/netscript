@@ -88,3 +88,11 @@ failure. Repair before re-review: share successful return and QueryResult body a
 generators, update resource goldens, and compile/render the actual canonical PeopleIsland
 with its real QueryIsland/useIslandQuery hooks in the browser. Repeat old-selector negative
 control against that resource surface. No commit/push before independentPASS.
+
+
+## Owner badge correction
+
+Owner explicitly requires per-variant backgrounds/borders to win over the later Utility outline
+override and secondary-text as the info fallback. This supersedes the earlier transparent/currentColor
+paint choice; anatomy/dot and semantic token values are unchanged. CSS-size growth and QueryResult
+duplication belong to separate issue scope, not this PR round.

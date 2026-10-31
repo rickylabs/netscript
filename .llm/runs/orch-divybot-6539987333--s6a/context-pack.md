@@ -114,3 +114,16 @@ Hydration round2 independent IMPL-EVAL:PASS. Actual resource render path and unc
 canonical island/loader fixture verified; all118hashes and final44browser/41focused/14root
 checks verified. Failure streak reset0. Sign-off commit/push next; require newfullPostgreSQL
 andSQLite CI runtime results plus requiredchecks beforeREADY. No further code changes pending.
+
+
+## Badge follow-up in progress
+
+Baseline c9c6e88 was READY with full PostgreSQL120/SQLite113 checks passing; owner added badge
+cascade/text fixes, so that READY is superseded. Source fix and independent red/green proofs are
+complete. New browser spec adds eight cases (full matrix52). All14rootchecks, broadquality,
+docsaccuracy and releasepreflight pass. Same independent reviewer and new exact-head CI remain
+required. No QueryResult or CSS-size work in this round.
+
+Badge follow-up local gates and independent review nowPASS (52browser,335package,14rootchecks).
+Both reviewer pre-commit conditions complete. Commit/push samePR2503, then wait for newheadrequiredCI
+and both fullruntime suites before renewedREADY. badge-gates.json and badge-review.md are current.
