@@ -41,3 +41,15 @@ source-style registrations, reject missing providers and all4 contract mutants.
 
 Slice5 source de67b38 signed off; all four carrier freshness checks PASS after
 clean-source MCP regeneration. No lock churn. Push/comment closes this slice.
+
+Latest steering: current Pages build failure6b42a62 caused by two missing symbols
+in docs/site/reference/fresh-ui/index.md, now corrected locally. Overlay has only
+been researched; no code yet. Finish docs CI repair and carrier regeneration,
+review/push/comment before resuming Overlays. docs:exports-drift and docs:snippets
+are in flight. See external run ci-docs-* logs; no private log dumps in public.
+
+CI repair local gates and independent review PASS: exports-drift, snippets,
+Lume253 HTML,23734 links and13 caveat markers. Prose generated; commit source,
+refresh clean-source corpus/publication, check all carriers and push. This fixes
+the user-reported build failure; Overlay remains unimplemented. For every new
+public export, run docs:exports-drift in addition to docs:accuracy.
