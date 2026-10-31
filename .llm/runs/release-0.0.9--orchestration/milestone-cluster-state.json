@@ -483,7 +483,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2481,
-      "headSha": "a8678d242c99e91a623441959db58821ead9d9b0",
+      "headSha": "15608953cf8329da36227f93151f70986c4c18c5",
       "issueNumbers": [
         2144
       ],
@@ -496,13 +496,27 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2482,
-      "headSha": "22d153183d287fc5327fba00de9833e3afba794b",
+      "headSha": "048bad37987ea86ee2fd67494c9ca96a04bcfcf4",
       "issueNumbers": [
         2400
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2438 (continuation after #2476 merged)",
       "receiptRefs": [],
       "note": "Claimed by the #2438 worker via orchid continuation (claim comment on #2400 at 00:39Z); uses briefs/2400.md."
+    },
+    {
+      "id": "A2-2395",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2483,
+      "headSha": "8aaec3bad30f4b540651da45d5f3d2a58a3f0cbf",
+      "issueNumbers": [
+        2395
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2395",
+      "receiptRefs": [],
+      "note": "re-planning: fresh PLAN-EVAL cycle authorized 01:11Z (briefs/2395.steer-1.md)"
     }
   ],
   "expensiveGates": [
@@ -690,7 +704,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T00:58:35.000Z",
+  "updatedAt": "2026-10-31T01:10:42.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -774,8 +788,8 @@
       "commentId": 6536806908,
       "postedAt": "2026-10-31T00:54:45.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "started",
-      "pr": null
+      "state": "pr-open",
+      "pr": 2483
     }
   ],
   "coordinatorArtifactPr": 2475
