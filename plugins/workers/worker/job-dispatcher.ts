@@ -16,6 +16,7 @@ import {
 } from '@netscript/telemetry/instrumentation';
 import { getParentContextFromHeaders } from '@netscript/telemetry/context';
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
+import { workerJobLogger } from './job-logger.ts';
 import { executeWorkerJob } from './job-execution.ts';
 import type { JobExecutionContext, WorkerDispatchContext } from './worker-options.ts';
 import { recordIdempotentSkip } from './worker-idempotency-events.ts';
@@ -50,8 +51,6 @@ export async function processWorkerJob(
   const traceHeaders = getMessageTraceHeaders(message, tracedContext);
   const parentContext = tracedContext?.parentContext ?? getParentContextFromHeaders(traceHeaders);
   const triggeredBy = normalizeTriggeredBy(message.triggeredBy);
-
-  console.log(`[Worker ${context.workerId}] Processing job '${jobId}' (trigger: ${triggeredBy})`);
 
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;
@@ -88,6 +87,13 @@ export async function processWorkerJob(
       throw new Error(`Job '${jobId}' is disabled`);
     }
 
+    workerJobLogger.debug('Processing job {jobId}', {
+      workerId: context.workerId,
+      jobId,
+      jobName: jobDef.name ?? jobId,
+      triggeredBy,
+    });
+
     const topic = jobDef.topic ?? message.topic ?? DEFAULT_TOPIC;
     claim = await context.idempotency.claim({
       concept: 'job',
@@ -98,7 +104,7 @@ export async function processWorkerJob(
       payload,
     });
     if (!claim.claimed) {
-      recordIdempotentSkip(context, 'job', jobId, claim, tracedContext);
+      recordIdempotentSkip(context, 'job', jobId, jobDef.name ?? jobId, claim, tracedContext);
       if (!claim.alreadyApplied) throw new Error(`Job '${jobId}' is already being processed`);
       return;
     }
@@ -261,13 +267,18 @@ export async function processWorkerTask(
   let claimAttempted = false;
   const lease = new WorkerDeliveryLease(queueContext, context.shutdownSignal);
 
-  console.log(`[Worker ${context.workerId}] Processing task '${taskId}' (trigger: ${triggeredBy})`);
-
   try {
     await lease.start();
     const taskDef = await context.taskRegistry.get(taskId);
     if (!taskDef) throw new Error(`Task '${taskId}' not found in registry`);
     if (!taskDef.enabled) throw new Error(`Task '${taskId}' is disabled`);
+
+    workerJobLogger.debug('Processing task {taskId}', {
+      workerId: context.workerId,
+      taskId,
+      taskName: taskDef.name ?? taskId,
+      triggeredBy,
+    });
 
     claimAttempted = true;
     claim = await context.idempotency.claim({
@@ -279,7 +290,7 @@ export async function processWorkerTask(
       payload,
     });
     if (!claim.claimed) {
-      recordIdempotentSkip(context, 'task', taskId, claim);
+      recordIdempotentSkip(context, 'task', taskId, taskDef.name ?? taskId, claim);
       if (!claim.alreadyApplied) throw new Error(`Task '${taskId}' is already being processed`);
       return;
     }
@@ -324,11 +335,18 @@ export async function processWorkerTask(
       await context.idempotency.release(claim.key, claim.token);
     }
 
-    console.log(
-      `[Worker ${context.workerId}] Task '${taskId}' ${
-        result.success ? 'completed' : 'failed'
-      } in ${result.duration}ms`,
-    );
+    if (result.success) {
+      workerJobLogger.debug('Task {taskId} completed', {
+        workerId: context.workerId,
+        taskId,
+        taskName: taskDef.name ?? taskId,
+        duration: result.duration,
+      });
+    } else {
+      console.error(
+        `[Worker ${context.workerId}] Task '${taskId}' failed in ${result.duration}ms`,
+      );
+    }
   } catch (error) {
     if (claim?.claimed) {
       await context.idempotency.release(claim.key, claim.token);

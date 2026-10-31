@@ -546,6 +546,7 @@
           "jsr:@netscript/contracts@0.0.8",
           "jsr:@netscript/cron@0.0.8",
           "jsr:@netscript/kv@0.0.8",
+          "jsr:@netscript/logger@0.0.8",
           "jsr:@netscript/plugin-streams-core@0.0.8",
           "jsr:@netscript/plugin-workers-core@0.0.8",
           "jsr:@netscript/plugin@0.0.8",

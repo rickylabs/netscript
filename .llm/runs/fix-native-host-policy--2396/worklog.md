@@ -579,3 +579,30 @@ orch-divybot-6541471368--2383/negative-control.patch. It is byte-identical to ap
 and belongs to retained run evidence. Preserve it unchanged; owned run/reference/carrier
 paths pass their scoped diff whitespace check. This is not a TypeScript quality failure
 or a waived source gate, and no incoming patch/evidence is reformatted or stripped.
+
+Main-lock inventory correction: unfiltered comparison shows FOUR approved main-owned lock
+updates in #2511 (root, Fresh UI, desktop reference and Expo reference), not only the two
+inside packages/. All four staged/worktree versions equal mainAEC exactly; no leaf lock
+regeneration or unstaged churn exists. Preserve all four and name the main ownership in PR.
+
+Current AEC logging union: all generators/freshness writers and all static/sweep gates
+terminalPASS before full test start. Root, quality/architecture, docsaccuracy/Aspire parity,
+native service8+both facade docs and five member dry-runs pass; fresh source audits exit0
+with existing warnings retained. Four main-owned locks match main exactly. Native auth,
+test, facades and debt remain unchanged; workers manifest keeps its additive service export.
+
+Fresh full19-root run is live: original14 roots +producer-session +all4 new docs/tool/saga
+regression files, with task-owned executableTMPDIR and all assertions/deadlines/permissions/
+ignores intact. All22 recorded source hashes frozen before run. No source writers/sweeps
+will run concurrently. Raw landing/complete-tests reports are external. Await terminal
+result, independently approve slice, commit/push and obtain new exact-head MERGE with live
+mergeability audit. Prior source verdicts remain historical. No local scaffold.runtime.
+
+
+Landing aec75e4d merge validation terminal PASS: complete fresh19-scope suite1937/0/25 in576971ms; root4051/34/0, quality/docs/parity, four freshness gates, service8+two facades doc-lint, five publication dry-runs PASS. All22 source hashes unchanged; FOUR incoming main locks exactmain. No test weakening. Same-session slice review next. Latest remote main851d1ce9 includes Figma/theme production changes; before READY audit live mergeability and reconcile if needed. Older c1f9 CI runtime lanes passed; close-gate red only on unchecked coordinator same-head proof checkbox; cannot transplant old CI proof.
+
+Current-main audit after tests: remote main851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2; `git merge-tree --write-tree HEAD origin/main` exits0 with no conflicts. No additional main merge is needed solely for mergeability. Final pushed-head audit must confirm GitHub MERGEABLE. Review-thread gate PASS0 unanswered.
+
+Independent landing slice checkpoint requested record correction: completeTests.roots omitted packages/service due to argv indexing. Corrected to exact19 before review returned; reviewer had read prior snapshot. Actual receipt always covered all19, real1937/0/25 unchanged. Clarified scoped gates are historical reused by exact native-file identity and old failure belongs to historical phase. Same evaluator follow-up required before commit.
+
+Independent landing slice review PASS after correcting receipt-root indexing and historical-gate wording. No source blocker; all22 hashes verified. Ready to commit/push normal aec75e4d merge; mandatory new exact-head total-delta IMPL-EVAL and live mergeability/CI snapshot still pending. Both raw facade doc-lints freshly exit0.

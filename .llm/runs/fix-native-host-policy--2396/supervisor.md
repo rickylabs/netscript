@@ -158,5 +158,5 @@ run. Reuse same evaluator for the new exact head; old32264fc11 MERGE remains his
 
 Additional current-main reconciliation aec75e4d947dcf7c83b9f7dd4b6444abe430f18b is authorized
 by the original normal-merge instruction. Preserve #2511 worker logging code/manifest and
-both main-owned private lock updates exactly. No leaf dependency/version change or lock
+all FOUR main-owned lock updates exactly. No leaf dependency/version change or lock
 regeneration is authorized. Runtime inputs change, so run a fresh complete suite, not reuse.
