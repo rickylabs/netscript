@@ -1,0 +1,31 @@
+{
+  "slice": "7b Chart and Carousel",
+  "shippedComponents": 87,
+  "inventoryComponents": 104,
+  "nativeRegistryItems": 115,
+  "initialFocusedTests": {
+    "passed": 217,
+    "failed": 0
+  },
+  "finalFocusedContractDataAndCopyTests": {
+    "passed": 210,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 17,
+    "failed": 0,
+    "includesActualTouchSwipeAndTap": true
+  },
+  "finalAccessibilityAndComponentCaptures": {
+    "passed": 4,
+    "failed": 0
+  },
+  "sourceAndBrowserWrappers": "PASS",
+  "qualityAndArchitecture": "PASS",
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "independentInitialAndFollowupReview": "PASS",
+  "phaseReady": false,
+  "finalPhaseGates": "PENDING"
+}

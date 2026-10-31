@@ -1,3 +1,4 @@
+import { DisplayMotion } from './gap-display-motion-fixture.tsx';
 import { DisplayBasics } from './gap-display-basics-fixture.tsx';
 import { Overlays } from './gap-overlays-fixture.tsx';
 import { Navigation } from './gap-navigation-fixture.tsx';
@@ -57,6 +58,7 @@ function Actions() {
       <Navigation />
       <Overlays />
       <DisplayBasics />
+      <DisplayMotion />
     </main>
   );
 }

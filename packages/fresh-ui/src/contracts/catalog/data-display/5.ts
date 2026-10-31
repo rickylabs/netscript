@@ -101,7 +101,7 @@ export const data_display_5: readonly ComponentContract[] = [
     'specId': 'D14',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'orientation': {
         'kind': 'enum',
@@ -120,42 +120,69 @@ export const data_display_5: readonly ComponentContract[] = [
       'dots': {
         'kind': 'boolean',
       },
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'slides': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'counter': {
+        'kind': 'boolean',
+      },
+      'defaultIndex': {
+        'kind': 'number',
+        'default': 0,
+      },
+      'onIndexChange': {
+        'kind': 'callback',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'viewport',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'slide',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'previous',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'next',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'dots',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'dot',
+        'when': 'dots supplied',
+      },
+      {
+        'name': 'counter',
+        'when': 'counter supplied',
+      },
+      {
+        'name': 'pagination',
+        'when': 'dots or counter supplied',
+      },
+      {
+        'name': 'empty',
+        'when': 'no slides',
       },
     ],
     'attributes': {
@@ -174,8 +201,14 @@ export const data_display_5: readonly ComponentContract[] = [
     },
     'booleans': [
       'dots',
+      'counter',
     ],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'slides',
+        'part': 'slide',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/carousel/',
     'keyboard': [
       {
@@ -193,7 +226,9 @@ export const data_display_5: readonly ComponentContract[] = [
       'text/fg',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native overflow scrolling and mandatory snap points retain touch/trackpad behavior. ResizeObserver realigns the current slide without global listeners.',
+      'No autoplay. Boundary controls use guarded aria-disabled so activation never removes focus. After hydration only the current slide is interactive; before hydration native scrolling keeps all slide content available.',
+      'defaultIndex is clamped to available slides; changing slide count or orientation keeps a valid current index.',
     ],
   },
 ];
