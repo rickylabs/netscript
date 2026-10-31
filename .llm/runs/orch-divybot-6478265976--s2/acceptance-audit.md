@@ -1,3 +1,9 @@
+# Current acceptance disposition — 2026-10-31
+
+All six issue acceptance requirements and the remaining approved CLI/MCP/build scope are delivered. Final independent full S2 **PASS** at dd486f5692902ff2b977ef4576ac9609a5553748 is recorded in 2026-10-31-impl-eval.md. Current stable integrated364/0/0, native3/0/0,83-file structured wrappers, public-entrypoint checks and eight exact-source broader/dry-run receipts pass. Current gate outcomes and limitations supersede the historical statuses below: root quality's upstream docs-fixture finding,123 unchanged component doc-lint errors and Docker-unavailable runtime/cleanup remain explicitly disclosed. No new source is included in the final evidence-only commit. Ready existing PR2468 and stop for Cockpit.
+
+## Detailed implementation/evidence mapping (retained)
+
 # S2 acceptance evidence audit
 
 This maps the full owner-approved objective to implementation and executable evidence. It is an implementer evidence audit, not an independent IMPL-EVAL verdict or a READY claim. Historical gate receipts in final-gates.md identify their exact source checkpoint; post-repair evidence must identify the newer checkpoint separately.

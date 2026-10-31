@@ -1,3 +1,44 @@
+# 2026-10-31 current-head gates
+
+Audited pushed product source: **dd486f5692902ff2b977ef4576ac9609a5553748**. This normal merge includes main **7907293f3dad3aeb557923809ddcd3435adae151** and reconciles documentation/carriers. It preserves the complete S2 source and prior removal repair. Every durable receipt below identifies this exact immutable head. Private raw receipts retain commands and output hashes; public evidence omits runtime identity.
+
+## Behavioral and structured checks
+
+- Full stable integrated application/CLI/adapter/token/MCP/schema/build/docs/carrier suite: **364 passed, 0 failed, 0 skipped**, structured wrapper exit **0**. The exact scope is the UI application/features/adapters, token application/features, agent MCP composition, contributor command-tree test, all MCP tests, six top-level Fresh UI registry protocol/build/doc tests, and docs accuracy/carrier tests named in the existing final gate recipe.
+- Actual CLI subprocess acceptance: **3 passed, 0 failed, 0 skipped**, structured wrapper exit **0**. These prove authenticated namespace installation without credential output/persistence; exact source/baseline/hash provenance and read-only local diffs; style switching/update and edited-copy refusal; preset init/theme-only apply, canonical docs, later S1 build persistence; and theme removal preserving app CSS/token state.
+- Separate stable carrier parity confirmation: **3/0/0**, exit **0**. The earlier overlapping 364-test run captured stale carrier imports during generation and reported **363/1/0**. No source was changed to resolve it; the fully stable rerun passes. That earlier failure is retained as historical, not hidden.
+- Structured check/lint/format select and process **83 changed TS/TSX files**, with zero findings, dropped files or coverage refusals. Check includes unstable-kv and frozen resolution; lint/fmt retain root rules while removing only path exclusions for the explicit file set.
+- Changed registry and full MCP export-map doc-lint: **zero errors**, exit **0**. JSR metadata audits CLI/Fresh UI/MCP: exit **0**; full workspace dry run below remains the authoritative slow-type check. Existing audit warnings do not claim an actual publication.
+- Docs-site build: **253 rendered HTML pages**, rendered-output check passes, and **87 static registry JSON artifacts**. All command documentation is current: **109/109** direct commands, **174** recursive paths.
+- Review-thread gate: **0 unanswered**, exit **0**. All generators leave tracked source clean. No package uploaded.
+
+## Durable allowlisted gates
+
+| Gate | Outcome | Exit |
+| --- | --- | --- |
+| `quality-gate` | FAIL | 1 |
+| `arch-check` | PASS | 0 |
+| `docs-accuracy` | PASS | 0 |
+| `exports-drift` | PASS | 0 |
+| `mcp-export-corpus` | PASS | 0 |
+| `assets-barrel` | PASS | 0 |
+| `publish-assets` | PASS | 0 |
+| `agent-docs-prose` | PASS | 0 |
+| `publish-dry-run` | PASS | 0 |
+
+The independent package/plugin quality scan also passes with the existing allowance limit unchanged. `arch-check` separately runs the configured dependency guards and doctrine scan, since the root quality chain short-circuits before architecture on its baseline finding.
+
+## Disclosed limitations
+
+- **Root quality:gate remains FAIL/exit 1**, solely for upstream docs/site/_plugins/markdown-render-fixture.ts:48 (`unsafe-cast`). Its bytes match current main exactly, independently verified with git diff. The merged upstream run also documents this baseline. No suppression, allowance increase, unrelated fixture repair or false green is introduced.
+- Full Fresh UI doc-lint retains the previously established **123 unchanged component findings**: 96 private references and 27 missing docs. S3-owned component sources remain untouched. The changed registry and MCP entrypoints pass.
+- The exact required **`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`** ran at this source head and exits **1**: preflight.deno passes, preflight.aspire and cleanup.aspire-stop fail. **Docker daemon unavailable; full runtime and cleanup remain UNPROVEN.** No generated runtime starts before the failing preflight. Read-only resource inspection reports unproven ownership entries and leaves them untouched.
+- The initial `check:cli-structure` spelling is not a configured task, and the initial singular doc-lint `--entrypoint` spelling is unsupported. Neither is gate evidence. Correct structured doc-lint uses repeated `--entrypoints`; architecture and its configured doctrine checks supply the broader verdict.
+
+Independent final review is recorded separately in 2026-10-31-impl-eval.md; automation results do not self-certify source review. No new architectural debt, dependency versions, S3 component source changes, labels, force push, PR merge, tag, release or assignment commit.
+
+## Historical gate checkpoints (retained)
+
 # Current removal repair gate evidence
 
 Audited clean pushed product source: **dd4e793462420733f281036c48e963f661f1f9aa**. It repairs the independent finding that explicit theme removal can delete app CSS/compiler outputs. Before repair both unit and actual public CLI controls fail with missing styles.css. After repair:
