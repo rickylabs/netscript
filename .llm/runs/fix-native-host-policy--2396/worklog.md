@@ -262,3 +262,10 @@ Both prerequisites are now merged by the coordinator: #2422 runtime reports120/0
 no main merge or label edit. New integration independent sign-off remains UNPROVEN because
 the feature's five evaluator rounds are exhausted. Prepare source and gates for coordinator
 review; preserve94393bc8's final MERGE as historical/source-equivalence evidence only.
+
+Canonical post-prerequisite export corpus regeneration PASS:35 packages,305 subpaths,9003
+symbols (new main includes the Fresh UI contracts exports). The feature service/runtime/test
+paths and both plugin export maps remain byte-identical to reviewed94393bc8. Incoming UI
+source is retained exactly from main. This carrier-only continuation finalizes the coherent
+merge tree; post-merge root/union tests/quality are running. Its new exact-head independent
+sign-off remains unproven at the spent5-round cap and must be decided by the coordinator.
