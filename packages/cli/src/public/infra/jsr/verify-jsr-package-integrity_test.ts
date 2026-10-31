@@ -90,6 +90,36 @@ async function checksum(bytes: Uint8Array): Promise<string> {
   const input = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(input).set(bytes);
   const digest = await crypto.subtle.digest('SHA-256', input);
-  return `sha256-${Array.from(new Uint8Array(digest), (byte) =>
-    byte.toString(16).padStart(2, '0')).join('')}`;
+  return `sha256-${
+    Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
+  }`;
 }
+
+Deno.test('published SQL migration sidecars require the same integrity verification as schemas', async () => {
+  const bytes = textEncoder.encode('ALTER TABLE example ADD CHECK (id > 0);');
+  const base = descriptorWithSchemaChecksum('unused');
+  const descriptor = {
+    ...base,
+    versionMetadata: {
+      ...base.versionMetadata,
+      files: {
+        '/database/checks.migration.sql': await checksum(bytes),
+      },
+    },
+  };
+  const result = await fetchJsrPackageSchemaFragments(descriptor, {
+    fetchFile: () => Promise.resolve(bytes),
+  });
+  assertEquals(result, [{
+    path: 'database/checks.migration.sql',
+    content: new TextDecoder().decode(bytes),
+  }]);
+  await assertRejects(
+    () =>
+      fetchJsrPackageSchemaFragments(descriptor, {
+        fetchFile: () => Promise.resolve(textEncoder.encode('tampered')),
+      }),
+    Error,
+    'actual sha256-',
+  );
+});

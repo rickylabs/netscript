@@ -19,3 +19,18 @@ Baseline equals current fetched main. No triage comment or existing PR referenci
 7. Contributor path: prisma-saga-command-retention.ts plus linked schema/migration recipe.
 
 Public additions use named typed exports on existing database commands/postgres and saga stores subpaths, explicit return annotations and JSDoc examples; no new entrypoints, dependencies or slow-type carveouts.
+
+## Plan repair
+
+Round 1 FAIL_PLAN recorded. Revised seven-item design follows plan.md: public cursor/scanned/deleted contracts; *.migration.sql sidecars installed by existing schema mechanism; migration runner appends pending immutable contributions before deploy; keyset scans bound examined records; TypeScript metadata validation; policy map and conservative outbox max; query-interception test seam; CI entry and copied-model adoption. Scope extension is within owner-authorized full delivery; no approval pause. Baseline quality:gate exit 0. Isolated native PostgreSQL startup/cleanup probe exit 0. Draft PR #2487 opened.
+
+PLAN-EVAL round 2 PASS; implementation begins only after this verdict. Latest main command-postgres run is green: https://github.com/rickylabs/netscript/actions/runs/41152000845 . Prior memory of a provider failure is stale.
+
+## S1 gates
+
+- Structured migration/schema tests: 33 passed, 0 failed, exit 0.
+- Structured real PostgreSQL installed schema: 1 outer conformance passed, exit 0. Actual contribution copy/dedup -> Prisma migrate diff with datasource config -> pending contribution append -> migrate deploy -> generated Prisma client. Catalog parity proves exact fixture columns/indexes/CHECKs; constraint rejection and idempotent existing-constraint adoption pass. Native database created/dropped by test, server cleaned by gate.
+- Scoped database, CLI-configured, and saga type checks exit 0. Scoped lint and format exit 0 (CLI excludes removed only in temporary validation config, keeping canonical rules). Quality/architecture final slice gate running.
+- Reconcile: issue remains open, draft PR #2487 targets main; no labels/milestones changed. Native diff exits zero without output if datasource config is omitted; proof now demands generated file and provides config. See memory-migration-delivery.md.
+
+S1 sign-off: independent substantive supervisor review PASS after fresh-install and line-ending repairs. Final real PostgreSQL: 2 passed (fresh contribution and copied-model adoption); 33 unit regressions pass; scoped check/lint/fmt and quality:gate exit 0. CI registration/path filters included. No engine or lock changes.

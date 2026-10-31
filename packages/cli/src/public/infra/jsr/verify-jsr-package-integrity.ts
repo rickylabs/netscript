@@ -53,7 +53,7 @@ export class WebJsrPackageFileFetcher implements JsrPackageFileFetcher {
   }
 }
 
-/** Fetch all published Prisma fragments below the package's `database` directory. */
+/** Fetch published Prisma fragments and migration sidecars below the package's `database` directory. */
 export async function fetchJsrPackageSchemaFragments(
   descriptor: ValidatedPluginDescriptor,
   fetcher: JsrPackageFileFetcher = new WebJsrPackageFileFetcher(),
@@ -64,7 +64,10 @@ export async function fetchJsrPackageSchemaFragments(
       path: normalizeJsrPackagePath(metadataPath),
       expected,
     }))
-    .filter(({ path }) => path.startsWith('database/') && path.endsWith('.prisma'))
+    .filter(({ path }) =>
+      path.startsWith('database/') &&
+      (path.endsWith('.prisma') || path.endsWith('.migration.sql'))
+    )
     .sort((left, right) => left.path.localeCompare(right.path));
 
   return await Promise.all(schemaFiles.map(async ({ metadataPath, path, expected }) => {

@@ -38,14 +38,16 @@ export async function writePluginSchemaFragment(
     pluginName,
     fileName,
   );
-  const preparedContent = await guardPrismaSchemaFragment(
-    schemaRoot,
-    targetPath,
-    pluginName,
-    sourcePath,
-    content,
-    fs,
-  );
+  const preparedContent = sourcePath.endsWith('.migration.sql')
+    ? content
+    : await guardPrismaSchemaFragment(
+      schemaRoot,
+      targetPath,
+      pluginName,
+      sourcePath,
+      content,
+      fs,
+    );
   const written = preparedContent === null
     ? false
     : await scaffolder.writeFile(targetPath, preparedContent, overwrite);
