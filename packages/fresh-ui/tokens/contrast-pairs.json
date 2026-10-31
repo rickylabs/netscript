@@ -520,7 +520,8 @@
       "background": [
         "state-disabled-container"
       ],
-      "minimum": 4.5
+      "minimum": 4.5,
+      "exemption": "inactive-component"
     },
     {
       "id": "ring/bg",
@@ -2308,7 +2309,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "fluent-text-inverse/inverse",
@@ -2839,7 +2841,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "fluent-system-caution/fluent-solid-base+fluent-system-caution-bg",
@@ -3197,7 +3200,8 @@
       "minimum": 4.5,
       "presets": [
         "tactile"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "tactile-edge-control/tactile-surface-well",
@@ -3965,7 +3969,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-default",
@@ -4315,7 +4320,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "badge-solid-d-destructive-fg/badge-solid-d-destructive-bg",

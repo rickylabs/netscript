@@ -1,0 +1,16 @@
+Task gen:mcp-export-corpus deno run --no-lock --allow-read --allow-write --allow-env --allow-run=deno,git .llm/tools/docs/generate-export-surface-corpus.ts '--allow-dirty'
+WARNING: MCP export-corpus generator read set is dirty:
+ M packages/fresh-ui/scripts/check-tokens.ts
+ M packages/fresh-ui/scripts/report-token-contrast.ts
+ M packages/fresh-ui/src/tokens/adapters/default-token-quality.ts
+ M packages/fresh-ui/src/tokens/assets/quality.generated.ts
+ M packages/fresh-ui/src/tokens/domain/check-token-contrast.ts
+ M packages/fresh-ui/src/tokens/domain/contrast-contract.ts
+ M packages/fresh-ui/tests/tokens/check-command.test.ts
+ M packages/fresh-ui/tests/tokens/contrast-report.test.ts
+ M packages/fresh-ui/tests/tokens/contrast.test.ts
+ M packages/fresh-ui/tokens/README.md
+ M packages/fresh-ui/tokens/contrast-exclusions.json
+ M packages/fresh-ui/tokens/contrast-pairs.json
+Proceeding because --allow-dirty was explicitly supplied.
+{"schemaVersion":1,"frameworkVersion":"0.0.8","sha256":"b21d37c12936e5c9015d6710a2b3b97c22aa691b0a2ed995d2e0f79aa0b06427","uncompressedBytes":2612550,"compressedBytes":397131,"packageCount":35,"subpathCount":304,"symbolCount":9028}

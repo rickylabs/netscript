@@ -1,0 +1,16 @@
+# @netscript/fresh-ui@0.0.8
+  root: packages/fresh-ui
+  exports: ., ./ai/render-ui, ./desktop, ./interactive, ./primitives, ./registry, ./tokens, ./token-config, ./registry-v2, ./contracts, ./contracts.json
+  files=175 loc=24544
+  docs: README=true(222L) docs/=false desc=66c
+  tests: 38 files
+  surface: .=9, ./ai/render-ui=10, ./desktop=7, ./interactive=10, ./primitives=5, ./registry=9, ./tokens=7, ./token-config=3, ./registry-v2=6, ./contracts=2, ./contracts.json=0
+  dry-run: OK slowTypeWarnings=1
+  findings: 7
+    FAIL F-JSR-2 module-tag: export ./contracts.json (./contracts.json) lacks @module JSDoc tag (./contracts.json)
+    WARN F-DOCT-4 vocabulary: forbidden folder name 'lib' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry (registry/lib)
+    WARN F-DOCT-5 cardinality: directory has 24 immediate children; doctrine cap is 12
+    WARN F-DOCT-5 cardinality: directory has 48 immediate children; doctrine cap is 12 (registry/theme/presets)
+    WARN F-DOCT-5 cardinality: directory has 34 immediate children; doctrine cap is 12 (registry/theme/figma)
+    WARN F-DOCT-5 cardinality: directory has 99 immediate children; doctrine cap is 12 (registry/components/ui)
+    WARN F-JSR-7 slow-types: Checking for slow types in the public API...

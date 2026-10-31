@@ -288,17 +288,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.281433737504,
-      "foreground": "#989799",
-      "background": "#e3e3e4",
-      "preset": "studio-utility",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeee",
       "background": "#eeeeee",
@@ -384,17 +373,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.953298212376,
-      "foreground": "#79797c",
-      "background": "#323234",
-      "preset": "studio-utility",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -596,17 +574,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.233626359507,
-      "foreground": "#8e8f95",
-      "background": "#d4d7dd",
-      "preset": "studio-cloud",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#edeef0",
       "background": "#edeef0",
@@ -692,17 +659,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.93588969174,
-      "foreground": "#757987",
-      "background": "#2c3247",
-      "preset": "studio-cloud",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -871,17 +827,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.223589882511,
-      "foreground": "#928d89",
-      "background": "#dad3c9",
-      "preset": "studio-workshop",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeec",
       "background": "#eeeeec",
@@ -970,17 +915,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.959544187322,
-      "foreground": "#7d7875",
-      "background": "#383029",
-      "preset": "studio-workshop",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -1055,17 +989,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.225540706226,
-      "foreground": "#908c98",
-      "background": "#d7d2e2",
-      "preset": "studio-playful",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -1157,17 +1080,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.987825944054,
-      "foreground": "#7a7682",
-      "background": "#342d3f",
-      "preset": "studio-playful",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -1242,17 +1154,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.251371401328,
-      "foreground": "#929296",
-      "background": "#dadbde",
-      "preset": "studio-ledger",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -1341,17 +1242,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.995076454876,
-      "foreground": "#70797e",
-      "background": "#243138",
-      "preset": "studio-ledger",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -1487,17 +1377,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.249290584199,
-      "foreground": "#949190",
-      "background": "#dddad5",
-      "preset": "studio-atelier",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeec",
       "background": "#eeeeec",
@@ -1583,17 +1462,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.957233693359,
-      "foreground": "#7a7978",
-      "background": "#33322e",
-      "preset": "studio-atelier",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -1762,17 +1630,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.227735757717,
-      "foreground": "#8d8e8f",
-      "background": "#d3d6d3",
-      "preset": "studio-signal",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeee",
       "background": "#eeeeee",
@@ -1858,17 +1715,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.10931554853,
-      "foreground": "#717473",
-      "background": "#252926",
-      "preset": "studio-signal",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -1960,17 +1806,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.262491939099,
-      "foreground": "#949397",
-      "background": "#dedee0",
-      "preset": "ledger",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#edeef0",
       "background": "#edeef0",
@@ -2056,17 +1891,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.054092929753,
-      "foreground": "#757578",
-      "background": "#2c2c2e",
-      "preset": "ledger",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -2169,17 +1993,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.271828478717,
-      "foreground": "#969597",
-      "background": "#e1e1e1",
-      "preset": "signal",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeee",
       "background": "#eeeeee",
@@ -2279,17 +2092,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.220981874559,
-      "foreground": "#6c6c6d",
-      "background": "#1d1d1d",
-      "preset": "signal",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -2375,17 +2177,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.232278026257,
-      "foreground": "#8f8e92",
-      "background": "#d6d6d9",
-      "preset": "glass",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -2477,17 +2268,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.054092929753,
-      "foreground": "#757578",
-      "background": "#2c2c2e",
-      "preset": "glass",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -2573,17 +2353,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.232278026257,
-      "foreground": "#8f8e92",
-      "background": "#d6d6d9",
-      "preset": "macos-27",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -2686,17 +2455,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.054092929753,
-      "foreground": "#757578",
-      "background": "#2c2c2e",
-      "preset": "macos-27",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -2782,17 +2540,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.232278026257,
-      "foreground": "#8f8e92",
-      "background": "#d6d6d9",
-      "preset": "apple-classic",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -2884,17 +2631,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.054092929753,
-      "foreground": "#757578",
-      "background": "#2c2c2e",
-      "preset": "apple-classic",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -2969,17 +2705,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.262042939411,
-      "foreground": "#949396",
-      "background": "#dedede",
-      "preset": "fluent-2-web",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -3071,17 +2796,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.05610917838,
-      "foreground": "#757577",
-      "background": "#2c2c2c",
-      "preset": "fluent-2-web",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -3145,17 +2859,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.27272396931,
-      "foreground": "#969598",
-      "background": "#e2e1e2",
-      "preset": "tonal",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -3269,17 +2972,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.051200542691,
-      "foreground": "#767578",
-      "background": "#2d2c2e",
-      "preset": "tonal",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 4.398398311949,
       "foreground": "#ffffff",
       "background": "#7d66d9",
@@ -3354,17 +3046,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.259250627219,
-      "foreground": "#959393",
-      "background": "#dfddda",
-      "preset": "bloom",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -3456,17 +3137,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.092802704483,
-      "foreground": "#747474",
-      "background": "#2a2929",
-      "preset": "bloom",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -3552,17 +3222,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.232278026257,
-      "foreground": "#8f8e92",
-      "background": "#d6d6d9",
-      "preset": "cupertino",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -3654,17 +3313,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.054092929753,
-      "foreground": "#757578",
-      "background": "#2c2c2e",
-      "preset": "cupertino",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.030914110457,
       "foreground": "#ffffff",
       "background": "#46a758",
@@ -3750,17 +3398,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.232278026257,
-      "foreground": "#8f8e92",
-      "background": "#d6d6d9",
-      "preset": "liquid",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -3926,17 +3563,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.054092929753,
-      "foreground": "#757578",
-      "background": "#2c2c2e",
-      "preset": "liquid",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -4149,28 +3775,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.262042939411,
-      "foreground": "#949396",
-      "background": "#dedede",
-      "preset": "fluent",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 1.847001220779,
-      "foreground": "#ffffff",
-      "background": "#bfbfbf",
-      "preset": "fluent",
-      "scheme": "light",
-      "pair": "fluent-text-on-accent-disabled/fluent-solid-base+fluent-accent-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-on-accent-disabled on fluent-solid-base → fluent-accent-disabled",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.265143188106,
       "foreground": "#868686",
       "background": "#f3f3f3",
@@ -4281,17 +3885,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.499080751026,
-      "foreground": "#9c9c9c",
-      "background": "#f5f5f5",
-      "preset": "fluent",
-      "scheme": "light",
-      "pair": "fluent-text-disabled/fluent-solid-base+fluent-control-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-disabled on fluent-solid-base → fluent-control-disabled",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.316775772508,
       "foreground": "#8d8d8d",
       "background": "#fefefe",
@@ -4358,17 +3951,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.515700252027,
-      "foreground": "#a1a1a1",
-      "background": "#fcfcfc",
-      "preset": "fluent",
-      "scheme": "light",
-      "pair": "fluent-text-disabled/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-disabled on fluent-solid-base → fluent-layer-default → fluent-card-default → fluent-control-disabled",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.309410067687,
       "foreground": "#8c8c8c",
       "background": "#fdfdfd",
@@ -4432,17 +4014,6 @@
       "pair": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-input-active",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-tertiary on fluent-solid-base → fluent-layer-default → fluent-card-secondary → fluent-control-input-active",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.50653865479,
-      "foreground": "#9e9e9e",
-      "background": "#f8f8f8",
-      "preset": "fluent",
-      "scheme": "light",
-      "pair": "fluent-text-disabled/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-disabled on fluent-solid-base → fluent-layer-default → fluent-card-secondary → fluent-control-disabled",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -4534,28 +4105,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.05610917838,
-      "foreground": "#757577",
-      "background": "#2c2c2c",
-      "preset": "fluent",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 4.090408377831,
-      "foreground": "#a7a7a7",
-      "background": "#434343",
-      "preset": "fluent",
-      "scheme": "dark",
-      "pair": "fluent-text-on-accent-disabled/fluent-solid-base+fluent-accent-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-on-accent-disabled on fluent-solid-base → fluent-accent-disabled",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 4.49398172421,
       "foreground": "#a2a2a2",
       "background": "#393939",
@@ -4575,17 +4124,6 @@
       "pair": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-control-solid",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-tertiary on fluent-solid-base → fluent-layer-default → fluent-control-solid",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.241991257043,
-      "foreground": "#777777",
-      "background": "#2a2a2a",
-      "preset": "fluent",
-      "scheme": "dark",
-      "pair": "fluent-text-disabled/fluent-solid-base+fluent-control-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-disabled on fluent-solid-base → fluent-control-disabled",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -4622,17 +4160,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.923560740934,
-      "foreground": "#838383",
-      "background": "#3c3c3c",
-      "preset": "fluent",
-      "scheme": "dark",
-      "pair": "fluent-text-disabled/fluent-solid-base+fluent-layer-default+fluent-card-default+fluent-control-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-disabled on fluent-solid-base → fluent-layer-default → fluent-card-default → fluent-control-disabled",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 4.438321309852,
       "foreground": "#a3a3a3",
       "background": "#3b3b3b",
@@ -4663,17 +4190,6 @@
       "pair": "fluent-text-tertiary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-solid",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-tertiary on fluent-solid-base → fluent-layer-default → fluent-card-secondary → fluent-control-solid",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.00221371373,
-      "foreground": "#808080",
-      "background": "#373737",
-      "preset": "fluent",
-      "scheme": "dark",
-      "pair": "fluent-text-disabled/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; fluent-text-disabled on fluent-solid-base → fluent-layer-default → fluent-card-secondary → fluent-control-disabled",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -4809,17 +4325,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.266956739573,
-      "foreground": "#97948d",
-      "background": "#e3e0d0",
-      "preset": "brutal",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.895079244469,
       "foreground": "#000000",
       "background": "#6e56cf",
@@ -4894,17 +4399,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.546489562602,
-      "foreground": "#878786",
-      "background": "#484846",
-      "preset": "brutal",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -5007,17 +4501,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.261820225405,
-      "foreground": "#949395",
-      "background": "#dedede",
-      "preset": "filigrane",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeec",
       "background": "#eeeeec",
@@ -5103,17 +4586,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.057050808541,
-      "foreground": "#757576",
-      "background": "#2c2c2b",
-      "preset": "filigrane",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -5213,17 +4685,6 @@
       "pair": "accent-fg/accent-solid-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; accent-fg on accent-solid-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.271828478717,
-      "foreground": "#969597",
-      "background": "#e1e1e1",
-      "preset": "terminal",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -5348,17 +4809,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 3.220981874559,
-      "foreground": "#6c6c6d",
-      "background": "#1d1d1d",
-      "preset": "terminal",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 4.158933169699,
       "foreground": "#9c681a",
       "background": "#f4efe6",
@@ -5480,17 +4930,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.229735722767,
-      "foreground": "#928e8b",
-      "background": "#dad5ce",
-      "preset": "pixel",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 1,
       "foreground": "#eeeeec",
       "background": "#eeeeec",
@@ -5576,17 +5015,6 @@
       "pair": "info-fg/info-hover",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; info-fg on info-hover",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 3.06527769635,
-      "foreground": "#767575",
-      "background": "#2d2b29",
-      "preset": "pixel",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -5678,17 +5106,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.189884328548,
-      "foreground": "#87888f",
-      "background": "#c8ccd3",
-      "preset": "tactile",
-      "scheme": "light",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.938402436625,
       "foreground": "#ffffff",
       "background": "#1e7bff",
@@ -5697,17 +5114,6 @@
       "pair": "tactile-text-on-accent/tactile-accent",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; tactile-text-on-accent on tactile-accent",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 1.903501157242,
-      "foreground": "#9aa3b8",
-      "background": "#dae0e8",
-      "preset": "tactile",
-      "scheme": "light",
-      "pair": "tactile-text-disabled/tactile-surface-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; tactile-text-disabled on tactile-surface-disabled",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
@@ -5810,17 +5216,6 @@
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     },
     {
-      "ratio": 2.613968095653,
-      "foreground": "#838489",
-      "background": "#424449",
-      "preset": "tactile",
-      "scheme": "dark",
-      "pair": "state-disabled-fg/state-disabled-container",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; state-disabled-fg on state-disabled-container",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
       "ratio": 3.321354635967,
       "foreground": "#ffffff",
       "background": "#3b8bff",
@@ -5829,17 +5224,6 @@
       "pair": "tactile-text-on-accent/tactile-accent",
       "minimum": 4.5,
       "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; tactile-text-on-accent on tactile-accent",
-      "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
-    },
-    {
-      "ratio": 2.168809547738,
-      "foreground": "#5c6477",
-      "background": "#2f3238",
-      "preset": "tactile",
-      "scheme": "dark",
-      "pair": "tactile-text-disabled/tactile-surface-disabled",
-      "minimum": 4.5,
-      "source": "Figma export #2493 at dd442e82794c4b960e51529f1c7ac534afda75ea; tactile-text-disabled on tactile-surface-disabled",
       "reason": "Retain the owned source value; Figma contrast burn-down remains open. The owner must correct and re-export it; see the S1b failing-pairs.json report."
     }
   ]

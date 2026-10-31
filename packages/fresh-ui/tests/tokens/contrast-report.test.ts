@@ -27,6 +27,18 @@ Deno.test('maintainer contrast report names every still-failing exclusion withou
     assertEquals(process.code, 0, new TextDecoder().decode(process.stderr));
     const report: {
       checks: number;
+      exempt: {
+        preset: string;
+        scheme: string;
+        pair: string;
+        foregroundRole: string;
+        backgroundRoles: string[];
+        ratio: number;
+        requiredRatio: number;
+        exemption: string;
+        criterion: string;
+        reason: string;
+      }[];
       failures: {
         preset: string;
         scheme: string;
@@ -39,6 +51,31 @@ Deno.test('maintainer contrast report names every still-failing exclusion withou
     } = JSON.parse(await Deno.readTextFile(`${directory}/failing-pairs.json`));
     assertEquals(report.checks > report.failures.length, true);
     assertEquals(report.failures.length, exclusions.exclusions.length);
+    assertEquals(report.exempt.length, 58);
+    assertEquals(new Set(report.exempt.map((row) => row.pair)).size, 6);
+    assertEquals(
+      [...new Set(report.exempt.map((row) => row.foregroundRole))].sort(),
+      [
+        'fluent-text-disabled',
+        'fluent-text-on-accent-disabled',
+        'state-disabled-fg',
+        'tactile-text-disabled',
+      ],
+    );
+    const failures = new Set(
+      report.failures.map((row) => JSON.stringify([row.preset, row.scheme, row.pair])),
+    );
+    for (const row of report.exempt) {
+      assertEquals(row.exemption, 'inactive-component');
+      assertEquals(row.criterion, 'WCAG 2.2 SC 1.4.3');
+      assertStringIncludes(row.reason, 'inactive user interface component');
+      assertEquals(row.requiredRatio, 4.5);
+      assertEquals(Number.isFinite(row.ratio) && row.ratio >= 1 && row.ratio <= 21, true);
+      assertEquals(failures.has(JSON.stringify([row.preset, row.scheme, row.pair])), false);
+      const pair = pairs.pairs.find((pair) => pair.id === row.pair)!;
+      assertEquals(row.foregroundRole, pair.foreground);
+      assertEquals(row.backgroundRoles, pair.background);
+    }
     assertEquals(
       new Set(report.failures.map((row) => JSON.stringify([row.preset, row.scheme, row.pair])))
         .size,
@@ -58,6 +95,7 @@ Deno.test('maintainer contrast report names every still-failing exclusion withou
     const table = await Deno.readTextFile(`${directory}/failing-pairs.md`);
     assertStringIncludes(table, 'burn-down — OPEN');
     assertStringIncludes(table, 'failing-pairs.json');
+    assertStringIncludes(table, '58 explicitly exempt inactive text uses');
     for (const preset of new Set(report.failures.map((row) => row.preset))) {
       assertStringIncludes(table, `| ${preset} |`);
     }

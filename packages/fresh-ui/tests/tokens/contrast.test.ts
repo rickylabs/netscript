@@ -8,6 +8,7 @@ import type {
   TokenContrastCoverage,
   TokenContrastExclusion,
 } from '../../src/tokens/domain/contrast-contract.ts';
+import { INACTIVE_COMPONENT_CONTRAST } from '../../src/tokens/domain/contrast-contract.ts';
 import type { BuiltToken, TokenContextOutput } from '../../src/tokens/domain/token-output.ts';
 import { tokenPreset } from '../../src/tokens/domain/token-presets.ts';
 
@@ -43,6 +44,134 @@ function context(foreground = '#000000'): TokenContextOutput {
     ),
   };
 }
+
+function inactiveFixture(value = '#ffffff'): {
+  context: TokenContextOutput;
+  coverage: TokenContrastCoverage;
+} {
+  const base = context();
+  const names = ['state-disabled-fg', 'control-text-disabled'];
+  return {
+    context: {
+      ...base,
+      tokens: {
+        ...base.tokens,
+        'state-disabled-container': { ...base.tokens.bg, cssVar: '--ns-state-disabled-container' },
+        ...Object.fromEntries(names.map((name) => [name, {
+          ...base.tokens.fg,
+          cssVar: `--ns-${name}`,
+          resolved: value,
+        }])),
+      },
+    },
+    coverage: {
+      ...coverage,
+      pairs: [
+        ...coverage.pairs,
+        ...names.map((foreground) => ({
+          id: `${foreground}/state-disabled-container`,
+          foreground,
+          background: ['state-disabled-container'],
+          minimum: 4.5 as const,
+          exemption: INACTIVE_COMPONENT_CONTRAST.exemption,
+        })),
+      ],
+    },
+  };
+}
+
+Deno.test('explicit inactive uses remain measured at passing and failing ratios without exclusions', () => {
+  for (const [value, ratio] of [['#ffffff', 1], ['#000000', 21]] as const) {
+    const fixture = inactiveFixture(value);
+    const report = evaluateTokenContrast(
+      [fixture.context],
+      fixture.coverage,
+      [],
+      tokenContrastColor,
+    );
+    assertEquals(report.checks, 6);
+    assertEquals(report.exempt.length, 2);
+    assertEquals(report.failures, []);
+    assertEquals(report.excluded, []);
+    for (const result of report.exempt) {
+      assertEquals(result.ratio, ratio);
+      assertEquals(result.exemption, INACTIVE_COMPONENT_CONTRAST.exemption);
+      assertEquals(result.criterion, INACTIVE_COMPONENT_CONTRAST.criterion);
+      assertEquals(result.reason, INACTIVE_COMPONENT_CONTRAST.reason);
+    }
+    assertTokenContrast(report);
+  }
+  const fixture = inactiveFixture();
+  const unannotated = {
+    ...fixture.coverage,
+    pairs: fixture.coverage.pairs.map((pair) => ({ ...pair, exemption: undefined })),
+  };
+  const failing = evaluateTokenContrast([fixture.context], unannotated, [], tokenContrastColor);
+  assertEquals(failing.failures.length, 2);
+  assertEquals(failing.exempt, []);
+  const exclusion: TokenContrastExclusion = {
+    ...failing.failures[0],
+    source: 'Test fixture',
+    reason: 'An obsolete exclusion must not also accept an exempt use.',
+  };
+  assertThrows(
+    () =>
+      evaluateTokenContrast([fixture.context], fixture.coverage, [exclusion], tokenContrastColor),
+    Error,
+    'Stale or unused contrast exclusion',
+  );
+});
+
+Deno.test('inactive annotations reject active and non-text roles, malformed markers and stale scope', () => {
+  const fixture = inactiveFixture();
+  for (const foreground of ['fg', 'ring', 'state-disabled-container']) {
+    const annotated = {
+      ...fixture.coverage,
+      pairs: [...fixture.coverage.pairs, {
+        id: `invalid/${foreground}`,
+        foreground,
+        background: ['state-disabled-container'],
+        minimum: 4.5 as const,
+        exemption: INACTIVE_COMPONENT_CONTRAST.exemption,
+      }],
+    };
+    assertThrows(
+      () => evaluateTokenContrast([fixture.context], annotated, [], tokenContrastColor),
+      Error,
+      'Invalid inactive text contrast exemption',
+    );
+  }
+  for (const changed of [{ exemption: 'unknown' }, { minimum: 3 }, { schemes: ['dark'] }]) {
+    const malformed = structuredClone(fixture.coverage);
+    Object.assign(malformed.pairs.at(-1)!, changed);
+    assertThrows(
+      () => evaluateTokenContrast([fixture.context], malformed, [], tokenContrastColor),
+      Error,
+      'minimum' in changed ? 'Invalid inactive text contrast exemption' : 'contrast exemption',
+    );
+  }
+  // An active foreground remains subject to AA even when its background is disabled.
+  const active = {
+    ...fixture.coverage,
+    pairs: [...fixture.coverage.pairs, {
+      id: 'active-on-disabled',
+      foreground: 'fg',
+      background: ['state-disabled-container'],
+      minimum: 4.5 as const,
+    }],
+  };
+  const bad = {
+    ...fixture.context,
+    tokens: {
+      ...fixture.context.tokens,
+      fg: { ...fixture.context.tokens.fg, resolved: '#ffffff' },
+    },
+  };
+  const report = evaluateTokenContrast([bad], active, [], tokenContrastColor);
+  assertEquals(report.exempt.length, 2);
+  assertEquals(report.failures.map((row) => row.pair), ['fg/bg', 'active-on-disabled']);
+  assertThrows(() => assertTokenContrast(report), Error, 'WCAG AA contrast failed');
+});
 
 Deno.test('contrast uses WCAG AA math and source-over alpha on nested surfaces', () => {
   assertEquals(tokenContrastColor.measure('#000000', ['#ffffff'], '#ffffff').ratio, 21);
@@ -206,6 +335,15 @@ Deno.test('chart and syntax coverage cannot disappear or weaken behind generic n
       ],
     };
     assertTokenContrast(evaluateTokenContrast([extra], complete, [], tokenContrastColor));
+    const exempted = structuredClone(complete);
+    Object.assign(exempted.pairs.find((pair) => pair.foreground === name)!, {
+      exemption: INACTIVE_COMPONENT_CONTRAST.exemption,
+    });
+    assertThrows(
+      () => evaluateTokenContrast([extra], exempted, [], tokenContrastColor),
+      Error,
+      'Invalid inactive text contrast exemption',
+    );
     for (const pair of pairs) {
       const removed = {
         ...complete,
