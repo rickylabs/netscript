@@ -39,15 +39,10 @@ import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from
  * ];
  * ```
  */
-export interface AnonymousRequestMatch {
-  /** Exact request method; bodyless probes require an explicit HEAD entry. */
-  readonly method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  /** Absolute path without encoding, parameters, wildcards, query or fragment. */
-  readonly path: string;
-}
+export type AnonymousRequestMatch = Exclude<AnonymousRule, string>;
 
 /** A legacy path prefix or one exact anonymous request. */
-export type AnonymousRule = string | AnonymousRequestMatch;
+export type AnonymousRule = NonNullable<AuthnOptions['allowAnonymous']>[number];
 
 /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
 export interface AuthnOptions {
@@ -61,7 +56,12 @@ export interface AuthnOptions {
    * nonempty list replaces it. Invalid objects throw TypeError when middleware is constructed,
    * before requests or listeners. Matched contract access declarations take precedence.
    */
-  readonly allowAnonymous?: readonly AnonymousRule[];
+  readonly allowAnonymous?: readonly (string | {
+    /** Exact request method; bodyless probes require an explicit HEAD entry. */
+    readonly method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    /** Absolute path without encoding, parameters, wildcards, query or fragment. */
+    readonly path: string;
+  })[];
 }
 
 /** Authorization middleware options for `withAuthz()` and `defineService({ auth })`. */
