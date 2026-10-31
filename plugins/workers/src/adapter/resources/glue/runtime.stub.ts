@@ -13,7 +13,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     "import { startCombinedProcess } from '@netscript/plugin-workers/runtime';",
     '',
     'if (import.meta.main) {',
-    '  let snapshot: (() => ChildHealthSnapshot) | undefined;',
+    '  let snapshot: (() => ChildHealthSnapshot | Promise<ChildHealthSnapshot>) | undefined;',
     '  await runChildHealthProcess(',
     '    async (health, signal) => {',
     '      await startCombinedProcess({',

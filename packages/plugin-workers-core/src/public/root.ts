@@ -157,7 +157,11 @@ export type JobHandler<TPayload = unknown, TResult = unknown> = (
 /** Callable root-surface job handler carrying its payload validator. */
 export type JobHandlerDefinition<TPayload = unknown, TResult = unknown> =
   & JobHandler<TPayload, TResult>
-  & Readonly<{ payloadSchema: JobPayloadSchema<TPayload> }>;
+  & Readonly<{
+    payloadSchema: JobPayloadSchema<TPayload>;
+    /** Retry fields declared alongside this handler, overriding definition defaults. */
+    retry?: import('../domain/job-retry-policy.ts').JobHandlerRetryPolicy;
+  }>;
 
 /** Root-surface job definition derived from the thin public schema. */
 export type JobDefinition<
