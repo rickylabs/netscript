@@ -89,9 +89,12 @@ await new Deno.Command('aspire', {
   );
 });
 
-Deno.test('CLI E2E source has no non-fenced Aspire describe polling', async () => {
+Deno.test('shipped CLI and E2E source have no non-fenced Aspire describe polling', async () => {
   const findings = unexpectedAspireResourcePolling(
-    await findAspireResourcePolling('packages/cli/e2e/src'),
+    [
+      ...await findAspireResourcePolling('packages/cli/e2e/src'),
+      ...await findAspireResourcePolling('packages/cli/src'),
+    ],
   );
   assertEquals(
     findings,
