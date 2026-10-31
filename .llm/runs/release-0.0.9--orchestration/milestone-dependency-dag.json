@@ -21,7 +21,7 @@
       "id": "issue:1367",
       "kind": "issue",
       "issueNumber": 1367,
-      "lane": "fixes",
+      "lane": "features",
       "title": "fix(streams): STREAMS_DATA_DIR is set by nothing the framework generates, so \"durable streams\" is always in-memory"
     },
     {
@@ -84,7 +84,7 @@
       "id": "issue:2132",
       "kind": "issue",
       "issueNumber": 2132,
-      "lane": "fixes",
+      "lane": "features",
       "title": "kv: RedisKvAdapter.list start is inclusive and pages are not globally ordered (SCAN batches sorted individually), unlike Deno KV"
     },
     {
@@ -182,7 +182,7 @@
       "id": "issue:2267",
       "kind": "issue",
       "issueNumber": 2267,
-      "lane": "fixes",
+      "lane": "features",
       "title": "fix(kv): MemoryKvAdapter.atomic exposes partial commits between awaited mutations"
     },
     {
@@ -210,7 +210,7 @@
       "id": "issue:2338",
       "kind": "issue",
       "issueNumber": 2338,
-      "lane": "fixes",
+      "lane": "features",
       "title": "fix(streams): stable producer IDs acknowledge new documents as duplicates after restart"
     },
     {
@@ -259,7 +259,7 @@
       "id": "issue:2377",
       "kind": "issue",
       "issueNumber": 2377,
-      "lane": "fixes",
+      "lane": "features",
       "title": "fix(kv): WatchableKvBridge needs an initial state when the wrapped adapter ignores initial"
     },
     {
