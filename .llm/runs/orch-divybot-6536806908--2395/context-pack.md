@@ -20,3 +20,10 @@ before re-steering the same independent evaluator. Do not silently launch round6
 Required full scaffold-runtime CI remains unproven until coordinator #2474 arms e2e-cli-gate.
 Keep both corrected-head review and runtime acceptance unchecked. No local scaffold.runtime,
 label/milestone changes, merge/tag/release. Canonical BLOCKED report uses excluded atomic handoff.
+
+
+Owner requested continued CI remediation after this handoff; see verbatim instruction in worklog.
+The previous cycle remains recorded as exhausted. Continue a bounded corrective validation cycle
+with the same evaluator/session, and use the checked-in manual e2e-cli workflow dispatch to get
+runtime proof without label changes. Final head includes only this continuation record beyond the
+already tested correction. Do not tick proof boxes until actual verdicts exist.

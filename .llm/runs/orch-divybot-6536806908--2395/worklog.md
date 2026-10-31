@@ -249,3 +249,25 @@ unproven: authorized round5 returned CHANGES on the prior head and the feature c
 Coordinator action required: authorize a fresh cycle in the same evaluator session and arm the
 required scaffold-runtime CI label. No self-certification, sixth round, local scaffold E2E,
 labels/milestones, merge or release in this run.
+
+
+## Continued CI remediation after corrected-head handoff
+
+Owner continuation instruction, quoted verbatim:
+
+> PR #2483 is NOT mergeable — CI is RED: close-gate failed. Don't sit idle on a red PR. Run  gh pr checks 2483  then  gh run view <run-id> --log-failed  to see the real cause, fix it, and push. For a deno_core/check-* 'MISSING — baselined but not seen' message the cause is test DISCOVERY, not a code bug. Auto-merge fires only when ALL checks are green.
+
+The owner requests continued remediation after the prior exhausted-cycle handoff. Continue as a
+bounded corrective validation cycle, same feature tier and independent evaluator/session, with
+an exact-head check of the shipped W1/SDK fixture correction. Preserve the historical five-round
+cycle and its CHANGES verdict; do not relabel it as approval or erase findings. No new framework
+source change is needed unless a real gate identifies one. Record this steering before launch.
+
+Ran gh pr checks and gh run view --log-failed as requested; the latter cannot return aggregate
+logs while test-4 is running. The completed close-gate job log identifies only unchecked exact-head
+review and full scaffold-runtime proof. Native agentic:pr-checks confirms current-fail on this
+head, with quality, typecheck, command-postgres and other completed shards passing. No discovery
+MISSING diagnostic is present. Use e2e-cli's checked-in workflow_dispatch path at the frozen
+branch head to obtain the required full runtime proof without changing coordinator-owned labels
+or running local scaffold.runtime. Complete actual evidence before updating acceptance and rerun
+close-gate on the same evaluated head.
