@@ -19,6 +19,10 @@ error on both ends before it ships.
   with `defineService` or the fluent builder, including health, shutdown, TLS and service auth.
 - [Typed SDK & client](/services-sdk/sdk/): call a service through a typed client, cache-first
   query factories and TanStack Query helpers.
+- [Transactional commands](/services-sdk/commands/): commit mutations, replay receipts, audit and outbox intents together.
+- [Command outbox relay](/services-sdk/command-relay/): publish committed intents with checked worker acceptance.
+- [Command operations](/services-sdk/command-operations/), [security](/services-sdk/command-security/) and
+  [compatibility](/services-sdk/command-compatibility/): reconcile failures and evolve durable records safely.
 - [Service layout](/services-sdk/service-layout/): the folder vocabulary inside a service, when to
   split modules, and how to migrate an existing service.
 - [Recipes](/services-sdk/how-to/): add a service, discover services, expose OpenAPI and Scalar,

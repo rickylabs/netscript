@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { isPrismaSagaStoreClient, type PrismaSagaStoreClient, PrismaSagaStore, createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
 import type { PostgresCommandClient, TransactionClientPort } from '@netscript/database/commands/postgres';
 import { assertAtomicTransitionConformance, transitionRequest } from 'REPO_URLpackages/plugin-sagas-core/tests/transition-conformance.ts';
+import { assertCompensationRetry, COMPENSATION_RETRY_STATUSES, type CompensationFault, type CompensationTestStore } from 'REPO_URLpackages/plugin-sagas-core/tests/fixtures/compensation-retry.ts';
 
 type Tx = Omit<Prisma.TransactionClient, '$transaction'|'$connect'|'$disconnect'|'$on'|'$use'|'$extends'>;
 const root = new PrismaClient({ adapter: new PrismaPg({ host: Deno.env.get('COMMAND_POSTGRES_SOCKET'), database: 'postgres', user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }) });
@@ -305,3 +306,112 @@ Deno.test('ordinary PostgreSQL marker, state, correlation and history roll back 
     }
   } finally { await reset(); await root.$disconnect(); }
 });
+
+
+// The fault follows the actual replay INSERT inside the interactive transaction. A thrown
+// exception must roll it back before state is updated; an acknowledgement fault follows COMMIT.
+for (const adapter of ['ordinary', 'command']) {
+  for (const fault of ['before-commit', 'after-commit'] as const satisfies readonly CompensationFault[]) {
+    for (const status of COMPENSATION_RETRY_STATUSES) {
+      Deno.test(`PostgreSQL ${adapter} compensation ${fault} retries the same ${status} outcome`, async () => {
+        let armed = false;
+        let faults = 0;
+        let markerWrites = 0;
+        let faultMarker: { instanceId: string; keyHash: string } | undefined;
+        const afterMarker = () => {
+          markerWrites++;
+          if (armed && fault === 'before-commit') {
+            armed = false;
+            faults++;
+            throw new Error('injected compensation persistence failure');
+          }
+        };
+        const client = new Proxy(ordinaryClient, {
+          get(target, key) {
+            if (key === '$transaction') return <T>(work: (tx: import('@netscript/plugin-sagas-core/stores').PrismaSagaStoreTransaction) => Promise<T>) =>
+              target.$transaction(async tx => {
+                const delegate = tx.sagaRuntimeCommandAppliedKey;
+                return await work({ ...tx, sagaRuntimeCommandAppliedKey: {
+                  findUnique: delegate.findUnique.bind(delegate),
+                  async createMany(args) {
+                    const result = await delegate.createMany(args);
+                    if (armed) faultMarker = args.data;
+                    afterMarker();
+                    return result;
+                  },
+                } });
+              });
+            const member = Reflect.get(target, key);
+            return typeof member === 'function' ? member.bind(target) : member;
+          },
+        });
+        const commandClient: PostgresCommandClient & TransactionClientPort<Tx> = {
+          ...bridge,
+          $transaction(work, options) {
+            return bridge.$transaction(async tx => {
+              const observed = new Proxy(tx, {
+                get(target, key) {
+                  if (key === '$queryRawUnsafe' || key === '$executeRawUnsafe') {
+                    return async (query: string, ...values: unknown[]) => {
+                      const result = await Reflect.apply(Reflect.get(target, key), target, [query, ...values]);
+                      if (/INSERT INTO saga_runtime_command_applied_key/.test(query)) {
+                        if (armed) faultMarker = { instanceId: String(values[0]), keyHash: String(values[1]) };
+                        afterMarker();
+                      }
+                      return result;
+                    };
+                  }
+                  const member = Reflect.get(target, key);
+                  return typeof member === 'function' ? member.bind(target) : member;
+                },
+              });
+              return await work(observed);
+            }, options);
+          },
+        };
+        const open = (): CompensationTestStore => {
+          const canonical = adapter === 'ordinary'
+            ? new PrismaSagaStore({ prisma: client })
+            : createPrismaSagaTransitionStore(commandClient, { transactionTimeoutMs: 5000 });
+          return new Proxy(canonical, {
+            get(target, key) {
+              if (key === 'commitTransition') return async (...args: Parameters<CompensationTestStore['commitTransition']>) => {
+                const result = await target.commitTransition(...args);
+                if (armed && fault === 'after-commit') {
+                  assertEquals(result.committed, true);
+                  armed = false;
+                  faults++;
+                  throw new Error('injected compensation persistence failure');
+                }
+                return result;
+              };
+              const member = Reflect.get(target, key);
+              return typeof member === 'function' ? member.bind(target) : member;
+            },
+          });
+        };
+        try {
+          await reset();
+          await assertCompensationRetry({
+            store: open(), status, fault,
+            armFault() { armed = true; },
+            faultCount() { return faults; },
+            reopen() { return Promise.resolve(open()); },
+          });
+          // Inbound has no replay key: only compensation inserts one. Replay attempts use the
+          // same identity, and neither a failed transaction nor a retry leaves an extra row.
+          assert(markerWrites > 0);
+          assert(faultMarker);
+          assertEquals(await counts(), [1, 0, 2, 1, 1]);
+          const markers = await root.$queryRawUnsafe<{ instance_id: string; key_hash: string }[]>(
+            'SELECT instance_id, key_hash FROM saga_runtime_command_applied_key',
+          );
+          assertEquals(markers, [{ instance_id: faultMarker.instanceId, key_hash: faultMarker.keyHash }]);
+        } finally {
+          await reset();
+          await root.$disconnect();
+        }
+      });
+    }
+  }
+}

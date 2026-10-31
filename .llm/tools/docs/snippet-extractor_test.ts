@@ -8,7 +8,7 @@ import {
 import { checkCliExamples } from './cli-example-policy.ts';
 import { dirname, fromFileUrl, join } from '@std/path';
 import { extractFencedBlocks } from './snippet-extractor.ts';
-import { analyzeSnippetSite } from './snippet-policy.ts';
+import { analyzeSnippetSite, TIER_1_PAGES } from './snippet-policy.ts';
 import { kill } from 'node:process';
 
 const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
@@ -151,18 +151,7 @@ Deno.test('real corpus census recognizes TS aliases and enforces Tier-1 invarian
   const temp = await Deno.makeTempDir();
   try {
     const site = join(temp, 'docs/site');
-    for (
-      const page of [
-        'quickstart.vto',
-        'index.vto',
-        'services-sdk/sdk.md',
-        'services-sdk/how-to/add-a-service.md',
-        'web-layer/query.md',
-        'web-layer/interactive.md',
-        'web-layer/form.md',
-        'web-layer/query-bridge.md',
-      ]
-    ) {
+    for (const page of TIER_1_PAGES) {
       const target = join(site, page);
       await Deno.mkdir(dirname(target), { recursive: true });
       await Deno.writeTextFile(

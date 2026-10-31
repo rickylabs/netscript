@@ -3,11 +3,17 @@ import { extractFencedBlocks, type FencedBlock } from './snippet-extractor.ts';
 import { runSnippetProcess } from './snippet-process.ts';
 import { checkCliExamples } from './cli-example-policy.ts';
 
-/** The issue-mandated Tier-1 source pages, including zero-fence index.vto. */
+/** The issue-mandated Tier-1 source pages, including command/relay guides and zero-fence index.vto. */
 export const TIER_1_PAGES = [
   'quickstart.vto',
   'index.vto',
   'services-sdk/sdk.md',
+  'services-sdk/commands.md',
+  'services-sdk/command-relay.md',
+  'services-sdk/command-operations.md',
+  'services-sdk/command-security.md',
+  'services-sdk/command-compatibility.md',
+  'orchestration-runtime/how-to/outbound-webhooks.md',
   'services-sdk/how-to/add-a-service.md',
   'web-layer/query.md',
   'web-layer/interactive.md',

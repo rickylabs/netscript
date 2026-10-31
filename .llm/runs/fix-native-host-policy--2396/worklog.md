@@ -529,3 +529,53 @@ Clarified publication scope: FIVE dry-runs, three source-member JSR audits. Dura
 explicitly child477856ms versus gate478001ms (startup/receipt overhead), not conflicting data.
 Reconcile: final target main4e018ad0b is fully integrated with no authored conflict resolution.
 Commit/push this coherent merge, then same-session exact-head review; preserve that head.
+
+Final exact-head IMPL-EVAL MERGE at32264fc11dbc3b1bbd044ba8010c0f4848fab506 accepted all
+source and verified all27 hashes. PR comment6542261032 records it. Final GitHub audit then
+found the PR CONFLICTING: main advanced during evaluation toabe9d3e43. Thus READY was NOT
+queued and no merge permission inferred from the accepted source head. New main changes
+only docs/docs tooling, test fixtures and image pre-pull helper, plus generated carriers;
+no production framework runtime/config/lock change. A normal refresh and focused new-delta
+validation can preserve the existing complete runtime proof by exact source identity.
+
+New-main diff classification: all15 prescribed complete runtime/test roots are BYTE-IDENTICAL
+to tested32264fc11, including all runtime/test source; manifests and locks unchanged. The
+changed docs-policy/image-prepull helpers are not imported by these source roots. Thus the
+complete1897/0/19 runtime evidence remains valid by exact source identity, while changed
+new-main docs/tool/saga-test paths need focused fresh validation. No broad runtime rerun is
+claimed at a different source snapshot. Two conflicts are generated prose/publish assets;
+ours is only a temporary generator seed, never a hand resolution. Regenerate canonically.
+
+Fresh incoming docs/tool/saga tests initially35/1/6, stable retry35/1/6. Sole failure is the
+new snippet interruption probe failing to start. Exact fixture startup reproduced EACCES:
+the platform default TMPDIR is noexec. A project-run-owned executable task TMPDIR starts
+the exact same shebang probe; rerun unchanged test command in that task environment. No
+assertion, timing, skip, source or permissions are relaxed. No local scaffold.runtime run.
+
+Docs-only refresh validation complete: root4050/34/0; all four freshness gates; quality/
+architecture, docsaccuracy, Aspire parity, native service8+both facades docs0; five member
+publication dry-runs allPASS. Fresh changed-delta tests36/0/6 PASS with executable taskTMPDIR;
+original assertions/deadlines/permissions unchanged. Failed default-noexec attempts retained.
+ALL15 entire prescribed runtime/test roots and workspace manifest/lock remain byte-identical
+to actual1897/0/19 tested32264fc11; reuse that complete proof by exact identity, not a claimed
+new runtime-suite execution. Docs/e2e helpers are not imported by those roots. Main authored
+source retained; service reference union word and two canonical carrier unions are the only
+main-source differences. Source hashes, immutable root Git objects and outcomes recorded in
+doc-refresh-gates.json; plan in doc-refresh-plan.md. Need independent refresh slice review.
+
+Independent docs-refresh CHECKPOINT: PASS; source equivalence accepted. Reviewer verified
+all15 immutable root objects and27 hashes. One root test reads outbound-webhooks.md at
+runtime; incoming edit is prose links outside its two identical TS fences/asserted phrases,
+so its observed inputs remain unchanged. This exception is explicit in the evidence.
+
+Main advanced again toaec75e4d947dcf7c83b9f7dd4b6444abe430f18b (#2511 structured worker log
+levels), now including worker runtime/manifest changes and two main-owned private locks.
+Finish/push this reviewed docs merge, then normally merge that exact main and do fresh
+complete runtime validation rather than reusing prior inputs. PR coordination comment
+6542465797 requests a shared-carrier landing window; continue without awaiting a reply.
+
+Whole staged merge whitespace inspection flags a context-only blank line in incoming
+orch-divybot-6541471368--2383/negative-control.patch. It is byte-identical to approved main
+and belongs to retained run evidence. Preserve it unchanged; owned run/reference/carrier
+paths pass their scoped diff whitespace check. This is not a TypeScript quality failure
+or a waived source gate, and no incoming patch/evidence is reformatted or stripped.

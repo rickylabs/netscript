@@ -147,3 +147,16 @@ is authorized by the original normal-merge instruction. Keep every main-owned ru
 change verbatim; only canonical carriers may need regeneration. No new authored runtime
 source scope. Add the incoming producer-session_test.ts to the final combined validation;
 all original scope remains. Evidence stays in this run; logs remain outside Git.
+
+Landing audit found PR32264fc11 CONFLICTING after main advanced to
+abe9d3e4303411544502ceb519f39a09d3723fcd (#2512 test-only saga compensation, #2514 command
+guides/docs-tool tests and image pre-pull helper). No production framework/runtime source
+changed. Original normal-current-main instruction authorizes this final mechanical refresh;
+preserve incoming source exactly, retain native union word in its reference paragraph,
+regenerate conflicted carriers only through canonical generators. Evidence stays in this
+run. Reuse same evaluator for the new exact head; old32264fc11 MERGE remains historical.
+
+Additional current-main reconciliation aec75e4d947dcf7c83b9f7dd4b6444abe430f18b is authorized
+by the original normal-merge instruction. Preserve #2511 worker logging code/manifest and
+both main-owned private lock updates exactly. No leaf dependency/version change or lock
+regeneration is authorized. Runtime inputs change, so run a fresh complete suite, not reuse.

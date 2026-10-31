@@ -257,3 +257,19 @@ independently checked. Ready to commit/push normal merge4e018ad0b over76bf7ee. F
 pushed-head total-delta IMPL-EVAL still required; do not make a later commit solely for its
 verdict. Local union1897/0/19 and root4048/34/0, every required local gatePASS. Five publication
 dry-runs, three source-member audits with warnings retained. Only coordinator arms runtime.
+
+Latest landing state: main moved during prior final review, making32264fc11 CONFLICTING;
+no READY was queued. Now normal mergeabe9d3e43 is staged/uncommitted, generated prose/publish
+conflicts resolved only through canonical regeneration. See doc-refresh-plan.md and
+-gates.json. Fresh local root4050/34/0, quality/docs/parity/freshness4/publication5 allPASS;
+changed docs/tool/saga tests36/0/6 PASS under executable taskTMPDIR. Entire original15 runtime/
+test roots +config/lock identical to actual1897/0/19 proof, explicitly reused by identity.
+Native repair/debt unchanged23/22. Need same evaluator refresh slice approval, commit/push,
+then NEW exact-head total-delta verdict and live mergeability check before canonical READY.
+Do not reuse32264fc11 MERGE as acceptance of the next commit. No localE2E or label/merge actions.
+
+Docs mergeABE independently approved; commit/push now. MainAEC subsequently adds worker
+logging runtime/manifest and main-owned private locks. Then normal-mergeAEC, regenerate
+carriers canonically, run all static/sweep gates before a FRESH complete runtime suite.
+Shared-carrier landing-window request posted on PR, no need to wait. Earlier source MERGE
+verdict remains history; new final exact-head review and mergeability audit are mandatory.
