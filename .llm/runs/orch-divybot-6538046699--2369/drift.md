@@ -8,3 +8,5 @@
 - Added targeted command-postgres workflow path filters for schema-copy/integrity code and the CLI installation probe so future CLI-only delivery regressions execute the real install proof. The S1 CI-script registration moved forward from S2.
 
 - JSR audit found existing missing @module tags on the saga backend and plugin doctor entrypoints. Added documentation tags within S3 to satisfy final audit; no runtime behavior changes.
+
+- Owner's later instruction: “merge-conflict: rebase onto the latest base branch, resolve conflicts, force-push.” This explicitly supersedes the brief's earlier no-force-push rule for this repair. Rebased onto main 2f426b970d7a00bdbeb09c59b72b49478b839a5a. Preserved both database changelog entries and regenerated combined embedded prose. The first four commits replay byte-equivalently; implementation unchanged. Generated corpus incorporates upstream watcher/connection-string changes. Push uses the exact old remote head as a force-with-lease precondition.

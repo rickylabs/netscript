@@ -60,3 +60,11 @@ Docs exports coverage PASS. All 475 JSDoc examples compile (zero enforced failur
 S3 gate completion: structured source check/lint/format exit 0; quality:gate exit 0; docs:exports-drift PASS; docs snippet gate exit0; all 475 JSDoc examples PASS. JSR audits/dry-runs pass for database, saga core, saga plugin and affected CLI, with existing warnings only. Corpus freshness, prose freshness (253 rendered HTML pages), assets-barrel direct freshness and publish-assets checks pass. Corpus was generated with the explicit --allow-dirty development flag before commit; clean committed regeneration/regression follows. Review-thread gate PASS, zero threads/unanswered. S3 independent supervisor PASS; no newly introduced doc-lint errors; inherited findings remain explicitly unproven as documented.
 
 Reconcile: PR remains draft while final evaluation is pending; no taxonomy changes or engine/lock churn. Required scaffold.runtime will be requested in READY for coordinator-controlled CI.
+
+## Rebase and preliminary IMPL-EVAL
+
+Independent IMPL-EVAL round 1 approved source/evidence at pushed 125a5902df43d6e692d8b3b4e4ecaace1a1a8a40, explicitly leaving required CI and coordinator-reserved scaffold.runtime unproven. The committed corpus regression subsequently passed all fourteen tests and root assets-barrel passed.
+
+Owner then directed rebase/force-push due merge conflicts. New base: 2f426b970d7a00bdbeb09c59b72b49478b839a5a. Conflict resolution preserves upstream connection-string changelog plus this feature's entry; generated prose rebuilt from merged docs. Range-diff verifies S0/S1/S1-fix/S2 replay unchanged. The earlier evaluation is historical, not an exact-head certificate for the rebased commit; final same-session evaluation follows the push.
+
+Rebase gates: full native PostgreSQL conformance exit0 again (all seven outer tests); quality/architecture exit0; regenerated assets, publish assets and corpus freshness pass. No implementation changes or lock churn. Force-with-lease push now; final JSDoc/corpus regression and exact-head IMPL-EVAL follow on the rebased head.
