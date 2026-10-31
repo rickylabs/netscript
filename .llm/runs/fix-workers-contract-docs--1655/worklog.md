@@ -13,3 +13,5 @@
 ## Baseline and research
 
 Branch from main a9620a3. Existing plugin full-export doclint exits1: two private refs, no missing JSDoc or other errors. Current export map has14 targets, all must remain. Re-read previous three partial PRs and the sanctioned upstream-boundary doctrine. Isolated, never-committed prototypes prove straightforward aliases/import qualification/interfaces do not repair native visibility; indiscriminate graph export expands the private frontier. No production source changed. Requesting independent design evaluation before selecting implementation. See research.md.
+
+Independent PLAN-EVAL FAIL_PLAN (read-only Claude Opus5.5/high requested). Evaluator requires an owner invariant decision; source design is not approved. Added complete core baseline:19 targets, two refs, no other diagnostics, exit1; plugin14 targets likewise. No code, export, lock, acceptance or debt mutation. Escalate the bounded decision on #1655 and #2474, keep draft research reviewable, and continue independent #2379 runtime proof rather than repeat known failing alias designs.

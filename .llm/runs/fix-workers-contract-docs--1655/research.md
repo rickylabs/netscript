@@ -11,3 +11,5 @@ Isolated prototypes, never applied to production sources:
 - Publishing the local graph directly makes private upstream contract/base/schema types the next frontier. Re-exporting a few upstream symbols exposes further nested SDK types. This would broaden the package into a vendor facade, conflicting with doctrine 02's prohibition on upstream re-exports; no such change is accepted or committed.
 
 Earlier exploratory wrapper invocation used a different cwd; native isolated-cwd reruns confirmed the findings. Raw prototype logs are private and not merge gate verdicts. No production modification or accepted debt closure yet. Existing public consumer controls prove precise Zod methods, payload correlation, bidirectional upstream implementer assignability, context/config/middleware/router/lazy capabilities and all 22 routes; erasing those is not an option.
+
+Closing-scope baseline completed: plugin full-export gate covers14 targets, core covers19. Both exit1 with exactly2 combined private refs, zero missing JSDoc and zero other classes; no target omitted. Existing debt closure must include both complete maps.
