@@ -31,3 +31,32 @@ assigned Codex seat. No privileged tier requested.
 Assignment read in full. Earlier S3 memory read before code. Routing resolved.
 Figma handoff fetched read-only; S2 is still open. No duplicate phase2 PR found.
 PLAN-EVAL pending; no product implementation yet.
+
+## PLAN-EVAL correction
+
+Round1 FAIL_PLAN identifies four planning blockers: fixture registration/API
+must precede components; name the browser gate; register each source slice
+before consumer proof; explicitly leave issue closure to full later acceptance.
+All four are now locked in plan.md. New Playwright files are inside the already
+authorized browser-tool scope; CLI generated embeds remain carrier-only.
+
+PLAN-EVAL round2: PASS in the same independent read-only reviewer. The new browser suite is local evidence unless explicitly added to CI; no remote coverage is claimed. Build its runner/config in slice2.
+
+## Slice1 — contract inventory and style seam
+
+104 unique contracts: all11 category sections,66 shipped/38 unshipped. Added17
+identities and explicit ledger deviations. Existing rendering fixtures remain
+complete; style registration moved out of the test module. No runtime/code or
+token changes. Independent read-only slice review: PASS (s1-review.md).
+Structured tests: catalog/serialization4/0 and whole contract suite81/0.
+Structured check/lint/fmt:54/54 files, zero findings or dropped files.
+Broader quality:gate including dependencies/architecture PASS; release:preflight
+PASS, zero import-attribute/file-url/self-import findings. Full package suite is
+still running as an additional baseline check, not claimed passed.
+Reconcile: phase1 API and 66 shipped identities unchanged; S2 is still open.
+Review followups (nonblocking): fill real fixture prop names, test declaration
+and render drift separately, document CSS-transient states when components land.
+
+Full Fresh UI package suite completed:300 passed,0 failed,0 ignored (168104ms).
+Asset-barrel generation completed with zero generated-source diff. No lock churn.
+Slice1 is terminal PASS with independent review; proceed to category slices.

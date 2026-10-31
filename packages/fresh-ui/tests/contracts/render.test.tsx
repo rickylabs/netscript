@@ -1,16 +1,11 @@
 import { assert, assertEquals } from '@std/assert';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { componentContracts } from '../../contracts.ts';
-import { proseFixture } from './utility-prose.ts';
 import { basicFixtures } from './utility-basic.tsx';
-import { compositeFixtures } from './utility-composites.tsx';
 import { renderViolations } from './contract-render.ts';
-import type { ContractStyleProvider } from './style-provider.ts';
+import { contractStyleProviders } from './styles.ts';
 
-export const utility: ContractStyleProvider = {
-  style: 'Utility',
-  fixtures: [...basicFixtures, ...compositeFixtures, proseFixture],
-};
+const utility = contractStyleProviders[0];
 for (const fixture of utility.fixtures) {
   Deno.test(`${utility.style}: ${fixture.component}/${fixture.scenario} conforms to the shared contract`, async () => {
     const contract = componentContracts.components.find((contract) =>
