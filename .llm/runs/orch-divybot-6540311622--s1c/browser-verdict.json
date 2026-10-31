@@ -1,0 +1,24 @@
+{
+  "verdict": "PASS",
+  "browserGate": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 74240,
+    "requestHash": "b9141d4caa4fe1b1ab330f8710258c6a643ad13b16b6cf9951ffdf99399d5628"
+  },
+  "contractGate": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+    "durationMs": 946,
+    "requestHash": "ffacb4cbeda069544f84c3ce68563cb599aac7791ed5d4f7904cc29b73c10ee9"
+  },
+  "browserTests": 24,
+  "failed": 0,
+  "skipped": 0,
+  "contractTests": 5,
+  "matrixCases": 12,
+  "fixedColorContrastAllowances": 12,
+  "addedOrRaisedAllowances": 0
+}

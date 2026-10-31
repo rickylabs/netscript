@@ -85,7 +85,7 @@
 
 :where(.ns-alert)[data-variant='destructive'] .ns-alert__icon,
 :where(.ns-inline-notice)[data-variant='destructive'] .ns-inline-notice__icon {
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
   background: var(--ns-destructive-subtle);
 }
 

@@ -8,7 +8,7 @@ import { createWatchHandle } from '../application/watch-handle.ts';
 import { delay } from '@std/async';
 import { chunk } from '@std/collections/chunk';
 import { KvClosedError } from '../application/errors.ts';
-import { keyToString } from '../application/keys.ts';
+import { compareKeys, keyToString } from '../application/keys.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
 import type {
@@ -26,6 +26,13 @@ import type {
 
 const MAX_WATCH_KEYS = 10;
 const WATCH_BATCH_TIMEOUT_MS = 100;
+
+/** Match native key parts without coercing numbers, bigint, or byte arrays into other types. */
+function equalKeyPart(left: Deno.KvKeyPart, right: Deno.KvKeyPart): boolean {
+  return left instanceof Uint8Array && right instanceof Uint8Array
+    ? left.toString() === right.toString()
+    : Object.is(left, right);
+}
 
 /**
  * Deno-native adapter for `@netscript/kv`.
@@ -145,28 +152,43 @@ export class DenoKvAdapter implements WatchableKv {
    */
   async *list<T = unknown>(options: KvListOptions): AsyncIterable<KvEntry<T>> {
     const kv = await this.ensureOpen();
-    const selector: Deno.KvListSelector = { prefix: options.prefix };
-
-    if (options.start) {
-      (selector as Deno.KvListSelector & { start: KvKey }).start = options.start;
+    if (options.limit !== undefined && options.limit <= 0) return;
+    const withinPrefix = (bound: KvKey | undefined): bound is KvKey =>
+      !!bound && bound.length > options.prefix.length &&
+      options.prefix.every((part, index) => equalKeyPart(part, bound[index]));
+    // Native KV permits only one bound with a prefix. Prefer the advancing bound.
+    let selector: Deno.KvListSelector = { prefix: options.prefix };
+    if (options.reverse && withinPrefix(options.end)) {
+      selector = { prefix: options.prefix, end: options.end };
+    } else if (withinPrefix(options.start)) {
+      selector = { prefix: options.prefix, start: options.start };
+    } else if (withinPrefix(options.end)) {
+      selector = { prefix: options.prefix, end: options.end };
     }
 
-    if (options.end) {
-      (selector as Deno.KvListSelector & { end: KvKey }).end = options.end;
-    }
-
+    let count = 0;
     for await (
       const entry of kv.list<T>(selector, {
         consistency: options.consistency,
-        limit: options.limit,
         reverse: options.reverse,
       })
     ) {
+      // Native start is inclusive; filter before counting so it cannot consume a page slot.
+      if (options.start) {
+        const excluded = 'start' in selector
+          ? entry.key.length === options.start.length &&
+            entry.key.every((part, index) => equalKeyPart(part, options.start![index]))
+          : compareKeys(entry.key, options.start) <= 0;
+        if (excluded) continue;
+      }
+      if (options.end && !('end' in selector) && compareKeys(entry.key, options.end) >= 0) continue;
       yield {
         key: entry.key as KvKey,
         value: entry.value,
         versionstamp: entry.versionstamp,
       };
+      count++;
+      if (options.limit !== undefined && count >= options.limit) return;
     }
   }
 

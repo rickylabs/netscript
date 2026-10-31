@@ -8,7 +8,7 @@
 
 :where(.ns-label)[data-required='true']::after {
   content: ' *';
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
 /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */

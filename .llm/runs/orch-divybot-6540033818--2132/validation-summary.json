@@ -1,0 +1,125 @@
+{
+  "scope": "S1 current working tree, independent review pending; not a clean-head receipt sufficiency claim",
+  "gates": [
+    {
+      "command": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --unstable-kv packages/kv/tests",
+      "exitCode": 0,
+      "summary": {
+        "passed": 223,
+        "failed": 0,
+        "ignored": 2,
+        "totalResults": 225,
+        "uniqueFailures": 0
+      },
+      "rawReportSha256": "bee8f7b5736ddef67c176a91cd54ff259cc7db13ce8cd5794b0efe8446480ca0"
+    },
+    {
+      "command": "run-deno-check.ts --root packages/kv --ext ts,tsx",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "rawReportSha256": "94b9ae9f534f5270c2247916062efd1c92c55fa6812af4e6ab151920a7f36837"
+    },
+    {
+      "command": "run-deno-lint.ts --root packages/kv --ext ts,tsx",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "rawReportSha256": "bd2caad90807dd94cfbbc019de9a1df37fe0bba187121eb3f0ede358f01e1205"
+    },
+    {
+      "command": "run-deno-fmt.ts --root packages/kv --ext ts,tsx",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 56,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "rawReportSha256": "f0a90370418edc8ba2febcdf744042479afe8d09131a579d03612179ceeb2573"
+    }
+  ],
+  "realRedisProof": {
+    "keys": 97,
+    "pageSizes": [
+      1,
+      32
+    ],
+    "scanCallsForFirstPage": 233,
+    "watchDiscoveryCycles": 1,
+    "watchPollCycles": 1
+  },
+  "negativeControls": {
+    "scanCount": 16,
+    "restoredSha256": "2d8026f19c2382ee47ea350f7515b9d3917b026487b37d4d47c10b7b113077f3",
+    "controls": [
+      {
+        "variant": "baseline-redis",
+        "exitCode": 1,
+        "summary": {
+          "passed": 17,
+          "failed": 7,
+          "ignored": 0,
+          "totalResults": 24,
+          "uniqueFailures": 5
+        },
+        "failingTests": [
+          "global order and prefix excludes exact key and sibling",
+          "exclusive bounds and limits apply in either direction",
+          "bounds outside prefix remain valid ranges",
+          "list contract: Redis: bounds, prefix, limit, reverse and cursor paging",
+          "forward cursor pages of 32 advance without gaps/repeats",
+          "forward cursor pages of 1 advance without gaps/repeats",
+          "prefix is literal even with Redis glob metacharacters"
+        ]
+      },
+      {
+        "variant": "exclusive-start-only",
+        "exitCode": 1,
+        "summary": {
+          "passed": 17,
+          "failed": 7,
+          "ignored": 0,
+          "totalResults": 24,
+          "uniqueFailures": 5
+        },
+        "failingTests": [
+          "global order and prefix excludes exact key and sibling",
+          "exclusive bounds and limits apply in either direction",
+          "bounds outside prefix remain valid ranges",
+          "list contract: Redis: bounds, prefix, limit, reverse and cursor paging",
+          "forward cursor pages of 32 advance without gaps/repeats",
+          "forward cursor pages of 1 advance without gaps/repeats",
+          "prefix is literal even with Redis glob metacharacters"
+        ]
+      }
+    ]
+  },
+  "additionalGates": {
+    "quality:gate": 0,
+    "arch:check baseline": 0,
+    "docLintAllFourExports": 0,
+    "jsrAudit": 0,
+    "packagePublishDryRun": 0,
+    "quality:gate after bridge correction": 0
+  },
+  "existingIgnores": [
+    "CI-only Redis URL enforcement (local run)",
+    "container-restart scenario (no test container configured)"
+  ],
+  "notes": [
+    "No local scaffold.runtime run: owner prohibition; no scaffold or plugin wiring changes.",
+    "Audit helper reports a baseline slow-types banner as one warning; actual package dry-run exits 0.",
+    "One earlier full-suite run saw unchanged Redis atomic contention test return 11/12; subsequent full suite passes unchanged."
+  ],
+  "reviewCorrection": "Bridge preserves native inclusive start in order and limit/cursor accounting; native-vs-bridge tests pass for memory, Deno KV and real Redis. Fractional limit cannot bypass the heap cap."
+}

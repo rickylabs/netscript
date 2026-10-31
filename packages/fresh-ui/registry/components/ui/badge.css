@@ -41,7 +41,7 @@
 }
 
 :where(.ns-badge)[data-variant='destructive'] {
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
   background: var(--ns-destructive-subtle);
   border: 1px solid var(--ns-destructive-border);
 }

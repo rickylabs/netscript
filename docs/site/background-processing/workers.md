@@ -37,10 +37,11 @@ runs a vision model over a pasted alert-email screenshot and extracts structured
 - **Carry references, not blobs.** The payload travels through the queue. The first version
   enqueued the raw image and hit Deno KV's 64&nbsp;KB enqueue limit. Enqueue a small reference, then
   fetch the bytes inside the handler through a typed service client.
-- **Keep workers compute-only.** A handler receives a `ctx` and returns a `JobResult`; it never gets
-  a database connection. Write results back through the owning service's typed client, so that
-  service stays the single writer. In that app, the channel database held an exclusive OS file
-  lock, and a second process opening it crashed.
+- **Respect the owning service's write boundary.** A handler receives a `ctx` and returns a
+  `JobResult`; its context does not supply a database connection. Write business records through
+  the owning service's typed client so that service stays the single writer. A worker can also
+  publish typed stream updates directly: see [worker stream writes](/durable-workflows/streams/#writes-from-a-worker-job).
+  In that app, opening the channel database from a second process crashed on its exclusive file lock.
 
 ## Minimal example
 
@@ -139,6 +140,15 @@ A handler has the type `(ctx: JobHandlerContext<TPayload>) => JobResult<TResult>
   ]
 }) }}
 
+## Delivery and idempotency
+
+Worker delivery is **at-least-once**. The runtime claims an idempotency key before running a job
+and marks it applied after success. A crash after an external effect but before that mark can run
+the effect again. Supply an `idempotencyKey` on enqueue, and use the same business-operation key in
+the downstream service or payment provider. A worker-side key alone cannot promise one charge.
+The [idempotency reference](/reference/plugin-workers-core/#idempotency) describes the applied-key
+window. Stream upserts likewise need a stable entity key when a job is retried.
+
 ## Worker runtime modes (`WORKER_RUNTIMES`)
 
 Only in-process job execution is implemented. The background worker is a separate process from the
@@ -188,7 +198,7 @@ export default handler;
   caption: "enqueueJob(job, options) — EnqueueJobOptions (from @netscript/plugin-triggers-core)",
   rows: [
     { name: "payload", type: "TPayload", desc: "The payload handed to the job's ctx.payload. Parse it with the job's Zod schema." },
-    { name: "idempotencyKey", type: "string", desc: "Collapses duplicate deliveries — at-most-once effect per key." },
+    { name: "idempotencyKey", type: "string", desc: "Guards duplicate deliveries within the applied-key window. Delivery remains at-least-once; external effects need downstream idempotency." },
     { name: "concurrencyKey", type: "string", desc: "Serializes runs that share a key (e.g. per-order) so they do not overlap." },
     { name: "priority", type: "number", desc: "Dispatch priority for this enqueue action." }
   ]
@@ -405,7 +415,8 @@ service moves into a worker unchanged.
 > **Drain on redeploy.** A runner that exits without draining abandons running jobs. Wire a
 > `ShutdownManager` to `SIGTERM` (see [Graceful shutdown](#graceful-shutdown)), bound it with
 > `timeoutMs`, and log `report.timedOut`. Add an `idempotencyKey` on enqueue so a retried delivery
-> after a forced exit does not charge twice.
+> after a forced exit is guarded, and enforce the same operation key in the payment service to
+> prevent a repeated charge across the crash window.
 
 ## Next steps
 

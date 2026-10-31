@@ -62,7 +62,7 @@ one path and one wire format.
   {
     label: "Open a producer & write (real)",
     lang: "ts",
-    code: "// streams/producer.ts\nimport { createDurableStream } from '@netscript/plugin-streams-core';\nimport { executionsSchema } from './executions-schema.ts';\n\n// createDurableStream returns a singleton producer per streamPath and begins\n// connecting to the durable-stream server immediately.\nconst producer = createDurableStream({\n  streamPath: '/workers/executions',\n  schema: executionsSchema,\n  producerId: 'workers-service',\n});\n\n// upsert/delete are synchronous enqueues keyed by the collection primary key.\nproducer.upsert('execution', {\n  id: 'exec-1',\n  status: 'running',\n  updatedAt: new Date().toISOString(),\n});\nproducer.delete('execution', 'exec-0');\n\n// flush before graceful shutdown; it rethrows the connect error if the\n// producer never connected (see known limitations).\nawait producer.flush();"
+    code: "// streams/producer.ts\nimport { createDurableStream } from '@netscript/plugin-streams-core';\nimport { executionsSchema } from './executions-schema.ts';\n\n// createDurableStream returns a singleton producer per streamPath and begins\n// connecting to the durable-stream server immediately.\nconst producer = createDurableStream({\n  streamPath: '/workers/executions',\n  schema: executionsSchema,\n  producerId: 'workers-service',\n});\n\n// upsert/delete are synchronous enqueues keyed by the collection primary key.\nproducer.upsert('execution', {\n  id: 'exec-1',\n  status: 'running',\n  updatedAt: new Date().toISOString(),\n});\nproducer.delete('execution', 'exec-0');\n\n// flush waits for the writes accepted before this call and rejects if\n// any of those writes is not delivered. See producer recovery below.\nawait producer.flush();"
   },
   {
     label: "Consume over HTTP/SSE (Fresh client)",
@@ -113,8 +113,10 @@ validates and emits State Protocol `ChangeEvent`s. The supported `Operation` set
 
 `createDurableStream(options)` takes a `DurableStreamProducerOptions` and returns a
 `DurableStreamProducer`. It is a **singleton factory keyed by `streamPath`**: a second call with the
-same path returns the same live producer, and a closed one is replaced. Writes are idempotent per
-stable `producerId`, so duplicate enqueues do not double-apply downstream.
+same path and compatible configuration returns the same live producer, and a stopped or failed
+one can be replaced. Protocol retries retain the producer identity, epoch and sequence so a lost
+acknowledgement does not require a new append identity. A new application write, including a job
+retry, is a new operation; use stable entity keys to materialize the latest state.
 
 {{ comp.apiTable({
   caption: "DurableStreamProducerOptions (createDurableStream argument)",
@@ -122,12 +124,38 @@ stable `producerId`, so duplicate enqueues do not double-apply downstream.
     { name: "streamPath", type: "string (required)", desc: "Stream path relative to the base URL, e.g. '/workers/executions'. This is the singleton key and the path consumers read over HTTP/SSE." },
     { name: "schema", type: "StateSchema<TDef> (required)", desc: "The frozen schema returned by defineStreamSchema; binds the producer to its collection map." },
     { name: "producerId", type: "string (required)", desc: "Stable producer identity used for idempotent delivery. Keep it stable across restarts for duplicate-safe writes." },
-    { name: "signal", type: "AbortSignal?", desc: "Optional abort signal consulted while opening the stream connection; aborting cancels the connect (an AbortError is treated as expected, not a failure)." }
+    { name: "retention", type: "StreamRetentionPolicyV1?", desc: "TTL or absolute expiry applied when the stream is created. Omit for unbounded retention." },
+    { name: "reconnectPolicy", type: "Partial<StreamProducerReconnectPolicyV1>?", desc: "Finite connection and delivery retry overrides. Omitted fields use the exported defaults." },
+    { name: "bufferPolicy", type: "Partial<StreamProducerBufferPolicyV1>?", desc: "Bounds accepted pending writes by event count and UTF-8 bytes." },
+    { name: "signal", type: "AbortSignal?", desc: "Producer-lifetime cancellation. Aborting stops local work, rejects new writes and settles pending receipts; it does not send durable EOF." }
   ]
 }) }}
 
-The returned `DurableStreamProducer` writes with `upsert` and `delete` and drains with `flush` and
-`close` at shutdown. The [streams reference](/reference/streams/) lists every member.
+The returned `DurableStreamProducer` writes with `upsert` and `delete`, drains with `flush`, and
+releases local resources with `stop`. Use `close` only to finish the stream with durable EOF. The
+[core reference](/reference/plugin-streams-core/) lists the contracts.
+
+### Producer recovery and write outcomes
+
+The producer connects and retries retryable failures automatically, within a **finite** budget.
+`DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1` permits eight attempts per connection or delivery
+phase, each with a 5,000 ms request timeout, starting at 100 ms backoff, multiplying by two up to 5,000 ms, with 20% jitter. Configure
+`reconnectPolicy` to change those bounds. Permanent failures or exhausted attempts fail the producer;
+there is no infinite reconnect loop. `waitUntilReady({ signal })` waits for readiness or rejects on
+terminal failure/caller cancellation; `state` and `isReady` expose its current condition.
+
+`upsert` and `delete` synchronously return a **receipt**, not proof of delivery. The default buffer
+accepts at most 256 pending events and 1,048,576 UTF-8 bytes. Check `receipt.accepted` and await
+`receipt.completion`: only `status: 'delivered'` confirms acknowledgement. Other outcomes are
+`rejected`, `cancelled` or `delivery-unknown`; the last means an attempted append cannot be safely
+reported as delivered. It may already exist on the server, so do not treat it as proof of absence.
+
+`flush()` waits for writes accepted before that call and rejects if one of those pending writes
+settles without delivery. It is not a history of receipts that already settled: inspect each write's
+completion when its outcome matters. At process shutdown, first drain handlers, then flush and
+`stop()` the shared producer. `stop()` cancels queued work and may leave an attempted write with
+unknown delivery. `close()` drains and sends durable EOF; it is unsuitable for a shared stream that
+later jobs must keep writing.
 
 ## Bound stream retention
 
@@ -182,6 +210,21 @@ reports a missing `streams` reference, install the streams plugin and run
 `netscript service generate` to reconcile the generated configuration.
 `ServiceStreamProducerOptions` has the same fields as `DurableStreamProducerOptions`, and it returns
 the same `DurableStreamProducer`.
+
+## Writes from a worker job
+
+A job handler can call `createServiceStreamProducer` with the same schema and discovered streams
+URL as any other backend. It does not need an HTTP request, a Fresh island or a saga to publish.
+The [worker delivery lesson](/tutorials/eis-chat/03-deliver-worker/) includes a complete
+schema-validated handler, registry setup and an enqueue command.
+
+Keep one compatible producer per path in a process. Pass the job's signal to `waitUntilReady`,
+then await the write receipt before returning success; do not bind a shared producer's lifetime to
+one job's signal or stop it in each handler's `finally`. The process owns its flush/stop sequence
+after handlers drain. Retried jobs can append again, so key the upsert by a stable business id.
+Multiple producer processes need distinct producer identities; each identity has one live owner.
+Match the job timeout to the finite producer retry budget. Stream delivery and the job's applied-key
+mark are separate commits, so the stream is a projection rather than an atomic business transaction.
 
 ## URL and auth resolution
 

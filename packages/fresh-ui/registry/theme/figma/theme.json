@@ -578,7 +578,7 @@
           "alias": "Theme/accent/d/10"
         },
         "Tonal": {
-          "alias": "Primitives/color/violet/d/10"
+          "alias": "Primitives/color/violet/d/9-hover"
         },
         "Glass": {
           "alias": "Theme/accent/d/10"
@@ -679,25 +679,19 @@
           "alias": "Primitives/color/indigo/l/11"
         },
         "Filigrane": {
-          "alias": "Primitives/color/tomato/l/11"
+          "alias": "Primitives/color/tomato/l/11-hover"
         },
-        "Signal": {
-          "alias": "Primitives/color/lime/l/11"
-        },
+        "Signal": "#59772e",
         "Tonal": {
           "alias": "Primitives/color/violet/l/11"
         },
         "Glass": {
           "alias": "Primitives/color/blue/l/12"
         },
-        "Brutal": {
-          "alias": "Primitives/color/amber/l/11"
-        },
+        "Brutal": "#a46003",
         "Fluent": "#003e92",
         "Tactile": "#1550b5",
-        "Pixel": {
-          "alias": "Primitives/color/ember/l/11"
-        }
+        "Pixel": "#926119"
       }
     },
     {
@@ -2140,7 +2134,7 @@
       "description": "Dark source for Scheme brand/fg. Studio: Studio flavor/primary/d/fg; other themes: accent/d/solid-fg.",
       "values": {
         "Studio": {
-          "alias": "Studio flavor/primary/d/fg"
+          "alias": "Studio flavor/brand-on/d"
         },
         "Ledger": {
           "alias": "Theme/accent/d/solid-fg"
@@ -4376,6 +4370,44 @@
         },
         "Pixel": {
           "alias": "Primitives/color/sand/d/12"
+        }
+      }
+    },
+    {
+      "name": "ink/d-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "description": "Dark source for Scheme ink/fg (text on ink). Light-ink themes: own gray/d/1; Brutal keeps black ink in dark, so gray/d/12.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/1"
         }
       }
     },

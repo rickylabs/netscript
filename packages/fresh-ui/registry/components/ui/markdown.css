@@ -188,7 +188,7 @@
 }
 
 .ns-markdown .hljs-deletion {
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
 .ns-markdown .hljs-emphasis {
