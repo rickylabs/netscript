@@ -1,3 +1,4 @@
+import { Navigation } from './gap-navigation-fixture.tsx';
 import { Calendars } from './gap-calendar-fixture.tsx';
 import { Forms } from './gap-forms-fixture.tsx';
 import { render } from 'preact';
@@ -51,6 +52,7 @@ function Actions() {
       <button type='button' id='after'>After components</button>
       <Forms />
       <Calendars />
+      <Navigation />
     </main>
   );
 }

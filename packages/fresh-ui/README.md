@@ -238,3 +238,18 @@ to the trigger. Selection requests respect controlled values; ordinary closing r
 controlled open state. Browser-forced dismissal (such as repeated Escape) remains
 native behavior; apps should normally accept native close requests. Reopening starts on the selected month. A named hidden input
 submits the ISO date, or range endpoints joined by `/`.
+
+The `navigation` collection adds NavigationMenu, Menubar, LocationMarker and Stepper.
+NavigationMenu uses native exclusive details disclosures and ordinary site links.
+Menubar accepts menu records with actions, controlled checkbox/radio choices,
+labels, separators and nested submenu records. It delegates native popovers to
+ActionMenu; arrow keys, Home/End, typeahead, Escape and Tab follow the application
+menu pattern. Hydrate it in an island; application callbacks and choice state
+belong to the app. `value`/`onValueChange` may control the open menu ID (`null` closes).
+
+ActionMenu.Item supports `role='menuitemcheckbox' | 'menuitemradio'`, native
+`aria-checked`, and `closeOnSelect={false}` for repeated choice adjustments.
+ActionMenu.Content supports `initialFocus='first' | 'last'`. Outside dismissal
+keeps the destination focus; explicit Escape/close actions return to the trigger.
+Stepper is an ordered list with per-step status and optional native links, and
+LocationMarker is decorative. Neither adds a composite keyboard manager.

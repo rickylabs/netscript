@@ -104,6 +104,12 @@ export const overlays_3: readonly ComponentContract[] = [
     'priority': 'P0',
     'shipped': true,
     'props': {
+      'initialFocus': {
+        'kind': 'enum',
+        'values': ['first', 'last'],
+        'default': 'first',
+        'description': 'ActionMenu.Content entry edge for ArrowDown/ArrowUp.',
+      },
       'open': {
         'kind': 'enum',
         'values': [
@@ -154,6 +160,21 @@ export const overlays_3: readonly ComponentContract[] = [
       },
       'checked': {
         'kind': 'boolean',
+      },
+      'role': {
+        'kind': 'enum',
+        'values': [
+          'menuitem',
+          'menuitemcheckbox',
+          'menuitemradio',
+        ],
+        'description':
+          'ActionMenu.Item semantic role; choice state supplied with native aria-checked.',
+      },
+      'closeOnSelect': {
+        'kind': 'boolean',
+        'default': true,
+        'description': 'ActionMenu.Item may stay open for repeated choice adjustments.',
       },
     },
     'parts': [
@@ -302,6 +323,7 @@ export const overlays_3: readonly ComponentContract[] = [
       'Dropdown menu is the contract name; ActionMenu is the compatible runtime API.',
       'Utility ActionMenu delegates all parts to the popover scope so existing app-owned floating.css retains positioning and visibility behavior.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
+      'Item traversal includes checkable roles and typeahead, excludes nested menus, and respects native disabled. Outside dismissal preserves its focus destination.',
     ],
   },
   {
