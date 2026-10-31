@@ -309,3 +309,4 @@
 - 15:45:40Z: #2535 (#2108) fix `5281ba8` with Opus MERGE; **expensive-gate.acquired** on #2535.
 - 16:02:46Z: Cockpit 16:05Z: orchid 83b160a fixed the conflict relay (merge + plain push). Codex weekly is at 89% with 20 runs active: **no new Codex leaves unless they block a canary**; finish the running ones.
 - 16:03:01Z: **merged** #2535 (`7feb24c7d`) for #2108 (B2 capstone). **B2 complete; canary .2 code complete** except the Eric-held items (#2159 follow-up, #2259).
+- 16:19:40Z: **Canary .2 readiness posted** on #2474: candidate `7feb24c7d`, main green. The canary .1 candidate is not cut yet; Eric can cut .2 directly.

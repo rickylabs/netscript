@@ -1,17 +1,12 @@
 # STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
-- H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
-- A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
-- A2 DONE: #2395 (#2483), #2351 (#2496 67d4704b4)
-- A3 DONE: #2144 #2151 #2161 #2400 (#2482 02a66ba6d) all closed
-- B1 DONE except #2159 follow-up (Eric): #2499 #2512 #2517 #2522 #2526 merged
-- B2 #2162 #2369 #2149 MERGED (closed); #2108 → PR #2535 (implementing, capstone)
-- C1 #2267 #2132 #2338 #1367 #2377 MERGED (closed); #2373 merged #2528 (issue open while its worker continues #2379); #2390 PR #2534 READY (stall no longer reproduces), e2e RUNNING
-- D1 #2396 all 3 PRs MERGED; issue OPEN for release-owned published-graph proof on canary .1; #2259 BLOCKED → Eric
-- E1 DONE · E2 #2385 #2155 #1491 MERGED; #2268 partial (live-AppHost proof owed); #2269 PR #2529 head 3d2b6db re-MERGE, CI pending (carrier moved to @netscript/mcp/docs)
-- F1 #2384 #2375 #2411 MERGED (closed); #2379 (continuation, #2373 worker); #2406 (Fresh UI PR #2408); #2409 (check vs S6a)
-- G1 #1912 → PR #2537 (published smoke); #1366 box 6 dispatched (features); #2068 claimed by continuation chain; #1655, #2185 (local docker), #2233 (Eric) remain; Eric asked about #1366 box5/consumer proof and #2068 consumer box
-- H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
-- Open for Eric: #2159 follow-up; #2259 options; #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; #2421 debt FYI (veto window); Garnet CI issue (likely moot); file upstream Aspire report (#2401 run record)
-- CANARY .1 READY TO CUT at 15cffa2fe (posted 11:52Z, comment 6542998232); Eric cuts. One expensive gate at a time; drop the label when a PR e2e completes.
-- Dispatch rule: before posting any /swarm, check the issue for a claim comment or an open PR (orchid continuation workers self-claim plan issues).
-- Live leaves (herdr dispatch): never relaunch a leaf with a live workspace (label codex-<commentId>); check before any relaunch.
+- CANARY .1 READY TO CUT at 15cffa2fe (11:52Z, comment 6542998232) · CANARY .2 READY TO CUT at 7feb24c7d (16:20Z, comment 6545979540) · Eric cuts; none cut yet
+- H01/H02/A1/A2/A3/E1 DONE (all closed)
+- B1 DONE (#2499 #2512 #2517 #2522 #2526; #2390 closed: no repro); #2159 OPEN for Eric's effects follow-up placement
+- B2 DONE: #2162 #2369 #2149 #2108 merged; #2108 issue open until its worker finishes (then close with the posted evidence)
+- C1 DONE: #2267 #2132 #2338 #1367 #2377 #2373 #2390 closed
+- D1 #2396 all PRs merged; open for the release-owned published-graph proof on the first published canary · #2259 BLOCKED → Eric
+- E2 #2385 #2155 #1491 #2269 closed; #2268 partial merged, box-1 live-AppHost proof in flight (continuation on test/mcp-live-apphost-parity)
+- F1 #2384 #2375 #2411 #2379 closed; #2409 in flight (fixes lane); #2406 waits on the Fresh UI lane's PR #2408 (asked Cockpit 14:52Z)
+- G1 #1912 closed; #1366 box 6 merged (box 5 and consumer proof → Eric); #2068 published proof merged, reopened (EIS-Chat box → Eric); #1655 → Eric (14:37Z); #2185 → Eric (14:40Z); #2233 → Eric
+- BUDGET: Codex weekly at 89% (Cockpit 16:05Z): no new Codex leaves unless canary-blocking; finish running ones
+- Rules: merge.sh confirms MERGED before recording; drop e2e label when a PR's e2e completes; keep a leaf's issue open while its worker continues; check closingIssuesReferences before partial merges

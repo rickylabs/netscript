@@ -1709,11 +1709,13 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": null,
       "headSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
       "startedAt": "2026-10-31T16:03:10Z",
-      "via": "workflow_dispatch on main (canary .2 control run 41217778710)"
+      "via": "workflow_dispatch on main (canary .2 control run 41217778710)",
+      "result": "SUCCESS (both runtime tiers, static)",
+      "completedAt": "2026-10-31T16:18:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1729,7 +1731,7 @@
       "state": "planned",
       "targetDate": "2026-11-06",
       "rationale": "B1 saga retry/compensation/read model on KV, B2 KV-only proof, C1 ordering and restart safety, E1 structured logging, rest of D1.",
-      "note": "code contents merged at 16:02Z (candidate 7feb24c7d09518a045c3955555967dbbde51e92a); main control runs in progress; Eric-held: #2159 follow-up placement, #2259"
+      "note": "READY TO CUT: candidate 7feb24c7d; readiness posted on #2474 16:20Z; main green (ci 41217755762, e2e 41217778710, command-postgres 41217780859)"
     },
     {
       "id": "0.0.9-canary.3",
@@ -1746,10 +1748,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T16:03:25Z",
-    "nextReportDueAt": "2026-10-31T17:03:25Z",
-    "lastReportRef": "worklog.md",
-    "headline": "canary .2 code complete; main control runs at 7feb24c7d",
+    "lastReportAt": "2026-10-31T16:19:40Z",
+    "nextReportDueAt": "2026-10-31T17:19:40Z",
+    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
+    "headline": "canary .2 READY TO CUT at 7feb24c7d",
     "currentMainSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -1936,7 +1938,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T16:03:26Z",
+  "updatedAt": "2026-10-31T16:19:41Z",
   "dispatches": [
     {
       "issue": 2438,

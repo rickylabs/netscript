@@ -51,3 +51,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 14:49 | `8a2cbc1f3` | #2541 | #2068 (partial) | W7 (G1) | published cold-consumer proof; issue reopened (EIS-Chat box with Eric) |
 | 2026-10-31 15:24 | `7312ba498` | #2542 | #1366 (box 6) | W7 (G1) | issue open: box 5 and the consumer proof await Eric |
 | 2026-10-31 16:02 | `7feb24c7d` | #2535 | #2108 | W7 (B2) | **B2 complete; canary .2 code complete** (except Eric-held #2159 follow-up / #2259) |
+| 2026-10-31 16:20 | `7feb24c7d` | — | — | canary .2 | **readiness posted**; main green (ci 41217755762, e2e-cli 41217778710, command-postgres 41217780859) |
