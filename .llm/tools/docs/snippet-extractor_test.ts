@@ -151,7 +151,6 @@ Deno.test('real corpus census recognizes TS aliases and enforces Tier-1 invarian
         'services-sdk/sdk.md',
         'services-sdk/how-to/add-a-service.md',
         'web-layer/query.md',
-        'web-layer/examples.md',
         'web-layer/interactive.md',
         'web-layer/form.md',
         'web-layer/query-bridge.md',

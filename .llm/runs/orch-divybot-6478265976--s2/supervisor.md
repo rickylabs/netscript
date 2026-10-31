@@ -1,5 +1,9 @@
 # S2 registry v2 supervision
 
+## Authorized continuation — 2026-10-31
+
+Resume existing branch and PR #2468 from evidence head `2c95e60c2dccbf07a78ae26a28237bceada7a142`, product source `dd4e793462420733f281036c48e963f661f1f9aa`. Reconcile current `origin/main` with a merge commit, refresh scoped and broader gates, resume the retained separate Anthropic evaluator using the owner's exact model/effort, record its substantive verdict, and stop at READY without merging the PR. The writable surface and S3 exclusions below still apply; normal upstream merge changes are retained. Local private execution records remain outside tracked evidence. The feature matrix was queried with `--json` again; the owner's quoted evaluator override remains authoritative.
+
 - Role: implementation, feature tier; supplied leaf profile is authoritative.
 - Generator: OpenAI Codex, requested sol / xhigh.
 - Branch: `orch/divybot-6478265976`; baseline: `9a31e879c32a8066c50946a57976f3da34ba43a6`; base: `main`.

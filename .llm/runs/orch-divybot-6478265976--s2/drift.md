@@ -1,5 +1,7 @@
 # Drift
 
+- 2026-10-31: Owner explicitly authorizes relaunch after reviewer quota reset. Original branch/PR and full scope are retained. Main advanced by four commits, requiring a normal merge with semantic docs/prose reconciliation. This supersedes the historical availability-only stop; it does not invent a passing verdict. Docker daemon is still unavailable. No new product scope or architectural debt is accepted.
+
 - Bootstrap: RTK is not installed; use direct commands and retain structured wrapper verdicts.
 - Owner override: explicit Anthropic PLAN-EVAL/IMPL-EVAL command replaces default matrix evaluators; vendor and session independence remain required.
 - S3 coordination hook: style items map logical component names to registry item references through `meta.components`. Each source item retains stable targets; S3 can publish new styles without changing the installer or app pages. Real alternate styles and ui:migrate remain S3-owned.

@@ -8,17 +8,10 @@ next: { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" }
 
 # The storefront page
 
-Every chapter so far built the backend: a typed catalog, a contract-first cart, a durable checkout, a
-verified webhook. All of it is reachable by `curl` — and none of it has a face. This chapter puts one
-on it, and in doing so closes the loop the whole track has been building toward: **the same oRPC
-contract that types the server handler also types the page's query and its checkout mutation.** Write
-a wrong field in the browser and it is a compile error, exactly as it is on the server. No second copy
-of "what a cart is", no hand-written fetch wrapper, no DTO that drifts.
-
-You will build a customer's cart page as a Fresh route with a **typed route contract**, then drive its
-catalog query and its checkout mutation through the SDK's contract-derived query utilities inside an
-island. This is the frontend half of NetScript's typed spine — the part the storefront backend never
-showed you until now.
+In this chapter you build a customer's cart page in Fresh. The page has a **typed route contract**,
+and an island drives its catalog query and checkout mutation through the SDK's contract-derived query
+utilities. **The same oRPC contract that types the server handler also types the page's query and its
+checkout mutation**, so a wrong field in the browser is a compile error, as it is on the server.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" },
@@ -32,42 +25,44 @@ showed you until now.
 
 ## What you will build
 
-A `GET /cart/[customer]` page. One **bound route contract** declares its URL pattern, its typed
-`{ customer }` path param, and its typed pagination search — so a link to the page and the handler that
-answers it can never disagree about its shape. A single clients module exposes a typed
-`productsClient` and `cartClient` plus their query utilities, each derived from the chapter-2 and
-chapter-3 contracts. An island then reads the catalog with `useIslandQuery` and begins checkout — a
-new cart — with `useIslandMutation`, both keyed off those contract-derived helpers. The catalog query
-runs live against the `products` service you have had up since chapter 2; the checkout mutation is
+A `GET /cart/[customer]` page:
+
+- one **bound route contract** declares its URL pattern, its typed `{ customer }` path param and its
+  typed pagination search, so a link to the page and the handler that answers it can't disagree;
+- one module per service exposes a typed `productsClient` and `cartClient` and their query
+  utilities, derived from the chapter 2 and chapter 3 contracts;
+- an island reads the catalog with `useIslandQuery` and begins checkout, creating a cart, with
+  `useIslandMutation`, both keyed off those helpers.
+
+The catalog query runs live against the `products` service from chapter 2. The checkout mutation is
 typed end to end against the cart contract from chapter 3.
 
-## Prerequisites
+## Before you begin
 
-- The `products` service on `:3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) (from [chapter 2](/tutorials/storefront/02-catalog-service/)) and
-  the `cart` contract and its typed client (from
-  [chapter 3](/tutorials/storefront/03-cart-contracts/)).
+- The `products` service at its allocated endpoint from [chapter 2](/tutorials/storefront/02-catalog-service/), and
+  the `cart` contract and its typed client from
+  [chapter 3](/tutorials/storefront/03-cart-contracts/).
 - `aspire start` up, so the `products` service is discoverable by name (the dashboard answers at
-  [https://localhost:18888](https://localhost:18888)).
-- The route contract and query utilities are built into `@netscript/fresh/route`,
-  `@netscript/sdk/client`, and `@netscript/sdk/query-client`; none needs Aspire to type-check, though
-  you run under Aspire to exercise the catalog query live.
+  the dashboard at the URL Aspire prints).
+- The route contract and query utilities ship in `@netscript/fresh/route`, `@netscript/sdk/client`
+  and `@netscript/sdk/query-client`. None needs Aspire to type-check, but the live catalog query runs
+  under Aspire.
 
-{{ comp callout { type: "note", title: "The cart page reuses your Fresh app" } }}
-Chapter 1 scaffolded a Fresh app alongside the services — that is where routes and islands live. This
-chapter adds files under <code>apps/storefront/</code> (use your app's actual folder name); the
-imports are what matter, not the exact path. If you stopped chapter 3 at the contract and never stood
-up a running <code>cart</code> service, the checkout mutation still type-checks end to end — the client
-is built from the contract alone. Running it live is the same <code>defineService</code> loop chapter
-2 used, pointed at the cart handlers.
+{{ comp callout { type: "note", title: "The cart page goes in your Fresh app" } }}
+Chapter 1 scaffolded a Fresh app next to the services; routes and islands live there. This chapter
+uses the default <code>apps/dashboard/</code> app: use that folder throughout this chapter. If you stopped
+chapter 3 at the contract and have no running <code>cart</code> service, the checkout mutation still
+type-checks end to end, because the client is built from the contract alone. To run it live, serve
+the cart handlers with the <code>defineService</code> loop from chapter 2.
 {{ /comp }}
 
 ## Step 1 — Declare the bound route contract
 
 Give the page a typed identity before any UI. A route contract from `@netscript/fresh/route` is the
-single source of truth for a route's pattern, its path params, and its search params.
-`createRouteReference` infers the `{ customer }` param straight from the pattern; `defineRouteContract`
-+ `bindRoutePattern` add typed pagination search with safe defaults. Put it in the shared `contracts/`
-tree so the page and any link import the *same* object:
+single source of truth for a route's pattern, path params and search params. `createRouteReference`
+infers the `{ customer }` param from the pattern, and `defineRouteContract` with `bindRoutePattern`
+adds typed pagination search with safe defaults. Put it in the shared `contracts/` tree so the page
+and every link import the *same* object:
 
 ```ts
 // contracts/routes/cart-page.ts
@@ -104,8 +99,8 @@ export const cartRoute = bindRoutePattern(
 
 `bindRoutePattern` returns one object with everything downstream needs: `cartRoute.parsePath(...)` and
 `cartRoute.parseSearch(...)` turn raw request params into typed values, and
-`cartRoute.href({ path: { customer } })` builds the URL for a link — so navigation and the handler
-that answers it share one definition of the route.
+`cartRoute.href({ path: { customer } })` builds the URL for a link. Navigation and the handler share
+one definition of the route.
 
 {{ comp.apiTable({
   caption: "@netscript/fresh/route — the bound route contract surface",
@@ -119,11 +114,11 @@ that answers it share one definition of the route.
 
 ## Step 2 — One typed module per service
 
-A client needs only a contract to be fully typed. Keep each service's client and cache-aware query
-factory together in `lib/<service>.ts`, matching `service add <name> --with-client`:
+A client needs only a contract to be fully typed. Keep each service's client and its cache-aware query
+factory together in `lib/<service>.ts`, the layout `service add <name> --with-client` generates:
 
 ```ts
-// apps/storefront/lib/products.ts
+// apps/dashboard/lib/products.ts
 import { ProductsContractV1 } from '@my-shop/contracts/versions/v1';
 import { createServiceClient } from '@netscript/sdk/client';
 import { createQueryFactories } from '@netscript/sdk/query';
@@ -138,32 +133,30 @@ export const productsQueries = createQueryFactories({
   products: { contract: ProductsContractV1, client: productsClient },
 }).products;
 
-// apps/storefront/lib/cart.ts follows the same generated shape:
+// apps/dashboard/lib/cart.ts follows the same generated shape:
 // cartClient + createQueryFactories({ cart: ... }).cart → cartQueries.
 ```
 
-`productsClient.list(input)` now has the exact signature `ProductsContractV1.list` declared, and
-`productsQueries.list.queryOptions(input)` hands you the **contract-derived cache key** the island
-reads and invalidates through. Change a field in the contract and this module re-type-checks — there
-is no second definition of a product or a cart to keep in sync.
+`productsClient.list(input)` has the exact signature `ProductsContractV1.list` declares, and
+`productsQueries.list.queryOptions(input)` gives you the **contract-derived cache key** the island
+reads and invalidates through. Change a field in the contract and this module re-type-checks.
 
 {{ comp callout { type: "note", title: "How serviceName becomes a URL" } }}
-You never write <code>http://localhost:3001</code>. <code>serviceName: 'products'</code> resolves at
-call time from an Aspire-injected env var — server-side <code>services__products__http__0</code> and
-its browser mirror — so the same client works in a page loader and in a hydrated island. Aspire sets
-those when the app lists <code>products</code> as a reference; the client just reads them. Full
-mechanics in <a href="/services-sdk/how-to/discover-services/">Discover services</a>.
+The client does not need a literal service URL. <code>serviceName: 'products'</code> resolves at
+call time from an Aspire-injected environment variable, <code>services__products__http__0</code> on
+the server and its browser mirror in the client, so the same client works in a page loader and in a
+hydrated island. Aspire sets those variables when the app lists <code>products</code> as a reference.
+See <a href="/services-sdk/how-to/discover-services/">Discover services</a>.
 {{ /comp }}
 
 ## Step 3 — Read and mutate in the island
 
-The island is where the typed contract meets the browser. `useIslandQuery` reads the catalog;
-`useIslandMutation` begins checkout by creating a cart. Both come from `@netscript/fresh/query` — island
-code imports query hooks from there, never from TanStack directly, so the dependency stays
-centralized:
+In the island, `useIslandQuery` reads the catalog and `useIslandMutation` begins checkout by creating
+a cart. Both come from `@netscript/fresh/query`; island code imports query hooks from there, never
+from TanStack directly, so the dependency stays in one place:
 
 ```tsx
-// apps/storefront/islands/CheckoutIsland.tsx
+// apps/dashboard/islands/CheckoutIsland.tsx
 import {
   QueryIsland,
   useIslandMutation,
@@ -175,8 +168,8 @@ import { productsClient, productsQueries } from '../lib/products.ts';
 
 interface CheckoutIslandProps {
   customer: string;
-  input: { limit: number; offset: number };
-  initialProducts?: { items: Array<{ id: number; name: string }> };
+  input: { page: number; limit: number; sortOrder: 'asc' | 'desc' };
+  initialProducts?: Awaited<ReturnType<typeof productsClient.list>>;
 }
 
 function CheckoutInner({ customer, input, initialProducts }: CheckoutIslandProps) {
@@ -200,7 +193,7 @@ function CheckoutInner({ customer, input, initialProducts }: CheckoutIslandProps
       queryClient.invalidateQueries({ queryKey: cartQueries.list.clientKey() }),
   });
 
-  const products = catalog.data?.items ?? [];
+  const products = catalog.data?.data ?? [];
   return (
     <ul class='ns-stack'>
       {products.map((product) => (
@@ -228,42 +221,42 @@ export default function CheckoutIsland(props: CheckoutIslandProps) {
 }
 ```
 
-The moves that make this typed end to end:
+What keeps this typed end to end:
 
 - **`queryKey` from the utility, `queryFn` calling the client.** `productsQueries.list.queryOptions(...)`
   computes the same cache key the server uses, so a server-seeded row and a client-refetched row share
-  one key. The island hook wants a zero-argument `queryFn`, so you invoke the typed
-  `productsClient.list(input)` there — the call is checked against `ProductsContractV1`, not a loose
-  `fetch`.
+  one key. The island hook wants a zero-argument `queryFn`, so you call the typed
+  `productsClient.list(input)` there, checked against `ProductsContractV1`.
 - **`mutationFn` is a typed contract call.** `cartClient.create({ customerId, items })` is checked
-  against `CartContractV1.create`; pass an item without a `productId` and it fails `deno task check`,
-  not in production.
-- **Invalidation is keyed off the contract too.** `cartQueries.list.clientKey()` is the
-  prefix-matchable cache key for every cart list query, so one line refetches the cart after checkout.
+  against `CartContractV1.create`; an item without a `productId` fails `deno task check`.
+- **Invalidation is keyed off the contract.** `cartQueries.list.clientKey()` is the prefix-matchable
+  cache key for every cart list query, so one line refetches the cart after checkout.
 
-Adding to a cart is a widget event, which is why it lives in the island. A checkout that collects an
-address and then navigates is a page event, and that is the other half of the decision —
-`definePage().withForm()` owns the validation, the error round trip, and the CSRF token so the page
-still works without JavaScript. [Server-validated forms](/web-layer/form/) covers the split and the
-pipeline behind it.
-
-{{ comp callout { type: "note", title: "Why the queryFn wraps the client instead of spreading queryOptions" } }}
-The island hooks (<code>useIslandQuery</code>/<code>useIslandMutation</code>) take a deliberately
-small option surface with a zero-argument <code>queryFn</code>. The SDK's
+{{ comp callout { type: "note", title: "Why the queryFn wraps the client" } }}
+The island hooks (<code>useIslandQuery</code>/<code>useIslandMutation</code>) take a small option
+surface with a zero-argument <code>queryFn</code>. The SDK's
 <code>queryOptions()</code>/<code>mutationOptions()</code> produce a fuller TanStack shape whose
-functions expect a call context, so they are not spread wholesale into the island hooks. You use the
-utilities for the parts that must stay contract-derived — the <strong>keys</strong> — and let the
-typed client be the function body. Same type source, honest seam.
+functions expect a call context, so you don't spread them into the island hooks. Use the utilities
+for the parts that must stay contract-derived, the <strong>keys</strong>, and make the typed client
+the function body.
 {{ /comp }}
+
+Adding to a cart is a widget event, so it lives in the island. A checkout that collects an address
+and then navigates is a page event: `definePage().withForm()` owns the validation, the error round
+trip and the CSRF token, so the page works without JavaScript.
+[Server-validated forms](/web-layer/form/) covers the split and the pipeline behind it.
 
 ## Step 4 — Wire the route to the page
 
-The page is built using NetScript's fluent `definePage` page builder. By binding to the `cartRoute` contract, the page gains access to type-safe path and search schemas so `ctx.path` and `ctx.search` are fully typed throughout the pipeline. `.withResource()` then registers a value resolved once per request — see [Request-scoped resources](/web-layer/resources/) for what "once" guarantees:
+Build the page with NetScript's fluent `definePage` builder. Binding it to the `cartRoute` contract
+types `ctx.path` and `ctx.search` throughout the pipeline. `.withResource()` registers a value
+resolved once per request; see [Request-scoped resources](/web-layer/resources/) for what "once"
+guarantees:
 
 ```tsx
-// apps/storefront/routes/cart/[customer].tsx
+// apps/dashboard/routes/cart/[customer].tsx
 import { definePage } from '@app/utils.ts';
-import { cartRoute } from '../../../contracts/routes/cart-page.ts';
+import { cartRoute } from '../../../../contracts/routes/cart-page.ts';
 import CheckoutIsland from '../../islands/CheckoutIsland.tsx';
 import { productsClient } from '../../lib/products.ts';
 
@@ -271,13 +264,21 @@ const cartPage = definePage()
   .withRoute(cartRoute)
   .withResource('initialProducts', async (ctx) => {
     // Resolve the first page of products on the server side
-    const input = { limit: ctx.search.limit, offset: ctx.search.offset };
+    const input = {
+      page: Math.floor(ctx.search.offset / ctx.search.limit) + 1,
+      limit: ctx.search.limit,
+      sortOrder: 'asc' as const,
+    };
     return await productsClient.list(input);
   })
   .withLayer('checkout', CheckoutIsland, {
     loader: async (ctx) => ({
       customer: ctx.path.customer,
-      input: { limit: ctx.search.limit, offset: ctx.search.offset },
+      input: {
+        page: Math.floor(ctx.search.offset / ctx.search.limit) + 1,
+        limit: ctx.search.limit,
+        sortOrder: 'asc' as const,
+      },
       initialProducts: await ctx.resource('initialProducts'),
     }),
   })
@@ -292,73 +293,54 @@ const cartPage = definePage()
 export default cartPage.default;
 ```
 
-`definePage` is imported from `@app/utils.ts` — the module chapter 1's scaffold wrote, which
-re-exports the builder bound to your app's `State` type so every page shares one typed context.
+`definePage` comes from `@app/utils.ts`, the module chapter 1's scaffold wrote. It re-exports the
+builder bound to your app's `State` type, so every page shares one typed context.
 
-`.withRoute(cartRoute)` hands the contract's schemas to the builder, so the parsing you would
-otherwise write by hand happens before your loader runs: `ctx.path.customer` is a typed string and
-`ctx.search` carries the `paginationSearchSchema` defaults, so `/cart/cust_1001` with no query string
-still yields `{ limit: 12, offset: 0 }`. A link elsewhere builds the URL with
-`cartRoute.href({ path: { customer: 'cust_1001' } })` — the pattern is written once, in the contract,
-and both the page and the link read it from there.
+`.withRoute(cartRoute)` hands the contract's schemas to the builder, so parsing happens before your
+loader runs: `ctx.path.customer` is a typed string, and `ctx.search` carries the
+`paginationSearchSchema` defaults, so `/cart/cust_1001` with no query string yields
+`{ limit: 12, offset: 0 }`. The loader converts that offset to the catalog's page-based input with `Math.floor(offset / limit) + 1`. A link elsewhere builds the URL with
+`cartRoute.href({ path: { customer: 'cust_1001' } })`, so the pattern is written once, in the
+contract.
 
-## Test it out
+## Verify your progress
 
-Type-check first — the whole typed chain is proven by the compiler, no server required:
+Type-check first. The compiler proves the whole typed chain without a server:
 
 ```sh
 # From the workspace root.
 deno task check
 ```
 
-A clean check means the route contract, both service clients, the query utilities, and the island all
-line up with the chapter-2 and chapter-3 contracts. Now exercise the **catalog query** live. With
-`aspire start` up and at least one product created (chapter 2), the `products` service answers by
-discovery, so the page's query returns real rows:
+A clean check means the route contract, both service clients, the query utilities and the island line
+up with the chapter 2 and chapter 3 contracts. Then run the **catalog query** live. With
+`aspire start` up and at least one product created in chapter 2, the `products` service answers by
+discovery and the page's query returns real rows:
 
-```sh
-# The query the island runs, against the live products service.
-curl "http://localhost:3001/api/products?page=1&limit=12"
-```
+Use the app's generated typed client or the catalog check from chapter 2. For an agent, call
+`list_api_services`, `list_service_operations` and `get_operation_schema` to inspect the live
+`products.list` operation before running the typed query.
 
-You get the page-shaped catalog back — the same `items` the island renders. Open the page in your
-Fresh app (the app's port shows in the Aspire dashboard resource list) at `/cart/cust_1001`, and each
-product carries an **Add to cart** button wired to the typed checkout mutation.
+You get `{ data, pagination }` back; the island renders `catalog.data.data`. Open `/cart/cust_1001` in
+your Fresh app (its port is in the Aspire dashboard resource list): each product has an **Add to
+cart** button wired to the typed checkout mutation.
 
 - [ ] `contracts/routes/cart-page.ts` exports `cartRoute`, a bound route contract with a typed
       `{ customer }` param and pagination search.
-- [ ] `apps/storefront/lib/products.ts` and `lib/cart.ts` export their service-derived clients and
+- [ ] `apps/dashboard/lib/products.ts` and `lib/cart.ts` export their service-derived clients and
       query factories.
 - [ ] `CheckoutIsland.tsx` reads with `useIslandQuery` and mutates with `useIslandMutation`, keyed off
       the contract-derived helpers.
 - [ ] The page binds to the contract and loads initial products using `definePage` and a layer loader.
 - [ ] `deno task check` passes.
-- [ ] `curl` against `:3001/api/products` returns the catalog the island renders.
+- [ ] The typed catalog query returns `data` and `pagination`, and the island renders `data`.
 
 ## What you built
 
-- A `GET /cart/[customer]` page whose route is a **bound route contract**: one object owns the
-  pattern, the typed `{ customer }` path param, and the pagination search, and it produces both the
-  page's typed context and the URL a link would call. `definePage` binds that contract, resolves the
-  first page of products on the server, and wires the checkout island as a layer.
-- One module per service with a typed `createServiceClient` wrapped in `createQueryFactories` — the
-  contract-derived query and mutation helpers shared by loaders and islands.
-- An island that **reads** the catalog with `useIslandQuery` and **begins checkout** with
-  `useIslandMutation`, both keyed off those helpers, with cache invalidation keyed off the cart
-  contract too.
-
-That is the differentiator this chapter exists to prove: the oRPC contract you wrote once on the
-backend is the *same* type source for the URL, the query, and the mutation on the frontend — checked
-by the compiler from the database to the button, never a second hand-maintained copy that can drift.
-
-## Next Steps
-
-- **Ship it.** [Chapter 7 · Deploy](/tutorials/storefront/07-deploy/) runs the whole storefront —
-  services, plugins, and this page — under one `aspire start`.
-- **Go cache-first and live.** The [live-dashboard track](/tutorials/live-dashboard/03-sdk-cache-first-query/)
-  takes the same query utilities further: KV-backed stale-while-revalidate reads and real-time
-  streamed updates.
-- **Reference.** The [SDK reference](/reference/sdk/) and [contracts explanation](/explanation/contracts/)
-  cover the full typed client-and-query surface.
-
-{{ comp.nextPrev({ prev: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" }, next: { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" } }) }}
+A `GET /cart/[customer]` page whose route is a **bound route contract**, built with `definePage`: it
+resolves the first page of products on the server and mounts the checkout island as a layer. One
+module per service wraps a typed `createServiceClient` in `createQueryFactories`, and the island
+reads with `useIslandQuery` and begins checkout with `useIslandMutation`, all keyed off the same
+contracts as the backend. The [live-dashboard track](/tutorials/live-dashboard/03-sdk-cache-first-query/)
+takes these query utilities further, with cache-first reads and streamed updates. Next, you run the
+whole storefront under one `aspire start`.

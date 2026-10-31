@@ -1,5 +1,13 @@
 # Worklog
 
+## Authorized continuation — 2026-10-31
+
+Recovered the complete assignment, original owner comments and retained run/memory before reading implementation. Resumed existing branch/PR at 2c95e60; queried NetScript find_guidance/search_docs and the feature matrix. Owner's exact Opus 5.5 High evaluator override and no-label/Refs-only/STOP-at-READY constraints remain in force.
+
+Current main moved to 7907293 with four upstream commits. Deepened the shallow assignment clone to recover the real merge base 9a31e87. The normal merge preserves upstream changes and reconciles four overlapping documentation pages plus their generated prose. Upstream reference layout remains, with S2 registry-v2 exports, command coverage and 26-tool metadata retained. Docs generation passes: 253 HTML files and 87 static registry JSON artifacts; docs:accuracy passes 109/109 direct commands and 174 recursive paths. Asset/publish generators complete. Integrated and native acceptance reruns are in progress. Docker daemon probe fails; the required exact one-pass smoke will be attempted and its limitation disclosed. No S3 component source or lock change was introduced by this continuation.
+
+Reconcile: PR #2468 is open/draft on the original branch; its implementation is the work being resumed, not a duplicate delivery. Final independent whole-change review and current-head gates remain required before READY. Historical quota failures and repaired findings below remain historical evidence.
+
 ## Design
 
 1. **Public surface:** JSON registry schema and `/registry-v2`; `ui:build`, `ui:init --preset`, `ui:add --diff`, `ui:update`, `ui:apply --preset --only`, `ui:view/search/list/docs/info`, `ui:registry add|validate`, `ui:preset decode|url`; four MCP registry tools. Existing page/island commands remain supported.

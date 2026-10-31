@@ -16,6 +16,68 @@ import type {
   TriggerIdempotencyPort,
 } from '../ports/mod.ts';
 import { TriggerProcessor } from './trigger-processor.ts';
+import { MemoryKvAdapter } from '@netscript/kv';
+import { KvTriggerIdempotencyStore } from '../stores/kv-trigger-runtime-stores.ts';
+
+Deno.test('TriggerProcessor applies definition keys to claims, handlers and dispatched actions', async () => {
+  await using kv = new MemoryKvAdapter();
+  const seen: Array<string | undefined> = [];
+  const definition = {
+    ...defineWebhook(
+      (event) => {
+        seen.push(event.idempotencyKey);
+        return Promise.resolve([enqueueJob({ id: 'scheduled-job' as never })]);
+      },
+      { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
+    ),
+    deduplication: {
+      ttlMs: 60_000,
+      payloadHashFallback: true,
+      key: () => 'definition-key',
+    },
+  };
+  const processor = new TriggerProcessor({
+    idempotency: new KvTriggerIdempotencyStore({ kv }),
+    dlq: new MemoryDlq(),
+    dispatchAction: (_action, event) => {
+      seen.push(event.idempotencyKey);
+      return Promise.resolve();
+    },
+  });
+  try {
+    await processor.process(webhookEvent({ idempotencyKey: 'adapter-key' }), definition);
+    await assertRejects(
+      () => processor.process(webhookEvent({ idempotencyKey: 'other-adapter-key' }), definition),
+      TriggerDeduplicatedError,
+    );
+    assertEquals(seen, ['definition-key', 'definition-key']);
+  } finally {
+    await processor.stop();
+  }
+});
+
+Deno.test('TriggerProcessor preserves the event key when the definition callback returns undefined', async () => {
+  await using kv = new MemoryKvAdapter();
+  const seen: Array<string | undefined> = [];
+  const definition = {
+    ...defineWebhook((event) => {
+      seen.push(event.idempotencyKey);
+      return Promise.resolve([]);
+    }, { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' }),
+    deduplication: { ttlMs: 60_000, payloadHashFallback: true, key: () => undefined },
+  };
+  const processor = new TriggerProcessor({
+    idempotency: new KvTriggerIdempotencyStore({ kv }),
+    dlq: new MemoryDlq(),
+  });
+  try {
+    await processor.process(webhookEvent({ idempotencyKey: 'first-slot' }), definition);
+    await processor.process(webhookEvent({ idempotencyKey: 'next-slot' }), definition);
+    assertEquals(seen, ['first-slot', 'next-slot']);
+  } finally {
+    await processor.stop();
+  }
+});
 
 Deno.test('TriggerProcessor dispatches handler actions once', async () => {
   const idempotency = new MemoryIdempotency();
@@ -195,7 +257,7 @@ class MemoryDlq implements TriggerDlqPort {
   }
 }
 
-function webhookEvent(): TriggerEvent<'webhook'> {
+function webhookEvent(overrides: Partial<TriggerEvent<'webhook'>> = {}): TriggerEvent<'webhook'> {
   return {
     id: 'evt_1' as TriggerEventId,
     triggerId: 'stripe-payments' as TriggerId,
@@ -211,6 +273,7 @@ function webhookEvent(): TriggerEvent<'webhook'> {
     detectedAt: fixedNow().toISOString(),
     updatedAt: fixedNow().toISOString(),
     idempotencyKey: 'evt_1',
+    ...overrides,
   };
 }
 

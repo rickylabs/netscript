@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertNotEquals } from 'jsr:@std/assert@^1';
 
 import { MemoryKvAdapter } from '@netscript/kv';
 import type { TriggerEvent, TriggerEventId, TriggerId } from '../domain/mod.ts';
@@ -7,6 +7,47 @@ import {
   KvTriggerEventStore,
   KvTriggerIdempotencyStore,
 } from './kv-trigger-runtime-stores.ts';
+import { MemoryTriggerIdempotencyStore } from '../testing/memory-trigger-idempotency-store.ts';
+
+for (const adapter of ['kv', 'memory'] as const) {
+  Deno.test(`${adapter} trigger payload fallback scopes identical payloads to the trigger`, async () => {
+    await using kv = new MemoryKvAdapter();
+    const store = adapter === 'kv'
+      ? new KvTriggerIdempotencyStore({ kv })
+      : new MemoryTriggerIdempotencyStore();
+    const event = webhookEvent();
+    const first = await store.resolveKey({ event });
+    const other = await store.resolveKey({
+      event: { ...event, triggerId: 'other-trigger' as TriggerId },
+    });
+    assertEquals(first.claimed, true);
+    assertEquals(other.claimed, true);
+    assertNotEquals(first.key, other.key);
+    assertEquals(first.source, 'payload-hash');
+    assertEquals((await store.resolveKey({ event })).claimed, false);
+    await store.markCompleted(first.key, 60_000);
+    assertEquals((await store.resolveKey({ event })).claimed, false);
+  });
+}
+
+Deno.test('KV caller and header key precedence remains explicit', async () => {
+  await using kv = new MemoryKvAdapter();
+  const store = new KvTriggerIdempotencyStore({ kv });
+  assertEquals(
+    await store.resolveKey({
+      event: webhookEvent({ idempotencyKey: 'caller-key' }),
+      requestHeaders: { 'x-idempotency-key': 'header-key' },
+    }),
+    { key: 'caller-key', source: 'caller', claimed: true },
+  );
+  assertEquals(
+    await store.resolveKey({
+      event: webhookEvent(),
+      requestHeaders: { 'x-idempotency-key': 'header-key', 'idempotency-key': 'other-header' },
+    }),
+    { key: 'header-key', source: 'request-header', claimed: true },
+  );
+});
 
 Deno.test('KvTriggerEventStore persists, lists, updates, and loads events with MemoryKvAdapter', async () => {
   const kv = new MemoryKvAdapter();

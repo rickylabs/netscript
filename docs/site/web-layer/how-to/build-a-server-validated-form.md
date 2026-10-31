@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a server-validated form
+description: Route-bound form state, server validation, mutation, and success handling in one typed page definition.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/build-a-server-validated-form/
@@ -8,8 +9,9 @@ oldUrl: /how-to/build-a-server-validated-form/
 
 # Build a server-validated form
 
-Use `definePage().withForm()` when a Fresh page needs route-bound form state, server validation,
-mutation, and redirect or same-page success handling in one typed page definition.
+This recipe adds a server-validated form to a Fresh page with `definePage().withForm()`. One typed
+page definition carries the route-bound form state, server validation, the mutation, and a redirect
+or same-page success.
 
 ## Prerequisites
 
@@ -20,9 +22,9 @@ mutation, and redirect or same-page success handling in one typed page definitio
 
 ## Define the form
 
-`withForm(id, component, config)` registers a typed layer and a method handler. The config surface
-includes `schema`, `initial`, `mutate`, `onIntent`, `redirectTo`, `onSuccess`, `invalidate`, `csrf`,
-`method`, and `spanName`.
+Call `withForm(id, component, config)` on the page builder. It registers a typed layer and a method
+handler. The config takes `schema`, `initial`, `mutate`, `onIntent`, `redirectTo`, `onSuccess`,
+`invalidate`, `csrf`, `method` and `spanName`.
 
 ```tsx
 import { definePage } from '@netscript/fresh/builders';
@@ -65,8 +67,8 @@ export const contactPage = definePage()
 
 ## Render validation errors
 
-Validation failures stay on the form layer. Keep field rendering defensive: read `values`, show
-field errors when present, and avoid assuming the mutation ran.
+A failed validation re-renders the form layer and the mutation does not run. Render defensively:
+read `values`, show field errors when present, and do not assume the mutation ran.
 
 ```tsx
 function FieldError(props: { errors?: readonly string[] }) {
@@ -77,7 +79,7 @@ function FieldError(props: { errors?: readonly string[] }) {
 
 ## Test the page definition
 
-Keep one unit test around the builder chain so method, schema, and layer IDs stay wired.
+Keep one unit test on the builder chain so the method, schema and layer ids stay wired:
 
 ```ts
 import { assertEquals } from '@std/assert';
@@ -93,15 +95,17 @@ Deno.test('contact page registers the route pattern', () => {
 - Missing `schema`: the form has no server validation boundary.
 - `mutate` throws: the form runtime returns an error state instead of running `redirectTo`.
 - `redirectTo` and `onSuccess` both exist: `redirectTo` takes precedence.
-- CSRF is enabled by default; disable it only for a route that has another verified protection.
+
+> [!CAUTION]
+> CSRF protection is on by default. Disable it only for a route that has another verified
+> protection.
+
+The full submission pipeline and its edge cases are in
+[Server-validated forms](/web-layer/form/#the-submission-pipeline).
 
 ## Next steps
 
-- Use the page-builder model from [Fresh meta-framework](/capabilities/fresh-framework/).
-- Connect the page to typed data with [Live Dashboard, chapter 04](/tutorials/live-dashboard/04-definePage-QueryIsland/).
-- Look up the builder surface in [fresh reference](/reference/fresh/).
-
-{{ comp.nextPrev({
-  prev: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" },
-  next: { label: "Build a validated ingestion queue", href: "/durable-workflows/how-to/build-a-validated-ingestion-queue/" }
-}) }}
+Read [Server-validated forms](/web-layer/form/) to render fields with the generated `fields` props,
+add repeatable rows, and enhance the form in the browser. See also
+[Live dashboard, chapter 04](/tutorials/live-dashboard/04-definePage-QueryIsland/) and the
+[`@netscript/fresh` reference](/reference/fresh/).

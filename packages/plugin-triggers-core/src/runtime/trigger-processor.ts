@@ -118,6 +118,11 @@ export class TriggerProcessor implements TriggerProcessorPort {
     event: TriggerEvent,
     definition: RunnableTriggerDefinition,
   ): Promise<TriggerProcessResult> {
+    const definitionKey = definition.deduplication?.key?.(event);
+    if (definitionKey !== undefined) {
+      // Pass the same resolved caller policy to the claim, handler and downstream actions.
+      event = { ...event, idempotencyKey: definitionKey };
+    }
     await this.#eventSubscription?.publish({
       type: 'trigger:started',
       timestamp: this.#now().toISOString(),

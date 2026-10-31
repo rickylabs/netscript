@@ -8,11 +8,9 @@ next: { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call
 
 # The chat UI
 
-The backend streams and persists turns; now it needs a face. In this chapter you copy the
-fresh-ui `ai` component collection into your app, seed the first paint from
-`resolveChatSnapshot`, and hydrate a chat island that drives `createNetScriptChatConnection`
-— subscribe, send, dispose. The transcript renders complete on load and updates as turns
-settle.
+This chapter gives the chat backend a face. You copy the fresh-ui `ai` component collection into
+your app, seed the first paint from `resolveChatSnapshot`, and hydrate a chat island that drives
+`createNetScriptChatConnection`.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
@@ -23,21 +21,31 @@ settle.
   { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
+## What you will build
+
+A chat page whose transcript renders complete on load and updates as each turn settles, built
+from app-owned copies of the fresh-ui chat components.
+
+## Before you begin
+
+You need the session route and stream proxy from [chapter 2](/tutorials/chat/02-durable-chat-route/),
+with `aspire start` running.
+
 ## Step 1 — Copy the AI component collection
 
-The chat primitives are **copy-source**: the CLI copies them into your app, where you own
-them. The `ai` collection installs the whole chat surface in one command — message,
-prompt-input, markdown, the `chat-render` block parser, and the tool-call and citation
-components you use in chapter 4:
+The chat primitives are **copy-source**: the CLI copies them into your app, and you own them from
+then on. The `ai` collection installs the chat surface in one command: message, prompt-input,
+markdown, the `chat-render` block parser, and the tool-call and citation components chapter 4
+uses:
 
 ```bash
 netscript ui:add ai
 ```
 
-This copies component files into `apps/dashboard/components/ui/`, the `chat-render` parser
-into `apps/dashboard/lib/chat/parse-blocks.ts`, and their CSS into `apps/dashboard/assets/ui/`,
-then wires the styles and merges any required imports. After the copy, that code is yours to
-edit — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the ownership model.
+The command copies component files into `apps/dashboard/components/ui/`, the `chat-render` parser
+into `apps/dashboard/lib/chat/parse-blocks.ts` and their CSS into `apps/dashboard/assets/ui/`, then
+wires the styles and merges any required imports. [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/)
+explains the ownership model.
 
 {{ comp.apiTable({
   caption: "The ai collection — the pieces this track uses",
@@ -53,7 +61,9 @@ edit — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the
 
 ## Step 2 — Seed the first paint
 
-Build the page using NetScript's fluent `definePage` page builder. Materialize the transcript so far via `resolveChatSnapshot` as a [request-scoped resource](/web-layer/resources/), then pass it to the island layer:
+Build the page with the `definePage` builder. Resolve the transcript so far with
+`resolveChatSnapshot` as a [request-scoped resource](/web-layer/resources/), then pass it to the
+island layer:
 
 ```tsx
 // apps/dashboard/routes/chat/[sessionId].tsx
@@ -85,21 +95,23 @@ const chatPage = definePage()
 export default chatPage.default;
 ```
 
-Note where `definePage` comes from: `@app/utils.ts`, the module your scaffold wrote in chapter 1. It
-re-exports the builder bound to the app's `State` type, so every page in the app shares one typed
-context — importing straight from `@netscript/fresh/builders` drops that binding.
+The route contract registers the `sessionId` path parameter and types `ctx.path.sessionId` in
+resources, loaders and the layout. `resolveChatSnapshot` returns `{ messages, renderParts, offset }`;
+`offset` seeds the live subscription, so the seed and the live read cover one continuous log.
 
-This registers the path parameter (`sessionId`) and exposes `ctx.path.sessionId` typed in resources, loaders, and layout. The `resolveChatSnapshot` returns `{ messages, renderParts, offset }` where `offset` seeds the live subscription so seed and live read one continuous log.
+`definePage` comes from `@app/utils.ts`, the module the scaffold wrote in chapter 1. It
+re-exports the builder bound to the app's `State` type, so every page in the app shares one typed
+context. Importing from `@netscript/fresh/builders` directly drops that binding.
 
 {{ comp callout { type: "note", title: "The one-projection law, in one sentence" } }}
-<code>resolveChatSnapshot</code> reduces the session through <code>projectChatSnapshot</code> — the <strong>same</strong> reducer the live path uses. That is why a tool card rendered at first paint does not jump or vanish when the first live chunk arrives: seed and live never disagree about intermediate state.
+<code>resolveChatSnapshot</code> reduces the session through <code>projectChatSnapshot</code>, the <strong>same</strong> reducer the live path uses, so a tool card rendered at first paint does not jump or vanish when the first live chunk arrives.
 {{ /comp }}
 
 ## Step 3 — The chat island
 
-The island is where the browser hydrates. It holds the snapshot in a signal, opens a durable
-connection pointed at the proxy from chapter 2, and on submit: appends the user message with
-`connection.send`, fires the model turn, then re-materializes the settled transcript.
+The island holds the snapshot in a signal and opens a durable connection pointed at the proxy
+from chapter 2. On submit, it appends the user message with `connection.send`, fires the model
+turn, then re-materializes the settled transcript.
 
 ```tsx
 // apps/dashboard/islands/Chat.tsx
@@ -162,24 +174,24 @@ const Chat = ({ sessionId, seed }: ChatProps) => {
 export default Chat;
 ```
 
-A few rules keep the island cheap and correct: keep it leaf-shaped, pass plain serializable
-props in (the seed snapshot is serializable), and declare handlers as arrow functions. The
-connection's `close` / `stop` / `dispose` are one idempotent teardown — call
-`connection.dispose()` when the island unmounts so no subscription leaks.
+Keep the island leaf-shaped, pass plain serializable props in (the seed snapshot is
+serializable), and declare handlers as arrow functions. The connection's `close`, `stop` and
+`dispose` are one idempotent teardown: call `connection.dispose()` when the island unmounts so no
+subscription leaks.
 
 {{ comp callout { type: "note", title: "Live streaming vs settle-then-render" } }}
-This island re-materializes each turn once it <strong>settles</strong>, which keeps the code mechanical and correct — and reload durability, the headline feature, is fully in hand this way. The connection also exposes <code>subscribe(signal)</code> for token-by-token live chunks; <a href="/tutorials/chat/06-live-streaming/">chapter 6</a> upgrades this island to that live subscription so replies stream in as they arrive.
+This island re-materializes each turn once it <strong>settles</strong>. That keeps the code simple, and reload durability already works. The connection also exposes <code>subscribe(signal)</code> for token-by-token chunks; <a href="/tutorials/chat/06-live-streaming/">chapter 6</a> switches the island to that live subscription.
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Why not useIslandQuery for the transcript?" } }}
-NetScript's typed island-query hooks (<code>useIslandQuery</code> / <code>useLiveQuery</code>) are the right tool when a page reads a <strong>typed service contract</strong> — a cache-first read whose data lives behind an oRPC service, as the <a href="/tutorials/live-dashboard/04-definePage-QueryIsland/">live-dashboard track</a> shows end to end. The chat transcript is different: it is not a service query but a <strong>durable session stream</strong>, so it is read through <code>createNetScriptChatConnection</code> and reduced by the one projection, not fetched through a query key. If <em>this</em> page also showed, say, a typed list of past conversations from a service, that sidebar is exactly where a <code>useIslandQuery</code> island would belong — the transcript itself stays on the durable connection.
+<code>useIslandQuery</code> and <code>useLiveQuery</code> read a <strong>typed service contract</strong>: a cache-first read of data behind an oRPC service, as the <a href="/tutorials/live-dashboard/04-definePage-QueryIsland/">live-dashboard track</a> shows. The chat transcript is a <strong>durable session stream</strong>, not a service query, so it is read through <code>createNetScriptChatConnection</code> and reduced by the one projection. A sidebar listing past conversations from a service would be a good fit for a <code>useIslandQuery</code> island; the transcript stays on the durable connection.
 {{ /comp }}
 
 ## Step 4 — Rich blocks with chat-render
 
-Assistant replies are markdown, and they can embed fenced data blocks (`chart`, `donut`,
-`table`, `stats`, `line`). `parseBlocks` from the copied `chat-render` parser turns that
-markdown into typed **presentation** parts you render with the copied primitives:
+Assistant replies are markdown and can embed fenced data blocks (`chart`, `donut`, `table`,
+`stats`, `line`). `parseBlocks` from the copied `chat-render` parser turns that markdown into typed
+**presentation** parts you render with the copied primitives:
 
 ```tsx
 import { parseBlocks, type RenderPart } from '@app/lib/chat/parse-blocks.ts';
@@ -202,26 +214,26 @@ const renderPart = (part: RenderPart) => {
 // {parseBlocks(message.content).map(renderPart)}
 ```
 
-`parseBlocks` never throws — an unrecognized fence falls back to a verbatim `text` part — and
-its inverse `blockToText` guarantees a parsed message survives a reload without drift.
+`parseBlocks` never throws: an unrecognized fence falls back to a verbatim `text` part. Its inverse,
+`blockToText`, guarantees a parsed message survives a reload without drift.
 
 {{ comp callout { type: "note", title: "Two RenderParts — transport vs presentation" } }}
-Do not conflate the two <code>RenderPart</code> types. <code>@netscript/fresh/ai</code> emits the <strong>transport</strong> part (<code>text</code> | <code>tool</code>) — the durable-session wire shape in <code>snapshot.renderParts</code>. <code>chat-render</code>'s <code>parseBlocks</code> owns the <strong>presentation</strong> part (<code>chart</code> | <code>donut</code> | <code>table</code> | <code>stats</code> | <code>line</code> | <code>text</code>) — the rich blocks you mount. The transcript reduces through the first; the UI renders through the second.
+<code>@netscript/fresh/ai</code> emits the <strong>transport</strong> part (<code>text</code> | <code>tool</code>), the durable-session wire shape in <code>snapshot.renderParts</code>. The <code>parseBlocks</code> function in <code>chat-render</code> owns the <strong>presentation</strong> part (<code>chart</code> | <code>donut</code> | <code>table</code> | <code>stats</code> | <code>line</code> | <code>text</code>), the rich blocks you mount. The transcript reduces through the first; the UI renders through the second.
 {{ /comp }}
 
 ## Verify your progress
 
 With `aspire start` running, open the app in the browser:
 
-1. The chat renders your existing transcript on load — no loading flash.
-2. Type a message and send it; the assistant reply appears once the turn settles.
-3. **Reload the page.** The full transcript is still there — that is the durable session, not
-   browser state.
+1. Check that the chat renders your existing transcript on load, with no loading flash.
+2. Type a message and send it. The assistant reply appears once the turn settles.
+3. **Reload the page.** The full transcript is still there: it comes from the durable session,
+   not browser state.
 4. Type-check the app:
 
-```bash
-deno task --cwd apps/dashboard check
-```
+   ```bash
+   deno task --cwd apps/dashboard check
+   ```
 
 - [ ] `netscript ui:add ai` copied the chat components into `components/ui/` and the parser into `lib/chat/`.
 - [ ] The chat renders the seeded transcript on first paint.
@@ -231,10 +243,8 @@ deno task --cwd apps/dashboard check
 
 ## What you built
 
-A working chat UI: copied, app-owned components; a `definePage` page that resolves the
-transcript snapshot as a request-scoped resource and hands it to the island; an SSR-seeded
-island that sends through the durable connection and re-renders on settle; and `chat-render`
-turning assistant markdown into rich blocks. Next you give the model a tool to call — and render its result as a
-tool-call card with citation chips.
-
-{{ comp.nextPrev({ prev: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" }, next: { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" } }) }}
+A chat UI built from app-owned components: a `definePage` page that resolves the transcript
+snapshot as a request-scoped resource, an SSR-seeded island that sends through the durable
+connection and re-renders on settle, and `chat-render` turning assistant markdown into rich
+blocks. Next, you give the model a tool to call and render its result as a tool-call card with
+citation chips.
