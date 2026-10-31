@@ -19,3 +19,13 @@
 - Independent registry integration review FAIL_FIX: preserve frozen legacy-v1
   baseline while admitting explicit post-v1 additions. Added a reviewed list and
   missing/changed/unexpected-item negative controls; no baseline snapshot edit.
+
+Calendar/DatePicker integration: the date picker reuses the public native modal
+Dialog runtime and CSS anchor positioning rather than adding a second dismissal/
+focus manager. A visible Cancel control complements Escape. Caption selects and
+muted noninteractive outside dates retain the Utility review anatomy. Day
+state/range are derived, not caller-simulated; ISO strings avoid timezone drift.
+The real browser builder now derives the workspace catalog for the public runtime
+entry; standalone configs cannot resolve workspace catalog imports without it.
+No duplicated dependency inventory is authored. The user explicitly authorized
+rebase/force-push, superseding the plan's ordinary no-force coordination rule.

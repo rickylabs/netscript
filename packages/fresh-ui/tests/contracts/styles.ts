@@ -1,3 +1,4 @@
+import { calendarFixtures, calendarKeyboard } from './utility-calendar.tsx';
 import { formFixtures, formKeyboard } from './utility-forms.tsx';
 import { actionFixtures, actionKeyboard } from './utility-actions.tsx';
 import { componentContracts } from '../../contracts.ts';
@@ -18,7 +19,8 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...compositeFixtures,
     ...actionFixtures,
     ...formFixtures,
+    ...calendarFixtures,
     proseFixture,
   ],
-  keyboard: [...actionKeyboard, ...formKeyboard],
+  keyboard: [...actionKeyboard, ...formKeyboard, ...calendarKeyboard],
 }];

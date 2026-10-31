@@ -169,3 +169,49 @@ passed all9 tests. Canonical S2 registry inputs and generated artifacts remain
 part of this branch. Force-with-lease targets exactly the published8d093a9.
 Required CI jobs currently report SKIPPED while draft; this is not a READY
 claim. Calendar/DatePicker remains uncommitted work for the next slice.
+
+## Slice4 — Calendar and DatePicker
+
+Two date controls plus one private copied arithmetic support item. Single/range
+ISO API, Gregorian leap/century arithmetic, months/caption, disabled/bounds,
+roving enabled days and native form values. DatePicker composes the package's
+native Dialog with anchored styling, named title/description, Escape/Cancel and
+focus return. Registry source style/collections and frozen-v1 addition allowlist
+updated;75 shipped/29 remaining. No new token values or dependencies.
+
+A rapid month-crossing key sequence exposed delayed focus; useLayoutEffect
+restores focus on the new rendered day before subsequent input. A real browser
+trace confirmed native modal BODY boundary focus; tests require :modal, re-entry
+and background inertness rather than introducing an artificial JS focus loop.
+Standalone consumers/public runtime entry resolve the root catalog derived at
+run time; no second catalog is committed. First corrected full browser80/80
+passes; final outside-day visual refinement is being rerun with all fixtures.
+Scoped source check/lint and consumer install/source/type/lint proof pass.
+Broad quality PASS; final focused tests and same-reviewer sign-off pending.
+
+Final focused130/130 tests PASS; scoped source7 check/6 lint/10 format PASS,
+browser fixtures3 and specs4 type-check PASS. Whole browser80/80 PASS, zero
+serious/critical axe in the standalone fixtures and open date dialog. Existing
+CSS variables all resolve to shipped theme definitions. Same independent reviewer
+is evaluating this slice; final selected-hover browser rerun is pending.
+
+Independent slice4 review FAIL_FIX: range-middle cells inherited selected visual
+state and primary fill, obscuring the lighter range fill. Computed-token browser
+negative control reproduced the wrong primary color before correction. Endpoints
+now own selected visual state; all range cells retain aria-selected. Browser
+asserts middle equals resolved surface-selected and differs from endpoints.
+Own controlled-state audit also protects native cancel when parent refuses the
+close request, and adds a real Escape/Cancel/value-refusal browser case. Reopening
+resets browsing to the selected month; a canceled browse cannot become the next
+opening month. UTC today default is now documented. Corrected full browser84
+and render gates are running before same-session corrective review.
+
+Slice4 terminal PASS after one range-fill correction. Final full browser84/84
+PASS plus24/24 date-only after range aria-multiselectable and screenshot proof.
+Corrected123 focused tests PASS; broader quality PASS, source/spec wrappers
+PASS, release preflight/docs accuracy111 PASS. Full package356/356 PASS before
+the small correction; final phase full suite still repeats. Same independent
+reviewer round2 PASS. Native browser-forced repeated Escape is documented as a
+platform limitation; normal controlled rejection, native focus and submission
+are covered. Local Linux screenshots reviewed against Utility handoff anatomy
+and retained under review/. No cross-platform pixel-identity claim.

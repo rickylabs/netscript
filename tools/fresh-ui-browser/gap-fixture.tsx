@@ -1,3 +1,4 @@
+import { Calendars } from './gap-calendar-fixture.tsx';
 import { Forms } from './gap-forms-fixture.tsx';
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
@@ -49,6 +50,7 @@ function Actions() {
       </section>
       <button type='button' id='after'>After components</button>
       <Forms />
+      <Calendars />
     </main>
   );
 }

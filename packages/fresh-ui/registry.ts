@@ -77,7 +77,7 @@ export type FreshUiRegistryManifest = {
  * Collections:
  * - `foundation`: theme-seed, sheet-styles, button, icon-button, input, textarea, checkbox, switch, label, select, form-field, card, panel, badge, separator, alert, inline-notice, spinner, progress, skeleton, breadcrumb, sidebar-shell, page-header, filter-form, stats-grid, detail-layout, data-table, responsive-table, pagination, empty-state, section-divider, sidebar-toggle, theme-toggle, toast-support, toast, avatar, code-block, chart-block, donut, dropzone, desktop-tray-menu, desktop-dialog, desktop-notification, desktop-window-chrome, desktop-update-prompt, desktop-only
  * - `ai`: theme-seed, avatar, citation-chip, code-block, chart-block, model-selector, tool-call-card, prompt-input, message, command-palette, search, markdown, chat-render, mcp-ui-widget, render-ui
- * - `forms-core`: theme-seed, button, icon-button, input, textarea, checkbox, switch, label, select, form-field, radio-group, input-group, input-otp, slider
+ * - `forms-core`: theme-seed, button, icon-button, input, textarea, checkbox, switch, label, select, form-field, radio-group, input-group, input-otp, slider, calendar, date-picker
  * - `surface-core`: theme-seed, card, panel, badge, separator
  * - `feedback-core`: theme-seed, alert, inline-notice, spinner, progress, skeleton, toast-support, toast
  * - `layout-foundations`: layout-objects

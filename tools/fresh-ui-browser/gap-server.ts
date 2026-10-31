@@ -24,7 +24,7 @@ const server = Deno.serve({
     return new Response(bundle, { headers: { 'content-type': 'text/javascript' } });
   }
   return new Response(
-    `<!doctype html><html lang="en" data-theme="studio" data-flavor="utility"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Fresh UI gap fixtures</title><style>${css}\nbody{background:var(--ns-bg);color:var(--ns-fg);font-family:var(--ns-font-body);padding:1rem}section{margin-block:2rem}section>*{margin-inline-end:1rem}</style></head><body><div id="app"></div><script type="module" src="/fixture.js"></script></body></html>`,
+    `<!doctype html><html lang="en" data-theme="studio" data-flavor="utility"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Fresh UI gap fixtures</title><style>${css}\nbody{background:var(--ns-bg);color:var(--ns-fg);font-family:var(--ns-font-body);padding:1rem}main>section{margin-block:2rem}main>section>*{margin-inline-end:1rem}</style></head><body><div id="app"></div><script type="module" src="/fixture.js"></script></body></html>`,
     { headers: { 'content-type': 'text/html' } },
   );
 });
