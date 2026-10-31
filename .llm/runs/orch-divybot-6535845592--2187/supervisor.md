@@ -20,3 +20,9 @@
 - Excluded final-report handoff files; temporary local evaluator state and evidence outside Git under project runs.
 
 No lock/cache deletion, dependency churn, label/milestone mutation, local scaffold runtime, merge, tag, or release. Only the coordinator merges.
+
+## S2 authorized CI repair
+
+The user explicitly requested fixing the failed quality job and pushing the repair. The failed gate is agent-docs-prose freshness after the owned triggers-doc update. Extend the write surface to the native generator outputs: packages/cli/src/kernel/assets/agent-docs-prose.generated.ts, packages/cli/src/kernel/assets/agent-docs.generated.ts, packages/cli/src/kernel/assets/embedded.generated.ts and .llm/assets/agent-docs/provenance.json if regenerated. No hand-edited carrier data or weakened freshness/discovery gates. Existing run-record paths remain authorized.
+
+The same repair slice also addresses Augment review 4429496686 (authorized by the user's instruction to address each review item): plugins/triggers/src/runtime/trigger-processor.ts and plugins/triggers/src/runtime/trigger-processor-stop_test.ts. Preserve normal event/key behavior; drain source tasks before closing processor admission.

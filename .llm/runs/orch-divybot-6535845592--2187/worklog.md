@@ -62,3 +62,19 @@ Re-fetched main during S1 review: still 7907293f3dad3aeb557923809ddcd3435adae151
 ## Independent S1 implementation review — PASS
 
 Native Claude (observed model claude-opus-5-5, requested high effort) substantively reviewed source, tests, docs, doctrine delta and privacy before sign-off. It independently reran the two new suites and existing processor tests: 24 passed, 0 failed. No blockers. Full report: evaluate.md. Known baseline gate failures remain explicitly ungreen. Sign-off commit/push now follows; final exact-head review will be posted on PR #2479 after ready transition without changing that head.
+
+## S2 CI failure investigation
+
+User reported quality red and requested a fix/push. gh pr checks confirms quality failed in run 41147825236. gh run view --log-failed was unavailable while remaining shards ran; completed-job logs identify failed gate agent-docs-prose and exact stale path agent-docs-prose.generated.ts. Source/lint/fmt steps passed before that failure. Repair the generated prose/asset chain; do not treat this as a baseline exception.
+
+## S2 implementation and proof
+
+Native docs regeneration changed only the triggers page carrier row; decoded 202 pages retained with no additions/removals and exact rendered-source equality. Agent-docs-prose now PASS via the exact CI gate. MCP export corpus, generated barrel and publish-asset freshness pass. The final git-diff-based assets-barrel check follows the reviewed commit.
+
+The Augment shutdown race is repaired by source settlement before processor admission closes. Tests cover a digest blocked across shutdown, both successful source stop and another source stop rejection. Old shutdown order causes two dropped-handler assertions; fixed bytes restored. Final core/plugin suite: 90 passed, 0 failed, 3 Redis-only ignored. Scoped runtime check/lint/fmt: 11 files clean; quality zero findings/allowances. Augment thread answered with evidence. Independent S2 review running; see ci-repair-evidence.md for details/digests.
+
+## S2 independent review and sign-off
+
+Same-session native Claude S2 review returned PASS, with no blockers. It independently reran plugin runtime plus S1 new suites: 31 passed, 0 failed, 3 Redis-only ignored. It reran agent-docs-prose, generated barrel --check and publish-asset freshness successfully. Scoped source checks and privacy/scope review pass. arch:check also exits 0. See s2-evaluate.md. Commit/push now; full git-diff-based assets-barrel verdict and CI tracking follow at that immutable repaired head.
+
+S2 reconcile: only prior-head quality is red; same failure is agent-docs-prose, with no evidence of discovery failures. Augment review 4429496686 was answered. No source acceptance weakened and no taxonomy mutations. Runtime lifecycle wiring now requires the coordinator-owned e2e-cli CI verdict, explicitly requested in the PR handoff.
