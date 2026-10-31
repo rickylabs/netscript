@@ -1,6 +1,6 @@
 # S3 phase-one handoff — READY
 
-Existing PR #2467, branch orch/divybot-6478265568. Original baseline 9a31e879c32a8066c50946a57976f3da34ba43a6; merged main 7907293f3dad3aeb557923809ddcd3435adae151. Independently reviewed source head bdb959d102189f5ad530fd3e07d54d29a8dbc0c4; the final evidence-only commit and public READY report identify the pushed head. Stop at READY: Cockpit reviews and merges. This phase leaves #2416 open.
+Existing PR #2467, branch orch/divybot-6478265568. Original baseline 9a31e879c32a8066c50946a57976f3da34ba43a6; merged main 6a71cd0599673d70cd6311de3bb20b2d6a9dde2c. Independently reviewed source head bdb959d102189f5ad530fd3e07d54d29a8dbc0c4; the final evidence-only commit and public READY report identify the pushed head. Stop at READY: Cockpit reviews and merges. This phase leaves #2416 open.
 
 ## Delivered
 
@@ -8,7 +8,7 @@ Existing PR #2467, branch orch/divybot-6478265568. Original baseline 9a31e879c32
 - Utility markup/CSS migration to data attributes, preserving specificity, native behavior and compound delegation.
 - ui:migrate variants for 0.0.8 app-owned copies: whole-app preflight, dry-run, versioned source edits, bounded JSX/CSS tokenization, formatting, original-content rechecks, rollback and idempotence.
 - Real-render style providers for all shipped identities and meaningful negative controls.
-- Main integration; docs reference/carrier reconciliation and Lume Page fixture fix for main's unsafe double cast.
+- Main integration; docs reference/carrier reconciliation and main's canonical #2480 fixture fix, superseding the temporary Page.create repair.
 - Independent review found one ActionMenu scope blocker; repaired by retaining popover scope, documented in the contract/JSON/naming record, and guarded by a new rendered regression and expanded browser parity.
 
 ## Verification
