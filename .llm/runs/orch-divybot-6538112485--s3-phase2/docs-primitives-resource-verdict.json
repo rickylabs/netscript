@@ -1,0 +1,11 @@
+{
+  "verdict": "READ_ONLY; unproven resources retained; no mutation",
+  "counts": {
+    "survivors": 24,
+    "owned": 0,
+    "foreign": 0,
+    "unproven": 24,
+    "unavailableProbes": 3,
+    "fixturePortConflicts": 1
+  }
+}

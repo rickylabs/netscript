@@ -114,6 +114,7 @@ export const navigation_1: readonly ComponentContract[] = [
           'numbered',
           'pager',
         ],
+        'default': 'numbered',
       },
       'type': {
         'kind': 'enum',
@@ -121,8 +122,8 @@ export const navigation_1: readonly ComponentContract[] = [
           'page',
           'previous',
           'next',
-          'ellipsis',
         ],
+        'description': 'Link type; decorative Ellipsis is a separate namespace member.',
       },
       'state': {
         'kind': 'enum',
@@ -133,6 +134,23 @@ export const navigation_1: readonly ComponentContract[] = [
           'current',
           'disabled',
         ],
+        'description':
+          'Link/tile snapshot; current/disabled also set native navigation semantics. Transient hover/focus use CSS.',
+      },
+      'children': {
+        'kind': 'slot',
+      },
+      'href': {
+        'kind': 'text',
+        'description': 'Required on enabled Link/Previous/Next destinations.',
+      },
+      'current': {
+        'kind': 'boolean',
+        'description': 'Link/tile only; emits aria-current=page.',
+      },
+      'disabled': {
+        'kind': 'boolean',
+        'description': 'Link/tile only; removes href and tab stop, blocks click callbacks.',
       },
     },
     'parts': [
@@ -168,6 +186,18 @@ export const navigation_1: readonly ComponentContract[] = [
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
       },
+      {
+        'name': 'key',
+        'when': 'numbered Link supplied',
+      },
+      {
+        'name': 'ellipsis',
+        'when': 'Ellipsis supplied',
+      },
+      {
+        'name': 'icon',
+        'when': 'previous/next key or tile supplied',
+      },
     ],
     'attributes': {
       'data-variant': {
@@ -175,13 +205,16 @@ export const navigation_1: readonly ComponentContract[] = [
           'numbered',
           'pager',
         ],
-        'plannedValues': [
-          'pager',
-        ],
       },
       'data-type': {
         'values': [
           'page',
+          'previous',
+          'next',
+          'ellipsis',
+        ],
+        'parts': [
+          'key',
           'previous',
           'next',
           'ellipsis',
@@ -197,19 +230,53 @@ export const navigation_1: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'key',
+          'previous',
+          'next',
+          'ellipsis',
+        ],
       },
     },
-    'booleans': [],
-    'slots': [],
+    'booleans': [
+      'current',
+      'disabled',
+    ],
+    'slots': [
+      {
+        'name': 'children',
+        'part': 'root',
+      },
+      {
+        'name': 'Previous.children',
+        'part': 'title',
+      },
+      {
+        'name': 'Next.children',
+        'part': 'title',
+      },
+      {
+        'name': 'Meta.children',
+        'part': 'meta',
+      },
+      {
+        'name': 'Actions.children',
+        'part': 'actions',
+      },
+      {
+        'name': 'Link.children',
+        'part': 'key',
+      },
+    ],
     'apg': 'native navigation links',
     'keyboard': [
       {
-        'key': 'Tab',
-        'action': 'Focus links',
+        'key': 'Tab/Shift+Tab',
+        'action': 'Focus enabled native links; skip disabled and decorative keys',
       },
       {
         'key': 'Enter',
-        'action': 'Follow link',
+        'action': 'Follow the focused enabled destination',
       },
     ],
     'tokenRoles': [
@@ -222,6 +289,7 @@ export const navigation_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Meta/Actions composition remains supported. Pager tiles use native previous/next relations; document direction mirrors their decorative arrows.',
     ],
   },
   {

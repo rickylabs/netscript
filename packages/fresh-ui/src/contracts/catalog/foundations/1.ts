@@ -13,6 +13,8 @@ export const foundations_1: readonly ComponentContract[] = [
         'kind': 'enum',
         'values': [
           'alert-triangle',
+          'arrow-left',
+          'arrow-right',
           'calendar',
           'check',
           'chevron-down',

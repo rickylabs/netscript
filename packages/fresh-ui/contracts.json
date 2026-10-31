@@ -12,6 +12,8 @@
           "kind": "enum",
           "values": [
             "alert-triangle",
+            "arrow-left",
+            "arrow-right",
             "calendar",
             "check",
             "chevron-down",
@@ -969,7 +971,8 @@
             "rest",
             "disabled",
             "invalid"
-          ]
+          ],
+          "description": "Presentation snapshot; the associated control owns disabled/invalid semantics."
         },
         "children": {
           "kind": "slot",
@@ -984,6 +987,10 @@
         },
         "optional": {
           "kind": "boolean"
+        },
+        "optionalText": {
+          "kind": "slot",
+          "description": "Optional hint content; rendered when optional is true and required is false."
         }
       },
       "parts": [
@@ -1013,9 +1020,6 @@
           "values": [
             "default",
             "eyebrow"
-          ],
-          "plannedValues": [
-            "eyebrow"
           ]
         },
         "data-state": {
@@ -1025,22 +1029,45 @@
             "invalid"
           ],
           "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+        },
+        "data-sr-only": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       },
       "booleans": [
         "required",
-        "optional"
+        "optional",
+        "srOnly"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "text"
+        },
+        {
+          "name": "optionalText",
+          "part": "optional-hint"
+        }
+      ],
       "apg": "native label",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between associated controls; the label adds no focus target"
+        }
+      ],
       "tokenRoles": [
         "destructive/text",
         "text/fg",
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Required wins over optional. srOnly preserves the native accessible label and suppresses its decorative required mark."
       ]
     },
     {
@@ -3090,16 +3117,17 @@
           "values": [
             "numbered",
             "pager"
-          ]
+          ],
+          "default": "numbered"
         },
         "type": {
           "kind": "enum",
           "values": [
             "page",
             "previous",
-            "next",
-            "ellipsis"
-          ]
+            "next"
+          ],
+          "description": "Link type; decorative Ellipsis is a separate namespace member."
         },
         "state": {
           "kind": "enum",
@@ -3109,7 +3137,23 @@
             "focus",
             "current",
             "disabled"
-          ]
+          ],
+          "description": "Link/tile snapshot; current/disabled also set native navigation semantics. Transient hover/focus use CSS."
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "href": {
+          "kind": "text",
+          "description": "Required on enabled Link/Previous/Next destinations."
+        },
+        "current": {
+          "kind": "boolean",
+          "description": "Link/tile only; emits aria-current=page."
+        },
+        "disabled": {
+          "kind": "boolean",
+          "description": "Link/tile only; removes href and tab stop, blocks click callbacks."
         }
       },
       "parts": [
@@ -3144,6 +3188,18 @@
           "name": "focus-ring",
           "representation": "pseudo",
           "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "key",
+          "when": "numbered Link supplied"
+        },
+        {
+          "name": "ellipsis",
+          "when": "Ellipsis supplied"
+        },
+        {
+          "name": "icon",
+          "when": "previous/next key or tile supplied"
         }
       ],
       "attributes": {
@@ -3151,14 +3207,17 @@
           "values": [
             "numbered",
             "pager"
-          ],
-          "plannedValues": [
-            "pager"
           ]
         },
         "data-type": {
           "values": [
             "page",
+            "previous",
+            "next",
+            "ellipsis"
+          ],
+          "parts": [
+            "key",
             "previous",
             "next",
             "ellipsis"
@@ -3172,20 +3231,54 @@
             "current",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "key",
+            "previous",
+            "next",
+            "ellipsis"
+          ]
         }
       },
-      "booleans": [],
-      "slots": [],
+      "booleans": [
+        "current",
+        "disabled"
+      ],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Previous.children",
+          "part": "title"
+        },
+        {
+          "name": "Next.children",
+          "part": "title"
+        },
+        {
+          "name": "Meta.children",
+          "part": "meta"
+        },
+        {
+          "name": "Actions.children",
+          "part": "actions"
+        },
+        {
+          "name": "Link.children",
+          "part": "key"
+        }
+      ],
       "apg": "native navigation links",
       "keyboard": [
         {
-          "key": "Tab",
-          "action": "Focus links"
+          "key": "Tab/Shift+Tab",
+          "action": "Focus enabled native links; skip disabled and decorative keys"
         },
         {
           "key": "Enter",
-          "action": "Follow link"
+          "action": "Follow the focused enabled destination"
         }
       ],
       "tokenRoles": [
@@ -3197,7 +3290,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Meta/Actions composition remains supported. Pager tiles use native previous/next relations; document direction mirrors their decorative arrows."
       ]
     },
     {
@@ -5980,21 +6074,14 @@
             "hover",
             "focus",
             "selected"
-          ]
+          ],
+          "description": "Visual snapshot; native hover/focus-within styles are enabled by interactive."
         },
-        "header": {
-          "kind": "boolean"
+        "interactive": {
+          "kind": "boolean",
+          "description": "Enables presentation states without adding a container tab stop or click handler."
         },
-        "description": {
-          "kind": "boolean"
-        },
-        "action": {
-          "kind": "slot"
-        },
-        "footer": {
-          "kind": "boolean"
-        },
-        "body": {
+        "children": {
           "kind": "slot"
         }
       },
@@ -6037,17 +6124,11 @@
           "values": [
             "default",
             "rule"
-          ],
-          "plannedValues": [
-            "rule"
           ]
         },
         "data-size": {
           "values": [
             "md",
-            "sm"
-          ],
-          "plannedValues": [
             "sm"
           ]
         },
@@ -6062,23 +6143,45 @@
         }
       },
       "booleans": [
-        "header",
-        "description",
-        "action",
-        "footer"
+        "interactive"
       ],
       "slots": [
         {
-          "name": "body",
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Header.children",
+          "part": "header"
+        },
+        {
+          "name": "Title.children",
+          "part": "title"
+        },
+        {
+          "name": "Description.children",
+          "part": "description"
+        },
+        {
+          "name": "Action.children",
+          "part": "action"
+        },
+        {
+          "name": "Body.children",
           "part": "body"
         },
         {
-          "name": "action",
-          "part": "action"
+          "name": "Footer.children",
+          "part": "footer"
         }
       ],
       "apg": "noninteractive presentation",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Focus native child actions; the card container adds no keyboard target"
+        }
+      ],
       "tokenRoles": [
         "border/control",
         "border/strong",
@@ -6092,7 +6195,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Header/body/footer presence comes from namespace composition, not phantom boolean root props. Rule has only a top border, with no resting fill/radius/shadow."
       ]
     },
     {
