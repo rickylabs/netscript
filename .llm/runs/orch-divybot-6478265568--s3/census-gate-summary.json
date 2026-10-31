@@ -38,5 +38,19 @@
   ],
   "independentImplEval": "PASS",
   "lockfileChanges": [],
-  "remoteRequiredQuality": "PENDING; must be SUCCESS at final pushed head before READY"
+  "remoteRequiredQuality": "PENDING at the final pushed head; earlier success is not reused",
+  "additionalInventorySourceHead": "06cca412b62054bafbcfe104e348c0811c77e56a",
+  "contributorInventory": {
+    "expectedRoot": "ui:migrate",
+    "focusedTapResults": 2,
+    "failed": 0,
+    "checkLintFmt": "PASS",
+    "independentImplEval": "PASS"
+  },
+  "earlierRemoteQuality": {
+    "head": "a5077091afc444111b43f48d8ff23be8e51ff2dd",
+    "conclusion": "success",
+    "jobUrl": "https://github.com/rickylabs/netscript/actions/runs/41152993141/job/124393674022",
+    "note": "Superseded for final readiness because the related stale contributor test expectation was then corrected."
+  }
 }

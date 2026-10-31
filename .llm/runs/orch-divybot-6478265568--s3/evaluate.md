@@ -11,3 +11,5 @@ Final main reconciliation: merged main 6a71cd059 (#2480) and kept its independen
 ## Coordinator census follow-up
 
 A separate read-only re-steer of the independent Claude Opus reviewer returns PASS for source 8f9394c71 (delta from 63ce2730a), retaining the original product review. Full verdict: census-impl-eval.md. Full named docs:accuracy and all four carrier checks are now terminal PASS on that committed source; docs:links and site build also pass. The final follow-up evidence commit has no source changes. Exact-head remote required quality remains the coordinator's mandatory READY gate, to be linked in the new READY report after success.
+
+The related CI failure in the local contributor CLI root inventory was corrected by adding only ui:migrate to the existing exact ordered expectation and using a type-only Command import. Independent re-review is PASS at 06cca412b, with focused tests/type/lint/fmt passing. Full verdict: census-inventory-impl-eval.md. This does not alter the prior product review, docs/carrier inputs or the two existing medium migration findings reserved for Cockpit. Final-head remote quality remains mandatory.
