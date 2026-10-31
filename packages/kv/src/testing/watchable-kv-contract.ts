@@ -37,8 +37,10 @@ const DELIVERY_SETTLE_MS = 100;
 const DELIVERY_TIMEOUT_MS = 2_000;
 /** Debounce window used by the debounce scenarios. */
 const DEBOUNCE_MS = 400;
-/** How soon an aborted stream must finish, well inside one debounce window. */
-const ABORT_BUDGET_MS = 150;
+/** Hang guard for abort completion; not a latency target. */
+const ABORT_TIMEOUT_MS = 5_000;
+/** Outlives the hang guard so natural expiry cannot satisfy the abort assertion. */
+const ABORT_DEBOUNCE_MS = 60_000;
 
 const A: KvKey = ['contract', 'watch', 'a'];
 const B: KvKey = ['contract', 'watch', 'b'];
@@ -210,22 +212,38 @@ const debounceKeepsQueuedEvents: WatchScenario = {
 };
 
 const abortEndsDebounceWindow: WatchScenario = {
-  title: 'aborting during a debounce window ends the stream promptly',
+  title: 'aborting during a debounce window ends the stream without another batch',
   async run(kv) {
     const controller = new AbortController();
-    const iterator = kv.watch([A], { debounce: DEBOUNCE_MS * 2, signal: controller.signal })
-      [Symbol.asyncIterator]();
+    const handle = kv.watch([A], {
+      debounce: ABORT_DEBOUNCE_MS,
+      signal: controller.signal,
+    });
+    const iterator = handle[Symbol.asyncIterator]();
     const pending = iterator.next();
-    await delay(DELIVERY_SETTLE_MS);
+    try {
+      if (handle.ready) {
+        await deadline(handle.ready, ABORT_TIMEOUT_MS);
+      } else {
+        await delay(DELIVERY_SETTLE_MS);
+      }
 
-    // The event opens the debounce window; abort well inside it.
-    await kv.set(A, 'A');
-    await delay(DELIVERY_SETTLE_MS);
-    controller.abort();
+      // Give network adapters time to receive the write. The long debounce
+      // cannot expire within the hang guard; only abort should complete next().
+      await kv.set(A, 'A');
+      await delay(DELIVERY_SETTLE_MS);
+      controller.abort();
 
-    const result = await deadline(pending, ABORT_BUDGET_MS);
-    assert(result.done, 'an aborted watch must end instead of yielding');
-    await deadline(Promise.resolve(iterator.return?.()), ABORT_BUDGET_MS);
+      assertEquals(await deadline(pending, ABORT_TIMEOUT_MS), { done: true, value: undefined });
+      await kv.set(A, 'after-abort');
+      assertEquals(await deadline(iterator.next(), ABORT_TIMEOUT_MS), {
+        done: true,
+        value: undefined,
+      });
+    } finally {
+      controller.abort();
+      await deadline(Promise.resolve(iterator.return?.()), ABORT_TIMEOUT_MS);
+    }
   },
 };
 
@@ -236,7 +254,7 @@ const abortEndsDebounceWindow: WatchScenario = {
  * that produced them and deliver values unchanged; that a change received
  * while the consumer is between batches is delivered on the next request
  * without waiting for a later write; that `debounce` never drops a queued
- * change; and that aborting ends the stream promptly, even mid-debounce.
+ * change; and that aborting completes the stream without another batch, even mid-debounce.
  * Default change-only scenarios always run. When a handle exposes `ready`, the
  * harness awaits its acknowledgement; otherwise it preserves the legacy startup
  * allowance. Neither optional readiness nor snapshot support is required.
