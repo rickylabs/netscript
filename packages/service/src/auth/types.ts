@@ -93,6 +93,12 @@ export interface AuthzRequest {
 }
 
 /**
+ * Error code identifying an unknown (404) or explicitly retired (410) procedure.
+ * Kept independent of runtime constants so type-only consumers can re-export the contract.
+ */
+export type ProcedureErrorCode = 'procedure_not_found' | 'procedure_retired';
+
+/**
  * Stable machine-readable codes for authenticated requests to unavailable procedures.
  *
  * @example
@@ -101,13 +107,13 @@ export interface AuthzRequest {
  * const upgradeRequired = PROCEDURE_ERROR_CODES.RETIRED;
  * ```
  */
-export const PROCEDURE_ERROR_CODES = {
+export const PROCEDURE_ERROR_CODES: {
+  readonly NOT_FOUND: 'procedure_not_found';
+  readonly RETIRED: 'procedure_retired';
+} = {
   NOT_FOUND: 'procedure_not_found',
   RETIRED: 'procedure_retired',
-} as const;
-
-/** Error code identifying an unknown (404) or explicitly retired (410) procedure. */
-export type ProcedureErrorCode = typeof PROCEDURE_ERROR_CODES[keyof typeof PROCEDURE_ERROR_CODES];
+} as const satisfies Record<string, ProcedureErrorCode>;
 
 /** Authorization decision; procedure errors stop dispatch after successful authentication. */
 export type AuthzDecision =

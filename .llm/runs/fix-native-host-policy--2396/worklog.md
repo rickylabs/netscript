@@ -403,3 +403,100 @@ unchanged factories/auth/tests/debt/locks, no unmerged files, and candid blocked
 finishing-checkpoint-review.md records that review. This is approval to commit the merge-only
 BLOCKED checkpoint, not feature acceptance. Final exact-head IMPL-EVAL follows in that same
 separate evaluator session after push; no later commit solely for its verdict.
+
+## Design — coordinator-authorized native-source repair (before code)
+
+1. Public surface: same native ProcedureErrorCode union/constant and root/auth exports;
+   singular workers/streams add only the native type, reaching23/22 doc-complete names.
+2. Vocabulary: unchanged two procedure availability codes; no new domain concept.
+3. Ports: existing native auth identity and service public surface-diff tool; no runtime port.
+4. Constants: unchanged PROCEDURE_ERROR_CODES, checked against the canonical union.
+5. Slice: native declaration and existing availability test, two facades, two debt entries,
+   canonical carriers if stale and run evidence. All gates in native-source-repair-plan.md.
+6. Deferred: hosted runtime arming and actual published graph remain existing owners' work;
+   unrelated plugin runtime and framework startup APIs are unchanged.
+7. Contributor path: packages/service/src/auth/types.ts owns the contract, constant and
+   explanation for keeping aliases independently re-exportable.
+
+Coordinator #2474 comment6541660112 resolves the prior genuine blocker and explicitly
+requests a fresh source repair. Prior stop-branch PLAN rounds remain immutable; this new
+phase re-steers the same independent plan evaluator for its newly authorized source scope.
+No source changes before this phase's PLAN-EVAL PASS.
+
+Native source first check: both actual facade doc-lint commands now exit0. Initial targeted
+test process correctly failed compilation at isolatedDeclarations TS9010/TS9027 rather than
+running tests. Explicitly annotated the exported constant with its unchanged readonly
+literal shape; as const satisfies still checks every value against ProcedureErrorCode.
+Raw full-service snapshot initially reported exactly the expected two ProcedureErrorCode
+representation changes at root/auth and no other signature changes; repeat after annotation.
+
+Native repair targeted tests PASS15/0/0, including the original public documentation check.
+Actual baseline-vs-current root/auth compatibility fixture PASS1/0/0: both native code types,
+full readonly const shapes and runtime objects remain exactly equal. Full eight-entrypoint
+inventory retains every exported name. Raw signature hash diff reports FOUR representation
+changes, alias+const at root/auth; before doc inference incorrectly widened as-const properties,
+where explicit annotations now render their actual readonly literal types. The raw report is
+retained transparently in native-source-api-diff.json; no scanner or baseline is modified.
+The semantic compatibility proof passes; no24/23 fallback is used.
+
+Independent amended F-5 debt re-review PASS recorded in native-source-debt-eval.md. Exact
+inventories23/22, native ProcedureErrorCode identity, #2492 cause, owners,2026-11-10 deadline,
+no extension/growth and existing closing gates all verified. This is numeric DEBT_ACCEPTED,
+not numeric F-5 PASS or source/runtime acceptance.
+
+All four canonical carrier generations and freshness gates PASS; quality:gate PASS. Scoped
+four-file check/lint/fmt PASS; native service eight-entrypoint and both actual facade
+structured doc-lint reports contain zero findings. All three service/workers/streams member
+publication dry-runs and JSR audits exit0. Complete combined tests and root check still run;
+terminal results must be recorded before source review/commit. No lockfile changed.
+
+Preliminary substantive source review: NO_SOURCE_BLOCKERS. Same independent implementation
+reviewer verifies source authority, semantically identical native API and exact23/22 closure.
+It reserves slice signoff until the combined suite is terminal. Corrected its two stale
+"derived type" documentation references to "union" under the recorded scope addition;
+canonical prose/carrier regeneration follows. No code/test change after the passed gates.
+
+Final prose/reference wording refresh regenerated canonically. Final four freshness checks,
+docs accuracy and final root check PASS. Concurrent final quality scan failed NotFound on a
+worker u3-headers negative-control fixture deleted by the combined suite between enumeration
+and read. This is a concrete source-sweep/test scheduling race, not a source quality finding.
+Preserve its receipt; rerun final quality and root check only after full tests clean up.
+No scanner/exclusion/suppression change is authorized or needed. See memory-sweep-test-order.md.
+
+First complete suite exits1:1872 passed/1 failed/18 ignored. The original public-doc test
+now passes; sole failure is the trusted-TLS child denying a read of native scalar.generated.ts
+while asset generators were being run concurrently. Investigate with the unchanged focused
+control on stable source, then rerun the FULL requested scope without generators/sweeps.
+No test permission, assertion, timeout or source code is weakened. First failed receipt is
+preserved. The tentative source-generation race must not be relabeled as proven causation.
+
+Stable-source focused TLS retry PASS1/0/0 with unchanged source and original child permissions.
+Stable quality:gate and root check PASS after fixture cleanup. The full exact combined scope
+is rerunning sequentially, with no source writers/generators/broad sweeps; its result, not the
+focused retry, is required for full-suite acceptance. No new ignore or filter in the full run.
+
+Final stable FULL exact combined suite PASS1873 passed/0 failed/18 inherited ignored,
+exit0,549185ms. No filter or permission/assertion/timeout/ignore edits. All generators and
+broad sweeps completed before this rerun. Original public-doc test passes; unchanged TLS
+control passes both focused and final full scope. First failed full attempt is retained.
+
+All required local source gates now terminal green: stable root4045/34/0; scoped4-file
+check/lint/fmt0; full service8+both facade docs0; actual-baseline compatibility1/0/0;
+four canonical freshness gates; quality/architecture; docsaccuracy; service/workers/streams
+member dry-runs3/3 and JSR audits exit0 with recorded existing warnings. Native source API
+semantics are unchanged despite four transparently retained syntax-hash representation
+changes. Exact facade inventory23/22; independent amended F5 reviewPASS; fixed deadline.
+Evidence/native source hashes in native-source-gates.json; original acceptance mapping now
+reconciled in native-source-acceptance-evidence.md. No lock changes. Next: SAME independent
+source reviewer final slice signoff, then commit/push and exact pushed-head delta review.
+
+Independent substantive slice gate CHECKPOINT: PASS, recorded in native-source-slice-review.md.
+Reviewer recomputed all9 source hashes, checked full suite receipt timing/scope, exact native
+API equality/debt bounds and unweakened assertions. Source slice may now commit and push.
+
+Reconcile before final delivery: main advanced to4e018ad0bab9b9b90daf4764a035fd3ff879b9fa
+with #2510 producer epochs, #2482 listener recovery and #2513 render provenance docs. These
+include worker/stream runtime paths inside the full test scope. Finish this reviewed native
+slice, then normal-merge that exact main, preserve incoming authored source, regenerate only
+canonical carriers, and rerun union gates before the final exact-head review. No force push
+or rebase, no merge to main. Extra consumer probe: incoming producer-session_test.ts.

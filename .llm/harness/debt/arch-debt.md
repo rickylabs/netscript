@@ -2964,38 +2964,44 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   now retains the Response. No fixture-only Response retention remains.
 
 
-## plugins/workers/services/mod.ts - F-5 native identity closure (22 symbols)
+## plugins/workers/services/mod.ts - F-5 native identity closure (23 symbols)
 
 - **ID:** `WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027`
-- **Reason:** The approved workers factory signature requires an exact 22-name public doc-lint
-  closure: 2 own symbols plus 20 existing native type-only identity re-exports. This exceeds the
-  F-5 numeric limit of 20 on this one `mod.ts`. All 22 still count; this is no type-only discount.
-  The authorized 7-name shape produces 5 real recursive `private-type-ref` errors; the exact
-  22-name experiment passes doc-lint. The numerical F-5 violation remains `DEBT_ACCEPTED`, not
+- **Reason:** The approved workers factory signature requires an exact 23-name public doc-lint
+  closure: 2 own symbols plus 21 existing native type-only identity re-exports. This exceeds the
+  F-5 numeric limit of 20 on this one `mod.ts`. All 23 still count; this is no type-only discount.
+  The original 7-name shape produced 5 real recursive `private-type-ref` errors; the
+  original 22-name experiment passed doc-lint before #2492.
+  Main #2492 added `code?: ProcedureErrorCode` to `AuthzDecision`, requiring the native
+  `ProcedureErrorCode` identity export and the exact 23-name closure. The coordinator-authorized
+  native explicit union removes its runtime-constant dependency without changing its type.
+  The numerical F-5 violation remains `DEBT_ACCEPTED`, not
   `PASS`; doc-lint itself and all other F-5 clauses must pass independently.
 - **Exact scope:** Only `plugins/workers/services/mod.ts`. Own: `startWorkersService`,
   `WorkersServiceOptions`. From `@netscript/plugin/sdk`: `PluginServiceContext`. From
   `@netscript/service`: `CorsOptions`, `RunningService`, `RunningServiceAddress`, `ServeOptions`,
   `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`. From `@netscript/service/auth`:
   `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
-  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ServiceAuthPolicy`,
-  `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`.
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ProcedureErrorCode`,
+  `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`.
 - **Why deferred:** A compatible native doc-lint/public-signature solution needs separate review;
   a doctrine amendment must also update fitness rules explicitly. This bounded migration does
   neither implicitly. No doc-lint waiver, extra API, type alias, structural interface, cast,
   suppression, runtime/policy behavior, dependency or lock change is covered.
 - **Owner:** NetScript native-host policy migration coordinator with repository maintainer
   `rickylabs`.
-- **Target:** 2026-11-10. No automatic extension; no growth beyond the exact named 22 while open.
+- **Target:** 2026-11-10. No automatic extension; no growth beyond the exact named 23 while open.
 - **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md` and
   `.llm/runs/fix-native-host-policy--u1/plan-review-addendum.md`.
 - **Linked independent finding:** `.llm/runs/fix-native-host-policy--u1/plan-type-closure-eval.md`
   (`FAIL_PLAN`, SHA256 `9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9`).
 - **Owner disposition:** `.llm/runs/fix-native-host-policy--u1/root-f5-debt-disposition.md`.
 - **Created:** 2026-10-27.
-- **Status:** open, `DEBT_ACCEPTED` by milestone coordinator; independent PLAN re-review pending.
-  This accepts only process debt metadata. Additional 15 exports, S2 source acceptance and commit
-  still require actual same-session independent PLAN PASS plus root substantive review.
+- **Status:** open, `DEBT_ACCEPTED` by milestone coordinator; amended bounds require independent
+  re-review recorded in `.llm/runs/fix-native-host-policy--2396/native-source-debt-eval.md`.
+  This accepts numeric debt only, not documentation, source, runtime or release acceptance.
+- **Amended disposition:** Coordinator [#2474 disposition](https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112) authorizes
+  exactly one additional native type, `ProcedureErrorCode`, with no further growth.
 - **Closing gate:** Land a reviewed compatible native doc-lint/public-signature solution that
   meets the numeric F-5 cap, OR a separately reviewed explicit doctrine amendment with matching
   fitness updates; prove public type identity, exact exported inventory, doc-lint zero and all
@@ -3006,27 +3012,33 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   E2E acceptance is implied. Function-level `@example` and every other documentation obligation
   remain unwaived.
 
-## plugins/streams/services/mod.ts - F-5 native identity closure (21 symbols)
+## plugins/streams/services/mod.ts - F-5 native identity closure (22 symbols)
 
 - **ID:** `STREAMS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261028`
 - **Owner:** Native-host migration coordinator and repository maintainer `rickylabs`.
-- **Target:** 2026-11-10. No automatic extension or growth beyond these exact21 names.
+- **Target:** 2026-11-10. No automatic extension or growth beyond these exact 22 names.
 - **Status:** Open, `DEBT_ACCEPTED`, after same original independent PLAN evaluator process PASS
-  and root acceptance. Numeric21 exceeds20; this is not numeric F-5 PASS or a type-only discount.
-- **Reason:** The approved streams signature needs this native public doc-lint closure. Actual
-  six-name and20-name probes fail; the21-name probe passes. Production doc-lint and every other
-  F-5 clause still require their own evidence.
+  and root acceptance. Numeric 22 exceeds 20; this is not numeric F-5 PASS or a type-only discount.
+- **Reason:** The approved streams signature needs this native public doc-lint closure.
+  The original six-name and 20-name probes failed; the 21-name probe passed before #2492. Main #2492 added
+  `code?: ProcedureErrorCode` to `AuthzDecision`, requiring the native `ProcedureErrorCode`
+  identity export and the exact 22-name closure. The coordinator-authorized native explicit
+  union removes its runtime-constant dependency without changing its type. Production doc-lint
+  and every other F-5 clause still require their own evidence.
 - **Exact scope:** `plugins/streams/services/mod.ts`. Own `startStreamsService`,
   `StreamsServiceOptions`; service types `CorsOptions`, `RunningService`, `RunningServiceAddress`,
   `ServeOptions`, `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`; auth types
   `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
-  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ServiceAuthPolicy`,
-  `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`. Nineteen native names are direct
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ProcedureErrorCode`,
+  `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`. Twenty native names are direct
   type-only identity re-exports, with no aliases, structural substitutes or wildcard.
 - **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md`, `plan-review-addendum.md`,
   `s5-streams-factory-proposal.md` and `plan-streams-f5-debt-eval.md` in that run.
 - **Independent finding:** Same original Grok session `ses_e8149b729ffeT3e3Xjhrqyql5U`, verdict
   SHA256 `8f9907d5c4b0864467bb295dbca5c8534995721779f2411b2bafbc974a61f508`.
+- **Amended disposition:** Coordinator [#2474 disposition](https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112) authorizes
+  exactly one additional native type, `ProcedureErrorCode`, with no further growth. Independent
+  re-review: `.llm/runs/fix-native-host-policy--2396/native-source-debt-eval.md`.
 - **Closing gate:** Separately reviewed compatible native public-signature/doc-lint solution
   meeting cap20 OR explicit doctrine amendment with matching fitness changes; exact public type
   identity/inventory, doc-lint zero and retained lifecycle/security gates before closure.

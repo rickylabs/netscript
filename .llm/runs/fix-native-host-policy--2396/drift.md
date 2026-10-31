@@ -132,3 +132,14 @@ The recorded native type-only export of that constant makes the scratch closure 
 24/23 names, exceeding the exact authorized 23/22. No such export is applied. Native owner
 redesign is outside this authorized finishing delta. Stop after the coherent main merge and
 fresh source confirmation unless the single approved export can actually prove zero.
+
+Coordinator decision6541660112 supersedes the stop branch: native ProcedureErrorCode becomes
+an explicit identical union with checked constant and exact equality test. Native public
+surface comparison required; fallback24/23 only for a measured semantic API change. This
+new phase preserves prior PLAN/IMPL history and reuses evaluator sessions.
+
+Native source validation found isolatedDeclarations rejects inferred exported const with
+as const satisfies (TS9010/TS9027). Added an explicit readonly literal-shape annotation to
+that same native constant. It is exactly the previous inferred shape, checked by the same
+satisfies constraint and equality test. This follows the PLAN review's explicit compatible
+annotation contingency; no semantic API fallback or new type/export is needed.

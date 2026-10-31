@@ -71,7 +71,7 @@
 export { startWorkersService, type WorkersServiceOptions } from './src/service.ts';
 
 // Identity re-exports of the native types reachable from the public signature, so the documented
-// surface is self-complete for the JSR `private-type-ref` doc rule. The resulting 22-symbol count
+// surface is self-complete for the JSR `private-type-ref` doc rule. The resulting 23-symbol count
 // is recorded as accepted F-5 debt: WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027.
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 export type {
@@ -93,6 +93,7 @@ export type {
   AuthzOptions,
   AuthzRequest,
   Principal,
+  ProcedureErrorCode,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,
   ServicePublicAuthPolicy,

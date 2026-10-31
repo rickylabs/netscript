@@ -192,3 +192,45 @@ finishing-checkpoint-review.md. Commit/push the reviewed main union plus these r
 then re-steer the same evaluator at that exact pushed head and publish its truthful CHANGES
 verdict on PR2421. Queue one canonical BLOCKED report via the excluded file handoff; do not
 wait for an answer or silently apply the out-of-bounds proposed repair.
+
+Active continuation: coordinator #2474 comment6541660112 now authorizes canonical native
+union-first repair. Follow native-source-repair-plan.md. The previous BLOCKED condition is
+resolved by this explicit scope grant, not by silently growing debt. Native source/test
+paths are recorded in supervisor.md before edits. Keep23/22 and fixed2026-11-10.
+
+Native source repair now implemented under explicit coordinator comment6541660112. PLAN
+PASS, independent F-5 re-review PASS (native-source-debt-eval.md), preliminary source analysis
+NO_SOURCE_BLOCKERS. Exact23/22 inventories in native-source-export-inventory.json. Native
+ProcedureErrorCode is standalone explicit union; checked constant has identical readonly
+literal annotation. Strengthened existing test; no runtime change. Full service8/facade
+structured docs0; focused availability/public tests15/0/0; actual-baseline public type/runtime
+compatibility1/0/0; raw4 syntax-hash differences reported in native-source-api-diff.json.
+
+Current mainf6839463 already integrated at4771da929. Scopedchecklintfmt4files0; final stable
+root4045/34/0 and quality PASS; freshness4/4 and docsaccuracy PASS; memberdryruns3/3 exit0,
+JSRaudits retain existing warning/info summaries. Two stale derived-type doc words corrected
+and carriers regenerated canonically. No lock changes. No commits yet for this repair slice.
+
+First full suite1872/1/18 failed only trusted TLS child readpermission during concurrent
+asset generation; source timing cause is not proven. Original public docs now pass. Unchanged
+focused TLS retry1/0/0 passes. Complete exact scope rerunning with all writers/sweeps stopped;
+raw receipt is external native-source run combined-stable.receipt.json. Wait for that actual
+terminal report before final slice review/commit; no focused result replaces full proof.
+If PASS, write native-source-gates.json and acceptance evidence, re-steer the SAME Anthropic
+source reviewer for substantive slice signoff, commit/push existing branch, final exact-head
+review on delta since d3a52cb1b, PR comment, then canonical READY file handoff. Hosted runtime
+and published consumer graph remain coordinator/release owned and unproven. No localE2E.
+
+Complete stable full suite terminalPASS1873/0/18, exit0. All other required local gatesPASS;
+see native-source-gates.json and native-source-acceptance-evidence.md. First failed concurrent
+attempt remains honest history. No remaining local source gate is pending. Re-steer the same
+independent implementation/source reviewer for slice signoff before committing. Then push
+existing branch, exact-head full finishing-delta review, PR verdict, canonical READY handoff.
+Do not move head after final review solely to store its verdict; do not claim pending/skipped
+hosted runtime or actual published graph green. No localE2E, labels, milestones, merge/release.
+
+Native repair slice substantive reviewPASS; commit/push now. Main advanced during its gates
+to4e018ad0b (#2510/#2482/#2513). Reconcile that exact main as a separate normal-merge slice,
+canonically regenerate carriers and prove the new source union; include incoming producer
+session tests along with the full original combined scope. Freeze source writers/sweeps
+before tests. Final same-session exact-head IMPL-EVAL follows that final pushed union.

@@ -52,7 +52,7 @@
 
 export { startStreamsService, type StreamsServiceOptions } from './src/service.ts';
 
-// Exact native identity closure for public doc-lint; all 21 names count as numeric F5 debt.
+// Exact native identity closure for public doc-lint; all 22 names count as numeric F5 debt.
 // STREAMS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261028 is separate from the workers exception.
 export type {
   CorsOptions,
@@ -73,6 +73,7 @@ export type {
   AuthzOptions,
   AuthzRequest,
   Principal,
+  ProcedureErrorCode,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,
   ServicePublicAuthPolicy,

@@ -116,3 +116,34 @@ same evaluator across repairs. No self-certification; evaluator performs substan
 No local scaffold.runtime, labels/milestones, force push, rebase, merge to main, tag or release.
 Execution metadata and raw logs stay outside Git; sanitized evidence stays in this run.
 Canonical final issue report uses the excluded .divybot-final-report.md handoff.
+
+## Authorized native-source repair continuation — 2026-10-31
+
+Coordinator authority: https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112.
+Verbatim decision: "fix it at the source. In @netscript/service/auth, ProcedureErrorCode
+becomes an explicit string-literal union with the same two members. The const is checked
+against it, and a test asserts the two are exactly equal." It also requires a public-surface
+diff and retains23/22;24/23 is fallback ONLY if source repair changes the published API.
+This supersedes the previous finishing STOP branch and authorizes a fresh native repair
+phase. Its plan evaluation and implementation review reuse the existing independent sessions;
+prior stop-branch verdicts remain historical and are not relabeled as new source acceptance.
+
+Write scope addition BEFORE edits: packages/service/src/auth/types.ts;
+packages/service/tests/auth/procedure-availability_test.ts. Existing two plugin facades and
+their exact F-5 debt entries, canonical carriers and this run remain in scope. No new public
+service symbol, runtime value, service export-map change, behavior, dependency or lock churn.
+One coherent repair slice, under30 authored files. PLAN-EVAL before source implementation;
+separate F-5 review and substantive source review before commit; exact pushed-head evaluation
+on the complete finishing delta remains required. Coordinator alone merges and arms runtime.
+
+Native-source preliminary review found two stale documentation words after the canonical
+alias representation change. Before editing, extend scope to packages/service/README.md
+and docs/site/reference/service/index.md only to change "derived ProcedureErrorCode type"
+to "ProcedureErrorCode union". Regenerate affected prose/carriers canonically and rerun
+freshness; no adoption policy or behavior changes. This is a source-consistency correction.
+
+Current-main reconciliation continuation: incoming4e018ad0bab9b9b90daf4764a035fd3ff879b9fa
+is authorized by the original normal-merge instruction. Keep every main-owned runtime/doc
+change verbatim; only canonical carriers may need regeneration. No new authored runtime
+source scope. Add the incoming producer-session_test.ts to the final combined validation;
+all original scope remains. Evidence stays in this run; logs remain outside Git.
