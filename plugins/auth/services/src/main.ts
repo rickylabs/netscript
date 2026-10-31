@@ -32,6 +32,12 @@ type PluginServiceBootstrap = {
 /** Starts the Auth API service using host-provided infrastructure. */
 export default async function createAuthService(
   ctx: PluginServiceContext,
+  options: Readonly<{
+    /** Request-start level; defaults to debug rather than the native middleware's info. */
+    readonly requestLevel?: 'debug' | 'info';
+    /** Successful-response level; defaults to debug rather than the native middleware's info. */
+    readonly responseLevel?: 'debug' | 'info';
+  }> = {},
 ): Promise<AuthRunningService> {
   const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
   if (portValue === undefined) {
@@ -55,6 +61,10 @@ export default async function createAuthService(
     // Only signout and operator revocation are guarded; the guard authenticates in-process
     // because the auth service cannot verify sessions by calling itself.
     auth: createAuthServiceGuard(registry),
+    logger: {
+      requestLevel: options.requestLevel ?? 'debug',
+      responseLevel: options.responseLevel ?? 'debug',
+    },
     name: 'auth',
     version: AUTH_PLUGIN_VERSION,
     port,

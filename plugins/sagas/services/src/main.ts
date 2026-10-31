@@ -44,6 +44,12 @@ type PluginServiceBootstrap = {
  */
 export default async function createSagasService(
   ctx: PluginServiceContext,
+  options: Readonly<{
+    /** Request-start level; defaults to debug rather than the native middleware's info. */
+    readonly requestLevel?: 'debug' | 'info';
+    /** Successful-response level; defaults to debug rather than the native middleware's info. */
+    readonly responseLevel?: 'debug' | 'info';
+  }> = {},
 ): Promise<RunningService> {
   const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
   if (portValue === undefined) {
@@ -65,6 +71,10 @@ export default async function createSagasService(
       public: true,
       reason:
         'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
+    },
+    logger: {
+      requestLevel: options.requestLevel ?? 'debug',
+      responseLevel: options.responseLevel ?? 'debug',
     },
     name: 'sagas',
     version: '1.0.0',

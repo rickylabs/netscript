@@ -138,6 +138,10 @@ const LEGACY_EVENTS_PATH = '/api/v1/events' as const;
 
 /** Options for assembling the triggers service runtime context. */
 export type TriggersServiceOptions = Readonly<{
+  /** Request-start level; defaults to debug rather than the native middleware's info. */
+  readonly requestLevel?: 'debug' | 'info';
+  /** Successful-response level; defaults to debug rather than the native middleware's info. */
+  readonly responseLevel?: 'debug' | 'info';
   /** HTTP port for the front listener. Defaults to `PORT` env or the plugin default. */
   port?: number;
   /** Trigger definitions; defaults to the generated project registry. */
@@ -230,7 +234,13 @@ export async function createTriggersServiceContext(
  */
 export function createTriggersService(
   context: TriggerServiceContextSource,
-  options: Readonly<{ port?: number }> = {},
+  options: Readonly<{
+    port?: number;
+    /** Request-start level; defaults to debug rather than the native middleware's info. */
+    readonly requestLevel?: 'debug' | 'info';
+    /** Successful-response level; defaults to debug rather than the native middleware's info. */
+    readonly responseLevel?: 'debug' | 'info';
+  }> = {},
 ): ServiceBuilder<typeof router> {
   const port = resolveServicePort(options.port);
   const resolveContext = () => typeof context === 'function' ? context() : context;
@@ -252,6 +262,10 @@ export function createTriggersService(
       public: true,
       reason:
         'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
+    },
+    logger: {
+      requestLevel: options.requestLevel ?? 'debug',
+      responseLevel: options.responseLevel ?? 'debug',
     },
     name: TRIGGERS_API_SERVICE_NAME,
     routerName: 'triggers',
@@ -283,7 +297,11 @@ export async function startTriggersService(
 ): Promise<void> {
   let context = createUnavailableTriggersServiceContext();
   const port = resolveServicePort(options.port);
-  await createTriggersService(() => context, { port }).serve();
+  await createTriggersService(() => context, {
+    port,
+    requestLevel: options.requestLevel,
+    responseLevel: options.responseLevel,
+  }).serve();
 
   queueMicrotask(async () => {
     try {
