@@ -264,7 +264,8 @@ assistive technology hears how many files were accepted or rejected.
 ## Interactive namespaces and contracts
 
 Exported from `@netscript/fresh-ui/interactive`. Each is a compound namespace bundling a root
-component with its structural subcomponents. The namespace, props, event, and shared structural
+component with its structural subcomponents. Popover.Root accepts `focusOnOpen={false}` for informational previews that preserve trigger focus.
+The namespace, props, event, and shared structural
 contracts in this section are also public exports.
 
 | Symbol | Kind | Signature | Description |

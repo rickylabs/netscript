@@ -1,0 +1,18 @@
+.ns-alert-dialog { box-sizing: border-box; inline-size: calc(var(--ns-space-16) * 8); max-inline-size: calc(100vw - var(--ns-space-8)); max-block-size: calc(100vh - var(--ns-space-8)); overflow: auto; padding: var(--ns-card-padding); border: var(--ns-border-width) solid var(--ns-border); border-radius: var(--ns-radius-card); background: var(--ns-card); color: var(--ns-fg); box-shadow: var(--ns-shadow-md); }
+.ns-alert-dialog::backdrop { background: var(--ns-overlay); }
+.ns-alert-dialog [data-part='header'] { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: start; gap: var(--ns-space-2); }
+.ns-alert-dialog [data-part='media'] { display: grid; place-items: center; grid-row: span 2; inline-size: var(--ns-space-10); block-size: var(--ns-space-10); background: var(--ns-muted); color: var(--ns-fg); border-radius: var(--ns-radius-control); }
+.ns-alert-dialog[data-variant='destructive'] [data-part='media'] { background: var(--ns-destructive-subtle); color: var(--ns-destructive-text); }
+.ns-alert-dialog :is([data-part='title'],[data-part='description']) { grid-column: 2; margin: 0; }
+.ns-alert-dialog [data-part='header']:not(:has([data-part='media'])) { grid-template-columns: minmax(0,1fr); }
+.ns-alert-dialog [data-part='header']:not(:has([data-part='media'])) :is([data-part='title'],[data-part='description']) { grid-column: 1; }
+.ns-alert-dialog [data-part='title'] { font-size: var(--ns-text-strong); font-weight: var(--ns-weight-strong); }
+.ns-alert-dialog [data-part='description'] { font-size: var(--ns-text-small); color: var(--ns-muted-fg); line-height: var(--ns-leading-small); }
+.ns-alert-dialog [data-part='body'] { margin-block-start: var(--ns-space-4); }
+.ns-alert-dialog [data-part='footer'] { display: flex; justify-content: flex-end; gap: var(--ns-control-gap); margin-block-start: var(--ns-space-4); }
+.ns-alert-dialog[data-size='sm'] { inline-size: calc(var(--ns-space-16) * 5); }
+.ns-alert-dialog[data-size='sm'] [data-part='header'] { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.ns-alert-dialog[data-size='sm'] [data-part='footer'] > * { flex: 1; }
+
+/* Existing destructive text/card pair preserves AA without editing the shared palette. */
+.ns-alert-dialog[data-variant='destructive'] [data-part='action'], .ns-alert-dialog[data-variant='destructive'] [data-part='action']:hover { background: var(--ns-destructive-text); color: var(--ns-card); border-color: var(--ns-destructive-text); }

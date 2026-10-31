@@ -36,6 +36,7 @@ export function restorePopoverTriggerFocus(trigger: Pick<HTMLElement, 'focus'> |
 }
 
 export function usePopover({
+  focusOnOpen = true,
   closeOnEscape = true,
   closeOnInteractOutside = true,
   defaultOpen = false,
@@ -83,12 +84,12 @@ export function usePopover({
   useSyncedPopover(contentRef, open);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !focusOnOpen) {
       return;
     }
 
     if (contentRef.current?.getAttribute('role') !== 'menu') contentRef.current?.focus();
-  }, [open]);
+  }, [open, focusOnOpen]);
 
   const getTriggerProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): PopoverTriggerElementProps =>

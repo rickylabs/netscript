@@ -177,7 +177,7 @@ export const overlays_1: readonly ComponentContract[] = [
     'specId': 'O2',
     'category': 'Overlays',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'variant': {
         'kind': 'enum',
@@ -193,78 +193,107 @@ export const overlays_1: readonly ComponentContract[] = [
           'md',
         ],
       },
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'open',
-        ],
-      },
       'media': {
+        'kind': 'boolean',
+      },
+      'open': {
+        'kind': 'boolean',
+      },
+      'defaultOpen': {
+        'kind': 'boolean',
+      },
+      'onOpenChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'triggerLabel': {
+        'kind': 'text',
+        'required': true,
+      },
+      'actionLabel': {
+        'kind': 'text',
+        'required': true,
+      },
+      'cancelLabel': {
+        'kind': 'text',
+        'required': false,
+      },
+      'title': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'description': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'children': {
+        'kind': 'slot',
+        'required': false,
+      },
+      'mediaIcon': {
+        'kind': 'slot',
+        'required': false,
+      },
+      'onAction': {
+        'kind': 'callback',
+      },
+      'onCancel': {
+        'kind': 'callback',
+      },
+      'pending': {
         'kind': 'boolean',
       },
     },
     'parts': [
+      { 'name': 'label' },
+      { 'name': 'spinner', 'when': 'pending action' },
       {
         'name': 'root',
         'representation': 'context',
-        'planned': true,
       },
       {
         'name': 'backdrop',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
+        'when': 'native modal is open',
+        'representation': 'pseudo',
       },
       {
         'name': 'content',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'header',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'body',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'footer',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'media',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'cancel',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'action',
-        'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'trigger',
       },
     ],
     'attributes': {
@@ -273,11 +302,17 @@ export const overlays_1: readonly ComponentContract[] = [
           'default',
           'destructive',
         ],
+        'parts': [
+          'content',
+        ],
       },
       'data-size': {
         'values': [
           'sm',
           'md',
+        ],
+        'parts': [
+          'content',
         ],
       },
       'data-state': {
@@ -287,12 +322,36 @@ export const overlays_1: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'trigger',
+          'content',
+        ],
+        'compatibilityValues': [
+          'closed',
+        ],
       },
     },
     'booleans': [
       'media',
     ],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'title',
+        'part': 'title',
+      },
+      {
+        'name': 'description',
+        'part': 'description',
+      },
+      {
+        'name': 'children',
+        'part': 'body',
+      },
+      {
+        'name': 'mediaIcon',
+        'part': 'media',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/',
     'keyboard': [
       {
@@ -309,7 +368,10 @@ export const overlays_1: readonly ComponentContract[] = [
       'text/fg',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Context-only Root composes public native Dialog. Native backdrop requires no extra DOM; no close icon or outside-click dismissal.',
+      'Cancel receives initial focus. Native Escape requests cancel; pending disables only the action. App callbacks and asynchronous work remain caller-owned.',
+      'Action includes Button label/spinner parts. Existing destructive-text/card pair is inverted for accessible solid action contrast; canonical destructive/default palette remains owned by #2450.',
+      'Open/closed runtime hooks remain on trigger/content; browser-forced dismissal remains native behavior.',
     ],
   },
   {

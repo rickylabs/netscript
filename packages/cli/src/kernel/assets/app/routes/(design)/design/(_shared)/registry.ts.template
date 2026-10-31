@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 106,
+  'total': 109,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -717,6 +717,24 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Roving application menus over package-owned native ActionMenu popovers.',
   },
+  {
+    'name': 'alert-dialog',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native confirmation dialog with least-destructive initial focus.',
+  },
+  {
+    'name': 'hover-card',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Focus-preserving profile preview on hover or native disclosure activation.',
+  },
+  {
+    'name': 'context-menu',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Pointer and keyboard context region with native shared menu content.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -890,6 +908,15 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'navigation-menu',
       'menubar',
       'stepper',
+    ],
+  },
+  {
+    'name': 'overlays',
+    'items': [
+      'theme-seed',
+      'alert-dialog',
+      'hover-card',
+      'context-menu',
     ],
   },
 ];

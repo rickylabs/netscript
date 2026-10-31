@@ -230,3 +230,8 @@ or maintains a second catalog. Use that generated config for scoped fixture type
 checks after building. Native modal boundary tests allow Chromium's BODY sentinel
 when focus visits browser chrome, require re-entry into the dialog, and prove
 background controls cannot receive focus while `:modal` is active.
+
+The dedicated touch-light-390 project runs the @touch HoverCard disclosure case
+with hasTouch=true. Desktop projects exclude that device-specific case and keep
+the full light/dark390/1280 matrix. A tap toggles from its pre-interaction state;
+mouse hover previews and a following click deliberately closes the preview.

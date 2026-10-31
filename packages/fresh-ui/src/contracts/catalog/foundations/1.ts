@@ -8,7 +8,40 @@ export const foundations_1: readonly ComponentContract[] = [
     'category': 'Foundations',
     'priority': 'P0',
     'shipped': true,
-    'props': {},
+    'props': {
+      'name': {
+        'kind': 'enum',
+        'values': [
+          'alert-triangle',
+          'calendar',
+          'check',
+          'chevron-down',
+          'chevron-left',
+          'chevron-right',
+          'chevron-up',
+          'copy',
+          'download',
+          'external-link',
+          'info',
+          'menu',
+          'minus',
+          'plus',
+          'search',
+          'settings',
+          'trash',
+          'x',
+        ],
+        'required': true,
+      },
+      'size': {
+        'kind': 'text',
+        'description': 'CSS length or numeric SVG dimension; defaults to 1em.',
+      },
+      'title': {
+        'kind': 'text',
+        'description': 'Optional accessible title; omitted icons are decorative.',
+      },
+    },
     'parts': [
       {
         'name': 'root',

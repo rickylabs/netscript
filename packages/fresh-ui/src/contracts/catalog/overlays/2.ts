@@ -172,6 +172,11 @@ export const overlays_2: readonly ComponentContract[] = [
       'close': {
         'kind': 'boolean',
       },
+      'focusOnOpen': {
+        'kind': 'boolean',
+        'default': true,
+        'description': 'Popover.Root may preserve trigger focus for informational previews.',
+      },
     },
     'parts': [
       {
