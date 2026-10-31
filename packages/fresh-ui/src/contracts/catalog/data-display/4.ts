@@ -105,6 +105,10 @@ export const data_display_4: readonly ComponentContract[] = [
       },
     ],
     'attributes': {
+      'data-series': {
+        'values': ['1', '2', '3', '4', '5'],
+        'parts': ['bar'],
+      },
       'data-variant': {
         'values': [
           'bar',
@@ -132,6 +136,7 @@ export const data_display_4: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'data-series is emitted only for automatic palette entries; explicit tone keeps semantic intent.',
     ],
   },
   {
@@ -207,6 +212,10 @@ export const data_display_4: readonly ComponentContract[] = [
       },
     ],
     'attributes': {
+      'data-series': {
+        'values': ['1', '2', '3', '4', '5'],
+        'parts': ['ring', 'swatch'],
+      },
       'data-segments': {
         'values': [
           '2',
@@ -237,6 +246,7 @@ export const data_display_4: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'data-series is emitted only for automatic palette entries; explicit tone keeps semantic intent.',
     ],
   },
   {

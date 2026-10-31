@@ -1,3 +1,4 @@
+import { UI_DEFAULT_THEME } from '../../../domain/ui/ui-config.ts';
 import { join } from '@std/path';
 import { toCamelCase } from '@std/text';
 import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults.ts';
@@ -212,6 +213,7 @@ export async function writeNormalizedAppFiles(
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
     names: DEFAULT_UI_INIT_ITEMS,
+    theme: UI_DEFAULT_THEME,
     overwrite: true,
   }, { fs: context.fs });
   for (const copiedFile of uiInstall.copiedFiles) {

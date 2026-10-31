@@ -18,3 +18,17 @@
   background: transparent;
   color-scheme: light dark;
 }
+
+/* Studio Utility: role bindings for the shipped contract. */
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='mcp-ui-widget'][data-part='root'] {
+  background: var(--ns-surface-raised);
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='mcp-ui-widget'][data-part='frame'] {
+  background: var(--ns-surface);
+  border-radius: var(--ns-radius-card);
+}

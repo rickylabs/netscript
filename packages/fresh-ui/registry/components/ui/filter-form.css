@@ -19,3 +19,12 @@
     justify-content: flex-end;
   }
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='filter-form'][data-part='root'] {
+  border-radius: var(--ns-radius-card);
+  border-color: var(--ns-card-border);
+  border-width: var(--ns-card-border-top) var(--ns-card-border-side) var(--ns-card-border-bottom);
+  box-shadow: none;
+  background: var(--ns-card-bg);
+}

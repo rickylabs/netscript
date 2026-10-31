@@ -1,0 +1,142 @@
+{
+  "baselineHead": "c9c6e88cfd0decfb7ef2def71a411afeb91eabff",
+  "sourcePaths": 119,
+  "redThenGreen": {
+    "originalCss": {
+      "exitCode": 1,
+      "stats": {
+        "startTime": "2026-10-31T13:54:02.112Z",
+        "duration": 5650.068,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 8,
+        "flaky": 0
+      },
+      "reportSha256": "f4d7c16a56b65fe21c6c3db6b0681d50386f2e9eb570feafa2ba88497b2113f5"
+    },
+    "variantFixOnly": {
+      "exitCode": 1,
+      "stats": {
+        "startTime": "2026-10-31T13:54:18.952Z",
+        "duration": 4487.471,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "reportSha256": "98061587c996daaf8abac24c8a1cf2e78f242a71c10157c7342fe64eb09e552b"
+    },
+    "bothFixes": {
+      "exitCode": 0,
+      "stats": {
+        "startTime": "2026-10-31T13:54:35.593Z",
+        "duration": 3249.6730000000002,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "0b0d0c175838bb2da666c6a2f886a7cb6e2572d84ebbd26758f405dc4a9d0049"
+    }
+  },
+  "fullBrowser": {
+    "stats": {
+      "startTime": "2026-10-31T13:57:18.370Z",
+      "duration": 186070.604,
+      "expected": 52,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "reportSha256": "d64b680a77993859499f37f99dc79ec4372762c5eefafcece35cbb597866fc12"
+  },
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "carriers": {
+    "gen:agent-docs-prose": 0,
+    "gen:mcp-export-corpus": 0,
+    "gen:assets-barrel": 0,
+    "gen:publish-assets": 0
+  },
+  "releasePreflightExitCode": 0,
+  "scoped": {
+    "check": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "lint": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "fmt": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "gates": {
+    "quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "c9c6e88cfd0decfb7ef2def71a411afeb91eabff",
+      "durationMs": 15736
+    },
+    "docs": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "c9c6e88cfd0decfb7ef2def71a411afeb91eabff",
+      "durationMs": 7405
+    },
+    "browser-full-r2": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "c9c6e88cfd0decfb7ef2def71a411afeb91eabff",
+      "durationMs": 186982
+    }
+  },
+  "excludedScope": [
+    "CSS-size growth",
+    "QueryResult duplication"
+  ],
+  "initialSetupFailures": "Missing host shared libraries and stale scratch scaffold were corrected; neither startup failure is counted as red regression proof.",
+  "runtime": "Prior c9 exact-head CI passed PostgreSQL120 and SQLite113 with cleanup. New head must pass required checks and runtime before renewed READY.",
+  "packageTests": {
+    "summary": {
+      "passed": 335,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 335,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0,
+    "durationMs": 423763
+  },
+  "independentReview": {
+    "verdict": "PASS",
+    "failureStreak": 0,
+    "conditionsCompleted": [
+      "Visual summary/inventory now describe subtle fills and per-variant borders; older transparent screenshots explicitly historical.",
+      "335 package tests finished green before sign-off commit."
+    ]
+  }
+}

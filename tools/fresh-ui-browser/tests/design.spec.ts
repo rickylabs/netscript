@@ -31,15 +31,13 @@ const fontData = JSON.parse(readFileSync(join(APP_DIR, 'assets/fonts.json'), 'ut
 };
 
 for (const destination of ['Home', 'Components', 'Gallery button']) {
-  test(`leaving a Utility preview for ${destination} restores the configured document theme`, async ({ page }) => {
+  test(`leaving an NS One preview for ${destination} restores the configured document theme`, async ({ page }) => {
     const galleryButton = destination === 'Gallery button';
     await page.goto(
-      galleryButton
-        ? '/design/components?preset=studio-utility'
-        : '/design/tokens?preset=studio-utility',
+      galleryButton ? '/design/components?preset=ns-one' : '/design/tokens?preset=ns-one',
     );
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'studio');
-    await expect(page.locator('link[href="/presets/studio-utility.css"]'))
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ns-one');
+    await expect(page.locator('link[href="/presets/ns-one.css"]'))
       .toHaveCount(1);
     if (galleryButton) {
       await page.getByRole('link', { name: /Browse the .*token vocabulary/ }).click();
@@ -51,26 +49,25 @@ for (const destination of ['Home', 'Components', 'Gallery button']) {
       }
       await page.locator('a.ns-dashboard__nav-item', { hasText: destination }).click();
     }
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ns-one');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'studio');
     await expect(page.locator('html')).toHaveAttribute(
       'data-density',
-      'comfortable',
+      'compact',
     );
-    expect(await page.locator('html').getAttribute('data-flavor')).toBeNull();
+    await expect(page.locator('html')).toHaveAttribute('data-flavor', 'utility');
     await expect(page.locator('link[rel="stylesheet"][href^="/presets/"]'))
       .toHaveCount(0);
     const fontLinks = () =>
       page.locator('link[rel="stylesheet"][href^="https://fonts.googleapis.com/"]').evaluateAll((
         links,
       ) => links.map((link) => link.getAttribute('href')));
-    expect(await fontLinks()).toEqual(fontData.imports['ns-one']);
-    await page.goBack();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'studio');
-    await expect(page.locator('html')).toHaveAttribute(
-      'data-flavor',
-      'utility',
-    );
     expect(await fontLinks()).toEqual(fontData.imports['studio-utility']);
+    await page.goBack();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ns-one');
+    await expect(page.locator('html')).toHaveAttribute('data-density', 'comfortable');
+    expect(await page.locator('html').getAttribute('data-flavor')).toBeNull();
+    await expect(page.locator('link[href="/presets/ns-one.css"]')).toHaveCount(1);
+    expect(await fontLinks()).toEqual(fontData.imports['ns-one']);
   });
 }
 
@@ -94,8 +91,9 @@ for (const route of ROUTES) {
         await expect(toggle).toBeVisible();
         await expect(page.locator('html')).toHaveAttribute('data-scheme', theme);
 
-        const utility =
-          new URL(route, 'https://example.test').searchParams.get('preset') === 'studio-utility';
+        const legacy =
+          new URL(route, 'https://example.test').searchParams.get('preset') === 'ns-one';
+        const utility = !legacy;
         await expect(page.locator('html')).toHaveAttribute(
           'data-theme',
           utility ? 'studio' : 'ns-one',
@@ -106,12 +104,12 @@ for (const route of ROUTES) {
         );
         if (utility) await expect(page.locator('html')).toHaveAttribute('data-flavor', 'utility');
         const previewStyles = page.locator('link[rel="stylesheet"][href^="/presets/"]');
-        await expect(previewStyles).toHaveCount(utility ? 1 : 0);
-        if (utility) {
-          await expect(previewStyles).toHaveAttribute('href', '/presets/studio-utility.css');
-          const css = await page.request.get('/presets/studio-utility.css');
+        await expect(previewStyles).toHaveCount(legacy ? 1 : 0);
+        if (legacy) {
+          await expect(previewStyles).toHaveAttribute('href', '/presets/ns-one.css');
+          const css = await page.request.get('/presets/ns-one.css');
           expect(css.status()).toBe(200);
-          expect(await css.text()).toContain('/* Preset studio-utility/light */');
+          expect(await css.text()).toContain('/* Preset ns-one/light */');
         }
         if (utility && testInfo.project.use.viewport?.width === 390) {
           const trigger = page.locator('button.ns-dashboard__mobile-trigger');
@@ -179,37 +177,56 @@ for (const route of ROUTES) {
             utility ? tokenData.allRamps.length : tokenData.ramps.length,
           );
         }
-        if (!utility) {
-          const colors = await page.locator('body').evaluate(async (element) => {
-            await Promise.all(element.getAnimations().map((animation) => animation.finished));
-            const style = getComputedStyle(element);
-            return [style.backgroundColor, style.color];
-          });
-          await page.evaluate((scheme) => {
-            document.documentElement.removeAttribute('data-scheme');
-            document.documentElement.setAttribute('data-theme', scheme);
+        if (legacy) {
+          // A 0.0.8 app loads NS One alone. Its scheme aliases are not cross-preset previews.
+          const aliasColors = await page.evaluate(async (scheme) => {
+            const frame = document.createElement('iframe');
+            document.body.append(frame);
+            try {
+              const doc = frame.contentDocument!;
+              const sheet = doc.createElement('link');
+              sheet.rel = 'stylesheet';
+              sheet.href = '/presets/ns-one.css';
+              const loaded = new Promise<void>((resolve, reject) => {
+                sheet.onload = () => resolve();
+                sheet.onerror = () =>
+                  reject(new Error('NS One compatibility sheet failed to load'));
+              });
+              doc.head.append(sheet);
+              await loaded;
+              doc.body.style.cssText = 'background:var(--ns-bg);color:var(--ns-fg)';
+              const colors = () => {
+                const style = frame.contentWindow!.getComputedStyle(doc.body);
+                return [style.backgroundColor, style.color];
+              };
+              doc.documentElement.setAttribute('data-theme', 'ns-one');
+              doc.documentElement.setAttribute('data-scheme', scheme);
+              const explicit = colors();
+              doc.documentElement.setAttribute('data-scheme', scheme === 'dark' ? 'light' : 'dark');
+              const opposite = colors();
+              doc.documentElement.removeAttribute('data-scheme');
+              doc.documentElement.setAttribute('data-theme', scheme);
+              const alias = colors();
+              sheet.disabled = true;
+              return { explicit, opposite, alias, withoutStylesheet: colors() };
+            } finally {
+              frame.remove();
+            }
           }, theme);
-          expect(
-            await page.locator('body').evaluate(async (element) => {
-              await Promise.all(element.getAnimations().map((animation) => animation.finished));
-              const style = getComputedStyle(element);
-              return [style.backgroundColor, style.color];
-            }),
-          ).toEqual(colors);
-          await page.evaluate((scheme) => {
-            document.documentElement.setAttribute('data-theme', 'ns-one');
-            document.documentElement.setAttribute('data-scheme', scheme);
-          }, theme);
+          expect(aliasColors.explicit[0]).not.toBe('rgba(0, 0, 0, 0)');
+          expect(aliasColors.explicit).not.toEqual(aliasColors.opposite);
+          expect(aliasColors.alias).toEqual(aliasColors.explicit);
+          expect(aliasColors.alias).not.toEqual(aliasColors.withoutStylesheet);
         }
         if (route === '/design/tokens' && testInfo.project.name === 'light-1280') {
           const preview = await page.request.get('/design/tokens?preset=studio-utility');
           expect(await preview.text()).toMatch(/<html[^>]*data-theme="studio"/);
           const normal = await page.request.get('/design/tokens');
-          expect(await normal.text()).toMatch(/<html[^>]*data-theme="ns-one"/);
+          expect(await normal.text()).toMatch(/<html[^>]*data-theme="studio"/);
           const outside = await page.request.get('/?preset=studio-utility');
-          expect(await outside.text()).toMatch(/<html[^>]*data-theme="ns-one"/);
+          expect(await outside.text()).toMatch(/<html[^>]*data-theme="studio"/);
           const unknown = await page.request.get('/design/tokens?preset=unknown');
-          expect(await unknown.text()).toMatch(/<html[^>]*data-theme="ns-one"/);
+          expect(await unknown.text()).toMatch(/<html[^>]*data-theme="studio"/);
         }
         await page.evaluate(async () => {
           (document.activeElement as HTMLElement | null)?.blur();

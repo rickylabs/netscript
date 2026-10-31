@@ -62,6 +62,7 @@ export function Donut({ data, total, class: className, ...props }: DonutProps): 
                 data-part='ring'
                 data-scope='donut'
                 data-tone={tone}
+                data-series={datum.tone ? undefined : (index % CYCLE.length) + 1}
                 cx='50'
                 cy='50'
                 r={RADIUS}
@@ -85,6 +86,7 @@ export function Donut({ data, total, class: className, ...props }: DonutProps): 
               data-part='swatch'
               data-scope='donut'
               data-tone={datum.tone ?? CYCLE[index % CYCLE.length]}
+              data-series={datum.tone ? undefined : (index % CYCLE.length) + 1}
             />
             {datum.label}
           </li>

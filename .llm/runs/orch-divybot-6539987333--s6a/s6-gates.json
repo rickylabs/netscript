@@ -1,0 +1,140 @@
+{
+  "fresh-ui-tokens": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "note": "Merged-source freshness passes."
+  },
+  "docs-accuracy": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 7650,
+    "requestHash": "71f2da579b1d97f57ddecbe428cbb059835fbc0100175e49a6a4034490477158"
+  },
+  "fresh-ui-token-quality": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 25680
+  },
+  "quality-gate": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 17092,
+    "requestHash": "9bf437e2002793405dcc1245ddd9a089a0c856deece25b3cf9633d90ed79def5"
+  },
+  "release-preflight": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "runtime": {
+    "outcome": "UNPROVEN",
+    "exitCode": 1,
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "note": "Aspire doctor preflight failed; cleanup cannot connect to Docker daemon. No runtime or container-cleanup success claimed."
+  },
+  "jsr-audit": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "publishDryRun": true,
+    "findings": [
+      {
+        "gate": "F-DOCT-4 vocabulary",
+        "level": "WARN",
+        "message": "forbidden folder name 'lib' (utils/helpers/common/lib/interfaces) \u2014 needs migration plan + debt entry",
+        "path": "registry/lib"
+      },
+      {
+        "gate": "F-DOCT-5 cardinality",
+        "level": "WARN",
+        "message": "directory has 24 immediate children; doctrine cap is 12",
+        "path": ""
+      },
+      {
+        "gate": "F-DOCT-5 cardinality",
+        "level": "WARN",
+        "message": "directory has 99 immediate children; doctrine cap is 12",
+        "path": "registry/components/ui"
+      },
+      {
+        "gate": "F-DOCT-5 cardinality",
+        "level": "WARN",
+        "message": "directory has 34 immediate children; doctrine cap is 12",
+        "path": "registry/theme/figma"
+      },
+      {
+        "gate": "F-DOCT-5 cardinality",
+        "level": "WARN",
+        "message": "directory has 48 immediate children; doctrine cap is 12",
+        "path": "registry/theme/presets"
+      },
+      {
+        "gate": "F-JSR-7 slow-types",
+        "level": "WARN",
+        "message": "Checking for slow types in the public API..."
+      }
+    ]
+  },
+  "dependencies": {
+    "outcome": "ADVISORIES_PRESENT",
+    "command": "deno task deps:audit",
+    "advisories": 53,
+    "note": "Existing workspace advisories; no dependency upgrades in scope. Added highlight.js11.11.1 is not named in the advisory output."
+  },
+  "token-contrast": {
+    "outcome": "PASS",
+    "inputs": 96,
+    "contexts": 48,
+    "uses": 9080,
+    "sourceExclusions": 0,
+    "exemptInactiveTextUses": 58,
+    "note": "Approved upstream contrast burn-down merged; no exclusions added by S6a."
+  },
+  "merged-source-checks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:review-threads": 0,
+    "tokens:check": 0,
+    "release:preflight": 0,
+    "docs:accuracy": 0,
+    "quality:gate": 0,
+    "package:check": 0,
+    "package:lint": 0
+  },
+  "browser": {
+    "fullMerged": {
+      "fixtures": 304,
+      "measurements": 1820,
+      "errors": []
+    },
+    "supplementalHeaderRepair": {
+      "fixtures": 2,
+      "measurements": 12,
+      "errors": []
+    },
+    "note": "Only the data-table/header selector changed after the full pass; supplemental capture proves its row/center axis. Other scopes unchanged."
+  },
+  "legacy": {
+    "fixtures": 262,
+    "presets": [
+      "ns-one",
+      "tonal",
+      "macos-27"
+    ],
+    "schemes": 2,
+    "errors": []
+  }
+}

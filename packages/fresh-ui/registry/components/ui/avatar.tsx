@@ -62,15 +62,15 @@ export function Avatar(
       data-part='root'
       data-scope='avatar'
     >
-      {src ? <img data-part='image' data-scope='avatar' src={src} alt='' /> : (
-        <span
-          data-part={agent ? 'agent-icon' : 'initials'}
-          data-scope='avatar'
-          style={{ display: 'contents' }}
-        >
-          {initials ?? deriveInitials(name)}
-        </span>
-      )}
+      {src ? <img data-part='image' data-scope='avatar' src={src} alt='' /> : null}
+      {/* Utility uses initials even when a legacy consumer supplies a photo. */}
+      <span
+        data-part={agent ? 'agent-icon' : 'initials'}
+        data-scope='avatar'
+        style={src ? undefined : { display: 'contents' }}
+      >
+        {initials ?? deriveInitials(name)}
+      </span>
       {presence
         ? (
           <span

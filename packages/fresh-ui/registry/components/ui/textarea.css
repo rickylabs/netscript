@@ -2,3 +2,9 @@
   min-height: 5rem;
   resize: vertical;
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='textarea'][data-part='root'] {
+  border-radius: var(--ns-radius-input);
+  resize: vertical;
+}

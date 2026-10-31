@@ -1,7 +1,7 @@
 # Fresh UI browser evidence
 
 This harness runs the real scaffold gallery through Chromium at 390 and 1280 CSS pixels in light
-and dark mode, including the Studio Utility token preview (12 cases). Each route must return HTTP 200, show its heading, stamp language/scheme/density/flavor, hydrate the scheme island, and let
+and dark mode, with Studio Utility as the scaffold default and explicit NS One token/component previews (20 cases). Each route must return HTTP 200, show its heading, stamp language/scheme/density/flavor, hydrate the scheme island, and let
 keyboard users reach and activate its theme toggle using Tab, Enter and Space. It captures a
 full-page PNG and attaches the complete axe report. Serious/critical findings must match the exact
 reviewed S0 baseline; this is not a claim that today’s gallery is axe-clean. CI uploads screenshots, traces on failure,
@@ -29,7 +29,23 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-Playwright starts and stops the app's dev task. The design routes are intentionally excluded from
+Playwright reinstalls Message and Markdown with `ui:add --force` into the owned test scaffold before starting its dev task,
+verifies that both use the same `highlight.js` `^11` import mapping, and stops the server afterward.
+The full matrix has 52 tests: 20 route/axe captures, 12 navigation cases, and four CodeBlock
+re-render cases, eight Badge CSS cascade/fallback cases, and eight generated-query DOM contract cases. The latter compile the shipped
+page template and the complete canonical resource island/loader (the same people/users/partial
+plan as scaffold.runtime), use the real public query singleton, and execute the same observation expression
+as the full runtime probe. Successful object/list/empty/null/scalar payloads count; loading,
+errors, unrelated markup and an absent list query do not satisfy the complete contract. The CodeBlock fixture mounts the installed Message in Chromium and counts calls
+to the real highlighter across streamed text, filename, code, language and mount changes.
+Unknown-language and plain text remain escaped, and the clipboard retains the original code.
+External-server mode skips these twelve component/query cases because it cannot install the fixture.
+The Badge cases load the actual registry stylesheet in Chromium with deliberately distinct token
+colors. They verify all seven variants under all three Utility selectors and the info fallback
+under legacy theme selectors; a late generic paint override or a solid secondary text fallback
+must fail the computed-style assertions. These isolated CSS cases also run in external-server mode.
+
+The design routes are intentionally excluded from
 production builds, so use development mode. A startup failure or missing browser fails the run.
 The test runner never reuses an unrelated server.
 
@@ -39,7 +55,7 @@ The test runner never reuses an unrelated server.
 | --- | --- |
 | `FRESH_UI_APP_DIR` | App directory, relative to this directory or absolute; must have a `dev` task |
 | `FRESH_UI_BASE_URL` | Already running app; disables server startup and shutdown |
-| `FRESH_UI_ROUTES` | Comma-separated app-relative paths; defaults to `/design/tokens,/design/components,/design/tokens?preset=studio-utility` |
+| `FRESH_UI_ROUTES` | Comma-separated app-relative paths; defaults to `/design/tokens,/design/components,/design/tokens?preset=studio-utility,/design/tokens?preset=ns-one,/design/components?preset=ns-one` |
 | `FRESH_UI_PORT` | Port for an owned local dev server; change it if the default is busy |
 | `FRESH_UI_OUTPUT_DIR` | Capture/report directory; defaults to ignored `test-results/` |
 | `FRESH_UI_AXE_STRICT` | Set to `1` to require zero serious/critical axe findings |
@@ -85,6 +101,12 @@ under an already-known rule), `duplicate` (an extra copy of a scanned blocking n
 comma-separated list to exercise them in one server lifecycle. Never set it for normal captures.
 `accessibility.contract.ts` also proves the multiset contract with deterministic fixtures.
 
+Set `FRESH_UI_CODE_NEGATIVE_CONTROL=1` and run `npm test -- --grep "CodeBlock memoizes"`
+to remove memoization from the generated fixture copy. All four unchanged call-count assertions
+must fail. A subsequent normal run reinstalls the original registry component. This control never
+changes repository source, and baseline recording rejects it. The fixture and its assertion live in
+`fixtures/code-block-rerender.ts.template` and `tests/code-block.spec.ts`.
+
 ## Existing accessibility findings
 
 `axe-baseline.json` records exact rule/impact/target counts for each route, theme and width. Every
@@ -117,11 +139,18 @@ inputs differ; the recorder supports relocated artifact paths.
 Upstream references: [Playwright accessibility testing](https://playwright.dev/docs/accessibility-testing)
 and [screenshots](https://playwright.dev/docs/screenshots).
 
-The S1 matrix changes data-scheme through the keyboard while retaining data-theme
-as the language. NS One remains the default. Utility has zero serious/critical
-allowances; its authored token failures stay in the separate exact token contrast
-report. Specimen captions use readable neutral surfaces without changing swatch
-values. Original S0 screenshots remain untouched.
+The matrix changes data-scheme through the keyboard while retaining data-theme as the language.
+Studio Utility is the scaffold default. Navigation tests leave an NS One preview for the configured
+Utility pages, then use browser Back to restore the preview, fonts and stylesheet. The Utility
+query matching the configured default must not add a duplicate preview stylesheet. NS One's old
+scheme aliases are tested with its stylesheet alone in a temporary iframe, matching a legacy
+consumer rather than mixing them with the new default's base CSS. It reads `--ns-bg`/`--ns-fg`,
+requires distinct opaque light/dark colors, and proves disabling the stylesheet changes the result.
+
+Utility routes have zero contrast allowances. The components gallery retains only its existing
+DesktopTrayMenu semantics debt. Explicit NS One previews retain their exact reviewed legacy
+findings. Specimen captions use readable neutral surfaces without changing swatch values. Original
+S0 screenshots remain untouched.
 
 ## Variant migration parity
 

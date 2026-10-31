@@ -1,0 +1,36 @@
+import { render, type VNode } from 'preact';
+import { getIslandQueryClient } from '@netscript/fresh/query';
+
+/* QUERY_RESULT_TEMPLATE */
+
+interface QueryState {
+  data?: unknown;
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+function Result({ query }: { query: QueryState }): VNode {
+/* QUERY_RESULT_RETURN */
+}
+
+/** Render the shipped presentation with the same public singleton used by the runtime probe. */
+export function renderState(query: QueryState, withQuery = true): void {
+  const client = getIslandQueryClient();
+  client.removeQueries({ queryKey: ['users', 'list'], exact: true });
+  if (withQuery) client.setQueryData(['users', 'list'], query.data ?? []);
+  let container = document.querySelector('#query-result-fixture');
+  if (!container) {
+    container = document.createElement('main');
+    container.id = 'query-result-fixture';
+    document.body.append(container);
+  }
+  render(<Result query={query} />, container);
+}
+
+/** Old output tags and unrelated semantic lists must not count as the generated query surface. */
+export function renderUnrelated(): void {
+  renderState({ data: [] });
+  const container = document.querySelector('#query-result-fixture')!;
+  render(null, container);
+  container.innerHTML = '<output>legacy</output><dl><dt>Label</dt><dd>Value</dd></dl>';
+}

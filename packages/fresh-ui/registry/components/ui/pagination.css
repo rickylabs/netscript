@@ -12,3 +12,12 @@
   font-size: var(--ns-text-sm);
   color: var(--ns-muted-fg);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='pagination'][data-part='meta'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-small);
+  font-weight: var(--ns-weight-small);
+  line-height: var(--ns-leading-small);
+  letter-spacing: var(--ns-tracking-small);
+}

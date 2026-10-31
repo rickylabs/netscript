@@ -1,0 +1,18 @@
+const key = ['users', 'list'] as const;
+
+/** A controlled query port; the actual generated island still uses QueryIsland/useIslandQuery. */
+export const usersQueries = {
+  list: {
+    queryOptions: (_input: Record<string, never>) => ({
+      queryKey: key,
+      // Keep the loading case pending; successful cases receive initialData from the loader props.
+      queryFn: () => new Promise<unknown>(() => {}),
+      staleTime: Infinity,
+      retry: false,
+      retryOnMount: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }),
+    clientKey: (_input: Record<string, never>) => key,
+  },
+};

@@ -28,3 +28,32 @@
 :where(.ns-choice)[data-invalid='true'] .ns-checkbox__indicator {
   border-color: var(--ns-destructive);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='checkbox'][data-part='indicator'] {
+  width: var(--ns-size-checkbox);
+  height: var(--ns-size-checkbox);
+  border-radius: var(--ns-radius-checkbox);
+  border-width: var(--ns-border-width);
+  background: var(--ns-card);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='checkbox']:checked + [data-part='indicator'] {
+  background: var(--ns-primary);
+  border-color: var(--ns-primary-stroke);
+  color: var(--ns-primary-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='checkbox'] {
+    transition: none;
+  }
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='checkbox'][data-part='root']:where(:hover):not([data-disabled='true']) [data-part='indicator'] {
+  border-color: var(--ns-border-control);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='checkbox'][data-part='root'][data-invalid='true'] [data-part='indicator'] {
+  border-color: var(--ns-destructive);
+}

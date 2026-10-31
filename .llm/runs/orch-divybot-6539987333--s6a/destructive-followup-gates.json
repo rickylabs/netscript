@@ -1,0 +1,133 @@
+{
+  "baselineHead": "5fbc30900817cb8231b28584ee05b0f736a1d2eb",
+  "scope": "Generated design-page destructive text and recursive consumer regression",
+  "negativeControl": {
+    "exitCode": 1,
+    "mutation": "Temporarily restored color: var(--ns-destructive) in .ns-rules-dont > span",
+    "reportedPath": "packages/cli/src/kernel/assets/app/assets/design.css.template",
+    "restoredInFinally": true
+  },
+  "positiveControl": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 0
+  },
+  "rootChecks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0
+    }
+  ],
+  "releasePreflight": {
+    "exitCode": 0
+  },
+  "gates": {
+    "quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5fbc30900817cb8231b28584ee05b0f736a1d2eb",
+      "durationMs": 24570,
+      "receiptSha256": "e83620600c245163116ee7ab9db3443daf61dd61d20d183c2ad93a5f1f7e540b"
+    },
+    "docs": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5fbc30900817cb8231b28584ee05b0f736a1d2eb",
+      "durationMs": 10204,
+      "receiptSha256": "805cb6ca6afd1465dc385b7dc1f4584aab471596284a1b268e1a9b4c35fbe7f6"
+    },
+    "tokens": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5fbc30900817cb8231b28584ee05b0f736a1d2eb",
+      "durationMs": 34388,
+      "receiptSha256": "0937704a821aeb76d58b1fbab47f20934e76a894c9539e0cbf92fe37273df977"
+    },
+    "check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "selection": null
+    }
+  }
+}

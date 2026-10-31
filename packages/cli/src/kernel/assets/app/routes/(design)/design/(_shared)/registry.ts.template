@@ -319,7 +319,7 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'kind': 'component',
     'layer': 2,
     'description':
-      'Fenced code surface with filename/language header and a copy affordance for assistant messages.',
+      'Syntax-highlighted code surface with filename/language header and a copy affordance for assistant messages.',
   },
   {
     'name': 'model-selector',

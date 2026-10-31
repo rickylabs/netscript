@@ -1,3 +1,10 @@
+import { join } from '@std/path';
+import { UI_CONFIG_FILE, UI_DEFAULT_THEME } from '../../../../kernel/domain/ui/ui-config.ts';
+import {
+  TOKEN_ASSET_DIR,
+  TOKEN_CONFIG_FILE,
+  TOKEN_PRESET_FILE,
+} from '../../../../kernel/domain/tokens/token-config.ts';
 import { applyUiPreset } from '../../../../kernel/application/ui/v2/presets/apply-preset.ts';
 import { installUiRegistry } from '../../../../kernel/application/ui/v2/install-registry.ts';
 import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
@@ -31,7 +38,10 @@ export function createUiInitCommand(
     .option('--project-root <path:string>', 'Project root directory')
     .option('--app <name:string>', 'Fresh app workspace name')
     .option('--registry-root <path:string>', 'Fresh UI package root override')
-    .option('--theme <name:string>', 'Theme registry item (defaults to the official theme)')
+    .option(
+      '--theme <name:string>',
+      'Theme registry item (Studio Utility for new apps; custom registries use their own default)',
+    )
     .option('--preset <code:string>', 'Preset code, share URL, or token preset id')
     .option('--force', 'Overwrite existing copied UI files', { default: false })
     .action(async (options: UiInitCommandInput): Promise<void> => {
@@ -63,11 +73,17 @@ export function createUiInitCommand(
         print(`Copied ${result.copiedFiles.length} files.`);
         return;
       }
+      const fs = dependencies.installDependencies.fs;
+      const configured = (await Promise.all([
+        UI_CONFIG_FILE,
+        TOKEN_CONFIG_FILE,
+        join(TOKEN_ASSET_DIR, TOKEN_PRESET_FILE),
+      ].map((path) => fs.exists(join(projectRoot, path))))).some(Boolean);
       const result = await installUiRegistry({
         root: projectRoot,
         names: DEFAULT_UI_INIT_ITEMS,
         force: options.force,
-        theme: options.theme,
+        theme: options.theme ?? (configured ? undefined : UI_DEFAULT_THEME),
       }, dependencies.installDependencies);
       reportUiRegistry(result, {}, print);
     });

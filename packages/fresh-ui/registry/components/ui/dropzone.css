@@ -67,3 +67,30 @@
     transition: none;
   }
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dropzone'][data-part='root'] {
+  border-radius: var(--ns-radius-card);
+  border-color: var(--ns-border);
+  background: var(--ns-card);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dropzone'][data-part='root']:focus-within {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dropzone'][data-part='root']:is(:hover, [data-active]) {
+  background: var(--ns-selected);
+  border-color: var(--ns-ring);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dropzone'][data-part='root']:has(input:invalid) {
+  border-color: var(--ns-destructive);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dropzone'] {
+    transition: none;
+  }
+}

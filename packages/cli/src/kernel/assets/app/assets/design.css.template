@@ -757,7 +757,7 @@
 }
 
 .ns-rules-dont > span {
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
 /* Responsive + reduced motion */

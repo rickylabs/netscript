@@ -12,7 +12,7 @@ import process from 'node:process';
 import { chromium } from '@playwright/test';
 import { OUTPUT_DIR, ROUTES, THEMES, WIDTHS } from './settings.ts';
 
-if (process.env.FRESH_UI_AXE_NEGATIVE_CONTROL) {
+if (process.env.FRESH_UI_AXE_NEGATIVE_CONTROL || process.env.FRESH_UI_CODE_NEGATIVE_CONTROL) {
   throw new Error('Refusing to capture a deliberate negative-control baseline');
 }
 const destination = resolve(

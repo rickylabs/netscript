@@ -352,6 +352,7 @@
         "dependencies": [
           "jsr:@netscript/sdk@0.0.8",
           "jsr:@std/assert@1",
+          "npm:highlight.js@11",
           "npm:preact@^10.29.2"
         ]
       },

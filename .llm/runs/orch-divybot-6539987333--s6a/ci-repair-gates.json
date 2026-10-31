@@ -1,0 +1,274 @@
+{
+  "baselineHead": "e501f41852ec24c48a24e140cd02b561fb8ca864",
+  "productionSourceChanged": false,
+  "testContractRepairs": {
+    "templateTests": 27,
+    "resourceSliceTests": 5
+  },
+  "browser": {
+    "tests": 32,
+    "axeCases": 20,
+    "navigationCases": 12,
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0
+  },
+  "baseline": {
+    "newOrIncreased": 0,
+    "legacyCasesUnchanged": 8,
+    "utilityContrastAllowances": 0,
+    "removedFromDefaultCases": 172,
+    "cases": [
+      {
+        "case": "/design/components?preset=ns-one|dark-1280",
+        "previousCase": "/design/components|dark-1280",
+        "retained": 12,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components?preset=ns-one|dark-390",
+        "previousCase": "/design/components|dark-390",
+        "retained": 10,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components?preset=ns-one|light-1280",
+        "previousCase": "/design/components|light-1280",
+        "retained": 73,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components?preset=ns-one|light-390",
+        "previousCase": "/design/components|light-390",
+        "retained": 70,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components|dark-1280",
+        "previousCase": "/design/components|dark-1280",
+        "retained": 3,
+        "removed": 9,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components|dark-390",
+        "previousCase": "/design/components|dark-390",
+        "retained": 3,
+        "removed": 7,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components|light-1280",
+        "previousCase": "/design/components|light-1280",
+        "retained": 3,
+        "removed": 70,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/components|light-390",
+        "previousCase": "/design/components|light-390",
+        "retained": 3,
+        "removed": 67,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=ns-one|dark-1280",
+        "previousCase": "/design/tokens|dark-1280",
+        "retained": 5,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=ns-one|dark-390",
+        "previousCase": "/design/tokens|dark-390",
+        "retained": 3,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=ns-one|light-1280",
+        "previousCase": "/design/tokens|light-1280",
+        "retained": 7,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=ns-one|light-390",
+        "previousCase": "/design/tokens|light-390",
+        "retained": 4,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=studio-utility|dark-1280",
+        "previousCase": "/design/tokens?preset=studio-utility|dark-1280",
+        "retained": 0,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=studio-utility|dark-390",
+        "previousCase": "/design/tokens?preset=studio-utility|dark-390",
+        "retained": 0,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=studio-utility|light-1280",
+        "previousCase": "/design/tokens?preset=studio-utility|light-1280",
+        "retained": 0,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens?preset=studio-utility|light-390",
+        "previousCase": "/design/tokens?preset=studio-utility|light-390",
+        "retained": 0,
+        "removed": 0,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens|dark-1280",
+        "previousCase": "/design/tokens|dark-1280",
+        "retained": 0,
+        "removed": 5,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens|dark-390",
+        "previousCase": "/design/tokens|dark-390",
+        "retained": 0,
+        "removed": 3,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens|light-1280",
+        "previousCase": "/design/tokens|light-1280",
+        "retained": 0,
+        "removed": 7,
+        "newOrIncreased": 0
+      },
+      {
+        "case": "/design/tokens|light-390",
+        "previousCase": "/design/tokens|light-390",
+        "retained": 0,
+        "removed": 4,
+        "newOrIncreased": 0
+      }
+    ]
+  },
+  "gates": {
+    "ci-quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "e501f41852ec24c48a24e140cd02b561fb8ca864",
+      "durationMs": 18050,
+      "receiptSha256": "c46ee65ee0587e8f95eeb21d09c34b13704f2d8b8e89ae0fb1340a73b28accb9"
+    },
+    "check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "browser-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 5,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 5,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "selection": null
+    },
+    "ci-browser-r2": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "e501f41852ec24c48a24e140cd02b561fb8ca864",
+      "durationMs": 142134,
+      "receiptSha256": "2866de7a547761beb893c4ff410e65b6d46eec13762fa9c3d9dc3528bfae3b53"
+    },
+    "ci-contract-r2": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "e501f41852ec24c48a24e140cd02b561fb8ca864",
+      "durationMs": 1282,
+      "receiptSha256": "c0b5132e4dc45f05b486a18a3a4a7d86ff73ff1b05abfa53359e9389932c08a0"
+    },
+    "alias-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "alias-lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "alias-fmt": {
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "selection": null
+    }
+  },
+  "reviewRound": 2
+}

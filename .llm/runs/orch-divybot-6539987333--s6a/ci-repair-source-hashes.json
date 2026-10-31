@@ -1,0 +1,9 @@
+{
+  "packages/cli/src/kernel/adapters/templates/template-asset_test.ts": "28ddfe9e6aada1b5f19eec1530a0c80d017c43cea467cd33e3fc6ba3daa697a7",
+  "packages/cli/src/kernel/application/resource-slice/render-resource-slice_test.ts": "c81cc8d6712d90446a446a6bfdd07d3af0dfe183be01d36bece79aaf66c3967c",
+  "packages/cli/src/kernel/templates/app/route-templates_test.ts": "c5067f281c64197907d1c52419b0ebce31f18bb0bacc9f05be780b0db1e96367",
+  "tools/fresh-ui-browser/README.md": "7ebebfa6f8266f454981ab29dab78afdf33edc4f454b788814d8c894a2021636",
+  "tools/fresh-ui-browser/axe-baseline.json": "e526bc1d6678a256a198cf0cc822894bd698ee3a43bfb47cd3391d5a729c1312",
+  "tools/fresh-ui-browser/settings.ts": "1fff67941603b56e799fbe304715729991a28047dd97f413bc7356ac9e498aa7",
+  "tools/fresh-ui-browser/tests/design.spec.ts": "a094dbb47a282dd3c0f119e900d49d878d0e22149c8cccfff9dd4d65c3366d9f"
+}

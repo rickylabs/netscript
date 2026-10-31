@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--lock=deno.lock",
+    "--frozen",
+    "--unstable-kv",
+    "tests/contracts/render.test.tsx",
+    "tests/registry/components/ui/foundation.test.tsx",
+    "tests/registry/components/ui/dropzone.test.tsx",
+    "tests/registry/components/ui/search.test.tsx"
+  ],
+  "cwd": "packages/fresh-ui",
+  "exitCode": 0,
+  "durationMs": 2022,
+  "summary": {
+    "passed": 95,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 95,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

@@ -31,7 +31,7 @@ Deno.test('native init/apply presets compile real tokens, install exact docs and
     const before = await snapshot();
     await run(['ui:init', '--preset', 'unknown-preset'], false);
     assertEquals(await snapshot(), before);
-    await run(['ui:init', '--preset', 'studio-utility']);
+    await run(['ui:init']);
     assertEquals(
       JSON.parse(await fs.readFile(join(root, 'assets/theme-preset.json'))).id,
       'studio-utility',
@@ -92,6 +92,40 @@ Deno.test('native init/apply presets compile real tokens, install exact docs and
     assertStringIncludes(output, 'SKILL.md');
     assertEquals(await snapshot(), beforeFailure);
     assert((await fs.readFile(button)).includes('app customization'));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('ui:init preserves an existing legacy NS One preset', async () => {
+  const root = await Deno.makeTempDir();
+  const cli = fromFileUrl(new URL('../../../../../bin/netscript-dev.ts', import.meta.url));
+  try {
+    await Deno.writeTextFile(join(root, 'deno.json'), '{}');
+    await Deno.mkdir(join(root, 'routes'));
+    for (const args of [['--theme', 'theme-ns-one'], []]) {
+      const result = await new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          '--frozen',
+          '--unstable-kv',
+          '-A',
+          cli,
+          'ui:init',
+          '--project-root',
+          root,
+          ...args,
+        ],
+        stdin: 'null',
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+      assertEquals(
+        JSON.parse(await Deno.readTextFile(join(root, 'assets/theme-preset.json'))).id,
+        'ns-one',
+      );
+    }
   } finally {
     await Deno.remove(root, { recursive: true });
   }

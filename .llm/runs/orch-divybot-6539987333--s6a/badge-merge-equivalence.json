@@ -1,0 +1,40 @@
+{
+  "base": "14816a409e31505bc528714332b0bf4670be2fcb",
+  "ours": "0202367e1f44013d7e7842dbfc0ee02c98e00209",
+  "theirs": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+  "overlaps": [
+    "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "packages/cli/src/kernel/domain/ui/ui-config.ts"
+  ],
+  "frozenSourcePaths": 120,
+  "changedFrozenSourcePaths": [
+    "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "packages/cli/src/kernel/domain/ui/ui-config.ts",
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "removedFrozenPaths": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts"
+  ],
+  "mainOnly": {
+    "paths": 426,
+    "byteIdentical": 424,
+    "exceptions": [
+      "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+      "packages/mcp/src/publish-assets.generated.ts"
+    ]
+  },
+  "prOnly": {
+    "paths": 221,
+    "byteIdentical": 215,
+    "exceptions": [
+      ".llm/runs/orch-divybot-6539987333--s6a/context-pack.md",
+      ".llm/runs/orch-divybot-6539987333--s6a/current-source-hashes.json",
+      ".llm/runs/orch-divybot-6539987333--s6a/drift.md",
+      ".llm/runs/orch-divybot-6539987333--s6a/supervisor.md",
+      ".llm/runs/orch-divybot-6539987333--s6a/worklog.md",
+      "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts"
+    ]
+  },
+  "carrierExplanation": "Main moves canonical prose to MCP and the generator removes the legacy CLI carrier. Regenerated MCP prose/provenance preserve all 209 pages; only the two Utility-default documentation pages differ from main. Other exceptions are current run bookkeeping."
+}
