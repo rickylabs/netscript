@@ -16,9 +16,20 @@ export function SectionDivider(
   { label, class: className, lineClass, ...props }: SectionDividerProps,
 ): VNode {
   return (
-    <div {...props} class={cn('ns-section-divider', className)}>
-      <span class='ns-section-divider__label'>{label}</span>
-      <div class={cn('ns-section-divider__line', lineClass)} />
+    <div
+      {...props}
+      class={cn('ns-section-divider', className)}
+      data-part='root'
+      data-scope='section-divider'
+    >
+      <span class='ns-section-divider__label' data-part='label' data-scope='section-divider'>
+        {label}
+      </span>
+      <div
+        class={cn('ns-section-divider__line', lineClass)}
+        data-part='line'
+        data-scope='section-divider'
+      />
     </div>
   );
 }

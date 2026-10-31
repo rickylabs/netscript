@@ -116,9 +116,13 @@ export function useTooltip({
         ...props,
         'aria-describedby': open && !disabled ? contentId : props['aria-describedby'],
         'data-expanded': open ? 'true' : 'false',
-        'data-part': 'trigger',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'trigger',
         'data-placement': placement,
-        'data-scope': 'tooltip',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'tooltip',
         'data-state': dataState,
         interestfor: contentId,
         onBlur: composeEventHandlers(props.onBlur, () => scheduleClose('focus')),
@@ -138,9 +142,13 @@ export function useTooltip({
   const getPositionerProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): TooltipPositionerElementProps => ({
       ...props,
-      'data-part': 'positioner',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'positioner',
       'data-placement': placement,
-      'data-scope': 'tooltip',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'tooltip',
       'data-state': dataState,
       style: mergePlatformStyle(props.style, {
         '--ns-floating-anchor-name': anchorName,
@@ -155,9 +163,13 @@ export function useTooltip({
       ({
         ...props,
         'data-expanded': open ? 'true' : 'false',
-        'data-part': 'content',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'content',
         'data-placement': placement,
-        'data-scope': 'tooltip',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'tooltip',
         'data-state': dataState,
         id: props.id ?? contentId,
         onMouseEnter: composeEventHandlers(props.onMouseEnter, () => {
@@ -204,9 +216,13 @@ export function useTooltip({
   const getArrowProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): TooltipArrowElementProps => ({
       ...props,
-      'data-part': 'arrow',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'arrow',
       'data-placement': placement,
-      'data-scope': 'tooltip',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'tooltip',
       'data-state': dataState,
     }),
     [dataState, placement],
@@ -215,9 +231,13 @@ export function useTooltip({
   const getArrowTipProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): TooltipArrowTipElementProps => ({
       ...props,
-      'data-part': 'arrow-tip',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'arrow-tip',
       'data-placement': placement,
-      'data-scope': 'tooltip',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'tooltip',
       'data-state': dataState,
     }),
     [dataState, placement],

@@ -12,7 +12,9 @@
     "./primitives": "./primitives.tsx",
     "./registry": "./registry.ts",
     "./tokens": "./tokens.ts",
-    "./token-config": "./token-config.ts"
+    "./token-config": "./token-config.ts",
+    "./contracts": "./contracts.ts",
+    "./contracts.json": "./contracts.json"
   },
   "imports": {
     "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.8/auto-update",
@@ -30,7 +32,9 @@
       "registry/lib/toast.ts",
       "deno.json",
       "README.md",
-      "tokens/README.md"
+      "tokens/README.md",
+      "src/contracts/README.md",
+      "contracts.json"
     ],
     "exclude": [
       "scripts/**",

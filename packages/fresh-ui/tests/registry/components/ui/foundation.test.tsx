@@ -1,4 +1,4 @@
-import { assert, assertExists, assertStrictEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertExists, assertStrictEquals } from '@std/assert';
 import { freshUiRegistryManifest } from '../../../../registry.manifest.ts';
 import { Button } from '../../../../registry/components/ui/button.tsx';
 import {
@@ -50,18 +50,15 @@ function createField(
   };
 }
 
-Deno.test('Textarea adds the semantic error class when requested', () => {
+Deno.test('Textarea exposes the semantic invalid state when requested', () => {
   const element: unknown = Textarea({ error: true });
   assertVNode(element, 'Expected Textarea to return a vnode');
   assertStrictEquals(element.type, 'textarea', 'Expected Textarea to render a native textarea');
 
   const className = element.props.class;
   assert(typeof className === 'string', 'Expected Textarea to include a class attribute');
-  assertStringIncludes(
-    className,
-    'ns-textarea--error',
-    'Expected Textarea to include the error class',
-  );
+  assertStrictEquals(element.props['data-state'], 'invalid');
+  assertStrictEquals(element.props['data-invalid'], 'true');
 });
 
 Deno.test('IconButton composes Button with icon sizing and an accessible label', () => {

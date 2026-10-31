@@ -10,6 +10,7 @@
  */
 import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
+import { walk } from 'jsr:@std/fs@^1/walk';
 import { fromFileUrl, join } from 'jsr:@std/path@^1';
 
 const REPO_ROOT = fromFileUrl(new URL('../../../../', import.meta.url));
@@ -98,6 +99,19 @@ Deno.test('copied Markdown type-checks and renders directly through Preact', asy
       '--force',
     ]);
     assertEquals(install.code, 0, install.stderr || install.stdout);
+
+    const lintArgs = ['lint', '--rules-include=jsx-curly-braces', 'components/ui/markdown.tsx'];
+    const lint = await run(projectRoot, lintArgs);
+    assertEquals(lint.code, 0, commandFailureMessage('copied Markdown lint', lintArgs, lint));
+    const copied = join(projectRoot, 'components/ui/markdown.tsx');
+    const source = await Deno.readTextFile(copied);
+    const broken = source.replace(/data-part=(['"])root\1/, "data-part={'root'}");
+    assert(broken !== source, 'negative control must change the copied attribute');
+    await Deno.writeTextFile(copied, broken);
+    const negative = await run(projectRoot, lintArgs);
+    assert(negative.code !== 0, 'the consumer lint guard must reject string-in-braces attributes');
+    assertStringIncludes(negative.stderr, 'jsx-curly-braces');
+    await Deno.writeTextFile(copied, source);
 
     const config = JSON.parse(await Deno.readTextFile(join(projectRoot, 'deno.json')));
     const imports: Record<string, string> = config.imports;
@@ -243,5 +257,36 @@ export default function MarkdownHydrationPage() {
     assert(serverBundle.isFile, 'Fresh production server bundle was not emitted');
   } finally {
     await Deno.remove(parent, { recursive: true });
+  }
+});
+
+Deno.test('registry TSX templates pass jsx-curly-braces before installation', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'registry-template-lint-' });
+  try {
+    await Deno.writeTextFile(
+      join(root, 'deno.json'),
+      JSON.stringify({ lint: { rules: { tags: [], include: ['jsx-curly-braces'] } } }),
+    );
+    const paths: string[] = [];
+    for await (
+      const file of walk(join(REGISTRY_ROOT, 'registry'), { match: [/\.tsx\.template$/] })
+    ) {
+      if (!file.isFile) continue;
+      const target = join(root, `${paths.length}.tsx`);
+      await Deno.writeTextFile(target, await Deno.readTextFile(file.path));
+      paths.push(target);
+    }
+    assert(paths.length > 0, 'the guard must inspect shipped templates');
+    const args = ['lint', '--config', join(root, 'deno.json'), ...paths];
+    const lint = await run(root, args);
+    assertEquals(lint.code, 0, commandFailureMessage('registry template lint', args, lint));
+    // A fresh template with the reported regression proves that this guard enforces the rule.
+    const control = join(root, 'negative.tsx');
+    await Deno.writeTextFile(control, `export const view = <div data-part={"root"} />;`);
+    const negative = await run(root, [...args, control]);
+    assert(negative.code !== 0, 'the template guard must reject string-in-braces attributes');
+    assertStringIncludes(negative.stderr, 'jsx-curly-braces');
+  } finally {
+    await Deno.remove(root, { recursive: true });
   }
 });

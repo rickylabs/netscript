@@ -23,12 +23,23 @@ type FilterFormComponent = ((props: FilterFormProps) => VNode) & {
 };
 
 function FilterFormRoot({ children, class: className, ...props }: FilterFormProps): VNode {
-  return <form {...props} class={cn('ns-card', className)}>{children}</form>;
+  return (
+    <form {...props} class={cn('ns-card', className)} data-part='root' data-scope='filter-form'>
+      {children}
+    </form>
+  );
 }
 
 function FilterFormBody({ children, class: className, ...props }: FilterFormSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-card__body ns-filter-form__body', className)}>{children}</div>
+    <div
+      {...props}
+      class={cn('ns-card__body ns-filter-form__body', className)}
+      data-part='body'
+      data-scope='filter-form'
+    >
+      {children}
+    </div>
   );
 }
 
@@ -36,7 +47,12 @@ function FilterFormActions(
   { children, class: className, ...props }: FilterFormSectionProps,
 ): VNode {
   return (
-    <div {...props} class={cn('ns-filter-form__actions', className)}>
+    <div
+      {...props}
+      class={cn('ns-filter-form__actions', className)}
+      data-part='actions'
+      data-scope='filter-form'
+    >
       {children}
     </div>
   );

@@ -35,10 +35,15 @@ export function CitationChip(
       title={source}
       aria-pressed={active ? 'true' : 'false'}
       aria-label={source ? `Source ${index}: ${source}` : `Source ${index}`}
-      class={cn('ns-citation', active && 'is-active', className)}
+      class={cn('ns-citation', className)}
+      data-state={active ? 'active' : 'rest'}
+      data-part='root'
+      data-scope='citation-chip'
       onClick={() => onClick?.(index)}
     >
-      {index}
+      <span data-part='index' data-scope='citation-chip' style={{ display: 'contents' }}>
+        {index}
+      </span>
     </button>
   );
 }

@@ -20,6 +20,9 @@ type ActionMenuContextValue = UsePopoverReturn & {
   triggerRef: { current: HTMLButtonElement | null };
 };
 
+// App-owned floating.css styles the delegated popover scope.
+const ACTION_MENU_SCOPE = 'popover';
+
 const ActionMenuContext = createContext<ActionMenuContextValue | null>(null);
 
 function useActionMenuContext(part: string): ActionMenuContextValue {
@@ -140,6 +143,8 @@ export function ActionMenuItem(
       disabled={unavailable}
       onClick={composeEventHandlers(onClick, (event) =>
         activateActionMenuItem(event, () => menu.setOpen(false, 'close-button')))}
+      data-part='item'
+      data-scope={ACTION_MENU_SCOPE}
       role='menuitem'
       tabIndex={props.tabIndex ?? -1}
       type={props.type ?? 'button'}
@@ -151,7 +156,7 @@ export function ActionMenuItem(
 
 /** Renders a semantic separator between action groups. */
 export function ActionMenuSeparator(props: ActionMenuSeparatorProps): VNode {
-  return <hr {...props} role='separator' />;
+  return <hr data-part='separator' data-scope={ACTION_MENU_SCOPE} {...props} role='separator' />;
 }
 
 /** Public type of the compound ActionMenu namespace. */

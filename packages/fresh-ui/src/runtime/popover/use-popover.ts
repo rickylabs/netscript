@@ -98,9 +98,13 @@ export function usePopover({
         'aria-expanded': open,
         'aria-haspopup': 'dialog',
         'data-expanded': open ? 'true' : 'false',
-        'data-part': 'trigger',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'trigger',
         'data-placement': placement,
-        'data-scope': 'popover',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'popover',
         'data-state': dataState,
         popovertarget: contentId,
         popovertargetaction: 'toggle',
@@ -119,9 +123,13 @@ export function usePopover({
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverAnchorElementProps =>
       ({
         ...props,
-        'data-part': 'anchor',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'anchor',
         'data-placement': placement,
-        'data-scope': 'popover',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'popover',
         'data-state': dataState,
         style: mergePlatformStyle(props.style, {
           '--ns-floating-anchor-name': anchorName,
@@ -134,9 +142,13 @@ export function usePopover({
   const getPositionerProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverPositionerElementProps => ({
       ...props,
-      'data-part': 'positioner',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'positioner',
       'data-placement': placement,
-      'data-scope': 'popover',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'popover',
       'data-state': dataState,
       style: mergePlatformStyle(props.style, {
         '--ns-floating-anchor-name': anchorName,
@@ -154,9 +166,13 @@ export function usePopover({
         'aria-labelledby': props['aria-labelledby'] ?? titleId,
         'aria-modal': modal ? 'true' : undefined,
         'data-expanded': open ? 'true' : 'false',
-        'data-part': 'content',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'content',
         'data-placement': placement,
-        'data-scope': 'popover',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'popover',
         'data-state': dataState,
         id: props.id ?? contentId,
         onToggle: composeEventHandlers(props.onToggle, () => {
@@ -182,8 +198,12 @@ export function usePopover({
   const getTitleProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLHeadingElement> = {}): PopoverTitleElementProps => ({
       ...props,
-      'data-part': 'title',
-      'data-scope': 'popover',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'title',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'popover',
       id: props.id ?? titleId,
     }),
     [titleId],
@@ -192,8 +212,12 @@ export function usePopover({
   const getDescriptionProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLParagraphElement> = {}): PopoverDescriptionElementProps => ({
       ...props,
-      'data-part': 'description',
-      'data-scope': 'popover',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'description',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'popover',
       id: props.id ?? descriptionId,
     }),
     [descriptionId],
@@ -202,8 +226,12 @@ export function usePopover({
   const getCloseProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): PopoverCloseElementProps => ({
       ...props,
-      'data-part': 'close',
-      'data-scope': 'popover',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'close',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'popover',
       onClick: composeEventHandlers(props.onClick, () => setOpen(false, 'close-button')),
       type: props.type ?? 'button',
     }),
@@ -213,9 +241,13 @@ export function usePopover({
   const getArrowProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverArrowElementProps => ({
       ...props,
-      'data-part': 'arrow',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'arrow',
       'data-placement': placement,
-      'data-scope': 'popover',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'popover',
       'data-state': dataState,
     }),
     [dataState, placement],
@@ -224,9 +256,13 @@ export function usePopover({
   const getArrowTipProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverArrowTipElementProps => ({
       ...props,
-      'data-part': 'arrow-tip',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'arrow-tip',
       'data-placement': placement,
-      'data-scope': 'popover',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'popover',
       'data-state': dataState,
     }),
     [dataState, placement],
