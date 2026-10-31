@@ -1,0 +1,12 @@
+{
+  "packages/fresh-ui/contracts.json": "4332c015427f0fce6a1f583b1aee7cd3c1311bb3c4aef8c96b466f4d8e1a6e6a",
+  "packages/fresh-ui/registry/components/ui/avatar.css": "a460868bdecc9549e9f50204afa06106204f5bf3d30d669c7d79925e69a48cd6",
+  "packages/fresh-ui/registry/components/ui/avatar.tsx": "fe0e59b53ec91868edbebc3d2cdf6fbbed1032bc984ca7b48f9003ca5f040827",
+  "packages/fresh-ui/registry/components/ui/badge.css": "1c0254a957c3d0b9e9cfacc18115a2a367dc5ed00018d1f88ae89a8296891119",
+  "packages/fresh-ui/registry/components/ui/badge.tsx": "076bcfc502b5dbc6fd7b3d7136a945f467f97bec45cdfad290966e33df00e730",
+  "packages/fresh-ui/registry/components/ui/form-field.css": "16d264b03b9620009c6364f9448f19e642758877723f588e45419e49605b6400",
+  "packages/fresh-ui/registry/components/ui/label.css": "b7b3311773fc63e6a50e0ec804b55540a98d5475ff6e0d52c61e479bbaf97163",
+  "packages/fresh-ui/registry/components/ui/switch.css": "b562e0dbcba726689d5c4d21eb51519164b2d2594998bf563fb6f0d6ecdb5211",
+  "packages/fresh-ui/src/contracts/catalog/data-display/1.ts": "392b1c7ea5c19767b4206eadb76c7871bb37ff71e5369f1ab25a3b25e8b6723f",
+  "packages/fresh-ui/tests/contracts/utility-basic.tsx": "0c47365ca13a677d7de5fd9d9d08c7fa7c0f95456a99b7077fa7de8ab313ba1e"
+}

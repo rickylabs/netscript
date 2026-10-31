@@ -159,6 +159,13 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'badge',
+    scenario: 'info',
+    render: () => <Badge variant='info'>Shipped</Badge>,
+    parts: ['label', 'dot'],
+    attributes: ['data-variant', 'data-emphasis'],
+  },
+  {
+    component: 'badge',
     scenario: 'status',
     render: () => <Badge variant='success'>Ready</Badge>,
     parts: ['label'],
@@ -190,6 +197,19 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
     component: 'chart-block',
     scenario: 'bar',
     render: () => <ChartBlock title='Chart' data={[{ label: 'One', value: 42 }]} />,
+  },
+  {
+    component: 'donut',
+    scenario: 'palette-and-error',
+    render: () => (
+      <Donut
+        data={[...[1, 2, 3, 4, 5].map((n) => ({ label: `Series ${n}`, value: n })), {
+          label: 'Error',
+          value: 2,
+          tone: 'destructive',
+        }]}
+      />
+    ),
   },
   {
     component: 'donut',

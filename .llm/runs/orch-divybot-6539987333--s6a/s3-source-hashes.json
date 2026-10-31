@@ -1,0 +1,22 @@
+{
+  "packages/fresh-ui/contracts.json": "426e1d195d45658102f91ea74060a4a3680690c8e7b624b0b97bbfc515660a7e",
+  "packages/fresh-ui/registry/components/ui/alert-styles.css": "4d0190e5a11fd48962827584e932c6e5a74708f674686c28da463a70b080f327",
+  "packages/fresh-ui/registry/components/ui/alert.css": "2062950d7abbc65fe0de97f60aec395d5d06300ebd18219ad673c0b060361289",
+  "packages/fresh-ui/registry/components/ui/avatar.css": "5660cb48fbe6a58115d93e9bd7e1e83127b2c46cc91ba0df75c8f78091139f37",
+  "packages/fresh-ui/registry/components/ui/badge.css": "326ecdc37b9096639868d0e912cd87e78f7a3685c16b4b3566c652ce46f51279",
+  "packages/fresh-ui/registry/components/ui/badge.tsx": "de984c12947e1a95b9ed14314328dff8e0698dbb7e736e50241f812f1ebb37de",
+  "packages/fresh-ui/registry/components/ui/card.css": "1316e210c836f9c084589b6efdb7ce28968becdd177e1764aefd46ebe3f6faad",
+  "packages/fresh-ui/registry/components/ui/empty-state.css": "c99ec325c0fd8e56034bbcd8afb3be5d0ff20b01c6e94637230f862d8ac91ae8",
+  "packages/fresh-ui/registry/components/ui/filter-form.css": "d00d921e21745971d1537288a1980488424e4333da571ba8bf453d8a7c9d36b8",
+  "packages/fresh-ui/registry/components/ui/inline-notice.css": "4aac31bb643c1caf21dc53e0447b3fc2034a00a29aa1f4be0194e9c4d43fc409",
+  "packages/fresh-ui/registry/components/ui/panel.css": "c3e50108f64921c5f489bf4f6b8864e8358b2316a486e55e192021fb41c624ab",
+  "packages/fresh-ui/registry/components/ui/progress.css": "6da0e09d08d917d4e61c77f85528d09b0fbe829e6de8598308f689f586b1a1f1",
+  "packages/fresh-ui/registry/components/ui/section-divider.css": "07e414479e461dea1eebb3dc877df0e4450aeef21715dc5d9f4c9e11c7449f40",
+  "packages/fresh-ui/registry/components/ui/separator.css": "530d0ca3a43c6300ed1e4943f95b0fb3737440d0d86d4953d32095f871db9994",
+  "packages/fresh-ui/registry/components/ui/skeleton.css": "e72be06a7fe901f587eafa873971eb442325d78318f9d1fbd08fcf44ed1bbe4f",
+  "packages/fresh-ui/registry/components/ui/spinner.css": "0d940cb6f48bdbd791a85e67464cd340f28726dd41e3bca2d878de0d55f58774",
+  "packages/fresh-ui/registry/components/ui/surface-styles.css": "50cdbc41a8127572bbec697976af648645cd541c55f6da0e98f2af8272523116",
+  "packages/fresh-ui/registry/components/ui/toast.css": "3d66a2bba326b186d772e0617d0b8ae94a33348e020f193d25fdadd84c84f119",
+  "packages/fresh-ui/src/contracts/catalog/data-display/1.ts": "6b454559e2b35f6f8430301259c55ff8f4361128342d36bc4ce76da59e18ba01",
+  "packages/fresh-ui/tests/contracts/utility-basic.tsx": "10e63121bbc153bfbf21caf8babf6a0c5164b3dabe3a861c054f583cdcb909aa"
+}

@@ -1,0 +1,252 @@
+{
+  "baselineHead": "87a9acf83fa22074f1626a6a54810fabb8a11486",
+  "scope": "CodeBlock bare shared dependency and code/language memoization",
+  "frozenSourcePaths": 109,
+  "avatar": "Optional photo omission deferred: no SSR preset input; preserve legacy photo behavior.",
+  "locks": "All four changed lockfiles retain identical npm/jsr resolved graphs and integrity data. Only dependency declarations changed.",
+  "dependencyAudit": {
+    "exitCode": 0,
+    "advisories": 53,
+    "note": "Existing findings; no resolved versions changed."
+  },
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:review-threads": 0
+  },
+  "gates": {
+    "quality-locks": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "87a9acf83fa22074f1626a6a54810fabb8a11486",
+      "durationMs": 17353,
+      "receiptSha256": "2200d996a0450f59ca4090422abf5c188479b8d196fc212351e054fec5814410"
+    },
+    "docs-accuracy": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "87a9acf83fa22074f1626a6a54810fabb8a11486",
+      "durationMs": 8687,
+      "receiptSha256": "53096f6f96acf0640f7fb6f7b4b31e88e7161bf7dcfb4e20096f7dec587df7dc"
+    },
+    "fresh-ui-token-quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "87a9acf83fa22074f1626a6a54810fabb8a11486",
+      "durationMs": 28375,
+      "receiptSha256": "edd9a92f094435d345594a6625d2393be57d1984f23368f75cca3580c5f2dd70"
+    },
+    "fresh-ui-browser-contract": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "87a9acf83fa22074f1626a6a54810fabb8a11486",
+      "durationMs": 1268,
+      "receiptSha256": "def369948f4142e95f70e8d82f6144d0e05ef8b8e496da95b51dd6cbfb8f90ab"
+    },
+    "browser-full": {
+      "stats": {
+        "startTime": "2026-10-31T12:31:41.873Z",
+        "duration": 155137.941,
+        "expected": 36,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "e1aa1cbad2fda6d66214f4c8a88dfa37dac1687f4c474b59898131a6e102a14d"
+    },
+    "package-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 266,
+        "batches": 3,
+        "failedBatches": 0
+      }
+    },
+    "package-lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 266,
+        "batches": 2,
+        "failedBatches": 0
+      }
+    },
+    "package-fmt": {
+      "summary": {
+        "filesSelected": 266,
+        "batches": 2,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "browser-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 4,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "browser-lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 4,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "browser-fmt": {
+      "summary": {
+        "filesSelected": 4,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "installed-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "browser-fs": {
+      "stats": {
+        "startTime": "2026-10-31T12:30:03.971Z",
+        "duration": 23632.618,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "cd87307c322dd0c19f9ac0ae8b358748a18e4b4d95e74cf2ad3eea300b1c5fdf"
+    },
+    "browser-negative": {
+      "stats": {
+        "startTime": "2026-10-31T12:30:43.440Z",
+        "duration": 26190.750999999997,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "reportSha256": "37a9407fd7c95d113283ab0c1cada8ee8aa142a0aa8e17d9c454d71efbac70e3"
+    },
+    "browser-final-focused": {
+      "stats": {
+        "startTime": "2026-10-31T12:35:12.732Z",
+        "duration": 22730.57,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "d39ba82cee19b3d4be9c1b0d96529bfa98e11c5aa9d9d75a5be0a475b810fb7e"
+    },
+    "package-test": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 334,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 334,
+        "uniqueFailures": 0
+      },
+      "durationMs": 411075
+    }
+  },
+  "negativeControl": {
+    "exitCode": 1,
+    "failedCases": 4,
+    "failure": "All four unchanged call-count assertions fail when useMemo is removed from the generated CodeBlock copy.",
+    "callsWithoutMemo": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      14,
+      14,
+      15,
+      16
+    ],
+    "callsWithMemo": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      3,
+      3,
+      3,
+      4,
+      5
+    ],
+    "restored": "ui:add --force before the passing full and final focused runs."
+  },
+  "releasePreflight": {
+    "exitCode": 0
+  },
+  "scaffoldProductionBuild": {
+    "exitCode": 0
+  },
+  "jsrAudit": {
+    "exitCode": 0,
+    "failedFindings": 0
+  },
+  "runtime": "Local Docker/Aspire runtime and leak hygiene remain UNPROVEN; no runtime claim from browser/build gates."
+}

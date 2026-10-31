@@ -143,6 +143,8 @@ async function main() {
   for (const [key, exp] of Object.entries(exportsMap)) {
     const p = join(ROOT, exp);
     if (!(await exists(p))) continue;
+    // JSON exports are data: comments would invalidate them; existence is checked above.
+    if (exp.endsWith('.json')) continue;
     const text = await Deno.readTextFile(p);
     const head = text.slice(0, 4096);
     moduleTagOnEntries[key] = /@module\b/.test(head);

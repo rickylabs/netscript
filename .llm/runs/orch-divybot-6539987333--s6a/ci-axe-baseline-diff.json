@@ -1,0 +1,148 @@
+{
+  "newOrIncreased": 0,
+  "legacyCasesUnchanged": 8,
+  "utilityContrastAllowances": 0,
+  "removedFromDefaultCases": 172,
+  "cases": [
+    {
+      "case": "/design/components?preset=ns-one|dark-1280",
+      "previousCase": "/design/components|dark-1280",
+      "retained": 12,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components?preset=ns-one|dark-390",
+      "previousCase": "/design/components|dark-390",
+      "retained": 10,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components?preset=ns-one|light-1280",
+      "previousCase": "/design/components|light-1280",
+      "retained": 73,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components?preset=ns-one|light-390",
+      "previousCase": "/design/components|light-390",
+      "retained": 70,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components|dark-1280",
+      "previousCase": "/design/components|dark-1280",
+      "retained": 3,
+      "removed": 9,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components|dark-390",
+      "previousCase": "/design/components|dark-390",
+      "retained": 3,
+      "removed": 7,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components|light-1280",
+      "previousCase": "/design/components|light-1280",
+      "retained": 3,
+      "removed": 70,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/components|light-390",
+      "previousCase": "/design/components|light-390",
+      "retained": 3,
+      "removed": 67,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=ns-one|dark-1280",
+      "previousCase": "/design/tokens|dark-1280",
+      "retained": 5,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=ns-one|dark-390",
+      "previousCase": "/design/tokens|dark-390",
+      "retained": 3,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=ns-one|light-1280",
+      "previousCase": "/design/tokens|light-1280",
+      "retained": 7,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=ns-one|light-390",
+      "previousCase": "/design/tokens|light-390",
+      "retained": 4,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=studio-utility|dark-1280",
+      "previousCase": "/design/tokens?preset=studio-utility|dark-1280",
+      "retained": 0,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=studio-utility|dark-390",
+      "previousCase": "/design/tokens?preset=studio-utility|dark-390",
+      "retained": 0,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=studio-utility|light-1280",
+      "previousCase": "/design/tokens?preset=studio-utility|light-1280",
+      "retained": 0,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens?preset=studio-utility|light-390",
+      "previousCase": "/design/tokens?preset=studio-utility|light-390",
+      "retained": 0,
+      "removed": 0,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens|dark-1280",
+      "previousCase": "/design/tokens|dark-1280",
+      "retained": 0,
+      "removed": 5,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens|dark-390",
+      "previousCase": "/design/tokens|dark-390",
+      "retained": 0,
+      "removed": 3,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens|light-1280",
+      "previousCase": "/design/tokens|light-1280",
+      "retained": 0,
+      "removed": 7,
+      "newOrIncreased": 0
+    },
+    {
+      "case": "/design/tokens|light-390",
+      "previousCase": "/design/tokens|light-390",
+      "retained": 0,
+      "removed": 4,
+      "newOrIncreased": 0
+    }
+  ]
+}

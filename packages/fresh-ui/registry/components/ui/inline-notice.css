@@ -3,3 +3,8 @@
   padding: var(--ns-space-3) var(--ns-space-4);
   background: color-mix(in srgb, var(--ns-surface) 92%, transparent);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='inline-notice'][data-part='root'] {
+  padding: var(--ns-stack-gap) var(--ns-control-padding-x);
+}

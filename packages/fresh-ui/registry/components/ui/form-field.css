@@ -32,3 +32,26 @@
   font-size: var(--ns-text-xs);
   color: var(--ns-destructive-text);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-part='description'] {
+  font-size: var(--ns-text-small);
+  line-height: var(--ns-leading-small);
+  color: var(--ns-muted-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-part='error'] {
+  font-size: var(--ns-text-small);
+  line-height: var(--ns-leading-small);
+  color: var(--ns-destructive-text);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-state='invalid'] [data-part='label'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-part='error-icon'] {
+  color: var(--ns-destructive-text);
+}
+
+/* Locked invalid fields keep the label neutral; border and error text carry the error. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-state='invalid'] [data-part='label'] {
+  color: var(--ns-fg);
+}

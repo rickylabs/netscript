@@ -11,3 +11,15 @@
   height: 100%;
   background: var(--ns-border-hover);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='separator'][data-part='root'] {
+  height: var(--ns-border-width);
+  background: var(--ns-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='separator'][data-part='root'][data-orientation='vertical'] {
+  width: var(--ns-border-width);
+  height: 100%;
+  background: var(--ns-border);
+}

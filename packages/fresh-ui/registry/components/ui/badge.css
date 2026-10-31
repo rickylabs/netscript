@@ -68,3 +68,90 @@
 :root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) :where(.ns-badge)[data-variant='destructive'] {
   color: var(--ns-destructive-text);
 }
+
+/* Legacy themes without info roles retain their secondary palette for this additive tone. */
+:where(.ns-badge)[data-variant='info'] {
+  color: var(--ns-info-text, var(--ns-secondary-text));
+  background: var(--ns-info-subtle, var(--ns-secondary-subtle));
+  border: var(--ns-border-width, 1px) solid var(--ns-info-border, var(--ns-secondary-border));
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'] {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-label);
+  font-weight: var(--ns-weight-label);
+  line-height: var(--ns-leading-label);
+  letter-spacing: var(--ns-tracking-label);
+  height: var(--ns-badge-height);
+  padding: 0 var(--ns-badge-padding-x);
+  border-radius: var(--ns-radius-badge);
+  border-width: var(--ns-border-width);
+  text-transform: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='primary'] {
+  color: var(--ns-primary-text);
+  background: var(--ns-primary-subtle);
+  border-color: var(--ns-primary-border);
+  border-style: solid;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='secondary'] {
+  color: var(--ns-secondary-text);
+  background: var(--ns-secondary-subtle);
+  border-color: var(--ns-secondary-border);
+  border-style: solid;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='info'] {
+  color: var(--ns-info-text);
+  background: var(--ns-info-subtle);
+  border-color: var(--ns-info-border);
+  border-style: solid;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='success'] {
+  color: var(--ns-success-text);
+  background: var(--ns-success-subtle);
+  border-color: var(--ns-success-border);
+  border-style: solid;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='warning'] {
+  color: var(--ns-warning-text);
+  background: var(--ns-warning-subtle);
+  border-color: var(--ns-warning-border);
+  border-style: solid;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='destructive'] {
+  color: var(--ns-destructive-text);
+  background: var(--ns-destructive-subtle);
+  border-color: var(--ns-destructive-border);
+  border-style: solid;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant='muted'] {
+  background: var(--ns-muted);
+  color: var(--ns-muted-fg);
+  border-color: var(--ns-border);
+}
+
+/* The Utility status dot is decorative; legacy badge anatomy stays visually unchanged. */
+.ns-badge__dot {
+  display: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant] {
+  font-family: var(--ns-font-label);
+  gap: var(--ns-space-1-5);
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='dot'] {
+  display: inline-block;
+  flex: none;
+  width: var(--ns-space-1-5);
+  height: var(--ns-space-1-5);
+  border-radius: var(--ns-radius-full);
+  background: currentColor;
+}

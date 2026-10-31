@@ -1,0 +1,124 @@
+{
+  "check": {
+    "source": {
+      "mode": "selection",
+      "cwd": "./packages/fresh-ui"
+    },
+    "command": "deno check --unstable-kv --lock=deno.lock --frozen <files>",
+    "selection": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "lint": {
+    "source": {
+      "mode": "command",
+      "cwd": "./packages/fresh-ui",
+      "exitCode": 0
+    },
+    "selection": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 4,
+      "filesProcessed": 4,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "fmt": {
+    "command": "deno fmt --check",
+    "cwd": "./packages/fresh-ui",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 4,
+      "filesProcessed": 4,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--lock=deno.lock",
+      "--frozen",
+      "--unstable-kv",
+      "tests/contracts",
+      "tests/registry/components/ui/code-block.test.tsx",
+      "tests/registry/markdown-pipeline.test.ts",
+      "tests/registry/markdown-renderer.test.ts",
+      "tests/registry/components/ui/prompt-input.test.tsx"
+    ],
+    "cwd": "./packages/fresh-ui",
+    "exitCode": 0,
+    "durationMs": 49179,
+    "summary": {
+      "passed": 112,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 112,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "legacy": {
+    "fixtures": 262,
+    "presets": [
+      "ns-one",
+      "tonal",
+      "macos-27"
+    ],
+    "schemes": 2,
+    "errors": []
+  },
+  "browser": {
+    "fixtures": 60,
+    "measurements": 688,
+    "errors": [],
+    "runs": [
+      {
+        "fixtures": 58,
+        "measurements": 670,
+        "errors": []
+      },
+      {
+        "fixtures": 2,
+        "measurements": 18,
+        "errors": []
+      }
+    ]
+  },
+  "quality": {
+    "command": "deno task quality:gate",
+    "exitCode": 0
+  }
+}

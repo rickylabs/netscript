@@ -33,13 +33,16 @@ Deno.test('Avatar honors explicit initials, agent, size, and presence', () => {
   );
   assertEquals(p['data-size'], 'lg');
   assertEquals(p['data-content'], 'agent');
-  const kids = p.children as Array<unknown>;
-  assert(render(Avatar({ name: 'VIF Agent', initials: 'AI', agent: true })).includes('>AI</span>'));
-  const dot = kids[1] as VNodeLike;
-  assert(dot && typeof dot === 'object', 'presence dot vnode');
-  const dotJson = JSON.stringify(dot);
-  assert(dotJson.includes('ns-avatar__presence'), 'presence dot class');
-  assert(dotJson.includes('online'), 'presence state value present');
+  // Inspect rendered parts: optional image/fallback children need not occupy fixed VNode slots.
+  for (const src of [undefined, 'avatar.png']) {
+    const html = render(
+      Avatar({ name: 'VIF Agent', initials: 'AI', agent: true, presence: 'online', src }),
+    );
+    assert(html.includes('>AI</span>'), 'explicit initials');
+    assert(html.includes('class="ns-avatar__presence"'), 'presence dot class');
+    assert(html.includes('data-part="presence"'), 'presence part');
+    assert(html.includes('data-presence="online"'), 'presence state');
+  }
 });
 
 Deno.test('Avatar single-word name yields two letters', () => {

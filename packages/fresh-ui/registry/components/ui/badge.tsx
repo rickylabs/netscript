@@ -15,6 +15,7 @@ import type { Renderable } from '../../lib/public-types.ts';
 export type BadgeVariant =
   | 'primary'
   | 'secondary'
+  | 'info'
   | 'success'
   | 'warning'
   | 'destructive'
@@ -41,6 +42,7 @@ export function Badge(
       data-scope='badge'
       data-emphasis='subtle'
     >
+      <span class='ns-badge__dot' data-part='dot' data-scope='badge' aria-hidden='true' />
       <span data-part='label' data-scope='badge'>{children}</span>
     </span>
   );

@@ -1,0 +1,218 @@
+{
+  "baselineHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+  "reviewRound": 2,
+  "sourcePaths": 118,
+  "correction": "ResourceIsland asset now receives shared success return and semantic QueryResult from canonical renderResourceSlice variables. Browser compiles complete canonical PeopleIsland plus loader, with real query hooks and controlled query port.",
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "gates": {
+    "quality-gate": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+      "durationMs": 19312,
+      "receiptSha256": "ccaa838a71bf7d622086a46073ebf79d64172106a069ed3057da97aecc88ab4a"
+    },
+    "docs-accuracy": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+      "durationMs": 10003,
+      "receiptSha256": "00e01228c4b6d5bde486660cee2fbc17c0f08474d9722d88c7d40d9736a75034"
+    },
+    "browser": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+      "durationMs": 168811,
+      "receiptSha256": "2e1d6e1ea491c860a96ea6293d2726a193e35494c3e274f19398af9cdf7113c9"
+    },
+    "check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 8,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 10,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 10,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "browser-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "installed-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "final-test-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "final-test-lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "final-test-fmt": {
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "focused-tests": {
+      "summary": {
+        "passed": 41,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 41,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0,
+      "durationMs": 7674
+    },
+    "focused": {
+      "stats": {
+        "startTime": "2026-10-31T13:25:08.427Z",
+        "duration": 35429.170999999995,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "4f559914baba6bc31a188040b4f338672474bf87bbbc3e7c581991aeaf0a4bf9"
+    },
+    "old-selector": {
+      "stats": {
+        "startTime": "2026-10-31T13:27:13.510Z",
+        "duration": 35438.448,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 8,
+        "flaky": 0
+      },
+      "reportSha256": "6109095434342297f4a601cb9d550ea2e58a109ddf6af82c0fa0f5172a12546d"
+    },
+    "missing-resource-marker": {
+      "stats": {
+        "startTime": "2026-10-31T13:27:49.659Z",
+        "duration": 36787.863000000005,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "reportSha256": "1fe727e8498ab1b0c3ffb89ab0da87160afe8c82e44939a88654eeccbbcb1b91"
+    },
+    "browser-full": {
+      "stats": {
+        "startTime": "2026-10-31T13:29:16.622Z",
+        "duration": 167956.315,
+        "expected": 44,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "8fa7a26d13ae3c6451f110990e5200e154576f426067c5c680f8d96c26388a19"
+    }
+  },
+  "negativeControls": [
+    {
+      "mutation": "Shared probe selector main output",
+      "exitCode": 1,
+      "expectedFailures": 8,
+      "expectedPasses": 0
+    },
+    {
+      "mutation": "Actual renderResourceSlice supplies unmarked success return only for resource",
+      "exitCode": 1,
+      "expectedFailures": 4,
+      "expectedPasses": 4,
+      "result": "Only resource cases fail; page cases stay green."
+    }
+  ],
+  "restoration": "Both mutations restored in finally before passing full44-case replay.",
+  "goldens": "Only the four OrdersIsland hashes changed; measured old-golden red, updated hash, all variants pass.",
+  "carriers": "All four regenerated; embedded resource asset updated and all freshness checks pass.",
+  "releasePreflight": {
+    "exitCode": 0
+  },
+  "runtime": "Requires new full CI at next head; prior runtime failures and local Docker/Aspire unavailability remain disclosed. No READY."
+}

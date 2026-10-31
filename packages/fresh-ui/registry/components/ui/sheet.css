@@ -139,3 +139,41 @@ dialog[data-part='content'][data-side='bottom']::before {
     animation-duration: 0.01ms;
   }
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='sheet'][data-part='content'] {
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-surface-raised);
+  box-shadow: none;
+  border-color: var(--ns-border);
+  z-index: var(--ns-z-overlay);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='sheet'][data-part='content']::backdrop {
+  background: var(--ns-overlay);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='sheet'][data-part='title'] {
+  font-family: var(--ns-font-heading);
+  font-size: var(--ns-text-heading);
+  font-weight: var(--ns-weight-heading);
+  line-height: var(--ns-leading-heading);
+  letter-spacing: var(--ns-tracking-heading);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='sheet'][data-part='description'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-small);
+  font-weight: var(--ns-weight-small);
+  line-height: var(--ns-leading-small);
+  letter-spacing: var(--ns-tracking-small);
+  color: var(--ns-muted-fg);
+}
+
+/* Native overlay controls share the locked Utility keyboard ring. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='sheet']:is([data-part='trigger'], [data-part='close']):focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}

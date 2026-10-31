@@ -69,7 +69,8 @@ export const data_display_1: readonly ComponentContract[] = [
       },
       {
         'name': 'initials',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when':
+          'always emitted for non-agent avatars; Utility shows initials even when src is supplied',
       },
       {
         'name': 'agent-icon',
@@ -169,7 +170,7 @@ export const data_display_1: readonly ComponentContract[] = [
       },
       {
         'name': 'dot',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'decorative status marker, visible in Studio Utility',
       },
       {
         'name': 'icon',
@@ -193,9 +194,6 @@ export const data_display_1: readonly ComponentContract[] = [
           'destructive',
           'info',
           'muted',
-        ],
-        'plannedValues': [
-          'info',
         ],
       },
       'data-emphasis': {

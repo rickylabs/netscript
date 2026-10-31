@@ -39,3 +39,12 @@
     animation-duration: 1.5s;
   }
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='spinner'][data-part='root'] {
+  color: var(--ns-marker);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-state='loading'] [data-scope='spinner'][data-part='root'] {
+  color: inherit;
+}

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "capturedAt": "2026-10-31T07:16:19.563Z",
-  "sourceHead": "082b3bb6e184ff70884af747a9505bbae8094745",
+  "capturedAt": "2026-10-31T09:12:02.151Z",
+  "sourceHead": "e501f41852ec24c48a24e140cd02b561fb8ca864",
   "engine": {
     "name": "axe-core",
     "version": "4.11.4"
   },
   "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
-  "review": "S1c contrast burn-down: remove exactly 12 proven stale color-contrast allowances after the #2506 value pass, owned NS One fill corrections and destructive-text consumer repair. Complete 12-case Chromium/axe matrix uses the same engine and browser. No new, increased or changed remaining allowance; Utility previews retain zero allowances. See .llm/runs/orch-divybot-6540311622--s1c/browser-baseline-diff.json.",
+  "review": "S6a scaffold-default migration: 20 complete Chromium/axe cases. Explicit NS One token/component previews exactly retain their previous route findings. Studio Utility default routes remove 172 stale contrast allowances; the components gallery retains only the same three DesktopTrayMenu semantics findings per case. No new or increased rule/target/count and no new contrast allowance. Independent review and full passing replay required; see .llm/runs/orch-divybot-6539987333--s6a/ci-repair-review.md.",
   "debt": {
     "color-contrast": "Existing theme/gallery contrast: tokens v2 in design-system epic #2412.",
     "aria-required-children": "Existing DesktopTrayMenu semantics: design-system component slice in epic #2412.",
     "listitem": "Existing DesktopTrayMenu list roles: design-system component slice in epic #2412."
   },
   "cases": {
-    "/design/components|dark-1280": {
+    "/design/components?preset=ns-one|dark-1280": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(1) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -28,7 +28,7 @@
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
     },
-    "/design/components|dark-390": {
+    "/design/components?preset=ns-one|dark-390": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-data-table__row.grid-cols-\\\\[minmax\\\\(0\\\\,1fr\\\\)_auto_auto\\\\].items-center:nth-child(1) > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -40,7 +40,7 @@
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
     },
-    "/design/components|light-1280": {
+    "/design/components?preset=ns-one|light-1280": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-cluster--md > .ns-badge[data-variant=\\\"primary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -115,7 +115,7 @@
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
     },
-    "/design/components|light-390": {
+    "/design/components?preset=ns-one|light-390": {
       "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-card__header[data-scope=\\\"card\\\"][data-part=\\\"header\\\"] > .ns-badge[data-variant=\\\"success\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\".ns-cluster--md > .ns-badge[data-variant=\\\"primary\\\"][data-emphasis=\\\"subtle\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
@@ -187,23 +187,39 @@
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
       "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
     },
-    "/design/tokens?preset=studio-utility|dark-1280": {},
-    "/design/tokens?preset=studio-utility|dark-390": {},
-    "/design/tokens?preset=studio-utility|light-1280": {},
-    "/design/tokens?preset=studio-utility|light-390": {},
-    "/design/tokens|dark-1280": {
+    "/design/components|dark-1280": {
+      "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
+    },
+    "/design/components|dark-390": {
+      "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
+    },
+    "/design/components|light-1280": {
+      "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
+    },
+    "/design/components|light-390": {
+      "[\"aria-required-children\",\"critical\",[\".ns-desktop-tray-menu > ul\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"role-item\\\"]\"]]": 1,
+      "[\"listitem\",\"serious\",[\"li[data-part=\\\"submenu\\\"]\"]]": 1
+    },
+    "/design/tokens?preset=ns-one|dark-1280": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"div:nth-child(1) > .ns-dashboard__nav-group[data-part=\\\"nav-group\\\"][role=\\\"list\\\"] > .ns-dashboard__nav-group-label[data-part=\\\"nav-group-label\\\"][data-scope=\\\"sidebar\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"div:nth-child(2) > .ns-dashboard__nav-group[data-part=\\\"nav-group\\\"][role=\\\"list\\\"] > .ns-dashboard__nav-group-label[data-part=\\\"nav-group-label\\\"][data-scope=\\\"sidebar\\\"]\"]]": 1
     },
-    "/design/tokens|dark-390": {
+    "/design/tokens?preset=ns-one|dark-390": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1
     },
-    "/design/tokens|light-1280": {
+    "/design/tokens?preset=ns-one|light-1280": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1,
@@ -212,11 +228,19 @@
       "[\"color-contrast\",\"serious\",[\"span[data-variant=\\\"primary\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"span[data-variant=\\\"secondary\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1
     },
-    "/design/tokens|light-390": {
+    "/design/tokens?preset=ns-one|light-390": {
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-destructive)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-secondary)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"button[data-token-copy=\\\"var(--ns-success)\\\"] > code\"]]": 1,
       "[\"color-contrast\",\"serious\",[\"span[data-variant=\\\"primary\\\"] > span[data-part=\\\"label\\\"][data-scope=\\\"badge\\\"]\"]]": 1
-    }
+    },
+    "/design/tokens?preset=studio-utility|dark-1280": {},
+    "/design/tokens?preset=studio-utility|dark-390": {},
+    "/design/tokens?preset=studio-utility|light-1280": {},
+    "/design/tokens?preset=studio-utility|light-390": {},
+    "/design/tokens|dark-1280": {},
+    "/design/tokens|dark-390": {},
+    "/design/tokens|light-1280": {},
+    "/design/tokens|light-390": {}
   }
 }

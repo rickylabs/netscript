@@ -47,7 +47,8 @@ async function renderCopiedProse(): Promise<string> {
       join(repo, 'packages/fresh-ui'),
       '--force',
     ]);
-    const markdown = '# Heading\n\nParagraph with **strong**, `code` and [link](/example).';
+    const markdown =
+      '# Heading\n\nParagraph with **strong**, `code` and [link](/example).\n\n```ts\nconst greeting = "hello"; // note\nconst count = 42;\n```';
     const source =
       "import {render} from 'preact-render-to-string'; import {Markdown} from './components/ui/markdown.tsx'; console.log(render(Markdown(" +
       JSON.stringify({ children: markdown }) + ')));';

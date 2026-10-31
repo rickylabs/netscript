@@ -6,6 +6,10 @@ import type {
   ResourceSlicePlannedLeaf,
   ResourceSliceVariant,
 } from './resource-slice-contract.ts';
+import {
+  QUERY_RESULT_SUCCESS_RETURN,
+  QUERY_RESULT_TEMPLATE,
+} from '../ui/page/query-result-template.ts';
 import { markOwnedResourceSliceLeaf } from './resource-slice-contract.ts';
 
 type ResourceSliceTemplateName =
@@ -113,6 +117,8 @@ function renderVariables(
   const partialName = `${input.resource}-summary`;
   const partialRoute = `/partials/${input.routeSegments.join('/')}/summary`;
   return {
+    queryResultReturn: QUERY_RESULT_SUCCESS_RETURN,
+    queryResultTemplate: QUERY_RESULT_TEMPLATE.trim(),
     resource: input.resource,
     resourceCamelCase: input.resourceCamelCase,
     resourcePascalCase: input.resourcePascalCase,

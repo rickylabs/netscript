@@ -1,0 +1,162 @@
+{
+  "baselineHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+  "failedRuntimeRun": "https://github.com/rickylabs/netscript/actions/runs/41203089082",
+  "failure": "Both runtime tiers timed out at main output despite queryClientFound/listQueryFound true. PostgreSQL108pass/1fail; SQLite101pass/1fail; both cleanup.aspire-stop gates passed.",
+  "contract": "Only successful QueryResult has data-query-result; query client and users.list requirements remain.",
+  "sourcePaths": 114,
+  "gates": {
+    "quality-gate": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+      "durationMs": 21593,
+      "receiptSha256": "1295ed86ab227b7011e8900ecae80e70cfcb4258fe43829092e5123cba214d59"
+    },
+    "docs-accuracy": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+      "durationMs": 8549,
+      "receiptSha256": "993a96c43cc8ad034a0e06068244bd946129a89f24c68f8d8542a98c513b6375"
+    },
+    "browser": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "7b847c319a20448d94b648587ca3976b5ab3e60c",
+      "durationMs": 154045,
+      "receiptSha256": "01d6c2ac3d9e5d038ced9f1c1e254366c08681c0177decabfc0d3c57a199ed37"
+    },
+    "check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 5,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 7,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 7,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "browser-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "installed-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "focused-tests": {
+      "summary": {
+        "passed": 32,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 32,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0,
+      "durationMs": 4925
+    },
+    "browser-focused": {
+      "stats": {
+        "startTime": "2026-10-31T13:11:48.096Z",
+        "duration": 24049.717,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "6fd53c2c250640558e1cede0cd0e51f5be5d06bdbe2f93939b64982c192e0edf"
+    },
+    "browser-negative": {
+      "stats": {
+        "startTime": "2026-10-31T13:12:37.829Z",
+        "duration": 28446.464,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "reportSha256": "f25870ca4fb895138971785313a9e9ff2c134e28bcdc3b035cbac2ffcedc80db"
+    },
+    "browser-full": {
+      "stats": {
+        "startTime": "2026-10-31T13:13:48.859Z",
+        "duration": 153167.992,
+        "expected": 40,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "60fff3bdd93aeb35f0bf9a9cba29564285edade232a049a8ff3251cd1c8f0f8d"
+    }
+  },
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "negativeControl": {
+    "exitCode": 1,
+    "failures": 4,
+    "mutation": "Actual shared observation selector changed to main output, restored in finally.",
+    "assertion": "All four cases expected freshIslandElement div but received null; real query client and list query remain present."
+  },
+  "releasePreflight": {
+    "exitCode": 0
+  },
+  "carriers": "All four regenerated; freshness passes.",
+  "runtime": "Previous full CI runtime failed and does not count as proof. Local Docker/Aspire unavailable; require a new full CI run after push. No READY yet."
+}

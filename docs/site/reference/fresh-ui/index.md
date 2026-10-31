@@ -472,7 +472,7 @@ build engine.
 The builder covers all 24 presets, both schemes and both requested densities. Theme set routes
 A to Theme and B to Theme B. Bloom, Cupertino, Liquid and Terminal each select their own
 Theme B mode; `macos-27`, `apple-classic` and `fluent-2-web` resolve the faithful modes. Each preset fixes its
-effective geometry. NS One remains the default; Studio Utility is available as an additional preset.
+effective geometry. Studio Utility is the default for new applications; NS One remains selectable as a legacy preset.
 An app override applies last and can only reassign semantic roles to typed aliases. Unknown roles,
 type mismatches, raw semantic values and reference cycles fail before output is returned.
 

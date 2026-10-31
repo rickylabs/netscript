@@ -5299,7 +5299,7 @@
         },
         {
           "name": "initials",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "always emitted for non-agent avatars; Utility shows initials even when src is supplied"
         },
         {
           "name": "agent-icon",
@@ -5399,7 +5399,7 @@
         },
         {
           "name": "dot",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "decorative status marker, visible in Studio Utility"
         },
         {
           "name": "icon",
@@ -5423,9 +5423,6 @@
             "destructive",
             "info",
             "muted"
-          ],
-          "plannedValues": [
-            "info"
           ]
         },
         "data-emphasis": {
@@ -6634,6 +6631,18 @@
         }
       ],
       "attributes": {
+        "data-series": {
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "parts": [
+            "bar"
+          ]
+        },
         "data-variant": {
           "values": [
             "bar",
@@ -6660,7 +6669,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "data-series is emitted only for automatic palette entries; explicit tone keeps semantic intent."
       ]
     },
     {
@@ -6736,6 +6746,19 @@
         }
       ],
       "attributes": {
+        "data-series": {
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "parts": [
+            "ring",
+            "swatch"
+          ]
+        },
         "data-segments": {
           "values": [
             "2",
@@ -6765,7 +6788,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "data-series is emitted only for automatic palette entries; explicit tone keeps semantic intent."
       ]
     },
     {

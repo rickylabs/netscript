@@ -11,6 +11,8 @@ export interface NavigationItem {
   readonly label: string;
   /** `prefix` keeps the link current on nested pages such as `/examples/crud`. */
   readonly match: NavigationMatch;
+  /** Development reference routes are excluded from production builds. */
+  readonly developmentOnly?: boolean;
 }
 
 /**
@@ -22,7 +24,7 @@ export const appNavigation: readonly NavigationItem[] = [
   { href: appRoutes.dashboard.href(), label: 'Dashboard', match: 'exact' },
   { href: appRoutes.examples.href(), label: 'Examples', match: 'prefix' },
   { href: appRoutes.health.href(), label: 'Health', match: 'exact' },
-  { href: appRoutes.design.href(), label: 'Design', match: 'prefix' },
+  { href: appRoutes.design.href(), label: 'Design', match: 'prefix', developmentOnly: true },
 ];
 
 /**

@@ -1,0 +1,101 @@
+{
+  "ours": "0202367e1f44013d7e7842dbfc0ee02c98e00209",
+  "main": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+  "sourcePaths": 120,
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "carriers": {
+    "gen:agent-docs-prose": 0,
+    "gen:mcp-export-corpus": 0,
+    "gen:assets-barrel": 0,
+    "gen:publish-assets": 0
+  },
+  "releasePreflightExitCode": 0,
+  "productionBuildExitCode": 0,
+  "scoped": {
+    "check": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "lint": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "fmt": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "installed-check": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "cli-tests": {
+      "passed": 37,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 37,
+      "uniqueFailures": 0
+    }
+  },
+  "gates": {
+    "quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "0202367e1f44013d7e7842dbfc0ee02c98e00209",
+      "durationMs": 13926
+    },
+    "docs": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "0202367e1f44013d7e7842dbfc0ee02c98e00209",
+      "durationMs": 7568
+    },
+    "browser": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "0202367e1f44013d7e7842dbfc0ee02c98e00209",
+      "durationMs": 121637
+    }
+  },
+  "packageTests": "335 PASS at badge head; all packages/fresh-ui source and tests byte-identical after this main merge. New CI will rerun package gates.",
+  "runtime": "Requires new exact-head CI. Badge head0202367 fullPostgreSQL122/fullSQLite115 passed with cleanup; historical evidence only for the new merge.",
+  "browser": {
+    "startTime": "2026-10-31T14:23:53.861Z",
+    "duration": 120998.848,
+    "expected": 52,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "docsCarrier": {
+    "documents": 209,
+    "changedRelativeToMain": [
+      "pages/reference/fresh-ui/index.md",
+      "pages/web-layer/how-to/customize-fresh-ui/index.md"
+    ],
+    "reason": "Retain reviewed Utility-default docs under the new main MCP carrier ownership; legacy CLI prose carrier removed by canonical generator."
+  }
+}
