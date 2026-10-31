@@ -81,7 +81,7 @@
   "qualityArchitecture": {
     "verdict": "PASS",
     "exitCode": 0,
-    "scope": "Working-tree gate after native anchoring; committed-source refresh follows"
+    "sourceCommit": "f08cafb756208ab444aa2d815dd1af9b55f20210"
   },
   "preflight": "PASS",
   "docsAccuracy": "PASS",
@@ -95,14 +95,39 @@
     "verdict": "PASS",
     "exitCode": 0,
     "slowTypes": 0,
-    "scope": "Initial member publication; committed-source refresh follows"
+    "sourceCommit": "f08cafb756208ab444aa2d815dd1af9b55f20210"
   },
   "publicationAudit": "slice10b-publication-audit.json",
   "negativeRegressionEvidence": "slice10b-negative.json",
   "independentDesignReviews": "PASS_INITIAL_RESET_AND_NATIVE_ANCHORING",
   "independentSourceReview": "PASS",
-  "independentEvidenceReview": "PENDING",
-  "carriers": "PENDING_AFTER_SOURCE_COMMIT",
+  "independentEvidenceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
   "inventory": {
     "total": 104,
     "shipped": 96,
@@ -117,5 +142,7 @@
   "runtime": "NEW_HEAD_UNPROVEN",
   "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
   "wholePhase2b": "IN_PROGRESS",
-  "ready": false
+  "ready": false,
+  "sourceCommit": "f08cafb756208ab444aa2d815dd1af9b55f20210",
+  "generatedCarriersAfterSource": []
 }
