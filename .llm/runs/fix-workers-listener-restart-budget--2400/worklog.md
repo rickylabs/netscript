@@ -1,0 +1,227 @@
+# Worklog
+
+## Design
+
+1. Public surface: WorkerOptions.listenerHealthyResetMs default60000; WorkerHealthStatus.listeners failureCause with safe fixed child incident message; existing max restarts Infinity documented. No new package entrypoint.
+2. Vocabulary: healthy running window, restartBudgetUsed (current burst), preserved cumulative restartCount (shared monitor), safe failure cause store-write-refused/connection-unavailable/listener-error.
+3. Ports: existing now/sleep/AbortSignal/run/onFailure seams, MessageQueue and core ChildHealthMonitor; no new port. Integration test real DenoKV and RedisAdapter.
+4. Constants: healthy default60000; existing defaults3,100,5000 remain authoritative at construction; finite failure categories and fixed redacted messages. No magic success timer.
+5. Commit slices: bootstrap/run artifacts; one bounded implementation+tests/docs slice proven by specified gates; CI repairs only when justified.
+6. Deferred: #2144 dispatcher/execution, queue adapter behavior, shared resource configuration, broader existing doctrine/doc debt and unrelated tracker cells.
+7. Contributor path: read worker/listener-supervisor.ts and adjacent tests; options flow from worker-options.ts to worker.ts and queue-consumer.ts; tuning guide explains public use.
+
+## Routing
+
+Native `deno task agentic:matrix --tier feature --json` inspected. Owner/coordinator brief override: “Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only.” Uses repo-native claude-print launcher, not ad-hoc agent launch. Codex generator and Claude evaluator differ in session/vendor. Exact private session handle retained outside public checkout. Feature max2 plan/max5 impl, same evaluator across rounds. No profiles/ read.
+
+## Bootstrap
+
+Current main rebaseline and #2400 issue/ownership checked. New worktree follows project layout after correcting git shim redirection. No source change before PLAN-EVAL. Baseline existing supervisor/options tests6 PASS. Baseline doc lint has2 preexisting private-type-ref findings in core workers contract, /worker clean. JSR audit no FAIL. PLAN-EVAL round1 FAIL_PLAN: preserve published restartCount semantics and name concrete integration/HTTP health assertions. Plan repaired before any production code; separate restartBudgetUsed chosen. Same evaluator round2 next.
+
+PLAN2 PASS before implementation, same independent Opus5.5/high evaluator. Published counter semantics preserved; resettable field additive. Baseline full quality/architecture gate PASS; baseline full workers doc lint FAIL2 inherited core contract private-type-ref, /worker0 findings. Private Redis7 server ready, no shared daemon mutation.
+
+## Implementation and gate evidence
+
+Implemented the additive window and resettable restartBudgetUsed. restartCount stays cumulative in listener and aggregate health; backoff is per burst and overflow-safe for indefinite zero-delay retries. Error/cause classification emits fixed strings into actual childHealth.lastFatalError, with legacy raw local diagnostics explicitly documented. All jobs/tasks/triggers receive the window. Worker validates it before allocating runner resources.
+
+Structured gate results (working tree before sign-off; private receipts attest their command/head22d1531, not a clean committed source hash):
+
+| Gate | Result |
+| --- | --- |
+| Worker/runtime/public tests, Redis enabled | PASS72, failed0, ignored0, frozen |
+| Focused listener tests | PASS19, including actual RedisACL and local DenoKV |
+| Old never-reset negative control, real stores | FAIL2 expected: both exhausted the budget before recovery; no skips; source restored in finally |
+| Typecheck whole workers plugin | PASS124 files,2 batches |
+| Changed TypeScript lint/fmt | PASS8 files |
+| Full quality:gate (quality + arch + deps) | PASS, durable private receipt |
+| Catalog-materialized workers publish dry-run | PASS |
+| Full workers doc lint | FAIL2 unchanged inherited core contract private-type-ref; /worker0 both baseline/current |
+| JSR audit | No FAIL; preexisting cardinality/banner warning |
+
+The private Redis7 server is run-owned, no shared Docker daemon. ACL tests modify only a new random test user and queue keys, process real messages between each refusal, and clean them up. Tests also prove all three listener families expose fixed category messages on the Worker childHealth/onStarted surface; cumulative totals remain4 after budget0; a shorter100ms test reset cannot clear shared crash-loop health early. A fake performance.now stub is explicitly checked in the Worker tests.
+
+An initial typecheck caught a test import-map mismatch; using the already recorded npm:ioredis@^5.11.1 selector repaired it without dependency/lock changes. The sole extra exact selector introduced experimentally was removed; retained root lock bytes match baseline. No dispatcher/job-execution edits. Next independent slice review before sign-off commit, then push/CI/final exact-head review.
+
+## Slice1 signoff and reconcile
+
+Independent Opus5.5/high IMPL1 PASS precommit (evaluate.md), same session as PLAN2. Reviewer independently ran18 tests with Redis intentionally unset and1ignored; real Redis/negative receipts were inspected, not claimed independently rerun. Signed off for source commit. Reconciled issue2400 ownership and PR2482 comments: no competing leaf or findings. PR2481 shares worker option/composition files but remains open; no dispatcher/execution edits made here. Existing inline test selector already follows package tests’ recorded npm version and leaves lock unchanged; optional import-map consolidation is deferred, not a new dependency. Sleep failure local diagnostic now records its actual sleep error as documented; HTTP category always safe. Adds2 colocated test files to existing folder cardinality warning, no new runtime concern/folder.
+
+## Resume and current-main reconciliation (2026-10-31)
+
+Adopted PR #2482 at 048bad37987ea86ee2fd67494c9ca96a04bcfcf4.
+Main baseline is f89260ac9. The shallow checkout initially lacked a shared ancestor;
+fetching deeper history restored the genuine merge base. Current main was merged,
+retaining retryClock alongside listenerHealthyResetMs in the single options conflict.
+Dispatcher/execution files match main byte-for-byte. No new design or acceptance
+scope; PLAN2 PASS remains the pre-implementation plan authority.
+
+Inspected `deno task agentic:matrix -- --tier feature --json`. Owner override,
+verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate
+session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed,
+blockers only.” The existing evaluator session will be resumed through claude-print.
+The feature matrix retains max2 plan/max5 implementation rounds; this continuation
+uses implementation round2 after the precommit round1 PASS.
+
+Read-only leak check: unrelated/unknown-owner Aspire processes left untouched;
+Docker unavailable. No shared resource mutation. Isolated Redis proof is next.
+
+Resumed positive suite after adapting Lua fault injection:111 PASS,0 FAIL,6 ignored
+(conditional backend/CI-only coverage); both real-store #2400 cases execute. Reset
+negative control now gives explicit budget-exhaustion assertions for both stores,
+and the fake-clock spaced case fails on the cumulative count assertion. Burst
+failures, capped backoff/Infinity, shutdown and credential-safe health remain green.
+Typecheck136 and changed-source lint/fmt9 pass after the typed error addition;
+quality/arch/deps passes again. Workers publish dry-run passes. Full doclint still
+has the identical2 inherited private-type refs, changed /worker0; JSR audit has
+no FAIL, only existing cardinality/banner warnings.
+
+Independent round2 review accepted merge coexistence and required sanitizing the
+newly generated leak report before staging. Raw diagnostics were copied privately;
+the run file now has only a safe ownership summary. The reviewer did not independently
+prove real Redis; its early acceptance of receipts preceded the discovered obsolete
+ACL fault injection. That proof has since been repaired and rerun as described above.
+Round3 reviews the final source repairs and generated freshness before commit.
+
+Generated prose and export carriers refreshed through native tasks. Export generator
+used its supported --allow-dirty preview because the main merge and reviewed source
+repairs were pending. Their actual paths are in supervisor.md. No handcrafted payload.
+Review thread4429709762 answered with the QueueError contract fix and regression proof.
+Protected source files and deno.lock still match main. No labels/milestones changed.
+
+Prose freshness, MCP export freshness, docs:accuracy, and repaired workers publish
+all PASS via allowlisted durable runners. Generated corpus comparison to main changes
+only plugin-workers /runtime and /worker rows; no unrelated package rows changed.
+Review-thread gate PASS:1 answered,0 unanswered. Run privacy scan found no operator
+paths, live host addresses or session identities. All source/proof fixes are ready
+for the retained evaluator's round3 signoff.
+
+## Resumed slice signoff and reconcile
+
+Retained separate Opus5.5/high evaluator round3 PASS, substantive findings in
+evaluate.md. It independently passed the export-corpus check and a structured
+74PASS/0FAIL/17ignored worker-only suite without Redis; real-store proof remains
+supervisor-run receipts, not falsely claimed independent reproduction. Prose
+freshness already passed the supervisor's durable runner. Supervisor signs off
+this merge plus bounded fixes for commit/push. Final exact-head evaluation will
+be posted on PR2482 so no later evidence-only commit invalidates its reviewed SHA.
+
+Reconcile: #2400 still open, PR2482 adopted, review4429709762 answered. Original
+PLAN2 PASS retained, no duplicated PR or issue, no label/milestone changes.
+Coordinator owns shared E2E and merge. After commit, run the corpus regression
+that clones committed HEAD, then final review and READY handoff; any pending CI
+or shared E2E remains explicitly unproven. No new architectural debt.
+
+## R2 routing, design and resume
+
+Feature matrix queried via `deno task agentic:matrix --tier feature --json`.
+Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after,
+both in a separate session with claude -p --model claude-opus-5-5 --effort high,
+read-only, stdin closed, blockers only.” Rationale: owner requests final merge-delta
+review with the existing independent evaluator; generator and evaluator remain
+separate sessions and vendor families. Original PLAN2 PASS remains intact; R2 asks
+for confirmation of the bounded integration plan before source changes.
+
+Seven design items above remain authoritative: no new public surface, vocabulary,
+ports or constants; one merge compatibility slice, files/gates in plan.md; unrelated
+work deferred; contributor entry remains listener-supervisor.ts. Native MCP guidance
+and literal docs search consulted; no healthy-window docs match was returned.
+Memory consulted before source/build work, including native carrier and Lua ACL
+proof recipes. RTK absent; focused raw reads and structured wrappers are used.
+
+## R2 merged-tree gate evidence
+
+PLAN confirmation PASS before source changes (`r2-plan-eval.md`). Merged main592a446af
+without rebasing. Only authored conflict was adjacent guide sections; retained both
+listener recovery and Redis concurrency/polling/drain guidance. Both carriers were
+recreated through gen:agent-docs-prose and gen:mcp-export-corpus --allow-dirty.
+Supervisor/options/queue-consumer remain identical to previous reviewed PR head;
+Redis adapter, dispatcher/execution and root lock match merged main exactly.
+
+Workers111 PASS/0FAIL/6conditional ignores, with both #2400 real stores executed.
+Reset-negative real stores2 FAIL on explicit budget-exhaustion assertions;
+fake-clock negative1 FAIL on count assertion; restored source verified byte-identical.
+Redis concurrency regressions8 PASS/0FAIL/6Garnet-conditional ignores; executed real
+Redis admission, backpressure, slow sibling, drain, abort and optional env cases.
+Structured check136PASS, carrier check2PASS, changed-source lint/fmt8PASS. Full
+quality/architecture/dependency gate, docs accuracy, prose/export freshness PASS0.
+Catalog-materialized workers publish dry-run PASS0. Workers doclint exit1 with2
+unchanged core private-type-ref diagnostics; /worker clean. JSR no FAIL, inherited
+cardinality/banner warnings. Thread gate PASS1answered/0unanswered.
+
+Two invocation mistakes are not gate results: passing --unstable-kv to check wrapper
+(default already enables it) rejected the invocation; rerun without the flag passed.
+Passing --allow-dirty to export --check rejected the invocation; only writing accepts
+that flag. The ordinary check then passed. No suppressions or gate weakening.
+Read r2-gate-summary.json for sanitized summaries; private receipts record the
+premerge immutable HEAD and therefore do not certify a clean final commit.
+
+Native generated-carrier consumer/regression suite:11PASS/0FAIL/0ignored before
+commit. Exact committed-HEAD export generator regressions run after commit because
+those tests deliberately clone HEAD. They cannot certify uncommitted source.
+
+## R2 independent signoff and reconciliation
+
+Retained separate Opus5.5/high evaluator: precommit PASS (`r2-evaluate.md`). It
+independently ran worker tests74PASS/0FAIL/17Redis-or-Garnet skips and corpus --check0;
+accepted explicitly identified private real-store/static receipts without claiming
+it executed them. Required staging regenerated prose/run files before commit;
+completed and staged/working copies reconciled. Source families, dispatcher/execution,
+queue and lock ownership verified. No new blockers, debt, labels or milestones.
+Native carrier regressions11PASS/0FAIL/0ignored. Current issue has no acceptance
+checkboxes; READY must map owner-required proofs without changing issue scope.
+The main-carried historical run has3 trailing-whitespace lines in its existing
+plan-eval.md; no authored whitespace finding, no unrelated artifact cleanup.
+Next exact pushed-head verdict and committed-HEAD regression are PR comments to
+avoid a trailing commit moving the reviewed implementation.
+
+## R3 routing and design checkpoint
+
+Queried feature matrix using `deno task agentic:matrix --tier feature --json`.
+Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after,
+both in a separate session with claude -p --model claude-opus-5-5 --effort high,
+read-only, stdin closed, blockers only.” Different session/vendor from Codex;
+feature max2 PLAN/max5 IMPL, same session retained across rounds within each phase.
+RTK absent; use focused raw reads and repository structured wrappers.
+Seven design items: (1) existing public worker options/health only; (2) existing
+healthy window, burst budget, cumulative count and safe cause vocabulary;
+(3) existing clock/queue/signal seams; (4) no new constants;
+(5) one merge/docs/generated-assets slice on supervisor.md declared surface, gates
+in R3 plan; (6) runtime redesign and local shared E2E deferred per owner;
+(7) contributor entry listener-supervisor.ts and tuning guide unchanged.
+No source edits before independent R3 plan evaluation.
+
+## R3 merged tree gates and reconciliation
+
+Independent plan PASS in r3-plan-eval.md before merge. Main f683946 merged without
+rewriting history; only generated prose conflicted. Read full combined tuning page:
+process layout/single scheduler ownership and restart recovery sections coexist,
+with no duplicated or contradictory guidance. Regenerated via all three canonical
+tasks in order; publish/export outputs already matched the correct auto-merged
+state, and prose was staged after regeneration. Sidecars and policy stayed stable.
+
+Focused listener tests21 PASS/0 FAIL/0 ignored with real Redis; private owned process
+stopped in finally. Deno KV persisted recovery and actual Redis ACL refusal recovery
+both executed. Structured workers check136 files PASS; explicit eight-file lint/fmt
+PASS. Full quality/architecture/dependency gate, docs accuracy and prose/publish/
+export freshness PASS with durable receipts. Carrier bundle3 and MCP consumer8 tests
+PASS, zero ignores. Review threads1 answered/0 unanswered. r3-gate-summary.json
+preserves safe totals and raw-report hashes; raw receipts identify premerge HEAD
+and pending merge tree, not the future clean commit. Existing R2 reset-revert
+controls still apply because worker runtime/tests are byte-identical to dfa2502be.
+Queue/dispatcher/execution/locks match main. No new debt or public surface.
+
+Reconcile: existing PR2482 remains ready, issue2400 open and reference-only;
+main still f683946 at gate completion. No competing work or unanswered threads.
+Next independent precommit signoff, merge commit/push, committed corpus regression,
+exact-pushed-head review and READY via the assignment report file. No local E2E,
+labels/milestones, merge/tag/release. Coordinator owns both exact-head runtime gates.
+
+## R3 slice signoff
+
+Retained independent Opus5.5/high evaluator gives PASS in r3-evaluate.md.
+Reviewer compares staged tree to read-only trial merge, verifies all protected files
+and locks, decodes prose row and reads the whole guide; independently reruns publish
+and export freshness checks. Test execution remains supervisor-run receipts, clearly
+identified. Supervisor signs off the merge commit after this substantive review.
+Final exact pushed-head IMPL-EVAL will be posted on the PR; no later evidence-only
+commit is intended. All source and run evidence staged after final regeneration.
