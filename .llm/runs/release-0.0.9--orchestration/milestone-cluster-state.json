@@ -151,7 +151,10 @@
     },
     {
       "number": 2108,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2535 7feb24c7d"
+      ]
     },
     {
       "number": 2115,
@@ -1310,6 +1313,20 @@
       "mergedAt": "2026-10-31T14:49:10Z",
       "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2068",
       "note": "partial: in-repo published cold-consumer proof; EIS-Chat box pending Eric; issue reopened after auto-close"
+    },
+    {
+      "id": "F1-2409",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2536,
+      "headSha": "1453c9204f8edfbfb3d3606d62db0b7d8f9407ca",
+      "issueNumbers": [
+        2409
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol (unannounced continuation; adopted)",
+      "receiptRefs": [],
+      "note": "green + Opus MERGE at 1453c92 but conflicts with main in publish-assets carrier; r1 mechanical finish (Codex low) posted"
     }
   ],
   "expensiveGates": [
@@ -1716,6 +1733,14 @@
       "via": "workflow_dispatch on main (canary .2 control run 41217778710)",
       "result": "SUCCESS (both runtime tiers, static)",
       "completedAt": "2026-10-31T16:18:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2536,
+      "headSha": "1453c9204f8edfbfb3d3606d62db0b7d8f9407ca",
+      "startedAt": "2026-10-31T16:52:02Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1938,7 +1963,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T16:19:41Z",
+  "updatedAt": "2026-10-31T17:08:13Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2235,11 +2260,12 @@
       "commentId": 6542589669,
       "postedAt": "2026-10-31T14:02:12Z",
       "route": "codex gpt-6.1-sol (continuation of the #2384 worker)",
-      "state": "claimed-continuation",
+      "state": "held",
       "pr": null,
       "claimRef": "#2268 comment 6544371938",
       "relaunchOf": "orphaned-continuation",
-      "startedAt": "2026-10-31T11:09:27Z"
+      "startedAt": "2026-10-31T11:09:27Z",
+      "note": "box-1 live-AppHost proof: claimant gone, draft PR #2540 is plan-only; held (Codex budget, and worker hosts lack Docker; same root as #2185) \u2192 Eric in the next status"
     },
     {
       "issue": 2149,
@@ -2396,9 +2422,11 @@
       "commentId": 6544556745,
       "postedAt": "2026-10-31T14:16:44Z",
       "route": "codex gpt-6.1-sol medium",
-      "state": "started",
-      "pr": null,
-      "startedAt": "2026-10-31T14:21:27Z"
+      "state": "relaunched-r1",
+      "pr": 2536,
+      "startedAt": "2026-10-31T14:21:27Z",
+      "relaunchCommentId": 6546528995,
+      "relaunchedAt": "2026-10-31T17:08:13Z"
     },
     {
       "issue": 2185,

@@ -310,3 +310,7 @@
 - 16:02:46Z: Cockpit 16:05Z: orchid 83b160a fixed the conflict relay (merge + plain push). Codex weekly is at 89% with 20 runs active: **no new Codex leaves unless they block a canary**; finish the running ones.
 - 16:03:01Z: **merged** #2535 (`7feb24c7d`) for #2108 (B2 capstone). **B2 complete; canary .2 code complete** except the Eric-held items (#2159 follow-up, #2259).
 - 16:19:40Z: **Canary .2 readiness posted** on #2474: candidate `7feb24c7d`, main green. The canary .1 candidate is not cut yet; Eric can cut .2 directly.
+- 16:52:02Z: #2409: an unannounced continuation had already opened PR #2536 (13:46Z); my 14:17 leaf verified it and stopped (no duplicate). Adopted #2536; **expensive-gate.acquired** at `1453c92`. The leaf's Opus PASS predates the head, so the coordinator runs an exact-head cross-family review (Opus, no Codex budget).
+- 16:52:34Z: #2268 box 1: the continuation claimant is gone and draft PR #2540 is plan-only. Held for the Codex budget and because worker hosts have no Docker (same root as #2185); goes to Eric with the #2185 question.
+- 16:53:27Z: #2536 (#2409): coordinator-run Opus exact-head review VERDICT: MERGE `1453c92` (receipt receipts/merge-eval/2536.1453c92.md, posted on the PR). Waiting for e2e.
+- 17:08:13Z: #2536 (#2409): green and approved at `1453c92` but conflicts with main in publish-assets.generated.ts. Posted a minimal r1 finish (Codex low: merge main, regenerate, push), comment 6546528995. Canary .3 content, so the budget rule allows it.
