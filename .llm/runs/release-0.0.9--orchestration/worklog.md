@@ -57,3 +57,6 @@
 - 00:58:18Z: #2395 binding `state=started` (codex gpt-6.1-sol). Five builders: #2187, #2144, #2396, #2400 (continuation), #2395.
 - 01:04Z: #2395 → PR #2483 (draft), implementing.
 - 01:10Z: #2395 (PR #2483) BLOCKED: PLAN-EVAL FAIL_PLAN in both rounds (shared-key contention; an adoption race before the receipt is stamped). Decision: authorize a fresh 2-round PLAN-EVAL cycle on the per-claim fence and recovery-grace design, with the constraints in briefs/2395.steer-1.md (one atomic script per transition, fence-checked adoption after the grace, destination-write invariant, a Streams/XAUTOCLAIM justification). Steered via a PR comment. A third failure escalates to Eric. Critical-path risk for canary .1: A2.
+- 01:21Z: #2481 (#2144) READY at `d7e4db3`, with all 3 slices (retry policy for in-process and polyglot jobs, the job DLQ port with a KV default, docs); 80 files, +3836/-64; no lock or listener-supervisor changes; Opus MERGE; 3 review threads answered. Accepted advisory debt: WORKERS-RETRY-DOMAIN-CARDINALITY (F-16 folder cap 13/12, has an owner and a gate). The coordinator judged that it needs no owner decision (advisory cap, doctrine debt mechanism) and will report it on #2474. **expensive-gate.acquired** on #2481.
+- 01:22Z: dispatched #2151 (A3, features), comment 6537103305. Builders: #2187, #2396, #2400, #2395, #2151.
+- 01:25:10Z: #2151 started.

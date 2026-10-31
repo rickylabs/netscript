@@ -480,15 +480,16 @@
     {
       "id": "A3-2144",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2481,
-      "headSha": "15608953cf8329da36227f93151f70986c4c18c5",
+      "headSha": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
       "issueNumbers": [
         2144
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2144",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY at d7e4db3; Opus MERGE; e2e-cli-gate armed"
     },
     {
       "id": "A3-2400",
@@ -539,6 +540,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
       "completedAt": "2026-10-31T00:37:28Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2481,
+      "headSha": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "startedAt": "2026-10-31T01:21:46.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -704,7 +713,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T01:10:42.000Z",
+  "updatedAt": "2026-10-31T01:25:19.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -790,6 +799,15 @@
       "route": "codex gpt-6.1-sol",
       "state": "pr-open",
       "pr": 2483
+    },
+    {
+      "issue": 2151,
+      "lane": "features",
+      "commentId": 6537103305,
+      "postedAt": "2026-10-31T01:22:07.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "started",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475
