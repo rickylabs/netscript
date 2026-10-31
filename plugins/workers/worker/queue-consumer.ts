@@ -63,6 +63,8 @@ export function startTaskQueueListener(
             `[Worker ${queueContext.workerId}] Unexpected error processing task '${message.taskId}':`,
             error instanceof Error ? error.message : String(error),
           );
+          if (!context.extendVisibility) throw error;
+          await context.nack({ requeue: true });
         }
       },
       { signal },

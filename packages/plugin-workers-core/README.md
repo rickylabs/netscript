@@ -217,6 +217,14 @@ provide it. The command relay publishes before settling, so its acceptance-to-ma
 redelivers the stable key. Supplied clients own their network permissions and cancellation;
 imports/construction need none.
 
+Queue consumers pass the stable `messageId` and increasing `deliveryCount` to the idempotency
+store. With atomic KV, a newer delivery of the same message can replace its stranded active
+marker immediately after broker recovery. A different message using the same caller key cannot
+take over. Completed applied markers continue to suppress all duplicates. The returned owner
+`token` must accompany `markApplied(key, undefined, token)` and `release(key, token)` so an older
+handler cannot complete or remove the replacement claim. Legacy callers without tokens retain
+their existing behavior; KV implementations without atomic checks cannot take over active markers.
+
 ## KV retention
 
 Each job's `retention.kvRetentionDays` (default 3) bounds terminal execution records under
