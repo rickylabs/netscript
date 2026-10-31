@@ -40,3 +40,8 @@
   metadata; regenerated from the combined canonical carrier. Upstream auth/saga prose and export
   rows were retained. The push uses an explicit lease against the previously published c9d5bb0.
   Earlier exact-head verdicts are historical; a fresh same-evaluator verdict is required.
+
+- A second later owner instruction requested another rebase/force-push after main advanced to
+  #2520 and #2518. Rebase replay was clean; regenerated two provenance fields for the merged page
+  bytes. Use a lease against 8c47a45. All old exact-head verdicts remain historical; obtain another
+  same-evaluator exact-head verdict. Scope and acceptance are unchanged.

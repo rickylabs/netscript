@@ -1,17 +1,14 @@
-# Resume / final coordinator handoff
+# Current repair handoff
 
-Issue 2269, E2, coordinator 2474, ready PR 2529. The owner later explicitly requested a rebase
-and force-push for a merge conflict, overriding the original prohibition. Rebased onto
-a9620a34e14e067c56bb6af025ec015f7252b7aa; regenerated conflicting publish metadata from merged canonical pages.
-Upstream auth/saga changes are retained. Explicit force-with-lease protects the prior remote head.
+PR 2529 / issue 2269 remains ready. The owner requested a second conflict rebase. Current base:
+eb9a1299b04a48ffe51348d15bb542606b7a6f82. All existing PR commits replayed cleanly; canonical generation updates only the merged
+corpus byte count and fixed hash. All 209 main rows are retained except the intentional MCP
+reference edit. 317 selected tests, quality:gate and all four native freshness checks pass.
 
-Rebased implementation source a74b039a20137f564c1cf524fdc848c4869574e4 passes 317 selected tests (0 failed/ignored), MCP
-check/lint/fmt, quality:gate, all four carrier freshness gates, and 11 public CLI stdio acceptance
-requests with refreshed citations. Evidence is in worklog.md and public-cli-acceptance.json.
-Earlier evaluations are historical and a final exact rewritten-head review is required in the
-same independent evaluator session. That verdict/CI snapshot lives in the PR and canonical READY
-report so recording it cannot move its own SHA. Review threads must be checked again before READY.
+The next commit records this provenance refresh and run evidence. Push with an exact lease against
+8c47a45811ed2146040cd021620e7e9a5ab26a55; obtain fresh final-head receipts and re-steer the same
+independent evaluator (round 4). Final verdict, current public CLI probe, review-thread gate and CI
+snapshot belong in the PR phase comment and atomic READY file handoff. Existing evaluation and
+public-cli-acceptance artifacts document earlier heads; do not treat them as this new head's proof.
 
-No local scaffold runtime; runtime e2e-cli is unnecessary for this docs retrieval scope, independently
-confirmed before rebase. No locks, labels/milestones, merge/tag/release or foreign resources changed.
-Use the excluded atomic .divybot-final-report.md handoff for canonical issue publication.
+No local scaffold runtime or merge/tag/release. No lock, label/milestone or foreign resource edits.

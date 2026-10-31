@@ -146,3 +146,20 @@ c9d5bb04275d2f8a64dc5f80e2484580088d0ba0, so another author's remote changes can
 No application resources or local scaffold runtime were started. The previous exact-head MERGE
 verdict is preserved in evaluate-pre-rebase.md and is superseded. Final same-session IMPL-EVAL
 must evaluate the rewritten pushed head. PR remains ready; coordinator still owns merge.
+
+## Second owner-requested conflict repair
+
+The owner again requested rebase, conflict resolution and force-push. Rebased onto
+eb9a1299b04a48ffe51348d15bb542606b7a6f82, which adds #2520 (streams storage provisioning) and #2518 (CLI preset validation).
+Git replayed all five PR commits cleanly. The newly merged docs changed two page rows, so canonical
+publish-asset generation refreshed only sourceBytes (2970059) and the fixed corpus SHA-256
+(1b802e2ce6f15947199d058583cbaa72e2fe78555b6427c98a442a353a218140).
+
+Every one of main's 209 page rows is retained; only this PR's intended MCP reference row differs.
+The same 317 consumer/generator tests passed, zero failed/ignored; quality:gate passed. Native
+agent-docs-prose/assets-barrel/publish-assets/mcp-export-corpus freshness checks all passed before
+commit. Final-head durable receipts and the refreshed independent verdict follow in the PR phase
+comment. Retrieval, ranking, tool schemas and CLI adapter logic were not changed by this repair.
+
+The explicit push lease protects former remote head 8c47a45811ed2146040cd021620e7e9a5ab26a55.
+No local scaffold runtime, lock churn, labels/milestone edits or merge/tag/release.
