@@ -299,3 +299,21 @@ zero findings. Native quality/architecture/deps and MCP corpus freshness pass. P
 signatures unchanged; no generated corpus rewrite needed. Commit/push this slice, then
 manual full CI and same-session corrective review2 at the exact final head. Do not move that
 head for evidence-only comments/checklist updates after review.
+
+
+Full manual CI at966c3ef: PostgreSQL scaffold.runtime PASS, static PASS, desktop check PASS
+under unchanged active#859 staged-update callback exception. SQLite has50passed/1failed:
+runtime.aspire-start cannot converge because Garnet finished and dependents wait. Latest main
+manual control40539973506 passed both runtime tiers. The SQLite uploaded report includes only
+readiness state, not the failed process's console error; do not guess at dependencies or args.
+
+Focused local diagnosis (not scaffold.runtime): exact generated dotnet toolrun flags work,
+and a minimal isolated Aspire13.5.3 AppHost launching only Garnet2.2.1 with the same deferred
+port/args callback reports Running/Healthy. Lua is bundled in the pinned tool. Both owned probe
+processes and the exact isolated AppHost were stopped. This does not replace the remote SQLite gate.
+
+Preserve bounded terminal-resource console logs on convergence failure: expected resources only,
+max3resources,5second command bound each,80lines and6000character tail. Retrieval failure leaves
+the original convergence verdict failed; no restart, retry or timeout relaxation. Six injected
+startup-diagnostic tests, scoped typecheck/lint/fmt pass. Push this diagnostic-only slice and
+rerun manual CI at its exact head to capture the actual environment-specific error if it recurs.

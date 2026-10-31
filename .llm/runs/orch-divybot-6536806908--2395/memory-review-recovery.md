@@ -43,3 +43,9 @@
   three suffix characters from runtime path; native package dotted-version stems can differ.
   Resolve the unique executable sibling, excluding runtime and non-executable assets, and fail
   closed on zero/multiple candidates. Main manual run40539973506 proves the inherited failure.
+
+- A resource state Finished is not a diagnosis. Existing E2E artifacts retained only describe
+  readiness and omitted process console, leaving native Garnet failures unattributed. Capture
+  bounded aspire logs for terminal expected resources before AppHost teardown, preserving the
+  failed verdict and never retrying startup. The exact native/Garnet2.2.1+Lua launch and a
+  minimal isolated Aspire13.5.3 AppHost can be probed separately without local scaffold.runtime.

@@ -60,3 +60,11 @@ latest main manual run: launcher lookup truncates runtime filename text. Necessa
 scope: cli/e2e/src/adapters/native-desktop/linux-native-driver.ts and a focused launcher
 lookup test. Resolve the unique installed executable beside the runtime, failing on absent
 or ambiguous candidates. No desktop product/package behavior or skip policy change.
+
+
+SQLite runtime diagnosis scope: e2e scaffold/runtime/evidence/describe-capture.ts and
+aspire-start-diagnostics_test.ts. Full PostgreSQL runtime passed at966c3ef; SQLite exited
+Garnet before readiness, while main control passed. Existing uploaded report retains only
+convergence states, losing the finished resource's actual console error. Capture bounded
+logs for terminal failed resources on failure, preserving the original failed verdict and
+never restarting/retrying startup. Use that evidence to choose the compatibility correction.

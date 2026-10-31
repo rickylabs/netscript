@@ -169,6 +169,7 @@ export async function captureDescribeFollow(
     const result = await status;
     if (!converged) {
       const details = (await stderr).trim();
+      const logs = await terminalResourceLogs(appHost, observations, expectedResources, commands);
       const reason = timedOut
         ? `timed out after ${timeoutSeconds}s`
         : `exited ${result.code}${details ? `: ${details}` : ''}`;
@@ -176,7 +177,7 @@ export async function captureDescribeFollow(
         `aspire describe --follow did not converge: ${reason}; ${await failureDetails(
           observationText(observations),
           expectedResources,
-        )}`,
+        )}${logs}`,
       );
     }
     console.info(
@@ -189,6 +190,39 @@ export async function captureDescribeFollow(
     terminate();
     await Promise.all([status, stderr]);
   }
+}
+
+/** Preserve the actual process error when a finished resource prevents startup convergence. */
+async function terminalResourceLogs(
+  appHost: string,
+  observations: ReadonlyMap<string, DescribeResourceObservation>,
+  expectedResources: readonly string[],
+  commands: DescribeCaptureCommands,
+): Promise<string> {
+  const expected = new Set(expectedResources.map((name) => name.toLowerCase()));
+  const failed = [...observations.values()].filter((resource) =>
+    expected.has(resource.name.toLowerCase()) &&
+    ['finished', 'failed', 'exited'].includes(resource.state?.toLowerCase() ?? '')
+  ).slice(0, 3);
+  const details: string[] = [];
+  for (const resource of failed) {
+    try {
+      const text = await commands.output([
+        'logs',
+        resource.name,
+        '-n',
+        '80',
+        '--apphost',
+        appHost,
+        '--non-interactive',
+        '--nologo',
+      ], 5_000);
+      details.push(`${resource.name} console: ${text.slice(-6_000)}`);
+    } catch (error) {
+      details.push(`${resource.name} console unavailable: ${String(error)}`);
+    }
+  }
+  return details.length ? `; ${details.join(' | ')}` : '';
 }
 
 function observationText(observations: ReadonlyMap<string, DescribeResourceObservation>): string {
