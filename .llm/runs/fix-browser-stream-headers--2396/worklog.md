@@ -41,3 +41,10 @@ S2 main integration: source merged cleanly. Debt conflict preserves both complet
 existing reader-header type closure and main's token-export cardinality debt. Prose carrier
 conflict takes main's generated carrier, to be regenerated canonically for the merged authored
 guide. No retained run evidence is removed; no debt scope, target or status is changed.
+
+S2 integrated complete Fresh/workers suites pass: 460/0/0, including native wire/header
+identity, reconnect/lifecycle and compiler controls. Scoped stream runtime/test lint and format
+pass 16 files each with no dropped targets. Canonical authored-prose generation and dependent
+barrel/publish-assets generation succeeded after the merge; only expected prose carrier differs.
+Next: stable merged-head root/quality/publish/doc and canonical-corpus checks, then independent
+exact-head implementation review. Required runtime CI remains an actual gate, not a local claim.
