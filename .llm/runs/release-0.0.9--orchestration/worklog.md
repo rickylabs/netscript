@@ -62,3 +62,7 @@
 - 01:25:10Z: #2151 started.
 - 01:37Z: **merged** #2481 (`4aa734e2b`) for #2144. The head moved after READY (`d7e4db3` → `6e902e3`: a one-line generated `publish-assets` refresh that fixed a stale-carrier quality failure). The evaluator reviewed the delta (`publish-carrier-review.md`) and re-attested MERGE at `6e902e3` by editing its attestation comment. CI 48/48 including both e2e tiers at that head. #2144 closed. Gate note: a future head move needs a fresh verdict comment, not an edit.
 - 01:38Z: #2151 → PR #2484 (draft), implementing.
+- 02:24Z: #2396 adoption: READY on #2422 (`b2e3124`; no code blockers; the evaluator's CHANGES is only for unarmed runtime CI) and #2421 (`a4dc705`, source MERGE). Landing order #2422 → #2423 → #2421. **expensive-gate.acquired** on #2422. After e2e passes: tick the runtime checklist, rerun close-gate, and get an exact-head opposite-family MERGE before merging.
+- 02:24Z: #2396 consolidated READY: all 8 acceptance entries are mapped. #2423 MERGE at `7421a60` with CI green including both runtime tiers. #2421 is the final PR. Release follow-up: HOST-POLICY-PUBLISHED-GRAPH-2396 (published-graph / e2e-cli-prod proof after the first 0.0.9 canary) is tracked in state `releaseFollowUps`.
+- 02:25Z: dispatched #2367 (D1, internals), comment 6537761359. Builders: #2187, #2400, #2395, #2151, #2367.
+- 02:28Z: #2367 started.

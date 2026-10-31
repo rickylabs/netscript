@@ -339,44 +339,44 @@
     {
       "id": "D1-2396-u1",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2421,
-      "headSha": "cef5fe57a69584e68712e764dd29552e8d548ce0",
+      "headSha": "a4dc70531c3e3a8c3139ecfa16419126c9551463",
       "issueNumbers": [
         2396
       ],
-      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "Pre-existing U1 draft (build red). Adopted by the #2396 leaf; reconcile or supersede, never duplicate."
+      "note": "READY at a4dc705 (source MERGE); landing order #2422 -> #2423 -> #2421; e2e pending"
     },
     {
       "id": "D1-2396-svc",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2422,
       "headSha": "b2e31245020b651a32eb3b476c61a8198a1b42c0",
       "issueNumbers": [
         2396
       ],
-      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "Pre-existing service-policy PR (close-gate red). Adopted by the #2396 leaf."
+      "note": "READY at b2e3124 (no code blockers; evaluator CHANGES only for unarmed runtime CI); e2e-cli-gate armed"
     },
     {
       "id": "D1-2396-hdr",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2423,
       "headSha": "7421a60f2ec0395a7e0f0ce76cbe9a24dd25980b",
       "issueNumbers": [
         2396
       ],
-      "implementerAgentId": "pre-run lane (unnamed, 2026-10-28)",
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "Pre-existing browser stream headers PR (quality, breaking-migration, close-gate red; conflicting). Adopted by the #2396 leaf."
+      "note": "READY; MERGE at 7421a60; CI incl both runtime tiers green; lands after #2422"
     },
     {
       "id": "F1-2406-pr2408",
@@ -517,7 +517,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2483,
-      "headSha": "bc54b1b4eec5a89860ff6b62b3d59b1a6da6645c",
+      "headSha": "d0c9bda04011d4298e2db30dab7d6d44d9271180",
       "issueNumbers": [
         2395
       ],
@@ -531,7 +531,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2484,
-      "headSha": "5ebaf96a46678706dbb6324c5ab84d2a8b0cb058",
+      "headSha": "4ce5f31e9ae139193e7fb6dc79efe0e20fde2590",
       "issueNumbers": [
         2151
       ],
@@ -569,6 +569,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS (both runtime tiers) at 6e902e314",
       "completedAt": "2026-10-31T01:36:55Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2422,
+      "headSha": "b2e31245020b651a32eb3b476c61a8198a1b42c0",
+      "startedAt": "2026-10-31T02:24:08.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -737,7 +745,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T01:38:18.000Z",
+  "updatedAt": "2026-10-31T02:28:09.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -832,7 +840,25 @@
       "route": "codex gpt-6.1-sol",
       "state": "pr-open",
       "pr": 2484
+    },
+    {
+      "issue": 2367,
+      "lane": "internals",
+      "commentId": 6537761359,
+      "postedAt": "2026-10-31T02:25:00.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "started",
+      "pr": null
     }
   ],
-  "coordinatorArtifactPr": 2475
+  "coordinatorArtifactPr": 2475,
+  "releaseFollowUps": [
+    {
+      "issue": 2396,
+      "debt": "HOST-POLICY-PUBLISHED-GRAPH-2396",
+      "what": "actual published consumer graph / e2e-cli-prod proof for the host-policy factories",
+      "when": "after the first exact 0.0.9 canary publish",
+      "owner": "coordinator (release readiness)"
+    }
+  ]
 }
