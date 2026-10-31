@@ -62,8 +62,8 @@ apps/dashboard/
 
 ## Pick a preset
 
-A preset is one design language with its type, colors, shape, and density. NetScript ships 24. The
-[design system](/design-system/) shows each theme.
+A preset sets a design language: type, colors, shape, and density. NetScript ships 24, and the
+[design system](/design-system/) shows each one.
 
 | Group | Preset ids |
 | --- | --- |
@@ -139,10 +139,10 @@ Then run `netscript tokens build`. An override can only alias an existing semant
 such as `#0057ff`, an unknown role, or a changed type fails before any file is replaced. One
 override covers light and dark, because ramp steps resolve per scheme. The build does not check
 contrast, so check text on `primary` in both schemes yourself. Each preset shapes through its own
-roles: in Studio Utility, `radius-md` and `radius-lg` follow roles that are already 0, so aliasing
-them changes nothing. Keep edits in the override file, because every build replaces the generated
-files. The [`tokens` reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) has
-the details.
+roles: in Studio Utility, `radius-md` and `radius-lg` follow roles that are already 0. Every build
+replaces the generated files, so keep edits in the override file. The
+[`tokens` reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) has the
+details.
 
 ## Registry theme items
 
@@ -231,8 +231,7 @@ every earlier `--ns-*` property remains. To adopt the new attributes:
 4. Run `netscript ui:update` to merge registry copies. It lists files you edited for a manual merge.
 5. Switch presets with `netscript ui:apply --preset studio-utility`.
 
-Component copies from 0.0.8 also need `netscript ui:migrate variants`, which converts them to the
-data-attribute contract the current styles use. Preview it with `--dry-run`.
+Component copies from 0.0.8 also need `netscript ui:migrate variants`. Preview it with `--dry-run`.
 
 ## Check your work
 
