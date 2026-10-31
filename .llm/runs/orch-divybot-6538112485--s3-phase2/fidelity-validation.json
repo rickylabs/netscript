@@ -39,8 +39,34 @@
     "htmlPages": 259
   },
   "independentReview": "PASS;combined source/finalized evidence sign-off",
-  "carriers": "After source commit",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
   "captures": 8,
   "ready": false,
-  "fullGoalComplete": false
+  "fullGoalComplete": false,
+  "sourceCommit": "0d399a1b89262f0c2c1a6e4850010b0f8b7d4311"
 }
