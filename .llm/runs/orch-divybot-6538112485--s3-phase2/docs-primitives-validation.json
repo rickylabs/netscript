@@ -47,9 +47,20 @@
   "invalidPortRejected": true,
   "independentInitialReview": "PASS",
   "independentFollowUp": "PASS",
-  "cleanSourceCarriers": "PENDING",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  },
   "phaseReady": false,
   "fullGoalComplete": false,
   "legacyHeaderLayout": "PASS; grid only with Card.Action, otherwise flex",
-  "publishedIconVocabulary": "PASS;20 names exactly match typed/JSON contract"
+  "publishedIconVocabulary": "PASS;20 names exactly match typed/JSON contract",
+  "sourceHead": "0adfad01d8efbad1da040e09d87116a991638d9a",
+  "publicHygieneCounts": {
+    "absolutePaths": 0,
+    "sessionIdentifiers": 0,
+    "thumbprints": 0
+  }
 }
