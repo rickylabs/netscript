@@ -112,3 +112,19 @@ Native loading=lazy provides the requested behavior without a new API. RealSSRCh
 prove hiddenUtility0fetches, visibleNSOne1, and deferredloading afterthemechange.
 Main7312ba4 onlyoverlapsMCPgeneratedcarriers;regenerationpreservesall209docs andbothparents.
 No CSS-size/QueryResult work, badge or CodeBlock changes in this follow-up.
+
+
+## Main refresh after Avatar READY
+
+Coordinator requested reconciliation with main7feb24c7d09518a045c3955555967dbbde51e92a after
+PR2503 became conflicting. Merge from53f3794; no rebase or force push. Conflicts only in
+CLI embedded assets and MCP publish assets. Regenerated all four canonical carriers.
+All82main-only paths match main; overlaps are three generated carriers and two lockfiles.
+Lock diffs preserve main's std/http workspace metadata; resolved dependency graphs unchanged.
+All Fresh UI authored source, browser tests and registry payload remain identical to the
+approved Avatar head. Docs retain209pages with only the two reviewed Utility-default pages
+differing from main. Current source manifest refreshes122hashes.
+
+New local carrier/root/quality gates and same independent evaluator are required before commit;
+new exact-head required CI and both full runtime suites are required before renewed READY.
+Previous53f3794CI is historical. No product redesign or new scope. Cockpit owns merge.

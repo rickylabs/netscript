@@ -4484,6 +4484,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
+      "jsr:@std/http@1",
       "jsr:@std/path@1",
       "jsr:@std/semver@1",
       "jsr:@std/testing@1"

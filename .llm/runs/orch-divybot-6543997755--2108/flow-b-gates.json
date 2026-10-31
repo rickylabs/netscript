@@ -1,0 +1,89 @@
+{
+  "tests": {
+    "rawExitCode": 0,
+    "summary": {
+      "passed": 20,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 20,
+      "uniqueFailures": 0
+    },
+    "files": [
+      "packages/cli/e2e/tests/application/gates/configure-published-workers-block_test.ts",
+      "packages/cli/e2e/tests/application/gates/locate-workers-resource-block_test.ts",
+      "packages/cli/e2e/src/application/gates/scaffold/locked-probes_test.ts"
+    ]
+  },
+  "check": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 3,
+      "batches": 1,
+      "failedBatches": 0
+    }
+  },
+  "lint": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 3,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 3,
+      "filesProcessed": 3,
+      "droppedFiles": [],
+      "refusals": []
+    }
+  },
+  "fmt": {
+    "summary": {
+      "filesSelected": 3,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 3,
+      "filesProcessed": 3,
+      "droppedFiles": [],
+      "refusals": []
+    }
+  },
+  "quality:gate": {
+    "rawExitCode": 0,
+    "evidence": "separate native task completion observed, quality scan and deps/doctrine PASS"
+  },
+  "aspire-version-parity": {
+    "outcome": "PASS",
+    "manifestChange": "one canonical row for real-generator regression test"
+  },
+  "fullRuntime": "CI only; new exact-head rerun required after push, no local scaffold.runtime run",
+  "windowsNegativeControl": {
+    "control": "native resolver replaced with sourceRoot + POSIX suffix in a disposable helper copy",
+    "pristineExitCode": 0,
+    "mutantExitCode": 1,
+    "mutantSummary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failingTests": [
+      "local workers rewrite resolves a Windows source root before checking its escaped entrypoint"
+    ],
+    "originalSourceUnchanged": true
+  }
+}

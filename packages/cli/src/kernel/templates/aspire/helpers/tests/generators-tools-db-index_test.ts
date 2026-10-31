@@ -44,13 +44,14 @@ describe('generateRegisterTools', () => {
     assertStringIncludes(output, 'register-tools.mts');
   });
 
-  it('should export registerTools async function', () => {
+  it('should preserve the promise-returning empty tool registration', () => {
     const output = generateRegisterTools({ tools: {} });
-    assertStringIncludes(output, 'export async function registerTools(');
+    assertStringIncludes(output, 'export function registerTools(');
+    assertStringIncludes(output, 'return Promise.resolve();');
   });
 
   it('should import resolveWorkspacePath from _aspire-compat', () => {
-    const output = generateRegisterTools({ tools: {} });
+    const output = generateRegisterTools({ tools: { 'prisma-studio': fixtures.MINIMAL_TOOL } });
     assertStringIncludes(output, 'buildDatabaseUriEnvKey');
     assertStringIncludes(output, 'resolveWorkspacePath');
     assertStringIncludes(output, "from './_aspire-compat.mts'");
@@ -161,7 +162,7 @@ describe('generateRegisterTools', () => {
 
   it('should handle empty tools', () => {
     const output = generateRegisterTools({ tools: {} });
-    assertStringIncludes(output, '// No tools configured');
+    assertStringIncludes(output, 'No development tools are configured.');
   });
 });
 // generateDbCliMode

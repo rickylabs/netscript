@@ -1,5 +1,5 @@
 /** Request-time browser authentication adapter. Never import this module into an island. */
-import { getCookies, setCookie } from 'jsr:@std/http@^1/cookie';
+import { getCookies, setCookie } from '@std/http/cookie';
 import { getServiceUrl } from '@netscript/sdk/discovery';
 import {
   type ContractLike,

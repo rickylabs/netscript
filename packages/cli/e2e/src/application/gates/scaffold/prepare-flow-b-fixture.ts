@@ -1,4 +1,8 @@
-import { configurePublishedWorkersBlock } from './configure-published-workers-block.ts';
+import {
+  configureLocalWorkersBlock,
+  configurePublishedWorkersBlock,
+  workersServiceSource,
+} from './configure-published-workers-block.ts';
 import {
   locateWorkersBackgroundBlock,
   locateWorkersResourceBlock,
@@ -68,7 +72,7 @@ const localSourcePackages = [
     '@netscript/plugin-workers-core/contracts/v1',
     'packages/plugin-workers-core/src/contracts/v1/mod.ts',
   ],
-  ['@netscript/plugin-workers/services', 'plugins/workers/services/src/main.ts'],
+  ['@netscript/plugin-workers/services', workersServiceSource],
   ['@netscript/plugin-sagas/runtime', 'plugins/sagas/src/runtime/mod.ts'],
   ['@netscript/plugin-sagas-core', 'packages/plugin-sagas-core/mod.ts'],
   ['@netscript/plugin-sagas-core/config', 'packages/plugin-sagas-core/config.ts'],
@@ -132,29 +136,9 @@ const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
 // The published flow-b config introduces jsr pins that are minutes old at
 // release-verification time; the Aspire-launched service must bypass Deno's
 // dependency recency guard or it never starts (health probe timeout).
-let configuredWorkersBlock = mode === 'published'
+const configuredWorkersBlock = mode === 'published'
   ? configurePublishedWorkersBlock(workersBlock)
-  : workersBlock.replace(
-    "['run', '--config', 'deno.json',",
-    "['run', '--config', '.netscript-flow-b-deno.json',",
-  );
-if (mode === 'local') {
-  configuredWorkersBlock = configuredWorkersBlock.replace(
-    /'jsr:@netscript\/plugin-workers@[^']+\/services'/,
-    "'@netscript/plugin-workers/services'",
-  );
-}
-if (
-  configuredWorkersBlock === workersBlock &&
-  !workersBlock.includes("'--config', '.netscript-flow-b-deno.json'")
-) {
-  throw new Error('workers-api resource did not contain the expected Deno config argument');
-}
-if (
-  mode === 'local' && !configuredWorkersBlock.includes("'@netscript/plugin-workers/services'")
-) {
-  throw new Error('workers-api resource did not contain the expected service entrypoint');
-}
+  : configureLocalWorkersBlock(workersBlock, sourceRoot);
 await Deno.writeTextFile(
   registerPluginsPath,
   registerPlugins.slice(0, workersIndex) + configuredWorkersBlock +

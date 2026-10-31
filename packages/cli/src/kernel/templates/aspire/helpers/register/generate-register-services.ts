@@ -162,6 +162,25 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     : '  // No services configured';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterServices1, {
+    executionImports: entries.length
+      ? "import { installationSecretPermissions } from './installation-secret.mts';\n"
+      : '',
+    otlpImport: entries.length
+      ? `import { OtlpProtocol } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';\n`
+      : '',
+    executionCompatImports: entries.length
+      ? '  buildDatabaseUriEnvKey,\n  buildDatabaseProviderEnvVars,\n  buildSqliteDatabaseUrl,\n  buildOtelEnvVars,\n  resolvePermissions,\n  resolveWorkspacePath,\n'
+      : '',
+    asyncModifier: entries.length ? 'async ' : '',
+    builderParameter: entries.length ? 'builder' : '_builder',
+    configParameter: entries.length ? 'config' : '_config',
+    infrastructureParameter: entries.length ? 'infrastructure' : '_infrastructure',
+    appHostDirParameter: entries.length ? 'appHostDir' : '_appHostDir',
+    secretParameter: entries.length ? 'installationSecretFile' : '_installationSecretFile',
+    databaseBindings: entries.length
+      ? '  const databaseEnvKey = buildDatabaseUriEnvKey(config);\n  const databaseProviderEnv = buildDatabaseProviderEnvVars(config);\n'
+      : '',
+    registrationResult: entries.length ? 'services' : 'Promise.resolve(services)',
     __slot0__: String(fileHeader('register-services.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),

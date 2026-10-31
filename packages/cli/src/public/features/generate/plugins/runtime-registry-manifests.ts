@@ -249,11 +249,35 @@ export async function discoverInstalledRuntimePackages(
     if (typeof entrypoint !== 'string') {
       throw new Error('Installed plugin declaration is missing its entrypoint.');
     }
-    const parsed = parseJsrEntrypoint(entrypoint);
+    const parsed = parseJsrEntrypoint(entrypoint) ??
+      await localPackageFromEntrypoint(projectRoot, entrypoint, fs);
     if (!parsed) throw new Error('Installed plugin entrypoint must be a versioned JSR specifier.');
     found.set(`${parsed.packageName}@${parsed.version}`, parsed);
   }
   return [...found.values()];
+}
+
+/** Resolve a local service to its owning package identity before manifest discovery. */
+async function localPackageFromEntrypoint(
+  projectRoot: string,
+  entrypoint: string,
+  fs: FileSystemPort,
+): Promise<InstalledRuntimePackage | undefined> {
+  if (!isLocalImport(entrypoint)) return undefined;
+  let directory = dirname(resolveLocalImport(projectRoot, entrypoint));
+  while (true) {
+    for (const filename of ['deno.json', 'deno.jsonc']) {
+      const path = join(directory, filename);
+      if (!await fs.exists(path)) continue;
+      const metadata = asRecord(parseJsonc(await fs.readFile(path)));
+      if (typeof metadata.name === 'string' && typeof metadata.version === 'string') {
+        return { name: metadata.name, packageName: metadata.name, version: metadata.version };
+      }
+    }
+    const parent = dirname(directory);
+    if (parent === directory) return undefined;
+    directory = parent;
+  }
 }
 
 function parseJsrEntrypoint(entrypoint: string): InstalledRuntimePackage | undefined {
