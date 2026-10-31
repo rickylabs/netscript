@@ -18,3 +18,5 @@
 - Main integration required after #2487 landed (8902e1a). One generated prose-carrier conflict; resolve through canonical generation against incoming main's corpus, retaining the merged docs. No rebase, force push or authored runtime conflict. Final evaluation and gates must use the new merged head.
 
 - Post-READY main advanced to 4060d1e61da0a8324e77ed351b05a343d746a188. One generated CLI prose conflict; canonical regeneration from merged docs resolves it. Incoming file-watch identity documentation is preserved. The prior c37a625 MERGE/green checks remain historical. No rebase, force push or authored framework conflict.
+
+- Another post-READY integration: main67d4704 (#2496 Redis listener concurrency). One generated CLI prose conflict; canonical regeneration preserves incoming worker tuning and the audit layout correction. Previous b9aa6cd round4 MERGE is historical. Next exact-head evaluation is the final allowed round5; no rebase or force push.

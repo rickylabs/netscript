@@ -1,0 +1,238 @@
+{
+  "baselineRevert": {
+    "S1": {
+      "failed": 14,
+      "passed": 0
+    },
+    "S2": {
+      "failed": 9,
+      "passed": 1,
+      "compatibilityControl": "scoped env defaults: expected pass on both original and fixed production"
+    }
+  },
+  "singleRegressionControls": {
+    "source": "isolated source copy; fixed runtime with exactly one production regression per run",
+    "results": [
+      {
+        "mutation": "aborted-settlement-signal",
+        "source": "packages/queue/adapters/redis.adapter.ts",
+        "sha256": "cbd7dce3485ed2f5f8f7303e6fd25b0594a0b2c7859c1f31a76f56c89041292a",
+        "filter": "final-attempt",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 2,
+          "uniqueFailures": 1
+        },
+        "failures": [
+          {
+            "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-concurrency_test.ts:<line>:<column>)",
+            "count": 2,
+            "tests": [
+              {
+                "name": "Redis Redis delivers a final-attempt claim committed during intake abort",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 126
+              },
+              {
+                "name": "Garnet Redis delivers a final-attempt claim committed during intake abort",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 126
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mutation": "immediate-lease-disconnect",
+        "source": "packages/queue/adapters/redis.adapter.ts",
+        "sha256": "edf6734fedc050be3cc732604c295112170039bb1573e12f8832ec1532386d59",
+        "filter": "stop awaits",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 2,
+          "uniqueFailures": 1
+        },
+        "failures": [
+          {
+            "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   2\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-concurrency_test.ts:<line>:<column>)",
+            "count": 2,
+            "tests": [
+              {
+                "name": "Redis Redis stop awaits all concurrent handlers and their fenced acknowledgements",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 95
+              },
+              {
+                "name": "Garnet Redis stop awaits all concurrent handlers and their fenced acknowledgements",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 95
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mutation": "unbounded-drain",
+        "source": "packages/queue/adapters/_redis-listener.ts",
+        "sha256": "35f5bc0a2f1d1f1c5c864d12499278d86ab82bdc84593bf27849e37deaa0473d",
+        "filter": "hung concurrent",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 2,
+          "uniqueFailures": 1
+        },
+        "failures": [
+          {
+            "message": "Error: Timed out waiting for lease test worker\n    at Timeout._onTimeout (file://<cwd>/packages/queue/tests/_fixtures/redis-lease-harness.ts:<line>:<column>)",
+            "count": 2,
+            "tests": [
+              {
+                "name": "Redis Redis hung concurrent handlers cannot outlive the stop drain budget",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 156
+              },
+              {
+                "name": "Garnet Redis hung concurrent handlers cannot outlive the stop drain budget",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 156
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mutation": "serial-admission",
+        "source": "packages/queue/adapters/_redis-lease-state.ts",
+        "sha256": "b50e8c853b128d8ab6ebf3fa941b0f5c32974107189cb92c84e8226adbc988a6",
+        "filter": "concurrency 1 stays serial",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 2,
+          "uniqueFailures": 1
+        },
+        "failures": [
+          {
+            "message": "Error: Timed out waiting for lease test worker\n    at Timeout._onTimeout (file://<cwd>/packages/queue/tests/_fixtures/redis-lease-harness.ts:<line>:<column>)",
+            "count": 2,
+            "tests": [
+              {
+                "name": "Redis Redis concurrency 1 stays serial and N admits exactly N with backpressure",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 10
+              },
+              {
+                "name": "Garnet Redis concurrency 1 stays serial and N admits exactly N with backpressure",
+                "file": "./packages/queue/tests/redis-concurrency_test.ts",
+                "line": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mutation": "hardcoded-delayed-poll",
+        "source": "packages/queue/adapters/redis.adapter.ts",
+        "sha256": "090c677b67f151c9adc73ca526d27f5287d379abfbee5c5f7af3a12850694eee",
+        "filter": "delayed pickup stays",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 4,
+          "ignored": 0,
+          "totalResults": 4,
+          "uniqueFailures": 4
+        },
+        "failures": [
+          {
+            "message": "AssertionError: pickup 1932ms exceeds 50ms polling plus overhead\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-dispatch-proof_test.ts:<line>:<column>)",
+            "count": 1,
+            "tests": [
+              {
+                "name": "Redis delayed pickup stays within configured polling plus measured overhead (environment)",
+                "file": "./packages/queue/tests/redis-dispatch-proof_test.ts",
+                "line": 160
+              }
+            ]
+          },
+          {
+            "message": "AssertionError: pickup 1941ms exceeds 35ms polling plus overhead\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-dispatch-proof_test.ts:<line>:<column>)",
+            "count": 1,
+            "tests": [
+              {
+                "name": "Garnet delayed pickup stays within configured polling plus measured overhead (options)",
+                "file": "./packages/queue/tests/redis-dispatch-proof_test.ts",
+                "line": 160
+              }
+            ]
+          },
+          {
+            "message": "AssertionError: pickup 1943ms exceeds 50ms polling plus overhead\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-dispatch-proof_test.ts:<line>:<column>)",
+            "count": 1,
+            "tests": [
+              {
+                "name": "Garnet delayed pickup stays within configured polling plus measured overhead (environment)",
+                "file": "./packages/queue/tests/redis-dispatch-proof_test.ts",
+                "line": 160
+              }
+            ]
+          },
+          {
+            "message": "AssertionError: pickup 1947ms exceeds 35ms polling plus overhead\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-dispatch-proof_test.ts:<line>:<column>)",
+            "count": 1,
+            "tests": [
+              {
+                "name": "Redis delayed pickup stays within configured polling plus measured overhead (options)",
+                "file": "./packages/queue/tests/redis-dispatch-proof_test.ts",
+                "line": 160
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mutation": "hardcoded-idle-poll",
+        "source": "packages/queue/adapters/_redis-listener.ts",
+        "sha256": "b917ebaf6471aab8c8c36eeadbfb0b6cf0c1e1b54454f4f3509b5e87058f97c7",
+        "filter": "configured idle pickup",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 2,
+          "uniqueFailures": 1
+        },
+        "failures": [
+          {
+            "message": "AssertionError: the configured interval must replace the fixed 50 ms poll\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at fn (file://<cwd>/packages/queue/tests/redis-dispatch-proof_test.ts:<line>:<column>)",
+            "count": 2,
+            "tests": [
+              {
+                "name": "Redis configured idle pickup follows its bounded poll interval",
+                "file": "./packages/queue/tests/redis-dispatch-proof_test.ts",
+                "line": 111
+              },
+              {
+                "name": "Garnet configured idle pickup follows its bounded poll interval",
+                "file": "./packages/queue/tests/redis-dispatch-proof_test.ts",
+                "line": 111
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

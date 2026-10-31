@@ -1,11 +1,11 @@
 {
   "authorization": "https://github.com/rickylabs/netscript/pull/2494#issuecomment-6539166396",
-  "integratedMain": "4060d1e61da0a8324e77ed351b05a343d746a188",
+  "integratedMain": "67d4704b406935a38e69c3b08989b64dd1a16b82",
   "generatedFiles": [
     {
       "path": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
       "generator": "deno task gen:agent-docs-prose",
-      "sha256": "ca7b70a4d68bff30de5bfcebca3b46e63465dedcccc7819406dc86b315297fed"
+      "sha256": "961ebc60842f47cf67fc5dfdda6b2ba7ad146cdba6bcdd23504eb09322e96539"
     },
     {
       "path": "packages/mcp/src/publish-assets.generated.ts",

@@ -1,0 +1,7 @@
+{
+  "ownedRedisStopped": true,
+  "ownedGarnetStopped": true,
+  "ownedTestChildrenJoined": true,
+  "foreignResourcesMutated": false,
+  "evidence": "exact owned supervisor and child status; real test harness asynchronous disposers"
+}
