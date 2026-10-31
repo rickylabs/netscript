@@ -6,7 +6,7 @@
  */
 import { deepStrictEqual, ok, strictEqual } from 'node:assert/strict';
 import { markdownIt } from 'lume/deps/markdown_it.ts';
-import { DOMParser } from 'lume/deps/dom.ts';
+import { Page } from 'lume/core/file.ts';
 import { autotrim, engine } from 'lume/deps/vento.ts';
 import {
   CALLOUT_TYPES,
@@ -39,13 +39,13 @@ function site(warnings: string[] = []) {
 }
 
 function article(html: string): Element {
-  const document = new DOMParser().parseFromString(
-    `<!doctype html><html><body><article class="ns-prose">${html}</article></body></html>`,
-    'text/html',
-  );
+  const document = Page.create({
+    url: '/fixture.html',
+    content: `<!doctype html><html><body><article class="ns-prose">${html}</article></body></html>`,
+  }).document;
   const element = document?.querySelector('article.ns-prose');
   if (!element) throw new Error('Could not parse rendered fixture');
-  return element as unknown as Element;
+  return element;
 }
 
 function twin(html: string): string {

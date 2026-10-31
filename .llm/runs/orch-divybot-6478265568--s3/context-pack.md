@@ -33,3 +33,5 @@ Generated carriers use existing gen:assets-barrel and gen:agent-docs-prose tasks
 ## Resume 2026-10-31
 
 Recovery in progress on the same branch/PR; integrate main 7907293f3, regenerate conflicting prose carriers, rerun source gates and the required runtime suite, and obtain the owner-selected Claude IMPL-EVAL. Original scope restrictions and phase-one-only issue linkage remain authoritative.
+
+Resume integration validation is green for source check/lint/format (245 files), migration tests (16), docs renderer fixture and quality:gate/arch:check. Main's fixture double cast was replaced with Page.create, retaining tests. Docs build passes. Runtime suite attempted once and fails on unavailable Docker/Aspire. Generated corpus/carrier freshness and independent Claude IMPL-EVAL remain next.

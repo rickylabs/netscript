@@ -1,0 +1,12 @@
+{
+  "gateId": "quality-gate",
+  "argv": [
+    "deno",
+    "task",
+    "quality:gate"
+  ],
+  "gitHead": "6e66b74a1011911f7d9b70d00e02a977ac0cf76e",
+  "outcome": "PASS",
+  "durationMs": 18855,
+  "exitCode": 0
+}
