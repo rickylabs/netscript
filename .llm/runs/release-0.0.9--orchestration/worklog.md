@@ -274,3 +274,4 @@
 - 14:00:20Z: Adopted continuation PRs (from the #2268 worker's chain): #2527 (#2411, F1) and #2532 (#2375, F1), both READY with Opus MERGE at their heads and green CI. #2411 was placed in features (internals at cap). The chain also claimed #2068 (G1 cold-consumer check).
 - 14:01:07Z: **merged** #2532 (`40c59ace8`) for #2375 (F1, adopted continuation).
 - 14:01:14Z: **merged** #2527 (`d54879b8d`) for #2411 (F1, adopted continuation).
+- 14:02:36Z: #1655 (continuation, draft PR #2539) BLOCKED on a design question. **Decision:** option B under doctrine 02's existing oRPC-boundary exception, on condition that both findings trace to oRPC internals; box 1 reworded and the debt rows closed citing the doctrine. Posted on #2539 and #1655, FYI with veto window on #2474.

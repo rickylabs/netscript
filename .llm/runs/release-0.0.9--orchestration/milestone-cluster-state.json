@@ -1213,6 +1213,20 @@
       "mergeCommit": "d54879b8d645554155c54af2f26c86d2232afda5",
       "mergedAt": "2026-10-31T14:01:10Z",
       "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2411"
+    },
+    {
+      "id": "G1-1655",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2539,
+      "headSha": "d615b7fbb93b373d29cc996c0932409db11aac28",
+      "issueNumbers": [
+        1655
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol (continuation chain of the #2373 worker)",
+      "receiptRefs": [],
+      "note": "BLOCKED \u2192 coordinator decision B (doctrine 02 oRPC boundary exception, traced)"
     }
   ],
   "expensiveGates": [
@@ -1777,7 +1791,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:01:28Z",
+  "updatedAt": "2026-10-31T14:02:42Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2218,6 +2232,15 @@
       "state": "claimed-continuation",
       "pr": null,
       "claimRef": "#2474 comment 6544330900"
+    },
+    {
+      "issue": 1655,
+      "lane": "internals",
+      "commentId": null,
+      "postedAt": "2026-10-31T14:00:16Z",
+      "route": "codex gpt-6.1-sol (continuation chain of the #2373 worker)",
+      "state": "blocked-decided",
+      "pr": 2539
     }
   ],
   "coordinatorArtifactPr": 2475,
