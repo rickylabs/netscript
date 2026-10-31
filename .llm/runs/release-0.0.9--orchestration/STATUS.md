@@ -1,5 +1,5 @@
 # STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
-- **MERGE HOLD**: canary cut pending Eric's direct confirmation (coordinator to dispatch release-canary.yml from 43aa891ec); run 41237108380 was cancelled with nothing minted
+- **MERGE HOLD**: canary publishing — release-canary.yml run 41237263834 from 43aa891ec (Eric approved 20:05Z); no merges until publish + e2e-cli-prod finish
 - COMBINED CANARY READY TO CUT at 6c3f8a118 (18:16Z, comment 6547307997; supersedes .1 15cffa2fe and .2 7feb24c7d; includes Fresh UI S6a) · Eric cuts
 - H01/H02/A1/A2/A3/E1 DONE (all closed)
 - DECISIONS EXECUTED (Eric "Approved" ~18:45Z): #2159 closed (follow-up #2543), #2259 → Backlog (#2278), #1655 → Backlog, #2185 closed, #2268 closed (box1 → #2544), #1366 closed (box5 → #429-431, consumer proof → #2545), #2068 closed (eis-chat#518)

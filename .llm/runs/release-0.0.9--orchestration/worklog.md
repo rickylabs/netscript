@@ -342,3 +342,4 @@
 - 19:23:56Z: Design session agrees: if Eric picks (b), the coordinator files the #2406 docs follow-up with label epic:design-system, and their lane picks it up after the canary.
 - 20:04:30Z: **Canary cut by Eric** ('Cut it'): the design session dispatched release-canary.yml (target 0.0.9) from main `43aa891ec` (one commit past the 6c3f8a118 candidate: #2546), run 41237108380. **MERGE HOLD** until the publish and e2e-cli-prod finish.
 - 20:05:08Z: The design session cancelled its canary dispatch (run 41237108380, at checkout; nothing minted) and relayed that Eric wants the coordinator to cut from `43aa891ec`. Not acting on a relay for an irreversible publish: asked Eric to confirm directly on #2474. Merge hold kept.
+- 20:05:58Z: **Eric (in session, ~20:05Z): 'I approve proceed'.** The coordinator dispatched release-canary.yml (target-version 0.0.9, ref main `43aa891ec`), run 41237263834. Merge hold until the publish and the pinned e2e-cli-prod finish.
