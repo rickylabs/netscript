@@ -92,7 +92,8 @@
   },
   "qualityArchitecture": {
     "verdict": "PASS",
-    "exitCode": 0
+    "exitCode": 0,
+    "sourceCommit": "2fc482994f67cc42b17bdae3add7643857ff4cb1"
   },
   "preflight": {
     "verdict": "PASS",
@@ -125,11 +126,43 @@
   "independentDesignReview": "PASS",
   "independentPointerRefinementReviews": "PASS",
   "independentSourceReview": "PASS",
-  "carriers": "PENDING_COMMITTED_SOURCE",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
   "publicationAudit": "slice9cb2-publication-audit.json",
   "runtime": "NEW_HEAD_UNPROVEN",
   "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
   "wholePhase2b": "IN_PROGRESS",
   "ready": false,
-  "sourceFiles": 20
+  "sourceFiles": 22,
+  "sourceCommit": "2fc482994f67cc42b17bdae3add7643857ff4cb1",
+  "independentEvidenceReview": "PASS",
+  "sourceCommitFiles": 20,
+  "generatedCarriersAfterSource": [
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ]
 }
