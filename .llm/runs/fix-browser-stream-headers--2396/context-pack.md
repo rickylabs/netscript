@@ -27,3 +27,21 @@ pass 16 files each with no dropped targets. Canonical authored-prose generation 
 barrel/publish-assets generation succeeded after the merge; only expected prose carrier differs.
 Next: stable merged-head root/quality/publish/doc and canonical-corpus checks, then independent
 exact-head implementation review. Required runtime CI remains an actual gate, not a local claim.
+
+## S2 local gate completion
+
+Source head e26aacb203b702cd776ac300d00da5656bebf44e: root check passes 3829 files/32
+batches; complete Fresh/workers suites 460/0/0. All touched authored TypeScript lint/fmt pass
+with no dropped targets. Quality:gate passes quality/architecture/dependency checks. Fresh,
+workers, MCP and CLI member dry-runs pass. All four generated-doc freshness gates pass.
+
+Full export doc lint is RED: Fresh45 and workers2. Both exactly match normalized main
+per-file/rule-count fingerprints; Fresh source in the comparison checkout is identical to main,
+and workers' two findings are in the unchanged core contract types. No waiver or diagnostic
+reduction is claimed. The older Windows reports are preserved but are not current baseline.
+Existing native type-closure debt and all original expiry dates remain unchanged.
+
+Reconcile: original branch and evidence retained; main source merged without manual resolution.
+Only debt-union and canonical prose-carrier conflicts required handling. PR already has its
+breaking-migration note and existing e2e-cli opt-in; labels/milestone were not changed. Independent
+exact-head review is next. Do not infer current-head CI/runtime results from historical green runs.
