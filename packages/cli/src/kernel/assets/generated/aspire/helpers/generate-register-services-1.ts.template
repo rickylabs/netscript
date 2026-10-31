@@ -1,19 +1,14 @@
 {{__slot0__}}
 
-import { installationSecretPermissions } from './installation-secret.mts';
+{{executionImports}}
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import { OtlpProtocol } from '{{__slot1__}}';
+{{otlpImport}}
 import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 import {
-  buildDatabaseUriEnvKey,
-  buildDatabaseProviderEnvVars,
-  buildSqliteDatabaseUrl,
-  buildOtelEnvVars,
+{{executionCompatImports}}
   extractPluginReferences,
   extractServiceReferences,
-  resolvePermissions,
-  resolveWorkspacePath,
 } from '{{__slot3__}}';
 
 type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
@@ -34,21 +29,20 @@ type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutabl
  * @param appHostDir - Absolute path to the AppHost directory
  * @returns Map of registered service resources keyed by name
  */
-export async function registerServices(
-  builder: DistributedApplicationBuilder,
-  config: NetScriptConfig,
-  infrastructure: InfrastructureContext,
-  appHostDir: string,
-  installationSecretFile: string | undefined = undefined,
+export {{asyncModifier}}function registerServices(
+  {{builderParameter}}: DistributedApplicationBuilder,
+  {{configParameter}}: NetScriptConfig,
+  {{infrastructureParameter}}: InfrastructureContext,
+  {{appHostDirParameter}}: string,
+  {{secretParameter}}: string | undefined = undefined,
 ): Promise<Map<string, ExecutableResource>> {
   const services = new Map<string, ExecutableResource>();
-  const databaseEnvKey = buildDatabaseUriEnvKey(config);
-  const databaseProviderEnv = buildDatabaseProviderEnvVars(config);
+{{databaseBindings}}
 
   // --- Pass 1: Create all service resources ---
 {{__slot4__}}
 
-  return services;
+  return {{registrationResult}};
 }
 
 /**

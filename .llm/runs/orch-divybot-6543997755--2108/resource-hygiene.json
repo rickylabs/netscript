@@ -1,0 +1,8 @@
+{
+  "reporterExitCode": 0,
+  "survivorOwnershipCounts": {
+    "unproven": 1
+  },
+  "foreignOrUnknownResourcesMutated": false,
+  "ownedAppHostsStoppedByExactPath": true
+}

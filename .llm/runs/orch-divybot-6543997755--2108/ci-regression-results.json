@@ -1,0 +1,31 @@
+{
+  "command": "structured run-deno-test.ts on every failing file listed in ci-failure-analysis.json",
+  "summary": {
+    "passed": 83,
+    "failed": 3,
+    "ignored": 0,
+    "totalResults": 86,
+    "uniqueFailures": 3
+  },
+  "remainingFailures": {
+    "count": 3,
+    "file": "packages/cli/e2e/tests/application/gates/scaffold/generated-browser-conformance_test.ts",
+    "cause": "Historical host-only failures; corrected launcher location/loader environment, final browser rerun passes."
+  },
+  "successfulCoverage": "All MCP guidance/corpus tests, BFF cookie topology, generated policy guards, guarded docs controls, generated service controls, and empty-tools pipeline.",
+  "browserRerun": {
+    "command": "structured run-deno-test.ts, generated-browser-conformance_test.ts; existing browser via project-owned loader-scoped launcher",
+    "rawExitCode": 0,
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    "controls": "Real browser signin/callback/guarded read; stripped Secure and omitted bearer forwarding both detected"
+  },
+  "aggregate": {
+    "passed": 86,
+    "failedAfterHostRepair": 0,
+    "scope": "same source across the twelve affected files; 83 passing results in original batch plus 3 passing browser rerun results"
+  }
+}

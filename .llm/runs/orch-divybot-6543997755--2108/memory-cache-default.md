@@ -1,0 +1,3 @@
+# 2026-10-31 — Explicit cache choice for KV proof
+
+Local init defaults to a Redis cache even when --cache is omitted. Use --cache false to omit that optional cache; installed KV plugins provision their declared Garnet dependency. Otherwise plugin readiness waits on an unrelated Redis container on remote-Docker hosts. NETSCRIPT_CACHE_MODE=Executable is supported for Garnet. Ensure PATH selects the installed .NET executable rather than an inactive mise shim, because the Garnet tool runs from a different working directory. BrowserLogs is an on-demand diagnostic session resource, not a runnable application process; list its exclusion explicitly in acceptance.

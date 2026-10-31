@@ -1,0 +1,15 @@
+{{header}}
+
+import type { DistributedApplicationBuilder } from '{{sdk}}';
+import type { NetScriptConfig } from '{{compat}}';
+import type { InfrastructureContext } from './register-infrastructure.mts';
+
+/** No development tools are configured. */
+export function registerTools(
+  _builder: DistributedApplicationBuilder,
+  _config: NetScriptConfig,
+  _infrastructure: InfrastructureContext,
+  _appHostDir: string,
+): Promise<void> {
+  return Promise.resolve();
+}
