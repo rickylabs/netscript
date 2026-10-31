@@ -1,12 +1,12 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
-- H01 #2438 → PR #2476 (implementing)
+- H01 #2438 MERGED #2476 a410a815c 00:37Z; close after main command-postgres green
 - A1 #2165 MERGED #2477 7907293f3 23:31Z (closed); #2187 r1 → PR #2479 (implementing)
-- A2 #2395 → #2351: W2 / W3
-- A3 #2144 cap-held → relaunch r1; #2400 #2151 #2161: W2
+- A2 #2395 brief ready, HOLD until Cockpit says both Fresh UI fixes (#2415, #2416) started; then #2351 (W3)
+- A3 #2144 → PR #2481 (implementing); #2400 #2151 #2161: W2
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
 - B2 #2162 (after #2161) #2149: W3; #2369: W4; #2108 (after B2 pair + all B1): W7
 - C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (after all B1): W7
-- D1 #2396 cap-held → relaunch r1 (adopt #2421–#2423); #2367 #2115 #2290 #2259: W3
+- D1 #2396 r1 started 00:17Z (adopting #2421–#2423); #2367 #2115 #2290 #2259: W3
 - E1 #2392 #2394 #2401: W4 · E2 #2155 #2385 #1491 #1364(docs): W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6
 - G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)

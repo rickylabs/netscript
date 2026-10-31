@@ -42,3 +42,10 @@
 - 23:59Z: #2187 → PR #2479 (draft); #2478 → PR #2480 (draft). Both recorded as implementing.
 - 00:08Z: **merged** #2480 (`6a71cd059`) for #2478 (H02). CI 47/47 green at `b2e1d30`, Opus MERGE, 0 threads. #2478 closes once the repo-wide Code quality run on main is green.
 - 00:09Z: Code quality is green on main (run 41148483243, `code-quality-repo` success at `6a71cd059`); #2478 closed with evidence.
+- 00:04:17Z: relaunched #2144 (`mc009d-r1-2144`, comment 6536190825); started 00:07:20Z.
+- 00:14:01Z: relaunched #2396 (`mc009d-r1-2396`, comment 6536318991); started 00:17:04Z. Builders: #2438, #2187, #2144, #2396; #2395 is scripted for 00:25Z (5th builder).
+- 00:20Z: Cockpit: the netscript hourly limit is full again (6 launches since 23:44Z), and the Fresh UI #2415 fix is held while it blocks the S2 merge. Stopped the scripted 00:25Z #2395 post before it ran (#2395 has 0 comments). The first free slot (~00:45Z) is left to #2415; #2395 posts at 00:55Z or later.
+- 00:24Z: #2476 (#2438 H01) READY at `1684e82`. Bound: `@opentelemetry/instrumentation` 0.223.0 with API 1.9.1 (SDK peers need API <1.10). Shared locked-fixture tool. Root lock and fresh-ui lock deltas disclosed in lock-delta.json; Fresh UI PRs may need a lock rebase. `command-postgres` green on the PR head; Opus MERGE at head; 0 threads. **expensive-gate.acquired** on #2476.
+- 00:26Z: Cockpit: a second Fresh UI fix (#2416, 00:25:45Z) is held too. Stopped the scripted #2395 post (nothing was posted). #2395 now waits for Cockpit's explicit go, after both Fresh UI fixes have started (about 00:52Z).
+- 00:37Z: **merged** #2476 (`a410a815c`) for #2438 (H01). 49/49 checks green, including command-postgres and e2e-cli on both runtime tiers at `1684e82`; expensive gate released. #2438 closes after command-postgres is green on main.
+- 00:38Z: #2144 → PR #2481 (draft), implementing.
