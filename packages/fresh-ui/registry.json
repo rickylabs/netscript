@@ -2372,7 +2372,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "model-selector",
@@ -2684,7 +2687,9 @@
       "description": "Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
       "author": "NetScript",
       "registryDependencies": [
-        "theme-seed"
+        "theme-seed",
+        "kbd",
+        "spinner"
       ],
       "type": "registry:component",
       "files": [
@@ -2717,7 +2722,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "search",
@@ -2875,7 +2883,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "inline-notice",
@@ -3375,7 +3386,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "empty-state",
@@ -4001,7 +4015,152 @@
           "desktop-update-prompt": "desktop-update-prompt",
           "desktop-only": "desktop-only",
           "mcp-ui-widget": "mcp-ui-widget",
-          "render-ui": "render-ui"
+          "render-ui": "render-ui",
+          "button-group": "button-group",
+          "toggle": "toggle",
+          "toggle-group": "toggle-group",
+          "radio-group": "radio-group",
+          "input-group": "input-group",
+          "input-otp": "input-otp",
+          "slider": "slider",
+          "calendar-date": "calendar-date",
+          "calendar": "calendar",
+          "date-picker": "date-picker",
+          "location-marker": "location-marker",
+          "navigation-menu": "navigation-menu",
+          "stepper": "stepper",
+          "menu-items": "menu-items",
+          "menubar": "menubar",
+          "alert-dialog": "alert-dialog",
+          "hover-card": "hover-card",
+          "context-menu": "context-menu",
+          "item": "item",
+          "kbd": "kbd",
+          "collapsible": "collapsible",
+          "chart": "chart",
+          "carousel": "carousel"
+        }
+      }
+    },
+    {
+      "name": "button-group",
+      "type": "registry:component",
+      "description": "Joined native actions with optional separators and text.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/button-group.tsx",
+          "type": "registry:component",
+          "target": "@ui/button-group.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/button-group.css",
+          "type": "registry:file",
+          "target": "@assets/ui/button-group.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "button"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "actions",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/button-group.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "toggle",
+      "type": "registry:component",
+      "description": "Native pressed button with controlled or local selection.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toggle.tsx",
+          "type": "registry:component",
+          "target": "@ui/toggle.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toggle.css",
+          "type": "registry:file",
+          "target": "@assets/ui/toggle.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "actions",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/toggle.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:component",
+      "description": "Single/multiple pressed-button toolbar with roving arrow navigation.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toggle-group.tsx",
+          "type": "registry:component",
+          "target": "@ui/toggle-group.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toggle-group.css",
+          "type": "registry:file",
+          "target": "@assets/ui/toggle-group.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "toggle"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "actions",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/toggle-group.css';"
+            }
+          ]
         }
       }
     },
@@ -4430,6 +4589,819 @@
           "target": ".agents/skills/fresh-ui-theme-fluent-2-web/SKILL.md"
         }
       ]
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:component",
+      "description": "Native radio fieldset with option labels and descriptions.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/radio-group.tsx",
+          "type": "registry:component",
+          "target": "@ui/radio-group.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/radio-group.css",
+          "type": "registry:file",
+          "target": "@assets/ui/radio-group.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/radio-group.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "input-group",
+      "type": "registry:component",
+      "description": "Native control and addon composition with input styling.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/input-group.tsx",
+          "type": "registry:component",
+          "target": "@ui/input-group.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/input-group.css",
+          "type": "registry:file",
+          "target": "@assets/ui/input-group.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/input-group.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "input-otp",
+      "type": "registry:component",
+      "description": "Native one-time code input with grouped visual slots and sanitized paste.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/input-otp.tsx",
+          "type": "registry:component",
+          "target": "@ui/input-otp.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/input-otp.css",
+          "type": "registry:file",
+          "target": "@assets/ui/input-otp.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/input-otp.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "slider",
+      "type": "registry:component",
+      "description": "One or two native ranges with keyboard steps and bounded values.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/slider.tsx",
+          "type": "registry:component",
+          "target": "@ui/slider.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/slider.css",
+          "type": "registry:file",
+          "target": "@assets/ui/slider.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/slider.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "calendar-date",
+      "type": "registry:lib",
+      "description": "UTC Gregorian date arithmetic for copied date controls.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/calendar-date.ts",
+          "type": "registry:file",
+          "target": "@ui/calendar-date.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "calendar",
+      "type": "registry:component",
+      "description": "Single/range APG day grid with native day and caption controls.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/calendar.tsx",
+          "type": "registry:component",
+          "target": "@ui/calendar.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/calendar.css",
+          "type": "registry:file",
+          "target": "@assets/ui/calendar.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/calendar.css';"
+            }
+          ]
+        }
+      },
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "calendar-date"
+      ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:component",
+      "description": "Native modal calendar picker with focus restoration and ISO form values.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/date-picker.tsx",
+          "type": "registry:component",
+          "target": "@ui/date-picker.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/date-picker.css",
+          "type": "registry:file",
+          "target": "@assets/ui/date-picker.css"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "forms",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/date-picker.css';"
+            }
+          ]
+        }
+      },
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "calendar-date",
+        "calendar"
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "location-marker",
+      "type": "registry:component",
+      "description": "Decorative square location mark with native current-location ownership.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/location-marker.tsx",
+          "type": "registry:component",
+          "target": "@ui/location-marker.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/location-marker.css",
+          "type": "registry:file",
+          "target": "@assets/ui/location-marker.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/location-marker.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:component",
+      "description": "Native links and exclusive details disclosures for site navigation.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/navigation-menu.tsx",
+          "type": "registry:component",
+          "target": "@ui/navigation-menu.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/navigation-menu.css",
+          "type": "registry:file",
+          "target": "@assets/ui/navigation-menu.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "location-marker"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/navigation-menu.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "stepper",
+      "type": "registry:component",
+      "description": "Ordered progress steps with native links and readable status.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/stepper.tsx",
+          "type": "registry:component",
+          "target": "@ui/stepper.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/stepper.css",
+          "type": "registry:file",
+          "target": "@assets/ui/stepper.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/stepper.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "menu-items",
+      "type": "registry:lib",
+      "description": "Private copied action/choice/submenu content for application menus.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menu-items.tsx",
+          "type": "registry:file",
+          "target": "@ui/menu-items.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menu-items.css",
+          "type": "registry:file",
+          "target": "@assets/ui/menu-items.css"
+        }
+      ],
+      "registryDependencies": [
+        "floating-styles"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/menu-items.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "menubar",
+      "type": "registry:component",
+      "description": "Roving application menus over package-owned native ActionMenu popovers.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menubar.tsx",
+          "type": "registry:component",
+          "target": "@ui/menubar.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menubar.css",
+          "type": "registry:file",
+          "target": "@assets/ui/menubar.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "floating-styles",
+        "menu-items"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/menubar.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:component",
+      "description": "Native confirmation dialog with least-destructive initial focus.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/alert-dialog.tsx",
+          "type": "registry:component",
+          "target": "@ui/alert-dialog.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/alert-dialog.css",
+          "type": "registry:file",
+          "target": "@assets/ui/alert-dialog.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "button"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "overlays",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/alert-dialog.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "hover-card",
+      "type": "registry:component",
+      "description": "Focus-preserving profile preview on hover or native disclosure activation.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/hover-card.tsx",
+          "type": "registry:component",
+          "target": "@ui/hover-card.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/hover-card.css",
+          "type": "registry:file",
+          "target": "@assets/ui/hover-card.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "floating-styles",
+        "avatar"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "overlays",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/hover-card.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:component",
+      "description": "Pointer and keyboard context region with native shared menu content.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/context-menu.tsx",
+          "type": "registry:component",
+          "target": "@ui/context-menu.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/context-menu.css",
+          "type": "registry:file",
+          "target": "@assets/ui/context-menu.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "floating-styles",
+        "menu-items"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "overlays",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/context-menu.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "item",
+      "type": "registry:component",
+      "description": "Presentation row with native content and action slots.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/item.tsx",
+          "type": "registry:component",
+          "target": "@ui/item.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/item.css",
+          "type": "registry:file",
+          "target": "@assets/ui/item.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/item.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "kbd",
+      "type": "registry:component",
+      "description": "Native keyboard notation and grouped shortcut keys.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/kbd.tsx",
+          "type": "registry:component",
+          "target": "@ui/kbd.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/kbd.css",
+          "type": "registry:file",
+          "target": "@assets/ui/kbd.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/kbd.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:component",
+      "description": "Native details disclosure with controlled or uncontrolled open state.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/collapsible.tsx",
+          "type": "registry:component",
+          "target": "@ui/collapsible.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/collapsible.css",
+          "type": "registry:file",
+          "target": "@assets/ui/collapsible.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/collapsible.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "chart",
+      "type": "registry:component",
+      "description": "Accessible Cartesian area/line series with native source-data disclosure.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/chart.tsx",
+          "type": "registry:component",
+          "target": "@ui/chart.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/chart.css",
+          "type": "registry:file",
+          "target": "@assets/ui/chart.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "empty-state",
+        "skeleton"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/chart.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "carousel",
+      "type": "registry:component",
+      "description": "Manual native scroll-snap carousel with stable-focus boundary controls.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/carousel.tsx",
+          "type": "registry:component",
+          "target": "@ui/carousel.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/carousel.css",
+          "type": "registry:file",
+          "target": "@assets/ui/carousel.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/carousel.css';"
+            }
+          ]
+        }
+      }
     }
   ],
   "meta": {
@@ -4526,7 +5498,13 @@
           "switch",
           "label",
           "select",
-          "form-field"
+          "form-field",
+          "radio-group",
+          "input-group",
+          "input-otp",
+          "slider",
+          "calendar",
+          "date-picker"
         ]
       },
       {
@@ -4591,6 +5569,51 @@
           "desktop-window-chrome",
           "desktop-update-prompt",
           "desktop-only"
+        ]
+      },
+      {
+        "name": "actions",
+        "description": "Native actions and keyboard-accessible selection groups.",
+        "items": [
+          "theme-seed",
+          "button",
+          "icon-button",
+          "button-group",
+          "toggle",
+          "toggle-group"
+        ]
+      },
+      {
+        "name": "navigation",
+        "description": "Native site navigation and application menus with current-location/progress affordances.",
+        "items": [
+          "theme-seed",
+          "location-marker",
+          "navigation-menu",
+          "menubar",
+          "stepper"
+        ]
+      },
+      {
+        "name": "overlays",
+        "description": "Native confirmation, informational preview and pointer/keyboard context menus.",
+        "items": [
+          "theme-seed",
+          "alert-dialog",
+          "hover-card",
+          "context-menu"
+        ]
+      },
+      {
+        "name": "data-display",
+        "description": "Native data presentation, notation and disclosures.",
+        "items": [
+          "theme-seed",
+          "item",
+          "kbd",
+          "collapsible",
+          "chart",
+          "carousel"
         ]
       }
     ]

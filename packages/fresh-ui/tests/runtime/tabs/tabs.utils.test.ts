@@ -29,3 +29,12 @@ Deno.test('getNextTabsIndex handles Home and End keys', () => {
     'End should jump to the last tab',
   );
 });
+
+Deno.test('RTL reverses only horizontal arrows, preserving endpoints and vertical navigation', () => {
+  assertEquals(getNextTabsIndex('ArrowLeft', 0, 3, 'horizontal', true, 'rtl'), 1);
+  assertEquals(getNextTabsIndex('ArrowRight', 0, 3, 'horizontal', true, 'rtl'), 2);
+  assertEquals(getNextTabsIndex('Home', 2, 3, 'horizontal', true, 'rtl'), 0);
+  assertEquals(getNextTabsIndex('End', 0, 3, 'horizontal', true, 'rtl'), 2);
+  assertEquals(getNextTabsIndex('ArrowDown', 0, 3, 'vertical', true, 'rtl'), 1);
+  assertEquals(getNextTabsIndex('ArrowUp', 0, 3, 'vertical', true, 'rtl'), 2);
+});

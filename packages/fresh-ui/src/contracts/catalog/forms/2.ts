@@ -274,15 +274,8 @@ export const forms_2: readonly ComponentContract[] = [
     'specId': 'F6',
     'category': 'Forms',
     'priority': 'P0',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'checked': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
-      },
       'state': {
         'kind': 'enum',
         'values': [
@@ -300,42 +293,62 @@ export const forms_2: readonly ComponentContract[] = [
           'vertical',
         ],
       },
+      'name': {
+        'kind': 'text',
+        'required': true,
+      },
+      'legend': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'options': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'value': {
+        'kind': 'text',
+      },
+      'defaultValue': {
+        'kind': 'text',
+      },
+      'onValueChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'required': {
+        'kind': 'boolean',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'control',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'indicator',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'body',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -343,6 +356,9 @@ export const forms_2: readonly ComponentContract[] = [
         'values': [
           'false',
           'true',
+        ],
+        'parts': [
+          'control',
         ],
       },
       'data-state': {
@@ -355,6 +371,10 @@ export const forms_2: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'root',
+          'control',
+        ],
       },
       'data-orientation': {
         'values': [
@@ -384,7 +404,8 @@ export const forms_2: readonly ComponentContract[] = [
       'surface/card',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.',
+      'Design checked belongs to individual Radio controls; the group public API uses value/defaultValue and native name. Disabled fieldset applies to every option.',
     ],
   },
 ];

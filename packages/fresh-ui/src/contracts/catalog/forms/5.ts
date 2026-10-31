@@ -7,7 +7,7 @@ export const forms_5: readonly ComponentContract[] = [
     'specId': 'F13',
     'category': 'Forms',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'months': {
         'kind': 'enum',
@@ -23,67 +23,95 @@ export const forms_5: readonly ComponentContract[] = [
           'dropdown',
         ],
       },
-      'state': {
+      'mode': {
         'kind': 'enum',
         'values': [
-          'rest',
-          'hover',
-          'focus',
-          'selected',
-          'disabled',
-          'today',
+          'single',
+          'range',
         ],
+        'default': 'single',
       },
-      'range': {
+      'value': {
+        'kind': 'collection',
+        'description': 'Ordered ISO date strings; single has at most one and range at most two.',
+      },
+      'defaultValue': {
+        'kind': 'collection',
+        'description': 'Ordered ISO date strings; single has at most one and range at most two.',
+      },
+      'defaultMonth': {
+        'kind': 'text',
+      },
+      'today': {
+        'kind': 'text',
+        'description':
+          'Defaults to the current UTC date. Pass the user-local ISO date when local-day highlighting is required.',
+      },
+      'min': {
+        'kind': 'text',
+      },
+      'max': {
+        'kind': 'text',
+      },
+      'locale': {
+        'kind': 'text',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'autoFocus': {
+        'kind': 'boolean',
+      },
+      'onValueChange': {
+        'kind': 'callback',
+      },
+      'isDateDisabled': {
+        'kind': 'callback',
+      },
+      'weekStartsOn': {
         'kind': 'enum',
         'values': [
-          'none',
-          'start',
-          'middle',
-          'end',
+          '0',
+          '1',
         ],
+        'default': 0,
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'header',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'nav-prev',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'caption',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'nav-next',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'weekdays',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'grid',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'day',
       },
     ],
     'attributes': {
@@ -110,6 +138,9 @@ export const forms_5: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'day',
+        ],
       },
       'data-range': {
         'values': [
@@ -117,6 +148,9 @@ export const forms_5: readonly ComponentContract[] = [
           'start',
           'middle',
           'end',
+        ],
+        'parts': [
+          'day',
         ],
       },
     },
@@ -132,6 +166,14 @@ export const forms_5: readonly ComponentContract[] = [
         'key': 'Home/End',
         'action': 'Move to first/last cell',
       },
+      {
+        'key': 'PageUp/PageDown',
+        'action': 'Move one month, preserving or clamping the day; Shift moves one year.',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Select the focused enabled day.',
+      },
     ],
     'tokenRoles': [
       'primary/default',
@@ -143,7 +185,8 @@ export const forms_5: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'UTC Gregorian ISO API; native buttons and select captions. Day state/range are derived, with CSS hover/focus; no caller state simulation. Only endpoints get selected visual state; middle cells remain aria-selected with range fill.',
+      'Hydrate inside an island. Disabled/out-of-bounds dates are skipped; browsing alone never changes selection.',
     ],
   },
   {
@@ -151,7 +194,7 @@ export const forms_5: readonly ComponentContract[] = [
     'specId': 'F14',
     'category': 'Forms',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'mode': {
         'kind': 'enum',
@@ -165,32 +208,79 @@ export const forms_5: readonly ComponentContract[] = [
         'values': [
           'rest',
           'focus',
-          'open',
           'disabled',
           'invalid',
         ],
+      },
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'name': {
+        'kind': 'text',
+      },
+      'defaultMonth': {
+        'kind': 'text',
+      },
+      'min': {
+        'kind': 'text',
+      },
+      'max': {
+        'kind': 'text',
+      },
+      'placeholder': {
+        'kind': 'text',
+      },
+      'locale': {
+        'kind': 'text',
+      },
+      'value': {
+        'kind': 'collection',
+      },
+      'defaultValue': {
+        'kind': 'collection',
+      },
+      'open': {
+        'kind': 'boolean',
+      },
+      'defaultOpen': {
+        'kind': 'boolean',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'onValueChange': {
+        'kind': 'callback',
+      },
+      'onOpenChange': {
+        'kind': 'callback',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'trigger',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'content',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'title',
+      },
+      {
+        'name': 'description',
+      },
+      {
+        'name': 'close',
       },
     ],
     'attributes': {
@@ -209,7 +299,15 @@ export const forms_5: readonly ComponentContract[] = [
           'invalid',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Root derives open from Dialog; trigger/content retain its native runtime open/closed values.',
+        'parts': [
+          'root',
+          'trigger',
+          'content',
+        ],
+        'compatibilityValues': [
+          'closed',
+        ],
       },
     },
     'booleans': [],
@@ -230,7 +328,9 @@ export const forms_5: readonly ComponentContract[] = [
       'text/fg',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Calendar embedded in package-owned native modal Dialog; uses existing focus, Escape and return behavior.',
+      'Browser-forced dismissal can supersede a rejected close request; applications should normally accept native close requests.',
+      'ISO value collection and open state can each be controlled. A named hidden input submits dates joined by /. Open data-state is derived; hydrate in an island.',
     ],
   },
   {

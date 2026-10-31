@@ -1,0 +1,20 @@
+.ns-calendar { display: flex; flex-wrap: wrap; gap: var(--ns-space-4); padding: var(--ns-space-2); color: var(--ns-fg); background: var(--ns-card); }
+.ns-calendar__month { min-inline-size: 0; }
+.ns-calendar [data-part='header'] { display: flex; align-items: center; justify-content: space-between; gap: var(--ns-control-gap); margin-block-end: var(--ns-space-2); min-block-size: var(--ns-control-height-sm); }
+.ns-calendar [data-part='caption'] { display: flex; justify-content: center; flex: 1; gap: var(--ns-space-2); font-size: var(--ns-text-strong); font-weight: var(--ns-weight-strong); }
+.ns-calendar :is([data-part='nav-prev'],[data-part='nav-next']) { inline-size: var(--ns-control-height-sm); block-size: var(--ns-control-height-sm); border: 0; border-radius: var(--ns-radius-control); background: transparent; color: inherit; font-size: var(--ns-text-strong); cursor: pointer; }
+.ns-calendar table { border-collapse: separate; border-spacing: 0; }
+.ns-calendar th { font-size: var(--ns-text-caption); font-weight: inherit; color: var(--ns-muted-fg); block-size: var(--ns-control-height-sm); }
+.ns-calendar td { padding: 0; text-align: center; }
+.ns-calendar [data-part='day'] { box-sizing: border-box; inline-size: var(--ns-control-height-sm); block-size: var(--ns-control-height-sm); border: 0; border-radius: var(--ns-radius-input); background: transparent; color: inherit; font-size: var(--ns-text-small); cursor: pointer; }
+.ns-calendar [data-state='today'] { background: var(--ns-muted); }
+.ns-calendar [data-range='middle'] { background: var(--ns-selected); border-radius: 0; }
+.ns-calendar [data-state='selected'] { background: var(--ns-primary); color: var(--ns-primary-fg); }
+.ns-calendar button:focus-visible, .ns-calendar select:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; position: relative; }
+.ns-calendar button:enabled:hover:not([data-state='selected']) { background: var(--ns-hover); color: var(--ns-fg); }
+.ns-calendar button:disabled { opacity: 0.38; cursor: not-allowed; }
+.ns-calendar select { border: var(--ns-border-width) solid var(--ns-input-border); border-radius: var(--ns-radius-input); background: var(--ns-card); color: var(--ns-fg); font: inherit; }
+
+.ns-calendar__outside { display: inline-grid; place-items: center; inline-size: var(--ns-control-height-sm); block-size: var(--ns-control-height-sm); color: var(--ns-muted-fg); font-size: var(--ns-text-small); }
+
+.ns-calendar [data-state='selected']:enabled:hover { background: var(--ns-primary-hover); color: var(--ns-primary-fg); }

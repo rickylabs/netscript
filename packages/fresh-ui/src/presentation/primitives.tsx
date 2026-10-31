@@ -9,15 +9,62 @@
 import { h } from 'preact';
 import type { ComponentChildren, JSX } from 'preact';
 
+/*!
+ * arrow-left, arrow-right, bell, circle-check, circle-alert, corner-down-left and file-text paths: Lucide / Feather.
+ * https://github.com/lucide-icons/lucide/tree/main/icons
+ *
+ * ISC License
+ * Copyright (c) 2026 Lucide Icons and Contributors
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * The MIT License (MIT), for these Feather-derived icons
+ * Copyright (c) 2013-present Cole Bemis
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * Curated stroke-SVG paths supported by the package-owned icon primitive.
  */
 export const ICON_PATHS = {
+  'alert-triangle': ['M12 3 22 21H2Z', 'M12 9v4', 'M12 17h.01'],
+  'arrow-left': ['m12 19-7-7 7-7', 'M19 12H5'],
+  'arrow-right': ['M5 12h14', 'm12 5 7 7-7 7'],
+  bell: [
+    'M10.268 21a2 2 0 0 0 3.464 0',
+    'M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326',
+  ],
+  calendar: ['M3 5h18v16H3Z', 'M8 3v4', 'M16 3v4', 'M3 11h18'],
   check: ['M20 6 9 17l-5-5'],
   'chevron-down': ['M6 9l6 6 6-6'],
   'chevron-left': ['M15 18l-6-6 6-6'],
   'chevron-right': ['M9 18l6-6-6-6'],
   'chevron-up': ['M18 15l-6-6-6 6'],
+  'circle-alert': ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z', 'M12 8v4', 'M12 16h.01'],
+  'circle-check': ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z', 'm16 9-5.5 5.5L8 12'],
+  'corner-down-left': ['M20 4v7a4 4 0 0 1-4 4H4', 'm9 10-5 5 5 5'],
   copy: [
     'M8 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z',
     'M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2',
@@ -27,6 +74,13 @@ export const ICON_PATHS = {
     'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
     'M15 3h6v6',
     'M10 14 21 3',
+  ],
+  'file-text': [
+    'M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z',
+    'M14 2v5a1 1 0 0 0 1 1h5',
+    'M10 9H8',
+    'M16 13H8',
+    'M16 17H8',
   ],
   info: ['M12 16v-4', 'M12 8h.01', 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z'],
   menu: ['M4 6h16', 'M4 12h16', 'M4 18h16'],

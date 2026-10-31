@@ -1,0 +1,20 @@
+{
+  "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+  "attempts": 1,
+  "exitCode": 1,
+  "verdict": "UNPROVEN",
+  "passed": 1,
+  "failed": 2,
+  "skipped": 0,
+  "failedGates": [
+    "preflight.aspire",
+    "cleanup.aspire-stop"
+  ],
+  "environment": "Aspire doctor failed; Docker daemon unavailable",
+  "runtimeBehaviorStarted": false,
+  "cleanupInspection": "UNPROVEN",
+  "manualForeignOrUnknownResourceMutation": false,
+  "observedHead": "f866c2fe77dc48004b2af4e39978472a8328e903",
+  "reviewedSourceCommit": "0d399a1b89262f0c2c1a6e4850010b0f8b7d4311",
+  "reviewedSourceWasUncommittedDuringRun": true
+}

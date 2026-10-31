@@ -17,7 +17,9 @@ export const feedback_1: readonly ComponentContract[] = [
           'success',
           'warning',
           'destructive',
+          'important',
         ],
+        'default': 'info',
       },
       'emphasis': {
         'kind': 'enum',
@@ -25,25 +27,54 @@ export const feedback_1: readonly ComponentContract[] = [
           'subtle',
           'strong',
         ],
+        'default': 'subtle',
       },
       'children': {
         'kind': 'slot',
         'description': 'Supported Utility public prop; native attributes pass through separately.',
       },
       'icon': {
-        'kind': 'boolean',
+        'kind': 'slot',
+        'description': 'Decorative glyph; omitted or true uses the tone default, false hides it.',
       },
       'title': {
-        'kind': 'boolean',
+        'kind': 'slot',
+        'description':
+          'Omitted uses the tone label; custom content replaces it. False/null keeps the localized tone label visually hidden for assistive technology.',
       },
       'description': {
-        'kind': 'boolean',
+        'kind': 'slot',
+        'description': 'Takes precedence over legacy children.',
       },
       'action': {
-        'kind': 'boolean',
+        'kind': 'slot',
+        'description': 'Caller-owned native link or button.',
       },
       'close': {
         'kind': 'boolean',
+        'default': false,
+      },
+      'closeLabel': {
+        'kind': 'text',
+        'default': 'Dismiss notification',
+      },
+      'open': {
+        'kind': 'boolean',
+        'description': 'Controlled visibility; dismissal requests may be refused.',
+      },
+      'defaultOpen': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'onOpenChange': {
+        'kind': 'callback',
+        'description':
+          'Receives false on native dismiss activation; native onClose remains a DOM event.',
+      },
+      'toneLabel': {
+        'kind': 'text',
+        'description':
+          'Localized default tone label; blank falls back to Note, Info, Success, Warning, Error or Important.',
       },
     },
     'parts': [
@@ -52,13 +83,13 @@ export const feedback_1: readonly ComponentContract[] = [
       },
       {
         'name': 'icon',
+        'when': 'unless icon is false',
       },
       {
         'name': 'body',
       },
       {
         'name': 'title',
-        'when': 'when the corresponding content or subcomponent is supplied',
       },
       {
         'name': 'description',
@@ -74,7 +105,8 @@ export const feedback_1: readonly ComponentContract[] = [
       },
       {
         'name': 'rule',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'emphasis is strong',
+        'representation': 'pseudo',
       },
     ],
     'attributes': {
@@ -85,42 +117,79 @@ export const feedback_1: readonly ComponentContract[] = [
           'success',
           'warning',
           'destructive',
+          'important',
         ],
-        'plannedValues': [
-          'neutral',
-        ],
+        'default': 'info',
       },
       'data-emphasis': {
         'values': [
           'subtle',
           'strong',
         ],
-        'plannedValues': [
-          'strong',
+        'default': 'subtle',
+      },
+      'data-state': {
+        'values': [
+          'open',
+          'closed',
         ],
+        'default': 'open',
       },
     },
     'booleans': [
-      'icon',
-      'title',
-      'description',
-      'action',
       'close',
     ],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'children',
+        'part': 'description',
+      },
+      {
+        'name': 'icon',
+        'part': 'icon',
+      },
+      {
+        'name': 'title',
+        'part': 'title',
+      },
+      {
+        'name': 'description',
+        'part': 'description',
+      },
+      {
+        'name': 'action',
+        'part': 'actions',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/alert/',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action':
+          'Traverse supplied action controls and optional close button in native order; hidden banners are skipped.',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Activate the close button; request open=false without moving focus on mount.',
+      },
+    ],
     'tokenRoles': [
       'border/default',
       'border/width',
       'destructive/border',
       'destructive/subtle',
       'destructive/text',
+      'important/border',
+      'important/subtle',
+      'important/text',
       'info/border',
       'info/subtle',
       'info/text',
       'marker/default',
       'radius/card',
+      'size/icon/md',
+      'space/card/padding',
+      'space/control/gap',
       'space/control/padding-x',
       'space/stack/gap',
       'success/border',
@@ -135,6 +204,10 @@ export const feedback_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Original four tone names and default info live-region role remain compatible; warning/destructive default to alert, other tones to status.',
+      'Closed banners remain mounted with native hidden and explicit display:none; visibility is independent of caller hidden. No automatic focus management.',
+      'Strong emphasis is a CSS leading rule. Optional named content slots accept Renderable values; 0 remains valid content.',
+      'Every banner has a visible tone or custom title by default; title=false/null opts into visually hidden tone text. Title uses body size and Medium label weight.',
     ],
   },
   {

@@ -30,12 +30,13 @@ export function getPopoverDataState(open: boolean): 'open' | 'closed' {
   return open ? 'open' : 'closed';
 }
 
-/** Restores focus to a popover trigger after any dismissal path. */
+/** Restore focus after explicit Escape/close dismissal; outside interaction keeps its target. */
 export function restorePopoverTriggerFocus(trigger: Pick<HTMLElement, 'focus'> | null): void {
   trigger?.focus();
 }
 
 export function usePopover({
+  focusOnOpen = true,
   closeOnEscape = true,
   closeOnInteractOutside = true,
   defaultOpen = false,
@@ -62,7 +63,7 @@ export function usePopover({
         uncontrolledOpen.value = nextOpen;
       }
 
-      if (open && !nextOpen) {
+      if (open && !nextOpen && (reason === 'escape-key' || reason === 'close-button')) {
         queueMicrotask(() => restorePopoverTriggerFocus(triggerRef.current));
       }
 
@@ -83,12 +84,12 @@ export function usePopover({
   useSyncedPopover(contentRef, open);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !focusOnOpen) {
       return;
     }
 
-    contentRef.current?.focus();
-  }, [open]);
+    if (contentRef.current?.getAttribute('role') !== 'menu') contentRef.current?.focus();
+  }, [open, focusOnOpen]);
 
   const getTriggerProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): PopoverTriggerElementProps =>
@@ -108,7 +109,12 @@ export function usePopover({
         'data-state': dataState,
         popovertarget: contentId,
         popovertargetaction: 'toggle',
-        onClick: composeEventHandlers(props.onClick, () => setOpen(!open, 'trigger')),
+        onClick: composeEventHandlers(props.onClick, (event) => {
+          // Hydrated state drives showPopover; do not also run the native toggle default.
+          // Submit/reset buttons retain their explicitly requested form behavior.
+          if (event.currentTarget.type === 'button') event.preventDefault();
+          setOpen(!open, 'trigger');
+        }),
         ref: composeRefs(props.ref, triggerRef),
         style: mergePlatformStyle(props.style, {
           '--ns-floating-anchor-name': anchorName,
