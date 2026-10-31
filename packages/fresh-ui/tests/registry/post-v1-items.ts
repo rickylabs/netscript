@@ -58,6 +58,7 @@ export const FRESH_UI_RUNTIME_DEPENDENCY: string =
 
 /** Updated baseline copies also receive real consumer install/type-check coverage. */
 export const AUDITED_BASELINE_COMPONENTS: readonly string[] = [
+  'stats-grid',
   'sidebar-shell',
   'page-header',
   'command-palette',

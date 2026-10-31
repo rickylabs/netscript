@@ -18,6 +18,9 @@ const css = (await Promise.all(
   .join('\n').replace(/@import\s+[^;]+;/g, '');
 const bundle = await Deno.readTextFile(new URL('./test-results/gap-fixture.js', import.meta.url));
 const shell = await Deno.readTextFile(new URL('./test-results/gap-shell.html', import.meta.url));
+const cardCss = await Deno.readTextFile(
+  new URL('packages/fresh-ui/registry/components/ui/card.css', base),
+);
 const server = Deno.serve({
   hostname: '127.0.0.1',
   port: Number(Deno.args[0] ?? '4187'),
@@ -25,6 +28,9 @@ const server = Deno.serve({
 }, (request) => {
   if (new URL(request.url).pathname === '/fixture.js') {
     return new Response(bundle, { headers: { 'content-type': 'text/javascript' } });
+  }
+  if (new URL(request.url).pathname === '/registered-card.css') {
+    return new Response(cardCss, { headers: { 'content-type': 'text/css' } });
   }
   const staticShell = new URL(request.url).pathname === '/shell-static';
   return new Response(

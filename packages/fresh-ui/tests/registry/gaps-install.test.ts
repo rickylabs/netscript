@@ -132,7 +132,9 @@ import { AspectRatio } from './components/ui/aspect-ratio.tsx';
 import { Direction } from './components/ui/direction.tsx';
 import { Resizable } from './components/ui/resizable.tsx';
 import { SidebarShell } from './components/ui/sidebar-shell.tsx';
+import { StatsGrid } from './components/ui/stats-grid.tsx';
 console.log(JSON.stringify({
+  'stats-grid': render(<StatsGrid columns={3} joined><StatsGrid.Card label='Revenue' value='$284,920' detail='+8.2% versus the previous period' delta='up' variant='hero' badge={<button type='button'>Inspect revenue</button>} /></StatsGrid>),
   'sidebar-shell': render(<SidebarShell layout='docs' pathname='/orders' navigation={[{label:'Work',items:[{href:'/orders',label:'Orders',count:'12'}]}]} brand={<a href='/'>NetScript</a>} rail railContent={<a href='#installation'>Installation</a>} mobileRailContent={<details><summary>On this page</summary>Contents</details>}><h1>Orders</h1></SidebarShell>),
   resizable: render(<Resizable label='Contents' startContent={<button type='button'>Open chapter</button>} endContent={<a href='#chapter'>Read chapter</a>} style={{height: 240}} />),
   'scroll-area': render(h(ScrollArea, { label: 'Recent activity', orientation: 'both', children: h('a', { href: '#activity' }, 'Activity') })),

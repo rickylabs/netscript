@@ -1,3 +1,4 @@
+import { statsGridFixtures, statsGridKeyboard } from './utility-stats-grid.tsx';
 import { shellFixtures, shellKeyboard } from './utility-shell.tsx';
 import { resizableFixtures, resizableKeyboard } from './utility-resizable.tsx';
 import { nativeLayoutFixtures, nativeLayoutKeyboard } from './utility-native-layout.tsx';
@@ -44,6 +45,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...nativeLayoutFixtures,
     ...resizableFixtures,
     ...shellFixtures,
+    ...statsGridFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -62,6 +64,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...nativeLayoutKeyboard,
     ...resizableKeyboard,
     ...shellKeyboard,
+    ...statsGridKeyboard,
     ...proseKeyboard,
   ],
 }];

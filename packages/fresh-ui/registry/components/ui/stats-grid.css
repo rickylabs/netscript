@@ -1,48 +1,158 @@
-/* StatsGrid block styles. Container-adaptive: the column count derives from
-   available width (auto-fit), not viewport breakpoints, so the grid behaves
-   in narrow rails, split panes, and embedded canvases alike. */
-
+/* Container-adaptive metrics: explicit columns cap, rather than replace, auto-fit. */
 .ns-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
-  gap: var(--ns-space-4);
+  gap: var(--ns-kpi-gap, var(--ns-space-4));
 }
-
-.ns-stats-grid__card {
-  overflow: hidden;
+.ns-stats-grid[data-columns='2'] {
+  --ns-stats-columns: 2;
 }
-
-.ns-stats-grid__body {
+.ns-stats-grid[data-columns='3'] {
+  --ns-stats-columns: 3;
+}
+.ns-stats-grid[data-columns='4'] {
+  --ns-stats-columns: 4;
+}
+.ns-stats-grid[data-columns] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(13rem,
+    calc((100% - (var(--ns-stats-columns) - 1) * var(--ns-kpi-gap, var(--ns-space-4))) /
+    var(--ns-stats-columns))
+    )), 1fr));
+}
+.ns-card.ns-stats-grid__card {
   min-width: 0;
+  overflow: hidden;
+  background: var(--ns-kpi-bg-1);
+  color: var(--ns-fg);
+  border-color: var(--ns-kpi-border);
+  border-style: solid;
+  border-width: var(--ns-kpi-border-top, var(--ns-border-width)) var(--ns-kpi-border-right, 0px)
+    var(--ns-kpi-border-bottom, 0px) var(--ns-kpi-border-left, 0px);
+  border-radius: var(--ns-radius-card);
+  box-shadow: var(--ns-shadow-xs);
 }
-
+.ns-stats-grid__card:nth-child(4n + 2) {
+  background: var(--ns-kpi-bg-2);
+}
+.ns-stats-grid__card:nth-child(4n + 3) {
+  background: var(--ns-kpi-bg-3);
+}
+.ns-stats-grid__card:nth-child(4n + 4) {
+  background: var(--ns-kpi-bg-4);
+}
+.ns-stats-grid__card:first-child {
+  border-inline-start-width: var(--ns-kpi-first-left, 0px);
+}
+.ns-card.ns-stats-grid__card > .ns-stats-grid__body {
+  display: grid;
+  min-width: 0;
+  gap: var(--ns-stack-gap, var(--ns-space-2));
+  padding: var(--ns-card-padding, var(--ns-space-5)) var(--ns-kpi-pad-x, var(--ns-space-5));
+}
 .ns-stats-grid__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--ns-space-3);
+  gap: var(--ns-inline-gap, var(--ns-space-3));
+  min-width: 0;
 }
-
 .ns-stats-grid__label {
-  font-family: var(--ns-font-mono);
+  min-width: 0;
+  margin-inline-end: auto;
+  font-family: var(--ns-font-eyebrow, var(--ns-font-mono));
   font-size: var(--ns-text-2xs);
+  font-weight: var(--ns-weight-eyebrow, 500);
+  line-height: var(--ns-leading-normal);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--ns-tracking-label, var(--ns-tracking-wide));
   color: var(--ns-muted-fg);
 }
-
+.ns-stats-grid__icon {
+  display: inline-flex;
+  color: var(--ns-muted-fg);
+}
 .ns-stats-grid__value {
-  font-size: var(--ns-text-3xl);
-  font-weight: 600;
-  letter-spacing: var(--ns-tracking-tight);
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--ns-font-kpi, var(--ns-font-sans));
+  font-size: var(--ns-text-kpi, var(--ns-text-3xl));
+  font-weight: var(--ns-weight-kpi, 500);
+  line-height: var(--ns-leading-kpi, var(--ns-leading-normal));
+  letter-spacing: var(--ns-tracking-kpi, var(--ns-tracking-tight));
   font-variant-numeric: tabular-nums;
-  color: var(--ns-fg);
+  color: inherit;
+}
+.ns-stats-grid__detail {
+  margin: 0;
+  font-size: var(--ns-text-small, var(--ns-text-sm));
+  line-height: var(--ns-leading-small, var(--ns-leading-relaxed));
+  color: var(--ns-muted-fg);
+  overflow-wrap: anywhere;
+}
+.ns-stats-grid__delta {
+  margin-inline-end: var(--ns-space-1);
+}
+.ns-stats-grid__card[data-delta='up'] .ns-stats-grid__delta {
+  color: var(--ns-success-text);
+}
+.ns-stats-grid__card[data-delta='down'] .ns-stats-grid__delta {
+  color: var(--ns-destructive-text);
+}
+.ns-stats-grid__card[data-variant='hero'] {
+  background: var(--ns-primary);
+  color: var(--ns-primary-fg);
+}
+.ns-stats-grid__card[data-variant='hero'] > .ns-stats-grid__body {
+  padding-inline: var(--ns-card-padding, var(--ns-space-5));
+}
+.ns-stats-grid__card[data-variant='hero'] :is(.ns-stats-grid__label, .ns-stats-grid__icon, .ns-stats-grid__detail, .ns-stats-grid__delta) {
+  color: inherit;
 }
 
-.ns-stats-grid__detail {
-  font-size: var(--ns-text-sm);
-  line-height: var(--ns-leading-relaxed);
-  color: var(--ns-muted-fg);
+/* The outer T/R/B frame and each cell's left rule also work after wrapping.
+   An upward shadow supplies one horizontal seam; clipping hides the first row's. */
+.ns-stats-grid[data-joined='true'] {
+  gap: 0;
+  border: var(--ns-border-width) solid var(--ns-kpi-border);
+  border-inline-start: 0;
+  border-radius: var(--ns-radius-card);
+  overflow: hidden;
+}
+.ns-stats-grid[data-joined='true'][data-columns] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(13rem,
+    calc(100% / var(--ns-stats-columns))
+    )), 1fr));
+}
+.ns-stats-grid[data-joined='true'] > .ns-stats-grid__card {
+  border: 0;
+  border-inline-start: var(--ns-border-width) solid var(--ns-kpi-border);
+  border-radius: 0;
+  box-shadow: 0 calc(-1 * var(--ns-border-width)) 0 0 var(--ns-kpi-border);
+}
+.ns-stats-grid[data-joined='true'] > .ns-stats-grid__card > .ns-stats-grid__body {
+  padding-inline: var(--ns-card-padding, var(--ns-space-5));
+}
+
+/* Decorations are opt-in content and opt-in theme roles. Unsupported style
+   queries fail closed to no decoration; no hidden content consumes layout space. */
+.ns-stats-grid__sparkline,
+.ns-stats-grid__ticks,
+.ns-stats-grid__blockbars {
+  display: none;
+}
+@container style(--ns-deco-sparkline: 1) {
+  .ns-stats-grid__sparkline {
+    display: block;
+  }
+}
+@container style(--ns-deco-ticks: 1) {
+  .ns-stats-grid__ticks {
+    display: block;
+  }
+}
+@container style(--ns-deco-blockbars: 1) {
+  .ns-stats-grid__blockbars {
+    display: block;
+  }
 }
 
 /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */

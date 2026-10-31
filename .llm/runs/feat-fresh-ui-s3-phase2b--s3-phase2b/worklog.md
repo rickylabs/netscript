@@ -134,3 +134,18 @@ Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently v
 
 
 Recovery6 child integration source3c6fde06:640fullpackage testsPASS0failed/ignored;quality/architecture/all4committedsourcecarriers/reviewthreadsPASS. Same independent read-only integration reviewPASS, streak0.636maintainedfilesbyteidentical; onlymain-ownedlockinherited. Reconcile:evidenceonlysinceSOURCE, noAPIchange. Privacy audit precedes leasedpushagainst2cd89188. New-headruntime/requiredCIunproven, browserpredecessoronly, noREADY. Next9c-b1StatsGrid and9c-b2DataTableDataGrid eachdesigngatebeforeproductionedits.
+
+
+Recovery6 terminal/pushed42fdcd88:640fullpackagePASS, sameindependentreviewPASS, privacy31587addedlines0findings. Beginning approved9c-b baseline audit as9c-b1StatsGrid then9c-b2DataTableDataGrid, eachcompletecontract/source/browser/install/gates/signoff. Seven-item9cb1checkpoint written, design review next; no production edits before PASS. Whole assignment remains active.
+
+
+9c-b1 StatsGrid design checkpointPASS, streak0. Implement reviewed opt-in columns/joined/cardvariant/delta andcallerowned icon/decorations, preservingoldports/classes. Scopeaxes/partsfirst; Utilitydeco0mustdisplaynone/takenospace/nofocus, arrowdecorativeanddetailtextconveyssign. Exactjoined1pxrulesandcontainerwrap proofrequired. DataTableDataGrid9c-b2stillnext.
+
+
+9c-b1StatsGrid implementation complete, source review next.14sourcefiles; axes scopedRootvsCard, existingcontent/nativeattrs/classeskept, realcolumncaps/joined/hero/delta andoptionalinertslots, notfuturepromotions.20browserPASS0failed/ignored/flaky, strictaxe0allowances,36captures;actualwrappedseamsmeasured1pixel inbothdirections;379contracts/124registry-installed/14catalog gatesPASS (seevalidationactualcounts).7sourcewrappers+browser wrappersPASS;quality/architecture/preflight/docsaccuracy/exportdrift/nativepublishPASS. Raw124documentation failure remains accepted2531, exact123TypeScriptmultiset0new/removed. OnlyUtilitynativeCSSstylequerydecorationenabledrolesprogressivelyenhance; defaultdisabledusesdisplaynone/inert/ariahidden, nolayout/focus. Inventory104/91/13/120unchanged. Sourcecommitthenall4carriers/evidence review/privacy/push remain;DataTableDataGrid9c-b2NEXT, fullgoalactive.
+
+
+9c-b1 substantive source reviewPASS; non-blocking CSS import-order advice implemented with strongerstatcard/bodyselectors. ActualregisteredCardstylesheet servedbyfocusedfixtureandappendedlast inbrowser, computedbackground/borders/radius/paddingunchanged. Final24browserPASSfourprojects,0axeallowances/ignored/flaky;15sourcefiles. READMEclarifiesdelta requiresdetail; catalogcountcorrected14. Sameevaluator smallfinaldelta reviewnextbeforeSOURCEcommit. NoDataTableDataGrid9c-b2productionedits.
+
+
+9c-b1 same independent final small delta reviewPASS;streak0. Browserfinal24PASS,fixturecheck3/spec1/lint4/fmt4green; finalgeneratedembeddings/buildtestsPASS. Source15files, no maintainededitsafterreview. SOURCEcommitnext, thenall4committedsourcecarriers/currentquality/nativepublish/evidence signoff; wholephaseactive.

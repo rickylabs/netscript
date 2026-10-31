@@ -295,3 +295,40 @@ Legacy `header="tabs"` without a file collection renders the filename/copy heade
 `Card variant='rule' size='sm'` provides the docs surface with a top border, no resting fill/radius/shadow and compact sections. Existing Header/Title/Description/Body/Footer composition remains, with optional `Card.Action`. Section visibility follows composition. `interactive` enables hover/focus-within styling; the card adds no aggregate tab stop or click handler. Native child actions retain their behavior; `state` can supply a visual snapshot.
 
 `Pagination variant='pager'` composes `Pagination.Previous` and `Pagination.Next` with native `href` destinations and automatic previous/next relations. Numbered pagination retains Meta/Actions and adds Link/current/disabled plus decorative Ellipsis. Disabled destinations have no href or tab stop and block activation callbacks. Horizontal arrows mirror with document direction; narrow layouts stack document tiles. The existing Icon primitive also supports arrow-left/right, sourced from [Lucide](https://lucide.dev/icons/arrow-left) with its Lucide/Feather notices retained in source.
+
+### StatsGrid metrics
+
+`ui:add stats-grid` installs the responsive block and its existing theme/layout/Card dependencies.
+Keep the automatic column layout, or cap it with `columns={2}`, `3` or `4`. Every mode adapts to the
+container: a narrow rail still stacks its cards. `joined` creates one ruled strip, including when
+cards wrap. Both options belong to the grid; `variant` and `delta` belong to each card.
+
+```tsx
+import { StatsGrid } from './components/ui/stats-grid.tsx';
+
+<StatsGrid columns={3} joined>
+  <StatsGrid.Card
+    label='Net revenue'
+    value='$284,920'
+    variant='hero'
+    delta='up'
+    detail='+8.2% versus the previous 30 days'
+  />
+  <StatsGrid.Card label='Orders' value='3,182' detail='Same period' />
+  <StatsGrid.Card label='Average order value' value='$89.54' delta='down' detail='-1.3%' />
+</StatsGrid>;
+```
+
+`StatsGrid.Card` keeps `label`, `value`, optional `detail` and `badge`, native attributes and classes.
+`variant` defaults to `default` (also `hero`); `delta` defaults to `none` (also `up` and `down`).
+The arrow appears only when `detail` is supplied. It is decorative: include the sign and meaning in the caller's `detail` text. Badge and
+supporting-content controls keep native Tab, Enter and Space behavior; neither the grid nor its cards
+add focus stops or handlers. The card retains the `ns-card` class while owning its stat-specific axes.
+
+`icon`, `sparkline`, `ticks` and `blockbars` accept optional caller-owned decorative content and are
+empty by default. Their wrappers are inert and hidden from assistive technology; put controls in
+`badge` or `detail`. Theme roles `--ns-deco-sparkline`, `--ns-deco-ticks` and `--ns-deco-blockbars`
+enable the corresponding content with value `1`, using native CSS style queries. Disabled roles and
+browsers without style-query support hide these decorations with no layout space. Utility disables
+all three. No series, fetching or chart engine is synthesized. Grid, borders, surfaces and typography
+consume the existing KPI/theme roles; no token values change.

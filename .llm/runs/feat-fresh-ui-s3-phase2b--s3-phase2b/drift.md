@@ -69,3 +69,6 @@ sidebar-backdrop part without a duplicate fake DOM layer.
 
 
 Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently verified/pushed. Child restacked from2cd89188;636 maintained Fresh UI/browser files excluding only main-owned private lock are byte-identical. Three generated-only conflicts resolved by canonical regeneration. Full package/quality/carriers and same independent review next, then privacy audit and leased push. No9c-b product source; whole task active, runtime/new-headCI unproven.
+
+
+9c-b audit is split into complete9c-b1StatsGrid and9c-b2DataTableDataGrid units to keep each source review under30files. Same approved scope and remaining obligations; no feature removed.

@@ -1,3 +1,4 @@
+import { StatsGrids } from './gap-stats-grid-fixture.tsx';
 import { ShellExamples } from './gap-shell-fixture.tsx';
 import SidebarToggle from '../../packages/fresh-ui/registry/islands/SidebarToggle.tsx';
 import { DialogOwnership } from './gap-dialog-ownership-fixture.tsx';
@@ -84,6 +85,8 @@ function Actions() {
 }
 if (location.pathname === '/shell-static') {
   hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
+} else if (location.pathname === '/stats-grid') {
+  render(<StatsGrids />, document.getElementById('app')!);
 } else if (location.pathname === '/shell') {
   document.body.style.padding = '0';
   render(<ShellExamples />, document.getElementById('app')!);
