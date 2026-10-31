@@ -1,0 +1,35 @@
+{
+  "reason": "Historical diagnostic source retained as data to avoid accidental Deno test discovery; shipping tests remain active",
+  "previousHead": "db8b84b5e57f4b99ad0836c498681deea1580729",
+  "ciRun": 40620981822,
+  "records": [
+    {
+      "originalPath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-chunked-only_test.ts",
+      "archivePath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-chunked-only_test.ts.txt",
+      "sha256": "59ae1b13148232308960cd3c900cebe1d2b27f1fc1c2f99e5ceaca0718e3ebe8",
+      "originalHeadBlob": "2e16abcb6bcbf511411b191406f5c2db35af019c",
+      "bytes": 4162
+    },
+    {
+      "originalPath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-declared-only_test.ts",
+      "archivePath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-declared-only_test.ts.txt",
+      "sha256": "66d7fd17cb35d6afdd832d0bd7ba51168a77e01242197eb77663099af9434a6d",
+      "originalHeadBlob": "6a33290a158361ac3ffb4db7e424dd3eda439ab9",
+      "bytes": 4073
+    },
+    {
+      "originalPath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-chunked-reader-cleanup_test.ts",
+      "archivePath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-chunked-reader-cleanup_test.ts.txt",
+      "sha256": "68f50d259ac4f634828e5b8801f42fe7cd564bd68bfb25de5a7a629db01f0ae9",
+      "originalHeadBlob": "cebfa35e9b5b413273812dec41a883f036fae962",
+      "bytes": 4881
+    },
+    {
+      "originalPath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-chunked-reader-cleanup-asserted_test.ts",
+      "archivePath": ".llm/runs/fix-native-service-policy--u2-u4/evidence/qualification-sol-20261028/q4-chunked-reader-cleanup-asserted_test.ts.txt",
+      "sha256": "3dc315adac8196fc71601d5f2d426d651d9e480d3f65001142630e6e4f8024e7",
+      "originalHeadBlob": "70daead140defee592825e9258cdc892a8a951a2",
+      "bytes": 5298
+    }
+  ]
+}

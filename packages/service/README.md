@@ -120,7 +120,55 @@ only scaffold-owned opt-outs are reconciled by service add or plugin installatio
 leaves authored inputs unchanged. Public examples below are demonstrations; declare contract access
 before using them for private operations.
 
+### Exact anonymous requests
+
+`allowAnonymous` accepts exact method/path objects alongside legacy string prefixes. An exact `GET`
+entry does not admit `HEAD`, descendants, encoded spellings or slash/case variants. Use six entries
+to leave the native health probes public while guarding every other request:
+
+```typescript
+import { createService } from '@netscript/service';
+import type { AuthenticatorPort } from '@netscript/service/auth';
+
+declare const authenticator: AuthenticatorPort;
+const app = createService({}, { name: 'guarded-health' })
+  .withAuthn({
+    authenticator,
+    protect: ['/'],
+    allowAnonymous: [
+      { method: 'GET', path: '/health' },
+      { method: 'GET', path: '/health/live' },
+      { method: 'GET', path: '/health/ready' },
+      { method: 'HEAD', path: '/health' },
+      { method: 'HEAD', path: '/health/live' },
+      { method: 'HEAD', path: '/health/ready' },
+    ],
+  })
+  .withHealth()
+  .route('all', '/*', (c) => c.text('guarded'))
+  .build();
+```
+
+Omitted or empty `allowAnonymous` keeps the method-blind `/health` prefix default. A nonempty list
+replaces that default; matched contract access declarations still take precedence. Invalid exact
+entries throw `TypeError` when middleware is constructed, before requests or a listener. `OPTIONS`
+is not an exact anonymous method; configure `withCors()` for native preflight handling.
+
+Health is now installed during `build()`, after authentication and body limits.
+Middleware registered with `use()` also runs before health, even when added after `withHealth()`. A custom nonempty legacy list excluding `/health`
+previously let health GET/HEAD return 200 by registration order; a rejecting authenticator now
+returns 401. Add `'/health'` to retain the prefix capability, or use the six exact entries above.
+Omitted, empty and `['/health']` lists preserve public health. Configure health checks before
+`build()`; health checks snapshot when installed, while readiness checks retain their live array.
+
 ## CORS migration (breaking in 0.0.8)
+
+Under `withCors()`, the service's native CORS decision is authoritative on every response, including
+RPC/OpenAPI projections, raw routes, proxied upstreams, health and errors. All six access-control
+headers are restored to the configured decision, including absence; handler, upstream and oRPC
+headers are replaced. Declare `exposeHeaders`, `allowHeaders` and `allowMethods` on `withCors()`.
+`Vary` retains the union of tokens present before and after downstream handling, deduplicated
+case-insensitively (`*` wins). Services that never call `withCors()` are unchanged.
 
 `withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
 omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
@@ -650,8 +698,9 @@ exclude envelope identities, keys, hashes, payloads and correlation IDs.
 ## Anonymous route rate limits
 
 Use the existing middleware seam to reject requests before routing. Selected routes share a
-fixed-window quota per key; the default key is the socket client address. Install this stage before
-immediate health/info routes if those routes should also be limited.
+fixed-window quota per key; the default key is the socket client address. Health routes are
+installed at `build()`, so registered middleware runs before them. Install the limiter before
+`withServiceInfo()` if the immediate service-info route should also be limited.
 
 ```ts
 import { createService } from '@netscript/service';

@@ -1,0 +1,123 @@
+﻿diff --git a/packages/service/CHANGELOG.md b/packages/service/CHANGELOG.md
+index 96a86ef2f..ff4081a8d 100644
+--- a/packages/service/CHANGELOG.md
++++ b/packages/service/CHANGELOG.md
+@@ -2,6 +2,13 @@
+ 
+ ## Unreleased
+ 
++- **Fixed:** Under `withCors()`, every response (RPC, OpenAPI, raw routes, proxied upstreams, health
++  and errors) now carries exactly the native service CORS decision: all six access-control headers,
++  present or absent, with the union of existing `Vary` tokens preserved. Handler, upstream and
++  oRPC-default access-control headers are replaced. Migrate their `exposeHeaders`, `allowHeaders`
++  and `allowMethods` declarations to `withCors()`. Services that never call `withCors()` are
++  unchanged.
++
+ - **Breaking (0.0.8, #1382):** `defineService()` now requires `auth: ServiceAuthPolicy` and
+   validates it before configuring the builder or starting IO. Missing policy is a type error and a
+   runtime `TypeError` for JavaScript callers. Keep native guards as
+diff --git a/packages/service/README.md b/packages/service/README.md
+index b702c2a99..6428565eb 100644
+--- a/packages/service/README.md
++++ b/packages/service/README.md
+@@ -122,6 +122,13 @@ before using them for private operations.
+ 
+ ## CORS migration (breaking in 0.0.8)
+ 
++Under `withCors()`, the service's native CORS decision is authoritative on every response, including
++RPC/OpenAPI projections, raw routes, proxied upstreams, health and errors. All six access-control
++headers are restored to the configured decision, including absence; handler, upstream and oRPC
++headers are replaced. Declare `exposeHeaders`, `allowHeaders` and `allowMethods` on `withCors()`.
++`Vary` retains the union of tokens present before and after downstream handling, deduplicated
++case-insensitively (`*` wins). Services that never call `withCors()` are unchanged.
++
+ `withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
+ omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
+ comma-separated exact HTTP(S) origins, with no path or trailing slash:
+diff --git a/packages/service/src/middleware/service-cors.ts b/packages/service/src/middleware/service-cors.ts
+index 4d1d3a717..abfba7231 100644
+--- a/packages/service/src/middleware/service-cors.ts
++++ b/packages/service/src/middleware/service-cors.ts
+@@ -1,9 +1,18 @@
+-/** NetScript CORS defaults and validation; Hono owns the HTTP middleware. */
++/** NetScript CORS configuration and response authority; Hono resolves the policy. */
+ import { cors } from 'hono/cors';
+ import type { CorsOptions, ServiceMiddleware } from '../types.ts';
+ 
+ type ResolvedCorsOptions = NonNullable<CorsOptions>;
+ 
++const ACCESS_CONTROL_RESPONSE_HEADERS = [
++  'access-control-allow-origin',
++  'access-control-allow-credentials',
++  'access-control-expose-headers',
++  'access-control-allow-methods',
++  'access-control-allow-headers',
++  'access-control-max-age',
++] as const;
++
+ /** Resolve and snapshot configuration once, before serving requests. */
+ export function resolveServiceCorsOptions(options?: CorsOptions): ResolvedCorsOptions {
+   const origin = options?.origin ?? readWorkspaceOrigins();
+@@ -41,17 +50,58 @@ export function assertServiceCorsOptions(options: ResolvedCorsOptions): void {
+   }
+ }
+ 
+-/** Keep upstream origin resolvers from emitting a credentialed wildcard. */
++/**
++ * Preserve Hono's once-resolved CORS decision across handlers and proxied responses.
++ * Snapshot all six headers, including absence, before downstream code runs; restore
++ * them on the final response and retain the union of checkpoint and final Vary tokens.
++ * Native preflight short-circuits unchanged. Credentialed resolvers cannot emit '*'.
++ */
+ export function createServiceCorsMiddleware(options: ResolvedCorsOptions): ServiceMiddleware {
+   const resolveOrigin = options.origin;
+-  if (options.credentials && typeof resolveOrigin === 'function') {
+-    return cors({
++  const upstream = options.credentials && typeof resolveOrigin === 'function'
++    ? cors({
+       ...options,
+       origin: async (origin, context) => {
+         const allowed = await resolveOrigin(origin, context);
+         return allowed === '*' ? null : allowed;
+       },
++    })
++    : cors(options);
++  return async (c, next) => {
++    let checkpoint: { headers: Map<string, string | null>; vary: string | null } | undefined;
++    const preflight = await upstream(c, async () => {
++      checkpoint = {
++        headers: new Map(
++          ACCESS_CONTROL_RESPONSE_HEADERS.map((name) => [name, c.res.headers.get(name)]),
++        ),
++        vary: c.res.headers.get('vary'),
++      };
++      await next();
+     });
++    if (preflight) return preflight;
++    if (!checkpoint) return;
++
++    const vary = unionVary(checkpoint.vary, c.res.headers.get('vary'));
++    // Hono's finalized-safe API rewraps even immutable responses without its
++    // response setter reapplying stale headers. Call it once; then headers are mutable.
++    c.header('vary', vary);
++    for (const [name, value] of checkpoint.headers) {
++      if (value === null) c.res.headers.delete(name);
++      else c.res.headers.set(name, value);
++    }
++    return;
++  };
++}
++
++function unionVary(checkpoint: string | null, final: string | null): string | undefined {
++  const tokens = new Map<string, string>();
++  for (const value of [checkpoint, final]) {
++    for (const part of value?.split(',') ?? []) {
++      const token = part.trim();
++      if (token === '*') return '*';
++      const key = token.toLowerCase();
++      if (token && !tokens.has(key)) tokens.set(key, token);
++    }
+   }
+-  return cors(options);
++  return tokens.size ? [...tokens.values()].join(', ') : undefined;
+ }

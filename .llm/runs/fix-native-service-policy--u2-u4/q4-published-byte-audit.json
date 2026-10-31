@@ -1,0 +1,37 @@
+{
+  "auditedUtc": "2026-10-28T02:19:47.754Z",
+  "publishedHead": "3acc32d98501be86e8bfc73251f1011f7f8ac9cf",
+  "baseline": "7cfa593e198ade668d531d2bdafa336ff6ca5709",
+  "publishedRawRecords": 67,
+  "allPublishedRawHashesMatch": true,
+  "currentRawIndexRecords": 68,
+  "allCurrentRawIndexHashesMatch": true,
+  "acceptedProtectedHashes": 29,
+  "allAcceptedProtectedHashesMatch": true,
+  "currentManifestSha256": "dd20fb62d0622c2d5623d2a5bbc3fe84d71a38d01615aa42da1c9a1e2aeb2557",
+  "credentialPatternFindings": 0,
+  "originalFullRangeWhitespace": {
+    "arguments": [
+      "diff",
+      "--check",
+      "7cfa593e198ade668d531d2bdafa336ff6ca5709..3acc32d98501be86e8bfc73251f1011f7f8ac9cf"
+    ],
+    "exitCode": 2,
+    "stdout": ".llm/runs/fix-native-service-policy--u2-u4/evidence/q4-sol-20261028/audit.ts:36: new blank line at EOF.\n.llm/runs/fix-native-service-policy--u2-u4/evidence/q4-sol-20261028/run-deno.ps1:27: new blank line at EOF.\n",
+    "stderr": ""
+  },
+  "scopedSourceProvenanceWhitespace": {
+    "arguments": [
+      "diff",
+      "--check",
+      "7cfa593e198ade668d531d2bdafa336ff6ca5709",
+      "--",
+      ".",
+      ":(exclude).llm/runs/fix-native-service-policy--u2-u4/evidence/q4-sol-20261028/**"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "limits": "Post-push audit; original raw-only EOF findings retained. No pre-push staged-audit or full-range whitespace PASS claim. No source/gate/inference changes."
+}

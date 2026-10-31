@@ -1,0 +1,168 @@
+{
+  "sourceHead": "de9f6df3561d9e27587dd63687c8825254e9c3d5",
+  "requiredReads": [
+    {
+      "name": "part-01.md",
+      "lines": 434,
+      "bytes": 29035,
+      "sha256": "de301e6d4ab1fdbdbf01d6e5611d3d3bdb56e1117a69e059d0f1ea4cc172cf38",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-01.md",
+      "originalSha256": "de301e6d4ab1fdbdbf01d6e5611d3d3bdb56e1117a69e059d0f1ea4cc172cf38"
+    },
+    {
+      "name": "part-02.md",
+      "lines": 406,
+      "bytes": 29989,
+      "sha256": "a2ebec40e1c1b803d83e69e25e525a38d4099048f9f48fda8201f89f8379ac6c",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-02.md",
+      "originalSha256": "a2ebec40e1c1b803d83e69e25e525a38d4099048f9f48fda8201f89f8379ac6c"
+    },
+    {
+      "name": "part-03.md",
+      "lines": 358,
+      "bytes": 29777,
+      "sha256": "a448d1e6b34dec6418dbff411fa283eb1f3c353fd2a15346e0965fa3e20e2035",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-03.md",
+      "originalSha256": "a448d1e6b34dec6418dbff411fa283eb1f3c353fd2a15346e0965fa3e20e2035"
+    },
+    {
+      "name": "part-04.md",
+      "lines": 239,
+      "bytes": 29991,
+      "sha256": "6f22fa208dbdddefde4f3471d397ea6d7ce2c239b668b7c7059f6ed5f26d92e1",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-04.md",
+      "originalSha256": "6f22fa208dbdddefde4f3471d397ea6d7ce2c239b668b7c7059f6ed5f26d92e1"
+    },
+    {
+      "name": "part-05.md",
+      "lines": 366,
+      "bytes": 29834,
+      "sha256": "198dd682917b4f8957713c26292ac84ba371d3bd4d62d71040a545f5681d2606",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-05.md",
+      "originalSha256": "198dd682917b4f8957713c26292ac84ba371d3bd4d62d71040a545f5681d2606"
+    },
+    {
+      "name": "part-06.md",
+      "lines": 399,
+      "bytes": 29959,
+      "sha256": "11cd6932b97db3fed7a9e26a1a566124aca7c09fd5e36b74b2d6976e77c3bb72",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-06.md",
+      "originalSha256": "11cd6932b97db3fed7a9e26a1a566124aca7c09fd5e36b74b2d6976e77c3bb72"
+    },
+    {
+      "name": "part-07.md",
+      "lines": 658,
+      "bytes": 29944,
+      "sha256": "5941a2944eaf4041d5857e656b336f20af1bf66a2a63bd2af1a2f479b34145e7",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-07.md",
+      "originalSha256": "5941a2944eaf4041d5857e656b336f20af1bf66a2a63bd2af1a2f479b34145e7"
+    },
+    {
+      "name": "part-08.md",
+      "lines": 540,
+      "bytes": 29991,
+      "sha256": "946f2509ff6f9e08c1bfb06809df61c0bbbf5f128f4b93fee76e569a340fcf97",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-08.md",
+      "originalSha256": "946f2509ff6f9e08c1bfb06809df61c0bbbf5f128f4b93fee76e569a340fcf97"
+    },
+    {
+      "name": "part-09.md",
+      "lines": 900,
+      "bytes": 29342,
+      "sha256": "b3a0a7f0de53f31c3ce15f61ce0f5d9a4f9b3607c6fd50e7589579cae1bc28ca",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-09.md",
+      "originalSha256": "b3a0a7f0de53f31c3ce15f61ce0f5d9a4f9b3607c6fd50e7589579cae1bc28ca"
+    },
+    {
+      "name": "part-10.md",
+      "lines": 900,
+      "bytes": 28264,
+      "sha256": "7bdaf4364bc3960b1fde0ea522b7153e9737aa766d36aaee0201a48f8e5bc6cb",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-10.md",
+      "originalSha256": "7bdaf4364bc3960b1fde0ea522b7153e9737aa766d36aaee0201a48f8e5bc6cb"
+    },
+    {
+      "name": "part-11.md",
+      "lines": 900,
+      "bytes": 29976,
+      "sha256": "99d3d26a5067c999035abebe31546f81ae2d5f6f81e03f4878936c61dd64ad32",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-11.md",
+      "originalSha256": "99d3d26a5067c999035abebe31546f81ae2d5f6f81e03f4878936c61dd64ad32"
+    },
+    {
+      "name": "part-12.md",
+      "lines": 900,
+      "bytes": 28722,
+      "sha256": "e4bab5efa62c08d790095575022e3d62a73c7996f86a39aac4cdb38709b08062",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-12.md",
+      "originalSha256": "e4bab5efa62c08d790095575022e3d62a73c7996f86a39aac4cdb38709b08062"
+    },
+    {
+      "name": "part-13.md",
+      "lines": 821,
+      "bytes": 29989,
+      "sha256": "5464d95d2e516a58de29afe3ec42575c1ba7ccb4696c201dc55e52f56e8192aa",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-13.md",
+      "originalSha256": "5464d95d2e516a58de29afe3ec42575c1ba7ccb4696c201dc55e52f56e8192aa"
+    },
+    {
+      "name": "part-14.md",
+      "lines": 874,
+      "bytes": 29966,
+      "sha256": "f86f7a9246ab1e51f6b86f92b9b372a325d1a854b7e7559cfe1f5b16bab5da63",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-14.md",
+      "originalSha256": "f86f7a9246ab1e51f6b86f92b9b372a325d1a854b7e7559cfe1f5b16bab5da63"
+    },
+    {
+      "name": "part-15.md",
+      "lines": 900,
+      "bytes": 25747,
+      "sha256": "19829f1e10fc6bd41b1771043deb625c47b0f57caefbd971b07b39835b00c665",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-15.md",
+      "originalSha256": "19829f1e10fc6bd41b1771043deb625c47b0f57caefbd971b07b39835b00c665"
+    },
+    {
+      "name": "part-16.md",
+      "lines": 900,
+      "bytes": 28979,
+      "sha256": "cabbd5f59bc1052402cf24dc3dedbb580a7a9c00300c47ec3de41e5a88f181a5",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-16.md",
+      "originalSha256": "cabbd5f59bc1052402cf24dc3dedbb580a7a9c00300c47ec3de41e5a88f181a5"
+    },
+    {
+      "name": "part-17.md",
+      "lines": 119,
+      "bytes": 3451,
+      "sha256": "9c1a3ca850a8325e70702fc9c78d94c7eb51129bee37252e71f133cb82d9db33",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-preparation-20261028/review-packet.part-17.md",
+      "originalSha256": "9c1a3ca850a8325e70702fc9c78d94c7eb51129bee37252e71f133cb82d9db33"
+    },
+    {
+      "name": "part-18-current-delta.md",
+      "lines": 214,
+      "bytes": 9898,
+      "sha256": "61c74bdc2acd444c697756e438ddfe5344b0d36543b68be024fb9f803f3edf30",
+      "originalPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-ci-successor-20261028/delta.md",
+      "originalSha256": "61c74bdc2acd444c697756e438ddfe5344b0d36543b68be024fb9f803f3edf30"
+    },
+    {
+      "name": "original-review-questions.md",
+      "lines": 156,
+      "bytes": 11623,
+      "sha256": "6d22c5178da1dfd1d56ab36689529acc0ef325ef3a40f9bf94d57a0aa9484e38"
+    },
+    {
+      "name": "current-ci-context.md",
+      "lines": 13,
+      "bytes": 1377,
+      "sha256": "ed4e5bf71179f9b96e295263d6fa25d5723c6e7e5a90740a96fd8bc7778ebc86"
+    }
+  ],
+  "original18PartsUnchanged": true,
+  "originalSources": 89,
+  "originalProductOwners": 19,
+  "generatedTwentiethOwner": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+  "sourcePacketBytes": 482854,
+  "sourcePacketSha256": "b7bd14cf9ac90928daf2c79136f1a9a43d8dd33aa799ce8b61803e28568ad9ab",
+  "fullSourceBindingsPath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-impl-ci-successor-20261028/source-bindings.json"
+}

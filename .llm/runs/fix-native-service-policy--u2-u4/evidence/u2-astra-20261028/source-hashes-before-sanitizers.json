@@ -1,0 +1,22 @@
+﻿[
+    {
+        "path":  "packages/service/src/middleware/service-cors.ts",
+        "sha256":  "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0",
+        "physicalLines":  107
+    },
+    {
+        "path":  "packages/service/tests/cors-response-authority_test.ts",
+        "sha256":  "34c5ed580990fd245bc98d93c935f41b08d19576e5106c727fc25cfbfef3bac3",
+        "physicalLines":  474
+    },
+    {
+        "path":  "packages/service/README.md",
+        "sha256":  "de17ac6fc75b5fbd23e38bfe4db91978c14b4b7dd05b95d33a09998726daf769",
+        "physicalLines":  719
+    },
+    {
+        "path":  "packages/service/CHANGELOG.md",
+        "sha256":  "c68339067f226042f5c83d3498886da442d9066d8745e725367a1be5156e4f65",
+        "physicalLines":  49
+    }
+]

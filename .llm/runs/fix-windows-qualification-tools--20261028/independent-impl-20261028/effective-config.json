@@ -1,0 +1,76 @@
+{
+  "capturedAt": "2026-10-28T02:55:26.953Z",
+  "version": "1.18.35",
+  "agent": {
+    "build": {
+      "steps": 8
+    }
+  },
+  "permission": {
+    "*": "deny",
+    "read": {
+      "*": "allow",
+      ".env": "deny",
+      ".env.*": "deny",
+      "auth.json": "deny",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/auth.json": "deny"
+    },
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "skill": "allow",
+    "bash": "deny",
+    "task": "deny",
+    "edit": "deny",
+    "external_directory": "deny",
+    "netscript_search_docs": "allow",
+    "netscript_get_doc": "allow",
+    "netscript_find_guidance": "allow",
+    "netscript_find_export": "allow",
+    "netscript_get_export": "allow",
+    "netscript_search_exports": "allow",
+    "netscript_list_package_exports": "allow"
+  },
+  "mcp": {
+    "netscript": {
+      "type": "local",
+      "command": [
+        "deno",
+        "run",
+        "--no-lock",
+        "--minimum-dependency-age=0",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008\\deno.json",
+        "-A",
+        "jsr:@netscript/cli@0.0.8",
+        "agent",
+        "mcp",
+        "--project-root",
+        "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008",
+        "--docs-root",
+        "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008\\.netscript\\docs"
+      ]
+    }
+  },
+  "completeEffectiveSha256": "891ba08c674f41f2241925337b3290ea40e03cb015baef6bbbd606555a3a7add",
+  "nativeCommands": [
+    {
+      "stdoutCapturedBytes": 8,
+      "stderrCapturedBytes": 0,
+      "statusAwaited": true,
+      "pipesAwaited": true,
+      "terminationRequested": false
+    },
+    {
+      "stdoutCapturedBytes": 1852,
+      "stderrCapturedBytes": 0,
+      "statusAwaited": true,
+      "pipesAwaited": true,
+      "terminationRequested": false
+    }
+  ],
+  "noInference": true,
+  "fullEffectiveConfigPersisted": false
+}

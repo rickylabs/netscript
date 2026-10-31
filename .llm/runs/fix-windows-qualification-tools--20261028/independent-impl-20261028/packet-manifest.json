@@ -1,0 +1,348 @@
+{
+  "targetHeads": {
+    "Windows2424": "0d5b982b0a3050b94172770a435581c931c93b22",
+    "DB2425": "d4b391217664371c17295529b956bd9f8950712a"
+  },
+  "requiredReads": [
+    {
+      "name": "01a-source-lines1-650.md",
+      "lines": 649,
+      "bytes": 26749,
+      "sha256": "f2bb9f0a5c43f9f3af808061d6882cb97fae27d60eff88681c47977a724da8b1",
+      "originals": [
+        {
+          "path": ".llm/tools/docs/check-exports-drift.ts",
+          "sha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269"
+        }
+      ],
+      "target": "Windows2424",
+      "sourceViewOf": "01-source.md",
+      "sourceViewLines": "1-650"
+    },
+    {
+      "name": "01b-source-lines651-end.md",
+      "lines": 575,
+      "bytes": 19351,
+      "sha256": "826e914c31141ce898664316ef9e9e5a19b60d3541d0e174502d00e04edc1671",
+      "originals": [
+        {
+          "path": ".llm/tools/docs/check-exports-drift.ts",
+          "sha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269"
+        }
+      ],
+      "target": "Windows2424",
+      "sourceViewOf": "01-source.md",
+      "sourceViewLines": "651-end"
+    },
+    {
+      "name": "02-source.md",
+      "lines": 331,
+      "bytes": 11067,
+      "sha256": "f124a7beb2e48bd8cfe14945d9a7ed2029d5c7fa6494fbee3c696131aca2d09c",
+      "originals": [
+        {
+          "path": ".llm/tools/docs/check-exports-drift_test.ts",
+          "sha256": "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "03-source.md",
+      "lines": 522,
+      "bytes": 19015,
+      "sha256": "413545f0062f160ae93c4bad68e840d4f5d28418d3cc01af8524ffea967eb3dd",
+      "originals": [
+        {
+          "path": ".llm/tools/docs/jsdoc-example-compiler.ts",
+          "sha256": "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "04-source.md",
+      "lines": 619,
+      "bytes": 23239,
+      "sha256": "8995070571db3213ac5849eeee7150ff64b5b53c27029b223fce17c5e4fa5ed2",
+      "originals": [
+        {
+          "path": ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+          "sha256": "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "05-source.md",
+      "lines": 430,
+      "bytes": 14868,
+      "sha256": "637c8dc971dd374ee50406e42ac0f55aa8bcf453da9fd7f736c527e5cbb24366",
+      "originals": [
+        {
+          "path": ".llm/tools/docs/jsdoc-example-policy.ts",
+          "sha256": "ec954fff331b75c023df39a84929bb0c8833bd1cab07bb9d62d859a671a4cefc"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "06a-skills.md",
+      "lines": 628,
+      "bytes": 41660,
+      "sha256": "f144b9e9722c237e7a618ebb829680918f61c3783fa97296fc9d1ea3c9404019",
+      "originals": [
+        {
+          "path": ".agents/skills/netscript-harness/SKILL.md",
+          "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+        },
+        {
+          "path": ".agents/skills/netscript-tools/SKILL.md",
+          "sha256": "e85a8e970fe53e26279203e7c77faf34a0a16c739b9e10d0ae83a2f29bf3e01f"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "06b-deno.md",
+      "lines": 281,
+      "bytes": 18482,
+      "sha256": "da2237c03fd3770bb046ac5b062c4af379dd19e826fdc04c4414804aecc127a2",
+      "originals": [
+        {
+          "path": ".agents/skills/deno/SKILL.md",
+          "sha256": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "06c-contract.md",
+      "lines": 620,
+      "bytes": 41589,
+      "sha256": "2d0675b0499db2a1e74721884aa46ad050f966b9189197739edf3bac28838fd5",
+      "originals": [
+        {
+          "path": ".llm/harness/evaluator/protocol.md",
+          "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+        },
+        {
+          "path": ".llm/harness/evaluator/verdict-definitions.md",
+          "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+        },
+        {
+          "path": ".llm/harness/archetypes/SCOPE-docs.md",
+          "sha256": "11bbcf4317f7ed797c3851223a885c323be7f3f38899f35d31a76c5fc44c7885"
+        },
+        {
+          "path": ".llm/harness/workflow/run-loop.md",
+          "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/plan.md",
+          "sha256": "da983cecae4ccf3fd7b3400bb3193d7d6d72e6591d25dbc2ee198fd1c2d1da84"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/root-source-identity-rescope.md",
+          "sha256": "a08f847a1b533b8387351af272825ecbc0b8f09a9c5f7b8fd408dac40ea4a430"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/root-source-acceptance.md",
+          "sha256": "0246f5d9d25c4dab81beaf7c6d6469f6ef2ee628e7ecdea360fdb1d7f0a265b8"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/worklog.md",
+          "sha256": "2c69e10175bba3a5dba08b66ef55eda78ed92e2dbde99e14faca465df7479a8c"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/context-pack.md",
+          "sha256": "904df37b054f4d01512f1fa428d6fbca5842ee8e10ffcc829993daa57288ecf7"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/drift.md",
+          "sha256": "f7c8fee1fcd9382074863803041370171671c006b1f1d76cc04e7491b471cd00"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "07-diff.md",
+      "lines": 257,
+      "bytes": 11407,
+      "sha256": "fc0661f6f4e326d5da62332bb15f5a75bd121388b2318310c10949efb8bdf584",
+      "originals": [
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/five-owner.diff",
+          "sha256": "3c314bf1539c8d2cc05b19e075050f0da4fd10b207383aaa1d390ce8a69aef07"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "08-gates.md",
+      "lines": 594,
+      "bytes": 32954,
+      "sha256": "c093896c5b85984b8aa215fa287d7674b3237c04e1ca839911fcb18c6c2e3a55",
+      "originals": [
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/red-exports-drift.json",
+          "sha256": "2638d9d6d218355681dfa7cc9205995724a25101d6776fc767c165c06fd94453"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/red-jsdoc-corpus.json",
+          "sha256": "890d6f24fa8426649f041d6f5b95087908e30ba762fd81595e06ac3c3df4eb74"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/red-regressions-selected.json",
+          "sha256": "b56b6cb88da2dc82ce0682acac80049e617e0459addb1f71f5417af8ddacdddd"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/green-owning-tests-final.json",
+          "sha256": "8de013861134adfe680460bf236d73b6bf22b7b2a6f82be3f93f3d887fa3bbf8"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/green-policy-corpus-tests.json",
+          "sha256": "2e1cf66c1dc0cf10b26f85ecd68d46933dcb93e3f3a96bef5de9b2b0b7fe8c20"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/green-exports-drift.json",
+          "sha256": "19f27a719ab53a5703f129c028ef4e42ed6905925b3b8c1853d3f99065ebb496"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/green-docs-accuracy.json",
+          "sha256": "76c17276188a85cf097b9600421dbe871e24796e38525bc21c6d895deb52ca5c"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/green-jsdoc-corpus-canonical-identity.json",
+          "sha256": "ddc022cce1178c6f637f2549665266ffc2c239f646c6385d2d2c8b4e7789d027"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/types-five-owners.json",
+          "sha256": "c11dc94c70494a07150531ab79e846cd0b126e774f9c5ac286bee2f04fb3ac26"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/lint-five-owners.json",
+          "sha256": "60056d7d490c16757615f2368ce0572e9a0f4a8a100d689818a9464a6e837f5d"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/format-five-owners.json",
+          "sha256": "b4ddd917b7d51685a1fd61ff6e7d84cdceaa120ee5208c37e40c678cee8daf20"
+        },
+        {
+          "path": ".llm/runs/fix-windows-qualification-tools--20261028/review-evidence-five-owners.json",
+          "sha256": "dcf223c467b36890d1342e7b5d5b63b6a7abd0d5c6e25cf524962b9f55bec150"
+        }
+      ],
+      "target": "Windows2424"
+    },
+    {
+      "name": "09-db-source.md",
+      "lines": 347,
+      "bytes": 13507,
+      "sha256": "81dda12c8875eee800baf53875c3a1d1605f155c300a7d0e2a8ab2426a26a7a2",
+      "originals": [
+        {
+          "path": ".llm/tools/deps/check-db-alignment.ts",
+          "sha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1"
+        },
+        {
+          "path": ".llm/tools/deps/check-db-alignment_test.ts",
+          "sha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/two-owner.diff",
+          "sha256": "406fd7521b3efed90d0c6e26c5e819817400bb6f7f80e5b85f470b0dd20c495e"
+        }
+      ],
+      "target": "DB2425"
+    },
+    {
+      "name": "10-db-contract.md",
+      "lines": 215,
+      "bytes": 15108,
+      "sha256": "60d9d6f0d6e6658d4aefe64ea7501430a50b44ced77fb194d5d9fb3610643f5e",
+      "originals": [
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/plan.md",
+          "sha256": "2c9660f851e8af89a5e10bb10067a5fdf7c357e720e99192a4e35b0885a70439"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/root-source-acceptance.md",
+          "sha256": "47fdb1784373789aa1d7f40b85fbbd528879cf0e53ed0fbfdcbbf86cee159a2c"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/checkpoint.md",
+          "sha256": "ea1e320d97b9bd05abb06a89005d503ce082ae7eb8567c5fae4ebf1a0bee9e11"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/worklog.md",
+          "sha256": "2e99ea48b07cb61ed4b3c55939fa3d607b1ece01d8622be38e39bccf7f5179a9"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/handoff.md",
+          "sha256": "7073ba464145132b03580544cb02eedb1fa860660c7808c6f9566082f979b0c6"
+        }
+      ],
+      "target": "DB2425"
+    },
+    {
+      "name": "11-db-gates.md",
+      "lines": 646,
+      "bytes": 29713,
+      "sha256": "62941ee8c7ac06ea46fa8681a56a12aadee303091a9dc78b23a9c3b2b09f2daf",
+      "originals": [
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/owning-unchanged-production-red.json",
+          "sha256": "1d3908100b52653d69a7e638d3060736d5155e491189a4adc69c11f48e959f67"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/owning-green.json",
+          "sha256": "22711b352e5aa5ad098aeacc741464c3a14e6df728f1a2fe6568eb605393e8dd"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/cold-unchanged-red.receipt.json",
+          "sha256": "7a2380d5c601f9d0842cb7c933a536d1cb4bde0fd4fd70a420605cd0ff4c3e06"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/cold-green.receipt.json",
+          "sha256": "a1d867030a26a7dd76d64f8d38c38e9c9d33b7134cb93f23f2fd5ec1c30841c9"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/adjacent-dependency-tests.json",
+          "sha256": "963ef3fd64a7edb4c5be56dc2e4d563894d02e295fb4f9c6964056729d514e37"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/selected-check.json",
+          "sha256": "342b1cbd8290aadabb1b5cac0b94c2adb206a0658a1260293934530e58d7733c"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/selected-fmt.json",
+          "sha256": "f770dda85617c32b0686f55f48c8e53ccc05f8eedf94f42ff3a0ddc20ad4c750"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/selected-lint.json",
+          "sha256": "720cf26c9aac4222bf6e0a7439c51ea92287cf24bacff880de342ce8afc20d4c"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/selected-lint-canonical-rules.json",
+          "sha256": "6f749471864544d5158508ddf25d3ea8f34dd6dac681055295c8e1bf51f08b7e"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/arch-check.receipt.json",
+          "sha256": "bf7591baf7d895eae21aa90376d2d3c5852175aeba93094c092e1b5d36bdcb32"
+        },
+        {
+          "path": ".llm/runs/fix-native-db-graph-entry--qualification/evidence/cleanup.json",
+          "sha256": "8adaf2fa52b94fe1fe06ea28e543d81216872b160eadac5e3a4d64582041bd43"
+        }
+      ],
+      "target": "DB2425"
+    }
+  ],
+  "distinctVerdictsRequired": true,
+  "sourceOwners": {
+    "Windows2424": 5,
+    "DB2425": 2
+  },
+  "noCombinedPassOrWaiver": true
+}

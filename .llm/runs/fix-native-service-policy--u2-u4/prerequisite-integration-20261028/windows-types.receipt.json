@@ -1,0 +1,48 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T05:47:16.009Z",
+  "finishedAt": "2026-10-28T05:47:17.056Z",
+  "durationMs": 1048,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 177,
+    "sha256": "97f33f723ca9d5cb33e19df853e461ebf8301082397256055150e898ca10bfac",
+    "tail": "{\"report\":\".llm/tmp/native-service-prerequisite-integration-20261028/windows-types.json\",\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "gateId": "windows-types",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-all",
+    ".llm/tools/run-deno-check.ts",
+    "--output",
+    ".llm/tmp/native-service-prerequisite-integration-20261028/windows-types.json",
+    "--deno-arg",
+    "--cached-only",
+    "--deno-arg",
+    "--frozen",
+    "--file",
+    ".llm/tools/docs/check-exports-drift.ts",
+    "--file",
+    ".llm/tools/docs/check-exports-drift_test.ts",
+    "--file",
+    ".llm/tools/docs/jsdoc-example-compiler.ts",
+    "--file",
+    ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+    "--file",
+    ".llm/tools/docs/jsdoc-example-policy.ts"
+  ],
+  "timeoutMs": 180000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative",
+  "childReport": ".llm/tmp/native-service-prerequisite-integration-20261028/windows-types.json"
+}

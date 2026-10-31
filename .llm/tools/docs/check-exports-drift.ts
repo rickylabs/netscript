@@ -828,7 +828,7 @@ export async function discoverReferencePagePaths(root: string = Deno.cwd()): Pro
   const paths: string[] = [];
   for await (const entry of Deno.readDir(referenceRoot)) {
     if (!entry.isDirectory) continue;
-    const relativePath = join('docs/site/reference', entry.name, 'index.md');
+    const relativePath = `docs/site/reference/${entry.name}/index.md`;
     try {
       if ((await Deno.stat(join(root, relativePath))).isFile) paths.push(relativePath);
     } catch (error) {

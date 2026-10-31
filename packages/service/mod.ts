@@ -86,6 +86,8 @@ export {
 } from './src/primitives/health.ts';
 
 export type {
+  AnonymousRequestMatch,
+  AnonymousRule,
   AuthnOptions,
   AuthzOptions,
   ContractAuthorizerOptions,

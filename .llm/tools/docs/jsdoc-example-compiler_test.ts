@@ -1,5 +1,5 @@
-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
-import { dirname, fromFileUrl } from '@std/path';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { dirname, fromFileUrl, join } from '@std/path';
 import type {
   JsdocExampleAnalysis,
   JsdocExampleBlock,
@@ -122,6 +122,100 @@ Deno.test('relative and undeclared NetScript subpath controls fail without execu
   assertEquals(result.failureCensus.badSpecifier, 2);
   assertStringIncludes(result.diagnostics, 'relative/absolute import');
   assertStringIncludes(result.diagnostics, 'undeclared NetScript subpath');
+});
+
+Deno.test('many example modules exceed Windows argv limits and retain tail diagnostics', async () => {
+  const moduleOwner: JsdocExampleOwner = {
+    memberName: '@netscript/test',
+    memberRoot: 'packages/test',
+    sourcePath: 'packages/test/mod.ts',
+    kind: 'module',
+  };
+  // Even a short temporary root gives the former 1,500-path argv more than 32,767 characters.
+  const blocks = Array.from(
+    { length: 1500 },
+    (_, index) => block(moduleOwner, 'const repeated: number = 1;\nvoid repeated;', index + 1),
+  );
+  const selected = analysis(blocks);
+  assertEquals(selected.census.checked, blocks.length);
+  assertEquals(selected.census.candidates, blocks.length);
+  const valid = await compileJsdocExamples(selected, repositoryRoot);
+  assertEquals(valid.code, 0, valid.diagnostics);
+  assertEquals(valid.enforcedFailureCount, 0);
+  assert(valid.denoCheckSpawned);
+  assert(valid.rootLockUnchanged);
+
+  const tail = blocks[blocks.length - 1]!;
+  tail.body = 'const tail: string = 1;\nvoid tail;';
+  const invalid = await compileJsdocExamples(analysis(blocks), repositoryRoot);
+  assertEquals(invalid.code, 1, invalid.diagnostics);
+  assert(invalid.denoCheckSpawned);
+  assert(invalid.rootLockUnchanged);
+  assertEquals(invalid.enforcedFailureCount, 1);
+  assertEquals(invalid.failureCensus.typeError, 1);
+  assertEquals(
+    invalid.typeErrorExamples.map(({ fenceOrdinal, tsCodes }) => ({
+      fenceOrdinal,
+      tsCodes,
+    })),
+    [{ fenceOrdinal: blocks.length, tsCodes: [2322] }],
+  );
+  assertStringIncludes(invalid.diagnostics, `fence ${blocks.length}:1:7`);
+  assertStringIncludes(invalid.diagnostics, 'TS2322');
+});
+
+Deno.test('private compiler files are removed on success, type failure, and root-lock refusal', async () => {
+  const originalMakeTempDir = Deno.makeTempDir;
+  const originalReadTextFile = Deno.readTextFile;
+  const rootLockPath = join(repositoryRoot, 'deno.lock');
+  const rootLock = await originalReadTextFile(rootLockPath);
+  const profile = ['USERPROFILE', 'TEMP', 'TMP', 'DENO_DIR'].map((key) => Deno.env.get(key));
+  const scratchRoot = join(repositoryRoot, '.llm', 'tmp');
+  await Deno.mkdir(scratchRoot, { recursive: true });
+  const temporaryRoots: string[] = [];
+  Deno.makeTempDir = async (options) => {
+    const path = await originalMakeTempDir({ ...options, dir: scratchRoot });
+    temporaryRoots.push(path);
+    return path;
+  };
+  const moduleOwner: JsdocExampleOwner = {
+    memberName: '@netscript/test',
+    memberRoot: 'packages/test',
+    sourcePath: 'packages/test/mod.ts',
+    kind: 'module',
+  };
+  try {
+    const valid = await compileJsdocExamples(
+      analysis([block(moduleOwner, 'const value: number = 1;\nvoid value;')]),
+      repositoryRoot,
+    );
+    assertEquals(valid.code, 0, valid.diagnostics);
+    const invalid = await compileJsdocExamples(
+      analysis([block(moduleOwner, 'const value: string = 1;\nvoid value;')]),
+      repositoryRoot,
+    );
+    assertEquals(invalid.code, 1, invalid.diagnostics);
+    assertEquals(invalid.failureCensus.typeError, 1);
+    let lockReads = 0;
+    Deno.readTextFile = async (path, options) => {
+      const text = await originalReadTextFile(path, options);
+      return path === rootLockPath && ++lockReads === 2 ? `${text}\n` : text;
+    };
+    await assertRejects(
+      () => compileJsdocExamples(analysis([block(moduleOwner, 'export {};')]), repositoryRoot),
+      Error,
+      'tracked root deno.lock changed during JSDoc check',
+    );
+  } finally {
+    Deno.makeTempDir = originalMakeTempDir;
+    Deno.readTextFile = originalReadTextFile;
+  }
+  assertEquals(temporaryRoots.length, 3);
+  for (const path of temporaryRoots) {
+    await assertRejects(() => Deno.stat(path), Deno.errors.NotFound);
+  }
+  assertEquals(await originalReadTextFile(rootLockPath), rootLock);
+  assertEquals(['USERPROFILE', 'TEMP', 'TMP', 'DENO_DIR'].map((key) => Deno.env.get(key)), profile);
 });
 
 Deno.test('scaffold aliases align to app and service generators per documented owner', async () => {

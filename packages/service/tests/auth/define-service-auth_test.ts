@@ -217,3 +217,83 @@ Deno.test('defineService guarded policy supports authentication without authoriz
     await running.stop();
   }
 });
+
+function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
+  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
+}
+
+exactTest(
+  'defineService passes exact health rules to a real listener without implicit HEAD',
+  async () => {
+    let calls = 0;
+    const running = await defineService({}, {
+      name: 'exact-preset',
+      port: 0,
+      auth: {
+        authn: {
+          protect: ['/'],
+          allowAnonymous: [{ method: 'GET', path: '/health' }],
+          authenticator: {
+            authenticate: () => {
+              calls++;
+              return { ok: false, reason: 'guarded' };
+            },
+          },
+        },
+      },
+    });
+    try {
+      const origin = clientOrigin(running.addr.hostname, running.addr.port);
+      for (const method of ['GET', 'HEAD', 'POST']) {
+        calls = 0;
+        const response = await fetch(`${origin}/health`, { method });
+        const body = await response.text();
+        assertEquals([response.status, calls], method === 'GET' ? [200, 0] : [401, 1]);
+        if (method === 'HEAD') assertEquals(body, '');
+      }
+    } finally {
+      await running.stop();
+    }
+  },
+);
+
+exactTest(
+  'defineService invalid exact rules reject before handlers and listener creation',
+  async () => {
+    let handlers = 0;
+    let listeners = 0;
+    const options: DefineServiceOptions = {
+      name: 'invalid-exact-preset',
+      port: 0,
+      auth: {
+        authn: {
+          authenticator: {
+            authenticate: () => {
+              handlers++;
+              return { ok: false, reason: 'guarded' };
+            },
+          },
+          allowAnonymous: [{ method: 'GET', path: '/health/' }],
+        },
+      },
+      middleware: [async (_c, next) => {
+        handlers++;
+        await next();
+      }],
+    };
+    const descriptor = Object.getOwnPropertyDescriptor(Deno, 'serve');
+    Object.defineProperty(Deno, 'serve', {
+      configurable: true,
+      value: () => {
+        listeners++;
+        throw new Error('listener must not start');
+      },
+    });
+    try {
+      await assertRejects(() => defineService({}, options), TypeError, 'invalid anonymous request');
+      assertEquals([handlers, listeners], [0, 0]);
+    } finally {
+      if (descriptor) Object.defineProperty(Deno, 'serve', descriptor);
+    }
+  },
+);

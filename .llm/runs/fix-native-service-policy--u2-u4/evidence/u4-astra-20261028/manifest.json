@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUtc": "2026-10-28T01:06:13.4919742Z",
+  "source": "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-policy-u4-astra-implementation-20261028",
+  "destination": "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\evidence\\u4-astra-20261028",
+  "audit": "Bounded credential-pattern scan of all copied records found zero candidates. All original setup, assertion failure, RED and broad-gate failure records retained. Existing run-local Git attributes preserve original bytes and saved patch context.",
+  "copiedCount": 51,
+  "files": [
+    {
+      "name": "arch-check-receipt.json",
+      "bytes": 19846,
+      "sha256": "36c9180f6944ddae3b46c16c7c2be983dfe6bfa184f1b2f233cbd63706dfb68a"
+    },
+    {
+      "name": "arch-check.log",
+      "bytes": 39302,
+      "sha256": "46161666d58cc027a0c4354696c3d52d594e69ef370279dbdb7032562aa336aa"
+    },
+    {
+      "name": "baseline-comparison.json",
+      "bytes": 2819,
+      "sha256": "1a5bb8e7371924032c1f4b1494c09e2358df1fd1e17c68fb44fcd03cab86b656"
+    },
+    {
+      "name": "baseline-test-preservation.json",
+      "bytes": 388,
+      "sha256": "14c880aeecbccdcb1ee2155639fe1d31a1086ae80d76044d140b4ecd711228a1"
+    },
+    {
+      "name": "consumer-check.log",
+      "bytes": 680,
+      "sha256": "c5a6fe27c12a70ceff4850c673099758c56ce41c7c6f4ca21cd52c9c3e4e7528"
+    },
+    {
+      "name": "consumer-fmt.log",
+      "bytes": 628,
+      "sha256": "8606a14f32f71fd5d2fcfa3ac37c38533850d2f71237705ca6c45c2270090cff"
+    },
+    {
+      "name": "consumer-lint.log",
+      "bytes": 730,
+      "sha256": "26fbac52844d30fc252c84579423ef53c3e901065d72c5aa3aaeb629a9864892"
+    },
+    {
+      "name": "consumers-aligned.json",
+      "bytes": 1220,
+      "sha256": "5a5a2bef0f77c0097996dde940e7f5f2c7723fc735f481350614274dcf05e324"
+    },
+    {
+      "name": "consumers-aligned.log",
+      "bytes": 372,
+      "sha256": "7ba397ca9d1e2620520bbf6ccee9f8b7c1cc564e54f5cedf129d130423b699f1"
+    },
+    {
+      "name": "consumers.json",
+      "bytes": 1714,
+      "sha256": "a11cfa636ffaeba504b2178783ba2f34259228cbf066097c11303675b2949fa5"
+    },
+    {
+      "name": "consumers.log",
+      "bytes": 356,
+      "sha256": "5fec95d8ae9629cd76962f20b86a3d714a72991e971b6641c93c233e3d9e9d40"
+    },
+    {
+      "name": "diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "doc-lint-receipt.json",
+      "bytes": 1526,
+      "sha256": "b889189251c9f1f1e8b4c6d6b78382a3eae25647672bdef372c0be5fdd62bf50"
+    },
+    {
+      "name": "doc-lint-report.json",
+      "bytes": 1523,
+      "sha256": "725e6eace1572eef59fd26983abde70c49169e146979ef59888b905ca3b873fb"
+    },
+    {
+      "name": "doc-lint.log",
+      "bytes": 2710,
+      "sha256": "08dceb27e2b37052cfcacb08aebb91a38487b2d19932a9cba9da88b14c857ae2"
+    },
+    {
+      "name": "doctrine-direct.log",
+      "bytes": 51236,
+      "sha256": "ef334a040efdb5b0ea83beccd5964a302f717df44e2b688edfded055d7206352"
+    },
+    {
+      "name": "final-state.json",
+      "bytes": 323,
+      "sha256": "6eaf8e96ecb38e69a00dc8fd26da2ec3bdfd3bab9971df23674d0e249ed09bc8"
+    },
+    {
+      "name": "final-status.txt",
+      "bytes": 1044,
+      "sha256": "57915ca26522b7cecf5f4376a34c6521ca74670900fb176ce790ca5dd8f6aa33"
+    },
+    {
+      "name": "green-health-initial.json",
+      "bytes": 416,
+      "sha256": "728771ffd1d363bce806559cf756eb7f2080604fb84a236c4739c406b61d813a"
+    },
+    {
+      "name": "green-health-initial.log",
+      "bytes": 378,
+      "sha256": "d1e64661d1662c84e84682a7846b8040f240c3e50d813292efb5028847ce509c"
+    },
+    {
+      "name": "guidance-receipt.json",
+      "bytes": 8595,
+      "sha256": "804f3fd208d02f65dc74aa9e150514efb776dd4b3bb1e504ffc58edcec53e883"
+    },
+    {
+      "name": "handoff.md",
+      "bytes": 9946,
+      "sha256": "d4784316927377eb3b42823ee1e7be6ba5ff691c9ba6db18ebc76f2b7d734143"
+    },
+    {
+      "name": "jsr-audit.log",
+      "bytes": 908,
+      "sha256": "6447bd9242f497887ee2382291d4d97b34427299ca553029ab1a8ee204fda74e"
+    },
+    {
+      "name": "new-health-test.diff",
+      "bytes": 11455,
+      "sha256": "bb9b815113d7259bc659a2bb5adef62213b25f3121dbda64802140e212619dc9"
+    },
+    {
+      "name": "owning-auth-checked.json",
+      "bytes": 862,
+      "sha256": "b55f8da4fbb319832e6d48c2e5431160669d107a12b492a087bc44793b3f2024"
+    },
+    {
+      "name": "owning-auth-checked.log",
+      "bytes": 380,
+      "sha256": "bfa765e695ea1b888abce8e3eb63bc08f16d47acd9c0e50042f998c8964b2584"
+    },
+    {
+      "name": "owning-auth-green.json",
+      "bytes": 393,
+      "sha256": "db88a444b822b3d5979bba933fe98b4752cc1563210148b36288454c18947a41"
+    },
+    {
+      "name": "owning-auth-green.log",
+      "bytes": 376,
+      "sha256": "3adcf1110c974a1e5766ead2d5bd32893d740f2d7499cb48dabb5430d01912c7"
+    },
+    {
+      "name": "owning-auth-initial.json",
+      "bytes": 4909,
+      "sha256": "40af78659ab3500e172c33ae1cd07bc44b3ce7420008556f58c9222708da5470"
+    },
+    {
+      "name": "owning-auth-initial.log",
+      "bytes": 372,
+      "sha256": "ae4d2bec3198330f3d526595db8985cd1ebfb2782c629658aa94891e2f59f8dc"
+    },
+    {
+      "name": "preserved-owner-hashes.json",
+      "bytes": 2131,
+      "sha256": "600386c4d74bb76392fbc396d126084d522410388ff751b2006dc47f715a53e5"
+    },
+    {
+      "name": "publish-dry-run-receipt.json",
+      "bytes": 17582,
+      "sha256": "a754d2caf39005ef485998371605aa6d3a3ff30c8edf55f4787fc6c2a23258ca"
+    },
+    {
+      "name": "publish-dry-run.log",
+      "bytes": 34862,
+      "sha256": "6bd31a86fc0e297337bd7ad7cdbaa4a1305141e0c4aff8ef92a197706dc1bc0e"
+    },
+    {
+      "name": "quality-scan-receipt.json",
+      "bytes": 5786,
+      "sha256": "482b9dd93f3fed35f0915c7ab35ce24972a68f1f185050dc3eedd141cdacae05"
+    },
+    {
+      "name": "quality-scan.log",
+      "bytes": 11270,
+      "sha256": "d63851e3195cfb271dec9fea49e54b5f63c7202ed7d8163cf8781aac6e774295"
+    },
+    {
+      "name": "red-health-baseline.json",
+      "bytes": 2296,
+      "sha256": "bd2132cfaf5c27e2e8ed175fcc3689250c1ada3f78d197683d5a4cda985ccfec"
+    },
+    {
+      "name": "red-health-baseline.log",
+      "bytes": 372,
+      "sha256": "0963997da1b72219bbf86d01cc956b360dc0f07f195f161d05df98c5b6bc4560"
+    },
+    {
+      "name": "red-health-corrected.json",
+      "bytes": 2232,
+      "sha256": "9e0b681005d980e1e118ac39a803301e81d33fef864dea9f51c5a2e33e50e6b0"
+    },
+    {
+      "name": "red-health-corrected.log",
+      "bytes": 378,
+      "sha256": "e3806ee2439c154e5b3e8670f0ef9c12fcd3e03aee5baf1e25361f09f12e1cfd"
+    },
+    {
+      "name": "red-health-counted.json",
+      "bytes": 3051,
+      "sha256": "369ab4b047559ac4d4cbf6fdf510b4a7c2f0d205d1fc0c4bfc8ec9f2bafd4401"
+    },
+    {
+      "name": "red-health-counted.log",
+      "bytes": 374,
+      "sha256": "93261482f81339621a5360d4f4009fa437bbf775ff222b63ea3269be3c8d2316"
+    },
+    {
+      "name": "red-owner-hashes.json",
+      "bytes": 977,
+      "sha256": "b3799e5cf87fda10f2b6f5ba667bc7366a704790ca8c69e3ecfd3625410c4716"
+    },
+    {
+      "name": "service-check.log",
+      "bytes": 684,
+      "sha256": "4175172a58e6283b334339e0358248c1d0d4372107659cbc1aa06cfa28195f69"
+    },
+    {
+      "name": "service-fmt.log",
+      "bytes": 640,
+      "sha256": "dbb66b9c54bf2e72d99b775a7fb19303bf09357d8d71f3d13be34df281b46461"
+    },
+    {
+      "name": "service-lint.log",
+      "bytes": 742,
+      "sha256": "c18973104078cad1726d9ff97dfc951ccd259f82df4eefc3bd2de274332245d9"
+    },
+    {
+      "name": "service-tests.json",
+      "bytes": 2983,
+      "sha256": "03c85af4fd71f322d58e9d7fa319c713d28069e17ec2394c79587c234461a703"
+    },
+    {
+      "name": "service-tests.log",
+      "bytes": 368,
+      "sha256": "c7200691fac2737a1c9a7b113823b353772a58659000e8442a48e2b0b50834b0"
+    },
+    {
+      "name": "source-hashes.json",
+      "bytes": 2387,
+      "sha256": "f5139245e5aa93cd7c694f4fd8635e7dfc84c0c7f2dc17e96f6585a3ffbff7bb"
+    },
+    {
+      "name": "tracked-source.diff",
+      "bytes": 32583,
+      "sha256": "5cbb8787679f4c68cc82a68f2a647d5e2dedbf96651a79bade40f8d60209a836"
+    },
+    {
+      "name": "u2-regression.json",
+      "bytes": 553,
+      "sha256": "49130c0b75fa0b9e72222a93b369863cd8e6552c8c97be29bcaffd0cc0e7c97f"
+    },
+    {
+      "name": "u2-regression.log",
+      "bytes": 368,
+      "sha256": "a803febd576dc619e038d18b9e3181233795a797d34fd3ea1f1ba9074b95ccf2"
+    }
+  ]
+}

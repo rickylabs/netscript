@@ -1,0 +1,36 @@
+{
+  "gateId": "jsdoc-example-compile",
+  "invocationId": "red-jsdoc-corpus",
+  "argv": [
+    "deno",
+    "task",
+    "docs:jsdoc-examples"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 300000,
+  "runnerIdentity": "worker:96068",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6b8f5b55990722cd99cab8d4c6d41d237dadaa71514463f2645ebb0ce7480863",
+  "lifecycleId": "worker:96068:red-jsdoc-corpus:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-10-28T01:46:16.279Z",
+  "startedAt": "2026-10-28T01:46:16.284Z",
+  "finishedAt": "2026-10-28T01:47:39.306Z",
+  "durationMs": 83024,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 310,
+    "sha256": "487af11ef2c7758c9680825b94092cda5cf8c38c57f549154404f5b4017dbaa9",
+    "tail": "Task docs:jsdoc-examples deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts\njsdoc examples: FAIL Failed to spawn 'C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe': Nom de fichier ou extension trop long. (os error 206)\n",
+    "truncated": false
+  }
+}
