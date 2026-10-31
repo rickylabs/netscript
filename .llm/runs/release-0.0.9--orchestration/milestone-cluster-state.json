@@ -536,16 +536,16 @@
     {
       "id": "A3-2400",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2482,
       "headSha": "6597b6452b22c72277509189b61ab78fba507648",
       "issueNumbers": [
         2400
       ],
-      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2438 (continuation after #2476 merged)",
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2400-r1 (resumed orphaned PR)",
       "receiptRefs": [],
-      "note": "orphaned 01:02Z (worker torn down when #2438 closed); resume dispatch r1"
+      "note": "READY at 6597b64 (resumed r1); e2e queued after #2496"
     },
     {
       "id": "A2-2395",
@@ -655,7 +655,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2494,
-      "headSha": "c37a62533baa0b5f886ab5e35b824a71294d5c2f",
+      "headSha": "b9aa6cd12a27963528c6a3d94fad0960149a7b1c",
       "issueNumbers": [
         2155
       ],
@@ -675,6 +675,32 @@
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2351",
       "receiptRefs": [],
       "note": "READY 7a46247; Opus MERGE; e2e armed"
+    },
+    {
+      "id": "A3-2161",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2497,
+      "headSha": "8c989c33523e1710cbdfd6b977431f19177c0d64",
+      "issueNumbers": [
+        2161
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2161",
+      "receiptRefs": []
+    },
+    {
+      "id": "D1-2115",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2498,
+      "headSha": "e383cf08dec4d724b05e27703829bafd163b90a4",
+      "issueNumbers": [
+        2115
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2115",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [
@@ -976,7 +1002,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T05:26:30.000Z",
+  "updatedAt": "2026-10-31T05:37:59.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1051,7 +1077,7 @@
       "commentId": null,
       "postedAt": "2026-10-31T00:39:24Z",
       "route": "codex gpt-6.1-sol (continuation of #2438 worker)",
-      "state": "started",
+      "state": "pr-open",
       "pr": 2482,
       "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)",
       "relaunchCommentId": 6539381089,
@@ -1099,8 +1125,8 @@
       "commentId": null,
       "postedAt": "2026-10-31T03:10:47Z",
       "route": "codex gpt-6.1-sol (continuation of #2151 worker)",
-      "state": "relaunched",
-      "pr": null,
+      "state": "pr-open",
+      "pr": 2498,
       "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)",
       "relaunchCommentId": 6539541933,
       "relaunchedAt": "2026-10-31T05:25:40Z"
@@ -1146,6 +1172,15 @@
       "lane": "fixes",
       "commentId": 6539498806,
       "postedAt": "2026-10-31T05:20:38.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "pr-open",
+      "pr": 2497
+    },
+    {
+      "issue": 2159,
+      "lane": "fixes",
+      "commentId": 6539608318,
+      "postedAt": "2026-10-31T05:33:29.000Z",
       "route": "codex gpt-6.1-sol",
       "state": "started",
       "pr": null

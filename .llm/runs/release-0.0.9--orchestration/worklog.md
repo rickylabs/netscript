@@ -104,3 +104,7 @@
 - 05:25Z: #2161 started 05:25:22Z. The scripted #2115 relaunch at 05:17Z failed (empty brief path in the background subshell). Posted #2115 r1 now, comment 6539541933.
 - 05:25Z: **merged** #2479 (`4060d1e61`) for #2187; #2187 closed. **A1 complete.** The expensive gate is free: next #2496 (#2351).
 - 05:26Z: **expensive-gate.acquired** on #2496 (#2351).
+- 05:26Z: status 3 posted on #2474 (13 merges / 14 closed, corrected from 16; canary .1 remaining #2351 #2400 #2161 #2421; process issues disclosed).
+- 05:33Z: #2400 r1 READY at `6597b64` (PR #2482 resumed; main merged without rewrite). #2115 r1 started 05:31Z. #2161 → PR #2497.
+- 05:33Z: dispatched #2159 (B1 head, fixes), comment 6539608318.
+- 05:36Z: #2115 → PR #2498. #2482 has an Opus MERGE at `6597b64`.
