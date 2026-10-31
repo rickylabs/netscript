@@ -46,7 +46,7 @@ const GENERATED_LINE_WIDTH = 100;
 /** Where every scaffolded page gets its frame and theme; printed after `ui:add page`. */
 const PAGE_FRAME_GUIDANCE = [
   'The page renders inside the app chrome from routes/_layout.tsx; navigation.ts lists the top-bar links, and chromelessRoutePrefixes opts a route out.',
-  'Theme every page at once: switch the preset with `netscript ui:apply --preset <id>`, or alias roles and run `netscript tokens build`; see MCP get_doc web-layer/how-to/theme-your-app.',
+  "Restyle app-wide through the --ns-* tokens in assets/tokens.css (light on :root, dark on [data-theme='dark']); see MCP get_doc web-layer/how-to/customize-fresh-ui.",
 ] as const;
 export interface UiIslandScaffoldInput extends WriteOptions {
   readonly projectRoot: string;
