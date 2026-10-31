@@ -38,4 +38,10 @@ internal attributes with equal specificity. Modifiers on controlled component in
 `<Button class="ns-btn--destructive">` require a manual conversion to public props (`variant`,
 `size`, etc.); passing attributes that the component would overwrite is refused. Headless
 trigger/close components may forward variant/size/icon attributes; their owned state remains under
-the headless controller. Unsupported cases stop the whole batch before writes.
+the headless controller. Detected unsupported cases stop the whole batch before writes. Spread-only JSX tags with residual
+legacy component modifiers or state hooks in the same file produce a preflight diagnostic; convert
+those class producers to data attributes first. Reviewed component copies and unrelated spreads
+without residual legacy hooks remain supported. Imported/indirect class producers require manual
+review because the command does not evaluate JavaScript. CSS state matching uses the whole compound,
+so `.is-active.ns-citation` and `.ns-citation.is-active` both migrate without borrowing classes from
+ancestor selectors, sibling branches or negated component bases.

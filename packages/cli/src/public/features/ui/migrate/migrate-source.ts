@@ -59,13 +59,17 @@ function migrateLiterals(source: string, input: string): VariantMigrationResult 
   let content = source;
   const edits: { start: number; end: number; replacement: string }[] = [];
   const diagnostics: string[] = [];
+  let hasSpreadOnlyTag = false;
   for (const tag of [...openingTags(source)].reverse()) {
     const text = source.slice(tag.start, tag.end);
     const attributes = readAttributes(text);
     const classes = attributes.find((attribute) =>
       attribute.name === 'class' || attribute.name === 'className'
     );
-    if (!classes) continue;
+    if (!classes) {
+      hasSpreadOnlyTag ||= attributes.some((attribute) => attribute.name === '...');
+      continue;
+    }
     if (!classes.literal) {
       if (
         hasComponentModifiers(classes.value) ||
@@ -121,6 +125,18 @@ function migrateLiterals(source: string, input: string): VariantMigrationResult 
   for (const edit of edits.sort((left, right) => right.start - left.start)) {
     content = content.slice(0, edit.start) + edit.replacement + content.slice(edit.end);
   }
+  // Reviewed hunks and literal edits consume supported producers. Remaining legacy vocabulary
+  // with a spread-only tag cannot be safely assigned to attributes without evaluating user code.
+  const tokens = content.match(/[\w-]+/g) ?? [];
+  const classContext = tokens.join(' ');
+  if (
+    hasSpreadOnlyTag &&
+    (hasComponentModifiers(content) || tokens.some((token) => stateRule(token, classContext)))
+  ) {
+    diagnostics.push(
+      'Legacy classes may arrive through a JSX spread: convert its class producer manually before migration.',
+    );
+  }
   return { content: diagnostics.length ? input : restoreLines(content, input), diagnostics };
 }
 
@@ -137,7 +153,18 @@ function readAttributes(tag: string): Attribute[] {
   let i = /^<[\w.:-]+/.exec(tag)?.[0].length ?? 1;
   while (i < tag.length - 1) {
     if (tag[i] === '{') {
+      const start = i;
       i = balancedEnd(tag, i);
+      if (/^\{\s*\.\.\./.test(tag.slice(start, i))) {
+        attributes.push({
+          name: '...',
+          start,
+          end: i,
+          value: tag.slice(start + 1, i - 1),
+          literal: false,
+          quote: '',
+        });
+      }
       continue;
     }
     const match = /^[\w:-]+/.exec(tag.slice(i));

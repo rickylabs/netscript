@@ -1,0 +1,19 @@
+{
+  "command": "deno fmt --check",
+  "cwd": ".",
+  "mode": "check",
+  "summary": {
+    "filesSelected": 262,
+    "batches": 2,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "coverage": {
+    "filesSelected": 262,
+    "filesProcessed": 262,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "findings": []
+}

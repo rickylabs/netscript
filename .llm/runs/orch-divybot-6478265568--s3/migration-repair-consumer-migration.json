@@ -1,0 +1,39 @@
+{
+  "baseline": "9a31e879c32a8066c50946a57976f3da34ba43a6",
+  "baselineCliVersion": "0.0.8",
+  "scaffold": "Exact source archive, maintainer init, Fresh dashboard, no DB/Aspire",
+  "changedFiles": 62,
+  "dryRunPreservedBytes": true,
+  "secondRunChangedFiles": 0,
+  "afterFormatIdempotent": true,
+  "steps": [
+    {
+      "step": "consumer-init",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-dry-run",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-migrate",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-idempotence",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-workspace-check",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-app-fmt",
+      "exitCode": 0
+    }
+  ],
+  "workspaceCheckIncludesAppSources": true,
+  "legacyCssStatesRemaining": [],
+  "copiedSourcesEqualAuthoredRegistry": 41,
+  "appLocalLintLimitation": "Existing react-no-danger finding on the constant theme bootstrap script; not suppressed."
+}

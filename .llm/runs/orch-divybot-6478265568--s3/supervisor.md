@@ -22,3 +22,9 @@
 - Owner authorizes the census update and documentation, full local docs:accuracy/docs:links/site build and carrier checks, separate read-only Claude Opus 5.5/high IMPL-EVAL, push and wait for required quality SUCCESS at the new exact head. Only then post a new READY. Cockpit merges.
 
 The first repaired-head CI run proved quality SUCCESS at a5077091a, but test-4 exposed the same unratified command in packages/cli/src/local/composition/local-contributor-command-tree_test.ts: its expected public root list omitted ui:migrate. Extend this narrow ratification surface to that existing test expectation, retaining the assertion. No runtime changes or test skips. The final head must be pushed and its own quality SUCCESS verified again.
+
+## Coordinator-approved migration repair and runtime addendum
+
+Baseline acd9a5abe0b4b5b8aadd283e576bda70726af45b, same branch/PR #2467. One repair round is approved for the CSS compound ordering bug, JSX spread-only class preflight, truthful CLI docs, regression/negative controls and resolving the two review threads. The runtime addendum additionally requires fixing copied Markdown's jsx-curly-braces failure and both cloud scaffold-runtime jobs green at the final head.
+
+Write surface: migration CSS/source/rule lexical policy and focused tests under packages/cli/src/public/features/ui/migrate/; its README; docs/site/reference/cli/commands.md; packages/fresh-ui/registry/components/ui/markdown.tsx.template and tests/registry/markdown-renderer.test.ts; existing generated registry/prose/corpus/assets/publish carriers; this run record. No dependency, lock, workflow bypass or label changes. Use structured wrappers, independent same-session read-only Opus review, then exact-final-head full CI including both runtime tiers. No READY before all required checks succeed; Cockpit merges.
