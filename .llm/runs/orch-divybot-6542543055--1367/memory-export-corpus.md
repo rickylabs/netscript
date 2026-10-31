@@ -9,3 +9,8 @@ check:assets-barrel; fixing only the first CI freshness gate leaves the next one
 During a normal --no-commit main merge, the API read set is staged/dirty. Native generation accepts
 --allow-dirty for that coherent union; checks intentionally reject that flag. Imported main changes
 are not newly authored leaf scope. Never strip upstream run evidence when merging main.
+
+Aspire-related new files also require regenerating the tracked Aspire surface manifest through
+aspire-surface-manifest.ts, then check:aspire-version-parity. New storage fixture/probe/tests add
+four rows under existing ownership rules. Do not change pins, scanner scope or enforcement to
+repair inventory freshness. Full CI quality continues beyond the docs/API freshness gates.

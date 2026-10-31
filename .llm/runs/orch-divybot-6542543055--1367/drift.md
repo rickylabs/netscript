@@ -33,3 +33,13 @@ streams legacy entrypoint now delegates to main's native service factory; it sti
 through STREAMS_DATA_DIR. Our contribution and AppHost wiring are unchanged. Regenerate from the
 coherent combined source using the documented --allow-dirty generation mode while merge is pending;
 freshness checks run without that flag. New-head E2E and final exact-head evaluation are required.
+
+## CI Aspire inventory freshness
+
+At bfc3e92, CI passes prose, MCP, assets-barrel and publish-assets freshness, then finds the static
+Aspire surface manifest stale. Extend the derived write surface to the maintained
+.llm/tools/validation/fixtures/aspire-surface-manifest.tsv. Use the native generator unchanged:
+exactly four rows added for this task's new fixture/probe/tests, under existing ownership rules.
+No version pin, scanner policy, exclusion or compatibility disposition changes. Parity reports
+manifestFresh true, zero failures and zero missing paths. Broader publish dry-run remains in flight
+locally; do not claim its result until it finishes. Final exact-head independent review still required.

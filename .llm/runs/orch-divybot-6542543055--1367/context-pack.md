@@ -34,3 +34,8 @@ service factory preserved, no custom source conflicts or lock edits. Native MCP 
 regenerated for directory signature changes; all derived asset freshness checks required as a
 complete closure. Focused combined tests still 258/258. See drift/worklog. Awaiting independent
 combined-artifact/slice review before commit/push, then E2E at the refreshed head and final review.
+
+Latest follow-up: bfc3e92 passes all four asset freshness gates in CI. Native Aspire surface
+inventory needed four rows for new task files. Generated without policy/version changes; parity
+now passes with zero failure/missing paths. Push this derived-only fix and rerun current-head CI.
+Local full publish dry-run is in progress; final exact-head reviewer pass is still reserved.

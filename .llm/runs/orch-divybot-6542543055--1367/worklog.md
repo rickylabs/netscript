@@ -114,3 +114,12 @@ committed corpus to match current APIs, and the large failing artifact compariso
 assertion diff buffer. Do not weaken these tests. After committing the corrected corpus, rerun the
 two exact failures from the committed tree (their fixture clones HEAD). Aggregated check-test fails
 because of that shard; it is not an additional independently diagnosed failure.
+
+## Aspire inventory CI repair
+
+CI at bfc3e92 now passes every docs/API asset freshness gate. Aspire version parity then reports
+only manifest:freshness. Native manifest generation adds four rows for the new storage fixture,
+restart probe and focused tests; no enforcement/pin/disposition changes. check:aspire-version-parity
+passes: manifestFresh=true, fail=0, missing=0 (1002 checked, unchanged inherited deferrals/info).
+This is a derived inventory correction; final separate-session exact-head review covers it before
+merge. Full runtime CI and final review remain unproven while their PR boxes are unchecked.
