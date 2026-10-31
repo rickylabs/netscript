@@ -60,3 +60,7 @@ Exports/snippets/build/links/caveats all PASS. Push triggers fresh Pages CI;
 remote success remains pending. Resume Overlay slice after push/comment.
 
 Coordinator public-repository requirement: every committed run log/receipt/JSON must use portable paths. The added-line audit at c644a44596623fd93be1dc0cd77897f76d88a399 found zero forbidden absolute paths. Follow memory-public-path-hygiene.md for all new logs and repeat the whole-PR origin/main...HEAD added-line audit at the final READY head; include its zero-hit result in READY. This audit does not mark unfinished implementation complete.
+
+Latest-base recovery: Theme B main is included; six new main themes are preserved. Native registry now107 =92 baseline +13 reviewed components +2 support entries. Keep structural registry-v2 equality rather than stale numeric counts. Compatibility guard explicitly combines TOKEN_PRESETS additions with reviewed component/support allowlists; preview test retains separate full PREVIEW_TOKEN_FILES coverage. Coordinator audit commits are preserved. Overlay WIP is saved privately for restoration after recovery push; do not lose it or mark phase2a complete.
+
+Latest-base integration independently reviewed PASS (rebase2-review.md). All112 rebuilt-source browser cases PASS; release preflight and docs accuracy PASS. Registry/source/prose assets regenerated from combined source. Remaining clean-source corpus refresh and carrier freshness checks precede the recovery push. This is recovery of reviewed slices, not phase completion.
