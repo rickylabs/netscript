@@ -27,3 +27,9 @@
 - CI docs build on S1 reported export drift: reference/mcp omitted the new docs subpath. Add its
   entrypoint and public transport/citation semantics to docs/site/reference/mcp/index.md, then
   refresh the one canonical carrier. This is required documentation for the new public seam.
+
+- Close audit records measured maintenance growth against existing MCP doctrine debt: central
+  tool contracts 459 to 469 lines; infrastructure root 17 to 18 children. Accepted cost and the
+  schema/adapter-group cleanup gate extend mcp-tool-contracts-a8-1102; no new runtime cost accepted.
+- First IMPL-EVAL PASS at implementation head 1261c03. Final verdict follows the evidence-only
+  commit on the exact pushed head; it is published externally to avoid a self-referential SHA.

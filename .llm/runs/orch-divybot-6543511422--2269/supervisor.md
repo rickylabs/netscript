@@ -17,3 +17,6 @@ Public records omit private operational metadata per assignment. Raw evaluator s
 
 S2 write surface also includes docs/site/reference/mcp/index.md and its export-coverage inventory,
 required by CI to document the new public docs subpath.
+
+Close-record surface: update existing MCP debt in .llm/harness/debt/arch-debt.md; add the dated
+lesson and sanitized public CLI acceptance record inside this run. No implementation scope change.

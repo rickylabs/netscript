@@ -92,3 +92,35 @@ and merging. No runtime resources, lock churn, force pushes, rebase, merge, tags
 Remaining: committed-head carrier freshness, final independent IMPL-EVAL, ready transition, checks
 snapshot and review threads. No local scaffold.runtime; no scaffold templates or runtime wiring
 were edited. CLI offline docs generation and MCP composition have direct consumer evidence.
+
+## Committed-head verification and independent evaluation
+
+At 1261c03e42626a941d5b60d311f2b8c598fef780:
+
+| Gate | Result |
+| --- | --- |
+| check:agent-docs-prose (run-gate receipt issue2269-prose) | PASS, exit 0 |
+| check:assets-barrel (issue2269-assets) | PASS, exit 0 |
+| check:publish-assets (issue2269-publish) | PASS, exit 0 |
+| check:mcp-export-corpus (issue2269-exports) | PASS, exit 0 |
+| check:aspire-version-parity (issue2269-aspire-parity) | PASS, exit 0 |
+| Export corpus generator clean-head tests | PASS, 14 additional tests |
+| Public CLI MCP stdio against an empty project | PASS, all 11 acceptance responses cited; see public-cli-acceptance.json |
+| check:review-threads | PASS, 0 threads / 0 unanswered |
+| Native MCP publish dry-run | PASS; no slow-type diagnostics |
+| Static JSR audit | Exit 0; inherited cardinality warnings; its slow-types banner heuristic is not a native warning |
+| Independent IMPL-EVAL round 1 | PASS / MERGE 1261c03e42626a941d5b60d311f2b8c598fef780 |
+
+The evaluator independently ran 27 retrieval/guidance/release tests and 7 CLI/carrier parity tests,
+all passing. Its report is evaluate.md. CI docs build at this head succeeded; other required checks
+remain draft-skipped until ready. The source tree remains clean after freshness generation.
+
+Runtime e2e-cli verdict: NOT NEEDED for this scoped change, independently confirmed. No scaffold
+source templates, plugin scaffolding, DB or runtime wiring changed. CLI offline docs and public
+MCP composition have direct consumer tests. The owner forbids a local scaffold runtime; none ran.
+Coordinator remains the merge owner and may select additional CI gates.
+
+Accepted maintenance debt and its bounded cost are recorded under mcp-tool-contracts-a8-1102;
+no runtime debt. Existing static warnings are not suppressed. The new public docs subpath passes
+native doc-lint/publish analysis. No lock changes, started application resources, or unknown-owner
+cleanup required. Final exact-head verdict and CI snapshot are published in the PR/READY report.
