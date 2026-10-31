@@ -1,3 +1,4 @@
+import type { TelemetryProvenance } from './telemetry/telemetry-snapshot.ts';
 import type { ToolSchema } from './schema.ts';
 
 /** Stable v1 MCP tool names. */
@@ -49,6 +50,8 @@ export interface ToolError {
   /** Stable machine-readable error code. */ readonly code: string;
   /** Bounded human-readable message. */ readonly message: string;
   /** Optional lifecycle state such as planned. */ readonly status?: string;
+  /** Telemetry evidence remains available on diagnostic errors. */
+  readonly provenance?: TelemetryProvenance;
 }
 
 /** Structured flow error. */

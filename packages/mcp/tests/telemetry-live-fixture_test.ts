@@ -6,7 +6,7 @@ import { createGetLastJobResultFlow } from '../src/application/flows/get-last-jo
 import { createGetRecentErrorsFlow } from '../src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from '../src/application/flows/get-run-flow.ts';
 import { createListRunsFlow } from '../src/application/flows/list-runs-flow.ts';
-import { createResolvedTelemetryQuery } from '../src/infrastructure/telemetry-query-adapter.ts';
+import { createResolvedTelemetryQuery } from '../src/infrastructure/telemetry/telemetry-query-adapter.ts';
 import { validateSchema } from '../src/domain/schema.ts';
 import { TOOL_OUTPUT_SCHEMAS } from '../src/domain/tool-contracts.ts';
 import {

@@ -1,0 +1,16 @@
+{
+  "fakeDashboard": {
+    "ok": true,
+    "cliExitCode": 0,
+    "mcpTraceIds": [
+      "trace-checkout"
+    ],
+    "cliTraceIds": [
+      "trace-checkout"
+    ]
+  },
+  "liveAppHost": {
+    "verdict": "UNPROVEN",
+    "reason": "No running conventional NetScript AppHost registered; no shared resources started or changed."
+  }
+}

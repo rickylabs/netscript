@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Bind status and performance tools to the selected AppHost, report sample provenance and explicit
+  no-data/discovery diagnostics, and expose the telemetry provenance contract.
+
 - Add bounded UI registry list/search/view tools and a structured ui:add command tool, with an
   injectable catalog port and an offline embedded Fresh UI adapter.
 

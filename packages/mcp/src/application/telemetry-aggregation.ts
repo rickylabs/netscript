@@ -18,7 +18,7 @@ import {
   type ServicePerformanceSummary,
   type SpanTreeNode,
   type TelemetryDomain,
-} from '../domain/telemetry-summaries.ts';
+} from '../domain/telemetry/telemetry-summaries.ts';
 
 export const TELEMETRY_DOMAINS: readonly TelemetryDomain[] = [
   'service',
@@ -265,12 +265,15 @@ export function aggregateServicePerformance(
     readonly service: string;
     readonly sinceUnixMs: number;
     readonly nowUnixMs: number;
+    /** The backend already resolved the exact logical resource or replica filter. */
+    readonly resourceSelected?: boolean;
     readonly limit?: number;
   },
 ): ServicePerformanceSummary {
   const selected = completedDurations(
     spans.filter((span) =>
-      serviceOf(span.attributes) === options.service && span.startTimeUnixMs >= options.sinceUnixMs
+      (options.resourceSelected || serviceOf(span.attributes) === options.service) &&
+      span.startTimeUnixMs >= options.sinceUnixMs
     ),
   );
   const values = selected.map((item) => item.durationMs);
@@ -305,11 +308,20 @@ export function aggregateServicePerformance(
 /** Rank OTel `db.` semantic-convention and NetScript KV operations by total time then p95. */
 export function aggregateDbBottlenecks(
   spans: readonly TelemetrySpan[],
-  options: { readonly sinceUnixMs: number; readonly service?: string; readonly limit?: number },
+  options: {
+    readonly sinceUnixMs: number;
+    readonly service?: string;
+    /** The backend already resolved the exact logical resource or replica filter. */
+    readonly resourceSelected?: boolean;
+    readonly limit?: number;
+  },
 ): DbBottleneckSummary {
   const selected = completedDurations(
     spans.filter((span) => span.startTimeUnixMs >= options.sinceUnixMs)
-      .filter((span) => !options.service || serviceOf(span.attributes) === options.service)
+      .filter((span) =>
+        options.resourceSelected || !options.service ||
+        serviceOf(span.attributes) === options.service
+      )
       .filter(isDbSpan),
   );
   const groups = new Map<string, Array<{ span: TelemetrySpan; durationMs: number }>>();

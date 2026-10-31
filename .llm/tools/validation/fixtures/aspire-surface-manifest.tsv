@@ -792,6 +792,8 @@ packages/mcp/cli.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures 
 packages/mcp/deno.json	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/mod.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/README.md	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/application/flows/analyze-db-bottlenecks-flow.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/application/flows/analyze-service-performance-flow.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/flows/doctor-flow.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/flows/telemetry-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/runner/mcp-server.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -799,6 +801,9 @@ packages/mcp/src/application/service-endpoint-directory.ts	mcp:client	S3/S11/S13
 packages/mcp/src/domain/docs/faithful-extraction.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/doctor-check-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/domain/telemetry/telemetry-diagnostics.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/domain/telemetry/telemetry-provenance-schema.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/domain/telemetry/telemetry-snapshot.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -807,7 +812,9 @@ packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-output.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
-packages/mcp/src/infrastructure/telemetry-query-adapter.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/telemetry/aspire-telemetry-snapshot.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/telemetry/dashboard-telemetry-api.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/telemetry/telemetry-query-adapter.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/ports/service-endpoint-directory-port.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/publish-assets.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/tests/aspire-ps-dashboard-reader_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
@@ -823,8 +830,10 @@ packages/mcp/tests/openapi-read-tools_test.ts	mcp:fixtures	S3	add 13.5.3 describ
 packages/mcp/tests/service-endpoint-directory_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/service-endpoint-source-fixtures.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/mcp/tests/service-endpoint-sources_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/telemetry-dashboard-fixtures.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/telemetry-endpoint_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/telemetry-live-fixture_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+packages/mcp/tests/telemetry-snapshot-lifecycle_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/plugin-auth-core/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-auth-core/src/adapters/auth-service-authenticator.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-sagas-core/src/integration/publisher/publish-saga-or-throw.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected

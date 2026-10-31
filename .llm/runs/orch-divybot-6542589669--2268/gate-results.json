@@ -1,0 +1,220 @@
+{
+  "sourceBaseline": "851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2",
+  "tests": {
+    "command": "deno task test --unstable-kv packages/mcp/tests packages/telemetry/tests/query packages/cli/src/public/features/plugins/doctor/{plugin-runtime-health,runtime-health-polling,runtime-health-surfaces}_test.ts",
+    "exitCode": 0,
+    "summary": {
+      "passed": 526,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 526,
+      "uniqueFailures": 0
+    }
+  },
+  "check": {
+    "command": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --root packages/telemetry/src/adapters/aspire-query --root packages/telemetry/tests/query --ext ts,tsx",
+    "exitCode": 0,
+    "selectedFiles": 157
+  },
+  "lint": {
+    "command": "structured run-deno-lint.ts over MCP and telemetry query adapter/tests",
+    "exitCode": 0,
+    "selection": {
+      "filesSelected": 156,
+      "batches": 3,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 156,
+      "filesProcessed": 156,
+      "droppedFiles": [],
+      "refusals": []
+    }
+  },
+  "format": {
+    "command": "structured run-deno-fmt.ts over the same source TypeScript scopes",
+    "exitCode": 0,
+    "summary": {
+      "filesSelected": 156,
+      "batches": 3,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "quality": {
+    "command": "deno task quality:gate through run-gate.ts",
+    "exitCode": 0,
+    "receiptSha256": "6bda934301194c2b1698b9863ac911cfd4b9c7a0b3b7c3b66a38916fd665d5af",
+    "note": "Source check at the reviewed working tree; immutable final-head receipt is collected after commit."
+  },
+  "docLint": {
+    "mcp": {
+      "exitCode": 0,
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 0,
+        "totalPrivateTypeRef": 0,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      }
+    },
+    "telemetryQuery": {
+      "exitCode": 0,
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 0,
+        "totalPrivateTypeRef": 0,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      }
+    },
+    "telemetryFull": {
+      "exitCode": 1,
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 7,
+        "totalPrivateTypeRef": 6,
+        "totalMissingJSDoc": 1,
+        "totalOther": 0
+      }
+    },
+    "baselineTelemetryFull": {
+      "exitCode": 1,
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 7,
+        "totalPrivateTypeRef": 6,
+        "totalMissingJSDoc": 1,
+        "totalOther": 0
+      }
+    },
+    "baselineFindingsIdentical": true,
+    "baselineFindings": [
+      {
+        "path": "packages/telemetry/src/orpc/tracing-plugin.ts",
+        "privateTypeRef": 5,
+        "missingJSDoc": 0,
+        "other": 0
+      },
+      {
+        "path": "packages/telemetry/src/hono/otel-middleware.ts",
+        "privateTypeRef": 1,
+        "missingJSDoc": 0,
+        "other": 0
+      },
+      {
+        "path": "packages/telemetry/src/adapters/otel/otel-sdk.ts",
+        "privateTypeRef": 0,
+        "missingJSDoc": 1,
+        "other": 0
+      }
+    ]
+  },
+  "jsrAudits": {
+    "mcp": {
+      "exitCode": 0,
+      "findings": [
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 15 immediate children; doctrine cap is 12",
+          "path": "src/domain"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 16 immediate children; doctrine cap is 12",
+          "path": "src/application/flows"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/infrastructure"
+        },
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "WARN",
+          "message": "Checking for slow types in the public API..."
+        }
+      ],
+      "publishDryRunSucceeded": true,
+      "note": "Slow-type warning parser counts the ordinary check banner; both real member publish dry-runs exit 0."
+    },
+    "telemetry": {
+      "exitCode": 0,
+      "findings": [
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 16 immediate children; doctrine cap is 12",
+          "path": ""
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 15 immediate children; doctrine cap is 12",
+          "path": "src/attributes"
+        },
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "WARN",
+          "message": "Checking for slow types in the public API..."
+        }
+      ],
+      "publishDryRunSucceeded": true,
+      "note": "Slow-type warning parser counts the ordinary check banner; both real member publish dry-runs exit 0."
+    }
+  },
+  "publishDryRun": {
+    "mcp": {
+      "exitCode": 0,
+      "command": "deno task --cwd packages/mcp publish:dry-run"
+    },
+    "telemetry": {
+      "exitCode": 0,
+      "command": "deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish-dry-run.ts --root . --member packages/telemetry"
+    }
+  },
+  "aspireParity": {
+    "exitCode": 0,
+    "ok": true,
+    "counts": {
+      "checked": 1006,
+      "fail": 0,
+      "deferred": 14,
+      "info": 4,
+      "skipped": 3,
+      "missing": 0
+    },
+    "manifestFresh": true
+  },
+  "generatedCarriers": {
+    "agentDocs": {
+      "exitCode": 0,
+      "fresh": true
+    },
+    "publishAssets": {
+      "exitCode": 0
+    },
+    "mcpExportCorpus": {
+      "exitCode": 0,
+      "fresh": true
+    }
+  },
+  "negativeControls": {
+    "file": "negative-controls.json",
+    "expectedFailures": 5,
+    "processFailures": 0
+  },
+  "physicalLiveAppHost": {
+    "verdict": "UNPROVEN",
+    "reason": "No running conventional NetScript AppHost registered; no shared runtime started."
+  },
+  "e2eCli": {
+    "required": false,
+    "localRun": false,
+    "reason": "Read-only MCP telemetry and documentation carriers; no scaffold templates, plugin scaffolding, DB or Aspire runtime wiring changed."
+  }
+}

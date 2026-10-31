@@ -20,6 +20,7 @@ import {
   normalizeSpan,
   normalizeTrace,
   selectItems,
+  selectLogs,
   selectSpans,
   unwrapData,
 } from './aspire-telemetry-normalize.ts';
@@ -108,7 +109,7 @@ export class AspireTelemetryQuery implements TelemetryQueryPort {
   /** Return structured logs matching the supplied filter. */
   async queryLogs(filter?: TraceQueryFilter): Promise<readonly TelemetryLog[]> {
     const payload = await this.#request('logs', filter);
-    return selectItems(payload, ['logs', 'items'])
+    return selectLogs(payload)
       .map(normalizeLog)
       .filter((log) => log !== undefined);
   }

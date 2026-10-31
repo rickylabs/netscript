@@ -51,7 +51,7 @@ Deno.test('all four telemetry flows return bounded semantic summaries', async ()
   assertStringIncludes(errorGroups[0]?.operationSchemaHint ?? '', 'worker');
 });
 
-Deno.test('trace intelligence flows apply windows and return structured empty summaries', async () => {
+Deno.test('trace intelligence flows distinguish empty measurements from numeric zero latency', async () => {
   const empty = new FakeTelemetryQuery();
   const job = await createGetLastJobResultFlow(empty, () => 1_000_000)({ jobName: 'missing' });
   assert(job.ok);
@@ -59,11 +59,13 @@ Deno.test('trace intelligence flows apply windows and return structured empty su
   const performance = await createAnalyzeServicePerformanceFlow(empty, () => 1_000_000)({
     service: 'api',
   });
-  assert(performance.ok);
-  assertEquals((performance.value as { sampleCount: number }).sampleCount, 0);
+  assert(!performance.ok);
+  assertEquals(performance.error.code, 'telemetry_no_data');
+  assertEquals(performance.error.provenance?.sampleCount, 0);
   const db = await createAnalyzeDbBottlenecksFlow(empty, () => 1_000_000)({ sinceUnixMs: 123 });
-  assert(db.ok);
-  assertEquals(db.value, { sinceUnixMs: 123, sampleCount: 0, operations: [] });
+  assert(!db.ok);
+  assertEquals(db.error.code, 'telemetry_no_data');
+  assertEquals(db.error.provenance?.window.sinceUnixMs, 123);
 });
 
 Deno.test('get_run returns structured not found', async () => {

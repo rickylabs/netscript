@@ -9,3 +9,5 @@ Authorized write surface: `packages/mcp/`, `packages/telemetry/` if the supporte
 Read the dispatcher-supplied leaf profile; no repository profiles loaded. Matrix queried with `deno task agentic:matrix --tier feature --json`. Primary implementation: sol/xhigh; plan evaluator: glm_5_3/provider_default; implementation evaluator: muse_spark_1_3/xhigh. Owner overrides both evaluators to separate Anthropic Claude Opus 5.5 sessions at high effort. Independent read-only evaluator will be resumed across rounds; final review must name the exact pushed SHA. Plan max 2 rounds, implementation max 5; two consecutive terminal failures stop the loop.
 
 Privacy: public artifacts contain only repository-relative paths and sanitized evidence; no operator paths, host addresses, credentials or session identifiers.
+
+Validation also owns the generated Aspire surface fixture under .llm/tools/validation/fixtures; regenerate it without changing scan policy. A short-lived detached checkout is permitted solely for baseline gate comparison, with no runtime resources.
