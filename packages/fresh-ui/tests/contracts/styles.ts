@@ -1,3 +1,4 @@
+import { codeBlockFixtures, codeBlockKeyboard } from './utility-code-block.tsx';
 import { displayMotionFixtures, displayMotionKeyboard } from './utility-display-motion.tsx';
 import { displayBasicFixtures, displayBasicKeyboard } from './utility-display-basics.tsx';
 import { overlayFixtures, overlayKeyboard } from './utility-overlays.tsx';
@@ -28,6 +29,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...overlayFixtures,
     ...displayBasicFixtures,
     ...displayMotionFixtures,
+    ...codeBlockFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -38,5 +40,6 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...overlayKeyboard,
     ...displayBasicKeyboard,
     ...displayMotionKeyboard,
+    ...codeBlockKeyboard,
   ],
 }];

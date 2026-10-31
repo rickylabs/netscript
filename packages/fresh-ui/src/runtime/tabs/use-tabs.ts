@@ -62,7 +62,13 @@ export function useTabs({
   }, []);
 
   const handleNavigation = useCallback(
-    (tabValue: string, key: string, mode: TabsActivationMode, axis: TabsOrientation) => {
+    (
+      tabValue: string,
+      key: string,
+      mode: TabsActivationMode,
+      axis: TabsOrientation,
+      direction: 'ltr' | 'rtl',
+    ) => {
       const currentIndex = triggerOrder.current.indexOf(tabValue);
       if (currentIndex < 0) {
         return;
@@ -74,6 +80,7 @@ export function useTabs({
         triggerOrder.current.length,
         axis,
         loop,
+        direction,
       );
       if (nextIndex < 0 || nextIndex === currentIndex) {
         return;
@@ -157,12 +164,16 @@ export function useTabs({
               return;
             }
 
-            handleNavigation(tabValue, event.key, activationMode, orientation);
-
-            if (
-              ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)
-            ) {
+            const keys = orientation === 'horizontal'
+              ? ['ArrowLeft', 'ArrowRight', 'Home', 'End']
+              : ['ArrowUp', 'ArrowDown', 'Home', 'End'];
+            if (keys.includes(event.key)) {
               event.preventDefault();
+              const direction = event.currentTarget.ownerDocument.defaultView
+                  ?.getComputedStyle(event.currentTarget).direction === 'rtl'
+                ? 'rtl'
+                : 'ltr';
+              handleNavigation(tabValue, event.key, activationMode, orientation, direction);
             }
           },
         ),

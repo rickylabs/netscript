@@ -1,0 +1,54 @@
+{
+  "slice": "7c1 CodeBlock and adjacent Tabs keyboard behavior",
+  "focusedTests": {
+    "passed": 340,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 20,
+    "failed": 0,
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      390,
+      1280
+    ],
+    "strictAxeSeriousOrCritical": 0
+  },
+  "sourceWrappers": {
+    "check": "PASS",
+    "lint": "PASS",
+    "format": "PASS"
+  },
+  "browserWrappers": {
+    "fixtureCheck": "PASS",
+    "specCheck": "PASS",
+    "lint": "PASS",
+    "format": "PASS"
+  },
+  "qualityAndArchitecture": "PASS",
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "installedBaselineComponent": "code-block",
+  "runtimeUsers": 8,
+  "legacyDependencyRepairs": [
+    "command-palette",
+    "code-block"
+  ],
+  "newThirdPartyDependency": false,
+  "tokenValuesChanged": false,
+  "lockfilesChanged": false,
+  "visualDeviation": "Tinted diff/highlight syntax uses text/fg until code syntax contrast pairs are certified on those backgrounds; drift.md records evidence and restoration cost.",
+  "independentReview": "PASS after legacy-header correction",
+  "cleanSourceCarriers": "PENDING",
+  "finalPhaseGates": "PENDING",
+  "phaseReady": false,
+  "legacyHeaderCompatibility": "none/title/tabs SSR plus real browser copy of tabs-without-files fallback"
+}
