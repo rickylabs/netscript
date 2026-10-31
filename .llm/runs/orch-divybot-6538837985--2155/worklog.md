@@ -43,3 +43,18 @@ Independent S1 slice review: docs PASS; all twelve source checks and worker/retr
 Final source-tracing clarification: the job scaffolder emits a metadata comment and handler, not a separate job config file; tutorial now explicitly preserves that comment. Retry attempts are described per connection/delivery phase. These prose clarifications will be included in the final exact-head review.
 
 Reconcile before S1: latest fetched main is b0b8f3f7282d073d92d64acdee522ea34bba4c5c; its sole new commit affects Figma variable exports, with no overlap in this audit.
+
+## S1 terminal
+
+- Commit: bed17028beb9096dc08cac05e3a44d0deb5c3faa. Pushed; direct ls-remote confirms identical remote SHA.
+- Independent docs review PASS before the source commit. Coordinator supervisor sign-off/merge remains outside this implementer lane.
+- Per-slice PR comment posted with scope, commit and gate evidence.
+- No package/plugin/lock/assignment files changed.
+
+## S2 evidence handoff
+
+Dated lesson and evaluate.md prepared. Final evaluation authority will be the independent PR phase comment naming the exact final pushed head, avoiding a self-invalidating verdict commit. Required CI freshness remains unproven/red until the coordinator updates the prohibited generated package carrier. No new architectural debt introduced; trigger builder retry parity is an existing API gap, documented for follow-up.
+
+Review threads gate: PASS, zero current/unanswered threads at the source-slice checkpoint. No AppHost, database, container or scaffold E2E was launched. No unclear resource ownership or cleanup needed.
+
+Reconcile S2: source docs and test remain byte-identical to S1. Only scoped run artifacts change in this slice.
