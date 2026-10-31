@@ -6,6 +6,7 @@
   "exports": {
     ".": "./mod.ts",
     "./cli": "./cli.ts",
+    "./docs": "./docs.ts",
     "./openapi-projection": "./openapi-projection.ts"
   },
   "imports": {

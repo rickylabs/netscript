@@ -12,35 +12,9 @@ const ROOT = new URL('../../', import.meta.url);
 const CHECK = Deno.args.includes('--check');
 const stalePaths: string[] = [];
 
-/** Golden-path prose embedded in the MCP package when no filesystem corpus resolves. */
-export const MCP_EMBEDDED_DOC_PATHS = [
-  'llms.txt',
-  'pages/durable-workflows/how-to/bound-stream-retention/index.md',
-  'pages/explanation/contracts/index.md',
-  'pages/explanation/plugin-system/index.md',
-  'pages/orchestration-runtime/how-to/author-a-plugin/index.md',
-  'pages/data-persistence/how-to/use-a-second-database/index.md',
-  'pages/services-sdk/services/index.md',
-  'pages/web-layer/builders/index.md',
-  'pages/web-layer/how-to/build-a-server-validated-form/index.md',
-  'pages/web-layer/query/index.md',
-  'pages/web-layer/route/index.md',
-  'pages/web-layer/generated-surface/index.md',
-  'pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md',
-  'pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md',
-] as const;
-
-/**
- * Maximum UTF-8 source bytes accepted for the generated MCP fallback prose.
- * 288 KiB: #1383 required the guarded plugin-service example on the embedded
- * plugin-system page (258 KiB), and the streams retention recipe is embedded
- * alone rather than the entire streams reference page.
- */
-export const MCP_EMBEDDED_DOCS_MAX_BYTES = 294_912;
-
 export const PUBLISH_ASSET_OUTPUTS: readonly string[] = [
   AGENT_DOCS_PAGE_CARRIER,
-  'packages/cli/src/kernel/assets/llms-policy.generated.ts',
+  'packages/mcp/src/infrastructure/docs/llms-policy.generated.ts',
   '.llm/assets/agent-docs/provenance.json',
   'packages/cli/src/kernel/assets/agent-tools.generated.ts',
   'packages/cli/src/kernel/assets/agent-docs.generated.ts',
@@ -305,7 +279,7 @@ async function readVersionFromRoot(root: URL, path: string): Promise<string> {
   return config.version;
 }
 
-/** Read and validate the bounded MCP prose selection from the release docs bundle. */
+/** Read and validate the complete MCP prose corpus from the release docs bundle. */
 export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedMcpEmbeddedDocs> {
   const frameworkVersion = await readVersionFromRoot(root, 'packages/mcp/deno.json');
   const provenancePath = '.llm/assets/agent-docs/provenance.json';
@@ -334,7 +308,7 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
   if (payload.schemaVersion !== 1 || !payload.files || typeof payload.files !== 'object') {
     throw new Error('agent docs prose payload must use schema version 1');
   }
-  const documents = MCP_EMBEDDED_DOC_PATHS.map((path) => {
+  const documents = Object.keys(payload.files).filter((path) => path !== 'llms-full.txt').sort().map((path) => {
     const source = payload.files[path];
     if (typeof source !== 'string') throw new Error(`agent docs prose payload is missing ${path}`);
     return { path, slug: normalizeDocsSlug(path), source };
@@ -344,11 +318,6 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
     (total, document) => total + new TextEncoder().encode(document.source).byteLength,
     0,
   );
-  if (sourceBytes > MCP_EMBEDDED_DOCS_MAX_BYTES) {
-    throw new Error(
-      `MCP embedded docs are ${sourceBytes} bytes; budget is ${MCP_EMBEDDED_DOCS_MAX_BYTES}`,
-    );
-  }
   const canonicalBytes = new TextEncoder().encode(canonical);
   return {
     documents,
@@ -356,7 +325,7 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
       schemaVersion: 1,
       frameworkVersion,
       sourceCommit: 'content-addressed',
-      paths: [...MCP_EMBEDDED_DOC_PATHS],
+      paths: documents.map(({ path }) => path),
       sourceBytes,
       documentCount: documents.length,
       sha256: hex(await crypto.subtle.digest('SHA-256', copiedBuffer(canonicalBytes))),
@@ -396,18 +365,14 @@ export const MCP_PACKAGE_VERSION: string = ${JSON.stringify(version)};
 const MCP_PACKAGE_README_GZIP_BASE64: string = ${JSON.stringify(readmeCompressed.toBase64())};
 export const MCP_PACKAGE_README: string = await new Response(new Blob([Uint8Array.fromBase64(MCP_PACKAGE_README_GZIP_BASE64).buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
 
-/** Generated golden-path prose used when no project documentation corpus resolves. */
-// deno-fmt-ignore
-export const MCP_EMBEDDED_DOCS = [\n${
-      embedded.documents.map((document) => `  ${JSON.stringify(document)},`).join('\n\n')
-    }\n] as const;
+/** Release identity and expected integrity of the one shared documentation corpus. */
+export const MCP_EMBEDDED_DOCS_PROVENANCE: import('./infrastructure/release-embedded-docs-corpus.ts').ReleaseEmbeddedDocsProvenance = {
+  schemaVersion: 1, frameworkVersion: MCP_PACKAGE_VERSION, sourceCommit: 'content-addressed',
+  paths: ${JSON.stringify(embedded.provenance.paths)},
+  sourceBytes: ${embedded.provenance.sourceBytes}, documentCount: ${embedded.provenance.documentCount},
+  sha256: ${JSON.stringify(embedded.provenance.sha256)},
+};
 
-/** Release identity, cardinality, size, and integrity of the generated fallback prose. */
-export const MCP_EMBEDDED_DOCS_PROVENANCE: import('./infrastructure/release-embedded-docs-corpus.ts').ReleaseEmbeddedDocsProvenance = { schemaVersion: 1, frameworkVersion: MCP_PACKAGE_VERSION, sourceCommit: 'content-addressed',
-  paths: MCP_EMBEDDED_DOCS.map((doc) => doc.path), sourceBytes: MCP_EMBEDDED_DOCS.reduce((sum, doc) => sum + new TextEncoder().encode(doc.source).byteLength, 0),
-  documentCount: MCP_EMBEDDED_DOCS.length,
-  sha256: new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(MCP_EMBEDDED_DOCS.map(({ path, source }) => \`\${path}\0\${source}\`).join('\0')))).toHex(),
-} as const;
 `,
     root,
     check,

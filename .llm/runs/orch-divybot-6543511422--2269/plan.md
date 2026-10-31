@@ -42,3 +42,10 @@ No scaffold templates, plugin scaffolding, database or runtime wiring change is 
 scaffold.runtime is forbidden by owner. Reassess CI e2e-cli need if generated output changes.
 No open architectural decisions. Deferred: external network retrieval, API export corpus redesign,
 new undocumented producer seams, release publication. No architectural debt planned.
+
+PLAN-EVAL round 1 correction (locked): search_docs keeps literal semantics. Every release search
+response, including zero matches, carries citation {frameworkVersion, sha256}. Zero matches adds
+confidence: low and fallback: No seam documented for this query in this corpus; use find_export
+or search_exports for public APIs. A withReadinessCheck regression MUST assert this explicit
+fallback and citation, not merely count zero, and must fail when the new fallback is reverted.
+No docs/site edits are required.

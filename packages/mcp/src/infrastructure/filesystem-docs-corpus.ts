@@ -6,6 +6,7 @@ import {
   DocsDocumentTooLargeError,
   type DocsSearchMatch,
   type DocsSection,
+  docsSlugCandidates,
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
   normalizeDocsSlug,
@@ -88,7 +89,11 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
   async get(slug: string): Promise<DocsDocument | undefined> {
     await this.#refresh();
     const normalized = normalizeDocsSlug(slug);
-    const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
+    const candidate =
+      docsSlugCandidates(slug).find((key) =>
+        this.#documents.has(key) || this.#aliases.has(key) || this.#rejected.has(key)
+      ) ?? normalized;
+    const canonicalSlug = this.#aliases.get(candidate) ?? candidate;
     const rejection = this.#rejected.get(canonicalSlug);
     if (rejection) throw rejection;
     const document = this.#documents.get(canonicalSlug);
@@ -177,7 +182,7 @@ async function* walkDocsSources(directory: string): AsyncGenerator<string> {
       if (!EXCLUDED_DIRECTORIES.has(entry.name)) yield* walkDocsSources(path);
     } else if (
       (entry.isFile || entry.isSymlink) &&
-      ['.md', '.txt'].includes(extname(entry.name).toLowerCase())
+      ['.md', '.mdx', '.txt'].includes(extname(entry.name).toLowerCase())
     ) {
       yield path;
     }
@@ -222,7 +227,7 @@ function* walkDocsSourcesSync(directory: string): Generator<string> {
       if (!EXCLUDED_DIRECTORIES.has(entry.name)) yield* walkDocsSourcesSync(path);
     } else if (
       (entry.isFile || entry.isSymlink) &&
-      ['.md', '.txt'].includes(extname(entry.name).toLowerCase())
+      ['.md', '.mdx', '.txt'].includes(extname(entry.name).toLowerCase())
     ) {
       yield path;
     }
@@ -397,6 +402,13 @@ function parseSections(content: string): DocsSection[] {
   }));
 }
 
+const SEARCH_FIELD_WEIGHTS = { title: 12, heading: 5, body: 1 } as const;
+const SEARCH_SUBSTRING_SHARE = 0.05;
+const SEARCH_PHRASE_BOOST = Object.values(SEARCH_FIELD_WEIGHTS).reduce(
+  (sum, weight) => sum + weight,
+  0,
+);
+
 /** Rank one parsed document against normalized lexical search terms. */
 export function rankDocument(
   document: DocsDocument,
@@ -408,11 +420,16 @@ export function rankDocument(
   const body = document.content.toLocaleLowerCase();
   let score = 0;
   for (const term of terms) {
-    score += occurrences(title, term) * 12;
-    score += occurrences(headings, term) * 5;
-    score += occurrences(body, term);
+    score += saturatedOccurrences(title, term) * SEARCH_FIELD_WEIGHTS.title;
+    score += saturatedOccurrences(headings, term) * SEARCH_FIELD_WEIGHTS.heading;
+    score += saturatedOccurrences(body, term) * SEARCH_FIELD_WEIGHTS.body;
   }
   if (score === 0) return undefined;
+  // A complete literal phrase outranks any bag-of-words match, even in a much longer page.
+  const phrase = terms.join(' ');
+  if ([title, headings, body].some((field) => wholeOccurrences(field, phrase) > 0)) {
+    score += SEARCH_PHRASE_BOOST * terms.length;
+  }
   const firstTerm = terms.find((term) => body.includes(term)) ??
     terms.find((term) => headings.includes(term)) ??
     terms.find((term) => title.includes(term));
@@ -429,14 +446,20 @@ export function tokenize(value: string): string[] {
   return [...new Set(value.toLocaleLowerCase().match(/[\p{Letter}\p{Number}]+/gu) ?? [])];
 }
 
-function occurrences(haystack: string, needle: string): number {
-  let count = 0;
-  let offset = 0;
-  while ((offset = haystack.indexOf(needle, offset)) >= 0) {
-    count++;
-    offset += needle.length;
-  }
-  return count;
+function wholeOccurrences(haystack: string, needle: string): number {
+  // Query tokens contain only letters/numbers; a phrase joins them with spaces.
+  return haystack.match(
+    new RegExp(`(?<![\\p{Letter}\\p{Number}])${needle}(?![\\p{Letter}\\p{Number}])`, 'gu'),
+  )?.length ?? 0;
+}
+
+function saturatedOccurrences(haystack: string, needle: string): number {
+  const whole = wholeOccurrences(haystack, needle);
+  if (whole > 0) return whole / (whole + 1);
+  // Retain literal identifier lookup (ReadinessHandler in createReadinessHandler),
+  // while giving incidental substrings such as hang in change less ranking weight.
+  const partial = haystack.split(needle).length - 1;
+  return SEARCH_SUBSTRING_SHARE * partial / (partial + 1);
 }
 
 function snippet(content: string, term?: string): string {
@@ -459,7 +482,8 @@ export function docsSlugFromPath(path: string): string {
 /** Admit public Markdown plus exactly the root task-router file `llms.txt`. */
 export function isPublicDocsSource(relativePath: string): boolean {
   const normalized = relativePath.split(SEPARATOR).join('/');
-  return extname(normalized).toLocaleLowerCase() === '.md' || normalized === 'llms.txt';
+  return ['.md', '.mdx'].includes(extname(normalized).toLocaleLowerCase()) ||
+    normalized === 'llms.txt';
 }
 
 function titleFromSlug(slug: string): string {

@@ -2,11 +2,12 @@ import { assertEquals } from '@std/assert';
 import {
   agentDocsFullCorpus,
   decodeAgentDocsPages,
-} from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
-import { EMBEDDED_AGENT_DOCS_PAGES } from '../../../packages/cli/src/kernel/assets/agent-docs-prose.generated.ts';
+} from '../../../packages/mcp/docs.ts';
+import { EMBEDDED_AGENT_DOCS_PAGES } from '../../../packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts';
 import { decodeExportSurfaceRows } from '../../../packages/mcp/src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
 import type { EXPORT_SURFACE_ROWS } from '../../../packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts';
-import { MCP_EMBEDDED_DOCS } from '../../../packages/mcp/src/publish-assets.generated.ts';
+import { loadReleaseDocsSource } from '../../../packages/mcp/src/infrastructure/release-embedded-docs-corpus.ts';
+const { documents: MCP_EMBEDDED_DOCS } = await loadReleaseDocsSource();
 import { parseAgentDocsPages, renderAgentDocsPages } from './agent-docs-page-carrier.ts';
 import {
   createGeneratedAsset,

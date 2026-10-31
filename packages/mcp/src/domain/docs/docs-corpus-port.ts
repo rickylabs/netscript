@@ -80,8 +80,18 @@ export interface DocsSearchMatch {
   readonly score: number;
 }
 
+/** Release identity and content digest for independently verifiable documentation citations. */
+export interface DocsCorpusCitation {
+  /** Exact framework release that supplied these pages. */
+  readonly frameworkVersion: string;
+  /** SHA-256 of the canonical path-and-content sequence. */
+  readonly sha256: string;
+}
+
 /** Public documentation capability consumed by docs flows. */
 export interface DocsCorpusPort {
+  /** Release citation when the corpus is an immutable published bundle. */
+  readonly citation?: DocsCorpusCitation;
   /** List indexed public document summaries. */
   list(): Promise<readonly DocsSummary[]>;
   /** Search indexed public documents by lexical relevance. */
@@ -95,7 +105,7 @@ export interface DocsCorpusPort {
 /** Normalize a docs source or lookup path into its public extensionless slug. */
 export function normalizeDocsSlug(slug: string): string {
   const normalized = slug.trim().replace(/\\/g, '/').replace(/^\/+|\/+$/g, '')
-    .replace(/\.(?:md|txt)$/i, '');
+    .replace(/\.(?:mdx?|txt)$/i, '');
   const withoutIndex = normalized === 'index' ? 'index' : normalized.replace(/\/index$/i, '');
   return withoutIndex || 'index';
 }
@@ -106,4 +116,17 @@ export function slugifyDocsHeading(value: string): string {
     .replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-|-$/g, '');
+}
+
+/** Exact identity wins; the alternative accepts a published pages/ prefix in either adapter. */
+export function docsSlugCandidates(slug: string): readonly string[] {
+  const normalized = normalizeDocsSlug(slug);
+  const alternate = normalized === 'index'
+    ? 'pages'
+    : normalized === 'pages'
+    ? 'index'
+    : normalized.startsWith('pages/')
+    ? normalized.slice('pages/'.length)
+    : `pages/${normalized}`;
+  return [normalized, alternate];
 }

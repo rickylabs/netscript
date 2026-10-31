@@ -24,3 +24,8 @@ Read doctrine axioms/public surface/folder/archetypes, relevant rules, harness r
 plan gate and archetype gate matrix. MCP remains integration/tooling; CLI remains archetype 6.
 Planned public subpath is pure typed data/decoding, explicit annotations, ESM-only, registry-safe
 TypeScript carrier (no JSON/text imports, package filesystem reads, or new dependencies).
+
+PLAN-EVAL correction: withReadinessCheck is not present in docs/site prose. It is in the
+@netscript/service export corpus. The full corpus alone cannot make literal search succeed.
+Baseline MCP confirmed zero matches. Preserve literal search semantics and add an explicit
+no-seam-documented fallback with a version/corpus citation on every search response, empty included.

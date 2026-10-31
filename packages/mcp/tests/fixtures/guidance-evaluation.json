@@ -59,7 +59,7 @@
       "intent": "create a new NetScript project from scratch",
       "mode": "rank-one",
       "expected": [
-        "llms#learn"
+        "pages/reference/cli/commands#init-scaffold-a-workspace"
       ]
     },
     {

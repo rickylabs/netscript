@@ -50,6 +50,7 @@ export function createGetDocFlow(corpus: DocsCorpusPort): ToolFlow {
     }
     const source = section?.content ?? document.content;
     const base = {
+      ...(corpus.citation ? { citation: corpus.citation } : {}),
       contractVersion: DOC_RETRIEVAL_VERSION as typeof DOC_RETRIEVAL_VERSION,
       slug: document.slug,
       title: document.title,

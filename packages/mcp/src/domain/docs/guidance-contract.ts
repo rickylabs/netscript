@@ -1,3 +1,5 @@
+import type { DocsCorpusCitation } from './docs-corpus-port.ts';
+
 /** Maximum natural-language intent characters accepted by `find_guidance`. */
 export const GUIDANCE_MAX_INTENT_CHARACTERS = 500;
 
@@ -83,6 +85,8 @@ export interface GuidanceRelatedLink extends GuidanceSectionCitation {
 
 /** Bounded intent-aware guidance result. */
 export interface GuidanceResult {
+  /** Exact release identity when served from published pages. */
+  readonly citation?: DocsCorpusCitation;
   /** Normalized caller intent. */
   readonly intent: string;
   /** Confidence supported by the indexed corpus. */
