@@ -1,4 +1,8 @@
-# Coordinator repair — locally verified; final CI quality required
+# Coordinator repair — test shards failing; every required check required
+
+Prior READY at5e51beb38 is superseded. Run41153807515 quality passed, but test-2 and test-5 each have one obsolete22-versus26 MCP catalog assertion, so required check-test fails. Actual downloaded receipts identify init-agent_test.ts S-18 restart and agent-mcp-stdio_test.ts native smoke. Fix these branch regressions, preserve historical fixture/pinning and existing smoke checks, assert exact canonical catalog and exercise registry stdio calls, then get independent review and EVERY required context green at the exact new head. No main-flake claim without matching failed main evidence. PR2468 is draft during repair. Main remains a410a815c. Do not repeat quality-only or old skipped-context readiness; verify terminal current-head/current-run shard and aggregator success. No new PR, labels, force push, self-merge or release.
+
+# Prior publish-source repair evidence (retained)
 
 Repair source **2372823dac8b6fb2d82605ac789276af4f45a335** is pushed and independently reviewed **PASS** with the retained exact native Opus5.5 High session (read-only/closed stdin). Generated registry/schema TypeScript replaces all3 publishable JSON import attributes; check-only staleness precedes generation in CI. Original JSON/schema bytes/public API/S3 components stay intact; duplicate raw JSON publication is removed and MIT license retained.
 

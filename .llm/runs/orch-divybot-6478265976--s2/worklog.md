@@ -1,5 +1,19 @@
 # Worklog
 
+2026-10-31 shard repair local proof: focused baseline reproduces exactly2 count failures (30/2/0, exit1). Current tests compare full names/order with public TOOL_NAMES and smoke all4 registry calls over actual stdio, preserving all previous pin/restart/triad/docs/doctor/denial/export checks. Focused repaired suite32/0/0, both-file structured check/lint/fmt0 findings/drops/refusals, canonical preflight and root quality PASS. No production, fixture, timeout, ignore, shard manifest, dependency or lock change. Source review and EVERY-required-context/current-run shard proof remain pending; quality-only READY is superseded. See2026-10-31-shard-repair.md.
+
+## Coordinator shard repair — design checkpoint, 2026-10-31
+
+Prior quality-only READY is superseded. Downloaded the actual atomic receipts and structured reports for test-2/test-5 in run41153807515. Test-2:1429 passed/1 failed/6 ignored; test-5:1625/1/3. Both failures are actual26 versus expected22, in init-agent_test.ts's S-18 restart scenario and agent-mcp-stdio_test.ts's native protocol smoke. No process failure, production defect or proven main flake is inferred.
+
+1. Public surface: no production changes; integration assertions follow the full canonical26-tool catalog, including the4 S2 registry tools.
+2. Vocabulary: public MCP catalog, prior-release host/restart, JSON-RPC stdio roundtrip, required-context terminal success.
+3. Ports: existing real CLI subprocess/stdio and filesystem fixture; public @netscript/mcp TOOL_NAMES is the catalog authority.
+4. Constants: use the public names tuple instead of obsolete22 cardinality; existing OpenAPI triad and prior fixture remain unchanged.
+5. One slice: the2 failing integration tests plus run evidence. Focused before/after reproduction, structured wrappers and independent exact native Opus review; final full required CI run must have all shards/check-test/quality green at the new head. No fail/skip/continue-on-error weakening.
+6. Deferred: unrelated main changes and new features; no source/lock/version/shard-assignment change. PLAN-EVAL N/A for the concrete contract-expectation repair proven by downloaded receipts.
+7. Contributor path: the existing stdio smoke test shows the complete protocol/catalog contract; its registry roundtrips extend the existing request/assertion pattern.
+
 2026-10-31 publish-source repair local gates: replaced the three forbidden JSON imports with a16 KB compressed typed TypeScript carrier; generator/check tasks wire into existing root assets generation/freshness. Exact parity and stale/missing negative controls pass. Structured S2 suite366/0/0, real CLI3/0/0, publish-size1/0/0;5-file check/lint/fmt, root quality/architecture, release:preflight, four carriers and workspace publication dry-run pass. Native payload2,341,743 bytes/100 files,114,063 fewer than pre-repair, unchanged5,000,000 cap. Raw JSON stays authoritative in repo and its duplicate publication is removed; upstream license stays shipped. No component or dependency-version changes in the repair. New main's dependency/lock changes are retained only by normal merge. Independent repair review and final-head required CI quality remain pending; no renewed READY. See2026-10-31-publish-source-repair.md.
 
 ## Coordinator publish-source repair — design checkpoint, 2026-10-31
