@@ -17,3 +17,9 @@ PLAN-EVAL selected by explicit assignment, before S1; separate Claude Opus 5.5 h
 Open decisions: none affecting authorized docs implementation. Scope conflict on generated carriers is safe to defer to measured gate outcome and coordinator; never bypass it.
 
 Deferred: runtime fixes, builder API enhancement, session/chat durability redesign, release and merge. No new architectural debt; existing builder policy gap is a coordinator handoff.
+
+## PLAN-EVAL round 1 correction — retry export shape locked
+
+The builder result is a non-exported local `base`. The module exports exactly one trigger definition for its id, as `export default Object.freeze({ ...base, retry: { ...full policy... } }) satisfies typeof base`. The retry policy declares all five required fields (maxAttempts, initialDelayMs, maxDelayMs, backoffMultiplier, jitter); it is a replacement, not a partial merge.
+
+Static contribution discovery recognizes direct exported builder calls only. It will not list this wrapped definition, while the runtime registry imports every exported runnable definition and does load the default export. Document both facts explicitly; no unsupported claim that the override appears in static counts. Risk: exporting the base as well would create duplicate-id definitions, with namespace ordering choosing the winner. Mitigation: exactly one exported runnable definition; the base stays private. Gate: focused snippet compile through existing compiler plus a small docs-tooling check of runtime registration and export count if needed. This is not scaffold.runtime E2E.

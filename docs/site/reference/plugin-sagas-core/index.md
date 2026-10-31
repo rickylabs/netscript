@@ -80,7 +80,7 @@ Opted-in ordinary transition handlers can also return the explicit pure
 | `CascadedMessage` | type alias | Message emitted by a saga handler as its only side-effect ledger. |
 | `CascadedMessageKind` | type alias | Cascaded message discriminator. |
 | `CascadedMessageOptions` | type alias | Common options accepted by cascaded message constructors. |
-| `CascadedMessageTarget` | type alias | Cascaded message target for jobs, sagas, or arbitrary runtime adapters. |
+| `CascadedMessageTarget` | type alias | Target identity carried by a cascade. The default send dispatcher treats its id as a saga message type; it does not enqueue jobs. |
 | `SendOptions` | type alias | Options for republishing an internal saga message onto the saga bus. |
 | `SagaScheduleDelay` | type alias | Delay accepted by the `schedule()` cascaded-message constructor. |
 | `SpawnOptions` | type alias | Options reserved for the unsupported `spawn()` cascade. |
@@ -122,8 +122,11 @@ Opted-in ordinary transition handlers can also return the explicit pure
 
 A saga handler is synchronous and returns cascaded messages; it does not `await`. This makes replay
 deterministic and keeps the compensation path a pure function of the transcript. Work outside the
-handler, such as enqueueing a worker job or calling a service, is a cascaded message the runtime
-dispatches, or goes through the explicit `@netscript/plugin-sagas-core/integration/workers` helpers.
+handler belongs to an explicit integration. `send(...)` and `schedule(...)` route internal saga
+messages; neither calls a service nor enqueues a worker job. Use the
+`@netscript/plugin-sagas-core/integration/workers` helpers for worker integration, or let a trigger
+enqueue a job whose result is published back to the saga, as in the
+[checkout tutorial](/tutorials/storefront/04-checkout-saga/).
 
 > [!WARNING]
 > `spawn()` is in the surface but rejects: child-saga spawn cascades are unsupported, and calling it

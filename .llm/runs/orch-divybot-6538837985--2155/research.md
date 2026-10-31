@@ -20,3 +20,7 @@ MCP order: `find_guidance` for this audit, then `search_docs`. MCP guidance is a
 | 12 — retry field | Definition-level property exists; spec-level builder gap remains | `packages/plugin-triggers-core/src/domain/trigger-definition.ts` has retry; processor selects definition.retry; builder specs and constructed objects omit it | State omission after each spec table and show a typed, frozen definition override; flag builder gap in final handoff; do not change code |
 
 Potential quality gate conflict: public docs changes stale generated package carriers, while this assignment forbids all `packages/**` changes. Do not modify those carriers or weaken freshness gates. Measure the actual result and report any scope-blocked gate explicitly.
+
+### Retry override discovery evidence
+
+PLAN-EVAL found the important export constraint: `.llm/tools/docs` evaluator traced `plugins/triggers/src/cli/trigger-registry-compiler.ts` runtime compiler (runtime map imports all exported definitions, then keys by id) and `ast-extractor.ts` (static walker recognizes direct exported defineWebhook/defineFileWatch/defineScheduledTrigger calls). The wrapped retry definition therefore runs but is absent from static contribution counts. Keep the base local and export only the final full-policy definition.

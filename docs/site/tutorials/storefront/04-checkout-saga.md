@@ -203,7 +203,9 @@ Three things to notice:
 - **The saga doesn't dispatch worker jobs.** The trigger in Step 4 owns the cross-plugin enqueue.
 - **Compensation is an explicit effect and a registered branch.** The forward `PaymentFailed`
   handler returns `sagaCompensate(...)`, and the matching `.compensate('PaymentFailed', ...)` handler
-  moves the same state machine to `cancelled` without another unhandled message.
+  moves the same state machine to `cancelled` without another unhandled message. The durable
+  runtime persists that compensation outcome as the next transition before dispatching the branch's
+  returned effects; the changed state is available after reloading the instance.
 
 {{ comp callout { type: "warning", title: "Durability does not deduplicate delivery" } }}
 The durability tier persists instance state so a workflow survives a restart, but it does

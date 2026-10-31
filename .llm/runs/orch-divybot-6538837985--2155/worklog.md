@@ -25,3 +25,21 @@ Rationale: owner-selected independent Anthropic evaluator for this OpenAI implem
 - Memory consulted; RTK unavailable, use direct commands.
 - Highest-priority operator directive selects reference-only PR body and coordinator-owned labels/milestone; generic closing-footer and automatic-label advice does not apply.
 - PLAN-EVAL pending. Implementation has not started.
+
+PLAN-EVAL round 1: FAIL_PLAN, retry-export/discovery design needs explicit constraints. Plan updated before implementation; second review reuses the same independent evaluator. Baseline docs verify, snippets and accuracy passed, and prose carrier freshness was true.
+
+PLAN-EVAL round 2: PASS before S1 edits; same separate read-only evaluator. Exact report in plan-eval.md; prior report retained in plan-eval-r1.md.
+
+## S1 implementation in progress
+
+Corrected public delivery, producer lifecycle, runtime entrypoint and policy wording. The worker lesson now contains a schema-first `defineJobHandler(schema, handler)` and awaits the write receipt. Shared producers are not stopped per job. Retry example keeps base private, exports one frozen full-policy definition, and documents static discovery limitations. No packages/plugins changed.
+
+S1 local gates passed: docs verify (253 pages, 23,829 links), docs:snippets (26 Tier-1 checks), focused workflow example compile, docs:accuracy, 33 existing runtime truth tests, scoped TS check/lint/fmt and diff whitespace. Baseline negative control fails as expected. Final per-item table is acceptance.md; detailed results are gate-results.md.
+
+Freshness remains non-green: generated package prose carrier is stale after docs changes. Scope prohibits its update, so no package carrier changes are made and no CI-green claim is made. Independent slice review is next, before S1 sign-off commit.
+
+Independent S1 slice review: docs PASS; all twelve source checks and worker/retry recipe constraints approved. Report: slice-review.md. Evaluator requested a publish-assets measurement; allowlisted check:publish-assets returns PASS against the current (old) corpus. Full allowlisted agent-docs-prose returns FAIL due to the stale CLI prose carrier. No package files changed.
+
+Final source-tracing clarification: the job scaffolder emits a metadata comment and handler, not a separate job config file; tutorial now explicitly preserves that comment. Retry attempts are described per connection/delivery phase. These prose clarifications will be included in the final exact-head review.
+
+Reconcile before S1: latest fetched main is b0b8f3f7282d073d92d64acdee522ea34bba4c5c; its sole new commit affects Figma variable exports, with no overlap in this audit.
