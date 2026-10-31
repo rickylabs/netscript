@@ -1,4 +1,5 @@
 name: e2e-cli-prod
+run-name: ${{ inputs.generated-surface-only && 'Published generated-surface parity (Windows)' || 'Published CLI runtime smoke' }}
 
 on:
   workflow_run:
@@ -10,6 +11,11 @@ on:
         description: Published @netscript/cli version to validate
         required: true
         type: string
+      generated-surface-only:
+        description: Run only the Windows published generated-surface parity smoke
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: read
@@ -22,7 +28,7 @@ concurrency:
 jobs:
   scaffold-runtime-jsr:
     name: scaffold-runtime (published JSR CLI)
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && !inputs.generated-surface-only) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
@@ -203,3 +209,31 @@ jobs:
             .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json
             ~/.aspire/logs/cli_*.log
           if-no-files-found: ignore
+
+  generated-surface-windows:
+    name: generated-surface (published JSR CLI, Windows)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.generated-surface-only }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.7'
+
+      - name: Check clean and hostile generated surfaces
+        env:
+          PUBLISHED_VERSION: ${{ inputs.published-version }}
+        run: >-
+          deno run --no-config -A .github/scripts/check-published-generated-surface.ts
+          "$env:PUBLISHED_VERSION" generated-surface-windows.json
+
+      - name: Upload sanitized parity evidence
+        uses: actions/upload-artifact@v5
+        with:
+          name: generated-surface-windows
+          path: generated-surface-windows.json
+          if-no-files-found: error

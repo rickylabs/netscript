@@ -1,0 +1,57 @@
+{
+  "cli": "jsr:@netscript/cli@0.0.8",
+  "deno": "2.9.7",
+  "os": "linux",
+  "checks": [
+    {
+      "generator": "plugins",
+      "scenario": "clean",
+      "command": "deno run --no-config -A jsr:@netscript/cli@0.0.8 generate plugins --check --format json --project-root <project>",
+      "exitCode": 0,
+      "status": "current",
+      "outputCount": 1,
+      "drift": [],
+      "nonMutating": true
+    },
+    {
+      "generator": "aspire",
+      "scenario": "clean",
+      "command": "deno run --no-config -A jsr:@netscript/cli@0.0.8 generate aspire --check --format json --project-root <project>",
+      "exitCode": 0,
+      "status": "current",
+      "outputCount": 15,
+      "drift": [],
+      "nonMutating": true
+    },
+    {
+      "generator": "plugins",
+      "scenario": "hostile-byte-mutation",
+      "command": "deno run --no-config -A jsr:@netscript/cli@0.0.8 generate plugins --check --format json --project-root <project>",
+      "exitCode": 1,
+      "status": "drift",
+      "outputCount": 1,
+      "drift": [
+        {
+          "path": ".netscript/generated/plugin-workers/job-registry.ts",
+          "kind": "bytes"
+        }
+      ],
+      "nonMutating": true
+    },
+    {
+      "generator": "aspire",
+      "scenario": "hostile-byte-mutation",
+      "command": "deno run --no-config -A jsr:@netscript/cli@0.0.8 generate aspire --check --format json --project-root <project>",
+      "exitCode": 1,
+      "status": "drift",
+      "outputCount": 15,
+      "drift": [
+        {
+          "path": "aspire/apphost.mts",
+          "kind": "bytes"
+        }
+      ],
+      "nonMutating": true
+    }
+  ]
+}

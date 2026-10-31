@@ -15,3 +15,28 @@
 Matrix resolved with --tier straightforward --json. Owner's Claude evaluator model/effort override and medium implementation effort recorded in supervisor.md. PLAN-EVAL: N/A, bounded CI evidence task with explicit acceptance and no architecture decisions. Prior run memory consulted. RTK unavailable.
 
 Reconcile: coordinator's missing box is still open; existing merged implementation PRs do not supply this evidence. Explicit operator no-closure/no-taxonomy rules override generic templates.
+
+## CI implementation and Linux evidence
+
+Shared script uses exact published entrypoint outside repository import maps, initializes a consumer with streams/workers, prepares both generated surfaces, and executes four checks. It verifies native schema/generator, exact exit/status, expected target presence and exact hostile bytes finding. It snapshots consumer source/locks around every check, excluding installed node_modules trees, and restores mutations independently. Sanitized report: linux.json.
+
+| Gate | Result |
+| --- | --- |
+| Linux published parity smoke | PASS, process exit 0; checks 0/current, 0/current, 1/drift/bytes, 1/drift/bytes |
+| Scoped structured check, lint, fmt | PASS, exit 0 each, one file processed |
+| Workflow YAML parse | PASS |
+| git diff --check | PASS |
+| Full deno task e2e:cli | UNPROVEN, exit 1 at preflight.aspire; Docker daemon unavailable, cleanup Docker query also failed; no scaffold runtime started |
+| Read-only leak-check | Completed; unrelated/unknown-owner resources left untouched; Docker probes unavailable |
+
+Reconcile: draft PR 2537 targets main and references 1912 without a closing keyword. No duplicate smoke or new issue comment changes scope. Broader runtime failure is an environment limitation, not a parity verdict. No product changes or lock churn retained.
+
+## Independent slice review repairs
+
+Separate read-only Claude Opus 5.5 high reviewed the initial slice. It confirmed no false green, correct default production behavior, Windows command syntax and privacy. Requested improvements: actionable failure diagnostics and recorded workflow-policy gates. Added redacted stderr diagnostics, failed-condition names, invalid-JSON diagnostics, exact single bytes finding, and a distinct parity-only run title. Existing Linux evidence/worklog updates were written after the review first read them; they are now present.
+
+Workflow-policy test gate through run-deno-test.ts: **16 passed, 0 failed, exit 0** across `.github/scripts/aspire-nuget-cache-policy.test.ts`, `ci-receipt-policy.test.ts`, `toolchain-version.test.ts`, and `.llm/tools/release/release-canary-workflow_test.ts`. Structured check/lint/fmt rerun after repairs: exit 0 each. Linux smoke rerun after repairs: process exit 0, same four native results.
+
+Optional scratch deletion declined: explicit assignment forbids deleting lock files or caches. Consumer fixtures stay in system temporary storage; hosted runners dispose of theirs. Optional extra clean checks declined to preserve exactly four requested check invocations. Original-byte restoration remains in finally blocks and the next hostile scenario starts after restoration.
+
+Independent substantive slice review: **SLICE REVIEW: PASS**, see slice-review.md. Supervisor signoff commit follows this review and the automated gates.
