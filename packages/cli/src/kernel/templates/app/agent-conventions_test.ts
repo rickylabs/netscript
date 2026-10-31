@@ -40,6 +40,10 @@ Deno.test('service app convention references are exact and rendered', () => {
     'routes/(_components)/dashboard-view.tsx',
     'components/ui/mod.ts',
     '/design/composition',
+    'assets/theme-preset.json',
+    'routes/_app.tsx',
+    'routes/_layout.tsx',
+    'navigation.ts',
   ]);
 
   const rendered = `${buildAppAgentsMarkdown(input)}\n${buildWebLayerMarkdown(input)}`;
@@ -58,9 +62,39 @@ Deno.test('service-free app conventions retain only shared resolvable references
     'routes/(_components)/dashboard-view.tsx',
     'components/ui/mod.ts',
     '/design/composition',
+    'assets/theme-preset.json',
+    'routes/_app.tsx',
+    'routes/_layout.tsx',
+    'navigation.ts',
   ]);
   assertStringIncludes(buildAppAgentsMarkdown(input), GUIDANCE);
   assertStringIncludes(buildWebLayerMarkdown(input), GUIDANCE);
+});
+
+Deno.test('app conventions point agents to the theme and customization guides', () => {
+  const agents = buildAppAgentsMarkdown(serviceInput());
+
+  assertStringIncludes(agents, '## Look and feel');
+  for (
+    const fact of [
+      '`assets/theme-preset.json`',
+      '`routes/_app.tsx`',
+      '`routes/_layout.tsx`',
+      '`navigation.ts`',
+      '`netscript ui:apply --preset <id>`',
+      '`netscript tokens init --preset <id>`',
+      '`netscript tokens build`',
+      '`--no-nav`',
+      'web-layer/how-to/theme-your-app',
+      'web-layer/how-to/customize-fresh-ui',
+    ]
+  ) {
+    assertStringIncludes(agents, fact);
+  }
+  assert(
+    agents.indexOf('## Look and feel') > agents.indexOf('## Copy versus delete'),
+    'look-and-feel guidance must follow the data architecture it decorates',
+  );
 });
 
 function serviceInput(): AppConventionsInput {

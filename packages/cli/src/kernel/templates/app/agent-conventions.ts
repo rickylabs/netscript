@@ -21,7 +21,11 @@ interface ConventionReference {
     | 'service-shared'
     | 'service-form'
     | 'service-partial'
-    | 'telemetry-route';
+    | 'telemetry-route'
+    | 'app-theme-preset'
+    | 'app-shell'
+    | 'app-layout'
+    | 'app-navigation';
   readonly path: string;
   readonly purpose: string;
 }
@@ -48,6 +52,34 @@ const COMMON_REFERENCES: readonly ConventionReference[] = [
     purpose: 'the live L0-L4 ownership and layout guide',
   },
 ];
+
+/** App-wide theme and chrome files named by the Look and feel guidance. */
+const LOOK_AND_FEEL_REFERENCES: readonly ConventionReference[] = [
+  {
+    id: 'app-theme-preset',
+    path: 'assets/theme-preset.json',
+    purpose: "the app's one preset: design language, density, and Studio flavor",
+  },
+  {
+    id: 'app-shell',
+    path: 'routes/_app.tsx',
+    purpose: 'the HTML shell that stamps the preset on <html>',
+  },
+  {
+    id: 'app-layout',
+    path: 'routes/_layout.tsx',
+    purpose: 'the app chrome around every page',
+  },
+  {
+    id: 'app-navigation',
+    path: 'navigation.ts',
+    purpose: 'the top-bar links and the routes that opt out of the chrome',
+  },
+];
+
+/** Docs slugs agents fetch with MCP `get_doc` for the theme chain and the page chrome. */
+const THEME_GUIDE_SLUG = 'web-layer/how-to/theme-your-app';
+const CUSTOMIZE_GUIDE_SLUG = 'web-layer/how-to/customize-fresh-ui';
 
 const RESOURCE_GENERATION_GUIDANCE =
   'Before manually constructing this path, run `netscript generate resource <resource> --procedure <query> --client <service> --partial --app <app>`.';
@@ -106,7 +138,7 @@ function serviceReferences(
 function references(
   input: AppConventionsInput,
 ): readonly ConventionReference[] {
-  return [...serviceReferences(input), ...COMMON_REFERENCES];
+  return [...serviceReferences(input), ...COMMON_REFERENCES, ...LOOK_AND_FEEL_REFERENCES];
 }
 
 function referencePath(
@@ -129,7 +161,8 @@ export function appConventionsReferencedPaths(
 
 /** Build the app-scoped dashboard conventions read by coding agents. */
 export function buildAppAgentsMarkdown(input: AppConventionsInput): string {
-  const localExamples = references(input)
+  const all = references(input);
+  const localExamples = [...serviceReferences(input), ...COMMON_REFERENCES]
     .map((reference) => `- \`${reference.path}\` - ${reference.purpose}`)
     .join('\n');
   const dataMode = input.dbEngine === 'none'
@@ -167,6 +200,23 @@ Do not hand-write Button, Input, Card, or Badge equivalents. Use:
 
 Copy the contract-to-query flow, page layers, island boundary, mutation/query-key pattern, partial refresh, live-stream boundary, and app-owned UI composition. Delete or replace the example records, labels, service-specific prose, and demonstration-only controls.${serviceNote}
 Before finishing, record which canonical surfaces you used or deliberately rejected. A page-sized island requires an explicit reason.
+
+## Look and feel
+
+Every page shares one theme and one chrome. Apply theme changes app-wide.
+
+- **Theme:** \`${
+    referencePath(all, 'app-theme-preset')
+  }\` names the app's one preset (Studio Utility for new apps), and \`${
+    referencePath(all, 'app-shell')
+  }\` stamps it on \`<html>\`. Switch it with \`netscript ui:apply --preset <id>\`, or alias roles in the override file that \`netscript tokens init --preset <id>\` creates (use the app's current preset ID) and run \`netscript tokens build\`. Never hand-edit the generated token files, and never set tokens or \`data-theme\` on a page wrapper.
+- **Chrome:** \`${
+    referencePath(all, 'app-layout')
+  }\` renders the top bar and theme toggle around every page. Its links are \`appNavigation\` in \`${
+    referencePath(all, 'app-navigation')
+  }\`: \`netscript ui:add page <path>\` links a one-segment page, \`--nav\` links a nested one, and \`--no-nav\` skips the link. Never copy a header or theme toggle into a page.
+
+Before changing the theme or the chrome, call MCP \`get_doc\` with slug ${THEME_GUIDE_SLUG}. For routes, islands, and registry components, use slug ${CUSTOMIZE_GUIDE_SLUG}.
 `;
 }
 
