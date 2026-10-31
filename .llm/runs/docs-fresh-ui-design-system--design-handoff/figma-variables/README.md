@@ -1,18 +1,20 @@
 # Figma variables export
 
-All local variables of Figma file `pGRLnkPPRZJZy74evNcQBr`, exported on 2026-10-28. There is one
-JSON file per variable collection. `index.json` lists each collection with its file, mode names and
-variable count.
+All local variables of Figma file `pGRLnkPPRZJZy74evNcQBr`, exported on 2026-10-31: 2,186 variables
+in nine collections. There is one JSON file per variable collection. `index.json` lists each
+collection with its file, mode names and variable count.
 
 | File                 | Collection    | Modes                                                                           | Variables |
 | -------------------- | ------------- | ------------------------------------------------------------------------------- | --------: |
 | `primitives.json`    | Primitives    | Value                                                                           |       413 |
-| `theme.json`         | Theme         | Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel |       146 |
+| `theme.json`         | Theme         | Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel |       340 |
 | `base-accent.json`   | Base accent   | Ink, Blue, Violet, Orange, Indigo, Tomato, Lime                                 |        32 |
-| `scheme.json`        | Scheme        | Light, Dark                                                                     |       399 |
-| `density.json`       | Density       | Comfortable, Compact, Dense, Airy, Chunky                                       |        15 |
+| `scheme.json`        | Scheme        | Light, Dark                                                                     |       462 |
+| `density.json`       | Density       | Comfortable, Compact, Dense, Airy, Chunky                                       |        19 |
 | `base-gray.json`     | Base gray     | Neutral, Slate, Sand, Mauve                                                     |        26 |
-| `studio-flavor.json` | Studio flavor | Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal                      |       198 |
+| `studio-flavor.json` | Studio flavor | Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal                      |       214 |
+| `theme-b.json`       | Theme B       | Bloom, Cupertino, Liquid, Terminal, macOS 27, Apple Classic, Fluent 2 Web       |       340 |
+| `theme-set.json`     | Theme set     | A, B                                                                            |       340 |
 
 ## File shape
 
@@ -27,8 +29,8 @@ variable count.
       "scopes": ["FRAME_FILL", "SHAPE_FILL"],
       "codeSyntax": "var(--ns-bg)",
       "values": {
-        "Light": { "alias": "Theme/surface/l/canvas" },
-        "Dark": { "alias": "Theme/surface/d/canvas" }
+        "Light": { "alias": "Theme set/surface/l/canvas" },
+        "Dark": { "alias": "Theme set/surface/d/canvas" }
       }
     }
   ]
@@ -47,8 +49,8 @@ variable count.
   property picker in Figma.
 - `codeSyntax`: the `WEB` code syntax, for example `var(--ns-bg)`. The key is omitted when the
   variable has no web code syntax. No variable in the file defines another platform's syntax.
-- `description`: the Figma description, verbatim, including HTML entities such as `&gt;` as stored.
-  The key is omitted when the description is empty.
+- `description`: the Figma description, verbatim, including HTML entities such as `&gt;` and `&#39;`
+  as stored. The key is omitted when the description is empty.
 - `values`: one entry per mode, keyed by mode name.
 
 ## Value encoding
@@ -79,5 +81,33 @@ referring collection. For example, `Theme` mode `Studio` aliases `type/display/t
 `Studio flavor/type/display/tracking`, which then takes its value from the active `Studio flavor`
 mode.
 
-Every alias target in these files exists in the export: 1,755 alias values point to 651 distinct
+Every alias target in these files exists in the export: 4,859 alias values point to 1,504 distinct
 variables, all local to this file.
+
+## Theme set
+
+`Theme`, `Theme B` and `Theme set` hold the same 340 variable names, with the same type, scopes
+and code syntax. Only some descriptions differ. `Theme set` stores no values of its own: each of
+its variables aliases the variable of the same name in `Theme` in mode `A`, and in `Theme B` in
+mode `B`.
+
+```json
+{
+  "name": "surface/l/canvas",
+  "type": "COLOR",
+  "scopes": [],
+  "values": {
+    "A": { "alias": "Theme/surface/l/canvas" },
+    "B": { "alias": "Theme B/surface/l/canvas" }
+  }
+}
+```
+
+`Scheme`, `Studio flavor` and `Base accent` alias `Theme set`, never `Theme` or `Theme B` directly.
+The active `Theme set` mode picks the collection, and that collection's active mode picks the theme.
+For example, `Scheme` `surface/bg` in `Light` aliases `Theme set/surface/l/canvas`. Under `A` it
+resolves to `Theme/surface/l/canvas` in the active `Theme` mode, and under `B` to
+`Theme B/surface/l/canvas` in the active `Theme B` mode. `A` is the default mode.
+
+Each name has the same code syntax in all three collections. For example, `chart/l/3` is
+`var(--ns-chart-l-3)` in `Theme`, `Theme B` and `Theme set`.
