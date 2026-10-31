@@ -65,3 +65,29 @@ checks before output and deep-cloned authored documents. Re-review required.
 S1 repaired independent slice review: PASS. Re-run source freshness, structured
 4-file check/lint/fmt and fixture test: exit 0; 14 existing routing/resolver tests
 also pass. Supervisor sign-off records source review and distinct gate evidence.
+
+## S2 — licensed snapshot and DTCG transport
+
+Selective upstream fork retains the exact MIT LICENSE and copyright. The RGB
+normalizer now preserves alpha rather than rounding it to two decimal places.
+Mock Plugin API export matches all ten archived fixture files byte-for-byte,
+2,186 variables; structured tests 5/0/0. DTCG format and resolver validate with
+the unchanged official schemas. STRING uses a fontFamily transport carrier;
+BOOLEAN uses numeric 0/1 because DTCG has no generic string/boolean type. Original
+Figma types stay in identity metadata. Single-mode Primitives uses a resolver
+set; collections with multiple modes use modifiers.
+
+Explicit plugin wrappers: check selected 6 files, lint/fmt selected and processed
+5 plugin files, zero findings. Separate package source lint/fmt pass. Added zod
+as a catalog dependency using the existing locked version: root lock membership
+and private lock membership plus native same-version peer-key normalization only.
+
+Draft docs build failed at S1 for missing public API symbols. Added all seven
+symbols to the complete Fresh UI API table; docs:exports-drift now PASS. Reconcile:
+this documentation repair is intentionally moved forward from S6; no labels,
+issue closing keyword or READY claim. S2 independent review pending.
+
+S2 independent source review PASS. Named structured gates pass, five fixture/
+schema tests pass, docs:exports-drift passes. Recommendations for S3: alias-cycle
+preflight, canonical mode/order validation, leaf converter contracts, per-file
+upstream attribution, alpha-ff preservation and browser-main compatibility.

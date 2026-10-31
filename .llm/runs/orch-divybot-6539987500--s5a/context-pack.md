@@ -13,3 +13,11 @@ S1 shared composition implemented; wrappers and canonical source freshness pass.
 Next: independent S1 sign-off, then Figma port and DTCG transport conversion.
 
 S1 terminal PASS: independent source review plus all named gates. Continue S2.
+
+S2 source, fixture tests and API reference implemented. Five schema/mock/name
+controls pass; awaiting independent review before committing the slice.
+
+S2 independent source review PASS. Named structured gates pass, five fixture/
+schema tests pass, docs:exports-drift passes. Recommendations for S3: alias-cycle
+preflight, canonical mode/order validation, leaf converter contracts, per-file
+upstream attribution, alpha-ff preservation and browser-main compatibility.

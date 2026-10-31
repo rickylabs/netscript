@@ -479,6 +479,13 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `buildTokens` | function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources; target app skips Figma output, and previews explicitly includes optional design styles. |
+| `figmaTokenSources` | function | Composes approved Figma variable values with the code-derived resolver and authored component tokens. |
+| `FigmaCollection` | interface | One local collection with its ordered modes and variable snapshots. |
+| `FigmaVariable` | interface | Name, type, scopes, WEB syntax, description and per-mode literal or alias values. |
+| `exportFigmaTokenBundle` | function | Converts the nine-collection snapshot to DTCG 2025.10 mode documents and a resolver, retaining oklch in extensions. |
+| `importFigmaTokenBundle` | function | Validates a portable DTCG variable bundle and restores the exact Figma snapshot shape. |
+| `FigmaTokenBundle` | interface | Ordered Figma identity metadata plus DTCG mode documents and their resolver. |
+| `assertFigmaTokenNames` | function | Rejects unknown collection/variable identities and WEB names against the independent code registry. |
 | `defaultTokenSources` | function | Returns the bundled resolver and DTCG source documents. Clone before editing caller-owned inputs. |
 | `PREVIEW_TOKEN_FILES` | const | The 18 optional design preview stylesheets. Install with ui:add theme-previews or tokens build --previews. Also exported from token-config without the compiler. |
 | `APP_TOKEN_FILES` | const | The five core app files: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. Also available from the lightweight token-config entrypoint. |

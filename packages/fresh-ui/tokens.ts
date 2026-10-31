@@ -39,3 +39,9 @@ export { TOKEN_DENSITIES, TOKEN_SCHEMES } from './src/tokens/domain/token-contra
 
 export { figmaTokenSources } from './src/tokens/adapters/figma-token-sources.ts';
 export type { FigmaCollection, FigmaVariable } from './src/tokens/domain/token-contract.ts';
+export {
+  exportFigmaTokenBundle,
+  importFigmaTokenBundle,
+} from './src/tokens/adapters/figma-round-trip.ts';
+export type { FigmaTokenBundle } from './src/tokens/adapters/figma-round-trip.ts';
+export { assertFigmaTokenNames } from './src/tokens/adapters/figma-token-names.ts';

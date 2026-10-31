@@ -154,7 +154,7 @@
     "npm:amqplib@^2.0.1": "2.2.0",
     "npm:amqplib@^2.2.0": "2.2.0",
     "npm:asn1js@^3.0.10": "3.0.10",
-    "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0__prisma@7.10.0__@types+react@19.3.0__react@19.2.8__react-dom@19.3.1_mysql2@3.24.5_pg@8.23.1_prisma@7.10.0_react@19.2.8_react-dom@19.3.1_@types+react@19.3.0",
+    "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_prisma@7.10.0_react@19.2.8_react-dom@19.3.1_@types+react@19.3.0",
     "npm:byte-encodings@^1.0.11": "1.0.11",
     "npm:clsx@^2.1.1": "2.1.1",
     "npm:colorjs.io@0.5.2": "0.5.2",
@@ -779,7 +779,7 @@
         "@better-auth/utils"
       ]
     },
-    "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0__prisma@7.10.0__@types+react@19.3.0__react@19.2.8__react-dom@19.3.1_prisma@7.10.0_@types+react@19.3.0_react@19.2.8_react-dom@19.3.1": {
+    "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_prisma@7.10.0_@types+react@19.3.0_react@19.2.8_react-dom@19.3.1": {
       "integrity": "sha512-mF6t5xqeZNWzUe0ErmrSdzQmtslJscmu9X8Mp5QmROlpnnAzvSc70RILu8lHms8CePt7N34+KRH1QvYjGFrVGQ==",
       "dependencies": [
         "@better-auth/core",
@@ -2524,7 +2524,7 @@
     "base64-js@1.5.1": {
       "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
     },
-    "better-auth@1.7.14_@prisma+client@7.10.0__prisma@7.10.0__@types+react@19.3.0__react@19.2.8__react-dom@19.3.1_mysql2@3.24.5_pg@8.23.1_prisma@7.10.0_react@19.2.8_react-dom@19.3.1_@types+react@19.3.0": {
+    "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_prisma@7.10.0_react@19.2.8_react-dom@19.3.1_@types+react@19.3.0": {
       "integrity": "sha512-QxDCI0pOCCHDYmruisKhKyrvOJ6Icv9xg0RA6ZUysfKFXENYwhNNpwUlkE/NmViH2nDMgkKcymmLr55pnpR9vw==",
       "dependencies": [
         "@better-auth/core",
@@ -4666,7 +4666,8 @@
         "dependencies": [
           "jsr:@netscript/sdk@0.0.8",
           "jsr:@std/assert@1",
-          "npm:preact@^10.29.2"
+          "npm:preact@^10.29.2",
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
