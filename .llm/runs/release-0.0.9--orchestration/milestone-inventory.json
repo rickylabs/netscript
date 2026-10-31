@@ -82,7 +82,7 @@
       "number": 2115,
       "title": "auth-kv-oauth: parseCookieHeader throws on one undecodable foreign cookie and loses the whole header",
       "disposition": "active",
-      "lane": "internals",
+      "lane": "features",
       "group": "D1"
     },
     {

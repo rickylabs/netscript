@@ -75,3 +75,5 @@
 - 02:57Z: #2369 started.
 - 03:02Z: #2369 → PR #2487 (draft). (#2486 is a design-system PR, not ours.)
 - 03:07Z: **merged** #2484 (`1d467c669`) for #2151; #2151 closed. The expensive gate is free: #2421 is next once its leaf posts READY at the new head.
+- 03:11Z: #2485 (#2367) READY at `df6b72b`; Opus MERGE at the head. The leaf dispatched its own e2e-cli run (workflow_dispatch): runtime tiers green, but `desktop-native-linux` failed (missing desktop executable; the leaf reports the same on main in dispatch mode). Armed `e2e-cli-gate` for the standard PR-event verdict, which supersedes it. Watch item: desktop-native-linux fails under workflow_dispatch on main (possible pre-existing defect).
+- 03:10:47Z: **orchid continuation.** The #2151 worker claimed D1 #2115 (brief briefs/2115.md). #2115 moved internals → features to respect lane WIP (drift.md). Builders: #2187, #2400, #2395, #2369, #2115 (5/5); the docs dispatch is held.

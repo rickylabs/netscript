@@ -33,7 +33,6 @@
         1667,
         1668,
         2068,
-        2115,
         2185,
         2233,
         2259,
@@ -84,6 +83,7 @@
       "issueNumbers": [
         1912,
         2108,
+        2115,
         2144,
         2151,
         2351,
@@ -531,7 +531,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2483,
-      "headSha": "da79e722bf64168a19c382e2bcf9336d03984a15",
+      "headSha": "966c3ef2f27bb5e43363b860086d6c16a5c53105",
       "issueNumbers": [
         2395
       ],
@@ -559,7 +559,7 @@
     {
       "id": "D1-2367",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2485,
       "headSha": "df6b72b0a372612060edf99c11d67656c0fc8243",
@@ -567,7 +567,8 @@
         2367
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2367",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY at df6b72b; Opus MERGE; leaf's manual e2e dispatch had desktop-native-linux failure (pre-existing in dispatch mode); armed PR-event e2e"
     },
     {
       "id": "B2-2369",
@@ -633,6 +634,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS both tiers",
       "completedAt": "2026-10-31T03:07:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2485,
+      "headSha": "df6b72b0a372612060edf99c11d67656c0fc8243",
+      "startedAt": "2026-10-31T03:11:00.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -818,7 +827,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T03:07:39.000Z",
+  "updatedAt": "2026-10-31T03:11:33.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -931,6 +940,15 @@
       "route": "codex gpt-6.1-sol",
       "state": "pr-open",
       "pr": 2487
+    },
+    {
+      "issue": 2115,
+      "lane": "features",
+      "commentId": null,
+      "postedAt": "2026-10-31T03:10:47Z",
+      "route": "codex gpt-6.1-sol (continuation of #2151 worker)",
+      "state": "claimed",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475,

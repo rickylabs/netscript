@@ -77,7 +77,7 @@
       "id": "issue:2115",
       "kind": "issue",
       "issueNumber": 2115,
-      "lane": "internals",
+      "lane": "features",
       "title": "auth-kv-oauth: parseCookieHeader throws on one undecodable foreign cookie and loses the whole header"
     },
     {
