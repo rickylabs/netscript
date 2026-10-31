@@ -1,0 +1,64 @@
+{
+  "verdict": "PASS",
+  "physicalLiveAppHost": true,
+  "isolated": true,
+  "rpcCalls": 3,
+  "expectedTraceCount": 3,
+  "mcpTraceCount": 3,
+  "cliTraceCount": 3,
+  "mcpSpanCount": 6,
+  "exactProjectBinding": true,
+  "toolSummaries": {
+    "get_app_status": {
+      "sampleCount": 6,
+      "provenanceSamples": 6,
+      "state": "ready",
+      "serviceRevisions": [
+        "issue2268-live"
+      ]
+    },
+    "analyze_service_performance": {
+      "sampleCount": 6,
+      "provenanceSamples": 6,
+      "state": "ready",
+      "serviceRevisions": [
+        "issue2268-live"
+      ]
+    },
+    "analyze_db_bottlenecks": {
+      "sampleCount": 3,
+      "provenanceSamples": 6,
+      "state": "ready",
+      "serviceRevisions": [
+        "issue2268-live"
+      ]
+    }
+  },
+  "privateBindingValuesExcluded": true,
+  "negativeBindingVerified": true,
+  "runtimeStopped": true,
+  "postStopDiagnostic": "telemetry_unbound",
+  "aspireVersion": "13.5.3",
+  "cleanup": {
+    "exactAppHostStopped": true,
+    "postStopBinding": "telemetry_unbound",
+    "aspireProbe": "ok",
+    "processProbe": "ok",
+    "runOwnedSurvivors": 0,
+    "unprovenSurvivorsLeftUntouched": 24,
+    "dockerProbe": "unavailable; fixture uses no containers"
+  },
+  "method": [
+    "Aspire 13.5.3 empty TypeScript AppHost, started with --isolated under a run-owned root.",
+    "One real Deno RPC executable, HTTP health readiness and an in-memory Deno KV cart.",
+    "Three Checkout.GetCart requests execute KV reads and export six OTLP spans to the real dashboard over HTTPS HTTP/JSON.",
+    "MCP resolves the exact AppHost from the project root; no discovery or HTTP transport is mocked.",
+    "RPC response trace IDs, MCP snapshot IDs and time-window-filtered aspire otel traces IDs agree as complete sets.",
+    "All three real MCP tool envelopes return ready provenance; actual dashboard token, API key, endpoint and project root are absent.",
+    "A wrong project is unbound while the AppHost is live; after stopping the exact AppHost, the same reader is unbound again."
+  ],
+  "tlsVerification": "enabled",
+  "transportMocked": false,
+  "verifierSha256": "ffc5d31a1990bd2e233ab26cda96e6ad8d014ce6c11077cd187ef965f78c8fde",
+  "rpcFixtureSha256": "69ecfec91386253bbdf891ba62c71a4e621905044886c22dbd5fd03bdc4724ee"
+}

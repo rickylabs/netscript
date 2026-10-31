@@ -1,15 +1,16 @@
 {
   "sourceBaseline": "851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2",
   "tests": {
-    "command": "deno task test --unstable-kv packages/mcp/tests packages/telemetry/tests/query packages/cli/src/public/features/plugins/doctor/{plugin-runtime-health,runtime-health-polling,runtime-health-surfaces}_test.ts",
+    "command": "deno task test --unstable-kv packages/mcp/tests packages/telemetry/tests/query packages/cli/src/public/features/plugins/doctor/{plugin-runtime-health,runtime-health-polling,runtime-health-surfaces}_test.ts packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts",
     "exitCode": 0,
     "summary": {
-      "passed": 526,
+      "passed": 527,
       "failed": 0,
       "ignored": 0,
-      "totalResults": 526,
+      "totalResults": 527,
       "uniqueFailures": 0
-    }
+    },
+    "sourceHead": "1da0d979a362f1bc98aa77fc3329567ee75d776c"
   },
   "check": {
     "command": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --root packages/telemetry/src/adapters/aspire-query --root packages/telemetry/tests/query --ext ts,tsx",
@@ -209,12 +210,16 @@
     "processFailures": 0
   },
   "physicalLiveAppHost": {
-    "verdict": "UNPROVEN",
-    "reason": "No running conventional NetScript AppHost registered; no shared runtime started."
+    "verdict": "PASS",
+    "evidence": "live-apphost-evidence.json"
   },
   "e2eCli": {
     "required": false,
     "localRun": false,
     "reason": "Read-only MCP telemetry and documentation carriers; no scaffold templates, plugin scaffolding, DB or Aspire runtime wiring changed."
+  },
+  "ciRepair": {
+    "evidence": "ci-follow-up.json",
+    "status": "pushed; final-head CI checked separately"
   }
 }

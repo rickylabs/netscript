@@ -10,7 +10,8 @@
     ]
   },
   "liveAppHost": {
-    "verdict": "UNPROVEN",
-    "reason": "No running conventional NetScript AppHost registered; no shared resources started or changed."
+    "verdict": "PASS",
+    "evidence": "live-apphost-evidence.json",
+    "historicalInitialAttempt": "No AppHost was initially registered; superseded by the isolated physical validation."
   }
 }
