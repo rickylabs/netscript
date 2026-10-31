@@ -7,6 +7,8 @@ Implementer: Codex, OpenAI family. Evaluators: separate read-only Claude session
 Owner override (verbatim): `PLAN-EVAL and IMPL-EVAL: claude -p --model claude-opus-5-5 --effort high, read-only.`
 Matrix queried with `deno task agentic:matrix --tier feature --json`: implementation sol/xhigh; declared fallback muse_spark_1_3/xhigh; plan evaluation glm_5_3/provider_default then fable_5_1/low; implementation evaluation muse_spark_1_3/xhigh then opus_5/xhigh. Owner evaluator override above applies. Plan max rounds 2; implementation max rounds 5; two consecutive terminal failures stop the leaf.
 
+Registry integration extension: `docs/design-system/token-presets/` for copied token-only DESIGN/SKILL notes; these are outside the full component-spec/preview catalogue.
+
 ## Declared write surface
 
 Review-required extension: `.llm/harness/debt/arch-debt.md` for the mixed Figma emphasis style/weight debt; recorded in drift before edit.

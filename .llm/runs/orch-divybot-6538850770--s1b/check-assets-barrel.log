@@ -1,0 +1,8 @@
+Task check:assets-barrel deno task --cwd packages/fresh-ui registry:embed:check && deno task --cwd packages/fresh-ui tokens:embed:check && deno task gen:assets-barrel && git diff --exit-code -- 'packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template' packages/cli/src/kernel/assets/agent-docs-prose.generated.ts packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts
+Task registry:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-registry-assets.ts --check
+Registry JSON embeddings checked.
+Task tokens:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check
+Token JSON embeddings checked.
+Task gen:assets-barrel deno task --cwd packages/fresh-ui registry:embed && deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+Task registry:embed deno run --lock=deno.lock --frozen --allow-read=. --allow-write=src/registry/assets --allow-run=deno scripts/embed-registry-assets.ts
+Registry JSON embeddings generated.

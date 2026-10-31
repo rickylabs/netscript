@@ -1,0 +1,36 @@
+{
+  "gateId": "mcp-export-corpus",
+  "invocationId": "s1b-fixed-corpus",
+  "argv": [
+    "deno",
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "cwd": "/home/agent/projects/orchid/worktrees/issue-6538850770",
+  "gitHead": "f836d0256fda694f19234601d092f848e9546505",
+  "actualGitHead": "f836d0256fda694f19234601d092f848e9546505",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:4115180",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "abba30d8cd6deee0d1b7e72deae1c60122dc647197f7f69c173f83c9252367a4",
+  "lifecycleId": "worker:4115180:s1b-fixed-corpus:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-31T04:54:57.734Z",
+  "startedAt": "2026-10-31T04:54:57.737Z",
+  "finishedAt": "2026-10-31T04:55:09.157Z",
+  "durationMs": 11420,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "0dff191b102ac9d3c641b9c7d6ee546b51e24d716807115308128b1f9910fcc6",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"a0a9f291457b483976f0ff37c7f690e93d5da3dafe64c3dfc0709734d384b06a\",\"uncompressedBytes\":2606277,\"compressedBytes\":396058,\"packageCount\":35,\"subpathCount\":304,\"symbolCount\":9008}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  }
+}

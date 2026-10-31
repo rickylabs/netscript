@@ -2,20 +2,36 @@ import { assertEquals } from '@std/assert';
 import legacyBaseline from './registry/legacy-v1.json' with { type: 'json' };
 import { freshUiRegistryManifest } from '../registry.manifest.ts';
 import { generatedThemes } from '../registry.theme-items.generated.ts';
+import { TOKEN_PRESETS } from '../src/tokens/domain/token-presets.ts';
 import { PREVIEW_TOKEN_FILES } from '../src/tokens/domain/token-output.ts';
 import { FRESH_UI_PACKAGE_VERSION } from '../src/package-metadata.generated.ts';
 
 Deno.test('JSON authoring preserves every legacy file target, dependency, CSS contribution and tag', () => {
-  const actual = Object.fromEntries(freshUiRegistryManifest.items.map((item) => [item.name, {
-    name: item.name,
-    kind: item.kind,
-    files: item.files,
-    ...(item.dependencies ? { dependencies: item.dependencies } : {}),
-    ...(item.registryDependencies ? { registryDependencies: item.registryDependencies } : {}),
-    ...(item.css ? { css: item.css } : {}),
-    tags: item.tags,
-  }]));
+  const legacyNames = new Set(Object.keys(legacyBaseline));
+  const previewSources = new Set(legacyBaseline['theme-previews'].files.map((file) => file.source));
+  const actual = Object.fromEntries(
+    freshUiRegistryManifest.items.filter((item) => legacyNames.has(item.name)).map((
+      item,
+    ) => [item.name, {
+      name: item.name,
+      kind: item.kind,
+      files: item.name === 'theme-previews'
+        ? item.files.filter((file) => previewSources.has(file.source))
+        : item.files,
+      ...(item.dependencies ? { dependencies: item.dependencies } : {}),
+      ...(item.registryDependencies ? { registryDependencies: item.registryDependencies } : {}),
+      ...(item.css ? { css: item.css } : {}),
+      tags: item.tags,
+    }]),
+  );
   assertEquals<unknown>(actual, legacyBaseline);
+  assertEquals(
+    freshUiRegistryManifest.items.filter((item) => !legacyNames.has(item.name)).map((item) =>
+      item.name
+    ).sort(),
+    TOKEN_PRESETS.map((preset) => `theme-${preset.id}`).filter((name) => !legacyNames.has(name))
+      .sort(),
+  );
 });
 
 Deno.test('authored themes match the token generator including files and preset metadata', () => {

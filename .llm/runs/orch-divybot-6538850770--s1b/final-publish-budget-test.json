@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","--lock=deno.lock","--frozen","--unstable-kv","tests/publish-size.test.ts"],"cwd":"/home/agent/projects/orchid/worktrees/issue-6538850770/packages/fresh-ui","exitCode":0,"durationMs":5637,"summary":{"passed":1,"failed":0,"ignored":0,"totalResults":1,"uniqueFailures":0},"failures":[]}

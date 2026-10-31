@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 85,
+  'total': 91,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -587,6 +587,45 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description':
       'Safe recursive render_ui payload renderer with depth and block-vocabulary guards for Fresh UI generative surfaces.',
+  },
+  {
+    'name': 'theme-ledger',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'ledger language preset; fixed compact density (Dense Figma geometry).',
+  },
+  {
+    'name': 'theme-signal',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'signal language preset; fixed compact density (Dense Figma geometry).',
+  },
+  {
+    'name': 'theme-glass',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'glass language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-macos-27',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'macos-27 language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-apple-classic',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'apple-classic language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-fluent-2-web',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'fluent-2-web language preset; fixed comfortable density (Comfortable Figma geometry).',
   },
 ];
 
