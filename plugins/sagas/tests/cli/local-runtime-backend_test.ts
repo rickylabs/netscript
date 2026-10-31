@@ -110,6 +110,44 @@ Deno.test('saga add update and remove regenerate a definition-only registry', as
   assertEquals(files.contents.get(registryPath)?.includes('checkout-saga.ts'), false);
 });
 
+for (const companion of [false, true]) {
+  for (const command of [new UpdateSagaCommand(), new RemoveSagaCommand()]) {
+    Deno.test(`saga ${command.definition.name} preserves shared root config with companion=${companion}`, async () => {
+      const rootConfig = `
+export const unrelated = defineSagaConfig('other', 'sagas/other-saga.ts').build();
+export const checkout = defineSagaConfig('checkout', 'sagas/checkout-saga.ts').build();
+`;
+      const sources = new Map([
+        ['netscript.config.ts', rootConfig],
+        ['sagas/checkout-saga.ts', "export default defineSaga('checkout');"],
+        ['sagas/other-saga.ts', "export default defineSaga('other');"],
+      ]);
+      if (companion) {
+        sources.set(
+          'sagas/checkout.config.ts',
+          "export default defineSagaConfig('checkout', 'sagas/checkout-saga.ts').build();",
+        );
+      }
+      const before = new Map(sources);
+      const files = new MemoryProjectFiles(sources);
+      const backend = new LocalSagasRuntimeBackend({
+        files,
+        runtime: new RecordingRuntimeClient(),
+      });
+      const result = await backend.handle(command.definition, {
+        command: command.definition.name,
+        values: ['checkout'],
+        flags: { topic: 'changed-topic' },
+      });
+      assertEquals(result.code, 1);
+      assertStringIncludes(result.message ?? '', 'netscript.config.ts');
+      assertStringIncludes(result.message ?? '', 'manually');
+      assertEquals(files.contents.get('netscript.config.ts'), rootConfig);
+      assertEquals(files.contents, before);
+    });
+  }
+}
+
 class RecordingRuntimeClient implements SagasRuntimeApiClient {
   readonly requests: Array<{ path: string; request: SagasRuntimeRequest }> = [];
 
