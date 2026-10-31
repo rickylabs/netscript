@@ -13,3 +13,7 @@ Remaining decision for Cockpit/owner: review the final F3 correction and supply 
 ## Subsequent owner decision
 
 The owner subsequently instructed: “If more work remains, keep going and mark ready when done.” This explicitly resumes the previously stopped task and requests completion of the remaining gate and ready transition. Continue the same independent evaluator for final verification of the repaired implementation. The earlier stop was honored; it is superseded for this owner-directed resumption. No evaluation waiver or self-approval is inferred.
+
+## Owner-resumed final outcome
+
+The same independent evaluator returned **PASS** after verifying the final correction and production-path positive/negative proof. See evaluate.md. The earlier stopped state is resolved by the later owner-directed resumption and completed independent review. Proceed to ready transition and applicable CI; no self-certification.

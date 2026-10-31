@@ -84,3 +84,9 @@ Independent PASS and non-draft CI remain unproven. The two-failure stop is still
 Owner instruction (verbatim): PR #2549 is green and mergeable but still a DRAFT, so it can't auto-merge. If it's complete, mark it ready now: gh pr ready 2549  — then it merges automatically. If more work remains, keep going and mark ready when done.
 
 The owner has now directly resumed work after the recorded evaluator stop and instructed completion through ready-for-review. Finish the outstanding independent verdict using the same requested read-only Claude evaluator; then transition ready and validate the real non-draft checks. This owner resumption supersedes the earlier stopped-loop handoff for this continuation; previous FAIL_FIX verdicts and decision remain historical evidence, not erased or relabeled. No implementation changes are planned.
+
+## Final independent verdict
+
+Owner-resumed final IMPL-EVAL: **PASS**, requested and observed Claude Opus 5.5 high, same separate Anthropic evaluator. It read the final source and checked staging/freshness regressions plus actual production-verifier proof. F1 and F3 are fixed; F2 remains accepted documented tooling debt. Current source hashes match the validated implementation e9236a3. Exact evaluator report is evaluate.md; raw transport/session metadata remains private.
+
+Next action under direct owner instruction: publish this verdict, complete PR body checkboxes, and mark #2549 ready; real required contexts quality/check-test must pass, while deps-report may be skipped by the workflow policy. Runtime opt-in lanes stay policy-skipped, never represented as runtime PASS. Cockpit merges.
