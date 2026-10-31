@@ -109,7 +109,7 @@ export class MemoryKvAdapter implements WatchableKv {
    */
   set(key: KvKey, value: unknown, options?: KvSetOptions): Promise<void> {
     this.assertOpen();
-    this.writeEntry(key, value, generateVersionstamp(), options?.expireIn);
+    this.notifyWatchers(this.writeEntry(key, value, generateVersionstamp(), options?.expireIn));
     return Promise.resolve();
   }
 
@@ -120,7 +120,8 @@ export class MemoryKvAdapter implements WatchableKv {
    */
   delete(key: KvKey): Promise<void> {
     this.assertOpen();
-    this.removeEntry(key, generateVersionstamp());
+    const event = this.removeEntry(key, generateVersionstamp());
+    if (event) this.notifyWatchers(event);
     return Promise.resolve();
   }
 
@@ -186,7 +187,8 @@ export class MemoryKvAdapter implements WatchableKv {
    * Checks and writes run synchronously as one unit, so no other caller can
    * observe or interleave with a partial commit. Every entry written by the
    * commit, and every watch event it fires, carries the single versionstamp
-   * that is returned.
+   * that is returned. Notifications are dispatched only after all mutations
+   * have been applied, so watch-triggered reads see the complete commit.
    *
    * @param checks - Version checks that must succeed
    * @param mutations - Mutations to apply
@@ -206,9 +208,12 @@ export class MemoryKvAdapter implements WatchableKv {
     }
 
     const versionstamp = generateVersionstamp();
+    const events: WatchEvent[] = [];
     for (const mutation of mutations) {
-      this.applyMutation(mutation, versionstamp);
+      const event = this.applyMutation(mutation, versionstamp);
+      if (event) events.push(event);
     }
+    for (const event of events) this.notifyWatchers(event);
 
     return Promise.resolve({ ok: true, versionstamp });
   }
@@ -468,18 +473,17 @@ export class MemoryKvAdapter implements WatchableKv {
    *
    * @param mutation - Mutation to apply
    * @param versionstamp - Versionstamp of the enclosing commit
+   * @returns The deferred event, if storage changed
    */
-  private applyMutation(mutation: AtomicMutation, versionstamp: string): void {
+  private applyMutation(mutation: AtomicMutation, versionstamp: string): WatchEvent | undefined {
     switch (mutation.type) {
       case 'set':
-        this.writeEntry(mutation.key, mutation.value, versionstamp, mutation.expireIn);
-        return;
+        return this.writeEntry(mutation.key, mutation.value, versionstamp, mutation.expireIn);
       case 'delete':
-        this.removeEntry(mutation.key, versionstamp);
-        return;
+        return this.removeEntry(mutation.key, versionstamp);
       default: {
         const stored = this.liveEntry(keyToString(mutation.key))?.value;
-        this.writeEntry(
+        return this.writeEntry(
           mutation.key,
           combineAtomicValue(mutation.type, stored, mutation.value),
           versionstamp,
@@ -489,19 +493,20 @@ export class MemoryKvAdapter implements WatchableKv {
   }
 
   /**
-   * Store an entry and notify watchers.
+   * Store an entry and describe its change without notifying watchers.
    *
    * @param key - Key to write
    * @param value - Value to store
    * @param versionstamp - Versionstamp of the write
    * @param expireIn - Optional TTL in milliseconds
+   * @returns The event to dispatch after storage updates finish
    */
   private writeEntry(
     key: KvKey,
     value: unknown,
     versionstamp: string,
     expireIn?: number,
-  ): void {
+  ): WatchEvent {
     const keyStr = keyToString(key);
     const existing = this.storage.get(keyStr);
     const entry: StorageEntry = {
@@ -517,16 +522,24 @@ export class MemoryKvAdapter implements WatchableKv {
       this.expirationHeap.push({ expiresAt: entry.expiresAt, keyStr });
     }
 
-    this.notifyWatchers(key, value, existing?.value ?? null, 'set', versionstamp);
+    return {
+      key,
+      value,
+      previousValue: existing?.value ?? null,
+      type: 'set',
+      versionstamp,
+      timestamp: new Date(),
+    };
   }
 
   /**
-   * Remove an entry, if present, and notify watchers.
+   * Remove an entry, if present, and describe its change without notifying watchers.
    *
    * @param key - Key to remove
    * @param versionstamp - Versionstamp of the deletion
+   * @returns The deletion event, or undefined when the key was absent
    */
-  private removeEntry(key: KvKey, versionstamp: string): void {
+  private removeEntry(key: KvKey, versionstamp: string): WatchEvent | undefined {
     const keyStr = keyToString(key);
     const existing = this.storage.get(keyStr);
     if (!existing) {
@@ -534,7 +547,14 @@ export class MemoryKvAdapter implements WatchableKv {
     }
 
     this.storage.delete(keyStr);
-    this.notifyWatchers(key, null, existing.value, 'delete', versionstamp);
+    return {
+      key,
+      value: null,
+      previousValue: existing.value,
+      type: 'delete',
+      versionstamp,
+      timestamp: new Date(),
+    };
   }
 
   /**
@@ -576,8 +596,8 @@ export class MemoryKvAdapter implements WatchableKv {
         const entry = this.storage.get(top.keyStr);
         if (!entry || !entry.expiresAt || entry.expiresAt > now) continue;
 
-        this.storage.delete(top.keyStr);
-        this.notifyWatchers(entry.key, null, entry.value, 'delete', generateVersionstamp());
+        const event = this.removeEntry(entry.key, generateVersionstamp());
+        if (event) this.notifyWatchers(event);
       }
     }, 1000);
   }
@@ -585,28 +605,10 @@ export class MemoryKvAdapter implements WatchableKv {
   /**
    * Notify key and prefix watchers about a mutation.
    *
-   * @param key - Changed key
-   * @param value - New value
-   * @param previousValue - Previous value
-   * @param type - Mutation type
-   * @param versionstamp - Versionstamp of the write that caused the event
+   * @param event - Change whose storage updates have completed
    */
-  private notifyWatchers<T>(
-    key: KvKey,
-    value: T | null,
-    previousValue: T | null,
-    type: 'set' | 'delete',
-    versionstamp: string,
-  ): void {
-    const event: WatchEvent<T> = {
-      key,
-      previousValue,
-      timestamp: new Date(),
-      type,
-      value,
-      versionstamp,
-    };
-
+  private notifyWatchers(event: WatchEvent): void {
+    const { key } = event;
     const keyWatchers = this.watchers.get(keyToString(key));
     if (keyWatchers) {
       for (const watcher of keyWatchers) {
