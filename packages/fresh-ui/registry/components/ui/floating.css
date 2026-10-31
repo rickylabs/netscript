@@ -1,7 +1,4 @@
-:where(
-  [data-scope='popover'][data-part='content'],
-  [data-scope='tooltip'][data-part='content']
-) {
+:where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content']) {
   position: fixed;
   inset: var(
     --ns-floating-fallback-inset,
@@ -11,35 +8,119 @@
   margin: 0;
 }
 
-:where(
-  [data-scope='popover'][data-part='content'],
-  [data-scope='tooltip'][data-part='content']
-)[data-state='closed'] {
+:where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content'])[data-state='closed'] {
   display: none;
 }
 
-:where(
-  [data-scope='popover'][data-part='content'],
-  [data-scope='tooltip'][data-part='content']
-):popover-open {
+:where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content']):popover-open {
   display: block;
 }
 
 @supports (anchor-name: --ns-floating-anchor) and (position-area: bottom) {
-  :where(
-    [data-scope='popover'][data-part='trigger'],
-    [data-scope='popover'][data-part='anchor'],
-    [data-scope='tooltip'][data-part='trigger']
-  ) {
+  :where([data-scope='popover'][data-part='trigger'], [data-scope='popover'][data-part='anchor'], [data-scope='tooltip'][data-part='trigger']) {
     anchor-name: var(--ns-floating-anchor-name);
   }
 
-  :where(
-    [data-scope='popover'][data-part='content'],
-    [data-scope='tooltip'][data-part='content']
-  ) {
+  :where([data-scope='popover'][data-part='content'], [data-scope='tooltip'][data-part='content']) {
     inset: auto;
     position-anchor: var(--ns-floating-anchor-name);
     position-area: var(--ns-floating-position-area, bottom);
+  }
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='content'] {
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-surface-raised);
+  color: var(--ns-fg);
+  padding: var(--ns-card-padding);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='title'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-strong);
+  font-weight: var(--ns-weight-strong);
+  line-height: var(--ns-leading-strong);
+  letter-spacing: var(--ns-tracking-strong);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='description'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-small);
+  font-weight: var(--ns-weight-small);
+  line-height: var(--ns-leading-small);
+  letter-spacing: var(--ns-tracking-small);
+  color: var(--ns-muted-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='content'] {
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-surface-raised);
+  color: var(--ns-fg);
+  padding: var(--ns-card-padding);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='title'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-strong);
+  font-weight: var(--ns-weight-strong);
+  line-height: var(--ns-leading-strong);
+  letter-spacing: var(--ns-tracking-strong);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='description'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-small);
+  font-weight: var(--ns-weight-small);
+  line-height: var(--ns-leading-small);
+  letter-spacing: var(--ns-tracking-small);
+  color: var(--ns-muted-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='tooltip'][data-part='content'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-small);
+  font-weight: var(--ns-weight-small);
+  line-height: var(--ns-leading-small);
+  letter-spacing: var(--ns-tracking-small);
+  padding: var(--ns-stack-gap) var(--ns-control-padding-x);
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-inverse);
+  color: var(--ns-inverse-fg);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='item'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  font-weight: var(--ns-weight-body);
+  line-height: var(--ns-leading-body);
+  letter-spacing: var(--ns-tracking-body);
+  padding: var(--ns-space-1) var(--ns-control-padding-x);
+  border-radius: var(--ns-radius-control);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='item']:is(:hover,[data-highlighted]) {
+  background: var(--ns-selected);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='item']:focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='content']::backdrop {
+  background: var(--ns-overlay);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'],
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='tooltip'] {
+    transition: none;
   }
 }

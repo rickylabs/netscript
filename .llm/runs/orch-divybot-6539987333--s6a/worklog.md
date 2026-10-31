@@ -48,3 +48,7 @@ S2 independent retry PASS. Reconcile: remote remains af6418f with no new reviewe
 Source frozen in s3-source-hashes.json. Utility card top-rule, panel/feedback roles, square avatars, info Badge, dark-visible indicators, single-title toasts and bottom-end placement implemented. Contract/type/render/JSON stay in sync. Gates: 93 tests pass; structured check/lint/fmt each cover 3 TS files, zero findings; quality gate exit 0; legacy 262×2 unchanged; 92 fixtures/230 measurements, zero browser errors including toast mobile/desktop RTL placement. Shared preset card specificity required the default variant qualifier; browser top-rule assertion proves it. Independent review pending.
 
 S3 independent PASS. Reconcile: all 20 frozen source hashes verified; no unreviewed source edits. S6 must capture indeterminate progress at a visible/static phase; footer border follows spec pending final ledger check. S3 signed off.
+
+## S4 sign-off
+
+Independent Claude Opus 5.5 high review PASS. 21 source/carrier-contract files frozen by SHA256; 139 focused tests + 19 template tests, check/lint/fmt6, quality gate, legacy262x2 and browser30fixtures176measurements pass. Scope: compact blocks, navigation, overlays, tables, chart category intent and generated top-bar hook. Owner locked-render authority recorded during this slice. Reconcile: diff contains only S4 inventory plus declared additive chart contract/test/fixture and template hook. S4R next reconciles earlier families; S5/S6 remain. Carry review cosmetics and carrier freshness into final pass.

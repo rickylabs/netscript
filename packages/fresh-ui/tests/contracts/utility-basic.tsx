@@ -200,6 +200,19 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'donut',
+    scenario: 'palette-and-error',
+    render: () => (
+      <Donut
+        data={[...[1, 2, 3, 4, 5].map((n) => ({ label: `Series ${n}`, value: n })), {
+          label: 'Error',
+          value: 2,
+          tone: 'destructive',
+        }]}
+      />
+    ),
+  },
+  {
+    component: 'donut',
     scenario: 'segments',
     render: () => <Donut data={[{ label: 'One', value: 42 }, { label: 'Two', value: 58 }]} />,
   },

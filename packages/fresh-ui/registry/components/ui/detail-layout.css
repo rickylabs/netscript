@@ -16,3 +16,8 @@
 .ns-detail-layout__aside {
   min-width: 0;
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='detail-layout'][data-part='root'] {
+  gap: var(--ns-section-gap);
+}

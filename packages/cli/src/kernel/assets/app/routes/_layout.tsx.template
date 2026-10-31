@@ -23,9 +23,15 @@ export default define.layout(function RootLayout({ Component, url }) {
 
   return (
     <Partial name='page'>
-      <header class='ns-topbar'>
+      <header class='ns-topbar' data-part='root' data-scope='top-bar'>
         <div class='ns-cluster ns-cluster--sm'>
-          <a href={appRoutes.home.href()} f-client-nav class='ns-topbar__brand'>
+          <a
+            href={appRoutes.home.href()}
+            f-client-nav
+            class='ns-topbar__brand'
+            data-part='brand'
+            data-scope='top-bar'
+          >
             {{name}}
           </a>
           <Badge variant='muted'>{{appName}}</Badge>

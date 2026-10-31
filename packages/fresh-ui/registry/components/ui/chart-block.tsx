@@ -34,6 +34,8 @@ interface ChartBlockProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'clas
 }
 
 const TICKS = 4;
+/** Number of semantic chart palette roles exposed by the theme contract. */
+const CHART_SERIES_COUNT = 5;
 
 /**
  * Rounds a value up to a "nice" axis maximum (1/2/5 × 10ⁿ).
@@ -99,6 +101,7 @@ export function ChartBlock(
                   data-part='bar'
                   data-scope='chart-block'
                   data-tone={datum.tone}
+                  data-series={datum.tone ? undefined : (i % CHART_SERIES_COUNT) + 1}
                   style={{ height: `${(datum.value / max) * 100}%` }}
                 >
                   <span class='ns-colchart__val' data-part='val' data-scope='chart-block'>
@@ -122,7 +125,7 @@ export function ChartBlock(
         ? <div class='ns-chart__title' data-part='title' data-scope='chart-block'>{title}</div>
         : null}
       {sub ? <div class='ns-chart__sub' data-part='sub' data-scope='chart-block'>{sub}</div> : null}
-      {data.map((datum) => (
+      {data.map((datum, i) => (
         <div class='ns-chart__row' data-part='row' data-scope='chart-block'>
           <span class='ns-chart__label' data-part='label' data-scope='chart-block'>
             {datum.label}
@@ -133,6 +136,7 @@ export function ChartBlock(
               data-part='bar'
               data-scope='chart-block'
               data-tone={datum.tone}
+              data-series={datum.tone ? undefined : (i % CHART_SERIES_COUNT) + 1}
               style={{ width: `${(datum.value / max) * 100}%` }}
             />
           </span>

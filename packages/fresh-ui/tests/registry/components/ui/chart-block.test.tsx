@@ -1,3 +1,4 @@
+import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { assert } from '@std/assert';
 import { ChartBlock } from '../../../../registry/components/ui/chart-block.tsx';
 
@@ -45,4 +46,19 @@ Deno.test('ChartBlock scales bar size to a nice axis maximum (no hardcoded color
   const json = JSON.stringify(ChartBlock({ data: DATA, variant: 'column' }));
   assert(json.includes('80%'), 'tallest column scaled to nice max');
   assert(!/#[0-9a-fA-F]{3,8}/.test(json), 'no raw hex in output');
+});
+
+Deno.test('ChartBlock reserves the chart palette for automatic series and preserves explicit error intent', () => {
+  const html = render(ChartBlock({
+    data: [
+      { label: 'Category', value: 10 },
+      { label: 'Error', value: 2, tone: 'destructive' },
+    ],
+  }));
+  assert(html.includes('data-series="1"'), 'automatic category has a palette role');
+  assert(
+    !html.includes('data-series="2"'),
+    'explicit error must not be replaced by a category colour',
+  );
+  assert(html.includes('data-tone="destructive"'), 'explicit destructive intent survives');
 });
