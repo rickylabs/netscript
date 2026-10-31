@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "counts": {
+    "addedLineAbsolutePaths": 0,
+    "addedLineSessionIdentifiers": 0,
+    "addedLineThumbprints": 0,
+    "runAbsolutePaths": 0,
+    "runSessionIdentifiers": 0,
+    "runThumbprints": 0
+  }
+}
