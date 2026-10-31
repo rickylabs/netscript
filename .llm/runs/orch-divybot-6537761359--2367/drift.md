@@ -9,3 +9,9 @@
   updated before implementation; no API expansion beyond the planned refusal reason.
 - Final handoff/lesson evidence is included in the implementation slice rather than an additional
   docs-only commit; final evaluator verdict stays outside Git to preserve its exact target head.
+- CI follow-up: updating the public reference also invalidates the shipped agent-docs prose corpus.
+  Canonical `gen:agent-docs-prose` and its freshness gate are added to the repair slice, with declared
+  generated outputs in supervisor.md. No parser behavior change is needed.
+- User's CI-failure follow-up requires finishing the pending runtime gate. Existing manual e2e-cli
+  workflow dispatched remotely at the pushed branch, leaving coordinator-owned labels untouched and
+  starting no local runtime. Final head must carry its own CI evidence after any repair push.

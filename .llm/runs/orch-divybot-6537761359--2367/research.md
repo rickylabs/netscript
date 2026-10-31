@@ -35,3 +35,6 @@
   warnings are non-blocking. Durable receipt retained outside the public tree.
 - Git identity was not configured despite dispatch assumptions. Set repository-local identity to
   the authenticated account's verified GitHub noreply identity, matching the baseline commit.
+- A public reference edit needs `gen:agent-docs-prose`, and exported JSDoc/reason changes need
+  `gen:mcp-export-corpus`; `gen:assets-barrel` does not rebuild either corpus. Quality CI checks both.
+  Check changed compressed rows to prove scope; canonical generation retains unchanged row bytes.

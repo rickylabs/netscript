@@ -24,3 +24,9 @@
 - Noncommitted scratch/evaluation output: project run evidence directory; assignment/final report
   files remain excluded. No lock changes, runtime resource launches, merge, labels, or milestones.
 - Privacy: public artifacts use repository-relative paths and omit machine/session identifiers.
+- CI follow-up scope extension: `packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`,
+  `.llm/assets/agent-docs/provenance.json` and `packages/cli/src/kernel/assets/llms-policy.generated.ts`
+  only if canonical `gen:agent-docs-prose` changes them; shipped docs must match the updated reference.
+- Also refresh `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`
+  using `gen:mcp-export-corpus` for the changed public reason/JSDoc. Allow-dirty is scoped to the
+  known generated-docs changes; maintained parser inputs are already committed.

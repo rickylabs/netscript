@@ -66,3 +66,32 @@ Handoff records and dated lesson were completed within the implementation slice;
 head is unnecessary. Final exact-pushed-head review is published outside Git, preserving its SHA.
 Full runtime CI remains unproven and must be armed by the coordinator; readiness means reviewable
 implementation, not permission to merge before that gate.
+
+## CI follow-up slice — shipped documentation freshness
+
+Exact-head evaluator returned `VERDICT: MERGE 0c8e140e0b5be72bb8040a98b8ddc613be922f6e`
+with no code blockers, conditional on required runtime CI. Review-thread gate passed, no unanswered
+threads; Augment advisory review found no suggestions. CI command-postgres, code-quality, source
+type-check and browser/test shard checks passed. The quality job exposed a required generated-docs
+freshness repair after the public reference/JSDoc changes.
+
+Regenerated with `deno task gen:agent-docs-prose` and `deno task gen:mcp-export-corpus --allow-dirty`.
+The explicit dirty-input override covers only the known generated docs (maintained parser already
+committed). Corpus comparison: exactly one of 202 prose entries changed,
+`pages/reference/database/index.md`; exactly one of 301 export surfaces changed,
+`database ./connection-strings/postgres`. All other compressed rows remain byte-identical.
+No parser, tests, locks, or unrelated reference content changed.
+
+`check:agent-docs-prose` durable receipt PASS, exit 0; `check:publish-assets` exit 0. MCP export
+freshness and scoped generated type check are run for this repair. Independent repair slice review
+required before commit/push. New final-head evaluation will supersede the old SHA's verdict.
+
+Reconcile: close-gate correctly names runtime CI and final review evidence; do not tick runtime
+without proof. Latest user instruction requires completing red CI. Dispatched the repository's
+existing manual e2e-cli workflow on hosted runners, changing no labels and launching no local runtime.
+Canceled only that run's own now-superseded workflow before the repair push; redispatch at new head.
+
+Repair gates all pass, and same-session independent repair review (round 3) is PASS with no blockers
+(repair-review.md). Post-repair direct decode confirms the prose row describes duplicate-key, TLS
+spellings and ports, and the export row contains the new refusal/compatibility JSDoc; no private run
+context. Commit/push the two canonical generated rows plus records, then finish CI at the new head.

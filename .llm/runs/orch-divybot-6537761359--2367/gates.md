@@ -41,3 +41,23 @@ zero refusals. No repository configuration or blanket exclusion was changed.
 Existing Markdown table formatting in the public reference was preserved; only its normalization
 paragraph changes. Generated barrels remain canonical generator output, excluded from source-style
 gates per repository policy.
+
+## CI freshness repair
+
+Quality CI at the first implementation head failed `Agent docs corpus freshness`; no parser defect.
+Canonical prose generation changes only `pages/reference/database/index.md` among 202 transported
+pages. Export-corpus generation changes only `database ./connection-strings/postgres` among 301
+transported surfaces. Other compressed rows are byte-identical. No lock change.
+
+- `deno task gen:agent-docs-prose` then durable `check:agent-docs-prose` — exit 0, PASS.
+- `deno task gen:mcp-export-corpus --allow-dirty` then `check:mcp-export-corpus` — exit 0; dirty
+  override covers only reviewed generated-doc changes; maintained parser source already committed.
+- Structured check wrapper selecting the two changed generated TS corpus files — exit 0,
+  zero diagnostics.
+- `deno task check:publish-assets` — exit 0.
+- `deno task gen:assets-barrel` — exit 0, no additional tracked delta.
+- `git diff --check` — exit 0.
+
+Runtime CI is being completed through the existing manual GitHub workflow at the pushed branch,
+after the user's explicit follow-up to fix red CI. No local runtime or label mutations. Final-head
+CI links and evaluator verdict belong in the PR phase comment/final report to keep their SHA stable.
