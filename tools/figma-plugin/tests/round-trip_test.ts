@@ -18,6 +18,14 @@ Deno.test('Plugin API export reproduces all ten handoff fixtures byte-for-byte',
   const api = fixtureFigma(collections);
   const snapshot = await exportSnapshot(api);
   const files = snapshotFiles(snapshot, 'pGRLnkPPRZJZy74evNcQBr', '2026-10-31');
+  assertEquals(
+    snapshotFiles(
+      importFigmaTokenBundle(exportFigmaTokenBundle(snapshot)),
+      'pGRLnkPPRZJZy74evNcQBr',
+      '2026-10-31',
+    ),
+    files,
+  );
   assertEquals(Object.keys(files).length, 10);
   assertEquals(snapshot.reduce((sum, collection) => sum + collection.variables.length, 0), 2186);
   for (const [name, bytes] of Object.entries(files)) {
@@ -69,12 +77,19 @@ Deno.test('unknown WEB names and unknown variable identities fail with their ori
       : collection
   );
   assertThrows(() => assertFigmaTokenNames(input), Error, `Scheme/${variable.name}`);
-  const unknown = input.map((collection) =>
-    collection === input[3]
-      ? { ...collection, variables: [...collection.variables, { ...data, name: 'unknown/new' }] }
+  const unknown = changed.map((collection) =>
+    collection.collection === 'Scheme'
+      ? {
+        ...collection,
+        variables: [...collection.variables, { ...variable, name: 'unknown/new' }],
+      }
       : collection
   );
-  assertThrows(() => exportFigmaTokenBundle(unknown));
+  assertThrows(
+    () => exportFigmaTokenBundle(unknown),
+    Error,
+    'Unknown Figma token name: Scheme/unknown/new',
+  );
 });
 
 Deno.test('malformed sources, alias targets and resolver URLs fail before import', () => {

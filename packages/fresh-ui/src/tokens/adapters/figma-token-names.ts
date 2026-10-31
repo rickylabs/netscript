@@ -1,6 +1,8 @@
-import { collections as inventory } from '../assets/figma.generated.ts';
-import { nameMigrations } from '../assets/metadata.generated.ts';
-import { roleRegistry } from '../assets/quality.generated.ts';
+import {
+  figmaNameInventory as inventory,
+  figmaNameMigrations,
+  figmaRegisteredNames,
+} from '../assets/figma-names.generated.ts';
 import type { FigmaCollection } from '../domain/token-contract.ts';
 
 /** Enforce code-owned variable identities and WEB names before export or installation. */
@@ -16,6 +18,9 @@ export function assertFigmaTokenNames(collections: readonly FigmaCollection[]): 
     seen.add(collection.collection);
     const expected = inventory.find((entry) => entry.collection === collection.collection);
     if (!expected) throw new Error(`Unknown Figma collection: ${collection.collection}`);
+    if (JSON.stringify(collection.modes) !== JSON.stringify(expected.modes)) {
+      throw new Error(`Figma mode inventory changed: ${collection.collection}`);
+    }
     const names = new Set<string>();
     for (const variable of collection.variables) {
       const location = `${collection.collection}/${variable.name}`;
@@ -29,13 +34,13 @@ export function assertFigmaTokenNames(collections: readonly FigmaCollection[]): 
       names.add(variable.name);
       if (known.type !== variable.type) throw new Error(`Figma token type changed: ${location}`);
       if (variable.codeSyntax) {
-        const migration = nameMigrations.migrations.find((entry) =>
+        const migration = figmaNameMigrations.find((entry) =>
           entry.collection === collection.collection && entry.variable === variable.name
         );
         const css = migration?.cssVar ??
           variable.codeSyntax.replace(/^var\(/, '').replace(/\)$/, '');
         if (
-          !Object.hasOwn(roleRegistry.roles, css) ||
+          !figmaRegisteredNames.includes(css) ||
           !/^var\(--ns-[a-z0-9-]+\)$/.test(variable.codeSyntax)
         ) {
           throw new Error(`Unknown exported token name: ${location} (${variable.codeSyntax})`);

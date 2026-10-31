@@ -91,3 +91,28 @@ S2 independent source review PASS. Named structured gates pass, five fixture/
 schema tests pass, docs:exports-drift passes. Recommendations for S3: alias-cycle
 preflight, canonical mode/order validation, leaf converter contracts, per-file
 upstream attribution, alpha-ff preservation and browser-main compatibility.
+
+## S3 — native import, download, GitHub PR and browser bundles
+
+Built minimal sandbox IIFE and browser UI separately. Shared name-only generated
+inventory is synchronous, avoiding DOM/decompression globals in Figma main;
+color/document metadata remains in the iframe. Native import validates names,
+modes, type compatibility and cycles first; creates variable targets, clears old
+alias edges with typed literals, then assigns final aliases. Existing IDs survive
+and stale WEB syntax is removed. Explicit opaque-alpha bytes survive transport.
+
+Structured tests: 11 passed, zero failed/ignored, including production main
+execution with DOM/decompression globals absent. Mock GitHub proves one changed
+tree entry and no credential-bearing bodies; complete item structural comparison
+rejects non-value edits. S3 initial review FAIL_FIX caught JSON reformatting in
+an otherwise values-only PR. Required canonical baseline bytes and stable key
+order; compact/reordered baseline controls now refuse before mutations. Removed
+the default fixture file key; only a real key enables snapshot downloads.
+
+Native Figma host remains UNPROVEN as required; UI message-origin behavior and
+host permissions/mode limits need manual acceptance. S3 repair review pending.
+
+S3 terminal PASS: independent repair review, 11/0/0 structured tests,
+14-file check and 13-file lint/fmt (nonzero plugin coverage), browser build,
+source freshness and release preflight pass. Reconcile: next S4 adds required
+CI coverage and the distributable name checker. No READY claim yet.

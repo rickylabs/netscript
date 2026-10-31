@@ -17,6 +17,7 @@ export interface VariableHandle {
   readonly valuesByMode: Readonly<Record<string, FigmaValue>>;
   setValueForMode(mode: string, value: FigmaValue): void;
   setVariableCodeSyntax(platform: 'WEB', value: string): void;
+  removeVariableCodeSyntax(platform: 'WEB'): void;
 }
 /** Mutable collection handle; the first mode is the default. */
 export interface CollectionHandle {

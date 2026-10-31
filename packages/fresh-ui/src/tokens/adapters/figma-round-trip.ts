@@ -1,63 +1,23 @@
 import Color from 'npm:colorjs.io@0.5.2';
 import { z } from 'zod';
-import type {
-  FigmaCollection,
-  FigmaVariable,
-  TokenDocument,
-  TokenResolver,
-} from '../domain/token-contract.ts';
-import type { TokenSources } from '../domain/resolve-tokens.ts';
+import type { FigmaCollection, TokenDocument } from '../domain/token-contract.ts';
 import { validateFigmaSnapshot } from '../domain/figma-snapshot.ts';
+import { assertFigmaAliasCycles } from '../domain/figma-alias-cycles.ts';
 import { assertFigmaTokenNames } from './figma-token-names.ts';
 import { parseFigmaTokenBundle } from './parse-figma-round-trip.ts';
 
-/** Official format URI shared by variable documents and their parser. */
-export const FIGMA_DTCG_SCHEMA = 'https://www.designtokens.org/schemas/2025.10/format.json';
-/** Variable identity metadata stays outside DTCG values and never depends on Figma IDs. */
-export interface FigmaTokenBundle {
-  /** DTCG revision supported by this portable boundary. */
-  readonly version: '2025.10';
-  /** Ordered collection, mode and variable metadata needed to restore the file. */
-  readonly collections: readonly {
-    readonly collection: string;
-    readonly modes: readonly string[];
-    readonly variables: readonly Omit<FigmaVariable, 'values'>[];
-  }[];
-  /** Mode documents plus one resolver; aliases follow active target-collection modes. */
-  readonly sources: TokenSources;
-}
-/** Stable source identity independent of Figma mode/variable IDs and token values. */
-export function figmaModeFile(collection: number, mode: number): string {
-  return `c${collection}-m${mode}.tokens.json`;
-}
-/** Compose collection modes through the official resolver contract rather than hardcoding alias modes. */
-export function figmaVariableResolver(collections: FigmaTokenBundle['collections']): TokenResolver {
-  const sets: Record<string, { sources: { $ref: string }[] }> = {};
-  const modifiers: Record<
-    string,
-    { default: string; contexts: Record<string, { $ref: string }[]> }
-  > = {};
-  const resolutionOrder: { $ref: string }[] = [];
-  collections.forEach((collection, c) => {
-    if (collection.modes.length === 1) {
-      sets[`c${c}`] = { sources: [{ $ref: figmaModeFile(c, 0) }] };
-      resolutionOrder.push({ $ref: `#/sets/c${c}` });
-    } else {
-      modifiers[`c${c}`] = {
-        default: collection.modes[0],
-        contexts: Object.fromEntries(
-          collection.modes.map((mode, m) => [mode, [{ $ref: figmaModeFile(c, m) }]]),
-        ),
-      };
-      resolutionOrder.push({ $ref: `#/modifiers/c${c}` });
-    }
-  });
-  return { version: '2025.10', sets, modifiers, resolutionOrder };
-}
+import {
+  dtcgType,
+  FIGMA_DTCG_SCHEMA,
+  figmaModeFile,
+  type FigmaTokenBundle,
+  figmaVariableResolver,
+} from '../domain/figma-token-bundle.ts';
 /** Convert a complete variable snapshot to DTCG 2025.10, retaining oklch in extensions. */
 export function exportFigmaTokenBundle(input: readonly FigmaCollection[]): FigmaTokenBundle {
   const collections = validateFigmaSnapshot(input);
   assertFigmaTokenNames(collections);
+  assertFigmaAliasCycles(collections);
   const ids = new Map<string, string>(
     collections.flatMap((collection, c) =>
       collection.variables.map((variable, v) =>
@@ -92,6 +52,7 @@ export function exportFigmaTokenBundle(input: readonly FigmaCollection[]): Figma
                     Number.isFinite(Number(value)) ? Number(value) : 0
                   ),
                   alpha: Number(color.alpha),
+                  sourceHex: String(value),
                 },
               },
             },
@@ -112,11 +73,6 @@ export function exportFigmaTokenBundle(input: readonly FigmaCollection[]): Figma
     })),
     sources: { resolver: figmaVariableResolver(collections), documents },
   };
-}
-/** Translate the finite Figma type vocabulary to transport token types. */
-export function dtcgType(type: FigmaVariable['type']): string {
-  // DTCG has no generic string/boolean types. Identity metadata disambiguates lossless carriers.
-  return { COLOR: 'color', FLOAT: 'number', STRING: 'fontFamily', BOOLEAN: 'number' }[type];
 }
 /** Validate untrusted transport data and recover all variable values from the DTCG documents. */
 export function importFigmaTokenBundle(input: unknown): readonly FigmaCollection[] {
@@ -172,14 +128,16 @@ export function importFigmaTokenBundle(input: unknown): readonly FigmaCollection
           ...color.components.map((channel) => Math.round(channel * 255)),
           ...(color.alpha === 1 ? [] : [Math.round(color.alpha * 255)]),
         ];
-        return [
-          mode,
-          '#' + channels.map((channel) => channel.toString(16).padStart(2, '0')).join(''),
-        ];
+        const hex = '#' + channels.map((channel) => channel.toString(16).padStart(2, '0')).join('');
+        const sourceHex = z.object({
+          netscript: z.object({ oklch: z.object({ sourceHex: z.string().optional() }) }),
+        }).safeParse(token.$extensions).data?.netscript.oklch.sourceHex;
+        return [mode, sourceHex === hex + 'ff' ? sourceHex : hex];
       })),
     })),
   }));
   const result = validateFigmaSnapshot(collections);
   assertFigmaTokenNames(result);
+  assertFigmaAliasCycles(result);
   return result;
 }

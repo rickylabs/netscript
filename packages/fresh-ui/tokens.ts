@@ -43,5 +43,5 @@ export {
   exportFigmaTokenBundle,
   importFigmaTokenBundle,
 } from './src/tokens/adapters/figma-round-trip.ts';
-export type { FigmaTokenBundle } from './src/tokens/adapters/figma-round-trip.ts';
+export type { FigmaTokenBundle } from './src/tokens/domain/figma-token-bundle.ts';
 export { assertFigmaTokenNames } from './src/tokens/adapters/figma-token-names.ts';

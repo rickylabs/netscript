@@ -6,7 +6,7 @@ import {
   figmaModeFile,
   type FigmaTokenBundle,
   figmaVariableResolver,
-} from './figma-round-trip.ts';
+} from '../domain/figma-token-bundle.ts';
 
 const metadata = z.object({
   name: z.string().min(1),
@@ -33,6 +33,7 @@ const token = z.object({
       oklch: z.object({
         components: z.array(z.number().finite()).length(3),
         alpha: z.number().min(0).max(1),
+        sourceHex: z.string().regex(/^#[a-f0-9]{6}(?:[a-f0-9]{2})?$/).optional(),
       }).strict(),
     }).strict(),
   }).strict().optional(),

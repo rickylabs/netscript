@@ -1,3 +1,4 @@
+// Copyright (c) 2023 Pavel Laptev. MIT; see ../LICENSE and ../NOTICE.
 export const normalizeRGBAColor = (rgba: {
   r: number;
   g: number;

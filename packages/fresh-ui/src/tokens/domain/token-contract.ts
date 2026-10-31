@@ -39,7 +39,11 @@ export type TokenDerivation = TokenMixDerivation | TokenShadowDerivation;
 /** NetScript metadata does not change DTCG value semantics. */
 export interface TokenMetadata {
   /** Perceptual color retained alongside the portable sRGB Figma value. */
-  readonly oklch?: { readonly components: readonly number[]; readonly alpha: number };
+  readonly oklch?: {
+    readonly components: readonly number[];
+    readonly alpha: number;
+    readonly sourceHex?: string;
+  };
   /** Exported custom property registered by code. */
   readonly cssVar?: string;
   /** Exact legacy spelling or an explicit CSS expression. */

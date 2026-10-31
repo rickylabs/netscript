@@ -59,6 +59,10 @@ export class MockFigma implements FigmaVariablesPort {
         this.mutations++;
         valuesByMode[mode] = value;
       },
+      removeVariableCodeSyntax: (_) => {
+        this.mutations++;
+        delete codeSyntax.WEB;
+      },
       setVariableCodeSyntax: (_, value) => {
         this.mutations++;
         codeSyntax.WEB = value;
@@ -113,4 +117,26 @@ export function rgba(hex: string): { r: number; g: number; b: number; a: number 
     b: parseInt(hex.slice(5, 7), 16) / 255,
     a: hex.length === 9 ? parseInt(hex.slice(7, 9), 16) / 255 : 1,
   };
+}
+
+/** Change one literal Scheme color and one routed Theme scalar without changing identity. */
+export function modifiedFixture(input: readonly FigmaCollection[]): readonly FigmaCollection[] {
+  return input.map((collection) => ({
+    ...collection,
+    variables: collection.variables.map((variable) => {
+      if (collection.collection === 'Scheme' && variable.name === 'bevel/edge') {
+        return { ...variable, values: { ...variable.values, Light: '#2233441a' } };
+      }
+      if (
+        collection.collection === 'Theme' &&
+        variable === collection.variables.find((entry) => typeof entry.values.Studio === 'number')
+      ) {
+        return {
+          ...variable,
+          values: { ...variable.values, Studio: Number(variable.values.Studio) + 1 },
+        };
+      }
+      return variable;
+    }),
+  }));
 }
