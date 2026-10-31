@@ -27,5 +27,11 @@
   "docsExportsDrift": "PASS",
   "independentInitialAndFollowupReview": "PASS",
   "phaseReady": false,
-  "finalPhaseGates": "PENDING"
+  "finalPhaseGates": "PENDING",
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
 }
