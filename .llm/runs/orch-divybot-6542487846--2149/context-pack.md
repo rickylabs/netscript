@@ -1,3 +1,11 @@
+# Resume — conflict resolved on latest main; new-head acceptance required
+
+Latest direct user instruction explicitly requested rebasing and force-pushing the merge-conflict repair, superseding the earlier merge-only rule. Five leaf commits rebased onto main 15cffa2; sole conflict was generated agent-docs prose carrier and it was canonically regenerated. All 20 owned framework/test TypeScript blobs match prior reviewed head 2f02788071fd4d8088b7b9e21dfa2394d04f2bc5. Current integration evidence: 27 focused tests pass, 21-file check passes, docs build/accuracy/links/carrier freshness pass. See rebase-source-equivalence.json, rebase-evidence.json and newest worklog entry. Preserve incoming main and the original historical review records.
+
+Round 3 returned MERGE for the OLD exact head and the PR was marked ready before main advanced. The rebase produces a new head; its independent exact-head attestation is UNPROVEN. No fourth review is authorized yet. Push with an explicit lease expecting old remote 2f02788071fd4d8088b7b9e21dfa2394d04f2bc5, then request coordinator authorization for one same-session delta review or independent acceptance on the concrete new head. Keep full scaffold.runtime unproven until coordinator arms e2e-cli-gate and CI proves it. No label/milestone edits, local runtime resources, merge/tag/release.
+
+## Historical pre-integration record
+
 # Resume — documentation repaired; final review authorized
 
 Issue 2149, B2, coordinator 2474/mc009e. Branch orch/divybot-6542487846, draft PR 2519. Main baseline 851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2. S1 committed/pushed at 02ba3bafc13aae2cdafc07b4d9fb9aa9a77724b2 after PLAN-EVAL and independent slice-review PASS. S2 is preserved in the next commit for review, without sign-off.

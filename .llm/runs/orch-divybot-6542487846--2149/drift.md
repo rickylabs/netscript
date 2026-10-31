@@ -14,3 +14,5 @@
 - Continued goal: the two round-2 documentation findings are now corrected and their carrier rows regenerated. No source-code changes or new evaluator round. The remaining blocker is independent acceptance/final-head review after the exhausted consecutive-failure loop, followed by coordinator-owned runtime CI. Earlier BLOCKED text about unfixed references is historical and superseded by this continuation record.
 
 - Coordinator decision https://github.com/rickylabs/netscript/pull/2519#issuecomment-6542839829 explicitly lifts the consecutive-failure stop for exactly IMPL-EVAL round 3 in the same session. This supersedes the earlier blocked state without erasing either failed verdict or claiming a review yet.
+
+- Latest direct user instruction explicitly requested rebase/force-push for the new merge conflict. Used a preserved old tip and exact-SHA force-with-lease. Sole conflict was the prose carrier, regenerated canonically; incoming main source/docs retained. New-head independent acceptance remains unproven after exhausting authorized round 3.
