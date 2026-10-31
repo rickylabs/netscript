@@ -1,0 +1,229 @@
+{
+  "source": "structured repo wrappers and canonical tasks",
+  "records": [
+    {
+      "name": "protocol/auth/selector contracts",
+      "wrapper": ".llm/tools/run-deno-test.ts",
+      "exitCode": 0,
+      "summary": {
+        "passed": 24,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 24,
+        "uniqueFailures": 0
+      },
+      "testPaths": [
+        "packages/plugin/tests/protocol/plugin-manifest_test.ts",
+        "plugins/auth/src/adapter/resources/resources.test.ts",
+        "plugins/auth/tests/scaffold/manifest_test.ts",
+        "packages/cli/src/public/features/plugins/install/plugin-database-requirement_test.ts"
+      ]
+    },
+    {
+      "name": "public/local install, dispatch and workspace mutator",
+      "wrapper": ".llm/tools/run-deno-test.ts",
+      "exitCode": 0,
+      "summary": {
+        "passed": 81,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 81,
+        "uniqueFailures": 0
+      },
+      "testPaths": [
+        "packages/cli/src/public/features/plugins/install/install-plugin_test.ts",
+        "packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts",
+        "packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts",
+        "packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts"
+      ]
+    },
+    {
+      "name": "final selector/local install/real consumer proof",
+      "wrapper": ".llm/tools/run-deno-test.ts",
+      "exitCode": 0,
+      "summary": {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 14,
+        "uniqueFailures": 0
+      },
+      "testPaths": [
+        "packages/cli/src/public/features/plugins/install/plugin-database-requirement_test.ts",
+        "packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts",
+        "packages/cli/src/local/composition/auth-backend-database_test.ts"
+      ]
+    },
+    {
+      "name": "scoped source format",
+      "wrapper": ".llm/tools/run-deno-fmt.ts",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 21,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "selection": null,
+      "coverage": {
+        "filesSelected": 21,
+        "filesProcessed": 21,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "mode": "check"
+    },
+    {
+      "name": "scoped source check",
+      "wrapper": ".llm/tools/run-deno-check.ts",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 21,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": null
+    },
+    {
+      "name": "scoped source lint",
+      "wrapper": ".llm/tools/run-deno-lint.ts",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 21,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 21,
+        "filesProcessed": 21,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "name": "quality:gate",
+      "exitCode": 0,
+      "baselineExitCode": 0
+    },
+    {
+      "name": "docs:accuracy",
+      "exitCode": 0
+    },
+    {
+      "name": "gen:agent-docs-prose",
+      "exitCode": 0,
+      "changedPages": [
+        "llms.txt",
+        "pages/cli-reference/index.md",
+        "pages/glossary/index.md",
+        "pages/identity-access/auth/index.md",
+        "pages/identity-access/how-to/add-authentication/index.md",
+        "pages/orchestration-runtime/how-to/add-a-plugin/index.md",
+        "pages/tutorials/workspace/01-scaffold/index.md",
+        "pages/tutorials/workspace/02-auth/index.md",
+        "pages/tutorials/workspace/03-workspace-data/index.md",
+        "pages/tutorials/workspace/06-deploy/index.md",
+        "pages/tutorials/workspace/index.md"
+      ]
+    },
+    {
+      "name": "doc:lint changed protocol/scaffold",
+      "exitCode": 0
+    },
+    {
+      "name": "JSR audit auth/CLI",
+      "exitCode": 0,
+      "publishDryRun": "PASS"
+    },
+    {
+      "name": "JSR audit plugin core",
+      "exitCode": 1,
+      "baselineFindings": [
+        "missing @module on unchanged abstracts/config/testing export barrels"
+      ],
+      "publishDryRun": "PASS"
+    },
+    {
+      "name": "whole package doc-lint",
+      "status": "baseline private-type-ref findings in unchanged public contracts; not green"
+    },
+    {
+      "name": "scaffold.runtime",
+      "status": "UNPROVEN",
+      "reason": "Owner prohibits local execution; coordinator must arm e2e-cli CI"
+    },
+    {
+      "name": "resource lifecycle",
+      "runtimeStarts": 0,
+      "unknownOwnedResourcesEncountered": false
+    },
+    {
+      "name": "auth recipe and command tests",
+      "wrapper": ".llm/tools/run-deno-test.ts",
+      "exitCode": 0,
+      "summary": {
+        "passed": 19,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "docs:links",
+      "exitCode": 0,
+      "brokenLinks": 0,
+      "brokenAnchors": 0
+    }
+  ],
+  "implementationEvaluation": {
+    "round1": "FAIL_FIX",
+    "round2": "FAIL_FIX",
+    "status": "ROUND_3_AUTHORIZED_PENDING",
+    "exactHeadMergeAttestation": "UNPROVEN",
+    "round3": "AUTHORIZED_PENDING",
+    "authorization": "https://github.com/rickylabs/netscript/pull/2519#issuecomment-6542839829"
+  },
+  "documentationRepair": {
+    "status": "CORRECTED_AFTER_ROUND_2",
+    "newEvaluation": "NOT_RUN_CAP_REMAINS",
+    "checks": [
+      {
+        "name": "gen:agent-docs-prose",
+        "exitCode": 0
+      },
+      {
+        "name": "docs:accuracy",
+        "exitCode": 0
+      },
+      {
+        "name": "docs:links",
+        "exitCode": 0
+      },
+      {
+        "name": "built-site prose freshness",
+        "exitCode": 0
+      },
+      {
+        "name": "git diff --check",
+        "exitCode": 0
+      }
+    ],
+    "changedCarrierPages": [
+      "pages/tutorials/workspace/01-scaffold/index.md",
+      "pages/tutorials/workspace/03-workspace-data/index.md"
+    ],
+    "unrelatedCarrierRowsChanged": false
+  }
+}

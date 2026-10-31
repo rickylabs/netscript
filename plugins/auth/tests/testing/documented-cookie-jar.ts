@@ -50,7 +50,11 @@ export async function proveDocumentedCookieJar(recipe: string): Promise<void> {
     assertEquals(env.NETSCRIPT_AUTH_COOKIE_NAME, 'ns_session_dev');
     running = await createAuthService(
       {
-        db: { getClient: () => Promise.resolve({}) },
+        db: {
+          getClient: () => {
+            throw new Error('KV auth must not request the host SQL client.');
+          },
+        },
         contracts: {},
         kv,
         logger: {},

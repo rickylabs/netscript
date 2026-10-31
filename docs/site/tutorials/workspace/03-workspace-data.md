@@ -27,7 +27,7 @@ migrate-and-generate pass you have a typed Prisma client scoped to that datasour
 A second Postgres datasource named `workspace`, scaffolded by `netscript db add`, with `Member` and
 `Workspace` models, its own migration and its own typed Prisma client. At the end you import that
 client from `database/workspace/schema/.generated/client.server.ts` and query workspace records,
-independently of the primary database and the auth tables.
+independently of the primary database and the KV-backed auth sessions.
 
 ## Before you begin
 
@@ -37,7 +37,6 @@ too:
 
 ```sh
 # In my-workspace/, with `aspire start` up in another terminal
-netscript db status        # primary datasource is migrated (chapter 2)
 docker info                # Docker engine is running
 ```
 
@@ -149,7 +148,7 @@ with `aspire start` up:
 ] }) }}
 
 Each datasource keeps its **own** migration history and generated client. Migrating
-`--db workspace` never touches the primary Postgres or the auth tables, and the reverse holds too.
+`--db workspace` never touches the primary Postgres or the KV-backed auth sessions. Each database migration targets its selected datasource.
 
 {{ comp callout { type: "note", title: "Omitting --db targets the primary" } }}
 A <code>db</code> command without <code>--db</code> runs against the <strong>primary</strong>

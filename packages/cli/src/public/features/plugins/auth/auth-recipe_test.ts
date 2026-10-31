@@ -2,7 +2,7 @@
 import { assert, assertEquals } from '@std/assert';
 import { join } from '@std/path';
 
-Deno.test('auth recipe configures and exports credentials before starting Aspire and migrating', async () => {
+Deno.test('kv-oauth recipe exports credentials before Aspire and skips the auth SQL migration', async () => {
   const recipe = await Deno.readTextFile(
     new URL(
       '../../../../../../../docs/site/identity-access/how-to/add-authentication.md',
@@ -52,7 +52,7 @@ Deno.test('auth recipe configures and exports credentials before starting Aspire
     assertEquals(child.code, 0, new TextDecoder().decode(child.stderr));
     const events = (await Deno.readTextFile(join(root, 'events'))).trim().split('\n');
     assertEquals(events[0], 'started');
-    assert(events.includes('migrated'));
+    assertEquals(events.includes('migrated'), false);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

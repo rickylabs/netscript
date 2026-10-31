@@ -32,7 +32,8 @@ You need:
 ] }) }}
 
 - **Aspire running, if you plan to run the plugin.** Installing and registering a plugin works
-  offline. Workers, sagas and auth need a database and Redis to run: start the local stack with
+  offline. Workers and sagas need a database and Redis to run; auth needs a database only with
+  the `better-auth` backend. Start the local stack with
   `cd aspire && aspire start`, as in [Run the stack with Aspire](/explanation/aspire/).
 
 Commands target the current directory. Pass `--project-root <path>` to target another workspace,
@@ -83,8 +84,8 @@ specifier.
   ]
 } /}}
 
-{{ comp callout { type: "warning", title: "Auth needs a database and KV" } }}
-<code>netscript plugin install auth</code> installs <code>@netscript/plugin-auth</code>, emits a user-owned <code>auth/mod.ts</code> glue barrel, registers the <code>auth-api</code> service and contributes Prisma models (<code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code>, <code>auth_verifications</code>). Keep database wiring on (don't pass <code>--no-db</code>) and run the database commands in <a href="#step-3-generate-registries-and-wire-the-database">Step 3</a> so the tables exist before the service starts. <code>NETSCRIPT_AUTH_BACKEND</code> selects the backend at runtime (default <code>kv-oauth</code>); <a href="/identity-access/how-to/add-authentication/">Configure authentication</a> covers the setup.
+{{ comp callout { type: "important", title: "Auth database requirements follow the backend" } }}
+<code>netscript plugin install auth --name auth</code> installs <code>@netscript/plugin-auth</code>, emits a user-owned <code>auth/mod.ts</code> glue barrel and registers the auth service. The selected backend controls database contributions: <code>kv-oauth</code> (the default) stores its data in KV, contributes no Prisma models and works in a database-free project, including with <code>--no-db</code>. <code>workos</code> also contributes no Prisma models. Only <code>better-auth</code> contributes <code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code> and <code>auth_verifications</code>; keep database wiring enabled and run the database commands in <a href="#step-3-generate-registries-and-wire-the-database">Step 3</a> for that backend. Set <code>NETSCRIPT_AUTH_BACKEND</code> before installation so scaffolding and runtime use the same backend; <a href="/identity-access/how-to/add-authentication/">Configure authentication</a> covers provider setup.
 {{ /comp }}
 
 ### KV-only installs and projection migration
@@ -136,8 +137,23 @@ over settings.
    netscript generate runtime-schemas
    ```
 
-3. For plugins that contribute Prisma models (workers, sagas and auth), create the tables with
-   Aspire running:
+3. For plugins that contribute Prisma models (workers, sagas, and auth with the `better-auth`
+   backend), create the tables with Aspire running. Auth's default `kv-oauth` backend uses KV;
+   it contributes no Prisma models and does not require a database. The hosted `workos` backend
+   also contributes no Prisma models. Select the auth backend before installing the plugin:
+
+   ```bash
+   netscript plugin auth backend set kv-oauth
+   netscript plugin install auth --name auth --force
+   ```
+
+   Use `better-auth` instead of `kv-oauth` when you want the auth SQL tables. Installation reads
+   `NETSCRIPT_AUTH_BACKEND` from the process environment, then the project's `.env`, then
+   appsettings, and defaults to `kv-oauth`. To change an installed backend's database wiring,
+   select the backend and reinstall with `--force`. Reinstallation preserves existing tables;
+   migrate or remove unused tables explicitly when your application no longer needs them.
+
+   For the plugins that need SQL, run:
 
    ```bash
    netscript db init --name add-plugin
@@ -156,7 +172,7 @@ over settings.
    ```
 
 {{ comp callout { type: "important", title: "Start Aspire before any db command" } }}
-<code>netscript db</code> talks to the database that Aspire provisions: Postgres by default, or the <code>mysql</code>, <code>mssql</code> or <code>sqlite</code> engine you chose with <code>--db</code> at scaffold time (sqlite is file-backed and has no Aspire container resource). Run <code>cd aspire &amp;&amp; aspire start</code> first. Skip the database commands only when every plugin you added is stateless.
+<code>netscript db</code> talks to the database that Aspire provisions: Postgres by default, or the <code>mysql</code>, <code>mssql</code> or <code>sqlite</code> engine you chose with <code>--db</code> at scaffold time (sqlite is file-backed and has no Aspire container resource). Run <code>cd aspire &amp;&amp; aspire start</code> first. Skip the database commands when none of your installed plugins requires SQL, including auth with <code>kv-oauth</code> or <code>workos</code>. KV-backed state does not require Prisma tables.
 {{ /comp }}
 
 ## Step 4 — Verify the plugin is registered

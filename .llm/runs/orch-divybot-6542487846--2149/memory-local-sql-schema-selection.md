@@ -1,0 +1,5 @@
+# Local schema fallback must honor plugin scaffold selection
+
+Do not feed every `database/*.prisma` from a local package into DB integration merely because the app has a database. Ordinary local packages select SQL through emitted scaffold files; importing their raw package files changes that selection and injects PostgreSQL-only `@db.VarChar`, `@db.Text` and `@db.Uuid` into SQLite. SQLite CI fails database.codegen before runtime starts. Use source-package fallback only for local backend-selecting metadata that needs it, and keep integrity-verified package reads for JSR sources. Restrict the missing-declared-schema guard by the same source policy.
+
+Regression proof: actual public/local CLI init with SQLite, install workers from local source, then standalone db:generate. This is focused code generation and does not start Aspire or Docker. Main run41197676281 passes the same SQLite runtime gate; leaf run41200678341 failed database.codegen with86errors. Full raw logs/artifacts remain private; public evidence is job URLs and sanitized failure details.

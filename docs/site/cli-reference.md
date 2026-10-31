@@ -270,14 +270,14 @@ after your own topology replaces their callers. See the
 
 The database workflow uses Prisma with the Deno runtime. Every command below needs Aspire running
 first, except with the file-backed `sqlite` engine. The same `generate` and `migrate` pass picks up
-plugin schemas (`workers`, `sagas`, `triggers`, `auth`). The
+plugin schemas (`workers`, `sagas`, `triggers`, and `auth` with the `better-auth` backend). The
 [database & migration how-to]({{ "howto:database-migration" |> xref }}) walks through the workflow.
 
 {{ comp.apiTable({
   caption: "Database workflow (Aspire must be running)",
   rows: [
     { name: "Initialize + first migration", type: "netscript db init --name init", desc: "Initialize database tooling and create the named migration." },
-    { name: "Generate the client", type: "netscript db generate", desc: "Generate the Deno-runtime Prisma client (and zod) — including plugin schemas such as <code>auth.prisma</code>." },
+    { name: "Generate the client", type: "netscript db generate", desc: "Generate the Deno-runtime Prisma client (and zod) — including plugin schemas such as <code>auth.prisma</code> when the auth backend is <code>better-auth</code>." },
     { name: "Migrate & seed", type: "netscript db migrate · netscript db seed", desc: "Apply migrations (including each plugin's contributed schema), then run the workspace seed scripts." },
     { name: "Inspect", type: "netscript db status · netscript db studio", desc: "Show migration/tooling status, or open the database studio for browsing data." },
     { name: "Recover", type: "netscript db introspect · netscript db reset", desc: "Introspect the configured database, or reset it back to a clean state." },
