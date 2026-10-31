@@ -255,3 +255,9 @@
 - 13:28:53Z: **merged** #2519 (`a9620a34e`) for #2149 (B2). #2149 is kept open while its worker is live (continuation check). #2108 is now unblocked (all requires edges merged).
 - 13:29:05Z: **expensive-gate.acquired** on #2520 (#1367) at `b3537c2` (merge-tree with main clean).
 - 13:30:02Z: dispatched #2108 (B2 capstone, moved features → fixes; drift recorded), comment 6543997755. Validator green.
+- 13:30:23Z: #2390 → PR #2534.
+- 13:35:24Z: #2108 started 13:34Z.
+- 13:38:49Z: #2108 → PR #2535.
+- 13:43:05Z: **merged** #2520 (`eb9a1299b`) for #1367 (C1); #1367 auto-closed, evidence posted.
+- 13:43:16Z: **expensive-gate.acquired** on #2530 (#2384) at `d9c3d6a`.
+- 13:44:05Z: dispatched #1912 (G1 verification, box 8 published smoke on Linux and Windows), comment 6544155256. Validator green.
