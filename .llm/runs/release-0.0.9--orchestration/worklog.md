@@ -231,3 +231,10 @@
 - 12:41:28Z: dispatched #2373 (C1 test-only, internals), comment 6543487801. The 12:34Z continuation claim (the #2382/#2377 worker) was orphaned: workspace gone, no PR. Validator green.
 - 12:42:49Z: **merged** #2521 (`b11c26c2f`) for #2268, partial (Refs); #2268 stays open for the box-1 live-AppHost proof (proof leaf to dispatch).
 - 12:43:43Z: dispatched #2269 (E2, internals), comment 6543511422, with the embedded-docs decision: one corpus generated once, served by get_doc, find_guidance and search_docs; the leaf picks the package seam under PLAN-EVAL. Validator green.
+- 12:44:41Z: **merged** #2525 (`46b22e636`) for #2377 (C1); #2377 closed with evidence.
+- 12:45:07Z: dispatched #2384 (F1, features), comment 6543525844. Validator green.
+- 12:47:02Z: #2373 started 12:46Z.
+- 12:50:30Z: #2374 READY (PR #2526, Opus MERGE `621f5df`); e2e queue: #2519 (running) → #2526 (B1 critical path) → #2520. #2269 and #2384 started 12:49Z.
+- 12:52:23Z: #2373 → PR #2528.
+- 12:54:35Z: #2519 (#2149) e2e RED at `3b219fd`: Postgres tier aspire-start, the auth resource exits (state=Finished). Product failure. Steered the worker, removed the label; **expensive-gate.released**.
+- 12:54:46Z: #2269 → PR #2529; #2384 → PR #2530. **expensive-gate.acquired** on #2526 (#2374) at `621f5df`.

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "b11c26c2f9f20c718d606acc32c6d4349cdb86a3",
+  "currentMainSha": "46b22e63608eb4ba067145445b523536d6e48aa9",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -301,7 +301,10 @@
     },
     {
       "number": 2377,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2525 46b22e636"
+      ]
     },
     {
       "number": 2379,
@@ -958,7 +961,7 @@
     {
       "id": "B2-2149",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2519,
       "headSha": "3b219fd2f90346eaffa83935434f106a41a57e5a",
@@ -967,7 +970,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2149",
       "receiptRefs": [],
-      "note": "SQLite repair 3b219fd; Opus MERGE; READY; e2e re-armed"
+      "note": "e2e red at 3b219fd: postgres aspire-start auth state=Finished; steered"
     },
     {
       "id": "C1-1367",
@@ -1037,20 +1040,21 @@
     {
       "id": "B1-2374",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2526,
-      "headSha": "67019ef42973483bc590e81acb27c4c43a607e2c",
+      "headSha": "621f5df9b0a7965bf93f636fec41772e26b3085b",
       "issueNumbers": [
         2374
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2374",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY; Opus MERGE 621f5df; e2e queued (B critical path: next after #2519)"
     },
     {
       "id": "C1-2377",
       "lane": "features",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2525,
       "headSha": "014f2c454d31cd20fc865b9a5f65cb90e8f822b7",
@@ -1059,7 +1063,49 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2382 (continuation)",
       "receiptRefs": [],
-      "note": "READY 014f2c4; Opus MERGE; no runtime wiring change, so required CI only"
+      "note": "READY 014f2c4; Opus MERGE; required CI green; kv only",
+      "mergeCommit": "46b22e63608eb4ba067145445b523536d6e48aa9",
+      "mergedAt": "2026-10-31T12:44:24Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2377"
+    },
+    {
+      "id": "C1-2373",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2528,
+      "headSha": "2d9be85ebd365201b5b0b00f5065d2f316884de8",
+      "issueNumbers": [
+        2373
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2373",
+      "receiptRefs": []
+    },
+    {
+      "id": "E2-2269",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2529,
+      "headSha": "2657b0be7ebdeeab0a02104abd03fb50fb4e47dd",
+      "issueNumbers": [
+        2269
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2269",
+      "receiptRefs": []
+    },
+    {
+      "id": "F1-2384",
+      "lane": "features",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2530,
+      "headSha": "743f5b94ce715dd72b4a6d8a44f06aeab0c7d6f0",
+      "issueNumbers": [
+        2384
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2384",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [
@@ -1347,11 +1393,21 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2519,
       "headSha": "3b219fd2f90346eaffa83935434f106a41a57e5a",
       "startedAt": "2026-10-31T12:40:39Z",
-      "via": "label e2e-cli-gate (re-armed at READY)"
+      "via": "label e2e-cli-gate (re-armed at READY)",
+      "result": "FAILURE postgres tier aspire-start: auth resource Finished (product failure); label removed",
+      "completedAt": "2026-10-31T12:53:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2526,
+      "headSha": "621f5df9b0a7965bf93f636fec41772e26b3085b",
+      "startedAt": "2026-10-31T12:54:46Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1383,11 +1439,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T12:42:49Z",
-    "nextReportDueAt": "2026-10-31T13:42:49Z",
+    "lastReportAt": "2026-10-31T12:44:41Z",
+    "nextReportDueAt": "2026-10-31T13:44:41Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2521 (#2268 partial)",
-    "currentMainSha": "b11c26c2f9f20c718d606acc32c6d4349cdb86a3",
+    "headline": "merged #2525 (#2377); e2e #2519 running; #2520 next",
+    "currentMainSha": "46b22e63608eb4ba067145445b523536d6e48aa9",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1573,7 +1629,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T12:43:43Z",
+  "updatedAt": "2026-10-31T12:54:48Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1931,9 +1987,10 @@
       "commentId": 6543487801,
       "postedAt": "2026-10-31T12:41:28Z",
       "route": "codex gpt-6.1-sol medium",
-      "state": "posted",
-      "pr": null,
-      "relaunchOf": "orphaned-continuation"
+      "state": "pr-open",
+      "pr": 2528,
+      "relaunchOf": "orphaned-continuation",
+      "startedAt": "2026-10-31T12:46:48Z"
     },
     {
       "issue": 2269,
@@ -1941,8 +1998,19 @@
       "commentId": 6543511422,
       "postedAt": "2026-10-31T12:43:42Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "posted",
-      "pr": null
+      "state": "pr-open",
+      "pr": 2529,
+      "startedAt": "2026-10-31T12:49:56Z"
+    },
+    {
+      "issue": 2384,
+      "lane": "features",
+      "commentId": 6543525844,
+      "postedAt": "2026-10-31T12:45:06Z",
+      "route": "codex gpt-6.1-sol high",
+      "state": "pr-open",
+      "pr": 2530,
+      "startedAt": "2026-10-31T12:49:55Z"
     }
   ],
   "coordinatorArtifactPr": 2475,

@@ -36,3 +36,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 12:19 | `14816a409` | #2522 | #2382 | W6 (B1) | B1 chain complete except #2374 and #2159's held follow-up; status migration |
 | 2026-10-31 12:40 | `a5bca5312` | #2523 | #2394 | W4 (E1) | **E1 complete** |
 | 2026-10-31 12:42 | `b11c26c2f` | #2521 | #2268 (partial) | W5 (E2) | box 1 live-AppHost proof owed (issue open) |
+| 2026-10-31 12:44 | `46b22e636` | #2525 | #2377 | W4 (C1) | continuation of the #2382 worker |
