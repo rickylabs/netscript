@@ -616,6 +616,16 @@ Uncertain settlement errors surface without a speculative release. Optional C4-c
 selects finite command attributes and preserves deferred/producer propagation without raw identity
 attributes. The database owns leases; no second relay, queue or runtime DDL is introduced.
 
+The sagas plugin contributes the Prisma command outbox model and its reviewed SQL constraints.
+Apply the normal application migration after installation. For bounded maintenance, the PostgreSQL
+relay store exposes `pruneSettled`; the composed saga API also prunes atomic replay keys according
+to terminal completion and the saga group's completed-retention window (default seven days).
+Pending work, leases and active saga markers survive; eligibility is rechecked at deletion.
+See [outbox retention](../database/index.md#bounded-outbox-retention) and the
+[Prisma saga retention recipe](../plugin-sagas-core/index.md#installed-outbox-schema-and-postgresql-retention)
+for migration, policies and persisted cursor examples.
+
+
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `createCommandOutboxRelay` | function | `function createCommandOutboxRelay(options): RunningCommandOutboxRelay` | Compose the one bounded decoded relay. |

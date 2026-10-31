@@ -18,6 +18,7 @@
 
 import { appendPluginMigrations, pendingPluginMigrations } from './plugin-migrations.ts';
 
+/** Application migration inputs, execution bounds and injectable process boundary. */
 export interface MigrationOptions {
   /** Database provider ('mssql' | 'postgres' | 'mysql' | 'sqlite') */
   provider: 'mssql' | 'postgres' | 'mysql' | 'sqlite';

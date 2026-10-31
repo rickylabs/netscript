@@ -50,3 +50,13 @@ Real fresh/adoption install scenarios pass; fresh case runs nine retention tests
 Reconcile: S1 CI repair now green at 1f07678, https://github.com/rickylabs/netscript/actions/runs/41163838807 . No unresolved review threads.
 
 S2 sign-off: full canonical native PostgreSQL conformance script exit 0 (new install/retention, existing command/relay, atomic transitions, saga-relay cohort and runtime publisher); all seven outer tests passed, with nine new retention child tests. Post-restoration structured check/lint/format exit 0; quality:gate exit 0. Independent final slice confirmation PASS. JSR dry-runs are OK; audit surfaced pre-existing missing module tags on saga backend and plugin doctor entrypoints; repair those documentation tags in S3 before final audit. No accepted debt.
+
+## S3 docs and public surface
+
+Documented schema/SQL installation, normal migration and optional copied-model adoption, group policy map, persisted cursors, canonical parent lifetime, strict cutoff, leased/pending safety, bounded work and independent page commits in saga reference and database/service relay docs. READMEs/changelogs updated. Independent substantive S3 review PASS. Added missing module tags surfaced by JSR audit and a MigrationOptions summary. Re-exported the new referenced database result type to remove the one introduced doc-lint finding.
+
+Docs exports coverage PASS. All 475 JSDoc examples compile (zero enforced failures). Documentation snippet gate exit 0. Database doc-lint clean; saga core/plugin full-export doc-lint matches isolated main baseline exactly (7/30 inherited private references), see doclint-baseline.md; these are not claimed green. Generated corpus/prose/assets refreshed with repository generators; final freshness checks follow. Baseline verification worktree cleaned.
+
+S3 gate completion: structured source check/lint/format exit 0; quality:gate exit 0; docs:exports-drift PASS; docs snippet gate exit0; all 475 JSDoc examples PASS. JSR audits/dry-runs pass for database, saga core, saga plugin and affected CLI, with existing warnings only. Corpus freshness, prose freshness (253 rendered HTML pages), assets-barrel direct freshness and publish-assets checks pass. Corpus was generated with the explicit --allow-dirty development flag before commit; clean committed regeneration/regression follows. Review-thread gate PASS, zero threads/unanswered. S3 independent supervisor PASS; no newly introduced doc-lint errors; inherited findings remain explicitly unproven as documented.
+
+Reconcile: PR remains draft while final evaluation is pending; no taxonomy changes or engine/lock churn. Required scaffold.runtime will be requested in READY for coordinator-controlled CI.

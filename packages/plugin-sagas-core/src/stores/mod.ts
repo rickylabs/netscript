@@ -101,6 +101,7 @@ export type {
   SagaTransitionStore,
 } from '../ports/saga-transition-commit-port.ts';
 export type {
+  CommandOutboxRetentionResult,
   DatabaseProvider,
   IsolationLevel,
   PostgresCommandClient,

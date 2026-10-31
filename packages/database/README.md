@@ -234,3 +234,13 @@ settlement even if nobody has claimed the row again. Consumer operations must re
 this is at-least-once delivery. The native PostgreSQL gate runs both command-store and relay-store
 generated-client conformance and owns its provider cleanup. Supplied provider operations need
 consumer-owned network permissions; framework construction needs none.
+
+### Outbox maintenance
+
+The PostgreSQL relay store also exposes `pruneSettled({ now, limit, completedRetentionDays, afterId })`.
+The default window is seven days and a page examines/deletes at most 100 primary-key rows, including
+retained rows. Persist `nextAfterId` until the sweep finishes. Only expired published/terminal rows
+with no lease are deleted, with eligibility rechecked at deletion. The saga plugin installs the
+outbox schema and SQL CHECK sidecar; normal migration tooling appends pending SQL before deploying.
+For atomic saga keys, compose `createPrismaSagaCommandRetention` from the saga stores subpath.
+See the [outbox reference](https://rickylabs.github.io/netscript/reference/database/#bounded-outbox-retention).
