@@ -413,7 +413,10 @@
     },
     {
       "number": 2396,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "published-graph proof at 0.0.9-canary.1 (receipts/release/2396-published-graph.md)"
+      ]
     },
     {
       "number": 2400,
@@ -1803,7 +1806,7 @@
       "state": "planned",
       "targetDate": "2026-11-02",
       "rationale": "H01 main CI green, A1-A3 silent job/queue loss, D1 #2396 guarded plugin services (waves 1-3 critical path).",
-      "note": "READY TO CUT: candidate 15cffa2fe; readiness posted on #2474 11:52Z (comment 6542998232); main green; Eric cuts | SUPERSEDED by the combined candidate 6c3f8a118 (readiness 18:16Z, comment 6547307997)"
+      "note": "PUBLISHED 0.0.9-canary.1 from f4aa307b5 (release-canary 41244658746; canary-pair success; e2e-cli-prod 41245117092) \u2014 combined content of the planned .1/.2 plus Fresh UI S6a"
     },
     {
       "id": "0.0.9-canary.2",
@@ -1827,10 +1830,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T21:26:31Z",
-    "nextReportDueAt": "2026-10-31T22:26:31Z",
-    "lastReportRef": "worklog.md",
-    "headline": "recut pending: #2549 merged (f4aa307b5); waiting on push CI, then release-canary",
+    "lastReportAt": "2026-10-31T22:07:20Z",
+    "nextReportDueAt": "2026-10-31T23:07:20Z",
+    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
+    "headline": "0.0.9-canary.1 published; left: #2406 decision",
     "currentMainSha": "f4aa307b5340bd3de8029c11778a38bbca451ba1",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -2017,7 +2020,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T21:26:31Z",
+  "updatedAt": "2026-10-31T22:07:21Z",
   "dispatches": [
     {
       "issue": 2438,
