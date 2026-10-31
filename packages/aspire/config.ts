@@ -271,6 +271,11 @@ export interface PluginEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
    * @deprecated Use {@link PluginEntry.Environment}.
    */
   Env?: Readonly<Record<string, string>>;
+  /**
+   * AppHost-provisioned directories keyed by environment variable. Relative paths
+   * resolve from Workdir; bindings override Environment. Omit for no provisioning.
+   */
+  DataDirectories?: Readonly<Record<string, string>>;
   /** Saga-specific metadata for saga plugin resources. */
   Sagas?: SagaResourceConfig;
 }
@@ -572,6 +577,10 @@ const PluginEntryZod = z.object({
   HealthCheckPath: z.union([z.string().min(1), z.literal(false)]).optional(),
   RequiresKv: z.boolean().default(false),
   RequiresDb: z.boolean().default(false),
+  DataDirectories: z.record(
+    z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/),
+    z.string().refine((path) => path.trim().length > 0, 'Directory path must not be blank'),
+  ).optional(),
   Sagas: SagaResourceConfigZod.optional(),
 }).meta({ title: 'PluginEntry', description: 'Configuration for a plugin service resource' });
 /** Plugin entry schema. */

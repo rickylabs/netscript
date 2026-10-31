@@ -116,6 +116,8 @@ export const GATE = {
   BEHAVIOR_UI_RENDER: 'behavior.ui-render',
   BEHAVIOR_MCP_WIDGET_ROUNDTRIP: 'behavior.mcp-widget-roundtrip',
   RUNTIME_AUTH_SMOKE_ENV: 'runtime.auth-smoke-env',
+  RUNTIME_STREAMS_STORAGE_FIXTURE: 'runtime.streams-storage-fixture',
+  BEHAVIOR_STREAMS_STORAGE_RESTART: 'behavior.streams-storage-restart',
   RUNTIME_FLOW_B_FIXTURE: 'runtime.flow-b-fixture',
   RUNTIME_READINESS_FIXTURE: 'runtime.readiness-fixture',
   RUNTIME_SERVICE_ENV_FIXTURE: 'runtime.service-env-fixture',

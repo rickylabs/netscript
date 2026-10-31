@@ -15,13 +15,25 @@ Archetypes: 5 (streams integration), 2 (Aspire contract), 6 (generated AppHost);
 3. Missing parent directories are created only for this opt-in. Empty/invalid declarations fail
    config validation. A file at the target or permissions failure aborts AppHost composition. Existing
    Environment.STREAMS_DATA_DIR remains a manually provisioned opt-in with unchanged fail-closed rules.
-4. Prove generated helper execution, config roundtrip and default off. Add a generated-project
-   Aspire proof that verifies memory health, then explicit file mode, producer documents readable
-   before resource restart and identical afterward. Subscribe to Aspire resource transitions before
-   restart and use exact logical resource names. No fabricated local runtime PASS.
-5. Full scaffold.runtime is CI-only on this shared host; request coordinator's e2e-cli-gate label.
-   Add the proof to the appropriate runtime suite or expose a focused generated-project acceptance
-   command if fixture lifecycle requires it; explain any unresolved execution evidence explicitly.
+4. Prove generated helper execution, config roundtrip and default off. Before runtime start, a new
+   `runtime.streams-storage-fixture` gate keeps a copy of the pristine streams config as
+   `streams-ephemeral-control` and adds DataDirectories.STREAMS_DATA_DIR to the original `streams`.
+   It regenerates Aspire helpers with the same local/published CLI source used by the suite.
+   Thus there is one AppHost start with both modes; resource restart never pretends to reconfigure it.
+   The service directory is NOT created by the fixture: only the generated AppHost may create it.
+5. A new `behavior.streams-storage-restart` gate in both scaffold.runtime tiers checks the generated
+   ephemeral control health (memory/durable:false), file health (file/durable:true/probe:passed),
+   provisions a real producer document and tombstone, requires nonempty exact HTTP reads, subscribes
+   to streams updates, executes `aspire resource streams restart`, waits for the new healthy process,
+   and requires identical HTTP history after restart. It uses the exact logical name `streams`.
+6. CI: `e2e-cli` (armed by coordinator e2e-cli-gate) executes both fixture and restart gates in the
+   one-pass scaffold.runtime suite. Do not run that full suite locally. A focused generated-project
+   AppHost with just streams and its ephemeral control may run locally to exercise this one gate.
+   Negative controls: execute on/off contribution and generated helper tests with directory wiring
+   reverted; execute restart-gate evaluator tests with memory file-health, empty/changed before/after
+   reads and failed restart evidence. In the focused Aspire proof also remove the emitted directory
+   provisioning/binding, restart the AppHost, and require failure; retain the red result. An unrun
+   runtime/CI acceptance remains unchecked in READY; never mark it passing from synthetic evidence.
 
 ## Open-decision sweep
 
