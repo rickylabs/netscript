@@ -39,3 +39,15 @@ message may atomically replace its stranded active marker, with fenced completio
 healthy job/task execution renews its queue lease and aborts on ownership loss. Completed
 markers still suppress effects. This integration is necessary for the issue's worker recovery
 acceptance, and does not change listen concurrency. The coordinator still owns runtime CI.
+
+Final review W1 follow-up: job-dead-letters_test.ts settlement expectations and
+worker-lease-survival_test.ts are in scope. Expected queue requeue decisions settle via nack
+and return normally, preserving the listener supervisor budget. Missing/disabled task behavior
+remains acknowledgement; actual claim-store failures remain recoverable. No supervisor or listen
+loop rewrite. Round5 exhausted the authorized evaluation cycle; corrected-head review needs a
+coordinator-authorized fresh cycle, not a silently launched sixth round.
+
+CI test-4 follow-up: helpers/tests/generated-helpers-compile_test.ts needs the existing
+container withArgs capability in its minimal restored SDK contract, now exercised by Garnet
+Lua flags. Preserve strict explicit methods; add Container-mode coverage rather than loosen
+the SDK type. This is a test-contract update, not a new production generator API.

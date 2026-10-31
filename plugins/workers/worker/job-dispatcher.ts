@@ -217,7 +217,11 @@ export async function processWorkerJob(
       error instanceof Error && error.name === 'ShutdownError' ||
       writingDeadLetter || terminalRecorded || executionSucceeded;
     try {
-      if (requeue) throw error;
+      if (requeue) {
+        if (!queueContext) throw error;
+        await queueContext.nack({ requeue: true });
+        return;
+      }
       if (!(error instanceof Error && error.name === 'AbortError')) {
         await deadLetter(
           error instanceof Error ? error.message : String(error),
@@ -254,6 +258,7 @@ export async function processWorkerTask(
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;
   let executionSucceeded = false;
+  let claimAttempted = false;
   const lease = new WorkerDeliveryLease(queueContext, context.shutdownSignal);
 
   console.log(`[Worker ${context.workerId}] Processing task '${taskId}' (trigger: ${triggeredBy})`);
@@ -264,6 +269,7 @@ export async function processWorkerTask(
     if (!taskDef) throw new Error(`Task '${taskId}' not found in registry`);
     if (!taskDef.enabled) throw new Error(`Task '${taskId}' is disabled`);
 
+    claimAttempted = true;
     claim = await context.idempotency.claim({
       concept: 'task',
       targetId: taskId,
@@ -345,9 +351,12 @@ export async function processWorkerTask(
       );
     }
     if (
-      executionSucceeded || !claim || lease.signal.aborted ||
-      (!claim.claimed && !claim.alreadyApplied)
-    ) throw error;
+      executionSucceeded || lease.signal.aborted || (claimAttempted && !claim) ||
+      (claim && !claim.claimed && !claim.alreadyApplied)
+    ) {
+      if (!queueContext) throw error;
+      await queueContext.nack({ requeue: true });
+    }
   } finally {
     await lease.stop();
   }

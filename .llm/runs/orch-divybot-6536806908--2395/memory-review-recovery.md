@@ -24,3 +24,14 @@
   an arbitrary worker/_fixtures directory which worker/**/*.ts would publish.
 - Worker-core combined doc-lint has two unchanged private-type-ref baseline diagnostics in
   src/contracts/v1/workers.contract-types.ts; restoring original worker code confirms them.
+
+- Redis adapter rethrows handler failures after nack. WorkerListenerSupervisor's restart count
+  is lifetime-bounded (default3). Expected queue retry outcomes must explicitly context.nack
+  and return normally; otherwise four ordinary messages can permanently stop a listener.
+  Direct dispatcher consumers without queue context still reject failed replay attempts.
+
+- Generator changes need generated-helpers-compile_test.ts in the validation set as well as
+  emitted-string assertions. Its minimal Aspire SDK fixture must model each exercised real
+  capability explicitly: container withArgs(string[]) is part of Aspire.Hosting 13.5.3.
+  CI shard4 uploads test.report.json even when condensed logs omit the failure; download the
+  specific gate-receipts artifact and read structured failures before guessing at the cause.

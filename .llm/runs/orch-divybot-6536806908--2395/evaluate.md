@@ -104,3 +104,24 @@ contract/runtime fixes and real-backend negative controls, recorded in the workl
 review-follow-up-validation.json. The next and final round5 must review the exact pushed
 rebased/fixed commit; publish its verdict on the PR and in the canonical READY handoff.
 The earlier MERGE line is historical evidence, not certification of the changed head.
+
+
+## Round 5 — exact pushed review follow-up: CHANGES
+
+Reviewed 1edb71eeeb72ddd4d84327bc9bd97f79ce5c31b3, local/remote/PR head equal and clean.
+One blocker W1: throwing expected task/job requeue outcomes spends Redis listener supervisor
+restarts and permanently stops consumption after four failures. Disabled/removed tasks fail
+before claim; active duplicates and lost leases repeat the failure. Review accepted timeout,
+keyPrefix, fenced idempotency takeover and heartbeat logic; no other code blockers found.
+
+Corrective slice explicitly nacks and returns for retryable outcomes, retains original ACK
+behavior for disabled/missing tasks, and preserves direct non-queue dispatcher rejection.
+Real backend tests enqueue six disabled tasks, six in-flight caller-key duplicates, and six
+lost-lease jobs, asserting zero listener restarts and successful subsequent valid work. Initial
+four task-survival tests all fail against the reviewed implementation (runtime timeouts).
+
+VERDICT: CHANGES 1edb71eeeb72ddd4d84327bc9bd97f79ce5c31b3
+
+The supplied feature cycle allows at most five implementation evaluations. A corrected-head
+MERGE verdict is unproven until the coordinator authorizes a fresh evaluation cycle; do not
+silently launch round6 or self-certify the correction. Exact-head acceptance remains unchecked.

@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import { delay } from '@std/async';
 import { DenoKvAdapter } from '@netscript/kv';
 import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
@@ -166,13 +166,18 @@ Deno.test('worker shutdown cancels its real subprocess and cannot mark effects a
       return executor.execute(task, options);
     },
   }, shutdown.signal);
+  let requeued = 0;
   const delivery: MessageContext = {
     messageId: 'cancel-task',
     deliveryCount: 1,
     enqueuedAt: new Date(),
     headers: {},
     ack: () => Promise.resolve(),
-    nack: () => Promise.resolve(),
+    nack: (options) => {
+      assertEquals(options?.requeue, true);
+      requeued++;
+      return Promise.resolve();
+    },
     extendVisibility: () => Promise.resolve(true),
   };
   const result = processWorkerTask(context, {
@@ -184,7 +189,8 @@ Deno.test('worker shutdown cancels its real subprocess and cannot mark effects a
   await started.promise;
   await delay(100);
   shutdown.abort();
-  await assertRejects(() => bounded(result, 5_000));
+  await bounded(result, 5_000);
+  assertEquals(requeued, 1, 'shutdown requeues without rejecting the listener handler');
   const retry = await store.claim({
     concept: 'task',
     targetId: 'cancel',

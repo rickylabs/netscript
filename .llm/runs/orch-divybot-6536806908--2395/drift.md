@@ -30,3 +30,9 @@ port/store and plugin dispatch scope explicitly: replace only a same-message old
 claim with atomic CAS, fence marker completion/release, renew healthy execution, and propagate
 cancellation to subprocesses. Preserve the newly landed main retry/DLQ behavior. Scope is
 necessary to prove actual first-party worker recovery, not a listen concurrency rewrite.
+
+
+Round5 CHANGES found one worker integration blocker W1 after the four Augment fixes. Correct
+message-settlement policy rather than change restart limits or concurrency: explicit nack and
+normal handler return for queue requeue outcomes. The feature evaluation cycle is exhausted;
+corrected-head review is explicitly unproven pending a coordinator-authorized fresh cycle.

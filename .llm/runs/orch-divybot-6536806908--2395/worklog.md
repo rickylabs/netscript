@@ -207,3 +207,45 @@ real crash/long-subprocess integration, and both generator suites. MCP corpus te
 Structured check/lint/fmt cover 101 files without dropped files or findings. Native MCP corpus
 freshness, assets barrel and publish assets checks pass; corpus regenerated from final sources.
 Sign off and push the rebased fix slice; final independent exact-head review and remote CI follow.
+
+
+## Round5 W1 correction
+
+Final independent review returned CHANGES at 1edb71e: explicit requeue by throwing exhausts
+WorkerListenerSupervisor's lifetime restart budget on Redis. Fix the authorized code before
+requesting a fresh evaluation cycle: job/task queue retry paths explicitly nack and return;
+pre-claim disabled/missing task errors retain main's ACK behavior. Claim-store failures and
+failed successful-effect persistence still requeue. Direct non-queue consumers retain rejection
+for replay safety. Task listener catches unexpected dispatch errors with explicit nack.
+
+No change to Redis listen concurrency, supervisor policy or restart limits. The existing job
+DLQ outage test now expects two normal handler returns and zero rejections, while retaining
+its two execution/write attempts, exactly one durable DLQ record and zero pending/processing
+assertions. Real task-subprocess shutdown now asserts explicit nack and normal handler return.
+Four new real Redis/Garnet task-survival tests fail on reviewed source, then pass with the fix.
+A further lost-job-lease test per backend covers the same policy on the job listener.
+
+
+CI check-test-shard test-4 at 1edb71e has 1459 passed, 1 failed, 5 ignored. Downloaded its
+structured test.report.json artifact: generated-helpers-compile_test.ts fails because the
+minimal restored SDK fixture omits container withArgs. The capability is already used for
+DenoKv containers and documented by Aspire.Hosting 13.5.3 at
+https://aspire.dev/reference/api/typescript/aspire.hosting/withargs/.
+Add the explicit withArgs(string[]) contract, retain strict methods, add Container-mode Garnet
+fixture coverage, and assert emitted Lua flags. This repairs the fixture's incomplete API
+model rather than relax compilation or change the working production launch method.
+
+
+Corrected combined suite:281 passed,0 failed,2 CI-only sentinels skipped. A first rerun had
+two test-only assertions using the wrong listener name (job:jobs vs actual jobs:jobs); corrected
+the test and reran the full command to green. All six new survival tests pass on both backends.
+Worker check/lint/fmt32files pass; quality/architecture/deps and native MCP corpus freshness pass.
+Generated helper compile + generator suites52pass; final compile test rerun1pass. The two
+legacy inline standard-library imports in that touched fixture now use workspace aliases, so
+its scoped lint and typecheck pass without suppressions or root formatting changes.
+
+Sign off/push the concrete corrected slice. Exact corrected-head independent review remains
+unproven: authorized round5 returned CHANGES on the prior head and the feature cycle is exhausted.
+Coordinator action required: authorize a fresh cycle in the same evaluator session and arm the
+required scaffold-runtime CI label. No self-certification, sixth round, local scaffold E2E,
+labels/milestones, merge or release in this run.
