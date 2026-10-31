@@ -1,5 +1,13 @@
 # Worklog
 
+Follow-on test-6 local repair: actual CI report1783/1/7 identifies ESRCH on a disappearing owned PID. Local before29/0/0 does not reproduce the race and is not used to waive it. Shared already-tested termination probe now serves both executor suites; after30/0/0,3-file structured wrappers and canonical preflight/root quality pass. Zombie/ENOENT/ESRCH acceptance, living-to-zombie two reads and strict unexpected-error controls remain/add coverage. Actual cancellation/timeout, subprocesses, exit/time bounds and watchdog unchanged. Original test-2/test-5 are SUCCESS in run41155740922, which failed only test-6 plus aggregator. Same independent evaluator and fresh every-required-check CI are still required before renewed READY.
+
+## Follow-on Linux liveness probe repair — design
+
+Final all-required watcher correctly withheld READY when run41155740922 at8664aa3d6 failed test-6:1783 passed/1 failed/7 ignored, process tree timeout case throws generic No such process (os error3) while reading /proc/<owned pid>/stat. Test-2 is green. This file matches main byte-for-byte, but that is not matching failed-main evidence; no flake waiver is claimed.
+
+Public production surface is unchanged. The test-domain concept is owned-PID termination (gone or zombie), with Deno filesystem IO as the existing seam. Extract the sibling process-review-regressions_test.ts's already-tested terminated probe into process-termination.ts and reuse it from both test files. Preserve its50-attempt/10ms bounds, actual subprocess cancellation/timeout assertions, kill watchdog and permission/unexpected-error propagation. Add a living-to-zombie control so a live PID cannot be declared terminated. One bounded test-only slice; focused executor tests, structured wrappers, canonical preflight/quality, retained native Opus review and fresh full required CI are gates. No main rerun/waiver, workflow/skip/timeout/dependency change or new production abstraction. Contributor path is the existing executor regression tests plus their shared probe.
+
 2026-10-31 shard repair local proof: focused baseline reproduces exactly2 count failures (30/2/0, exit1). Current tests compare full names/order with public TOOL_NAMES and smoke all4 registry calls over actual stdio, preserving all previous pin/restart/triad/docs/doctor/denial/export checks. Focused repaired suite32/0/0, both-file structured check/lint/fmt0 findings/drops/refusals, canonical preflight and root quality PASS. No production, fixture, timeout, ignore, shard manifest, dependency or lock change. Source review and EVERY-required-context/current-run shard proof remain pending; quality-only READY is superseded. See2026-10-31-shard-repair.md.
 
 ## Coordinator shard repair — design checkpoint, 2026-10-31

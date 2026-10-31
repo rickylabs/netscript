@@ -1,5 +1,9 @@
 # S2 registry v2 supervision
 
+## Follow-on required test-6 repair
+
+Run41155740922 at8664aa3d6 fixes test-2 but exposes an independent Linux ESRCH race in stdin-payload_test.ts's inline liveness probe. The source file is unchanged from main, but no failed matching main run proves a waiver; repair it on this branch under the coordinator's authorization. Writable surface adds packages/plugin-workers-core/tests/executor/{stdin-payload_test.ts,process-review-regressions_test.ts,process-termination.ts}. Share the existing sibling probe that already handles ENOENT and ESRCH; preserve actual cancellation/timeout/kill/latency and unexpected-I/O assertions. Test-only, no process-runner production change, skip, timeout increase or policy waiver. Require independent review and fresh EVERY-required-check green at the next exact head.
+
 ## Coordinator repair — every required CI check, 2026-10-31
 
 Baseline5e51beb38e6fd98bd07122bb906075d0ff8b1da3; same branch/PR2468. Downloaded run41153807515 test-2/test-5 structured receipts prove one failure per shard: agent-init restart and real stdio smoke both expect22 tools while the S2 catalog correctly exposes26. These are branch regressions; main-flake classification is not claimed. Writable scope adds packages/cli/src/public/features/agent/init/init-agent_test.ts and packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts plus run evidence. Preserve production code, prior-release fixture/pinning behavior and existing assertions. Replace stale cardinality-only expectations with exact public catalog comparison and strengthen the stdio smoke for all4 registry operations. Final gate now requires EVERY required GitHub context green at the exact final head, including current-run check-test and all shards, not quality alone or skipped/stale placeholders. Stop for Cockpit merge; no labels/new PR/force push/self-merge/release.
