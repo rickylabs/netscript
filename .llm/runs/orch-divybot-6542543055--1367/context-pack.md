@@ -2,7 +2,9 @@
 
 Issue #1367, PR #2520, branch orch/divybot-6542543055; baseline main
 851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2. PLAN-EVAL PASS after one corrective round.
-Current phase: independent slice/implementation review PASS; implementation ready for commit/push.
+Current phase: implementation pushed and ready for review; CI follow-up refreshes the embedded
+streams docs prose. Prior exact-head reviewer approved 57193c427042a6fdbc1ee1bcff6e61d2d55bf1ea.
+Any new commit needs refreshed exact-head review and full runtime CI evidence.
 
 Implementation: optional PluginEntry.DataDirectories map; generated registration provisions absolute
 paths and binds env before launching; streams contribution optional dataDir emits the core directory
@@ -20,3 +22,9 @@ evaluate.md for verdict/limits. Raw local logs are intentionally outside Git. Re
 using the existing claude-print wrapper with the owner model/high effort and stdin closed.
 Final evaluator must review exact pushed final head; preserve its verdict through public PR phase
 comment and the excluded final report, without moving the head afterward.
+
+Current CI issue: quality's agent-docs-prose freshness check. Native generators change only the
+embedded streams page; no runtime changes or removed corpus entries. Close-gate's nine issue boxes
+now carry executed evidence; only the full-runtime CI checkbox remains genuinely unproven. Existing
+e2e-cli workflow was manually dispatched on GitHub-hosted VMs without labels, in response to owner
+CI repair requests. New-head dispatch must supersede old-head CI after this prose-only commit.

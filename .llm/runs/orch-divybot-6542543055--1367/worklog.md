@@ -67,3 +67,23 @@ restored and focused owned runtime stopped. No open review threads.
 Commit this cohesive implementation slice and push; mark ready so CI starts. Required full
 scaffold.runtime stays pending coordinator e2e-cli-gate. Final exact-head review follows in the same
 independent session. No merge authorization is asserted by local PASS.
+
+## CI remediation slice
+
+Final independent review approved pushed implementation 57193c427042a6fdbc1ee1bcff6e61d2d55bf1ea
+with exact `VERDICT: MERGE` and no code blockers; this is preserved as historical review, not a
+verdict for a future head. Root CI quality then caught stale embedded consumer prose after the
+streams docs edit. Native regeneration changed only pages/durable-workflows/streams/index.md in
+the carrier, removed no entries, and left all runtime source unchanged. No lock edits.
+
+Close-gate follow-up: validateEvidenceMapping matched all nine issue acceptance boxes to linked
+executed evidence. Updated those boxes without changing their text and completed the actual
+exact-head-review PR checkbox. Only the separate, unproven full scaffold.runtime requirement
+remains unchecked. Never represent it as green without an executed verdict. Manual existing e2e-cli
+workflow dispatch uses isolated GitHub-hosted VMs and leaves coordinator-owned labels unchanged.
+
+CI remediation slice review: independent same-session reviewer PASS, decoded both carriers:
+208 entries before/after, exactly the streams page changed, no additions/removals or unrelated
+content. check:agent-docs-prose exits 0 (fresh:true, no stale paths); check:publish-assets exits 0.
+Commit/push the generated-only correction and refresh runtime CI and exact-head review; preserve
+all pending E2E claims as unchecked. Prior 57193c4 review remains historical evidence only.

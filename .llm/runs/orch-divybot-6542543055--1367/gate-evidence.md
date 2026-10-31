@@ -20,3 +20,11 @@ tracked/public artifacts; structured wrapper verdicts and durable run-gate recei
 | Full scaffold.runtime | REQUIRED CI, not run locally | owner prohibits local suite; coordinator must arm e2e-cli-gate on PR #2520 |
 
 No lock changes, suppressed tests, new scanner allowances or weakened durability claims.
+
+## CI generated-prose remediation
+
+CI quality's agent-docs-prose freshness check exposed an owned missing generated artifact. Native
+regeneration refreshed only the embedded streams page (208 entries retained, zero removed).
+`check:agent-docs-prose`: exit 0, fresh true, no stale paths. `check:publish-assets`: exit 0.
+Independent same-session slice review decoded before/after content and returned PASS. No runtime
+source, tests, dependencies or locks changed. New-head CI and exact-head review remain required.
