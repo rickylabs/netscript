@@ -27,3 +27,10 @@ Extended isolated Redis proof probes the actual generated process every second f
 120 strict health reads remain ready. The owned provider and child are reaped. This is focused
 startup/steady-process evidence; it does not substitute for the full hosted runtime verdict.
 At diagnostic head, 16 of 17 quality receipts pass; the sole failure is the repaired inventory.
+
+Focused full CLI scaffold proof: maintainer init must target beneath the monorepo, so use an owned
+directory under .llm/tmp. Install saga with samples, generate plugins, then boot sagas/runtime.ts
+directly with its generated shared bootstrap, watch mode and an isolated Redis provider. The default
+settings explicitly select KV for canonical state and projection. Startup and 30 subsequent health
+reads remain ready after static doctor inspection. Static doctor exits non-zero for this intentionally
+incomplete one-plugin fixture; it is not the full runtime acceptance verdict. All owned PIDs are reaped.

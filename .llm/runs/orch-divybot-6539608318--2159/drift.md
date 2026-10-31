@@ -15,3 +15,6 @@
   the declared generated write surface only; MCP behavior is unchanged.
 - Repeated runtime CI failure requires focused generated-entrypoint coverage and pre-cleanup
   diagnostic evidence in the E2E gate. The doctor verdict and readiness contract remain unchanged.
+- The real-message smoke uncovered Redis JSON date strings on canonical reload. Add adapter-local
+  date decoding and round-trip/compensation regression coverage. Remove the temporary E2E diagnostic
+  wrappers after isolation; preserve the full doctor gate, validator, and original runtime verdict.

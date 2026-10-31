@@ -14,9 +14,9 @@ slice and is not evidence of full goal achievement. The goal must remain active.
 | Crash after state save / before effects dispatch loses no effect | No such positive recovery proof exists | Missing |
 | Every acceptance regression goes red when reverted | Atomic-state/crash/CAS controls recorded; effects controls do not exist | Incomplete |
 | Commit, push, one PR, no assignment/lock/attribution churn | PR #2499, normal pushed commits, clean source before each generator pass | Proven |
-| Independent exact-head final implementation verdict | Prior MERGE names 155051c; CI repairs move the head and require a new verdict | Pending |
+| Independent exact-head final implementation verdict | Four implementation rounds used; final fifth round reserved for the repaired pushed head | Pending |
 | Local structured quality gates | Prior 256/14-test and source/quality gates; CI repairs add 7 passing focused cases | Proven for the tested scopes |
-| Required current-head CI including e2e-cli | Core CI reruns after repair; coordinator-owned e2e-cli remains skipped | Pending / unproven |
+| Required current-head CI including e2e-cli | Core failures repaired; hosted runtime exposed and locally reproduced Redis date crash; repair requires fresh dual-tier CI | Pending / unproven |
 | Review threads answered | Previous read-only gate found zero unanswered; rerun before handoff | Pending refresh |
 
 The live coordinator record on #2474 explicitly retains #2159 open for a decision on the single

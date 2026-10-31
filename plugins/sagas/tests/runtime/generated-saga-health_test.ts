@@ -2,8 +2,9 @@ import { assertEquals } from '@std/assert';
 import { runtimeGlueStub } from '../../src/adapter/resources/glue/runtime.stub.ts';
 import { readChildHealth } from '../../../../packages/cli/src/kernel/adapters/aspire/child-health-reader.ts';
 import { stderrTail } from '../../../../packages/plugin-sagas-core/tests/fixtures/transition-store/provider-process.ts';
+import type { SagaStateEnvelope } from '@netscript/plugin-sagas-core/domain';
 
-Deno.test('generated saga child boots the default KV store with a valid ready health payload', async () => {
+Deno.test('generated saga child remains ready after compensation on the default KV store', async () => {
   const root = await Deno.makeTempDir();
   const listener = Deno.listen({ hostname: '127.0.0.1', port: 0 });
   const port = (listener.addr as Deno.NetAddr).port;
@@ -12,20 +13,43 @@ Deno.test('generated saga child boots the default KV store with a valid ready he
   await Deno.writeTextFile(root + '/runtime.ts', runtimeGlueStub.source);
   await Deno.writeTextFile(
     root + '/registry.ts',
-    "import { defineSaga } from '@netscript/plugin-sagas-core';\n" +
-      "export const definitions = [defineSaga('health-proof').state({ count: 0 }).on('start', () => []).build()];\n",
+    "import { defineSaga, sagaCompensate } from '@netscript/plugin-sagas-core';\n" +
+      "export const definitions = [defineSaga('health-proof').state({ compensated: false })\n" +
+      ".on('start', () => [sagaCompensate({ type: 'undo', payload: {} }, 'health proof')])\n" +
+      ".compensate('undo', (saga) => { saga.state = { compensated: true }; return []; }).build()];\n",
   );
+  const env = {
+    CACHE_PROVIDER: 'denokv',
+    DENO_KV_URL: root + '/runtime.kv',
+    KV_URL: root + '/runtime.kv',
+    NETSCRIPT_SAGA_KV_PATH: root + '/runtime.kv',
+    SAGAS_REGISTRY_MODULE: new URL('file://' + root + '/registry.ts').href,
+    PORT: String(port),
+  };
+  const published = await new Deno.Command(Deno.execPath(), {
+    args: [
+      'eval',
+      '--frozen',
+      '--unstable-kv',
+      '--config',
+      config,
+      "import { createSagaDeliveryPublisher } from '@netscript/plugin-sagas/runtime';\n" +
+      'const publisher = createSagaDeliveryPublisher();\n' +
+      "await publisher.publish({ type: 'start', payload: {}, correlationKey: 'case', idempotencyKey: 'health-request' });\n" +
+      'await publisher.stop();',
+    ],
+    cwd: root,
+    env,
+    stdin: 'null',
+    stdout: 'null',
+    stderr: 'piped',
+    signal: AbortSignal.timeout(15_000),
+  }).output();
+  assertEquals(published.code, 0, new TextDecoder().decode(published.stderr));
   const child = new Deno.Command(Deno.execPath(), {
     args: ['run', '--frozen', '--unstable-kv', '-A', '--config', config, root + '/runtime.ts'],
     cwd: root,
-    env: {
-      CACHE_PROVIDER: 'denokv',
-      DENO_KV_URL: root + '/runtime.kv',
-      KV_URL: root + '/runtime.kv',
-      NETSCRIPT_SAGA_KV_PATH: root + '/runtime.kv',
-      SAGAS_REGISTRY_MODULE: new URL('file://' + root + '/registry.ts').href,
-      PORT: String(port),
-    },
+    env,
     stdin: 'null',
     stdout: 'null',
     stderr: 'piped',
@@ -43,6 +67,19 @@ Deno.test('generated saga child boots the default KV store with a valid ready he
       if (status) throw new Error('Saga child exited: ' + await errors);
       await new Promise((resolve) => setTimeout(resolve, 25));
     } while (Date.now() < deadline);
+    assertEquals(health?.state, 'ready');
+    using kv = await Deno.openKv(root + '/runtime.kv');
+    const compensationDeadline = Date.now() + 15_000;
+    let envelope;
+    do {
+      envelope = (await kv.get<SagaStateEnvelope>(['sagas', 'state', 'health-proof:case'])).value;
+      if (envelope?.metadata.version === 2) break;
+      if (status) throw new Error('Saga child exited after delivery: ' + await errors);
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    } while (Date.now() < compensationDeadline);
+    assertEquals(envelope?.state, { compensated: true });
+    assertEquals(envelope?.metadata.version, 2);
+    health = await readChildHealth(endpoint, fetch);
     assertEquals(health, {
       state: 'ready',
       registryReady: true,

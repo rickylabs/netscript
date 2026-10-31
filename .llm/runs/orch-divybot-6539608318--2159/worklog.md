@@ -111,3 +111,21 @@ for the saga child, while Aspire still reports that child Healthy. Other childre
 ready payloads. The next diagnostic also compares the target listener using Aspire's resolved PORT
 and retains console lifecycle/error categories only. It preserves the failed doctor verdict and
 does not increase readiness timeouts. Seven focused tests pass; scoped check/lint pass.
+
+## Runtime repair — Redis date decoding
+
+The actual generated project remains ready until the Flow-B compensation request is published.
+That message reproduces the CI crash: Redis JSON has converted createdAt to a string, which the
+atomic validator rejects during compensation. Decode the declared envelope/history date fields at
+KvSagaStore's read boundary; do not weaken the validator or coerce business state/payload strings.
+The same generated project now processes compensation and remains ready for 30 health reads.
+
+Negative control: both real-Redis regressions fail before repair while four native/memory controls
+pass. Positive suite: 269 passed, zero failed, five provider-specific ignores. The generated child
+test now processes compensation and verifies version 2 before its strict readiness assertion.
+The projection regression checks the raw JSON date and decoded canonical date separately, keeping
+all query-model assertions. Temporary E2E diagnostic wrappers are removed; the original doctor gate
+and readiness timeouts remain intact. Inventory regeneration retains just the generated test row.
+
+Reconcile: full #2159 effects acceptance remains missing. This source repair will be pushed, then
+current-head CI and the final fifth exact-head IMPL-EVAL must pass before READY. No lock changes.
