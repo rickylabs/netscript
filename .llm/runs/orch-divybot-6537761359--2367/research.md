@@ -29,3 +29,9 @@
 - Generator source: `.llm/tools/generate-postgres-connection-template.ts`; both generated module and
   Prisma config behavior are tested in `packages/cli/src/kernel/templates/database/postgres-normalizer_test.ts`.
 - Target package publish task: `deno task publish:dry-run --member packages/database`.
+- Baseline package normalizer suite: structured test wrapper, `-- --allow-all
+  packages/database/tests/postgres-connection-string_test.ts`: 10 passed, exit 0.
+- Root quality/architecture/dependency gate passes at bootstrap head (exit 0); existing doctrine
+  warnings are non-blocking. Durable receipt retained outside the public tree.
+- Git identity was not configured despite dispatch assumptions. Set repository-local identity to
+  the authenticated account's verified GitHub noreply identity, matching the baseline commit.

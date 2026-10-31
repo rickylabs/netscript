@@ -19,6 +19,8 @@
   `packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template` and
   `packages/cli/src/kernel/assets/embedded.generated.ts`, and extend
   `packages/cli/src/kernel/templates/database/postgres-normalizer_test.ts`.
+- PLAN-EVAL scope correction before implementation: `docs/site/reference/database/index.md` and
+  `packages/database/CHANGELOG.md`, to keep the public error-reason table and change notice accurate.
 - Noncommitted scratch/evaluation output: project run evidence directory; assignment/final report
   files remain excluded. No lock changes, runtime resource launches, merge, labels, or milestones.
 - Privacy: public artifacts use repository-relative paths and omit machine/session identifiers.

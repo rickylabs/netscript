@@ -98,17 +98,25 @@ const url = normalizePostgresConnectionString(
 ```
 
 The helper maps `Disable`, `Prefer`, `Require`, `VerifyCA`, and `VerifyFull` to their PostgreSQL
-`sslmode` values and percent-encodes credentials and database names. Quoted values may contain
-semicolons and equals signs. Missing endpoint and credential fields use the scaffold defaults:
-`localhost:5432`, database/user `postgres`, and an empty password. Omitting `SSL Mode` leaves the
-driver's TLS defaults in effect.
+`sslmode` values. The libpq spellings `verify-ca` and `verify-full` are also accepted, and all mode
+values are case-insensitive. Decimal ports are canonicalized (`Port=05432` becomes `:5432`).
+Credentials and database names are percent-encoded. Quoted values may contain semicolons and equals
+signs, and doubled quotes escape the enclosing quote. Missing endpoint and credential fields use the
+scaffold defaults: `localhost:5432`, database/user `postgres`, and an empty password. Omitting
+`SSL Mode` leaves the driver's TLS defaults in effect.
+
+Repeated keys are refused, including case variants, aliases (such as `Host`/`Server`,
+`Database`/`DB`, `Username`/`User ID`/`UID`, `Password`/`Pwd`, and `SSL Mode`/`SslMode`), and
+identical repeated values. They throw `PostgresConnectionStringError` with reason `duplicate-key`
+and the canonical lowercase `key` (for example, `sslmode`), before an option can overwrite an
+earlier setting.
 
 Unsupported keys (including certificate options), unsupported values (including `SSL Mode=Allow`),
-and malformed input throw `PostgresConnectionStringError`. Its `reason` is `unsupported-key`,
-`unsupported-value`, or `invalid-format`; its optional `key` identifies the refused option. Messages
-never include option values or credentials. The scaffolded Postgres module and Prisma config use
-generated inline code from this same helper, with no runtime package import in Prisma config. The
-scaffold wrapper trims environment values before calling the helper.
+and malformed input also throw `PostgresConnectionStringError`. Their reasons are `unsupported-key`,
+`unsupported-value`, and `invalid-format`; the optional `key` identifies the refused option.
+Messages never include option values or credentials. The scaffolded Postgres module and Prisma
+config use generated inline code from this same helper, with no runtime package import in Prisma
+config. The scaffold wrapper trims environment values before calling the helper.
 
 ## Public surface
 

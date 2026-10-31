@@ -19,6 +19,8 @@ Archetype 2 Integration; no structural rewrite. Doctrine verdict Refactor is exi
 1. Bootstrap: run records, plan and draft PR. Gate: plan checklist + independent PLAN-EVAL.
 2. One cohesive implementation: database normalizer/error, README and tests; generated CLI template
    and embedded barrel plus `postgres-normalizer_test.ts`; run worklog/context/evidence.
+   Public reference `docs/site/reference/database/index.md` updates the error-reason table, duplicate
+   policy and TLS spellings; `packages/database/CHANGELOG.md` records the behavior change under Unreleased.
    Gate: scoped structured test/check/lint/fmt, negative control, docs, package publish dry-run,
    JSR audit and `quality:gate`; independent slice review before commit.
 3. Review handoff: run records, dated lesson and gate summary. Push, ready PR after blocker-free
