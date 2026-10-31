@@ -216,6 +216,25 @@ console.log(serializeComponentContracts(componentContracts));
 console.log(catalog.schemaVersion);
 ```
 
-Phase 1 includes 66 shipped inventory entries and 21 design-only contracts from the six built
-Figma categories. `shipped: false`, planned values and native/pseudo parts distinguish specified
-anatomy from a rendering implementation. It does not add gap components or token values.
+The catalog covers all 104 Figma inventory identities. `shipped: false`, planned values and
+native/pseudo parts distinguish specified anatomy from a rendering implementation. Phase 2
+adds registry components with real render and browser keyboard coverage; it preserves token values.
+
+The `actions` collection includes ButtonGroup, Toggle and ToggleGroup. The `forms-core`
+collection includes RadioGroup, InputGroup, InputOTP, Slider, Calendar and DatePicker.
+Install individual items with `netscript ui:add calendar` or `netscript ui:add date-picker`.
+Hydrate interactive controls inside a Fresh island.
+
+Calendar accepts ordered ISO date strings through `value`/`defaultValue`, plus
+`mode='single' | 'range'`, `months={1 | 2}`, `caption='label' | 'dropdown'`,
+`min`/`max`, `isDateDisabled`, `weekStartsOn` and `onValueChange`. Its `today`
+default is UTC; supply the user's local ISO day when local-day highlighting is needed.
+Arrow keys browse enabled dates, Home/End move within the week, PageUp/PageDown
+move months (Shift moves years), and Enter/Space select.
+
+DatePicker adds a required `label`, optional form `name`, and independently controlled
+`open`/`onOpenChange`. Its native modal Dialog supports Escape/Cancel and returns focus
+to the trigger. Selection requests respect controlled values; ordinary closing requests respect
+controlled open state. Browser-forced dismissal (such as repeated Escape) remains
+native behavior; apps should normally accept native close requests. Reopening starts on the selected month. A named hidden input
+submits the ISO date, or range endpoints joined by `/`.

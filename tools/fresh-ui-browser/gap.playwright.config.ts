@@ -24,7 +24,7 @@ export default defineConfig({
   ),
   webServer: {
     command:
-      'deno bundle --no-lock --config gap.deno.json --platform browser --output test-results/gap-fixture.js gap-fixture.tsx && deno run --allow-read --allow-net=127.0.0.1 gap-server.ts 4187',
+      'deno run --allow-read --allow-write=test-results --allow-run gap-build.ts && deno run --allow-read --allow-net=127.0.0.1 gap-server.ts 4187',
     url: 'http://127.0.0.1:4187',
     reuseExistingServer: false,
     timeout: 30000,
