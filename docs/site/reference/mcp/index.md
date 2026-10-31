@@ -49,6 +49,7 @@ MCP fit together. The complete symbol list is in
 | `validateSchema` | function | Validate a value against a tool schema, throwing on drift. |
 | `ToolDefinition` | interface | A tool's name, contracts, and flow. |
 | `ToolFlow` | type alias | The function a tool executes; depends only on ports. |
+| `TelemetryProvenance` | interface | Window, sample counts, serving version, observed revisions and snapshot completeness carried by telemetry results and errors. |
 | `ToolName` | type alias | Union of the 26 tool names. |
 
 ### Per-tool field overview
@@ -61,13 +62,13 @@ required result fields are in the Standard Schema contracts (`TOOL_INPUT_SCHEMAS
 
 | Tool                          | Inputs                                                | Result fields                                                                                                                                                     |
 | ----------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `get_app_status`              | `service`, `limit`                                    | `status`, `counts`, `domains`                                                                                                                                     |
+| `get_app_status`              | `service`, `sinceUnixMs`, `limit` | `status`, `counts`, `domains`, `provenance`, optional `diagnostic` |
 | `list_runs`                   | `domain`, `status`, `service`, `sinceUnixMs`, `limit` | `count`, `runs`                                                                                                                                                   |
 | `get_run`                     | **`id`**                                              | `id`, `summary`, `traceId`, `outcome`, `errorMessage`, `spans`, `logs`                                                                                            |
 | `get_recent_errors`           | `service`, `domain`, `sinceUnixMs`, `limit`           | `count`, `groups`                                                                                                                                                 |
 | `get_last_job_result`         | `jobId`, `jobName`, `service`, `sinceUnixMs`          | `found`, `jobName`, `jobId`, `status`, `outcome`, `exitCode`, `startUnixMs`, `completedUnixMs`, `durationMs`, `errorMessage`, `traceId`                           |
-| `analyze_service_performance` | **`service`**, `sinceUnixMs`, `limit`                 | `service`, `sinceUnixMs`, `sampleCount`, `errorCount`, `errorRate`, `averageDurationMs`, `p50DurationMs`, `p95DurationMs`, `throughputPerMinute`, `topOperations` |
-| `analyze_db_bottlenecks`      | `service`, `sinceUnixMs`, `limit`                     | `sinceUnixMs`, `sampleCount`, `operations`                                                                                                                        |
+| `analyze_service_performance` | **`service`**, `sinceUnixMs`, `limit`                 | `service`, `sinceUnixMs`, `sampleCount`, `errorCount`, `errorRate`, `averageDurationMs`, `p50DurationMs`, `p95DurationMs`, `throughputPerMinute`, `topOperations`, `provenance` |
+| `analyze_db_bottlenecks`      | `service`, `sinceUnixMs`, `limit`                     | `sinceUnixMs`, `sampleCount`, `operations`, `provenance` |
 | `doctor`                      | `endpoint`                                            | `status`, `endpoint`, `counts`, `checks`, `families`                                                                                                              |
 | `search_docs`                 | **`query`**, `limit`                                  | `count`, `matches`                                                                                                                                                |
 | `list_docs`                   | `limit`                                               | `count`, `docs`, and `corpus` (`kind`, resolved `root`, total `documentCount`)                                                                                    |
@@ -273,17 +274,59 @@ stdio.
 | `resolveDocsRoot` | function | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe. |
 | `McpCliOptions` | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root. |
 
-Telemetry endpoint discovery tries, in order: an explicit `endpoint` option,
-`NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, then a built-in fallback. That fallback may not match an allocated port; set the endpoint to the URL Aspire prints. Only `http:`
-and `https:` endpoints are accepted, and an unreachable endpoint yields a structured warning rather
-than a crash.
+## Telemetry binding and sample evidence
+
+The three status/performance tools bind to the server's project, selected with
+`netscript agent mcp --project-root <project-root>`. On each call they select that project's exact
+`aspire/apphost.mts` from `aspire ps`, then read the supported dashboard telemetry API. Start that
+AppHost before requesting telemetry. Discovery runs once per call, so a later start or restart is
+seen without restarting MCP.
+
+Explicit dashboard configuration takes precedence: `--endpoint` (or the composition's `endpoint`),
+then `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`. The port variable is an explicit
+HTTP dashboard override. Use a full endpoint for HTTPS. An endpoint may contain a dashboard login
+URL; its token is exchanged privately for an API key using Aspire's supported authentication API.
+Invalid overrides fail instead of selecting another dashboard. These three tools have no
+conventional dashboard fallback.
+
+Every response carries `provenance`: the requested inclusive `window`, selected span
+`sampleCount`, optional `logCount`, `servingRevision` (the serving MCP package version), and any
+observed `serviceRevisions` from `service.version`. A deployment commit is reported only if the
+service emitted it. The span `totalCount`, `returnedCount`, acquisition `observedRange`, `limit`
+and `sourceTruncated` describe the bounded snapshot before local window filtering. Resource
+counts describe the dashboard's telemetry emitter inventory; plugin runtime health is separate.
+
+`provenance.state` distinguishes `ready`, `no_data`, `partial`, `unbound` and `unavailable`.
+A wrong project returns `telemetry_unbound` with a project/AppHost selection hint. Query,
+authentication and malformed-response failures return `telemetry_unavailable`. An unknown or
+ambiguous service filter returns `telemetry_unknown_service`, with a service/replica-name hint.
+Failure sample counts are `null`; these errors contain no latency statistics. Successful empty
+performance windows return `telemetry_no_data`, and an empty capped selection returns
+`telemetry_partial`. Incomplete service spans return `telemetry_no_completed_samples`.
+App status retains plugin health with a warning and diagnostic for empty or partial telemetry.
+
+Performance statistics use completed spans: the top-level analysis `sampleCount` counts completed
+service spans or DB/KV operations, while `provenance.sampleCount` counts all spans selected in the
+window. A partial snapshot remains partial even when it contains samples. The default window is
+15 minutes; `sinceUnixMs` can widen it. Status's `limit` caps each source read (default 100);
+analysis reads at most 1,000 spans and its `limit` bounds the returned operation list.
+
+Native metrics and histogram streams are **visible only in the dashboard Metrics view** through
+this integration. The [supported dashboard read API](https://aspire.dev/dashboard/apis/) exposes
+resources, spans, traces and logs. The latency percentiles above are calculated from sampled spans;
+they are not queries of native histogram buckets. The capability is reported as
+`nativeMetrics: "dashboard_only"`.
+
+Credentials, dashboard URLs, configuration values and raw transport errors remain inside the
+adapter. To extend acquisition, start at `src/ports/telemetry-snapshot-port.ts`; explicit query-port
+flow injections retain their existing contract and identify their evidence as `injected_query`.
 
 ## Data boundary
 
 The server reads telemetry, project metadata, generated registries, public documentation, and its
 package-embedded public export corpus. It never returns project source, environment-variable values,
-credentials, or secrets. Stdio is process-local; the only outbound traffic is the telemetry probe to
-the resolved endpoint.
+credentials, or secrets. Stdio is process-local; outbound telemetry traffic consists of authenticated reads and reachability probes
+to the selected dashboard.
 
 ## Declared plugin runtime health
 

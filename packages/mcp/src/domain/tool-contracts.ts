@@ -1,3 +1,5 @@
+import { TELEMETRY_ANALYSIS_OUTPUT_SHAPES } from './telemetry/telemetry-analysis-schemas.ts';
+import { TELEMETRY_PROVENANCE_SCHEMA } from './telemetry/telemetry-provenance-schema.ts';
 import type { PluginHealthSummary } from '@netscript/plugin/health';
 import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
 import type { ToolName } from './tool-types.ts';
@@ -169,7 +171,11 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['query']),
   view_registry_item: objectSchema({ name: registryNameProperty }, ['name']),
   get_registry_add_command: objectSchema({ name: registryNameProperty }, ['name']),
-  get_app_status: objectSchema({ service: stringProperty, limit: limitProperty }),
+  get_app_status: objectSchema({
+    service: stringProperty,
+    sinceUnixMs: { type: 'number' },
+    limit: limitProperty,
+  }),
   list_runs: objectSchema({
     domain: stringProperty,
     status: stringProperty,
@@ -243,6 +249,7 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
 };
 
 const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
+  ...TELEMETRY_ANALYSIS_OUTPUT_SHAPES,
   list_registry_items: registryPageShape,
   search_registry_items: registryPageShape,
   view_registry_item: objectSchema({ item: { type: 'object' } }, ['item']),
@@ -251,13 +258,15 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     args: { type: 'array', minItems: 2, maxItems: 2, items: stringProperty },
   }, ['command', 'args']),
   get_app_status: objectSchema({
+    provenance: TELEMETRY_PROVENANCE_SCHEMA,
+    diagnostic: stringProperty,
     status: { enum: ['pass', 'warn', 'fail'] },
     counts: { type: 'object' },
     domains: { type: 'array', maxItems: 5 },
     pluginHealth: { type: 'array', maxItems: 20, items: pluginHealthShape },
     healthStatus: { enum: ['healthy', 'degraded', 'unhealthy', 'unknown'] },
     runtimeChecks: { type: 'array', maxItems: 20, items: doctorCheckShape },
-  }, ['status', 'counts', 'domains']),
+  }, ['status', 'counts', 'domains', 'provenance']),
   list_runs: objectSchema({ count: { type: 'integer' }, runs: { type: 'array', maxItems: 100 } }, [
     'count',
     'runs',
@@ -288,34 +297,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     errorMessage: stringProperty,
     traceId: stringProperty,
   }, ['found']),
-  analyze_service_performance: objectSchema({
-    service: stringProperty,
-    sinceUnixMs: { type: 'number' },
-    sampleCount: { type: 'integer' },
-    errorCount: { type: 'integer' },
-    errorRate: { type: 'number' },
-    averageDurationMs: { type: 'number' },
-    p50DurationMs: { type: 'number' },
-    p95DurationMs: { type: 'number' },
-    throughputPerMinute: { type: 'number' },
-    topOperations: { type: 'array', maxItems: 20 },
-  }, [
-    'service',
-    'sinceUnixMs',
-    'sampleCount',
-    'errorCount',
-    'errorRate',
-    'averageDurationMs',
-    'p50DurationMs',
-    'p95DurationMs',
-    'throughputPerMinute',
-    'topOperations',
-  ]),
-  analyze_db_bottlenecks: objectSchema({
-    sinceUnixMs: { type: 'number' },
-    sampleCount: { type: 'integer' },
-    operations: { type: 'array', maxItems: 20 },
-  }, ['sinceUnixMs', 'sampleCount', 'operations']),
+
   doctor: objectSchema({
     status: { enum: ['pass', 'warn', 'fail'] },
     endpoint: stringProperty,

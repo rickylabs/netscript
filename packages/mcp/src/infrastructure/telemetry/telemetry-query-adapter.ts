@@ -2,8 +2,8 @@ import { createTelemetryQuery, type TelemetryQueryPort } from '@netscript/teleme
 import type {
   AspirePsDashboardPort,
   TelemetryEndpointEnvironment,
-} from '../domain/telemetry-endpoint.ts';
-import { resolveTelemetryEndpoint } from '../domain/telemetry-endpoint.ts';
+} from '../../domain/telemetry-endpoint.ts';
+import { resolveTelemetryEndpoint } from '../../domain/telemetry-endpoint.ts';
 
 /** Infrastructure overrides used by tests and non-standard Aspire installations. */
 export interface ResolvedTelemetryQueryOptions {
@@ -48,25 +48,34 @@ export function createAspireDashboardFetch(
   endpoint: string,
   options: ResolvedTelemetryQueryOptions,
 ): typeof fetch | undefined {
+  return openAspireDashboardConnection(endpoint, options).fetch;
+}
+
+/** Open a dashboard HTTP connection whose development-certificate client has an explicit lifetime. */
+export function openAspireDashboardConnection(
+  endpoint: string,
+  options: ResolvedTelemetryQueryOptions = {},
+): { readonly fetch: typeof fetch; readonly close: () => void } {
   if (options.fetch) {
-    return options.fetch;
+    return { fetch: options.fetch, close: () => {} };
   }
   if (!isLoopbackHttps(endpoint)) {
-    return undefined;
+    return { fetch, close: () => {} };
   }
 
   const certificates = readAspnetDevelopmentCertificates(
     options.aspnetTrustDirectory ?? defaultAspnetTrustDirectory(),
   );
   if (certificates.length === 0) {
-    return undefined;
+    return { fetch, close: () => {} };
   }
 
   const client = Deno.createHttpClient({ caCerts: [...certificates] });
-  return (input, init) => {
+  const dashboardFetch: typeof fetch = (input, init) => {
     const request = { ...init, client } as RequestInit & { client: Deno.HttpClient };
     return fetch(input, request);
   };
+  return { fetch: dashboardFetch, close: () => client.close() };
 }
 
 /** Create the Aspire-backed telemetry reader for resolved endpoint inputs. */

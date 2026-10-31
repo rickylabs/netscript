@@ -1,0 +1,17 @@
+{
+  "fakeDashboard": {
+    "ok": true,
+    "cliExitCode": 0,
+    "mcpTraceIds": [
+      "trace-checkout"
+    ],
+    "cliTraceIds": [
+      "trace-checkout"
+    ]
+  },
+  "liveAppHost": {
+    "verdict": "PASS",
+    "evidence": "live-apphost-evidence.json",
+    "historicalInitialAttempt": "No AppHost was initially registered; superseded by the isolated physical validation."
+  }
+}

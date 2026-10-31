@@ -258,3 +258,5 @@ export type {
   UiRegistryCatalogPort,
   UiRegistryItemSummary,
 } from './src/ports/ui-registry-catalog-port.ts';
+
+export type { TelemetryProvenance } from './src/domain/telemetry/telemetry-snapshot.ts';
