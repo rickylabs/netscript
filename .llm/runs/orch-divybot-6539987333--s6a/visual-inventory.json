@@ -1,0 +1,366 @@
+[
+  {
+    "item": "button",
+    "type": "registry:component",
+    "scope": "button",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/actions/review-button.png",
+    "result": "Sharp, flat controls; semantic variant fills; shipped sm/md/lg/icon sizes. Figma xs and link variant are unshipped. Fixture text in icon-size Button is intentionally wider than the icon square; IconButton has the actual hidden label."
+  },
+  {
+    "item": "icon-button",
+    "type": "registry:component",
+    "scope": "icon-button",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/actions/review-icon-button.png",
+    "result": "Square control; no depth or movement. Only md is shipped."
+  },
+  {
+    "item": "input",
+    "type": "registry:component",
+    "scope": "input",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-input.png",
+    "result": "32px control, input border, ink focus, red invalid; disabled muted. Only md and native input anatomy shipped; Figma sm and leading/trailing wrapper icons deferred."
+  },
+  {
+    "item": "textarea",
+    "type": "registry:component",
+    "scope": "textarea",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-textarea.png",
+    "result": "Sharp input surface, resizable, same state palette. Content/line count differs from reference."
+  },
+  {
+    "item": "checkbox",
+    "type": "registry:component",
+    "scope": "checkbox",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-checkbox.png",
+    "result": "16px indicator, token radius; invalid persists when checked; ink focus. Native checked state is authoritative."
+  },
+  {
+    "item": "switch",
+    "type": "registry:component",
+    "scope": "switch",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-switch.png",
+    "result": "Locked authority: distinct input-border grey off and primary ink checked, native invalid/focus/disabled and reversed RTL travel; existing md only."
+  },
+  {
+    "item": "label",
+    "type": "registry:component",
+    "scope": "label",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-label.png",
+    "result": "Locked authority: labels above controls, strong14px/500 and neutral invalid label; srOnly remains invisible."
+  },
+  {
+    "item": "select",
+    "type": "registry:component",
+    "scope": "select",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-select.png",
+    "result": "Sharp native select, same input/focus/invalid palette. Native popup uses platform UI; Figma custom list anatomy is not this contract."
+  },
+  {
+    "item": "form-field",
+    "type": "registry:component",
+    "scope": "field",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-field.png",
+    "result": "Locked authority: strong14px/500 label above control, small helper/error; invalid red belongs to error copy/control border."
+  },
+  {
+    "item": "card",
+    "type": "registry:component",
+    "scope": "card",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-card.png",
+    "result": "Transparent, top card hairline, no shadow; heading/small text and token padding. Existing default/md contract only; rule/sm/selected variants deferred. Interactive caller with tabIndex captured."
+  },
+  {
+    "item": "panel",
+    "type": "registry:component",
+    "scope": "panel",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-panel.png",
+    "result": "Card/muted/raised surfaces; quiet border, token padding, strong/small text, no elevation."
+  },
+  {
+    "item": "badge",
+    "type": "registry:component",
+    "scope": "badge",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-badge.png",
+    "result": "Locked authority: transparent status outlines, leading6px dot, sans11px label; seven shipped tones. No separate emphasis axis added."
+  },
+  {
+    "item": "avatar",
+    "type": "registry:component",
+    "scope": "avatar",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-avatar.png",
+    "result": "Locked authority: square initials tiles even when src is supplied; legacy photos retained. Sizes24/32/40 and agent/presence states."
+  },
+  {
+    "item": "citation-chip",
+    "type": "registry:component",
+    "scope": "citation-chip",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/ai/review-citation-chip.png",
+    "result": "Mono caption, neutral rest and ink active chip, focus and hover. Existing switch-height role supplies 18px; no dedicated citation height exists."
+  },
+  {
+    "item": "code-block",
+    "type": "registry:component",
+    "scope": "code-block",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display-2/review-code-block.png",
+    "result": "Sharp quiet chrome, mono code and real escaped syntax spans; original clipboard payload. Unknown languages stay plain. No new line-number/size API."
+  },
+  {
+    "item": "model-selector",
+    "type": "registry:component",
+    "scope": "model-selector",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/ai/review-model-selector.png",
+    "result": "Sharp trigger, mono provider, strong-small label, raised menu and ink focus. Native open/align states captured; gallery puts menu in flow."
+  },
+  {
+    "item": "tool-call-card",
+    "type": "registry:component",
+    "scope": "tool-call-card",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/ai/review-tool-call-card.png",
+    "result": "Sharp panel, semantic status badges, mono name/IO and inset keyboard focus. Existing string arguments/results remain plain code; no language prop or new pending state added."
+  },
+  {
+    "item": "chart-block",
+    "type": "registry:component",
+    "scope": "chart-block",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/chart-palettes/review-chart-block.png",
+    "result": "Default automatic categories use chart1\u20135; explicit semantic intent retained. Tracks, axes and text use tokens."
+  },
+  {
+    "item": "donut",
+    "type": "registry:component",
+    "scope": "donut",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/chart-palettes/review-donut.png",
+    "result": "Chart palette for automatic rings/swatches, explicit error stays red, light center numeral. Shipped 96px SVG retained because no diameter role exists; reference is larger."
+  },
+  {
+    "item": "prompt-input",
+    "type": "registry:component",
+    "scope": "prompt-input",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/ai/review-prompt-input.png",
+    "result": "Ink send/stop, square active tool marker, strong focus-within ring. Existing one-row auto-grow height and stacked compact capability slots remain; Figma compact is inline and default specimen taller. Missing height role recorded."
+  },
+  {
+    "item": "message",
+    "type": "registry:component",
+    "scope": "message",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/ai/review-message.png",
+    "result": "Strong-small author, mono time/model, role-bound body, sharp user bubble and inherited initials avatar. Existing streaming/pending semantics retained."
+  },
+  {
+    "item": "markdown",
+    "type": "registry:component",
+    "scope": "prose",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/docs-kit/review-prose.png",
+    "result": "Body and heading roles, ink links, sharp code surfaces, hairline tables and fenced-code syntax."
+  },
+  {
+    "item": "command-palette",
+    "type": "registry:component",
+    "scope": "command-palette",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/overlays/review-command-palette.png",
+    "result": "Sharp raised panel, no blur/elevation, mono groups and neutral kind badge; keyboard behavior unchanged."
+  },
+  {
+    "item": "search",
+    "type": "registry:component",
+    "scope": "search",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-search.png",
+    "result": "Input hairline and mono keycap. Existing search is a launcher button; editable search anatomy belongs to another contract."
+  },
+  {
+    "item": "dropzone",
+    "type": "registry:component",
+    "scope": "dropzone",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/forms/review-dropzone.png",
+    "result": "Sharp dashed card, ink focus/drag selection. Contract test fixture includes a second native file input as children to test its slot, visible in the gallery; the component's own picker stays hidden."
+  },
+  {
+    "item": "separator",
+    "type": "registry:component",
+    "scope": "separator",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-separator.png",
+    "result": "Hairline in both orientations. Existing default-only variant."
+  },
+  {
+    "item": "alert",
+    "type": "registry:component",
+    "scope": "alert",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-alert.png",
+    "result": "Tinted status surface, one medium title, matching status icon/text, body aligned below label. Existing text glyphs differ from Figma icons. Neutral/important/strong variants unshipped."
+  },
+  {
+    "item": "inline-notice",
+    "type": "registry:component",
+    "scope": "inline-notice",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-inline-notice.png",
+    "result": "Same semantic tones, compact small text and spacing. Trailing action part unshipped."
+  },
+  {
+    "item": "spinner",
+    "type": "registry:component",
+    "scope": "spinner",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-spinner.png",
+    "result": "Marker arc is visible in dark; loading button inherits its text color. Existing sm/md/lg sizes. Tone axis unshipped. Reduced motion retains the existing slow essential indicator."
+  },
+  {
+    "item": "progress",
+    "type": "registry:component",
+    "scope": "progress",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-progress.png",
+    "result": "Sharp material track, primary marker and secondary text role, existing semantic fills. RTL mirrors fill direction; reduced motion stops sweep. Circular/value-label anatomy unshipped."
+  },
+  {
+    "item": "skeleton",
+    "type": "registry:component",
+    "scope": "skeleton",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-skeleton.png",
+    "result": "Flat muted bones, sharp shapes, quiet card/table grouping. Existing composite presets retained; no new avatar/block API. Reduced motion freezes animation."
+  },
+  {
+    "item": "breadcrumb",
+    "type": "registry:block",
+    "scope": "breadcrumb",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/navigation/review-breadcrumb.png",
+    "result": "Body role, current emphasis, focus and mirrored RTL separator."
+  },
+  {
+    "item": "sidebar-shell",
+    "type": "registry:block",
+    "scope": "app-shell",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-app-shell.png",
+    "result": "Page spacing, logical sidebar edge, overlay scrim; existing responsive shell maintained."
+  },
+  {
+    "item": "page-header",
+    "type": "registry:block",
+    "scope": "page-header",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-page-header.png",
+    "result": "Locked page-title and body roles, section spacing; caller supplies actions."
+  },
+  {
+    "item": "filter-form",
+    "type": "registry:block",
+    "scope": "filter-form",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-filter-form.png",
+    "result": "Inherits transparent top-rule Card anatomy. Added-filter chips/clear controls are unshipped."
+  },
+  {
+    "item": "stats-grid",
+    "type": "registry:block",
+    "scope": "stats-grid",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-stats-grid.png",
+    "result": "Locked top hairline, mono uppercase eyebrow and 40px/400 KPI. Fixture content differs."
+  },
+  {
+    "item": "detail-layout",
+    "type": "registry:block",
+    "scope": "detail-layout",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-detail-layout.png",
+    "result": "Quiet section spacing; existing responsive columns retained. No new width role invented."
+  },
+  {
+    "item": "data-table",
+    "type": "registry:block",
+    "scope": "data-table",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-data-table.png",
+    "result": "Locked hairline compact rows, uppercase mono headers, ink native selection and leading selection rule. DataGrid and block share scope."
+  },
+  {
+    "item": "responsive-table",
+    "type": "registry:block",
+    "scope": "table",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-table.png",
+    "result": "Responsive table preserves mobile stacked-label fallback; sharp quiet edge, hairline rows, logical alignment."
+  },
+  {
+    "item": "pagination",
+    "type": "registry:block",
+    "scope": "pagination",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/navigation/review-pagination.png",
+    "result": "Small metadata and inherited Utility controls; existing compact API does not add page-number anatomy."
+  },
+  {
+    "item": "empty-state",
+    "type": "registry:block",
+    "scope": "empty-state",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-empty-state.png",
+    "result": "Sharp dashed frame, centered heading/body with role typography. Existing heading/content contract lacks media/actions/type variants."
+  },
+  {
+    "item": "section-divider",
+    "type": "registry:block",
+    "scope": "section-divider",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/layout/review-section-divider.png",
+    "result": "Mono eyebrow voice and subtle hairline. Label sizing uses existing roles; no separate eyebrow size/line/tracking role exists."
+  },
+  {
+    "item": "theme-toggle",
+    "type": "registry:component",
+    "scope": "theme-toggle",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/actions/review-theme-toggle.png",
+    "result": "Sharp 32px control, ink focus and reduced motion."
+  },
+  {
+    "item": "sidebar-toggle",
+    "type": "registry:component",
+    "scope": "sidebar-toggle",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/navigation/review-sidebar-toggle.png",
+    "result": "Sharp 32px control, ink focus, quiet hover."
+  },
+  {
+    "item": "toast",
+    "type": "registry:component",
+    "scope": "toast",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/feedback/review-toast.png",
+    "result": "Single title (legacy eyebrow hidden in Utility), tinted surface, text-tone timer at bottom, no slab shadow. Existing four types; default/loading/actions/stacked toaster unshipped. Runtime wrapper uses bottom-end placement, mirrored in RTL; stacking remains unshipped."
+  },
+  {
+    "item": "desktop-tray-menu",
+    "type": "registry:component",
+    "scope": "tray-menu",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/desktop/review-tray-menu.png",
+    "result": "Raised sharp panel, mono group/keycap metadata, neutral hover and ink focus. Native role/disabled variants retained."
+  },
+  {
+    "item": "desktop-dialog",
+    "type": "registry:component",
+    "scope": "desktop-dialog",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/desktop/review-desktop-dialog.png",
+    "result": "Sharp token surface, strong heading, small copy and ink action controls. Existing native-request API retained rather than simulated dialog variants."
+  },
+  {
+    "item": "desktop-notification",
+    "type": "registry:component",
+    "scope": "desktop-notification",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/desktop/review-desktop-notification.png",
+    "result": "Sharp raised surface, role-bound icon tile and strong-small heading, body copy and focus. Existing disabled state captured."
+  },
+  {
+    "item": "desktop-window-chrome",
+    "type": "registry:component",
+    "scope": "window-chrome",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/desktop/review-window-chrome.png",
+    "result": "Quiet bar, flat controls and destructive close hover only. Disabled controls and both schemes captured."
+  },
+  {
+    "item": "desktop-update-prompt",
+    "type": "registry:component",
+    "scope": "update-prompt",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/desktop/review-update-prompt.png",
+    "result": "Sharp quiet panel, ink actions and info-toned manual update notice. Automatic/manual modes captured."
+  },
+  {
+    "item": "desktop-only",
+    "type": "registry:component",
+    "scope": "desktop-only",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/desktop/annotation-desktop-only.png",
+    "result": "No visual chrome: hydration-safe capability gate renders caller fallback in browser/SSR. Actual fallback captured; native bridge mounting is a runtime concern, not a themed surface."
+  },
+  {
+    "item": "mcp-ui-widget",
+    "type": "registry:component",
+    "scope": "mcp-ui-widget",
+    "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/ai/review-mcp-ui-widget.png",
+    "result": "Raised sharp frame; existing 16rem frame minimum retained because no named replacement height role. Existing error/loading/iframe lifecycle unchanged."
+  }
+]

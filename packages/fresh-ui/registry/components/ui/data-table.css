@@ -116,3 +116,9 @@
   outline: var(--ns-focus-ring-width) solid var(--ns-ring);
   outline-offset: var(--ns-focus-ring-offset);
 }
+
+/* Keep the header rail horizontal even when shared Card styles load later. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='header'] {
+  flex-direction: row;
+  align-items: center;
+}

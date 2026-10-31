@@ -124,3 +124,11 @@
     transition: none;
   }
 }
+
+/* Native overlay controls share the locked Utility keyboard ring. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog']:is([data-part='trigger'], [data-part='close']):focus-visible,
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover']:is([data-part='trigger'], [data-part='close']):focus-visible,
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='tooltip']:is([data-part='trigger'], [data-part='close']):focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}

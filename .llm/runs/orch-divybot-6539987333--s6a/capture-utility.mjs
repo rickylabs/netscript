@@ -31,6 +31,12 @@ try {
    document.addEventListener('submit',event=>event.preventDefault(),true);
    return document.fonts.ready;
   });
+  // Freeze only indeterminate progress at its real keyframe midpoint for visible evidence.
+  // Remove this specimen-only override before testing the actual reduced-motion rules.
+  await page.locator('[data-scope=progress][data-state=loading] [data-part=bar]').evaluateAll(els=>els.forEach(el=>{
+   for(const animation of el.getAnimations()){animation.pause();animation.currentTime=Number(animation.effect.getTiming().duration)/2;}
+   const transform=getComputedStyle(el).transform;el.style.animation='none';el.style.transform=transform;
+  }));
   for (let i=0;i<selected.length;i++) {
    const row = selected[i];
    const container = page.locator(`#case-${i}`);
@@ -50,11 +56,12 @@ try {
      probe.style.color=role?`var(--ns-${role}-border)`:'var(--ns-border)';const toneBorder=getComputedStyle(probe).color;
      probe.style.color=node.dataset.series?`var(--ns-chart-${node.dataset.series})`:'var(--ns-fg)';const seriesColor=getComputedStyle(probe).color;
      probe.style.color='var(--ns-primary)';const primaryColor=getComputedStyle(probe).color;probe.style.color='var(--ns-input-border)';const inputBorder=getComputedStyle(probe).color;probe.remove();
-     return {syntax,syntaxColor,scope:node.dataset.scope,part:node.dataset.part,tag:node.tagName,state:node.dataset.state,size:node.dataset.size,variant:node.dataset.variant,inputBorder,primaryColor,checked:node.previousElementSibling?.checked,seriesColor,series:node.dataset.series,stroke:s.stroke,weight:s.fontWeight,display:s.display,before:getComputedStyle(node,'::before').backgroundColor,markerWidth:getComputedStyle(node,'::before').width,accent:s.accentColor,toneText,toneFill,toneBorder,status,errorColor,ringColor,invalid:node.closest('[data-invalid=true]')?'true':undefined,focusWithin:node.matches(':focus-within'),focused:node.matches(':focus-visible'),disabled:node.matches(':disabled'),radius:s.borderRadius,sideBorder:s.borderInlineStartWidth,bottomBorder:s.borderBottomWidth,shadow:s.boxShadow,transform:s.transform,height:s.height,color:s.color,background:s.backgroundColor,border:s.borderColor,outline:s.outlineColor,outlineStyle:s.outlineStyle,outlineWidth:s.outlineWidth,opacity:s.opacity,font:s.fontFamily,fontSize:s.fontSize,transition:s.transitionDuration,animation:s.animationName};
+     return {flexDirection:s.flexDirection,alignItems:s.alignItems,syntax,syntaxColor,scope:node.dataset.scope,part:node.dataset.part,tag:node.tagName,state:node.dataset.state,size:node.dataset.size,variant:node.dataset.variant,inputBorder,primaryColor,checked:node.previousElementSibling?.checked,seriesColor,series:node.dataset.series,stroke:s.stroke,weight:s.fontWeight,display:s.display,before:getComputedStyle(node,'::before').backgroundColor,markerWidth:getComputedStyle(node,'::before').width,accent:s.accentColor,toneText,toneFill,toneBorder,status,errorColor,ringColor,invalid:node.closest('[data-invalid=true]')?'true':undefined,focusWithin:node.matches(':focus-within'),focused:node.matches(':focus-visible'),disabled:node.matches(':disabled'),radius:s.borderRadius,sideBorder:s.borderInlineStartWidth,bottomBorder:s.borderBottomWidth,shadow:s.boxShadow,transform:s.transform,height:s.height,color:s.color,background:s.backgroundColor,border:s.borderColor,outline:s.outlineColor,outlineStyle:s.outlineStyle,outlineWidth:s.outlineWidth,opacity:s.opacity,font:s.fontFamily,fontSize:s.fontSize,transition:s.transitionDuration,animation:s.animationName};
     }));
     results.push({name:row.name,scheme,state,values});
     await container.screenshot({path:join(output,`state-${i}-${scheme}-${state}.png`),animations:'disabled'});
     for (const v of values) {
+     if(v.scope==='data-table'&&v.part==='header'&&(v.flexDirection!=='row'||v.alignItems!=='center'))errors.push(`${row.name}/${scheme}: table header axis`);
      if(v.scope==='prompt-input'&&v.part==='root'&&v.focusWithin&&(v.outlineWidth!=='2px'||v.outline!==v.ringColor))errors.push(`${row.name}/${scheme}: composer focus ring`);
      if(v.focused&&['copy','action','btn','send','opt'].includes(v.part)&&['code-block','desktop-dialog','desktop-notification','window-chrome','update-prompt','tray-menu','model-selector','prompt-input'].includes(v.scope)&&(v.outlineWidth!=='2px'||v.outline!==v.ringColor))errors.push(`${row.name}/${scheme}: action focus ring`);
      if(v.syntax&&v.color!==v.syntaxColor)errors.push(`${row.name}/${scheme}: syntax ${v.syntax} colour`);
@@ -92,7 +99,7 @@ try {
     await control.evaluate(el=>{el.blur();if(el.type==='checkbox')el.checked=el.defaultChecked;});
    }
   }
-  if(families.includes('prompt-input')) {
+  {
    for(let i=0;i<selected.length;i++) {
     const container=page.locator(`#case-${i}`);
     // Record all secondary actions, not just the first focusable control in a composition.
@@ -101,7 +108,8 @@ try {
      const c=controls[j];if(!await c.isVisible()||!await c.isEnabled())continue;
      await c.hover();await page.keyboard.press('Tab');await c.focus();
      const v=await c.evaluate(el=>{const s=getComputedStyle(el);return {scope:el.dataset.scope,part:el.dataset.part,outline:s.outlineWidth,style:s.outlineStyle,radius:s.borderRadius,shadow:s.boxShadow};});
-     if(v.outline!=='2px'||v.style!=='solid')errors.push(`${selected[i].name}/${scheme}: secondary action focus`);
+     // Accordion here is the unstyled headless primitive, outside the baseline registry inventory.
+     if(v.scope!=='accordion'&&(v.outline!=='2px'||v.style!=='solid'))errors.push(`${selected[i].name}/${scheme}: secondary action focus`);
      results.push({name:selected[i].name,scheme,state:`secondary-focus-${j}`,values:[v]});
      await container.screenshot({path:join(output,`secondary-${i}-${j}-${scheme}.png`),animations:'disabled'});await c.blur();
     }
@@ -120,6 +128,7 @@ try {
   }
   await page.locator('.specimen').evaluateAll(els=>els.forEach(el=>el.hidden=false));
   await page.evaluate(()=>document.documentElement.dir='rtl');
+  await page.locator('[data-scope=progress][data-state=loading] [data-part=bar]').evaluateAll(els=>els.forEach(el=>{el.style.removeProperty('animation');el.style.removeProperty('transform');}));
   await page.emulateMedia({reducedMotion:'reduce'});
   for(let i=0;i<selected.length;i++) {
    const control=page.locator(`#case-${i} input[type=checkbox]`).first();

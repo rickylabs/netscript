@@ -6,7 +6,7 @@ import { TOKEN_PRESETS } from '../src/tokens/domain/token-presets.ts';
 import { PREVIEW_TOKEN_FILES } from '../src/tokens/domain/token-output.ts';
 import { FRESH_UI_PACKAGE_VERSION } from '../src/package-metadata.generated.ts';
 
-Deno.test('JSON authoring preserves every legacy file target, dependency, CSS contribution and tag', () => {
+Deno.test('JSON authoring preserves legacy contracts plus the reviewed syntax dependency', () => {
   const legacyNames = new Set(Object.keys(legacyBaseline));
   const previewSources = new Set(legacyBaseline['theme-previews'].files.map((file) => file.source));
   const actual = Object.fromEntries(
@@ -24,7 +24,12 @@ Deno.test('JSON authoring preserves every legacy file target, dependency, CSS co
       tags: item.tags,
     }]),
   );
-  assertEquals<unknown>(actual, legacyBaseline);
+  // S6a adds syntax rendering; retain the historical fixture and declare only this reviewed delta.
+  const expected = {
+    ...legacyBaseline,
+    'code-block': { ...legacyBaseline['code-block'], dependencies: ['npm:highlight.js@11.11.1'] },
+  };
+  assertEquals<unknown>(actual, expected);
   assertEquals(
     freshUiRegistryManifest.items.filter((item) => !legacyNames.has(item.name)).map((item) =>
       item.name

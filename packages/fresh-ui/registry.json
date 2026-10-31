@@ -2342,7 +2342,9 @@
       "registryDependencies": [
         "theme-seed"
       ],
-      "dependencies": ["npm:highlight.js@11.11.1"],
+      "dependencies": [
+        "npm:highlight.js@11.11.1"
+      ],
       "type": "registry:component",
       "files": [
         {
