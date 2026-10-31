@@ -414,3 +414,20 @@ README incorporates the non-blocking distinction between JSON quote/newline
 escapes and HTML attribute escaping. Source remains28files before the expected
 public Icon corpus update. Source commit precedes carriers/current-head quality/
 publication and same evidence review; then parent rebase/restack before11b.
+
+Docs11a source dbcb96ff committed. All six generation/freshness commands PASS
+(including all four carrier checks) after that source; raw git status was clean
+before these evidence edits. Contrary to the pre-source estimate, there is NO
+post-source generated delta, including no Icon corpus change. Actual footprint
+remains28source/carrier files, under30. Committed-source quality/architecture
+receipt matches dbcb96ff, native publication refresh PASS with0slow types. Same
+independent evidence reconciliation follows before audited push/comment and
+required parent latest-main recovery/restack. No READY or final report.
+
+## Docs11a terminal evidence reconciliation
+
+Same independent evidence PASS at dbcb96ff; all4 committed-source carrier checks
+and quality/native publication reconcile, actual generated delta0,28sourcefiles.
+Evidence-only commit records the sign-off, then mandatory zero public audit
+precedes normal push/comment. Recovery7 parent latest-main rebase and child
+restack are next, before remaining11b/12/13 product implementation. No READY.
