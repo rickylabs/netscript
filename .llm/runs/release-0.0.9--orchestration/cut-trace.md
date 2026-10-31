@@ -21,3 +21,15 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 05:58 | `3d83caf1c` | #2498 | #2115 | W3 (D1) | package-only; resumed after orphan |
 | 2026-10-31 06:13 | `c6bce8f86` | #2497 | #2161 | W2 (A3) | relaunched after orphaned claim |
 | 2026-10-31 06:42 | `59902cf6f` | #2502 | #2267 | W4 (C1) | memory adapter only |
+| 2026-10-31 08:13 | `a2fe36aee` | #2505 | #2132 | W4 (C1) | mc009e; READY a75d631, Opus MERGE r5, 30/30 |
+| 2026-10-31 08:15 | `1d274c16b` | #2494 | #2155 | W5 (E2) | combined-tree carrier check (prose, publish-assets) by coordinator |
+| 2026-10-31 08:40 | `f68394636` | #2499 | #2159 (slice 1) | W3 (B1) | #2159 stays open for owner follow-up decision |
+| 2026-10-31 09:28 | `24d63fd80` | #2510 | #2338 | W4 (C1) | combined-tree carriers fresh |
+| 2026-10-31 09:36 | `02a66ba6d` | #2482 | #2400 | W2 (A3) | A3 complete; r3 finish leaf after carrier conflict; one Garnet rerun at r2 |
+| 2026-10-31 10:19 | `20583c83c` | #2512 | #2383 | W4 (B1) | includes Garnet CI prep root-cause fix |
+| 2026-10-31 10:21 | `abe9d3e43` | #2514 | #1491 | W5 (E2) | docs lane |
+| 2026-10-31 10:36 | `aec75e4d9` | #2511 | #2392 | W4 (E1) | lock +1 line each (@netscript/logger) |
+| 2026-10-31 10:53 | `0af1d65b2` | #2515 | #2401 | W4 (E1) | upstream Aspire report ready-to-file (owner) |
+| 2026-10-31 10:54 | `da3d08f3d` | #2509 | #2162 | W3 (B2) | steered after e2e red (doctor check rename) |
+| 2026-10-31 11:33 | `462f15c09` | #2517 | #2160 | W5 (B1) | v1 sagas contract response shape documented |
+| 2026-10-31 11:37 | `15cffa2fe` | #2421 | #2396 (final PR) | W1 (D1) | F-5 debt 23/22 (literal-union closure); **canary .1 contents complete**; readiness posted 11:52 (main green: ci 41197652794, e2e-cli 41197676281, command-postgres 41197674602) |

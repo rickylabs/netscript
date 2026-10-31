@@ -205,3 +205,6 @@
 - 11:33:54Z: dispatched #2382 (B1, fixes; last B1 leaf; requires #2160 merged), comment 6542833423. Validator green before posting.
 - 11:34:37Z: #2149 (PR #2519) BLOCKED: IMPL-EVAL rounds 1-2 FAIL_FIX on two tutorial lines only (no code blockers); it proposed a coordinator takeover. **Decision:** no takeover; the leaf finishes on its branch with one authorized eval round 3. Steered the live worker on its own PR and on the issue.
 - 11:38:12Z: **merged** #2421 (`15cffa2fe`), the final #2396 PR. The coordinator ticked the same-head runtime-proof box with the e2e evidence and reran close-gate (green). #2396 stays open for the release-owned published-graph proof on the first canary containing it. **All canary .1 contents are merged.** Next: main control runs at `15cffa2` (push CI, command-postgres dispatch, e2e-cli dispatch), then post readiness.
+- 11:39:15Z: #2519 (#2149) round-3 Opus MERGE at `2f02788` after the tutorial fixes; waiting for READY.
+- 11:42:38Z: #2382 → PR #2522.
+- 11:51:21Z: **Canary .1 readiness posted** on #2474: candidate `15cffa2fe`, all contents merged, main green (ci, quality, carriers, Fresh UI, docs, e2e-cli dispatch 41197676281 incl desktop-native, command-postgres 41197674602). Pre/post-cut items: #2396 published-graph proof, #2421 debt veto window, upstream Aspire report. Eric cuts.

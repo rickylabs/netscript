@@ -955,7 +955,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2519,
-      "headSha": "2f02788071fd4d8088b7b9e21dfa2394d04f2bc5",
+      "headSha": "b798a187636da64e90dff28d42fcac5170527854",
       "issueNumbers": [
         2149
       ],
@@ -969,7 +969,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2520,
-      "headSha": "aecbe4022e7fa92b84bd761bfdb875e76a68d05e",
+      "headSha": "bfc3e922cd38fb0e013a220232cd5ed7171eaf72",
       "issueNumbers": [
         1367
       ],
@@ -982,11 +982,24 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2521,
-      "headSha": "26fc46f9c44df2b139f505adb74a77b7d94d1ec6",
+      "headSha": "660f20038e47ad1a9e038df3ffacd09ac5928d3d",
       "issueNumbers": [
         2268
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2268",
+      "receiptRefs": []
+    },
+    {
+      "id": "B1-2382",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2522,
+      "headSha": "fa11024d190782ab4ffb1733d3a13fa98166ea2b",
+      "issueNumbers": [
+        2382
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2382",
       "receiptRefs": []
     }
   ],
@@ -1235,11 +1248,13 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": null,
       "headSha": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
       "startedAt": "2026-10-31T11:38:10Z",
-      "via": "workflow_dispatch on main (canary .1 control run 41197676281)"
+      "via": "workflow_dispatch on main (canary .1 control run 41197676281)",
+      "result": "SUCCESS (both runtime tiers, static, desktop-native-linux)",
+      "completedAt": "2026-10-31T11:50:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1248,7 +1263,7 @@
       "state": "planned",
       "targetDate": "2026-11-02",
       "rationale": "H01 main CI green, A1-A3 silent job/queue loss, D1 #2396 guarded plugin services (waves 1-3 critical path).",
-      "note": "contents merged at 11:37Z (candidate 15cffa2fe); main control runs in progress; Eric cuts (publishing/complete are release-captain states)"
+      "note": "READY TO CUT: candidate 15cffa2fe; readiness posted on #2474 11:52Z (comment 6542998232); main green; Eric cuts"
     },
     {
       "id": "0.0.9-canary.2",
@@ -1271,10 +1286,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T11:38:48Z",
-    "nextReportDueAt": "2026-10-31T12:38:48Z",
-    "lastReportRef": "worklog.md",
-    "headline": "canary .1 contents all merged (candidate 15cffa2fe); main control runs in progress",
+    "lastReportAt": "2026-10-31T11:51:47Z",
+    "nextReportDueAt": "2026-10-31T12:51:47Z",
+    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474#issuecomment-6542998232",
+    "headline": "canary .1 READY TO CUT at 15cffa2fe (posted on #2474); canary .2 in flight",
     "currentMainSha": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -1461,7 +1476,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T11:38:50Z",
+  "updatedAt": "2026-10-31T11:51:48Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1780,8 +1795,8 @@
       "commentId": 6542833423,
       "postedAt": "2026-10-31T11:33:54Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "posted",
-      "pr": null
+      "state": "pr-open",
+      "pr": 2522
     }
   ],
   "coordinatorArtifactPr": 2475,
