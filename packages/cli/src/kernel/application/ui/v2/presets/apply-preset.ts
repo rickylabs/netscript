@@ -1,6 +1,6 @@
 import { resolve } from '@std/path';
 import { z } from 'zod';
-import { resolveUiPreset } from './resolve-preset.ts';
+import { type ResolvedUiPreset, resolveUiPreset } from './resolve-preset.ts';
 import { applyRemoteUiPreset } from './apply-remote-preset.ts';
 import { uiContentHash } from '../../../../domain/ui/ui-lock.ts';
 import { readUiConfig, readUiLock, writeUiMetadata } from '../config-lock.ts';
@@ -20,9 +20,13 @@ export interface UiPresetApplyInput {
 }
 
 /** Apply theme/font through the existing compiler; component sources change only for explicit style. */
-export async function applyUiPreset(input: UiPresetApplyInput, deps: UiRegistryDependencies) {
+export async function applyUiPreset(
+  input: UiPresetApplyInput,
+  deps: UiRegistryDependencies,
+  resolved?: ResolvedUiPreset,
+) {
   const root = resolve(input.root);
-  const selection = await resolveUiPreset(input.preset, deps);
+  const selection = resolved ?? await resolveUiPreset(input.preset, deps);
   if (selection.kind === 'remote') {
     return await applyRemoteUiPreset(input, selection.url, selection.deps);
   }

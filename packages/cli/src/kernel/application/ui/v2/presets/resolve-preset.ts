@@ -2,11 +2,18 @@ import { decodeUiPreset, type UiPreset, UiPresetSchema } from '../../../../domai
 import { parseUiRegistryJson, uiRegistryUrl } from '../../../../domain/ui/ui-config.ts';
 import type { UiRegistryDependencies } from '../registry-client.ts';
 
-/** Distinguish local share links from fetched preset JSON and portable registry items. */
-export async function resolveUiPreset(input: string, deps: UiRegistryDependencies): Promise<
+/** Validated selection retains fetched bytes for application without a second request. */
+export type ResolvedUiPreset =
   | { readonly kind: 'preset'; readonly preset: UiPreset }
-  | { readonly kind: 'remote'; readonly url: string; readonly deps: UiRegistryDependencies }
-> {
+  | { readonly kind: 'remote'; readonly url: string; readonly deps: UiRegistryDependencies };
+
+const HTTP_LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+/** Distinguish local share links from fetched preset JSON and portable registry items. */
+export async function resolveUiPreset(
+  input: string,
+  deps: UiRegistryDependencies,
+): Promise<ResolvedUiPreset> {
   if (!/^[a-z][a-z0-9+.-]*:/i.test(input)) return { kind: 'preset', preset: decodeUiPreset(input) };
   let url: URL;
   try {
@@ -14,10 +21,13 @@ export async function resolveUiPreset(input: string, deps: UiRegistryDependencie
   } catch {
     throw new Error('Invalid UI preset URL');
   }
-  if (!['https:', 'http:'].includes(url.protocol)) {
-    throw new Error('UI preset URLs require HTTP or HTTPS');
-  }
   if (url.username || url.password) throw new Error('UI preset URLs cannot contain credentials');
+  if (
+    url.protocol !== 'https:' &&
+    !(url.protocol === 'http:' && HTTP_LOOPBACK_HOSTS.has(url.hostname))
+  ) {
+    throw new Error(`UI preset URLs require HTTPS (HTTP is allowed only for loopback): ${input}`);
+  }
   if (url.searchParams.has('preset')) {
     if (!url.searchParams.get('preset')) {
       throw new Error('UI share URL has an empty preset parameter');
@@ -43,6 +53,11 @@ export async function resolveUiPreset(input: string, deps: UiRegistryDependencie
       throw new Error('URL preset JSON theme must name a registered built-in token preset');
     }
     return { kind: 'preset', preset: preset.data };
+  }
+  const { validateRegistryItem } = await import('@netscript/fresh-ui/registry-v2');
+  const item = validateRegistryItem(payload);
+  if (!['registry:theme', 'registry:base'].includes(item.type)) {
+    throw new Error('URL preset must be a registry:theme or registry:base item');
   }
   const transport = deps.transport;
   return {

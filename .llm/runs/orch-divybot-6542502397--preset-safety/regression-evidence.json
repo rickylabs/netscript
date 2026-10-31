@@ -1,0 +1,67 @@
+{
+  "baseline": "851d1ce92d91352aa0d7b9c29ba6e3e4ee39bae2",
+  "red": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 8,
+      "ignored": 0,
+      "totalResults": 8,
+      "uniqueFailures": 8
+    },
+    "failures": [
+      {
+        "test": "init rejects bad preset URLs and schemas before creating any scaffold files",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 4
+      },
+      {
+        "test": "preset URLs require HTTPS except exact loopback HTTP hosts",
+        "file": "./packages/cli/src/kernel/application/ui/v2/tests/url-preset_test.ts",
+        "line": 205
+      },
+      {
+        "test": "netscript-dev.ts: bad-url",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 28
+      },
+      {
+        "test": "netscript-dev.ts: bad-theme-schema",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 28
+      },
+      {
+        "test": "netscript.ts: bad-theme-schema",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 28
+      },
+      {
+        "test": "netscript.ts: bad-preset-schema",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 28
+      },
+      {
+        "test": "netscript-dev.ts: bad-preset-schema",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 28
+      },
+      {
+        "test": "netscript.ts: bad-url",
+        "file": "./packages/cli/src/public/features/init/init-preset-safety_test.ts",
+        "line": 28
+      }
+    ],
+    "rawReportSha256": "d702ae7d2f2b3687a7537b00e75d04aecb8604e1ed56671f7284c2b0de9dcb01"
+  },
+  "green": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 10,
+      "uniqueFailures": 0
+    },
+    "rawReportSha256": "f144aba7cf4a2a08013e22a47721309c1be1d0023ad49fab89263a6d05d1c4da"
+  }
+}

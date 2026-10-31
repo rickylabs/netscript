@@ -43,7 +43,7 @@ in your installed version, run `netscript --help` or `netscript <group> --help`.
 | `--dry-run`                 | Preview the scaffold plan without writing files (default `false`).                             |
 | `--json`                    | Emit a single machine-readable JSON result (default `false`).                                  |
 | `--from <preset>`           | Apply a named scaffold preset.                                                                 |
-| `--preset <code-or-url>` | Apply a UI token preset, encoded/share preset, URL preset JSON, or URL registry theme to the generated Fresh app after scaffolding. Dry runs do not fetch or apply it. |
+| `--preset <code-or-url>` | Resolve and validate a UI token preset, encoded/share preset, URL preset JSON, or URL registry theme before scaffolding, then apply it to the generated Fresh app. Dry runs do not fetch or apply it. |
 
 Project init runs the agent installer after scaffolding by default, using the generated project
 root. Host detection honors project markers before the invoking environment and defaults to Claude
@@ -373,7 +373,9 @@ netscript init my-app --preset https://raw.githubusercontent.com/owner/themes/ma
 ```
 
 A URL with a nonempty `?preset=` parameter remains a shared preset link and is decoded locally.
-Other HTTP(S) URLs fetch either strict version-1 preset JSON (its `theme` is a registered built-in
+Preset URLs require HTTPS. For local development, HTTP is allowed only on loopback hosts
+`localhost`, `127.0.0.1`, and `[::1]` (with optional ports); this also applies to `init --preset`
+and `ui:apply --preset`. Other URLs fetch either strict version-1 preset JSON (its `theme` is a registered built-in
 preset ID) or a published-schema `registry:theme`/`registry:base` item. Malformed URLs, failed HTTP
 requests, invalid JSON/schema, unknown names and unsafe file targets produce an error. Registry
 theme items apply as a whole; `--only` remains available for preset codes and preset JSON.
@@ -387,9 +389,11 @@ replacement before writes. A second URL theme can replace sources owned by the p
 After installing a URL theme, selecting a built-in preset code changes the context within the
 app's installed sources. It retains `sourceRoot` and the Figma-owned values; it does not reset
 those sources to the bundled catalog. `init --dry-run --preset` previews the scaffold and skips
-remote fetch/application. With a real init, preset application follows scaffold creation; if a
-URL fails, repair it and use `ui:apply --preset` on the generated app to finish configuration. Agent setup was skipped after that failure; run
-`netscript agent init --project-root .` from the generated workspace after applying the theme.
+remote fetch/application. With a real init, the preset is resolved, fetched, and schema-validated
+before any scaffold files are written. Invalid URLs or schemas leave the target directory untouched.
+The validated preset is applied after scaffold creation, before agent setup. If that later application
+fails (for example on a dependency fetch or file conflict), repair it with `ui:apply --preset` in the
+generated app, then run `netscript agent init --project-root .` from the generated workspace.
 
 The [plugin contributor guide](https://github.com/rickylabs/netscript/blob/main/tools/figma-plugin/README.md)
 explains Figma import/export, token scopes, the values-only PR contract and the shared CI name check.
