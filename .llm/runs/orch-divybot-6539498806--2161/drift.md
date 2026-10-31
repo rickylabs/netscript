@@ -5,3 +5,5 @@
 - No private host/path/session details will be committed. Evaluator session routing stays in local evidence outside Git.
 
 - Pre-implementation research found the standalone workers compiler and AI protocol-2 selectors. Include them for consistent exclusion policy, keeping edits limited to scan rules.
+
+- Maintainer init rejects an external temporary target. The targeted install fixture therefore uses the repository-designated scratch surface .llm/tmp/registry-opt-out-2161/, with all evidence outside Git; this is a generated-project acceptance fixture, not another worktree. No Aspire resources are started.

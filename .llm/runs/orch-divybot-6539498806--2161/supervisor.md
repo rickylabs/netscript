@@ -9,3 +9,5 @@
 - Permissions: edit, commit, push, draft and ready PR, phase comments, final report handoff. No merge, labels, milestones, local scaffold.runtime, lock/cache deletion or reload.
 
 - Research scope extension before implementation: plugins/ai/src/cli/ai-registry-compiler.ts, plugins/ai/src/cli/ai-registry-compiler.test.ts, plugins/ai/README.md; workers registry-compiler.ts and its existing tests. Correct documentation path is docs/site/orchestration-runtime/how-to/author-a-plugin.md.
+
+- Targeted generated fixture write surface: .llm/tmp/registry-opt-out-2161/ (ignored; no source ownership changes).

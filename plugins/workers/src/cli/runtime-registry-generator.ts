@@ -2,6 +2,7 @@ import type { RenderedRuntimeRegistry } from './command-types.ts';
 import { exists } from 'jsr:@std/fs@^1';
 import { basename, dirname, join, relative } from 'jsr:@std/path@^1';
 import { toCamelCase } from 'jsr:@std/text@^1';
+import { LocalProjectFiles, selectRegistrySources } from '@netscript/plugin/cli';
 import type { JobConfig, WorkersConfigData } from '@netscript/plugin-workers-core/config';
 import { resolveConfiguredJobPolicies } from './configured-job-policies.ts';
 
@@ -106,17 +107,23 @@ export async function renderRuntimeRegistries(
       (options.workers.jobs.length > 0 ||
         options.workers.groups.some((group) => group.jobs.length));
     const targetDirExists = await exists(targetDir, { isDirectory: true });
+    const excludedSourceFiles: string[] = [];
     const files = targetDirExists
       ? await discoverRegistryFiles(options.projectRoot, targetDir, {
         fileSuffixes: target.fileSuffixes,
         include: target.include,
         includeWhenPresent: target.includeWhenPresent,
         exclude: target.exclude,
-      })
+      }, excludedSourceFiles)
       : [];
     const registryPath = target.registryPath ?? `${target.dir}/_registry.ts`;
     if ((!targetDirExists || files.length === 0) && !hasConfiguredJobs) {
-      rendered.push({ registryPath, sourceFiles: [], content: null });
+      rendered.push({
+        registryPath,
+        sourceFiles: [],
+        content: null,
+        ...(excludedSourceFiles.length ? { excludedSourceFiles } : {}),
+      });
       continue;
     }
     const registry = await generateRuntimeRegistry(
@@ -125,8 +132,13 @@ export async function renderRuntimeRegistries(
       join(options.projectRoot, registryPath),
       files,
       options.workers,
+      excludedSourceFiles,
     );
-    rendered.push({ registryPath, ...registry });
+    rendered.push({
+      registryPath,
+      ...registry,
+      ...(excludedSourceFiles.length ? { excludedSourceFiles } : {}),
+    });
   }
   return rendered;
 }
@@ -153,6 +165,7 @@ async function discoverRegistryFiles(
     readonly includeWhenPresent?: readonly ConditionalRuntimeInclude[];
     readonly exclude: readonly string[];
   },
+  excludedSourceFiles: string[],
 ): Promise<string[]> {
   const include = await resolveRuntimeIncludes(projectRoot, options);
   const files: string[] = [];
@@ -167,7 +180,12 @@ async function discoverRegistryFiles(
       files.push(entry.name);
     }
   }
-  return files.sort();
+  const selection = await selectRegistrySources(
+    new LocalProjectFiles(projectRoot),
+    files.sort().map((file) => relative(projectRoot, join(dir, file)).replaceAll('\\', '/')),
+  );
+  excludedSourceFiles.push(...selection.excludedSourceFiles);
+  return selection.sourceFiles.map((path) => basename(path));
 }
 
 async function resolveRuntimeIncludes(
@@ -197,6 +215,7 @@ async function generateRuntimeRegistry(
   registryPath: string,
   files: readonly string[],
   workers: WorkersConfigData | undefined,
+  excludedSourceFiles: string[],
 ): Promise<{ readonly content: string; readonly sourceFiles: readonly string[] }> {
   const lines = createRegistryHeader(target);
   const registryDir = relative(projectRoot, dirname(registryPath)).replaceAll('\\', '/');
@@ -208,7 +227,13 @@ async function generateRuntimeRegistry(
     );
   });
 
-  const pluginEntries = await appendPluginImports(projectRoot, target, registryDir, lines);
+  const pluginEntries = await appendPluginImports(
+    projectRoot,
+    target,
+    registryDir,
+    lines,
+    excludedSourceFiles,
+  );
   const configuredPolicies = target.kind === 'workers-job' && workers
     ? resolveConfiguredJobPolicies(projectRoot, [
       ...files.map((file) => ({ path: `${target.dir}/${file}`, source: 'local' as const })),
@@ -281,6 +306,7 @@ async function appendPluginImports(
   target: RuntimeRegistryTarget,
   registryDir: string,
   lines: string[],
+  excludedSourceFiles: string[],
 ): Promise<PluginEntry[]> {
   const pluginEntries: PluginEntry[] = [];
   for (const pluginDir of target.pluginDirs ?? []) {
@@ -292,7 +318,7 @@ async function appendPluginImports(
     const pluginFiles = await discoverRegistryFiles(projectRoot, dir, {
       fileSuffixes: target.fileSuffixes,
       exclude: pluginDir.exclude ?? [],
-    });
+    }, excludedSourceFiles);
     if (pluginFiles.length === 0) {
       continue;
     }

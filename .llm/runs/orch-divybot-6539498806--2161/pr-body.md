@@ -14,7 +14,7 @@ The module-level option fits static registry generation: it can be checked witho
 ## Slices
 
 - [x] S0 plan and independent PLAN-EVAL (round 2 PASS).
-- [ ] S1 shared directive, generator selection, inspection and doctor evidence.
+- [x] S1 shared directive, generator selection, inspection and doctor evidence (60 focused tests, scoped gates and independent review PASS).
 - [ ] S2 installed-project proof and documentation.
 
 ## Validation

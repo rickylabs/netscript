@@ -2,6 +2,7 @@ import {
   type ProjectFileEntry,
   type ProjectFiles,
   renderRegistryModule,
+  selectRegistrySources,
 } from '@netscript/plugin/cli';
 import { inspectSagasProject } from './saga-inspector.ts';
 
@@ -46,6 +47,7 @@ export async function renderSagaRegistry(
   {
     readonly registryPath: string;
     readonly sourceFiles: readonly string[];
+    readonly excludedSourceFiles?: readonly string[];
     readonly content: string;
   }
 > {
@@ -54,11 +56,15 @@ export async function renderSagaRegistry(
   const sourcePaths = inspected.entries.map((entry) => entry.sourcePath).filter((path) =>
     isIncludedSourcePath(path, options)
   );
-  const sagaFiles = await toEntries(files, sourcePaths);
+  const selection = await selectRegistrySources(files, sourcePaths);
+  const sagaFiles = await toEntries(files, selection.sourceFiles);
   const source = renderSagaRegistrySource(registryPath, sagaFiles);
   return Object.freeze({
     registryPath,
     sourceFiles: Object.freeze(sagaFiles.map((entry) => entry.relativePath)),
+    ...(selection.excludedSourceFiles.length
+      ? { excludedSourceFiles: selection.excludedSourceFiles }
+      : {}),
     content: source,
   });
 }
