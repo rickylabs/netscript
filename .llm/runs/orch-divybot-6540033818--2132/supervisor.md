@@ -12,3 +12,6 @@
 - Scope expansion after independent IMPL-EVAL: `packages/kv/adapters/denokv-bridge.ts`, with focused
   native-vs-bridge inclusive-start tests under the already-authorized tests directory. Rationale
   and exact compatibility correction are in drift.md; no exported signature changes.
+- CI-derived generated-surface expansion: refresh only the existing export-corpus generator's
+  output under `packages/mcp/src/infrastructure/export-surfaces/` for the changed KV documentation/adapter surface.
+  No MCP API or generator behavior changes; exact output and row delta recorded in S2 evidence.

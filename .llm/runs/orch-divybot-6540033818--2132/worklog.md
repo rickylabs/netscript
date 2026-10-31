@@ -112,3 +112,36 @@ wiring surfaces were not touched; source changes stay within the declared surfac
 recorded bridge expansion. No lock or assignment-file churn. Push this slice, record its exact
 commit in the PR phase comment, then mark ready and perform final exact-head evaluation. Final
 verdict belongs on the PR without a subsequent evidence commit changing the reviewed SHA.
+
+## S2 — CI-generated corpus correction
+
+At S1 head85dc6199a8c98ebd86902573338d1c58bf8df775 the independent final review returned MERGE;
+it reran223package tests/check/fmt at that exact head. Then CI's broader quality job exposed stale
+MCP export-corpus metadata. The native freshness check reproduces this failure locally. Run
+`gen:mcp-export-corpus` from committed package sources; exactly one existing kv ./redis row
+changes, all15symbols retained. Decoding proves only the normalized class signature changes:
+private listForward/listReverse are replaced by scanPrefix. No public API, runtime or generator
+behavior change. Exact output path and declared surface expansion are recorded in drift.md.
+
+S2 gates: native corpus freshness, asset-barrel freshness, publish-asset freshness,7corpus
+consumer tests, structured export-surface check/lint/fmt and quality:gate all pass. See
+s2-validation-summary.json. S2 needs independent substantive slice review before commit, then a
+new exact pushed-head final review; the S1 verdict is not claimed to attest a later commit.
+
+The initial close-gate failure was an unchecked final-review box while review ran. Once reviewed,
+checking it made live close-gate pass. GitHub refused rerun while the workflow was still active.
+The new generated correction will trigger a new CI run; no label, milestone or force-push.
+
+The test-4 CI artifact reports two failures in generate-export-surface-corpus_test.ts:
+"write mode generates the artifact from a clean committed tree" and "--check remains
+freshness-only when the generator read set is dirty". Both derive from the same stale committed
+corpus; the second expects freshness0 and gets1, and the first hits the assertion diff allocator
+while comparing the stale payload. The corpus refresh addresses both. These fixtures archive
+HEAD, so run their structured regression suite after the generated correction is committed;
+working-tree-only generation cannot satisfy that committed-tree assertion.
+
+S2 independent round4 pre-commit review PASS. The evaluator decoded old/new rows, verified only
+kv ./redis changed with unchanged symbols/kinds, independently ran native freshness and7corpus
+consumer tests. S2 reconcile: CI quality/test-4 have the same stale-corpus root cause; no KV source
+change is needed. Commit the correction and run committed-HEAD generator regressions, push it,
+then obtain the round5 exact-head final verdict. No lock/source churn or unrelated metadata.

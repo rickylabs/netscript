@@ -30,3 +30,18 @@ No labels/milestones, no force-push/rebase, no lock churn, no local scaffold.run
 tag or release. No scaffold/plugin/runtime wiring touched. Final READY report goes through the
 assignment's atomic .divybot-final-report file handoff, not gh issue comment. Never commit the
 assignment or private execution logs/endpoints/session identity.
+
+## S2 corrective state
+
+S1 is committed/pushed at85dc6199a8c98ebd86902573338d1c58bf8df775 and independently final-reviewed
+MERGE. PR is ready. CIquality then found stale MCP corpus; generated one-row kv ./redis refresh
+is in the working tree, with7consumer tests and all freshness/static/quality gates passing.
+S2 scope/gates are in drift.md and s2-validation-summary.json. Need independent round4 slice
+review, commit/push with run records, then round5 final exact-head evaluation and CI green.
+Old S1 exact-head verdict must not be represented as proof for the new head. Final checklist
+must reflect the new exact-head review truthfully. Do not change KV implementation code.
+
+S2 independent round4 review PASS; evaluate-s2.md records semantic one-row verification and
+independent7consumer/freshness gates. Commit this correction, run the committed-tree generator
+regression suite, push, then run final round5 on the exact pushed SHA. The old CItest-4 failures
+are also stale-corpus fixture failures; the one-row refresh addresses their common cause.

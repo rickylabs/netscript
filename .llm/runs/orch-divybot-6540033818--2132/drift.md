@@ -35,3 +35,10 @@
 - Self-review found fractional limits could bypass an equality-only heap capacity check. Use
   >= capacity so retained memory remains bounded even for fractional input; preserve Redis's
   existing ceiling-like result count, and add a heap-cap regression.
+
+- CI quality at the first pushed implementation head finds stale generated MCP export-surface
+  metadata after KV adapter shape changes. Expand the write surface to the existing
+  generator's single output, packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts,
+  as identified by the generator. Refresh with gen:mcp-export-corpus from committed package
+  source, then run freshness and corpus consumer tests. Do not hand-edit compressed rows.
+  Keep this in a separate corrective slice with worklog/context and independent review.
