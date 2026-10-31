@@ -1,3 +1,5 @@
+import { createServiceLogger, ensureLogging } from '@netscript/logger';
+import type { LoggerPort } from '@netscript/plugin-triggers-core/runtime';
 import { openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
 import type { ChildHealthMonitor } from '@netscript/plugin/health';
 import type {
@@ -17,6 +19,7 @@ import {
 } from '@netscript/plugin-triggers-core/adapters';
 import { loadProjectTriggerDefinitions } from './project-trigger-registry.ts';
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
+import { TriggerHealthMonitor } from './trigger-health-monitor.ts';
 
 /** Options for starting the background trigger processor runtime. */
 export type TriggerProcessorRuntimeOptions = Readonly<{
@@ -29,6 +32,8 @@ export type TriggerProcessorRuntimeOptions = Readonly<{
   fileWatcher?: FileWatcherPort;
   kv?: KvStore;
   drainTimeoutMs?: number;
+  /** Structured diagnostic sink for file-watch failures and readiness transitions. */
+  logger?: LoggerPort;
 }>;
 
 /** Background trigger processor entrypoint for Aspire-managed runtimes. */
@@ -47,7 +52,18 @@ export async function startTriggerProcessorRuntime(
     processor = options.processor ?? await createRuntimeTriggerProcessor({ kv, definitions });
     options.health?.dependenciesReady();
     scheduler = options.scheduler ?? new CronTriggerSchedulerAdapter();
-    fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter();
+    const logger = options.logger ?? createServiceLogger('triggers');
+    fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter({
+      onError: async (error, handle) => {
+        if (options.logger === undefined) await ensureLogging();
+        logger.error('trigger.file_watch.error', { triggerId: handle.id, error });
+      },
+      onStatusChange: async (event) => {
+        if (options.health instanceof TriggerHealthMonitor) options.health.updateWatch(event);
+        if (options.logger === undefined) await ensureLogging();
+        logger.info('trigger.file_watch.status', event);
+      },
+    });
     const activeProcessor = processor;
     for (const definition of definitions) {
       if (isScheduledTriggerDefinition(definition)) {
@@ -55,6 +71,9 @@ export async function startTriggerProcessorRuntime(
           await activeProcessor.process(event, definition);
         });
       } else if (isFileWatchDefinition(definition)) {
+        if (options.health instanceof TriggerHealthMonitor) {
+          options.health.registerWatch(definition.id);
+        }
         await fileWatcher.watch(definition, async (event) => {
           await activeProcessor.process(event, definition);
         });

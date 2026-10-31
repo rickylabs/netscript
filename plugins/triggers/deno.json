@@ -20,6 +20,7 @@
     "@netscript/config": "jsr:@netscript/config@0.0.8",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.8",
     "@netscript/kv": "jsr:@netscript/kv@0.0.8",
+    "@netscript/logger": "jsr:@netscript/logger@0.0.8",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.8",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8",
     "@netscript/plugin-triggers-core": "jsr:@netscript/plugin-triggers-core@0.0.8",

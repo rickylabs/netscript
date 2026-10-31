@@ -126,6 +126,18 @@ The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-triggers@<version>`](https://jsr.io/@netscript/plugin-triggers/doc)
 (pin `<version>` on the pre-release line, as above).
 
+## File-watch availability
+
+The generated background child includes `fileWatches` in its existing `/health` response. Each
+entry identifies the trigger and reports `watching` or `unavailable` with an ISO transition time.
+Missing roots and failed watches remain visible while other triggers continue processing. The
+adapter retries with bounded exponential backoff and reports recovery after reopening the root.
+It does not replay files changed during an outage. Shutdown cancels retries and drains handlers.
+
+Custom background glue can use `TriggerHealthMonitor` from the runtime subpath and provide its
+snapshot to `runChildHealthProcess`. Aggregate child readiness remains independent of individual
+watch availability, including the starter watch before its directory exists.
+
 ## Docs
 
 - **Triggers reference — commands, service, and contract**:

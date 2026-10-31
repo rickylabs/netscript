@@ -15,8 +15,8 @@ react to file changes.
 | --- | --- | --- |
 | `@netscript/watchers` | `./mod.ts` | [Factory](#factory), [watcher](#watcher), [filters](#filters), [failure tracking](#failure-tracking) and [filesystem helpers](#filesystem-helpers). The package has no other entrypoints. |
 
-The watcher selects its strategy automatically: native OS notifications for local paths, polling
-for network paths. Most callers only need `createWatcher`.
+With no explicit strategy, the watcher selects native OS notifications with polling fallback for
+local paths, or polling for network paths. Set `strategy` when the choice must be explicit.
 
 ## Factory
 
@@ -32,6 +32,57 @@ for network paths. Most callers only need `createWatcher`.
 | | | `watch` | `async *watch(): AsyncGenerator<WatchEvent>` | Start watching and yield file events through the filter pipeline. |
 | | | `stop` | `stop(): void` | Stop the watcher by signaling abort. |
 | | | `running` | `get running(): boolean` | Whether the watcher is currently running. |
+
+## Strategy selection and failures
+
+| Options | Behavior |
+| --- | --- |
+| `strategy: 'native'` | Native OS notifications only. A setup or runtime failure emits an `onError` diagnostic and rejects the iterator; it never starts polling. |
+| `strategy: 'polling'` | Polling without a native attempt. |
+| `strategy: 'hybrid'` | Native first, with polling fallback for native failures other than a missing/removed root. |
+| No `strategy`, `forcePolling: true` | Polling, preserving the legacy option. |
+| No `strategy`, network path | Polling selected automatically. |
+| No `strategy`, local path | Hybrid selected automatically. |
+
+An explicit `strategy` takes precedence over `forcePolling` and network-path heuristics. Unknown
+strategy identifiers fail with `TypeError`; there is no implicit fallback for them.
+`WATCH_STRATEGIES` exports the accepted built-in values.
+
+`onReady` runs after the strategy acquires resources, independently of matching file events.
+Polling retains its consecutive-access-failure grace period during startup, but does not announce
+readiness until every root has been scanned successfully. A share that returns within that budget
+continues in the same polling session; persistent startup failures reject for supervisor recovery.
+Files present when that first successful polling scan completes establish its initial snapshot;
+changes during the startup access outage are not replayed.
+`onError` receives a `WatcherErrorEvent` containing `type: 'error'`, configured `paths`, the original
+`error`, and a `Date` timestamp. This diagnostic is separate from the `WatchEvent` stream: file
+filters and file handlers never receive an error as a file change. The original error still rejects
+`watch()`, even if the diagnostic hook throws. Cancellation completes without an error diagnostic.
+
+Removing a watched root invalidates the native subscription even when only `create` events were
+requested. That failure propagates in native and hybrid modes so a supervisor can reopen the root;
+it is not hidden by polling. A standalone watcher does not retry automatically. Create a fresh
+watcher for each session or recovery attempt, and call `stop()` to release it. File-watch triggers
+use a supervising adapter that retries with bounded backoff and exposes
+[per-trigger availability](/reference/triggers/#file-watch-health).
+
+```ts
+import { createWatcher } from '@netscript/watchers';
+
+const watcher = createWatcher({
+  paths: ['./incoming'],
+  strategy: 'native',
+  onReady: () => console.info('Native watch ready'),
+  onError: ({ error }) => console.error('Native watch failed', error),
+});
+try {
+  for await (const event of watcher.watch()) {
+    console.log(event.kind, event.path);
+  }
+} finally {
+  watcher.stop();
+}
+```
 
 ## Filters
 
@@ -75,8 +126,9 @@ Low-level helpers that swallow only missing or inaccessible errors and re-throw 
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `WatcherOptions` | interface | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, signal). |
+| `WatcherOptions` | interface | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, strategy, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, onReady, onError, signal). |
 | `WatchEvent` | interface | A single file-system event yielded by a watcher strategy. |
+| `WatcherErrorEvent` | interface | Failure diagnostic passed to `onError` before the iterator rejects. |
 | `WatchFilter` | interface | A filter takes an async iterable of events and yields only those that pass. |
 | `WatchStrategyHandler` | interface | A watch strategy produces raw file-system events as an async iterable. |
 | `FileInfo` | interface | Metadata about a watched file, built from `Deno.FileInfo`. |
@@ -90,7 +142,7 @@ Low-level helpers that swallow only missing or inaccessible errors and re-throw 
 | --- | --- | --- | --- |
 | `KnownEventKind` | type alias | `"create" \| "modify" \| "remove"` | Built-in file-system event kinds the watcher can detect. |
 | `EventKind` | type alias | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind: a built-in kind or another string. |
-| `KnownWatchStrategy` | type alias | `"native" \| "polling" \| "hybrid"` | Built-in watch strategies for detecting file changes. |
+| `KnownWatchStrategy` | type alias | `typeof WATCH_STRATEGIES[number]` | Built-in watch strategies for detecting file changes. |
 | `WatchStrategy` | type alias | `KnownWatchStrategy \| (string & Record<never, never>)` | Watch-strategy identifier; built-in factory values remain runtime validated. |
 
 ## Internals
