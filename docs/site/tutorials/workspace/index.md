@@ -76,7 +76,7 @@ then adds authentication. If `netscript init` and `aspire start` are new to you,
   },
   {
     title: "2 · Auth",
-    body: "Add the <code>auth</code> plugin, choose the interactive <code>kv-oauth</code> backend, run the <code>auth.prisma</code> migration, and check the session endpoints on the <code>auth-api</code> service at its allocated endpoint.",
+    body: "Add the <code>auth</code> plugin, choose the interactive <code>kv-oauth</code> backend with KV session storage and no auth SQL tables, and check the session endpoints on the <code>auth-api</code> service at its allocated endpoint.",
     href: "/tutorials/workspace/02-auth/"
   },
   {

@@ -29,3 +29,27 @@ Memory and guidance consulted. Main baseline verified. No pre-existing changes. 
 - Consumer generate runtime-schemas/doctor exposed the pre-existing local plugin package import gap: local scaffolder emits auth/plugin.ts importing @netscript/plugin-auth, but local init copies core packages only. S2 will reconcile selected local package exports with root imports; this is necessary for the requested clean generate/doctor acceptance. Record bounded drift and test the real path.
 - Auth JSR audit passes. Core plugin audit reports three unchanged entrypoint @module omissions (abstracts/config/testing); its publish dry-run passes. These are baseline findings, not newly accepted debt or a green full JSR audit.
 - S1 independent slice review: PASS, see slice-review.md. Reconcile: PR 2519 still draft; no label/milestone edits, no unrelated source changes or lock churn. Proceed to S2 with the bounded local import correction and consumer evidence.
+
+## S2 consumer proof and docs
+
+The actual CLI regression creates DB-free scaffolds and exercises local and public plugin install paths, generate plugins, generate runtime-schemas and plugin doctor. It also selects better-auth through .env, checks all four SQL tables, changes to KV with a process override, verifies existing tables are preserved, and proves an existing SQL app receives no fresh auth schema from KV. No test-only global workspace import substitution. Local package aliases are reconciled from declared package exports.
+
+The first consumer run passed local KV and better-auth controls but exposed a public fixture accidentally using local-source markers. The public fixture now uses public init, so it exercises normal exact package aliases; all three consumer tests pass. Doctor has no errors and only expected stopped-AppHost warnings.
+
+The docs warning now distinguishes SQL-backed better-auth from KV/hosted backends and explains precedence and safe reinstallation. `gen:agent-docs-prose` regenerated exactly one carrier row for that page; docs accuracy and rendered-output checks pass. Added explicit return type to the scaffold closure after doc-lint caught it. Changed protocol and scaffold entrypoint doc-lint pass. Whole-package doc-lint retains pre-existing private-type-reference findings in unrelated exported auth/streams/core contracts; full lint is not claimed green.
+- Final focused S2 suite: 14 passed, zero failures/ignored (selector including incompatible --no-db, local install, three real consumer proofs). Structured changed-source check/lint/format check: 20 files, no findings or dropped files. Docs accuracy, carrier freshness and changed protocol/scaffold doc-lint pass. CLI JSR audit passes (23 existing warnings); auth JSR audit passes. Review-thread gate passes with zero threads.
+- Also aligned auth README's unconditional schema/Postgres claims with the same selected-backend behavior. This is prose within the declared auth plugin surface.
+
+## IMPL-EVAL round 1 repair
+
+FAIL_FIX was limited to stale dependent docs; no source/test blocker. Corrected the identity auth recipe/reference, workspace tutorial chapters 1/2/3/6 and index, glossary, CLI reference and auth README. The recipe now conditionally runs SQL commands only for better-auth; its existing executable test still checks credential export before Aspire and now asserts default KV skips SQL. Auth recipe/command tests: 19 passed. Docs accuracy and link checks pass. Carrier regeneration changes those ten source pages plus derived llms.txt index text, with no unrelated rows. The prior one-row statement describes the initial warning-only pass, superseded by this repair.
+
+Recorded CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE for the incremental cost of the existing oversized install module/directory. Baseline module 712 lines → 754; immediate siblings 15 → 18. Broader installer split is deferred with explicit owner, target and preserving gates. No runtime debt added.
+
+## Stop decision — two consecutive implementation failures
+
+Round 1 FAIL_FIX: dependent docs still claimed unconditional auth migrations; repaired the requested conditional-storage guidance. Round 2 FAIL_FIX: two tutorial references remain stale: chapter 3's primary-db-status precheck still credits chapter 2 migration, and chapter 1 says database commands begin in chapter 2 instead of chapter 3. Both full verdicts are retained in evaluate-round-1.md/evaluate.md.
+
+The assignment and run-loop terminate a leaf after two consecutive terminal failures. Stop the fix/evaluation loop; no third review, no passing exact-head attestation, no ready transition. The print-mode evaluator has completed; there is no live evaluator process or leased resource to retain. Preserve and push S2 as work awaiting review, not a sign-off commit. The PR remains draft. Coordinator decision requested: take over the two docs corrections and arrange final exact-head review, or dispatch a fresh remediation leaf. Recommend coordinator takeover for this small remainder. Full scaffold.runtime CI remains unproven and must be armed by the coordinator.
+
+Reconcile: no labels/milestones changed, no runtime resources started, no lock/cache churn, no unrelated work folded in. Remaining source acceptance is implemented and locally proven, but documentation acceptance and final independent review are not complete. Do not mark READY or merge.

@@ -9,7 +9,7 @@ next: { label: '3 · Workspace data', href: '/tutorials/workspace/03-workspace-d
 # Add auth and a session
 
 In this chapter you give `my-workspace/` an identity layer: you add the official `auth` plugin,
-choose an authentication **backend**, run its database migration, and check the **session**
+choose the interactive KV-backed authentication **backend**, and check the **session**
 endpoints of the `auth-api` service at the URL Aspire prints. You select the backend with one environment
 variable, and the contract is identical for every backend, so switching providers later is a
 configuration change.
@@ -25,16 +25,16 @@ configuration change.
 
 ## What you will build
 
-The `auth` plugin installed, the interactive `kv-oauth` backend selected, the `auth.prisma`
-migration applied, and the `auth-api` service answering at the URL Aspire prints. At the end,
+The `auth` plugin installed, the interactive `kv-oauth` backend selected with no auth SQL
+tables, and the `auth-api` service answering at the URL Aspire prints. At the end,
 `GET /api/v1/auth/session` and `GET /api/v1/auth/me` report "no session yet" before login, which
 proves the backend is composed and the session endpoints are wired.
 
 ## Before you begin
 
 You need the workspace from [chapter 1](/tutorials/workspace/01-scaffold/) with **`aspire start`
-running**: the auth plugin contributes a service and a Prisma schema that Aspire and `netscript db`
-reach through the running graph. Check that the base is up:
+running**: the auth plugin contributes a service and KV-backed sessions that run through
+the Aspire graph. Check that the base is up:
 
 ```sh
 # In my-workspace/, with `aspire start` up in another terminal
@@ -52,8 +52,9 @@ netscript plugin install @netscript/plugin-auth
 ```
 
 The installer scaffolds `@netscript/plugin-auth` into `plugins/`, registers it, and adds three
-things to your workspace: a Prisma schema (`auth.prisma`), a service entry that becomes the
-`auth-api` service, and the `/api/v1/auth/*` routes. Confirm it landed:
+things to your workspace: KV-backed session storage, a service entry that becomes the
+`auth-api` service, and the `/api/v1/auth/*` routes. The default `kv-oauth` backend contributes no
+Prisma schema or SQL requirement. Confirm it landed:
 
 ```sh
 netscript plugin list
@@ -104,27 +105,19 @@ backends are for environments where sign-in happened elsewhere and NetScript onl
 from NetScript, stay on <code>kv-oauth</code>.
 {{ /comp }}
 
-## Step 3 — Run the auth database migration
+## Step 3 — Confirm the backend's storage requirements
 
-The `auth` plugin contributes a package-provided **`auth.prisma`** schema that aggregates into your
-primary Postgres at `db generate`. With Aspire running, run the database commands from the workspace
-root:
+This track uses `kv-oauth`, which stores sessions in KV and contributes no `auth.prisma` schema.
+Skip the auth database migration and continue to Step 4. The primary Postgres from chapter 1
+remains available for other application data.
 
-```sh
-netscript db init --name init    # first time only — create the migration
-netscript db generate            # generate the Prisma client + Zod schemas
-netscript db seed                # optional seed data
-netscript db status              # confirm the migration is applied
-```
-
-{{ comp callout { type: "note", title: "Which backends use these tables" } }}
-<code>auth.prisma</code> defines four better-auth-shaped models: <code>AuthUser</code> &rarr;
-<code>auth_users</code>, <code>AuthSession</code> &rarr; <code>auth_sessions</code>,
-<code>AuthAccount</code> &rarr; <code>auth_accounts</code> and <code>AuthVerification</code> &rarr;
-<code>auth_verifications</code>. The migration always runs, but storage differs by backend:
-<strong>kv-oauth</strong> keeps sessions in Deno KV, <strong>workos</strong> verifies a sealed cookie and keeps durable revocation fences in KV, and <strong>better-auth</strong> reads and writes these tables through
-Prisma.
-{{ /comp }}
+Only the non-interactive `better-auth` backend contributes `auth.prisma` and its four models:
+`AuthUser` → `auth_users`, `AuthSession` → `auth_sessions`, `AuthAccount` → `auth_accounts`, and
+`AuthVerification` → `auth_verifications`. If you intentionally choose that backend in another
+application, select it before installation (or reinstall with `--force` after changing it), then
+run `netscript db init`, `netscript db generate` and `netscript db status` with Aspire running.
+WorkOS verifies sealed cookies and keeps durable revocation state in KV; it also contributes no
+SQL schema.
 
 ## Step 4 — Configure the kv-oauth backend
 
@@ -223,6 +216,6 @@ For HTTP cookie-jar diagnostics outside the app, follow the
 ## What you built
 
 An identity layer for your workspace: the `auth` plugin composed onto the interactive `kv-oauth`
-backend, the `auth.prisma` migration applied, and the `auth-api` service answering at the URL Aspire prints with
+backend, KV-backed sessions with no auth SQL tables, and the `auth-api` service answering at the URL Aspire prints with
 the six-route contract. The app can now tell a signed-in team member from a stranger. Next, you give
 it something to protect: an isolated database for team records.

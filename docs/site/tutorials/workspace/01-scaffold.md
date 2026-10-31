@@ -85,7 +85,7 @@ running a health probe; no fixed service port is required.
   caption: "netscript init options used here",
   rows: [
     { name: "--service --service-name workspace", type: "example service", desc: "Include an example oRPC service named 'workspace' at its allocated endpoint. You protect it in chapter 5." },
-    { name: "--db postgres", type: "database workspace", desc: "Scaffold a Postgres database workspace. The auth plugin's auth.prisma migration (chapter 2) aggregates into this primary datasource." },
+    { name: "--db postgres", type: "database workspace", desc: "Scaffold a Postgres database workspace. This primary datasource is available for application data; chapter 2 uses KV-backed auth without an auth SQL migration." },
     { name: "--dry-run", type: "plan only", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
 }) }}

@@ -9,3 +9,11 @@
 - Writable surface: auth plugin manifest/adapter/scaffold and tests under `plugins/auth/`; plugin persistence contracts under `packages/plugin/` if necessary; plugin install/generation/doctor orchestration and tests under `packages/cli/`; `docs/site/orchestration-runtime/how-to/add-a-plugin.md`; this run directory. Assignment/report handoff files are excluded from Git.
 - External actions: push assigned branch, open and ready PR, per-slice PR comments. No labels/milestones, merge, tag, release, or local scaffold.runtime E2E.
 - Public evidence uses repository-relative paths, no private machine/session details.
+
+## Consumer-proof scope amendment
+
+Independent IMPL-EVAL required updating stale auth migration claims in the identity docs,
+workspace tutorial chapters 1/2/3/6/index, glossary and CLI reference. The corresponding auth
+README, executable recipe regression and generated CLI prose carrier are included. The
+architecture debt registry receives the scoped install-shape growth record. These paths are
+explicitly recorded in drift.md and remain within the single issue's acceptance coherence.

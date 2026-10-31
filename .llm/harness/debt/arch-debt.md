@@ -3184,3 +3184,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open.
 - **Gate:** Split emphasis font-style and font-weight names with an explicit migration, preserve Figma round-trip, and pass DTCG schema/name/CSS tests across every preset.
 - **Notes:** Cost: standard DTCG consumers see regular weight for Italic unless they read the style extension; CSS consumers cannot use the mixed source WEB name in one fixed property across every preset. No current in-repo component consumes these names. Preserve exact original export and expose the limitation until the naming migration is ratified. Independent slice-review F1 identified this risk; scoped owner authorization covers recording it, not closing the design burn-down.
+
+## packages/cli — CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE
+
+- **ID:** `CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE`
+- **Reason:** Issue #2149 adds backend-dependent SQL selection before install planning. The existing
+  public install module grows from 712 to 754 lines, above the 500-line F-1 warning threshold, and
+  its existing over-cap directory grows from 15 to 18 immediate children. The selector, schema
+  resolver and colocated regression remain named, focused modules rather than further inlining.
+- **Cost:** Three additional sibling entries and 42 orchestration lines in an already oversized
+  feature; no new runtime process, service abstraction or per-request work.
+- **Why deferred:** Splitting unrelated installer confirmation, metadata persistence and dispatch
+  responsibilities would widen the auth persistence fix beyond its consumer acceptance proof.
+- **Owner:** CLI plugin-install maintainers.
+- **Target:** Before adding another plugin persistence selection axis.
+- **Linked plan:** `.llm/runs/orch-divybot-6542487846--2149/plan.md`.
+- **Created:** 2026-10-31.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Split install orchestration below 500 lines and feature folders to at most 12 immediate
+  children while preserving plugin install/dispatch/mutator tests, auth backend consumer proofs,
+  package publish dry-run and the coordinator's full `scaffold.runtime` verdict.

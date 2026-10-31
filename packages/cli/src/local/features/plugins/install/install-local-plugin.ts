@@ -38,6 +38,7 @@ import { planPluginInstall } from '../../../../public/features/plugins/install/p
 import { resolvePluginPackageSpec } from '../../../../public/features/plugins/install/plugin-package-resolver.ts';
 import { renderPluginSupport } from '../../../../public/features/plugins/install/render-plugin.ts';
 import {
+  ensureLocalPluginImports,
   ensurePluginServiceContext,
   mergeUniqueReferences,
   toWorkspaceRelativePath,
@@ -193,6 +194,14 @@ export async function installLocalPlugin(
     pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
+  if (resolvedPlugin?.source.kind === 'local-path' && request.dryRun !== true) {
+    await ensureLocalPluginImports(
+      plan.projectRoot,
+      resolvedPlugin.source.path,
+      resolvedPlugin.descriptor.manifest.name,
+      dependencies.fs,
+    );
+  }
   const provisionedCache = plan.provider.defaultRequiresKv
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;

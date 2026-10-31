@@ -2,6 +2,8 @@ import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/
 import { parsePluginManifest } from '@netscript/plugin/protocol';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import { selectPluginDatabaseRequirement } from './plugin-database-requirement.ts';
+import { resolvePluginDescriptorBeforePlanning } from './install-plugin.ts';
+import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 
 const parsed = parsePluginManifest(JSON.parse(
   await Deno.readTextFile(
@@ -66,4 +68,32 @@ Deno.test('plugins without a database selector preserve their original manifest'
   );
   assertEquals(selected.manifest, legacy);
   assertEquals(selected.configuration, undefined);
+});
+
+Deno.test('a backend that requires SQL cannot be silently installed with --no-db', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile('/source/scaffold.plugin.json', JSON.stringify(manifest));
+  await fs.writeFile('/project/.env', 'NETSCRIPT_AUTH_BACKEND=better-auth\n');
+  await assertRejects(
+    () =>
+      resolvePluginDescriptorBeforePlanning(
+        {
+          kind: 'auth',
+          pluginName: 'auth',
+          projectRoot: '/project',
+          localPath: '/source',
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: true,
+          includeSamples: false,
+          overwrite: false,
+        },
+        new PluginKindRegistry(),
+        undefined,
+        fs,
+      ),
+    Error,
+    'requires a database',
+  );
+  assertEquals(await fs.exists('/project/database'), false);
 });

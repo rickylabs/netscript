@@ -7,6 +7,7 @@ import {
   createPluginAdapter,
   type PluginScaffoldEntrypoint,
   runPluginScaffoldCli,
+  type ScaffoldResult,
 } from '@netscript/plugin/adapter';
 import {
   AUTH_BACKEND_ENV,
@@ -22,7 +23,7 @@ export type {
 } from '@netscript/plugin/adapter';
 
 /** Auth adapter scaffold entrypoint. */
-const scaffold: PluginScaffoldEntrypoint = (context) => {
+const scaffold: PluginScaffoldEntrypoint = (context): Promise<ScaffoldResult> => {
   const configuration = context.options.configuration;
   const selected = configuration !== null && typeof configuration === 'object'
     ? Reflect.get(configuration, AUTH_BACKEND_ENV)

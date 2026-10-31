@@ -29,3 +29,16 @@ Structured .llm/tools/run-deno-{check,test,lint,fmt}.ts on changed TypeScript an
 ## Open decisions / deferred scope / debt
 
 No must-resolve open decisions. Auto-migrating existing data or runtime switching of provisioned infrastructure is deferred: reinstall explicitly reconciles requirements, existing tables remain owned by the consumer. No new accepted architecture debt. Broader KV-only consumer proof belongs to 2108. No profiles/ files read.
+
+## S2 consumer-driven refinement
+
+Actual CLI consumer checks confirmed local init copies core packages but omits the composing auth plugin, while its generated auth/plugin.ts uses that package name. Reuse the existing local install helper to register the selected package's declared exports as relative source imports. This preserves source-mode semantics and lets generate/doctor run without test-only import substitution. Scope adds the existing install-local-plugin-helpers.ts plus a real CLI consumer test under local/composition. Both remain within the declared CLI surface. Docs regeneration changes only the add-a-plugin page in the checked-in compressed prose carrier.
+
+## Documentation repair after IMPL-EVAL round 1
+
+The evaluator found that dependent auth recipes/tutorials still require KV users to migrate the
+better-auth tables. Correct those conditional-storage claims across the identity pages, workspace
+tutorial chapters/index and glossary, and update the existing executable recipe expectation so
+its default KV path skips SQL. Regenerate the associated prose carrier rows. No runtime or API
+scope expansion. Record the existing install-module/directory shape increase as
+CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE with an explicit closing gate.
