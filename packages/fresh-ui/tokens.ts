@@ -36,3 +36,6 @@ export type {
 } from './src/tokens/domain/token-contract.ts';
 export { TOKEN_PRESETS } from './src/tokens/domain/token-presets.ts';
 export { TOKEN_DENSITIES, TOKEN_SCHEMES } from './src/tokens/domain/token-contract.ts';
+
+export { figmaTokenSources } from './src/tokens/adapters/figma-token-sources.ts';
+export type { FigmaCollection, FigmaVariable } from './src/tokens/domain/token-contract.ts';
