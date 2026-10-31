@@ -1,0 +1,5 @@
+# Existing health wiring and evidence
+
+ChildHealthMonitor defaults to 3 restarts in 60 seconds with inclusive boundary and full uninterrupted ready-window recovery. Generated saga glue injects the transport monitor into the supervisor; generated trigger glue creates a distinct TriggerHealthMonitor for file-watch diagnostics, so any process-history integration must share that exact instance with transport. Saga finally-stop can mark a health snapshot stopped before transport records fatal completion: retain the crash-loop latch when building the terminal failed response.
+
+Existing focused baseline: structured run-deno-test.ts with --allow-all --unstable-kv --frozen over monitor, transport, saga-child-health and trigger-child-health: 16 passed, zero failures/ignores. File persistence can use the existing ignored .data/ subtree in generated projects. Generated child-health vocabulary is a derived page; edit exported contract JSDoc and run gen:child-health-docs. Any public export change requires MCP corpus regeneration; supported precommit generation flag is --allow-dirty.
