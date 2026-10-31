@@ -6871,8 +6871,13 @@
       "specId": "D9",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
+        "locale": {
+          "kind": "text",
+          "default": "en-US",
+          "description": "Explicit number locale shared by server and client."
+        },
         "type": {
           "kind": "enum",
           "values": [
@@ -6881,12 +6886,9 @@
           ]
         },
         "series": {
-          "kind": "enum",
-          "values": [
-            "1",
-            "2",
-            "3"
-          ]
+          "kind": "collection",
+          "required": true,
+          "description": "One to three labeled series; data-series is derived from their count."
         },
         "orientation": {
           "kind": "enum",
@@ -6902,92 +6904,120 @@
             "line",
             "dashed"
           ]
+        },
+        "data": {
+          "kind": "collection",
+          "required": true
+        },
+        "title": {
+          "kind": "text",
+          "required": true
+        },
+        "description": {
+          "kind": "text"
+        },
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "hover",
+            "loading",
+            "empty"
+          ]
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "plot",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "grid",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "axis-x",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "axis-y",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "series-1",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "series-2",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "series-3",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "cursor",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "legend",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "tooltip",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "swatch",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "value",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "skeleton",
+          "when": "loading"
+        },
+        {
+          "name": "empty",
+          "when": "empty"
+        },
+        {
+          "name": "data"
+        },
+        {
+          "name": "data-trigger"
+        },
+        {
+          "name": "table"
+        },
+        {
+          "name": "line",
+          "when": "plot present"
+        },
+        {
+          "name": "area",
+          "when": "type area and plot present"
         }
       ],
       "attributes": {
@@ -7016,12 +7046,29 @@
             "line",
             "dashed"
           ]
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "loading",
+            "empty"
+          ]
         }
       },
       "booleans": [],
       "slots": [],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native figure and SVG image with labeled series plus native data disclosure/table",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Focus the native data disclosure; chart graphics add no focus targets"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the source data table"
+        }
+      ],
       "tokenRoles": [
         "SF:deco/sparkline",
         "SF:deco/ticks",
@@ -7035,7 +7082,9 @@
         "warning/default"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Exact data values remain available through a native disclosure/table; hover is supplemental, never the only data access.",
+        "Series count derives from1–3 labeled input series. Each datum has a label and matching finite numeric values. Legend orientation does not rotate the Cartesian plot.",
+        "Existing chart/1..3 roles follow the latest per-theme chart palette ledger. No token values change."
       ]
     },
     {
@@ -7513,7 +7562,7 @@
       "specId": "D14",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -7531,43 +7580,70 @@
         },
         "dots": {
           "kind": "boolean"
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "slides": {
+          "kind": "collection",
+          "required": true
+        },
+        "counter": {
+          "kind": "boolean"
+        },
+        "defaultIndex": {
+          "kind": "number",
+          "default": 0
+        },
+        "onIndexChange": {
+          "kind": "callback"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "viewport",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "slide",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "previous",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "next",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "dots",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "dot",
+          "when": "dots supplied"
+        },
+        {
+          "name": "counter",
+          "when": "counter supplied"
+        },
+        {
+          "name": "pagination",
+          "when": "dots or counter supplied"
+        },
+        {
+          "name": "empty",
+          "when": "no slides"
         }
       ],
       "attributes": {
@@ -7585,9 +7661,15 @@
         }
       },
       "booleans": [
-        "dots"
+        "dots",
+        "counter"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "slides",
+          "part": "slide"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/",
       "keyboard": [
         {
@@ -7605,7 +7687,9 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native overflow scrolling and mandatory snap points retain touch/trackpad behavior. ResizeObserver realigns the current slide without global listeners.",
+        "No autoplay. Boundary controls use guarded aria-disabled so activation never removes focus. After hydration only the current slide is interactive; before hydration native scrolling keeps all slide content available.",
+        "defaultIndex is clamped to available slides; changing slide count or orientation keeps a valid current index."
       ]
     },
     {

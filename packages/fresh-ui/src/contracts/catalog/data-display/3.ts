@@ -274,8 +274,13 @@ export const data_display_3: readonly ComponentContract[] = [
     'specId': 'D9',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
+      'locale': {
+        'kind': 'text',
+        'default': 'en-US',
+        'description': 'Explicit number locale shared by server and client.',
+      },
       'type': {
         'kind': 'enum',
         'values': [
@@ -284,12 +289,9 @@ export const data_display_3: readonly ComponentContract[] = [
         ],
       },
       'series': {
-        'kind': 'enum',
-        'values': [
-          '1',
-          '2',
-          '3',
-        ],
+        'kind': 'collection',
+        'required': true,
+        'description': 'One to three labeled series; data-series is derived from their count.',
       },
       'orientation': {
         'kind': 'enum',
@@ -306,91 +308,119 @@ export const data_display_3: readonly ComponentContract[] = [
           'dashed',
         ],
       },
+      'data': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'title': {
+        'kind': 'text',
+        'required': true,
+      },
+      'description': {
+        'kind': 'text',
+      },
+      'state': {
+        'kind': 'enum',
+        'values': [
+          'rest',
+          'hover',
+          'loading',
+          'empty',
+        ],
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'header',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'plot',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'grid',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'axis-x',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'axis-y',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'series-1',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'series-2',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'series-3',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'cursor',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'legend',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'tooltip',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'swatch',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'value',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
+      },
+      {
+        'name': 'skeleton',
+        'when': 'loading',
+      },
+      {
+        'name': 'empty',
+        'when': 'empty',
+      },
+      {
+        'name': 'data',
+      },
+      {
+        'name': 'data-trigger',
+      },
+      {
+        'name': 'table',
+      },
+      {
+        'name': 'line',
+        'when': 'plot present',
+      },
+      {
+        'name': 'area',
+        'when': 'type area and plot present',
       },
     ],
     'attributes': {
@@ -420,11 +450,28 @@ export const data_display_3: readonly ComponentContract[] = [
           'dashed',
         ],
       },
+      'data-state': {
+        'values': [
+          'rest',
+          'hover',
+          'loading',
+          'empty',
+        ],
+      },
     },
     'booleans': [],
     'slots': [],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'apg': 'native figure and SVG image with labeled series plus native data disclosure/table',
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Focus the native data disclosure; chart graphics add no focus targets',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Toggle the source data table',
+      },
+    ],
     'tokenRoles': [
       'SF:deco/sparkline',
       'SF:deco/ticks',
@@ -438,7 +485,9 @@ export const data_display_3: readonly ComponentContract[] = [
       'warning/default',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Exact data values remain available through a native disclosure/table; hover is supplemental, never the only data access.',
+      'Series count derives from1–3 labeled input series. Each datum has a label and matching finite numeric values. Legend orientation does not rotate the Cartesian plot.',
+      'Existing chart/1..3 roles follow the latest per-theme chart palette ledger. No token values change.',
     ],
   },
 ];

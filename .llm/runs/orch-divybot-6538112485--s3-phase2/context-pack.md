@@ -1,90 +1,21 @@
-# Resume S3 phase 2
+# Resume S3 phase2a — PR2488
 
-Branch orch/divybot-6538112485; draft PR2488; base main ad252e8.
-Read plan.md/research.md/worklog.md. Owner says Refs #2416 only, no labels or
-session IDs, never commit assignment/final-report files, stop at READY; Cockpit
-merges. Two review units:2a core categories, then2b Layout/AI/Desktop/Docs/harness.
-Same separate read-only Claude Opus5.5 high reviewer is required; final IMPL-EVAL
-still pending. Review transport/private identity stays in external project runs.
+Branch orch/divybot-6538112485; draft PR2488; base main3d83caf. Read plan.md and latest worklog entries. Owner requires Refs #2416 only, no labels/session IDs, never commit assignment/final-report files. Stop at READY; Cockpit merges. Approved split:2a core gaps,2b Layout/AI/Desktop/Docs and all-style harness. Neither closes the issue prematurely.
 
-Terminal PASS: all104 typed/JSON contracts; Actions3; Forms6 including Calendar/
-DatePicker; Navigation4 including Menubar.79 shipped/25 remaining. Native
-registry101 = baseline86 +13 reviewed components +2 copied support items.
-Author registry.json and style-utility maps/collections, preserve compatibility
-projection and frozen legacy-v1.json. Keep post-v1 allowlist/counts current.
+All104 typed/JSON contracts exist. Reviewed source now ships87/104: Actions3, Forms6, Navigation4, Overlays3, Data display5, plus66 baseline. Native registry115 =92 main items +21 new components +2 copied supports. Six main Theme B presets and coordinator audit commits survived the latest-base rebase. Source slices through7a pushed/commented at f7a6fab. Slice7b Chart/Carousel has terminal initial/follow-up PASS and local gates complete; finish clean-source corpus/carrier refresh, commit/push/comment before starting7c.
 
-Navigation slice5 terminal PASS after one closed-Escape boundary correction.
-112 full rebuilt-source browser cases,142 focused tests, quality, preflight,
-docs accuracy111, source/spec wrappers PASS. Runtime ActionMenu supports choices,
-first/last entry, scoped traversal/typeahead, layout native popovers; outside
-focus is preserved and submenu Escape stays at its own level. Interactive
-Deno doc-lint123 diagnostics exactly match pre-slice c788023 full checkout by
-code/message/relative file; no new diagnostics.9 design/doc-drift tests pass.
-Final clean-source corpus/carrier refresh + push/comment completes slice5.
+7b final evidence:210 contract/data/installed-copy tests,17 real browser cases (including actual Chromium touch swipe/tap),4 strict axe/component captures, source/browser wrappers, quality/architecture, preflight/docs accuracy/export drift PASS. Chart uses1–3 finite matched series, negative/zero/single-point geometry, native exact-data disclosure and explicit number locale default en-US. Carousel uses native scroll-snap/ResizeObserver, stable boundary-control focus, current-only inertness after hydration and viewport focus before a focused slide becomes inactive. Visible8px dots have24px hit targets. See display-motion-validation.json and review verdicts.
 
-Next slice6: AlertDialog, HoverCard, ContextMenu; compose existing native runtime
-and reuse menu-items helper. Then slice7: Item/Kbd/Chart/Collapsible/Carousel,
-CodeBlock tabs/line/diff and Feedback/Label/PageHeader/docs-gap audit. Phase2a
-needs full package/quality/JSR/preflight/docs/carrier/runtime gates and mandatory
-same-session final IMPL-EVAL. Only exact-head required green CI allows READY.
+Next7c: enhance CodeBlock tabs/line/diff/copy/scroll semantics and reconcile existing Feedback/Label/Card/Pagination/PageHeader/docs-gap axes against spec/ledgers. Split further if needed for review size. No new component identities remain in2a; do not claim completion until existing-component gaps are audited/implemented. Then phase2a final full package/browser/quality/JSR/doc-lint/preflight/docs/carrier gates and mandatory same-session IMPL-EVAL. Run one full CLI scaffold.runtime smoke with cleanup; Docker unavailable is UNPROVEN. Only exact-head required green CI permits READY.
 
-Browser: tools/fresh-ui-browser/gap.playwright.config.ts rebuilds current sources
-through gap-build.ts; it derives root catalog into ignored generated config.
-Use that generated config for fixture type checks; Node specs use docs.deno.json.
-Chromium needs existing project-run system libraries in LD_LIBRARY_PATH only for
-Playwright; restricted Deno spawn wrappers reject that inherited env. See browser
-README and memory-browser.md. No changed lock files/caches allowed.
+Keep the same separate read-only Claude Opus5.5 high evaluator session through private read-only-review.ts (external project run). Do not launch a fresh evaluator per correction or publish transport/session identity. Review tooling/model override is recorded in supervisor/drift; final evaluation is not self-certification.
 
-Phase2b remains: Layout4, AI5, Docs8 + Desktop audit and all-style harness.
-The current style ID table is still Utility-only; phase2b must derive native
-source-style registrations, reject missing providers and all4 contract mutants.
+Author registry.json, not registry.manifest.ts. Maintain style-utility maps, collections and registry.ts collection JSDoc order, POST_V1_COMPONENTS/SUPPORT lists, typed catalogs and serialized contracts.json. Keep structural registry-v2 equality and complete design-sync name comparison. Frozen legacy-v1 fixture stays unchanged; explicit generated TOKEN_PRESETS additions coexist with component/support allowlists, and the full PREVIEW_TOKEN_FILES guard remains independent. Regenerate all carriers; MCP generation needs its source read set committed first.
 
-Slice5 source de67b38 signed off; all four carrier freshness checks PASS after
-clean-source MCP regeneration. No lock churn. Push/comment closes this slice.
+RTK is absent. Use /usr/bin/git for ground truth; the git shim rewrites worktree operations. Explicit fetch must update remote refs with a refspec; FETCH_HEAD is authoritative if only a branch was fetched. User authorized latest-base rebase/leased force-push. Preserve coordinator updates and saved recovery stash; never force unleased or overwrite others.
 
-Latest steering: current Pages build failure6b42a62 caused by two missing symbols
-in docs/site/reference/fresh-ui/index.md, now corrected locally. Overlay has only
-been researched; no code yet. Finish docs CI repair and carrier regeneration,
-review/push/comment before resuming Overlays. docs:exports-drift and docs:snippets
-are in flight. See external run ci-docs-* logs; no private log dumps in public.
+Public run notes/logs/JSON must use portable paths. Audit every added line in origin/main...HEAD for forbidden absolute roots before pushes and repeat at final READY head. Preserve outcomes/digests/context while normalizing paths. Do not copy private raw wrappers/transports into this public run. See memory-public-path-hygiene.md.
 
-CI repair local gates and independent review PASS: exports-drift, snippets,
-Lume253 HTML,23734 links and13 caveat markers. Prose generated; commit source,
-refresh clean-source corpus/publication, check all carriers and push. This fixes
-the user-reported build failure; Overlay remains unimplemented. For every new
-public export, run docs:exports-drift in addition to docs:accuracy.
+Browser tool rebuilds current sources with gap-build.ts and generated root-catalog config. Node specs use docs.deno.json. Actual Chromium uses existing borrowed project-run libraries via LD_LIBRARY_PATH only for npm Playwright; restricted Deno spawn wrappers reject that environment. See memory-browser.md. Each browser run wipes test-results/gaps; retain captures before the next run. No axe baseline relaxations. Source fmt/check/lint/test wrappers and broader quality are required; no lock/cache deletion or reload.
 
-CI build repair complete locally: reviewed source f21bff4; all four carrier
-freshness checks PASS, no additional generated change after prose refresh.
-Exports/snippets/build/links/caveats all PASS. Push triggers fresh Pages CI;
-remote success remains pending. Resume Overlay slice after push/comment.
-
-Coordinator public-repository requirement: every committed run log/receipt/JSON must use portable paths. The added-line audit at c644a44596623fd93be1dc0cd77897f76d88a399 found zero forbidden absolute paths. Follow memory-public-path-hygiene.md for all new logs and repeat the whole-PR origin/main...HEAD added-line audit at the final READY head; include its zero-hit result in READY. This audit does not mark unfinished implementation complete.
-
-Latest-base recovery: Theme B main is included; six new main themes are preserved. Native registry now107 =92 baseline +13 reviewed components +2 support entries. Keep structural registry-v2 equality rather than stale numeric counts. Compatibility guard explicitly combines TOKEN_PRESETS additions with reviewed component/support allowlists; preview test retains separate full PREVIEW_TOKEN_FILES coverage. Coordinator audit commits are preserved. Overlay WIP is saved privately for restoration after recovery push; do not lose it or mark phase2a complete.
-
-Latest-base integration independently reviewed PASS (rebase2-review.md). All112 rebuilt-source browser cases PASS; release preflight and docs accuracy PASS. Registry/source/prose assets regenerated from combined source. Remaining clean-source corpus refresh and carrier freshness checks precede the recovery push. This is recovery of reviewed slices, not phase completion.
-
-Recovery source4d9a356 includes latest main3d83caf (auth cookie fix) without additional conflicts. All four generated carrier freshness checks PASS; clean-source MCP corpus is unchanged after regeneration. Focused135/browser112/quality/publication/docs gates and independent integration review PASS. Full Fresh UI package regression suite is still running and is not claimed green by this recovery push. Phase implementation continues; draft remains incomplete.
-
-Slice6 Overlays implemented:82 shipped/22 remaining; native104 items,16 new
-components/2 support.158 focused and132 full browser PASS, plus143 focused and
-installed-copy rerun after private timer type fix. Full package378/378 PASS.
-8 hover browser cases pass after default Avatar's existing control-radius
-refinement. Quality/preflight/docs accuracy/exports and scoped wrappers PASS.
-Independent same reviewer is evaluating. No Data display yet. Destructive action
-uses an explicitly recorded existing-role inverse pair to preserve strict AA;
-no token/global Button changes. Coordinator all-added-line path audit still
-required at exact READY head; new public evidence uses relative paths.
-
-Post-rebase baseline full Fresh UI suite PASS372/372. Saved Overlay source restored, preserving recovery/coordinator notes and main Theme B registrations; native inventory110 (92 main +16 new components +2 supports), shipped82/104. The corrected Overlay snapshot under independent review matches restored sources; rerun current-base gates before signoff.
-
-Overlay corrective review terminal PASS: mouse-only hover preview and pointer/focus sequencing fix real touch taps; second tap closes, keyboard focus opens, existing scoped Escape preserved. Restored source equals reviewed snapshot in11 files. Current-base focused192, source/browser wrappers, quality and docs exports/prose PASS; browser137 matrix in flight. Native items110, shipped82/104. Refresh clean-source corpus/carriers, commit/push/comment before starting Data display.
-
-Current-base full Overlay/browser regression matrix PASS137/137 (four light/dark desktop viewport projects plus actual touch). Captures refreshed from this source. Independent corrective review PASS and192 focused tests/source-browser wrappers/quality/docs exports/prose PASS. No token values or lockfiles changed. Final publication/docs accuracy and clean-source generated carrier checks precede the slice push. Evidence scope and pending whole-phase gates are explicit in overlays-validation.json.
-
-Overlay source137447c independently signed off, clean-source corpus refreshed and all four carrier freshness checks PASS. Slice6 is terminal after push/comment. Completed source now82/104; next is Data display5 plus CodeBlock/Feedback/docs-gap audit, split into smaller review slices to bound the source surface. Current recovery head ffc0e5c remote Pages build and Utility docs browser/style-policy jobs both SUCCESS; new push requires fresh exact-head CI.
-
-Slice7a substantive initial and corrective reviews PASS (display-basics-review-round1/2.md). Latest contract/copied-consumer160 and all16 updated browser cases PASS, including native DOM changes and exactly-one controlled callback. Initial registry/contract168 also PASS. Wrappers/quality/publication/docs accuracy/export drift PASS; six fresh local captures retained. Existing semantic roles only; no dependencies or token/lock edits. Inventory85/104, registry113. Final clean-source corpus and four carrier checks precede push/comment. Remaining7b Chart/Carousel,7c CodeBlock/Feedback/docs reconciliation and final phase2a gates/IMPL-EVAL remain mandatory.
-
-Slice7a source76c85a8 and clean-source corpus refresh complete; all four carrier freshness checks PASS. Both independent review rounds PASS; gates summarized in display-basics-validation.json. Push/comment closes7a. Remote Overlay head bace6f8 Pages build and Utility docs browser/style-policy both SUCCESS. Next7b Chart/Carousel, with latest per-theme chart palette ledger taking precedence over earlier chart colors.
+Baseline attribution: pre-Overlay rebased full package372 PASS. Global interactive doc-lint123 diagnostics exactly matched the complete pre-Navigation checkout; final attribution still required. Current phase2b remainder17: Layout4, AI5, Docs8 plus Desktop audit and all-style harness. Current style source registration is Utility only; token presets are not source styles. Real additional styles remain S4–S6.

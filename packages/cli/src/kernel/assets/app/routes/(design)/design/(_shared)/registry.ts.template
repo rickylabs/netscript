@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 112,
+  'total': 114,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -753,6 +753,18 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Native details disclosure with controlled or uncontrolled open state.',
   },
+  {
+    'name': 'chart',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Accessible Cartesian area/line series with native source-data disclosure.',
+  },
+  {
+    'name': 'carousel',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Manual native scroll-snap carousel with stable-focus boundary controls.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -944,6 +956,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'item',
       'kbd',
       'collapsible',
+      'chart',
+      'carousel',
     ],
   },
 ];

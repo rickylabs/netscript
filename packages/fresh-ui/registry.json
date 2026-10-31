@@ -4025,7 +4025,9 @@
           "context-menu": "context-menu",
           "item": "item",
           "kbd": "kbd",
-          "collapsible": "collapsible"
+          "collapsible": "collapsible",
+          "chart": "chart",
+          "carousel": "carousel"
         }
       }
     },
@@ -5289,6 +5291,88 @@
           ]
         }
       }
+    },
+    {
+      "name": "chart",
+      "type": "registry:component",
+      "description": "Accessible Cartesian area/line series with native source-data disclosure.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/chart.tsx",
+          "type": "registry:component",
+          "target": "@ui/chart.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/chart.css",
+          "type": "registry:file",
+          "target": "@assets/ui/chart.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "empty-state",
+        "skeleton"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/chart.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "carousel",
+      "type": "registry:component",
+      "description": "Manual native scroll-snap carousel with stable-focus boundary controls.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/carousel.tsx",
+          "type": "registry:component",
+          "target": "@ui/carousel.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/carousel.css",
+          "type": "registry:file",
+          "target": "@assets/ui/carousel.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "data-display",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/carousel.css';"
+            }
+          ]
+        }
+      }
     }
   ],
   "meta": {
@@ -5498,7 +5582,9 @@
           "theme-seed",
           "item",
           "kbd",
-          "collapsible"
+          "collapsible",
+          "chart",
+          "carousel"
         ]
       }
     ]

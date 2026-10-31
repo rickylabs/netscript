@@ -277,3 +277,7 @@ destructive/default palette remains owned by the token workstream; no palette
 values change here.
 
 Data display additions: `ui:add item kbd collapsible` copies presentation rows, native keyboard notation and native details disclosures. Item retains native child links/actions; Kbd adds no focus targets; after hydration, Collapsible supports controlled open refusal and blocks disabled summary activation. Before hydration, its summary retains native disclosure behavior.
+
+`ui:add chart carousel` adds token-driven Cartesian series and a manual native scroll-snap carousel. Chart accepts one to three labeled `series` and `data` rows with matching finite numeric `values`; its native data disclosure exposes exact values to keyboard and assistive technology. Hover is supplemental. Carousel supports horizontal/vertical orientation, inside/outside controls, dots, counter and a clamped `defaultIndex`; it has no autoplay. Boundary controls retain focus with guarded `aria-disabled`, and inactive slide content becomes inert after hydration.
+
+Chart uses an explicit `locale` (`en-US` by default) for consistent server/client number formatting. When native carousel scrolling moves away from a focused slide link, focus moves to the existing scroll viewport before that slide becomes inert; previous/next/dot focus stays on its native control.

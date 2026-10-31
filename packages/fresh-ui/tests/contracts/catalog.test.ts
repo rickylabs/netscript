@@ -23,10 +23,10 @@ Deno.test('catalog covers every owner-approved Figma category in priority order'
   for (const [prefix, count] of Object.entries(CATEGORY_IDS)) {
     for (let index = 1; index <= count; index++) assert(ids.includes(`${prefix}${index}`));
   }
-  assertEquals(componentContracts.components.filter((c) => c.shipped).length, 85);
+  assertEquals(componentContracts.components.filter((c) => c.shipped).length, 87);
   assert(ids.includes('I6'));
   assert(ids.includes('L10'));
-  assertEquals(componentContracts.components.filter((c) => !c.shipped).length, 19);
+  assertEquals(componentContracts.components.filter((c) => !c.shipped).length, 17);
 });
 
 Deno.test('contracts are self-consistent and losslessly serializable', () => {
