@@ -339,3 +339,4 @@
 - 19:06:54Z: #2546 (#2233) parity fix `90d94de` with Opus MERGE; waiting for CI.
 - 19:22:34Z: **merged** #2546 (`43aa891ec`) for #2233 (option b); #2233 closed. Left: #2406 (Fresh UI #2408) and #2396 (post-cut proof).
 - 19:23:37Z: #2406: boxes 1 and 4 are done in #2407; boxes 2 and 3 are the docs half in the #752 run's stale PR #2408, which the design session will not touch. Decision posted for Eric and Cockpit on #2474 (recommend splitting: close #2406 on #2407, docs follow-up for the Fresh UI lane).
+- 19:23:56Z: Design session agrees: if Eric picks (b), the coordinator files the #2406 docs follow-up with label epic:design-system, and their lane picks it up after the canary.
