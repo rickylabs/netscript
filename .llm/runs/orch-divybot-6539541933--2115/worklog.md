@@ -33,3 +33,11 @@ Draft PR #2498 targets main, issue still open; no metadata mutations or unrelate
 ## S1 independent sign-off
 
 Same-session independent Opus review returned PASS with no blockers. Reviewer substantively checked parser correctness, compatibility, backend/flow coverage, revert evidence, scope and baseline doc failure. Confirmed lock is clean before sign-off commit. Implementation patch is authorized for commit; ready transition follows push and review evidence comment. Final exact pushed-head review still required.
+
+## S2 close records
+
+S1 committed as e2d5a21 (see actual PR commit list for the full immutable hash) and pushed; evidence comment links immutable validation/review artifacts. Added dated lesson and final resume instructions. No new architectural debt accepted, no launched resources, no ownership ambiguity requiring leak cleanup. Plan and implementation evaluator observed claude-opus-5-5 with no permission denials, same separate reviewer session.
+
+## Reconcile S2
+
+PR #2498 remains the only issue PR; issue #2115 still open. No metadata/lock/scaffold changes. Preliminary implementation verdict PASS; transition to ready immediately after this final records commit, then resume the same read-only evaluator for the exact pushed head. Final exact-head verdict and current CI snapshot belong in the final PR review comment and ignored canonical report handoff, avoiding a commit that would invalidate that verdict. No merge, tag or release is authorized for this worker.
