@@ -8,7 +8,7 @@ NetScript MCP find_guidance(intent) then search_docs were consulted first. The
 published guidance is general; focused source supplies the lifecycle contract.
 `kernel/adapters/plugin/browser-auth-reconciler.ts` generates shared helpers,
 Fresh auth/session routes and an independently owned service policy. It returns
-written paths only. All six lifecycle call sites consume that list; update goes
+written paths only. Five direct callers consume that list; the sixth command, update, goes
 through public install. All command handlers currently print completion text.
 `@netscript/plugin/adapter` already exposes DoctorReport/DoctorCheck with `ok` and
 `message`, suitable for informational findings that must not fail a command.

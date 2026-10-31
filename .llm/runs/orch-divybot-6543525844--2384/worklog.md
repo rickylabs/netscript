@@ -113,3 +113,18 @@ after verifying the F1 repair, current source and final evidence. See evaluate.m
 S1 is terminal and ready to commit/push. Source snapshot hashes are unchanged since
 the reviewed repair. The evidence packaging is S2; final exact-head evaluation
 will be recorded as a PR comment to avoid changing its own reviewed commit.
+
+## S2 evidence packaging and handoff
+
+S1 landed at 8981fa6 and its PR phase comment records scope and gate evidence.
+S2 packages the already reviewed run evidence, scoped validation config, gate
+summary, command inventory and dated lesson. No product source changes follow the
+independent PASS. JSON parsing and diff hygiene prove this documentation slice;
+its claims are cross-checked against the structured wrapper outputs. The final
+same-session review will cover the exact pushed S2 head after readiness.
+
+Reconcile: issue 2384 remains open; PR 2530 references it without a closing keyword
+per owner. Coordinator retains labels/milestones, merge and e2e-cli-gate ownership.
+No acceptance checkbox on the issue was changed. No lock/template drift. All three
+issue acceptance behaviors have local evidence; the full CI E2E merge gate remains
+explicitly required and unproven until the coordinator arms it.

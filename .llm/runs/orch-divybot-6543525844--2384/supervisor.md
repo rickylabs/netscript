@@ -26,3 +26,9 @@ Owner process overrides: preserve the supplied branch; use references to issue
 2384 in the PR body, no closing keywords; coordinator owns labels and milestones,
 merge, and the e2e-cli gate. No local scaffold.runtime suite. Final report uses
 the atomic Orchid file handoff. Stop at READY.
+
+Write-surface reconciliation: the cross-cutting acceptance test is explicitly
+`packages/cli/tests/browser-auth-reporting_test.ts`; the shared renderer is
+`packages/cli/src/kernel/presentation/output/render-doctor-report.ts`. The CLI
+README documents the result field. These additions are within browser-auth
+reporting scope; their location change is recorded in drift.md.
