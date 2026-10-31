@@ -1,14 +1,14 @@
 import { basename, relative, resolve } from '@std/path';
-import { buildAppTokens } from '../../tokens/build-app-tokens.ts';
-import { readTokenConfig } from '../../tokens/token-files.ts';
+import { buildAppTokens } from '../../../tokens/build-app-tokens.ts';
+import { readTokenConfig } from '../../../tokens/token-files.ts';
 import {
   TOKEN_ASSET_DIR,
   TOKEN_CONFIG_FILE,
   TOKEN_OVERRIDE_FILE,
-} from '../../../domain/tokens/token-config.ts';
-import type { UiConfig } from '../../../domain/ui/ui-config.ts';
-import type { UiRegistryDependencies } from './registry-client.ts';
-import type { UiWritePlan } from './ui-write-plan.ts';
+} from '../../../../domain/tokens/token-config.ts';
+import type { UiConfig } from '../../../../domain/ui/ui-config.ts';
+import type { UiRegistryDependencies } from '../registry-client.ts';
+import type { UiWritePlan } from '../ui-write-plan.ts';
 
 /** Reuse S1 validation/compilation once, selecting only the requested generated output files. */
 export async function stageUiPresetTokens(input: {

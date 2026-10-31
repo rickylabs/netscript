@@ -1,0 +1,8 @@
+Selective fork of TokensBrücke: https://github.com/tokens-bruecke/figma-plugin
+Upstream commit: ded44a2e1f825e82d4888dd27fc056062da642f7
+Copyright (c) 2023 Pavel Laptev. MIT; see LICENSE (verbatim upstream bytes).
+
+upstream/normalize-rgba.ts derives from src/common/transform/color/normalizeRGBAColor.ts.
+Local changes: explicit return type and lossless alpha (no two-decimal rounding).
+The NetScript-specific variable snapshot, DTCG bridge, UI and GitHub workflow
+replace upstream's broad UI/providers. No analytics or credential persistence.

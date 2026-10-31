@@ -38,6 +38,12 @@ export type TokenDerivation = TokenMixDerivation | TokenShadowDerivation;
 
 /** NetScript metadata does not change DTCG value semantics. */
 export interface TokenMetadata {
+  /** Perceptual color retained alongside the portable sRGB Figma value. */
+  readonly oklch?: {
+    readonly components: readonly number[];
+    readonly alpha: number;
+    readonly sourceHex?: string;
+  };
   /** Exported custom property registered by code. */
   readonly cssVar?: string;
   /** Exact legacy spelling or an explicit CSS expression. */
@@ -149,18 +155,27 @@ export interface TokenPreset {
 
 /** Figma's export shape, kept independent of DTCG's type vocabulary. */
 export interface FigmaVariable {
+  /** Slash-delimited variable name owned by the code inventory. */
   readonly name: string;
+  /** Resolved native variable type, independent of its alias target. */
   readonly type: 'COLOR' | 'FLOAT' | 'STRING' | 'BOOLEAN';
+  /** Property pickers where Figma exposes this variable; empty means hidden. */
   readonly scopes: readonly string[];
+  /** Optional WEB code syntax, preserved verbatim from Figma. */
   readonly codeSyntax?: string;
+  /** Nonempty Figma description, including its original entities. */
   readonly description?: string;
+  /** Literal or collection/name alias for every ordered mode. */
   readonly values: Readonly<Record<string, string | number | boolean | { readonly alias: string }>>;
 }
 
 /** One collection uses its own active mode while resolving aliases. */
 export interface FigmaCollection {
+  /** Local Figma collection name. */
   readonly collection: string;
+  /** Ordered modes; the first is the native default. */
   readonly modes: readonly string[];
+  /** Variables in UTF-16 code-unit name order. */
   readonly variables: readonly FigmaVariable[];
 }
 

@@ -15,6 +15,8 @@ export interface TokenEngineDefaults {
 
 /** Build tokens through the public Fresh UI tooling entrypoint. */
 export interface TokenEnginePort {
+  /** Convert validated Figma transport with the public shared importer, without filesystem IO. */
+  figmaSources?(bundle: unknown): Promise<Readonly<Record<string, string>>>;
   outputFiles(previews?: boolean): Promise<readonly string[]>;
   defaults(): Promise<TokenEngineDefaults>;
   build(options: TokenEngineBuildOptions): Promise<{

@@ -4,17 +4,17 @@ import {
   tokenAlias,
   type TokenDocument,
   type TokenPreset,
-} from '../domain/token-contract.ts';
-import { resolveFigmaValue } from '../domain/figma-aliases.ts';
+} from '../../domain/token-contract.ts';
+import { resolveFigmaValue } from '../../domain/figma-aliases.ts';
 import {
   FIGMA_THEME_COLLECTIONS,
   FIGMA_THEME_SET,
   figmaModes,
   TOKEN_PRESETS,
-} from '../domain/token-presets.ts';
-import { figmaPrimitive, legacyPrimitive } from './token-values.ts';
-import { applyLegacyGaps } from '../domain/legacy-role-aliases.ts';
-import { nameMigrations } from '../assets/metadata.generated.ts';
+} from '../../domain/token-presets.ts';
+import { figmaPrimitive, legacyPrimitive } from '../token-values.ts';
+import { applyLegacyGaps } from '../../domain/legacy-role-aliases.ts';
+import { nameMigrations } from '../../assets/metadata.generated.ts';
 
 /** The pre-S1 manifest is evidence and the value source for NS One. */
 export interface LegacyTokenSource {

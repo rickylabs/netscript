@@ -1,3 +1,4 @@
+import { applyInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { FetchUiRegistry } from '../../../kernel/adapters/ui/fetch-ui-registry.ts';
 import type { UiRegistryDependencies } from '../../../kernel/application/ui/v2/registry-client.ts';
 import { DenoUiRegistryPaths } from '../../../kernel/adapters/ui/deno-ui-registry-paths.ts';
@@ -329,6 +330,12 @@ export function createPublicCommandDependencies(
 
   const uiRegistryPaths = new DenoUiRegistryPaths();
   const tokenEngine = new FreshUiTokenEngine();
+  const uiInstallDependencies = {
+    fs,
+    transport: new FetchUiRegistry(),
+    paths: uiRegistryPaths,
+    tokenEngine,
+  };
   return {
     uiRegistryPaths,
     fs,
@@ -343,6 +350,7 @@ export function createPublicCommandDependencies(
     resolveProjectRoot,
     resolveUiAppRoot,
     initCommandDependencies: {
+      applyPreset: (input) => applyInitPreset(input, uiInstallDependencies),
       initAgent: (input) =>
         initAgent(input, {
           fs: new DenoAgentInitFileSystem(),
@@ -357,12 +365,7 @@ export function createPublicCommandDependencies(
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
     uiPageFormatter: generatedSourceFormatter,
-    uiInstallDependencies: {
-      fs,
-      transport: new FetchUiRegistry(),
-      paths: uiRegistryPaths,
-      tokenEngine,
-    },
+    uiInstallDependencies,
     dbOperationDependencies: {
       cwd: host.cwd,
     },

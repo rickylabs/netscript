@@ -75,6 +75,12 @@ async function copyFixture(source: URL, target: string): Promise<void> {
 Deno.test('frozen token check rejects every stale and missing SD artifact without repair', async () => {
   const root = await Deno.makeTempDir({ prefix: 'fresh-ui-token-check-' });
   try {
+    // Keep the workspace lock context, but map the copied modules outside its import scope.
+    const { catalog } = JSON.parse(await Deno.readTextFile(new URL('../../deno.json', PACKAGE)));
+    await Deno.writeTextFile(
+      `${root}/imports.json`,
+      JSON.stringify({ imports: { zod: `npm:zod@${catalog.zod}` } }),
+    );
     for (
       const source of [
         'scripts/build-tokens.ts',
@@ -92,6 +98,8 @@ Deno.test('frozen token check rejects every stale and missing SD artifact withou
           'run',
           '--config',
           fileURLToPath(new URL('deno.json', PACKAGE)),
+          '--import-map',
+          `${root}/imports.json`,
           '--lock',
           fileURLToPath(new URL('deno.lock', PACKAGE)),
           '--frozen',

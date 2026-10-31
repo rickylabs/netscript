@@ -4,7 +4,7 @@ import { MemoryFileSystemAdapter } from '../../../../adapters/scaffold/memory-fs
 import type { TokenEnginePort } from '../../../../ports/token-engine-port.ts';
 import { encodeUiPreset } from '../../../../domain/ui/ui-preset.ts';
 import { installUiRegistry, UiRegistryConflictError } from '../install-registry.ts';
-import { applyUiPreset } from '../apply-preset.ts';
+import { applyUiPreset } from '../presets/apply-preset.ts';
 import { removeUiRegistry, updateUiRegistry } from '../registry-lifecycle.ts';
 import { buildAppTokens } from '../../../tokens/build-app-tokens.ts';
 import { readUiConfig, readUiLock } from '../config-lock.ts';

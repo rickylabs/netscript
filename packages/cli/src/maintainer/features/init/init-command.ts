@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../kernel/presentation/command-types.ts';
 import { outputText } from '../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import type { DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
@@ -71,6 +71,7 @@ export function createMaintainerInitCommand(
     .option('--dry-run', 'Preview scaffold plan without writing files', { default: false })
     .option('--json', 'Emit a single machine-readable JSON result', { default: false })
     .option('--from <preset:string>', 'Apply a named scaffold preset')
+    .option('--preset <code:string>', 'UI preset code, theme/preset JSON URL, or token preset id')
     .action(async (options, name: string): Promise<void> => {
       if (options.from !== undefined) {
         const presets = new PresetRegistry();
@@ -95,6 +96,7 @@ export function createMaintainerInitCommand(
         dryRun: options.dryRun ?? false,
         json: options.json ?? false,
         from: options.from,
+        preset: options.preset,
         noGit: options.git === false,
         noAspire: options.aspire === false,
         dbEngine: parseDbEngine(options.db),
