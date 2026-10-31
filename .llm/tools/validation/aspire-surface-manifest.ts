@@ -37,6 +37,13 @@ const re = (r: RegExp) => (p: string) => r.test(p);
 /** Ordered rules — first match wins. */
 const RULES: readonly Rule[] = [
   {
+    test: (p) => p === '.github/workflows/fresh-ui-quality.yml',
+    cls: 'ci:workflow',
+    owner: 'S1',
+    disposition:
+      'standalone npm/Playwright browser job; --no-aspire scaffold; no Aspire host/database/service; maintained-source parity remains enforced',
+  },
+  {
     test: (p) => p === '.github/workflows/generated-carriers.yml',
     cls: 'ci:workflow',
     owner: 'derived',

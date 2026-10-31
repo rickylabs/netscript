@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/tools/fresh-ui-browser"
+    schedule:
+      interval: "weekly"
+    versioning-strategy: increase
+    labels: []
+    groups:
+      playwright:
+        patterns:
+          - "@playwright/test"
+          - "playwright-core"
+      axe:
+        patterns:
+          - "@axe-core/playwright"
+          - "axe-core"
