@@ -11,6 +11,7 @@
  *   generator inserts `.withRoute(routes.<key>.$route)` and the `routes` import.
  * - Form C (no contract): the generator inserts a default
  *   `.withRoute(routes.<key>.$route)` backed by `createRouteReference`.
+ * Existing explicit `.withRoute(...)` bindings remain author-owned in Forms B/C.
  *
  * This module is intentionally dependency-free: it uses a small brace/paren
  * matching scanner rather than a full TypeScript AST, matching the existing
@@ -360,7 +361,8 @@ function applyBraceDelta(line: string, initialDepth: number): number {
  * - Form A inserts `$route: <manifest>.<key>` as the first field of the inline
  *   `.withRouteContract({...})` object and ensures the `routePatterns` import.
  * - Form B and Form C insert `.withRoute(<routes>.<key>)` immediately after the
- *   `definePage()` call and ensure the `routes` import.
+ *   `definePage()` call and ensure the `routes` import when no binding exists.
+ *   An existing explicit binding and its imports are preserved.
  *
  * The function is idempotent: when the source already matches the target it
  * returns `changed: false` and the original source unchanged.
@@ -439,6 +441,11 @@ function rewriteWithRouteForm(
       /\broutes\b[^\n]*\bfrom\b/,
     );
     return { content: ensured, changed: ensured !== input.source, warning };
+  }
+
+  // An explicit binding may use an app-owned alias or a different route expression.
+  if (scanPageModuleRouteBinding(input.source).hasWithRoute) {
+    return { content: input.source, changed: false, warning };
   }
 
   const defineCall = input.source.match(/definePage\s*(?:<[^>]*>)?\s*\(\s*\)/);

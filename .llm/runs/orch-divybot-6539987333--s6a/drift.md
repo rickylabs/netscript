@@ -128,3 +128,14 @@ differing from main. Current source manifest refreshes122hashes.
 New local carrier/root/quality gates and same independent evaluator are required before commit;
 new exact-head required CI and both full runtime suites are required before renewed READY.
 Previous53f3794CI is historical. No product redesign or new scope. Cockpit owns merge.
+
+
+## Held-main reconciliation after coordinator approval
+
+Coordinator approved d53e422, confirmed greenCI/cleanleakscan, and requested one more
+merge of main19bca622338b7ac79913def27d17051b097329b6 (#2536). Other merges are held
+until2503lands. Merge --no-commit --no-ff; sole conflict MCPpublishgenerated carrier.
+Main authored-route binding fixes and documentation merge without authored conflicts.
+Regenerate all4canonical carriers, verify bothparents, rootchecks/quality/docs/release,
+resume same independent reviewer, ordinarypush, then exactheadCIbeforeREADYfullSHA.
+No rebase/forcepush/newlabels or product scope changes. Cockpit owns merge.

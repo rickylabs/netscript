@@ -267,3 +267,22 @@ docsaccuracy and releasepreflightPASS. Same independent reviewer now evaluates t
 Same independent Opus reviewerPASS:122hashes match,82main-only paths preserved,
 allPR-only source preserved,allfiveoverlaps combine both parents. Failurestreak0.
 Commit merge and ordinary push; new requiredCI and both full runtimes precedeREADY.
+
+
+## Held-main reconciliation after coordinator approval
+
+Coordinator approved d53e422, confirmed greenCI/cleanleakscan, and requested one more
+merge of main19bca622338b7ac79913def27d17051b097329b6 (#2536). Other merges are held
+until2503lands. Merge --no-commit --no-ff; sole conflict MCPpublishgenerated carrier.
+Main authored-route binding fixes and documentation merge without authored conflicts.
+Regenerate all4canonical carriers, verify bothparents, rootchecks/quality/docs/release,
+resume same independent reviewer, ordinarypush, then exactheadCIbeforeREADYfullSHA.
+No rebase/forcepush/newlabels or product scope changes. Cockpit owns merge.
+
+All4generators,14rootchecks,quality/architecture,docsaccuracy,releasepreflightPASS.
+All20main-onlypaths preserved;2MCPoverlaps regenerated;209docsretained.
+FreshUI/browser source unchanged; current122hashes match. Independentreviewpending.
+
+IndependentreviewPASS: all122hashes match;20main-onlyfiles preserved;allPR-only
+source preserved;only2MCPcarriers overlap. All gates completedgreen. Commit/push
+plainmerge then waitnewheadrequiredCI/fullPostgres+SQLite beforeREADYfullSHA.

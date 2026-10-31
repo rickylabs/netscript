@@ -553,7 +553,8 @@ export interface PageModuleBindingResult {
  *
  * Form A page modules receive `$route: routePatterns.<key>.$route` as the first
  * field of their inline `.withRouteContract({...})`; Form B/C page modules
- * receive `.withRoute(routes.<key>.$route)` after `definePage()`. Writes are
+ * receive `.withRoute(routes.<key>.$route)` after `definePage()` when unbound.
+ * Explicit `.withRoute(...)` bindings are preserved. Writes are
  * idempotent — a module whose content already matches the target is left
  * untouched.
  *

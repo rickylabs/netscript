@@ -6,6 +6,7 @@ import {
   renderNetScriptRouteManifest,
   renderNetScriptRoutesModule,
   resolveNetScriptRouteManifestOptions,
+  writeNetScriptPageModuleBindingsSync,
   writeNetScriptRouteManifestSync,
 } from './manifest.ts';
 
@@ -395,4 +396,38 @@ Deno.test('writeNetScriptRouteManifestSync writes sibling manifest.ts and routes
     routesSource.includes('export const routes = {'),
     'Expected routes.ts routes export',
   );
+});
+
+Deno.test('page binding disk pass preserves authored bindings and still binds unbound pages', () => {
+  const appRoot = Deno.makeTempDirSync({ prefix: 'netscript-authored-binding-' });
+  try {
+    const routesDir = resolve(appRoot, 'routes');
+    Deno.mkdirSync(routesDir);
+    const pagePath = resolve(routesDir, 'index.tsx');
+    const source = [
+      "import { appRoutes } from '@app/router.ts';",
+      "import { definePage } from '@app/utils.ts';",
+      'export const homePage = definePage().withRoute(appRoutes.home).build();',
+    ].join('\n');
+    Deno.writeTextFileSync(pagePath, source);
+    const unboundPath = resolve(routesDir, 'about.tsx');
+    Deno.writeTextFileSync(unboundPath, 'export const aboutPage = definePage().build();');
+    const options = resolveNetScriptRouteManifestOptions(appRoot, {});
+    const bindings = {
+      manifestImportSpecifier: '@app/.generated/manifest.ts',
+      routesImportSpecifier: '@app/.generated/routes.ts',
+    };
+    const first = writeNetScriptPageModuleBindingsSync(options, bindings);
+    assert(first.rewrittenCount === 1, 'Expected only the unbound page rewritten');
+    assert(Deno.readTextFileSync(pagePath) === source, 'Expected authored source unchanged');
+    assert(
+      Deno.readTextFileSync(unboundPath).includes('.withRoute(routes.about.$route)'),
+      'Expected automatic binding on the unbound page',
+    );
+    const second = writeNetScriptPageModuleBindingsSync(options, bindings);
+    assert(!second.changed && second.rewrittenCount === 0, 'Expected stable repeated disk pass');
+    assert(Deno.readTextFileSync(pagePath) === source, 'Expected stable authored page');
+  } finally {
+    Deno.removeSync(appRoot, { recursive: true });
+  }
 });

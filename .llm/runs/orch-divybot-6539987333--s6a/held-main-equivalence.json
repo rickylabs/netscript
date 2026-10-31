@@ -1,0 +1,25 @@
+{
+  "previousHead": "d53e422cc5d96934b77455f1d8d57088286b9b4c",
+  "mergedMain": "19bca622338b7ac79913def27d17051b097329b6",
+  "mergeBase": "7feb24c7d09518a045c3955555967dbbde51e92a",
+  "mainOnlyPaths": 20,
+  "mainOnlyMismatches": [],
+  "overlapPaths": [
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "changedReviewedPaths": [
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "freshUISourceAndTestsUnchanged": true,
+  "docs": {
+    "mainPages": 209,
+    "mergedPages": 209,
+    "missing": [],
+    "changed": [
+      "pages/reference/fresh-ui/index.md",
+      "pages/web-layer/how-to/customize-fresh-ui/index.md"
+    ]
+  }
+}
