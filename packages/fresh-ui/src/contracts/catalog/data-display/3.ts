@@ -75,14 +75,42 @@ export const data_display_3: readonly ComponentContract[] = [
     'priority': 'P1',
     'shipped': true,
     'props': {
+      'code': {
+        'kind': 'text',
+        'description':
+          'Raw clipboard source; absent text derives from display rows excluding removals.',
+      },
+      'filename': {
+        'kind': 'text',
+      },
+      'lang': {
+        'kind': 'text',
+      },
+      'tabs': {
+        'kind': 'collection',
+      },
+      'lines': {
+        'kind': 'collection',
+      },
       'variant': {
         'kind': 'enum',
         'values': [
+          'single',
+          'tabbed',
+          'diff',
           'default',
           'destructive',
           'added',
           'removed',
           'highlighted',
+        ],
+        'description': 'Ledger modes plus published phase1 aliases.',
+      },
+      'tone': {
+        'kind': 'enum',
+        'values': [
+          'default',
+          'destructive',
         ],
       },
       'size': {
@@ -93,12 +121,39 @@ export const data_display_3: readonly ComponentContract[] = [
         ],
       },
       'header': {
-        'kind': 'enum',
-        'values': [
-          'none',
-          'title',
-          'tabs',
-        ],
+        'kind': 'boolean',
+        'values': ['none', 'title', 'tabs'],
+        'default': true,
+        'description':
+          'Boolean chrome control with legacy none/title/tabs aliases; tabs without files falls back to title. Essential file tabs remain when chrome is hidden.',
+      },
+      'copy': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'lineNumbers': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'footer': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'footerContent': {
+        'kind': 'slot',
+      },
+      'scrollbar': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'value': {
+        'kind': 'text',
+      },
+      'defaultValue': {
+        'kind': 'text',
+      },
+      'onValueChange': {
+        'kind': 'callback',
       },
       'state': {
         'kind': 'enum',
@@ -107,29 +162,11 @@ export const data_display_3: readonly ComponentContract[] = [
           'copied',
         ],
       },
-      'code': {
-        'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      'onCopied': {
+        'kind': 'callback',
       },
-      'filename': {
-        'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
-      },
-      'lang': {
-        'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
-      },
-      'copy': {
-        'kind': 'boolean',
-      },
-      'lineNumbers': {
-        'kind': 'boolean',
-      },
-      'footer': {
-        'kind': 'boolean',
-      },
-      'scrollbar': {
-        'kind': 'boolean',
+      'onCopyError': {
+        'kind': 'callback',
       },
     },
     'parts': [
@@ -138,78 +175,113 @@ export const data_display_3: readonly ComponentContract[] = [
       },
       {
         'name': 'head',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'header enabled',
       },
       {
         'name': 'name',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'filename supplied outside tabbed mode',
       },
       {
         'name': 'lang',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'header and lang supplied',
       },
       {
         'name': 'tabs',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'tabbed mode',
+      },
+      {
+        'name': 'tab',
+        'when': 'tabbed mode',
       },
       {
         'name': 'copy',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'header and copy enabled',
       },
       {
         'name': 'content',
       },
       {
         'name': 'line',
-        'when': 'when the corresponding content or subcomponent is supplied',
       },
       {
         'name': 'line-number',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'lineNumbers enabled',
+      },
+      {
+        'name': 'sign',
       },
       {
         'name': 'code',
       },
       {
+        'name': 'syntax',
+        'when': 'caller supplies Token content',
+      },
+      {
+        'name': 'marker',
+        'representation': 'pseudo',
+        'when': 'highlighted row',
+      },
+      {
         'name': 'scrollbar',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
+        'when': 'overflow and scrollbar enabled',
       },
       {
         'name': 'thumb',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
+        'when': 'overflow and scrollbar enabled',
+      },
+      {
+        'name': 'copy-tooltip',
+        'representation': 'native',
+        'when': 'browser shows the copy button title',
       },
       {
         'name': 'footer',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'footer enabled',
+      },
+      {
+        'name': 'added-count',
+        'when': 'diff header enabled',
+      },
+      {
+        'name': 'removed-count',
+        'when': 'diff header enabled',
+      },
+      {
+        'name': 'status',
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
-        'when': 'matching CSS interaction or variant',
+        'when': 'native focus-visible',
       },
     ],
     'attributes': {
       'data-variant': {
         'values': [
+          'single',
+          'tabbed',
+          'diff',
+        ],
+        'compatibilityValues': [
           'default',
           'destructive',
           'added',
           'removed',
           'highlighted',
         ],
-        'plannedValues': [
+      },
+      'data-tone': {
+        'values': [
+          'default',
           'destructive',
-          'added',
-          'removed',
-          'highlighted',
         ],
       },
       'data-size': {
         'values': [
           'md',
-          'sm',
-        ],
-        'plannedValues': [
           'sm',
         ],
       },
@@ -219,35 +291,83 @@ export const data_display_3: readonly ComponentContract[] = [
           'title',
           'tabs',
         ],
-        'plannedValues': [
-          'tabs',
-        ],
       },
       'data-state': {
         'values': [
           'rest',
           'copied',
         ],
-        'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'root',
+        ],
+      },
+      'data-scrollbar': {
+        'values': [
+          'true',
+          'false',
+        ],
+      },
+      'data-line-variant': {
+        'values': [
+          'default',
+          'added',
+          'removed',
+          'highlighted',
+        ],
+        'parts': [
+          'line',
+        ],
+      },
+      'data-syntax': {
+        'values': [
+          'keyword',
+          'function',
+          'type',
+          'string',
+          'number',
+          'comment',
+          'punctuation',
+        ],
+        'parts': [
+          'syntax',
+        ],
       },
     },
     'booleans': [
+      'header',
       'copy',
       'lineNumbers',
       'footer',
       'scrollbar',
     ],
-    'slots': [],
-    'apg': 'native buttons and links',
+    'slots': [
+      {
+        'name': 'footerContent',
+        'part': 'footer',
+      },
+      {
+        'name': 'lines',
+        'part': 'line',
+      },
+    ],
+    'apg': 'Tabs APG with native buttons, code and horizontal overflow regions',
     'keyboard': [
       {
         'key': 'Tab/Shift+Tab',
-        'action': 'Move between native controls',
+        'action': 'Move between native tabs, copy control and code scroll region',
       },
       {
         'key': 'Enter/Space',
-        'action': 'Activate focused button; links use Enter',
+        'action': 'Activate the focused tab or copy button',
+      },
+      {
+        'key': 'ArrowLeft/ArrowRight',
+        'action':
+          'Navigate horizontal file tabs, respecting direction; code scroll regions retain native arrows',
+      },
+      {
+        'key': 'Home/End',
+        'action': 'Select first/last file tab',
       },
     ],
     'tokenRoles': [
@@ -264,9 +384,19 @@ export const data_display_3: readonly ComponentContract[] = [
       'surface/surface',
       'text/fg',
       'text/muted',
+      'code/bg',
+      'code/syntax/*',
+      'scrollbar/thumb',
+      'font/mono',
+      'type/code/*',
     ],
     'notes': [
-      'Native DOM attributes pass through where the implementation accepts them.',
+      'Ledger modes single/tabbed/diff and tone replace the old design-only vocabulary; published default/destructive/added/removed/highlighted aliases remain supported.',
+      'Legacy header none/title/tabs aliases remain; header=tabs without files renders a title header. Header=false removes file chrome/copy but never removes essential tab controls.',
+      'Native horizontal scrollbar/thumb and native copy title tooltip are platform internals, not fabricated layout parts.',
+      'Syntax content is a trusted application slot; plain raw text is escaped, with no tokenizer or unsafe HTML.',
+      'Syntax roles apply on code/bg. Tinted diff/highlight rows use text/fg until the token workstream certifies syntax pairs on those backgrounds.',
+      'Clipboard result callbacks are separate from native onCopy. Actual status ignores stale file/text requests; controlled state may render a chosen visual snapshot.',
     ],
   },
   {
