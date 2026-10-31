@@ -78,3 +78,9 @@ preflight/docsaccuracy/exportdriftPASS. Native publish dryrun0slowtypes; inherit
 2531doclint raw124FAIL has exact123TypeScript identities unchanged/0new and primitives
 entrypoint0diagnostics. No new waiver/token values/dependency version/lock/schema
 churn. Reconcile current source before commit; carriers follow SOURCE commit.
+
+
+9b source8c5bcc25 committed; all4committed-sourcecarriersPASS. Refreshed native member publish dryrunPASS0slowtypes on committed bytes. Raw124doclint failure remains unchanged debt2531; no new diagnostics. Independent committed-source evidence reconciliation next, then audit/push/comment. No9csource yet; research only.
+
+
+9b independent committed-source evidence reconciliation PASS. Native source8c5bcc25 and all4carriers verified; public privacy audit precedes evidence commit/push. Next9c shell research must preserve SidebarToggle island compatibility and useful SSR, with one active nav branch/native mobile modal after hydration; no9csource yet.
