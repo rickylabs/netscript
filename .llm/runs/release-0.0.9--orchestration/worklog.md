@@ -139,3 +139,6 @@
 - 08:16:44Z: **merged** #2505 (`a2fe36aee`) for #2132 (C1); #2132 auto-closed by the PR body, evidence comment posted. READY at `a75d631`, Opus MERGE r5, 30/30 checks including both runtime tiers, 0 threads.
 - 08:16:44Z: **merged** #2494 (`1d274c16b`) for #2155 (E2, docs); #2155 closed with evidence. Opus MERGE r5 at `482097b`; main had moved since the merge base and both sides touched agent-docs-prose, so the coordinator built the combined tree (merge-tree) and ran check:agent-docs-prose (fresh) and check:publish-assets (pass). The e2e on #2482 (#2400) is running at `dfa2502` alongside #2505's finished gate.
 - 08:19:07Z: dispatched #2162 (B2, fixes; requires #2161 merged), comment 6541068260. Brief tightened to merge-main-never-rebase.
+- 08:20:41Z: #2482 (#2400) e2e Postgres tier FAIL at aspire-start on `dfa2502`: garnet state=Finished, `garnet_resp` Unhealthy (garnet-server tool missing in the container), the same infra flake as #2492 at 04:54Z. Reran the failed job once.
+- 08:20:58Z: dispatched #2338 (C1, features), comment 6541084410. #2392 (E1, internals) brief written; posting after a spacing gap. #2394 waits for #2421 (same plugin service entrypoints).
+- 08:22:01Z: status 4 posted on #2474 (19 merges, 20 closed; canary .1 left: #2400, #2421; Eric items unchanged; Garnet flake watch item).
