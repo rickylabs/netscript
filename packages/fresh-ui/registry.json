@@ -4890,6 +4890,7 @@
         "name": "actions",
         "description": "Native actions and keyboard-accessible selection groups.",
         "items": [
+          "theme-seed",
           "button",
           "icon-button",
           "button-group",
