@@ -75,6 +75,10 @@ Deno.test('app conventions point agents to the theme and customization guides', 
   const agents = buildAppAgentsMarkdown(serviceInput());
 
   assertStringIncludes(agents, '## Look and feel');
+  assert(
+    !agents.includes('netscript tokens init'),
+    'preset overrides must preserve existing sources',
+  );
   for (
     const fact of [
       '`assets/theme-preset.json`',
@@ -82,7 +86,8 @@ Deno.test('app conventions point agents to the theme and customization guides', 
       '`routes/_layout.tsx`',
       '`navigation.ts`',
       '`netscript ui:apply --preset <id>`',
-      '`netscript tokens init --preset <id>`',
+      'create a semantic override file',
+      '`override` in the token config when one exists',
       '`netscript tokens build`',
       '`--no-nav`',
       'web-layer/how-to/theme-your-app',

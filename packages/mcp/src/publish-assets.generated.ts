@@ -216,6 +216,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/how-to/build-a-server-validated-form/index.md',
       'pages/web-layer/how-to/customize-fresh-ui/index.md',
       'pages/web-layer/how-to/index.md',
+      'pages/web-layer/how-to/theme-your-app/index.md',
       'pages/web-layer/index.md',
       'pages/web-layer/interactive/index.md',
       'pages/web-layer/layers/index.md',
@@ -230,7 +231,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/vite/index.md',
       'pages/why/index.md',
     ],
-    sourceBytes: 2973599,
-    documentCount: 209,
-    sha256: 'e93012819ba5396aec964cfb4a7285cf1404e7f835c7ca001785865192f0760f',
+    sourceBytes: 2983724,
+    documentCount: 210,
+    sha256: '86a309c3cc3462dda3d585e0eb13c9d287fb9b4b4ad709faec3a1dbf54c77ca6',
   };

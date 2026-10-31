@@ -1,17 +1,9 @@
-# Resume / review handoff
+# Current handoff — close-gate repaired
 
-Task #2552 code half implemented in four assigned source/test files on orch/divybot-6550268951. PR #2555. Baseline f4aa307b5340bd3de8029c11778a38bbca451ba1.
+PR #2555 now contains all #2552 deliverables: normal merge includes companion #2554 at b2fe065a75ee80675159dc8e1ff048a2baf8bf83, plus original generated guidance and page hint. Required final closing line remains. No dependency on separately merging docs first.
 
-Full patch recovered from issue comment and applied with git apply. Added shared theme/chrome guidance and MCP slugs, replaced stale ui:add page CSS hint. Corrected token init to --preset <id> preserving current app preset.
+Newer recipe's safe override workflow now also appears in AGENTS.md: create semantic override, register under `override` in existing config, build. Test rejects tokens init advice.
 
-35 focused tests pass, including generated file-reference existence in both scaffold modes. Structured check/lint/fmt process all four files; quality:gate, release:preflight, docs:accuracy and JSR audit commands exit 0 (existing audit warnings). See worklog for commands and caveats.
+Same independent Opus 5.5 session returned FAIL_FIX then **PASS**, independently repeated all 35 focused tests and scoped fmt, and approved all three issue acceptance evidence mappings. Current structured check/lint/fmt, quality:gate, docs build/links/snippets/contract/accuracy and all four carrier freshness tasks exit 0. See evaluate.md and close-gate-remediation.md. Prior bb2bd43 audit is historical only.
 
-Full one-pass scaffold.runtime exits 1 before runtime: Aspire doctor fails and Docker daemon inaccessible. Read-only leak-check exits 0 but Docker probes unavailable, 24 unknown-owner survivors untouched. Runtime gate unproven.
-
-Independent Claude Opus 5.5 evaluator returned PASS on code correctness after read-only review, independent 35-test rerun, scoped fmt and throwaway scaffold verification. Requested high effort; evaluator does not independently attest effort. See evaluate.md. Implementation sign-off includes this evidence; PR transitions to ready for review, without status:ready-merge.
-
-Companion docs PR #2554 remains OPEN. Its pages match web-layer/how-to/theme-your-app and web-layer/how-to/customize-fresh-ui; no docs/carrier source touched here. Assignment requires final PR body line Closes rickylabs/netscript#2552; do not mark status:ready-merge while issue acceptance (including docs) remains unverified.
-
-Never commit .divybot-goal.md. Do not merge or wait for remote CI; owner/orchestrator handles integration.
-
-Combined acceptance audit completed: see acceptance-audit.md. Every docs/site verify, docs links/accuracy/snippets/contract-derivation and agent-docs-prose/MCP export/publish/assets-barrel freshness command passes on companion bb2bd43 + code a0dee5d. Actual compressed docs corpus content/hashes verified. Both PRs still open; do not close goal or issue on combined local evidence alone. Runtime and owner merge remain outstanding. Detached sibling acceptance checkout retained for evidence/resumption.
+Next: publish immutable evidence/acceptance mapping, tick only proven issue boxes, run live close-gate and rerun CI. Keep status:impl-eval until pushed-head CI is verified. Nothing merged to main. Runtime local UNPROVEN and remote skipped-by-policy, never PASS. Owner/Cockpit owns merge. Never commit .divybot-goal.md.

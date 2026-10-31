@@ -209,7 +209,7 @@ Every page shares one theme and one chrome. Apply theme changes app-wide.
     referencePath(all, 'app-theme-preset')
   }\` names the app's one preset (Studio Utility for new apps), and \`${
     referencePath(all, 'app-shell')
-  }\` stamps it on \`<html>\`. Switch it with \`netscript ui:apply --preset <id>\`, or alias roles in the override file that \`netscript tokens init --preset <id>\` creates (use the app's current preset ID) and run \`netscript tokens build\`. Never hand-edit the generated token files, and never set tokens or \`data-theme\` on a page wrapper.
+  }\` stamps it on \`<html>\`. Switch it with \`netscript ui:apply --preset <id>\`, or follow the theme guide to create a semantic override file, register it under \`override\` in the token config when one exists, and run \`netscript tokens build\`. Never hand-edit the generated token files, and never set tokens or \`data-theme\` on a page wrapper.
 - **Chrome:** \`${
     referencePath(all, 'app-layout')
   }\` renders the top bar and theme toggle around every page. Its links are \`appNavigation\` in \`${

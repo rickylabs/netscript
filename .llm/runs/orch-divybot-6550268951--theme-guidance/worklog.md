@@ -59,3 +59,13 @@ Final diff review: four product files, scoped harness artifacts only; no imports
 Verified exact companion docs head bb2bd43 plus reviewed four-file implementation in isolated detached sibling checkout. Docs build/links/snippets/contract-derivation and all four carrier freshness tasks PASS, including check:assets-barrel. Decoded actual corpus entries and verified hashes and recipe content. See acceptance-audit.md for requirement-by-requirement evidence and command coverage limits. No product changes or source fixes needed.
 
 Reconcile: both PRs OPEN, original issue OPEN/unverified. Merge owner remains Cockpit; full runtime remains unproven. No issue boxes ticked or ready-merge label applied.
+
+## Close-gate remediation
+
+Reproduced current CI close-gate failure: all three issue boxes unchecked, PR DoD complete. Normal-merge companion #2554 at b2fe065a75ee80675159dc8e1ff048a2baf8bf83 cleanly. Original four code files remain reviewed. New docs prerequisite brings all issue deliverables into this same PR, removing premature partial closure risk. Earlier audit covered bb2bd43; companion advanced, so prior docs proof is not reused for new content. Rerun docs gates and independent evaluator before sign-off and acceptance synchronization.
+
+## Close-gate repair sign-off and reconcile
+
+Same independent evaluator returned combined FAIL_FIX for override advice, then **PASS** after the targeted source/test repair. Independently repeated 35 tests and scoped fmt. Structured check/lint/fmt and all latest close-* docs/carrier commands exit **0**; `deno task quality:gate` raw exit **0**. All three issue acceptance mappings approved.
+
+Reconcile: final PR includes #2554 current b2fe065 docs prerequisite via normal merge, so original separate-PR merge dependency is superseded. Publish structured evidence linked to immutable repair commit and synchronize proven premerge issue boxes. No close-gate override, no keyword removal, no rebase/force push. Full runtime remains local UNPROVEN and CI skipped-by-policy. Remote close-gate must be rerun against live checked acceptance.

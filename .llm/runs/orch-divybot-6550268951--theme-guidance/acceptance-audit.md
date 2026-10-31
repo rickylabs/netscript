@@ -35,3 +35,7 @@ All commands run from combined repository root unless specified. Every listed co
 ## Remaining constraints
 
 Do not tick issue acceptance or claim issue complete until both PRs' accepted changes land and required merge evidence is satisfied. Do not replace missing runtime evidence with docs gates. No status:ready-merge, owner waiver, merge, deployment, or remote CI polling performed.
+
+## Superseded by close-gate repair
+
+This audit records older bb2bd43 content and a formerly separate docs dependency. Current branch normal-merges newer b2fe065 docs source, reruns all docs/carrier gates, repairs override guidance, and receives final combined independent PASS. Use close-gate-remediation.md and evaluate.md as current evidence. Premerge acceptance boxes may now be checked with that evidence; main merge remains distinct and owner-controlled.

@@ -1,24 +1,21 @@
-# Independent implementation evaluation
+# Independent implementation evaluation — current combined scope
 
-Verdict: **PASS on code correctness**. Merge readiness remains **UNPROVEN**.
+Final verdict: **PASS**. Same separate Claude Opus 5.5 read-only session, high effort requested; observed model claude-opus-5-5. Evaluator cannot independently attest effort. No evaluator source edits, commits, external messages or agent delegation.
 
-Separate vendor-family session: Claude Opus 5.5, requested high effort, launched read-only via `.llm/tools/agentic/claude/claude-print.ts`. Launcher init reports claude-opus-5-5. The evaluator cannot independently attest reasoning effort beyond the request. Owner issue comment explicitly selected this evaluator.
+Initial code-only scope passed 35 tests and scaffold path checks. Close-gate repair then normal-merged companion #2554 at b2fe065a75ee80675159dc8e1ff048a2baf8bf83, making all #2552 deliverables self-contained in this PR.
 
-Coordinator transcription of the independent final report:
+Combined review round 1: **FAIL_FIX**. Newer docs/skill use registered semantic aliases, whereas generated AGENTS.md still suggested tokens init. Repaired generated guidance to create a semantic override file, register it under `override` in existing config, then tokens build. Regression assertion now rejects tokens init advice.
 
-- Reviewed four product files and run artifacts against baseline f4aa307b5340bd3de8029c11778a38bbca451ba1. No implementation edits, commits, external messages, subordinate agents or target profiles/ reads by evaluator.
-- Independently reran all four focused suites: **35 passed, 0 failed**. Independently checked formatting: all four files processed.
-- Created a throwaway scaffold, verified all four new local references exist, Studio Utility default, HTML preset stamping, theme toggle and navigation exports. Removed evaluator-owned scratch scaffold.
-- Verified ui:apply, tokens init/build, --nav and --no-nav spellings and behavior against source. Explicit --preset correction avoids NS One default. Fresh scaffold has no tokens.config.json, so initialization works without --force.
-- Both documentation slugs match fetched companion #2554 guides; evaluator relied on fetched guide copies.
-- Existing public-command-tree integration tests sufficiently enforce exact declared/generated path correspondence and file existence in both scaffold modes.
-- No blocking code findings. Advisories: token init after ui:apply needs --force, whose override-reset risk is described in the linked guide; short page hint delegates initialization detail to that guide; unquoted docs slugs avoid the local-path parser treating them as files.
+Combined review round 2, same evaluator: **PASS**. Independently reran four focused suites: 35 passed, 0 failed. Independently checked scoped format and git diff whitespace. Structured check/lint/fmt agree: four files each, zero findings. quality:gate raw exit **0**, existing warnings only (wrapper completion recorded by implementer). Docs/corpus/skills match b2fe065 source.
 
-Merge constraints from evaluator:
+Evaluator explicitly verified all three acceptance mappings can be checked before merge:
 
-1. Commit/push reviewed files and update run/PR evidence. Bootstrap-only PR was observed during review; this is addressed in the implementation sign-off commit. Worklog evidence was added during review before that commit.
-2. Full scaffold.runtime remains unproven because Aspire doctor/Docker unavailable; run on suitable environment or obtain explicit owner waiver before merge.
-3. Companion #2554 and original issue docs acceptance must complete before this required closing-keyword PR merges.
-4. Current formatter proof is the successful rerun with explicit config, not the initial all-excluded refusal.
+1. Theme chain/recipe checked against current code and built by docs/site verify.
+2. Actual MCP corpus hashes, real get_doc response, skills and generated app pointers verified. New recipe returns verbatim within budget (12,190 of 12,288 bytes).
+3. Latest build/link/snippet/contract and four carrier freshness tasks all exit 0. Snippet gate compiles configured tier-1 set, not every displayed snippet.
 
-No self-certification or claim of full issue acceptance. No status:ready-merge or merge performed.
+Runtime remains local UNPROVEN, current CI skipped-by-policy for guidance/docs; never reported PASS. This is not a release cut. Nothing merged to main by this agent. Apply ready-merge only after actual pushed-head CI and issue evidence are satisfied. Companion #2554 can be treated as included after this PR lands.
+
+Advisory: recipe has 98-byte get_doc budget margin; future edits should check retrieval remains verbatim. This is not a blocking finding.
+
+See close-gate-remediation.md for exact source prerequisites, gate commands and evidence coverage.

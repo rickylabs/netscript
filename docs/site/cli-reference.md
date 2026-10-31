@@ -74,8 +74,8 @@ the “Preview” column says which ones do.
 | --- | --- | --- | --- | --- |
 | `netscript init` | New workspace choices and root configuration | Entire workspace, app/service/plugin/database skeletons, Aspire graph | Deno tasks, Fresh app, services, plugin runtimes, Aspire | `--dry-run` |
 | `netscript tokens init` | App-owned DTCG sources, semantic override and `tokens.config.json` | None until build | Token builder | No; existing files require `--force` |
-| `netscript tokens build` | None | Five core web assets under `assets/` and 18 optional stylesheets under `static/presets/` | Fresh root, CSS and design routes | No; validates before writes |
-| `netscript tokens clean` | None | Removes only the 23 declared generated assets | Rebuild before running the app | No |
+| `netscript tokens build` | None | Five core web assets under `assets/` and 24 optional stylesheets under `static/presets/` | Fresh root, CSS and design routes | No; validates before writes |
+| `netscript tokens clean` | None | Removes the generated token assets and preview stylesheets, keeping `theme-preset.json` | Rebuild before running the app | No |
 | `netscript config set` | Generated `aspire/appsettings.json` value | None beyond the configuration write | AppHost generator and resources reading the setting | No |
 | `netscript contract add` / `netscript contract add-route` | Workspace-owned versioned contract source | Version aggregate exports | Service handlers, SDK clients, OpenAPI/RPC routers | No |
 | `netscript contract version add` / `netscript contract remove` | Versioned contract source | Version and root aggregate exports | Service and SDK imports | No |
