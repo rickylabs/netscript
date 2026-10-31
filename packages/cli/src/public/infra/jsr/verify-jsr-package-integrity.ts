@@ -1,3 +1,4 @@
+import { JsrRequestError, readJsrResource } from './read-jsr-resource.ts';
 import type { ValidatedPluginDescriptor } from '../../features/plugins/install/jsr-plugin-validator-port.ts';
 
 /** Fetcher used to read published package files for integrity verification. */
@@ -43,13 +44,19 @@ export async function verifyJsrPackageIntegrity(
 
 /** Fetch-backed package file reader for JSR package contents. */
 export class WebJsrPackageFileFetcher implements JsrPackageFileFetcher {
+  constructor(private readonly fetcher: typeof fetch = fetch) {}
+
   /** Fetch a published package file as bytes. */
   async fetchFile(url: string): Promise<Uint8Array> {
-    const response = await fetch(url, { headers: { Accept: 'application/octet-stream' } });
+    const response = await readJsrResource(
+      url,
+      { headers: { Accept: 'application/octet-stream' } },
+      this.fetcher,
+    );
     if (!response.ok) {
-      throw new Error(`JSR package file request failed with ${response.status}: ${url}`);
+      throw new JsrRequestError(url, response.attempts, response.status, { retryable: false });
     }
-    return new Uint8Array(await response.arrayBuffer());
+    return response.bytes;
   }
 }
 
