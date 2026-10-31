@@ -13,3 +13,8 @@
   are outside the write surface. The handoff branch is read-only input.
 - Assignment and final-report handoff files are never committed. Public evidence
   contains no private host identity or session identifiers.
+
+Scoped evidence extension: record the unchanged full-export documentation and
+JSON-data audit baseline in `.llm/harness/debt/arch-debt.md`, linked to follow-up
+#2531. This adds ownership/closing gates only; it authorizes no scanner waiver,
+publication assertion, unrelated runtime refactor or dependency change.
