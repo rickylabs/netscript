@@ -161,3 +161,11 @@ assertion failed (85 ->92 after7 intentional additions). The design-sync gate no
 derives its count from the frozen v1 snapshot plus the explicit post-v1 list,
 and still refuses portable style-utility leakage. No product behavior changed.
 Targeted inventory rerun follows; do not call the initial full run all-green.
+
+Reconcile: latest main advanced again to ad252e8 (queue lease repair and CLI
+example documentation). Replayed all six feature commits cleanly onto that
+head; no additional source conflicts. The prior targeted design-sync rerun
+passed all9 tests. Canonical S2 registry inputs and generated artifacts remain
+part of this branch. Force-with-lease targets exactly the published8d093a9.
+Required CI jobs currently report SKIPPED while draft; this is not a READY
+claim. Calendar/DatePicker remains uncommitted work for the next slice.
