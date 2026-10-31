@@ -56,3 +56,59 @@ checks. Full local scaffold.runtime forbidden by owner; request coordinator's
 CI e2e-cli verdict in READY. No labels/milestones changed. #2382 status list
 semantics, compensation, atomic commits and unrelated debt are deferred.
 No new architecture debt planned; report baseline gate failures accurately.
+
+## PLAN-EVAL round 1 corrections (locked)
+
+- Prisma projection JSON is the full SagaInstanceReadModel plus the explicit
+  `projectionVersion: 2` marker, defined by a shared named constant. The reader
+  checks that marker, validates the new document, and returns nested business
+  `state` unchanged. Legacy flat rows are not guessed from state/metadata keys;
+  return their existing payload verbatim with runtime fields derived separately.
+  Historical overwritten values need a new transition or application-led replay;
+  no read-time migration can recreate missing data.
+- `services/src/instance-query.ts` resolves service read wiring from the same
+  env+appsettings backend resolver with `defaultBackend: 'kv'`. `main.ts` supplies
+  merged process/context env and service appsettings, exactly as runner settings.
+  Only a direct canonical read needs a store. Its KV opener is
+  `openSagaRuntimeKv`, preserving NETSCRIPT_SAGA_KV_PATH. Prisma canonical reads
+  validate only isPrismaSagaStoreClient; projection delegates are unnecessary.
+- Backend matrix (all six combinations tested through this wiring helper):
+
+  | Canonical | Projection | GET | list |
+  | --- | --- | --- | --- |
+  | kv | kv | canonical index+envelope, two KV gets | KV projection |
+  | prisma | kv | canonical findByCorrelation+load, two unique queries | KV projection |
+  | kv | prisma | one indexed projection findFirst | Prisma projection |
+  | prisma | prisma | one indexed projection findFirst | Prisma projection |
+  | kv | none | canonical index+envelope, two KV gets | empty |
+  | prisma | none | canonical findByCorrelation+load, two unique queries | empty |
+
+  Context has optional `sagaStore` for direct reads; GET chooses it when present.
+  `useKvProjection` remains specifically the list backend selector. Projection
+  none returns the existing empty DB adapter for lists and injects canonical store
+  for GET. Only Prisma projection requires the full query/stream client.
+- No docs expansion needs a human decision: the assignment explicitly authorizes
+  sagas migration documentation; the old docs/pages path was a discovery error.
+  supervisor.md now lists the actual authorized sagas documentation file.
+
+## S1 exact file inventory
+
+Production: plugins/sagas/src/runtime/saga-instance-projection.ts;
+plugins/sagas/services/src/instance-query.ts (new);
+plugins/sagas/services/src/main.ts;
+plugins/sagas/services/src/database-client.ts;
+plugins/sagas/services/src/routers/v1-types.ts;
+plugins/sagas/services/src/routers/v1-helpers.ts;
+plugins/sagas/services/src/routers/v1-handlers.ts;
+packages/plugin-sagas-core/src/contracts/v1/sagas.contract.ts (JSDoc only).
+
+Tests: plugins/sagas/services/src/instance-query_test.ts (new);
+plugins/sagas/services/src/instance-read_test.ts (new);
+plugins/sagas/services/src/prisma-retention_test.ts;
+plugins/sagas/tests/runtime/fixtures/runner-prisma-client.ts;
+plugins/sagas/tests/runtime/saga-kv-only-runner_test.ts;
+plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts.
+
+Docs: plugins/sagas/README.md; docs/site/durable-workflows/sagas.md.
+Run: current scoped run directory, including memory, gate evidence and evaluations.
+Any additional source file requires explicit drift recording before it is edited.

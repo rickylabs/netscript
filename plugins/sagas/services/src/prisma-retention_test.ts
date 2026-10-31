@@ -38,6 +38,7 @@ Deno.test('Prisma-backed saga API retains its query model when optional archiveT
         });
         return Promise.resolve();
       },
+      findFirst: () => Promise.resolve(records[0] ?? null),
       findMany: () => Promise.resolve(records),
       count: () => Promise.resolve(records.length),
     },

@@ -132,20 +132,20 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
   /** Get a specific saga instance by name and correlation ID. */
   getInstance: router.getInstance.handler(async ({ input, errors, path, context }) => {
     const { sagaName, correlationId } = input;
-    if (context.useKvProjection === true || !hasPrismaSagaInstanceClient(context.db)) {
-      const instance = await findSagaInstanceKv(sagaName, correlationId);
+    if (
+      context.sagaStore || context.useKvProjection === true ||
+      !hasPrismaSagaInstanceClient(context.db)
+    ) {
+      const instance = await findSagaInstanceKv(sagaName, correlationId, context.sagaStore);
       if (!instance) {
         notFound({ errors, path, resourceId: `${sagaName}/${correlationId}` });
         throw new Error('Not found');
       }
       return instance;
     }
-    const records = await context.db.sagaInstance.findMany({
+    const record = await context.db.sagaInstance.findFirst({
       where: { sagaName, correlationId },
-      orderBy: { createdAt: 'desc' },
-      take: 1,
     });
-    const record = records[0];
 
     if (!record) {
       notFound({ errors, path, resourceId: `${sagaName}/${correlationId}` });

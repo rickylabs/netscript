@@ -70,15 +70,8 @@ Deno.test({
         instanceId,
       ]);
       assertEquals(projection?.value?.createdAt, occurredAt.toISOString());
-      assertEquals(projection?.value?.state.metadata, {
-        sagaId,
-        instanceId,
-        version: 1,
-        status: 'running',
-        durability: 't1',
-        createdAt: occurredAt.toISOString(),
-        updatedAt: occurredAt.toISOString(),
-      });
+      assertEquals(projection?.value?.state, { stage: 'started' });
+      assertEquals(projection?.value?.status, 'running');
     } finally {
       await canonical.close();
     }

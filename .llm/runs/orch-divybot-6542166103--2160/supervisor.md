@@ -9,7 +9,7 @@ separate session with claude -p --model claude-opus-5-5 --effort high, read-only
 stdin closed, blockers only."
 
 Allowed tracked writes: plugins/sagas/**; packages/plugin-sagas-core/**;
-docs/pages/background-processing/** (sagas documentation if required);
+docs/site/durable-workflows/sagas.md (sagas documentation);
 .llm/runs/orch-divybot-6542166103--2160/**.
 Excluded assignment/report handoffs are not committed. No lock changes.
 No labels or milestone mutations. No local scaffold.runtime, merge, tag, or release.

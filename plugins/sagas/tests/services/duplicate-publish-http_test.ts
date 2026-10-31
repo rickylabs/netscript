@@ -9,7 +9,11 @@ import type { SagaServiceDatabaseClient } from '../../services/src/routers/v1-ty
 import { createSagaPublisher } from '../../src/runtime/saga-publisher.ts';
 
 const emptyDatabase: SagaServiceDatabaseClient = {
-  sagaInstance: { findMany: () => Promise.resolve([]), count: () => Promise.resolve(0) },
+  sagaInstance: {
+    findFirst: () => Promise.resolve(null),
+    findMany: () => Promise.resolve([]),
+    count: () => Promise.resolve(0),
+  },
   sagaExecutionHistory: { findMany: () => Promise.resolve([]), count: () => Promise.resolve(0) },
 };
 

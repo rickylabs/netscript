@@ -1,7 +1,15 @@
 import { getKv } from '@netscript/kv';
 import { z } from 'zod';
+import { KvSagaStore, openSagaRuntimeKv } from '@netscript/plugin-sagas-core/stores';
+import type { SagaStorePort } from '@netscript/plugin-sagas-core/runtime';
+import type { SagaCorrelationKey, SagaId } from '@netscript/plugin-sagas-core/domain';
 import { SAGA_INSTANCE_STATUSES } from '@netscript/plugin-sagas-core/domain';
-import type { SagaInstanceReadModel } from '../../../src/runtime/saga-instance-projection.ts';
+import {
+  parseSagaInstanceReadModel,
+  SAGA_INSTANCE_PROJECTION_VERSION,
+  type SagaInstanceReadModel,
+  sagaInstanceReadModel,
+} from '../../../src/runtime/saga-instance-projection.ts';
 import type {
   PrismaRecord,
   SagaDefinitionResponse,
@@ -9,7 +17,6 @@ import type {
   SagaHistoryResponseEntry,
   SagaInstanceApiStatus,
   SagaInstanceResponse,
-  SagaInstanceState,
   SagaInstanceWhereInput,
   SagaMetadataView,
   SagaServiceDatabaseClient,
@@ -17,22 +24,6 @@ import type {
 
 /** Kvdex saga instance shape used by the fallback list path. */
 export type SagaInstanceKv = SagaInstanceReadModel;
-
-const SagaInstanceKvSchema: z.ZodType<SagaInstanceKv> = z.object({
-  sagaName: z.string(),
-  sagaId: z.string(),
-  instanceId: z.string(),
-  correlationId: z.string(),
-  correlationKey: z.string(),
-  state: z.record(z.string(), z.unknown()),
-  status: z.enum(SAGA_INSTANCE_STATUSES),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  completedAt: z.string().optional(),
-  version: z.number(),
-  messageCount: z.number(),
-  lastMessageType: z.string().optional(),
-});
 
 /** List runner-written KV saga instance projections. */
 export async function listSagaInstanceKv(): Promise<SagaInstanceKv[]> {
@@ -44,19 +35,30 @@ export async function listSagaInstanceKv(): Promise<SagaInstanceKv[]> {
   return instances.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 }
 
-/** Find one runner-written KV saga instance projection. */
+/** Read one canonical instance through its correlation index and direct store load. */
 export async function findSagaInstanceKv(
   sagaName: string,
   correlationId: string,
+  store?: Pick<SagaStorePort, 'findByCorrelation' | 'load'>,
 ): Promise<SagaInstanceKv | undefined> {
-  return (await listSagaInstanceKv()).find((instance) =>
-    instance.sagaName === sagaName && instance.correlationId === correlationId
+  const canonical = store ?? new KvSagaStore({ kv: await openSagaRuntimeKv() });
+  const instanceId = await canonical.findByCorrelation(
+    sagaName as SagaId,
+    correlationId as SagaCorrelationKey,
   );
+  if (instanceId === undefined) return undefined;
+  const envelope = await canonical.load(instanceId);
+  return envelope === undefined ? undefined : sagaInstanceReadModel({
+    sagaId: sagaName,
+    correlationKey: correlationId,
+    instanceId,
+    envelope,
+  });
 }
 
 /** Validate and return one KV-backed saga instance. */
 export function parseSagaInstanceKv(value: unknown): SagaInstanceKv {
-  return SagaInstanceKvSchema.parse(value);
+  return parseSagaInstanceReadModel(value);
 }
 
 /** Whether a database value exposes the Prisma saga instance subset. */
@@ -102,56 +104,45 @@ export function toISOString(value: string | Date | undefined | null): string {
   return value.toISOString();
 }
 
-/** Map saga instance state to the API response shape. */
-export function mapStateToInstance(
-  sagaName: string,
-  correlationId: string,
-  state: SagaInstanceState,
-): SagaInstanceResponse {
-  const metadata = (state as { metadata?: SagaInstanceState['metadata'] }).metadata;
-  const isCompleted = metadata?.isCompleted ?? state.isCompleted ?? false;
-  const version = metadata?.version ?? state.version ?? 1;
-  const stateRecord = state as Record<string, unknown>;
-  const lastMessageType = (stateRecord.lastMessageType as string) ||
-    (stateRecord.status as string) ||
-    undefined;
-
-  return {
-    sagaName,
-    // Decision-B identifiers: surfaced from durable-store metadata/state when
-    // present. They are optional on the contract, so undefined is conformant.
-    sagaId: metadata?.sagaId ?? (stateRecord.sagaId as string | undefined),
-    instanceId: state.id ?? (stateRecord.instanceId as string | undefined),
-    correlationId,
-    correlationKey: (stateRecord.correlationKey as string | undefined) ?? correlationId,
-    state: state as Record<string, unknown>,
-    // Non-completed instances normalize to the canonical `'running'` status
-    // (the contract vocabulary has no `'active'`).
-    status: isCompleted ? 'completed' : 'running',
-    createdAt: toISOString(metadata?.createdAt ?? state.createdAt),
-    updatedAt: toISOString(metadata?.updatedAt ?? state.updatedAt),
-    completedAt: isCompleted ? toISOString(metadata?.updatedAt ?? state.updatedAt) : undefined,
-    version,
-    messageCount: version,
-    lastMessageType,
-  };
-}
-
-/** Map a raw Prisma record to the saga instance API response shape. */
+/** Map a versioned Prisma projection or an unchanged legacy payload to the API. */
 export function mapPrismaRecordToInstance(
   record: PrismaRecord,
   sagaName: string = record.sagaName,
 ): SagaInstanceResponse {
-  const state = (record.state ?? {}) as SagaInstanceState;
-  return mapStateToInstance(sagaName, record.correlationId, {
-    ...state,
-    id: record.id,
+  if (record.state.projectionVersion === SAGA_INSTANCE_PROJECTION_VERSION) {
+    return parseSagaInstanceKv({
+      ...record.state,
+      sagaName,
+      instanceId: record.id,
+      correlationId: record.correlationId,
+      version: record.version,
+      createdAt: toISOString(record.createdAt),
+      updatedAt: toISOString(record.updatedAt),
+    });
+  }
+  // Old flat rows may already have lost business fields. Do not guess a nested payload.
+  const runtimeStatus = z.enum(SAGA_INSTANCE_STATUSES).safeParse(record.state.status);
+  return {
+    sagaName,
+    sagaId: sagaName,
+    instanceId: record.id,
     correlationId: record.correlationId,
+    correlationKey: record.correlationId,
+    state: record.state,
+    status: record.isCompleted
+      ? 'completed'
+      : runtimeStatus.success
+      ? runtimeStatus.data
+      : 'running',
+    createdAt: toISOString(record.createdAt),
+    updatedAt: toISOString(record.updatedAt),
+    completedAt: record.isCompleted ? toISOString(record.updatedAt) : undefined,
     version: record.version,
-    isCompleted: record.isCompleted,
-    createdAt: record.createdAt,
-    updatedAt: record.updatedAt,
-  });
+    messageCount: record.version,
+    lastMessageType: typeof record.state.lastMessageType === 'string'
+      ? record.state.lastMessageType
+      : undefined,
+  };
 }
 
 /** Map a registered saga definition to the API response shape. */

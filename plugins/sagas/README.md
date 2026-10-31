@@ -273,3 +273,52 @@ terminal-instance cancellation/expiry contract, so their retention window is not
 change. Terminal records written before this policy was installed also need a migration/backfill;
 this change assigns deadlines when a terminal state is written. These remaining acceptance items
 keep issue #2109 open.
+
+## Instance API state migration
+
+Both `GET /instances/{sagaName}/{correlationId}` and the instance list return business
+state verbatim in `response.state`. Runtime lifecycle status, identifiers, version,
+and timestamps are sibling response fields. A saga's own `status`, `metadata`,
+`instanceId`, or other field is never replaced by runtime data:
+
+```json
+{
+  "sagaName": "checkout",
+  "correlationId": "order-123",
+  "state": { "status": "payment_pending", "metadata": { "customer": "example" } },
+  "status": "running",
+  "version": 1
+}
+```
+
+Consumers that previously read runtime status from `response.state.status` must use
+`response.status`. Read runtime identifiers, version and dates from their top-level
+response fields instead of `response.state` or `response.state.metadata`.
+`response.state.status` and `response.state.metadata` now belong exclusively to the
+application's business state. The v1 route and the published response schema stay
+in place; the payload semantics are corrected.
+
+The KV projection stores this separated response document. The Prisma projection's
+JSON `state` column stores the same document with `projectionVersion: 2`; its nested
+`state` property is the business payload. Raw Prisma readers should check that
+version and read `row.state.state` for business data and `row.state.status` for
+runtime status. This changes no database columns or indexes. Lists, single-row
+Prisma reads and stream startup reconciliation validate the same versioned
+document; startup snapshots preserve the same business state as live updates.
+
+Existing KV query documents and flat Prisma rows are not rewritten automatically.
+They remain readable in their legacy shape until a new committed transition writes
+an updated projection or retention removes them. Values already overwritten in an
+old projection cannot be recovered by a read-time migration. Restore them from
+canonical state or an application-controlled replay if a refreshed projection is
+needed; do not infer missing business values from runtime metadata.
+
+With a KV projection, single-instance GET reads the canonical correlation index and
+then loads that instance through the configured store, independently of list size
+or projection freshness. KV persistence needs exactly two KV reads for an existing
+instance; Prisma persistence with a KV projection uses two keyed runtime queries.
+Missing or expired canonical state returns `NOT_FOUND` even if an old projection
+remains. With a Prisma projection, GET uses one indexed query on saga name and
+correlation ID. With projection `none`, GET still reads the canonical store and
+lists remain empty. Direct canonical GET can omit optional `lastMessageType`, which
+is only recorded in the projection; it does not read transition history to fill it.
