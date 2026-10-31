@@ -1,4 +1,4 @@
-# Redis visibility timeout — Plan & Design — READY FOR REVIEW
+# Redis visibility timeout — blocked at PLAN-EVAL
 
 Archetype 2 integration: queue-owned ports with technology-specific Redis IO. Runtime
 failure/cancellation rules apply within this adapter. Docs overlay: queue README.
@@ -12,8 +12,11 @@ Relevant known debt: existing adapter size/logging conventions; introduce no new
 - Respect ListenOptions.visibilityTimeout (default 30 seconds), add optional maxDeliveries
   (default 5), and optional MessageContext.extendVisibility(milliseconds?) returning whether
   the current claim was still live. Other providers may omit the optional capability.
-- Use one dedicated, serialized WATCH connection and bounded MULTI retries. Atomically move
-  ready to processing, increment the envelope deliveryCount and index its deadline. Each
+- Preserve BRPOPLPUSH blocking pickup exactly. Stamp its processing entry, increment the
+  deliveryCount and index its deadline in one guarded transaction touching only processing
+  and lease keys, never the producer ready key. A crash in the pickup-to-stamp gap is
+  recovered by adoption; a killed child test pins the gap. Use one dedicated serialized
+  WATCH connection and bounded MULTI retries. Each
   processing encoding includes a unique receipt and its retry policy, so old contexts cannot
   remove a later delivery. Redis TIME supplies shared time rather than worker clock skew.
 - Use WATCH on all touched keys, validate key types before destructive transactions, reject
@@ -26,8 +29,23 @@ Relevant known debt: existing adapter size/logging conventions; introduce no new
 - Default DLQ matches RedisDeadLetterStore records/reasons. An explicit external store uses
   a durable Redis outbox, append-before-removal, and the existing idempotent append port;
   a failed external write retains the outbox record for retry and never loses the message.
-- Recover pre-upgrade processing-list entries without leases through bounded adoption.
-  Document quiescing old workers during rollout; already-live old receipts cannot be fenced.
+- Recover pre-upgrade and pickup-gap processing entries through a rotating bounded scan.
+  Adoption atomically replaces each lease-less entry with a unique receipt and a fresh full
+  lease, never immediately requeues it. Its effective delivery count is preserved (legacy
+  stored count was the number BEFORE its in-progress delivery, so normalize by +1 once).
+  Multiple adopters use WATCH. Old and new entries share the processing list. Document
+  quiescing old workers: an old worker cannot ack the replaced bytes and its work can repeat.
+  Test mixed live old/new entries plus a stale old-worker ack.
+- Normalize non-envelope JSON once into a stable envelope before handing it to a handler.
+  Persist its count/identity on every retry. Atomically move malformed JSON bytes to DLQ
+  with validation_failed and raw string payload; test poison bytes next in queue.
+- Expired/missing receipts make ack/nack no-ops and increment staleSettlements; never throw
+  for a stale receipt. Unknown connection outcomes retry a fixed budget until confirmed
+  committed/gone. A persistent outage remains a surfaced error with durable claim retained.
+  Test lost connection during ack, stale ack after expiry, and max-attempt handler error.
+- Recovery timer also drains the custom DLQ outbox. Health includes outbox depth. Explicit
+  stores must provide idempotent append; existing RedisDeadLetterStore is append-only and
+  is therefore unsuitable as an explicit mirrored destination without a deduplicating layer.
 - Expose reclaimExpired() as an operational seam and getMetrics()/getHealth() with durable
   reclaimed/deadLettered counters and ready/processing/DLQ depth. Poll recovery while a
   handler runs; clear timers and disconnect the owned lease client on stop.
@@ -74,3 +92,28 @@ process reclaims stopped-process claims; health/metrics show counters; each core
 fails with the old Redis implementation restored temporarily. Use real Redis/Garnet and
 structured wrappers. No local scaffold.runtime E2E (owner instruction). No scaffold/runtime
 wiring outside the queue adapter changes. CI state reported at exact head without waiting.
+
+## Coordinator decision after round 2
+
+Status: NOT APPROVED FOR IMPLEMENTATION. Round 2 still returned FAIL_PLAN; the
+following proposed corrections are concrete but have no passing evaluator verdict.
+Do not treat the earlier locked decisions as approved runtime design.
+
+Proposed revision for a newly authorized plan-evaluation cycle:
+
+- Replace shared-key WATCH with a fence per claim, derived from the original processing
+  bytes and then the unique receipt. Only ownership/liveness fences participate in WATCH;
+  ready/processing/deadline/DLQ/counter destinations remain inside the atomic mutation.
+- Specify the destination-type invariant and preserve source records on a failed destination
+  write. The evaluator's per-claim recommendation still needs to reconcile this with concurrent
+  administrative key-type changes; MULTI itself does not roll back runtime command errors.
+- Permit a handler only after its own receipt is committed. Stamp loss/exhaustion skips
+  handler invocation, increments a diagnostic counter and retains the durable processing entry.
+- Adopt only lease-less bytes observed on two scans separated by a full recovery grace period.
+  Any intervening receipt stamp cancels adoption; test this against a delayed healthy stamp.
+- Add sustained-producer/multi-worker progress proof with no fallback adoptions or exhausted
+  heartbeat/ack retries, and a concurrent stamp/adoption single-handler regression.
+
+Recommendation: coordinator authorize a fresh plan cycle on the revised fence/grace design,
+then implement the full queue fix in this existing draft PR. Alternative: reassign the design
+and preserve this branch's research/evidence. Never waive runtime proof or mark this PR ready.

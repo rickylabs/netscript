@@ -29,3 +29,23 @@
    durability and extending the internal lease transaction seam.
 
 Reconcile (plan): issue remains open, no duplicate PR, coordinator-owned taxonomy untouched.
+
+PLAN-EVAL round 1: FAIL_PLAN on claim contention, poison input, legacy adoption and
+settlement ambiguity. Revised plan locks all four, including real regressions. No code edited.
+
+
+## Terminal plan-gate decision
+
+- Round 1: FAIL_PLAN. Revised blocking pickup, raw/poison input, legacy adoption and
+  stale/ambiguous settlement semantics before round 2.
+- Round 2, same evaluator: FAIL_PLAN. Remaining blockers are shared-key transaction
+  contention and healthy-stamp/adoption ownership/grace rules. See plan-eval.md for both
+  complete verdicts and plan.md for a concrete proposed correction.
+- Two-round limit reached. No third evaluation, implementation, IMPL-EVAL or readiness claim.
+- Baseline focused wrapper: 7 passed, 0 failed, exit 0.
+- Baseline real-Redis delayed-promotion wrappers: 14 passed, 1 ignored, 0 failed, exit 0.
+- Redis and Garnet backends were provisioned independently and responded to TIME/LPOS.
+  These setup checks do not prove the requested fix; all acceptance remains unproven.
+- Run-owned backend processes stopped at handoff. No foreign resources changed.
+- Reconcile: draft PR #2483 remains open; no labels/milestones changed; coordinator #2474
+  owns the next decision. Assignment and final-report files excluded from commits.
