@@ -37,3 +37,8 @@
 - 23:14Z: #2477 (#2165) READY at `c313a62`. Gate: Opus IMPL-EVAL MERGE at the exact head; CI 20 success / 33 skipped, no failures; review threads 0 unanswered; diff limited to plugin-triggers-core and tests. **expensive-gate.acquired**: e2e-cli scaffold.runtime on #2477 via `e2e-cli-gate`.
 - 23:15Z: #2477 (#2165) READY at `c313a62`. Gate: Opus IMPL-EVAL MERGE at the exact head; CI 20 success / 33 skipped, no failures; review threads 0 unanswered; diff limited to plugin-triggers-core and tests. **expensive-gate.acquired**: e2e-cli scaffold.runtime on #2477 via `e2e-cli-gate`.
 - 23:31Z: **merged** #2477 (`7907293f3`) for #2165 after e2e-cli was green on both runtime tiers at `c313a62` (65/65 checks); #2165 closed with evidence; expensive gate released. #2187 must merge main into its branch (function ownership in trigger-processor.ts).
+- 23:40:56Z: relaunched #2187 (`mc009d-r1-2187`, comment 6535845592); started 23:44:01Z. #2478 is scheduled for 23:50Z (scripted: post, then wait for its binding).
+- 23:50:19Z: dispatched #2478 (H02, comment 6535993009); started 23:54:22Z. #2144-r1 is scripted for 00:04Z and #2396-r1 for 00:14Z, each only after the previous launch started.
+- 23:59Z: #2187 → PR #2479 (draft); #2478 → PR #2480 (draft). Both recorded as implementing.
+- 00:08Z: **merged** #2480 (`6a71cd059`) for #2478 (H02). CI 47/47 green at `b2e1d30`, Opus MERGE, 0 threads. #2478 closes once the repo-wide Code quality run on main is green.
+- 00:09Z: Code quality is green on main (run 41148483243, `code-quality-repo` success at `6a71cd059`); #2478 closed with evidence.
