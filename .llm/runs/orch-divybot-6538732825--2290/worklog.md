@@ -124,3 +124,62 @@ rejecting retired/live overlap is intentionally not added. No source behavior ch
 
 Reconcile: all issue acceptance bullets have local proof; exact pushed-head review and coordinator
 CI E2E remain separate. Sign-off commit includes the run record with implementation and evidence.
+
+## CI quality correction
+
+Current failure verified by agentic:pr-checks at 4d1ebfb; quality job 124439860756 in run
+41168029582 fails Agent docs corpus freshness after lint/fmt/JSDoc/README checks pass. Later
+freshness checks were skipped, so validate them too. No auth runtime change is indicated.
+
+Native regeneration completed: gen:agent-docs-prose, gen:mcp-export-corpus --allow-dirty,
+gen:assets-barrel and gen:publish-assets. The write-only --allow-dirty exception was needed
+because the regenerated prose carrier was uncommitted; no authored package/plugin source changed.
+All freshness verifiers ran without that option.
+
+Decoded generated delta: 202 documentation pages before and after; only the service reference
+and authz tutorial changed, both carrying the new error codes. Export corpus retains every
+package/subpath/symbol; service root and ./auth add the two public error exports, root reflects
+options/JSDoc, and plugin ./service updates the JSDoc on its re-exported AuthzDecision. No other
+generated payload changes and no runtime/source/test or lock changes.
+
+Correction gates before sign-off: agent-docs-prose, mcp-export-corpus and publish-assets durable
+receipts PASS (exit 0); scoped generated-module check PASS; 11 corpus regression results PASS;
+MCP generated formatting PASS. A combined format selection correctly refused the intentionally
+excluded CLI carrier; its byte layout is verified by the native docs generator, not a forged fmt
+pass. gen:assets-barrel completed with no additional changes; its git-diff freshness verdict must
+be run after the generated correction commit. CLI/MCP member dry runs are in flight.
+
+The newly reported test-4 failure is also stale MCP corpus, not an additional runtime defect.
+Downloaded authoritative test.report.json from job 124439860826: 2121 passed, 2 failed. Failures
+are `--check remains freshness-only when the generator read set is dirty` (stale corpus) and
+`write mode generates the artifact from a clean committed tree` (the huge unequal byte diff
+exhausted its assertion formatter). Both clone committed HEAD, so rerun these exact tests after
+committing the regenerated corpus. The MCP generation delta already covers their root cause.
+
+CLI and MCP member publish dry runs both completed successfully (exit 0). Scoped generated MCP
+lint also passed. No auth source changes are needed for either reported CI failure.
+
+Independent correction slice review (same Claude session, feature round 3) PASS. The reviewer
+independently decompressed both generated payloads, verified only the two authored docs and the
+expected service/plugin export entries changed, and reran three freshness checks plus check,
+MCP lint/format and two embedded-corpus tests. CLI/MCP dry-run results are now reconciled PASS.
+Sign-off commits this generated refresh and its run evidence. Postcommit assets-barrel and the
+two clone-based generator failures must pass before the final exact-head review/handoff.
+
+## Owner-requested rebase
+
+Owner instruction: “merge-conflict: rebase onto the latest base branch, resolve conflicts,
+force-push.” This explicitly supersedes the earlier no-force-push restriction for this repair;
+use an explicit force-with-lease against the observed remote head
+3691cc4f2069afc228462e7f73d9805d3e841fa6.
+
+Fetched main 8902e1a58eb308bd69e3086ba3520d339207147d and replayed the three PR commits.
+The only conflict was the compressed CLI documentation carrier; authored source merged cleanly.
+Resolved by starting from the new base carrier and regenerating from the merged docs with native
+agent-docs, MCP export, assets-barrel and publish-asset generators. No compressed payload edited
+manually. Existing main documentation and public surfaces retained.
+
+Verified every packages/service file is byte-identical to the reviewed pre-rebase head. Compared
+decoded generated payloads against latest main: same 202 docs, only service reference/authz
+tutorial changed; same 304 export surfaces, only service root/auth and plugin/service changed.
+Rebased-head scoped tests/freshness and the final independent review follow before handoff.

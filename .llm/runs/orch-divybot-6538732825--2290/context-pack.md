@@ -18,9 +18,26 @@ compilation gate passes its existing ratchet (5 unrelated baseline errors across
 Restored full service test suite passed 642 results, zero failures and zero ignored. Independent IMPL-EVAL round 1 PASS with no blockers; its evidence/documentation notes were
 reconciled without changing source behavior. See evaluate.md. No local scaffold.runtime launched.
 
-Next: commit/push slice with
-run evidence, update draft PR, mark ready after no blockers, inspect current CI and threads once,
-and re-steer the SAME implementation reviewer for exact pushed-head final verdict. Publish final
-review in PR comment to avoid changing the evaluated head. Canonical READY handoff uses excluded
-.divybot-final-report.tmp renamed to .divybot-final-report.md. Do not post final directly with gh.
-Coordinator owns labels, milestone, e2e-cli arming and merge. No merge/tag/release by this leaf.
+
+## Current CI correction
+
+Owner reported quality FAILURE. Current job 124439860756 on 4d1ebfb fails agent-docs prose
+freshness. The earlier review's main-only regeneration assumption was incorrect. Refreshed native
+agent-docs, export corpus, assets barrel and publish assets. Only two generated files changed:
+CLI agent-docs-prose (two updated pages out of 202) and MCP export corpus (service root/auth
+plus plugin/service's re-exported AuthzDecision documentation). No auth runtime or tests changed. The reported test-4 failure consists of two generator
+tests requiring a fresh committed MCP corpus; the same refresh addresses both.
+
+Freshness receipts and member dry runs passed. Independent same-session slice review round 3
+PASS. Next: commit and push with run record, verify assets-barrel and the two failing clone-based generator tests against the clean committed tree, then same-session final
+review at the pushed head and inspect current CI. No local scaffold.runtime, labels or milestones.
+Canonical revised report uses the excluded atomic handoff; coordinator retains merge authority.
+
+## Latest maintenance state
+
+Rebase onto main 8902e1a58eb308bd69e3086ba3520d339207147d is resolving the final generated
+commit. Auth source/tests are byte-identical to the approved pre-rebase branch. Generated docs
+and export metadata refreshed natively. Owner explicitly authorized a force-push; use an exact
+force-with-lease against 3691cc4f2069afc228462e7f73d9805d3e841fa6. After rebase, validate
+service auth and generated freshness/clone regressions, push, and use the same independent
+review session for the new exact head. No merge, labels, local scaffold runtime or release.
