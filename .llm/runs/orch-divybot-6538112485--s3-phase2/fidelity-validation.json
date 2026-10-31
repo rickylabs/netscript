@@ -1,0 +1,46 @@
+{
+  "slice": "7c4 contextual contrast fidelity",
+  "focusedTests": {
+    "passed": 462,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "metadataFollowup": {
+    "passed": 3,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 57,
+    "failed": 0,
+    "syntaxCellsPerProject": 28,
+    "projects": 4,
+    "syntaxContrastThreshold": 4.5,
+    "chromaticRolesDifferFromPlainText": true,
+    "canonicalActionRoles": [
+      "destructive",
+      "destructive-fg",
+      "destructive-hover"
+    ],
+    "strictAxeSeriousOrCritical": 0,
+    "actualTouchRegressionIncluded": true,
+    "style": "Utility",
+    "tokenPreset": "studio-utility",
+    "otherTokenPresetsCertified": false
+  },
+  "negativeControl": {
+    "expectedFailingCases": 1,
+    "case": "keyword on added row loses syntax color in old monochrome CSS"
+  },
+  "wrappers": "PASS;source2-file check/lint/fmt, fixture/spec check/lint/fmt;zero drops",
+  "cssFormat": "PASS",
+  "qualityAndArchitecture": "PASS",
+  "preflightDocsAccuracyAndDocsBuild": {
+    "verdict": "PASS",
+    "htmlPages": 259
+  },
+  "independentReview": "PASS;combined source/finalized evidence sign-off",
+  "carriers": "After source commit",
+  "captures": 8,
+  "ready": false,
+  "fullGoalComplete": false
+}
