@@ -718,6 +718,7 @@ packages/cli/src/public/features/init/init-agent-integration_test.ts	cli:other	S
 packages/cli/src/public/features/init/init-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-input.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/init/init-preset-safety_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/run-init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

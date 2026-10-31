@@ -1,3 +1,4 @@
+import type { PreparedInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import {
   AGENT_HOSTS,
   type InitAgentInput,
@@ -35,10 +36,8 @@ export interface InitCommandDependencies {
   readonly defaultProjectName: ProjectNameResolver;
   /** Prompt adapter used by interactive terminal init. */
   readonly prompt: PromptPort;
-  /** Apply UI choices after scaffold output exists, before agent setup. */
-  readonly applyPreset?: (
-    input: import('../../../kernel/application/ui/v2/presets/apply-init-preset.ts').InitPresetInput,
-  ) => Promise<void>;
+  /** Fetch and validate UI choices before scaffolding, then apply the retained selection. */
+  readonly preparePreset?: (preset: string) => Promise<PreparedInitPreset>;
 }
 
 function dbEngine(raw: string | undefined): DbEngineChoice | undefined {
@@ -105,6 +104,13 @@ export async function runInitCommand(
     resolvedOptions.serviceName !== undefined ||
     resolvedOptions.servicePort !== undefined;
   const dryRun = resolvedOptions.dryRun ?? false;
+  let applyPreset: PreparedInitPreset | undefined;
+  if (!dryRun && resolvedOptions.preset) {
+    if (!dependencies.preparePreset) {
+      throw new Error('Init UI preset dependencies are not configured');
+    }
+    applyPreset = await dependencies.preparePreset(resolvedOptions.preset);
+  }
   const initContext = dependencies.createInitContext?.({ dryRun }) ?? dependencies.initContext;
   const result = await executeInit(initContext, {
     name: resolved.name,
@@ -128,11 +134,8 @@ export async function runInitCommand(
     modelName: resolvedOptions.modelName,
     servicePort: resolvedOptions.servicePort,
   });
-  if (!result.dryRun && resolvedOptions.preset) {
-    if (!dependencies.applyPreset) {
-      throw new Error('Init UI preset dependencies are not configured');
-    }
-    await dependencies.applyPreset({
+  if (!result.dryRun && applyPreset && resolvedOptions.preset) {
+    await applyPreset({
       projectRoot: result.targetPath,
       name: resolved.name,
       appName: resolvedOptions.appName,

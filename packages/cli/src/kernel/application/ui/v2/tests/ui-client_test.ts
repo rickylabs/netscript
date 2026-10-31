@@ -22,6 +22,61 @@ Deno.test('theme overrides preserve canonical dependency ownership in the resolv
   await assertRejects(() => client.resolve(['x'], 'x'), Error, 'Theme override');
 });
 
+Deno.test('registry dependency URLs require HTTPS before transport reads', async () => {
+  const theme = 'https://theme.test/theme.json';
+  for (
+    const dependency of [
+      'http://evil.example/dep.json',
+      'http://localhost.evil.example/dep.json',
+      'http://127.0.0.1.evil.example/dep.json',
+      'http://[::2]/dep.json',
+    ]
+  ) {
+    const reads: string[] = [];
+    const client = await createUiRegistryClient(UiConfigSchema.parse({}), {
+      transport: {
+        read: (url) => {
+          reads.push(url);
+          return Promise.resolve(
+            JSON.stringify(
+              url === theme
+                ? { name: 'theme', type: 'registry:theme', registryDependencies: [dependency] }
+                : { name: 'dep', type: 'registry:file' },
+            ),
+          );
+        },
+      },
+    });
+    await assertRejects(() => client.resolve([theme]), Error, dependency);
+    assertEquals(reads, [theme]);
+  }
+});
+
+Deno.test('registry dependency URLs accept exact loopback HTTP hosts', async () => {
+  const theme = 'https://theme.test/theme.json';
+  for (const host of ['localhost', '127.0.0.1', '[::1]']) {
+    const dependency = `http://${host}:8080/dep.json`;
+    const reads: string[] = [];
+    const client = await createUiRegistryClient(UiConfigSchema.parse({}), {
+      transport: {
+        read: (url) => {
+          reads.push(url);
+          return Promise.resolve(
+            JSON.stringify(
+              url === theme
+                ? { name: 'theme', type: 'registry:theme', registryDependencies: [dependency] }
+                : { name: 'dep', type: 'registry:file' },
+            ),
+          );
+        },
+      },
+    });
+    const graph = await client.resolve([theme]);
+    assertEquals(graph.map((entry) => entry.ref), [dependency, theme]);
+    assertEquals(reads, [theme, dependency]);
+  }
+});
+
 Deno.test('namespaced dependency names stay in their registry and fetch each source once', async () => {
   const calls: string[] = [];
   const config = UiConfigSchema.parse({

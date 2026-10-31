@@ -1,0 +1,58 @@
+[
+  {
+    "gate": "check",
+    "verdict": "PASS",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "rawReportSha256": "7756c19c7491a3a0ef0273d5d3e9c7129faf89049e54711f68a3a2464237002b"
+  },
+  {
+    "gate": "lint",
+    "verdict": "PASS",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 5,
+      "filesProcessed": 5,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "rawReportSha256": "76d08e8fdf2155fb592a54a19442df4136ebdcafb5682095ec1b5b0941217da7"
+  },
+  {
+    "gate": "fmt",
+    "verdict": "PASS",
+    "summary": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 5,
+      "filesProcessed": 5,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "rawReportSha256": "b5509cb70e7f646d718db24742b562f287f21963c8613dab032c5f9016684f58"
+  }
+]

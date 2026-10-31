@@ -8,6 +8,8 @@ import { buildAppTokens } from '../../../tokens/build-app-tokens.ts';
 import { themeItem } from '../../../../../../../../tools/figma-plugin/src/theme-item.ts';
 import { collections } from '../../../../../../../fresh-ui/src/tokens/assets/figma.generated.ts';
 import { modifiedFixture } from '../../../../../../../../tools/figma-plugin/tests/mock-figma.ts';
+import { prepareInitPreset } from '../presets/apply-init-preset.ts';
+import { resolveUiPreset } from '../presets/resolve-preset.ts';
 import { encodeUiPreset } from '../../../../domain/ui/ui-preset.ts';
 
 const URL = 'https://theme.test/studio-utility.json';
@@ -199,4 +201,65 @@ Deno.test('an emptied previous theme remains locked while an installed item depe
   assert(current.items[URL]);
   assertEquals(current.items[URL].files, []);
   assertEquals(current.items.dependent.registryDependencies, [URL]);
+});
+
+Deno.test('preset URLs require HTTPS except exact loopback HTTP hosts', async () => {
+  const deps = await fixture();
+  deps.set({ version: 1, theme: 'studio-utility' });
+  const before = deps.fs.getFiles();
+  for (
+    const url of [
+      'http://example.com/theme.json',
+      'http://localhost.example.com/theme.json',
+      'http://127.0.0.1.example.com/theme.json',
+      'http://[::2]/theme.json',
+    ]
+  ) {
+    await assertRejects(() => applyUiPreset({ root: '/app', preset: url }, deps), Error, url);
+    assertEquals(deps.calls(), 0);
+    assertEquals(deps.fs.getFiles(), before);
+  }
+  for (const host of ['localhost', '127.0.0.1', '[::1]']) {
+    const result = await resolveUiPreset(`http://${host}:8080/theme.json`, deps);
+    assertEquals(result.kind, 'preset');
+  }
+  assertEquals(deps.calls(), 3);
+});
+
+Deno.test('prepared init preset validates before writes and reuses fetched bytes after scaffold', async () => {
+  const deps = await fixture();
+  deps.set({ version: 1, theme: 'studio-utility' });
+  const before = deps.fs.getFiles();
+  const apply = await prepareInitPreset(URL, deps);
+  assertEquals(deps.fs.getFiles(), before);
+  assertEquals(deps.calls(), 1);
+  deps.set({ version: 2 });
+  await deps.fs.writeFile('/workspace/apps/dashboard/deno.json', '{}');
+  await deps.fs.createDir('/workspace/apps/dashboard/routes');
+  await apply({ projectRoot: '/workspace', name: 'test', appName: 'dashboard', preset: URL });
+  assertEquals(deps.calls(), 1);
+  assertEquals(
+    JSON.parse(await deps.fs.readFile('/workspace/apps/dashboard/assets/theme-preset.json')).id,
+    'studio-utility',
+  );
+});
+
+Deno.test('prepared registry theme applies cached bytes without refetching after scaffold', async () => {
+  const deps = await fixture();
+  deps.set({
+    name: 'cached-theme',
+    type: 'registry:theme',
+    cssVars: { light: { '--ns-bg': '#123456' } },
+  });
+  const before = deps.fs.getFiles();
+  const apply = await prepareInitPreset(URL, deps);
+  assertEquals(deps.fs.getFiles(), before);
+  assertEquals(deps.calls(), 1);
+  deps.set({});
+  await deps.fs.writeFile('/workspace/apps/dashboard/deno.json', '{}');
+  await deps.fs.createDir('/workspace/apps/dashboard/routes');
+  await apply({ projectRoot: '/workspace', name: 'test', appName: 'dashboard', preset: URL });
+  assertEquals(deps.calls(), 1);
+  assertStringIncludes([...deps.fs.getFiles().values()].join('\n'), '#123456');
+  assert((await readUiLock('/workspace/apps/dashboard', deps.fs))!.items[URL]);
 });
