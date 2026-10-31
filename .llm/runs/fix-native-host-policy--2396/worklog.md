@@ -162,3 +162,13 @@ the exact round1 head; no bounds, expiry, runtime gate or numeric facade verdict
 Same independent evaluator must now review this corrected pushed head. Round1 found no other
 source blocker. CI is still draft/unproven. Final acceptance-evidence.md maps all eight issue
 entries, with published graph and runtime CI limits explicit.
+
+Independent source review round2: VERDICT: MERGE
+ac50f54502dd5d2f07a62cdd2b562094eb5dee21. The reviewer verified the byte-identical
+helper move, four imports, native included-file list, unchanged factory behavior and accepted
+debt limits. No source/architecture/publication-shape/migration blocker remains. This final
+record checkpoint changes only run context, not source, tests, exports, generated data or debt.
+After push, mark the original draft ready, notify the coordinator to arm required runtime CI,
+and run final exact-head evaluation in this same session. Terminal CI/final verdicts are
+published on the PR and canonical final file handoff; they must not be inferred from this
+pre-readiness checkpoint. No merge readiness is claimed while required CI is unproven.
