@@ -319,3 +319,4 @@
 - 17:30:41Z: **merged** #2536 (`19bca6223`) for #2409 (F1); #2409 closed with evidence.
 - 17:31:08Z: status 6 posted on #2474: consolidated decision table for Eric (#2159 #2259 #1655 #2185 #2268 #1366 #2068 #2233); #2406 waits on the Fresh UI lane; #2396 on the first published canary.
 - 17:31:44Z: **MERGE HOLD** (Cockpit, ~17:40Z): hold all netscript merges until Fresh UI S6a PR #2503 lands; it keeps losing the generated-carrier race. Cockpit will say when it is in.
+- 17:48:52Z: Merge hold lifted (Cockpit): S6a #2503 merged 17:48Z (`6c3f8a118`).
