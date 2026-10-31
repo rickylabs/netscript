@@ -4,6 +4,6 @@
 - DECISIONS EXECUTED (Eric "Approved" ~18:45Z): #2159 closed (follow-up #2543), #2259 → Backlog (#2278), #1655 → Backlog, #2185 closed, #2268 closed (box1 → #2544), #1366 closed (box5 → #429-431, consumer proof → #2545), #2068 closed (eis-chat#518)
 - LEFT for stable: #2233 option b (in flight); #2406 (Fresh UI PR #2408); #2396 (published-graph proof after Eric cuts the combined canary 6c3f8a118)
 - C1 DONE: #2267 #2132 #2338 #1367 #2377 #2373 #2390 closed
-- F1 #2384 #2375 #2411 #2379 closed; #2409 in flight (fixes lane); #2406 waits on the Fresh UI lane's PR #2408 (asked Cockpit 14:52Z)
+- F1 #2384 #2375 #2411 #2379 #2409 closed; #2406 waits on the Fresh UI lane's PR #2408 (asked Cockpit 14:52Z)
 - BUDGET: Codex weekly at 89% (Cockpit 16:05Z): no new Codex leaves unless canary-blocking; finish running ones
 - Rules: merge.sh confirms MERGED before recording; drop e2e label when a PR's e2e completes; keep a leaf's issue open while its worker continues; check closingIssuesReferences before partial merges
