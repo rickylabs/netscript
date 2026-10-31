@@ -1,6 +1,7 @@
 import { relative } from '@std/path';
 import { extractFencedBlocks, type FencedBlock } from './snippet-extractor.ts';
 import { runSnippetProcess } from './snippet-process.ts';
+import { checkCliExamples } from './cli-example-policy.ts';
 
 /** The issue-mandated Tier-1 source pages, including zero-fence index.vto. */
 export const TIER_1_PAGES = [
@@ -106,7 +107,9 @@ export async function analyzeSnippetSite(
   for (const path of files) {
     const sourcePath = toSourcePath(siteRoot, path);
     try {
-      blocks.push(...extractFencedBlocks(await Deno.readTextFile(path), sourcePath));
+      const source = await Deno.readTextFile(path);
+      checkCliExamples(source, sourcePath);
+      blocks.push(...extractFencedBlocks(source, sourcePath));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(generatedPathDiagnostic(sourcePath, message));

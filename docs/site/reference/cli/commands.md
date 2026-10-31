@@ -222,6 +222,15 @@ The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`)
 | `netscript plugin auth <sub>`                       | Configure auth and manage sessions (see below).                                                                                   |
 | `netscript plugin ai <verb> [...args]`              | Configure AI tools, agents, models, providers, and MCP servers. Flag: `--project-root <path>` (the only flag NetScript consumes). |
 
+For `plugin update`, pass the installed name shown by `netscript plugin list`:
+
+```sh
+netscript plugin update workers
+```
+
+The host re-pins the plugin and regenerates its registries. Package specifiers belong to the
+package-dispatch verbs (`enable`, `disable`, `setup`); `update` uses the installed name.
+
 `plugin ai` is a **pass-through**, not a command group with its own verbs. NetScript strips
 `--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child `deno run`
 process, forwards every remaining argument verbatim, prints its output and propagates its exit code.

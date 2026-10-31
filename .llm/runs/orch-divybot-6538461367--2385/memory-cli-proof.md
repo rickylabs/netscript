@@ -1,0 +1,7 @@
+# Public CLI proof setup
+
+The public entrypoint is packages/cli/bin/netscript.ts, unlike the maintainer/local-source entrypoint netscript-dev.ts. `plugin update --help` on baseline main 2f426b9 declares `netscript plugin update <name>`, “Re-pin and regenerate an installed plugin,” and only --project-root plus --help. Public init supports --db none --no-aspire --no-agent --editor none --yes --ci --no-git to avoid starting resources during a docs proof. Git identity may be absent; use the authenticated account's noreply identity per commit, without changing shared repo configuration.
+
+`init --path <directory>` creates `<directory>/<name>`, not the directory itself. This host's initial TMPDIR mount disallows execution: preexisting shebang fixture tests fail to start there. Re-run with a project-run temporary root assigned to TMPDIR (without altering repository code). A compiled public binary may omit optional native Rollup modules needed by init; the source public entrypoint initialized the same temporary workspace successfully with identical baseline sources.
+
+Plugin install/update regenerates Aspire helpers even when no runtime is started: a workspace generated with --no-aspire is insufficient. Generate the temporary workspace with the default Aspire layer and omit --no-aspire; do not restore/start it. `plugin install worker --name workers --no-db --no-samples --ci --skip-confirmation` then succeeds with the ordinary public CLI. This setup is a focused command proof, not the expensive scaffold.runtime suite.
