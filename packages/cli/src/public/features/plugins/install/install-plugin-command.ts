@@ -79,7 +79,11 @@ export function createPluginInstallCommand(
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,
-      }, dependencies.installPluginDependencies);
+      }, {
+        ...dependencies.installPluginDependencies,
+        readEnvironment: dependencies.installPluginDependencies.readEnvironment ??
+          ((key) => Deno.env.get(key)),
+      });
 
       const plugin = result.plugin;
       if (plugin.hostPort === undefined) {

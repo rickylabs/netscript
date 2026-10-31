@@ -54,6 +54,8 @@ export interface DispatchPluginScaffoldOptions {
   readonly dryRun: boolean;
   /** Whether the child scaffolder should emit starter samples. */
   readonly includeSamples?: boolean;
+  /** Selected finite plugin configuration resolved before database planning. */
+  readonly configuration?: Readonly<Record<string, string>>;
   /** Deno permission flags from the S3 flag builder. */
   readonly permissionFlags: readonly string[];
   /** Additional arguments forwarded after the context payload. */
@@ -214,6 +216,7 @@ async function runScaffoldEntrypoint(
         JSON.stringify({
           workspaceRoot: options.projectRoot,
           options: {
+            ...(options.configuration ? { configuration: options.configuration } : {}),
             pluginName: options.pluginName,
             mcp: options.scaffoldArgs?.includes('--mcp') === true,
             includeSamples: options.includeSamples !== false,

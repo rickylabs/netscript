@@ -27,6 +27,7 @@ const requiredProviderFields = new Map<string, string>([
 type Manifest = {
   provider: Record<string, unknown>;
   officialSource: Record<string, unknown>;
+  databaseRequirement: unknown;
 };
 
 Deno.test('auth scaffold manifest satisfies plugin kind provider contract', async () => {
@@ -36,6 +37,19 @@ Deno.test('auth scaffold manifest satisfies plugin kind provider contract', asyn
   assertEquals(provider.kind, 'auth');
   assertEquals(provider.category, 'plugin');
   assertEquals(provider.defaultServiceEntrypoint, 'services/src/main.ts');
+  assertEquals(provider.defaultRequiresDb, false);
+  assertEquals(provider.infrastructureRequires, ['kv']);
+  assertEquals(manifest.officialSource.requiresDb, false);
+  assertEquals(manifest.databaseRequirement, {
+    environmentVariable: 'NETSCRIPT_AUTH_BACKEND',
+    defaultValue: 'kv-oauth',
+    appsettingsPaths: [
+      ['NetScript', 'Plugins', 'auth', 'Environment', 'NETSCRIPT_AUTH_BACKEND'],
+      ['auth', 'backend'],
+      ['Auth', 'Backend'],
+    ],
+    values: { 'kv-oauth': false, workos: false, 'better-auth': true },
+  });
 
   for (const [field, expectedType] of requiredProviderFields) {
     assert(field in provider, `missing provider.${field}`);
@@ -77,6 +91,7 @@ async function readManifest(): Promise<Manifest> {
     return {
       provider: value.provider,
       officialSource: value.officialSource,
+      databaseRequirement: Reflect.get(value, 'databaseRequirement'),
     };
   }
   throw new TypeError('scaffold.plugin.json does not match the auth manifest test shape.');

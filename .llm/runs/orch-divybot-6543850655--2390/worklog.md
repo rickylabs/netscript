@@ -31,3 +31,9 @@ Structured source check/lint/fmt report zero findings. quality:gate exits 0. Sag
 Reconcile: #2390 and #2474 remain references, PR #2534 remains draft; no labels/milestones modified. Added one CI-driver invocation so provider CI executes this fixture. No production change or new debt. Independent slice/implementation review pending before sign-off commit.
 
 Independent implementation/slice review round 1: PASS, no blockers. Evaluator verified raw provider output, source, controls and all stated limitations. This clears the supervisor sign-off commit. Sanitized report index is gate-summary.json; it is explicitly an index, not a substitute for wrapper verdicts.
+
+## Current-main reconciliation
+
+Merged current main `a9620a34e14e067c56bb6af025ec015f7252b7aa` normally after the reviewed reproduction sign-off `d0171ab5`. Its only advancement is #2519 (auth database contribution selection); no saga/streams/worker/provider-driver changes overlap this slice. No rebase or force push. The independent review cleared the reproduction; this merge records baseline currency without changing its source. Post-merge exact-head reproduction/static/quality receipts and final same-session evaluation follow.
+
+Reconcile: PR slice comment links the committed gates/review; #2390 remains open, no labels/milestones changed. Full scaffold.runtime remains coordinator-owned CI.
