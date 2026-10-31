@@ -38,3 +38,12 @@ quality:gate passes and 258 focused/regression tests pass. Explicit current-sour
 sync followed by the actual minimal Aspire restart proof passes with main's native service factory;
 exact focused AppHost stopped. Independent combined-slice review PASS. Clone-based corpus tests
 must be rerun after committing, because they clone HEAD rather than the working directory.
+
+## Remaining quality gate validation
+
+Aspire version parity passes after native four-row inventory regeneration (1002 checked, zero
+failure/missing, inherited dispositions unchanged). Full workspace publish dry-run passes; cold
+AI peer compatibility passes lock-free; critical advisory audit passes with zero critical findings.
+Docs now distinguish AppHost directory-creation failure from streams write-probe startup failure.
+Prose/MCP/publish freshness and parity checks pass after the wording correction. Current-head CI
+and final exact-head review remain the final external verdicts; earlier-head runtime is not relabeled.

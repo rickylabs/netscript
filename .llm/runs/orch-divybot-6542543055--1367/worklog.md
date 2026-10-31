@@ -123,3 +123,15 @@ restart probe and focused tests; no enforcement/pin/disposition changes. check:a
 passes: manifestFresh=true, fail=0, missing=0 (1002 checked, unchanged inherited deferrals/info).
 This is a derived inventory correction; final separate-session exact-head review covers it before
 merge. Full runtime CI and final review remain unproven while their PR boxes are unchecked.
+
+## Final documentation precision and remaining quality gates
+
+Clarify failure timing without changing behavior: directory-creation failure aborts AppHost
+composition; an existing unwritable directory fails the streams startup probe. This prevents an
+unproven claim that every permission failure stops AppHost composition. Native embedded prose
+regenerated; all prose/MCP/publish freshness and Aspire parity checks pass afterward.
+
+Full workspace publish:dry-run exits 0. Cold AI peer compatibility exits 0 (lock-free); critical
+advisory audit exits 0 (zero critical, not a claim of zero lower-severity advisories). No dependency,
+lock, pin, policy or runtime-source changes. Keep final current-head runtime CI and exact-head
+independent review pending; do not move their checkboxes until actually proven.

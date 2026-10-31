@@ -69,9 +69,10 @@ and passes its absolute path through `STREAMS_DATA_DIR` before streams starts. R
 resolve from the resource's `Workdir` (the project root for the default streams resource).
 Add `.netscript/data/` to `.gitignore`. Existing contents are retained across resource and AppHost
 restarts. There is no directory provisioning or file-storage binding when `DataDirectories` is
-omitted. Directory bindings override a conflicting `Environment` value. A file at the target or
-an unwritable location fails AppHost composition; the streams startup write/read probe must still
-pass before health claims file mode.
+omitted. Directory bindings override a conflicting `Environment` value. Directory-creation failure
+(for example, a file at the target or an unwritable parent) aborts AppHost composition. If an
+existing directory cannot pass the streams startup write/read probe, the streams service fails
+startup before health can claim file mode.
 
 Programmatic hosts can declare the same opt-in using
 `new StreamsAspireContribution({ dataDir: '.netscript/data/streams' })` from

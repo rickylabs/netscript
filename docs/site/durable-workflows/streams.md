@@ -372,9 +372,10 @@ binding for the host builder without provisioning it during import.
 
 The existing `Environment.STREAMS_DATA_DIR` opt-in still requires a manually created directory.
 An empty, missing or unwritable manually configured path fails startup; there is no memory fallback.
-For AppHost-provisioned paths, a file at the target or an unwritable location fails composition.
-A startup write/read probe must pass before health reports file mode. The probe verifies directory
-I/O, not historical integrity or repair. Deployments must mount persistent storage separately;
+For AppHost-provisioned paths, directory-creation failure (such as a file at the target or an
+unwritable parent) aborts composition. An existing directory that cannot pass the startup write/read
+probe prevents the streams service from starting. The probe must pass before health reports file
+mode; it verifies directory I/O, not historical integrity or repair. Deployments must mount persistent storage separately;
 a folder in a disposable container does not provide persistence.
 
 To return to memory storage, remove the directory binding and any manual environment opt-in,
