@@ -320,3 +320,5 @@
 - 17:31:08Z: status 6 posted on #2474: consolidated decision table for Eric (#2159 #2259 #1655 #2185 #2268 #1366 #2068 #2233); #2406 waits on the Fresh UI lane; #2396 on the first published canary.
 - 17:31:44Z: **MERGE HOLD** (Cockpit, ~17:40Z): hold all netscript merges until Fresh UI S6a PR #2503 lands; it keeps losing the generated-carrier race. Cockpit will say when it is in.
 - 17:48:52Z: Merge hold lifted (Cockpit): S6a #2503 merged 17:48Z (`6c3f8a118`).
+- 18:01:00Z: Fresh UI design-system session (via Eric): land a canary tonight from main. Qualifying main `6c3f8a118` (includes #2503 and all canary .1/.2 content) as one combined canary: e2e-cli 41227279424 and command-postgres 41227281728 dispatched 18:00Z. Lanes merge-quiet until readiness is posted.
+- 18:16:37Z: **Combined canary readiness posted** on #2474 (comment 6547307997): candidate main `6c3f8a118`, which supersedes the uncut .1 and .2 candidates; includes Fresh UI S6a and the design lane's release notes; all gates green.

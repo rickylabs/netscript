@@ -53,3 +53,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 16:02 | `7feb24c7d` | #2535 | #2108 | W7 (B2) | **B2 complete; canary .2 code complete** (except Eric-held #2159 follow-up / #2259) |
 | 2026-10-31 16:20 | `7feb24c7d` | — | — | canary .2 | **readiness posted**; main green (ci 41217755762, e2e-cli 41217778710, command-postgres 41217780859) |
 | 2026-10-31 17:30 | `19bca6223` | #2536 | #2409 | W6 (F1) | adopted continuation; coordinator-run Opus reviews; r1 mechanical carrier merge |
+| 2026-10-31 18:25 | `6c3f8a118` | — | — | combined canary | **readiness posted** (supersedes .1/.2 candidates; includes Fresh UI S6a); ci 41226320355, e2e-cli 41227279424, command-postgres 41227281728 |
