@@ -84,6 +84,36 @@
             "$ref": "presets.tokens.json#/studio-signal"
           }
         ],
+        "ledger": [
+          {
+            "$ref": "presets.tokens.json#/ledger"
+          }
+        ],
+        "signal": [
+          {
+            "$ref": "presets.tokens.json#/signal"
+          }
+        ],
+        "glass": [
+          {
+            "$ref": "presets.tokens.json#/glass"
+          }
+        ],
+        "macos-27": [
+          {
+            "$ref": "presets.tokens.json#/macos-27"
+          }
+        ],
+        "apple-classic": [
+          {
+            "$ref": "presets.tokens.json#/apple-classic"
+          }
+        ],
+        "fluent-2-web": [
+          {
+            "$ref": "presets.tokens.json#/fluent-2-web"
+          }
+        ],
         "tonal": [
           {
             "$ref": "presets.tokens.json#/tonal"

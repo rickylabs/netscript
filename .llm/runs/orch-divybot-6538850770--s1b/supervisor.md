@@ -8,6 +8,8 @@ Owner override (verbatim): `PLAN-EVAL and IMPL-EVAL: claude -p --model claude-op
 Matrix queried with `deno task agentic:matrix --tier feature --json`: implementation sol/xhigh; declared fallback muse_spark_1_3/xhigh; plan evaluation glm_5_3/provider_default then fable_5_1/low; implementation evaluation muse_spark_1_3/xhigh then opus_5/xhigh. Owner evaluator override above applies. Plan max rounds 2; implementation max rounds 5; two consecutive terminal failures stop the leaf.
 
 ## Declared write surface
+
+Review-required extension: `.llm/harness/debt/arch-debt.md` for the mixed Figma emphasis style/weight debt; recorded in drift before edit.
 - `.llm/runs/orch-divybot-6538850770--s1b/`: plan, research, worklog, context, drift, evaluation, memory, contrast report, lesson and evidence.
 - `.llm/runs/docs-fresh-ui-design-system--design-handoff/figma-variables/`: exact approved source PR export only, if needed for reproducibility.
 - `packages/fresh-ui/`: token inputs, resolver/importer/quality/format/build source and tests, generated registry/theme/style assets, metadata, README and embedded carriers.

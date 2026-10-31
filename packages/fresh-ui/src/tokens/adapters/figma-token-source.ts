@@ -6,8 +6,12 @@ import {
   type TokenPreset,
 } from '../domain/token-contract.ts';
 import { resolveFigmaValue } from '../domain/figma-aliases.ts';
-import { figmaModes, TOKEN_PRESETS } from '../domain/token-presets.ts';
-import { PRESET_ROLE_MAPS } from '../domain/preset-role-map.ts';
+import {
+  FIGMA_THEME_COLLECTIONS,
+  FIGMA_THEME_SET,
+  figmaModes,
+  TOKEN_PRESETS,
+} from '../domain/token-presets.ts';
 import { figmaPrimitive, legacyPrimitive } from './token-values.ts';
 import { applyLegacyGaps } from '../domain/legacy-role-aliases.ts';
 import { nameMigrations } from '../assets/metadata.generated.ts';
@@ -53,13 +57,61 @@ export function importFigmaTokens(
     }
     roles[name] ??= { type: token.$type, category };
   }
+  // Sort origins for deterministic primitive identities regardless of snapshot file order.
+  const origins = [...collections].sort((a, b) => a.collection < b.collection ? -1 : 1);
+  const router = origins.find((collection) => collection.collection === FIGMA_THEME_SET);
+  if (!router) throw new Error('Missing Figma Theme set');
+  for (const variable of router.variables) {
+    for (const [mode, collection] of Object.entries(FIGMA_THEME_COLLECTIONS)) {
+      const value = variable.values[mode];
+      if (typeof value !== 'object' || value.alias !== `${collection}/${variable.name}`) {
+        throw new Error(`Misrouted Figma Theme set: ${variable.name}/${mode}`);
+      }
+    }
+  }
+  for (const migration of nameMigrations.migrations) {
+    if (
+      !origins.some((collection) =>
+        collection.collection === migration.collection &&
+        collection.variables.some((variable) => variable.name === migration.variable)
+      )
+    ) {
+      throw new Error(`Orphaned name migration: ${migration.collection}/${migration.variable}`);
+    }
+  }
+  for (const name of Object.values(FIGMA_THEME_COLLECTIONS)) {
+    const theme = origins.find((collection) => collection.collection === name);
+    if (
+      !theme || theme.variables.length !== router.variables.length ||
+      router.variables.some((variable) => {
+        const target = theme.variables.find((entry) => entry.name === variable.name);
+        return !target || target.type !== variable.type ||
+          target.codeSyntax !== variable.codeSyntax;
+      })
+    ) throw new Error(`Inconsistent shared Figma names: ${name}`);
+  }
+  const exportedNames = new Set<string>();
+  for (const collection of origins) {
+    if (Object.values(FIGMA_THEME_COLLECTIONS).includes(collection.collection)) continue;
+    for (const variable of collection.variables) {
+      if (!variable.codeSyntax || collection.collection === 'Primitives') continue;
+      const migration = nameMigrations.migrations.find((entry) =>
+        entry.collection === collection.collection && entry.variable === variable.name
+      );
+      const name = migration ? migration.cssVar.slice('--ns-'.length) : suffix(variable.codeSyntax);
+      if (exportedNames.has(name)) throw new Error(`Duplicate Figma WEB name: --ns-${name}`);
+      exportedNames.add(name);
+    }
+  }
   for (const preset of TOKEN_PRESETS) {
     const contexts: TokenDocument = {};
     for (const scheme of ['light', 'dark'] as const) {
       const values: TokenDocument = {};
       const modes = figmaModes(preset, scheme);
       // Every language receives the complete core and declared role vocabulary.
-      for (const collection of collections) {
+      for (const collection of origins) {
+        // Theme set follows the active A/B route; inactive collections must never overwrite it.
+        if (Object.values(FIGMA_THEME_COLLECTIONS).includes(collection.collection)) continue;
         for (const variable of collection.variables) {
           if (!variable.codeSyntax || collection.collection === 'Primitives') continue;
           const originalName = suffix(variable.codeSyntax);
@@ -82,6 +134,9 @@ export function importFigmaTokens(
               collection: collection.collection,
               name: variable.name,
               mode: modes[collection.collection],
+              themeSet: preset.themeSet ?? 'A',
+              themeCollection: FIGMA_THEME_COLLECTIONS[preset.themeSet ?? 'A'],
+              themeMode: preset.themeMode,
             },
           });
           role(name, literal, category(name));
@@ -94,10 +149,17 @@ export function importFigmaTokens(
           'shadow-blur': 'shadow/blur',
         })
       ) {
-        const resolved = resolveFigmaValue(collections, 'Theme', variable, modes);
+        const resolved = resolveFigmaValue(collections, FIGMA_THEME_SET, variable, modes);
         const literal = figmaPrimitive(variable, 'FLOAT', resolved.value);
         values[name] = tokenAlias(lift(literal), literal.$type, {
-          figma: { collection: 'Theme', name: variable, mode: preset.themeMode },
+          figma: {
+            collection: FIGMA_THEME_SET,
+            name: variable,
+            mode: preset.themeSet ?? 'A',
+            themeSet: preset.themeSet ?? 'A',
+            themeCollection: FIGMA_THEME_COLLECTIONS[preset.themeSet ?? 'A'],
+            themeMode: preset.themeMode,
+          },
         });
         role(name, literal, ['semantic', name]);
       }
@@ -179,16 +241,11 @@ export function importFigmaTokens(
         }
         applyLegacyGaps(values, scheme, roles, new Set(Object.keys(old)), weights);
       } else {
-        applyPresetOverlay(values, preset, scheme);
         const read = (name: string): string | number | boolean =>
-          resolveFigmaValue(collections, 'Theme', name, modes).value;
+          resolveFigmaValue(collections, FIGMA_THEME_SET, name, modes).value;
         const y = Number(read('shadow/y'));
         const blur = Number(read('shadow/blur'));
-        const x = preset.language === 'studio'
-          ? Number(resolveFigmaValue(collections, 'Studio flavor', 'shadow/x', modes).value)
-          : preset.id === 'brutal'
-          ? y
-          : 0;
+        const x = Number(read('shadow/x'));
         const color = String(read(`shadow/${scheme === 'light' ? 'l' : 'd'}/color`));
         const shadow = legacyPrimitive('shadow', `${x}px ${y}px ${blur}px ${color}`);
         const recipe: DesignToken = {
@@ -275,6 +332,7 @@ export function importFigmaTokens(
     type: string,
     language?: string,
   ): void {
+    if (exportedNames.has(name)) return;
     const literal = figmaPrimitive(name, type, raw);
     values[name] = {
       ...tokenAlias(lift(literal), literal.$type),
@@ -292,98 +350,6 @@ export function importFigmaTokens(
       throw new Error(`Missing role mapping ${name} → ${target}`);
     }
     values[name] = tokenAlias(`context.${scheme}.${target}`, String(token.$type));
-  }
-
-  function applyPresetOverlay(values: TokenDocument, preset: TokenPreset, scheme: string): void {
-    for (const [name, target] of Object.entries(PRESET_ROLE_MAPS[preset.id] ?? {})) {
-      alias(values, scheme, name, target);
-    }
-    if (preset.language === 'studio') {
-      for (
-        const [name, target] of Object.entries({
-          primary: 'studio-primary-bg',
-          'primary-hover': 'studio-primary-bg-hover',
-          'primary-fg': 'studio-primary-fg',
-        })
-      ) alias(values, scheme, name, target);
-    }
-    if (preset.id === 'liquid' && scheme === 'dark') {
-      // The approved dark delta binds the core value, not the unused pack value.
-      const resolved = resolveFigmaValue(
-        collections,
-        'Scheme',
-        'success/text',
-        figmaModes(preset, 'dark'),
-      );
-      const literal = figmaPrimitive('success/text', 'COLOR', resolved.value);
-      values['liquid-success-text'] = tokenAlias(lift(literal), 'color', {
-        figma: { collection: 'Scheme', name: 'success/text', mode: 'Dark' },
-      });
-    }
-    if (preset.id === 'bloom') {
-      // Font roles use the names registered by the Theme collection.
-      for (
-        const [name, family] of Object.entries({
-          'font-sans': 'Funnel Sans',
-          'font-label': 'Funnel Sans',
-          'font-data': 'Funnel Sans',
-          'font-heading': 'Funnel Display',
-          'font-kpi': 'Funnel Display',
-        })
-      ) {
-        const literal = figmaPrimitive(name.replace('font-', 'font/'), 'STRING', family);
-        values[name] = tokenAlias(lift(literal), literal.$type);
-      }
-      for (
-        const [name, size] of Object.entries({
-          'radius-control': 28,
-          'radius-input': 28,
-          'radius-card': 22,
-          'text-body': 15,
-          'leading-body': 20,
-          'text-caption': 12,
-          'leading-caption': 16,
-          'text-display': 92,
-          'leading-display': 96,
-          'text-heading': 40,
-          'leading-heading': 48,
-          'text-title': 28,
-          'leading-title': 32,
-          'text-label': 16,
-          'leading-label': 21,
-          'text-small': 13,
-          'leading-small': 17,
-          'text-strong': 15,
-          'leading-strong': 20,
-          'text-kpi': 60,
-          'leading-kpi': 64,
-          'text-kpi-sm': 48,
-          'leading-kpi-sm': 52,
-        })
-      ) addLiteral(values, name, size, 'FLOAT', 'bloom');
-    }
-    if (preset.id === 'liquid') {
-      for (const name of ['font-sans', 'font-heading', 'font-kpi', 'font-label', 'font-data']) {
-        const literal = figmaPrimitive(name.replace('font-', 'font/'), 'STRING', 'Inter');
-        values[name] = tokenAlias(lift(literal), literal.$type);
-      }
-      for (
-        const [name, size] of Object.entries({
-          'text-display': 40,
-          'leading-display': 48,
-          'text-kpi': 26,
-          'leading-kpi': 32,
-          'text-body': 13,
-          'leading-body': 17,
-          'text-caption': 11,
-          'leading-caption': 14,
-          'radius-input': 7,
-          'radius-control': 10,
-          'radius-card': 16,
-        })
-      ) addLiteral(values, name, size, 'FLOAT', 'liquid');
-    }
-    // Shared, newly named roles have a value in every preset, not a partial map.
   }
 
   function addNodeRoles(values: TokenDocument, scheme: string, preset: TokenPreset): void {

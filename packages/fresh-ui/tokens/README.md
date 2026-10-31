@@ -2,17 +2,17 @@
 
 The canonical inputs live under `v2/`. `deno task tokens:build` uses the public
 `@netscript/fresh-ui/tokens` builder and Style Dictionary 5.7.1 formats to build
-all 72 scheme × preset × requested-density inputs. `tokens:check` compares all
-68 generated outputs without writing or repairing them. `tokens:validate` checks
+all 96 scheme × preset × requested-density inputs. `tokens:check` compares all
+88 generated outputs without writing or repairing them. `tokens:validate` checks
 source freshness, official schemas, aliases, registered names and contrast. The
-CLI and route migration are the remaining S1 slices; the draft PR is not READY.
+CLI and design routes consume the same built preset catalog.
 
 Figma owns values. The registered roles and DTCG resolver own names, tiers and
 supported contexts. NS One remains the default. Studio Utility is an additional
 preset; it does not switch existing applications.
 
-The value snapshot in `figma/` comes from design handoff #2427 at
-`e6ff8413683911a3a7ef82b0edacdc97ffdecb8c` (2026-10-28). `legacy.json` records
+The nine-collection value snapshot in `figma/` comes from design handoff #2493 at
+`dd442e82794c4b960e51529f1c7ac534afda75ea` (2026-10-31), with 2,186 variables. `legacy.json` records
 the NS One value source and CSS from S0 #2432. Neither snapshot is a DTCG source.
 The `v2/*.tokens.json` documents are DTCG 2025.10; `v2/tokens.resolver.json` is the one
 resolver document. Official schemas in `schemas/` are vendored unchanged from
@@ -78,6 +78,33 @@ dark, `data-density` for the preset density, and Studio `data-flavor`.
 `data-density` reports the preset's effective geometry; it is not a separate
 density toggle that overrides that preset.
 
+## Theme set and language presets
+
+Scheme aliases Theme set, whose A mode selects Theme and B mode selects Theme B.
+The selected collection then uses its own language mode. Studio flavor, Base gray,
+Base accent and Density retain their own active modes throughout the alias chain.
+Theme/Theme B/Theme set share WEB names: import emits each once through Theme set.
+Unexpected shared names fail; the four existing rule-width migrations remain explicit.
+
+All 24 presets build: NS One; seven Studio flavors; Ledger, Signal, Glass,
+Filigrane, Tonal, Brutal, Fluent, Tactile, Pixel; Bloom, Cupertino, Liquid, Terminal;
+and the faithful macOS 27 (`macos-27`), Apple Classic (`apple-classic`) and Fluent 2 Web
+(`fluent-2-web`). All three faithful modes fully resolve and retain Figma-exported
+values without core overlays or fallback to NS One. Legacy-only compatibility roles
+remain available in every preset. Base inputs affect only aliases that reach them;
+Theme B's own gray/accent values are not replaced by Base collection defaults.
+
+The existing Bloom, Cupertino, Liquid and Terminal ids now select their namesake
+Theme B modes. They no longer share Tonal, Glass or Signal scalar defaults. Studio
+and Fluent core roles also follow the current export rather than old pack overlays;
+Brutal's shadow x comes from Theme set. These are intentional value updates.
+
+`TokenPreset.themeSet` is optional for existing callers (default A), explicit for
+built-in presets. New opacity roles are unitless DTCG numbers. DTCG 2025.10 has no
+fontStyle type: an Italic style uses a regular fontWeight carrier with exact CSS
+and original Figma style metadata; CSS emits `italic` and Figma output retains
+`Italic`. Other weight styles remain numeric fontWeight values.
+
 ## Validation and contrast feedback
 
 From this package directory:
@@ -97,7 +124,11 @@ values that a later modifier would otherwise overwrite.
 `contrast-pairs.json` declares intentional foreground/background uses and paint
 stacks. Every foreground and named background must be covered in its owning
 language; shared roles apply to all presets. Core input/control boundaries and
-focus require 3:1, and text requires 4.5:1. The Terminal key variant is measured
+focus require 3:1, and text requires 4.5:1. Chart series require 3:1 against bg,
+card-bg and card, plus the owning Cupertino/Liquid/Fluent chart surfaces. Explicit
+l/d chart and surface intermediates are checked only in their matching scheme.
+Every code/syntax role requires 4.5:1 on code-bg; removing a required chart surface
+or syntax pair fails coverage. The Terminal key variant is measured
 in Terminal. Fluent's outer 2px indicator provides the focus contrast; its inner
 1px decorative line is not treated as a standalone indicator.
 
@@ -127,6 +158,21 @@ policy regression rejects unpaired roles, missing focus checks, weakened text
 thresholds and stale exclusions. `tokens:report` emits JSON on stdout; the normal
 validation task also prints its source-freshness preflight.
 
+The internal report script re-measures with zero exclusions, so fixed exceptions
+cannot survive a refresh. From this package directory, after updating source inputs
+and embeddings:
+
+```sh
+deno run --lock=deno.lock --frozen --allow-read --allow-write --allow-env scripts/report-token-contrast.ts --write-exclusions --report-dir ../../.llm/runs/<run>
+deno task tokens:embed
+```
+
+It writes every failing pair with preset, scheme, foreground role, background paint
+stack, unrounded-decision ratio and required ratio to `failing-pairs.json`. The short
+`failing-pairs.md` table shows the worst relative failure and count per preset/scheme.
+Omit `--write-exclusions` for a report without updating policy. Contrast value
+burn-down stays open for the Figma owner; the report is feedback, not a value fix.
+
 ## Consuming app commands
 
 From a NetScript workspace, select an app with `--app dashboard` (or point
@@ -150,7 +196,7 @@ require explicit `--force`. Edit the final alias layer, for example:
 }
 ```
 
-Build validates all contexts before writing five core web assets. Add `--previews` to write the 18 separate development preview styles. App builds skip catalog-only Figma formats. The public
+Build validates all contexts before writing five core web assets. Add `--previews` to write the 24 separate development preview styles. App builds skip catalog-only Figma formats. The public
 builder owns DTCG, alias, reference, type and name validation. CLI application
 logic uses the existing filesystem port; its lazy engine adapter imports this
 package's public `tokens` entrypoint only for token commands. Clean retains the configured `theme-preset.json`, app
@@ -181,12 +227,12 @@ and after generating outputs; the token, source and registry asset checks verify
 
 Every app stylesheet contains its configured light/dark preset and NS One
 compatibility only (two effective contexts for NS One, four for another preset).
-The build also emits `presets/<id>.css` for all 18 presets. A theme registry item
+The build also emits `presets/<id>.css` for all 24 presets. A theme registry item
 installs its own CSS as assets/tokens.css. Install `ui:add theme-previews` or run `tokens build --previews` to opt in to separate files under
 static/presets; the development shell links one only when an allowlisted design
 preview differs from the configured preset. Normal app pages load no preview CSS.
-All 72 inputs still build, and all 68 outputs participate in read-only freshness.
-The CLI writes five core files by default and 23 with `--previews`. Clean removes generated CSS/catalog/font files and any known preview CSS, preserving the selected preset, settings, source files and app styles. CI bounds app contexts/declarations and
+All 96 inputs still build, and all 88 outputs participate in read-only freshness.
+The CLI writes five core files by default and 29 with `--previews`. Clean removes generated CSS/catalog/font files and any known preview CSS, preserving the selected preset, settings, source files and app styles. CI bounds app contexts/declarations and
 bytes so unrelated preset CSS cannot return to the default stylesheet.
 
 The native publish-file-set test enforces a 5,000,000-byte total budget for the
@@ -196,3 +242,10 @@ transitive dependencies, and unused language packs/ramps stay in design data.
 Production routes import only preset/font metadata; the full manifest and preview
 resolver are reachable only through development design routes. `--force` replaces
 the managed `tokens/source/` tree, including stale files.
+
+The exported Figma emphasis names (`weight-em`, `studio-weight-em`) currently mix
+Italic with numeric body weights across modes. They cannot be used in one fixed CSS
+font property across every preset. Consumers must inspect `sourceStyle`/`figmaStyle`
+when present; a standard DTCG reader sees the regular-weight carrier for Italic.
+The architecture debt register tracks splitting style and weight names before the
+next stable design-system release. No shipped component currently consumes them.

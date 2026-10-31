@@ -89,6 +89,17 @@ export function figmaPrimitive(
 ): DesignToken {
   if (sourceType === 'COLOR') return { $type: 'color', $value: tokenColor(String(raw)) };
   if (sourceType === 'BOOLEAN') return { $type: 'number', $value: raw ? 1 : 0 };
+  if (typeof raw === 'number' && name.endsWith('-opacity')) {
+    return { $type: 'number', $value: roundTokenNumber(raw) };
+  }
+  if (raw === 'Italic' && name === 'type/em/style') {
+    // DTCG has no fontStyle primitive; preserve the source style in both outputs.
+    return {
+      $type: 'fontWeight',
+      $value: 400,
+      $extensions: { netscript: { css: 'italic', figmaStyle: raw } },
+    };
+  }
   if (typeof raw === 'number') return { $type: 'dimension', $value: dimension(raw) };
   if (/font\//.test(name)) return { $type: 'fontFamily', $value: String(raw) };
   if (name.endsWith('/style') || name.includes('/weight')) {

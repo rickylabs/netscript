@@ -1,0 +1,490 @@
+Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/maint/teardown/leak-check.ts '--' '--slice-dir' '.llm/runs/orch-divybot-6538850770--s1b' '--worktree' '/home/agent/projects/orchid/worktrees/issue-6538850770'
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-31T04:35:27.638Z",
+  "worktreeRoot": "/home/agent/projects/orchid/worktrees/issue-6538850770",
+  "probes": {
+    "aspire": {
+      "state": "ok"
+    },
+    "docker": {
+      "state": "failed",
+      "message": "docker ps failed (1): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?"
+    },
+    "volumes": {
+      "state": "failed",
+      "message": "docker volume ls failed (1): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?"
+    },
+    "networks": {
+      "state": "failed",
+      "message": "docker network ls failed (1): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?"
+    },
+    "process": {
+      "state": "ok"
+    }
+  },
+  "survivors": [
+    {
+      "kind": "apphost",
+      "identity": "/home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts (pid 16489)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": null,
+      "stale": false,
+      "command": "aspire stop --apphost '/home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts' --non-interactive --nologo",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "apphost",
+        "appHostPath": "/home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts",
+        "appHostPid": 16489
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire run --non-interactive --apphost /home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts --log-file /home/agent/.aspire/logs/cli_20261030T134822689_detach-child_a3ea6c08c8fb4b8c8c6f7d6d391f43aa.log --log-level None (pid 16208)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53224000,
+      "stale": true,
+      "command": "kill -TERM '16208'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 16208,
+        "ppid": 1,
+        "observedAgeMs": 53224000,
+        "commandLine": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire run --non-interactive --apphost /home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts --log-file /home/agent/.aspire/logs/cli_20261030T134822689_detach-child_a3ea6c08c8fb4b8c8c6f7d6d391f43aa.log --log-level None",
+        "evidence": [
+          {
+            "kind": "apphost-argv",
+            "path": "/home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed server --contentRoot /home/agent/projects/deploy-36a18a8/repo/aspire/.aspire/integrations/apphosts/13e4b0554594 (pid 16489)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53224000,
+      "stale": true,
+      "command": "kill -TERM '16489'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 16489,
+        "ppid": 16208,
+        "observedAgeMs": 53224000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed server --contentRoot /home/agent/projects/deploy-36a18a8/repo/aspire/.aspire/integrations/apphosts/13e4b0554594",
+        "evidence": [
+          {
+            "kind": "content-root-argv",
+            "path": "/home/agent/projects/deploy-36a18a8/repo/aspire/.aspire/integrations/apphosts/13e4b0554594"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp start-apiserver --monitor 16489 --kubeconfig /ephemeral/tmp/aspire-dcp5HacM7/kubeconfig --tls-cert-thumbprint B61BC460D594D5C0EF406F52A03D4577A49D1DFC --tls-cert-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.crt --tls-key-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.key (pid 18684)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53215000,
+      "stale": true,
+      "command": "kill -TERM '18684'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 18684,
+        "ppid": 1,
+        "observedAgeMs": 53215000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp start-apiserver --monitor 16489 --kubeconfig /ephemeral/tmp/aspire-dcp5HacM7/kubeconfig --tls-cert-thumbprint B61BC460D594D5C0EF406F52A03D4577A49D1DFC --tls-cert-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.crt --tls-key-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.key",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp run-controllers --kubeconfig /ephemeral/tmp/aspire-dcp5HacM7/kubeconfig --notification-socket /home/agent/.cache/dcp/dcp-notify-sock-pnplazop --monitor 18684 --monitor-identity-time 0001-01-01T00:12:14.300Z (pid 18839)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53215000,
+      "stale": true,
+      "command": "kill -TERM '18839'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 18839,
+        "ppid": 18684,
+        "observedAgeMs": 53215000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp run-controllers --kubeconfig /ephemeral/tmp/aspire-dcp5HacM7/kubeconfig --notification-socket /home/agent/.cache/dcp/dcp-notify-sock-pnplazop --monitor 18684 --monitor-identity-time 0001-01-01T00:12:14.300Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19095 --child-identity-time 0001-01-01T00:12:14.820Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 19096)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53214000,
+      "stale": true,
+      "command": "kill -TERM '19096'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 19096,
+        "ppid": 18839,
+        "observedAgeMs": 53214000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19095 --child-identity-time 0001-01-01T00:12:14.820Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19186 --child-identity-time 0001-01-01T00:12:14.940Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 19187)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53214000,
+      "stale": true,
+      "command": "kill -TERM '19187'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 19187,
+        "ppid": 18839,
+        "observedAgeMs": 53214000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19186 --child-identity-time 0001-01-01T00:12:14.940Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed dashboard (pid 19194)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53214000,
+      "stale": true,
+      "command": "kill -TERM '19194'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 19194,
+        "ppid": 18839,
+        "observedAgeMs": 53214000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed dashboard",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19193 --child-identity-time 0001-01-01T00:12:14.950Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 19195)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53214000,
+      "stale": true,
+      "command": "kill -TERM '19195'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 19195,
+        "ppid": 18839,
+        "observedAgeMs": 53214000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19193 --child-identity-time 0001-01-01T00:12:14.950Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19194 --child-identity-time 0001-01-01T00:12:14.950Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 19198)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53214000,
+      "stale": true,
+      "command": "kill -TERM '19198'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 19198,
+        "ppid": 18839,
+        "observedAgeMs": 53214000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19194 --child-identity-time 0001-01-01T00:12:14.950Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19197 --child-identity-time 0001-01-01T00:12:14.950Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 19199)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53214000,
+      "stale": true,
+      "command": "kill -TERM '19199'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 19199,
+        "ppid": 18839,
+        "observedAgeMs": 53214000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 19197 --child-identity-time 0001-01-01T00:12:14.950Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID 35c6b1e8fe8fc768bd0eac82014406adea09ff2ac58d22d4fb6e8195ea7584e0 --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 20040)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53211000,
+      "stale": true,
+      "command": "kill -TERM '20040'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 20040,
+        "ppid": 18839,
+        "observedAgeMs": 53211000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID 35c6b1e8fe8fc768bd0eac82014406adea09ff2ac58d22d4fb6e8195ea7584e0 --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID 604b96b02fbb77a8bf67d5e8ff6f65bb0871465322548f2ed4676edc560bd08c --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 20121)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53211000,
+      "stale": true,
+      "command": "kill -TERM '20121'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 20121,
+        "ppid": 18839,
+        "observedAgeMs": 53211000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID 604b96b02fbb77a8bf67d5e8ff6f65bb0871465322548f2ed4676edc560bd08c --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire describe --follow --apphost /home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts --format Json --non-interactive --nologo (pid 29792)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53165000,
+      "stale": true,
+      "command": "kill -TERM '29792'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 29792,
+        "ppid": 5799,
+        "observedAgeMs": 53165000,
+        "commandLine": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire describe --follow --apphost /home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts --format Json --non-interactive --nologo",
+        "evidence": [
+          {
+            "kind": "apphost-argv",
+            "path": "/home/agent/projects/deploy-36a18a8/repo/aspire/apphost.ts"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38716 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38717)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38717'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38717,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38716 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38718 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38720)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38720'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38720,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38718 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38719 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38722)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38722'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38722,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38719 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38721 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38723)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38723'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38723,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38721 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38724 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38730)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38730'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38730,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38724 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38728 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38747)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38747'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38747,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38728 --child-identity-time 0001-01-01T00:14:08.490Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38794 --child-identity-time 0001-01-01T00:14:08.500Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38796)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38796'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38796,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38794 --child-identity-time 0001-01-01T00:14:08.500Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38833 --child-identity-time 0001-01-01T00:14:08.520Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38836)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38836'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38836,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38833 --child-identity-time 0001-01-01T00:14:08.520Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38832 --child-identity-time 0001-01-01T00:14:08.520Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z (pid 38859)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 53100000,
+      "stale": true,
+      "command": "kill -TERM '38859'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 38859,
+        "ppid": 18839,
+        "observedAgeMs": 53100000,
+        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 38832 --child-identity-time 0001-01-01T00:14:08.520Z --monitor 18839 --monitor-identity-time 0001-01-01T00:12:14.390Z",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire agent mcp (pid 3765632)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 49000,
+      "stale": false,
+      "command": "kill -TERM '3765632'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 3765632,
+        "ppid": 3765400,
+        "observedAgeMs": 49000,
+        "commandLine": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire agent mcp",
+        "evidence": []
+      }
+    },
+    {
+      "kind": "process",
+      "identity": "/home/agent/.local/aspire/aspire ps --format Json (pid 3779418)",
+      "ownership": "unproven",
+      "owner": "unknown",
+      "ageMs": 0,
+      "stale": false,
+      "command": "kill -TERM '3779418'",
+      "atRiskFromUpstream": false,
+      "resource": {
+        "kind": "process",
+        "pid": 3779418,
+        "ppid": 3779398,
+        "observedAgeMs": 0,
+        "commandLine": "/home/agent/.local/aspire/aspire ps --format Json",
+        "evidence": []
+      }
+    }
+  ]
+}

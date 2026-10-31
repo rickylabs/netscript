@@ -28,6 +28,10 @@ export interface ExportedToken {
 export interface BuiltToken extends ExportedToken {
   /** Resolved DTCG value, including computed vendor derivations. */
   readonly resolved: TokenValue;
+  /** Exact Figma style when its CSS meaning is carried in an extension. */
+  readonly sourceStyle?: string;
+  /** Theme set input retained in catalogs and loaded into NS One CSS by aliases. */
+  readonly sourceOnly?: boolean;
 }
 
 /** One requested resolver permutation and its fixed effective preset. */

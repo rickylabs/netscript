@@ -1,5 +1,6 @@
 import type { Dictionary } from 'npm:style-dictionary@5.7.1/types';
 import Color from 'npm:colorjs.io@0.5.2';
+import { FIGMA_THEME_SET } from '../domain/token-presets.ts';
 import { isTokenAlias } from '../domain/resolve-tokens.ts';
 import {
   type DesignToken,
@@ -147,12 +148,20 @@ export function formatTokenContext(
     if (!metadata?.cssVar) continue;
     const name = metadata.cssVar.slice('--ns-'.length);
     const raw = value(path);
+    let origin = token;
+    while (isTokenAlias(origin.$value)) origin = originals.get(origin.$value.slice(1, -1))!;
+    const sourceStyle = origin.$extensions?.netscript?.figmaStyle;
     tokens[name] = {
       type: token.$type,
       value: css(path, metadata.cssVar),
       cssVar: metadata.cssVar,
       path: metadata.category ?? path.split('.'),
       resolved: raw,
+      ...(sourceStyle ? { sourceStyle } : {}),
+      ...(originals.get(`context.${context.scheme}.${name}`)?.$extensions?.netscript?.figma
+          ?.collection === FIGMA_THEME_SET
+        ? { sourceOnly: true }
+        : {}),
       ...(token.$type === 'color' ? { hex: colorHex(raw), fallback: fallback(path) } : {}),
     };
   }
