@@ -3,16 +3,16 @@
 ## Locked decisions
 
 1. Keep the existing adapter and ports. Set event.idempotencyKey at construction; do not edit the KV resolveKey function, definition-key wiring, or scheduled identities from #2165.
-2. With both valid mtime and size, use a prefixed JSON tuple of triggerId/path/kind/mtime/size. Partial/absent metadata gets a per-event UUID key independent of counters and timestamps. Keep existing event ids outside this fix.
+2. With both valid mtime and size, use a fixed-size namespace plus SHA-256 of the JSON tuple triggerId/path/kind/mtime/size. This bounds both KV and downstream key length, including valid paths over 2 KiB. Partial/absent metadata gets a per-event UUID key independent of counters and timestamps. Keep existing event ids outside this fix.
 3. File-watch default completed TTL is zero (active claim only); explicit definition ttlMs remains authoritative. Other kinds keep the 24-hour default. No builder contract change.
 4. Explain active-only duplicate suppression, eligibility after completion, metadata identity, missing-metadata UUIDs and explicit policy in the triggers docs. Keep the intentional one-import-per-path example and explain its worker policy.
 5. Use deterministic watcherFactory input through the real WatchersFileWatcherAdapter, real TriggerProcessor and disk-backed DenoKvAdapter. Close and reopen the same KV file with fresh adapter/processor instances for restart proof. Block handler entry with promises to prove concurrent duplicate rejection across processors, then eligibility after completion.
-6. Add a real upstream watcher/filesystem smoke where feasible to complement the deterministic metadata seam. Negative-control each new test against the two original production files; restore exactly afterwards. Tests must fail assertions, not types or unrelated setup.
+6. Add a real upstream watcher/filesystem smoke where feasible to complement the deterministic metadata seam. Run negative controls against both original production files together and separately; restore exactly afterwards. Regression cases must fail assertions, not types or unrelated setup; compatibility controls must pass both versions. The matrix below binds each proof to its expected sensitivity.
 
 ## Slices
 
 - S0: tracked research/design/run record; draft PR in this session. Gate: explicit scope and seven-item Design checkpoint present.
-- S1: one coherent behavior correction and regression suite. Files: the two production core files, colocated adapter tests, runtime/file-watch-idempotency_test.ts, triggers docs, run record and dated lesson. Gates: focused tests (positive + negative controls); full core tests; structured source check/lint/fmt; quality:gate and arch:check; scoped JSR audit and doc lint. Independent read-only slice review before sign-off commit, then push/comment.
+- S1: one coherent behavior correction and regression suite. Files: the two production core files, colocated adapter tests, tests/file-watch-idempotency_test.ts, triggers docs, run record and dated lesson. Gates: focused tests (positive + negative controls); full core tests; structured source check/lint/fmt; quality:gate and arch:check; scoped JSR audit and doc lint. Independent read-only slice review before sign-off commit, then push/comment.
 - S2 if required: evaluator/CI blocker repairs only with appropriate affected gates and run updates. No speculative refactor.
 
 ## Gates and acceptance
@@ -35,3 +35,20 @@ No decision requiring owner input remains. Safe to defer: changing process-local
 ## Debt
 
 No new or deepened architectural debt intended. Existing package verdict is Keep; record any uncovered pre-existing gate failure as baseline evidence rather than silently accepting new debt.
+
+## S1 acceptance and negative-control matrix
+
+| Proof/test | Fixed | Both original | Adapter original only | TTL original only |
+| --- | --- | --- | --- | --- |
+| Adapter key identifies all five tuple fields and ignores callback time/contentHash/stableChecks | pass | fail (key absent) | fail | pass |
+| Adapter missing/partial metadata yields distinct keys within/across instances | pass | fail (key absent) | fail | pass |
+| Missing-metadata same-path modifies two seconds apart reach handler, default definition | pass | fail (second deduplicated) | pass behavior | pass |
+| Missing-metadata persisted-KV restart delivers second modify | pass | fail (second deduplicated) | pass behavior | pass |
+| Distinct missing-metadata events run concurrently across processors (limit 2) | pass | fail (second deduplicated) | fail (same active payload hash) | pass |
+| Same complete-metadata duplicate blocks while in flight, then is eligible after completion | pass | fail after completion | pass | fail after completion |
+| Same metadata eligible after completion and persisted-KV restart | pass | fail after restart | pass | fail after restart |
+| Different complete metadata modifies pass | pass | pass | pass | pass |
+| Long path >2 KiB runs through real adapter/disk KV and has bounded key | pass | pass behavior | pass behavior | pass |
+| #2165 definition-key precedence, explicit TTL, webhook/scheduled default controls | pass | pass | pass | pass |
+
+The adapter-only concurrent missing-metadata case proves unique keys are necessary even with zero completed TTL. The TTL-only same-metadata replay/restart cases prove zero completed retention is necessary even with correct adapter keys. Combined duplicate tests assert both rejection during the active claim and acceptance after completion. Compatibility controls are deliberately not claimed as reverted-fix regressions.

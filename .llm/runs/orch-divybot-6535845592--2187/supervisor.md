@@ -13,7 +13,7 @@
 - `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter.ts`
 - `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter_test.ts`
 - `packages/plugin-triggers-core/src/runtime/trigger-processor.ts` (event construction and resolveDedupTtl only; preserve #2165 key resolution)
-- `packages/plugin-triggers-core/src/runtime/file-watch-idempotency_test.ts`
+- `packages/plugin-triggers-core/tests/file-watch-idempotency_test.ts` (cross-cutting adapter/runtime/KV tests; relocated before S1 commit)
 - `docs/site/durable-workflows/triggers.md`
 - `.llm/runs/orch-divybot-6535845592--2187/**`
 - `.llm/2026-10-31-file-watch-idempotency.md`
