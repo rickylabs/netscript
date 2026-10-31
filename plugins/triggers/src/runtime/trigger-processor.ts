@@ -19,6 +19,7 @@ import {
 } from '@netscript/plugin-triggers-core/adapters';
 import { loadProjectTriggerDefinitions } from './project-trigger-registry.ts';
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
+import { TriggerHealthMonitor } from './trigger-health-monitor.ts';
 
 /** Options for starting the background trigger processor runtime. */
 export type TriggerProcessorRuntimeOptions = Readonly<{
@@ -58,6 +59,7 @@ export async function startTriggerProcessorRuntime(
         logger.error('trigger.file_watch.error', { triggerId: handle.id, error });
       },
       onStatusChange: async (event) => {
+        if (options.health instanceof TriggerHealthMonitor) options.health.updateWatch(event);
         if (options.logger === undefined) await ensureLogging();
         logger.info('trigger.file_watch.status', event);
       },
@@ -69,6 +71,9 @@ export async function startTriggerProcessorRuntime(
           await activeProcessor.process(event, definition);
         });
       } else if (isFileWatchDefinition(definition)) {
+        if (options.health instanceof TriggerHealthMonitor) {
+          options.health.registerWatch(definition.id);
+        }
         await fileWatcher.watch(definition, async (event) => {
           await activeProcessor.process(event, definition);
         });

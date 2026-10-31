@@ -6,6 +6,10 @@ export {
 } from './project-trigger-registry.ts';
 export { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
 export { startCombinedProcess, startTriggerProcessorRuntime } from './trigger-processor.ts';
+export { TriggerHealthMonitor } from './trigger-health-monitor.ts';
+export type { TriggerHealthSnapshot } from './trigger-health-monitor.ts';
+export { FILE_WATCH_STATES } from '@netscript/plugin-triggers-core/ports';
+export type { FileWatchState, FileWatchStatusEvent } from '@netscript/plugin-triggers-core/ports';
 export {
   TRIGGER_ACTION_KINDS,
   TRIGGER_DURABILITY_TIERS,

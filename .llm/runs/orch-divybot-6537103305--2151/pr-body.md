@@ -11,12 +11,12 @@ Archetype 3 runtime behavior across watchers, triggers-core, and trigger plugin 
 ## Slices
 
 - [x] S1 Bounded recovery, lifecycle events, and processor error wiring.
-- [ ] S2 Per-trigger watch health through the existing child health endpoint.
+- [x] S2 Per-trigger watch health through the existing child health endpoint.
 - [ ] S3 Native-only strategy, error diagnostics, and documentation.
 
 ## Validation
 
-PLAN-EVAL passed on round 2; S1 independent repair review passed. S1 has 32 passing focused tests, green structured check/lint/fmt and quality:gate, and four behavioral negative controls. Remaining gates: focused real-watcher and runtime tests, structured check/lint/format wrappers, quality/architecture scan, export doc lint, JSR audits, publish dry-runs, and negative controls.
+PLAN-EVAL passed on round 2; S1 independent repair review passed. S1 has 32 passing focused tests and four negative controls. S2 has 22 passing focused tests and two negative controls, including real HTTP health plus root deletion/recreation and the actual generated starter. Both slices have green structured check/lint/fmt, quality:gate, and independent slice review. Remaining gates: focused real-watcher and runtime tests, structured check/lint/format wrappers, quality/architecture scan, export doc lint, JSR audits, publish dry-runs, and negative controls.
 
 Generated runtime wiring requires the e2e-cli CI verdict; the coordinator owns enabling its gate label. Full local scaffold runtime is excluded by the assignment.
 
@@ -31,7 +31,7 @@ No new architecture debt planned. Existing watcher console-warning debt and base
 ## Definition of Done
 
 - [x] Real root deletion/recreation reports failure and recovery, then delivers later file changes.
-- [ ] Health shows each trigger as watching or unavailable and a missing root is visible without blocking unrelated trigger processing.
+- [x] Health shows each trigger as watching or unavailable and a missing root is visible without blocking unrelated trigger processing.
 - [ ] Native strategy reports actual watcher failures and never switches to polling.
 - [ ] Focused local gates and negative controls recorded; documentation updated.
 - [ ] Independent evaluation attests the exact pushed head; CI state reported honestly.

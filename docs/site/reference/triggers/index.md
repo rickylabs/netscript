@@ -68,6 +68,30 @@ live in [`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/).
 [`@netscript/plugin-triggers-core`](/reference/plugin-triggers-core/) is canonical for the
 handler-first DSL, ingress and processor runtimes, ports, configuration and testing exports.
 
+## File-watch health
+
+The generated background runtime exposes per-trigger availability in the existing child `/health`
+response. `fileWatches` contains `{ triggerId, state, occurredAt }` for each registered file trigger.
+`state` is `watching` only after the watcher has acquired resources; a failed or missing root is
+`unavailable`. Failures and recoveries also produce structured runtime diagnostics.
+
+The default adapter retries failed watches with exponential delays from 250 milliseconds up to
+30 seconds. Recreating a removed root allows a fresh watch to start; later changes reach the
+handler. Files changed while the watch was unavailable are not replayed automatically. Pausing
+suppresses delivery while keeping the watch and its health active. Stopping the processor cancels
+retries and drains in-flight handlers.
+
+An unavailable watch does not change aggregate child readiness: scheduled triggers and watches for
+other roots can still process events. The scaffold's starter watch root may not exist until you
+create it, so check `fileWatches` even when `/health` returns HTTP 200. Shutdown marks all watched
+sources unavailable.
+
+For custom runtime glue, construct `TriggerHealthMonitor` from
+`@netscript/plugin-triggers/runtime`, pass it as `health` to `startCombinedProcess`, and pass
+`() => health.snapshot()` as the snapshot provider to `runChildHealthProcess` from
+`@netscript/plugin/health`. Custom `fileWatcher` adapters should forward lifecycle transitions to
+`health.updateWatch`; a registration remains unavailable until readiness is reported.
+
 ## Examples
 
 ### Test triggers with in-memory doubles
