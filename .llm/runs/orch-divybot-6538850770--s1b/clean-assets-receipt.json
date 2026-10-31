@@ -6,7 +6,7 @@
     "task",
     "check:assets-barrel"
   ],
-  "cwd": "/home/agent/projects/orchid/worktrees/issue-6538850770",
+  "cwd": ".",
   "gitHead": "f12d6388d04efc67f344123c973b6d441feab247",
   "actualGitHead": "f12d6388d04efc67f344123c973b6d441feab247",
   "timeoutMs": 1800000,

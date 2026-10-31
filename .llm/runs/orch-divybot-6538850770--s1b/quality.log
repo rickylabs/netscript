@@ -29,7 +29,7 @@ Task deps:check:reference-locks deno run --allow-read --allow-write --allow-run 
 │  Enable it in your deno config file:
 │  "nodeModulesDir": "auto"
 ╰─
-Warning: config file file:///home/agent/projects/orchid/worktrees/issue-6538850770/resources/examples/expo-streams/deno.json is not a member of the workspace at file:///home/agent/projects/orchid/worktrees/issue-6538850770/. Ignoring the parent workspace config.
+Warning: config file file://resources/examples/expo-streams/deno.json is not a member of the workspace at file://. Ignoring the parent workspace config.
 reference-lock PASS locks=3
 WARN DEPS-NPM-CATALOG packages/ai/deno.json:31 packages/ai uses npm:@tanstack/ai@0.68.0 outside package.json catalog: (no root catalog entry exists)
 WARN DEPS-NPM-CATALOG packages/ai/deno.json:32 packages/ai uses npm:@tanstack/ai-anthropic@0.21.1 outside package.json catalog: (no root catalog entry exists)

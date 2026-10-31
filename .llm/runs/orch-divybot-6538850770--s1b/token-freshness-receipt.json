@@ -6,7 +6,7 @@
     "task",
     "tokens:check"
   ],
-  "cwd": "/home/agent/projects/orchid/worktrees/issue-6538850770/packages/fresh-ui",
+  "cwd": "packages/fresh-ui",
   "gitHead": "f836d0256fda694f19234601d092f848e9546505",
   "actualGitHead": "f836d0256fda694f19234601d092f848e9546505",
   "timeoutMs": 1800000,

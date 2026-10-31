@@ -13,5 +13,5 @@ error: Uncaught (in promise) Error: MCP export-corpus generator read set is dirt
 Refusing to generate from uncommitted package/plugin sources. Commit or stash them, or deliberately rerun with --allow-dirty.
   throw new Error(
         ^
-    at guardGeneratorWrite (file:///home/agent/projects/orchid/worktrees/issue-6538850770/.llm/tools/docs/generate-export-surface-corpus.ts:565:9)
-    at async file:///home/agent/projects/orchid/worktrees/issue-6538850770/.llm/tools/docs/generate-export-surface-corpus.ts:601:15
+    at guardGeneratorWrite (file://.llm/tools/docs/generate-export-surface-corpus.ts:565:9)
+    at async file://.llm/tools/docs/generate-export-surface-corpus.ts:601:15
