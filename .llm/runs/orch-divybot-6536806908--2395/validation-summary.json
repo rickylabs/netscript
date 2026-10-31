@@ -1,0 +1,230 @@
+{
+  "evidenceScope": "Reviewed implementation working tree before sign-off; exact pushed-head evaluation and CI follow. Summaries do not replace gate receipts.",
+  "gates": [
+    {
+      "gate": "combined",
+      "rawReportSha256": "436a865064fe0865dba720690652365784436e063ad01a2e2dc356cd51927123",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/queue/tests",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 192,
+        "failed": 0,
+        "ignored": 2,
+        "totalResults": 194,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "outage-safety",
+      "rawReportSha256": "4bd91f9c45642be468c3d024d9b16a8bebc40d2dcc8613536866261ed59b6f49",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/queue/tests/redis-lease-outage_test.ts",
+        "packages/queue/tests/redis-lease-safety_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 18,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 18,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "busy-outage-compat",
+      "rawReportSha256": "5a00abd6a9465680d6eb6f3ee6863db1fe5f250bde7eb62bce475aea4b17169a",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/queue/tests/redis-lease-outage_test.ts",
+        "packages/queue/tests/redis-lease-compat_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 1,
+        "totalResults": 17,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "negative-control",
+      "rawReportSha256": "86c13487035f479fcbcedef9662fada2182f6444d248cd937043f82e0f738691",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--allow-all",
+        "packages/queue/tests/redis-lease_test.ts"
+      ],
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 10,
+        "ignored": 1,
+        "totalResults": 11,
+        "uniqueFailures": 3
+      },
+      "expectedExitCode": 1,
+      "failingTests": [
+        "Redis killed process claim is recovered by a new process with delivery count 2",
+        "Redis stopped process claim is recovered by a new process with delivery count 2",
+        "Redis repeated worker death dead-letters exactly after N deliveries",
+        "Garnet killed process claim is recovered by a new process with delivery count 2",
+        "Garnet stopped process claim is recovered by a new process with delivery count 2",
+        "Garnet repeated worker death dead-letters exactly after N deliveries",
+        "Redis heartbeat prevents a long job from being reclaimed and expiry resumes after worker death",
+        "Garnet heartbeat prevents a long job from being reclaimed and expiry resumes after worker death",
+        "Redis explicit requeue nacks persist delivery count and stop at the delivery limit",
+        "Garnet explicit requeue nacks persist delivery count and stop at the delivery limit"
+      ]
+    },
+    {
+      "gate": "type-check",
+      "rawReportSha256": "61f6c6dc39481955eecbc3499917f41248720e18b6480a776e209e9cd8a6920d",
+      "command": "deno check --unstable-kv <files>",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 68,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "gate": "queue-lint",
+      "rawReportSha256": "1fbc1e612e167e30b38fa67090e8b329b80080eab1aa48dfc5be2c7d4be767ba",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 66,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 66,
+        "filesProcessed": 66,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "queue-format",
+      "rawReportSha256": "6c4b8f1fa36d1fe7d5848cc0c122cc7b6f609687d2643e61c19035099b9a657b",
+      "command": "deno fmt --check",
+      "summary": {
+        "filesSelected": 66,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 66,
+        "filesProcessed": 66,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "cli-lint",
+      "rawReportSha256": "d4bce39e86ff38de7e0f6481b1142df69f0d2e2acd80bc1e7061b290a3396157",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "cli-format",
+      "rawReportSha256": "71c3ea1c383455dd63198cc6fc5a8599a904b3338ee42066420a0a51631204c4",
+      "command": "deno fmt --check",
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gateId": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "durationMs": 23384
+    }
+  ],
+  "docLint": {
+    "changedRedisAndPorts": {
+      "totalPackages": 1,
+      "totalErrors": 0,
+      "totalPrivateTypeRef": 0,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    },
+    "fullBaseline": {
+      "totalPackages": 1,
+      "totalErrors": 1,
+      "totalPrivateTypeRef": 1,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    },
+    "fullImplementation": {
+      "totalPackages": 1,
+      "totalErrors": 1,
+      "totalPrivateTypeRef": 1,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    },
+    "unchangedDiagnostic": "packages/kv/types/watchable-kv.ts private-type-ref"
+  },
+  "preliminaryEvaluation": "Round3 PASS; final exact pushed-head verdict follows in PR evidence.",
+  "requiredCi": "Full scaffold-runtime CI via coordinator-owned e2e-cli-gate; local scaffold.runtime prohibited."
+}

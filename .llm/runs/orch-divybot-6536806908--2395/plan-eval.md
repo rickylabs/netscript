@@ -1,3 +1,8 @@
+# Latest plan status: PASS (authorized second cycle, round 2)
+
+Implementation follows the coordinator-authorized PASS at the end of this record. Earlier
+blocked decisions below are retained historical evidence and are superseded by that PASS.
+
 # PLAN-EVAL decision record
 
 Two permitted rounds completed in the same separate Claude Opus 5.5 high evaluator

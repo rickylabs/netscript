@@ -73,3 +73,69 @@ Executable and Auto paths, with existing-project migration docs. New cycle round
 Authorized cycle round 2: PASS. Independent evaluator confirmed both generator launch
 functions cover every Garnet arm, including Auto fallback. Implementation now authorized.
 Reconcile: no code yet; scaffold CI verdict is required and coordinator will be notified.
+
+## Implementation proof before independent review
+
+- Core acceptance tests: 10 passed on real Redis 7.0.15 and Garnet 2.2.1 (Lua transactional).
+- Whole queue suite: 131 passed, 2 CI-only sentinels ignored; exit 0.
+- Safety/compatibility/lifecycle focused suite: 26 passed, including a separate Garnet with
+  Lua disabled proving that unsupported configuration never removes ready work.
+- Infrastructure generator: 25 passed for both managed Garnet launch functions and Auto arms.
+- Negative control: old main Redis adapter restored temporarily; all 10 core tests fail at
+  runtime, with failures specifically on redelivery, missing heartbeat and stuck attempt 1.
+  The implementation restored in finally; full passing rerun follows.
+- Structured check: all 64 queue TS files and two changed CLI files pass (66 files).
+- Queue lint: 64/64 processed, 0 findings. CLI lint: 2/2 processed, 0 findings, using a
+  standalone config because root intentionally excludes CLI; no gate targets dropped.
+- Quality gate durable receipt: quality:scan + arch:check/dependency checks exit 0.
+- Scoped JSR audit/dry-run: dry-run OK; cardinality advisory recorded as explicit debt.
+- Full-export doc-lint: exactly the existing WatchableKv private-type-ref, also present with
+  old adapter restored; 0 new missing-JSDoc diagnostics. No unrelated KV change.
+- Architecture debt delta recorded in redis-lease-cardinality, with cost/owner/closing gate.
+
+Final restored implementation plus adjacent generator suite: 182 passed, 2 CI-only sentinels
+ignored, exit 0. Publication checks preserve the single verified baseline KV documentation issue.
+Checked the pinned Garnet commit Dockerfile: ENTRYPOINT is /app/GarnetServer with no CMD
+arguments, so adding Lua flags does not replace hidden default port/index command arguments.
+Source: https://github.com/microsoft/garnet/blob/b0255a31de95b1e903ee187feb59ceb04819a639/Dockerfile
+
+Self-review found dangling deadline-index entries could occupy the bounded recovery page.
+Add an atomic missing-record prune (rechecks absence in-script), plus real Redis/Garnet
+100-dangling-entry regressions. This is part of the bounded recovery seam, not scope expansion.
+
+IMPL-EVAL round 1: FAIL_FIX on transient transport ending consumption, external DLQ errors
+ending consumption, and terminal reason priority at the last delivery. All addressed:
+listener readiness/pickup retry availability loss with capped cancellable backoff; settlements
+remain bounded; broken ioredis generations are replaced from duplicate() options; external
+outbox flush is single-flight and independent from lease recovery/consumption; terminal
+requeue:false preserves reason. Add real TCP proxy outage (4 seconds) and startup cancellation
+tests, healthy-next-message during DLQ outage, and last-delivery reason tests. Proxy outage
+plus safety suite now passes 18 tests on real Redis/Garnet.
+
+After all I1–I3 fixes: combined queue + both generator suites PASS, 190 tests passed,
+2 CI-only sentinels ignored, exit 0. Real TCP outage tests prove consumption after a
+four-second disconnection; startup cancellation and lost-ack generation replacement pass.
+Additional source/API/static gates are rerun on this reviewed working tree.
+
+IMPL-EVAL round 2 found I1b: settlement during a handler outage still ended consumption.
+Context ack/nack now use the same cancellable availability loop, while transport attempts
+and standalone operational settlements remain bounded. Fences turn expired retries into
+counted no-ops; a handler's own error still propagates after its fallback nack.
+Real Redis/Garnet busy-handler outage tests now prove both continued consumption and delivery2
+after expiry. Outage+compatibility suite: 16 pass, 1 optional no-Lua probe skipped in that run.
+Feature-tier IMPL-EVAL limit remains 5 rounds; next is round3, same evaluator.
+
+IMPL-EVAL round3 PASS: the independent evaluator re-ran its own busy-handler outage probe on
+Redis and Garnet and confirmed continued consumption, delivery2 and counted stale ack.
+It independently ran 16 core/outage tests with zero failures. No remaining blockers.
+
+Final local combined queue+generator result: 192 passed, 2 CI-only sentinels ignored, exit0.
+Structured check68files, queue lint66files, queue fmt66files, CLI lint/fmt2files: pass.
+Redis-only and ports documentation gate now both exit0 after completing public type exports;
+the full package still has the separately verified unchanged KV private-type-ref baseline.
+JSR audit/publication dry-run OK; F16 navigation debt explicitly recorded.
+
+Reconcile before implementation sign-off: PR #2483 is still draft; no labels/milestones,
+locks/caches or foreign resources changed. Commit/push implementation and run evidence;
+mark ready now that preliminary independent review has no blockers. Required scaffold-runtime
+CI is coordinator-armed; final evaluator must inspect the exact pushed head. No merge here.

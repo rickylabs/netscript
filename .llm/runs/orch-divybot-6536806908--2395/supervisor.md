@@ -23,3 +23,6 @@ if needed: packages/queue/tests/abort-cleanup_test.ts (lease lifecycle stub) onl
 Expanded necessary compatibility scope: CLI helper register/generate-register-infrastructure.ts
 and helper tests/generate-register-infrastructure_test.ts, to enable atomic Lua in all generated
 Garnet launch arms. Record rescope and require coordinator-owned scaffold-runtime CI gate.
+
+Additional evidence-only write surface: .llm/harness/debt/arch-debt.md, recording the
+pre-existing adapters cardinality advisory growing from 15 to 19 due to four cohesive modules.

@@ -84,7 +84,9 @@ reclaimed/deadLettered/staleSettlements; health includes ready/processing/DLQ/ou
 Single-flight bounded recovery runs while handlers run; clear timers on abort/error/stop.
 Reuse existing connections: producer commands keep their policy; the former blocking
 connection owns lease scripts with offline queue and command replay disabled, bounded
-command/connect timeouts and three transport attempts using the same fence. Stop interrupts
+command/connect timeouts and three transport attempts per operation using the same fence.
+Listener startup/pickup and context settlement retry availability with capped cancellable
+backoff until stopped; standalone operational calls remain bounded. Stop interrupts
 the retry wait; closed old contexts cannot reopen a connection. Cached hash retries EVAL on NOSCRIPT.
 
 1. Revised plan and same-session independent PLAN-EVAL, new cycle at most two rounds.
@@ -111,6 +113,8 @@ The generator renders TypeScript directly; no asset-template or embedded-asset c
 JSR audit: optional new ports preserve other adapters. Explicit exported types/JSDoc, unchanged
 export paths, no dependencies/lock changes. Consumer gate: whole queue suite/public checks.
 Relevant doctrine: adapter boundaries, no hidden state, explicit at-least-once lifecycle.
-No debt accepted. Risks and mitigations are locked above. No open design decisions remain.
+Existing adapters cardinality advisory grows from 15 to 19; navigation cost and closing
+F-16 gate are recorded as redis-lease-cardinality in the debt registry. No functional gate
+or acceptance is waived. Risks and mitigations are locked above. No open design decisions remain.
 Deferred: Streams migration, concurrency #2351, other-provider heartbeat and exporter wiring.
 Contributor path: packages/queue/README.md. Write surface in supervisor.md.
