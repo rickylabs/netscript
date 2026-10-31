@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 91,
+  'total': 106,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -589,6 +589,24 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
       'Safe recursive render_ui payload renderer with depth and block-vocabulary guards for Fresh UI generative surfaces.',
   },
   {
+    'name': 'button-group',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Joined native actions with optional separators and text.',
+  },
+  {
+    'name': 'toggle',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native pressed button with controlled or local selection.',
+  },
+  {
+    'name': 'toggle-group',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Single/multiple pressed-button toolbar with roving arrow navigation.',
+  },
+  {
     'name': 'theme-ledger',
     'kind': 'theme',
     'layer': null,
@@ -626,6 +644,78 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': null,
     'description':
       'fluent-2-web language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'radio-group',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native radio fieldset with option labels and descriptions.',
+  },
+  {
+    'name': 'input-group',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native control and addon composition with input styling.',
+  },
+  {
+    'name': 'input-otp',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native one-time code input with grouped visual slots and sanitized paste.',
+  },
+  {
+    'name': 'slider',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'One or two native ranges with keyboard steps and bounded values.',
+  },
+  {
+    'name': 'calendar-date',
+    'kind': 'lib',
+    'layer': 2,
+    'description': 'UTC Gregorian date arithmetic for copied date controls.',
+  },
+  {
+    'name': 'calendar',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Single/range APG day grid with native day and caption controls.',
+  },
+  {
+    'name': 'date-picker',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native modal calendar picker with focus restoration and ISO form values.',
+  },
+  {
+    'name': 'location-marker',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Decorative square location mark with native current-location ownership.',
+  },
+  {
+    'name': 'navigation-menu',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native links and exclusive details disclosures for site navigation.',
+  },
+  {
+    'name': 'stepper',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Ordered progress steps with native links and readable status.',
+  },
+  {
+    'name': 'menu-items',
+    'kind': 'lib',
+    'layer': 2,
+    'description': 'Private copied action/choice/submenu content for application menus.',
+  },
+  {
+    'name': 'menubar',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Roving application menus over package-owned native ActionMenu popovers.',
   },
 ];
 
@@ -714,6 +804,12 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'label',
       'select',
       'form-field',
+      'radio-group',
+      'input-group',
+      'input-otp',
+      'slider',
+      'calendar',
+      'date-picker',
     ],
   },
   {
@@ -773,6 +869,27 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'desktop-window-chrome',
       'desktop-update-prompt',
       'desktop-only',
+    ],
+  },
+  {
+    'name': 'actions',
+    'items': [
+      'theme-seed',
+      'button',
+      'icon-button',
+      'button-group',
+      'toggle',
+      'toggle-group',
+    ],
+  },
+  {
+    'name': 'navigation',
+    'items': [
+      'theme-seed',
+      'location-marker',
+      'navigation-menu',
+      'menubar',
+      'stepper',
     ],
   },
 ];
