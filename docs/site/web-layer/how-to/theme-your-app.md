@@ -8,9 +8,8 @@ order: 104
 
 # Theme your app
 
-A scaffolded Fresh app has one theme and one chrome, and every page gets both. This recipe shows how
-the theme reaches each page, how to switch or tune it, and what a new page inherits. New apps start
-on Studio Utility: ink on neutral gray, sharp corners, hairline rules, and compact density.
+A scaffolded Fresh app has one theme and one chrome, and every page gets both. New apps start on
+Studio Utility: ink on neutral gray, sharp corners, hairline rules, and compact density.
 
 Paths are relative to the Fresh app, such as `apps/dashboard/`. In a workspace with several apps,
 add `--app <name>` to the `ui:*` and `tokens` commands. For routes, islands, and registry
@@ -24,11 +23,11 @@ Generated files hold the values, and the app shell stamps the selected preset on
 apps/dashboard/
 ├── client.ts                     # [owned] imports assets/styles.css on every route
 ├── navigation.ts                 # [owned] top-bar links and chrome opt-outs
-├── tokens.config.json            # [owned] the selected preset, written by ui:apply and tokens init
+├── tokens.config.json            # [owned] the selected preset
 ├── tokens/semantic.tokens.json   # [owned] your alias overrides
 ├── lib/theme.ts                  # [owned] reads theme-preset.json and fonts.json
 ├── assets/
-│   ├── styles.css                # [owned] Tailwind, the tokens, and the component stylesheets
+│   ├── styles.css                # [owned] Tailwind, tokens, component CSS
 │   ├── ui/                       # [owned] one stylesheet per component
 │   ├── tokens.css                # [generated] the --ns-* tokens, light and dark
 │   ├── theme-bridge.css          # [generated] Tailwind utilities such as bg-ns-surface
@@ -97,7 +96,7 @@ before any file changes.
 `netscript ui:preset url --theme studio-cloud` prints a share link, and
 `netscript ui:preset decode <code>` reads a code.
 
-A new app takes the same flag, so it starts on that preset:
+A new app takes the same flag:
 
 ```sh
 netscript init my-app --preset studio-cloud
@@ -239,8 +238,8 @@ data-attribute contract the current styles use. Preview it with `--dry-run`.
 ## Check your work
 
 In development, open `/design/components` and `/design/tokens` to see the components and tokens
-under the active preset. They exist in development only. Then open the pages you changed, flip
-`ThemeToggle`, and check light and dark, including the empty, loading, and error states.
+under the active preset. Then open the pages you changed, flip `ThemeToggle`, and check light and
+dark, including the empty, loading, and error states. The `/design` routes exist in development only.
 
 ## Next steps
 

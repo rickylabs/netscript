@@ -40,6 +40,7 @@ an existing host, but they shouldn't be the first construction you copy into a N
 | Load data for a typed page | [`definePage().withResource(...)`](/web-layer/builders/) | Keeps route data in the page builder instead of recreating an Express-style loader. |
 | Keep island data live | [`useLiveQuery`](/web-layer/query/) | Uses the package-owned query bridge, hydration, and cleanup rather than a hand-rolled polling loop. |
 | Add or customize UI | [`netscript ui:add`]({{ "howto:customize-fresh-ui" |> xref |> url }}) | Copies registry source and its token-driven styles into the app you own. |
+| Theme the whole app | [`netscript ui:apply`](/web-layer/how-to/theme-your-app/) | Switches the app-wide preset and rebuilds the tokens instead of editing generated CSS or theming one page. |
 | Deploy to Google Cloud | [`netscript deploy cloud-run`]({{ "howto:deploy" |> xref |> url }}) | Uses the first-class target lifecycle (`plan`, `up`, `down`) instead of an unrelated deployment wrapper. |
 | Back TanStack DB with a service | [`@netscript/sdk/collections`](/reference/sdk/#collections-netscriptsdkcollections) | Builds the collection from the typed service/query surface. |
 | Connect a typed client to TanStack Query | [`@netscript/sdk/query-client`](/services-sdk/sdk/#service-discovery-query-client) | Supplies NetScript query keys, invalidation, persistence, and service utilities. |
