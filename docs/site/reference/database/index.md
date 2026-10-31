@@ -84,9 +84,14 @@ Exported from `@netscript/database/connection-strings/postgres`, without loading
 `normalizePostgresConnectionString` preserves PostgreSQL URIs byte-for-byte and translates Npgsql
 key/value strings, including explicit TLS modes and encoded credentials. Unsupported settings and
 malformed input throw `PostgresConnectionStringError` with a typed
-`PostgresConnectionStringErrorReason`: `unsupported-key`, `unsupported-value`, or `invalid-format`.
-Certificate settings and `SSL Mode=Allow` are refused. Generated Postgres modules and Prisma config
-inline this maintained implementation; their environment wrapper trims whitespace before conversion.
+`PostgresConnectionStringErrorReason`: `duplicate-key`, `unsupported-key`, `unsupported-value`, or
+`invalid-format`. Duplicate keys, case variants and aliases are refused even when their values are
+identical; the error's `key` identifies the canonical lowercase option, and its message omits
+values. TLS modes accept both Npgsql `VerifyCA`/`VerifyFull` and libpq `verify-ca`/`verify-full`
+spellings, case-insensitively. Decimal ports are canonicalized (`Port=05432` becomes `:5432`).
+Quoted delimiters and doubled quote escapes are preserved. Certificate settings and `SSL Mode=Allow`
+are refused. Generated Postgres modules and Prisma config inline this maintained implementation;
+their environment wrapper trims whitespace before conversion.
 
 ### SQL Server adapter
 
