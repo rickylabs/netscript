@@ -154,3 +154,19 @@ retaining all legacy/runtime/syntax guards. Prove unchanged UI/browser bytes and
 root import maps, rerun affected package/release/carrier/quality checks and obtain
 the same integration review. No push yet; exactremotelease remains71d8df6f.
 Childd0d8d922 restack and full11b/12/13 still required, no READY.
+
+Recovery7 latest-base continuation now on f4aa307b at adc94477. Rendering/browser
+source equality620/623, only main-owned registry README/test/fixture differences;
+imports unchanged and all3topiclockdeltas0. Current63affected tests and one-file
+wrappers PASS. Current-head quality/nativepublication0slowtypes and all4carrier
+checks PASS; raw tracked tree clean before notes, actual generated delta0. Prior
+318/44/12 browser proof reused only via verified identical rendering sources/maps,
+not claimed as new runs. Same latest-base source/evidence review next before
+exact-lease parent push, then required child restack and11b/12/13. No READY.
+
+Recovery7 latest-base continuation same independent source/evidence PASS at
+adc94477 on f4aa307b, failure streak0. Current63tests/wrappers/quality/pub and
+all4carriers reconcile; predecessor renderer/browser proof is scoped by byte
+identity. Evidence-only commit then verify remote main/parent, mandatory public
+audit and exact-lease parent push. Childd0d8d922 restack/freshgates/review next
+before11b; full11b/12/13 remains required, no READY or final publication.
