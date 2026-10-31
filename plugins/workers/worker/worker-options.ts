@@ -1,3 +1,4 @@
+import type { JobDeadLetterStorePort } from './job-dead-letters.ts';
 import type { MessageContext, MessageQueue } from '@netscript/queue';
 import type {
   JobDefinition,
@@ -135,6 +136,8 @@ export interface WorkerOptions {
   queueName?: string;
   /** Optional job queue; this worker owns and stops the supplied queue. */
   queue?: MessageQueue<JobMessage>;
+  /** Durable terminal job storage; defaults to a namespaced KV store. */
+  deadLetters?: JobDeadLetterStorePort;
   /** Optional task queue; this worker owns and stops the supplied queue. */
   taskQueue?: MessageQueue<TaskMessage>;
   /** Number of concurrent jobs to process. */
@@ -199,6 +202,8 @@ export interface WorkerJobResult {
 
 /** Context required by worker job dispatch helpers. */
 export interface WorkerDispatchContext {
+  readonly deadLetters: JobDeadLetterStorePort;
+  readonly queueName?: string;
   readonly workerId: string;
   /** Configured queue delivery concurrency, also reported on completed job spans. */
   readonly concurrency: number;

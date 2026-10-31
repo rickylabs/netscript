@@ -1,3 +1,4 @@
+import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import {
   assert,
   assertEquals,
@@ -394,6 +395,7 @@ function dispatchContext(
 ): WorkerDispatchContext {
   return {
     workerId: 'worker-test',
+    deadLetters: new KvDeadLetterStore<JobMessage>({ queueName: 'job-failures', kv: options.kv }),
     concurrency: 1,
     registry: new SingleJobRegistry(options.job ? { maxRetries: 0, ...options.job } : undefined),
     executionState: options.executionState,

@@ -14,7 +14,11 @@
   independent retry behavior into an unrelated contract file.
 - **Notes:** Cost is one additional sibling to navigate; no dependency-direction violation or
   runtime overhead is accepted. Existing parent/executor-adapter cardinality warnings predate this
-  change.
+  change. The plugin's already-over-cap `worker/` directory grows from 22 to 25 immediate children:
+  one retry regression file, one typed job DLQ specialization module and its regression file.
+  Cost is three more sibling entries in the existing runtime folder. The same maintainers' next
+  worker organization review owns that F-16 follow-up; closing evidence must also remove this
+  folder-cardinality increase without combining independent runtime concerns.
 
 Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2026-04-29. Entries
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`

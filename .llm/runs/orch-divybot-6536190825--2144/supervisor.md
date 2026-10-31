@@ -12,3 +12,4 @@
 - Runtime acceptance: use local structured gates, real KV and available Redis queue adapters; scaffold.runtime is CI-only by owner instruction.
 - Public artifacts contain only repository-relative paths and no private runtime/session details.
 - Scoped debt writes: append only the issue-2144 domain-cardinality entry to `.llm/harness/debt/arch-debt.md`; the new cohesive retry policy raises immediate domain children from 12 to 13, so retain explicit follow-up cost rather than reshuffling unrelated domain files.
+- S2 health transport scope: `packages/plugin/src/presentation/run-child-health-process.ts` and its focused health test may add backward-compatible async snapshot support. This lets each workers health request await durable DLQ depth instead of reporting a stale process-local counter. Generated workers runtime glue and bin/runtime.ts carry the compatible async reader; no listener-supervisor change.

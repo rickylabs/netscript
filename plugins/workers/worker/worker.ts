@@ -1,3 +1,5 @@
+import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
+import { JOB_DEAD_LETTER_NAMESPACE, type JobDeadLetterStorePort } from './job-dead-letters.ts';
 /**
  * Worker process for the NetScript workers plugin.
  *
@@ -46,6 +48,8 @@ export type {
 
 /** Health snapshot for a worker runtime. */
 export interface WorkerHealthStatus {
+  /** Durable job dead-letter sample, populated by readHealthStatus(). */
+  readonly deadLetters?: Readonly<{ available: boolean; depth: number | null }>;
   /** Aggregate worker health state. */
   readonly status: 'healthy' | 'degraded';
   /** Shared child health contract for the background health route. */
@@ -67,6 +71,8 @@ export interface WorkerHealthStatus {
 
 /** Worker process that consumes queued jobs and tasks for one runtime instance. */
 export class Worker {
+  /** Durable terminal job store; also supports listing and controlled reprocessing. */
+  readonly deadLetters: JobDeadLetterStorePort;
   private readonly workerId: string;
   private readonly queueName: string;
   private readonly concurrency: number;
@@ -100,6 +106,9 @@ export class Worker {
   constructor(options: WorkerOptions) {
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
+    this.deadLetters = options.deadLetters ?? new KvDeadLetterStore<JobMessage>({
+      queueName: `${JOB_DEAD_LETTER_NAMESPACE}:${this.queueName}`,
+    });
     this.suppliedQueue = options.queue;
     this.suppliedTaskQueue = options.taskQueue;
     this.concurrency = options.concurrency ?? 1;
@@ -172,6 +181,22 @@ export class Worker {
       childHealth,
       listeners,
     };
+  }
+
+  /** Read current durable DLQ depth; a storage outage makes dependency health unavailable. */
+  async readHealthStatus(): Promise<WorkerHealthStatus> {
+    try {
+      const depth = await this.deadLetters.depth();
+      return { ...this.healthStatus, deadLetters: { available: true, depth } };
+    } catch {
+      const health = this.healthStatus;
+      return {
+        ...health,
+        status: 'degraded',
+        childHealth: { ...health.childHealth, dependencyReady: false },
+        deadLetters: { available: false, depth: null },
+      };
+    }
   }
 
   /** Start queue consumption for this worker instance. */
@@ -360,6 +385,8 @@ export class Worker {
   private dispatchContext(): WorkerDispatchContext {
     return {
       workerId: this.workerId,
+      deadLetters: this.deadLetters,
+      queueName: this.queueName,
       concurrency: this.concurrency,
       registry: this.registry,
       executionState: this.executionState,

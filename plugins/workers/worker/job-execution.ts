@@ -20,6 +20,7 @@ export async function executeWorkerJob(
   signal: AbortSignal,
   traceHeaders: Record<string, string>,
   correlationId?: string,
+  onAttempt?: (attempt: number) => void,
 ): Promise<WorkerJobResult> {
   return await executeJobWithRetry(
     async () => {
@@ -37,7 +38,7 @@ export async function executeWorkerJob(
         : await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
     },
     resolveJobRetryPolicy(jobDef, jobDef.handler),
-    { signal, clock: context.retryClock },
+    { signal, clock: context.retryClock, onAttempt },
   );
 }
 

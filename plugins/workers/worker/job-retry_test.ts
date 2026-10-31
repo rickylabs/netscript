@@ -1,3 +1,4 @@
+import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import { assertEquals } from '@std/assert';
 import { DenoKvAdapter as KvStoreAdapter } from '@netscript/kv';
 import { KvPollingAdapter } from '@netscript/queue/adapters/kv-polling';
@@ -103,6 +104,7 @@ for (const adapter of ['kv-polling', 'deno-kv', 'redis'] as const) {
         assertEquals(calls, 1);
         assertEquals(clock.delays, []);
         assertEquals(harness.completed.map((result) => result.status), ['failed']);
+        assertEquals(await harness.context.deadLetters.depth(), 1);
       } finally {
         await queue.stop();
         await harness.context.workerPool.shutdown();
@@ -167,6 +169,7 @@ Deno.test('Worker KV listener replays a job after shutdown during backoff and re
   const queue = makeQueue('kv-polling', kv) as KvPollingAdapter<JobMessage>;
   const options = {
     workerId: 'shutdown-replay',
+    deadLetters: harness.context.deadLetters,
     queue,
     registry: harness.context.registry,
     taskRegistry: harness.context.taskRegistry,
@@ -186,6 +189,7 @@ Deno.test('Worker KV listener replays a job after shutdown during backoff and re
     await bounded(started);
     assertEquals((await queue.getStats()).pending, 1, 'shutdown must preserve the queued job');
     assertEquals(disposed, 1);
+    assertEquals(await harness.context.deadLetters.depth(), 0);
     next = new Worker({
       ...options,
       retryClock: new RetryClock(),
@@ -242,6 +246,10 @@ Deno.test('polyglot timeout is terminal after one attempt and records timeout wi
     assertEquals(calls, 1);
     assertEquals(clock.delays, []);
     assertEquals(harness.completed.map((result) => result.status), ['timeout']);
+    const records = await harness.context.deadLetters.list();
+    assertEquals(records.length, 1);
+    assertEquals(records[0].deliveryCount, 1);
+    assertEquals(records[0].errorCode, 'job.timeout');
   } finally {
     await harness.context.workerPool.shutdown();
   }
@@ -266,6 +274,7 @@ async function dispatchHarness(kv: Deno.Kv, job: JobDefinition, retryClock: JobR
   let executions = 0;
   const context: WorkerDispatchContext = {
     workerId: 'retry-test',
+    deadLetters: new KvDeadLetterStore<JobMessage>({ queueName: 'job-failures', denoKv: kv }),
     concurrency: 1,
     registry: { get: () => Promise.resolve(job) },
     taskRegistry: { get: () => Promise.resolve(undefined) },

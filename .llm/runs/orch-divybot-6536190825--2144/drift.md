@@ -4,3 +4,4 @@
 - RTK is not installed; focused direct commands and repository structured gate wrappers are used.
 - Specific owner process wins over generic assignment boilerplate: Refs only and no labels/milestones. Final publication uses the file handoff.
 - Merged current main at `6a71cd0599673d70cd6311de3bb20b2d6a9dde2c` after the repository quality scan identified the already-fixed markdown fixture unsafe cast. The main commit changes only documentation fixtures and its retained run artifacts; the assigned worker surface is unchanged.
+- S2 resolves the synchronous health-reader constraint with additive async snapshot support in the shared child health process. Existing synchronous readers remain supported. Worker health requests can then await durable DLQ depth, including changes made by reprocess or another process, without timers or cached counters.

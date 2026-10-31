@@ -40,3 +40,16 @@ PASS from the same independent evaluator before any implementation. See plan-eva
 - Final S1 regression suite: 114 passed, 0 failed, 4 unavailable Redis integrations ignored; structured check/lint/fmt for all 20 changed TS files: exit 0. Full maintained-source check: 218 files, zero errors. quality:gate: exit 0. JSR package audit: exit 0, dry-run OK; one additional F-16 domain child is recorded as WORKERS-RETRY-DOMAIN-CARDINALITY debt with owner/closing gate.
 - Negative controls confirmed the production Worker listener rethrow and polyglot timeout guard independently; zero-retry off-by-one mutant fails both KV cases. All fixed source restored before final gates.
 - S1 reconcile: main's #2480 fix is incorporated without worker overlap; issue scope unchanged, no labels/milestones changed, PR remains draft. Continue to S2 only after this slice is committed and pushed.
+
+## S2 progress
+
+- JobDeadLetterStorePort specializes the canonical queue append/list/reprocess/depth contract; Worker defaults it to a distinct KV namespace and exposes it for inspection/reprocess.
+- Exhausted returned and thrown failures, timeouts and unroutable jobs await durable append. Shutdown and user cancel do not poison the DLQ. Failed appends propagate through the actual Worker listener after claim release.
+- The retry executor reports attempt admission so thrown exhaustion and timeouts retain actual attempt counts.
+- Worker.readHealthStatus queries durable depth on each call, including external reprocess changes; storage failure marks dependency readiness unavailable. Compatible async child readers carry that data through the generated background health HTTP route.
+- Focused runtime/CLI/health regression: 128 passed, 0 failed, four Redis integrations unavailable. Includes default KV port, real-KV terminal ack ordering, thrown/returned exhaustion, zero retries, storage-outage redelivery, health/reprocess depth, user cancellation, disabled jobs and real HTTP async health transport.
+- All four S2 negative controls exited 1 with the intended assertions; fixed files restored afterwards.
+- Investigated user-reported command-postgres red. Fresh current main reproduces the same generated-fixture OpenTelemetry logs-export error before test execution. Public links and exact classification are in ci-baseline.md; no unrelated dependency or lock changes made.
+- S2 supervisor review: PASS in slice-2-review.md. Closed its thrown-exhaustion advisory by making the two-retry real-KV test throw from the handler; the zero-retry case returns failure. Remaining bounded at-least-once replay/pre-dispatch diagnostics are documented limitations, not blockers.
+- Final S2 regression: 135 passed, 0 failed, four unavailable Redis cases ignored. Structured check/lint/fmt over all 14 changed TS files exit 0; quality:gate exits 0; workers plugin JSR audit/dry-run exits 0. Full plugin doc-lint has only the same two inherited contract-type references after exporting all new sibling type dependencies.
+- S2 reconcile: no review comments or threads from other authors; command-postgres red confirmed independently on current main. PR remains draft; labels and milestone are coordinator-owned. S3 proceeds only after S2 commit/push.

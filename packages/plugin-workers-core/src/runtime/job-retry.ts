@@ -6,12 +6,18 @@ import { WebPlatformJobRunnerClock } from '../adapters/web-platform-job-runner-c
 export async function executeJobWithRetry<T extends { readonly success: boolean }>(
   execute: () => Promise<T>,
   policy: JobRetryPolicy,
-  options: Readonly<{ signal: AbortSignal; clock?: JobRunnerClock }>,
+  options: Readonly<{
+    signal: AbortSignal;
+    clock?: JobRunnerClock;
+    /** Observe an attempt immediately before its handler is invoked. */
+    onAttempt?: (attempt: number) => void;
+  }>,
 ): Promise<T & { readonly attempts: number }> {
   const clock = options.clock ?? new WebPlatformJobRunnerClock();
   for (let attempt = 0;; attempt++) {
     options.signal.throwIfAborted();
     try {
+      options.onAttempt?.(attempt + 1);
       const result = await execute();
       options.signal.throwIfAborted();
       if (result.success || attempt === policy.maxRetries) {
