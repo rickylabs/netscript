@@ -1,11 +1,13 @@
 import { createWatcher } from '@netscript/watchers';
-import { assert, assertEquals, assertThrows } from '@std/assert';
+import { defineFileWatch } from '../builders/mod.ts';
+import { assert, assertEquals, assertMatch, assertNotEquals, assertThrows } from '@std/assert';
 import { deadline, delay } from '@std/async';
 import { FakeTime } from 'jsr:@std/testing@^1/time';
 import type { FileWatchDefinition, TriggerEvent, TriggerId } from '../domain/mod.ts';
 import type { FileWatchStatusEvent } from '../ports/mod.ts';
 import {
   type RuntimeWatchEvent,
+  type RuntimeWatchFileInfo,
   WatchersFileWatcherAdapter,
 } from './watchers-file-watcher-adapter.ts';
 
@@ -323,3 +325,111 @@ Deno.test('callback cancellation still works after the same adapter drains and r
     await Deno.remove(root, { recursive: true });
   }
 });
+
+const MODIFIED_AT = new Date('2026-10-30T12:00:00.000Z');
+const OBSERVATION: RuntimeWatchEvent = {
+  path: '/incoming/state.json',
+  kind: 'modify',
+  timestamp: MODIFIED_AT,
+  fileInfo: { modifiedAt: MODIFIED_AT, size: 0 },
+};
+
+Deno.test('file-watch keys identify all five change fields across adapter restarts', async () => {
+  const [original] = await observe([OBSERVATION]);
+  assert(original.idempotencyKey !== undefined, 'adapter must provide an explicit change key');
+  assertMatch(original.idempotencyKey, /^file-watch:[0-9a-f]{64}$/);
+  const [duplicate] = await observe(
+    [{
+      ...OBSERVATION,
+      timestamp: new Date('2026-10-30T12:00:02.000Z'),
+      contentHash: 'incidental-content-hash',
+    }],
+    'file-change',
+    3,
+  );
+  assertEquals(duplicate.idempotencyKey, original.idempotencyKey);
+
+  const changed = await observe([
+    { ...OBSERVATION, path: '/incoming/other.json' },
+    { ...OBSERVATION, kind: 'create' },
+    { ...OBSERVATION, fileInfo: { modifiedAt: new Date(MODIFIED_AT.getTime() + 1), size: 0 } },
+    { ...OBSERVATION, fileInfo: { modifiedAt: MODIFIED_AT, size: 1 } },
+  ]);
+  const [otherTrigger] = await observe([OBSERVATION], 'other-trigger');
+  const keys = [...changed, otherTrigger].map((event) => event.idempotencyKey);
+  assertEquals(new Set([original.idempotencyKey, ...keys]).size, 6);
+  for (const key of keys) assertMatch(key!, /^file-watch:[0-9a-f]{64}$/);
+});
+
+for (
+  const [label, fileInfo] of [
+    ['absent', undefined],
+    ['null', null],
+    ['empty', {}],
+    ['size only', { size: 0 }],
+    ['mtime only', { modifiedAt: MODIFIED_AT }],
+    ['null mtime', { size: 0, modifiedAt: null }],
+  ] satisfies Array<[string, RuntimeWatchFileInfo | null | undefined]>
+) {
+  Deno.test(`file-watch ${label} metadata uses per-observation UUIDs across adapter restarts`, async () => {
+    const raw = { ...OBSERVATION, fileInfo };
+    const first = await observe([raw, raw]);
+    const second = await observe([raw]);
+    const keys = [...first, ...second].map((event) => event.idempotencyKey);
+    assertEquals(new Set(keys).size, 3);
+    for (const key of keys) {
+      assertMatch(key!, /^file-watch:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/);
+    }
+    // The restarted counter is intentionally unsuitable as a change identity.
+    assertEquals(first[0].id, second[0].id);
+    assertNotEquals(first[0].idempotencyKey, second[0].idempotencyKey);
+  });
+}
+
+/** Exercise the production adapter with only the external observation stream controlled. */
+async function observe(
+  observations: readonly RuntimeWatchEvent[],
+  id = 'file-change',
+  stableChecks = 1,
+): Promise<TriggerEvent<'file-watch'>[]> {
+  const finished = Promise.withResolvers<void>();
+  const sourceStopped = Promise.withResolvers<void>();
+  const events: TriggerEvent<'file-watch'>[] = [];
+  const errors: unknown[] = [];
+  const adapter = new WatchersFileWatcherAdapter({
+    watcherFactory: () => ({
+      async *watch() {
+        try {
+          yield* observations;
+          finished.resolve();
+          await sourceStopped.promise;
+        } finally {
+          finished.resolve();
+        }
+      },
+      stop: () => sourceStopped.resolve(),
+    }),
+    onError: (error) => {
+      errors.push(error);
+    },
+  });
+  const definition = defineFileWatch(() => Promise.resolve([]), {
+    id,
+    paths: ['/incoming'],
+    patterns: ['*.json'],
+    on: ['create', 'modify', 'remove'],
+    stabilityThreshold: { checkIntervalMs: 1, stableChecks },
+  });
+  try {
+    await adapter.watch(definition, (event) => {
+      events.push(event);
+      return Promise.resolve();
+    });
+    await deadline(finished.promise, 5_000);
+    assertEquals(errors, []);
+    assertEquals(events.length, observations.length);
+    return events;
+  } finally {
+    await adapter.stop();
+  }
+}

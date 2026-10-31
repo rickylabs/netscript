@@ -22,6 +22,8 @@ const [WATCHING, UNAVAILABLE] = FILE_WATCH_STATES;
 const INITIAL_RETRY_DELAY_MS = 250;
 const MAX_RETRY_DELAY_MS = 30_000;
 
+const FILE_WATCH_KEY_PREFIX = 'file-watch:';
+
 /** Minimal file metadata emitted by a runtime watcher. */
 export type RuntimeWatchFileInfo = Readonly<{
   size?: number;
@@ -259,7 +261,8 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
 
   async #dispatch(record: WatchersFileWatcherRecord, event: RuntimeWatchEvent): Promise<void> {
     try {
-      await this.#invokeCallback(() => record.handler(this.#eventFor(record, event)));
+      const triggerEvent = await this.#eventFor(record, event);
+      await this.#invokeCallback(() => record.handler(triggerEvent));
     } catch (error) {
       await this.#reportError(error, stripRuntime(record));
     }
@@ -292,30 +295,55 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     return true;
   }
 
-  #eventFor(
+  async #eventFor(
     record: WatchersFileWatcherRecord,
     event: RuntimeWatchEvent,
-  ): TriggerEvent<'file-watch', FileWatchTriggerPayload> {
+  ): Promise<TriggerEvent<'file-watch', FileWatchTriggerPayload>> {
     this.#sequence += 1;
+    const id = `file_watch_${this.#sequence}` as TriggerEventId;
     const detectedAt = event.timestamp.toISOString();
+    const payload: FileWatchTriggerPayload = {
+      path: event.path,
+      kind: event.kind as FileWatchLifecycle,
+      size: event.fileInfo?.size,
+      modifiedAt: event.fileInfo?.modifiedAt?.toISOString(),
+      stableChecks: record.definition.stabilityThreshold?.stableChecks,
+    };
     return {
-      id: `file_watch_${this.#sequence}` as TriggerEventId,
+      id,
       triggerId: record.id,
       kind: 'file-watch',
       status: 'pending',
-      payload: {
-        path: event.path,
-        kind: event.kind as FileWatchLifecycle,
-        size: event.fileInfo?.size,
-        modifiedAt: event.fileInfo?.modifiedAt?.toISOString(),
-        stableChecks: record.definition.stabilityThreshold?.stableChecks,
-      },
+      payload,
+      idempotencyKey: await fileChangeKey(record.id, payload),
       attempt: 0,
       detectedAt,
       updatedAt: this.#now().toISOString(),
       metadata: event.contentHash === null ? undefined : { contentHash: event.contentHash },
     };
   }
+}
+
+/** Bound metadata identities for KV; without a complete snapshot each observation is distinct. */
+async function fileChangeKey(
+  triggerId: TriggerId,
+  payload: FileWatchTriggerPayload,
+): Promise<string> {
+  if (payload.modifiedAt === undefined || payload.size === undefined) {
+    return `${FILE_WATCH_KEY_PREFIX}${crypto.randomUUID()}`;
+  }
+  const identity = JSON.stringify([
+    triggerId,
+    payload.path,
+    payload.kind,
+    payload.modifiedAt,
+    payload.size,
+  ]);
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identity));
+  const hex = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(
+    '',
+  );
+  return `${FILE_WATCH_KEY_PREFIX}${hex}`;
 }
 
 function stripRuntime(record: WatchersFileWatcherRecord): FileWatcherHandle {
