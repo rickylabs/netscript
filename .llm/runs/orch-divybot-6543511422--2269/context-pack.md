@@ -1,10 +1,15 @@
 # Resume
 
-Issue 2269, E2, coordinator 2474, draft PR 2529. PLAN-EVAL passed round 2 before code.
-S1 shared corpus/canonical lookup/citations/lazy decoding passed independent supervisor review.
-S1 76 tests, MCP check/lint/doc-lint/publish dry-run and quality:gate passed. See worklog.md.
-S2 pending: original-intent coverage confidence, issue fixture, and full-corpus golden ranking repair.
-Golden plugin case may assert only its two specific related routes (reviewer explicitly permits);
-score-only ownership-vs-integration ranking must be fixed, not snapshot unrelated pages.
-No local scaffold runtime; no labels/milestones, merge/tag/release, rebase or force push.
-Final report uses excluded .divybot-final-report.md atomic handoff. No private metadata in Git.
+Issue 2269, E2, coordinator 2474, PR 2529. PLAN-EVAL round 2 PASS before implementation;
+S1 and S2 independent supervisor reviews PASS. Full selected suite 303 PASS, no ignored tests;
+MCP check/lint/fmt/doc-lint and quality:gate PASS. Seven confidence negative controls are red
+when original behavior returns; page context restores old ownership expectations.
+
+Shared corpus is @netscript/mcp/docs, loaded lazily from release adapter. Literal search retains
+identifier fragments. CI docs export-reference omission repaired and canonical carrier refreshed.
+Read worklog.md and supervisor-review-s2.md for proof and fixture classifications.
+
+Next: push S2, run committed-head carrier freshness and export generator tests, final independent
+IMPL-EVAL in a new Anthropic session, mark ready when no blockers, record CI snapshot at final
+pushed head, review-thread gate, then canonical .divybot-final-report.md atomic file handoff.
+No local scaffold runtime, labels/milestones, merge/tag/release, rebase or force push.

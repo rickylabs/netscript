@@ -21,11 +21,10 @@
     },
     {
       "intent": "add a capability NetScript does not ship",
-      "mode": "exact",
+      "mode": "ordered-prefix",
       "expected": [
         "pages/explanation/plugin-system#a-plugin-is-a-thin-layer-over-a-core-package",
-        "pages/orchestration-runtime/how-to/author-a-plugin#step-1-scaffold-the-two-tier-skeleton",
-        "llms#learn"
+        "pages/orchestration-runtime/how-to/author-a-plugin#step-1-scaffold-the-two-tier-skeleton"
       ]
     },
     {

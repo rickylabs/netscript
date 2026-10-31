@@ -14,3 +14,6 @@ Owner requested implementer effort: high. Evaluators are Anthropic family, separ
 PLAN-EVAL limit 2; IMPL-EVAL limit 5; two consecutive terminal failures stop the loop.
 Use repository claude-print launcher. Preserve evaluator across repair rounds with resume.
 Public records omit private operational metadata per assignment. Raw evaluator streams stay outside Git.
+
+S2 write surface also includes docs/site/reference/mcp/index.md and its export-coverage inventory,
+required by CI to document the new public docs subpath.

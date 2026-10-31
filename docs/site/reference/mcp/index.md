@@ -21,6 +21,7 @@ MCP fit together. The complete symbol list is in
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/mcp` | `./mod.ts` | [Tool contracts](#tool-contracts), the registry, the protocol runner, [ports](#ports) and [default adapters](#default-adapters). |
+| `@netscript/mcp/docs` | `./docs.ts` | Complete shared release Markdown pages, integrity-checked decoding, and derived full-corpus composition. |
 | `@netscript/mcp/cli` | `./cli.ts` | [Executable composition](#netscriptmcpcli) that binds the real telemetry, docs, doctor and process adapters. |
 | `@netscript/mcp/openapi-projection` | `./openapi-projection.ts` | OpenAPI operation projection used by the API introspection tools. |
 
@@ -84,6 +85,19 @@ required result fields are in the Standard Schema contracts (`TOOL_INPUT_SCHEMAS
 | `list_api_services`           | —                                                     | Service status, URLs, optional operation count, conflicts, and verbatim discovery source outcomes                                                                 |
 | `list_service_operations`     | **`service`**, `filter`, `limit`                      | Bounded operation rows with optional `access`, plus `truncated` metadata                                                                                          |
 | `get_operation_schema`        | **`service`**, **`operation`**, `view`                | Projected schema view, operation identity, optional `access`, access-aware `curlExample`, and `authNote`                                                          |
+
+### Shared release corpus
+
+MCP and the CLI offline documentation installer read the same full generated page carrier through
+`@netscript/mcp/docs`. The subpath exports `EMBEDDED_AGENT_DOCS_PAGES`, the `AgentDocsPage` tuple,
+`decodeAgentDocsPages` (gzip/size/SHA-256 verification), and `agentDocsFullCorpus` (the derived
+concatenation). The corpus is decoded lazily for MCP documentation requests. Other MCP imports
+load only the small release metadata.
+
+Release `list_docs`, `get_doc`, `find_guidance`, and `search_docs` results include `citation` with
+`frameworkVersion` and the content-addressed corpus `sha256`. Canonical page lookup accepts a
+slug with or without `pages/` and a trailing `/index`. An empty literal search carries low
+confidence and an explicit no-seam-documented fallback directing API queries to the export tools.
 
 ### Faithful documentation retrieval
 

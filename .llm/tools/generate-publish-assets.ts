@@ -308,11 +308,14 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
   if (payload.schemaVersion !== 1 || !payload.files || typeof payload.files !== 'object') {
     throw new Error('agent docs prose payload must use schema version 1');
   }
-  const documents = Object.keys(payload.files).filter((path) => path !== 'llms-full.txt').sort().map((path) => {
-    const source = payload.files[path];
-    if (typeof source !== 'string') throw new Error(`agent docs prose payload is missing ${path}`);
-    return { path, slug: normalizeDocsSlug(path), source };
-  });
+  const documents = Object.keys(payload.files).filter((path) => path !== 'llms-full.txt').sort()
+    .map((path) => {
+      const source = payload.files[path];
+      if (typeof source !== 'string') {
+        throw new Error(`agent docs prose payload is missing ${path}`);
+      }
+      return { path, slug: normalizeDocsSlug(path), source };
+    });
   const canonical = documents.map(({ path, source }) => `${path}\0${source}`).join('\0');
   const sourceBytes = documents.reduce(
     (total, document) => total + new TextEncoder().encode(document.source).byteLength,

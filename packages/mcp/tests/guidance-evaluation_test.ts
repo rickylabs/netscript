@@ -9,7 +9,7 @@ import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corp
 
 interface EvaluationCase {
   readonly intent: string;
-  readonly mode: 'exact' | 'rank-one' | 'required-set';
+  readonly mode: 'exact' | 'rank-one' | 'required-set' | 'ordered-prefix';
   readonly rankingAxis?: 'score';
   readonly expected: readonly string[];
 }
@@ -61,6 +61,14 @@ function assertExpectedTopThree(evaluation: EvaluationCase, result: GuidanceResu
   const actual = result.recommendations.slice(0, 3).map(({ slug, section }) =>
     `${slug}#${section}`
   );
+  if (evaluation.mode === 'ordered-prefix') {
+    assertEquals(
+      actual.slice(0, evaluation.expected.length),
+      evaluation.expected,
+      evaluation.intent,
+    );
+    return;
+  }
   if (evaluation.mode === 'rank-one') {
     assertEquals(actual.slice(0, 1), evaluation.expected, evaluation.intent);
     return;

@@ -1,8 +1,5 @@
 import { assertEquals } from '@std/assert';
-import {
-  agentDocsFullCorpus,
-  decodeAgentDocsPages,
-} from '../../../packages/mcp/docs.ts';
+import { agentDocsFullCorpus, decodeAgentDocsPages } from '../../../packages/mcp/docs.ts';
 import { EMBEDDED_AGENT_DOCS_PAGES } from '../../../packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts';
 import { decodeExportSurfaceRows } from '../../../packages/mcp/src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
 import type { EXPORT_SURFACE_ROWS } from '../../../packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts';

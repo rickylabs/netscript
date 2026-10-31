@@ -23,3 +23,7 @@
 - Preserve identifier substring admission in literal search (ReadinessHandler in
   createReadinessHandler); only ranking favors whole words. Fresh regression asserts the documented
   services page and absence of fallback. This avoids falsely claiming an API seam is undocumented.
+
+- CI docs build on S1 reported export drift: reference/mcp omitted the new docs subpath. Add its
+  entrypoint and public transport/citation semantics to docs/site/reference/mcp/index.md, then
+  refresh the one canonical carrier. This is required documentation for the new public seam.
