@@ -123,3 +123,14 @@
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='avatar'][data-part='presence'][data-presence='offline'] {
   background: var(--ns-border-strong);
 }
+
+/* Preserve photo rendering in legacy themes while Utility follows the locked initials anatomy. */
+.ns-avatar > img + [data-scope='avatar'] {
+  display: none;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='avatar'][data-part='image'] {
+  display: none;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='avatar'][data-part='image'] + :is([data-part='initials'],[data-part='agent-icon']) {
+  display: contents;
+}

@@ -5299,7 +5299,7 @@
         },
         {
           "name": "initials",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "always emitted for non-agent avatars; Utility shows initials even when src is supplied"
         },
         {
           "name": "agent-icon",
@@ -5399,7 +5399,7 @@
         },
         {
           "name": "dot",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "decorative status marker, visible in Studio Utility"
         },
         {
           "name": "icon",

@@ -137,3 +137,23 @@
   color: var(--ns-muted-fg);
   border-color: var(--ns-border);
 }
+
+/* The Utility status dot is decorative; legacy badge anatomy stays visually unchanged. */
+.ns-badge__dot {
+  display: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='root'][data-variant] {
+  font-family: var(--ns-font-label);
+  gap: var(--ns-space-1-5);
+  background: transparent;
+  border-color: currentColor;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='badge'][data-part='dot'] {
+  display: inline-block;
+  flex: none;
+  width: var(--ns-space-1-5);
+  height: var(--ns-space-1-5);
+  border-radius: var(--ns-radius-full);
+  background: currentColor;
+}

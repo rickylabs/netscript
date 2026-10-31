@@ -52,3 +52,7 @@ S3 independent PASS. Reconcile: all 20 frozen source hashes verified; no unrevie
 ## S4 sign-off
 
 Independent Claude Opus 5.5 high review PASS. 21 source/carrier-contract files frozen by SHA256; 139 focused tests + 19 template tests, check/lint/fmt6, quality gate, legacy262x2 and browser30fixtures176measurements pass. Scope: compact blocks, navigation, overlays, tables, chart category intent and generated top-bar hook. Owner locked-render authority recorded during this slice. Reconcile: diff contains only S4 inventory plus declared additive chart contract/test/fixture and template hook. S4R next reconciles earlier families; S5/S6 remain. Carry review cosmetics and carrier freshness into final pass.
+
+## S4R sign-off
+
+Locked authority reconciliation independently PASS after one FAIL_FIX repair: outlined status dots, initials-only Utility avatars (legacy photos preserved), neutral 14px strong field labels, and distinct grey off/ink on switches. Reviewer caught border-control ink and small library labels; existing input-border/strong roles fix both. 94 tests, scoped check/lint/fmt4, quality gate, legacy262x2 and browser102fixtures416measurements pass. Reconcile: ten source files plus evidence; no other theme values changed. S5 next.

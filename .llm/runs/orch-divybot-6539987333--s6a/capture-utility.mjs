@@ -48,8 +48,8 @@ try {
      probe.style.color=role?`var(--ns-${role}-subtle)`:'var(--ns-card)';const toneFill=getComputedStyle(probe).color;
      probe.style.color=role?`var(--ns-${role}-border)`:'var(--ns-border)';const toneBorder=getComputedStyle(probe).color;
      probe.style.color=node.dataset.series?`var(--ns-chart-${node.dataset.series})`:'var(--ns-fg)';const seriesColor=getComputedStyle(probe).color;
-     probe.remove();
-     return {scope:node.dataset.scope,part:node.dataset.part,tag:node.tagName,state:node.dataset.state,size:node.dataset.size,variant:node.dataset.variant,seriesColor,series:node.dataset.series,stroke:s.stroke,weight:s.fontWeight,before:getComputedStyle(node,'::before').backgroundColor,markerWidth:getComputedStyle(node,'::before').width,accent:s.accentColor,toneText,toneFill,toneBorder,status,errorColor,ringColor,invalid:node.closest('[data-invalid=true]')?'true':undefined,focused:node.matches(':focus-visible'),disabled:node.matches(':disabled'),radius:s.borderRadius,sideBorder:s.borderInlineStartWidth,bottomBorder:s.borderBottomWidth,shadow:s.boxShadow,transform:s.transform,height:s.height,color:s.color,background:s.backgroundColor,border:s.borderColor,outline:s.outlineColor,outlineStyle:s.outlineStyle,outlineWidth:s.outlineWidth,opacity:s.opacity,font:s.fontFamily,fontSize:s.fontSize,transition:s.transitionDuration,animation:s.animationName};
+     probe.style.color='var(--ns-primary)';const primaryColor=getComputedStyle(probe).color;probe.style.color='var(--ns-input-border)';const inputBorder=getComputedStyle(probe).color;probe.remove();
+     return {scope:node.dataset.scope,part:node.dataset.part,tag:node.tagName,state:node.dataset.state,size:node.dataset.size,variant:node.dataset.variant,inputBorder,primaryColor,checked:node.previousElementSibling?.checked,seriesColor,series:node.dataset.series,stroke:s.stroke,weight:s.fontWeight,display:s.display,before:getComputedStyle(node,'::before').backgroundColor,markerWidth:getComputedStyle(node,'::before').width,accent:s.accentColor,toneText,toneFill,toneBorder,status,errorColor,ringColor,invalid:node.closest('[data-invalid=true]')?'true':undefined,focused:node.matches(':focus-visible'),disabled:node.matches(':disabled'),radius:s.borderRadius,sideBorder:s.borderInlineStartWidth,bottomBorder:s.borderBottomWidth,shadow:s.boxShadow,transform:s.transform,height:s.height,color:s.color,background:s.backgroundColor,border:s.borderColor,outline:s.outlineColor,outlineStyle:s.outlineStyle,outlineWidth:s.outlineWidth,opacity:s.opacity,font:s.fontFamily,fontSize:s.fontSize,transition:s.transitionDuration,animation:s.animationName};
     }));
     results.push({name:row.name,scheme,state,values});
     await container.screenshot({path:join(output,`state-${i}-${scheme}-${state}.png`),animations:'disabled'});
@@ -58,11 +58,16 @@ try {
      if(v.scope==='tabs'&&v.part==='trigger'&&v.state==='active'&&v.markerWidth!=='6px')errors.push(`${row.name}/${scheme}: selected square marker`);
      if(v.scope==='stats-grid'&&v.part==='value'&&v.weight!=='400')errors.push(`${row.name}/${scheme}: KPI weight`);
      if(v.status&&['alert','inline-notice','toast','badge'].includes(v.scope)) {
-      if(v.part==='root'&&(v.background!==v.toneFill||v.border!==v.toneBorder))errors.push(`${row.name}/${scheme}: status surface`);
+      if(v.part==='root'&&(v.scope==='badge'?(v.background!=='rgba(0, 0, 0, 0)'||v.border!==v.toneText):(v.background!==v.toneFill||v.border!==v.toneBorder)))errors.push(`${row.name}/${scheme}: status surface`);
       if(['title','icon','symbol'].includes(v.part)&&v.color!==v.toneText)errors.push(`${row.name}/${scheme}: status text`);
      }
      if(['card','panel','alert','inline-notice','toast','empty-state'].includes(v.scope)&&v.part==='root'&&(v.radius!=='0px'||v.shadow!=='none'))errors.push(`${row.name}/${scheme}: surface geometry`);
      if(v.scope==='card'&&v.part==='root'&&(v.sideBorder!=='0px'||v.bottomBorder!=='0px'))errors.push(`${row.name}/${scheme}: card must have only top rule`);
+     if(v.scope==='switch'&&v.part==='track'&&!v.checked&&(v.background===v.primaryColor||v.background!==v.inputBorder))errors.push(`${row.name}/${scheme}: off switch must be grey and distinct from ink`);
+     if((v.scope==='label'&&v.part==='root'||v.scope==='field'&&v.part==='label')&&(v.fontSize!=='14px'||v.weight!=='500'))errors.push(`${row.name}/${scheme}: locked strong field label`);
+     if(v.scope==='switch'&&v.part==='track'&&v.checked&&v.background!==v.primaryColor)errors.push(`${row.name}/${scheme}: checked switch lost ink`);
+     if(v.scope==='avatar'&&v.part==='image'&&v.display!=='none')errors.push(`${row.name}/${scheme}: Utility photo visible`);
+     if(v.scope==='badge'&&v.part==='dot'&&(v.display==='none'||v.background!==v.color))errors.push(`${row.name}/${scheme}: status dot`);
      if(v.scope==='avatar'&&v.part==='root'&&v.radius!=='0px')errors.push(`${row.name}/${scheme}: avatar radius`);
      if(v.invalid==='true'&&!v.disabled&&(['input','select','textarea'].includes(v.scope)&&v.part==='root'||['checkbox','switch'].includes(v.scope)&&['indicator','track'].includes(v.part))&&v.border!==v.errorColor)errors.push(`${row.name}/${scheme}/${state}: invalid border lost`);
      if(v.focused&&['button','icon-button','input','select','textarea','search'].includes(v.scope)&&(v.outlineStyle!=='solid'||v.outlineWidth!=='2px'||v.outline!==v.ringColor))errors.push(`${row.name}/${scheme}: focus-visible outline absent`);
@@ -87,6 +92,7 @@ try {
    const indexes=selected.flatMap((x,i)=>(x.component??x.name.split('/')[0])===component?[i]:[]);
    if(!indexes.length) { errors.push(`Missing component ${component}`); continue; }
    await page.locator('.specimen').evaluateAll((els,keep)=>els.forEach((el,i)=>el.hidden=!keep.includes(i)),indexes);
+   await page.evaluate(()=>scrollTo(0,0));
    await page.screenshot({path:join(output,`${component}-${scheme}.png`),fullPage:true});
   }
   await page.locator('.specimen').evaluateAll(els=>els.forEach(el=>el.hidden=false));

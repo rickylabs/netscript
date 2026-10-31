@@ -161,7 +161,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
     component: 'badge',
     scenario: 'info',
     render: () => <Badge variant='info'>Shipped</Badge>,
-    parts: ['label'],
+    parts: ['label', 'dot'],
     attributes: ['data-variant', 'data-emphasis'],
   },
   {

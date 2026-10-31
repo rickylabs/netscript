@@ -50,3 +50,8 @@
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-part='error-icon'] {
   color: var(--ns-destructive-text);
 }
+
+/* Locked invalid fields keep the label neutral; border and error text carry the error. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-state='invalid'] [data-part='label'] {
+  color: var(--ns-fg);
+}

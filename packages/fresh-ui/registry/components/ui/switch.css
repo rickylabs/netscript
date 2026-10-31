@@ -86,3 +86,13 @@
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='switch']:checked + [data-part='track'] [data-part='thumb'] {
   background: var(--ns-switch-thumb);
 }
+
+/* The locked off state is a visible control-grey track in both schemes. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'][data-part='track'] {
+  background: var(--ns-input-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='switch']:checked + [data-part='track'] {
+  background: var(--ns-primary);
+  border-color: var(--ns-primary);
+}

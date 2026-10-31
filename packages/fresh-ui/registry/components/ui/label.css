@@ -15,8 +15,8 @@
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='label'][data-part='root'],
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-part='label'] {
   font-family: var(--ns-font-label);
-  font-size: var(--ns-text-label);
-  line-height: var(--ns-leading-label);
-  font-weight: var(--ns-weight-label);
-  letter-spacing: var(--ns-tracking-label);
+  font-size: var(--ns-text-strong);
+  line-height: var(--ns-leading-strong);
+  font-weight: var(--ns-weight-strong);
+  letter-spacing: var(--ns-tracking-strong);
 }
