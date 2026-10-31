@@ -21,7 +21,7 @@ export interface ModelOption {
 }
 
 interface ModelSelectorProps
-  extends Omit<JSX.HTMLAttributes<HTMLDetailsElement>, 'class' | 'onChange'> {
+  extends Omit<JSX.DetailsHTMLAttributes<HTMLDetailsElement>, 'class' | 'onChange'> {
   /** Selected model id. */
   value: string;
   /** Available models. */

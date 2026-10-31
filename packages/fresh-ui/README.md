@@ -38,6 +38,12 @@ tokens; the components never know.
   tray, dialogs, notifications, and window actions around an existing Deno Desktop window, and
   returns an inert browser-safe lifecycle everywhere else.
 
+`CodeBlock` highlights recognized `lang` names and aliases (such as `ts`, `javascript`, and `json`)
+with the common highlight.js language set. Unknown or omitted languages remain plain text. Source
+is escaped before syntax spans are added, and the copy payload remains the original source. The
+copied component keeps clipboard handling in the app's island. Studio Utility binds the syntax
+classes to its light/dark `code/syntax/*` roles.
+
 ## Architecture
 
 ```mermaid

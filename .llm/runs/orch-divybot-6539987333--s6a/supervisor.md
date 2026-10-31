@@ -13,6 +13,7 @@ The queried feature matrix selects Sol/Muse for implementation, GLM/Fable for pl
 
 ## Authorized write surface
 
+- `deno.lock`: the reviewed syntax-highlighter dependency only.
 - `packages/fresh-ui/`: shipped registry CSS/components/blocks, existing contracts if necessary for state coverage, tests, generated registry carriers, README. No gap components from #2488. No Figma-owned token value changes.
 - `packages/cli/`: init defaults, app/page/island templates, tests, generated assets.
 - `docs/`, `README.md`, `.agents/`: affected default-preset examples and generated documentation carriers only.

@@ -4,11 +4,11 @@
  * @depends theme-seed
  * @description Fenced code surface with a filename/language header and a copy
  * affordance. Presentational — clipboard + "Copied" state are hydrated by an app
- * island (the button exposes data-part='copy' and data-clipboard); syntax
- * highlighting is layered at L4 if desired.
+ * island (the button exposes data-part='copy' and data-clipboard); recognized languages use escaped highlight.js syntax markup.
  */
 
 import type { JSX, VNode } from 'preact';
+import hljs from 'npm:highlight.js@11.11.1/lib/common';
 import { cn } from '../../lib/cn.ts';
 
 interface CodeBlockProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class'> {
@@ -16,7 +16,7 @@ interface CodeBlockProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class
   code: string;
   /** Optional filename shown in the header. */
   filename?: string;
-  /** Optional language label. */
+  /** Language label and highlight.js common-language name or alias; unknown names stay plain. */
   lang?: string;
   class?: string;
 }
@@ -27,6 +27,10 @@ interface CodeBlockProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class
 export function CodeBlock(
   { code, filename, lang, class: className, ...props }: CodeBlockProps,
 ): VNode {
+  // highlight.js escapes source before adding its own spans; unknown languages use Preact text.
+  const highlighted = lang && hljs.getLanguage(lang)
+    ? hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
+    : undefined;
   return (
     <div {...props} class={cn('ns-code', className)} data-part='root' data-scope='code-block'>
       <div class='ns-code__head' data-part='head' data-scope='code-block'>
@@ -50,7 +54,15 @@ export function CodeBlock(
       <pre
         data-part='content'
         data-scope='code-block'
-      ><code data-part='code' data-scope='code-block'>{code}</code></pre>
+      >{highlighted === undefined
+          ? <code data-part='code' data-scope='code-block'>{code}</code>
+          : (
+            <code
+              data-part='code'
+              data-scope='code-block'
+              dangerouslySetInnerHTML={{ __html: highlighted }}
+            />
+          )}</pre>
     </div>
   );
 }

@@ -2337,11 +2337,12 @@
     },
     {
       "name": "code-block",
-      "description": "Fenced code surface with filename/language header and a copy affordance for assistant messages.",
+      "description": "Syntax-highlighted code surface with filename/language header and a copy affordance for assistant messages.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
       ],
+      "dependencies": ["npm:highlight.js@11.11.1"],
       "type": "registry:component",
       "files": [
         {

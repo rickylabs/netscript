@@ -1,0 +1,23 @@
+{
+  "deno.lock": "8a4773143f02048b45bb9fc54a43eaa065557aa4e82db28e922c1d2c4febb4cb",
+  "packages/fresh-ui/README.md": "6cb828d8000784b19daa66c11fd80a13ff836aaf2788fadb9b5a62d2862e94d5",
+  "packages/fresh-ui/deno.lock": "91a2a693d9906d139a646a2aa28fe159ff50dbbceebfd9e39f413290c874c14c",
+  "packages/fresh-ui/registry.json": "2881d932c5cee11b0d640c233b0227307b3969bbea17777465ade8d33d977228",
+  "packages/fresh-ui/registry/components/ui/citation-chip.css": "d3c9093ed1dd267a9a2bb8a5706a84a6c84c4007a8ade2c830d4387f5fc12292",
+  "packages/fresh-ui/registry/components/ui/code-block.css": "7d0b6dc5f604c7db198828b0c6aa9671dbd511fca510e61769f352cc9d43ed82",
+  "packages/fresh-ui/registry/components/ui/code-block.tsx": "6f4a705cb42982f50933ee0e6b0b11330dc0948d215b11ad2addc2db52f1b342",
+  "packages/fresh-ui/registry/components/ui/desktop-dialog.css": "a61aa10ea3f08e718dece4852a217c8ae94c611b784f98ce5a10ef9bfe277429",
+  "packages/fresh-ui/registry/components/ui/desktop-notification.css": "490db1cedd8d6c52f9d3fe16d0c34de6514d9760ed845b71f299e4b47626bc64",
+  "packages/fresh-ui/registry/components/ui/desktop-tray-menu.css": "a0a981b4a10a8ea6a7654243143240a1c8b05a18585f9c0d8a6c836c196c95b7",
+  "packages/fresh-ui/registry/components/ui/desktop-update-prompt.css": "02899159f30e1b16e52a01dab92bcb29f425817f64fef135bc548fd125a57c52",
+  "packages/fresh-ui/registry/components/ui/desktop-window-chrome.css": "8c91916ec9eb6821ab8c80e8065fd050ce0c788441e315e63fdaedda1b3b43c6",
+  "packages/fresh-ui/registry/components/ui/markdown.css": "0b36c44adfad4fc7e107e787cf194d59cb28334da1faaec158f64779f94044ec",
+  "packages/fresh-ui/registry/components/ui/message.css": "71f5a0c9c006d93a3fa5be15bd22dc9ec4a6222abb2dcdbb19c780478c9f1542",
+  "packages/fresh-ui/registry/components/ui/model-selector.css": "c8e2909c29326056528be044bd0072c093a191f147a7245c22883264473d89f4",
+  "packages/fresh-ui/registry/components/ui/model-selector.tsx": "2206a7d6d7d4e9717effe4cfbfacddca80cabdda618013f6acac8992f129cc36",
+  "packages/fresh-ui/registry/components/ui/prompt-input.css": "4aedb21beb8edb03e0f8d1ee34397fdfbe649b635e792bebdd1e59ab3bec4bdd",
+  "packages/fresh-ui/registry/components/ui/tool-call-card.css": "937c4c4bab2b0b2c7736c0e340e7f1817c40f1f70f13f85f997f21b8caa9301b",
+  "packages/fresh-ui/registry/islands/mcp-ui-widget.css": "7112c3b57bbfdcf91b3c2ebad74535270d5d1b392f196085ad97eb7b5677feeb",
+  "packages/fresh-ui/tests/contracts/utility-prose.ts": "8872928dd9d75619b59c734bca783ffd97b77c8c4745b172b5bf06e4503ea5d4",
+  "packages/fresh-ui/tests/registry/components/ui/code-block.test.tsx": "3d35d0a17d5fc1f04f3367e9afb3e03c52a145805fbf0a256f6e1f2c6a77e566"
+}

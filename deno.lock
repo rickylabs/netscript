@@ -198,6 +198,7 @@
     "npm:esbuild-wasm@~0.25.11": "0.25.12",
     "npm:esbuild@0.25.7": "0.25.7",
     "npm:esbuild@~0.25.5": "0.25.7",
+    "npm:highlight.js@11.11.1": "11.11.1",
     "npm:ioredis@^5.11.1": "5.11.1",
     "npm:ioredis@^5.8.2": "5.11.1",
     "npm:jose@^6.2.12": "6.2.12",
@@ -3658,6 +3659,9 @@
       "dependencies": [
         "function-bind"
       ]
+    },
+    "highlight.js@11.11.1": {
+      "integrity": "sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w=="
     },
     "hono@4.13.5": {
       "integrity": "sha512-O6+/eCYRkzzzy0rPWwKLiGBR1nFuUPZynnwjxN1MBA62NNqbT0wQEzQyK2gSO5yDIDB336sXQleAhOHrzlYyKw=="

@@ -56,3 +56,9 @@ Independent Claude Opus 5.5 high review PASS. 21 source/carrier-contract files f
 ## S4R sign-off
 
 Locked authority reconciliation independently PASS after one FAIL_FIX repair: outlined status dots, initials-only Utility avatars (legacy photos preserved), neutral 14px strong field labels, and distinct grey off/ink on switches. Reviewer caught border-control ink and small library labels; existing input-border/strong roles fix both. 94 tests, scoped check/lint/fmt4, quality gate, legacy262x2 and browser102fixtures416measurements pass. Reconcile: ten source files plus evidence; no other theme values changed. S5 next.
+
+## S5 review repair
+
+AI/code/desktop source implemented; 112 tests, scoped check/lint/fmt4 and quality gate pass. Initial independent review FAIL_FIX: two unguarded legacy border substitutions. Both restored. Expanded legacy comparison passes 262 fixtures × three presets × two schemes with actual preset/scheme attributes. Fresh Utility browser recapture pending, then same evaluator repair review. Explicit anatomy gaps accepted by first review, additional non-blocking visual differences recorded in s5-comparison.md.
+
+S5 independent repair PASS. Final browser total is 688 measurements (670 main +18 citation), not the preliminary684 count; comparison corrected. Source hashes match all21 files. 112 tests, check/lint/fmt4, quality gate, 262 fixtures ×3 legacy presets ×2 schemes and all60 Utility fixtures pass. Reconcile: only reviewed S5 source plus scoped evidence; no other theme CSS changes. Signed off for push. S6 must prove copied syntax import with Fresh/Vite and complete carriers/full gates.
