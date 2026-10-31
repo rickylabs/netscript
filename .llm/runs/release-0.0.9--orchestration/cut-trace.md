@@ -44,3 +44,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 13:58 | `cecf77621` | #2530 | #2384 | W6 (F1) | |
 | 2026-10-31 14:01 | `40c59ace8` | #2532 | #2375 | W6 (F1) | adopted continuation (#2268 worker chain) |
 | 2026-10-31 14:01 | `d54879b8d` | #2527 | #2411 | W6 (F1) | adopted continuation (#2268 worker chain) |
+| 2026-10-31 14:05 | `da8151643` | #2529 | #2269 | W5 (E2) | one docs corpus owned by @netscript/mcp/docs; scoped F-16 debt accepted |

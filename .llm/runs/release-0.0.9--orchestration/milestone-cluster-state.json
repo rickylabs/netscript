@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "d54879b8d645554155c54af2f26c86d2232afda5",
+  "currentMainSha": "da815164373a4cf7c24ea2097573440f34e4f98b",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -253,7 +253,10 @@
     },
     {
       "number": 2269,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2529 da8151643"
+      ]
     },
     {
       "number": 2290,
@@ -1112,7 +1115,7 @@
     {
       "id": "E2-2269",
       "lane": "internals",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2529,
       "headSha": "3d2b6dbf973b8b73f2499a938c095a24046cfe65",
@@ -1121,7 +1124,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2269",
       "receiptRefs": [],
-      "note": "head moved to 3d2b6db after READY (worker push); needs fresh exact-head MERGE + CI"
+      "note": "READY + provenance refresh 3d2b6db; Opus MERGE at 3d2b6db; 32/32; carrier moved to @netscript/mcp/docs (one corpus); scoped F-16 debt accepted on coordinator review; combined-tree carriers incl barrel fresh",
+      "mergeCommit": "da815164373a4cf7c24ea2097573440f34e4f98b",
+      "mergedAt": "2026-10-31T14:05:57Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2269"
     },
     {
       "id": "F1-2384",
@@ -1173,7 +1179,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2537,
-      "headSha": "1af3160878aa64773a7a15f316fe243bfdf05643",
+      "headSha": "bcefeaa33ce3d8971ff3dad3dbfb6e7686e21439",
       "issueNumbers": [
         1912
       ],
@@ -1227,6 +1233,19 @@
       "implementerAgentId": "codex-gpt-6.1-sol (continuation chain of the #2373 worker)",
       "receiptRefs": [],
       "note": "BLOCKED \u2192 coordinator decision B (doctrine 02 oRPC boundary exception, traced)"
+    },
+    {
+      "id": "F1-2379",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2533,
+      "headSha": "c6455df242d99972aad39c3716956e6f50472adf",
+      "issueNumbers": [
+        2379
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol (continuation of the #2373 worker)",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [
@@ -1601,11 +1620,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:01:15Z",
-    "nextReportDueAt": "2026-10-31T15:01:15Z",
+    "lastReportAt": "2026-10-31T14:06:02Z",
+    "nextReportDueAt": "2026-10-31T15:06:02Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2532 (#2375) #2527 (#2411)",
-    "currentMainSha": "d54879b8d645554155c54af2f26c86d2232afda5",
+    "headline": "merged #2529 (#2269)",
+    "currentMainSha": "da815164373a4cf7c24ea2097573440f34e4f98b",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1791,7 +1810,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:02:42Z",
+  "updatedAt": "2026-10-31T14:06:29Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2086,11 +2105,11 @@
       "issue": 2268,
       "lane": "internals",
       "commentId": 6542589669,
-      "postedAt": "2026-10-31T11:07:03Z",
-      "route": "codex gpt-6.1-sol high",
-      "state": "pr-open",
-      "pr": 2521,
-      "claimRef": "#2474 comment 6542202922",
+      "postedAt": "2026-10-31T14:02:12Z",
+      "route": "codex gpt-6.1-sol (continuation of the #2384 worker)",
+      "state": "claimed-continuation",
+      "pr": null,
+      "claimRef": "#2268 comment 6544371938",
       "relaunchOf": "orphaned-continuation",
       "startedAt": "2026-10-31T11:09:27Z"
     },
@@ -2190,8 +2209,8 @@
       "commentId": null,
       "postedAt": "2026-10-31T13:18:29Z",
       "route": "codex gpt-6.1-sol (continuation of the #2373 worker)",
-      "state": "claimed-continuation",
-      "pr": null,
+      "state": "pr-open",
+      "pr": 2533,
       "claimRef": "#2474 comment"
     },
     {
@@ -2220,8 +2239,9 @@
       "commentId": 6544332029,
       "postedAt": "2026-10-31T13:59:25Z",
       "route": "codex gpt-6.1-sol high",
-      "state": "posted",
-      "pr": null
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-31T14:04:15Z"
     },
     {
       "issue": 2068,

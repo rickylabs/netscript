@@ -275,3 +275,6 @@
 - 14:01:07Z: **merged** #2532 (`40c59ace8`) for #2375 (F1, adopted continuation).
 - 14:01:14Z: **merged** #2527 (`d54879b8d`) for #2411 (F1, adopted continuation).
 - 14:02:36Z: #1655 (continuation, draft PR #2539) BLOCKED on a design question. **Decision:** option B under doctrine 02's existing oRPC-boundary exception, on condition that both findings trace to oRPC internals; box 1 reworded and the debt rows closed citing the doctrine. Posted on #2539 and #1655, FYI with veto window on #2474.
+- 14:03:10Z: Continuation: the #2384 worker claimed #2268's live-AppHost proof at 14:02Z, after #2384 closed at 13:59Z. Teardown risk; checking its workspace.
+- 14:06:02Z: **merged** #2529 (`da8151643`) for #2269 (E2): the prose carrier now lives in packages/mcp (`@netscript/mcp/docs`); open PRs touching the old carrier path must merge main and regenerate. #2269 close is held while its worker is live. #1366 started 14:04Z.
+- 14:06:29Z: #2379 continuation → PR #2533 (adopted).
