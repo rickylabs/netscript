@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+  "currentMainSha": "9fc6d01fa5aca89893d3355484c8e384addd5720",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -320,7 +320,10 @@
     },
     {
       "number": 2379,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2533 9fc6d01fa"
+      ]
     },
     {
       "number": 2382,
@@ -1172,7 +1175,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2535,
-      "headSha": "6a9f3f6db35ffd839a402666b7d7f2bc782f38d2",
+      "headSha": "6a62a6fdb000fa045cb5e901aa64fe78c70cb374",
       "issueNumbers": [
         2108
       ],
@@ -1185,12 +1188,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2537,
-      "headSha": "71b2241a4fb996ca6dae9d976bc77c8173a7dd28",
+      "headSha": "74790b41707bd5889f24bce2f258f32bfdfb2574",
       "issueNumbers": [
         1912
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1912",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "parity fix 74790b4; Opus MERGE; CI pending"
     },
     {
       "id": "F1-2375",
@@ -1243,7 +1247,7 @@
     {
       "id": "F1-2379",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2533,
       "headSha": "c6455df242d99972aad39c3716956e6f50472adf",
@@ -1251,7 +1255,11 @@
         2379
       ],
       "implementerAgentId": "codex-gpt-6.1-sol (continuation of the #2373 worker)",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "mergeCommit": "9fc6d01fa5aca89893d3355484c8e384addd5720",
+      "mergedAt": "2026-10-31T14:32:41Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2379",
+      "note": "READY c6455df; Opus MERGE; 30/30 incl both runtime tiers at exact head; carriers fresh"
     },
     {
       "id": "G1-1366",
@@ -1259,7 +1267,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2542,
-      "headSha": "d5a3c5717dbbe595bd34e4ed93939bc0e01d8dc1",
+      "headSha": "e1c68e5e7a666ab2abc9d8ba728375ef6d8417b0",
       "issueNumbers": [
         1366
       ],
@@ -1610,6 +1618,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
       "completedAt": "2026-10-31T14:14:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": null,
+      "headSha": "9fc6d01fa5aca89893d3355484c8e384addd5720",
+      "startedAt": "2026-10-31T14:33:09Z",
+      "via": "local run on the N5 for #2185 box 5 (reserved for the leaf)"
     }
   ],
   "canaryCheckpoints": [
@@ -1641,11 +1657,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:16:15Z",
-    "nextReportDueAt": "2026-10-31T15:16:15Z",
+    "lastReportAt": "2026-10-31T14:32:47Z",
+    "nextReportDueAt": "2026-10-31T15:32:47Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2534 (#2390); C1 complete; canary .2 waits on #2108",
-    "currentMainSha": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+    "headline": "merged #2533 (#2379)",
+    "currentMainSha": "9fc6d01fa5aca89893d3355484c8e384addd5720",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1831,7 +1847,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:16:44Z",
+  "updatedAt": "2026-10-31T14:33:09Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2288,6 +2304,16 @@
       "lane": "fixes",
       "commentId": 6544556745,
       "postedAt": "2026-10-31T14:16:44Z",
+      "route": "codex gpt-6.1-sol medium",
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-31T14:21:27Z"
+    },
+    {
+      "issue": 2185,
+      "lane": "internals",
+      "commentId": 6544753737,
+      "postedAt": "2026-10-31T14:33:09Z",
       "route": "codex gpt-6.1-sol medium",
       "state": "posted",
       "pr": null

@@ -281,3 +281,9 @@
 - 14:10:07Z: #1366 → PR #2542.
 - 14:16:06Z: **merged** #2534 (`19a677ece`) for #2390 (C1 investigation; no longer reproduces). The expensive gate is free.
 - 14:16:44Z: dispatched #2409 (F1, moved internals → fixes; drift recorded), comment 6544556745. Validator green.
+- 14:17:16Z: #1912 READY: box 8 published smoke on Linux and Windows (cli 0.0.8; clean exit 0, hostile drift exit 1). PR #2537 adds an e2e-cli-prod job and script; Opus MERGE at `71b2241`; waiting for CI.
+- 14:19:18Z: #2537 (#1912) quality red at `71b2241` (Aspire version parity, phase 1); steered the live worker.
+- 14:22:43Z: #2409 started 14:21Z.
+- 14:25:13Z: #2537 (#1912) parity fix `74790b4` with Opus MERGE; waiting for CI.
+- 14:32:47Z: **merged** #2533 (`9fc6d01fa`) for #2379 (F1); #2379 auto-closed, evidence posted. #2373 stays open (its worker continues on #1655).
+- 14:33:09Z: dispatched #2185 (G1 box 5: one local scaffold.runtime run on a local Docker engine), comment 6544753737; **expensive-gate.acquired** (reserved) for it. Validator green.
