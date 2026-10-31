@@ -1,0 +1,96 @@
+{
+ "group": "G3c",
+ "theme": "fluent",
+ "page": "53:2",
+ "continues": "ledger-style-g3b.json",
+ "status": "DONE: Fluent Data display 1 complete (18/18 sets), review + strip captured, swap test 68/68, DD1 sweep into Forms/Navigation/Overlays done, all five Fluent category reviews and strips re-captured.",
+ "modes": {"themeSet": "239:7", "theme": "52:0", "scheme": "3:0 (Light) / 3:1 (Dark)"},
+ "strayCheck": "Checked 465:98978 at the start of both sessions: the only 'Fluent/Data table' is 480:87145 (this run's build). No 'Fluent/Data table · block' or duplicate existed; nothing was deleted.",
+ "sets": [
+  {"category": "Data display 1", "name": "Fluent/Data table", "id": "480:87145", "baseId": "416:4605", "variants": 10, "built": "G3c"},
+  {"category": "Data display 1", "name": "Fluent/Kbd", "id": "465:98979", "baseId": "403:28", "variants": 4, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Kbd group", "id": "465:98991", "baseId": "403:96", "variants": 8, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Badge", "id": "465:104106", "baseId": "405:180", "variants": 20, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Badge / kind", "id": "465:104210", "baseId": "405:211", "variants": 10, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Avatar presence", "id": "465:105136", "baseId": "406:43", "variants": 3, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Avatar", "id": "465:105144", "baseId": "406:95", "variants": 12, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Avatar group", "id": "465:105220", "baseId": "406:150", "variants": 3, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/.Item icon tile", "id": "465:111648", "baseId": "408:82", "variants": "1 (component)", "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/.Item image", "id": "465:111655", "baseId": "408:85", "variants": "1 (component)", "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Item", "id": "465:111659", "baseId": "408:792", "variants": 27, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Item group", "id": "465:113782", "baseId": "408:996", "variants": 2, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Card", "id": "466:44976", "baseId": "409:951", "variants": 16, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Stat card", "id": "466:45258", "baseId": "409:1270", "variants": 6, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Table header cell", "id": "466:67853", "baseId": "410:546", "variants": 27, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Table cell", "id": "466:68073", "baseId": "410:383", "variants": 27, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Table row", "id": "466:68272", "baseId": "412:1187", "variants": 20, "built": "G3b"},
+  {"category": "Data display 1", "name": "Fluent/Table", "id": "466:98664", "baseId": "413:1367", "variants": 6, "built": "G3b"}
+ ],
+ "frames": {
+  "Data display 1": "465:98973",
+  "Data display 1 · Sets": "465:98978",
+  "Style review · Data display 1": "488:89774",
+  "panel · Light": "488:89775",
+  "panel · Dark": "488:98344",
+  "Fluent style strip · Data display 1": "514:70862",
+  "strip rows": {
+   "Light · Base (Utility)": "514:70864", "Light · Base (Theme Fluent)": "514:72849", "Light · Fluent style": "514:73792", "Light · Swap test": "514:76316", "Light · States": "514:78367",
+   "Dark · Base (Utility)": "514:79190", "Dark · Base (Theme Fluent)": "514:80133", "Dark · Fluent style": "514:81076", "Dark · Swap test": "514:83127", "Dark · States": "514:85178"
+  }
+ },
+ "pngs": {
+  "Data display 1": {
+   "review": "review/styles/fluent/data-display-1.png",
+   "review-hi": "review/styles/fluent/data-display-1-hi.png",
+   "strip": "review/styles/fluent/data-display-1-strip.png",
+   "strip-hi": "review/styles/fluent/data-display-1-strip-hi.png"
+  },
+  "re-captured (overwritten)": [
+   "review/styles/fluent/actions.png", "review/styles/fluent/actions-strip.png",
+   "review/styles/fluent/forms.png", "review/styles/fluent/forms-strip.png",
+   "review/styles/fluent/navigation.png", "review/styles/fluent/navigation-strip.png", "review/styles/fluent/navigation-strip-hi.png",
+   "review/styles/fluent/overlays.png", "review/styles/fluent/overlays-strip.png", "review/styles/fluent/overlays-strip-hi.png"
+  ]
+ },
+ "swapTest": "68/68 text and boolean overrides survived the swap from base to Fluent (Badge x6, Avatar x2, presence x3, Avatar group, Kbd group, Card x2, Stat card x2, Table row x3, Item group, Data table selection).",
+ "reseed": "Pass over 465:98978 after the Data table build: 895 bound paints checked, 4 re-seeded (resolved rgb), none resolving transparent.",
+ "sweep": {
+  "total": 178,
+  "bySet": {
+   "Fluent/Menu item <- Fluent/Kbd": 30, "Fluent/Tooltip <- Fluent/Kbd": 12, "Fluent/Command item <- Fluent/Kbd": 9, "Fluent/Command palette <- Fluent/Kbd": 24,
+   "Fluent/Search <- Fluent/Kbd": 8, "Fluent/Menubar <- Fluent/Kbd": 8, "Fluent/Select content · block <- Fluent/Kbd": 5, "Fluent/Combobox <- Fluent/Kbd": 10,
+   "Fluent/Tab / horizontal <- Fluent/Badge (plain)": 24, "Fluent/Tab / vertical <- Fluent/Badge (plain)": 24, "Fluent/Nav item <- Fluent/Badge (plain)": 10,
+   "Fluent/Combobox <- Fluent/Badge (subtle)": 10, "Fluent/Hover card <- Fluent/Avatar": 4
+  },
+  "partNames": "Every swap re-applied the instance's part name.",
+  "sidebarTopBar": "Fluent/Sidebar and Fluent/Top bar draw 'avatar' as a base FRAME part, not an Avatar instance, so there was nothing to swap and retyping the part would break parity. The four Sidebar variants still on surface/muted (sidebar icon, floating expanded/icon, inset icon) were restyled in place by copying the fluent/avatar/royal-blue fill, radius and text bindings from the expanded variant. The Top bar avatars already used the royal-blue recipe."
+ },
+ "fixes": [
+  "Fluent/Data table: root strokes rebound to border/width on all four sides (card/border-bottom and card/border-side resolve to 0 under Fluent, so only the top edge drew).",
+  "DD1 sets: 126 nested base instances left over from base overrides (Badges with dots, photo avatars, a base selected Table row with the blue surface/selected fill, Checkbox, glyphs) were swapped to their Fluent sets with matching variants. Left as base: .Slot (16, has no Fluent set), Empty state (4, the hidden 'empty' part) and Skeleton (134, the hidden 'skeleton-row' parts).",
+  "DD1 sets: 120 part names restored that had been renamed to their main component (Item 'media', 'focus-ring' and others), matched against the base set's nested instances.",
+  "DD1 sets: Fluent/Item focus rings carried a vertical flip ([[1,0,-3],[0,-1,-3]]), so they drew one ring-height above the item. All 90 DD1 rings were reset to the identity transform at -3/-3, size +6, stretch constraints. The same check across the 618 rings in Actions, Forms, Navigation and Overlays found no flips and no clipping in the mains.",
+  "All ten Fluent review and strip frames: clipsContent turned off on their presentation frames (panels, rows, grounds; never inside instances). The rows clipped the -3 focus ring wherever an instance touched a row edge, which is why the Tab, Nav item and Page key focus states showed only side brackets.",
+  "Fluent/Stat card: the delta-down arrow (arrow_down_12_filled) carried a -90 rotation from the base and read as a left arrow; rotation reset in both down variants.",
+  "Fluent/Data table: the Selects and Export were rebuilt as fresh instances because the swapped ones kept base height overrides (28-30 tall). Filters are 140/172 wide. The title textCase is ORIGINAL ('Orders · 3,182', not the eyebrow uppercase). The empty variants hide the base 'empty' block and show the Fluent 'empty-text' stand-in. The columns menu sits under Columns, inside the card.",
+  "Fluent/Table and Fluent/Data table: the avatar in each row now shows that customer's initials (MR, JW, AT, LM, PS) and steps through the palette (royal-blue, teal, grape, marigold, pumpkin, light-green). Before, every row showed 'MR' because the base used photos (32 rows).",
+  "Fluent/Search (Forms, built by G3): the nested 'field' (Fluent/Input) was overridden to 20 tall in every variant; it is reset to the Input main height (md 32, sm 24) and the kbd is re-centred. This also fixes the Data table toolbar search.",
+  "DD1 strip: the Dark rows first rendered light because the scheme mode lives on the source strip's ground frames, not its rows. The ground modes are now copied from the Overlays strip, and Scheme Light/Dark is set on each row and ground."
+ ],
+ "deviations": [
+  "Fluent/Data table toolbar uses md controls (32, WinUI's one control height) for Search, Selects, Columns (Fluent/Dropdown menu, trigger label 'Columns') and Export (Fluent/Button / md ghost + arrow-export), instead of the brief's 'Fluent/Search sm'. The SelectorBar (Fluent/Toggle group segmented md) is 40 tall, centred in the toolbar.",
+  "Fluent/Data table: the nested Fluent/Table has its own card chrome removed (fills, strokes, effects) with side padding 4 and vertical 0, not padding 0 as planned, so the r4 row pills and the 3x16 selection pill do not touch the card edge. Header padding 16/16/12, gap 12; title F.body-strong text/primary; 1px fluent/stroke/divider under the toolbar; footer is the 48 Fluent/Pagination row with 16 side padding (mobile: meta + Page keys, padding 8/16).",
+  "Fluent/Data table mobile: the toolbar 'filter' is Fluent/Icon button / md outline and the search fills the remaining width.",
+  "Fluent/Data table root keeps the base bound card shadow effect (resolves to 0 under Fluent), like Fluent/Card.",
+  "Sidebar and Top bar avatars stay base FRAME parts restyled to the Fluent recipe, not nested Fluent/Avatar instances (see sweep.sidebarTopBar)."
+ ],
+ "ownerReview": [
+  "Navigation sets still contain 74 base 'Location marker' instances and 2 base 'Spinner' instances; this run found them but left them, since they are outside the DD1 sweep. Fluent/Location marker (463:207328) and Fluent/Spinner (460:49323) exist; decide whether a Navigation pass should swap them.",
+  "Stat card: the colour icon appears only when icon=true (the base default false is kept). Decide whether Fluent may default it on.",
+  "Avatar group sm: the -8 overlap clips the initials.",
+  "Table row disabled: there is no layer opacity, so the badge and avatar keep full colour in a disabled row.",
+  "Kbd keeps the base default label '⌘K' (contract parity keeps TEXT defaults); Kbd group reads 'Ctrl+K'. WinUI would write 'Ctrl+K' everywhere.",
+  "The Base (Theme Fluent) rows show the base sets under Theme Fluent: the hero Stat card is a blue (dark: cyan) slab and selected base rows take the blue surface/selected tint. That is the 'before'; the Fluent style rows have neither."
+ ],
+ "remaining": []
+}

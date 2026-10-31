@@ -1,0 +1,51 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback style pass (Tonal)",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "page": "16:2",
+  "frames": {"Feedback": "558:105607", "Feedback · sets": "558:105612", "review": "560:120094 (Light 560:120095, Dark 560:120750)", "strip": "560:121379"},
+  "sets": [
+    {"name": "Tonal/Alert", "id": "558:105613", "baseId": "450:422", "variants": 12},
+    {"name": "Tonal/Inline notice", "id": "558:105768", "baseId": "451:56561", "variants": 6},
+    {"name": "Tonal/Toast", "id": "558:105839", "baseId": "452:245", "variants": 6},
+    {"name": "Tonal/Progress", "id": "559:26372", "baseId": "453:6139", "variants": 30},
+    {"name": "Tonal/Progress circular", "id": "559:26739", "baseId": "453:6280", "variants": 30},
+    {"name": "Tonal/Spinner", "id": "459:84579", "baseId": "252:11837", "variants": 18, "note": "existing Actions set reused (already tone x size, Tonal arc)"},
+    {"name": "Tonal/Skeleton", "id": "559:26850", "baseId": "454:975", "variants": 12},
+    {"name": "Tonal/Skeleton preset", "id": "559:26863", "baseId": "454:1072", "variants": 4},
+    {"name": "Tonal/Empty state", "id": "559:26960", "baseId": "454:2671", "variants": 18}
+  ],
+  "png": ["review/styles/tonal/feedback.png", "review/styles/tonal/feedback-strip.png"],
+  "swapTest": "5/5 pass (Alert title+description+action+close, Inline notice description+close, Toast title+description+progress, Progress label+value+track padding, Empty state title+secondaryAction)",
+  "anatomy": [
+    "Alert: M3 banner. radius/card 28, no stroke; subtle = <tone>/subtle (neutral surface/container-high); strong = badge/solid/<tone>/bg + badge/solid/<tone>/fg (important strong primary/default + primary/fg: no important/default role), rule hidden; glyph size/icon/sm in the label line; action Tonal/Button / sm ghost (text); close Tonal/Icon button / xs.",
+    "Inline notice: status-chip language. radius/badge 8, no stroke, <tone>/subtle (neutral container-high).",
+    "Toast: M3 snackbar on the ladder. Literal radius 20 (menus), no stroke, effect/shadow float, status <tone>/subtle, default/loading container-high, ghost action; timer a 4px inset pill + theme-only timer-gap (visible bound to progress).",
+    "Progress: T.wave. Track transparent and clipped; base bar kept hidden; theme-only wave frame (wave-clip + wave-line in <tone>/text, rest and rest-start text/muted lines 4px off the wave, constraint-pinned) and a stop dot; value still = track padding; stroke 3/4/6, track 8/12/16.",
+    "Progress circular: arc <tone>/text, round caps, ring surface/container-highest.",
+    "Skeleton: surface/container-highest bones, pill lines, circle avatars, 16 blocks (lg radius/card).",
+    "Skeleton preset: table = segmented rows (surface/container, table/row-gap, table/row-radius inner, 28 outer), no head or rules; other presets tonal containers r28 without strokes; bones Tonal/Skeleton.",
+    "Empty state: border on = surface/container card (radius/card) instead of the dashed rule; media 14/12 squircle (first-use primary/container, no-results container-highest, error destructive/subtle); Tonal/Button / md filled + ghost."
+  ],
+  "sweep": {"swapped": 71, "detail": "Data display 1: 67 Skeleton + 2 Empty state (Tonal/Table, Tonal/Data table loading/empty); Overlays: 2 Spinner", "tableBadgeTones": "Tonal/Table rows keep distinct tones (success, warning, info, success, neutral): not affected by the 2026-10-31 row-tone defect"},
+  "defectsFixed": [
+    "Tonal/Field hid labels for Switch/Radio/Slider/OTP/Checkbox: the label instance is now visible in the vertical variants (its 'text' part materialises again, so base label overrides carry over); the nested Tonal/Input hides field-label and its padding is re-centred 24/8 -> 16/16. Fields now show the label above the filled field.",
+    "Tonal/Field control lost part names: in the Tonal screens the swapped controls were named after their component (Select, Textarea, Slider, Switch, Radio group, Input OTP, Checkbox): 16 layers renamed back to 'control' (Tonal style sets were already correct).",
+    "Tonal Sidebar nav items lost part names: 19 icon layers named 'Icon/<glyph>' renamed back to 'nav-icon' (Tonal/Nav group 12, Tonal/Sidebar 3) and 'glyph' (Tonal/Sidebar toggle 4). Collapsed Nav item parts match the base (no marker in base collapsed)."
+  ],
+  "screens": {
+    "group": "533:104114",
+    "swapped": {"Alert": 4, "Inline notice": 2, "Progress": 2, "Toast": 6},
+    "leftoverBaseFeedback": 0,
+    "fixes": ["Field labels: 6 duplicate inner field-labels hidden (+12 in the first pass), controls re-centred", "Orders sheet: Email and Tracking number rows hidden so the pinned overlay fits (560 of 696; same as the Tactile and Terminal groups)", "Settings: stray slider value 'Email' -> '60'"],
+    "reShot": ["review/screens/tonal/orders-light.png", "review/screens/tonal/orders-dark.png", "review/screens/tonal/settings-light.png", "review/screens/tonal/settings-dark.png", "review/screens/tonal/sign-in-light.png", "review/screens/tonal/sign-in-dark.png", "review/screens/tonal/command-light.png", "review/screens/tonal/command-dark.png"],
+    "unchanged": ["Dashboard"]
+  },
+  "ownerReview": [
+    "Alert strong light uses the Badge solid pairs: info and success white-on-step-9 are ~3.3:1 / 3.0:1 for body text (below 4.5:1), the same known trade-off as Badge solid.",
+    "Tonal/Field now puts the label above the filled field (the M3 label-inside look survives only on standalone Tonal/Input) - the only way every control keeps its label and base label overrides survive the swap.",
+    "Progress circular is not wavy (derived)."
+  ],
+  "notTouched": "Data display 1 review/strip PNGs were not re-shot after the Skeleton/Empty state sweep."
+}

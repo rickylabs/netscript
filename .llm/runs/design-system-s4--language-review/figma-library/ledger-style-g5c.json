@@ -1,0 +1,653 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "style-builder-G5c (filigrane, continuation of G5b)",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "page": "37:6",
+ "styleComponents": "465:98595",
+ "continues": "ledger-style-g5b.json (Actions 23 sets + Forms 8 built sets; ids there)",
+ "setsFrames": {
+  "Forms": "465:98607",
+  "Navigation": "465:98613",
+  "Overlays": "465:98619",
+  "Data display 1": "465:98625"
+ },
+ "sets": [
+  {
+   "name": "Filigrane/Radio group",
+   "id": "487:91372",
+   "baseId": "284:1885",
+   "variants": 2,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Field",
+   "id": "487:91485",
+   "baseId": "287:2656",
+   "variants": 6,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Field set",
+   "id": "487:91694",
+   "baseId": "287:2743",
+   "variants": 2,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Input group",
+   "id": "487:91860",
+   "baseId": "297:3861",
+   "variants": 16,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/OTP slot",
+   "id": "487:92458",
+   "baseId": "301:4385",
+   "variants": 12,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Input OTP",
+   "id": "487:92522",
+   "baseId": "301:4490",
+   "variants": 4,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Slider",
+   "id": "493:4319",
+   "baseId": "303:5022",
+   "variants": 16,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Calendar day",
+   "id": "493:4468",
+   "baseId": "307:6154",
+   "variants": 30,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Calendar",
+   "id": "493:4598",
+   "baseId": "309:8620",
+   "variants": 8,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Combobox",
+   "id": "493:9434",
+   "baseId": "305:5623",
+   "variants": 10,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Date picker",
+   "id": "493:9878",
+   "baseId": "313:14889",
+   "variants": 10,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Search",
+   "id": "495:7306",
+   "baseId": "316:16426",
+   "variants": 8,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Dropzone",
+   "id": "495:7503",
+   "baseId": "319:16832",
+   "variants": 7,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Location marker",
+   "id": "504:69868",
+   "baseId": "337:22",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Breadcrumb item",
+   "id": "504:69873",
+   "baseId": "338:92",
+   "variants": 9,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Breadcrumb",
+   "id": "504:69954",
+   "baseId": "338:161",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Page key",
+   "id": "504:70097",
+   "baseId": "339:270",
+   "variants": 20,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Pager tile",
+   "id": "504:70236",
+   "baseId": "339:319",
+   "variants": 6,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Pagination",
+   "id": "504:70299",
+   "baseId": "339:379",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Tab / horizontal",
+   "id": "504:70436",
+   "baseId": "342:402",
+   "variants": 24,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Tab / vertical",
+   "id": "504:70615",
+   "baseId": "342:599",
+   "variants": 24,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Tabs list",
+   "id": "504:70794",
+   "baseId": "343:424",
+   "variants": 6,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Tabs",
+   "id": "504:71649",
+   "baseId": "343:489",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/.Brand logo",
+   "id": "504:71924",
+   "baseId": "344:410",
+   "variants": 0,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Sidebar toggle",
+   "id": "504:71927",
+   "baseId": "344:462",
+   "variants": 4,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Nav item",
+   "id": "506:11652",
+   "baseId": "345:601",
+   "variants": 20,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Nav group",
+   "id": "506:11822",
+   "baseId": "346:611",
+   "variants": 6,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Sidebar",
+   "id": "506:13003",
+   "baseId": "347:994",
+   "variants": 6,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Nav menu item",
+   "id": "506:12211",
+   "baseId": "349:1036",
+   "variants": 10,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/.Nav menu link",
+   "id": "506:12284",
+   "baseId": "348:1108",
+   "variants": 3,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Navigation menu",
+   "id": "506:12302",
+   "baseId": "349:1132",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Menubar trigger",
+   "id": "506:12507",
+   "baseId": "349:1153",
+   "variants": 5,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Menubar",
+   "id": "506:12534",
+   "baseId": "349:1236",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Step",
+   "id": "506:12806",
+   "baseId": "352:1355",
+   "variants": 8,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Stepper",
+   "id": "506:12875",
+   "baseId": "352:1424",
+   "variants": 2,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/Top bar",
+   "id": "506:14190",
+   "baseId": "351:1349",
+   "variants": 4,
+   "category": "Navigation"
+  },
+  {
+   "name": "Filigrane/.Breadcrumb separator",
+   "id": "504:69871",
+   "baseId": null,
+   "variants": 0,
+   "category": "Navigation",
+   "note": "theme-only helper component (middle dot in F.label primary/text) swapped into Breadcrumb item 'separator'"
+  },
+  {
+   "name": "Filigrane/Menu item",
+   "id": "512:17577",
+   "baseId": "371:587",
+   "variants": 30,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Menu label",
+   "id": "512:18110",
+   "baseId": "373:35",
+   "variants": 0,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Menu separator",
+   "id": "512:18113",
+   "baseId": "373:38",
+   "variants": 0,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Menu group",
+   "id": "512:18115",
+   "baseId": "373:248",
+   "variants": 3,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Menu content",
+   "id": "512:18455",
+   "baseId": "373:256",
+   "variants": 0,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Dropdown menu",
+   "id": "512:18753",
+   "baseId": "374:382",
+   "variants": 2,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Context menu",
+   "id": "512:19154",
+   "baseId": "374:653",
+   "variants": 2,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Tooltip",
+   "id": "512:19520",
+   "baseId": "381:1030",
+   "variants": 12,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Popover",
+   "id": "512:19593",
+   "baseId": "381:937",
+   "variants": 4,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Hover card",
+   "id": "512:19684",
+   "baseId": "381:1093",
+   "variants": 4,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Dialog",
+   "id": "514:18096",
+   "baseId": "378:743",
+   "variants": 6,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Alert dialog",
+   "id": "514:18542",
+   "baseId": "378:880",
+   "variants": 4,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Sheet",
+   "id": "514:18772",
+   "baseId": "379:1004",
+   "variants": 8,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Drawer",
+   "id": "514:19349",
+   "baseId": "379:1150",
+   "variants": 4,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Command item",
+   "id": "514:19574",
+   "baseId": "382:1015",
+   "variants": 9,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Command palette",
+   "id": "514:19710",
+   "baseId": "383:1355",
+   "variants": 6,
+   "category": "Overlays"
+  },
+  {
+   "name": "Filigrane/Kbd",
+   "id": "521:23259",
+   "baseId": "403:28",
+   "variants": 4,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Kbd group",
+   "id": "521:23268",
+   "baseId": "403:96",
+   "variants": 8,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Badge",
+   "id": "521:23349",
+   "baseId": "405:180",
+   "variants": 20,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Badge / kind",
+   "id": "521:23450",
+   "baseId": "405:211",
+   "variants": 10,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Avatar presence",
+   "id": "521:23481",
+   "baseId": "406:43",
+   "variants": 3,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Avatar",
+   "id": "521:23485",
+   "baseId": "406:95",
+   "variants": 12,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Avatar group",
+   "id": "521:23537",
+   "baseId": "406:150",
+   "variants": 3,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/.Item icon tile",
+   "id": "521:23628",
+   "baseId": "408:82",
+   "variants": 0,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/.Item image",
+   "id": "521:23631",
+   "baseId": "408:85",
+   "variants": 0,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Item",
+   "id": "521:23632",
+   "baseId": "408:792",
+   "variants": 27,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Item group",
+   "id": "521:24473",
+   "baseId": "408:996",
+   "variants": 2,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Card",
+   "id": "522:23472",
+   "baseId": "409:951",
+   "variants": 16,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Stat card",
+   "id": "531:27010",
+   "baseId": "409:1270",
+   "variants": 6,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Table header cell",
+   "id": "522:25062",
+   "baseId": "410:546",
+   "variants": 27,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Table cell",
+   "id": "522:25234",
+   "baseId": "410:383",
+   "variants": 27,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Table row",
+   "id": "522:25442",
+   "baseId": "412:1187",
+   "variants": 20,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Table",
+   "id": "522:26724",
+   "baseId": "413:1367",
+   "variants": 6,
+   "category": "Data display 1"
+  },
+  {
+   "name": "Filigrane/Data table",
+   "id": "522:27998",
+   "baseId": "416:4605",
+   "variants": 10,
+   "category": "Data display 1"
+  }
+ ],
+ "categories": {
+  "Forms": {
+   "status": "done (21 sets)",
+   "verifiedG5bSets": "Label, Input, Select, Textarea, Select content, Checkbox, Radio, Switch screenshotted in the sets frame: no defect found except Select content (base Menu content/items, pending the Overlays swap)",
+   "review": "498:7378",
+   "strip": "498:8949",
+   "png": [
+    "review/styles/filigrane/forms.png",
+    "review/styles/filigrane/forms-strip.png"
+   ],
+   "swapTest": "28/28 pass (Light+Dark, 14 base sets with one TEXT override and one flipped BOOLEAN each)",
+   "pendingSwaps": [
+    "Select content rows (base Menu item) -> Filigrane/Menu item type=option (after Overlays)",
+    "Combobox multiple chips (base Badge) -> Filigrane/Badge subtle (after Data display 1)",
+    "Search kbd (base Kbd, restyled by overrides) -> Filigrane/Kbd sm (after Data display 1)",
+    "Date picker open wrapper is a styled frame 'content' (F.panel, padding 16); the base has no Popover instance there"
+   ],
+   "deviations": [
+    "Field: label-to-control gap 4 and helper 4 under the field, measured on kit 37:44 (label top 28, value top 50, note top 89); the brief says about 8 for the helper",
+    "Field set: legend sits in a theme-only 'legend-row' frame with theme-only 'numeral' (\"01\", hidden in variant=label) and 'section-rule' (2px frame, 1px INSIDE bottom stroke border/strong); legend's parent changes, its TEXT property is kept",
+    "Input group: root is the underline field (theme-only 'underline' rect); the nested Filigrane/Input or Filigrane/Textarea hides its own underline; addon is a 30-tall row (2 top) so glyphs centre on the value line",
+    "OTP slot stays 37 tall in focus and invalid (the 2px underline takes the bottom two rows) so a row of slots keeps one baseline",
+    "Slider: control row 12 tall; range is a 2px text/fg rect, track a 2px rect with a 1px INSIDE bottom stroke border/strong (whole pixel); thumbs 12 squares",
+    "Calendar day hover/today underline is a theme-only 16x1 'underline' at y26; range-middle uses top/bottom INSIDE strokes border/strong",
+    "Calendar: root has no box and padding 0; weekday labels fixed 36 wide centred",
+    "Combobox open maps the nested Input to state focus; multiple=true 'input' frame is the underline field and nests a strokeless Filigrane/Input",
+    "Search: field is Filigrane/Input sm (F.data label) with iconStart off and padding 2/6 (md, 28 tall) or 0/4 (sm, 24); kbd restyled by instance overrides until Filigrane/Kbd exists",
+    "Dropzone: top rule is the root's INSIDE top stroke, bottom rule is the theme-only 'underline' (1px border/strong, 2px destructive/default when invalid); hover rules border/control (derived); active adds theme-only 'margin-bar'"
+   ],
+   "note": "forms.png re-shot on 2026-10-31 after the sweeps; forms-strip.png predates the sweeps (Select content rows, chips, kbd)"
+  },
+  "Navigation": {
+   "status": "done (23 sets + 1 theme-only helper)",
+   "review": "507:63039",
+   "strip": "507:65180",
+   "png": [
+    "review/styles/filigrane/navigation.png",
+    "review/styles/filigrane/navigation-strip.png"
+   ],
+   "swapTest": "28/28 pass (Light+Dark, 14 base sets)",
+   "pendingSwaps": [
+    "Menubar open menu (base Menu content) -> Filigrane/Menu content (after Overlays)",
+    "Tab and Nav item count (base Badge) -> Filigrane/Badge plain (after Data display 1)",
+    "Top bar and Sidebar avatar are base frames restyled as 32px hairline circles (radius/avatar bound); no Avatar instance there"
+   ],
+   "deviations": [
+    "Breadcrumb separator: the separator part (bound to the 'separator' boolean) is swapped to the theme-only helper Filigrane/.Breadcrumb separator, so the chevron becomes a middle dot without changing the part",
+    "Breadcrumb link hover underline is a theme-only absolute 'underline' at the link bottom",
+    "Page key previous/next nest Filigrane/Button / sm variant=link; labels keep the base text (Previous/Next), not 'Previous page'",
+    "Pager tile: the 16px arrow stays in the direction row (base position); title hover underline sits in a theme-only 'label-wrap'",
+    "Tab: heights 38 via padding 2/8 (vertical 5/5 with 14 left); selected underline set explicitly (tabs/sel-border, bottom 2 / left 2) instead of relying on the base weight bindings; root fills cleared (segmented resolved to a tint)",
+    "Tabs list: theme-only 'baseline' (1px border/strong) with paddingBottom 1 (vertical: paddingLeft 1); vertical triggers fixed 200 wide",
+    "Tabs: root gap 22 (the 28 top padding of the page tabs row is left to layouts)",
+    "Nav item / Nav menu item / Menubar trigger: theme-only 'underline' in every variant (nav/active transparent, text/fg when selected or open), 34 tall",
+    "Step: numerals show the base number property ('2'), not zero-padded '02'; complete check resized to 12 with 2px stroke",
+    "Top bar: padding 0/40 desktop, 0/16 mobile (the 89:887 padding was not measured); brand texts in F.heading; search fixed 220",
+    "Sidebar floating 'panel' frame is F.panel (surface/bg, border/strong)"
+   ],
+   "openDefect": "none: the vertical Stepper connector is ink under a complete step (verified at 2x); navigation.png re-shot after the Menubar menu fix; navigation-strip.png predates the count/marker sweeps"
+  },
+  "Overlays": {
+   "status": "done (16 sets)",
+   "review": "516:25374",
+   "strip": "516:26893",
+   "png": [
+    "review/styles/filigrane/overlays.png",
+    "review/styles/filigrane/overlays-strip.png"
+   ],
+   "swapTest": "28/28 pass (Light+Dark, 14 base sets)",
+   "sweepDone": [
+    "Filigrane/Select content: root is F.panel (padding 8/12) and its 5 rows are Filigrane/Menu item (type=option); Filigrane/Combobox content follows",
+    "Filigrane/Menubar open menu -> Filigrane/Menu content (plain swap keeps the File-menu labels)",
+    "Filigrane/Step: vertical connector rect recoloured (complete text/fg, else border/strong)"
+   ],
+   "pendingSwaps": [
+    "Hover card avatar (base Avatar) -> Filigrane/Avatar (after Data display 1)",
+    "Menu item / Tooltip / Command item shortcut and Command palette kbd (base Kbd, restyled by overrides: no fill, 1px border/default, F.caption text/muted) -> Filigrane/Kbd sm (after Data display 1)"
+   ],
+   "deviations": [
+    "Menu item: 34 tall via padding 7/12; radio 'dot' ellipse replaced by a 6x6 rectangle with the same layer name and property refs; check/minus 12px at 2px; disabled recolours (opacity unbound to 1)",
+    "Tooltip/Popover/Hover card: 'arrow' unbound from the arrow boolean and hidden (default stays true); arrow-tip repainted surface/bg + border/strong",
+    "Popover close stays the base xs slot but swapped to Filigrane/Icon button / sm ghost",
+    "Alert dialog: theme-only 'accent-rule' (1px primary/default or destructive/default) over the panel's top edge; media tile becomes a theme-only 'eyebrow' text 'Attention' (icon hidden)",
+    "Sheet/Drawer: base per-side weights kept, stroke paint border/strong; header/footer rules border/default",
+    "Command item: item-kind chip loses fill and padding (an F.caption word); selected adds theme-only 'margin-bar'",
+    "Command palette: list padding-left 20 so the margin bar stays inside the panel; the input row search glyph still shows (its layer name did not match 'search-icon')",
+    "Dialog/Command palette scrim: surface/overlay, no blur"
+   ],
+   "note": "overlays.png re-shot after the Kbd/Avatar sweep; overlays-strip.png predates it"
+  },
+  "Data display 1": {
+   "status": "done (18 sets)",
+   "review": "531:27342",
+   "strip": "531:29133",
+   "png": [
+    "review/styles/filigrane/data-display-1.png",
+    "review/styles/filigrane/data-display-1-strip.png"
+   ],
+   "swapTest": "28/28 pass (Light+Dark, 14 base sets)",
+   "deviations": [
+    "Badge: dot is 7x7 with radius unbound to 0; glyph colour by tone (neutral text/subtle); outline/subtle/solid draw the same glyph+word; plain word text/muted; icon and remove 12px",
+    "Kbd: inverse identical to default (no tooltip/* binding); padding-x 5, min width = height",
+    "Avatar: hairline on the 'media' frame (border/default), agent fill action/primary-*; initials F.caption/F.label/F.body by size",
+    "Avatar presence: 7x7 square with 2px OUTSIDE surface/bg ring; offline border/strong",
+    "Item: hover adds theme-only 'margin-bar' in border/strong; title F.body (F.data at sm/xs); mediaContent default now points at Filigrane/.Item icon tile",
+    "Card: binds card/border (resolves to border/default under Theme Filigrane); hover rule border/strong; rule variant border/subtle; selected theme-only 'margin-bar'; md gap 22, sm 14; side padding 0",
+    "Stat card: hairlines kpi/border top/right/bottom; hero = theme-only 'accent-rule' (1px primary/default) + primary/text label; delta-icon becomes a text glyph (same layer name) in F.data Medium",
+    "Table cell: height stays bound to space/table/row-height (resolves 52); padding-x 0 (select cell 8)",
+    "Table row: the base selection bar part becomes the 3px margin bar at x-8 (primary/default selected, border/strong hover); fills cleared; selected row sets the select checkbox checked",
+    "Table/Data table: nested Badge tones per row reset to the Filigrane cell default after the swap (status words keep their text); Data table selection variant re-selects rows 1-2",
+    "Table empty/loading keep base Feedback sets Empty state (2) and Skeleton (67): Feedback is out of scope"
+   ]
+  }
+ },
+ "lessons": [
+  "A use_figma script that throws is rolled back entirely, so a retry after a fix is safe",
+  "Deep text restore after swap+resetOverrides must skip duplicate layer paths (lists of Menu items or Calendar days all received the last label)",
+  "Setting x/y on a focus ring inside a nested instance throws (relative-transform cannot be overridden); place rings only on the set's own parts",
+  "New auto-layout frames clip content by default: set clipsContent=false on review/strip frames or the 3-5px double ring is cut",
+  "Probe with a one-line read before re-sending a large script after a rate-limit refusal; every refused large script costs context",
+  "Iterating findAll() results while swapping nested instances invalidates sibling ids ('node does not exist'); collect direct parts with a walk that stops at instances, or re-query after each swap",
+  "Glyphs like \u25b2/\u25bc need the 'Noto Sans Symbols2' fallback loaded before text-style bindings",
+  "swapKeep (reset + restore props) loses nested instance state such as selected rows or badge tones; re-apply the state that matters after swapping composites, or use a plain swap when the layer tree matches"
+ ],
+ "sweeps": {
+  "crossCategory": "161 base Badge/Kbd/Avatar instances in Filigrane sets swapped (Combobox chips -> Badge subtle; Tab/Nav item counts -> Badge plain; Search, Menu item, Tooltip, Command item, Command palette kbd -> Kbd sm; Hover card avatar -> Avatar; Stat card badge), plus 3 Item group media avatars",
+  "leftoverFix": "Location marker parts in Tab h/v, Nav menu item, Command palette (64) -> Filigrane/Location marker; stacked Table row cells (70) -> Filigrane/Table cell; Data table Page keys (8) -> Filigrane/Page key; Command palette Input (6) -> Filigrane/Input md with its underline hidden",
+  "menubar": "carried-over highlighted fill in the Menubar open menu cleared"
+ },
+ "finalCheck": {
+  "setsChecked": 101,
+  "contractIssues": 0,
+  "note": "property names, types, variant options, variant counts and BOOLEAN/TEXT defaults equal the base for all 101 Filigrane sets; the only differences are G5b's theme-only BOOLEAN 'caret' on Input and Textarea (allowed). Plus 1 theme-only helper component Filigrane/.Breadcrumb separator",
+  "leftoverBaseInstances": {
+   "Filigrane/Table": "Empty state (2), Skeleton (67) from Components \u00b7 Feedback"
+  }
+ },
+ "status": "complete: Forms (13 new + 8 verified), Navigation 23, Overlays 16, Data display 1 18; with G5b's Actions 23 the Filigrane style covers all 101 sets",
+ "remaining": "none in scope. Optional: re-shoot the three older strips (forms, navigation, overlays) so their style rows show the swept Badge/Kbd/Menu item instances"
+}

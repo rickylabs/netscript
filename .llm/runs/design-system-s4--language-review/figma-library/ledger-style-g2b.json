@@ -1,0 +1,579 @@
+{
+ "group": "G2b",
+ "style": "liquid",
+ "builder": "style builder G2b: Liquid completion pass (Navigation, Overlays, Data display 1, follow-up swaps)",
+ "started": "2026-10-28",
+ "status": "DONE: Navigation, Overlays and Data display 1 built (57 sets), each with review, strip, PNGs and a 6/6 swap test; the follow-up swaps are made; the Cupertino-vs-Liquid check is saved. Parity: 56/57 sets match base exactly; Liquid/Avatar adds the theme-only boolean `ring` (allowed).",
+ "page": "93:735",
+ "modes": {
+  "Theme set": "239:8",
+  "Theme B": "239:2 Liquid",
+  "Density": "3:2 Comfortable",
+  "Scheme": "3:0 Light build / 3:1 Dark check"
+ },
+ "styleComponentsFrame": "464:302461",
+ "categories": {
+  "navigation": {
+   "frame": "465:106151",
+   "sectionLabel": "465:106152 (text rewritten for Navigation)",
+   "setsFrame": "465:106156",
+   "strip": "473:22388 (Light 473:22389, Dark 473:25922)",
+   "review": "470:17827 (Light 470:17828, Dark 470:22907)",
+   "pngs": [
+    "review/styles/liquid/navigation.png (2218x3200; review 3200x4617)",
+    "review/styles/liquid/navigation-strip.png (1280x4600)"
+   ],
+   "sets": [
+    {
+     "name": "Liquid/Location marker",
+     "id": "465:106157",
+     "baseId": "337:22",
+     "variants": 2,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/.Brand logo",
+     "id": "465:106160",
+     "baseId": "344:410",
+     "variants": 0,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Breadcrumb item",
+     "id": "465:106162",
+     "baseId": "338:92",
+     "variants": 9,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Breadcrumb",
+     "id": "465:106217",
+     "baseId": "338:161",
+     "variants": 2,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Page key",
+     "id": "465:106228",
+     "baseId": "339:270",
+     "variants": 20,
+     "status": "restyled, screenshot-checked; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Pager tile",
+     "id": "465:106289",
+     "baseId": "339:319",
+     "variants": 6,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Pagination",
+     "id": "465:106332",
+     "baseId": "339:379",
+     "variants": 2,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Tab / horizontal",
+     "id": "465:106346",
+     "baseId": "342:402",
+     "variants": 24,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Tab / vertical",
+     "id": "465:106519",
+     "baseId": "342:599",
+     "variants": 24,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Tabs list",
+     "id": "465:106692",
+     "baseId": "343:424",
+     "variants": 6,
+     "status": "restyled, screenshot-checked (horizontal hug fix not re-screenshotted); seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Tabs",
+     "id": "465:106723",
+     "baseId": "343:489",
+     "variants": 2,
+     "status": "restyled (nests Liquid/Tabs list); seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Nav item",
+     "id": "465:106730",
+     "baseId": "345:601",
+     "variants": 20,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Nav group",
+     "id": "465:106861",
+     "baseId": "346:611",
+     "variants": 6,
+     "status": "restyled, screenshot-checked, then glyph sync + per-destination tints; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Sidebar toggle",
+     "id": "465:106885",
+     "baseId": "344:462",
+     "variants": 4,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Nav menu item",
+     "id": "465:106894",
+     "baseId": "349:1036",
+     "variants": 10,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/.Nav menu link",
+     "id": "465:106950",
+     "baseId": "348:1108",
+     "variants": 3,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Navigation menu",
+     "id": "465:106966",
+     "baseId": "349:1132",
+     "variants": 2,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Menubar trigger",
+     "id": "465:106990",
+     "baseId": "349:1153",
+     "variants": 5,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Menubar",
+     "id": "465:107011",
+     "baseId": "349:1236",
+     "variants": 2,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Step",
+     "id": "465:107028",
+     "baseId": "352:1355",
+     "variants": 8,
+     "status": "restyled; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Stepper",
+     "id": "465:107093",
+     "baseId": "352:1424",
+     "variants": 2,
+     "status": "restyled (nests Liquid/Step); seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Sidebar",
+     "id": "465:107104",
+     "baseId": "347:994",
+     "variants": 6,
+     "status": "restyled (glass column, traffic-lights, account footer); glyph sync 210 + 15 nav tints; ; seen in review 470:17827"
+    },
+    {
+     "name": "Liquid/Top bar",
+     "id": "465:107194",
+     "baseId": "351:1349",
+     "variants": 4,
+     "status": "restyled; history/view-group items are icon-only Liquid/Icon button / sm ghost (32x28, 17px glyphs); seen in review 470:17827"
+    }
+   ],
+   "themeOnly": {
+    "Tab / horizontal": "part underline (2px text/fg RECTANGLE, absolute bottom; visible only on line+selected)",
+    "Tab / vertical": "part underline (2px text/fg on the inline-start edge; line+selected only)",
+    "Sidebar": "part traffic-lights (close, minimize, zoom ellipses) in sidebar-header",
+    "Top bar": "parts history (Liquid/Button group md with icon-only Liquid/Icon button / sm ghost items, 32x28, 17px glyphs), window-title (title + subtitle texts), view-group (same as history, 3 glyphs), new-order (Liquid/Button / md primary)"
+   },
+   "swaps": [
+    "N1 swap pass (427 swaps): every top-level nested instance in the 23 clones whose main is a base set with a Liquid twin (foundations, Actions, Forms, and the Navigation sets themselves) was swapped to the same-named Liquid variant, and the part name was restored after each swap",
+    "Page key previous/next: nested button → Liquid/Button / sm variant=ghost (bar action; state follows the key, current→rest)",
+    "Sidebar toggle trigger → Liquid/Icon button / md outline (desktop), / lg outline (mobile)",
+    "Glyph sync (Lucide override colour) + per-destination nav tints run on Nav group; glyph sync on Navigation menu, Stepper, Pagination, Breadcrumb, Tabs, Tabs list"
+   ],
+   "pendingSwaps": [
+    "Tab / Nav item count: base Badge plain → Liquid/Badge plain without dot (Data display 1)",
+    "Menubar open menu: base Menu content → Liquid/Menu content (Overlays)",
+    "Navigation menu viewport currently draws the Menu content float recipe on the frame; optionally nest Liquid/Menu content after Overlays"
+   ],
+   "deviations": [
+    "Tabs list horizontal: segments hug their labels instead of sharing the track equally (equal widths overflow with counts; same choice as the Actions Toggle group)",
+    "Tab line variant (derived): unselected labels text/muted, selected Semi Bold text/fg plus underline",
+    "All Tab variants are 30 tall, including line",
+    "Nav item 32 tall literal (base binds space/control/height-sm = 30) and 220 wide inside the 240 sidebar; level 2 padding-left 34",
+    "Nav tints: Overview/Orders liquid/accent/system, Customers liquid/tag/green, Products liquid/tag/purple, Reports/Analytics liquid/tag/red (crafted 93:750 Analytics is a literal; red per brief)",
+    "Step indicator glyphs/numbers: number L.emphasis (text/fg current, text/muted upcoming)",
+    "Gradient rims: accepted coordinator fallback, a solid 1px INSIDE liquid/effect/specular-tint (pending #2414), on the Tab thumb and the Navigation menu viewport",
+    "Top bar: notifications hidden alongside the avatar (the crafted toolbar 93:809 has neither); the Theme toggle glass circle stays per brief",
+    "Top bar view-group sort glyph is Icon/arrow-up-down (no Icon/chevrons-up-down in the glyph set)",
+    "Sidebar inset: drawn as the opaque surface/card plane at r16 (owner should confirm this reading of 'inset adds an opaque surface/card content area')",
+    "Sidebar icon-collapsed (derived): 52 wide, traffic lights hidden; footer role text set to 'Store manager' to match 93:802 (base shows an email)",
+    "Navigation menu: the open viewport draws the Menu content float recipe on the frame instead of nesting Liquid/Menu content (Overlays was not built yet)"
+   ],
+   "swapTest": "6/6 overrides survive (Nav item label + count + glyph, Tab label + iconStart, Page key label, Step title + number + description, Menubar trigger label, Nav menu item label)",
+   "status": "done"
+  },
+  "overlays": {
+   "status": "done",
+   "frame": "477:37301",
+   "sectionLabel": "477:37302",
+   "setsFrame": "477:37306",
+   "sets": [
+    {
+     "name": "Liquid/Menu item",
+     "id": "477:37307",
+     "baseId": "371:587",
+     "variants": 30,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Menu label",
+     "id": "477:37698",
+     "baseId": "373:35",
+     "variants": 0,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Menu separator",
+     "id": "477:37701",
+     "baseId": "373:38",
+     "variants": 0,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Menu group",
+     "id": "477:37703",
+     "baseId": "373:248",
+     "variants": 3,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Menu content",
+     "id": "477:37719",
+     "baseId": "373:256",
+     "variants": 0,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Dropdown menu",
+     "id": "477:37733",
+     "baseId": "374:382",
+     "variants": 2,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Context menu",
+     "id": "477:37739",
+     "baseId": "374:653",
+     "variants": 2,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Dialog",
+     "id": "477:37747",
+     "baseId": "378:743",
+     "variants": 6,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Alert dialog",
+     "id": "477:37817",
+     "baseId": "378:880",
+     "variants": 4,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Sheet",
+     "id": "477:37858",
+     "baseId": "379:1004",
+     "variants": 8,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Drawer",
+     "id": "477:37963",
+     "baseId": "379:1150",
+     "variants": 4,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Popover",
+     "id": "477:38016",
+     "baseId": "381:937",
+     "variants": 4,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Tooltip",
+     "id": "477:38057",
+     "baseId": "381:1030",
+     "variants": 12,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Hover card",
+     "id": "477:38130",
+     "baseId": "381:1093",
+     "variants": 4,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Command item",
+     "id": "477:38175",
+     "baseId": "382:1015",
+     "variants": 9,
+     "status": "restyled"
+    },
+    {
+     "name": "Liquid/Command palette",
+     "id": "477:38293",
+     "baseId": "383:1355",
+     "variants": 6,
+     "status": "restyled"
+    }
+   ],
+   "review": "539:86897 (Light 539:86898, Dark 539:90758)",
+   "strip": "539:91015 (Light 539:91016, Dark 539:93029)",
+   "pngs": [
+    "review/styles/liquid/overlays.png (1677x8000; review 3200x15267)",
+    "review/styles/liquid/overlays-strip.png (1026x8000; strip 1280x9990)"
+   ],
+   "themeOnly": {},
+   "swaps": [
+    "Clone swap pass: 175 nested swaps (foundations, Actions, Forms, Navigation, Overlays twins)",
+    "Dialog/Alert/Sheet/Drawer footers → Liquid/Button / lg (Cancel secondary, action primary or destructive), equal widths, gap 10",
+    "close → Liquid/Icon button / sm secondary (L.close)",
+    "Command palette Command item rows: text inks reset per state (base text-colour overrides survived the swap)",
+    "Sweep: Menu item / Command item shortcuts, Command palette kbd, Tooltip kbd → Liquid/Kbd; Hover card avatar → Liquid/Avatar; Context menu nested Menu content → Liquid"
+   ],
+   "pendingSwaps": [],
+   "swapTest": "6/6 overrides survive (Dialog title + description + footer, Alert dialog title, Menu item label + shortcut + iconStart, Popover titleText, Tooltip label, Command item label)",
+   "deviations": [
+    "Radio menu rows keep the base dot (in the row ink) instead of a 13px check",
+    "Alert dialog default media: material/track tile with a liquid/tag/gray glyph (brief names only the glyph hue for default)",
+    "Alert and Dialog titles both L.sheet-title (22/28 Bold)",
+    "Sheet/Drawer: detached 12px via root padding on auto-layout roots; content 360 wide for left/right",
+    "Command palette filters: the base lanes row restyled (L.strong text/muted over a hairline), not nested Liquid/Toggle group",
+    "Command palette input: Liquid/Input with control-glass overrides (36 tall pill), as the Forms Search did",
+    "Gradient rims: accepted solid 1px specular-tint fallback on every float (pending #2414)",
+    "Strip rows sit on a tiled copy of the wallpaper blobs (every 1100px) so glass always has a desktop behind it"
+   ]
+  },
+  "dataDisplay1": {
+   "status": "done",
+   "frame": "540:119504",
+   "sectionLabel": "540:119505",
+   "setsFrame": "540:119509",
+   "swapPass": "529 nested swaps, no misses",
+   "sets": [
+    {
+     "name": "Liquid/Kbd",
+     "id": "540:119510",
+     "baseId": "403:28",
+     "variants": 4
+    },
+    {
+     "name": "Liquid/Kbd group",
+     "id": "540:119519",
+     "baseId": "403:96",
+     "variants": 8
+    },
+    {
+     "name": "Liquid/Badge",
+     "id": "540:119560",
+     "baseId": "405:180",
+     "variants": 20
+    },
+    {
+     "name": "Liquid/Badge / kind",
+     "id": "540:119661",
+     "baseId": "405:211",
+     "variants": 10
+    },
+    {
+     "name": "Liquid/Avatar presence",
+     "id": "540:119692",
+     "baseId": "406:43",
+     "variants": 3
+    },
+    {
+     "name": "Liquid/Avatar",
+     "id": "540:119696",
+     "baseId": "406:95",
+     "variants": 12
+    },
+    {
+     "name": "Liquid/Avatar group",
+     "id": "540:119742",
+     "baseId": "406:150",
+     "variants": 3
+    },
+    {
+     "name": "Liquid/.Item icon tile",
+     "id": "540:119761",
+     "baseId": "408:82",
+     "variants": 0
+    },
+    {
+     "name": "Liquid/.Item image",
+     "id": "540:119763",
+     "baseId": "408:85",
+     "variants": 0
+    },
+    {
+     "name": "Liquid/Item",
+     "id": "540:119764",
+     "baseId": "408:792",
+     "variants": 27
+    },
+    {
+     "name": "Liquid/Item group",
+     "id": "540:120116",
+     "baseId": "408:996",
+     "variants": 2
+    },
+    {
+     "name": "Liquid/Card",
+     "id": "540:120129",
+     "baseId": "409:951",
+     "variants": 16
+    },
+    {
+     "name": "Liquid/Stat card",
+     "id": "540:120354",
+     "baseId": "409:1270",
+     "variants": 6
+    },
+    {
+     "name": "Liquid/Table header cell",
+     "id": "540:120625",
+     "baseId": "410:546",
+     "variants": 27
+    },
+    {
+     "name": "Liquid/Table cell",
+     "id": "540:120761",
+     "baseId": "410:383",
+     "variants": 27
+    },
+    {
+     "name": "Liquid/Table row",
+     "id": "540:120825",
+     "baseId": "412:1187",
+     "variants": 20
+    },
+    {
+     "name": "Liquid/Table",
+     "id": "540:121126",
+     "baseId": "413:1367",
+     "variants": 6
+    },
+    {
+     "name": "Liquid/Data table",
+     "id": "540:121322",
+     "baseId": "416:4605",
+     "variants": 10
+    }
+   ],
+   "review": "547:36759 (Light 547:36760, Dark 547:46598)",
+   "strip": "547:46917 (Light 547:46918, Dark 547:51076)",
+   "pngs": [
+    "review/styles/liquid/data-display-1.png (1958x5000; review 3200x8175)",
+    "review/styles/liquid/data-display-1-strip.png (1280x7098)"
+   ],
+   "themeOnly": {
+    "Badge": "part tint (absolute hue rectangle, 14% / 12% success; subtle only)",
+    "Avatar": "boolean ring (default false) + part ring (1.5px OUTSIDE white 90%)",
+    "Stat card": "part dot (8px liquid/tag/green) in the header"
+   },
+   "swaps": [
+    "Clone swap pass: 529 nested swaps",
+    "Deep pass: 56 nested base instances that survived parent swaps as instance-swap overrides (Table/Data table rows, Item group items, Menubar and Context menu content) → Liquid twins",
+    "Table and Data table: base fixture overrides (row status tone, initials, texts) mirrored back by name after the swap (coordinator lesson); table badges forced to plain",
+    "Data table selected rows: L.selected inversion applied as overrides (fill, white ink, avatar ring on); action bar → Liquid/Action bar floating, absolute, centred 12 above the table's bottom edge, last in z-order",
+    "Columns/Export → Liquid/Button / md outline"
+   ],
+   "swapTest": "6/6 overrides survive (Badge label + remove, Card title + footer + eyebrow + eyebrowText, Stat card label + value + icon, Avatar initials, Item title + chevron, Kbd label)",
+   "deviations": [
+    "Badge plain count (dot off) needs a text/muted override (done on Tab and Nav item counts), as Cupertino",
+    "Stat card hero shows its delta as 12/16 Medium success text + helper; the Liquid/Badge subtle pill would sit behind the base `badge` boolean (default off)",
+    "Stat card dot is green in the set; instances retint (red/orange) per KPI",
+    "Table header sort keeps the base arrow glyphs (13px text/muted) instead of chevrons",
+    "Table row hover uses liquid/state/hover-overlay as the row fill (the row has no state-layer part)",
+    "Item group separators are full width (inset 15 not drawn)",
+    "Alert/Item outline containers use liquid/sidebar/selection as the group-stroke stand-in (pending #2414)",
+    "Stat card up delta binds core success/text (#71d083 dark) per coordinator decision; Badge success ink keeps liquid/success/text per brief"
+   ]
+  }
+ },
+ "remaining": [],
+ "resume": {
+  "sidebarDescription": "Liquid style · the edge-to-edge sidebar glass column (L301-304, L376; 93:746): 240 wide (space/sidebar/width), full height, no radius. Fill liquid/material/glass-sidebar, BACKGROUND_BLUR 60, INNER_SHADOW 0 1 0 liquid/effect/specular, and a 1px trailing edge in liquid/sidebar/selection (stand-in, pending #2414). Padding 10. Header: theme-only part `traffic-lights` (L.traffic: 14px discs at a 23px pitch in liquid/window/close, /minimize, /zoom); brand-group and sidebar-toggle hidden (the toolbar holds the toggle). Body: Liquid/Nav group, no dividers, groups 14 apart; nav icons tinted per destination. Footer: the account, an L.avatar (28 disc liquid/tag/orange, 11px Semi Bold initials in literal #000000, pending #2414) plus name L.body Medium and role 11/14 text/muted. sidebar and floating are both the edge-to-edge column (derived; a floating r26 sidebar is Cupertino's, L440). inset: drawn as the opaque surface/card window content plane at radius 16 (derived reading of 'inset adds an opaque surface/card content area'). icon: a 52 column of 32 icon squares; traffic lights hidden (derived).",
+  "topBarPlan": [
+   "bar frame: H 52 literal, fill liquid/toolbar/scroll-edge (122:7229), effects [BACKGROUND_BLUR 6], bottom-only 1px stroke liquid/toolbar/hairline (122:7230), padding 8/20, gap 10, counter-align CENTER",
+   "app desktop: topbar-start = sidebar-toggle (already Liquid/Sidebar toggle, 36 glass circle), breadcrumb hidden, then theme-only 'history' = Liquid/Button group (464:340281) 'orientation=horizontal, size=md' with 2 items (glyph swaps to Icon/chevron-left, Icon/chevron-right; separator boolean off; hide items 3-4), then theme-only 'window-title' = vertical frame: 'Orders' L.window-title (type/heading 15/18 Semi Bold, text/fg) over '3,182 orders · last 30 days' 11/14 Regular text/muted (crafted 93:823)",
+   "app desktop topbar-end: theme-only 'view-group' = Liquid/Button group with Icon/filter, Icon/chevrons-up-down, Icon/download (93:827); search → Liquid/Search 'size=md, state=rest' (220×36); theme-only 'new-order' = Liquid/Button / md 'variant=primary, state=rest' label 'New Order' with plus icon (≈116 wide, 93:849); theme-toggle stays (Liquid/Theme toggle glass circle); notifications and avatar hidden (not in the crafted toolbar)",
+   "app mobile: sidebar toggle (lg 40), window-title, new-order; brand, search and avatar hidden",
+   "docs: brand visible (Liquid/.Brand logo + wordmark as L.window-title), Liquid/Navigation menu after it; version chip → 22 pill in liquid/sidebar/selection with L.helper text/muted; search Liquid/Search md",
+   "Glyph lookup: get any Icon/* instance's main component and read its parent's children by name (Icon/chevron-left, etc.)",
+   "Then SYNC(topbar) and set the description"
+  ],
+  "helperJs": "figma.skipInvisibleInstanceChildren=false;\nconst page=await figma.getNodeByIdAsync('93:735');await figma.setCurrentPageAsync(page);\nfor(const f of [['Inter','Regular'],['Inter','Medium'],['Inter','Semi Bold'],['Inter','Bold'],['Geist Mono','Regular'],['Geist Mono','Medium']]){try{await figma.loadFontAsync({family:f[0],style:f[1]});}catch(e){}}\nconst CTX=await figma.getNodeByIdAsync('464:302461');\nconst VC={};const V=async id=>{const k=id.startsWith('VariableID:')?id:'VariableID:'+id;if(!VC[k])VC[k]=await figma.variables.getVariableByIdAsync(k);return VC[k];};\nconst P=async id=>{const v=await V(id);const r=v.resolveForConsumer(CTX).value;const a=r.a===undefined?1:r.a;const p=figma.variables.setBoundVariableForPaint({type:'SOLID',color:{r:r.r,g:r.g,b:r.b}},'color',v);return {...p,opacity:a};};\nconst TY={body:['233','234','235','236'],strong:['237','238','239','240'],small:['241','242','243','244'],caption:['245','246','247','248'],label:['249','250','251','252'],heading:['229','230','231','232'],title:['225','226','227','228']};\nconst T=async(t,role,color)=>{if(!t||t.type!=='TEXT')return;const fam=await V('239:219');\n if(role==='row'||role==='rowsemi'){for(const k of['fontSize','lineHeight','letterSpacing','fontStyle'])t.setBoundVariable(k,null);t.fontName={family:'Inter',style:role==='row'?'Regular':'Semi Bold'};t.fontSize=14;t.lineHeight={unit:'PIXELS',value:18};t.letterSpacing={unit:'PERCENT',value:-0.4};t.setBoundVariable('fontFamily',fam);}\n else if(role==='emph'||role==='medium'){t.setBoundVariable('fontStyle',null);t.fontName={family:'Inter',style:role==='emph'?'Semi Bold':'Medium'};t.setBoundVariable('fontFamily',fam);const[s,l,tr]=TY.body;t.setBoundVariable('fontSize',await V('239:'+s));t.setBoundVariable('lineHeight',await V('239:'+l));t.setBoundVariable('letterSpacing',await V('239:'+tr));}\n else{const b=role==='upper'?'label':role;const[s,l,tr,st]=TY[b];t.setBoundVariable('fontFamily',fam);t.setBoundVariable('fontSize',await V('239:'+s));t.setBoundVariable('lineHeight',await V('239:'+l));t.setBoundVariable('fontStyle',await V('239:'+st));if(role==='upper'){t.setBoundVariable('letterSpacing',null);t.letterSpacing={unit:'PERCENT',value:2};t.textCase='UPPER';}else{t.setBoundVariable('letterSpacing',await V('239:'+tr));t.textCase='ORIGINAL';}}\n if(color)t.fills=[await P(color)];};\nconst G=async(n,color,size)=>{if(!n)return;const p=await P(color);const vs=n.type==='VECTOR'?[n]:n.findAll(x=>['VECTOR','BOOLEAN_OPERATION','ELLIPSE','LINE','STAR','POLYGON'].includes(x.type));for(const v of vs){if(v.strokes&&v.strokes.length)v.strokes=[p];else if(v.fills&&v.fills.length)v.fills=[p];}if(size&&n.type==='INSTANCE')n.resize(size,size);};\nconst R=async(n,r)=>{const ks=['topLeftRadius','topRightRadius','bottomLeftRadius','bottomRightRadius'];if(typeof r==='string'){const v=await V(r);for(const k of ks)n.setBoundVariable(k,v);}else{for(const k of ks)if(n.boundVariables&&n.boundVariables[k])n.setBoundVariable(k,null);n.cornerRadius=r;}};\nconst H=(n,h)=>{if(n.boundVariables&&n.boundVariables.height)n.setBoundVariable('height',null);const hz=n.layoutMode==='HORIZONTAL';const pa=n.primaryAxisSizingMode,ca=n.counterAxisSizingMode;n.resize(n.width,h);if(n.layoutMode&&n.layoutMode!=='NONE'){if(hz){n.primaryAxisSizingMode=pa;n.counterAxisSizingMode='FIXED';}else{n.primaryAxisSizingMode='FIXED';n.counterAxisSizingMode=ca;}}};\nconst PX=(n,t,r,b,l)=>{for(const k of['paddingTop','paddingRight','paddingBottom','paddingLeft'])if(n.boundVariables&&n.boundVariables[k])n.setBoundVariable(k,null);n.paddingTop=t;n.paddingRight=r;n.paddingBottom=b;n.paddingLeft=l;};\nconst GAP=(n,g)=>{if(n.boundVariables&&n.boundVariables.itemSpacing)n.setBoundVariable('itemSpacing',null);n.itemSpacing=g;};\nconst pr=v=>Object.fromEntries(v.name.split(', ').map(s=>s.split('=')));\nconst F=(v,name)=>v.findOne(n=>n.name===name);\nconst FA=(v,name)=>v.findAll(n=>n.name===name);\nconst SRC={control:await figma.getNodeByIdAsync('464:302607'),float:await figma.getNodeByIdAsync('464:340827'),prom:await figma.getNodeByIdAsync('464:302537')};\nconst LOOK=(d,s,o={})=>{if(o.fills!==false)d.fills=s.fills;if(o.strokes!==false){d.strokes=s.strokes;d.strokeWeight=s.strokeWeight;d.strokeAlign=s.strokeAlign;}if(o.effects!==false)d.effects=s.effects;};\nconst SL=async(v,on,rad)=>{for(const s of FA(v,'state-layer')){if(s.componentPropertyReferences&&s.componentPropertyReferences.visible)continue;s.visible=!!on;s.opacity=1;if(rad!==undefined)await R(s,rad);}};\nconst FR=async(v,on,rad)=>{for(const s of FA(v,'focus-ring')){if(s.componentPropertyReferences&&s.componentPropertyReferences.visible)continue;s.visible=!!on;if(rad!==undefined)await R(s,rad);}};\nconst HIDE=(n)=>{if(!n)return;if(n.componentPropertyReferences&&n.componentPropertyReferences.visible)return 'bound';n.visible=false;};\n",
+  "syncJs": "const SYNC=async(root)=>{let n=0;for(const I of root.findAllWithCriteria({types:['INSTANCE']})){const M=await I.getMainComponentAsync();if(!M)continue;const top=M.parent&&M.parent.type==='COMPONENT_SET'?M.parent:M;if(!/^Liquid\\//.test(top.name))continue;\n for(const g of I.findAllWithCriteria({types:['INSTANCE']})){const gm=await g.getMainComponentAsync();if(!gm||!/^Icon\\//.test(gm.name))continue;const path=[];let p=g;while(p&&p.id!==I.id){path.unshift(p.name);p=p.parent;}let q=M;for(const nm of path){q=q&&'children' in q?q.children.find(c=>c.name===nm):null;}if(!q)continue;\n  const mv=q.findOne(x=>(x.type==='VECTOR')&&((x.strokes&&x.strokes.length)||(x.fills&&x.fills.length)));if(!mv)continue;\n  for(const v of g.findAll(x=>x.type==='VECTOR')){if(v.strokes&&v.strokes.length&&mv.strokes.length)v.strokes=mv.strokes;else if(v.fills&&v.fills.length&&mv.fills.length)v.fills=mv.fills;}n++;}}return n;};\nconst TINT={Overview:'121:741',Orders:'121:741',Customers:'121:745',Products:'121:747',Reports:'121:748',Analytics:'121:748'};\nconst TINTALL=async(root)=>{let n=0;for(const I of root.findAll(x=>x.type==='INSTANCE'&&x.name==='nav-item')){const l=I.findOne(x=>x.name==='nav-label');const ic=I.findOne(x=>x.name==='nav-icon');if(l&&ic&&TINT[l.characters]){await G(ic,TINT[l.characters]);n++;}}return n;};\n",
+  "sidebarScript": "// Requires helper.js prelude (V, P, G, R, PX, GAP, pr, F) plus the T variant below.\nconst T2=async(t,role,color)=>{if(!t||t.type!=='TEXT')return;const fam=await V('239:219');\n if(role==='medium'){t.setBoundVariable('fontStyle',null);t.fontName={family:'Inter',style:'Medium'};t.setBoundVariable('fontFamily',fam);t.setBoundVariable('fontSize',await V('239:233'));t.setBoundVariable('lineHeight',await V('239:234'));t.setBoundVariable('letterSpacing',await V('239:235'));}\n else{for(const k of['fontSize','lineHeight','letterSpacing','fontStyle'])t.setBoundVariable(k,null);t.fontName={family:'Inter',style:role==='initials'?'Semi Bold':'Regular'};t.fontSize=11;t.lineHeight={unit:'PIXELS',value:14};t.letterSpacing={unit:'PERCENT',value:0};t.setBoundVariable('fontFamily',fam);}\n if(color)t.fills=[color==='black'?{type:'SOLID',color:{r:0,g:0,b:0}}:await P(color)];};\nconst inner=figma.variables.setBoundVariableForEffect({type:'INNER_SHADOW',color:{r:1,g:1,b:1,a:0.9},offset:{x:0,y:1},radius:0,spread:0,visible:true,blendMode:'NORMAL'},'color',await V('114:1359'));\nconst blur={type:'BACKGROUND_BLUR',radius:60,visible:true};\nconst sb=await figma.getNodeByIdAsync('465:107104');\nfor(const v of sb.children){const p=pr(v);const icon=p.collapsible==='icon';const inset=p.variant==='inset';\n if(v.boundVariables&&v.boundVariables.width)v.setBoundVariable('width',null);\n v.resize(icon?52:240,640); if(!icon&&!inset) v.setBoundVariable('width',await V('241:15'));\n if(inset){v.fills=[await P('3:5')];v.strokes=[];v.effects=[];await R(v,16);v.clipsContent=true;}\n else{v.fills=[await P('121:742')];v.effects=[blur,inner];v.strokes=[await P('121:743')];v.strokeAlign='INSIDE';v.strokeTopWeight=0;v.strokeBottomWeight=0;v.strokeLeftWeight=0;v.strokeRightWeight=1;await R(v,0);}\n const hd=F(v,'sidebar-header'),bd=F(v,'sidebar-body'),ft=F(v,'sidebar-footer');\n hd.strokes=[];if(hd.boundVariables&&hd.boundVariables.height)hd.setBoundVariable('height',null);\n hd.resize(hd.width,52);hd.counterAxisSizingMode='FIXED';PX(hd,0,10,0,18);GAP(hd,9);hd.counterAxisAlignItems='CENTER';hd.primaryAxisAlignItems='MIN';\n const bgp=F(hd,'brand-group');if(bgp)bgp.visible=false;const tg=F(hd,'sidebar-toggle');if(tg)tg.visible=false;\n let tl=hd.children.find(c=>c.name==='traffic-lights');\n if(!tl){tl=figma.createAutoLayout('HORIZONTAL',{name:'traffic-lights',itemSpacing:9});tl.fills=[];hd.insertChild(0,tl);\n  for(const [nm,vid] of [['close','114:1355'],['minimize','114:1356'],['zoom','114:1357']]){const e=figma.createEllipse();e.name=nm;e.resize(14,14);e.fills=[await P(vid)];tl.appendChild(e);}}\n tl.visible=!icon; if(icon){PX(hd,0,0,0,0);hd.primaryAxisAlignItems='CENTER';}\n PX(bd,4,10,10,10);GAP(bd,14);\n for(const d of bd.findAll(n=>n.name==='nav-divider'))d.visible=false;\n for(const g of bd.children.filter(c=>c.name==='nav-group')){g.layoutSizingHorizontal=icon?'HUG':'FILL';}\n ft.strokes=[];PX(ft,10,10,12,10);\n const user=F(ft,'user');if(user){PX(user,0,8,0,8);GAP(user,10);user.counterAxisAlignItems='CENTER';}\n const av=F(ft,'avatar');if(av){av.resize(28,28);await R(av,999);av.fills=[await P('121:746')];av.primaryAxisAlignItems='CENTER';av.counterAxisAlignItems='CENTER';const ini=av.findOne(n=>n.type==='TEXT');if(ini)await T2(ini,'initials','black');}\n const tx=F(ft,'text');if(tx){const ts=tx.findAll(n=>n.type==='TEXT');if(ts[0])await T2(ts[0],'medium','3:11');if(ts[1]){await T2(ts[1],'meta','3:13');ts[1].characters='Store manager';}GAP(tx,0);}\n const ch=ft.findOne(n=>n.type==='INSTANCE'&&/chevron|arrow/i.test(n.name));if(ch)await G(ch,'3:13',13);\n}\n// then run SYNC(sb) (see sync.js) and TINTALL(sb), and set sb.description (text in the ledger).\n",
+  "helperNotes": [
+   "P(varId) seeds a bound paint with the colour resolved in the Style components frame context (Liquid Light) and sets paint.opacity to the variable's alpha",
+   "T(text, role, colourVar): roles body/strong/small/caption/label/heading/title bind type/* vars; emph = body size/line/tracking + literal Semi Bold (fontStyle unbound); medium = the same in Medium; row/rowsemi = literal 14/18 −0.4%; upper = type/label + UPPER + 2%",
+   "G(instance, colourVar, size) recolours glyph vectors (and resizes the instance); SL/FR toggle state-layer/focus-ring (opacity 1, radius) and skip boolean-bound layers",
+   "Recipe sources to copy fills/strokes/effects from: L.control 464:302607, L.prominent 464:302537, L.float bar 464:340827 (GLASS effect included); thumb = tabs/sel-bg + specular-tint rim + 0 1 4 effect/control-shadow + float GLASS"
+  ]
+ },
+ "notes": [
+  "Rate limit: Figma MCP Professional Full seat = 200 calls/day + 10/min across the whole account; whoami and write-only tools are exempt, but use_figma and get_metadata were refused",
+  "Followed the G2 traps: figma.skipInvisibleInstanceChildren=false in every script; after each swapComponent the part name is restored; no layer bound to a boolean property was hidden (SL/FR/HIDE skip bound layers)",
+  "Section label 465:106152: the clone's replace also hit its description line; it was rewritten for Navigation",
+  "Coordinator decisions to apply later: gradient-rim fallback accepted; pink avatar → liquid/tag/red; Stat card dark green delta binds core success/text (#71d083), not liquid/success/text",
+  "The rate limit is intermittent: the shared 10/minute window is contended by the other builders; a 60-90 s back-off then retry works",
+  "A use_figma script that throws is rolled back entirely (the first O1 attempt left nothing); partial-run cleanup is not needed after an error",
+  "Glyph components live on another page: walk any Icon/* main component to its PAGE, await page.loadAsync(), then page.findOne(COMPONENT 'Icon/<name>'). There is no Icon/chevrons-up-down (use arrow-up-down), and no truck or package (the swap test used the next existing fallback)",
+  "Column frames (Strip/Review · Light|Dark) clip so the tiled wallpaper stays inside; rows, sections and items frames do not clip, so focus rings show (coordinator lesson)",
+  "A swap invalidates queued nested nodes: collect top-level instances before swapping, and check .removed",
+  "Nested instance-swap overrides from base fixtures survive the parent swap; run a deep pass (any depth) after the top-level pass",
+  "The base-override mirror must skip style-like variant props (it copied badge style=outline back); re-apply style overrides afterwards"
+ ],
+ "resumed": "2026-10-31",
+ "followUps": {
+  "done": [
+   "Select content + Combobox rows → Liquid/Menu item option (Select content also moved to the Menu content recipe: float glass, r22, padding 6)",
+   "Search kbd → Liquid/Kbd",
+   "Combobox chips → Liquid/Badge subtle (10)",
+   "Forms strip Field set (row 2 invalid) now sits in a real Liquid/Sheet (side=right) through the Sheet body slot, light 550:76815 and dark 550:76997, overrides mirrored",
+   "Tab/Nav item counts → Liquid/Badge plain without dot, text/muted 11/14 (tabs) and 12/16 (nav) — 58 instances",
+   "Menubar open menu → Liquid/Menu content"
+  ],
+  "reshot": [
+   "forms.png",
+   "forms-strip.png",
+   "navigation.png",
+   "navigation-strip.png",
+   "overlays.png",
+   "overlays-strip.png",
+   "data-display-1.png",
+   "data-display-1-strip.png"
+  ]
+ },
+ "distinctness": {
+  "frame": "551:51539 (Cupertino 551:51540, Liquid 551:52651), two 480px columns under each theme's modes on the same wallpaper",
+  "png": "review/styles/liquid/vs-cupertino.png (984x1427)",
+  "verdict": "pass: each column reads without its label — Cupertino's r12 grouped menu with 44px divided rows and UPPER captions vs Liquid's r22 glass float with 32px pill rows; opaque shadowed alert vs smoky glass with rim; translucent focus halo vs solid 3px band on a 28px field; circle checkbox vs r7 square; black inverse tooltip vs glass pill; sparkline KPI card vs flat platter with a dot and a ▲ line; grey vs orange avatar with black initials. Closest pair: the Liquid outline (control-glass) capsule vs Cupertino's secondary capsule; the Liquid one has no drop shadow."
+ },
+ "parity": "57 sets checked against base: variant counts, variant names, property names, options and boolean/text defaults match; only Liquid/Avatar adds the theme-only boolean `ring`.",
+ "leftBase": "~140 instances inside Liquid sets still point to base placeholders with no style set (Skeleton, Empty state, .Slot, crafted glyphs), as in Cupertino"
+}
