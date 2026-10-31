@@ -499,7 +499,7 @@
     {
       "id": "A1-2187",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2479,
       "headSha": "15fa0c689249a92c17471709b739d23b323d5d65",
@@ -507,7 +507,8 @@
         2187
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2187",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY 00:05Z (missed by watcher gap); MERGE at 15fa0c6; e2e armed 05:1xZ"
     },
     {
       "id": "A3-2144",
@@ -529,7 +530,7 @@
     {
       "id": "A3-2400",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
       "prNumber": 2482,
       "headSha": "048bad37987ea86ee2fd67494c9ca96a04bcfcf4",
@@ -538,7 +539,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2438 (continuation after #2476 merged)",
       "receiptRefs": [],
-      "note": "Claimed by the #2438 worker via orchid continuation (claim comment on #2400 at 00:39Z); uses briefs/2400.md."
+      "note": "orphaned 01:02Z (worker torn down when #2438 closed); resume dispatch r1"
     },
     {
       "id": "A2-2395",
@@ -954,7 +955,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T05:06:03.000Z",
+  "updatedAt": "2026-10-31T05:08:00.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1029,8 +1030,11 @@
       "commentId": null,
       "postedAt": "2026-10-31T00:39:24Z",
       "route": "codex gpt-6.1-sol (continuation of #2438 worker)",
-      "state": "pr-open",
-      "pr": 2482
+      "state": "relaunched",
+      "pr": 2482,
+      "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)",
+      "relaunchCommentId": 6539381089,
+      "relaunchedAt": "2026-10-31T05:07:44Z"
     },
     {
       "issue": 2395,
@@ -1074,8 +1078,9 @@
       "commentId": null,
       "postedAt": "2026-10-31T03:10:47Z",
       "route": "codex gpt-6.1-sol (continuation of #2151 worker)",
-      "state": "claimed",
-      "pr": null
+      "state": "orphaned",
+      "pr": null,
+      "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)"
     },
     {
       "issue": 2385,
