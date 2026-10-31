@@ -26,3 +26,11 @@ native props/handlers and an explicit boundaryRef, and retains the clone form.
 Closed native-container choices are documented. No extra wrapper/context/global
 mutation. Installed tests must render actual precompiled JSX including nesting;
 browser RTL scenarios use as. Failure streak1 until re-review PASS.
+
+
+Slice9b native overflow found by strict axe: text-only panels can overflow at
+minimum widths and need their own keyboard focus, even when no child control
+exists. Both panels are consistently tabbable, named groups; endLabel defaults to
+Secondary panel. Child controls retain native tab order around those panel stops.
+SSR aria-hidden uses the explicit string true because precompile boolean values
+otherwise serialize as a bare attribute. Tests preserve the strict axe verdict.

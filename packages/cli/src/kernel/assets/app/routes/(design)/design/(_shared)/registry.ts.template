@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 117,
+  'total': 118,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -783,6 +783,13 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Wrapper-free local native direction on an existing HTML boundary.',
   },
+  {
+    'name': 'resizable',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Native two-panel layout with bounded pixel proposals and pointer/keyboard resizing.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -908,6 +915,7 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'scroll-area',
       'aspect-ratio',
       'direction',
+      'resizable',
     ],
   },
   {

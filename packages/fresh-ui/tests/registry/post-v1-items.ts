@@ -26,6 +26,7 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'scroll-area',
   'aspect-ratio',
   'direction',
+  'resizable',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */

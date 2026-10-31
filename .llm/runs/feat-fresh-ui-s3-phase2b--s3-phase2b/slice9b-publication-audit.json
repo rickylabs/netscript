@@ -1,0 +1,22 @@
+{
+  "fullExportDocLint": {
+    "rawExitCode": 1,
+    "totalDiagnostics": 124,
+    "typescript": 123,
+    "jsonDataExportLimitation": 1,
+    "identityComparison": {
+      "baseline": 123,
+      "current": 123,
+      "new": 0,
+      "removed": 0
+    },
+    "newPrimitivesEntrypointDiagnostics": 0,
+    "attribution": "Inherited accepted debt2531, raw failure retained; exact kind/message/repo-relative source path match."
+  },
+  "nativeMemberPublishDryRun": {
+    "exitCode": 0,
+    "slowTypeWarnings": 0
+  },
+  "runtimePublishProof": false,
+  "ready": false
+}

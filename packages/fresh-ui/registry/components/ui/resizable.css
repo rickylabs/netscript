@@ -1,0 +1,95 @@
+.ns-resizable {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  overflow: hidden;
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  color: var(--ns-fg);
+  background: var(--ns-card);
+}
+.ns-resizable__group {
+  position: relative;
+  display: grid;
+  inline-size: 100%;
+  block-size: 100%;
+  grid-template-columns: minmax(0, min(var(--ns-resizable-start-size), calc(100% -
+    var(--ns-border-width)))) minmax(0, 1fr);
+  column-gap: var(--ns-border-width);
+  background: var(--ns-border);
+}
+.ns-resizable__panel {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: auto;
+  padding: var(--ns-card-padding);
+  background: var(--ns-card);
+}
+.ns-resizable__panel:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+.ns-resizable__handle {
+  position: absolute;
+  z-index: 1;
+  inset-block: 0;
+  inset-inline-start: calc(var(--ns-resizable-start-size) - (24px - var(--ns-border-width)) / 2);
+  inline-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+.ns-resizable__handle::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inline-size: var(--ns-border-width);
+  background: var(--ns-border);
+}
+.ns-resizable__handle:hover::before {
+  background: var(--ns-border-hover);
+}
+.ns-resizable__handle:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+.ns-resizable__grip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: 12px;
+  block-size: 16px;
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-badge);
+  background: var(--ns-muted);
+  color: var(--ns-muted-fg);
+}
+.ns-resizable[data-direction='vertical'] > .ns-resizable__group {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, min(var(--ns-resizable-start-size), calc(100% -
+    var(--ns-border-width)))) minmax(0, 1fr);
+  column-gap: 0;
+  row-gap: var(--ns-border-width);
+}
+.ns-resizable[data-direction='vertical'] > .ns-resizable__group > .ns-resizable__handle {
+  inset-inline: 0;
+  inset-block-start: calc(var(--ns-resizable-start-size) - (24px - var(--ns-border-width)) / 2);
+  inset-block-end: auto;
+  inline-size: auto;
+  block-size: 24px;
+  cursor: row-resize;
+}
+.ns-resizable[data-direction='vertical'] > .ns-resizable__group > .ns-resizable__handle::before {
+  inset-inline: 0;
+  inset-block: auto;
+  inline-size: auto;
+  block-size: var(--ns-border-width);
+}
+.ns-resizable[data-direction='vertical'] > .ns-resizable__group > .ns-resizable__handle > .ns-resizable__grip {
+  transform: rotate(90deg);
+}

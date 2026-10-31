@@ -1,3 +1,4 @@
+import { Resizables } from './gap-resizable-fixture.tsx';
 import { PageHeaders } from './gap-page-header-fixture.tsx';
 import { NativeLayouts } from './gap-native-layout-fixture.tsx';
 import { CommandPalettes } from './gap-command-palette-fixture.tsx';
@@ -73,6 +74,7 @@ function Actions() {
       <CommandPalettes />
       <PageHeaders />
       <NativeLayouts />
+      <Resizables />
     </main>
   );
 }

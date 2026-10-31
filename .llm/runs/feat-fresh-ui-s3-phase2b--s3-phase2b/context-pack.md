@@ -51,3 +51,24 @@ source before9a terminal push/comment.
 
 
 Slice9a committed-source evidence reconciliation PASS. No docs/site or published entrypoint edits in this unit; docs-site build/export drift remain final-phase gates. Source format12files. Public privacy audit0hits across addedlines and bothrun dirs. Push/comment completes9a; next9b contractcheckpoint/research.
+
+
+Slice9a source660c4a71/evidence7a5dd090 pushed and PR2538 comment retained. Starting9b research/contractcheckpoint, no product edits yet. Locked native measured separator and bounded pixel ports are in slice9b-checkpoint.md; independent checkpoint review next.
+
+
+9b design checkpoint PASS; implementation starts. Geometry-only viewport clamping never calls onSizeChange; next real interaction proposes from the displayed size/current bounds. Infinity is described as unbounded, never serialized as a JSON default. Accessible primary naming shared by separator/group; no undeclared state attributes. Failure streak0.
+
+
+## Slice9b source sign-off
+
+Resizable source review PASS; failure streak0.104inventory/91shipped/13pending/
+119nativeitems.354contracts-primitives/18installed-registry/21browserPASS,0ignored/
+failed/flaky and0seriouscriticalaxe; real touch drag and actual capture release on
+connected-node direction change/hidden zero extent/restore/unmount. Both panels
+are named and tabbable for native text-only overflow; primary name matches handle.
+Root runtime dependency imports the existing public Icon primitive and one required
+licensed Lucide grip glyph. Source11files and browser wrappers/quality/architecture/
+preflight/docsaccuracy/exportdriftPASS. Native publish dryrun0slowtypes; inherited
+2531doclint raw124FAIL has exact123TypeScript identities unchanged/0new and primitives
+entrypoint0diagnostics. No new waiver/token values/dependency version/lock/schema
+churn. Reconcile current source before commit; carriers follow SOURCE commit.
