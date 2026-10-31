@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "1d274c16bd3163eb72a40ea3f2e3f0523861159f",
+  "currentMainSha": "f6839463668c5dae4ca7234d26909e74e10b89c0",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -378,16 +378,16 @@
     {
       "id": "D1-2396-u1",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
       "prNumber": 2421,
-      "headSha": "c875e3893458f92a701239ff10461df2c56c2c9f",
+      "headSha": "d3a52cb1bf09e9baf0faf857a76e5102fa3c60a4",
       "issueNumbers": [
         2396
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "c875e38 faithful per coordinator Opus eval; conflicts with main in 3 non-source files; steered to merge main + regenerate"
+      "note": "r2 merge faithful; CHANGES: ProcedureErrorCode private-type-ref on both facades after #2492; coordinator authorized +1 name F-5 growth (23/22) with debt re-review; r3 finish leaf queued"
     },
     {
       "id": "D1-2396-svc",
@@ -738,7 +738,7 @@
     {
       "id": "B1-2159",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2499,
       "headSha": "d21257f08834e10d10faf314596d68bd62733550",
@@ -747,7 +747,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2159",
       "receiptRefs": [],
-      "note": "e2e red both tiers at da931b7: behavior.plugins-health, sagas runner unhealthy; steered"
+      "note": "slice 1 (atomic applied key/envelope/transition) READY d21257f; Opus MERGE r5; 30/30 incl both runtime tiers; combined-tree corpus+prose fresh. #2159 stays OPEN pending Eric's effects follow-up decision",
+      "mergeCommit": "f6839463668c5dae4ca7234d26909e74e10b89c0",
+      "mergedAt": "2026-10-31T08:40:29Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2159"
     },
     {
       "id": "D1-2259",
@@ -1166,7 +1169,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T08:22:01Z",
+  "updatedAt": "2026-10-31T08:42:33Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1391,6 +1394,15 @@
       "commentId": 6541084410,
       "postedAt": "2026-10-31T08:20:53Z",
       "route": "codex gpt-6.1-sol high",
+      "state": "posted",
+      "pr": null
+    },
+    {
+      "issue": 2392,
+      "lane": "internals",
+      "commentId": 6541170747,
+      "postedAt": "2026-10-31T08:30:31Z",
+      "route": "codex gpt-6.1-sol medium",
       "state": "posted",
       "pr": null
     }
