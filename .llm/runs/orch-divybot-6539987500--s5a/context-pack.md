@@ -66,3 +66,22 @@ init rerun14/0/0, new dependent retention control1/0/0; 16-file source wrappers
 pass. Existing preset-tokens moved too, restoring v2 to12entries. Independent
 repair review confirms S2 dependent protection, grouping and documentation.
 Next S6c: complete source JSDoc, DTCG download links, carriers and final gates.
+
+
+## S6c — downloadable DTCG files and final carriers
+
+Added individual DTCG mode documents and a standalone resolver download beside
+its lossless transport bundle. UI import accepts either the portable theme or
+that bundle. Fixture tests validate the emitted resolver against the official
+schema and import the bundle back to exact Figma state. Documented nine public
+contract fields, restoring doc-lint to the exact baseline124 findings; the
+public tokens entrypoint itself passes. Fixed the remaining init test import
+after S6b's helper move.
+
+Independent S6c source review PASS. Explicit plugin CI passes15 source files,
+12 tests and the browser build. Root check, lint-report, fmt-check-report and
+docs-accuracy durable receipts all PASS. Regenerated agent prose, assets barrel,
+publish assets and MCP export corpus in order. No docs/site/deno.lock churn.
+Reconcile: source and carrier slice complete; final check:* freshness checks,
+publication gates, formal IMPL-EVAL and exact-head non-draft CI remain before
+READY. Runtime and actual Figma host acceptance remain UNPROVEN as documented.

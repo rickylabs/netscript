@@ -17,7 +17,8 @@ deno run -A tools/figma-plugin/build.ts
 
 In Figma Desktop, import `.llm/tmp/figma-plugin/manifest.json` as a development plugin, then run
 NetScript token round-trip on the library file. Select one of the 24 presets. Download its
-portable theme JSON, or download the original collection JSON files individually. The date and
+portable theme JSON. The DTCG section also downloads `figma.tokens.json`, every mode document
+and `tokens.resolver.json`; the snapshot section downloads the original collection JSON files. The date and
 file key control the snapshot index; a fixture comparison uses the handoff's exact metadata.
 No scripted Figma export or personal Figma access token is needed.
 
@@ -31,7 +32,9 @@ DTCG has no generic string or boolean type: lossless Figma transport uses fontFa
 carriers and number 0/1 boolean carriers; metadata retains the original Figma type. The shared
 NetScript importer then assigns the actual semantic token types when compiling a theme.
 
-Import a downloaded theme using the file control. The plugin validates the entire snapshot,
+Import a downloaded theme or the complete `figma.tokens.json` bundle using the file control.
+Individual mode documents use the resolver for other DTCG consumers; restoring Figma names/scopes
+requires the complete bundle metadata. The plugin validates the entire snapshot,
 registered names, modes, alias targets and cycles before mutation. It creates all variables before
 assigning aliases and retains existing variable IDs. Incompatible existing modes/types are refused.
 Host permission, plan limits and actual Figma editor execution cannot be tested in CI; native

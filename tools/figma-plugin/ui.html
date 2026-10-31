@@ -11,8 +11,10 @@ body{font:13px system-ui;margin:20px;color:#222;background:#fff}h1{font-size:20p
 <label>Export date <input id="date" type="date"></label></details>
 <button id="refresh">Refresh variables</button>
 <p id="status" role="status">Reading local variables…</p>
-<details open><summary>Download files</summary><div id="downloads"></div></details>
-<label>Import a downloaded theme <input id="import" type="file" accept="application/json,.json"></label>
+<div id="theme-downloads"></div>
+<details><summary>DTCG 2025.10 documents and resolver</summary><div id="dtcg-downloads"></div></details>
+<details><summary>Original Figma snapshot files</summary><div id="downloads"></div></details>
+<label>Import a theme or Figma DTCG bundle <input id="import" type="file" accept="application/json,.json"></label>
 <details><summary>Open a GitHub pull request</summary>
 <p>Commit the downloaded theme once to establish a baseline. Future exports change values only.</p>
 <label>Repository <input id="repository" placeholder="owner/themes" autocomplete="off"></label>

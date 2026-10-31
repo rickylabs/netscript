@@ -1,4 +1,4 @@
-import type { InitPresetInput } from '../../../kernel/application/scaffold/apply-init-preset.ts';
+import type { InitPresetInput } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { createPublicCommandDependencies } from '../root/public-command-dependencies.ts';

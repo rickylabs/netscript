@@ -11,7 +11,7 @@ import {
   formatSchema,
   resolverSchema,
 } from '../../../packages/fresh-ui/src/tokens/assets/schemas.generated.ts';
-import { exportSnapshot, snapshotFiles, snapshotValue } from '../src/snapshot.ts';
+import { dtcgFiles, exportSnapshot, snapshotFiles, snapshotValue } from '../src/snapshot.ts';
 import { fixtureFigma } from './mock-figma.ts';
 
 Deno.test('Plugin API export reproduces all ten handoff fixtures byte-for-byte', async () => {
@@ -48,6 +48,13 @@ Deno.test('DTCG 2025.10 preserves every mode, alias, WEB name, float and oklch',
   const validate = new Ajv({ strict: false, validateFormats: false }).compile(formatSchema);
   const resolver = new Ajv({ strict: false, validateFormats: false }).compile(resolverSchema);
   assert(resolver(bundle.sources.resolver), JSON.stringify(resolver.errors));
+  const downloads = dtcgFiles(bundle);
+  assert(resolver(JSON.parse(downloads['tokens.resolver.json'])), JSON.stringify(resolver.errors));
+  assertEquals(importFigmaTokenBundle(JSON.parse(downloads['figma.tokens.json'])), collections);
+  for (const [name, document] of Object.entries(bundle.sources.documents)) {
+    assertEquals(JSON.parse(downloads[name]), document);
+  }
+  assertEquals(Object.keys(downloads).length, Object.keys(bundle.sources.documents).length + 2);
   for (const document of Object.values(bundle.sources.documents)) {
     assert(validate(document), JSON.stringify(validate.errors));
   }

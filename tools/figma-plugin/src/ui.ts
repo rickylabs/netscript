@@ -1,8 +1,11 @@
 import { z } from 'npm:zod@^4.6.5';
 import { TOKEN_PRESETS } from '../../../packages/fresh-ui/src/tokens/domain/token-presets.ts';
-import { importFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
+import {
+  exportFigmaTokenBundle,
+  importFigmaTokenBundle,
+} from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 import { validateFigmaSnapshot } from '../../../packages/fresh-ui/src/tokens/domain/figma/figma-snapshot.ts';
-import { snapshotFiles } from './snapshot.ts';
+import { dtcgFiles, snapshotFiles } from './snapshot.ts';
 import { themeItem } from './theme-item.ts';
 import { pushThemePullRequest } from './github-export.ts';
 import type { FigmaCollection } from '../../../packages/fresh-ui/src/tokens/domain/token-contract.ts';
@@ -36,22 +39,27 @@ const status = (message: string) => {
   element('status').textContent = message;
 };
 const send = (message: unknown) => parent.postMessage({ pluginMessage: message }, '*');
-function download(name: string, bytes: string): void {
+function download(name: string, bytes: string, container = 'downloads'): void {
   const url = URL.createObjectURL(new Blob([bytes], { type: 'application/json' }));
   urls.push(url);
   const link = document.createElement('a');
   link.href = url;
   link.download = name;
   link.textContent = name;
-  element('downloads').append(link, document.createElement('br'));
+  element(container).append(link, document.createElement('br'));
 }
 function render(): void {
   for (const url of urls) URL.revokeObjectURL(url);
   urls = [];
-  element('downloads').replaceChildren();
+  for (const id of ['downloads', 'theme-downloads', 'dtcg-downloads']) {
+    element(id).replaceChildren();
+  }
   if (!snapshot) return;
   const item = themeItem(snapshot, preset.value);
-  download(`theme-${preset.value}.json`, JSON.stringify(item, null, 2) + '\n');
+  download(`theme-${preset.value}.json`, JSON.stringify(item, null, 2) + '\n', 'theme-downloads');
+  for (const [name, bytes] of Object.entries(dtcgFiles(exportFigmaTokenBundle(snapshot)))) {
+    download(name, bytes, 'dtcg-downloads');
+  }
   if (input('file-key').value.trim()) {
     for (
       const [name, bytes] of Object.entries(
@@ -92,9 +100,13 @@ input('import').onchange = async () => {
   try {
     const file = input('import').files?.[0];
     if (!file) return;
+    const data: unknown = JSON.parse(await file.text());
     const item = z.object({ meta: z.object({ netscript: z.object({ figma: z.unknown() }) }) })
-      .parse(JSON.parse(await file.text()));
-    send({ type: 'import', snapshot: importFigmaTokenBundle(item.meta.netscript.figma) });
+      .safeParse(data);
+    send({
+      type: 'import',
+      snapshot: importFigmaTokenBundle(item.success ? item.data.meta.netscript.figma : data),
+    });
     status('Importing variables…');
   } catch (error) {
     status(error instanceof Error ? error.message : 'Invalid theme file');

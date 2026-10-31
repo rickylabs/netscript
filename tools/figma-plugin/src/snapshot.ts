@@ -1,3 +1,4 @@
+import type { FigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/domain/figma/figma-token-bundle.ts';
 import type { FigmaCollection } from '../../../packages/fresh-ui/src/tokens/domain/token-contract.ts';
 import { normalizeRGBAColor } from '../upstream/normalize-rgba.ts';
 import type { FigmaValue, FigmaVariablesPort } from './figma-port.ts';
@@ -84,4 +85,19 @@ export function snapshotFiles(
   files['index.json'] = JSON.stringify({ fileKey, exportDate, collections: entries }, null, 2) +
     '\n';
   return files;
+}
+
+/** Downloadable DTCG documents and the resolver retain the transport bundle for lossless import. */
+export function dtcgFiles(bundle: FigmaTokenBundle): Readonly<Record<string, string>> {
+  const json = (value: unknown): string => JSON.stringify(value, null, 2) + '\n';
+  return {
+    'figma.tokens.json': json(bundle),
+    'tokens.resolver.json': json({
+      $schema: 'https://www.designtokens.org/schemas/2025.10/resolver.json',
+      ...bundle.sources.resolver,
+    }),
+    ...Object.fromEntries(
+      Object.entries(bundle.sources.documents).map(([name, document]) => [name, json(document)]),
+    ),
+  };
 }
