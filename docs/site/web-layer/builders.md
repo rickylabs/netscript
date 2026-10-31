@@ -154,7 +154,8 @@ route-bound `Link` component, and `parsePath` / `parseSearch` helpers (plus `saf
 `safeParseSearch`, which return a `PageSchemaParseResult`).
 
 With the NetScript Vite plugin enabled, the binding call is generated from the page module's path
-under `routes/`, so you author only the contract body: inline in `withRouteContract()`, in a sibling
+under `routes/` when the page has no explicit binding. An existing `.withRoute(...)` call and its
+imports remain author-owned. Otherwise, author only the contract body: inline in `withRouteContract()`, in a sibling
 `<page>.route.ts` sidecar, or not at all. The three forms, their conflict rules and the
 `pageModuleRouteBinding: false` opt-out are covered in
 [Routing and route contracts](/web-layer/route/#three-authoring-forms-one-generated-binding).

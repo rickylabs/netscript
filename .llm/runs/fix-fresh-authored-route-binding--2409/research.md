@@ -7,7 +7,8 @@ F1 lists this leaf; Fresh UI PR #2503 does not change the route generator/Vite f
 Consulted NetScript MCP find_guidance(intent), then search_docs(withRoute appRoutes generated binding).
 Public docs describe three auto-binding forms and app-owned ui:add pages using appRoutes. Existing
 rewriteWithRouteForm only detects the exact canonical string; any other existing .withRoute gets a
-second binding. Both Vite hooks and the CLI use the same writeNetScriptPageModuleBindingsSync seam.
+second binding. Vite hooks use writeNetScriptPageModuleBindingsSync. Current CLI manifest staging calls only
+writeNetScriptRouteManifestSync and already preserves pages; verify that path without changing it.
 The existing scanner already reports hasWithRoute. Inline/withRoute conflict detection is separate.
 
 Surface is the existing @netscript/fresh/vite generator (archetype 6 concern inside archetype 4 Fresh).

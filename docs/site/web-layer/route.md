@@ -282,7 +282,7 @@ registry items.
 ## Three authoring forms, one generated binding
 
 A page module and its route contract can be colocated, split into a sidecar, or absent. The
-generator recognizes all three and owns the binding call in each:
+generator recognizes all three and supplies missing bindings:
 
 | Form | You write | The generator inserts |
 | --- | --- | --- |
@@ -293,6 +293,11 @@ generator recognizes all three and owns the binding call in each:
 Form A keeps the schemas next to the page that reads them; the `routes` leaf for a Form A page stays
 a plain navigable reference. Choose Form B when several modules (a page, its partial, a test) need
 the same contract object.
+
+An existing explicit `.withRoute(...)` binding stays author-owned, including bindings through
+`appRoutes.home`, `appRoutes['notes']` or a router-owned `routes` alias. The generator preserves
+that expression and its imports instead of inserting another binding. If you rename a page, update
+its explicit route binding yourself; the generator does not retarget it to the new path.
 
 The rewrite is idempotent and edits your source file on disk, so the binding is visible in the
 module. Set `pageModuleRouteBinding: false` in the plugin options to opt out; the plugin then writes
