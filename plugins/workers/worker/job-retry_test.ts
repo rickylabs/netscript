@@ -1,5 +1,5 @@
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { closeKv, DenoKvAdapter as KvStoreAdapter, getKv, isKvInitialized } from '@netscript/kv';
 import { KvPollingAdapter } from '@netscript/queue/adapters/kv-polling';
 import { DenoKvAdapter as NativeKvQueue } from '@netscript/queue/adapters/deno-kv';
@@ -282,6 +282,57 @@ Deno.test('direct dispatcher consumers without a DLQ field keep the canonical du
   } finally {
     await harness.context.workerPool.shutdown();
     await closeKv();
+  }
+});
+
+Deno.test('DLQ replay during terminal claim release is deferred without losing the durable job', async () => {
+  await using kv = await Deno.openKv(':memory:');
+  let calls = 0;
+  const harness = await dispatchHarness(kv, {
+    id: 'retry-job',
+    enabled: true,
+    maxRetries: 0,
+    handler: () =>
+      ++calls === 1 ? { success: false, error: 'retry after repair' } : { success: true },
+  }, new RetryClock());
+  const releasing = Promise.withResolvers<void>();
+  const releaseAllowed = Promise.withResolvers<void>();
+  const idempotency = harness.context.idempotency;
+  const original: WorkerDispatchContext = {
+    ...harness.context,
+    idempotency: {
+      claim: (input) => idempotency.claim(input),
+      markApplied: (key, ttl) => idempotency.markApplied(key, ttl),
+      release: async (key) => {
+        releasing.resolve();
+        await releaseAllowed.promise;
+        await idempotency.release(key);
+      },
+    },
+  };
+  const first = processWorkerJob(original, {
+    jobId: 'retry-job',
+    topic: 'jobs',
+    triggeredBy: 'queue',
+    idempotencyKey: 'replay-window',
+  });
+  void first.catch(() => undefined);
+  try {
+    await bounded(releasing.promise);
+    const replay = () =>
+      harness.deadLetters.reprocess((record) => processWorkerJob(harness.context, record.payload));
+    await assertRejects(replay, Error, 'already being processed');
+    assertEquals(await harness.deadLetters.depth(), 1, 'failed replay retains its durable record');
+    assertEquals(calls, 1);
+    releaseAllowed.resolve();
+    await bounded(first);
+    assertEquals(await replay(), 1);
+    assertEquals(calls, 2);
+    assertEquals(await harness.deadLetters.depth(), 0);
+  } finally {
+    releaseAllowed.resolve();
+    await first;
+    await harness.context.workerPool.shutdown();
   }
 });
 

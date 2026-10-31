@@ -70,3 +70,21 @@ PASS from the same independent evaluator before any implementation. See plan-eva
 - Independent S3 review: PASS. Clarified its advisory that handler policy validates when the generated registry loads, rather than during source emission.
 - All three new TypeScript examples compile through the repository snippet compiler. Docs source-format passes; docs:links reports 105 docs with zero broken links, anchors or orphans. No source behavior changed in S3.
 - S3 reconcile: all requested implementation scope is delivered; no follow-up issue is needed. Redis integration runs and scaffold.runtime remain CI proof, with the coordinator owning e2e-cli-gate. Exact-head independent IMPL-EVAL is next, then the ready transition and final CI state.
+
+## Ready-state quality correction
+
+- Initial and post-ready independent evaluations approved `a8678d242c99e91a623441959db58821ead9d9b0`; the evaluator independently ran 25 focused regressions. command-postgres was green at that head after both compatibility and main baseline repairs.
+- The first ready-state close-gate sampled the final checkbox before its body update; the live gate now passes. Stop the obsolete-head rerun watcher because the docs artifact repair will produce a new head. Update the final checklist before the next ready transition.
+- CI quality found the generated CLI/MCP prose carrier stale after the recipe changed. This freshness gate is broader than source/snippet/link checks. Apply `deno task gen:agent-docs-prose`, inspect the deterministic carrier delta, and prove `check:agent-docs-prose` before a new exact-head evaluation. No runtime logic changes are required.
+- Canonical prose regeneration changes only the task-router summary, the background how-to index and tune-worker-runtime's compressed page. Freshness check passes, and all three prose-generator tests pass.
+- Test shard 4's two failures both arise from the stale MCP public export corpus: the clean-tree generation byte comparison and the freshness-only dirty-read-set test. The aggregator merely reports that shard failure. Regenerate the canonical export corpus from the reviewed committed source, then run its tests; do not weaken either freshness check.
+
+## Augment review corrections
+
+- Comment 4429701184: direct DLQ fallback identity now uses the canonical job-scoped idempotency resolver. Real KV stores two different jobs sharing a caller key while preserving same-job append deduplication.
+- Comment 4429701186: an active, unapplied duplicate claim is deferred by rejection/requeue rather than acknowledged. A real-KV replay test holds the original terminal claim release, verifies replay retains the durable record, then completes once release is allowed. An already-applied duplicate still acknowledges normally.
+- Comment 4429701189: fatal state and shutdown timing are established synchronously. Optional diagnostic enrichment never gates completion, and pending health reads are interrupted on fatal/stop so HTTP draining cannot hang on a stalled snapshot. A real HTTP regression uses a never-settling reader.
+- Focused correction suite: 23 passed, 4 unavailable Redis integrations ignored. Each review correction has a fix-reverted negative control, restored before final gates.
+- Independent corrections review: PASS; evaluator independently ran 44 focused tests, zero failures, four unavailable Redis cases skipped. Full local regression now passes 142 tests, with seven Redis integrations unavailable. Structured check/lint/source-fmt pass, and quality:gate passes.
+- The prose carrier is intentionally excluded by the nearest CLI formatter config. The structured formatter correctly refused partial coverage, so it was checked separately with the same root formatting settings and no exclusion; that explicit generated-file check passes. No formatter suppression or file mutation was added.
+- Commit these reviewed sources and the regenerated prose now; then regenerate the public export corpus from the required clean package/plugin read set before marking ready again.

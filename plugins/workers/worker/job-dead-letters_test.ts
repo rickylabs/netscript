@@ -12,7 +12,22 @@ import type {
 import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
 import { childHealthResponse } from '@netscript/plugin/health';
 import { Worker } from './worker.ts';
-import type { JobDeadLetterStorePort } from './job-dead-letters.ts';
+import { type JobDeadLetterStorePort, recordJobDeadLetter } from './job-dead-letters.ts';
+
+Deno.test('direct job failures sharing an idempotency key keep separate durable DLQ identities', async () => {
+  await using kv = await Deno.openKv(':memory:');
+  const store = new KvDeadLetterStore<JobMessage>({ queueName: 'identity-scope', denoKv: kv });
+  for (const jobId of ['first-job', 'second-job', 'first-job']) {
+    await recordJobDeadLetter(store, {
+      jobId,
+      topic: 'jobs',
+      triggeredBy: 'manual',
+      idempotencyKey: 'same-event',
+    }, { queueName: 'jobs', attempts: 1, error: 'failed' });
+  }
+  const records = await store.list();
+  assertEquals(records.map((record) => record.payload.jobId).sort(), ['first-job', 'second-job']);
+});
 
 for (const maxRetries of [0, 2]) {
   Deno.test(`KV job DLQ persists after ${maxRetries} retries before the Worker listener acknowledges`, async () => {

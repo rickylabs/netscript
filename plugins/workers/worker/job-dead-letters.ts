@@ -1,6 +1,9 @@
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import type { DeadLetterRecord, DeadLetterStorePort, MessageContext } from '@netscript/queue';
-import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
+import {
+  type JobMessage,
+  resolveWorkerIdempotencyKey,
+} from '@netscript/plugin-workers-core/runtime';
 
 /** Durable terminal job record using the queue's canonical dead-letter shape. */
 export type JobDeadLetterRecord = DeadLetterRecord<JobMessage>;
@@ -30,9 +33,15 @@ export async function recordJobDeadLetter(
   }>,
 ): Promise<void> {
   const failedAt = new Date().toISOString();
+  const messageId = options.queueContext?.messageId ?? (await resolveWorkerIdempotencyKey({
+    concept: 'job',
+    targetId: message.jobId,
+    idempotencyKey: message.idempotencyKey,
+    messageId: options.executionId,
+    payload: message.payload,
+  })).key;
   await store.append({
-    messageId: options.queueContext?.messageId ?? message.idempotencyKey ?? options.executionId ??
-      crypto.randomUUID(),
+    messageId,
     queueName: options.queueName,
     payload: message,
     headers: {

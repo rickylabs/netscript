@@ -96,6 +96,7 @@ export async function processWorkerJob(
     });
     if (!claim.claimed) {
       recordIdempotentSkip(context, 'job', jobId, claim, tracedContext);
+      if (!claim.alreadyApplied) throw new Error(`Job '${jobId}' is already being processed`);
       return;
     }
 
@@ -212,7 +213,8 @@ export async function processWorkerJob(
     );
   } catch (error) {
     await recordJobFailure(context, message, executionId, error);
-    const requeue = context.shutdownSignal?.aborted ||
+    const requeue = (claim !== undefined && !claim.claimed && !claim.alreadyApplied) ||
+      context.shutdownSignal?.aborted ||
       error instanceof Error && error.name === 'ShutdownError' ||
       writingDeadLetter || terminalRecorded || executionSucceeded;
     try {

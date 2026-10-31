@@ -32,42 +32,63 @@ export async function runChildHealthProcess(
   }
   const health = new ChildHealthMonitor();
   const controller = new AbortController();
+  const healthReads = new AbortController();
+  let latest: ChildHealthSnapshot | undefined;
   let terminal: ChildHealthSnapshot | undefined;
   let failureTimer: ReturnType<typeof setTimeout> | undefined;
   const server = Deno.serve(
     { port },
     async (request) => {
-      const current = await snapshot?.();
-      return childHealthResponse(request, terminal ?? current ?? health.snapshot());
+      if (terminal) return childHealthResponse(request, terminal);
+      const interrupted = Promise.withResolvers<undefined>();
+      const onStop = (): void => interrupted.resolve(undefined);
+      healthReads.signal.addEventListener('abort', onStop, { once: true });
+      if (healthReads.signal.aborted) onStop();
+      try {
+        const current = await Promise.race([snapshot?.(), interrupted.promise]);
+        if (current) latest = current;
+        return childHealthResponse(request, terminal ?? current ?? health.snapshot());
+      } finally {
+        healthReads.signal.removeEventListener('abort', onStop);
+      }
     },
   );
   const signals: readonly Deno.Signal[] = Deno.build.os === 'windows'
     ? ['SIGINT', 'SIGBREAK']
     : ['SIGINT', 'SIGTERM'];
-  const stop = () => controller.abort();
+  const stop = (): void => {
+    controller.abort();
+    healthReads.abort();
+  };
   for (const signal of signals) Deno.addSignalListener(signal, stop);
-  const failed = async (cause: unknown): Promise<void> => {
+  const failed = (cause: unknown): void => {
     console.error('Background child failed:', cause);
     Deno.exitCode = 1;
-    let child: ChildHealthSnapshot | undefined;
+    health.failed();
+    const retainFailure = (child: ChildHealthSnapshot | undefined): void => {
+      terminal = Object.freeze({
+        ...(child ?? health.snapshot()),
+        state: child?.state === 'crash-looping' ? 'crash-looping' : 'failed',
+        dependencyReady: false,
+        lastFatalError: child?.lastFatalError ?? health.snapshot().lastFatalError,
+      });
+    };
+    retainFailure(latest);
+    healthReads.abort();
+    failureTimer = setTimeout(stop, 1_000);
     try {
-      child = await snapshot?.();
+      // A fresh snapshot may enrich diagnostics, but IO never gates fatal shutdown.
+      void Promise.resolve(snapshot?.()).then((child) => {
+        if (child) retainFailure(child);
+      }, () => undefined);
     } catch {
       // A failed health dependency must not hide the original process failure.
     }
-    health.failed();
-    terminal = Object.freeze({
-      ...(child ?? health.snapshot()),
-      state: child?.state === 'crash-looping' ? 'crash-looping' : 'failed',
-      dependencyReady: false,
-      lastFatalError: child?.lastFatalError ?? health.snapshot().lastFatalError,
-    });
-    failureTimer = setTimeout(stop, 1_000);
   };
   const completion = Promise.resolve().then(() => run(health, controller.signal)).then(
-    async () => {
+    () => {
       if (!controller.signal.aborted) {
-        await failed(new Error('Background child stopped before process shutdown.'));
+        failed(new Error('Background child stopped before process shutdown.'));
       }
     },
     failed,
