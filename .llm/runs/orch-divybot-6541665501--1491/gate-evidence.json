@@ -1,5 +1,5 @@
 {
-  "note": "Privacy-safe extracts of native gate receipts; raw receipts retained outside Git. S2 working tree had canonical carrier changes; gitHead identifies command baseline, not an assertion that generated files were committed at invocation. The precommit assets comparison is expected to fail until its reviewed carrier is committed.",
+  "note": "Privacy-safe extracts of native gate receipts; raw receipts retained outside Git. S2 working tree had canonical carrier changes; gitHead identifies command baseline, not an assertion that generated files were committed at invocation. The precommit assets comparison is expected to fail until its reviewed carrier is committed. Final postcommit assets receipt supersedes the precommit comparison.",
   "receipts": [
     {
       "gateId": "exports-drift",
@@ -66,6 +66,17 @@
       "requestHash": "7392160028f25bb8896387c18234009e8c7c80b63f5027097b93d2439232ca72",
       "startedAt": "2026-10-31T09:59:36.016Z",
       "finishedAt": "2026-10-31T09:59:43.220Z"
+    },
+    {
+      "gateId": "assets-barrel",
+      "invocationId": "command1491-assets-final",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5f54380147cfdb634c1926b08e0547999c8cd202",
+      "durationMs": 2870,
+      "requestHash": "a7e2169fb795fe5d308809dd97e5e03b08557bf8bf3160e91b3ba7c3396fa48c",
+      "startedAt": "2026-10-31T10:02:25.581Z",
+      "finishedAt": "2026-10-31T10:02:28.451Z"
     }
   ]
 }

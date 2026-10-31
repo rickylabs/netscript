@@ -14,11 +14,11 @@
 
 | Issue box | Evidence | State |
 | --- | --- | --- |
-| Guide/reference/operations/security/compatibility match exports | deno doc and source audit; five planned pages and reference | Pending |
-| Transaction, expected version, idempotency, audit, outbox, relay, reconciliation, failure examples | Tier-1 fences and semantic execution | Pending |
-| #1364 outbox integration without inbound/outbound conflation | Existing outbound-webhooks source integration plus reciprocal links; #1364 closed, #1381 owns observations | Pending |
-| Clean public-consumer snippets and docs gates | Selected gate set in plan | Pending |
-| IMPL-EVAL passes | Separate Claude evaluator at pushed head | Pending |
+| Guide/reference/operations/security/compatibility match exports | Five services-sdk command guides, expanded service reference, public `deno doc`/source audit; independent S1 review PASS | Proven |
+| Transaction, expected version, idempotency, audit, outbox, relay, reconciliation, failure examples | commands.md executable assertions; command-relay.md compiled shipped adapter/sink composition; command-operations.md compiled application inspection/replay; all ten command/webhook fences Tier-1, zero exemptions | Proven at the stated compile/execution level |
+| #1364 outbox integration without inbound/outbound conflation | Existing webhook outbox-to-checked-worker integration retained, reciprocal links added from guides and back; #1364 closed, observations owned by #1381; inbound verification explicitly separate in relay/security/webhook pages | Proven |
+| Clean public-consumer snippets and docs gates | docs:snippets 36 compiled fences; 2/2 extracted consumer/coverage tests; verify/links/accuracy/exports/prose/publish/MCP/asset gates exit 0; native receipt extracts in gate-evidence.json | Proven; supplementary unrelated baseline test failure recorded separately |
+| IMPL-EVAL passes | Separate evaluator PASS at implementation/carrier head `5f54380147cfdb634c1926b08e0547999c8cd202`, independently executed new consumer tests (2/2). Final exact-head recheck after evidence commit/readiness is published on PR #2514 timeline and final READY report | Proven for implementation; final head attestation follows |
 
 ## Intake
 
@@ -72,3 +72,19 @@ Native gate request/outcome/timing/head metadata is preserved without private pa
 Independent S2 review: **SLICE REVIEW: PASS**, same separate reviewer. All 208 carrier hashes/sizes verified; exact expected five-page/four-update delta; MCP document set and byte budget preserved.
 
 Reconcile S2: no new PR review findings or owner scope changes; generated files stay in the two explicitly allowed carriers, no barrel/lock/runtime delta. Commit/push precedes the final assets diff verdict.
+
+
+## S2 postcommit verdict
+
+`check:assets-barrel` via native runner **PASS, exit 0** at carrier commit `5f54380147cfdb634c1926b08e0547999c8cd202` (full head in gate-evidence.json). No further generated changes. This supersedes the expected precommit git-diff exit. The full test invocation with standard `--allow-all` also reproduces the same pre-existing interruption-probe failure (12 passed including new tests, one failed); permission narrowing was not its cause.
+
+All requested documentation gates are proven locally. Runtime/scaffold output, DB wiring and plugin implementation are unchanged; the only packages changes are canonical prose carriers, so local scaffold.runtime remains explicitly prohibited/not applicable to this docs leaf. No resources were launched and no ownership symptom called for cleanup.
+
+Reconcile final evidence: local source and locks remain clean except this scoped run evidence update. No review findings or owner scope changes were received. Exact-head IMPL-EVAL, ready-for-review transition, live CI/thread snapshot and final report handoff remain.
+
+
+## IMPL-EVAL and final handoff
+
+Independent IMPL-EVAL found no blockers and ends `VERDICT: MERGE 5f54380147cfdb634c1926b08e0547999c8cd202`; full result in evaluate.md. Evaluator independently ran the extracted consumer tests (2/2 passed), verified matching local/remote/PR head, all five acceptance boxes, allowed scope, no locks/runtime/scaffold drift and public-record privacy. Evidence-only final commit does not alter those reviewed sources or carriers.
+
+Review-thread gate: `deno task check:review-threads -- --repo rickylabs/netscript --pr 2514 --pretty` PASS, threads=0, unanswered=0. Labels, milestone, issue checkboxes and merge remain coordinator-owned. Final exact-head evaluation and CI snapshot will be posted in the PR timeline and the excluded READY report; retaining that attestation outside the committed tree avoids moving the evaluated head. The report is handed off through .divybot-final-report.md, not a direct issue comment.
