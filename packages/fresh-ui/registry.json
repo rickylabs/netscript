@@ -3381,7 +3381,10 @@
             }
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "empty-state",

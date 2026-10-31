@@ -52,3 +52,17 @@ instances. CSS support registry items and token-only presets are excluded.
 Providers declare contracts, real render fixtures with their public input names,
 and semantic keyboard scenarios. Keyboard metadata alone is never behavioral
 proof: the dedicated browser suite must press the keys and assert outcomes.
+
+Describe inputs the implementation actually accepts. Composed section presence is not an invented
+boolean root prop: Card's section content is recorded as qualified slots such as `Header.children`
+and `Action.children`. Member-only inputs, such as Pagination Link state, identify their scope in
+the description. Keep closed vocabularies complete; the Icon contract has an independent equality
+guard against the published glyph names so adding an implementation name cannot leave the catalog
+behind.
+
+Audited baseline copies join `AUDITED_BASELINE_COMPONENTS` separately from the exact new-gap list.
+The installer gate preserves source-byte equality, proves the real package mapping before adding
+local aliases for unreleased APIs, compiles/lints the installed files, and renders audited copies
+against these contracts. Overridable scope expressions are checked through actual rendering rather
+than requiring a particular JSX spelling. The frozen legacy registry fixture remains unchanged;
+necessary metadata repairs have explicit named allowances and negative controls.

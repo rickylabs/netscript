@@ -1,0 +1,55 @@
+{
+  "slice": "7c2a Label Card Pagination docs gaps",
+  "focusedTests": {
+    "passed": 426,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 20,
+    "failed": 0,
+    "widths": [
+      390,
+      1280
+    ],
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "strictAxeSeriousOrCritical": 0
+  },
+  "sourceWrappers": "PASS",
+  "browserWrappers": "PASS",
+  "qualityAndArchitecture": "PASS",
+  "publicPrimitivesDocLint": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "installedSourceRendering": "PASS with native temporary node_modules mode",
+  "rootDependencyRepairs": [
+    "command-palette",
+    "code-block",
+    "pagination"
+  ],
+  "auditedBaselineCopies": [
+    "code-block",
+    "label",
+    "card",
+    "pagination"
+  ],
+  "newPackageDependencies": false,
+  "tokenValuesChanged": false,
+  "rootLocksChanged": false,
+  "frozenFixtureChanged": false,
+  "invalidPortRejected": true,
+  "independentInitialReview": "PASS",
+  "independentFollowUp": "PASS",
+  "cleanSourceCarriers": "PENDING",
+  "phaseReady": false,
+  "fullGoalComplete": false,
+  "legacyHeaderLayout": "PASS; grid only with Card.Action, otherwise flex",
+  "publishedIconVocabulary": "PASS;20 names exactly match typed/JSON contract"
+}
