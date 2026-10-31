@@ -1,5 +1,5 @@
 # STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
-- COMBINED CANARY READY TO CUT at 6c3f8a118 (18:25Z, comment 6547307997; supersedes .1 15cffa2fe and .2 7feb24c7d; includes Fresh UI S6a) · Eric cuts
+- COMBINED CANARY READY TO CUT at 6c3f8a118 (18:16Z, comment 6547307997; supersedes .1 15cffa2fe and .2 7feb24c7d; includes Fresh UI S6a) · Eric cuts
 - H01/H02/A1/A2/A3/E1 DONE (all closed)
 - B1 DONE (#2499 #2512 #2517 #2522 #2526; #2390 closed: no repro); #2159 OPEN for Eric's effects follow-up placement
 - B2 DONE: #2162 #2369 #2149 #2108 merged; #2108 issue open until its worker finishes (then close with the posted evidence)

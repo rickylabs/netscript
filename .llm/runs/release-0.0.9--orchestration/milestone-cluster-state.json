@@ -1768,14 +1768,14 @@
       "state": "planned",
       "targetDate": "2026-11-02",
       "rationale": "H01 main CI green, A1-A3 silent job/queue loss, D1 #2396 guarded plugin services (waves 1-3 critical path).",
-      "note": "READY TO CUT: candidate 15cffa2fe; readiness posted on #2474 11:52Z (comment 6542998232); main green; Eric cuts | SUPERSEDED by the combined candidate 6c3f8a118 (readiness 18:25Z, comment 6547307997)"
+      "note": "READY TO CUT: candidate 15cffa2fe; readiness posted on #2474 11:52Z (comment 6542998232); main green; Eric cuts | SUPERSEDED by the combined candidate 6c3f8a118 (readiness 18:16Z, comment 6547307997)"
     },
     {
       "id": "0.0.9-canary.2",
       "state": "planned",
       "targetDate": "2026-11-06",
       "rationale": "B1 saga retry/compensation/read model on KV, B2 KV-only proof, C1 ordering and restart safety, E1 structured logging, rest of D1.",
-      "note": "READY TO CUT: candidate 7feb24c7d; readiness posted on #2474 16:20Z; main green (ci 41217755762, e2e 41217778710, command-postgres 41217780859) | SUPERSEDED by the combined candidate 6c3f8a118 (readiness 18:25Z, comment 6547307997)"
+      "note": "READY TO CUT: candidate 7feb24c7d; readiness posted on #2474 16:20Z; main green (ci 41217755762, e2e 41217778710, command-postgres 41217780859) | SUPERSEDED by the combined candidate 6c3f8a118 (readiness 18:16Z, comment 6547307997)"
     },
     {
       "id": "0.0.9-canary.3",
