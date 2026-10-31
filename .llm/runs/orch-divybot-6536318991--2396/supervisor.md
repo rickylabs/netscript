@@ -31,3 +31,5 @@ docs/site/services-sdk/how-to/host-plugin-services.md; docs/site/services-sdk/se
 plugins/streams/README.md; plugins/workers/CHANGELOG.md; plugins/streams/CHANGELOG.md.
 Canonical generated carrier paths are enumerated in the plan round-1 repair. Saga/trigger
 entrypoints and export maps are read-only review scope, with results recorded in the guide.
+
+S3 allowed documentation addition: docs/site/services-sdk/how-to/index.md, one recipe link.

@@ -15,3 +15,10 @@ to the coordinator; production CLI graph proof remains post-publish debt, not a 
 
 PLAN-EVAL round 2: PASS, separate Anthropic session on the owner-requested model.
 Implementation may begin. Next: S1 on original branch fix/native-service-policy.
+
+S3 research qualification of the adopted, not-yet-integrated factories: 57 pass, 1 fail,
+0 ignored. The sole failure is a 10-second checked compiler-child deadline; 57 runtime,
+permission, TLS, durability and cleanup controls pass on Linux. Recheck the failing control
+on the integrated graph with no concurrent heavy compiler jobs before changing any deadline.
+S2 independent exact-head review returned MERGE on7421a60f2, with current CI/runtime explicitly
+pending. S1 has no code blockers, but coordinator runtime arming and final CI proof are pending.

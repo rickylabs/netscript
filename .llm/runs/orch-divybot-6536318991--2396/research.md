@@ -61,3 +61,8 @@ origin fetch configuration does not create PR branch tracking refs from branch-n
 Explicit destination refs and bounded deepening recovered real merge bases.
 Consulted the shared NetScript memory before code/build work; generated documentation has
 four freshness gates and retained run evidence is owner-controlled.
+
+S3 pre-implementation finding: native auth defaults guard `/api`, while streams uses raw
+`/v1/stream` paths. Existing factory tests explicitly select `protect: ['/']`, but the adopted
+streams JSDoc examples omit it. Correct those examples and explicitly test/document native
+raw-route policy selection. Do not silently rewrite caller policy or duplicate #2364.
