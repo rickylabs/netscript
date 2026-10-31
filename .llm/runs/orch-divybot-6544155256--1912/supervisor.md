@@ -8,3 +8,5 @@ Evaluator override, verbatim: "run the final IMPL-EVAL with claude -p --model cl
 Allowed tracked writes: `.github/workflows/e2e-cli-prod.yml`, `.github/scripts/check-published-generated-surface.ts`, and `.llm/runs/orch-divybot-6544155256--1912/**`.
 Allowed untracked scratch: project run evidence outside Git and system temporary directories; excluded final-report handoff files.
 No product code, labels, milestones, releases or merges. Public evidence excludes machine identity, absolute paths and session identities.
+
+CI-repair scope extension (owner request to fix red quality): `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv`, regenerated only by the canonical aspire-surface-manifest.ts. The new smoke script is an Aspire mention and requires its generated manifest row. No product code or scan-policy exemption is authorized.

@@ -11,3 +11,5 @@ Gates: structured scoped Deno check/lint/fmt; workflow YAML parsing; real Linux 
 Risks: fresh project installs may require network; setup errors fail before clean certification. Empty inventories fail. Hostile commands must exit exactly 1 and contain a bytes finding for the actual mutated output. Reports must not expose absolute paths. Windows dispatch availability must be demonstrated, not assumed.
 
 Open decisions: none. PLAN-EVAL: N/A — bounded verification/CI repair with explicit owner contract and no product architecture decision. No new architectural debt. Deferred: additional hostile cases already covered by published product tests, product fixes, releases and merges.
+
+CI follow-up slice: regenerate the Aspire tracked-surface manifest for the new smoke script; prove check:aspire-version-parity via native gate receipt and the 26 focused parity-checker tests, then re-attest the new immutable head. Inspect the new PR CI run and fix current failures; no gate weakening, test baseline deletion or product changes.

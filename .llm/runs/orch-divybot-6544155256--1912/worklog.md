@@ -60,3 +60,15 @@ Review-thread gate: PASS, 0 threads / 0 unanswered. Ordinary production job was 
 Reconcile: issue 1912 box 8 now has both OS evidence; box closure is coordinator-owned. PR 2537 remains Refs-only and draft until final evaluation. No independent work remains in this bounded assignment.
 
 Independent evidence-slice review: **EVIDENCE SLICE REVIEW: PASS**. Reviewer checked both reports, gate summaries, privacy, failed-attempt disclosure and scope. Optional wording fixes clarify sixteen snapshots/eight comparisons and explicitly identify Linux's tested script version. Final exact-head evaluation must verify the implementation files still match tested commit bcefeaa33ce3d8971ff3dad3dbfb6e7686e21439.
+
+## CI quality repair
+
+Owner reported red quality on PR 2537. `gh pr checks 2537` confirmed quality failure in run 41209144740, job 124560416605. `gh run view --log-failed` was unavailable while other run jobs continued; the completed job log was retrieved from the GitHub job logs API. Actual failing step: Aspire version parity (phase 1), one `manifest:freshness` finding: "Aspire surface manifest is stale; rerun aspire-surface-manifest.ts". This failure is not a deno_core missing-test discovery report.
+
+Canonical regeneration (`deno run --allow-read --allow-run=git --allow-write=.llm/tools/validation/fixtures .llm/tools/validation/aspire-surface-manifest.ts`) adds exactly one sorted manifest row for `.github/scripts/check-published-generated-surface.ts`, using the generator's existing classification. No scan rule, exclusion, baseline, check, product source or tested smoke bytes changed.
+
+Validation: aspire-version-parity through run-gate.ts PASS, exit 0, manifestFresh=true, checked=1013, fail=0, missing=0; pre-existing deferred findings unchanged. Focused run-deno-test.ts gate for check-aspire-version-parity_test.ts: 26 passed, 0 failed, exit 0. Raw CI log and receipt remain outside Git; sanitized results recorded here. This local receipt attests the working-tree repair at precommit head, not a clean already-committed head; final committed-head validation follows.
+
+Reconcile: prior exact-head verdict at 71b2241 is historical once this carrier refresh commits. Same independent evaluator must review/re-attest the new head. Published Linux/Windows parity remains valid because the script/workflow bytes are unchanged. CI quality must be observed green rather than inferred from local scoped checks.
+
+Independent same-session carrier slice review: **SLICE REVIEW: PASS**. Reviewer confirmed one canonical sorted row, unchanged scanner policy/product/smoke bytes, accurate failure diagnosis and unchanged prior parity evidence. Supervisor signoff commit follows.
