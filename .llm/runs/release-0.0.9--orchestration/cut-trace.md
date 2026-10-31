@@ -11,3 +11,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 02:54 | `727542963` | #2422 | (#2396 part 1/3) | W1 (D1) | breaking (health 401 with custom anonymous list); SQLite flake rerun; coordinator Opus exact-head MERGE |
 | 2026-10-31 02:55 | `204a71b1e` | #2423 | (#2396 part 2/3) | W1 (D1) | MERGE at 7421a60; both tiers green |
 | 2026-10-31 03:07 | `1d467c669` | #2484 | #2151 | W2 (A3) | all 3 slices; both tiers green |
+| 2026-10-31 03:26 | `2f426b970` | #2485 | #2367 | W3 (D1) | PR-event e2e green incl. desktop job |
