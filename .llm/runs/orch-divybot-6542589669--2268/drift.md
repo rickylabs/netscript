@@ -13,3 +13,5 @@
 - Source and documentation finish together in the implementation slice: required public-type docs and generated carriers must describe the same tree before review. Final verification/handoff is the remaining evidence-only slice.
 - Regenerated the maintained Aspire surface manifest under .llm/tools/validation/fixtures after staging new source so the normal static scope includes it. No checker policy or exclusion changed.
 - Full telemetry doc lint is a baseline failure: six private-type-ref findings and one missing JSDoc, identical by file/category/count in a detached baseline checkout. MCP's full export map and the changed telemetry/query entrypoint pass. No unrelated public-type remediation added.
+
+- CI continuation: current test-5 shard failed only the real CLI stdio smoke, whose unreachable-endpoint assertion still expected the former health-summary shape. Extend this leaf's test surface to packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts and assert the approved telemetry_unavailable error/provenance contract. This does not change scaffold output or runtime wiring.

@@ -217,8 +217,25 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
 
     const status = responses[4].result?.structuredContent;
     assert(status);
-    assert(['warn', 'fail'].includes(String(status.status)));
-    assert(Array.isArray(status.domains));
+    assertEquals(responses[4].result?.isError, true);
+    assertEquals(status.code, 'telemetry_unavailable');
+    assertStringIncludes(String(status.message), 'Dashboard telemetry could not be read');
+    const provenance = status.provenance as {
+      readonly state: string;
+      readonly sampleCount: number | null;
+      readonly logCount: number | null;
+      readonly servingRevision: string;
+      readonly window: { readonly sinceUnixMs: number; readonly untilUnixMs: number };
+    };
+    assert(provenance);
+    assertEquals(provenance.state, 'unavailable');
+    assertEquals(provenance.sampleCount, null);
+    assertEquals(provenance.logCount, null);
+    assert(provenance.servingRevision.length > 0);
+    assert(provenance.window.sinceUnixMs <= provenance.window.untilUnixMs);
+    for (const field of ['counts', 'domains', 'averageDurationMs', 'p95DurationMs']) {
+      assert(!(field in status), 'Unavailable telemetry must not expose measured statistics');
+    }
 
     const denied = responses[5].result?.structuredContent;
     assert(denied);

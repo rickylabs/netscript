@@ -43,3 +43,11 @@ See gate-results.json, negative-controls.json and cli-comparison.json. Raw logs 
 IMPL-EVAL round 2 PASS, same independent Anthropic reviewer, substantive source sign-off before commit. See evaluate.md. The review's non-blocking partial-status wording note was corrected: a capped nonempty sample now says the result is sampled, without implying empty data. The compact gate-results artifact is present for final exact-head review (the reviewer began reading before its atomic creation).
 
 Implementation reconcile: one cohesive code/docs/test slice uses only declared source, generated carrier/manifest and run surfaces. Existing cardinality debt did not deepen; no dependency, lockfile, scaffold/template or runtime resource wiring changed. Commit/push this slice, then mark PR ready and attach exact-pushed-head evaluator/receipt evidence on the PR without moving the reviewed head.
+
+## CI continuation
+
+Previous turn classified as progress: implementation/push, independent exact-head attestation and published READY handoff are authoritative. Re-audit found the current test-5 failure (job 124529261090, run 41198401104). Its durable artifact reports 1,248 pass / 1 fail / 15 ignored; sole failure is agent mcp real CLI stdio smoke. That smoke deliberately supplies an unreachable telemetry endpoint and still requires the old warn/fail status plus domains array. Updating its expectation to the approved structured acquisition error preserves the intended fix and strengthens null-count/no-statistics assertions. No production behavior is weakened.
+
+CI repair local proof: original stdio smoke fails (0 pass / 1 fail); updated smoke passes (1 pass / 0 fail), with structured check/lint/fmt selecting and processing the test file. IMPL-EVAL round 4 PASS before committing the repair; no production files changed. Exact source diff is the new refusal-error assertions plus this run record. The final review round remains available for the exact pushed head.
+
+The isolated live-AppHost fixture starts successfully and its RPC resource is healthy. OTLP exporter setup is still being verified; no live-acceptance claim is made yet. Fixture files, credential-bearing logs and host state stay outside Git and only sanitized evidence will be published.

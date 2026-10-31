@@ -11,3 +11,5 @@ Read the dispatcher-supplied leaf profile; no repository profiles loaded. Matrix
 Privacy: public artifacts contain only repository-relative paths and sanitized evidence; no operator paths, host addresses, credentials or session identifiers.
 
 Validation also owns the generated Aspire surface fixture under .llm/tools/validation/fixtures; regenerate it without changing scan policy. A short-lived detached checkout is permitted solely for baseline gate comparison, with no runtime resources.
+
+CI continuation also owns packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts for its telemetry status assertion, and sanitized CI follow-up evidence in this run. A minimal isolated AppHost may be used solely to prove live telemetry acceptance, with exact ownership recorded outside public artifacts; no local scaffold.runtime suite or shared resource mutation is authorized.
