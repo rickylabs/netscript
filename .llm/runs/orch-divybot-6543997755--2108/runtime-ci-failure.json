@@ -1,0 +1,30 @@
+{
+  "head": "d92acd5ba42ed4d282f4f18d3ab8a9133f312fd1",
+  "run": "https://github.com/rickylabs/netscript/actions/runs/41212626904",
+  "mainComparison": {
+    "head": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+    "run": "https://github.com/rickylabs/netscript/actions/runs/41197676281",
+    "jobs": [
+      {
+        "name": "scaffold-runtime (aspire + docker + postgres)",
+        "jobId": 124527157448,
+        "conclusion": "success"
+      },
+      {
+        "name": "scaffold-runtime-sqlite (aspire + sqlite + garnet)",
+        "jobId": 124527157504,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "failedTiers": [
+    "scaffold-runtime (aspire + docker + postgres)",
+    "scaffold-runtime-sqlite (aspire + sqlite + garnet)"
+  ],
+  "failedGate": "runtime.flow-b-fixture",
+  "passedBeforeFailure": 49,
+  "error": "workers-api resource did not contain the expected Deno config argument",
+  "cause": "Flow-B fixture local-mode rewrite assumes a compact argument array and a published service entrypoint. Correct local service metadata introduces an absolute path and multiline formatting.",
+  "fix": "Share the existing whitespace-independent config rewrite; accept and preserve the exact expected local service source, while retaining alias support for legacy generated fixtures and strict missing-config/wrong-source failures.",
+  "localFullRuntimeRun": false
+}

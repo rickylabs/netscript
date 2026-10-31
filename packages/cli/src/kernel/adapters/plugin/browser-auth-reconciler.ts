@@ -116,6 +116,18 @@ export async function reconcileBrowserAuth(
   // Preserve the legacy helper-only flow when no browser apps are configured.
   // Task and desktop entries cannot opt an authored browser app back into scaffolding.
   const scaffoldBrowser = apps.length === 0 || scaffoldApps.length > 0;
+  if (scaffoldBrowser) {
+    // The generated BFF is root userland, so its direct cookie dependency belongs here.
+    const denoPath = join(projectRoot, 'deno.json');
+    const deno = JSON.parse(await fs.exists(denoPath) ? await fs.readFile(denoPath) : '{}') as {
+      imports?: Record<string, string>;
+    };
+    deno.imports ??= {};
+    if (deno.imports['@std/http/cookie'] === undefined) {
+      deno.imports['@std/http/cookie'] = 'jsr:@std/http@^1/cookie';
+      await fs.writeFile(denoPath, `${JSON.stringify(deno, null, 2)}\n`);
+    }
+  }
   const authServiceName = `'${auth}'`;
   const files: BrowserAuthFile[] = [
     {

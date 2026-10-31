@@ -5,6 +5,7 @@ export const TEMPLATE_KEYS = {
   authRoute: 'auth/route.ts.template',
   authService: 'auth/service.ts.template',
   generatedAspireEmptyRegistration: 'generated/aspire/helpers/empty-registration.ts.template',
+  generatedAspireEmptyTools: 'generated/aspire/helpers/empty-tools.ts.template',
   appClient: 'app/client.ts.template',
   appAssetsDesignCss: 'app/assets/design.css.template',
   appComponentsUiMod: 'app/components/ui/mod.ts.template',

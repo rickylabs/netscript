@@ -31,6 +31,8 @@ export function generateDbCliMode(options: DbCliModeOptions): string {
   const targets = targetCases.length > 0 ? targetCases.join(',\n') : '';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateDbCliMode1, {
+    appHostDirParameter: dbEntries.length ? 'appHostDir' : '_appHostDir',
+    infrastructureParameter: dbEntries.length ? 'infrastructure' : '_infrastructure',
     __slot0__: String(fileHeader('db-cli-mode.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),

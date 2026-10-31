@@ -1,0 +1,135 @@
+{
+  "issue": 2108,
+  "packageSource": "local",
+  "ok": true,
+  "scaffold": "PASS",
+  "generate": "PASS",
+  "doctor": "PASS",
+  "noDatabase": "PASS",
+  "generatedQuality": "PASS",
+  "resources": [
+    {
+      "name": "auth",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "garnet",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "netscript-installation-secret",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "sagas-api",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "sagas",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "streams",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "triggers-api",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "triggers",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "web",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "workers-api",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "workers",
+      "state": "Running",
+      "health": "Healthy"
+    }
+  ],
+  "backgroundReadiness": "PASS",
+  "workflows": {
+    "completedJobs": 2,
+    "triggerEventId": "trg_evt_143ab36a-b89c-47e5-93b2-168bc50c7cd9"
+  },
+  "saga": {
+    "count": 3,
+    "version": 3,
+    "detached": true
+  },
+  "finalResources": [
+    {
+      "name": "auth",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "garnet",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "netscript-installation-secret",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "sagas-api",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "sagas",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "streams",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "triggers-api",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "triggers",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "web",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "workers-api",
+      "state": "Running",
+      "health": "Healthy"
+    },
+    {
+      "name": "workers",
+      "state": "Running",
+      "health": "Healthy"
+    }
+  ],
+  "cleanup": "PASS"
+}

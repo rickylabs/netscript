@@ -45,13 +45,17 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'register-services.mts');
   });
 
-  it('should export registerServices async function', () => {
+  it('should preserve the asynchronous empty services contract', () => {
     const output = generateRegisterServices(emptyOptions);
-    assertStringIncludes(output, 'export async function registerServices(');
+    assertStringIncludes(output, 'export function registerServices(');
+    assertStringIncludes(output, 'return Promise.resolve(services);');
   });
 
   it('should import register-services dependencies', () => {
-    const output = generateRegisterServices(emptyOptions);
+    const output = generateRegisterServices({
+      ...emptyOptions,
+      services: { users: fixtures.MINIMAL_SERVICE },
+    });
     assertStringIncludes(output, 'buildOtelEnvVars,');
     assertStringIncludes(output, 'extractPluginReferences,');
     assertStringIncludes(output, 'extractServiceReferences,');
