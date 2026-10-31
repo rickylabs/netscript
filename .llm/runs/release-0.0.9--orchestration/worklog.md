@@ -113,6 +113,7 @@
 - 05:42Z: **merged** #2496 (`67d4704b4`) for #2351; **A2 complete.** Next expensive gate: #2482 (#2400).
 - 05:51Z: Cockpit: held /swarms now auto-release (cockpit 6b5dc26), so held launches are not reposted. #2498 (#2115) READY at `4540c50`, Opus MERGE; auth-kv-oauth cookie parsing only, so required CI suffices (no runtime wiring).
 - 05:51Z: C1 moved fixes → features (drift.md). Dispatched #2259 (D1 security, internals), comment 6539763986.
-- 05:54Z: #2497 (#2161) READY at `e768c1f`, Opus MERGE; e2e queued after #2482. #2267 (C1, features) is scripted for 06:08Z (hourly spacing).
+- 05:54Z: #2497 (#2161) READY at `e768c1f`, Opus MERGE; e2e queued after #2482. #2267 (C1) scheduled for 06:08Z, then cancelled at 06:00Z (builder cap 5 reached); it posts when a worker frees.
 - 05:55:21Z: #2259 started.
 - 05:58Z: **merged** #2498 (`3d83caf1c`) for #2115; #2115 closed.
+- 05:59Z: #2482 e2e green at `6597b64` but it now conflicts with main; steered via PR comment to merge main and re-READY. **expensive-gate.acquired** on #2497 (#2161).

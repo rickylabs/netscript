@@ -542,7 +542,7 @@
     {
       "id": "A3-2400",
       "lane": "internals",
-      "phase": "gating",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2482,
       "headSha": "6597b6452b22c72277509189b61ab78fba507648",
@@ -551,7 +551,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2400-r1 (resumed orphaned PR)",
       "receiptRefs": [],
-      "note": "READY 6597b64; Opus MERGE; e2e armed"
+      "note": "conflicts with main after green e2e at 6597b64; steered to merge main"
     },
     {
       "id": "A2-2395",
@@ -688,7 +688,7 @@
     {
       "id": "A3-2161",
       "lane": "fixes",
-      "phase": "ready",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2497,
       "headSha": "e768c1f302342943eae6a21f90376d638bcf0e14",
@@ -697,7 +697,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2161",
       "receiptRefs": [],
-      "note": "READY e768c1f; Opus MERGE; e2e queued after #2482"
+      "note": "READY e768c1f; e2e armed"
     },
     {
       "id": "D1-2115",
@@ -833,10 +833,20 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2482,
       "headSha": "6597b6452b22c72277509189b61ab78fba507648",
       "startedAt": "2026-10-31T05:43:05.000Z",
+      "via": "label e2e-cli-gate",
+      "result": "SUCCESS both tiers at 6597b64 (then conflicted with main)",
+      "completedAt": "2026-10-31T05:59:08Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2497,
+      "headSha": "e768c1f302342943eae6a21f90376d638bcf0e14",
+      "startedAt": "2026-10-31T05:59:30.000Z",
       "via": "label e2e-cli-gate"
     }
   ],
@@ -1055,7 +1065,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T05:58:59.000Z",
+  "updatedAt": "2026-10-31T05:59:30.000Z",
   "dispatches": [
     {
       "issue": 2438,
