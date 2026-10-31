@@ -1,0 +1,13 @@
+{
+  "verdict": "UNPROVEN",
+  "counts": {
+    "owned": 0,
+    "foreign": 0,
+    "unproven": 24,
+    "probes": {
+      "ok": 2,
+      "failed": 3
+    },
+    "reporterMutations": 0
+  }
+}
