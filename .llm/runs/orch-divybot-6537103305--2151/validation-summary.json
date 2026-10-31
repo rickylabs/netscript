@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "#2151 integrated pre-sign-off validation; final pushed-head attestation is recorded in PR phase comments",
+  "scope": "#2151 product head 34fe0583aa3b785076667c0d9fa6eaf1eec3697a; final evidence-commit head is attested on the PR timeline",
   "tests": {
     "exitCode": 0,
     "summary": {
@@ -203,5 +203,34 @@
     "triggers-core": 0,
     "triggers-plugin": 0
   },
-  "runtimeCI": "Required e2e-cli verdict not yet proven; coordinator enables its gate label. Local full scaffold.runtime prohibited by assignment."
+  "runtimeCI": "Required e2e-cli verdict not yet proven; coordinator enables its gate label. Local full scaffold.runtime prohibited by assignment.",
+  "pushedHeadReceipts": [
+    {
+      "gateId": "test",
+      "invocationId": "watch-2151-pushed-tests",
+      "gitHead": "34fe0583aa3b785076667c0d9fa6eaf1eec3697a",
+      "requestHash": "3b52fbcba0af651be8f059a22454653d2491827716d5b3a01cdd6f8feb9e8640",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5855
+    },
+    {
+      "gateId": "quality-gate",
+      "invocationId": "watch-2151-pushed-quality",
+      "gitHead": "34fe0583aa3b785076667c0d9fa6eaf1eec3697a",
+      "requestHash": "54d63ea9ecce008765de534934cbcbd73b8ebae8106e696a6bca8d0529527a7e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18488
+    },
+    {
+      "gateId": "assets-barrel",
+      "invocationId": "watch-2151-pushed-barrel",
+      "gitHead": "34fe0583aa3b785076667c0d9fa6eaf1eec3697a",
+      "requestHash": "8950723494decbcb5ea8c41aab06f8e1fd1ae290d9b39222a8945f89070a105a",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1788
+    }
+  ]
 }
