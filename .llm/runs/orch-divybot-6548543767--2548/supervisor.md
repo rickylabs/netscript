@@ -27,3 +27,5 @@ Final delivery surface required by assignment footer: `.divybot-final-report.tmp
 Review correction write surface: `.llm/tools/release/prepare-release.ts` and its existing test, plus registry embedded output `packages/fresh-ui/src/registry/assets/registry.generated.ts` only through the generator.
 
 Second-review correction write surface: `.llm/tools/release/github-release.ts` and `.llm/tools/release/github-release_test.ts` (inside already declared release-tooling scope). Evaluator loop stopped after its second FAIL_FIX; no third pass or self-certification.
+
+Owner explicitly resumed the blocked task to finish remaining work and mark PR ready. Final read-only evaluation uses the existing Claude Opus 5.5 high evaluator; original verdict history retained. Ready transition is now explicitly requested when gates are satisfied.

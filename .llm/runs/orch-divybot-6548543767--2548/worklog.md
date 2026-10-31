@@ -78,3 +78,9 @@ Revalidated PR #2549 remains open draft at e9236a3, with no new independent revi
 Executed assertPreparedReleaseGeneratedOutputsFresh with its default production dependencies in a disposable clean checkout: exit 0. Then changed only the encoded registry carrier to contain a stale sdk pin, committed that fixture only inside the disposable clone, and ran the entire production verifier again. It rejected at registry:embed:check with Stale embedded registry assets; the expected-rejection harness exited 0. No publication invoked. See reports/stable-freshness-production.json and completion-audit.md.
 
 Independent PASS and non-draft CI remain unproven. The two-failure stop is still in force; no third evaluator or READY claim.
+
+## Owner-directed resumption
+
+Owner instruction (verbatim): PR #2549 is green and mergeable but still a DRAFT, so it can't auto-merge. If it's complete, mark it ready now: gh pr ready 2549  — then it merges automatically. If more work remains, keep going and mark ready when done.
+
+The owner has now directly resumed work after the recorded evaluator stop and instructed completion through ready-for-review. Finish the outstanding independent verdict using the same requested read-only Claude evaluator; then transition ready and validate the real non-draft checks. This owner resumption supersedes the earlier stopped-loop handoff for this continuation; previous FAIL_FIX verdicts and decision remain historical evidence, not erased or relabeled. No implementation changes are planned.

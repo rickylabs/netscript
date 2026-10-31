@@ -9,3 +9,7 @@ F2: accepted tooling limitation — catalog meta.version follows generic version
 F3: fixed after the second review — stable generated-output proof now checks registry:embed:check before consuming the carrier in downstream barrels. Regression fails before the change and passes after.
 
 Remaining decision for Cockpit/owner: review the final F3 correction and supply an independent passing implementation verdict before READY/merge. This draft PR is the concrete reviewable delivery; local checks and dry-run proof are recorded without self-certification. Required non-draft CI remains a handoff gate; all-skipped draft runs are not a success claim.
+
+## Subsequent owner decision
+
+The owner subsequently instructed: “If more work remains, keep going and mark ready when done.” This explicitly resumes the previously stopped task and requests completion of the remaining gate and ready transition. Continue the same independent evaluator for final verification of the repaired implementation. The earlier stop was honored; it is superseded for this owner-directed resumption. No evaluation waiver or self-approval is inferred.

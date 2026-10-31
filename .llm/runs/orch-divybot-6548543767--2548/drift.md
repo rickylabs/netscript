@@ -12,3 +12,5 @@
 
 - Second independent source review: FAIL_FIX (F3). Adding the carrier to the generated release allowlist requires its own source-to-carrier freshness check in stable evidence reuse. Added registry:embed:check before downstream barrels and a negative ordering/short-circuit regression.
 - Evaluation stop: two terminal failure verdicts reached the supplied leaf limit. No third round; see evaluation-decision.md. Draft delivery remains review-required, not READY.
+
+- Owner-directed resumption after blocked handoff: “If more work remains, keep going and mark ready when done.” Complete the pending independent evaluation with the same requested Claude evaluator, then mark ready and execute applicable CI. Earlier stop and verdicts are retained as history. No waiver of independent evaluation.
