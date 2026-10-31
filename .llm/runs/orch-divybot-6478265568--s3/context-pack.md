@@ -1,41 +1,30 @@
-# S3 phase-one handoff
+# S3 phase-one handoff — READY
 
-Implementation and local validation are complete. PR #2467 remains draft because the mandatory independent IMPL-EVAL service is unavailable. Branch: orch/divybot-6478265568; exact pre-migration source baseline: 9a31e879c32a8066c50946a57976f3da34ba43a6. The PR and final handoff report identify the pushed head. Milestone: 0.0.9. This phase leaves #2416 open.
+Existing PR #2467, branch orch/divybot-6478265568. Original baseline 9a31e879c32a8066c50946a57976f3da34ba43a6; merged main 7907293f3dad3aeb557923809ddcd3435adae151. Independently reviewed source head bdb959d102189f5ad530fd3e07d54d29a8dbc0c4; the final evidence-only commit and public READY report identify the pushed head. Stop at READY: Cockpit reviews and merges. This phase leaves #2416 open.
 
 ## Delivered
 
-- Typed contracts and JSON export: 87 identities, 66 shipped plus 21 designs in the six approved Figma categories. Canonical design values, planned/native/pseudo/context anatomy and existing-runtime compatibility values are explicit.
-- Utility component markup/CSS uses contract parts and attributes. Compound getters preserve explicit part/scope delegation. Root markers are unique; helper anatomy is named separately.
-- ui:migrate variants: injected command/use case/FS/formatter, versioned source edits for copied components, bounded native JSX/CSS tokenization, complete preflight, dry-run, rollback and idempotence. Layout aliases stay compatible. Controlled component class overrides require manual public-prop conversion. IconButton is recognized despite its classless delegated source.
-- Style-independent real-render provider for every shipped identity and negative controls for missing parts/attributes, invalid values and duplicate roots.
+- 87 typed component contracts and JSON catalog: 66 shipped identities and 21 approved Figma designs; explicit planned/native/pseudo/context anatomy, compatibility values and keyboard metadata.
+- Utility markup/CSS migration to data attributes, preserving specificity, native behavior and compound delegation.
+- ui:migrate variants for 0.0.8 app-owned copies: whole-app preflight, dry-run, versioned source edits, bounded JSX/CSS tokenization, formatting, original-content rechecks, rollback and idempotence.
+- Real-render style providers for all shipped identities and meaningful negative controls.
+- Main integration; docs reference/carrier reconciliation and Lume Page fixture fix for main's unsafe double cast.
+- Independent review found one ActionMenu scope blocker; repaired by retaining popover scope, documented in the contract/JSON/naming record, and guarded by a new rendered regression and expanded browser parity.
 
-## Verified
+## Verification
 
-- Fresh UI tests: 298/298 PASS. CLI migration/app-root tests: 16/16 PASS. Scoped checks/lint/format PASS.
-- quality:gate including arch:check PASS; durable sanitized receipt retained.
-- 187-case Utility computed-style/pixel parity PASS, for authored CSS and separately for actual CLI-transformed CSS. Correct Studio/Utility host attributes, same compiler settings, own-revision runtimes and input hashes; all four PNG pairs match.
-- Normal browser matrix: 24/24 PASS; five axe validator contract tests PASS. All 12 axe case rule/impact/count totals retained; all four Utility cases retain zero allowances.
-- Exact 0.0.8 archive scaffold: 62 files converted, dry-run byte preservation, zero-change second apply, workspace deno task check (including all Fresh sources) and app formatting PASS. All 43 copied TSX sources match the maintained registry after the installer's two import relocations; 41 are byte-identical. No legacy state selectors remain.
-- Contract TypeScript facade and CLI public doc lint PASS. Fresh UI JSR static dry run PASS. Review threads: zero unanswered.
+- Fresh UI tests: 299 passed, zero failed/ignored. CLI migration/app-root: 16 passed.
+- Structured Fresh UI check/lint/fmt: all 246 files pass; migration check/lint/fmt: all 15 pass. Browser tool check passes.
+- quality:gate including dependency/architecture checks passes on the reviewed source head.
+- Two expanded 188-case parity runs (authored CSS and actual CLI-transformed CSS), four width/scheme combinations each: zero computed differences; all PNG pairs identical. Open ActionMenu included, with production base tokens, top-layer activation, geometry and stacking checks. Old-scope negative control fails as expected.
+- Retained 24-case normal browser matrix with unchanged axe totals. Exact 0.0.8 consumer proof: 62 converted files; dry-run unchanged, idempotent, workspace check includes all app sources, and 43 copied TSX sources equivalent after installer import relocation. Migration implementation remains unchanged.
+- Docs build/rendered-output, original docs renderer test, generated embeds/prose/publish/MCP corpus, migration data freshness and Fresh UI export/reference drift pass. Review threads: zero unanswered. No lock changes.
+- Separate same-session Claude IMPL-EVAL: FAIL_FIX → one repair → PASS. See evaluate.md and both full verdicts.
 
-## Outstanding signoff / measured limits
+## Measured limits and remaining scope
 
-PLAN-EVAL passed after one repair; slice 1 and 2 supervisor reviews passed after repairs. Both slice 3 review findings and the literal repair miss are retained honestly. Final implementation review was attempted twice, but Claude returned usage_limit_reached (429) before review. No substitute or self-certification is presented as a verdict.
+The required single full scaffold.runtime attempt exits 1 at Aspire/Docker preflight; Docker daemon unavailable, no generated runtime starts, runtime acceptance UNPROVEN. Resource reporter finds no positively proven run-owned survivors; every foreign/unknown resource was left untouched.
 
-The single canonical full scaffold.runtime attempt failed at Aspire/Docker preflight; Docker was unavailable and no runtime acceptance was proven. Full Fresh UI docs lint has 123 measured baseline diagnostics plus one JSON-data missing-JSDoc limitation. App-local check retains the existing constant bootstrap-script react-no-danger lint finding; workspace check includes the full app and passes. No validator or finding was suppressed.
+Retained baseline limitations: 123 existing Fresh UI doc-lint diagnostics plus JSON-data missing-JSDoc limitation; existing exact-0.0.8 app-local constant-script react-no-danger finding. Workspace app check passes; nothing suppressed.
 
-## Continuation
-
-Obtain the owner-required independent IMPL-EVAL when its service is available. Run the full scaffold runtime suite in a working Docker/Aspire environment. Keep the PR draft until required signoff is satisfied. Do not merge, tag, release, close #2416, change labels, force-push, or commit the assignment/report handoff files.
-
-Generated carriers use existing gen:assets-barrel and gen:agent-docs-prose tasks. The migration source edits regenerate from the exact baseline through .llm/tools/generate-ui-variant-migration.ts. See memory notes for isolated parity compiler settings, CLI format exclusions, actual legacy state selectors, import relocation and evaluator/runtime availability. Raw operational evidence stays private; only sanitized evidence is tracked here.
-
-## Resume 2026-10-31
-
-Recovery in progress on the same branch/PR; integrate main 7907293f3, regenerate conflicting prose carriers, rerun source gates and the required runtime suite, and obtain the owner-selected Claude IMPL-EVAL. Original scope restrictions and phase-one-only issue linkage remain authoritative.
-
-Resume integration validation is green for source check/lint/format (245 files), migration tests (16), docs renderer fixture and quality:gate/arch:check. Main's fixture double cast was replaced with Page.create, retaining tests. Docs build passes. Runtime suite attempted once and fails on unavailable Docker/Aspire. Generated corpus/carrier freshness and independent Claude IMPL-EVAL remain next.
-
-All 298 Fresh UI tests now pass after main integration, alongside the 16 migration tests and 15-file CLI check/lint/fmt. The original parity and 0.0.8 consumer proofs remain applicable: package/component and migration sources have zero diff from 1cac8f994. Versioned migration regeneration is unchanged. MCP corpus regenerated; final committed-head freshness and Claude verdict remain outstanding.
-
-Independent review round 1 found one ActionMenu floating-scope blocker (resume-impl-eval-round-1.md). Repair is now implemented, with an actual-render scope regression and two expanded 188-case visual parity passes plus a failing old-scope negative control. Source check/lint/fmt covers 246 files and passes. Full package test rerun and same-session re-review remain pending; keep draft until resolved.
+Gap components, additional styles/all-style behavioral tests, tokens and registry v2 remain in their approved later phases. No issue closure, new PR, label change, force-push, merge, tag or release. Do not commit assignment/report handoff files.

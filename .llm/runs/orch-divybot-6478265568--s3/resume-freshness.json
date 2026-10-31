@@ -1,5 +1,5 @@
 {
-  "sourceHead": "ac2f1e440d4e42d652f977011815c7f31aefe232",
+  "sourceHead": "bdb959d102189f5ad530fd3e07d54d29a8dbc0c4",
   "checks": [
     {
       "command": "deno task check:assets-barrel",
@@ -31,5 +31,5 @@
     }
   ],
   "lockfileChanges": [],
-  "retainedProofInputs": "Fresh UI/migration/parity product inputs are identical to 1cac8f994"
+  "retainedProofInputs": "Migration code and 0.0.8 app-copy inputs are unchanged; current component visuals are proven by two expanded 188-case parity runs including repaired ActionMenu."
 }
