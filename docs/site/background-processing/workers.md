@@ -360,6 +360,26 @@ service: the API enqueues and the runner executes. Aspire injects the runner's q
 `WORKERS_CONCURRENCY`; [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/)
 shows how to change it.
 
+## Lifecycle logging
+
+Routine job processing, entrypoint resolution, execution and duplicate-delivery skips emit structured
+`debug` records through `@netscript/logger` under the category `netscript.workers.runtime`. Each
+job record carries `jobId`, `jobName` (the definition's name, falling back to its id) and `workerId`.
+Task processing, successful completion and duplicate skips use the same category with `taskId` and
+`taskName`. Warnings and failures retain their warning/error console diagnostics.
+
+Configure logging **inside the worker process** to see these records. For example, call
+`await configureLogging({ level: 'debug' })` from `@netscript/logger` in your worker entrypoint before
+starting the runtime. Configuring the API service process does not configure its separate worker
+process. The built-in background entrypoint does not initialize logging itself: without host
+configuration, routine lifecycle records are silent. This change adds no separate sinks or logger
+initialization.
+
+An `info` threshold suppresses these lifecycle records; `debug` enables them. NetScript's configured
+default is `info` in production and `debug` in development, unless `NETSCRIPT_LOG_LEVEL` or
+`NETSCRIPT_DEBUG` overrides it. Apps using LogTape's `configure` can set `lowestLevel` for
+`['netscript', 'workers', 'runtime']` independently of other categories.
+
 ## Tracing
 
 The workers runtime traces the scheduler → queue → worker → subprocess path with OpenTelemetry
