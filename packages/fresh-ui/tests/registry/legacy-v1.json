@@ -2470,7 +2470,7 @@
       }
     ],
     "dependencies": [
-      "jsr:@netscript/sdk@0.0.8/auto-update"
+      "jsr:@netscript/sdk@0.0.0-fixture/auto-update"
     ],
     "registryDependencies": [
       "theme-seed"
@@ -2497,7 +2497,7 @@
       }
     ],
     "dependencies": [
-      "jsr:@netscript/sdk@0.0.8/desktop",
+      "jsr:@netscript/sdk@0.0.0-fixture/desktop",
       "npm:preact@^10.29.2"
     ],
     "registryDependencies": [
@@ -2547,7 +2547,7 @@
       }
     ],
     "dependencies": [
-      "jsr:@netscript/ai@0.0.8",
+      "jsr:@netscript/ai@0.0.0-fixture",
       "npm:preact@^10.29.2"
     ],
     "registryDependencies": [

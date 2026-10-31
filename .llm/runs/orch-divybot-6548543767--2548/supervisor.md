@@ -19,3 +19,11 @@ Disposable rehearsal is a separate clone under the project runs directory, never
 Draft PR uses `Refs #2548` only, no labels. No publication or merge.
 
 Scope correction before implementation: release bump implementation lives in `.llm/tools/deps/bump-version.ts`, not `.llm/tools/release/`. Add `.llm/tools/deps/bump-version.ts` and `.llm/tools/deps/bump-version_test.ts` to the write surface. Registry contributor guide: `packages/fresh-ui/src/registry/README.md`.
+
+Focused regression write surface also includes `.llm/tools/deps/bump-version-registry_test.ts` and `packages/fresh-ui/tests/registry-authoring.test.ts`.
+
+Final delivery surface required by assignment footer: `.divybot-final-report.tmp` atomically renamed to `.divybot-final-report.md`; both excluded from Git. The canonical READY report is handed to Orchid through this file, not posted directly with gh.
+
+Review correction write surface: `.llm/tools/release/prepare-release.ts` and its existing test, plus registry embedded output `packages/fresh-ui/src/registry/assets/registry.generated.ts` only through the generator.
+
+Second-review correction write surface: `.llm/tools/release/github-release.ts` and `.llm/tools/release/github-release_test.ts` (inside already declared release-tooling scope). Evaluator loop stopped after its second FAIL_FIX; no third pass or self-certification.

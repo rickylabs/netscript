@@ -24,9 +24,23 @@ Deno.test('JSON authoring preserves legacy contracts plus the reviewed syntax de
       tags: item.tags,
     }]),
   );
+  // Historical fixture versions are independent of releases; compare their first-party pins today.
   // S6a adds syntax rendering; retain the historical fixture and declare only this reviewed delta.
   const expected = {
-    ...legacyBaseline,
+    ...Object.fromEntries(
+      Object.entries(legacyBaseline).map(([name, item]) => [name, {
+        ...item,
+        ...('dependencies' in item
+          ? {
+            dependencies: item.dependencies.map((dependency) =>
+              dependency.startsWith('jsr:@netscript/')
+                ? dependency.replace('@0.0.0-fixture', `@${FRESH_UI_PACKAGE_VERSION}`)
+                : dependency
+            ),
+          }
+          : {}),
+      }]),
+    ),
     'code-block': { ...legacyBaseline['code-block'], dependencies: ['npm:highlight.js@^11'] },
   };
   assertEquals<unknown>(actual, expected);

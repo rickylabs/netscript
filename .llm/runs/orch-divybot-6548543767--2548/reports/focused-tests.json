@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--unstable-kv",
+    ".llm/tools/deps/bump-version-registry_test.ts",
+    ".llm/tools/deps/bump-version_test.ts",
+    ".llm/tools/validation/check-netscript-jsr-specifiers_test.ts",
+    ".llm/tools/release/prepare-release_test.ts",
+    ".llm/tools/release/cut_test.ts",
+    ".llm/tools/release/canary_test.ts"
+  ],
+  "cwd": ".",
+  "exitCode": 0,
+  "durationMs": 2288,
+  "summary": {
+    "passed": 52,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 52,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

@@ -475,7 +475,36 @@ Deno.test('generated release freshness checks semantic prose before downstream a
     'deno task check:agent-docs-prose',
     'deno task gen:publish-assets --check',
     'deno task check:mcp-export-corpus',
+    'deno task --cwd packages/fresh-ui registry:embed:check',
     'deno run --no-lock --allow-read --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts --check',
+  ]);
+});
+
+Deno.test('generated release freshness rejects a stale registry before checking its downstream barrel', async () => {
+  const calls: string[] = [];
+  await assertRejects(
+    () =>
+      assertPreparedReleaseGeneratedOutputsFresh('/repo', {
+        trackedStatus: () => Promise.resolve(''),
+        runDeno: (_root, args) => {
+          const command = `deno ${args.join(' ')}`;
+          calls.push(command);
+          if (args.includes('registry:embed:check')) {
+            return Promise.reject(
+              new Error(`${command} did not reproduce the generated release outputs`),
+            );
+          }
+          return Promise.resolve();
+        },
+      }),
+    Error,
+    'did not reproduce the generated release outputs',
+  );
+  assertEquals(calls, [
+    'deno task check:agent-docs-prose',
+    'deno task gen:publish-assets --check',
+    'deno task check:mcp-export-corpus',
+    'deno task --cwd packages/fresh-ui registry:embed:check',
   ]);
 });
 
