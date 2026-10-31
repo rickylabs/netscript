@@ -10,3 +10,4 @@
 - Scope changes must be recorded in drift.md before edits.
 - Stop at READY. Coordinator owns merge and e2e-cli-gate. Local scaffold.runtime is forbidden for this assignment.
 - Privacy: public artifacts omit machine identity, concrete local paths, session IDs and service bindings.
+- Reconciled CI write surface: `.llm/tools/command-postgres-conformance.sh` adds the new generated-provider test to the existing real-Postgres gate, as selected in the reviewed plan.

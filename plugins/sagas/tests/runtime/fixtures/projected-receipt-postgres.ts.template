@@ -1,0 +1,106 @@
+import { PrismaClient, type Prisma } from './.generated/client.ts';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { assert, assertEquals } from '@std/assert';
+import { z } from 'zod';
+import { SAGA_INSTANCE_STATUSES } from '@netscript/plugin-sagas-core/domain';
+import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
+import {
+  createPostgresCommandOutboxRelayStore,
+  type PostgresCommandClient,
+  type TransactionClientPort,
+} from '@netscript/database/commands/postgres';
+import {
+  PrismaSagaInstanceProjection,
+  parseSagaInstanceReadModel,
+} from 'REPO_URLplugins/sagas/src/runtime/saga-instance-projection.ts';
+import {
+  RECEIPT_INSTANCE,
+  RECEIPT_SAGA_ID,
+  runProjectedReceiptFlow,
+} from 'REPO_URLplugins/sagas/tests/runtime/fixtures/projected-receipt-flow.ts';
+
+type Tx = Omit<Prisma.TransactionClient, '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>;
+const connection = {
+  host: Deno.env.get('COMMAND_POSTGRES_SOCKET'),
+  database: 'postgres',
+  user: Deno.env.get('PGUSER'),
+  port: Number(Deno.env.get('PGPORT')),
+};
+
+Deno.test('projected atomic worker receipt reaches recorded on real Prisma after both restarts', async () => {
+  const schema = 'receipt_' + crypto.randomUUID().replaceAll('-', '');
+  const admin = new PrismaClient({ adapter: new PrismaPg(connection) });
+  const root = new PrismaClient({ adapter: new PrismaPg({ ...connection, options: `-c search_path=${schema}` }, { schema }) });
+  const bridge: PostgresCommandClient & TransactionClientPort<Tx> = {
+    $queryRawUnsafe: root.$queryRawUnsafe.bind(root),
+    $executeRawUnsafe: root.$executeRawUnsafe.bind(root),
+    $transaction(work, options) {
+      if (options?.isolationLevel === 'Snapshot') throw new TypeError('Unsupported isolation');
+      return root.$transaction(tx => work(new Proxy(tx, {
+        get(target, key, receiver) {
+          if (typeof key === 'string' && ['$transaction', '$connect', '$disconnect', '$on', '$use', '$extends'].includes(key)) return undefined;
+          return Reflect.get(target, key, receiver);
+        },
+      })), { ...options, isolationLevel: options?.isolationLevel });
+    },
+  };
+  let created = false;
+  try {
+    await admin.$executeRawUnsafe(`CREATE SCHEMA ${schema}`);
+    created = true;
+    for (const path of [
+      'packages/database/tests/fixtures/command-store/migration.sql',
+      'packages/plugin-sagas-core/tests/fixtures/transition-store/runtime-migration.sql',
+      'packages/plugin-sagas-core/tests/fixtures/transition-store/command-replay-migration.sql',
+    ]) {
+      const sql = await Deno.readTextFile(new URL(path, 'REPO_URL'));
+      for (const statement of sql.replace(/^--.*$/gm, '').split(';').filter(value => value.trim())) {
+        await root.$executeRawUnsafe(statement);
+      }
+    }
+    await root.$executeRawUnsafe(`CREATE TABLE saga_instances (
+      id varchar(100) NOT NULL, saga_name varchar(100) NOT NULL, correlation_id varchar(100) NOT NULL,
+      version integer NOT NULL DEFAULT 1, status varchar(20) NOT NULL DEFAULT 'running',
+      is_completed boolean NOT NULL DEFAULT false, state jsonb NOT NULL,
+      created_at timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at timestamp(3) NOT NULL,
+      PRIMARY KEY (saga_name, id))`);
+    await runProjectedReceiptFlow({
+      openStore: () => createPrismaSagaTransitionStore(bridge, { transactionTimeoutMs: 5000 }),
+      readCanonical: () => createPrismaSagaTransitionStore(bridge, { transactionTimeoutMs: 5000 }).load(RECEIPT_INSTANCE),
+      // The boundary is the actual generated-client upsert; its argument is emitted by the native projector.
+      projection: new PrismaSagaInstanceProjection({ sagaInstance: {
+        upsert: args => root.sagaInstance.upsert(args as Prisma.SagaInstanceUpsertArgs),
+      } }, () => false, 'prisma'),
+      readProjection: async () => {
+        const row = await root.sagaInstance.findUnique({ where: { sagaName_id: { sagaName: RECEIPT_SAGA_ID, id: RECEIPT_INSTANCE } } });
+        if (!row) return undefined;
+        assertEquals(row.status, 'running');
+        return parseSagaInstanceReadModel(row.state);
+      },
+      serviceContext: { db: {
+        sagaInstance: {
+          findFirst: async args => {
+            const row = await root.sagaInstance.findFirst(args);
+            return row ? { ...row, status: z.enum(SAGA_INSTANCE_STATUSES).parse(row.status), state: z.record(z.string(), z.unknown()).parse(row.state) } : null;
+          },
+          findMany: async () => { throw new Error('Single-instance GET must not scan'); },
+          count: async () => { throw new Error('Single-instance GET must not count'); },
+        },
+        sagaExecutionHistory: { findMany: async () => [], count: async () => 0 },
+      }, useKvProjection: false },
+      relayStore: createPostgresCommandOutboxRelayStore(bridge, { transactionTimeoutMs: 5000 }),
+      assertCommands: async expected => { assertEquals(await root.netScriptCommandOutbox.count(), expected); },
+    });
+    assertEquals(await root.sagaRuntimeTransition.count(), 2);
+    assertEquals(await root.sagaRuntimeCommandAppliedKey.count(), 2);
+    const outbox = await root.netScriptCommandOutbox.findFirst();
+    assert(outbox);
+    assert(outbox.publishedAt instanceof Date);
+    assert(outbox.acceptanceIdentity);
+    assertEquals(outbox.attemptCount, 1);
+  } finally {
+    await root.$disconnect();
+    if (created) await admin.$executeRawUnsafe(`DROP SCHEMA ${schema} CASCADE`);
+    await admin.$disconnect();
+  }
+});

@@ -17,3 +17,17 @@ Owner override, verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL aft
 ## Bootstrap
 
 Assignment/AGENTS read, memory consulted, MCP guidance/search complete, clean baseline. RTK missing; direct bounded commands. KV worker-outbox limitation included in plan. PLAN-EVAL pending; implementation not started.
+
+## Plan gate
+
+Independent requested-route PLAN-EVAL passed before implementation, first round. Draft PR #2534 opened from bootstrap commit 918fb6f within the required window. Reconcile: live #2390 remains open, no other PR covers the fixture, no labels/milestones changed.
+
+## Reproduction slice
+
+Native first-party synthetic receipt fixture is implemented, including real Prisma interactive transaction/projection/relay, shipped worker dispatcher/pool, real durable-stream protocol server and HTTP saga publisher/query. KV is explicitly the supported non-outbox route plus capability refusal. All three new tests pass without provider skips or disabled sanitizers. Two processor lifecycle reconstructions retain canonical/replay storage; the stream producer is recreated with a KV-CAS allocated epoch between admission and receipt.
+
+Structured source check/lint/fmt report zero findings. quality:gate exits 0. Sagas JSR audit exits 0 with inherited advisory warnings; new tests do not enter its publish include list. Neighbors: 81 pass, 6 provider skips, zero failures. Historical producer probe fails on exact canary.8 and passes on main; forced epoch-zero integration fails both providers. See evidence.md for exact proof boundaries and honest per-PR attribution.
+
+Reconcile: #2390 and #2474 remain references, PR #2534 remains draft; no labels/milestones modified. Added one CI-driver invocation so provider CI executes this fixture. No production change or new debt. Independent slice/implementation review pending before sign-off commit.
+
+Independent implementation/slice review round 1: PASS, no blockers. Evaluator verified raw provider output, source, controls and all stated limitations. This clears the supervisor sign-off commit. Sanitized report index is gate-summary.json; it is explicitly an index, not a substitute for wrapper verdicts.
