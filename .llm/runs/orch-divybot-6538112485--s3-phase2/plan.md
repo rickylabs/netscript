@@ -1,7 +1,9 @@
 # Plan & Design — READY FOR REVIEW
 
-Feature tier; supplied leaf profile. Archetype 1 contracts plus existing Fresh UI
-presentation/runtime archetypes, frontend overlay. PLAN-EVAL is mandatory before
+Feature tier; supplied leaf profile. Primary package Archetype4 (Public DSL/Builder),
+as assigned to Fresh UI by doctrine06; the small-contract concern is folded into it.
+Frontend and docs overlays apply; existing interactive materialization adds real
+browser/lifecycle/consumer gates. No new builder API or CLI command is introduced. PLAN-EVAL is mandatory before
 implementation, separate read-only Claude Opus 5.5 high as the owner specifies.
 
 ## Locked decisions
