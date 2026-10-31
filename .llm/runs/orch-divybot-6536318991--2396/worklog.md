@@ -26,3 +26,10 @@ then documentation search. Consulted shared NetScript memory. Resolved feature r
 owner evaluator override verbatim. Audited real merge-base footprints and all eight acceptance
 entries in research.md. No product edits yet. Existing draft 2421 is the early review surface;
 2422 and 2423 remain non-draft by owner instruction. No acceptance is marked complete yet.
+
+## PLAN-EVAL round 1
+
+FAIL_PLAN; report preserved verbatim in plan-eval-round-1.md. Corrected the four concrete
+plan gaps, verified workflow push capability without storing credentials, and recorded
+exact added paths before implementation. All three native review-thread gates pass (0 threads).
+Re-steering the same independent evaluator for round 2. No product edits.

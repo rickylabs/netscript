@@ -24,3 +24,10 @@ will be committed. Local gate output remains outside Git unless summarized witho
 No labels, milestones, merges, releases, force pushes, lock/cache deletion or local runtime E2E.
 
 RTK is unavailable on this worker; use focused raw commands and repository wrappers.
+
+Additional exact S3 write scope approved by this plan's recorded expansion: streams legacy
+main; workers/streams service-host-policy_test.ts; streams service-legacy_test.ts;
+docs/site/services-sdk/how-to/host-plugin-services.md; docs/site/services-sdk/services.md;
+plugins/streams/README.md; plugins/workers/CHANGELOG.md; plugins/streams/CHANGELOG.md.
+Canonical generated carrier paths are enumerated in the plan round-1 repair. Saga/trigger
+entrypoints and export maps are read-only review scope, with results recorded in the guide.
