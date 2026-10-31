@@ -72,3 +72,40 @@ IMPL-EVAL round 1: FAIL_FIX (evaluate.md). Sole blocker: six token notes were mi
 All four repaired carrier gates now have canonical run-gate receipts: fixed-assets, fixed-corpus, fixed-prose, fixed-publish — each PASS, exit 0. Root structured check completed: 3,996 files, 34 batches, 0 findings. CLI token regressions pass 10/0. Current native publish budget regression passes. Immutable baseline CSS declaration superset + web gzip budget pass.
 
 This next commit is the source-clean integration checkpoint needed by the corpus generator; final independent sign-off follows clean-source carrier regeneration and renewed immutable-head quality evidence. Final READY remains gated on exact-head remote checks. No root/docs-site lock churn.
+
+## Clean-source final gate evidence (f12d6388d)
+
+Product source and carriers are committed and unchanged in the worktree. `gen:mcp-export-corpus` ran WITHOUT --allow-dirty, followed by assets and publish generation; it produced no source/carrier diff. Clean corpus SHA256 a0a9f291457b483976f0ff37c7f690e93d5da3dafe64c3dfc0709734d384b06a.
+
+| Gate | Result / evidence |
+| --- | --- |
+| Quality + architecture/dependencies | clean-quality-receipt.json PASS, exit 0, f12d6388d |
+| check:assets-barrel | clean-assets-receipt.json PASS, exit 0, f12d6388d |
+| check:agent-docs-prose | clean-prose-receipt.json PASS, exit 0, f12d6388d; real Lume build/rendered-output |
+| check:mcp-export-corpus | clean-corpus-receipt.json PASS, exit 0, f12d6388d |
+| check:publish-assets | clean-publish-receipt.json PASS, exit 0, f12d6388d |
+| docs:accuracy | docs-accuracy-receipt.json PASS, exit 0, f12d6388d |
+| release:preflight | final-release-preflight.log PASS, exit 0, all four scans |
+| Full token/build/report/publish regressions after docs fix | post-doc-token-tests.json exit 0, 41 passed / 0 failed |
+| Relocated copied-theme-doc tests | relocated-theme-doc-tests.json exit 0, 10 passed / 0 failed |
+| Full registry/component suite | registry-complete-tests.json exit 0, 283 passed / 0 failed |
+| CLI token regressions | cli-token-tests.json exit 0, 10 passed / 0 failed |
+| Package check after documentation-root fix | fixed-integration-check.json 265 files, 0 findings |
+| Integration lint after documentation-root fix | fixed-integration-lint.json 13 files, 0 findings |
+| Root check | root-check.json: 3996 files / 34 batches / 0 findings, exit 0 |
+| Token freshness / authored inventory | token-freshness-receipt.json PASS, exit 0; 88 outputs / 96 inputs / 24 authored themes |
+| Other root check:* tasks | all 8 static tasks + review-threads exit 0; per-task logs retained |
+| Runtime | UNPROVEN, exact one-pass attempt exit 1 at Aspire/Docker prerequisites |
+| Whole-package doclint / JSR audit | inherited baseline diagnostics recorded, not claimed green |
+
+No root or docs-site lock churn. No labels. Mixed emphasis debt and directory-cardinality debt remain explicitly recorded. Source docs location repair complete; requesting same-session IMPL-EVAL round 2. Remote required checks are still draft SKIPPED and do not establish READY.
+
+## Final independent sign-off
+
+Same-session read-only IMPL-EVAL round 2 PASS in evaluate.md, certifying implementation/local gates at product source f12d6388d. Prior FAIL_FIX preserved in evaluate-round1.md. No product changes after that checkpoint; this commit contains run evidence only. Native final payload: 142 files / 4,294,002 bytes / 5,000,000 budget. Complete post-doc token run41/0; registry283/0; CLI10/0; root3996files0; all 13 check:* tasks pass with raw-exit receipts for the carriers.
+
+PR #2495 carries the originating issue's 0.0.9 milestone, no labels, Refs #2450 only. Figma burn-down OPEN. READY is deliberately not posted yet: draft quality/check-test/deps-report statuses are skipped. After this evidence commit, mark ready for review to schedule real CI, verify required contexts at the exact PR head, and publish final proof externally without another evidence push. Cockpit merges.
+
+## Reconcile — integration
+
+Code, documentation sources and all four carriers match committed product source; root/docs-site locks unchanged. Every prior baseline NS One declaration remains. All three faithful presets resolve. Accepted emphasis and directory-layout debt are explicit. Runtime remains UNPROVEN due Docker; no foreign resources mutated. Final CI head/status and READY live in PR phase comments and the excluded final-report handoff, so those reports cannot invalidate their own source head.
