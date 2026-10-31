@@ -31,3 +31,6 @@ S3 terminal PASS: independent repair review, 11/0/0 structured tests,
 14-file check and 13-file lint/fmt (nonzero plugin coverage), browser build,
 source freshness and release preflight pass. Reconcile: next S4 adds required
 CI coverage and the distributable name checker. No READY claim yet.
+
+S4 terminal PASS: explicit plugin/CI/name command and negative file control.
+Next implement S5 URL dispatch, persistent source/lock ownership and init wiring.

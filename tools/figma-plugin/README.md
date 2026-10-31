@@ -97,3 +97,40 @@ Start here, then follow these boundaries:
 The fixture proof changes Scheme `bevel/edge` in Light and one Theme scalar in Studio, validates
 the complete portable item as values-only, then tests a one-file PR through a mocked GitHub API.
 Code Connect and library gap components are phase 2.
+
+## Name checks in CI
+
+From NetScript, `deno task figma:ci` runs the explicit structured plugin wrappers,
+unit tests, name check and browser build. These wrappers report nonzero processed
+file counts; root workspace wrappers exclude tools/. The required CI quality job
+runs this task even when its other work is skipped by path policy.
+
+`deno task check:figma-names` checks the pinned nine-collection snapshot and a
+portable item built from the committed fixtures. Pass `--theme <item.json>` once
+per exported item to check your actual PR files. `--negative-control` deliberately
+exits nonzero for `Scheme/accent/border (var(--ns-unknown-export))`.
+
+Copy this into the theme repository so unknown export names fail its PR checks:
+
+```yaml
+name: token-names
+on: [pull_request]
+jobs:
+  names:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.7'
+      - uses: actions/checkout@v5
+        with:
+          repository: rickylabs/netscript
+          ref: main
+          path: .netscript
+      - run: deno task --cwd .netscript check:figma-names --theme ../themes/studio-utility.json
+```
+
+Pin the NetScript checkout to your plugin's release commit when retaining an older
+code vocabulary. The plugin refuses unknown names before push, this CI command
+uses that same checker, and the CLI checks again before installation.

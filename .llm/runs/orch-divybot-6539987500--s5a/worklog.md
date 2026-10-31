@@ -116,3 +116,17 @@ S3 terminal PASS: independent repair review, 11/0/0 structured tests,
 14-file check and 13-file lint/fmt (nonzero plugin coverage), browser build,
 source freshness and release preflight pass. Reconcile: next S4 adds required
 CI coverage and the distributable name checker. No READY claim yet.
+
+## S4 — required CI and portable name-check command
+
+Independent source review PASS. figma:ci exits 0: 15 selected/processed source
+files, no check/lint/fmt findings; 12 tests passed; pinned 2,186 variable names
+and one portable fixture checked; browser bundles built. Real --theme file
+negative control exits 1 naming Scheme/accent/border and its unknown CSS name.
+The plugin's standalone npm zod pin matches the root catalog. npm-catalog and
+zod alignment gates pass (existing unrelated catalog warnings retained).
+
+Added the figma-ci allowlisted gate so required quality CI uploads a durable
+receipt, including tools-only policy skips. This necessarily extends the initial
+write surface to .llm/tools/gates/catalog.ts; recorded as tooling drift, not
+framework scope. Reconcile: S4 complete; S5 URL/init application is next.
