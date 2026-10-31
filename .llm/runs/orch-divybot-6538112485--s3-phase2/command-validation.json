@@ -49,5 +49,12 @@
   "frozenFixtureChanged": false,
   "phaseReady": false,
   "fullGoalComplete": false,
-  "independentSourceAndEvidenceSignOff": "PASS"
+  "independentSourceAndEvidenceSignOff": "PASS",
+  "sourceHead": "d985633317cda1a8090db1157f3f2a4ddbc91327",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
 }
