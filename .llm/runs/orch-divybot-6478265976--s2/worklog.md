@@ -1,5 +1,9 @@
 # Worklog
 
+2026-10-31 main4aa integration: regenerated both generated conflict carriers and MCP corpus from combined sources; all workers retry/DLQ production and registry-generation code matches main exactly. Combined eleven-file tests123/0/4; five-file wrappers zero issues/drops; release preflight/root quality PASS. Source merge and exact-head durable review follow. READY withheld until EVERY required actual final-head CI job succeeds. See2026-10-31-main-integration.md.
+
+02:00Z coordinator merge: fetched main4aa734e2b (#2481). Normal merge preserves upstream retry/dead-letter implementation and our test probe without direct worker-file conflicts. The actual conflicts are agent-docs-prose.generated.ts and packages/mcp/src/publish-assets.generated.ts; regenerate all combined docs/export/publish carriers from retained source. Both-behavior validation will rerun MCP/probe focused tests plus upstream retry/dead-letter unit suites. Pre-merge combined focused62/0/0 passed; it is not a post-merge verdict. Full required CI remains pending after merge/review/evidence, and no renewed READY is claimed.
+
 Follow-on test-6 local repair: actual CI report1783/1/7 identifies ESRCH on a disappearing owned PID. Local before29/0/0 does not reproduce the race and is not used to waive it. Shared already-tested termination probe now serves both executor suites; after30/0/0,3-file structured wrappers and canonical preflight/root quality pass. Zombie/ENOENT/ESRCH acceptance, living-to-zombie two reads and strict unexpected-error controls remain/add coverage. Actual cancellation/timeout, subprocesses, exit/time bounds and watchdog unchanged. Original test-2/test-5 are SUCCESS in run41155740922, which failed only test-6 plus aggregator. Same independent evaluator and fresh every-required-check CI are still required before renewed READY.
 
 ## Follow-on Linux liveness probe repair — design

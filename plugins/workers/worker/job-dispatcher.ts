@@ -1,3 +1,4 @@
+import { createDefaultJobDeadLetterStore, recordJobDeadLetter } from './job-dead-letters.ts';
 import {
   DEFAULT_TOPIC,
   type JobMessage,
@@ -54,6 +55,27 @@ export async function processWorkerJob(
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;
   let unlinkShutdown: (() => void) | undefined;
+  let attempts = 0;
+  let writingDeadLetter = false;
+  let terminalRecorded = false;
+  let executionSucceeded = false;
+  const deadLetter = async (error: string, errorCode?: string): Promise<void> => {
+    writingDeadLetter = true;
+    await recordJobDeadLetter(
+      context.deadLetters ?? createDefaultJobDeadLetterStore(context.queueName),
+      message,
+      {
+        queueName: context.queueName ?? 'jobs',
+        executionId,
+        attempts,
+        error,
+        errorCode,
+        queueContext,
+      },
+    );
+    terminalRecorded = true;
+    writingDeadLetter = false;
+  };
 
   try {
     const jobDef = await context.registry.get(jobId);
@@ -74,6 +96,7 @@ export async function processWorkerJob(
     });
     if (!claim.claimed) {
       recordIdempotentSkip(context, 'job', jobId, claim, tracedContext);
+      if (!claim.alreadyApplied) throw new Error(`Job '${jobId}' is already being processed`);
       return;
     }
 
@@ -154,12 +177,20 @@ export async function processWorkerJob(
           abortController.signal,
           subprocessHeaders,
           correlationId,
+          (attempt) => {
+            attempts = attempt;
+          },
         );
 
         addJobStepEvent('state_update', { status: result.success ? 'completed' : 'failed' });
         if (result.success) {
+          executionSucceeded = true;
           await context.idempotency.markApplied(claim!.key);
         } else {
+          await deadLetter(
+            result.error ?? 'Job failed after exhausting retries',
+            'job.retries_exhausted',
+          );
           await context.idempotency.release(claim!.key);
         }
         recordSharedWorkerMetrics(
@@ -181,10 +212,24 @@ export async function processWorkerJob(
       },
     );
   } catch (error) {
-    if (claim?.claimed) {
-      await context.idempotency.release(claim.key);
-    }
     await recordJobFailure(context, message, executionId, error);
+    const requeue = (claim !== undefined && !claim.claimed && !claim.alreadyApplied) ||
+      context.shutdownSignal?.aborted ||
+      error instanceof Error && error.name === 'ShutdownError' ||
+      writingDeadLetter || terminalRecorded || executionSucceeded;
+    try {
+      if (requeue) throw error;
+      if (!(error instanceof Error && error.name === 'AbortError')) {
+        await deadLetter(
+          error instanceof Error ? error.message : String(error),
+          error instanceof Error && error.name === 'TimeoutError'
+            ? 'job.timeout'
+            : 'job.execution_failed',
+        );
+      }
+    } finally {
+      if (claim?.claimed) await context.idempotency.release(claim.key);
+    }
   } finally {
     unlinkShutdown?.();
     if (executionId) {

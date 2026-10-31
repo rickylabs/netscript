@@ -1,7 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Tune the worker runtime
-description: Trade throughput against isolation with concurrency, runner mode, per-task permissions, timeouts, and retries.
+description: Set concurrency, handler retry and backoff, job dead letters, task permissions, timeouts, and cleanup budgets.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/tune-worker-runtime/
@@ -9,15 +9,16 @@ oldUrl: /how-to/tune-worker-runtime/
 
 # Tune the worker runtime
 
-This recipe tunes queue concurrency, per-topic scaling, task timeouts and retries, and the abort
-cleanup budget without changing a job handler.
+This recipe tunes queue concurrency, per-topic scaling, job retry and dead-letter behavior, task
+timeouts and permissions, and the abort cleanup budget. Declare each job's retry policy beside its
+handler so discovery and the generated registry carry the same policy into execution.
 
 Jobs execute in-process in the background worker service. Concurrency overlaps asynchronous I/O; it
 does not create Web Worker isolates or parallelize synchronous CPU work. Other runner modes are
 reserved; only `in-process` is implemented (see
 [worker runtime modes](/background-processing/workers/#worker-runtime-modes-worker_runtimes)). The
-settings live in `config/official-plugins/mod.ts` (`defineWorkers(...)`), in per-task runtime
-config, or in an environment variable that the worker entrypoint reads. For handler authoring, see
+settings live beside job handlers, in `config/official-plugins/mod.ts` (`defineWorkers(...)`), in
+per-task runtime config, or in an environment variable that the worker entrypoint reads. For handler authoring, see
 [Background jobs](/background-processing/workers/).
 
 ## Prerequisites
@@ -128,6 +129,109 @@ export const workers = defineWorkers({
 });
 ```
 
+## Declare job retry and dead-letter behavior with the handler
+
+Attach `retry` to the schema-backed handler in the discovered job file. Both registry generators
+preserve the declaration. The generated registry validates it when loaded, before registering the
+job. The same retry executor applies
+to in-process Deno jobs and jobs delegated to a polyglot runtime.
+
+```ts
+// workers/jobs/send-email.ts
+import { defineJobHandler } from '@netscript/plugin-workers-core';
+import { z } from 'zod';
+
+declare const mailer: { send(to: string, signal: AbortSignal): Promise<void> };
+
+export default Object.assign(
+  defineJobHandler(z.object({ to: z.string().email() }), async ({ payload, signal }) => {
+    await mailer.send(payload.to, signal);
+    return { success: true };
+  }),
+  {
+    id: 'send-email',
+    retry: { maxRetries: 2, backoff: 'exponential' as const, delayMs: 1000, maxDelayMs: 30_000 },
+  },
+);
+```
+
+`maxRetries` counts **additional attempts**: this example runs once, waits 1,000 ms after its first
+failure, then waits 2,000 ms after its second failure, for at most three attempts. With
+`maxRetries: 0`, the handler still executes once; a failure goes straight to the job dead-letter
+store. Thrown errors and `{ success: false, error: '...' }` results both consume the retry budget.
+
+| Handler retry field | Meaning |
+| --- | --- |
+| `maxRetries` | Integer from 0 to 100; default 3 additional attempts. |
+| `delayMs` | Base delay in milliseconds; defaults to the definition's `retryDelay`, then 1,000 ms. |
+| `backoff` | `fixed` (default), `linear`, or `exponential`. |
+| `maxDelayMs` | Ceiling on each wait; default 300,000 ms, raised to the base delay if needed. Must be at least `delayMs`. |
+
+For retry number `n` starting at one, fixed backoff waits `delayMs`, linear backoff waits
+`n * delayMs`, and exponential backoff waits `2 ** (n - 1) * delayMs`. Every wait is capped at
+`maxDelayMs`. Delays must be finite, nonnegative safe integers. Invalid declarations fail validation
+instead of being silently ignored.
+
+Each field resolves in this order: **handler `retry` → builder `metadata.retry` → definition
+`maxRetries` / `retryDelay` → defaults**. A handler field wins even over an explicitly configured
+group field. Group-versus-flat job configuration keeps its existing whole-group precedence. This
+also means a group entry that omits retry settings cannot hide the handler policy behind schema
+defaults. A definition authored with the builder can use the same policy:
+
+```ts
+import { defineJob } from '@netscript/plugin-workers-core';
+import { z } from 'zod';
+
+export const sendEmail = defineJob('send-email')
+  .payload(z.object({ to: z.string().email() }))
+  .entrypoint('./send-email.ts')
+  .retry(2, { backoff: 'exponential', delayMs: 1000, maxDelayMs: 30_000 })
+  .build();
+```
+
+### Inspect and replay exhausted jobs
+
+Every job has terminal dead-letter handling by default; no additional handler flag is needed. The
+worker awaits the durable write after the final allowed attempt and only then lets the queue
+acknowledge the delivery. `Worker.deadLetters` uses `JobDeadLetterStorePort`, the queue's existing
+`append`, `list`, `reprocess`, and `depth` contract specialized to `JobMessage`. Pass a replacement as
+`WorkerOptions.deadLetters` when constructing a `Worker`; the default is `KvDeadLetterStore` under
+the separate namespace `workers:job-dlq:<queue>`. This works independently of the queue provider.
+
+A record keeps the original job message, message id, trace headers, enqueue/failure times, error,
+and actual handler-attempt count in `deliveryCount`. Missing or disabled definitions have zero
+handler attempts and reason `unroutable`. Queue-level poison-message storage remains separate.
+
+```ts
+import type { JobMessage, Worker } from '@netscript/plugin-workers/worker';
+import type { MessageQueue } from '@netscript/queue';
+
+declare const worker: Worker;
+declare const jobs: MessageQueue<JobMessage>;
+
+const failures = await worker.deadLetters.list({ limit: 25 });
+const health = await worker.readHealthStatus();
+console.log(failures.length, health.deadLetters);
+
+// After correcting the cause, replay a bounded batch through the ordinary job queue.
+await worker.deadLetters.reprocess((record) => jobs.enqueue(record.payload), { limit: 10 });
+```
+
+The background `/health` response includes `deadLetters: { available, depth }`. Depth is read from
+durable storage for each request, including after replay or writes from another worker. A nonzero
+depth reports failed work without making an otherwise ready worker unavailable. If the store cannot
+be read, `available` is false, `depth` is null, dependency readiness is false, and health returns
+HTTP 503. Records remain until successfully reprocessed; execution-history retention does not
+remove them.
+
+Timeout is terminal for either job runtime: it records `timeout` and writes a job dead letter after
+that attempt instead of restarting potentially uncooperative work. Explicit user cancellation
+records `cancelled` and acknowledges without a dead letter. Shutdown aborts an active attempt or
+retry wait, releases the claim and requeues without a dead letter. A dead-letter write failure also
+releases the claim and propagates to the queue for redelivery; it cannot acknowledge a missing
+terminal record. Transport redelivery has its own budget and may run the handler again, so external
+side effects must be idempotent.
+
 ## Step 3 — Set task runtime, timeout and retries
 
 A polyglot task (`defineTask`, or a `TaskConfig` entry in `workers/runtime/`) runs as a spawned
@@ -236,11 +340,15 @@ selection and reason names.
 > subprocess task executor for work that needs its own process.
 
 > [!WARNING]
-> **Bound timeouts and retries together.** A task with `timeout: 300000` and `maxRetries: 3` can
-> hold a worker slot for about 15&nbsp;minutes of wall time, and each retry first waits
-> `retryDelay`. Under a saturated pool that is head-of-line blocking. Size `timeout` to the work,
-> keep `maxRetries` small for slow tasks, and pair retries with an `idempotencyKey` on enqueue so a
-> re-delivery after a forced restart does not charge twice. See
+> **Bound timeouts and retries together.** A job with `timeout: 300000` and `maxRetries: 3` can
+> hold a worker slot for about 20&nbsp;minutes plus retry waits when failures occur near each
+> deadline. Budget `(maxRetries + 1) * timeout + sum(capped retry waits)`. For transports with a
+> visibility timeout, keep that budget below the visibility lease and the active idempotency claim
+> TTL. KV polling defaults to a 30-second visibility lease; worker active claims default to
+> 15 minutes (`NETSCRIPT_WORKERS_IDEMPOTENCY_ACTIVE_TTL_MS`). Configure the transport and claim
+> budgets for your workload; retries do not renew either lease. Size `timeout` to the work, keep
+> `maxRetries` small for slow jobs, and use an `idempotencyKey` plus idempotent external effects
+> when enqueueing. See
 > [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) for delivery
 > semantics.
 

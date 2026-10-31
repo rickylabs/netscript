@@ -1,5 +1,7 @@
 # 2026-10-31 — Required shard handoff
 
+- Integrating main4aa734e2b (#2481) conflicts only in agent-docs prose and MCP publish carriers, not workers production. Regenerate agent-docs prose → CLI assets → publish assets → MCP export corpus (--allow-dirty only for generation). Validate retry/DLQ and async child-health alongside our process probe. Eleven-file combined wrapper result123/0/4; main workers production equality is independently checked, not inferred from clean merge.
+
 - The first full rerun41155740922 at8664aa3d6 fixed test-2/test-5 but exposed a Linux process-probe race in test-6. Downloaded report is1783/1/7; failed timeout/grandchild case throws ESRCH reading /proc/<owned pid>/stat after exit. The source matches main, which is not a failed-main waiver. Fix rather than silently rerun/waive.
 - process-review-regressions_test.ts already had the correct ENOENT/ESRCH/zombie probe and strict error controls, while stdin-payload_test.ts duplicated an incomplete NotFound-only loop. Share it through tests/executor/process-termination.ts; preserve actual process kill/latency/watchdog and50x10ms bounds. Add a live-to-zombie two-read control and unrelated-error propagation. Local before29/0/0 merely misses the race; after30/0/0 includes the deterministic controls.
 

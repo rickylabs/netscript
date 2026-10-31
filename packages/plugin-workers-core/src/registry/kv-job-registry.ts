@@ -1,3 +1,4 @@
+import { jobRetryRegistration } from '../domain/job-retry-policy.ts';
 import { executionRetentionRemaining } from '../state/execution-retention.ts';
 import { DEFAULT_TOPIC, JobDefinitionSchema } from '../domain/mod.ts';
 import type {
@@ -202,6 +203,7 @@ function normalizeJobDefinition(input: RegisterJobInput): JobDefinition {
     enabled: input.enabled ?? true,
     persist: input.persist ?? true,
     tags: input.tags ?? [],
+    ...jobRetryRegistration(input, input.handler),
   }) as JobDefinition;
   return input.payloadSchema ? { ...job, payloadSchema: input.payloadSchema } : job;
 }

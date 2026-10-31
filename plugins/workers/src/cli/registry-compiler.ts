@@ -72,6 +72,7 @@ function renderRegistrySource(
       `  readonly ${JSON.stringify(jobId(job.relativePath))}: ResolvedJobHandler<typeof ${alias}>;`,
     ],
     header: [
+      "import { jobRetryRegistration } from '@netscript/plugin-workers-core/runtime';",
       "import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
     ],
     body: (entries) => [
@@ -183,6 +184,7 @@ function renderRegistrySource(
       '    metadata: undefined,',
       '    retention: undefined,',
       '    ...policy,',
+      '    ...jobRetryRegistration(policy ?? {}, handler),',
       '    handler,',
       '    payloadSchema: handler.payloadSchema,',
       '  };',

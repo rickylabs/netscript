@@ -1,5 +1,9 @@
 # S2 registry v2 supervision
 
+## Coordinator merge — main4aa734e2b
+
+Explicit02:00Z steering requires a normal main merge before final CI. The implementation files for upstream workers retry/dead-letter merge cleanly; actual conflicts are generated agent-docs prose and MCP publish assets. Regenerate combined prose/export/publish carriers from preserved source, never choose one side permanently. Retain the test-only shared termination probe and upstream retry/DLQ behavior together; validate both focused surfaces and all required CI at the resulting exact head. No force push or readiness waiver.
+
 ## Follow-on required test-6 repair
 
 Run41155740922 at8664aa3d6 fixes test-2 but exposes an independent Linux ESRCH race in stdin-payload_test.ts's inline liveness probe. The source file is unchanged from main, but no failed matching main run proves a waiver; repair it on this branch under the coordinator's authorization. Writable surface adds packages/plugin-workers-core/tests/executor/{stdin-payload_test.ts,process-review-regressions_test.ts,process-termination.ts}. Share the existing sibling probe that already handles ENOENT and ESRCH; preserve actual cancellation/timeout/kill/latency and unexpected-I/O assertions. Test-only, no process-runner production change, skip, timeout increase or policy waiver. Require independent review and fresh EVERY-required-check green at the next exact head.
