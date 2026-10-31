@@ -395,7 +395,7 @@ function dispatchContext(
   return {
     workerId: 'worker-test',
     concurrency: 1,
-    registry: new SingleJobRegistry(options.job),
+    registry: new SingleJobRegistry(options.job ? { maxRetries: 0, ...options.job } : undefined),
     executionState: options.executionState,
     taskExecutor: options.taskExecutor,
     taskRegistry: new SingleTaskRegistry(options.task),

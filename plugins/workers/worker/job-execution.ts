@@ -1,7 +1,9 @@
 import {
   DEFAULT_TOPIC,
+  executeJobWithRetry,
   type JobDefinition,
   type JobMessage,
+  resolveJobRetryPolicy,
   type TaskDefinition,
   type TaskExecutionOptions,
 } from '@netscript/plugin-workers-core/runtime';
@@ -19,19 +21,24 @@ export async function executeWorkerJob(
   traceHeaders: Record<string, string>,
   correlationId?: string,
 ): Promise<WorkerJobResult> {
-  const executionType = jobDef.executionType ?? 'deno';
-  if (executionType === 'deno') {
-    return await executeDenoJob(
-      context,
-      jobDef,
-      executionId,
-      payload,
-      traceHeaders,
-      correlationId,
-      signal,
-    );
-  }
-  return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
+  return await executeJobWithRetry(
+    async () => {
+      const executionType = jobDef.executionType ?? 'deno';
+      return executionType === 'deno'
+        ? await executeDenoJob(
+          context,
+          jobDef,
+          executionId,
+          payload,
+          traceHeaders,
+          correlationId,
+          signal,
+        )
+        : await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
+    },
+    resolveJobRetryPolicy(jobDef, jobDef.handler),
+    { signal, clock: context.retryClock },
+  );
 }
 
 async function executeDenoJob(
@@ -165,7 +172,7 @@ async function executePolyglotTask(
     topic: jobDef.topic ?? DEFAULT_TOPIC,
     entrypoint,
     timeout: jobDef.timeout,
-    maxRetries: jobDef.maxRetries,
+    maxRetries: 0,
     retryDelay: jobDef.retryDelay ?? 1000,
     maxConcurrency: jobDef.maxConcurrency ?? 1,
     priority: jobDef.priority,
@@ -195,6 +202,13 @@ async function executePolyglotTask(
   };
 
   const result = await context.taskExecutor.execute(taskDef, execOptions);
+  if (result.status === 'timeout') {
+    throw new DOMException(result.error ?? 'Task deadline elapsed.', 'TimeoutError');
+  }
+  if (result.status === 'cancelled') {
+    signal.throwIfAborted();
+    throw new DOMException(result.error ?? 'Task cancelled.', 'AbortError');
+  }
   let resultData = result.result ?? undefined;
   if (!result.success) {
     const diagnostics: Record<string, unknown> = { ...resultData };

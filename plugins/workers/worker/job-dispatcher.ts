@@ -185,6 +185,11 @@ export async function processWorkerJob(
       await context.idempotency.release(claim.key);
     }
     await recordJobFailure(context, message, executionId, error);
+    if (
+      context.shutdownSignal?.aborted || error instanceof Error && error.name === 'ShutdownError'
+    ) {
+      throw error;
+    }
   } finally {
     unlinkShutdown?.();
     if (executionId) {

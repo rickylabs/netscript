@@ -2,6 +2,7 @@ import type { MessageContext, MessageQueue } from '@netscript/queue';
 import type {
   JobDefinition,
   JobMessage,
+  JobRunnerClock,
   TaskDefinition,
   TaskExecutionOptions,
   TaskMessage,
@@ -96,6 +97,8 @@ export interface WorkerTaskExecutor {
 
 /** Task execution result surface consumed by the worker process. */
 export type WorkerTaskResult = Readonly<{
+  /** Runtime outcome, including terminal timeout or cancellation. */
+  status?: string;
   /** Whether the task completed successfully. */
   success: boolean;
   /** Task duration in milliseconds. */
@@ -154,6 +157,8 @@ export interface WorkerOptions {
   workerUrl?: string;
   /** Options for in-process job handler resolution. */
   workerPoolOptions?: WorkerPoolOptions;
+  /** Clock used for cancellable job retry waits. */
+  retryClock?: JobRunnerClock;
   /** Maximum listener restarts before worker health degrades. */
   listenerMaxRestarts?: number;
   /** Initial listener restart backoff in milliseconds. */
@@ -180,6 +185,8 @@ export interface JobExecutionContext {
 
 /** Internal result shape returned by worker job execution. */
 export interface WorkerJobResult {
+  /** Handler attempts, including the initial attempt. */
+  readonly attempts?: number;
   /** Whether execution succeeded. */
   readonly success: boolean;
   /** Process-style exit code. */
@@ -204,6 +211,8 @@ export interface WorkerDispatchContext {
   readonly jobsDir: string;
   readonly activeJobs: Map<string, JobExecutionContext>;
   readonly workerSpan: Span | null;
+  /** Clock used for cancellable job retry waits. */
+  readonly retryClock?: JobRunnerClock;
   /** Shutdown signal also inherited by executions admitted while drain begins. */
   readonly shutdownSignal?: AbortSignal;
 }

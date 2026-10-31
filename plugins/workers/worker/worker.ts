@@ -7,7 +7,7 @@
 import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
-import type { WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
+import type { JobRunnerClock, WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
 import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
 import { startWorkerSpan, type TracedMessageContext } from '@netscript/telemetry/instrumentation';
@@ -76,6 +76,7 @@ export class Worker {
   private readonly taskRegistry: WorkerTaskRegistry;
   private readonly idempotency: WorkerIdempotencyPort;
   private readonly workerPool: WorkerPool;
+  private readonly retryClock?: JobRunnerClock;
   private readonly jobsDir: string;
   private readonly queueTriggers: readonly QueueTriggerConfig[];
   private readonly listenerMaxRestarts: number;
@@ -107,6 +108,7 @@ export class Worker {
     this.taskExecutor = options.taskExecutor;
     this.taskRegistry = options.taskRegistry;
     this.idempotency = options.idempotency;
+    this.retryClock = options.retryClock;
     this.jobsDir = options.jobsDir ?? './jobs';
     this.queueTriggers = resolveWorkerQueueTriggers(options.queueTriggers);
     this.listenerMaxRestarts = options.listenerMaxRestarts ?? 3;
@@ -307,6 +309,7 @@ export class Worker {
               `[Worker ${this.workerId}] Unexpected error processing job '${message.jobId}':`,
               error instanceof Error ? error.message : String(error),
             );
+            throw error;
           }
         },
         { signal, concurrency: this.concurrency },
@@ -368,6 +371,7 @@ export class Worker {
       activeJobs: this.activeJobs,
       workerSpan: this.workerSpan,
       shutdownSignal: this.abortController?.signal,
+      retryClock: this.retryClock,
     };
   }
 

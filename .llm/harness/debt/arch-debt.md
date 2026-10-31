@@ -1,5 +1,21 @@
 # Architecture Debt Registry
 
+## packages/plugin-workers-core — WORKERS-RETRY-DOMAIN-CARDINALITY (13 immediate domain children)
+
+- **Reason:** A cohesive retry-policy schema and resolver are a separate domain concern. This adds
+  one immediate child to the existing domain directory, exceeding the F-16 advisory cap of 12 by
+  one. Moving unrelated job/task contracts in this runtime fix would widen its review surface.
+- **Owner:** Workers core maintainers.
+- **Target:** Next workers domain organization review after milestone 0.0.9.
+- **Linked plan:** `.llm/runs/orch-divybot-6536190825--2144/plan.md`, issue #2144.
+- **Created:** 2026-10-31
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-16: JSR package audit reports at most 12 immediate domain children without merging
+  independent retry behavior into an unrelated contract file.
+- **Notes:** Cost is one additional sibling to navigate; no dependency-direction violation or
+  runtime overhead is accepted. Existing parent/executor-adapter cardinality warnings predate this
+  change.
+
 Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2026-04-29. Entries
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
 verdicts are not seeded here.

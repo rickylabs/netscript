@@ -1,6 +1,7 @@
 import type { JobContext } from './job-context.ts';
 import type { JobResult } from './job-result.ts';
 import type { JobPayloadSchema } from './public-schema.ts';
+import type { JobHandlerRetryPolicy } from './job-retry-policy.ts';
 
 /** Function that executes a worker job. */
 export type JobHandler<TPayload = unknown, TResult = unknown> = (
@@ -10,7 +11,11 @@ export type JobHandler<TPayload = unknown, TResult = unknown> = (
 /** Callable worker job handler that carries its payload validator. */
 export type JobHandlerDefinition<TPayload = unknown, TResult = unknown> =
   & JobHandler<TPayload, TResult>
-  & Readonly<{ payloadSchema: JobPayloadSchema<TPayload> }>;
+  & Readonly<{
+    payloadSchema: JobPayloadSchema<TPayload>;
+    /** Retry fields declared alongside this handler, overriding definition defaults. */
+    retry?: JobHandlerRetryPolicy;
+  }>;
 
 /** Error raised when a job payload fails its definition's schema. */
 export class JobPayloadValidationError extends TypeError {
