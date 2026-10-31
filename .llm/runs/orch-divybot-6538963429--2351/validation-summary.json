@@ -1,0 +1,117 @@
+{
+  "baseline": {
+    "queue": {
+      "passed": 144,
+      "failed": 0,
+      "ignored": 3
+    },
+    "worker": {
+      "passed": 13,
+      "failed": 0
+    }
+  },
+  "S1": {
+    "check": "PASS",
+    "lint": "PASS",
+    "fmt": "PASS",
+    "qualityGate": "PASS",
+    "correctedFocused": {
+      "passed": 26,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 26,
+      "uniqueFailures": 0
+    },
+    "initialFullQueue": {
+      "passed": 155,
+      "failed": 3,
+      "ignored": 3,
+      "failure": "producer-only promotion disconnect/error callback ordering; corrected preserving existing 100 ms disconnect grace"
+    },
+    "negativeControl": {
+      "source": "main b0b8f3f, exact new tests, --no-check in isolated source copy",
+      "passed": 0,
+      "failed": 14,
+      "distinguishingFailures": [
+        "N active barrier",
+        "slow/fast overlap",
+        "stop drain",
+        "post-abort final claim handled=0",
+        "configuration rejection missing"
+      ]
+    },
+    "fullQueueFinal": {
+      "exitCode": 0,
+      "durationMs": 68259,
+      "passed": 158,
+      "failed": 0,
+      "ignored": 3,
+      "totalResults": 161,
+      "uniqueFailures": 0
+    },
+    "independentReview": "PASS round 2",
+    "docLint": {
+      "newDiagnostics": 0,
+      "inheritedDiagnostics": 1,
+      "inheritedSource": "packages/kv/types/watchable-kv.ts private-type-ref"
+    },
+    "jsrDryRun": "PASS"
+  },
+  "S2": {
+    "proof": {
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0
+    },
+    "negative": {
+      "behaviorTestsFailed": 9,
+      "compatibilityTestsPassed": 1
+    },
+    "mutants": {
+      "variants": 6,
+      "expectedFailedTests": 14,
+      "allExpectedFailuresObserved": true
+    },
+    "check": "PASS",
+    "lint": "PASS",
+    "fmt": "PASS",
+    "qualityGate": "PASS",
+    "corpusFreshness": "PASS",
+    "publishAssetsFreshness": "PASS",
+    "agentDocsProseFreshness": "PASS",
+    "assetsBarrel": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "committedHead": "72048a3aa032cc2090da0bc580fa2c80ecbbf1f2",
+      "workingTreeAfter": "clean"
+    },
+    "combinedRuntime": {
+      "exitCode": 0,
+      "durationMs": 171429,
+      "passed": 193,
+      "failed": 0,
+      "ignored": 3,
+      "totalResults": 196,
+      "uniqueFailures": 0,
+      "scope": [
+        "full queue suite",
+        "worker Redis/Garnet lease and survival regressions",
+        "worker heartbeat tests",
+        "telemetry consumer/parenting tests",
+        "MCP corpus/flow tests"
+      ]
+    },
+    "docLint": {
+      "newDiagnostics": 0,
+      "inheritedDiagnostics": 1
+    },
+    "jsrDryRun": "PASS",
+    "independentReview": "PASS round 3",
+    "resources": "owned Redis/Garnet stopped and test children joined",
+    "reviewThreads": {
+      "threads": 0,
+      "unanswered": 0,
+      "outcome": "PASS"
+    }
+  }
+}

@@ -201,6 +201,18 @@ export interface ListenOptions {
   concurrency?: number;
 
   /**
+   * Redis idle pickup poll in integer milliseconds, 10–60000 (default 50).
+   * Overrides NETSCRIPT_REDIS_QUEUE_POLL_INTERVAL_MS; other providers ignore it.
+   */
+  pollIntervalMs?: number;
+
+  /**
+   * Redis delayed-promotion poll in integer milliseconds, 10–60000 (default 1000).
+   * Overrides NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS; other providers ignore it.
+   */
+  delayedPollIntervalMs?: number;
+
+  /**
    * Visibility timeout in milliseconds.
    * How long a message is hidden from other consumers while processing.
    * Provider-specific behavior.
