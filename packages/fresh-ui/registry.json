@@ -4011,7 +4011,12 @@
           "slider": "slider",
           "calendar-date": "calendar-date",
           "calendar": "calendar",
-          "date-picker": "date-picker"
+          "date-picker": "date-picker",
+          "location-marker": "location-marker",
+          "navigation-menu": "navigation-menu",
+          "stepper": "stepper",
+          "menu-items": "menu-items",
+          "menubar": "menubar"
         }
       }
     },
@@ -4829,6 +4834,207 @@
         "calendar-date",
         "calendar"
       ]
+    },
+    {
+      "name": "location-marker",
+      "type": "registry:component",
+      "description": "Decorative square location mark with native current-location ownership.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/location-marker.tsx",
+          "type": "registry:component",
+          "target": "@ui/location-marker.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/location-marker.css",
+          "type": "registry:file",
+          "target": "@assets/ui/location-marker.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/location-marker.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:component",
+      "description": "Native links and exclusive details disclosures for site navigation.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/navigation-menu.tsx",
+          "type": "registry:component",
+          "target": "@ui/navigation-menu.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/navigation-menu.css",
+          "type": "registry:file",
+          "target": "@assets/ui/navigation-menu.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "location-marker"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/navigation-menu.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "stepper",
+      "type": "registry:component",
+      "description": "Ordered progress steps with native links and readable status.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/stepper.tsx",
+          "type": "registry:component",
+          "target": "@ui/stepper.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/stepper.css",
+          "type": "registry:file",
+          "target": "@assets/ui/stepper.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/stepper.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "menu-items",
+      "type": "registry:lib",
+      "description": "Private copied action/choice/submenu content for application menus.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menu-items.tsx",
+          "type": "registry:file",
+          "target": "@ui/menu-items.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menu-items.css",
+          "type": "registry:file",
+          "target": "@assets/ui/menu-items.css"
+        }
+      ],
+      "registryDependencies": [
+        "floating-styles"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "support"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/menu-items.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "menubar",
+      "type": "registry:component",
+      "description": "Roving application menus over package-owned native ActionMenu popovers.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menubar.tsx",
+          "type": "registry:component",
+          "target": "@ui/menubar.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/menubar.css",
+          "type": "registry:file",
+          "target": "@assets/ui/menubar.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "floating-styles",
+        "menu-items"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "navigation",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/menubar.css';"
+            }
+          ]
+        }
+      }
     }
   ],
   "meta": {
@@ -5008,6 +5214,17 @@
           "button-group",
           "toggle",
           "toggle-group"
+        ]
+      },
+      {
+        "name": "navigation",
+        "description": "Native site navigation and application menus with current-location/progress affordances.",
+        "items": [
+          "theme-seed",
+          "location-marker",
+          "navigation-menu",
+          "menubar",
+          "stepper"
         ]
       }
     ]

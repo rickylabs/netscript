@@ -29,3 +29,11 @@ The real browser builder now derives the workspace catalog for the public runtim
 entry; standalone configs cannot resolve workspace catalog imports without it.
 No duplicated dependency inventory is authored. The user explicitly authorized
 rebase/force-push, superseding the plan's ordinary no-force coordination rule.
+
+Navigation: composing application menus exposed related runtime gaps rather than
+requiring a separate menu engine. ActionMenu adds checkable roles and entry edge,
+filters nested menu collections and typeaheads accessible labels. Native popover
+promotion moves to layout; outside dismissal preserves the destination focus.
+These focused shared-runtime changes are necessary for Menubar and the upcoming
+ContextMenu and will receive full browser regression and independent slice review.
+No unrelated runtime, tokens, dependencies or locks are changed.

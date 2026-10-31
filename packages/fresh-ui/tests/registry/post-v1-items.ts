@@ -9,7 +9,11 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'slider',
   'calendar',
   'date-picker',
+  'location-marker',
+  'navigation-menu',
+  'stepper',
+  'menubar',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
-export const POST_V1_SUPPORT: readonly string[] = ['calendar-date'];
+export const POST_V1_SUPPORT: readonly string[] = ['calendar-date', 'menu-items'];

@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { useLayoutEffect } from 'preact/hooks';
 
 type PlatformPopoverElement = HTMLElement & {
   hidePopover?: () => void;
@@ -54,7 +54,7 @@ export function useSyncedPopover(
   ref: { current: HTMLElement | null },
   open: boolean,
 ): void {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = ref.current as PlatformPopoverElement | null;
     if (!element?.showPopover || !element.hidePopover) {
       return;

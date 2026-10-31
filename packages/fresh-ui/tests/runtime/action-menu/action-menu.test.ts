@@ -22,6 +22,7 @@ Deno.test('ActionMenu traverses enabled items with Arrow/Home/End keys', () => {
     Object.assign(Object.create(null), {
       getAttribute: (name: string) => name === 'aria-disabled' && disabled ? 'true' : null,
       focus: () => focused = id,
+      closest: () => menu,
     });
   const first = item('first');
   const disabled = item('disabled', true);

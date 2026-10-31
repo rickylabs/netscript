@@ -25,3 +25,11 @@ workspace catalog. gap-build.ts derives it into ignored test-results config each
 run before bundling; use the generated config for fixture type checks. Never
 check in another catalog or stale bundle. Scope fixture layout CSS to outer
 examples: a broad section rule distorts nested Calendar month sections.
+
+2026-10-31 Preact container focus exits require native bubbling onFocusOut;
+onBlur does not behave like React's synthetic bubbling blur. Functional component
+refs are not necessarily native elements: for private submenu return, keep a
+ref on a native wrapper and query its trigger. Native popover promotion in a
+layout effect must suppress hydrated button's duplicate default popovertarget
+toggle, while retaining no-JS attributes and explicit submit/reset behavior.
+ActionMenu.Content sets first/last entry autofocus and retries on native toggle.
