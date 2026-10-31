@@ -97,7 +97,12 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           ),
         );
       }
-      if (names.includes(name)) assertStringIncludes(installed, `data-scope='${name}'`);
+      if (names.includes(name)) {
+        assertStringIncludes(
+          installed,
+          name === 'direction' ? "'data-scope': 'direction'" : `data-scope='${name}'`,
+        );
+      }
     }
     await run(root, [
       'check',
@@ -111,7 +116,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
     ]);
     // Audited baseline components preserve overridable scopes; verify actual installed rendering.
     await Deno.writeTextFile(
-      join(root, 'render-audited.ts'),
+      join(root, 'render-audited.tsx'),
       `
 import { h } from 'preact';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
@@ -122,7 +127,13 @@ import { Pagination } from './components/ui/pagination.tsx';
 import { Alert } from './components/ui/alert.tsx';
 import { CommandPalette } from './components/ui/command-palette.tsx';
 import { PageHeader } from './components/ui/page-header.tsx';
+import { ScrollArea } from './components/ui/scroll-area.tsx';
+import { AspectRatio } from './components/ui/aspect-ratio.tsx';
+import { Direction } from './components/ui/direction.tsx';
 console.log(JSON.stringify({
+  'scroll-area': render(h(ScrollArea, { label: 'Recent activity', orientation: 'both', children: h('a', { href: '#activity' }, 'Activity') })),
+  'aspect-ratio': render(h(AspectRatio, { ratio: '4:3', children: h('button', { type: 'button' }, 'Play') })),
+  direction: render(<Direction as='section' dir='rtl'><Direction as='div' dir='ltr'><input aria-label='Search' /></Direction></Direction>),
   'page-header': render(h(PageHeader, { title: 'Overview', eyebrow: 'Commerce', description: 'Recent orders', variant: 'with-status', status: 'Operational', actions: h('button', {children: 'Create order'}) })),
   'command-palette': render(h(CommandPalette, { scrim: false, groups: [{id: 'docs', label: 'Docs', items: [{id: 'start', label: 'Start', type: 'page', excerpt: 'Read the guide', shortcut: 'Enter'}]}] })),
   'code-block': render(h(CodeBlock, { tabs: [{ value: 'source', label: 'Source', code: 'x' }] })),
@@ -134,10 +145,16 @@ console.log(JSON.stringify({
 `,
     );
     const rendered: Record<string, string> = JSON.parse(
-      await run(root, ['run', '--node-modules-dir=auto', 'render-audited.ts']),
+      await run(root, ['run', '--node-modules-dir=auto', 'render-audited.tsx']),
     );
-    assertEquals(Object.keys(rendered).sort(), [...AUDITED_BASELINE_COMPONENTS].sort());
-    for (const name of AUDITED_BASELINE_COMPONENTS) {
+    const renderedNames = [
+      ...AUDITED_BASELINE_COMPONENTS,
+      'scroll-area',
+      'aspect-ratio',
+      'direction',
+    ];
+    assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
+    for (const name of renderedNames) {
       const contract = componentContracts.components.find((contract) => contract.name === name)!;
       assertEquals(
         renderViolations(contract, {

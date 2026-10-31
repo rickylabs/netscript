@@ -1,0 +1,47 @@
+.ns-scroll-area {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  overflow: hidden;
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-card);
+  color: var(--ns-fg);
+}
+.ns-scroll-area__viewport {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: var(--ns-card-padding);
+  overflow: auto;
+  scrollbar-color: var(--ns-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+}
+.ns-scroll-area[data-orientation='vertical'] > .ns-scroll-area__viewport {
+  overflow-x: hidden;
+}
+.ns-scroll-area[data-orientation='horizontal'] > .ns-scroll-area__viewport {
+  overflow-y: hidden;
+}
+.ns-scroll-area__viewport:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+/* Engines without standard scrollbar styling can expose the ledger's 10/6/8px geometry. */
+@supports not (scrollbar-color: auto) {
+  .ns-scroll-area__viewport::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .ns-scroll-area__viewport::-webkit-scrollbar-thumb {
+    background: var(--ns-scrollbar-thumb);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+  .ns-scroll-area__viewport::-webkit-scrollbar-thumb:hover {
+    border-width: 1px;
+  }
+  .ns-scroll-area__viewport::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

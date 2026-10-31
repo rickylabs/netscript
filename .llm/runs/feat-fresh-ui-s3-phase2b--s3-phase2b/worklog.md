@@ -31,3 +31,19 @@ PLAN-EVAL round2 PASS; failure streak reset0. No product edits preceded it. Late
 
 
 Parent rebased onto d54879b8 and independently verified at037d048b:608packagePASS, all4carriers/qualityPASS; all612 FreshUI/browser files unchanged. Child restacked. DetailedPLAN-EVAL round2PASS and slice9a designcheckpoint PASS; starting strictchecker/nativeScrollArea/AspectRatio/Direction. Failure streak0.
+
+
+## Slice9a source sign-off
+
+ScrollArea/AspectRatio/Direction and strict-new-identity checker implemented.
+Direction as form supports precompiled JSX; cloned native VNodes remain supported,
+with native props overriding existing child props (including class). Native
+boundaryRef explicitly avoids component-instance refs. Real installed TSX covers
+nested as boundaries; actual browser roving RTL/LTR keys remain local. AspectRatio
+uses resolved existing muted role, measured in all4projects. Independent source
+review round2PASS; failure streak reset0.345contract/10installed-registry/16browser
+PASS,0serious-criticalaxe; source/browser wrappers and broader quality/architecture
+PASS.104inventory/90shipped/14pending/118registry. Carriers follow source commit.
+Reconcile: sourceunit stays below30files, no token/lock/newdependency/schema churn.
+All-style slice12b must limit legitimate nested-root allowances to independently
+declared nesting support and include an illegitimate nested-root negative control.

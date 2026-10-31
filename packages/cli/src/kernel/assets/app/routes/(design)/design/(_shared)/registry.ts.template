@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 114,
+  'total': 117,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -765,6 +765,24 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Manual native scroll-snap carousel with stable-focus boundary controls.',
   },
+  {
+    'name': 'scroll-area',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Named native scrolling viewport with caller-owned dimensions.',
+  },
+  {
+    'name': 'aspect-ratio',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native CSS media frame with four shared aspect ratios.',
+  },
+  {
+    'name': 'direction',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Wrapper-free local native direction on an existing HTML boundary.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -887,6 +905,9 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     'name': 'layout-foundations',
     'items': [
       'layout-objects',
+      'scroll-area',
+      'aspect-ratio',
+      'direction',
     ],
   },
   {
