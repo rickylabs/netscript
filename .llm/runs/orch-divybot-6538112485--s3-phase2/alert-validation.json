@@ -44,5 +44,12 @@
   "newPackageFamilies": false,
   "phaseReady": false,
   "fullGoalComplete": false,
-  "independentEvidenceSignOff": "PASS"
+  "independentEvidenceSignOff": "PASS",
+  "sourceHead": "086e2ede501d05583fa926d11213cc38b8101d91",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
 }
