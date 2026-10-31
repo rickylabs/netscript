@@ -283,3 +283,8 @@ docs:snippets PASS; full Lume build253 HTML PASS via prose generation;23734
 internal links resolve and13 caveat markers resolve. Prose regenerated. No source
 behavior, export or lock change. Clean-source corpus/publication and all carrier
 freshness checks follow this reviewed source commit before push.
+
+CI build repair complete locally: reviewed source f21bff4; all four carrier
+freshness checks PASS, no additional generated change after prose refresh.
+Exports/snippets/build/links/caveats all PASS. Push triggers fresh Pages CI;
+remote success remains pending. Resume Overlay slice after push/comment.
