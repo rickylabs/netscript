@@ -7,3 +7,5 @@ Run-gate receipt ids available: quality-gate,assets-barrel,agent-docs-prose,publ
 Native JSR audit still flags contracts.json missing @module and baseline folder/slow-types banner warnings. Canonical doclint still124diagnostics (96private-type-ref,28missing-jsdoc,0other); never call wholepackage publish auditgreen. Runtime attempted canonical one-pass exits1 because Dockerdaemon and Aspire doctor unavailable; report UNPROVEN.
 
 CI does not execute required jobs on drafts. A local/evaluation-complete PR must leave draft to trigger them; this is distinct from publishing the owner's final READY report, which requires actual exact-head green contexts. Do not mistake all-skipped draft runs for a successful required gate set.
+
+A push immediately before leaving draft can still create all-SKIPPED draft-snapshot workflow runs even after ghready succeeds. Verify real classify/quality/shard jobs materialize. A subsequent authorized run-note commit pushed while non-draft activates synchronize; it changes only run evidence, not reviewed product sources. Never equate skipped required contexts to executed greenCI.
