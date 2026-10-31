@@ -131,6 +131,7 @@ function createStrategy(options: WatcherOptions): WatchStrategyHandler {
       events: options.events,
       pollIntervalMs: options.pollIntervalMs,
       signal: options.signal,
+      onReady: options.onReady,
     });
   }
 
@@ -142,6 +143,7 @@ function createStrategy(options: WatcherOptions): WatchStrategyHandler {
       events: options.events,
       pollIntervalMs: options.pollIntervalMs,
       signal: options.signal,
+      onReady: options.onReady,
     });
   }
 
@@ -151,6 +153,7 @@ function createStrategy(options: WatcherOptions): WatchStrategyHandler {
     events: options.events,
     pollIntervalMs: options.pollIntervalMs,
     signal: options.signal,
+    onReady: options.onReady,
   });
 }
 
@@ -222,6 +225,7 @@ export class FileWatcher {
   private readonly options: WatcherOptions;
   private readonly abortController: AbortController;
   private _running = false;
+  private readonly onExternalAbort: () => void;
 
   /**
    * Create a watcher with strategy, filters, and cancellation options.
@@ -231,10 +235,12 @@ export class FileWatcher {
   constructor(options: WatcherOptions) {
     this.options = options;
     this.abortController = new AbortController();
+    this.onExternalAbort = () => this.abortController.abort();
 
     // Chain the external signal to our internal controller
     if (options.signal) {
-      options.signal.addEventListener('abort', () => this.abortController.abort(), { once: true });
+      if (options.signal.aborted) this.abortController.abort();
+      else options.signal.addEventListener('abort', this.onExternalAbort, { once: true });
     }
   }
 
@@ -335,6 +341,7 @@ export class FileWatcher {
     this._running = true;
 
     try {
+      if (this.abortController.signal.aborted) return;
       if (!this.strategy) {
         await this.init();
       }
@@ -370,12 +377,14 @@ export class FileWatcher {
       }
     } finally {
       this._running = false;
+      this.options.signal?.removeEventListener('abort', this.onExternalAbort);
     }
   }
 
   /** Stop the watcher by signaling abort. */
   stop(): void {
     this.abortController.abort();
+    this.options.signal?.removeEventListener('abort', this.onExternalAbort);
   }
 
   /** Whether the watcher is currently running. */

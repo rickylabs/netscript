@@ -1,3 +1,5 @@
+import { createServiceLogger, ensureLogging } from '@netscript/logger';
+import type { LoggerPort } from '@netscript/plugin-triggers-core/runtime';
 import { openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
 import type { ChildHealthMonitor } from '@netscript/plugin/health';
 import type {
@@ -29,6 +31,8 @@ export type TriggerProcessorRuntimeOptions = Readonly<{
   fileWatcher?: FileWatcherPort;
   kv?: KvStore;
   drainTimeoutMs?: number;
+  /** Structured diagnostic sink for file-watch failures and readiness transitions. */
+  logger?: LoggerPort;
 }>;
 
 /** Background trigger processor entrypoint for Aspire-managed runtimes. */
@@ -47,7 +51,17 @@ export async function startTriggerProcessorRuntime(
     processor = options.processor ?? await createRuntimeTriggerProcessor({ kv, definitions });
     options.health?.dependenciesReady();
     scheduler = options.scheduler ?? new CronTriggerSchedulerAdapter();
-    fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter();
+    const logger = options.logger ?? createServiceLogger('triggers');
+    fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter({
+      onError: async (error, handle) => {
+        if (options.logger === undefined) await ensureLogging();
+        logger.error('trigger.file_watch.error', { triggerId: handle.id, error });
+      },
+      onStatusChange: async (event) => {
+        if (options.logger === undefined) await ensureLogging();
+        logger.info('trigger.file_watch.status', event);
+      },
+    });
     const activeProcessor = processor;
     for (const definition of definitions) {
       if (isScheduledTriggerDefinition(definition)) {

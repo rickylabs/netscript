@@ -115,6 +115,8 @@ export interface WatcherOptions {
   readonly maxFileAge?: number;
   /** File stability check configuration. When set, waits for files to stop growing. */
   readonly stabilityThreshold?: StabilityOptions;
+  /** Called after the strategy has acquired its watch resources. */
+  readonly onReady?: () => void | Promise<void>;
   /** Abort signal for graceful shutdown. */
   readonly signal?: AbortSignal;
 }

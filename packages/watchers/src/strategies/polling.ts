@@ -38,6 +38,8 @@ export interface PollingStrategyOptions {
    * @default 3
    */
   readonly maxConsecutiveFailures?: number;
+  /** Called after roots are accessible and the initial snapshot is built. */
+  readonly onReady?: () => void | Promise<void>;
   /** Abort signal for graceful shutdown. */
   readonly signal?: AbortSignal;
 }
@@ -66,6 +68,7 @@ export class PollingStrategy implements WatchStrategyHandler {
   private readonly allowedEvents: ReadonlySet<EventKind>;
   private readonly pollIntervalMs: number;
   private readonly signal?: AbortSignal;
+  private readonly onReady?: () => void | Promise<void>;
   private readonly snapshot = new Map<string, FileSnapshot>();
   private readonly failureTracker: AccessFailureTracker;
 
@@ -74,6 +77,7 @@ export class PollingStrategy implements WatchStrategyHandler {
     this.allowedEvents = new Set(options.events ?? ['create']);
     this.pollIntervalMs = Math.max(options.pollIntervalMs ?? 5000, 500);
     this.signal = options.signal;
+    this.onReady = options.onReady;
 
     this.failureTracker = new AccessFailureTracker({
       maxConsecutiveFailures: options.maxConsecutiveFailures ?? 3,
@@ -93,8 +97,16 @@ export class PollingStrategy implements WatchStrategyHandler {
 
   /** Start polling and yield file events. */
   async *watch(): AsyncIterable<WatchEvent> {
+    if (this.signal?.aborted) return;
+    // Readiness must not claim success for roots that disappeared during initialization.
+    for (const root of this.paths) {
+      const info = await Deno.stat(root);
+      if (!info.isDirectory) throw new Deno.errors.NotADirectory('Watch root is not a directory.');
+    }
     // Initial snapshot (no events emitted for the first scan)
     await this.buildSnapshot();
+    if (this.signal?.aborted) return;
+    await this.onReady?.();
 
     while (!this.signal?.aborted) {
       await delay(this.pollIntervalMs, { signal: this.signal }).catch(() => {});

@@ -85,6 +85,7 @@ export type {
 } from '@netscript/plugin-triggers-core/ports';
 export type { RuntimeTriggerProcessorOptions } from './trigger-runtime-processor.ts';
 export type { TriggerProcessorRuntimeOptions } from './trigger-processor.ts';
+export type { LoggerPort } from '@netscript/plugin-triggers-core/runtime';
 
 export type {
   ChildFatalError,

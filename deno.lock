@@ -5309,6 +5309,7 @@
           "jsr:@netscript/kv@0.0.8",
           "jsr:@netscript/watchers@0.0.8",
           "jsr:@std/assert@1",
+          "jsr:@std/async@1",
           "npm:zod@^4.6.5"
         ],
         "packageJson": {
@@ -5535,6 +5536,7 @@
           "jsr:@netscript/config@0.0.8",
           "jsr:@netscript/contracts@0.0.8",
           "jsr:@netscript/kv@0.0.8",
+          "jsr:@netscript/logger@0.0.8",
           "jsr:@netscript/plugin-streams-core@0.0.8",
           "jsr:@netscript/plugin-triggers-core@0.0.8",
           "jsr:@netscript/plugin-workers-core@0.0.8",

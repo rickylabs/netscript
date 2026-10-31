@@ -19,3 +19,23 @@ Feature matrix resolved as JSON. Owner explicitly requests: “Run PLAN-EVAL bef
 ## Bootstrap
 
 Read assignment in full, issue and comments, skills and doctrine, consulted prior memory and NetScript MCP. Baseline main current. Real native root-removal probe confirmed remove event rather than iterator throw. PLAN-EVAL pending; no implementation yet.
+
+## PLAN-EVAL round 1 repair
+
+Independent reviewer returned FAIL_PLAN: starter watch root is not created by scaffold, so making every unavailable watch degrade the child would break default runtime readiness. Locked decision: preserve aggregate readiness and expose per-trigger fileWatches; the processor remains available for other triggers. Add default missing-starter-root health test (HTTP 200 with unavailable watch). No implementation yet.
+
+Dependency wiring planned: reuse existing @std/async for abortable delay and @netscript/logger for structured runtime diagnostics, declaring imports in each consumer config without changing versions or lock files.
+
+## S1 evidence
+
+Implemented recovery/readiness/root removal and production logging. Structured type check passes; focused suite passes 30/30, including real deletion/recreation and pause/recovery/drain. Backoff test uses fake time to prove 10/20/20 millisecond intervals and no retry after unwatch; diagnostic failures are isolated. Native idle cancellation closes the underlying resource directly.
+
+Negative controls (structured test wrapper, behavioral failures, exit 1): (1) restoring terminal return after watch failure breaks real recovery test; (2) removing native root-loss detection breaks the same real test; (3) removing processor onError logger breaks real processor failure/recovery test. All files restored byte-for-byte after each control.
+
+Dependency configs and four maintained locks have only required workspace declaration metadata for existing std async/logger; no dependency versions or integrity hashes changed. Frozen reference checks initially caught missing metadata, repaired with native resolver and deps:refresh:desktop-lock. Quality rerun and independent slice review pending.
+
+S1 final structured check/lint/fmt: exit 0; focused tests: 30/30; quality:gate: PASS (durable receipt watch-2151-s1-quality-4). Export doc lint found 3 private-type-reference diagnostics confined to unchanged workers-core/root and triggers-core contract sources; baseline comparison will be recorded before final review. No diagnostics in new watch contracts. Independent slice review next.
+
+S1 independent review round 1: FAIL_FIX for retained external abort listeners across retries. Repair: FileWatcher stores/detaches its listener both on watch completion and stop, including never-started and pre-aborted cases. Added deterministic listener-release tests. Also ensure the default production logger is initialized before diagnostics. Baseline doc lint independently confirmed exactly 3 core and 27 plugin private-type diagnostics at the original main commit. Initial plugin comparison found one new private reference from the injectable LoggerPort; re-export that existing port alongside the option so the public type is renderable.
+
+S1 independent repair review: PASS. Listener negative control (disable both detach paths) fails the real repeated-failure listener test with exit 1. Final structured tests: 32/32; changed-file check/lint/fmt: exit 0; quality-gate receipt watch-2151-s1-quality-5: PASS. Watchers export doc lint: clean; triggers-core remains at baseline 3 private-reference findings. Required metadata-only additions in four locks are retained; unrelated native peer-key normalization was restored. S1 reconcile: scope preserved, #eventFor/dedup untouched, #2479 still open. S1 ready to commit/push and report.

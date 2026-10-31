@@ -1,4 +1,5 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
+import { spy } from 'jsr:@std/testing@^1/mock';
 import { createWatcher, DebounceFilter, type WatchEvent } from '../mod.ts';
 
 Deno.test('FileWatcher watch loop stops when the external signal aborts and leaves running === false', async () => {
@@ -201,4 +202,38 @@ Deno.test('DebounceFilter suppresses rapid events for the same path', async () =
 
   assertEquals(results.length, 1);
   assertEquals(results[0].path, '/tmp/a.txt');
+});
+
+Deno.test('FileWatcher detaches registration abort listeners after repeated failures and stop', async () => {
+  const directory = await Deno.makeTempDir();
+  const controller = new AbortController();
+  using added = spy(controller.signal, 'addEventListener');
+  using removed = spy(controller.signal, 'removeEventListener');
+  try {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const watcher = createWatcher({ paths: [`${directory}/missing`], signal: controller.signal });
+      await assertRejects(() => watcher.watch().next(), Deno.errors.NotFound);
+      watcher.stop();
+    }
+    const listeners = added.calls.filter((call) => call.args[0] === 'abort');
+    assertEquals(listeners.length, 5);
+    for (const call of listeners) {
+      assertEquals(removed.calls.some((removal) => removal.args[1] === call.args[1]), true);
+    }
+    const stopped = createWatcher({ paths: [directory], signal: controller.signal });
+    const listener = added.calls.at(-1)?.args[1];
+    stopped.stop();
+    assertEquals(removed.calls.some((removal) => removal.args[1] === listener), true);
+  } finally {
+    controller.abort();
+    await Deno.remove(directory, { recursive: true });
+  }
+});
+
+Deno.test('FileWatcher with an already aborted signal never initializes a missing root', async () => {
+  const controller = new AbortController();
+  controller.abort();
+  const watcher = createWatcher({ paths: ['./missing-aborted-root'], signal: controller.signal });
+  assertEquals((await watcher.watch().next()).done, true);
+  assertEquals(watcher.running, false);
 });
