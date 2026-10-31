@@ -1,0 +1,9 @@
+# IMPL-EVAL
+
+Round1 FAIL_FIX. Separate read-only Opus5.5/high review accepted provenance, cold isolation, lock stability, real writer records, oracle semantics and first/last-reader cancellation. It found two gaps: same-ID updates alone do not prove retained seed history, and cleanup-only dispose does not assert disposal behavior.
+
+Repairs: seed rich plus an untouched activity message; append a new live ID while updating the existing ID; assert both readers' complete ordered native state and final reload. Reopen a third reader at the current stream end, then assert dispose ends it and closes its SSE before finally cleanup. Fresh cold run PASS2/0/0 and exactly1 semantic control failure; round2 review pending. No scope reduction or framework changes.
+
+The stronger reload check exposed a fixture error inherited from the authority example: the native start cursor -1 means the beginning, not Array.slice(-1). Corrected the fixture and asserted the native snapshot cursor. A reopened subscriber has no per-reader history replay; it correctly waits for suffix events, so disposal is asserted on that pending read. Cached source hashes now exclude Deno's variable HTTP metadata footer while verifying its URL against the graph. Evidence refreshed after all corrections.
+
+Round2 PASS after correcting the historical control assertion wording in worklog. Reviewer independently checked both repairs, protocol cursor semantics, published source hashing, all97 published NetScript graph modules, source/launcher/copy hashes, stable locks and matching sanitized result. The final control preserves echoed messages but fails the named assertion "native parts/metadata field metadata must survive"; it no longer fails history count. Source slice approved for sign-off commit. Final immutable pushed-head attestation remains pending after CI.

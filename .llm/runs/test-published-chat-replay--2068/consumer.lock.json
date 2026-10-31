@@ -1,0 +1,130 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@netscript/fresh@0.0.8": "0.0.8",
+    "jsr:@netscript/plugin-streams-core@0.0.8": "0.0.8",
+    "jsr:@netscript/telemetry@0.0.8": "0.0.8",
+    "jsr:@standard-schema/spec@1.1.0": "1.1.0",
+    "jsr:@std/assert@1.0.19": "1.0.19",
+    "jsr:@std/internal@^1.0.12": "1.0.14",
+    "npm:@durable-streams/client@0.2.7": "0.2.7",
+    "npm:@durable-streams/state@0.3.2": "0.3.2",
+    "npm:@durable-streams/tanstack-ai-transport@0.0.10": "0.0.10",
+    "npm:@opentelemetry/api@^1.9.1": "1.10.0",
+    "npm:@tanstack/ai@0.68.0": "0.68.0_@opentelemetry+api@1.10.0"
+  },
+  "jsr": {
+    "@netscript/fresh@0.0.8": {
+      "integrity": "4f34a5793ee3190a812d5bddd037c1a3db34eaf8171fd8833db1f81bf3c9068c",
+      "dependencies": [
+        "jsr:@netscript/plugin-streams-core",
+        "npm:@durable-streams/client",
+        "npm:@durable-streams/tanstack-ai-transport",
+        "npm:@tanstack/ai"
+      ]
+    },
+    "@netscript/plugin-streams-core@0.0.8": {
+      "integrity": "53ecf135412f9577569fab68d1903726196c9697298fed1ebe9c3bae279ba3ae",
+      "dependencies": [
+        "jsr:@netscript/telemetry",
+        "npm:@durable-streams/client",
+        "npm:@durable-streams/state"
+      ]
+    },
+    "@netscript/telemetry@0.0.8": {
+      "integrity": "d8b42cefa4a7bc2ebbc30a348fa21c178c2de022ebec46808742dc257f063bbb",
+      "dependencies": [
+        "jsr:@standard-schema/spec",
+        "npm:@opentelemetry/api"
+      ]
+    },
+    "@standard-schema/spec@1.1.0": {
+      "integrity": "2ccd54513cd9c960bd155ab569b1a901bc99c6f9ad29559d3f38a28c91c1822d"
+    },
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
+    }
+  },
+  "npm": {
+    "@ag-ui/core@1.0.0": {
+      "integrity": "sha512-yCRhsQvb4+lmGMrDsi4TOJxqKpm/kb3H64wwL+Z90jNVrkhy17RErfzsNgybfbjNKLM0nenEDYDVJsZHJJSigQ=="
+    },
+    "@durable-streams/client@0.2.7": {
+      "integrity": "sha512-oxWbPEo8NO1Ruv9UgUVu3OswdE2z5ERhjccaujlpwe4tWuVd+Y/kdx+HtrkOnwN+bnRHTlxKYUNY8JTyrnhKew==",
+      "dependencies": [
+        "@microsoft/fetch-event-source"
+      ],
+      "bin": true
+    },
+    "@durable-streams/state@0.3.2": {
+      "integrity": "sha512-pFj09315ARvyJR6iCt6p1CP6HW6tw/JsKgD1pfyjduveOzqxq3v01aXPSlUMb83ncwWjtMTuzwyfP6JsywbaJg==",
+      "dependencies": [
+        "@durable-streams/client",
+        "@standard-schema/spec"
+      ],
+      "bin": true
+    },
+    "@durable-streams/tanstack-ai-transport@0.0.10": {
+      "integrity": "sha512-6ZTRHEF3la8XLdkxX0UjJJlqZm021MJwfwCogp4Z8TQD5Ifs/cACQItrbJbFRPuvsQE1NyJ6bTaiGPERa3x2jA==",
+      "dependencies": [
+        "@durable-streams/client"
+      ],
+      "bin": true
+    },
+    "@microsoft/fetch-event-source@2.0.1": {
+      "integrity": "sha512-W6CLUJ2eBMw3Rec70qrsEW0jOm/3twwJv21mrmj2yORiaVmVYGS4sSS5yUwvQc1ZlDLYGPnClVWmUUMagKNsfA=="
+    },
+    "@opentelemetry/api@1.10.0": {
+      "integrity": "sha512-lMkyes8iHrG+mk6WH7X70MdCLI2RS0FwNBY1PyQ8UemaijE2m5mv5A0Niy3HtbYTFrgkUEQjFMXmSAk2hQDuPQ=="
+    },
+    "@standard-schema/spec@1.1.0": {
+      "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
+    },
+    "@tanstack/ai-event-client@0.13.1": {
+      "integrity": "sha512-lCPcshu6Sd4tFNeMSr+HXgdqCGupYU2cpJZVUent4GkFx41dXzrBaKkwOgkji6olDBT99OBagWCce1NZ15XeJA==",
+      "dependencies": [
+        "@tanstack/devtools-event-client"
+      ]
+    },
+    "@tanstack/ai-utils@0.4.2": {
+      "integrity": "sha512-ucSgSK9kLloInqr/7s0VZlp1IFtbpgPnskISvnLXti/hc8koqXc4Zv9pfTTc8V80WzIKYWMf+ZgSIDeFM50eCw=="
+    },
+    "@tanstack/ai@0.68.0_@opentelemetry+api@1.10.0": {
+      "integrity": "sha512-l++ORsrL5dAC/nNJ2ZyQiTkDmxNo2Xh0lsS4m0QbWzUVyvmSmFriDemqQmAiko+zMvVeeQ8QlTXUMOLLPfZyEQ==",
+      "dependencies": [
+        "@ag-ui/core",
+        "@opentelemetry/api",
+        "@standard-schema/spec",
+        "@tanstack/ai-event-client",
+        "@tanstack/ai-utils",
+        "fast-json-patch",
+        "partial-json"
+      ],
+      "optionalPeers": [
+        "@opentelemetry/api"
+      ]
+    },
+    "@tanstack/devtools-event-client@0.4.4": {
+      "integrity": "sha512-6T5Yop/793YI+H+5J8Hsyj4kCih9sl4t3ElLgKioW5hk3ocn+ZdSJ94tT7vL7uabxSugWYBZlOTMPzEw2puvQw==",
+      "bin": true
+    },
+    "fast-json-patch@3.1.1": {
+      "integrity": "sha512-vf6IHUX2SBcA+5/+4883dsIjpBTqmfBjmYiWK1savxQmFk4JfBMLa7ynTYOs1Rolp/T1betJxHiGD3g1Mn8lUQ=="
+    },
+    "partial-json@0.1.7": {
+      "integrity": "sha512-Njv/59hHaokb/hRUjce3Hdv12wd60MtM9Z5Olmn+nehe0QDAsRtRbJPvJ0Z91TusF0SuZRIvnM+S4l6EIP8leA=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@netscript/fresh@0.0.8",
+      "jsr:@std/assert@1.0.19"
+    ]
+  }
+}

@@ -1,0 +1,463 @@
+{
+  "verdict": "PASS",
+  "exactPublishedPackage": "@netscript/fresh@0.0.8/ai",
+  "cacheInitiallyAbsent": true,
+  "standalone": true,
+  "noLocalFrameworkAliases": true,
+  "sourceHashes": {
+    "published-chat-probe.ts": "de79227c477f0e22ca018c2f9af5f13f46c276b96d459fa39d4c310f6e7e618c",
+    "http-stream-fixture.ts": "eaae73be21020162714400cd6a76932168a0f2fc3299f46d0639308cdd335f33",
+    "consumer.deno.jsonc": "5af9e0286c49a480fd2ff5c22e66ee52f9b4c2f0a99d740185c7acb0d9c2ebbf",
+    "consumer.lock.json": "3ec32988b1aa53b8d727363994c2021ecb171c1fdd7d4f6153929baca2c7c88e"
+  },
+  "launcherSha256": "88938669c03b0bbe5c56bef2b36964e41039878ef1b3f1a2bb78fc13c83882d6",
+  "published": [
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/internal/chat-message-replay.ts",
+      "sha256": "e7d66cf0cb854a1dce671825103e06733047be41e11ba6bbaa4f4b6c97570cd8"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/internal/chat-stream-subscription.ts",
+      "sha256": "e5472fa07b68f4ef8fa4c6422274eaf714356fdd7916857678a4dca09103bdb7"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/internal/chat-subscription-hub.ts",
+      "sha256": "054baebfc65c5dd374178b3ca74ab437affa6b3f5173d0b4fcb8524826f66896"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/runtime/ai/chat-producer.ts",
+      "sha256": "05e300e576df890022986d0119ef1c25ae7741227d969de1e79d6cc6d77770bb"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/runtime/ai/create-chat-connection.ts",
+      "sha256": "148ed0a2d9b20a06a3680d187d8b17481000b608d42cf12ceb97c669a4bf40ba"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/runtime/ai/fenced-chat-session-writer.ts",
+      "sha256": "3b21c4776951b9829e27ccb631b12f02d9917ddee0d8ef547ac21a84cd44b2dd"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/runtime/ai/mod.ts",
+      "sha256": "e4150c8c8b7c4591c640274674c63664668a90d7b749d6ef6af80bf860d630bf"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/runtime/ai/project-chat-snapshot.ts",
+      "sha256": "d4e704d0e2115f657264ef375aee191776ceb772110b31632d33b63c71ce52ad"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/fresh/0.0.8/src/runtime/ai/stream-proxy.ts",
+      "sha256": "affb6316cde3575be0bc4fc8800b714662cfdb4bbacd2144ed8cbcd7367bf277"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/mod.ts",
+      "sha256": "0e5d0f2cb66cb14e5ac37d27fe11fbac29740511ecf415ac4ff924789b210f36"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/adapters/durable-stream-admin.ts",
+      "sha256": "f73f234d1b244d58366f67ab1c40b0d216d35445ca46408dcfc6c45a2601dc2a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/adapters/durable-stream-producer-transport.ts",
+      "sha256": "977797cd3fb215a39315c041604277dfda0bc62b0790fa9f186eb8fd06179977"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/adapters/system-stream-producer-clock.ts",
+      "sha256": "6c6ce5cea72b7763b0743fd09755569e3cb1c5e0031c4d205496d23826a86990"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/adapters/system-stream-producer-random.ts",
+      "sha256": "3fcad6881bdf6361e66783f76b9edf13f0843ecce3cd640978dfe0b288c13f3d"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/administer-durable-stream.ts",
+      "sha256": "dd7e1199deb2cc6ecf0111998a582ec438bfbf8ee5aeb715183a0015caed0648"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/create-durable-stream.ts",
+      "sha256": "8bdf0d53e704da13fd9ad68acee523071e0e3d5ee76b9b11a8cdaadd32040861"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/create-service-stream-producer.ts",
+      "sha256": "03ea652a5535b04ab90e8fc6129251e169d27f61cb5eb03cb44cbc14b6460a7c"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/durable-stream-producer-queue.ts",
+      "sha256": "d251003eae4f3ea643dbc74753136d27530398bf42ab274db1886b76e166b81b"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/durable-stream-producer-supervisor-contract.ts",
+      "sha256": "cab1f1dfb01ccc350192a9cf56805be9f31f85d16b9364ce2b496faf17d8817b"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/durable-stream-producer-supervisor.ts",
+      "sha256": "4a73555f83992a57dfc279a61813c841f4bbd5df9639fb0ef638bb538e625924"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/durable-stream-producer-support.ts",
+      "sha256": "f48c18879bf29fae485633ae294c4fd421930a07788d6a6024a739bda1fc7774"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/stream-browser-environment.d.ts",
+      "sha256": "4d21dcda8e0f3a18b44a6cffa602695bf14a228dfcd7f9ab60afb6a645911b77"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/application/stream-url-resolver.ts",
+      "sha256": "953f1be682810dadfa6b3e403a46bd59063556c791428f35c04ea7e113a0fa95"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/builders/define-stream-schema.ts",
+      "sha256": "005b90eb6ec4403e6eb953835701a9a4693f63963b112158740a7f86a1a68e83"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/diagnostics/inspect-stream-topic.ts",
+      "sha256": "ed49f57ba4aa9c2e8c1ddce0314b66c047239a9366715afdb1905bd10d17bf22"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/admin-contract-v1.ts",
+      "sha256": "57837844d6e71f8a9fea7f628804d470caded5dd531a40df55dfba528bbccd68"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/constants.ts",
+      "sha256": "dd798d7343756795269efb159c4964646d42d5a827f1f6693d202f41c6b6ed5d"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/producer-contract-v1.ts",
+      "sha256": "51316b20c8b0710510a2af57fbf1083cf7b5516705e46c85389cce25003e8b61"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/retention-contract-v1.ts",
+      "sha256": "eacd393e170b8c01dce561ea24cf14a255a24f29a949f5f01ecdd814fb49244a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/stream-collection.ts",
+      "sha256": "f9300a2e4a5f15e6bfb1d282df333807b2df856c97c909babef741e9d2afc202"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/stream-event.ts",
+      "sha256": "08813249c3e1dcdbfd2a384f8486d0e05dbd67b2d4fbb8d7d04f1b305de55437"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/domain/stream-schema.ts",
+      "sha256": "290a7c574ef74fb0966d44bfe987ef68314f04dde5e25dcec0126a1d0f955cef"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/package-metadata.generated.ts",
+      "sha256": "d1a39e0ab67e5c62f77c42cd845d4172acf230b8cbb964fc018acc0bb0497b58"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/ports/stream-admin-port.ts",
+      "sha256": "7d2cfb29490fa89e8e7d574ce48c295a8bab6beee82ac2ca589c64bdfbab9872"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/ports/stream-producer-clock-port.ts",
+      "sha256": "e3e6397bd62d3dfa0f06a92174df799a1e34ad232daf34b39053be7796ce45e7"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/ports/stream-producer-port.ts",
+      "sha256": "bbe12223ed60f9fa2eab4f4e7819cabff40d38327b4aab3bb9714bfc2b9e5b45"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/ports/stream-producer-random-port.ts",
+      "sha256": "38403c4244d6220268f7147e2e464cdbae1fdb10efe3871cfd39f18d86d3d92a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/ports/stream-producer-transport-port.ts",
+      "sha256": "0e6dcaf108346aad47f7bcf4cd3bc035f0bb39309906157103d306daa4f5a991"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/public/mod.ts",
+      "sha256": "f4060a988d8e2f0f0ae89eacf13af85df2d1607da5f986d3ca8e7bdf8dba3d7a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/telemetry/attributes.ts",
+      "sha256": "2fb1a161c08182c07fb05ba2696c1e7fa445df11411497b75075f0715a1b6b61"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/telemetry/instrumentation.ts",
+      "sha256": "8848c8490544f75e3487a0fc095de23f9b7b31dbfe2f82af1deb705bdf8e33f5"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/plugin-streams-core/0.0.8/src/telemetry/producer-metrics.ts",
+      "sha256": "e4ff1fe3230ee999bbb8d819efa4fc8ce94a7b5134057f0c2d55ca7dd3a414fa"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/context.ts",
+      "sha256": "fc0cdcb1b14611de2567e4b841a2437805877d47d216904152367e0ec73b0453"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/mod.ts",
+      "sha256": "a999e38a7205ca61f6e7bd61ce4fe545c0921db5c9a966c964d0637f4040e9a4"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/adapters/otel/mod.ts",
+      "sha256": "df0d50d90528302bb30b6f2e6bda5d28e3c9aa70c2c15fffd1c4f922cbaa7ff7"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/adapters/otel/otel-deno.ts",
+      "sha256": "3cf5829bc308bc2d15ed9fd448b74e6f1c80d3c8170ee6b4ed8d80d55bab6b61"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/adapters/otel/otel-sdk.ts",
+      "sha256": "755632495b131b6e389fd874e1b1e11327614d11321c102e2432d2f70399b5b0"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/adapters/otel/select-provider.ts",
+      "sha256": "8189c9847122f4ca96683cf75b33325c2fd0269e8487b5fcfc930cc5e1233060"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/fan-in-links.ts",
+      "sha256": "f1d4d072fbddc922e2119a0a20f9dd87d658c4ac5c27e57ac058fa17dd83c8b4"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/mod.ts",
+      "sha256": "fae6a279be25d0f74d802e6495c3c43cd7ee69817e8af53a364957a039a9cc6e"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/registry/instrumentation-registry.ts",
+      "sha256": "6fda5b79c2ff3f03828442ba8078171c063c9eb817d28e00d9bc49fcfe825d4e"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/registry/mod.ts",
+      "sha256": "993d36c9199e932480a8e1703a4c13c56c2691f41a6db2978c39d72ee046c126"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/registry/provider-registration.ts",
+      "sha256": "2e5cf141a629a53d4e4501154dbdc77d576b5dfff853011ec29bf81b8ae76dd6"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/registry/types.ts",
+      "sha256": "af1a61888a15723e640e4462ccdb7f2a0635378556b5ed593cfa240d96b6b910"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/span-utils.ts",
+      "sha256": "3e731d5e122e2db78e33bd8fed815b7464cc73a7b56d0e0a8d787bec20bfa4a2"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/span.ts",
+      "sha256": "bbbd14ecd4ffa6ea031a00fe7ea2474e08b04a41b5042fd34610d06a92dd8b41"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/application/tracer.ts",
+      "sha256": "bb72d1af94119f515d318e468d70444871980c85544c6a8aedce299570c5e324"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/cache.ts",
+      "sha256": "7566dcf56485f93ac8a6d89c5bfdcdd4b5f099985a0060170ebe9f5224959a3c"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/command.ts",
+      "sha256": "ef560f17c400de06fe1efa6fa20862de944feee7cae9e69f5cae1516b23db5b0"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/execution.ts",
+      "sha256": "02b84e2fbbf03face206e866b596f8e558c9094bd6246a2821b46bef531376e9"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/genai.ts",
+      "sha256": "32a2d1d90f136d090492710c8bb35dddff56652665b460c9f2031fcc4cc8a3c8"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/helpers.ts",
+      "sha256": "6cdd3d1b7f1b8241cb22573bc9e962f26ffcbbf30c786f7a499274825fcb1e00"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/job.ts",
+      "sha256": "ae44775fd05b3d1605e1aca3fde1c7ac41d1d347faa5fa35bce1f89dec3c418d"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/kv.ts",
+      "sha256": "35ada85dc56265b4707a88d22c49885c5557e11c34f50b65076531198d8e0c7e"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/messaging.ts",
+      "sha256": "615aeb37ceecad87050127e7b115e91203e3941b9b34432541b5a12955a3d3d5"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/mod.ts",
+      "sha256": "217f65c017f0ac52e6f02da4eb90ef559d89699bf92ec9c99ae8b6eab3d9bea4"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/saga.ts",
+      "sha256": "138f01bc0554d756145429ad7ca24f4c1d8ecb4ac26d66e785577aa02de75ee8"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/scheduler.ts",
+      "sha256": "dd70ca8d30d467d33770d9c91e134eb78f410bf8386775b05334587f28f43a4a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/spans.ts",
+      "sha256": "375fbb46ac6d1c1c5dd910649771d0a02b194b3b2470c472ac5eaa8e96656f92"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/sse.ts",
+      "sha256": "d074a96c67a6f4c44526e6b88e2faf663cbb0bf626385c90102a122047445fa2"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/trigger.ts",
+      "sha256": "2b2d6cd81bf854314880b644bbef7902233d291f5e36a46a2ff605d4729c9d7e"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/attributes/worker.ts",
+      "sha256": "021013aa8ed6e9015f5fddbbe45d89e315ce137503938731949d13a3a119c3f3"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/config/constants.ts",
+      "sha256": "811d63e025c485ecdf50d7098821deeb4fec5ee75f083588639d91c229a8f24a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/config/environment.ts",
+      "sha256": "b31d7451083487cce81ae2bc22b6907c107ca0ba436ce52973d2b71c38982cf9"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/config/mod.ts",
+      "sha256": "a8e641567a44dfdaeb8573309e9a02b4047b6597c582c85f6440fb19f32c2b9a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/config/provider-registration.ts",
+      "sha256": "d2e5b3f6e00c0e6c0009a9be3c832c745a0e85ebc4dd9ee361fe46306f233666"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/config/schema.ts",
+      "sha256": "2b22641bd9c7e7851c9235dadaf9857a7d37624dfb21972f7c498c57483e498d"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/config/singleton.ts",
+      "sha256": "2c806475db06745f1c1443df3af6ef411b08e4af3801cf90f2bef5c30dc66bfb"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/context/helpers.ts",
+      "sha256": "0075a18324533a53edbcfdac91a419d5dfdc9d41795afe628060af6b4730c9ce"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/context/message.ts",
+      "sha256": "a62bec83213ca3f84841d7ff35e7d38f4ac88de953d43ab6d1a1a67859f3a6f8"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/context/mod.ts",
+      "sha256": "f2ba04e035fbb447b9cc8d46d07881c269e5b2ebdf684839f21bbcd13052bcab"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/context/payload-context.ts",
+      "sha256": "90c9b6b40492919c2594e27e148907e5861c497339005de3fdf18081a09ee139"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/context/types.ts",
+      "sha256": "db3e03d7c39ac930a892b4cfbad15a796acf9191e23cf9bd02fd244da4f1429f"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/context/w3c.ts",
+      "sha256": "937d235043b396fc27bcaadd111ec9979f762579093b1e86533e41d0309f040a"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/diagnostics/inspect-telemetry.ts",
+      "sha256": "fd8694ac8fdd8c23f727117a6e0f2869748286ae67f87997abd54de59fe0d465"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/domain/mod.ts",
+      "sha256": "9fae01495d7f47ac7f4cdd0ea312d0183357664091487dafa8145d990711cd6e"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/domain/query.ts",
+      "sha256": "ecb3b27fa40aa7b3d619b1d32dd519f6a6b06ebea393e43cc5f0778ce750a233"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/domain/telemetry-convention.ts",
+      "sha256": "397fbe595ad876ac544c0a1ffaeaf48a5422b1b1e5a5777716f16a981d161883"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/domain/types.ts",
+      "sha256": "9345d4ce2a273f219dc6279132a478d9378a8bf3fca7f8574bf61f9d6fe90277"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/instrumentation/worker.ts",
+      "sha256": "f2fbdf80f9e7228db66ac7de1f86eb25f502fec670279ecb5fc430c7a9d44f9e"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/meter-port.ts",
+      "sha256": "2e09981bc85f2748b61eb92d08d15ad83cb00970d4d6210196d5a862329b8c75"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/mod.ts",
+      "sha256": "556049d11aa2f7cf576102cd685403ee8273796c5a94165cb1b68c5d989ebe05"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/propagator-port.ts",
+      "sha256": "91b30dafba35dd2dcd00d77007bd7cf5fb54c38a9bf9a64939b1504d12a4b8fb"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/provider-options.ts",
+      "sha256": "c272a15e2c81e89c5a6d5d1362c6079302990b2be20900a773224ed5d012ca83"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/span-link-port.ts",
+      "sha256": "9eae67c1a3dc25b696d8539feefe29557fad1b6121a9b909576d9c672f150a14"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/telemetry-query-port.ts",
+      "sha256": "d065a5e84cfed4e7652ccb3b79580739a4a6f0c0dbe95674a922f244c2ffcba1"
+    },
+    {
+      "specifier": "https://jsr.io/@netscript/telemetry/0.0.8/src/ports/tracer-provider-port.ts",
+      "sha256": "1fe6960aa9309b45501027f576687ab422502b5eb2479cf43d38cd4783456f45"
+    }
+  ],
+  "localFiles": [
+    "consumer_test.ts",
+    "http-stream-fixture.ts"
+  ],
+  "commands": {
+    "install": {
+      "exitCode": 0,
+      "durationMs": 1266
+    },
+    "production-install": {
+      "exitCode": 0,
+      "durationMs": 169
+    },
+    "graph": {
+      "exitCode": 0,
+      "durationMs": 30
+    },
+    "check": {
+      "exitCode": 0,
+      "durationMs": 749
+    },
+    "lint": {
+      "exitCode": 0,
+      "durationMs": 87
+    },
+    "fmt": {
+      "exitCode": 0,
+      "durationMs": 91
+    },
+    "positive": {
+      "exitCode": 0,
+      "durationMs": 601
+    },
+    "negative": {
+      "exitCode": 1,
+      "durationMs": 256
+    }
+  },
+  "positive": {
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 2,
+    "uniqueFailures": 0
+  },
+  "negative": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "control": "Drops native records only on the HTTP relay; semantic assertions fail, no production revert claimed",
+  "consumerLockBefore": "3ec32988b1aa53b8d727363994c2021ecb171c1fdd7d4f6153929baca2c7c88e",
+  "consumerLockAfter": "3ec32988b1aa53b8d727363994c2021ecb171c1fdd7d4f6153929baca2c7c88e",
+  "repositoryLockBefore": "884935552df175250e4c77148eafbb6e2952f76665731afd1199954f6174c99a",
+  "repositoryLockAfter": "884935552df175250e4c77148eafbb6e2952f76665731afd1199954f6174c99a",
+  "fixture": "Controlled HTTP storage/framing; every application record arrives from default published writer POSTs",
+  "remaining": "EIS-Chat adoption and one-SSE-per-pane check in its actual app remain outside this repo"
+}
