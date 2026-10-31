@@ -133,3 +133,9 @@
 - 06:42Z: **merged** #2502 (`59902cf6f`) for #2267; #2267 closed.
 - 06:42Z: #2132 → PR #2505.
 - 07:35Z: #2505 (#2132) READY at `a75d631`, Opus MERGE; **expensive-gate.acquired** (Redis/Garnet KV is used by the scaffold). #2482 and #2421 show no response to the merge-main steers after 1.5 h: their workers end their runs after READY, and steering reaches only a live job's own PR. Re-dispatching focused merge-main leaves.
+- 07:41Z: posted r2 finish dispatches for #2400 (PR #2482) and #2396 (PR #2421), spaced about 5 min.
+- 07:43:30Z: #2400 r2 started (finishing PR #2482).
+- 08:16:44Z: **mc009e takeover** (relaunch after the 07:45Z power-off). Cockpit: the N5 restore resumed the old leaf runs, so a leaf is relaunched only when it has no live herdr workspace. Live: #2159 (PR #2499), #2396 r2 (PR #2421). Done: #2400 r2 (PR #2482, READY queued, Opus PASS at `dfa2502`), #2155, #2132, #2259 (blocked). mc009d's pane was closed by Cockpit, so this is the only coordinator.
+- 08:16:44Z: **merged** #2505 (`a2fe36aee`) for #2132 (C1); #2132 auto-closed by the PR body, evidence comment posted. READY at `a75d631`, Opus MERGE r5, 30/30 checks including both runtime tiers, 0 threads.
+- 08:16:44Z: **merged** #2494 (`1d274c16b`) for #2155 (E2, docs); #2155 closed with evidence. Opus MERGE r5 at `482097b`; main had moved since the merge base and both sides touched agent-docs-prose, so the coordinator built the combined tree (merge-tree) and ran check:agent-docs-prose (fresh) and check:publish-assets (pass). The e2e on #2482 (#2400) is running at `dfa2502` alongside #2505's finished gate.
+- 08:19:07Z: dispatched #2162 (B2, fixes; requires #2161 merged), comment 6541068260. Brief tightened to merge-main-never-rebase.
