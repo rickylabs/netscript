@@ -1,3 +1,5 @@
+import { coverageNotice, runSelectedProject, standaloneCoverage } from './standalone-projects.ts';
+
 /**
  * deps/prod-install.ts — structured wrapper over `deno ci --prod`.
  *
@@ -30,6 +32,7 @@ export function buildDenoCiArgs(args: { skipTypes: boolean }): string[] {
 }
 
 async function main() {
+  await runSelectedProject('prod-install');
   const args = parseArgs(Deno.args);
   const cmdArgs = buildDenoCiArgs(args);
   const start = performance.now();
@@ -41,6 +44,7 @@ async function main() {
 
   const result = {
     generatedAt: new Date().toISOString(),
+    standaloneCoverage: standaloneCoverage('prod-install'),
     command: `deno ${cmdArgs.join(' ')}`,
     exitCode: output.code,
     ok: output.code === 0,
@@ -49,6 +53,7 @@ async function main() {
   };
 
   if (args.pretty) {
+    console.log(coverageNotice('prod-install'));
     console.log(
       `deps:prod-install — ${result.ok ? 'OK' : `FAILED (exit ${output.code})`} in ${durationMs}ms`,
     );
@@ -69,6 +74,7 @@ function printHelp(): void {
       '    .llm/tools/deps/prod-install.ts [flags]',
       '',
       'Flags:',
+      '  --project <dir>  select tools/fresh-ui-browser (production install unsupported)',
       '  --skip-types   pass --skip-types to `deno ci --prod`',
       '  --pretty       human-readable summary instead of JSON',
       '  --help, -h     show this help',

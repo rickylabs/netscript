@@ -1,3 +1,5 @@
+import { coverageNotice, runSelectedProject, standaloneCoverage } from './standalone-projects.ts';
+
 /**
  * deps/audit.ts — structured wrapper over `deno audit`.
  *
@@ -20,6 +22,7 @@ function parseArgs(argv: string[]): { level: string; pretty: boolean; failOnFind
 }
 
 async function main() {
+  await runSelectedProject('audit');
   const args = parseArgs(Deno.args);
   const command = new Deno.Command('deno', {
     args: ['audit', '--level', args.level],
@@ -38,6 +41,7 @@ async function main() {
 
   const result = {
     generatedAt: new Date().toISOString(),
+    standaloneCoverage: standaloneCoverage('audit'),
     level: args.level,
     exitCode: output.code,
     advisoriesFound,
@@ -47,6 +51,7 @@ async function main() {
   };
 
   if (args.pretty) {
+    console.log(coverageNotice('audit'));
     console.log(
       `deps:audit (level=${args.level}) — ${advisoriesFound ? 'ADVISORIES FOUND' : 'clean'}`,
     );
@@ -70,6 +75,7 @@ function printHelp(): void {
       '  deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts [flags]',
       '',
       'Flags:',
+      '  --project <dir>  select tools/fresh-ui-browser (production install unsupported)',
       '  --level <critical|high|moderate|low>   severity floor (default: low)',
       '  --pretty                               human-readable output instead of JSON',
       '  --fail-on-find                         exit 1 if advisories are found',
