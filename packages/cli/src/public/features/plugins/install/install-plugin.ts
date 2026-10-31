@@ -262,7 +262,7 @@ export async function installPlugin(
     rootDenoJsonBefore,
   });
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
-  const browserAuthFiles = await reconcileBrowserAuth(
+  const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,
     dependencies.formatter,
@@ -290,6 +290,7 @@ export async function installPlugin(
     provisionedCache,
     schemaCopies,
     helperFiles,
+    browserAuthReport,
   };
 }
 

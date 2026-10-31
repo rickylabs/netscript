@@ -1,3 +1,4 @@
+import { renderDoctorReport } from '../../../../kernel/presentation/output/render-doctor-report.ts';
 import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
@@ -96,6 +97,7 @@ export function createPluginInstallCommand(
       }
       print(`Created ${plugin.scaffoldResult.filesCreated.length} plugin files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
+      renderDoctorReport(result.browserAuthReport, print);
     });
 }
 
