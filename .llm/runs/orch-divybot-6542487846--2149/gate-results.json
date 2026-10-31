@@ -190,8 +190,10 @@
   "implementationEvaluation": {
     "round1": "FAIL_FIX",
     "round2": "FAIL_FIX",
-    "status": "STOPPED_AT_TWO_CONSECUTIVE_FAILURES",
-    "exactHeadMergeAttestation": "UNPROVEN"
+    "status": "ROUND_3_AUTHORIZED_PENDING",
+    "exactHeadMergeAttestation": "UNPROVEN",
+    "round3": "AUTHORIZED_PENDING",
+    "authorization": "https://github.com/rickylabs/netscript/pull/2519#issuecomment-6542839829"
   },
   "documentationRepair": {
     "status": "CORRECTED_AFTER_ROUND_2",

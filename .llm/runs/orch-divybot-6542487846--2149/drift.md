@@ -12,3 +12,5 @@
 - Shape debt: the already oversized public install module grows from 712 to 754 lines and its already over-cap directory gains three siblings for the selector, schema resolver and colocated regression. Keep the behavior fix focused; record the exact incremental cost in the architecture debt registry for the next CLI install split.
 
 - Continued goal: the two round-2 documentation findings are now corrected and their carrier rows regenerated. No source-code changes or new evaluator round. The remaining blocker is independent acceptance/final-head review after the exhausted consecutive-failure loop, followed by coordinator-owned runtime CI. Earlier BLOCKED text about unfixed references is historical and superseded by this continuation record.
+
+- Coordinator decision https://github.com/rickylabs/netscript/pull/2519#issuecomment-6542839829 explicitly lifts the consecutive-failure stop for exactly IMPL-EVAL round 3 in the same session. This supersedes the earlier blocked state without erasing either failed verdict or claiming a review yet.
