@@ -23,3 +23,9 @@ Latest origin/main **204a71b1ef0133faa07ce5c191e4170b5cb76171** includes S3 PR24
 Generated agent-docs prose/fallback and Fresh UI content conflicts were regenerated from combined sources: seed conflicted carriers temporarily, bootstrap CLI assets to obtain current S3 copied bytes, build prose, regenerate CLI assets consuming new prose, then publish assets and MCP export corpus. Temporary carrier seeding is not the resolution. No lock/cache deletion or dependency update; locks retain approved S2 MCP→Fresh UI workspace metadata plus incoming main. All upstream run evidence retained.
 
 Post-merge tests **220/0/0** UI/migration/contracts/command-tree; streams9/0/0; registry-embedding/publish3/0/0. Seven-file structured check/lint/fmt zero findings/drops/refusals. Canonical release preflight and root quality/architecture PASS, docs accuracy PASS, review threads0 unanswered. Current-source durable carrier/publication checks and retained independent review follow; no renewed READY.
+
+## Final source/local sign-off
+
+All six clean609e64813 durable quality/carrier/publication gates PASS. Retained separate native Opus5.5 High read-only IMPL-EVAL PASS; supervisor accepts. Combined tests220/0/0, streams9/0/0, embedding/publish3/0/0, seven-file wrappers/preflight/docs111 PASS. Full FreshUI doclint remeasured after S3:124 (96private-type,28missing), reproduced on detached EXACT main204a with identical finding counts by file and entrypoint; extra registry-v2 entrypoint has0 findings. Historical123 is superseded. No change is attributed to the repair and no doclint pass claimed.
+
+All sign-off evidence is committed before the next decisive CI; final head proof will be published externally after both full workflows and actual runtime suites succeed. No READY yet or extra push after green.
