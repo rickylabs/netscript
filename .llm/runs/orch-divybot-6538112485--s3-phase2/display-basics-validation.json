@@ -1,0 +1,28 @@
+{
+  "slice": "7a Data display basics",
+  "shippedComponents": 85,
+  "inventoryComponents": 104,
+  "nativeRegistryItems": 113,
+  "initialFocusedTests": {
+    "passed": 168,
+    "failed": 0
+  },
+  "reviewedFocusedContractAndCopyTests": {
+    "passed": 160,
+    "failed": 0
+  },
+  "reviewedBrowserTests": {
+    "passed": 16,
+    "failed": 0
+  },
+  "sourceAndBrowserWrappers": "PASS",
+  "qualityAndArchitecture": "PASS",
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "independentReview": "PASS",
+  "captures": "review/",
+  "nativeDisclosureBeforeHydration": "Native summary remains toggleable; state refusal and disabled activation blocking require hydration.",
+  "finalPhaseGates": "PENDING",
+  "phaseReady": false
+}

@@ -45,3 +45,5 @@ strict AA without changing any token value or global Button styling. Utility
 fill is therefore an explicit temporary visual deviation from the handoff;
 #2450 owns the canonical pair. Follow-up cost: remove one scoped rule and refresh
 visual proof once that pair passes. No axe allowance is added.
+
+Data display slice7 split into7a (Item/Kbd/Collapsible),7b (Chart/Carousel),7c (CodeBlock/Feedback/docs audit) solely to bound the reviewed source surface. Scope, native-first policy and phase2a acceptance are unchanged.
