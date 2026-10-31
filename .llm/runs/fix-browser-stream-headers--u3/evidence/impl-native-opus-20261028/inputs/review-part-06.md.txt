@@ -1,0 +1,801 @@
+owned, foreign, and unknown-owner resources. `deno task maint:teardown -- ...` is dry-run by
+default; `--apply` is explicit and can act only on positively proven run-owned resources.
+
+Use `deno task maint:dogfood-skills` to install the local CLI's current consumer bundle into
+`.agents/generated/consumer-skills/`; never fork that bundle by hand.
+
+The supervisor drives Tier-D Codex and Tier-E OpenHands through `.llm/tools/agentic/*`, each exposed
+as an `agentic:*` `deno task` (see `deno.json` and the index in `.llm/harness/workflow/tooling.md`).
+Two are durable GitHub infra utilities worth calling out:
+
+- **`gh-watch.ts`** (`deno task agentic:gh-watch --pr <n>`) — token-free CI/verdict watch. Run it as
+  a **background** process: it polls a PR's OpenHands IMPL/PLAN-EVAL summary comment (and, with
+  `--run-id`, the triggered Actions run) until the state is terminal, then exits — re-waking the
+  supervisor turn without a polling loop kept in context. Exit codes: `0` PASS · `10` FAIL · `12`
+  final-no-verdict · `13` action-run-failed · `2` timeout · `4` no-token. Use it whenever you have
+  dispatched an evaluator and must wait for the verdict.
+- **`maint/gh-token.ts`** (`deno task maint:gh-token check|store`) — durable GitHub-token
+  resolver/store. `check` resolves a token from any healthy source (env candidates → `gh auth token`
+  Windows/WSL → bounded GCM `git credential fill`), validates it against `GET /user`, and reports
+  only the source + login (never the token). `store` reads ONE PAT from stdin and persists it to
+  every durable place (Windows GCM + WSL `gh`) so later sessions auto-resolve. Use `check` at the
+  start of any GitHub session; use `store` once when the supervisor's token is missing/rotated.
+
+The desired-state runtime controller is the default health/repair entry point:
+`deno task agentic:runtime doctor|status` for inspect-only environment/session snapshots, and
+`deno task agentic:runtime repair codex-remote --worktree <path> [--dry-run]` for planned,
+session-safe Codex daemon repair. `deno task agentic:routing-state` reads the persisted
+quota-fallback routing state.
+
+Read the pinned Harness fleet routing through `deno task agentic:matrix`, never by shell-scraping
+TypeScript. NetScript's internal launch resolver and paid OpenCode guard read the same pinned
+Harness matrix. Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a
+direct evaluator lookup, `--role deep-research` for the dedicated research role,
+`--fallback-of
+<logical-model>` to list every context-sensitive fallback, and `--json` for
+structured consumption. The full table includes separate Deep Research default and fallback columns.
+
+Pure UI/UX specialist routing is an explicit `ui_ux` role; incidental UI changes stay on the normal
+implementation role. Owner overrides require the typed override record and the exact grant in a
+repo-relative `.llm/runs/**/worklog.md`. Never bypass the launcher directly: the override does not
+waive separate-session or different-family evaluation.
+
+The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
+`dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in `.llm/harness/workflow/tooling.md`.
+`.llm/tools/agentic/` is the **only** interface for driving Codex — never ad-hoc `wsl.exe`. The
+suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` +
+`runtime/cli/`, `lib/`); its `README.md` is the canonical map.
+
+**Monthly maintenance:** fleet route model IDs live in pinned Harness; transitional local provider
+presets live in `.llm/tools/agentic/config/models.ts`, tool versions in `config/versions.ts`,
+endpoints in `config/endpoints.ts`; workload and coordinator bindings live in pinned Harness, while
+`runtime/routing-policy.ts` resolves local provider availability. The "Maintenance map" table in the
+suite README says exactly where to change a model, version, policy, agent, or dep. A guard test
+(`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is hardcoded outside
+`config/`.
+
+## Lock Hygiene
+
+Do not delete lock files or caches. Do not run `deno cache --reload` without approval. If automation
+or validation mutates `deno.lock`, inspect the diff against the true branch base before accepting
+it. PLAN-EVAL should not commit lock churn.
+
+## Worktree Sync
+
+If push rejects due to a remote-only evaluator/bot commit, inspect the remote commit before
+integrating:
+
+```powershell
+deno eval 'const p = new Deno.Command("git", { args: ["show", "--stat", "--oneline", "--name-status", "origin/<branch>"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'
+```
+
+If the remote commit is unrelated and the local commit should sit on top, use a normal rebase onto
+`origin/<branch>` and push. Do not discard user or bot commits.
+
+## Common Gotchas
+
+- `deno task check:packages` and `deno task check:plugins` may not exist; inspect root `deno.json`
+  and use the available wrapper plus focused checks.
+- Raw root `deno fmt --check` can include generated/scratch/future-wave files. Prefer scoped wrapper
+  verdicts.
+- `deno check .` can walk generated caches and deferred package surfaces. Prefer explicit roots and
+  entrypoints.
+- OpenHands may commit `deno.lock` churn; inspect before merging.
+- The final full scaffold/plugins E2E command lives in the `netscript-cli` skill.
+
+
+## .agents/skills/jsr-audit/SKILL.md
+
+Original-byte SHA256:b34002e35bd00656f1a68f54126eb7e316e9099ca6d4be92dc460a2d50ee7a79
+
+---
+name: jsr-audit
+description: "This skill should be used when the user asks to 'audit for JSR', 'check JSR readiness', 'review JSR config', 'verify package for JSR', 'publish to JSR', 'prepare for JSR publishing', 'JSR compliance check', 'run JSR audit', or wants to ensure their Deno/TypeScript package meets JSR standards before publishing."
+version: 1.0.0
+---
+
+# JSR Publishing Audit
+
+Comprehensive audit guide for JSR (JavaScript Registry) compliance and scoring optimization. This
+skill is a **required Plan-Gate input** for package/plugin waves — apply it to the planned public
+surface before slicing.
+
+## When to Use
+
+- Auditing a package for JSR readiness.
+- Preparing a package for JSR publishing.
+- Reviewing JSR config (`deno.json` or `jsr.json`).
+- Checking for slow types before publish.
+- Verifying documentation quality for JSR score.
+
+## When Not to Use
+
+- For package architecture decisions — use `netscript-doctrine`.
+- For harness run orchestration — use `netscript-harness`.
+- For non-JSR publishing (npm-only, private registries) — this skill is JSR-specific.
+
+---
+
+## Understanding the JSR Score
+
+JSR assigns packages a quality score from 0-100%, displayed with color coding:
+
+- **Red**: Below 60%
+- **Orange**: 60-90%
+- **Green**: 90%+ (target this)
+
+The score directly influences search ranking. View any package's breakdown at
+`jsr.io/@scope/package/score`.
+
+### The 9 Scoring Factors
+
+| Category            | Factor                                 | Impact |
+| ------------------- | -------------------------------------- | ------ |
+| **Documentation**   | Has README or module doc               | High   |
+|                     | Has examples in README/module doc      | High   |
+|                     | Has module docs in all entrypoints     | High   |
+|                     | Has docs for most symbols              | High   |
+| **Best Practices**  | No slow types                          | Medium |
+|                     | Has provenance (SLSA attestation)      | Medium |
+| **Discoverability** | Has description (≤250 chars)           | Low    |
+| **Compatibility**   | At least one runtime marked compatible | Low    |
+|                     | At least two runtimes compatible       | Low    |
+
+**Key insight**: Documentation carries the heaviest weight. Comprehensive JSDoc + README + `@module`
+tags will score higher than perfect types with minimal docs.
+
+---
+
+## Audit Checklist
+
+| Check                | Command/Location         | What to Look For                            |
+| -------------------- | ------------------------ | ------------------------------------------- |
+| Required metadata    | `deno.json`              | `name`, `version`, `exports` fields         |
+| Scoped package name  | `name` field             | Format: `@scope/package-name`               |
+| Package description  | `description` field      | ≤250 characters for discoverability         |
+| Valid exports        | `exports` field          | Entry points exist and are correct          |
+| No slow types        | `deno publish --dry-run` | No slow type warnings                       |
+| Clean file list      | `deno publish --dry-run` | Only intended files included                |
+| ESM only             | Source files             | No CommonJS (`module.exports`, `require()`) |
+| Module documentation | Entry point files        | `@module` JSDoc tag present                 |
+| Symbol documentation | Exported symbols         | JSDoc with `@param`, `@returns`, `@example` |
+
+---
+
+## Audit Process
+
+### Step 1: Check Required Metadata
+
+Read `deno.json` (or `jsr.json`) and verify:
+
+```json
+{
+  "name": "@scope/package-name",
+  "version": "1.0.0",
+  "description": "Concise package description under 250 characters",
+  "exports": "./mod.ts"
+}
+```
+
+**Package name rules:**
+
+- Must start with `@scope/`
+- Lowercase letters, numbers, hyphens only
+- 2-40 characters (excluding scope)
+
+**Config file choice:**
+
+- Deno projects: Use `deno.json`
+- Node/Bun/other: Use `jsr.json`
+- Never split config between both files
+
+### Step 2: Verify Exports
+
+Check all entry points exist:
+
+```json
+{
+  "exports": {
+    ".": "./mod.ts",
+    "./utils": "./src/utils/mod.ts"
+  }
+}
+```
+
+For each entry point, confirm:
+
+- File exists at specified path
+- Exports are properly defined
+- Type annotations are explicit (no slow types)
+- Has `@module` JSDoc tag
+
+### Step 3: Audit Documentation Quality
+
+**Module-level documentation** (top of entry points):
+
+````typescript
+/**
+ * A module providing string utilities for common transformations.
+ *
+ * @example
+ * ```ts
+ * import { camelCase } from "@scope/cases";
+ * camelCase("hello world"); // "helloWorld"
+ * ```
+ *
+ * @module
+ */
+````
+
+**Symbol documentation**:
+
+````typescript
+/**
+ * Converts a string to camelCase format.
+ *
+ * @param input - The string to convert
+ * @returns The camelCase formatted string
+ *
+ * @example
+ * ```ts
+ * camelCase("hello world"); // "helloWorld"
+ * camelCase("foo-bar-baz"); // "fooBarBaz"
+ * ```
+ */
+export function camelCase(input: string): string {
+  // ...
+}
+````
+
+**JSDoc tags reference:**
+
+- `@param name - description` - Document parameters
+- `@returns description` - Document return value
+- `@example` - Runnable code examples (use triple backticks)
+- `@deprecated message` - Mark deprecated APIs
+- `@see SymbolName` - Cross-reference related symbols
+- `@throws ErrorType` - Document thrown errors
+- `{@link SymbolName}` - Inline links
+- `{@linkcode SymbolName}` - Inline links with monospace
+
+### Step 4: Run Dry-Run Verification
+
+```bash
+deno publish --dry-run --allow-dirty
+```
+
+This reveals:
+
+- **Slow types**: Exports without explicit type annotations
+- **File list**: Everything that would be published
+- **Metadata errors**: Invalid name, version, etc.
+
+**The dry-run is a static gate, not proof of a working publish.** It never loads the module over the
+real `https:`/`jsr:` graph, so it cannot catch the runtime-only publish failures listed in
+[JSR publish gotchas](#jsr-publish-gotchas-netscript-grounded) — a green `--dry-run` is necessary
+but not sufficient. The authoritative post-publish check is the production CLI e2e (`e2e-cli-prod`),
+which installs and runs the published package over the remote graph.
+
+### Step 5: Audit the File List
+
+Review dry-run output for files that should NOT be published:
+
+**Common offenders:**
+
+- `.claude/`, `.zed/`, `.vscode/` - IDE settings
+- `.github/`, `.gitlab/` - CI/CD configs
+- `.mise.toml`, `.tool-versions` - Local tooling
+- `coverage/` - Test coverage data
+- `docs/`, `*.md` (except LICENSE/README) - Documentation
+- `deno.lock` - Lock files
+- `*.test.ts`, `**/test_utils/**` - Test files
+- `sonar-project.properties`, `*.config.js` - Build configs
+- `.env`, `*.local.*` - Local configuration
+
+### Step 6: Configure Publish Filtering
+
+Use `include` (whitelist) + `exclude` (filter):
+
+```json
+{
+  "publish": {
+    "include": [
+      "LICENSE",
+      "README.md",
+      "deno.json",
+      "mod.ts",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  }
+}
+```
+
+**Why both?**
+
+- `include` whitelists only intended files
+- `exclude` filters test files from `src/**/*.ts` glob
+- `exclude` takes precedence when both match
+
+### Step 7: Verify Clean Output
+
+Run dry-run again. Only these should appear:
+
+- `LICENSE`
+- `README.md`
+- `deno.json`
+- Entry point files (`mod.ts`, etc.)
+- Source code (`src/**/*.ts` minus tests)
+
+---
+
+## Fixing Slow Types
+
+Slow types are exports without explicit type annotations. They prevent JSR from generating `.d.ts`
+files efficiently and degrade npm compatibility by 1.5-2x slower type checking.
+
+### Function Return Types
+
+```typescript
+// SLOW - inferred return type
+export function greet(name: string) {
+  return 'Hello, ' + name + '!';
+}
+
+// FIXED - explicit return type
+export function greet(name: string): string {
+  return 'Hello, ' + name + '!';
+}
+```
+
+### Constants
+
+```typescript
+// SLOW - inferred type
+export const GLOBAL_ID = crypto.randomUUID();
+
+// FIXED - explicit annotation
+export const GLOBAL_ID: string = crypto.randomUUID();
+```
+
+### Class Properties
+
+```typescript
+// SLOW - inferred property type
+export class Config {
+  timeout = 5000;
+}
+
+// FIXED - explicit property type
+export class Config {
+  timeout: number = 5000;
+}
+```
+
+### Detection Commands
+
+```bash
+# Catch slow types before publishing
+deno publish --dry-run
+
+# Validate documentation generation
+deno doc --lint
+```
+
+**Note**: TypeScript 5.5's `isolatedDeclarations` mode produces code that automatically satisfies
+JSR's no-slow-types requirement.
+
+---
+
+## Prohibited Patterns
+
+JSR enforces ESM-only architecture:
+
+| Prohibited       | Alternative                             |
+| ---------------- | --------------------------------------- |
+| `require()`      | `import`                                |
+| `module.exports` | `export`                                |
+| `declare global` | Module-scoped types                     |
+| `declare module` | Module-scoped types                     |
+| HTTP imports     | `jsr:`, `npm:`, `node:` specifiers only |
+
+---
+
+## Multiple Entry Points
+
+For packages with multiple exports:
+
+```json
+{
+  "exports": {
+    ".": "./mod.ts",
+    "./providers": "./providers.ts",
+    "./utils": "./src/utils/mod.ts"
+  }
+}
+```
+
+Users import as:
+
+```typescript
+import { main } from '@scope/pkg';
+import { OpenAI } from '@scope/pkg/providers';
+import { helper } from '@scope/pkg/utils';
+```
+
+Each entry point should have its own `@module` JSDoc tag.
+
+---
+
+## Dependencies
+
+Declare in `imports`:
+
+```json
+{
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.0",
+    "zod": "npm:zod@^3.22.0"
+  }
+}
+```
+
+Supported specifiers:
+
+- `jsr:@scope/pkg@version` - JSR packages
+- `npm:package@version` - npm packages
+- `node:module` - Node.js built-ins
+
+---
+
+## CI Publishing with Provenance
+
+GitHub Actions OIDC enables tokenless publishing with automatic SLSA provenance:
+
+```yaml
+name: Publish to JSR
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for OIDC and provenance
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno publish
+```
+
+**Requirements for provenance:**
+
+1. Link package to GitHub repo in JSR settings
+2. Include `id-token: write` permission
+3. Provenance generated automatically
+
+No API tokens needed - JSR uses GitHub OIDC authentication.
+
+---
+
+## Audit Report Template
+
+After completing the audit:
+
+```markdown
+## JSR Publishing Audit Results
+
+| Check                | Status |
+| -------------------- | ------ |
+| Required metadata    | ✓ / ✗  |
+| Scoped package name  | ✓ / ✗  |
+| Package description  | ✓ / ✗  |
+| Valid exports        | ✓ / ✗  |
+| No slow types        | ✓ / ✗  |
+| Clean file list      | ✓ / ✗  |
+| ESM only             | ✓ / ✗  |
+| Module documentation | ✓ / ✗  |
+| Symbol documentation | ✓ / ✗  |
+
+### Estimated Score Impact
+
+- Documentation: X/4 factors
+- Best Practices: X/2 factors
+- Discoverability: X/1 factors
+- Compatibility: X/2 factors
+
+### Files Published
+
+[List from dry-run]
+
+### Issues Found
+
+[List any problems]
+
+### Recommendations
+
+[Suggested fixes prioritized by score impact]
+```
+
+---
+
+## Quick Commands
+
+```bash
+# Full audit dry-run
+deno publish --dry-run --allow-dirty
+
+# Validate documentation
+deno doc --lint
+
+# Type check
+deno check **/*.ts
+
+# Lint
+deno lint
+
+# Format
+deno fmt
+
+# Publish (when ready)
+deno publish
+```
+
+---
+
+## Learning the Publish Surface with `deno doc`
+
+`deno doc` renders a package's **public API surface** straight from its exports — the same surface
+JSR scores and publishes. It is the cheapest way to inspect what a unit actually exposes before you
+audit it, and the canonical internal-API tool: AGENTS.md instructs contributors to reach for
+`deno doc <module>` / `deno doc --filter <symbol>` before broad implementation reads — **"`deno doc`
+is your friend"** (see `AGENTS.md` Read Order). Use it to learn a surface; use `deno doc --lint` to
+hold it to the publish bar.
+
+### Inspect a surface
+
+```bash
+# Full public surface of a workspace package or entrypoint
+deno doc packages/cli/mod.ts
+
+# Narrow to a single symbol (fastest way to confirm a signature)
+deno doc --filter scaffoldProject packages/cli/mod.ts
+
+# A remote/JSR module also works
+deno doc jsr:@std/assert
+```
+
+`deno doc <module>` lists every exported symbol with its resolved type and JSDoc;
+`deno doc --filter
+<symbol>` prints just the matching declaration, which is the cheapest possible
+read for confirming a type contract without opening source.
+
+### npm-dependency rendering
+
+When a unit re-exports or returns types from an `npm:` dependency, `deno doc` follows the npm
+package's bundled type declarations and renders the resolved types inline — so the printed surface
+reflects what consumers see, npm types included. This is why an audit reads the real published shape
+rather than the local source signatures alone.
+
+#### npm-without-types workaround
+
+If an `npm:` dependency ships **no type declarations**, `deno doc` cannot resolve those types and
+renders them as `any` (and may warn about missing types), which understates or muddies the surface.
+Resolve it the same way you fix it for type-checking:
+
+- Add a typed shim via the `@types/<pkg>` companion in `imports` (e.g.
+  `"@types/node": "npm:@types/node@..."`), or
+- Pin a `// @deno-types="..."` reference to a local/declared `.d.ts` at the import site.
+
+With types resolved, `deno doc` (and `--lint`) render the real surface instead of `any`. Untyped npm
+deps that surface through your public exports are an audit finding, not just a doc cosmetic — they
+weaken the published `.d.ts` and the no-slow-types posture (see
+[Fixing Slow Types](#fixing-slow-types)).
+
+### JSX/TSX highlighting
+
+For `.tsx` units (the `@netscript/fresh-ui`-style Preact/Fresh component packages), `deno doc`
+parses and renders JSX/TSX entrypoints and highlights component and prop types in the emitted
+surface. You can point it at a `.tsx` entrypoint directly (e.g. `deno doc packages/fresh-ui/mod.ts`)
+to inspect exported components the same way you would a plain `.ts` module.
+
+### `deno doc --lint` — the publish-quality bar
+
+`deno doc --lint` is the **documentation-quality gate** for the publish surface. The bar is **0
+diagnostics on the FULL export surface of each unit** — the same bar the Group 3 user-site reference
+generation and the scorecard **A1** factor use. It flags two failure classes that block a clean
+publish:
+
+- `missing-jsdoc` — an exported symbol with no module/symbol documentation.
+- `private-type-ref` — a public export annotated with a non-exported (private) type, which leaks an
+  unrenderable type into the surface.
+
+```bash
+# Per-unit publish bar: must be 0 diagnostics across all entrypoints
+deno doc --lint packages/<unit>/mod.ts
+```
+
+When the raw output is too noisy to attribute per entrypoint or per file, use the structured runner
+`.llm/tools/run-deno-doc-lint.ts`, which auto-discovers a unit's exports from `deno.json` and emits
+grouped per-entrypoint / per-file counts:
+
+```bash
+deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/<unit> --pretty
+```
+
+**Census (2026-06-18):** the canonical `deno task publish:dry-run` simulates **25** units and the
+real publish denominator is **26** (the 25 E-wave units plus `@netscript/cli`; `@netscript/cli-e2e`
+is `publish:false` and excluded). At baseline **25 / 26 units are already `deno doc --lint` clean**.
+The one current `--lint` debt is **`@netscript/fresh-ui`**, which fails with `private-type-ref`
+errors where public component consts (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`,
+`Tooltip`) are annotated with private `*Namespace` types. That is a **source/TypeScript fix**
+(export the namespace types), not a doc edit, and is **out of scope for this skill** — track it as
+framework debt.
+
+---
+
+## JSR publish gotchas (NetScript, grounded)
+
+These are publish-surface traps established across NetScript release cuts. They are consolidated
+here as the canonical home; the `deno doc --lint` full-export-surface bar is covered above under
+[`deno doc --lint`](#deno-doc---lint-the-publish-quality-bar) — do not restate it.
+
+**`deno publish --dry-run` is NOT publish-equivalent.** Every trap below passes a clean dry-run and
+only fails at real publish/install time, because the dry-run analyzes the local source graph rather
+than loading the module over the remote `https:`/`jsr:` graph a consumer resolves. Treat a green
+dry-run as a static pre-check, never as the release verdict — the verdict is a real-publish
+preflight plus `e2e-cli-prod` against the published package.
+
+- **Embed assets as generated TypeScript constants, never import attributes or runtime file reads.**
+  The JSR registry can reject `with { type: "text" }` or `with { type: "json" }` while building the
+  module graph even when local `deno publish --dry-run` passes. A published module also runs over an
+  `https:`/`jsr:` graph where `Deno.readTextFile(...)` /
+  `fromFileUrl(new URL(..., import.meta.url))` have no package filesystem. Generate checked-in
+  `*.generated.ts` constants and protect them with a regeneration-plus-diff freshness gate. Guard:
+  `release:preflight` + `e2e-cli-prod`. This import-attribute ban is conditional and preserves the
+  incident lineage: #138/#142 captured the alpha.6 half-publish, #143 recovered with string
+  constants, and beta.10 partially published before the registry-side failure was tracked as
+  [denoland/deno#35546](https://github.com/denoland/deno/issues/35546). Lift the ban only after that
+  issue is fixed, merged, and released **and** an authenticated canary publish of a text-import
+  probe is green.
+- **Top-level `import.meta`/`fromFileUrl` crashes over https.** Same root cause as above but even
+  for path resolution: a top-level `fromFileUrl(new URL("...", import.meta.url))` throws when the
+  module is imported over `https:`/`jsr:`. Make it lazy (resolve inside the function that needs it)
+  and guard on `import.meta.url`'s protocol before touching the filesystem.
+- **Self-referential subpath import trap (#188).** A package that imports its OWN bare specifier
+  (e.g. `@netscript/x/sub` from inside `@netscript/x`) resolves at publish time against the LATEST
+  PUBLISHED version on JSR, not the in-repo source — so the publish graph fails or silently binds an
+  old version. Fix: use relative imports (`./sub.ts`) within a package; reserve bare specifiers for
+  true cross-package edges.
+- **JSR renders `@module` JSDoc, not README, by default (`readmeSource=jsdoc`).** The package page
+  shows the entrypoint `@module` JSDoc rather than `README.md` when `readmeSource` is `jsdoc` (the
+  default). If the README should be the page, toggle `readmeSource` to `readme` in the JSR UI or via
+  a PATCH to the package config; otherwise ensure the `@module` doc carries the intended landing
+  content.
+- **Prerelease-only packages show `latest=null`.** A package with only prerelease versions has JSR
+  `latest = null`, which renders a blank version badge/README on the package page. This self-heals
+  at the first non-prerelease (stable) publish; no config fix is needed.
+
+## Known Limitations (2024-2025)
+
+- **Private packages**: Not yet available (most requested feature)
+- **JSX publishing**: Not supported
+- **HTTP imports**: Prohibited
+- **Complex inference**: Libraries like Zod/ArkType may require `--allow-slow-types`
+
+
+## .agents/skills/netscript-pr/SKILL.md
+
+Original-byte SHA256:486aa7f26376baaf1d467fff962a40500c8b0ca8ef1563151015e2e94392fee3
+
+---
+name: netscript-pr
+description: Author NetScript branches, pull requests, and the per-phase structured PR comments used by the harness (research / plan / plan-eval / impl / impl-eval / review summaries), plus umbrella↔sub-PR linking and the namespaced label taxonomy. Use this whenever you are about to create a branch, open or update a PR, post a phase summary comment, split an umbrella into sub-PRs, or apply status/type/area labels in this repo — even if the user just says "open a PR", "push this", "comment the results", or "mark it ready for review". Getting the branch name, PR body, and labels right the first time is what keeps the harness board from rotting.
+---
+
+# NetScript PR Authoring
+
+Consistent branches, PR bodies, phase comments, and labels are what let the harness run as a
+machine: humans and agents read the same structured surface, and automation (Phase D labels +
+Projects v2) keys off it. Sloppy PR hygiene is how a board becomes a graveyard. This skill is the
+house format.
+
+## Tooling note
+
+`gh` is **not** on PATH in this environment. Use the **GitHub MCP** tools for all PR/issue/label
+operations (`create_pull_request`, `update_pull_request`, `add_issue_comment`, `issue_write`,
+`pull_request_read`, label tools). For ground-truth branch/remote state, spawn git directly (RTK can
+serve stale reads) — see the **netscript-tools** skill.
+
+## Branch naming
+
+`<type>/<slug>` — lowercase, kebab, no trailing dates. Types match the commit/PR taxonomy:
+
+- `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `test/`.
+- `plan/` — harness **seed runs** only (planning-only runs whose draft PR carries a board plan,
+  never shippable code); see `.llm/harness/workflow/seed-run.md`.
+- Sub-branches of an umbrella append a scope: `chore/deno-2.8-aspire-13.4-upgrade` (umbrella) →
+  `chore/deno-2.8-aspire-13.4-upgrade-fresh` (sub). Keep the umbrella prefix so the relationship is
+  visible in `git branch` and the PR list.
+
+## Umbrella vs sub-PR (wave-4/5 pattern)
+
+- **Umbrella PR**: the coordinating PR for a multi-slice effort. Body carries the slice checklist and
+  links every sub-PR. Labelled `type:umbrella`.
+- **Sub-PR**: one parallelizable slice on its own sub-branch, targeting the **umbrella branch** (not
+  `main`). Labelled `type:sub-pr` and links back to the umbrella with `Part of #<umbrella>`.
+- **Sequential vs parallel**: only split into sub-PRs when slices are genuinely independent. Slices
+  that all edit `deno.json`/catalog are conflict-prone → keep them **sequential on one branch**, one
+  commit per slice. (This is why PR #44's remediation is sequential, not fanned out.)
+
+## PR body template
+
+Always structure the body like this so reviewers and automation find the same anchors:
+
+```markdown
+## Summary
+
+<1–3 sentences: what this PR changes and why.>
+
+## Scope
+
+- Archetype / area: <e.g. tooling, packages/fresh, plugins/workers>
+- Part of #<umbrella> · Sub-PRs: #<n>, #<n>   <!-- omit the side that doesn't apply -->
+
+## Slices
+
+- [x] S1 <slice> — <commit>
+- [ ] S2 <slice>
+
+## Validation
+
+- `deno task check:<slice>` — <result>
+- `deno task ci` / `e2e:cli scaffold.runtime` — <result + native-WSL note if applicable>
+
+## Harness
+
+- Run dir: `.llm/runs/<run-id>/`
+- Phase: <research|plan|plan-eval|impl|impl-eval|review> — see phase comments below.
+
+## Drift / Debt
+
+- <DEBT_ACCEPTED rows or "none">
+
+## Definition of Done
+
+- [ ] <truthful, evidence-backed completion claim>
+```
+
+Keep `Validation` honest: paste real results/exit codes; if a gate was skipped, say so. A green
+checkbox with no evidence is how false-green merges happen.
+
+`## Definition of Done` and `## Acceptance` are the authoritative PR-body checklist sections. Any
+unchecked box beneath either heading fails close-gate. `## Slices` is progress tracking, and other
+planning, rollout, or explanatory checklists are non-authoritative; do not put a durable completion
+claim outside Definition of Done/Acceptance merely to avoid enforcement.
+
+## Linking issues (auto-close on merge) — MANDATORY
+
+A PR that **fully resolves** an issue MUST put a GitHub **closing keyword** in the **PR body** so the
+merge auto-closes the issue. Use one of: `Closes #N`, `Fixes #N`, `Resolves #N` (one per issue; put
+each on its own line in the `## Scope` section).
+
+```markdown
+## Scope
+
+- Archetype / area: packages/service
+- Closes #234
+- Part of #301   <!-- umbrella: reference only, do NOT close -->
+```
+
+- **Bare `#N` and `Refs #N` / `Re #N` do NOT auto-close.** This is the exact defect that left 40+
+  merged NetScript PRs with stale-open issues that had to be triaged by hand. If the work fully
+  lands the issue, a closing keyword is not optional.

@@ -1,0 +1,99 @@
+{
+  "capturedUtc": "2026-10-28T03:17:07.432Z",
+  "head": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "authoredSourceUnchanged": true,
+  "protectedRows": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "e46d3baa4c35d0ec45ea5c3fcbe47234c34d66d5a2e57336ed7819b8e5f97d2b",
+      "match": true
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/mod.ts",
+      "sha256": "148969fac7d5401855af15a4eff73ac92dfe9cb4d191328d9b81f08b70e4ec36",
+      "match": true
+    },
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "sha256": "18786a3bc5e5d13558fb2b5747d3f2278cc0f69dfa42cc4509817ae2867f055e",
+      "match": true
+    },
+    {
+      "path": "plugins/workers/streams/mod.ts",
+      "sha256": "b07b1e26b6eb07fb95d6073a04feee4ca60470da3310c5f8b467527512ccb318",
+      "match": true
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3",
+      "match": true
+    },
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "match": true
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "match": true
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "match": true
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "match": true
+    }
+  ],
+  "generatedOwners": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+  ],
+  "evidence": [
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/prose-freshness.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json",
+      "sha256": "b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/mcp-freshness.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json",
+      "sha256": "7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/mcp-tests.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json",
+      "sha256": "6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/decoded-delta.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json",
+      "sha256": "f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/review.ts",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review.ts.txt",
+      "sha256": "bbcf053383e533b82700fb354c77f1be9e6b19209d0d23649eb48ee9a3ba82f0"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/review-v2.ts",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review-v2.ts.txt",
+      "sha256": "2de6e64501d0f83f21ff0ce6ce83940c4b69c89d57bd6fbed6421a4d27ea9adb"
+    },
+    {
+      "source": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+      "target": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+      "sha256": "22d0110ceccac7956008746785a5bfbc684cb77d18f6d8c7bcf7a7347de98498"
+    },
+    {
+      "source": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "target": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "83ec73db03b7cef8142387a5fd2dfa49ab678342f8f543db3aa3e2e02c6c73b1"
+    }
+  ],
+  "sourceAcceptance": "Root accepts exact canonical generated delta only; independent feature IMPL and integration remain open."
+}

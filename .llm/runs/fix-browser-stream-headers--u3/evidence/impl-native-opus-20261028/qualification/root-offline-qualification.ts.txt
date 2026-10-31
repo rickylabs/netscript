@@ -1,0 +1,47 @@
+const dir='.llm/tmp/u3-opus-native-impl-continuation-1-20261028';
+const head='9288ea2939f56eeb75fa53b6260f6cf1e91f31f0';
+const session='a4d71fd7-efc6-4444-8141-7fa312a2977a';
+const json=async(p:string)=>JSON.parse(await Deno.readTextFile(p));
+const sha=async(b:Uint8Array)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(x=>x.toString(16).padStart(2,'0')).join('');
+const report=await Deno.readFile(`${dir}/final-verdict.md`);
+const text=new TextDecoder('utf-8',{fatal:true}).decode(report);
+const verdicts=[...text.matchAll(/^#{1,6} VERDICT: (PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT)\s*$/gm)];
+if(verdicts.length!==1||!text.includes(`**Exact HEAD: \`${head}\`**`))throw new Error('Unique exact-head Markdown verdict absent');
+const native=await json(`${dir}/native-result.json`),guards=await json(`${dir}/final-guards.json`),coverage=await json(`${dir}/coverage.json`);
+if(native.code!==0||native.failure!==null||native.session!==session||guards.failures.length||guards.settlement.failures.length||
+ !guards.settlement.statusAwaited||!guards.settlement.stdoutSettled||!guards.settlement.pipesAwaited||guards.settlement.spawnCount!==1||
+ coverage.session!==session||coverage.resultSubtype!=='success'||coverage.nativeTurns!==1||
+ coverage.failures.length!==1||coverage.failures[0]!=='Complete canonical exact-head public verdict absent.')throw new Error('Failure was not solely the strict lexical parser');
+const snapshot=await json('.llm/tmp/u3-opus-native-impl-successor-20261028/source-bindings.json');
+for(const row of snapshot.protected){if(await sha(await Deno.readFile(row.path))!==row.sha256)throw new Error('Source binding drift');}
+const targets:[string,string,string][]=[
+ ['Fresh native type identity','packages/fresh/src/runtime/streams/create-stream-db.ts',"import type { HeadersRecord, MaybePromise }"],
+ ['Fresh undefined-only fallback','packages/fresh/src/runtime/streams/create-stream-db.ts','headers: options.headers === undefined ? getStreamsAuth() : options.headers'],
+ ['Workers native type identity','plugins/workers/streams/factory.ts',"import type { HeadersRecord, MaybePromise }"],
+ ['Workers undefined-only fallback','plugins/workers/streams/factory.ts','headers: options.headers === undefined ? getStreamsAuth() : options.headers'],
+ ['Fresh nonempty/non-minus-one checkpoint','packages/fresh/tests/streamdb-headers-contract_test.ts',"checkpoint.length > 0 && checkpoint !== '-1'"],
+ ['Fresh retained entity','packages/fresh/tests/streamdb-headers-contract_test.ts','assert(collection.get(before) === originalEntity)'],
+ ['Fresh retained offset','packages/fresh/tests/streamdb-headers-contract_test.ts','assertEquals(reads[reconnectStart]?.offset, checkpoint)'],
+ ['Fresh rotated reconnect','packages/fresh/tests/streamdb-headers-contract_test.ts',"reconnected.some((read) => read.authorization === 'Bearer u3-v3')"],
+ ['Fresh env-denied configured-port qualification','packages/fresh/tests/streamdb-headers-contract_test.ts','streamOptions: { ...input.streamOptions, warnOnHttp: false }'],
+ ['Fresh genuine negative compiler oracle','packages/fresh/tests/streamdb-headers-contract_test.ts',"result.text.includes('TS2322')"],
+ ['Workers lazy callbacks','plugins/workers/tests/streams/factory-headers_test.ts','assertEquals(asyncCalls, 0)'],
+ ['Workers borrowed record mutation','plugins/workers/tests/streams/factory-headers_test.ts',"headers['x-u3-static'] = 'workers-static'"],
+ ['Workers real long poll rotation','plugins/workers/tests/streams/factory-headers_test.ts',"assertEquals(rotated.live, 'long-poll')"],
+ ['Workers collection identity','plugins/workers/tests/streams/factory-headers_test.ts','assert(db.collections === collections)'],
+ ['Workers transient in-tree compiler fixture','plugins/workers/tests/streams/factory-headers_test.ts',"dir: fromFileUrl(new URL('./', import.meta.url))"],
+ ['Workers genuine negative compiler oracle','plugins/workers/tests/streams/factory-headers_test.ts',"negative.text.includes('TS2322')"],
+];
+const anchors=[];
+for(const [control,path,needle]of targets){const lines=(await Deno.readTextFile(path)).split(/\r?\n/);const hits=lines.flatMap((line,i)=>line.includes(needle)?[{line:i+1,text:line.trim()}]:[]);if(hits.length!==1)throw new Error(`Ambiguous source anchor: ${control}`);anchors.push({control,path,...hits[0]});}
+const output={at:new Date().toISOString(),offlineOnly:true,noInference:true,noSourceGateRerun:true,head,session,
+ nativeExit:0,nativeTurns:1,reportSha256:await sha(report),verdict:verdicts[0][1],
+ originalWrapperExit:1,originalWrapperFailurePreserved:true,parserFalseNegative:'Original regex rejected the Markdown heading ## VERDICT: PASS; unchanged complete report has one exact-head verdict.',
+ allProtectedMatched:snapshot.protected.length,actualModel:'claude-opus-5',requestedEffort:'xhigh',actualResponseEffortAttested:false,
+ sourceReferencesQualification:'Several independent report line numbers refer to packet/historical offsets, not physical shipping lines. Do not reuse them as file links. These measured physical anchors supersede only those coordinates; original report bytes/verdict remain unchanged.',
+ physicalAnchors:anchors,breakingLabel:'Root independently verified PR2423 already has breaking; reviewer did not inspect live labels.',
+ ownMcpQualification:'Seven successful own calls; relevant export lookups explicitly return truncated:false. Broad search is not independent proof of the native type shape.',
+ remainingGates:'Full CLI E2E, unintegrated DB/security/Windows tool repair, docs links/private findings/facade surplus, final integration and browser/CEF/EIS/release remain unwaived.',
+ rootManualCompleteReportRead:true,sourcePassAccepted:true,mergeAccepted:false};
+await Deno.writeTextFile(`${dir}/root-offline-qualification.json`,JSON.stringify(output,null,2),{createNew:true});
+console.log(JSON.stringify({sourceVerdict:output.verdict,protected:snapshot.protected.length,physicalAnchors:anchors.length,reportUnchanged:true,mergeAccepted:false}));

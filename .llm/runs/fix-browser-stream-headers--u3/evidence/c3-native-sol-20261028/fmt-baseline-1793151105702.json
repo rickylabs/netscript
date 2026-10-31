@@ -1,0 +1,23 @@
+{
+  "selected": "fmt-baseline",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-fmt.ts",
+    "--file",
+    ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/baseline-streams.md",
+    "--file",
+    ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/baseline-worklog.md",
+    "--ext",
+    "md",
+    "--config",
+    ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/fmt-md.json"
+  ],
+  "code": 1,
+  "started": "2026-10-28T01:31:45.705Z",
+  "ended": "2026-10-28T01:31:45.846Z",
+  "originalOutputAwaited": true,
+  "deadlineAborted": false,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/fmt-baseline-1793151105702"
+}

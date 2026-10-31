@@ -1,0 +1,17 @@
+{
+  "name": "numeric-value",
+  "args": [
+    "check",
+    "--frozen",
+    "--unstable-kv",
+    "--config",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "code": 1,
+  "ts2322Count": 3,
+  "expectedErrors": 3,
+  "deadlineAborted": false,
+  "outputAwaited": true
+}

@@ -1,0 +1,405 @@
+- A README declares compliance while `arch-debt.md` still has open entries.
+- Knowledge-base docs describe only current state and omit doctrine status.
+- Harness docs grow into a second doctrine.
+
+## Rescope Triggers
+
+- The doc cannot be accurate without a code audit.
+- A knowledge-base update discovers stale architecture claims.
+- A docs request reveals a doctrine conflict that needs a new plan.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/worklog.md
+
+Original-byte SHA256:13f90750620548060822c977dcab7e0db12ca4e29a2a1eaef8e05634a1afbb24
+
+# U3 browser stream headers: coordinator authorization
+
+Root milestone coordinator,2026-10-27. User authorizes full autonomous delivery of EIS
+NetScript0.0.8 epic500 and explicitly requests delegated slices.
+
+Exact isolated worktree: C:/Users/ericc/source/repos/netscript-browser-stream-headers-008, branch
+fix/browser-stream-headers, baseline1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d. Root completed exact
+CLI0.0.8 agent init --with-docs:190 prose/1 API/8 exports. The temporary detection-only service
+alias was restored byte-exact; eight known tracked initialization files were inspected/restored.
+Product/config/locks are clean.
+
+Authorized next phase is a compact **feature PLAN**, using the current pinned matrix/suite and
+actual installed NetScript MCP/docs. No privileged tier is selected. Rationale: this is additive
+forwarding through two existing public client factories to a locked client capability. It does not
+select an issuer, principal, authorization policy or new lifecycle architecture. Root will read the
+concrete plan and decide any selected PLAN-EVAL before implementation. Do not infer approval to
+implement, self-review, change defaults or waive independent IMPL.
+
+Two actual EIS consumer surfaces are in scope:
+
+- packages/fresh/src/runtime/streams/create-stream-db.ts (including public factory input/options
+  types and existing native recovery adapter behavior).
+- plugins/workers/streams/factory.ts (including public export/type/consumer proofs).
+
+Both currently hard-code getStreamsAuth(). It returns {} in a browser and reads producer secrets on
+a server. The locked durable-streams/client0.2.7 already accepts header values that are strings or
+per-request sync/async callbacks. This is a record of per-header callbacks, not a whole-header-map
+factory: inspect the exact public export and implementation before choosing a NetScript-owned public
+type.
+
+The additive explicit headers input must reach the real client without eager callback evaluation.
+Explicit caller headers (including {}) replace ambient producer credentials completely; they are
+never merged with getStreamsAuth(). Only absence retains legacy resolution. Do not leak server
+producer keys into browser output or require env access when explicit credentials are provided.
+Preserve native Fresh recovery/checkpoint/cancellation/terminal behavior and existing
+collection/live-query types; do not copy the recovery implementation.
+
+Plan meaningful actual-client tests: static and async header values, rotation on subsequent
+requests/reconnects, no eager invocation, absence compatibility, explicit-empty replacement, denied
+env with explicit headers, failure behavior, browser type/public export compatibility and existing
+native recovery tests. Do not add a hand-written fetch transport or HTTP/header serializer.
+
+Lock a minimal proving footprint from actual source; candidate tests/docs/public type owners are not
+yet an approved exact path list. Do not broaden to sagas or triggers merely because their analogous
+factories also omit this option; they are outside the current EIS consumer slice. Name any
+shared-type necessity with evidence rather than adding a universal options interface.
+
+U1 host factories, U2 native CORS, U4 exact anonymous requests, EIS credential
+issuance/roles/TTL/workspace scope, ordinary-browser bootstrap, process supervision,
+versions/releases, dependencies and locks are outside this leaf. Header forwarding does not
+authenticate a reader or resolve any of those gates. No shipping claim.
+
+Use only existing agentic suite launch/watch/steer surfaces and tier-specific routes; no ad-hoc
+WSL/native model process. Normal existing native subscription may be used through the already
+verified task-owned official CLI2.1.251 without copying profiles/keys. Any paid provider fallback
+requires proven current usage, positive evidence-backed estimate and root coordination before
+inference; another review is active, so a stale allowance snapshot is not permission to spend.
+
+## PLAN generation checkpoint,2026-10-27
+
+Source remains1582e1c9e; tracked source/config/locks unchanged. Research and the corrected native
+proposal are ready for root read; implementation remains held. Actual feature/plan routing was
+Fable5.1 low. Existing runClaudePrint used official CLI2.1.251 with normal native subscription and
+strict single NetScript MCP. Actual SID641b2185-ebd6-4204-bce0-53ab1befe734/assistant model
+claude-fable-5-1 in both turns. Effort is requested-only. No profile/key copy or paid fallback.
+
+Attempt1 exit0 was retained verbatim with identified planning defects. Root then authorized ONE
+same-session correction<=300s; attempt2 exit0 in146s, own MCP search_docs and zero87-path protected
+guard failures. No source implementation, product tests, runtime or independent verdict was run.
+Direct native statuses were awaited; current21:29:57Z exact-task process observation found0 matches.
+
+See context-pack.md for final hashes and remaining explicit root/PLAN decisions: public-port
+widening, meaningful compiler/runtime tests, comment-only extra owner, complete prospective22-path
+count. Native proposal/verbatim receipt are not a PASS or permission to implement. Root selects
+independent PLAN-EVAL next.
+
+## Root PLAN acceptance and C1 authorization,2026-10-27
+
+Root fully read the actual independent GLM PLAN PASS, faithful final SHA256
+`2d2f36ec3692cb3be6e922222da672a82a5bf1a939a213207137516ab4ab78f5`,
+actual five-assistant own-session identity and qualified tool coverage. Accepted
+with separate qualifications: provider is OpenRouter/z-ai/glm-5.3 (native header
+`glm-ai` is not attestation); package fmt alone does not cover the new test, so the
+planned scoped fmt wrapper must. Full three packets were read without truncation;
+the partial direct factory spot-read is qualified by complete packet content.
+
+Verbatim verdict and compact receipt are retained as plan-eval.md and
+plan-eval-receipt.json. Root authorizes C1 ONLY through the current feature
+implementation matrix/public suite, meaningful RED before GREEN, explicit enabled
+sanitizers, exact old-assertion preservation and owned helper cleanup. C2 requires
+actual C1 gates and root read. No issuer/E1 scope, lock/dependency/policy waiver,
+self-signoff or release acceptance follows. Prospective owner ceiling remains22
+(conditional23 only for an actual reference-doc parity failure).
+
+
+## Root-accepted C1 checkpoint,2026-10-28
+
+Native Sol repair completed20/0/0 focused runtime/compiler results, four selected type/lint/fmt
+inputs with zero findings/drops, authored consumer and quality scan. New test478lines. Root read
+final source/cleanup/strict-diff delta and independently verified17 bindings before acceptance.
+See [checkpoint and byte-verified evidence](c1-checkpoint.md) and [root acceptance](root-c1-source-acceptance.md).
+Original RED/18+2, paid incomplete turns and every repair failure remain distinct and preserved.
+C1 is authorized for draft checkpoint/push; no independent IMPL or release acceptance. F15 source
+export/debt remains a separately authorized following step; doc12/baseline10 are not waived.
+
+
+## F15 application FAILED owning-doc condition,2026-10-28
+
+The historically accepted source-local export/debt candidate was applied only after C1 checkpoint.
+Actual frozen owning doc lint remained12 (including both header findings), independently confirmed
+by structured12; the expected12-to10 reduction was not qualified. Three exact placement attempts
+and applied source/debt byte snapshots are retained under ignored native-sol/f15 evidence. Root
+instructed removal of only these uncommitted deltas; factory restored to fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f,
+canonical debt restored to d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042.
+The historical independent PLAN verdict is unchanged; corrective SAME-evaluator review is pending.
+No ineffective export/debt remains in the delivery candidate. Direct doctrine exited0 with existing
+warnings; arch:check failed the DB identity prerequisite. Baseline10 and both header findings remain
+RED/unwaived. Root separately authorized C2 to continue; no F15 checkpoint or false success.
+
+
+## Root-accepted C2 checkpoint,2026-10-28
+
+Root read all237new test lines and three existing diffs, independently verified4source+7protected
+hashes and actual raw gates. See root-c2-source-acceptance.md and c2-checkpoint.md. Focused5/0/0,
+five selected types/four lint+fmt, package check/positive consumer/negative controls, direct doctrine
+and publish dry-run pass. Workers public doc0-to1 remains RED; Fresh12 and DBidentity remain
+unwaived. The failed F15 application is archived/reverted, not a revoked historical verdict or
+successful closure. C2 authorized for draft checkpoint/push; C3 docs are the next scoped source
+work and require root review before their checkpoint. No independent IMPL or shipping acceptance.
+
+## C3 documentation candidate,2026-10-28
+
+Added the native reader-header recipe, replacement/undefined semantics, custom-port migration and
+caller credential ownership to streams.md. Corrected only the two stale generic-factory module
+introductions; their remaining source is byte-identical to C2 HEAD. No runtime/API/export/debt change.
+
+Actual docs:snippets passed (27 checked/14 exempt), but this streams page is outside its Tier-1
+coverage. A separate exact-fence public compiler control passed; changing the header value to1
+failed TS2322, with native child output awaited and temporary sources removed. Scoped source fmt
+passed2files; the exact added Markdown section passed. Full scoped Markdown fmt still reports the
+same two findings reproduced from unchanged HEAD streams.md/worklog.md; no formatting waiver.
+
+Actual docs:links failed5 installed Aspire-skill targets; exports-drift and accuracy failed the
+36 Windows reference-path coverage prerequisites. docs:jsdoc-examples failed Windows spawn error206
+(command length), without reaching its deadline. These gates remain RED; no doc/export parity or
+global example-compiler PASS is inferred. Raw receipts and source hashes are sealed under ignored
+native-sol/c3 evidence for root review before any C3 checkpoint. Fresh12/workers1 and the failed F15
+application remain unwaived; no independent IMPL or release acceptance follows.
+
+
+## Root-accepted corrective type closure,2026-10-28
+
+Actual SAME-GLM corrective PLAN is PASS as bounded DEBT_ACCEPTED, with repaired BOTH F15/F5
+wording. Root independently read source/gates and matched11bindings before accepting the exact
+four-site +8/-2 patch and48-line registry entry. See type-closure-checkpoint.md and root source
+acceptance. Shipping Fresh10/workers0, compiler/runtime/static/package/publish evidence and
+qualified external existing reference contract are retained. Original failed premise/application,
+ten baseline findings, surplus and parent Windows/architecture failures remain unwaived.
+All planned source is complete; prepare independent Opus/xhigh IMPL only, no inference authority.
+PR2423 may enter actual CI. No merge/readiness or release acceptance.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/context-pack.md
+
+Original-byte SHA256:ca1ce59d9ba55899bbfe5bffd282c4ff4b650b1ec9b1f68800d82185d0b883c5
+
+# U3 PLAN handoff
+
+Decision requested: review the corrected native feature PLAN, accept or repair its public-port
+migration/test footprint, then select the independent PLAN evaluator. No source implementation is
+authorized.
+
+- Exact worktree: `C:/Users/ericc/source/repos/netscript-browser-stream-headers-008`.
+- Branch/head: `fix/browser-stream-headers` / `1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d`.
+- [Corrected native PLAN](plan.md), SHA256
+  `7fd0f254c5eb8d209e6aa54ec38c85fb0cd3f1e15440477a214e65924c165271`.
+- [Initial native proposal](plan-initial-native.md), SHA256
+  `f9cb79badb6234671b026fe9f720c3118a4953e3f1beaec958ac742747f9efcb`, retained verbatim; superseded
+  as a proposal, not deleted.
+- [Actual generation receipt](plan-generation-receipt.json), [source intake](research.md),
+  [drift](drift.md).
+
+## Actual evidence
+
+Both generator turns used the existing `runClaudePrint` suite and official task-owned Claude2.1.251
+executable SHA256 `8d1229a281281b98fd2dee72b3253a704be4fce4d45207200cd32a9bb5a6c909`. Actual same
+native SID `641b2185-ebd6-4204-bce0-53ab1befe734`, observed assistant model only `claude-fable-5-1`;
+requested `low` is not independent effort attestation. Normal existing authenticated subscription,
+no credential/profile copy, no paid fallback. Built-ins were restricted to Read/Glob/Grep. Actual
+tool audit found only these plus NetScript documentation tools.
+
+Attempt1 completed exit0 in about236s with its own `find_guidance`; root authorized exactly one
+same-session correction bounded300s. Attempt2 completed exit0 in about146s with its own
+`search_docs`. Both strict single NetScript MCP inventories were connected; both awaited the
+original native child status and reported zero protected guard failures across87 selected
+config/lock/source paths. Tracked `git diff HEAD` remains empty. No implementation, product tests,
+host/app/provider runtime or bootstrap was executed.
+
+Ignored raw evidence and exact launchers: `.llm/tmp/browser-stream-headers-u3-plan/`. Each
+`attempt-{1,2}` retains native UTF8 JSONL, identity, init, protected-before map, exit and the
+verbatim proposal. `process-observation.json` at21:29:57Z found zero current native Claude/Deno
+command matches for this exact project/task; this is a current observation, not historical/global
+hygiene proof. Direct child statuses are separately awaited.
+
+Preparation caveats are retained in `preflight.json`: the repository-config check initially selected
+no ignored script; no-config alone then lacked two Harness aliases. The explicit nonempty
+no-config/root-import-map/frozen-root-lock check passed for both launchers. This is preparation type
+evidence, not a product gate. The native CLI emitted an initial unrecognized-model catalogue
+warning; actual init and every assistant model matched the selected Fable ID. No alternative model
+was accepted.
+
+## Concrete coordinator/PLAN-EVAL read points
+
+1. The corrected proposal uses the required `headers === undefined` branch and direct upstream
+   public `HeadersRecord`; explicit `{}` replaces all ambient producer auth. It records the exported
+   Fresh string-only factory-port widening as a possible external source break. Root must accept
+   that migration boundary before implementation.
+2. Its paired compiler controls use owned temporary invalid sources, positive resolution/selection
+   controls and intended diagnostics; no suppression/cast is proposed. Assertions must distinguish a
+   genuine header-contract failure from module/permission/empty-selection failures. Workers'
+   temp-source workspace resolution is a named preflight; any fallback must retain the same owner
+   and cleanup.
+3. Its test budgets are prospective: Fresh live tests+210, new compiler test110, workers
+   real-request/compiler test160. Actual readability/lifecycle proof must fit or stop for rescope.
+   Native client callbacks/recovery remain delegated. Runtime-state `close` is distinct from
+   producer `DurableStream.close`.
+4. The comment-only `packages/fresh/src/runtime/streams/mod.ts` owner is not necessary to expose the
+   option (no new export). Root may drop that incidental stale-comment correction to retain exactly
+   two production owners. Do not silently add a reference-doc owner if accuracy gates require one.
+5. The native proposal's15-path table omits context/receipt and future provenance. A complete
+   prospective ceiling for root selection is **22 tracked paths**: its9 product/test/doc paths +
+   the7 current run paths +6 reserved review paths (`plan-eval.md`, `plan-eval-receipt.json`,
+   `evaluate.md`, `impl-eval-receipt.json`, `supervisor.md`, `root-review.md`). Use Harness
+   `evaluate.md`, rather than silently adding the proposed `impl-eval.md`. This bookkeeping
+   correction is not approval of the footprint; root/independent PLAN must bind it. Dropping
+   comment-only mod.ts reduces the total to21.
+6. Full CLI-E2E and normal quality/publish/consumer gates remain final merge requirements. Existing
+   authored consumer `--no-lock` policy is documented separately from frozen project gates. No
+   graph/version/age/TLS/deadline policy was changed. No gate in the proposed plan has run.
+
+Future reader issuer, principal/roles/TTL/workspace/browser bootstrap, U1/U2/U4, sagas/triggers/auth
+factories and releases remain excluded. The plan's conditional future proxy removal sentence
+authorizes no proxy architecture or UX removal. Header forwarding does not authenticate the browser
+or close S16.
+
+Next action: root reads `plan.md` with these concrete bookkeeping/compatibility points, then
+dispatches the selected independent evaluator. The two authorized generator turns are exhausted; no
+third inference or implementation follows automatically.
+
+
+## Current continuation: root accepted C1 source,2026-10-28
+
+The earlier PLAN handoff above is historical. C1 implementation and complete focused gates now
+exist and root accepted exact final bytes. Read c1-checkpoint.md and root-c1-source-acceptance.md
+for current source/gate bindings. Next authorized work is separate F15 application and owning
+doc12-to10 replay, then root-authorized C2 under its exact three-owner/400-line test cap. C2 source
+still requires root acceptance before its commit. C3/independent IMPL/whole-package/release gates
+remain open; no readiness or issue closure.
+
+
+## Current continuation: root accepted C2 source,2026-10-28
+
+C1 draftPR2423 is published. C2 source is root accepted with exact four-owner review; see
+c2-checkpoint.md/root-c2-source-acceptance.md. The earlier Fresh F15 candidate failed actual owning
+closure and was archived/reverted; no extra native export/canonical debt remains. Fresh12 and
+workers1 documentation findings stay unwaived. Next authorized work is only C3 reader-header
+documentation and stale factory/module introductions, with actual docs gates before root review.
+Broader native type closure awaits separate corrective independent review. No readiness/merge.
+
+
+## Current continuation: root accepted bounded type closure,2026-10-28
+
+C1/C2/C3 and the exact four-site native type closure are root source accepted. The canonical
+entry is DEBT_ACCEPTED for BOTH F15 native exposure and F5 measured facade growth, fixedNov10
+without extension/growth. Actual shipping docs10/0; original ten Fresh findings/surplus remain
+unwaived. Root qualified the existing reference contract through read-only external Windows
+checker0d5b982b; no checker import/page edit/waiver or original parent task PASS. See
+type-closure-checkpoint.md. Next is independent feature IMPL preparation: Opus/xhigh fallback,
+skipping Meta and OpenAI generator families. No review inference or merge authorization yet.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/drift.md
+
+Original-byte SHA256:c44da6ec2d07ac90ff28dd5a7ffb7914909b1839bac14fed9062f11f51f86fa0
+
+# U3 planning drift
+
+- **Public compatibility, significant:** the intake's additive option also widens the exported Fresh
+  factory-port header values from strings to the upstream per-header callback union. Existing
+  forwarding adapters remain compatible; string-only serializers may fail to compile. This is
+  explicit and requires root/PLAN acceptance. No source change has occurred.
+- **Generator correction:** attempt1 used `??`, a type suppression, incomplete footprint accounting
+  and provisional commands. Root authorized one same-session Fable-low correction with300s cap. Both
+  verbatim proposals and raw receipts are preserved. Attempt2 fixed those source-design points, but
+  its provenance count still needs the complete prospective owner accounting in context-pack.md.
+- **Scope bookkeeping, pending:** the corrected native table is15 paths. Complete prospective count
+  is22 including current context/receipt and six reserved review records, or21 if root drops
+  incidental comment-only mod.ts. This is a pre-approval correction, not retrospective evaluator
+  approval.
+- **Tooling:** RTK was unavailable; bounded raw reads were used. Ignored-driver config exclusions
+  and missing-alias diagnostics were corrected only for nonempty scratch type checking, preserving
+  root config/locks. No product gate, plan verdict or architecture debt waiver is claimed.
+
+Issuer/auth/listener/CORS/health/browser-bootstrap scope is unchanged. No implementation, tests,
+independent PLAN-EVAL or IMPL-EVAL has run.
+
+## Current C3 documentation qualification,2026-10-28
+
+The intake paragraphs above are historical. Root accepted C1/C2 source and their measured focused
+gates; independent IMPL remains pending. The Fresh custom port widening is an accepted source
+compatibility boundary: external string-only serializers must forward native header records
+unchanged. C3 documents that migration, undefined-only legacy selection, replace-not-merge and
+native per-request callbacks. It corrects only the stale generic factory/module delegation prose.
+
+The earlier Fresh type-closure candidate failed actual owning doc replay and was archived/reverted;
+its historical PLAN disposition is not a successful application. Fresh12/workers1 findings remain
+unwaived. Broader type exports/debt need separate corrective review. No issuer/browser/bootstrap
+authority, runtime/API behavior, dependency/lock, source export or canonical debt changes in C3.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/plan.md
+
+Original-byte SHA256:7fd0f254c5eb8d209e6aa54ec38c85fb0cd3f1e15440477a214e65924c165271
+
+## U3 feature PLAN — corrected replacement (attempt 2; attempt 1 retained verbatim at `.llm/tmp/browser-stream-headers-u3-plan/attempt-1/plan-proposal.md`)
+
+Baseline `1582e1c9e`, branch `fix/browser-stream-headers`. PLAN only; nothing implemented, run, or claimed PASS. Forwarding primitive only — not reader authentication, not S16/U1/U2/U4.
+
+MCP qualification (this turn): `search_docs` for `createNetScriptStreamDB headers reconnect preload stop dispose` returned no streams-factory page (hits were shutdown/session/telemetry/response). The indexed corpus does not describe Fresh recovery/headers behavior; the authority is local source: `create-stream-db.ts:110-121` JSDoc, `stream-db-recovery-adapter.ts:86-103,232-241`, upstream `client@0.2.7 dist/index.js:1623,3083` (`resolveHeaders` awaited per `#buildRequest`), `state@0.3.2 dist/db.d.ts:95-107` (`stream`/`preload`/`close` public on the runtime handle).
+
+### 1. Contract and signatures (absence-only legacy selection)
+
+**Fresh `packages/fresh/src/runtime/streams/create-stream-db.ts`**
+```ts
+import type { HeadersRecord } from '@durable-streams/client';   // already a declared dep (deno.json:48)
+
+// NetScriptStreamDBFactoryInput.streamOptions — WIDENED public port field
+/** Headers forwarded untouched to the durable streams client; function values resolve per request. */
+headers: HeadersRecord;                       // was Record<string, string>
+
+// NetScriptStreamDBOptions — new optional input
+/** Explicit reader headers. Any supplied record (including `{}`) replaces env-resolved producer auth entirely; omit to keep `getStreamsAuth()`. */
+headers?: HeadersRecord;
+
+// composition (replaces line 150)
+headers: options.headers === undefined ? getStreamsAuth() : options.headers,
+```
+`defaultCreateStreamDB` already spreads `input.streamOptions` into `new DurableStream(...)` (line 167-170): the caller's record reaches the native client by reference; no copy, no resolution, no env read. `mod.ts` export list unchanged (no new symbol); only the stale "plugin factories call this" lines (`create-stream-db.ts:9-11`, `mod.ts:13-14`) are corrected.
+
+**Workers `plugins/workers/streams/factory.ts`**
+```ts
+import type { HeadersRecord } from '@durable-streams/client';   // package.json catalog: dep (line 3)
+export function createWorkersStreamDB(
+  options: { baseUrl?: string; headers?: HeadersRecord } = {},
+): WorkersStreamDB
+// headers: options.headers === undefined ? getStreamsAuth() : options.headers,
+```
+`WorkersStreamDB` return type unchanged (collections only). No alias, no shared type, no lifecycle handle, no core/lock/version edit. `null` is a compile error under both signatures (not an undocumented fallback).
+
+**Port migration risk (retained, explicit).** `NetScriptStreamDBFactoryInput.streamOptions.headers` is public (`mod.ts:24`, `docs/site/reference/fresh/index.md:520`). Widening to `HeadersRecord` is a source-level break for any external custom `createStreamDB` adapter that serializes `headers` as plain strings; adapters that forward `streamOptions` to the upstream client/state (the only in-repo consumer, `create-stream-db_test.ts:34`) compile unchanged. Migration statement for docs/JSDoc: forward the record to the upstream client, which owns per-request resolution; the framework does not provide a serializer. Root must accept this widening.
+
+### 2. Exact owners and physical ceilings (added/removed)
+
+| # | Path | Kind | Ceiling |
+|---|---|---|---|
+| 1 | `packages/fresh/src/runtime/streams/create-stream-db.ts` | product | +18 / −8 |
+| 2 | `packages/fresh/src/runtime/streams/mod.ts` | product (stale comment) | +1 / −2 |
+| 3 | `plugins/workers/streams/factory.ts` | product | +12 / −2 |
+| 4 | `packages/fresh/src/runtime/streams/create-stream-db_test.ts` | test (live/reconnect/failure/env-denied) | +210 |
+| 5 | `packages/fresh/tests/streamdb-headers-contract_test.ts` | test (new; paired compiler control) | +110 |
+| 6 | `packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts` | type gate (positive only) | +8 |
+| 7 | `plugins/workers/tests/streams/factory-headers_test.ts` | test (new; real requests + compiler control) | +160 |
+| 8 | `plugins/workers/tests/streams/live-query-consumer_type.ts` | type gate (positive only) | +4 |
+| 9 | `docs/site/durable-workflows/streams.md` | doc | +18 |
+| 10 | `.llm/runs/fix-browser-stream-headers--u3/worklog.md` | provenance (modify) | +25 |
+| 11 | `.llm/runs/fix-browser-stream-headers--u3/drift.md` | provenance (new: port widening) | +15 |
+| 12 | `.llm/runs/fix-browser-stream-headers--u3/plan.md` | provenance (coordinator-saved plan) | — |
+| 13 | `.llm/runs/fix-browser-stream-headers--u3/plan-eval.md` | provenance (independent PLAN-EVAL) | — |
+| 14 | `.llm/runs/fix-browser-stream-headers--u3/impl-eval.md` | provenance (independent IMPL-EVAL) | — |
+| 15 | `.llm/runs/fix-browser-stream-headers--u3/research.md` | provenance (modify if findings change) | +10 |
+
+Tracked total 15 (<30). Prospective owner **not** in the list: `docs/site/reference/fresh/index.md`. No new exported symbol is added, so `docs:exports-drift` should be clean; if it or `docs:accuracy` demands an edit there, that is a **stop/rescope** to root, not a silent addition. Unchanged by design: `stream-db-recovery-adapter.ts`, `tests/_fixtures/stream-db-server.ts`, `streamdb-consumer-deno.json` (keeps `--no-lock`, `workspace: []`, `plugin-streams-core@0.0.4`, client 0.2.7/state 0.3.2), all `deno.json`/`package.json`/locks.
+
+### 3. Commit slices
+
+**C1 `feat(fresh): forward caller headers through createNetScriptStreamDB`** — owners 1, 2, 4, 5, 6.
+Tests in owner 4 (extend; existing helpers `startReferenceServer`, `eventually`, `preloadDeadline`, loopback `Deno.serve` stub at 211ff reused):
+- **Port/identity (no network):** custom `createStreamDB` captures input; `captured.streamOptions.headers === headers`; sync/async callback counters remain 0 after construction and after a second `createNetScriptStreamDB` call. With `STREAMS_SECRET` set in-test (save/restore à la `factory-discovery_test.ts:23-38`): `headers: {}` → captured `{}`; absent → `{ Authorization: 'Bearer …' }`.
+- **Live + rotation + reconnect (reference server 0.3.9, existing kill/restart flow):** headers `{ 'x-static': 'a', 'x-sync': () => syncValue, authorization: async () => current }`; the existing `globalThis.fetch` delegating observer (line 145) additionally records GET request `authorization`/`x-static`/`x-sync`. Assert: catch-up request = v1; set `current = v2`; the next long-poll carries v2 with static/sync intact; kill server, set `current = v3`, restart on the same port; first reconnect request carries v3 **at the retained checkpoint offset** (`!== '-1'`), `db.collections.events` identity preserved, status `live`; `stop()` → `stopped`. Fetch and env restored in `finally`.
+- **Callback failure (native/adapter semantics, no ambient fallback):** (a) async callback rejects with plain `Error` → `isRecoverableReadError` false → `preload()` rejects with that error, observer saw zero requests, status `failed`; `stop()` → `stopped` (adapter line 237-240). (b) callback throws `TypeError` with `reconnect: { maxRetries: 1, initialDelayMs: 1, maxDelayMs: 1 }` → classified recoverable: callback invoked exactly twice, zero requests, then `failed`. Neither case fetches with `getStreamsAuth()`; "all errors terminal" is not claimed.

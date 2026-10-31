@@ -1,0 +1,20 @@
+{
+  "selected": "doc-structured",
+  "args": [
+    "run",
+    "--frozen",
+    "--allow-read",
+    "--allow-run",
+    ".llm/tools/run-deno-doc-lint.ts",
+    "--root",
+    "packages/fresh",
+    "--entrypoints",
+    "src/runtime/streams/mod.ts",
+    "--pretty"
+  ],
+  "code": 1,
+  "started": "2026-10-28T01:04:35.221Z",
+  "ended": "2026-10-28T01:04:35.747Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/f15/doc-structured-1793149475218"
+}

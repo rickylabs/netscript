@@ -1,0 +1,36 @@
+{
+  "gateId": "mcp-export-corpus",
+  "invocationId": "root-u3-generated-exports",
+  "argv": [
+    "deno",
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "gitHead": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "actualGitHead": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "timeoutMs": 120000,
+  "runnerIdentity": "root",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "cff938a558f2d2d346c5d82919f6a7a8546b669ad1a91cd4b73a03d84d9e9e6a",
+  "lifecycleId": "root:root-u3-generated-exports:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:01:08.003Z",
+  "startedAt": "2026-10-28T03:01:08.009Z",
+  "finishedAt": "2026-10-28T03:01:23.994Z",
+  "durationMs": 15985,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "f1d2b1b835372765f1e694563ac936a2c990d26e55237bb6e914291dcfd600ef",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"afc85193bffbf8ceb0f5ff9a014094206106c1f136fd05901b78c23b6fbfc614\",\"uncompressedBytes\":2572574,\"compressedBytes\":389882,\"packageCount\":35,\"subpathCount\":299,\"symbolCount\":8902}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  }
+}

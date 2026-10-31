@@ -1,3 +1,4 @@
+import type { HeadersRecord } from '@durable-streams/client';
 import { createStateSchema } from '@durable-streams/state';
 import { createStreamDB } from '@durable-streams/state/db';
 import { createNetScriptStreamDB, useLiveQuery } from '@netscript/fresh/streams';
@@ -35,6 +36,33 @@ const wrapped = createNetScriptStreamDB({
   schema: state,
 });
 
+const headerRecord: HeadersRecord = {
+  authorization: 'Bearer fixture-static',
+  'x-u3-sync': () => 'fixture-sync',
+  'x-u3-async': () => Promise.resolve('fixture-async'),
+};
+
+const withHeaders = createNetScriptStreamDB({
+  baseUrl: 'https://streams.example.test',
+  streamPath: '/people-headers',
+  schema: state,
+  headers: headerRecord,
+});
+
+const viaPort = createNetScriptStreamDB({
+  baseUrl: 'https://streams.example.test',
+  streamPath: '/people-port',
+  schema: state,
+  headers: headerRecord,
+  createStreamDB(input) {
+    const forwarded: HeadersRecord = input.streamOptions.headers;
+    const roundTrip: typeof input.streamOptions.headers = forwarded;
+    void forwarded;
+    void roundTrip;
+    return wrapped;
+  },
+});
+
 // Control: the upstream package accepts the documented query shape.
 const controlQuery = useLiveQuery((query) => query.from({ person: control.collections.people }));
 
@@ -55,3 +83,5 @@ const preload: (() => Promise<void>) | undefined = wrapped.preload;
 void reconnect;
 void status;
 void preload;
+void withHeaders;
+void viaPort;

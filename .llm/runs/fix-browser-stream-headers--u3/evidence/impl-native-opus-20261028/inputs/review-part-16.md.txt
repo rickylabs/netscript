@@ -1,0 +1,742 @@
++    assert(captured.streamOptions.headers === suppliedHeaders, 'Port retains the header record.');
++    assertEquals(syncCalls, 0);
++    assertEquals(asyncCalls, 0);
++  } finally {
++    await cleanup(() => db?.close?.(), () => {
++      if (previousSecret === undefined) Deno.env.delete('STREAMS_SECRET');
++      else Deno.env.set('STREAMS_SECRET', previousSecret);
++    });
++  }
++});
++
++test('U3 explicit per-request headers rotate across polls and reconnect at the retained offset', async () => {
++  const dataDir = await Deno.makeTempDir();
++  const reads: Array<
++    Record<'offset' | 'live' | 'authorization' | 'static' | 'sync', string | null>
++  > = [];
++  let server: Awaited<ReturnType<typeof startReferenceServer>> | undefined;
++  let db: NetScriptStreamDB<TestState> | undefined;
++  let drain: (() => Promise<void>) | undefined;
++  let current = 'Bearer u3-v1';
++  let syncValue = 'u3-sync-v1';
++  try {
++    server = await startReferenceServer(dataDir);
++    const endpoint = new URL(server.url);
++    drain = observeFetch((url, headers) => {
++      reads.push({
++        offset: url.searchParams.get('offset'),
++        live: url.searchParams.get('live'),
++        authorization: headers.get('authorization'),
++        static: headers.get('x-u3-static'),
++        sync: headers.get('x-u3-sync'),
++      });
++    });
++    const streamUrl = new URL('/v1/stream/netscript/rotation', server.url);
++    const producer = new DurableStream({
++      url: streamUrl.href,
++      contentType: 'application/json',
++      backoffOptions: { initialDelay: 1, maxDelay: 1, multiplier: 1, maxRetries: 0 },
++    });
++    await producer.create();
++    const before = crypto.randomUUID();
++    await producer.append(JSON.stringify(schema.events.insert({ value: { id: before } })));
++    let syncCalls = 0;
++    let asyncCalls = 0;
++    db = createNetScriptStreamDB({
++      baseUrl: server.url,
++      streamPath: '/rotation',
++      schema,
++      headers: {
++        'x-u3-static': 'u3-static',
++        'x-u3-sync': () => {
++          syncCalls += 1;
++          return syncValue;
++        },
++        authorization: () => {
++          asyncCalls += 1;
++          return Promise.resolve(current);
++        },
++      },
++    });
++    const activeDb = db;
++    const collection = activeDb.collections.events;
++    assertExists(db.preload);
++    assertEquals(syncCalls, 0);
++    assertEquals(asyncCalls, 0);
++    await preloadDeadline(db.preload());
++    await eventually(() => reads.some((read) => read.authorization === 'Bearer u3-v1'));
++    const first = reads.find((read) => read.authorization === 'Bearer u3-v1');
++    assertExists(first);
++    assertEquals(first.static, 'u3-static');
++    assertEquals(first.sync, 'u3-sync-v1');
++    const originalEntity = collection.get(before);
++    assertExists(originalEntity);
++    current = 'Bearer u3-v2';
++    syncValue = 'u3-sync-v2';
++    const seen = reads.length;
++    const second = crypto.randomUUID();
++    await producer.append(JSON.stringify(schema.events.insert({ value: { id: second } })));
++    await eventually(
++      () => reads.slice(seen).some((read) => read.authorization === 'Bearer u3-v2'),
++      400,
++    );
++    const rotated = reads.slice(seen).find((read) => read.authorization === 'Bearer u3-v2');
++    assertExists(rotated);
++    assertEquals(rotated.static, 'u3-static');
++    assertEquals(rotated.sync, 'u3-sync-v2');
++    await eventually(() => collection.get(second)?.id === second);
++    await eventually(() => reads.some((read) => read.live === 'long-poll'));
++    const checkpointRead = reads.at(-1);
++    assertExists(checkpointRead);
++    const checkpoint = checkpointRead.offset;
++    assert(typeof checkpoint === 'string' && checkpoint.length > 0 && checkpoint !== '-1');
++    assertEquals(collection.get(before)?.id, before);
++    await server.kill();
++    server = undefined;
++    current = 'Bearer u3-v3';
++    await eventually(() => activeDb.status === 'retrying' || activeDb.status === 'failed');
++    const reconnectStart = reads.length;
++    server = await startReferenceServer(dataDir, Number(endpoint.port));
++    const after = crypto.randomUUID();
++    await producer.append(JSON.stringify(schema.events.insert({ value: { id: after } })));
++    await eventually(() => collection.get(after)?.id === after);
++    assert(db.collections.events === collection);
++    assert(collection.get(before) === originalEntity);
++    assertEquals(collection.get(before)?.id, before);
++    assertEquals(db.status, 'live');
++    assertEquals(reads[reconnectStart]?.offset, checkpoint);
++    const reconnected = reads.slice(reconnectStart);
++    assert(reconnected.every((read) => read.offset !== '-1'));
++    assert(reconnected.some((read) => read.authorization === 'Bearer u3-v3'));
++    db.stop?.();
++    assertEquals(db.status, 'stopped');
++  } finally {
++    await cleanup(
++      () => db?.stop?.(),
++      () => drain?.(),
++      () => server?.kill(),
++      () => Deno.remove(dataDir, { recursive: true }),
++    );
++  }
++});
++
++test('U3 explicit empty headers replace ambient auth while absence keeps legacy', async () => {
++  const previousSecret = Deno.env.get('STREAMS_SECRET');
++  const authorizations: Array<string | null> = [];
++  let drain: (() => Promise<void>) | undefined;
++  let server: ReturnType<typeof upToDateStub> | undefined;
++  let explicitDb: NetScriptStreamDB<TestState> | undefined;
++  let legacyDb: NetScriptStreamDB<TestState> | undefined;
++  try {
++    Deno.env.set('STREAMS_SECRET', 'u3-synthetic-producer');
++    drain = observeFetch((_, headers) => authorizations.push(headers.get('authorization')));
++    server = upToDateStub();
++    const baseUrl = `http://127.0.0.1:${server.addr.port}`;
++    explicitDb = createNetScriptStreamDB({
++      baseUrl,
++      streamPath: '/explicit-empty',
++      schema,
++      headers: {},
++    });
++    assertExists(explicitDb.preload);
++    await preloadDeadline(explicitDb.preload());
++    assert(authorizations.length > 0, 'Expected observed wire requests.');
++    assert(authorizations.every((value) => value === null), 'No ambient auth for {}.');
++    legacyDb = createNetScriptStreamDB({ baseUrl, streamPath: '/legacy', schema });
++    assertExists(legacyDb.preload);
++    await preloadDeadline(legacyDb.preload());
++    assert(
++      authorizations.some((value) => value === 'Bearer u3-synthetic-producer'),
++      'Absent headers must retain legacy env-resolved auth.',
++    );
++    explicitDb.stop?.();
++    assertEquals(explicitDb.status, 'stopped');
++    await legacyDb.dispose?.();
++    assertEquals(legacyDb.status, 'stopped');
++    const preloadLegacy = legacyDb.preload;
++    await assertRejects(() => preloadDeadline(preloadLegacy()), DOMException);
++  } finally {
++    await cleanup(
++      () => explicitDb?.stop?.(),
++      () => legacyDb?.stop?.(),
++      () => drain?.(),
++      () => server?.shutdown(),
++      () => {
++        if (previousSecret === undefined) Deno.env.delete('STREAMS_SECRET');
++        else Deno.env.set('STREAMS_SECRET', previousSecret);
++      },
++    );
++  }
++});
++
++test(
++  'U3 explicit headers work through the configured native port with all env denied',
++  async () => {
++    let server: ReturnType<typeof upToDateStub> | undefined;
++    let db: NetScriptStreamDB<TestState> | undefined;
++    let drain: (() => Promise<void>) | undefined;
++    try {
++      for (const variable of ['STREAMS_SECRET', 'NODE_ENV']) {
++        assertThrows(() => Deno.env.get(variable), Deno.errors.NotCapable);
++      }
++      drain = observeFetch();
++      server = upToDateStub();
++      const baseUrl = `http://127.0.0.1:${server.addr.port}`;
++      db = createNetScriptStreamDB({
++        baseUrl,
++        streamPath: '/denied-env',
++        schema,
++        headers: { authorization: 'Bearer u3-explicit-denied-env' },
++        createStreamDB(input) {
++          // Disable only the native HTTP warning, whose default reads NODE_ENV.
++          return createStreamDB({
++            ...input,
++            streamOptions: { ...input.streamOptions, warnOnHttp: false },
++          });
++        },
++      });
++      assertExists(db.preload);
++      await preloadDeadline(db.preload());
++      assertExists(db.close);
++      db.close();
++      const denial = assertThrows(
++        () => createNetScriptStreamDB({ baseUrl, streamPath: '/denied-env', schema }),
++        Error,
++      );
++      assert(denial.message.includes('STREAMS_SECRET'), 'Framework auth read must fail.');
++      assert(/env access|denied|NotCapable/i.test(denial.message), 'Missing env capability.');
++    } finally {
++      await cleanup(() => db?.close?.(), () => drain?.(), () => server?.shutdown());
++    }
++  },
++  { env: false, net: true, read: true },
++);
++
++test('U3 failing header callbacks send no requests and never fall back to ambient auth', async () => {
++  const previousSecret = Deno.env.get('STREAMS_SECRET');
++  const originalFetch = globalThis.fetch;
++  let requests = 0;
++  let db: NetScriptStreamDB<TestState> | undefined;
++  try {
++    Deno.env.set('STREAMS_SECRET', 'u3-synthetic-producer');
++    globalThis.fetch = (...args: Parameters<typeof globalThis.fetch>) => {
++      requests += 1;
++      return originalFetch(...args);
++    };
++    for (const error of [new Error('u3 header boom'), new TypeError('u3 offline')]) {
++      let calls = 0;
++      db = createNetScriptStreamDB({
++        baseUrl: 'https://streams.example.test',
++        streamPath: '/failure',
++        schema,
++        reconnect: { maxRetries: 1, initialDelayMs: 1, maxDelayMs: 1 },
++        headers: {
++          authorization: () => {
++            calls += 1;
++            if (error instanceof TypeError) throw error;
++            return Promise.reject<never>(error);
++          },
++        },
++      });
++      assertExists(db.preload);
++      const preload = db.preload;
++      const failure = await assertRejects(() => preloadDeadline(preload()), Error, error.message);
++      assertEquals(failure, error, 'Original callback error.');
++      assertEquals(failure instanceof TypeError, error instanceof TypeError);
++      assertEquals(calls, error instanceof TypeError ? 2 : 1);
++      assertEquals(requests, 0);
++      assertEquals(db.status, 'failed');
++      db.stop?.();
++      assertEquals(db.status, 'stopped');
++    }
++  } finally {
++    try {
++      db?.stop?.();
++    } finally {
++      globalThis.fetch = originalFetch;
++      if (previousSecret === undefined) Deno.env.delete('STREAMS_SECRET');
++      else Deno.env.set('STREAMS_SECRET', previousSecret);
++    }
++  }
++});
++
++test('U3 header options satisfy the public compiler contract and reject invalid shapes', async () => {
++  const tempDir = await Deno.makeTempDir();
++  try {
++    const fixtures = new URL('./type-fixtures/', import.meta.url);
++    const fixturePath = (name: string) => fromFileUrl(new URL(name, fixtures));
++    const config = fixturePath('streamdb-consumer-deno.json');
++    const positiveFile = fixturePath('streamdb-wrapper_type.ts');
++    assert(positiveFile.length > 0);
++    const positive = await checkSource(positiveFile, config);
++    assertEquals(positive.code, 0, positive.text);
++    assert(!/TS\d+|No matching|No target/.test(positive.text), positive.text);
++    const negatives = [
++      { name: 'u3-headers-number.ts', headers: '{ authorization: 1 }' },
++      { name: 'u3-headers-callback.ts', headers: '{ authorization: () => 1 }' },
++      { name: 'u3-headers-map.ts', headers: "() => ({ authorization: 'x' })" },
++    ];
++    for (const negative of negatives) {
++      const file = `${tempDir}/${negative.name}`;
++      await Deno.writeTextFile(file, negativeSource(negative.headers));
++      const result = await checkSource(file, config);
++      assert(result.code !== 0, `Expected a contract type error for ${negative.name}.`);
++      assert(result.text.includes(negative.name), `Expected ${negative.name} in diagnostics.`);
++      assert(result.text.includes('TS2322'), `Expected TS2322 for ${negative.name}.`);
++      assert(
++        /MaybePromise|HeadersRecord|not assignable/.test(result.text),
++        `Expected a header contract diagnostic for ${negative.name}.`,
++      );
++      assert(!/TS2307|TS2305/.test(result.text), 'Imports must resolve.');
++    }
++  } finally {
++    await Deno.remove(tempDir, { recursive: true });
++  }
++});
++
++function negativeSource(headers: string): string {
++  return `import { createStateSchema } from '@durable-streams/state';
++import { createNetScriptStreamDB } from '@netscript/fresh/streams';
++import { z } from 'zod';
++const schema = createStateSchema({ events: { schema: z.object({ id: z.string() }), type: 'event', primaryKey: 'id' } });
++createNetScriptStreamDB({ baseUrl: 'https://streams.example.test', streamPath: '/negative', schema, headers: ${headers} });
++`;
++}
++
++async function checkSource(
++  file: string,
++  config: string,
++): Promise<{ code: number; text: string }> {
++  const deadline = new AbortController();
++  const timer = setTimeout(
++    () => deadline.abort(new Error(`Compiler deadline exceeded: ${file}`)),
++    30_000,
++  );
++  try {
++    const output = await new Deno.Command(Deno.execPath(), {
++      args: ['check', '--no-lock', '--config', config, '--unstable-kv', file],
++      signal: deadline.signal,
++      stdout: 'piped',
++      stderr: 'piped',
++    }).output();
++    deadline.signal.throwIfAborted();
++    return { code: output.code, text: new TextDecoder().decode(output.stderr) };
++  } finally {
++    clearTimeout(timer);
++  }
++}
+diff --git a/packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts b/packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts
+index f09789c8a..de4e4798c 100644
+--- a/packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts
++++ b/packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts
+@@ -1,3 +1,4 @@
++import type { HeadersRecord } from '@durable-streams/client';
+ import { createStateSchema } from '@durable-streams/state';
+ import { createStreamDB } from '@durable-streams/state/db';
+ import { createNetScriptStreamDB, useLiveQuery } from '@netscript/fresh/streams';
+@@ -35,6 +36,33 @@ const wrapped = createNetScriptStreamDB({
+   schema: state,
+ });
+ 
++const headerRecord: HeadersRecord = {
++  authorization: 'Bearer fixture-static',
++  'x-u3-sync': () => 'fixture-sync',
++  'x-u3-async': () => Promise.resolve('fixture-async'),
++};
++
++const withHeaders = createNetScriptStreamDB({
++  baseUrl: 'https://streams.example.test',
++  streamPath: '/people-headers',
++  schema: state,
++  headers: headerRecord,
++});
++
++const viaPort = createNetScriptStreamDB({
++  baseUrl: 'https://streams.example.test',
++  streamPath: '/people-port',
++  schema: state,
++  headers: headerRecord,
++  createStreamDB(input) {
++    const forwarded: HeadersRecord = input.streamOptions.headers;
++    const roundTrip: typeof input.streamOptions.headers = forwarded;
++    void forwarded;
++    void roundTrip;
++    return wrapped;
++  },
++});
++
+ // Control: the upstream package accepts the documented query shape.
+ const controlQuery = useLiveQuery((query) => query.from({ person: control.collections.people }));
+ 
+@@ -55,3 +83,5 @@ const preload: (() => Promise<void>) | undefined = wrapped.preload;
+ void reconnect;
+ void status;
+ void preload;
++void withHeaders;
++void viaPort;
+diff --git a/plugins/workers/streams/factory.ts b/plugins/workers/streams/factory.ts
+index 7146f53f5..2e1455789 100644
+--- a/plugins/workers/streams/factory.ts
++++ b/plugins/workers/streams/factory.ts
+@@ -9,6 +9,8 @@
+  */
+ 
+ import { createStreamDB } from '@durable-streams/state/db';
++import type { HeadersRecord, MaybePromise } from '@durable-streams/client';
++export type { HeadersRecord, MaybePromise };
+ import {
+   buildStreamUrl,
+   getStreamsAuth,
+@@ -55,13 +57,17 @@ export type WorkersStreamDB = Readonly<{
+  * ```
+  */
+ export function createWorkersStreamDB(
+-  options: { baseUrl?: string } = {},
++  options: {
++    baseUrl?: string;
++    /** Explicit reader headers replace ambient auth; native callbacks resolve per request. */
++    headers?: HeadersRecord;
++  } = {},
+ ): WorkersStreamDB {
+   return createStreamDB({
+     streamOptions: {
+       url: buildStreamUrl('/workers/executions', options.baseUrl),
+       contentType: 'application/json',
+-      headers: getStreamsAuth(),
++      headers: options.headers === undefined ? getStreamsAuth() : options.headers,
+     },
+     state: workersStreamSchema,
+   });
+diff --git a/plugins/workers/streams/mod.ts b/plugins/workers/streams/mod.ts
+index a07773591..393818992 100644
+--- a/plugins/workers/streams/mod.ts
++++ b/plugins/workers/streams/mod.ts
+@@ -8,6 +8,8 @@
+ 
+ export {
+   createWorkersStreamDB,
++  type HeadersRecord,
++  type MaybePromise,
+   type WorkerExecution,
+   type WorkerJob,
+   type WorkersStreamDB,
+diff --git a/plugins/workers/tests/streams/factory-headers_test.ts b/plugins/workers/tests/streams/factory-headers_test.ts
+new file mode 100644
+index 000000000..0f83ff375
+--- /dev/null
++++ b/plugins/workers/tests/streams/factory-headers_test.ts
+@@ -0,0 +1,237 @@
++/** Native caller-header contracts for the workers StreamDB factory. @module */
++
++import { assert, assertEquals, assertExists } from '@std/assert';
++import { delay } from '@std/async';
++import { fromFileUrl } from '@std/path';
++import type { HeadersRecord } from '@durable-streams/client';
++import { createWorkersStreamDB, type WorkersStreamDB } from '../../streams/factory.ts';
++
++interface Reader {
++  preload(): Promise<void>;
++  close(): void;
++}
++interface Read {
++  path: string;
++  live: string | null;
++  auth: string | null;
++  static: string | null;
++  sync: string | null;
++}
++
++function test(name: string, fn: () => Promise<void>) {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++async function cleanup(...steps: Array<() => void | Promise<void>>) {
++  const failures: unknown[] = [];
++  for (const step of steps) {
++    try {
++      await step();
++    } catch (error) {
++      failures.push(error);
++    }
++  }
++  if (failures.length) throw new AggregateError(failures, 'Workers header cleanup failed.');
++}
++
++async function deadline(pending: Promise<void>): Promise<void> {
++  let timer: ReturnType<typeof setTimeout> | undefined;
++  try {
++    await Promise.race([
++      pending,
++      new Promise<never>((_, reject) => {
++        timer = setTimeout(() => reject(new Error('Workers preload deadline.')), 5_000);
++      }),
++    ]);
++  } finally {
++    clearTimeout(timer);
++  }
++}
++
++async function eventually(predicate: () => boolean): Promise<void> {
++  for (let attempt = 0; attempt < 400; attempt++) {
++    if (predicate()) return;
++    await delay(10);
++  }
++  assert(predicate(), 'Expected a later native workers request.');
++}
++
++async function withServer(
++  action: (
++    baseUrl: string,
++    reads: Read[],
++    reader: (db: WorkersStreamDB) => Reader,
++  ) => Promise<void>,
++): Promise<void> {
++  const previous = Deno.env.get('STREAMS_SECRET');
++  const readers: Reader[] = [];
++  const reads: Read[] = [];
++  let server: Deno.HttpServer<Deno.NetAddr> | undefined;
++  try {
++    Deno.env.set('STREAMS_SECRET', 'u3-workers-synthetic');
++    server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} }, async (request) => {
++      const url = new URL(request.url);
++      reads.push({
++        path: url.pathname,
++        live: url.searchParams.get('live'),
++        auth: request.headers.get('authorization'),
++        static: request.headers.get('x-u3-static'),
++        sync: request.headers.get('x-u3-sync'),
++      });
++      if (url.searchParams.get('live') === 'long-poll') await delay(25);
++      return new Response('[]', {
++        headers: {
++          'content-type': 'application/json',
++          'stream-next-offset': '0',
++          'stream-up-to-date': 'true',
++        },
++      });
++    });
++    await action(`http://127.0.0.1:${server.addr.port}`, reads, (db) => {
++      const preload: unknown = Reflect.get(db, 'preload');
++      const close: unknown = Reflect.get(db, 'close');
++      assert(typeof preload === 'function');
++      assert(typeof close === 'function');
++      const reader = {
++        preload: () => Promise.resolve(preload.call(db)).then(() => {}),
++        close: () => {
++          close.call(db);
++        },
++      };
++      readers.push(reader);
++      return reader;
++    });
++  } finally {
++    await cleanup(
++      ...readers.map((reader) => () => reader.close()),
++      () => server?.shutdown(),
++      () => {
++        if (previous === undefined) Deno.env.delete('STREAMS_SECRET');
++        else Deno.env.set('STREAMS_SECRET', previous);
++      },
++    );
++  }
++}
++
++test('U3 workers native headers remain lazy and rotate on real requests', async () => {
++  await withServer(async (baseUrl, reads, reader) => {
++    let auth = 'Bearer workers-v1';
++    let sync = 'workers-sync-v1';
++    let asyncCalls = 0;
++    let syncCalls = 0;
++    const headers: HeadersRecord = {
++      'x-u3-static': 'before-construction',
++      'x-u3-sync': () => {
++        syncCalls += 1;
++        return sync;
++      },
++      authorization: () => {
++        asyncCalls += 1;
++        return Promise.resolve(auth);
++      },
++    };
++    // A variable keeps the unchanged production RED runnable before the new option exists.
++    const options = { baseUrl, headers };
++    const db = createWorkersStreamDB(options);
++    const active = reader(db);
++    const collections = db.collections;
++    const execution = collections.execution;
++    assertEquals(syncCalls, 0);
++    assertEquals(asyncCalls, 0);
++    headers['x-u3-static'] = 'workers-static';
++    await deadline(active.preload());
++    const first = reads[0];
++    assertExists(first);
++    assertEquals(first.auth, 'Bearer workers-v1');
++    assertEquals(first.static, 'workers-static');
++    assertEquals(first.sync, 'workers-sync-v1');
++    const seen = reads.length;
++    auth = 'Bearer workers-v2';
++    sync = 'workers-sync-v2';
++    await eventually(() => reads.slice(seen).some((read) => read.auth === auth));
++    const rotated = reads.slice(seen).find((read) => read.auth === auth);
++    assertExists(rotated);
++    assertEquals(rotated.live, 'long-poll');
++    assertEquals(rotated.static, 'workers-static');
++    assertEquals(rotated.sync, 'workers-sync-v2');
++    assert(reads.every((read) => read.path === '/v1/stream/netscript/workers/executions'));
++    assert(syncCalls >= 2);
++    assert(asyncCalls >= 2);
++    assert(db.collections === collections);
++    assert(db.collections.execution === execution);
++    active.close();
++  });
++});
++
++test('U3 workers empty headers replace ambient auth and omission preserves legacy', async () => {
++  await withServer(async (baseUrl, reads, reader) => {
++    const options = { baseUrl, headers: {} };
++    const explicit = reader(createWorkersStreamDB(options));
++    await deadline(explicit.preload());
++    explicit.close();
++    assert(reads.length > 0);
++    assert(reads.every((read) => read.auth === null));
++  });
++  await withServer(async (baseUrl, reads, reader) => {
++    const legacy = reader(createWorkersStreamDB({ baseUrl }));
++    await deadline(legacy.preload());
++    assert(reads.length > 0);
++    assert(reads.every((read) => read.auth === 'Bearer u3-workers-synthetic'));
++    legacy.close();
++  });
++});
++
++test('U3 workers public compiler target accepts headers and rejects three invalid shapes', async () => {
++  const tempDir = await Deno.makeTempDir({
++    dir: fromFileUrl(new URL('./', import.meta.url)),
++    prefix: 'u3-headers-',
++  });
++  try {
++    const positiveFile = fromFileUrl(new URL('./live-query-consumer_type.ts', import.meta.url));
++    const config = fromFileUrl(new URL('../../../../deno.json', import.meta.url));
++    assert(positiveFile.length > 0 && (await Deno.stat(positiveFile)).size > 0);
++    const positive = await check(positiveFile, config);
++    assertEquals(positive.code, 0, positive.text);
++    assert(!/TS\d+|No matching|No target/.test(positive.text), positive.text);
++    for (
++      const [name, headers] of [
++        ['number', '{ authorization: 1 }'],
++        ['callback', '{ authorization: () => 1 }'],
++        ['map', "() => ({ authorization: 'x' })"],
++      ]
++    ) {
++      const file = `${tempDir}/workers-headers-${name}.ts`;
++      await Deno.writeTextFile(
++        file,
++        `import { createWorkersStreamDB } from '@netscript/plugin-workers/streams';
++createWorkersStreamDB({ headers: ${headers} });
++`,
++      );
++      const negative = await check(file, config);
++      assert(negative.code !== 0, `${name}: ${negative.text}`);
++      assert(negative.text.includes(`workers-headers-${name}.ts`), negative.text);
++      assert(negative.text.includes('TS2322'), negative.text);
++      assert(/MaybePromise|HeadersRecord|not assignable/.test(negative.text), negative.text);
++      assert(!/TS2307|TS2305|No matching|No target/.test(negative.text), negative.text);
++    }
++  } finally {
++    await Deno.remove(tempDir, { recursive: true });
++  }
++});
++
++async function check(file: string, config: string): Promise<{ code: number; text: string }> {
++  const controller = new AbortController();
++  const timer = setTimeout(() => controller.abort(new Error(`Compiler deadline: ${file}`)), 30_000);
++  try {
++    const output = await new Deno.Command(Deno.execPath(), {
++      args: ['check', '--unstable-kv', '--frozen', '--config', config, file],
++      signal: controller.signal,
++      stdout: 'piped',
++      stderr: 'piped',
++    }).output();
++    controller.signal.throwIfAborted();
++    return { code: output.code, text: new TextDecoder().decode(output.stderr) };
++  } finally {
++    clearTimeout(timer);
++  }
++}
+diff --git a/plugins/workers/tests/streams/live-query-consumer_test.ts b/plugins/workers/tests/streams/live-query-consumer_test.ts
+index a6c8907d3..d5f20114c 100644
+--- a/plugins/workers/tests/streams/live-query-consumer_test.ts
++++ b/plugins/workers/tests/streams/live-query-consumer_test.ts
+@@ -1,15 +1,35 @@
+-import { assertEquals } from '@std/assert';
++import { assert, assertEquals } from '@std/assert';
++import { fromFileUrl } from '@std/path';
+ 
+-Deno.test('all four public StreamDB factories preserve live-query entity and lifecycle types', async () => {
+-  const fixture = new URL('./live-query-consumer_type.ts', import.meta.url);
+-  const output = await new Deno.Command(Deno.execPath(), {
+-    args: ['check', '--unstable-kv', fixture.pathname],
+-    stdout: 'piped',
+-    stderr: 'piped',
+-  }).output();
+-  const diagnostics = new TextDecoder().decode(output.stderr)
+-    .split('\n')
+-    .filter((line) => /(?:TS\d+ \[ERROR\]|^error:|^Found \d+ errors?)/.test(line))
+-    .join('\n');
+-  assertEquals(output.code, 0, diagnostics);
++Deno.test({
++  name: 'all four public StreamDB factories preserve live-query entity and lifecycle types',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  async fn() {
++    const fixture = fromFileUrl(new URL('./live-query-consumer_type.ts', import.meta.url));
++    assert(fixture.length > 0 && (await Deno.stat(fixture)).size > 0);
++    const deadline = new AbortController();
++    const timer = setTimeout(
++      () => deadline.abort(new Error('Consumer compiler deadline.')),
++      30_000,
++    );
++    try {
++      const output = await new Deno.Command(Deno.execPath(), {
++        args: ['check', '--unstable-kv', fixture],
++        signal: deadline.signal,
++        stdout: 'piped',
++        stderr: 'piped',
++      }).output();
++      deadline.signal.throwIfAborted();
++      const text = new TextDecoder().decode(output.stderr);
++      assertEquals(output.code, 0, text);
++      assert(
++        !/No matching|No target|Module not found|not mapped|unresolved|TS\d+/i.test(text),
++        text,
++      );
++    } finally {
++      clearTimeout(timer);
++    }
++  },
+ });
+diff --git a/plugins/workers/tests/streams/live-query-consumer_type.ts b/plugins/workers/tests/streams/live-query-consumer_type.ts
+index 66a930f3c..ef5b820d0 100644
+--- a/plugins/workers/tests/streams/live-query-consumer_type.ts
++++ b/plugins/workers/tests/streams/live-query-consumer_type.ts
+@@ -15,7 +15,9 @@ import {
+ import { type AuthSession, createAuthStreamDB } from '@netscript/plugin-auth/streams';
+ 
+ function useWorkerExecutions() {
+-  const db = createWorkersStreamDB();
++  const db = createWorkersStreamDB({
++    headers: { authorization: () => Promise.resolve('Bearer worker-fixture') },
++  });
+   const result = useLiveQuery((q) => q.from({ item: db.collections.execution }));
+   assertType<IsExact<Pick<typeof result.data[number], keyof WorkerExecution>, WorkerExecution>>(
+     true,
+
+
+## Immutable current CI/admission context
+
+Root-reported CI40625858274: ALL6testshards/typecheck/check-test PASS; docsbuildPASS. QualitycriticalBetterAuth and closegateFAIL remain separate, no wholeCI/mergePASS.
+Fresh owningdoc10 baseline findings remain unwaived; workers0. Named F15+F5 debt is DEBT_ACCEPTED fixedNov10/noextension/nogrowth, never F15/F5PASS. External Windows reference36/36 supports existing entrypointsonly contract, not parent accuracyPASS or exhaustive pername prose. Separate DB repair not integrated.
+Only2generated carriers added after root authored source acceptance. Canonical generation299surfaces/189pages, exact twoMCProws and oneexistingstreamsprosepage;9protectedbindings and10blob audit included. Prior failures and historical falsezero/F15attempts remain preserved.
+Meta Muse incomplete authoring and OpenAI Sol implementation exclude both vendorfamilies; eligible feature fallback is EXACT nativeAnthropic claude-opus-5/xhigh. Root observed supported nativeCLI auth/usage and advertised Opus5/1Mcontext without inference, qualifying a positive included-allowance predicate only. Actual selected-review model/effort response must be assessed; no entitlement probe or OpenRouter/model override. No usage window/balance/private profile data belongs in public verdict or Git.
+

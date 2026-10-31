@@ -1,0 +1,15 @@
+{
+  "selected": "json-fresh",
+  "args": [
+    "doc",
+    "--json",
+    "--frozen",
+    "packages/fresh/src/runtime/streams/mod.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:20.245Z",
+  "ended": "2026-10-28T02:20:20.428Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242"
+}

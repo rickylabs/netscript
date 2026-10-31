@@ -1,0 +1,11 @@
+{
+  "rootAuthorization": "Parent root message selecting repair-brief item7 on 2026-10-28",
+  "originalPath": ".llm/tmp/browser-stream-headers-u3-c1/continuation-2/gate.ts",
+  "originalSHA256": "e6b3569612c9cd3eefb3ac158c8d3b5b1a9c5fcb33311e124583db76796dd1e8",
+  "successorPath": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/gate-exact-loopback-format.ts",
+  "successorSHA256": "519f09fe22fd8d1e8da06862a6e9b2b4c85b50c951e32e0965127a4dc51b5796",
+  "uniqueLiteralReplacements": 2,
+  "originalBlock": "const server = Deno.serve({ port: 0, onListen() {} }, () =>\n    new Response('[]', {\n      headers: {\n        'Content-Type': 'application/json',\n        'Stream-Next-Offset': '0',\n        'Stream-Up-To-Date': 'true',\n      },\n    }));",
+  "formattedBlock": "const server = Deno.serve(\n    { hostname: '127.0.0.1', port: 0, onListen() {} },\n    () =>\n      new Response('[]', {\n        headers: {\n          'Content-Type': 'application/json',\n          'Stream-Next-Offset': '0',\n          'Stream-Up-To-Date': 'true',\n        },\n      }),\n  );",
+  "unchangedRemainderExtractionImportsAndLineCeiling": true
+}

@@ -31,3 +31,9 @@ S3 prerequisite integration: merged original service branch at
 without code blockers at7dd579d7. The later delta is its reviewed documentation repair and
 canonical prose carrier. Required service CI/runtime proof is still pending, not inherited as
 PASS by this integration. No source conflict required manual resolution.
+
+S3 prerequisite integration: original reader-header branch at
+7421a60f2ec0395a7e0f0ce76cbe9a24dd25980b is integrated. Its independent exact-head MERGE
+verdict is source acceptance with explicit pending CI/runtime qualification. Debt conflict
+preserves all complete factory/header/main entries without expiry or scope changes. No
+auth/header implementation conflict resolution was required. Final union gates are next.

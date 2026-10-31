@@ -1,0 +1,14 @@
+{
+  "selected": "publish",
+  "args": [
+    "task",
+    "--cwd",
+    "plugins/workers",
+    "publish:dry-run"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:14:02.975Z",
+  "ended": "2026-10-28T01:14:06.498Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/publish-1793150042972"
+}

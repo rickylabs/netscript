@@ -1,0 +1,30 @@
+{
+  "checked": 194,
+  "normalizationFixes": [
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/native/protected-before.json",
+      "normalizedSHA256": "779969352ea13a7e2a873e42156798d2f4f8c0e5c4aa9841eb68fed8528d9ecd",
+      "exactSHA256": "888b91c47eeda565d3df088678f7cb609ee5fbf563e2764d0fb3495a9faf14bd"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/native/cleanup-observation.json",
+      "normalizedSHA256": "b297093287b8c49387d12728d2cbe0da9e09cce95eb90192271cf450533764bc",
+      "exactSHA256": "9792612dcd320b0d3281e6d3766d571711a3d0884bd3af9322adc2cdee787782"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/native/cleanup-observation-final.json",
+      "normalizedSHA256": "848ccbe18e996243a5fcabf08671357ab9a9d5c87a2439ecb61c057d0dd8c037",
+      "exactSHA256": "9b44d43bd54fa6b883bad2586af6ab3ad3d905a6319d71c4ac8e8e6f242c1cd1"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/native/final-source.diff",
+      "normalizedSHA256": "ae150954061f78288cd692341f1da9de02b15eb8e4bac854660de11c116ed724",
+      "exactSHA256": "c1a9be355e26b87d097a9ae0d263e003276d25e66da1c40d57279c68c53a390f"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/prior-incomplete-authoring-summary.json",
+      "normalizedSHA256": "5e5b6310269a0dd67d8b710f98e6a4ea081497d55330310a0cd7c3c2f56718f8",
+      "exactSHA256": "6c082ed535124d4c6ef65fdc6ef870310e7381042c63513b9c6181ef3993102d"
+    }
+  ]
+}

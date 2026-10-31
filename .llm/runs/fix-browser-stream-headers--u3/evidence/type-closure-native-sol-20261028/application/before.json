@@ -1,0 +1,50 @@
+{
+  "sourceHead": "2322e6c66033e4db99ac3262110bcf5c3d3661e8",
+  "before": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "809df1fd5b44af597399d60c972397b4b133252719782473d330e88e5d0141f9",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/0-create-stream-db.ts"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/mod.ts",
+      "sha256": "439fd1b14fd1021e172644f172b2ed23a028808b0f3dd7ec7c16b7837763d047",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/1-mod.ts"
+    },
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "sha256": "ed94832c5778bf942fd7b0c1d8c38ea4a2ef416e893243249a65bc858ec76763",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/2-factory.ts"
+    },
+    {
+      "path": "plugins/workers/streams/mod.ts",
+      "sha256": "2692919e148f7ea1ba14c2195e6cada3bc16fcf61e6b0984412dddc819b31d8d",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/3-mod.ts"
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/4-arch-debt.md"
+    },
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/5-deno.json"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/6-deno.lock"
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/7-deno.json"
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "snapshot": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-type-closure-application-20261028/before/8-deno.json"
+    }
+  ]
+}
