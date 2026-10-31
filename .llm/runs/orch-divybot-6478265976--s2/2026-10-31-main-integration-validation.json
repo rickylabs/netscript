@@ -1,0 +1,95 @@
+{
+  "sourceHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+  "mainHead": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
+  "mergeParents": [
+    "8b3b58a2681a2073926235aa3b22753d09451c2c",
+    "4aa734e2b6ca93119462ec2e0cd34b729df51bfd"
+  ],
+  "gates": [
+    {
+      "gate": "quality-gate",
+      "gitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "actualGitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "36dd323d471588b12584a3190f957d3b47ef6d9fb1112f2f66f82a7d8a1b43dc"
+    },
+    {
+      "gate": "assets-barrel",
+      "gitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "actualGitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "09059d72a4dd6978b19dd7123e52a1395468621fe77dc40680ad395ebad28f39"
+    },
+    {
+      "gate": "publish-assets",
+      "gitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "actualGitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "027d78e63de09eef92f1ff3e06e6830c184e159ddfbd04c63b573c9198b968ea"
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "gitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "actualGitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "cb8ab22859b02a82b2a3f1fad14884ae3e38d3a2a4475474f19b8a0351c8ca04"
+    },
+    {
+      "gate": "agent-docs-prose",
+      "gitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "actualGitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "5ddde79aea15addb797b4caeb0b05c1374cc2273ac957d789ef81c9e36cb4c34"
+    },
+    {
+      "gate": "publish-dry-run",
+      "gitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "actualGitHead": "4ba1c3043a2498db5f0be9332cc24c86ad48063d",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "2ff0de714cee7462416d2b0f9cd06ab0cc9ff6b7920028678310c9236a0efeb6"
+    }
+  ],
+  "tests": {
+    "passed": 123,
+    "failed": 0,
+    "ignored": 4,
+    "exitCode": 0,
+    "ignoreReason": "Existing Redis cases require configured Redis URL; unchanged from main."
+  },
+  "scopedWrappers": {
+    "filesSelected": 5,
+    "checkFindings": 0,
+    "lintFindings": 0,
+    "fmtFindings": 0,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "releasePreflight": "PASS: zero findings",
+  "reviewThreads": {
+    "total": 0,
+    "unanswered": 0,
+    "outcome": "PASS"
+  },
+  "independentReview": {
+    "requestedModel": "claude-opus-5-5",
+    "requestedEffort": "high",
+    "observedModelUsage": [
+      "claude-opus-5-5"
+    ],
+    "exitCode": 0,
+    "verdict": "PASS for source/local evidence",
+    "sourceUnchanged": true,
+    "commandsExecutedByReviewer": false
+  },
+  "finalRemoteCi": "PENDING at final evidence head; all actual8 shards, check-test, quality and whole CI must succeed. deps-report policy skip reported distinctly.",
+  "retainedLimitations": [
+    "Docker-dependent scaffold.runtime attempt unproven: unavailable Docker daemon",
+    "123 unchanged Fresh UI component doc-lint findings"
+  ]
+}
