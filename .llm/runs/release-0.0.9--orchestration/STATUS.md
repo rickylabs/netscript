@@ -1,0 +1,17 @@
+# STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
+- H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
+- A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
+- A2 DONE: #2395 (#2483), #2351 (#2496 67d4704b4)
+- A3 DONE: #2144 #2151 #2161 #2400 (#2482 02a66ba6d) all closed
+- B1 DONE except #2159 follow-up (Eric): #2499 #2512 #2517 #2522 #2526 merged
+- B2 #2162 #2369 #2149 MERGED (closed); #2108 → PR #2535 (implementing, capstone)
+- C1 #2267 #2132 #2338 #1367 #2377 MERGED (closed); #2373 merged #2528 (issue open while its worker continues #2379); #2390 PR #2534 READY (stall no longer reproduces), e2e RUNNING
+- D1 #2396 all 3 PRs MERGED; issue OPEN for release-owned published-graph proof on canary .1; #2259 BLOCKED → Eric
+- E1 DONE · E2 #2385 #2155 #1491 MERGED; #2268 partial (live-AppHost proof owed); #2269 PR #2529 head 3d2b6db re-MERGE, CI pending (carrier moved to @netscript/mcp/docs)
+- F1 #2384 #2375 #2411 MERGED (closed); #2379 (continuation, #2373 worker); #2406 (Fresh UI PR #2408); #2409 (check vs S6a)
+- G1 #1912 → PR #2537 (published smoke); #1366 box 6 dispatched (features); #2068 claimed by continuation chain; #1655, #2185 (local docker), #2233 (Eric) remain; Eric asked about #1366 box5/consumer proof and #2068 consumer box
+- H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
+- Open for Eric: #2159 follow-up; #2259 options; #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; #2421 debt FYI (veto window); Garnet CI issue (likely moot); file upstream Aspire report (#2401 run record)
+- CANARY .1 READY TO CUT at 15cffa2fe (posted 11:52Z, comment 6542998232); Eric cuts. One expensive gate at a time; drop the label when a PR e2e completes.
+- Dispatch rule: before posting any /swarm, check the issue for a claim comment or an open PR (orchid continuation workers self-claim plan issues).
+- Live leaves (herdr dispatch): never relaunch a leaf with a live workspace (label codex-<commentId>); check before any relaunch.
