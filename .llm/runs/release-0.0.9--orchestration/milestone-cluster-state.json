@@ -806,12 +806,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2509,
-      "headSha": "fdb5b69509a1136700825386bf1aedd699b0947f",
+      "headSha": "f13b14c70e013871c6417d5860f035a645f59bb0",
       "issueNumbers": [
         2162
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2162",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "e2e static red at 048856c: package-backed doctor gate asserts the old check name 'generated job registry is non-empty' (PR renamed to 'initialized'); steered the live worker via PR comment"
     },
     {
       "id": "C1-2338",
@@ -819,7 +820,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2510,
-      "headSha": "85ab044ae1b302e2a469eabe55a5bb27eea3717e",
+      "headSha": "67df9ff742f7e83e32e46f6b96ed5024d7ee6520",
       "issueNumbers": [
         2338
       ],
@@ -977,6 +978,16 @@
       "via": "label e2e-cli-gate (label kept from the r1 run; push-triggered)",
       "result": "SUCCESS after one rerun of the Postgres tier (Garnet start-up flake); superseded: PR conflicts with main, r3 head will re-run",
       "completedAt": "2026-10-31T08:50:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "complete",
+      "prNumber": 2509,
+      "headSha": "048856c7e7ca3ec3a364d11dc613b912837071b1",
+      "startedAt": "2026-10-31T09:03:47Z",
+      "via": "label e2e-cli-gate",
+      "result": "FAILURE (static: package-backed doctor check name; test-2 shard; both runtime tiers) \u2014 product failure, released",
+      "completedAt": "2026-10-31T09:10:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1197,7 +1208,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T08:54:23Z",
+  "updatedAt": "2026-10-31T09:12:03Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1250,12 +1261,12 @@
       "commentId": 6534991540,
       "postedAt": "2026-10-30T22:38:40Z",
       "route": "codex gpt-6.1-sol xhigh",
-      "state": "relaunched-r3",
+      "state": "started",
       "pr": null,
       "heldReason": "cockpit hourly_cap_reached",
       "relaunchCommentId": 6541384172,
       "relaunchedAt": "2026-10-31T08:54:09Z",
-      "startedAt": "2026-10-31T00:17:04Z"
+      "startedAt": "2026-10-31T09:11:18Z"
     },
     {
       "issue": 2478,
@@ -1272,11 +1283,12 @@
       "commentId": null,
       "postedAt": "2026-10-31T00:39:24Z",
       "route": "codex gpt-6.1-sol (continuation of #2438 worker)",
-      "state": "relaunched-r3",
+      "state": "started",
       "pr": 2482,
       "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)",
       "relaunchCommentId": 6541366578,
-      "relaunchedAt": "2026-10-31T08:52:08Z"
+      "relaunchedAt": "2026-10-31T08:52:08Z",
+      "startedAt": "2026-10-31T09:11:18Z"
     },
     {
       "issue": 2395,
@@ -1431,8 +1443,19 @@
       "commentId": 6541170747,
       "postedAt": "2026-10-31T08:30:31Z",
       "route": "codex gpt-6.1-sol medium",
-      "state": "posted",
-      "pr": null
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-31T09:11:18Z"
+    },
+    {
+      "issue": 2383,
+      "lane": "fixes",
+      "commentId": 6541471368,
+      "postedAt": "2026-10-31T09:04:05Z",
+      "route": "codex gpt-6.1-sol high",
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-31T09:11:18Z"
     }
   ],
   "coordinatorArtifactPr": 2475,
