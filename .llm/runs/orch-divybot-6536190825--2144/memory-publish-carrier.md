@@ -1,0 +1,3 @@
+# Refresh the complete generated docs chain
+
+After editing a site recipe, canonical prose generation can also change `llms.txt`. The MCP publish fallback embeds that router even when the edited recipe itself is outside its selected pages. Run `deno task gen:publish-assets` after `gen:agent-docs-prose`, then `deno task check:publish-assets`. `check:assets-barrel` does not refresh this separate publish carrier. For public API changes, also regenerate/check the MCP export corpus from clean committed package/plugin sources. CI checks these layers sequentially; an earlier stale carrier can hide a later one. The publish generator's focused structured test wrapper targets `.llm/tools/generate-publish-assets_test.ts` and runs six tests.

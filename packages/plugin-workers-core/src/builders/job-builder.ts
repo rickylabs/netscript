@@ -1,3 +1,4 @@
+import { resolveJobRetryPolicy } from '../domain/job-retry-policy.ts';
 import { DEFAULT_TOPIC } from '../domain/constants.ts';
 import type { CronExpression } from '../domain/cron.ts';
 import {
@@ -30,11 +31,7 @@ type HandlerPayload<TConfigured extends JobBuilderState, TPayload, TNextPayload>
   TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload;
 
 /** Retry configuration options for job definitions. */
-export type RetryOptions = Readonly<{
-  backoff?: 'linear' | 'exponential';
-  delayMs?: number;
-  maxDelayMs?: number;
-}>;
+export type RetryOptions = import('../domain/job-retry-policy.ts').JobRetryOptions;
 
 /** Execution retention settings for job definitions. */
 export type JobRetentionOptions = Readonly<{
@@ -242,6 +239,7 @@ class JobBuilderImpl<
     maxRetries: number,
     options?: RetryOptions,
   ): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    resolveJobRetryPolicy({ maxRetries, metadata: { retry: options ?? {} } });
     return new JobBuilderImpl({
       ...this.#data,
       maxRetries,
@@ -319,7 +317,7 @@ class JobBuilderImpl<
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       source: 'local',
       executionType: 'deno',
-      retryDelay: 1000,
+      retryDelay: resolveJobRetryPolicy({ maxRetries: this.#data.maxRetries, metadata }).delayMs,
       maxConcurrency: 1,
       persist: true,
       permissions: toDomainPermissions(this.#data.permissions),

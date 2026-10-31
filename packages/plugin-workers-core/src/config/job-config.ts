@@ -1,3 +1,4 @@
+import { MAX_JOB_RETRIES } from '../domain/job-retry-policy.ts';
 import { z } from 'zod';
 import { JOB_SOURCES } from '../domain/constants.ts';
 import { TaskPermissionsInputSchema } from '../domain/task.ts';
@@ -102,7 +103,7 @@ export const JobConfigZodSchema: z.ZodType<JobConfig> = z.object({
   schedule: z.string().optional(),
   timezone: z.string().optional(),
   timeout: z.number().default(60000),
-  maxRetries: z.number().default(3),
+  maxRetries: z.number().int().min(0).max(MAX_JOB_RETRIES).default(3),
   priority: z.number().int().min(0).max(100).default(50),
   retryDelay: z.number().int().nonnegative().default(1000),
   maxConcurrency: z.number().int().nonnegative().default(1),

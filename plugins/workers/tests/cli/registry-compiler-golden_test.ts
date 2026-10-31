@@ -60,7 +60,8 @@ function assertJobConfigKeysAreEmitted(source: string | undefined): void {
 }
 
 const EXPECTED_WORKERS_REGISTRY =
-  `import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
+  `import { jobRetryRegistration } from '@netscript/plugin-workers-core/runtime';
+import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
 import * as job0 from "../../../workers/jobs/example-job.ts";
 import * as job1 from "../../../workers/jobs/health-check.ts";
 import * as job2 from "../../../workers/jobs/nested/deep-job.ts";
@@ -158,6 +159,7 @@ function createLocalJobDefinition<TId extends string, THandler extends SchemaBac
     metadata: undefined,
     retention: undefined,
     ...policy,
+    ...jobRetryRegistration(policy ?? {}, handler),
     handler,
     payloadSchema: handler.payloadSchema,
   };

@@ -1,0 +1,295 @@
+{
+  "review-corrections-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "plugins/workers/worker/job-dead-letters_test.ts",
+      "plugins/workers/worker/job-retry_test.ts",
+      "packages/plugin/src/presentation/run-child-health-process_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 8738,
+    "summary": {
+      "passed": 23,
+      "failed": 0,
+      "ignored": 4,
+      "totalResults": 27,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "review-corrections-regression": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "packages/plugin-workers-core/tests/runtime",
+      "packages/plugin-workers-core/tests/config",
+      "plugins/workers/worker",
+      "plugins/workers/tests/runtime",
+      "plugins/workers/tests/cli",
+      "packages/plugin/src/runtime/child-health-monitor_test.ts",
+      "packages/plugin/src/presentation/run-child-health-process_test.ts",
+      "plugins/workers/src/adapter/resources/resources.test.ts",
+      "plugins/triggers/src/runtime/scheduled-idempotency_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 19403,
+    "summary": {
+      "passed": 142,
+      "failed": 0,
+      "ignored": 7,
+      "totalResults": 149,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "review-corrections-check": {
+    "source": {
+      "mode": "selection",
+      "cwd": "<worktree>"
+    },
+    "command": "deno check --unstable-kv --no-lock <files>",
+    "selection": {
+      "filesSelected": 7,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "review-corrections-lint": {
+    "source": {
+      "mode": "command",
+      "cwd": "<worktree>",
+      "exitCode": 2
+    },
+    "selection": {
+      "filesSelected": 7,
+      "batches": 3,
+      "failedBatches": 1,
+      "excludedBatches": 1
+    },
+    "coverage": {
+      "filesSelected": 7,
+      "filesProcessed": 6,
+      "droppedFiles": [
+        "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts"
+      ],
+      "refusals": [
+        {
+          "cause": "partial-exclusion",
+          "filesSelected": 7,
+          "filesProcessed": 6,
+          "droppedFiles": [
+            "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts"
+          ]
+        }
+      ]
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "review-corrections-fmt": {
+    "command": "deno fmt --check",
+    "cwd": "<worktree>",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 6,
+      "batches": 2,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 6,
+      "filesProcessed": 6,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "generated-fmt-result": {
+    "command": "deno fmt --check",
+    "cwd": "<worktree>",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 1,
+      "filesProcessed": 1,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "negative-dlq-identity": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "sharing an idempotency key",
+      "plugins/workers/worker/job-dead-letters_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 6033,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      \"first-job\",\n+     \"second-job\",\n    ]\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/worker/job-dead-letters_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "direct job failures sharing an idempotency key keep separate durable DLQ identities",
+            "file": "./plugins/workers/worker/job-dead-letters_test.ts",
+            "line": 17
+          }
+        ]
+      }
+    ]
+  },
+  "negative-dlq-replay": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "replay during terminal claim",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 6108,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Expected function to reject.\n    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:<line>:<column>)\n    at async file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "DLQ replay during terminal claim release is deferred without losing the durable job",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 288
+          }
+        ]
+      }
+    ]
+  },
+  "negative-fatal-health": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "fatal child failure",
+      "packages/plugin/src/presentation/run-child-health-process_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 3761,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "Error: Health drain deadline elapsed\n    at Timeout._onTimeout (file://<cwd>/packages/plugin/src/presentation/run-child-health-process_test.ts:<line>:<column>)",
+        "count": 1,
+        "tests": [
+          {
+            "name": "fatal child failure drains even when a health snapshot never settles",
+            "file": "./packages/plugin/src/presentation/run-child-health-process_test.ts",
+            "line": 54
+          }
+        ]
+      }
+    ]
+  },
+  "agent-docs-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      ".llm/tools/docs/build-agent-docs-bundle_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 865,
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 3,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "proseFreshness": {
+    "fresh": true,
+    "command": "deno task check:agent-docs-prose",
+    "changedPages": [
+      "llms.txt",
+      "pages/background-processing/how-to/index.md",
+      "pages/background-processing/how-to/tune-worker-runtime/index.md"
+    ]
+  }
+}
