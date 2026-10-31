@@ -1,0 +1,25 @@
+{
+  "control": "original stale pg override under frozen root lock",
+  "old": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 15,
+      "failed": 8,
+      "ignored": 0,
+      "totalResults": 23,
+      "uniqueFailures": 8
+    },
+    "failureClass": "PG_CLIENT_UNAVAILABLE in credential assertions; no process/compile failure"
+  },
+  "fixed": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 23,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 23,
+      "uniqueFailures": 0
+    }
+  },
+  "rootLockUnchangedDuringBaseline": true
+}
