@@ -114,7 +114,7 @@ in the last column, because a filesystem-only `--dry-run` can't model those effe
 }) }}
 
 Every `init` flag — including `--app-name`, `--no-git`, `--force`, `--json`, and
-`--from <preset>` — is spelled out in the [command reference](/reference/cli/commands/).
+`--from <preset>` and `--preset <code-or-url>` — is spelled out in the [command reference](/reference/cli/commands/).
 
 ## Aspire orchestration CLI
 
@@ -365,3 +365,13 @@ These commands install and run the NetScript tooling for coding agents.
 }) }}
 
 See [Agent tooling](/ai/agent-tooling/) for the mental model.
+
+## Install a Figma theme
+
+Use a downloaded Figma theme item hosted as JSON to configure an existing app with
+`netscript ui:apply --preset https://raw.githubusercontent.com/owner/themes/main/themes/studio-utility.json`,
+or scaffold and apply it with
+`netscript init my-app --preset https://raw.githubusercontent.com/owner/themes/main/themes/studio-utility.json --yes`.
+The source files and `fresh-ui.lock.json` stay in the app; later token builds keep the imported
+values. The [complete command reference](/reference/cli/commands/) defines URL validation, preset
+JSON, source ownership and local-edit refusal.

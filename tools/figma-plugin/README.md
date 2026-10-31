@@ -68,7 +68,7 @@ netscript init my-app --preset https://raw.githubusercontent.com/owner/themes/ma
 The CLI validates the published registry schema and the strict Figma bundle, checks names using
 the same checker as export, then reuses the S2 registry installer and the existing token engine.
 It installs editable DTCG sources under `tokens/source`, writes `tokens.config.json` with
-`sourceRoot`, and retains hashes/provenance in `components.lock.json`. An existing custom source
+`sourceRoot`, and retains hashes/provenance in `fresh-ui.lock.json`. An existing custom source
 root is refused; an installed URL theme's managed root can be replaced by another URL theme.
 Existing semantic overrides are retained and compiled. A later `netscript tokens build` keeps
 the imported values. Invalid URLs, JSON, schemas, names, destinations and compiler inputs fail

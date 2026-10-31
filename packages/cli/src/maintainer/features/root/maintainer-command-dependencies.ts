@@ -1,3 +1,8 @@
+import { applyInitPreset } from '../../../kernel/application/scaffold/apply-init-preset.ts';
+import type { InitPresetInput } from '../../../kernel/application/scaffold/apply-init-preset.ts';
+import { DenoUiRegistryPaths } from '../../../kernel/adapters/ui/deno-ui-registry-paths.ts';
+import { FetchUiRegistry } from '../../../kernel/adapters/ui/fetch-ui-registry.ts';
+import { FreshUiTokenEngine } from '../../../kernel/adapters/tokens/fresh-ui-token-engine.ts';
 import { DenoGeneratedSourceFormatter } from '../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -24,6 +29,7 @@ export interface MaintainerCommandDependencies {
   readonly process: DenoProcess;
   /** Dependencies for maintainer init. */
   readonly initDependencies: {
+    readonly applyPreset?: (input: InitPresetInput) => Promise<void>;
     readonly cwd: () => string;
     readonly detectMonorepoRoot: typeof detectMonorepoRoot;
     readonly runInit: Parameters<typeof executeInit>[0] extends never ? never
@@ -69,7 +75,14 @@ export function createMaintainerCommandDependencies(
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
   const packageCopier = createPackageCopier();
+  const uiInstallDependencies = {
+    fs,
+    transport: new FetchUiRegistry(),
+    paths: new DenoUiRegistryPaths(),
+    tokenEngine: new FreshUiTokenEngine(),
+  };
   const initDependencies = {
+    applyPreset: (input: InitPresetInput) => applyInitPreset(input, uiInstallDependencies),
     cwd: host.cwd,
     detectMonorepoRoot,
     runInit: (request: Parameters<typeof executeInit>[1]) =>

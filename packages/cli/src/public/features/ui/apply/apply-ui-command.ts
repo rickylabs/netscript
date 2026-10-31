@@ -16,9 +16,13 @@ export function createUiApplyCommand(deps: {
     .description('Apply a token preset, font, or component style to a Fresh app')
     .option('--project-root <path:string>', 'Project root directory')
     .option('--app <name:string>', 'Fresh app workspace name')
-    .option('--preset <code:string>', 'Preset code, share URL, or token preset id', {
-      required: true,
-    })
+    .option(
+      '--preset <code:string>',
+      'Preset code, share URL, theme/preset JSON URL, or token preset id',
+      {
+        required: true,
+      },
+    )
     .option('--only <parts:string>', 'Limit changes to theme, font, or theme,font')
     .option('--json', 'Emit structured application results')
     .action(async (options) => {

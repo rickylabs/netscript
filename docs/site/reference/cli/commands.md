@@ -43,6 +43,7 @@ in your installed version, run `netscript --help` or `netscript <group> --help`.
 | `--dry-run`                 | Preview the scaffold plan without writing files (default `false`).                             |
 | `--json`                    | Emit a single machine-readable JSON result (default `false`).                                  |
 | `--from <preset>`           | Apply a named scaffold preset.                                                                 |
+| `--preset <code-or-url>` | Apply a UI token preset, encoded/share preset, URL preset JSON, or URL registry theme to the generated Fresh app after scaffolding. Dry runs do not fetch or apply it. |
 
 Project init runs the agent installer after scaffolding by default, using the generated project
 root. Host detection honors project markers before the invoking environment and defaults to Claude
@@ -350,7 +351,7 @@ following registry and preset commands complete the setup and discovery workflow
 | Command | Behavior |
 | --- | --- |
 | `netscript ui:build --registry registry.json --source-root . --output public/r` | Validate local authoring and publish a static catalog plus one JSON file per item. Resolve source paths inside the declared source root. |
-| `netscript ui:init --preset <code>` | Initialize the foundation using a token preset id, encoded preset, or shared URL. |
+| `netscript ui:init --preset <code>` | Initialize the foundation using a token preset id, encoded/share preset, or URL theme/preset JSON. |
 | `netscript ui:add <name\|@namespace/name\|url> --diff` | Show installed/local/registry differences without writing application files. Omit `--diff` to install. Install a `registry:style` item or apply a preset with a `style` field to select component sources. |
 | `netscript ui:view <reference>` | Print portable metadata and exact source files without installing. |
 | `netscript ui:search [query] --registry @acme` | Search item metadata in the built-in catalog or a configured namespace. |
@@ -362,7 +363,29 @@ following registry and preset commands complete the setup and discovery workflow
 | `netscript ui:preset` | Group for offline preset decoding and shareable URL generation. |
 | `netscript ui:preset decode <code>` | Decode a versioned preset, shared URL or plain token preset id without a network request. |
 | `netscript ui:preset url [code] --theme studio-utility` | Construct a shareable URL; optional `--style`, `--font`, and `--icon-library` set those preset fields. |
-| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
+| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder; a theme/preset JSON URL is also accepted. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
+
+A portable Figma theme installs in one command:
+
+```sh
+netscript ui:apply --preset https://raw.githubusercontent.com/owner/themes/main/themes/studio-utility.json
+netscript init my-app --preset https://raw.githubusercontent.com/owner/themes/main/themes/studio-utility.json --yes
+```
+
+A URL with a nonempty `?preset=` parameter remains a shared preset link and is decoded locally.
+Other HTTP(S) URLs fetch either strict version-1 preset JSON (its `theme` is a registered built-in
+preset ID) or a published-schema `registry:theme`/`registry:base` item. Malformed URLs, failed HTTP
+requests, invalid JSON/schema, unknown names and unsafe file targets produce an error. Registry
+theme items apply as a whole; `--only` remains available for preset codes and preset JSON.
+
+Figma exports retain their DTCG source under `tokens/source` and select it with
+`tokens.config.json` `sourceRoot`, so later `netscript tokens build` preserves imported values.
+The S2 `fresh-ui.lock.json` records source files, generated assets and theme docs. Existing semantic
+overrides are retained and compiled; a custom source root or edited installed sources block a
+replacement before writes. A second URL theme can replace sources owned by the previous theme.
+The [plugin contributor guide](https://github.com/rickylabs/netscript/blob/main/tools/figma-plugin/README.md)
+explains Figma import/export, token scopes, the values-only PR contract and the shared CI name check.
+
 
 An app configuration can declare a registry source and unresolved header templates:
 

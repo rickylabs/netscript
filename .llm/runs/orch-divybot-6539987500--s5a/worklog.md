@@ -130,3 +130,35 @@ Added the figma-ci allowlisted gate so required quality CI uploads a durable
 receipt, including tools-only policy skips. This necessarily extends the initial
 write surface to .llm/tools/gates/catalog.ts; recorded as tooling drift, not
 framework scope. Reconcile: S4 complete; S5 URL/init application is next.
+
+## S5 — URL presets and fresh-app acceptance
+
+URL dispatch distinguishes local shared preset links, strict version-1 preset
+JSON and published-schema registry theme/base items. Figma item metadata is
+strictly validated by the shared importer. Compilation precedes staged writes;
+S2 owns copying, hashes, edit conflicts, path containment and lock persistence.
+Incoming sources install at tokens/source; app config selects that sourceRoot,
+retains semantic overrides, and the URL lock entry owns sources/config/assets.
+Existing theme baseline ownership transfers for replacement without disabling
+local-edit checks. Custom roots and modified installed sources refuse writes.
+
+init --preset is wired for public and local-source commands. The public command
+presentation shrank to 55 lines by moving its flow to a feature helper. The
+existing domain app-name derivation remains authoritative. Dry runs skip preset
+fetch/apply. Public reference, help and the live option census ratify --preset;
+existing command paths remain 111 direct / 176 recursive.
+
+Structured URL service tests: 4/0/0. Existing init/preset regression plus new
+public forwarding/dry-run test: 27/0/0. Native acceptance: 1/0/0; loopback-server
+exported theme, single maintainer init --preset command, actual ui:apply, token
+rebuild preserving changed values, generated workspace deno task check, bad
+schema refusal preserving lock/CSS. The scaffold is cleaned up by its test.
+S5 independent review pending; final carriers and broader gates remain S6.
+
+S5 independent source review PASS. Scoped 18-file check/lint/fmt: zero findings;
+docs:accuracy PASS (including live --preset option census), quality:gate PASS
+with existing warnings. Four service tests, 27 regressions and native fresh-app
+acceptance all pass. Reconcile: no labels; issue milestone0.0.9 mirrored to PR.
+S6 will document context selection on imported sources, remove empty retired
+portable theme lock entries, reuse the app-directory constant, regenerate
+carriers, run remaining gates and obtain final IMPL-EVAL.

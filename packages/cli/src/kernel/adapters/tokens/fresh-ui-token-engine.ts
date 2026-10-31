@@ -6,6 +6,17 @@ import type {
 
 /** Keep Style Dictionary and its source documents out of other command startup paths. */
 export class FreshUiTokenEngine implements TokenEnginePort {
+  async figmaSources(bundle: unknown): Promise<Readonly<Record<string, string>>> {
+    const engine = await import('@netscript/fresh-ui/tokens');
+    const snapshot = engine.importFigmaTokenBundle(bundle);
+    const sources = engine.figmaTokenSources(snapshot);
+    return Object.fromEntries(
+      Object.entries({ 'tokens.resolver.json': sources.resolver, ...sources.documents }).map((
+        [name, document],
+      ) => [name, JSON.stringify(document, null, 2) + '\n']),
+    );
+  }
+
   async outputFiles(previews = false): Promise<readonly string[]> {
     const metadata = await import('@netscript/fresh-ui/token-config');
     return [...metadata.APP_TOKEN_FILES, ...(previews ? metadata.PREVIEW_TOKEN_FILES : [])];

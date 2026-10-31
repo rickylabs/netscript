@@ -1,6 +1,7 @@
 import { resolve } from '@std/path';
 import { z } from 'zod';
-import { decodeUiPreset } from '../../../domain/ui/ui-preset.ts';
+import { resolveUiPreset } from './resolve-preset.ts';
+import { applyRemoteUiPreset } from './apply-remote-preset.ts';
 import { uiContentHash } from '../../../domain/ui/ui-lock.ts';
 import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
 import { prepareUiRegistryInstall } from './install-registry.ts';
@@ -21,7 +22,11 @@ export interface UiPresetApplyInput {
 /** Apply theme/font through the existing compiler; component sources change only for explicit style. */
 export async function applyUiPreset(input: UiPresetApplyInput, deps: UiRegistryDependencies) {
   const root = resolve(input.root);
-  const preset = decodeUiPreset(input.preset);
+  const selection = await resolveUiPreset(input.preset, deps);
+  if (selection.kind === 'remote') {
+    return await applyRemoteUiPreset(input, selection.url, selection.deps);
+  }
+  const preset = selection.preset;
   const only = new Set(input.only?.split(',').map((part) => part.trim()) ?? []);
   if ([...only].some((part) => part !== 'theme' && part !== 'font')) {
     throw new Error('--only accepts theme,font');

@@ -139,8 +139,13 @@ export const COMMAND_REFERENCE_PATHS: readonly string[] = [
   'docs/site/cli-reference.md',
 ];
 
-/** Ratified S2 plus ui:migrate root/direct-child census. */
+/** Ratified command paths; S5a adds --preset to existing init without adding a command. */
 export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 111;
+/** Ratified UI preset flags are checked against the live tree as well as the reference prose. */
+export const RATIFIED_UI_PRESET_OPTIONS = [
+  { command: 'init', flag: '--preset' },
+  { command: 'ui:apply', flag: '--preset' },
+] as const;
 
 export interface GoldenPathDocsResult {
   readonly pageCount: number;
@@ -462,6 +467,7 @@ export async function listPublicCommandPaths(): Promise<readonly string[]> {
     readonly getName: () => string;
     readonly getDescription: () => string;
     readonly getCommands: () => readonly EnumerableCommand[];
+    readonly getOptions: () => readonly { readonly flags: readonly string[] }[];
   }
   interface PublicTreeModule {
     readonly createPublicCommandRegistry: () => {
@@ -507,6 +513,17 @@ export async function listPublicCommandPaths(): Promise<readonly string[]> {
       dependencies: dependenciesModule.createPublicCommandDependencies(host),
     },
   });
+  for (const option of RATIFIED_UI_PRESET_OPTIONS) {
+    const command = rootCommand.getCommands().find((entry) => entry.getName() === option.command);
+    if (!command?.getOptions().some((entry) => entry.flags.includes(option.flag))) {
+      throw new Error(`Ratified public CLI option missing: ${option.command} ${option.flag}`);
+    }
+  }
+  requireText(
+    await read('docs/site/reference/cli/commands.md'),
+    '`--preset <code-or-url>`',
+    'CLI init option reference',
+  );
   return (await new catalogModule.PublicCliCommandCatalog(rootCommand).listCommands()).map(
     ({ path }) => path,
   );

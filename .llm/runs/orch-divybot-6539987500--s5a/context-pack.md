@@ -34,3 +34,16 @@ CI coverage and the distributable name checker. No READY claim yet.
 
 S4 terminal PASS: explicit plugin/CI/name command and negative file control.
 Next implement S5 URL dispatch, persistent source/lock ownership and init wiring.
+
+S5 implemented: 4 URL tests, 27 regression tests and native one-command scaffold
+acceptance all pass. New --preset docs/census added; independent review next.
+Final S6 still requires carriers, all check:* tasks, full runtime suite and final
+IMPL-EVAL. No READY claim before exact-head required CI.
+
+S5 independent source review PASS. Scoped 18-file check/lint/fmt: zero findings;
+docs:accuracy PASS (including live --preset option census), quality:gate PASS
+with existing warnings. Four service tests, 27 regressions and native fresh-app
+acceptance all pass. Reconcile: no labels; issue milestone0.0.9 mirrored to PR.
+S6 will document context selection on imported sources, remove empty retired
+portable theme lock entries, reuse the app-directory constant, regenerate
+carriers, run remaining gates and obtain final IMPL-EVAL.

@@ -1,3 +1,4 @@
+import type { InitPresetInput } from '../../../kernel/application/scaffold/apply-init-preset.ts';
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { createPublicCommandDependencies } from '../root/public-command-dependencies.ts';
@@ -13,6 +14,7 @@ async function fixture(
     parse: (args?: string[]) => Promise<void>;
     results: InitAgentResult[];
     inputs: InitAgentInput[];
+    presets: InitPresetInput[];
     docsCalls: () => number;
   }) => Promise<void>,
   environment: AgentEnvironment = {},
@@ -25,10 +27,15 @@ async function fixture(
   }).initCommandDependencies;
   const results: InitAgentResult[] = [];
   const inputs: InitAgentInput[] = [];
+  const presets: InitPresetInput[] = [];
   let docsCalls = 0;
   const command = () =>
     createInitCommand({
       ...dependencies,
+      applyPreset: async (input) => {
+        assert(await new DenoAgentInitFileSystem().exists(join(root, 'deno.json')));
+        presets.push(input);
+      },
       // Keep the real scaffold writers and installer; do not launch external processes.
       initContext: {
         ...dependencies.initContext,
@@ -65,6 +72,7 @@ async function fixture(
     await run({
       root,
       inputs,
+      presets,
       results,
       docsCalls: () => docsCalls,
       parse: async (args = []) => {
@@ -194,5 +202,27 @@ Deno.test('init integration: json emits one scaffold result while still installi
     assertEquals(inputs.length, 1);
     assertEquals(lines.length, 1);
     assertEquals(JSON.parse(lines[0]).project.name, 'agent-project');
+  });
+});
+
+Deno.test('init --preset forwards the URL and selected generated app after scaffold, and dry-run skips it', async () => {
+  await fixture(async ({ parse, root, presets }) => {
+    await parse([
+      '--preset',
+      'https://themes.test/studio.json',
+      '--app-name',
+      'studio',
+      '--no-agent',
+    ]);
+    assertEquals(presets, [{
+      projectRoot: root,
+      name: 'agent-project',
+      appName: 'studio',
+      preset: 'https://themes.test/studio.json',
+    }]);
+  });
+  await fixture(async ({ parse, presets }) => {
+    await parse(['--preset', 'https://themes.test/unreachable.json', '--dry-run']);
+    assertEquals(presets, []);
   });
 });
