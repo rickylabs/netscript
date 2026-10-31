@@ -1,6 +1,6 @@
 # Locked theme renders
 
-These are the approved example screens for each theme, reviewed over eight rounds. **They define each theme's identity and set the UI quality bar.** When the component library, the archetype screens and these renders disagree on composition, anatomy, shape, type or density, these renders win.
+These are the approved example screens for each theme, reviewed over eight rounds. **They define each theme's identity and set the UI quality bar.** When the component library, the archetype screens and these renders disagree on composition, anatomy, shape, type or density, these renders win. Colour values follow the variables export (`.llm/runs/docs-fresh-ui-design-system--design-handoff/figma-variables/`); these renders predate the 2026-10-31 contrast pass, so their status colours are older.
 
 | File | Theme |
 | --- | --- |
