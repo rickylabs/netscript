@@ -1,3 +1,4 @@
+import { AIExamples } from './gap-ai-fixture.tsx';
 import { DataTableExamples } from './gap-data-table-fixture.tsx';
 import { StatsGrids } from './gap-stats-grid-fixture.tsx';
 import { ShellExamples } from './gap-shell-fixture.tsx';
@@ -86,6 +87,10 @@ function Actions() {
 }
 if (location.pathname === '/shell-static') {
   hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
+} else if (location.pathname === '/ai-static') {
+  hydrate(<AIExamples />, document.body);
+} else if (location.pathname === '/ai') {
+  render(<AIExamples />, document.body);
 } else if (location.pathname === '/data-table') {
   render(<DataTableExamples />, document.getElementById('app')!);
 } else if (location.pathname === '/stats-grid') {

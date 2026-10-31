@@ -18,6 +18,7 @@ const css = (await Promise.all(
   .join('\n').replace(/@import\s+[^;]+;/g, '');
 const bundle = await Deno.readTextFile(new URL('./test-results/gap-fixture.js', import.meta.url));
 const shell = await Deno.readTextFile(new URL('./test-results/gap-shell.html', import.meta.url));
+const ai = await Deno.readTextFile(new URL('./test-results/gap-ai.html', import.meta.url));
 const cardCss = await Deno.readTextFile(
   new URL('packages/fresh-ui/registry/components/ui/card.css', base),
 );
@@ -32,12 +33,13 @@ const server = Deno.serve({
   if (new URL(request.url).pathname === '/registered-card.css') {
     return new Response(cardCss, { headers: { 'content-type': 'text/css' } });
   }
+  const staticAI = new URL(request.url).pathname === '/ai-static';
   const staticShell = new URL(request.url).pathname === '/shell-static';
   return new Response(
     `<!doctype html><html lang="en" data-theme="studio" data-flavor="utility"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Fresh UI gap fixtures</title><style>${css}\nbody{background:var(--ns-bg);color:var(--ns-fg);font-family:var(--ns-font-body);padding:${
       staticShell ? '0' : '1rem'
     }}main>section{margin-block:2rem}main>section>*{margin-inline-end:1rem}</style></head><body>${
-      staticShell ? shell : '<div id="app"></div>'
+      staticShell ? shell : staticAI ? ai : '<div id="app"></div>'
     }<script type="module" src="/fixture.js"></script></body></html>`,
     { headers: { 'content-type': 'text/html' } },
   );

@@ -406,3 +406,62 @@ Rows now contain real native actions, and selection lives on checkboxes rather t
 `aria-selected` on static table rows. Consumers that inspect `column.header` as a string should
 narrow it before string operations, or use `headerLabel`. Keep stylesheet imports from `ui:add`
 to receive both the frame and package presentation styles.
+
+### AI event labels, step traces and attachments
+
+Install `marker`, `trace` or `attachment` with `ui:add`; import the copied
+component from `@/components/ui/<name>.tsx`. Their Utility CSS is installed through
+the registry. Marker uses presentation variants `default`, `border` and
+`separator`; optional `label` takes precedence over `children`, and `icon` is
+decorative. Supplied native child controls keep their ordinary tab order.
+
+```tsx
+import { Trace } from '@/components/ui/trace.tsx';
+import { Attachment } from '@/components/ui/attachment.tsx';
+
+<Trace status='running' title='Agent trace' duration='2.1s'>
+  <Trace.Line
+    title='Search docs'
+    status='running'
+    description='Querying the documentation index'
+    duration='312ms'
+    collapsible
+    defaultOpen
+  >
+    <a href='/sources'>Read sources</a>
+  </Trace.Line>
+</Trace>;
+
+<Attachment
+  title='report.pdf'
+  description='Upload failed: file exceeds the limit'
+  state='error'
+  stateLabel='Transfer failed'
+  size='xs'
+  media={<span>PDF</span>}
+  actions={<button type='button'>Retry</button>}
+/>;
+```
+
+Trace renders a native ordered list. Place `Trace.Line` only inside Trace or a
+native list. Aggregate `status` accepts `running | done | error`; a line also
+accepts `pending`. Static lines add no tab stop. Collapsible lines use native
+details/summary, including useful SSR and native Enter/Space behavior. Keep
+title/description/duration presentation-only inside the summary; put native
+actions in the line's children. Keep descriptions brief: they are visible while
+collapsed and form part of the summary's accessible name. `open`/`onOpenChange` are controlled proposals:
+refusal retains the accepted physical state; `defaultOpen` supplies uncontrolled
+initial state. Static lines ignore open. `connector={false}` removes a final
+step's rail. `statusLabel` localizes the static status text on both root and line;
+glyphs are decorative and no live region or agent runtime is created.
+
+Attachment accepts `idle | uploading | processing | error | done`, three sizes
+(`default | sm | xs`) and two orientations (`horizontal | vertical`). The caller
+owns media/alt text, description, actions and optional `progress` content, such
+as a named native progress element. It performs no upload, fetch, remove or retry
+operation. Every non-idle state includes static text (Uploading, Processing, Error
+or Done), localizable through `stateLabel`. At xs horizontal, description stays
+in the accessibility tree while visually hidden; progress is omitted and the
+trailing glyph carries the visual state. Busy state updates preserve native
+action identity and focus. Use caller content or host announcements for detailed
+transfer outcomes; these components never create automatic live announcements.

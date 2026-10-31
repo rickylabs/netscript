@@ -99,6 +99,15 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           ),
         );
       }
+      if (['marker', 'trace', 'attachment'].includes(name)) {
+        assertEquals(
+          await Deno.readTextFile(join(root, 'assets/ui', name + '.css')),
+          await Deno.readTextFile(
+            join(repo, 'packages/fresh-ui/registry/components/ui', name + '.css'),
+          ),
+          'New AI styles must preserve actual installed CSS bytes.',
+        );
+      }
       if (names.includes(name)) {
         assertStringIncludes(
           installed,
@@ -137,7 +146,13 @@ import { SidebarShell } from './components/ui/sidebar-shell.tsx';
 import { StatsGrid } from './components/ui/stats-grid.tsx';
 import { DataTable } from './components/ui/data-table.tsx';
 import { DataGrid } from '@netscript/fresh-ui';
+import { Marker } from './components/ui/marker.tsx';
+import { Trace } from './components/ui/trace.tsx';
+import { Attachment } from './components/ui/attachment.tsx';
 console.log(JSON.stringify({
+  marker: render(<Marker variant='separator' icon='ⓘ' label='Restored' />),
+  trace: render(<Trace status='running' title='Run'><Trace.Line title='Search' status='running' collapsible defaultOpen description='Searching docs' duration='312ms'><button type='button'>Read output</button></Trace.Line></Trace>),
+  attachment: render(<Attachment title='report.pdf' description='PDF · 248 KB' state='error' size='xs' media='PDF' actions={<button type='button'>Retry</button>} />),
   'data-table': render(<DataTable state='default'><DataTable.Header>Orders</DataTable.Header><DataTable.Body><DataGrid label='Orders' columns={[{key:'name',header:<button type='button'>Sort name</button>,headerLabel:'Name',sort:'ascending',cell:'strong'}]} rows={[{id:'one',data:{name:'First order'},href:'/orders/one',label:'Read first order'}]} /></DataTable.Body><DataTable.Footer><a href='#next-orders'>Next orders</a></DataTable.Footer></DataTable>),
   'stats-grid': render(<StatsGrid columns={3} joined><StatsGrid.Card label='Revenue' value='$284,920' detail='+8.2% versus the previous period' delta='up' variant='hero' badge={<button type='button'>Inspect revenue</button>} /></StatsGrid>),
   'sidebar-shell': render(<SidebarShell layout='docs' pathname='/orders' navigation={[{label:'Work',items:[{href:'/orders',label:'Orders',count:'12'}]}]} brand={<a href='/'>NetScript</a>} rail railContent={<a href='#installation'>Installation</a>} mobileRailContent={<details><summary>On this page</summary>Contents</details>}><h1>Orders</h1></SidebarShell>),
@@ -164,6 +179,9 @@ console.log(JSON.stringify({
       'aspect-ratio',
       'direction',
       'resizable',
+      'marker',
+      'trace',
+      'attachment',
     ];
     assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
     for (const name of renderedNames) {

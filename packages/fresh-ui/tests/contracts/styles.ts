@@ -1,3 +1,4 @@
+import { aiFixtures, aiKeyboard } from './utility-ai.tsx';
 import { dataTableFixtures, dataTableKeyboard } from './utility-data-table.tsx';
 import { statsGridFixtures, statsGridKeyboard } from './utility-stats-grid.tsx';
 import { shellFixtures, shellKeyboard } from './utility-shell.tsx';
@@ -48,6 +49,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...shellFixtures,
     ...statsGridFixtures,
     ...dataTableFixtures,
+    ...aiFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -68,6 +70,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...shellKeyboard,
     ...statsGridKeyboard,
     ...dataTableKeyboard,
+    ...aiKeyboard,
     ...proseKeyboard,
   ],
 }];

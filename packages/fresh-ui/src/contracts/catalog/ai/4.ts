@@ -99,7 +99,7 @@ export const ai_4: readonly ComponentContract[] = [
     'specId': 'I4',
     'category': 'AI',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'variant': {
         'kind': 'enum',
@@ -108,6 +108,7 @@ export const ai_4: readonly ComponentContract[] = [
           'border',
           'separator',
         ],
+        'default': 'default',
       },
       'icon': {
         'kind': 'slot',
@@ -115,21 +116,22 @@ export const ai_4: readonly ComponentContract[] = [
       'children': {
         'kind': 'slot',
       },
+      'label': {
+        'kind': 'slot',
+        'description':
+          'Takes precedence over children when supplied, preserving empty text and zero.',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'icon',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when icon supplied',
       },
       {
         'name': 'content',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
     ],
     'attributes': {
@@ -139,6 +141,7 @@ export const ai_4: readonly ComponentContract[] = [
           'border',
           'separator',
         ],
+        'default': 'default',
       },
     },
     'booleans': [],
@@ -149,6 +152,10 @@ export const ai_4: readonly ComponentContract[] = [
       },
       {
         'name': 'children',
+        'part': 'content',
+      },
+      {
+        'name': 'label',
         'part': 'content',
       },
     ],
@@ -169,9 +176,33 @@ export const ai_4: readonly ComponentContract[] = [
     'specId': 'I5',
     'category': 'AI',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'status': {
+        'kind': 'enum',
+        'values': [
+          'running',
+          'done',
+          'error',
+        ],
+        'default': 'running',
+        'description': 'Aggregate status; pending is a Line status only.',
+      },
+      'statusLabel': {
+        'kind': 'text',
+        'description': 'Localizable static status text, default Running/Done/Error.',
+      },
+      'title': {
+        'kind': 'slot',
+      },
+      'duration': {
+        'kind': 'slot',
+      },
+      'children': {
+        'kind': 'slot',
+        'description': 'Trace.Line LI children form a native ordered list.',
+      },
+      'Line.status': {
         'kind': 'enum',
         'values': [
           'done',
@@ -179,70 +210,97 @@ export const ai_4: readonly ComponentContract[] = [
           'pending',
           'error',
         ],
+        'default': 'pending',
       },
-      'open': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+      'Line.statusLabel': {
+        'kind': 'text',
+        'description':
+          'Localizable static text included in summary name, default Done/Running/Pending/Error.',
       },
-      'children': {
+      'Line.title': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Line.description': {
         'kind': 'slot',
       },
-      'title': {
+      'Line.duration': {
         'kind': 'slot',
       },
-      'description': {
+      'Line.children': {
         'kind': 'slot',
       },
-      'duration': {
-        'kind': 'slot',
-      },
-      'collapsible': {
+      'Line.collapsible': {
         'kind': 'boolean',
+        'default': false,
+      },
+      'Line.connector': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'Line.open': {
+        'kind': 'boolean',
+        'description': 'Controlled accepted disclosure state; ignored for static lines.',
+      },
+      'Line.defaultOpen': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'Line.onOpenChange': {
+        'kind': 'callback',
+        'description':
+          'One proposal per native activation; refusal retains physical accepted state.',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
+      },
+      {
+        'name': 'list',
+      },
+      {
+        'name': 'status-label',
+      },
+      {
+        'name': 'header',
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'line',
-        'planned': true,
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'icon',
-        'planned': true,
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'title',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'description',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'duration',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when the corresponding content or line is supplied',
+      },
+      {
+        'name': 'disclosure',
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'collapsible-trigger',
-        'planned': true,
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'collapsible-content',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when the corresponding content or line is supplied',
       },
       {
         'name': 'connector',
-        'planned': true,
+        'when': 'when the corresponding content or line is supplied',
       },
     ],
     'attributes': {
@@ -253,40 +311,87 @@ export const ai_4: readonly ComponentContract[] = [
           'pending',
           'error',
         ],
+        'parts': [
+          'root',
+          'line',
+        ],
+        'description': 'Root accepts running/done/error only; pending belongs to Line.',
       },
       'data-open': {
         'values': [
           'false',
           'true',
         ],
+        'parts': [
+          'line',
+        ],
+        'description': 'Actual accepted disclosure state; static lines always false.',
+      },
+      'data-collapsible': {
+        'values': [
+          'false',
+          'true',
+        ],
+        'parts': [
+          'line',
+        ],
+        'default': 'false',
+      },
+      'data-connector': {
+        'values': [
+          'false',
+          'true',
+        ],
+        'parts': [
+          'line',
+        ],
+        'default': 'true',
       },
     },
     'booleans': [
-      'collapsible',
+      'Line.collapsible',
+      'Line.connector',
     ],
     'slots': [
       {
         'name': 'children',
-        'part': 'collapsible-content',
+        'part': 'list',
       },
       {
         'name': 'title',
         'part': 'title',
       },
       {
-        'name': 'description',
+        'name': 'duration',
+        'part': 'duration',
+      },
+      {
+        'name': 'Line.title',
+        'part': 'title',
+      },
+      {
+        'name': 'Line.description',
         'part': 'description',
       },
       {
-        'name': 'duration',
+        'name': 'Line.duration',
         'part': 'duration',
+      },
+      {
+        'name': 'Line.children',
+        'part': 'collapsible-content',
       },
     ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/',
     'keyboard': [
       {
         'key': 'Enter/Space',
-        'action': 'Toggle the focused disclosure',
+        'action': 'Toggle the focused native summary',
+      },
+      {
+        'key': 'Tab/Shift+Tab',
+        'action':
+          'Move between summaries and visible native child controls; static lines add no tab stop',
       },
     ],
     'tokenRoles': [
@@ -299,6 +404,9 @@ export const ai_4: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-ai adds duration and success check icon; running uses warning spinner. Status pending belongs to Trace line; the Trace aggregate draws running/done/error.',
+      'Trace renders a native ordered list; Line is an LI and must be placed in Trace or a native list. Summary content is presentation only; native actions belong in collapsible-content.',
+      'All statuses have static text equivalents; glyphs are decorative. No automatic live announcements or backend run state.',
+      'Native open/defaultOpen and controlled refusal are reconciled after every render; static lines ignore open.',
     ],
   },
 ];

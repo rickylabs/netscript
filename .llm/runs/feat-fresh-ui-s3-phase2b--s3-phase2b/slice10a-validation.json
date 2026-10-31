@@ -1,0 +1,117 @@
+{
+  "sourceFiles": 26,
+  "tests": {
+    "final-contracts-installed": {
+      "exitCode": 0,
+      "passed": 437,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 437,
+      "uniqueFailures": 0
+    },
+    "registry": {
+      "exitCode": 0,
+      "passed": 121,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 121,
+      "uniqueFailures": 0
+    },
+    "final-embeddings": {
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "chromium": {
+      "passed": 36,
+      "failed": 0,
+      "ignored": 0,
+      "flaky": 0,
+      "scope": "Utility light/dark390/1280; all ledger states, native control focus, accepted/refused/default disclosure, external DOM reconciliation, native SSR before JavaScript and real hydration, accessibility text/zero axe, RTL geometry and reduced motion"
+    },
+    "additionalEngines": {
+      "passed": 28,
+      "failed": 0,
+      "scope": "Focused actual Firefox/WebKit light390/1280: seven native keyboard/disclosure/SSR semantics scenarios; not full engine certification"
+    },
+    "pageConsoleErrors": 0,
+    "seriousCriticalAxe": 0,
+    "allowances": 0,
+    "captures": 32
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "scope": "Source working-tree gate before source commit; refreshed committed-head evidence follows"
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsSiteBuild": {
+    "verdict": "PASS",
+    "command": "deno task gen:agent-docs-prose",
+    "scope": "Site built to extract prose"
+  },
+  "nativeMemberPublishDryRun": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0
+  },
+  "publicationAudit": "slice10a-publication-audit.json",
+  "independentDesignReview": "PASS_AFTER_ROUND1_ACCESSIBILITY_FIX",
+  "independentSourceReview": "PASS",
+  "independentEvidenceReview": "PENDING",
+  "carriers": "PENDING_AFTER_SOURCE_COMMIT",
+  "inventory": {
+    "total": 104,
+    "shipped": 94,
+    "pending": 10,
+    "nativeRegistryItems": 123
+  },
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
+  "wholePhase2b": "IN_PROGRESS",
+  "ready": false
+}

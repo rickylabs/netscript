@@ -166,7 +166,7 @@ export const ai_5: readonly ComponentContract[] = [
     'specId': 'I7',
     'category': 'AI',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'state': {
         'kind': 'enum',
@@ -177,6 +177,7 @@ export const ai_5: readonly ComponentContract[] = [
           'error',
           'done',
         ],
+        'default': 'idle',
       },
       'size': {
         'kind': 'enum',
@@ -185,6 +186,7 @@ export const ai_5: readonly ComponentContract[] = [
           'sm',
           'xs',
         ],
+        'default': 'default',
       },
       'orientation': {
         'kind': 'enum',
@@ -192,9 +194,11 @@ export const ai_5: readonly ComponentContract[] = [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
       'title': {
         'kind': 'slot',
+        'required': true,
       },
       'media': {
         'kind': 'slot',
@@ -205,35 +209,49 @@ export const ai_5: readonly ComponentContract[] = [
       'actions': {
         'kind': 'slot',
       },
+      'stateLabel': {
+        'kind': 'text',
+        'description':
+          'Localizable static non-idle state text, default Uploading/Processing/Error/Done; never a live region.',
+      },
+      'progress': {
+        'kind': 'slot',
+        'description': 'Optional caller-owned progress content; omitted at xs horizontal.',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
-      },
-      {
-        'name': 'media',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'content',
-        'planned': true,
       },
       {
         'name': 'title',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+      },
+      {
+        'name': 'media',
+        'when': 'when corresponding content/state is supplied',
       },
       {
         'name': 'description',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content/state is supplied',
       },
       {
         'name': 'actions',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content/state is supplied',
+      },
+      {
+        'name': 'progress',
+        'when': 'when corresponding content/state is supplied',
+      },
+      {
+        'name': 'state-label',
+        'when': 'when corresponding content/state is supplied',
+      },
+      {
+        'name': 'state-icon',
+        'when': 'when corresponding content/state is supplied',
       },
     ],
     'attributes': {
@@ -245,6 +263,7 @@ export const ai_5: readonly ComponentContract[] = [
           'error',
           'done',
         ],
+        'default': 'idle',
       },
       'data-size': {
         'values': [
@@ -252,12 +271,14 @@ export const ai_5: readonly ComponentContract[] = [
           'sm',
           'xs',
         ],
+        'default': 'default',
       },
       'data-orientation': {
         'values': [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
     },
     'booleans': [],
@@ -277,6 +298,10 @@ export const ai_5: readonly ComponentContract[] = [
       {
         'name': 'actions',
         'part': 'actions',
+      },
+      {
+        'name': 'progress',
+        'part': 'progress',
       },
     ],
     'apg': 'native action controls in a noninteractive attachment surface',
@@ -302,6 +327,8 @@ export const ai_5: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-ai media sizes40/32/24; xs horizontal omits description and uses trailing state glyph.',
+      'Every non-idle state has visually hidden static text at all sizes; glyphs are decorative. xs horizontal visually hides description but retains it in the accessibility tree.',
+      'Native child actions remain independent; no upload, fetch, timer, remove/retry behavior or automatic live region. Media and alt text are caller-owned.',
     ],
   },
 ];

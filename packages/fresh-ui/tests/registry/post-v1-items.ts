@@ -27,6 +27,9 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'aspect-ratio',
   'direction',
   'resizable',
+  'marker',
+  'trace',
+  'attachment',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */

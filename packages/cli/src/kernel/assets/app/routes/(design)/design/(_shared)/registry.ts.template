@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 119,
+  'total': 122,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -796,6 +796,24 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 3,
     'description': 'Private copied navigation and native shell/toggle DOM interoperability.',
   },
+  {
+    'name': 'marker',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'In-thread event label with optional icon and separator rules.',
+  },
+  {
+    'name': 'trace',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Caller-owned run status with native ordered step disclosures.',
+  },
+  {
+    'name': 'attachment',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Media and caller-owned transfer state with native child actions.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -922,6 +940,9 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'aspect-ratio',
       'direction',
       'resizable',
+      'marker',
+      'trace',
+      'attachment',
     ],
   },
   {

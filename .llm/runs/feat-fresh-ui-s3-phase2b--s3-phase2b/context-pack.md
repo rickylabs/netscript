@@ -186,3 +186,53 @@ No maintained product code changed after source review. Runtime at the new head
 and required remote CI remain unproven; this is no READY claim. Reconciled
 against the source commit with no topic lock changes. The next implementation
 unit is AI10a Marker/Trace/Attachment after the mandatory public audit and push.
+
+
+## AI10a design checkpoint
+
+The seven-item contract in `slice10a-checkpoint.md` is recorded before product
+code. Figma I4/I5/I7 spec, ledger deviations and all three Utility review renders
+were inspected; native Collapsible and Item informed the native/platform and
+L2-independent boundaries. Same independent design review is required next.
+
+
+AI10a design round1 FAIL_PLAN identified inaccessible decorative Attachment states,
+especially xs errors. No product source was written. Checkpoint now requires a
+localizable static state-label at every size, preserves xs description in the
+accessibility tree, adds status equivalents to Trace, uses native ordered list/LI
+semantics, and locks pending to a CSS ring (no missing glyph addition). Same
+evaluator receives round2; one consecutive terminal failure, no third attempt.
+
+
+AI10a revised design PASS from the same independent evaluator. Failure streak
+reset to zero. Contract-first implementation is authorized by this terminal
+checkpoint verdict; the inaccessible-state design was corrected before source.
+
+
+## AI10a source ready for independent review
+
+The reviewed checkpoint is implemented in26 source/carrier files. Strict contract
+renders and final actual ui:add source/CSS fidelity, compile/lint and SSR pass437;
+the broader registry set passed121; final embeddings/closure passed4. Chromium
+36 and focused Firefox/WebKit28 pass, no failed/ignored/flaky cases. Utility
+light/dark390/1280,32 private captures, zero serious/critical axe findings,
+allowances or page/console errors. Native summaries work with JavaScript disabled
+and real SSR hydration retains controlled refusal. Both status families expose
+localizable static text; compact Attachment descriptions remain accessible.
+Source wrappers11; browser fixture check4/spec1/lint5/fmt5 pass with zero dropped.
+Quality/architecture, preflight/docs accuracy/export drift/site prose build and
+native member publication pass; slow types0. Raw full doc-lint remains124 under
+#2531, exact123-diagnostic multiset unchanged plus one JSON limitation.
+All source tokens are existing; no lock/dependency/version/primitive-glyph change.
+Carriers and refreshed committed-head quality/publication evidence follow the
+source commit. Same independent source review is pending. No READY; remaining
+AI10b/Docs/Desktop/extensions/all-style/final gates remain part of the assignment.
+
+
+AI10a same independent source evaluator PASS; no blockers, failure streak0.
+README now incorporates the non-blocking advice to keep summary descriptions
+brief because they contribute to the accessible name. The unscoped description
+layout wrapper has no data axis; canonical bindings remain on declared parts.
+Source26files, inventory104/94/10/123; no lock churn. Reconciled reviewed source
+against the current branch; source commit and committed-head carrier/quality/
+publication checks are next. No next-unit product code started.
