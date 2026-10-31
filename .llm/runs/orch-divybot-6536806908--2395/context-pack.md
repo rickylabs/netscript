@@ -1,29 +1,18 @@
-# Resume — round5 W1 fixed, fresh independent cycle required
+# Resume — W2 and manual CI harness correction
 
-PR #2483 remains ready and rebased onto main 4aa734e. All four Augment findings have fixes
-and replies, and native review-thread gate passes. Round5 independently reviewed exact head
-1edb71eeeb72ddd4d84327bc9bd97f79ce5c31b3 and returned CHANGES for one W1 blocker: throwing
-expected requeue outcomes exhausts the Redis listener supervisor's lifetime restart budget.
+Owner directed continued CI remediation; verbatim instruction and bounded corrective cycle are
+recorded in worklog. Original five-round cycle remains historical. Corrective review1 CHANGES
+at da79e72 found native Deno KV retry regression; fixed by lease-capability guarding Redis's
+nack-and-return policy. Real Deno KV job-DLQ-outage and shutdown-task replacement tests fail
+before and pass after. Six Redis/Garnet listener survival cases remain green.
 
-The follow-up code explicitly nacks and returns for queue requeue outcomes, preserves disabled/
-missing task ACK behavior and direct non-queue replay rejection, and leaves supervisor/listen
-concurrency unchanged. Real Redis/Garnet regressions exercise six disabled tasks, six active
-caller-key duplicates and six lost-lease jobs, then prove later valid work executes with zero
-supervisor restarts. Four task-survival tests fail on round5 source and all six new cases pass
-on the correction. Existing shutdown/DLQ tests assert explicit settlement rather than rejection.
+Manual e2e-cli41162244034 exposed an inherited desktop test-driver launcher filename assumption,
+matching latest main manual run40539973506. Fix discovers the unique executable sibling of the
+runtime without guessing a version stem; absent/ambiguous cases remain errors. No packaging
+product behavior, skip policy, labels/milestones or workflow is changed.
 
-Final combined follow-up suite and exact-head gate results are recorded in listener-validation.json
-and the PR update. Corrected-head independent approval is UNPROVEN. The supplied feature cycle
-caps implementation evaluations at five; all are used. Coordinator must authorize a fresh cycle
-before re-steering the same independent evaluator. Do not silently launch round6 or self-certify.
-
-Required full scaffold-runtime CI remains unproven until coordinator #2474 arms e2e-cli-gate.
-Keep both corrected-head review and runtime acceptance unchecked. No local scaffold.runtime,
-label/milestone changes, merge/tag/release. Canonical BLOCKED report uses excluded atomic handoff.
-
-
-Owner requested continued CI remediation after this handoff; see verbatim instruction in worklog.
-The previous cycle remains recorded as exhausted. Continue a bounded corrective validation cycle
-with the same evaluator/session, and use the checked-in manual e2e-cli workflow dispatch to get
-runtime proof without label changes. Final head includes only this continuation record beyond the
-already tested correction. Do not tick proof boxes until actual verdicts exist.
+corrective-validation.json records285pass/0fail/2CI-onlyskip full suite and passing structured
+static/quality/corpus gates. Commit/push this corrected slice. Then run manual e2e-cli and the
+same independent evaluator corrective review2 at the exact frozen head. Update acceptance only
+with actual MERGE/full-runtime proof, then rerun close-gate without moving the head. No local
+scaffold.runtime, merge/tag/release. Canonical report uses excluded atomic handoff.

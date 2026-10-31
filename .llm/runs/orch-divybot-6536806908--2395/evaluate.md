@@ -125,3 +125,16 @@ VERDICT: CHANGES 1edb71eeeb72ddd4d84327bc9bd97f79ce5c31b3
 The supplied feature cycle allows at most five implementation evaluations. A corrected-head
 MERGE verdict is unproven until the coordinator authorizes a fresh evaluation cycle; do not
 silently launch round6 or self-certify the correction. Exact-head acceptance remains unchecked.
+
+
+## Owner-directed corrective cycle — review1: CHANGES
+
+Exact pushed head da79e722bf64168a19c382e2bcf9336d03984a15. W1 survival independently
+rerun on Redis/Garnet:6pass,0fail. One W2 blocker: native Deno KV nack(requeue:true) is a
+no-op and a normal return acknowledges the message. Restrict nack-and-return to lease-capable
+contexts, preserving rejection for non-lease queues. Real native-KV DLQ-outage and task-shutdown
+regressions fail before this fix and pass after. Earlier fencing, idempotency, heartbeat,
+timeout, keyPrefix and SDK fixture corrections remain accepted. Final review2 follows at the
+pushed corrected head, including the manual native CI harness lookup correction.
+
+VERDICT: CHANGES da79e722bf64168a19c382e2bcf9336d03984a15

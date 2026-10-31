@@ -127,9 +127,9 @@ Deno.test('KV Worker listener requeues after a job DLQ write outage instead of a
   void started.catch(() => undefined);
   try {
     await harness.queue.enqueue({ jobId: 'exhausted', topic: 'jobs', triggeredBy: 'queue' });
-    await until(async () => await durable.depth() === 1 && harness.returned() === 2);
+    await until(async () => await durable.depth() === 1 && harness.returned() === 1);
     await until(async () => (await harness.queue.getStats()).processing === 0);
-    assertEquals(harness.rejected(), 0, 'explicit nack preserves the long-running listener');
+    assertEquals(harness.rejected(), 1, 'non-lease queues retain rejection-based retry semantics');
     assertEquals(attempts, 2, 'released idempotency claim permits transport redelivery');
     assertEquals(writes, 2);
     assertEquals(await harness.queue.getStats(), { pending: 0, processing: 0, dlq: 0 });

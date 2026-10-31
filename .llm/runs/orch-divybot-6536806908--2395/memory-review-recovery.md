@@ -35,3 +35,11 @@
   capability explicitly: container withArgs(string[]) is part of Aspire.Hosting 13.5.3.
   CI shard4 uploads test.report.json even when condensed logs omit the failure; download the
   specific gate-receipts artifact and read structured failures before guessing at the cause.
+
+- Native DenoKvAdapter requeues only when its handler rejects. nack(requeue:true) is a no-op,
+  so Redis's explicit-nack-and-normal-return policy must be guarded by extendVisibility capability.
+  worker-kv-recovery_test.ts covers real native KV DLQ-outage and interrupted-task redelivery.
+- Manual e2e-cli runs also exercise desktop-native. Its launcher cannot be inferred by removing
+  three suffix characters from runtime path; native package dotted-version stems can differ.
+  Resolve the unique executable sibling, excluding runtime and non-executable assets, and fail
+  closed on zero/multiple candidates. Main manual run40539973506 proves the inherited failure.

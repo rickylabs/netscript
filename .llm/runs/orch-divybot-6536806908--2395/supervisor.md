@@ -51,3 +51,12 @@ CI test-4 follow-up: helpers/tests/generated-helpers-compile_test.ts needs the e
 container withArgs capability in its minimal restored SDK contract, now exercised by Garnet
 Lua flags. Preserve strict explicit methods; add Container-mode coverage rather than loosen
 the SDK type. This is a test-contract update, not a new production generator API.
+
+
+Corrective review W2: worker-kv-recovery_test.ts is in scope. Preserve native Deno KV
+rejection-based retry semantics; nack-and-return is restricted to lease-capable deliveries.
+Manual e2e-cli also exposed a pre-existing desktop test-driver failure, reproduced by the
+latest main manual run: launcher lookup truncates runtime filename text. Necessary CI harness
+scope: cli/e2e/src/adapters/native-desktop/linux-native-driver.ts and a focused launcher
+lookup test. Resolve the unique installed executable beside the runtime, failing on absent
+or ambiguous candidates. No desktop product/package behavior or skip policy change.

@@ -218,7 +218,7 @@ export async function processWorkerJob(
       writingDeadLetter || terminalRecorded || executionSucceeded;
     try {
       if (requeue) {
-        if (!queueContext) throw error;
+        if (!queueContext?.extendVisibility) throw error;
         await queueContext.nack({ requeue: true });
         return;
       }
@@ -354,7 +354,7 @@ export async function processWorkerTask(
       executionSucceeded || lease.signal.aborted || (claimAttempted && !claim) ||
       (claim && !claim.claimed && !claim.alreadyApplied)
     ) {
-      if (!queueContext) throw error;
+      if (!queueContext?.extendVisibility) throw error;
       await queueContext.nack({ requeue: true });
     }
   } finally {

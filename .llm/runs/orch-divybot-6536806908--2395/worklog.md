@@ -271,3 +271,31 @@ MISSING diagnostic is present. Use e2e-cli's checked-in workflow_dispatch path a
 branch head to obtain the required full runtime proof without changing coordinator-owned labels
 or running local scaffold.runtime. Complete actual evidence before updating acceptance and rerun
 close-gate on the same evaluated head.
+
+
+Corrective cycle review1 returned CHANGES at da79e722bf64168a19c382e2bcf9336d03984a15.
+W2: native Deno KV's requeue nack is a no-op; normal handler return acknowledges the message.
+Restrict explicit nack-and-return to contexts with the lease capability; preserve rejection for
+non-lease/native Deno KV and direct calls. Apply consistently in job/task dispatch and listener.
+Two real in-memory Deno KV regressions (job DLQ storage outage and task shutdown/replacement)
+fail at runtime before the fix, then pass. Combined targeted native-KV and Redis/Garnet survival,
+job DLQ/retry suites:33 passed. Restore the pre-existing non-lease KV outage test's rejection
+expectation; Redis's zero-restart survival proof remains unchanged.
+
+Manual e2e-cli41162244034 reaches runtime tiers but exposed desktop-native's pre-existing
+launcher lookup bug. Latest main manual e2e-cli40539973506 fails identically: installPackage
+truncates the native runtime path and attempts to stat a nonexistent dotted-version launcher.
+This is a real CI harness failure, not a queue or packaging product change. Locate the unique
+other executable beside the installed runtime instead, rejecting missing/ambiguous candidates.
+The regression uses a different dotted-version stem and a non-executable renderer asset; all
+three boundary cases pass. No skip, exception label, workflow rewrite, or product weakening.
+Full runtime proof will be rerun at the eventual frozen corrected head; old-head runs are diagnostic.
+
+
+W2 and manual-CI corrective slice gates:285passed,0failed,2CI-onlyskips in the combined full
+queue/worker/store/retry/generator/compile/native-launcher suite. Structured check106files,
+queue/worker lint100files, CLI lint2files, worker fmt33files and CLI fmt2files all pass with
+zero findings. Native quality/architecture/deps and MCP corpus freshness pass. Public API
+signatures unchanged; no generated corpus rewrite needed. Commit/push this slice, then
+manual full CI and same-session corrective review2 at the exact final head. Do not move that
+head for evidence-only comments/checklist updates after review.
