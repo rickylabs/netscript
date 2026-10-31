@@ -1,0 +1,3 @@
+# Public CLI command ratification
+
+New commands must update EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT in .llm/tools/docs/check-accuracy-and-discoverability.ts. The gate audits root commands and their direct children separately from the live CLI catalog. A documented descendant does not ratify its root: a colon group such as ui:migrate needs its own structural Markdown heading (or exact root invocation). The only accepted reference corpus is docs/site/reference/cli/commands.md plus docs/site/cli-reference.md. quality:gate omits docs:accuracy; required CI quality includes it. Always run the named docs gate before READY for new CLI commands.

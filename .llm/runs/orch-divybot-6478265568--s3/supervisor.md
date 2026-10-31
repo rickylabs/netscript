@@ -14,3 +14,9 @@
 - Codex implementation route: sol/xhigh, feature tier, confirmed from agentic:matrix --tier feature --json. Owner evaluation override remains claude-opus-5-5/high in a separate read-only session, stdin closed, blockers only; one repair and same-session re-review.
 - Read the original brief and all prior plan/worklog/drift/evaluation/memory records. Consulted live NetScript MCP find_guidance and search_docs before edits. RTK is still unavailable; use native focused inspections and repository structured wrappers.
 - Resume evidence may write this run directory, with raw operational logs in the project runs directory. Assignment and final report handoffs remain excluded from Git. No new PR, labels, closure of #2416, merge of the PR, force-push, lock/cache deletion or reload.
+
+## Coordinator CI repair — comment 6536466544
+
+- Baseline: 63ce2730a94362c00c70d71158aeb86562c5df48 on the same branch and PR #2467. Required CI quality failed docs:accuracy because the public census remained 97 after ui:migrate and ui:migrate variants made it 99.
+- Explicit additional write surface: .llm/tools/docs/check-accuracy-and-discoverability.ts; docs/site/cli-reference.md; docs/site/reference/cli/commands.md; existing generated prose/corpus/assets/publish carriers; this run record. No product behavior, registry schema, labels or lock changes.
+- Owner authorizes the census update and documentation, full local docs:accuracy/docs:links/site build and carrier checks, separate read-only Claude Opus 5.5/high IMPL-EVAL, push and wait for required quality SUCCESS at the new exact head. Only then post a new READY. Cockpit merges.

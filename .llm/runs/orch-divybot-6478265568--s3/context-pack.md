@@ -1,4 +1,4 @@
-# S3 phase-one handoff — READY
+# S3 phase-one handoff — CI census repair in progress
 
 Existing PR #2467, branch orch/divybot-6478265568. Original baseline 9a31e879c32a8066c50946a57976f3da34ba43a6; merged main 6a71cd0599673d70cd6311de3bb20b2d6a9dde2c. Independently reviewed source head bdb959d102189f5ad530fd3e07d54d29a8dbc0c4; the final evidence-only commit and public READY report identify the pushed head. Stop at READY: Cockpit reviews and merges. This phase leaves #2416 open.
 
@@ -30,3 +30,7 @@ Retained baseline limitations: 123 existing Fresh UI doc-lint diagnostics plus J
 Gap components, additional styles/all-style behavioral tests, tokens and registry v2 remain in their approved later phases. No issue closure, new PR, label change, force-push, merge, tag or release. Do not commit assignment/report handoff files.
 
 Final main reconciliation is verified: upstream #2480 fixture retained, bridge test and quality:gate/arch:check PASS at c433b6e398781fbc586ddcace4d0c7811c9b7f5e; no Fresh UI/CLI/browser code differs from reviewed bdb959d10. The final closeout commit changes evidence only.
+
+Coordinator follow-up 6536466544 supersedes the previous READY: required quality was red for the unratified ui:migrate census. Ratify the two paths, document the group/child, regenerate carriers and pass local docs gates, then obtain independent review and exact-new-head remote quality SUCCESS before a new READY. Same branch/PR; no merge or labels.
+
+Census source is repaired to 99, with a structural ui:migrate heading and its variants preview example in the CLI references. Live command audit is 99/99 with no missing paths; 10 checker tests and scoped wrappers pass; site build and docs links pass. Carriers regenerated; named docs:accuracy/freshness and independent delta review are next. Do not publish a new READY before exact-head remote quality SUCCESS.

@@ -73,3 +73,19 @@ Final reconciliation: evaluated product source is bdb959d102189f5ad530fd3e07d54d
 The final remote read found main advanced to 6a71cd0599673d70cd6311de3bb20b2d6a9dde2c through #2480, which independently fixes the same Markdown fixture double cast. Merge that commit and retain main's already-reviewed canonical fixture instead of the temporary Page.create integration fix. No Fresh UI, migration or parity product code differs from the independently reviewed bdb959d10 source. Re-run the original docs fixture bridge and quality gate on the merged commit; keep the 299-test/188-case evidence because its product inputs are unchanged. This supersedes the earlier statement that main remained 7907293f3 at final reconciliation.
 
 Final reconciliation gates are terminal PASS: original docs fixture bridge and quality:gate/arch:check at c433b6e398781fbc586ddcace4d0c7811c9b7f5e. git diff confirms zero Fresh UI/CLI/browser tool change from independently reviewed bdb959d10. The latest fixture is byte-identical to main. The following final commit records evidence only; all product verification remains valid. READY handoff proceeds on the existing PR, with Docker/runtime and baseline doc/app-lint limits explicit.
+
+## Coordinator CI census fix — intake and design
+
+Read the complete coordinator brief in issue comment 6536466544. Live CI at 63ce2730a confirms quality failed at Docs accuracy check. NetScript MCP guidance consulted. The checker intentionally audits both structural root entries and direct child invocations: describing the descendant alone cannot document its root.
+
+1. Public surface: both ui:migrate and ui:migrate variants are discoverable in the CLI reference and cheat sheet. No runtime/API change.
+2. Vocabulary: command census = ratified root/direct-child paths; the new colon root is distinct from its variants child.
+3. Ports: existing live CLI catalog, locked Markdown reference corpus and carrier generators.
+4. Constants: ratify EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT from 97 to 99 for these two approved paths; keep coverage rules unchanged.
+5. One scoped repair slice: checker constant + two CLI docs + regenerated carriers + run artifacts. Prove through existing checker tests, docs:accuracy, docs:links, site build, all four carrier checks, independent IMPL-EVAL and exact-head CI quality success.
+6. Deferred: product behavior, missing components, registry/token work, labels, merge and release.
+7. Contributor path: .llm/tools/docs/check-accuracy-and-discoverability.ts defines the census and reference corpus.
+
+PLAN-EVAL N/A for this mechanical ratification and docs repair; existing implementation evaluation remains intact, and the coordinator requires a new separate read-only IMPL-EVAL for this delta. Prior READY is superseded until required quality is green on the repaired head.
+
+Census repair validation: existing checker tests 10/10 PASS; scoped checker type/lint/format PASS. The live catalog reports exactly 99/99 documented root/direct paths from 164 recursive paths, including ui:migrate and ui:migrate variants. docs:links PASS (zero broken links/anchors/orphans). gen:agent-docs-prose completes the full site build and rendered-output check (253 HTML pages), then corpus/assets/publish generators complete in the documented order; corpus generation uses the explicit existing --allow-dirty override because the regenerated prose is uncommitted. Only the two intended prose carrier rows change. No lockfile churn. Full named docs:accuracy and all final carrier checks run on the following committed source before signoff; independent IMPL-EVAL pending.

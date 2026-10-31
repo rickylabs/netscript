@@ -332,16 +332,27 @@ lists, updates, and removes copied registry items:
 | `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
 | `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
 
-`netscript ui:migrate variants --project-root <workspace> [--app <name>] [--dry-run]`
-converts app-owned 0.0.8 Utility modifiers and anatomy to the shared data-attribute contract.
-Preview changes, apply them, then run the app's `deno task check`. It preserves custom classes,
-base/element hooks, strings and comments. Customized structural edits or unsupported dynamic
-classes stop preflight with a manual-merge diagnostic before any writes. Controlled component
-invocations require conversion to their public props; layout utility aliases are retained. Use the matching CLI
-and Fresh UI release together; dependency copies and registry ownership hashes remain untouched.
-
 Fresh UI is copy-source, so `ui:update` only touches registry files you have not modified; your
 edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+
+## `ui:migrate` — migrate app-owned Fresh UI copies
+
+`netscript ui:migrate` shows the available migrations. `netscript ui:migrate variants` converts
+0.0.8 Utility component modifiers and anatomy to the shared data-attribute contract.
+
+Preview the changes before applying them:
+
+```sh
+netscript ui:migrate variants --project-root apps/dashboard --dry-run
+```
+
+Run the same command without `--dry-run` to apply, then run the app's `deno task check`.
+`--project-root <path>` accepts a workspace or Fresh app; `--app <name>` selects an app in a workspace.
+The migration preserves custom classes, base/element hooks, strings and comments. Customized
+structural edits or unsupported dynamic classes stop preflight before any writes and need a manual
+merge. Controlled component overrides require conversion to their public props; layout utility
+aliases remain supported. Use the matching CLI and Fresh UI release together. Dependency copies
+and registry ownership hashes remain untouched.
 
 ## `deploy` — cloud and container targets
 
