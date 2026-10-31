@@ -28,3 +28,5 @@ The required single full scaffold.runtime attempt exits 1 at Aspire/Docker prefl
 Retained baseline limitations: 123 existing Fresh UI doc-lint diagnostics plus JSON-data missing-JSDoc limitation; existing exact-0.0.8 app-local constant-script react-no-danger finding. Workspace app check passes; nothing suppressed.
 
 Gap components, additional styles/all-style behavioral tests, tokens and registry v2 remain in their approved later phases. No issue closure, new PR, label change, force-push, merge, tag or release. Do not commit assignment/report handoff files.
+
+Final main reconciliation is verified: upstream #2480 fixture retained, bridge test and quality:gate/arch:check PASS at c433b6e398781fbc586ddcace4d0c7811c9b7f5e; no Fresh UI/CLI/browser code differs from reviewed bdb959d10. The final closeout commit changes evidence only.
