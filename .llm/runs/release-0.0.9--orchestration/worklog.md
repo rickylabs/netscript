@@ -347,3 +347,4 @@
 - 20:11:00Z: #2547 closed as a duplicate of #2548: the design-system lane filed and dispatched the registry-pin fix (epic:design-system; Cockpit merges). Closing #2547 cancels its leaf before start. The canary needs Eric's go again after #2548 merges.
 - 20:11:59Z: Posted the canary failure outcome on #2474; asked Cockpit to cancel the held #2547 launch.
 - 20:12:22Z: Cockpit: orchid refused the #2547 duplicate launch at 20:11:47Z (source-issue-closed), so no second worker. #2548 bound at 20:11:46Z; Cockpit merges it at READY; #2488 stays held. Re-cut only on Eric's go.
+- 20:55:51Z: **Eric (in session): 'Recut approved'.** Dispatching release-canary.yml (target 0.0.9) from main once #2549 (the #2548 residue fix) has merged and main push CI is green at that sha; a recut before the fix would fail the same residue check.
