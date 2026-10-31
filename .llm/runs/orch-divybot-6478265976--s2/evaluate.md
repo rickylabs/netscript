@@ -1,3 +1,9 @@
+# Coordinator publish-source repair — PASS; required CI pending
+
+Native exact-model independent repair IMPL-EVAL is **PASS** at2372823dac8b6fb2d82605ac789276af4f45a335. See2026-10-31-publish-source-eval.md for the substantive response, route/readonly proof and limitations. Canonical local release preflight now passes; full S2 suite366/0/0 and all requested local gates pass. Supervisor accepts this source sign-off. The previous READY is superseded until the required quality job succeeds at the final head; no renewed READY is claimed in this commit. CI proof must be posted externally after this evidence is pushed, preserving the checked head. Cockpit owns merge.
+
+## Historical reviews (retained)
+
 # 2026-10-31 — Final full-change PASS
 
 **PASS**, exact reviewed product source **dd486f5692902ff2b977ef4576ac9609a5553748**. The retained separate native Anthropic evaluator completed the exact requested Opus 5.5 High read-only review, then confirmed the stable **364/0/0** result in the same session. Full S2 scope and the theme-removal repair pass with no introduced source blockers. Both review commands exit 0 and leave source unchanged. Full verbatim substantive responses and identity/evidence limits are in 2026-10-31-impl-eval.md.

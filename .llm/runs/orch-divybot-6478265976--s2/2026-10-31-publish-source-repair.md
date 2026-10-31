@@ -21,3 +21,8 @@ Prior READY at56cc5be89 is superseded. Required CI run41148772405 fails Release 
 ## Required remaining handoff
 
 Push this provisional implementation; run the retained separate exact native Opus5.5 High read-only IMPL-EVAL and fix once if needed. Commit/push its evidence before the final CI run so the final checked head is not invalidated. Ready the repaired draft to schedule required CI (draft pushes intentionally skip it), then wait for the required quality job to succeed at that exact head before renewing the canonical READY report. Record CI proof in PR/issue comments without moving the checked head. Stop for Cockpit merge; no labels, force push, new PR, tag or release.
+
+
+## Independent source sign-off
+
+The retained separate native Opus5.5 High evaluator returned **PASS** at2372823dac8b6fb2d82605ac789276af4f45a335 after reading the clean exact-source receipts and actual tests. Full response is2026-10-31-publish-source-eval.md. Source stays unchanged in the final evidence commit. Required final-head CI quality is the only remaining coordinator handoff condition; no renewed READY is claimed until its exact success is observed.

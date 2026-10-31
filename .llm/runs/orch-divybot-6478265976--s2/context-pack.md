@@ -1,3 +1,15 @@
+# Coordinator repair — locally verified; final CI quality required
+
+Repair source **2372823dac8b6fb2d82605ac789276af4f45a335** is pushed and independently reviewed **PASS** with the retained exact native Opus5.5 High session (read-only/closed stdin). Generated registry/schema TypeScript replaces all3 publishable JSON import attributes; check-only staleness precedes generation in CI. Original JSON/schema bytes/public API/S3 components stay intact; duplicate raw JSON publication is removed and MIT license retained.
+
+Local preflight PASS; S2 tests366/0/0, actual CLI3/0/0, publish-size1/0/0, focused9/0/0,5-file structured wrappers, registry doclint, root quality/dependency/architecture, four carriers and workspace dry-run PASS. Six clean exact2372823 durable receipts PASS. Native payload2,341,743 bytes, down114,063, unchanged5 MB budget. See2026-10-31-publish-source-{repair,eval}.md and leading final-gates.md. Prior0.9 MB wording is not a native measurement.
+
+This final evidence-only commit must be pushed BEFORE the decisive CI run. Ready draft2468 to schedule required checks (draft pushes skip them), then run the private exact-head quality watcher. Renew READY ONLY after required quality has conclusion success at the same final head and release-preflight/generated-assets/publication steps actually passed. Do not push another evidence commit after green; record remote run/job proof in PR and canonical ignored report file. If CI fails, inspect/fix and repeat gates/review as required; never reuse a prior-head green. No CI verdict is claimed yet. Stop for Cockpit merge; no labels/new PR/force push/self-merge/tag/release.
+
+Docker-unavailable runtime/cleanup and123 component doc-lint findings remain disclosed. No reviewed source changes after2372823 in this evidence commit.
+
+## Historical context (retained)
+
 # 2026-10-31 — Under coordinator-directed publish-source repair
 
 Repair implementation is locally complete: generated compressed registry/schema TypeScript, no three JSON import attributes, registry embedding generation/freshness in existing root tasks, canonical sources preserved and duplicate raw JSON publication removed. Preflight, full S2 suite366/0/0, actual CLI3/0/0,5-file structured wrappers, root quality/architecture, four carriers and workspace dry-run pass. Native payload2,341,743 bytes versus2,455,806 pre-repair under unchanged5 MB cap; do not claim the brief's0.9 MB description as a measured fact. Push source checkpoint, collect current-head durable receipts, resume retained native Opus evaluator, commit/push final evidence, then ready draft to schedule CI and verify exact-head required quality green before renewed READY. Do not push a further evidence commit after that green job; use external PR/issue proof so the verified head stays current.

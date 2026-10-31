@@ -1,3 +1,20 @@
+# 2026-10-31 — Coordinator publish-source repair gates
+
+Exact repaired source: **2372823dac8b6fb2d82605ac789276af4f45a335**. Normal merge d2758985a retains main a410a815c, including the former docs-quality baseline repair and upstream dependency/lock fixes. Repair source is independently reviewed PASS in2026-10-31-publish-source-eval.md; public registry contracts and canonical JSON/schema source bytes are unchanged.
+
+- Canonical `deno task release:preflight`: before FAIL with3 JSON import-attribute findings; after PASS on text imports/import attributes/file-URL initialization/self-imports, zero findings.
+- Structured S2 regressions **366/0/0**, separate actual CLI **3/0/0**, focused embeddings/schema **9/0/0**, native publish-size **1/0/0**; all exit0. Exact parity and stale/missing negative controls exercise the actual generator with no writes in --check mode.
+- Structured check/lint/fmt: all **5** repair source/generated/test files processed, zero findings/drops/refusals, exit0. Changed registry entrypoints have0 doc-lint errors.
+- Six durable exact-source receipts **PASS/exit0**: quality-gate (including dependency/architecture), assets-barrel, publish-assets, mcp-export-corpus, agent-docs-prose and full workspace publish-dry-run. All four carrier checks pass and generators leave source unchanged. No package uploaded.
+- Docs build retains253 HTML pages/87 registry JSON artifacts. Review-thread gate0 unanswered.
+- Native Fresh UI payload **2,341,743 bytes /100 files**, versus **2,455,806 /102** before repair, delta **-114,063**. Existing **5,000,000-byte** budget unchanged and green. The brief's0.9 MB-class description does not match actual native file sizes; no such measurement is claimed. Raw JSON duplicates are excluded only from publication; authoritative source and upstream MIT license stay intact.
+
+**Required external gate still pending:** CI quality must succeed at the final pushed head before renewed READY. Earlier required run41148772405 at56cc5be89 remains historical FAIL. This final evidence commit must be pushed before scheduling the decisive run; put the resulting exact-head job/run proof in PR and canonical issue comments so it does not invalidate the checked head.
+
+Remaining limits: full scaffold runtime/cleanup remain UNPROVEN from the earlier Docker-unavailable attempt; full Fresh UI component doc-lint retains123 unchanged findings. The current coordinator repair does not invent either result or change component sources. No new product scope, labels, force push, self-merge, tag, release, dependency version or assignment commit.
+
+## Historical gate evidence (retained)
+
 # 2026-10-31 current-head gates
 
 Audited pushed product source: **dd486f5692902ff2b977ef4576ac9609a5553748**. This normal merge includes main **7907293f3dad3aeb557923809ddcd3435adae151** and reconciles documentation/carriers. It preserves the complete S2 source and prior removal repair. Every durable receipt below identifies this exact immutable head. Private raw receipts retain commands and output hashes; public evidence omits runtime identity.
