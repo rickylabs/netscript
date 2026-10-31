@@ -1,0 +1,7 @@
+Task check:aspire-host-ports deno run --allow-read .llm/tools/validation/check-aspire-host-ports.ts --pretty
+Scanned 1304 files.
+  allowed  plugins/auth/services/src/backend-registry.ts:356 — own origin from Aspire-allocated PORT
+  allowed  plugins/auth/src/constants.ts:16 — deprecated compatibility export, never read at runtime
+  allowed  plugins/sagas/src/constants.ts:14 — deprecated compatibility export, never read at runtime
+  allowed  plugins/triggers/src/constants.ts:16 — deprecated compatibility export, never read at runtime
+OK — no pinned host ports.

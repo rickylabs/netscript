@@ -1,0 +1,10 @@
+{
+  "baseline": "d25f65b5ead991c372592afb08b13621b5dfda46",
+  "before": 531,
+  "after": 475,
+  "disabledRemoved": 56,
+  "otherEntriesUnchanged": true,
+  "annotatedPairDefinitions": 6,
+  "checks": 9132,
+  "exempt": 58
+}

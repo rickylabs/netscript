@@ -1,0 +1,2 @@
+Task tokens:embed deno run --lock=deno.lock --frozen --allow-read=. --allow-write=. --allow-run=deno scripts/embed-token-assets.ts
+Token JSON embeddings generated.

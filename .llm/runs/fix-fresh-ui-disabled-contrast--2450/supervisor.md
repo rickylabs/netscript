@@ -8,6 +8,7 @@ Owner authority: latest continuation requests next tracker subtask and a new PR.
 
 - This run directory: design, plans, evaluation, worklog, context, drift, memory, reports and gate evidence.
 - packages/fresh-ui/src/tokens/domain/contrast-contract.ts and check-token-contrast.ts: additive exemption classification/report contract.
+- packages/fresh-ui/src/tokens/adapters/default-token-quality.ts: validate/narrow additive pair metadata.
 - packages/fresh-ui/scripts/check-tokens.ts and report-token-contrast.ts: explicit exemption reporting.
 - packages/fresh-ui/tests/tokens/: policy, report and command regressions.
 - packages/fresh-ui/tokens/contrast-pairs.json and contrast-exclusions.json: explicit inactive-use policy if needed, exact regenerated source exclusions.

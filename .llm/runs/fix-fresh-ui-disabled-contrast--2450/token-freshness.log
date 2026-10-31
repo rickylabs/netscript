@@ -1,0 +1,5 @@
+Task tokens:check deno task tokens:embed:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts --check && deno run --lock=deno.lock --frozen --allow-read=.,../../docs/design-system scripts/sync-theme-registry.ts --check
+Task tokens:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check
+Token JSON embeddings checked.
+Checked 88 SD outputs from 96 scheme × preset × density inputs.
+Theme registry checked: 24 presets.

@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "disabled-docs",
+  "argv": [
+    "deno",
+    "task",
+    "docs:accuracy"
+  ],
+  "cwd": "/home/agent/projects/orchid/worktrees/issue-6538850770",
+  "gitHead": "3574d4a7519c6e1fccc9b83675b4ae2050900336",
+  "actualGitHead": "3574d4a7519c6e1fccc9b83675b4ae2050900336",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1158603",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6eee8280aac72ee595a8e9a06124075093cab888b88ea4ead751a5cd8af77592",
+  "lifecycleId": "worker:1158603:disabled-docs:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-31T06:04:03.838Z",
+  "startedAt": "2026-10-31T06:04:03.840Z",
+  "finishedAt": "2026-10-31T06:04:12.553Z",
+  "durationMs": 8713,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 334,
+    "sha256": "b172569bffaeffbf951f70208330552d1f660a8b782e8d2876d1d484293376e3",
+    "tail": "docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 208 published source pages, 203 shipped corpus files, one query dialect exception page, 4 cache-first loader pages, mutation-map columns, 111/111 root/direct public commands from 176 recursive paths, 2 valid @netscript/fresh root imports checked)\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 134,
+    "sha256": "b99f2bd553696ea6522afb6a2a84126543f759f1aa8b2d154f14cbf7c7451e98",
+    "tail": "Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts\n",
+    "truncated": false
+  }
+}

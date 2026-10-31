@@ -5,6 +5,13 @@ export const TEXT_CONTRAST_MINIMUM = 4.5;
 /** Input, control and focus boundaries need non-text contrast. */
 export const CONTROL_CONTRAST_MINIMUM = 3;
 
+/** Only explicitly reviewed inactive UI text uses qualify for this WCAG exception. */
+export const INACTIVE_COMPONENT_CONTRAST = {
+  exemption: 'inactive-component',
+  criterion: 'WCAG 2.2 SC 1.4.3',
+  reason: 'Text in an inactive user interface component has no contrast requirement.',
+} as const;
+
 /** One intentional foreground/background use; layers paint from bottom to top. */
 export interface TokenContrastPair {
   /** Stable pair identity used by exact exclusions and READY reports. */
@@ -19,6 +26,8 @@ export interface TokenContrastPair {
   readonly presets?: readonly string[];
   /** Explicit l/d source roles are measured only in their matching scheme. */
   readonly schemes?: readonly TokenScheme[];
+  /** Reviewed inactive text use; disabled names alone never imply an exemption. */
+  readonly exemption?: typeof INACTIVE_COMPONENT_CONTRAST.exemption;
 }
 
 /** Pair coverage and narrowly explained color roles whose names describe decoration. */
@@ -77,10 +86,22 @@ export interface TokenContrastResult extends TokenContrastMeasurement {
   readonly minimum: number;
 }
 
+/** An inactive use remains measured and visible, independently of whether its ratio passes. */
+export interface TokenContrastExemptResult extends TokenContrastResult {
+  /** Explicit classification from the pair contract. */
+  readonly exemption: typeof INACTIVE_COMPONENT_CONTRAST.exemption;
+  /** WCAG criterion whose inactive-component exception applies. */
+  readonly criterion: typeof INACTIVE_COMPONENT_CONTRAST.criterion;
+  /** Why this use is outside the contrast requirement. */
+  readonly reason: typeof INACTIVE_COMPONENT_CONTRAST.reason;
+}
+
 /** Complete report; exclusions do not remove checks from the denominator. */
 export interface TokenContrastReport {
   /** Number of measured pairs across all effective contexts. */
   readonly checks: number;
+  /** Explicit inactive uses, including both passing and failing measured ratios. */
+  readonly exempt: readonly TokenContrastExemptResult[];
   /** Explicit, still-failing source pairs accepted by exact data. */
   readonly excluded: readonly TokenContrastResult[];
   /** Unapproved AA violations. */
