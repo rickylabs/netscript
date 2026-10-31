@@ -41,5 +41,11 @@
   "finalPhaseGates": "PENDING",
   "phaseReady": false,
   "publicationPreflight": "PASS",
-  "docsAccuracy": "PASS"
+  "docsAccuracy": "PASS",
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
 }
