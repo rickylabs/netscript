@@ -19,7 +19,7 @@
       "number": 1366,
       "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green",
       "disposition": "active",
-      "lane": "internals",
+      "lane": "features",
       "group": "G1"
     },
     {

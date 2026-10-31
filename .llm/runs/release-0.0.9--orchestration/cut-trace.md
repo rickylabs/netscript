@@ -41,3 +41,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 13:14 | `e4875a56c` | #2528 | #2373 | W4 (C1) | test-only (published testing helper) |
 | 2026-10-31 13:28 | `a9620a34e` | #2519 | #2149 | W3 (B2) | two e2e repair rounds (SQLite VarChar, Postgres auth start); one force-push (relayed instruction) |
 | 2026-10-31 13:42 | `eb9a1299b` | #2520 | #1367 | W4 (C1) | AppHost opt-in STREAMS_DATA_DIR + restart proof |
+| 2026-10-31 13:58 | `cecf77621` | #2530 | #2384 | W6 (F1) | |

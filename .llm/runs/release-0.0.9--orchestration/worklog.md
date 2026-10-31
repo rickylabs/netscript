@@ -261,3 +261,13 @@
 - 13:43:05Z: **merged** #2520 (`eb9a1299b`) for #1367 (C1); #1367 auto-closed, evidence posted.
 - 13:43:16Z: **expensive-gate.acquired** on #2530 (#2384) at `d9c3d6a`.
 - 13:44:05Z: dispatched #1912 (G1 verification, box 8 published smoke on Linux and Windows), comment 6544155256. Validator green.
+- 13:45:15Z: #2269 READY (PR #2529 at `8c47a45`), Opus MERGE; no e2e needed. Its leaf force-pushed a rebase citing an 'owner-requested rebase' (second relayed rebase instruction today). Drift recorded; flagging on #2474.
+- 13:45:39Z: status 5 posted on #2474 (37 merged, 33 closed; canary .2 waits on #2108 and #2390; force-push relay flagged to Cockpit; Eric asked about #1366 box handoff and #2068 consumer box).
+- 13:49:18Z: #1912 started 13:48Z.
+- 13:49:39Z: #2534 (#2390) Opus MERGE at `bb876fa`; waiting for READY.
+- 13:51:24Z: Cockpit: the force-push source is orchid's PR-watch conflict relay ('rebase ... force-push'); fix filed as harness #775. Posted a no-rebase override on live leaf PRs (#2535 #2534 #2529 #2530) and issues (#2379 #1912). The brief template now carries the override. Eric's #1366 and #2068 questions are in Cockpit's morning summary.
+- 13:53:27Z: #2529 merge refused: the head moved `8c47a45` → `3d2b6db` (worker push after READY). Waiting for a fresh exact-head verdict and CI.
+- 13:53:51Z: #2390 READY (PR #2534 `bb876fa`): the canary.8 stall no longer reproduces on main (fixes credited to #2510, #2499, #2517, #2522); repro tests added; e2e queued after #2530. #1912 → PR #2537.
+- 13:58:44Z: **merged** #2530 (`cecf77621`) for #2384 (F1). Issue close pending the worker continuation check.
+- 13:58:58Z: #2384 closed with evidence. **expensive-gate.acquired** on #2534 (#2390) at `bb876fa`.
+- 13:59:25Z: dispatched #1366 box 6 (G1, moved internals → features; drift recorded), comment 6544332029; box 4 accepted as met (redacted marker plus timestamp). Validator green.

@@ -14,7 +14,7 @@
       "id": "issue:1366",
       "kind": "issue",
       "issueNumber": 1366,
-      "lane": "internals",
+      "lane": "features",
       "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green"
     },
     {
