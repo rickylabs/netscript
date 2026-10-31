@@ -69,27 +69,17 @@ export function hasPrismaSagaInstanceClient(
     'sagaExecutionHistory' in db;
 }
 
-/** Build a provider-aware Prisma where clause for saga instance lists. */
+/** Filter the indexed lifecycle column without interpreting business JSON. */
 export function buildSagaInstanceWhere(
   sagaName: string | undefined,
   status: SagaInstanceApiStatus | null | undefined,
 ): SagaInstanceWhereInput {
-  const dbProvider = Deno.env.get('DB_PROVIDER') || 'mysql';
-  const jsonPath = dbProvider === 'postgres' ? ['status'] : '$.status';
-  const whereClause: {
-    sagaName?: string;
-    isCompleted?: boolean;
-    state?: { path: string[] | string; equals: string };
-  } = {};
+  const whereClause: SagaInstanceWhereInput = {};
 
   if (sagaName) {
     whereClause.sagaName = sagaName;
   }
-  if (status === 'completed') {
-    whereClause.isCompleted = true;
-  } else if (status) {
-    whereClause.state = { path: jsonPath, equals: status };
-  }
+  if (status) whereClause.status = status;
 
   return whereClause;
 }
@@ -109,9 +99,13 @@ export function mapPrismaRecordToInstance(
   record: PrismaRecord,
   sagaName: string = record.sagaName,
 ): SagaInstanceResponse {
+  const status = record.status == null
+    ? undefined
+    : z.enum(SAGA_INSTANCE_STATUSES).parse(record.status);
   if (record.state.projectionVersion === SAGA_INSTANCE_PROJECTION_VERSION) {
     return parseSagaInstanceKv({
       ...record.state,
+      status: status ?? record.state.status,
       sagaName,
       instanceId: record.id,
       correlationId: record.correlationId,
@@ -129,11 +123,8 @@ export function mapPrismaRecordToInstance(
     correlationId: record.correlationId,
     correlationKey: record.correlationId,
     state: record.state,
-    status: record.isCompleted
-      ? 'completed'
-      : runtimeStatus.success
-      ? runtimeStatus.data
-      : 'running',
+    status: status ??
+      (record.isCompleted ? 'completed' : runtimeStatus.success ? runtimeStatus.data : 'running'),
     createdAt: toISOString(record.createdAt),
     updatedAt: toISOString(record.updatedAt),
     completedAt: record.isCompleted ? toISOString(record.updatedAt) : undefined,

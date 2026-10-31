@@ -170,6 +170,7 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
       sagaName: projection.sagaId,
       correlationId: projection.correlationKey,
       version: projection.envelope.metadata.version,
+      status: projection.envelope.metadata.status,
       isCompleted: projection.envelope.metadata.status === 'completed',
       state,
       createdAt: dates.createdAt,
@@ -186,6 +187,7 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
       update: {
         correlationId: projection.correlationKey,
         version: projection.envelope.metadata.version,
+        status: projection.envelope.metadata.status,
         isCompleted: projection.envelope.metadata.status === 'completed',
         state,
         updatedAt: dates.updatedAt,

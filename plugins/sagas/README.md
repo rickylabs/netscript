@@ -317,14 +317,20 @@ in place; the payload semantics are corrected.
 The KV projection stores this separated response document. The Prisma projection's
 JSON `state` column stores the same document with `projectionVersion: 2`; its nested
 `state` property is the business payload. Raw Prisma readers should check that
-version and read `row.state.state` for business data and `row.state.status` for
-runtime status. This changes no database columns or indexes. Lists, single-row
-Prisma reads and stream startup reconciliation validate the same versioned
-document; startup snapshots preserve the same business state as live updates.
+version and read `row.state.state` for business data. The relational `row.status`
+column is the canonical runtime lifecycle (`SAGA_INSTANCE_STATUSES`); new projections
+write it on both insert and update, alongside the versioned JSON document. Instance
+lists filter that column through the `[sagaName, status]` index, including `pending`,
+`running`, `completed`, `failed`, `compensating`, `compensated` and `cancelled`.
+Single-row reads use the same mapper. The legacy `isCompleted` column remains for
+existing cleanup consumers; it does not determine the status of new API responses.
+Stream startup reconciliation continues to validate the versioned JSON document;
+startup snapshots preserve the same business state as live updates.
 
-Existing KV query documents and flat Prisma rows are not rewritten automatically.
-They remain readable in their legacy shape until a new committed transition writes
-an updated projection or retention removes them. Values already overwritten in an
+Existing KV query documents and flat Prisma JSON payloads remain readable in their
+legacy shape until a new committed transition writes an updated projection or
+retention removes them. The Prisma reader accepts rows without the new scalar
+value using the existing versioned/flat status mapping. Values already overwritten in an
 old projection cannot be recovered by a read-time migration. Restore them from
 canonical state or an application-controlled replay if a refreshed projection is
 needed; do not infer missing business values from runtime metadata.
@@ -338,3 +344,27 @@ remains. With a Prisma projection, GET uses one indexed query on saga name and
 correlation ID. With projection `none`, GET still reads the canonical store and
 lists remain empty. Direct canonical GET can omit optional `lastMessageType`, which
 is only recorded in the projection; it does not read transition history to fill it.
+
+
+### Upgrade the Prisma instance status column
+
+Stop older saga writers and API processes, synchronize the upgraded plugin assets,
+and run the application's normal `netscript db migrate` flow before starting the
+new runtime. Regenerate the host Prisma client with the upgraded schema. Avoid
+mixed-version writers: an older binary does not update the new status column.
+
+The declared `instance-status.migration.sql` contribution is appended by the
+database migration tooling after Prisma creates the defaulted `status` column and
+its index. It backfills existing rows using a valid version-2 document's runtime
+status first; for flat legacy rows, `is_completed` wins, then a valid top-level
+runtime status, otherwise `running`. It changes only the status column, preserving
+business JSON, ids, versions and timestamps. Historical lifecycle information
+already lost by an older projection cannot be reconstructed from a completion
+boolean alone.
+
+The forward migration makes filtered lists correct for existing rows immediately,
+while the read-compatible mapping keeps older document shapes readable. No
+runtime backfill or parallel query path is added. PostgreSQL rejects non-canonical
+column values with `saga_instances_status_check`. When the core lifecycle vocabulary
+changes, ship a new immutable migration to update that constraint; never edit an
+already-installed SQL contribution.

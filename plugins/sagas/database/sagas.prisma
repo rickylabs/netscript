@@ -104,6 +104,9 @@ model SagaInstance {
   /// Version for optimistic concurrency control
   version       Int      @default(1)
 
+  /// Canonical SAGA_INSTANCE_STATUSES lifecycle, separate from business state
+  status        String   @default("running") @db.VarChar(20)
+
   /// Whether the saga has completed (terminal state)
   isCompleted   Boolean  @default(false) @map("is_completed")
 
@@ -122,6 +125,9 @@ model SagaInstance {
 
   // Index for completed saga cleanup
   @@index([sagaName, isCompleted])
+
+  // Index for canonical lifecycle list filters
+  @@index([sagaName, status])
 
   // Index for updated timestamp (cleanup queries)
   @@index([updatedAt])

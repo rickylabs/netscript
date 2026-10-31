@@ -182,6 +182,7 @@ Deno.test('projection errors propagate after atomic commit and explicit recovery
     sagaName: 'document',
     correlationId: 'one',
     version: 1,
+    status: 'running',
     isCompleted: false,
     state: {
       projectionVersion: 2,

@@ -1,0 +1,128 @@
+{
+  "implementation-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 34,
+      "failed": 0,
+      "ignored": 2,
+      "totalResults": 36,
+      "uniqueFailures": 0
+    }
+  },
+  "check": {
+    "exitCode": null,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "lint": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    }
+  },
+  "fmt": {
+    "exitCode": 0,
+    "summary": {
+      "filesSelected": 10,
+      "batches": 2,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "negative-projection": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 2
+    }
+  },
+  "negative-migration": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    }
+  },
+  "restored-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 3,
+      "uniqueFailures": 0
+    }
+  },
+  "doc-lint": {
+    "exitCode": 1,
+    "summary": {
+      "totalPackages": 1,
+      "totalErrors": 30,
+      "totalPrivateTypeRef": 30,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    }
+  },
+  "baseline-doc-lint": {
+    "exitCode": 1,
+    "summary": {
+      "totalPackages": 1,
+      "totalErrors": 30,
+      "totalPrivateTypeRef": 30,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    }
+  },
+  "final-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 34,
+      "failed": 0,
+      "ignored": 3,
+      "totalResults": 37,
+      "uniqueFailures": 0
+    }
+  },
+  "repair-check": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "repair-lint": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    }
+  },
+  "repair-fmt": {
+    "exitCode": 0,
+    "summary": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  }
+}
