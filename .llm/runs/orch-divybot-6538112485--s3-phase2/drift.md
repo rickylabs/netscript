@@ -9,3 +9,13 @@
 - PLAN-EVAL round1 FAIL_PLAN: one plan correction made before implementation.
   Phase-specific owner instruction "Refs #2416 only" wins over the generic
   assignment closing-keyword template; no partial work auto-closes #2416.
+
+- 2026-10-31 user steering: "merge-conflict: rebase onto the latest base branch,
+  resolve conflicts, force-push." This supersedes the earlier no-force rule for
+  this repair only. Rebase onto main6b7f152 retains merged S2 and moves7 items
+  into canonical registry.json/style-utility map/collections. Compatibility TS
+  projection is unchanged; generated carriers are rebuilt, not conflict-spliced.
+  Calendar WIP was saved separately and remains uncommitted.
+- Independent registry integration review FAIL_FIX: preserve frozen legacy-v1
+  baseline while admitting explicit post-v1 additions. Added a reviewed list and
+  missing/changed/unexpected-item negative controls; no baseline snapshot edit.
