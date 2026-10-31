@@ -21,7 +21,7 @@ local stored = redis.call('GET', KEYS[1])
 local record = stored and cjson.decode(stored) or nil
 
 if op == 'prune' then
-  if not record then return redis.call('ZREM', KEYS[4], KEYS[1]) end
+  if not record then return redis.call('ZREM', KEYS[4], request.receipt) end
   return 0
 end
 
@@ -33,7 +33,7 @@ local function removeClaim()
   redis.call('LREM', KEYS[3], 1, record.raw)
   local owners = redis.call('HINCRBY', KEYS[5], record.raw, -1)
   if owners <= 0 then redis.call('HDEL', KEYS[5], record.raw) end
-  redis.call('ZREM', KEYS[4], KEYS[1])
+  redis.call('ZREM', KEYS[4], request.receipt)
   redis.call('DEL', KEYS[1])
 end
 local function insert(destination, bytes)
@@ -84,7 +84,7 @@ if op == 'claim' or op == 'observe' then
     local error = insert(KEYS[3], request.raw)
     if error then return error end
   end
-  redis.call('ZADD', KEYS[4], record.deadline + record.grace, KEYS[1])
+  redis.call('ZADD', KEYS[4], record.deadline + record.grace, request.receipt)
   redis.call('SET', KEYS[1], encoded)
   redis.call('HINCRBY', KEYS[5], request.raw, 1)
   if op == 'claim' then redis.call('RPOP', KEYS[2])
@@ -107,7 +107,7 @@ if owners and not tonumber(owners) then return redis.error_reply('Invalid claim 
 if op == 'extend' then
   record.deadline = now + request.timeout
   local encoded = cjson.encode(record)
-  redis.call('ZADD', KEYS[4], record.deadline + record.grace, KEYS[1])
+  redis.call('ZADD', KEYS[4], record.deadline + record.grace, request.receipt)
   redis.call('SET', KEYS[1], encoded)
   return 1
 end

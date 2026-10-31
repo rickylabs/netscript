@@ -66,6 +66,11 @@ current lease expires. Omit the argument to extend by the original visibility ti
 result means ownership expired or changed: stop performing effects for that receipt. Expired or
 replaced acknowledgements and nacks are refused and counted; they cannot settle a later delivery.
 
+The first-party workers plugin renews job and task deliveries automatically: it requests a
+60-second lease before dispatch and renews every 20 seconds until execution finishes. Lease loss
+or renewal failure cancels the job/subprocess and prevents successful application being recorded.
+Custom queue consumers remain responsible for their own heartbeat.
+
 Use `await redisQueue.getMetrics()` to read durable `reclaimed`, `deadLettered`,
 `staleSettlements`, and `observedOrphans` counters. `await redisQueue.getHealth()` includes these
 counters plus `ready`, `processing`, `deadLetterDepth`, and `outboxDepth`. The explicit

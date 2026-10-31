@@ -6,6 +6,38 @@ import { LeaseProxy } from './_fixtures/redis-lease-proxy.ts';
 
 for (const [backend, url] of leaseBackends) {
   Deno.test({
+    name: `${backend} an open connection with missing replies does not terminate consumption`,
+    ignore: !url,
+    async fn() {
+      assert(url);
+      await using proxy = new LeaseProxy(new URL(url));
+      await using harness = new LeaseHarness(url);
+      const producer = harness.queue();
+      const consumer = new RedisAdapter(proxy.url, harness.name);
+      harness.queues.push(consumer);
+      const first = Promise.withResolvers<void>();
+      const second = Promise.withResolvers<void>();
+      let terminated = false;
+      const { done, controller } = harness.listen(consumer, async (message, context) => {
+        await context.ack();
+        if (message === 'before') first.resolve();
+        else second.resolve();
+      });
+      void done.then(() => terminated = true, () => terminated = true);
+      await producer.enqueue('before');
+      await bounded(first.promise);
+      proxy.stalled = true;
+      await delay(7_000);
+      assertEquals(terminated, false, 'ioredis Command timed out must remain retryable');
+      proxy.stalled = false;
+      await producer.enqueue('after');
+      await bounded(second.promise, 10_000);
+      controller.abort();
+      await bounded(done);
+    },
+  });
+
+  Deno.test({
     name:
       `${backend} an outage during a handler preserves consumption and expired work is redelivered`,
     ignore: !url,

@@ -23,3 +23,10 @@ Ready-head CI quality failed on MCP export corpus freshness, after lint/fmt/docs
 Refresh through deno task gen:mcp-export-corpus and verify dependent generated carriers.
 This necessary generated-data delta was omitted from the initial public-surface gate list;
 record it explicitly and re-evaluate the new exact head. No runtime source change is needed.
+
+
+Augment review found worker-level acceptance holes beyond the queue-only proof. Expand the
+port/store and plugin dispatch scope explicitly: replace only a same-message older broker
+claim with atomic CAS, fence marker completion/release, renew healthy execution, and propagate
+cancellation to subprocesses. Preserve the newly landed main retry/DLQ behavior. Scope is
+necessary to prove actual first-party worker recovery, not a listen concurrency rewrite.

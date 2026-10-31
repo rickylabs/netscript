@@ -8,7 +8,7 @@ const TRANSPORT_ATTEMPTS = 3;
 /** Recognize availability failures without retrying configuration or script errors. */
 export function isRedisLeaseTransportError(error: unknown): boolean {
   return error instanceof Error &&
-    /closed|disconnected|connecting|offline|ECONN|EPIPE|EAI_AGAIN|ENOTFOUND|ETIMEDOUT|timeout|max retries|writeable/i
+    /closed|disconnected|connecting|offline|ECONN|EPIPE|EAI_AGAIN|ENOTFOUND|ETIMEDOUT|timeout|timed out|max retries|writeable/i
       .test(error.message);
 }
 
@@ -44,7 +44,8 @@ export class RedisLeaseConnection {
     keys: readonly string[],
     request: Readonly<Record<string, unknown>>,
   ): Promise<unknown> {
-    const encoded = JSON.stringify(request);
+    // Sorted-set members are data: ioredis prefixes command keys, never these values.
+    const encoded = JSON.stringify({ ...request, receipt: keys[0] });
     const sha = await (this.sha ??= this.scriptHash());
     return await this.call(async () => {
       try {

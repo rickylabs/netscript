@@ -153,3 +153,57 @@ IMPL-EVAL round5; keep the independent-evaluation checkbox unproven until its ne
 Reconcile: PR remains ready, not draft. Coordinator-owned e2e-cli-gate still absent; required
 scaffold-runtime CI remains unproven and its acceptance stays unchecked. No labels/milestones
 changed, no local scaffold runtime and no merge/release.
+
+
+## Rebase and review follow-up design checkpoint
+
+User explicitly authorized rebasing onto latest main and force-pushing. Rebased onto
+4aa734e2b6ca93119462ec2e0cd34b729df51bfd, retaining the landed worker retry/DLQ feature.
+Only conflict was the generated MCP corpus: preserve base then regenerate canonically.
+Use force-with-lease against the previously observed remote head, after validation.
+
+Augment review identified four valid gaps; all are in scope of working worker recovery:
+
+1. Public surface: optional broker delivery generation and owner token on worker idempotency
+   claims; optional token on completion/release. First-party dispatch owns renewal and cancellation.
+2. Vocabulary: broker generation identifies a replacement delivery of the same message; owner
+   token fences an older handler's marker mutations. Applied markers remain authoritative.
+3. Ports: existing queue MessageContext heartbeat, KV atomic checks, TaskExecutionOptions.signal.
+4. Constants: worker lease 60 seconds, renewal 20 seconds, three bounded CAS claim attempts.
+5. Slice: transport timeout spelling plus logical deadline members and real backend negative
+   controls; worker contract/store/dispatch integration and process/subprocess regressions;
+   generated corpus and final independent exact-head review.
+6. Deferred: no listen concurrency redesign, exactly-once effects, unsafe sequential KV takeover,
+   taxonomy mutation, or local scaffold.runtime. Downstream effects still need idempotency.
+7. Contributor path: worker/delivery-lease.ts for lifecycle; store README documents marker tokens.
+
+Before fixes, missing-reply and keyPrefix tests failed on Redis and Garnet: four failures,
+with six existing outage tests passing. Structured check/lint/fmt cover 101 files after fixes;
+56 existing worker/retry/store and queue review tests pass on both backends. Cancellation
+helper tests cover false/error renewal and initial ownership loss (3 pass).
+
+
+Review proof: 7 real worker integration tests pass; restoring the old worker port/store and
+job/task dispatch produces 7 runtime failures (4 killed-process replacements, 2 healthy long
+subprocesses, 1 atomic takeover/fencing test). Type-checking was deliberately disabled only
+for the negative control because the tests exercise the new optional contract. The initial
+negative attempt stopped at type errors and is not counted as functional proof. All source
+was restored in finally. Missing-reply/keyPrefix negative controls separately fail four
+behavioral tests on both backends with the previous implementation.
+
+The first expanded run passed 274 tests and exposed one operator-cancellation regression.
+Explicit operator cancellation must ACK without DLQ; lost queue ownership must requeue.
+WorkerDeliveryLease.lost now distinguishes these causes. No acceptance or test was weakened.
+
+Core worker combined-export doc lint reports exactly two baseline private-type-ref diagnostics
+in unchanged contracts/v1/workers.contract-types.ts. Restoring all pre-review worker source
+and rerunning the same command reports the identical two diagnostics. Publication dry-run
+passes. This baseline is separate from the already recorded KV doc diagnostic.
+
+
+Final combined review-fix run: 275 passed, 0 failed, 2 CI-only sentinels skipped (exit 0).
+It includes the full queue suite, worker store/concurrency/retry policy, worker runtime tests,
+real crash/long-subprocess integration, and both generator suites. MCP corpus tests add 7 pass.
+Structured check/lint/fmt cover 101 files without dropped files or findings. Native MCP corpus
+freshness, assets barrel and publish assets checks pass; corpus regenerated from final sources.
+Sign off and push the rebased fix slice; final independent exact-head review and remote CI follow.

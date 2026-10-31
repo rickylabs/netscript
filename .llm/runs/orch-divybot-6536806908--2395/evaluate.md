@@ -95,3 +95,12 @@ VERDICT: MERGE bd31d2d494091be987d9756320542b1a9cdcc7d0
 
 A subsequent CI-required generated MCP API corpus refresh moves the head. Final round5
 must inspect that exact new head; round4 is retained historical evidence.
+
+
+## Rebased review follow-up — final round pending
+
+Round4 above predates the rebase and four valid Augment findings. Those findings now have
+contract/runtime fixes and real-backend negative controls, recorded in the worklog and
+review-follow-up-validation.json. The next and final round5 must review the exact pushed
+rebased/fixed commit; publish its verdict on the PR and in the canonical READY handoff.
+The earlier MERGE line is historical evidence, not certification of the changed head.

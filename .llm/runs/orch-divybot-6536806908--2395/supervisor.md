@@ -30,3 +30,12 @@ pre-existing adapters cardinality advisory growing from 15 to 19 due to four coh
 CI-followup write surface: packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts,
 the repository-generated public API corpus, plus run evidence. CI quality identified its
 required freshness delta after the new queue public API; no hand editing of generated rows.
+
+Review follow-up surface: worker idempotency port/store and their tests in
+packages/plugin-workers-core/src/{ports,stores}, its README; plugins/workers/worker/job-dispatcher.ts,
+queue-consumer.ts, a delivery-lease helper, and focused worker recovery tests. Review exposed
+that broker recovery must be honored by first-party consumers: a higher delivery of the same
+message may atomically replace its stranded active marker, with fenced completion/release;
+healthy job/task execution renews its queue lease and aborts on ownership loss. Completed
+markers still suppress effects. This integration is necessary for the issue's worker recovery
+acceptance, and does not change listen concurrency. The coordinator still owns runtime CI.

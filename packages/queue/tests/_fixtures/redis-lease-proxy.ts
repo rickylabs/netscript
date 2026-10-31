@@ -2,6 +2,7 @@
 export class LeaseProxy implements AsyncDisposable {
   readonly url: string;
   enabled = true;
+  stalled = false;
   private readonly listener: Deno.TcpListener;
   private readonly connections = new Set<Deno.Conn>();
   private readonly tasks = new Set<Promise<void>>();
@@ -53,7 +54,13 @@ export class LeaseProxy implements AsyncDisposable {
       if (!this.enabled) return;
       await Promise.all([
         incoming.readable.pipeTo(outgoing.writable).catch(() => {}),
-        outgoing.readable.pipeTo(incoming.writable).catch(() => {}),
+        outgoing.readable.pipeThrough(
+          new TransformStream<Uint8Array, Uint8Array>({
+            transform: (chunk, controller) => {
+              if (!this.stalled) controller.enqueue(chunk);
+            },
+          }),
+        ).pipeTo(incoming.writable).catch(() => {}),
       ]);
     } finally {
       for (const connection of [incoming, outgoing]) {
