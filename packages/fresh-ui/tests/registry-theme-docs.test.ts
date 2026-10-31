@@ -20,7 +20,15 @@ Deno.test('every authored preset theme carries its canonical design and skill do
     assert(theme, preset.id);
     const language = preset.id === 'ns-one' ? 'studio' : preset.language;
     for (const name of ['DESIGN.md', 'SKILL.md']) {
-      const source = `docs/design-system/themes/${language}/${name}`;
+      const file = theme.files?.find((file) =>
+        file.target === `.agents/skills/fresh-ui-theme-${preset.id}/${name}`
+      );
+      assert(file, `${preset.id}/${name}`);
+      const source = file.path;
+      assert(
+        source === `docs/design-system/themes/${language}/${name}` ||
+          source === `docs/design-system/token-presets/${language}/${name}`,
+      );
       const target = `.agents/skills/fresh-ui-theme-${preset.id}/${name}`;
       assert(theme.files?.some((file) => file.path === source && file.target === target));
       const canonical = await Deno.readTextFile(new URL(`../../../${source}`, import.meta.url));

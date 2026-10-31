@@ -168,7 +168,7 @@ const build = await buildTokens({
 console.log(build.files['tokens.css']);
 ```
 
-All 18 presets, both schemes and both requested density contexts build through
+All 24 presets, both schemes and both requested density contexts build through
 Style Dictionary. Presets fix their own geometry. NS One stays the default;
 Studio Utility is available as `theme-studio-utility` in the registry. The
 three-tier source and extension guide is [tokens/README.md](tokens/README.md).

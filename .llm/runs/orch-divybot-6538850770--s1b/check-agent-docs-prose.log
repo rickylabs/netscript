@@ -1,0 +1,30 @@
+Task check:agent-docs-prose deno task check:child-health-docs && deno task gen:agent-docs-prose --check
+Task check:child-health-docs deno task gen:child-health-docs --check
+Task gen:child-health-docs deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/docs/generate-child-health-docs.ts '--check'
+child-health-docs PASS: exported contract and vocabulary page match
+Task gen:agent-docs-prose deno task gen:child-health-docs && deno task --cwd docs/site build && deno run --no-lock --allow-read --allow-write --allow-run=git .llm/tools/docs/build-agent-docs-bundle.ts --site-dir docs/site/_site '--check'
+Task gen:child-health-docs deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/docs/generate-child-health-docs.ts
+Generated docs/site/orchestration-runtime/child-health.md
+Warning: config file file://docs/site/deno.json is not a member of the workspace at file://. Ignoring the parent workspace config.
+Task build deno task check:source-format && deno task lume && deno task build:registry && deno task check:rendered-output
+Warning: config file file://docs/site/deno.json is not a member of the workspace at file://. Ignoring the parent workspace config.
+Task check:source-format deno run --no-lock --allow-read _plugins/check-source-format.ts .
+Warning: config file file://docs/site/deno.json is not a member of the workspace at file://. Ignoring the parent workspace config.
+Docs source format: OK
+Warning: config file file://docs/site/deno.json is not a member of the workspace at file://. Ignoring the parent workspace config.
+Task lume echo "import 'lume/cli.ts'" | deno run --unstable-temporal -A -
+Warning: config file file://docs/site/deno.json is not a member of the workspace at file://. Ignoring the parent workspace config.
+Loading config file file://docs/site/_config.ts
+[diagram] verified 21 diagram asset reference(s).
+error: Uncaught (in promise) Error: apple-classic: DESIGN.md requires YAML front matter
+  if (!match) throw new Error(`${id}: DESIGN.md requires YAML front matter`);
+                    ^
+    at parseTheme (file://docs/site/_plugins/design-system.ts:109:21)
+    at file://docs/site/_plugins/design-system.ts:216:12
+    at async Promise.all (index 11)
+    at async loadDesignSources (file://docs/site/_plugins/design-system.ts:214:18)
+    at async default (file://docs/site/design-system/index.page.ts:15:19)
+    at async Renderer.renderPages (https://deno.land/x/lume@v2.5.4/core/renderer.ts:104:26)
+    at async Site.#buildPages (https://deno.land/x/lume@v2.5.4/core/site.ts:650:5)
+    at async Site.build (https://deno.land/x/lume@v2.5.4/core/site.ts:550:9)
+    at async buildSite (https://deno.land/x/lume@v2.5.4/cli/utils.ts:48:3)

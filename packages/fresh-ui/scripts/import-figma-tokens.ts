@@ -1,3 +1,4 @@
+import { verifiedFigmaProvenance } from './figma-provenance.ts';
 import { importFigmaTokens } from '../src/tokens/adapters/figma-token-source.ts';
 import type { FigmaCollection, TokenDocument } from '../src/tokens/domain/token-contract.ts';
 import { TOKEN_PRESETS } from '../src/tokens/domain/token-presets.ts';
@@ -5,12 +6,15 @@ import { assertSemanticAliases } from '../src/tokens/domain/resolve-tokens.ts';
 
 const root = new URL('../tokens/', import.meta.url);
 const output = new URL('v2/', root);
+await verifiedFigmaProvenance(new URL('figma/', root));
 const check = Deno.args.includes('--check');
 if (!check) await Deno.mkdir(output, { recursive: true });
 const files = [
   'primitives',
   'scheme',
   'theme',
+  'theme-b',
+  'theme-set',
   'density',
   'base-gray',
   'base-accent',

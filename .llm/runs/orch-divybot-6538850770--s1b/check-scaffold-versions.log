@@ -1,0 +1,2 @@
+Task check:scaffold-versions deno run .llm/tools/validation/check-scaffold-versions.ts --pretty
+E-12 OK — 12 scaffold pin(s) are stable (no prerelease suffix).

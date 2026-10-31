@@ -1,0 +1,7 @@
+{
+  "command": "deno publish --dry-run --allow-dirty",
+  "exitCode": 0,
+  "files": 142,
+  "bytes": 4294002,
+  "budgetBytes": 5000000
+}

@@ -1,0 +1,11 @@
+Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.9
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 208 published source pages, 203 shipped corpus files, one query dialect exception page, 4 cache-first loader pages, mutation-map columns, 111/111 root/direct public commands from 176 recursive paths, 1 valid @netscript/fresh root imports checked)
