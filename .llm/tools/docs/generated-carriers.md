@@ -26,8 +26,17 @@ adjacent independent edits. The CLI derives `llms-full.txt` from the page twins 
 composition policy lives in `docs/site/_plugins/llms-policy.ts`; the prose generator copies that
 source to MCP, and the site uses the same functions and canonical location. The provenance
 sidecar contains only schema and framework versions. API docs still come from the exact installed
-package exports. Installed `MANIFEST.md` omits the old source-commit and extraction time rows; its
-API generation time is still the caller's clock.
+package exports. Installed `MANIFEST.md` retains the historical `Prose source commit` and
+`Prose extraction time` row labels for compatibility. Their values are now `sha256:<digest>`
+and `release:<framework version>`: content identity and a deterministic release label. The digest
+covers UTF-8 JSON `{schemaVersion:1,files:<sorted decoded prose map>}`, including derived
+`llms-full.txt`, before adding API docs or the manifest. It is computed at installation, never
+stored as an aggregate that would conflict across independent page edits. Neither row uses Git
+identity or wall-clock time. `API generation time` still uses the caller's clock.
+The strict full-manifest byte-parity test in
+`packages/cli/src/public/adapters/agent/deno-agent-docs-generator_test.ts` reads the canonical
+carrier independently, fixes the API clock, and compares both generation and actual installation.
+Extend that expected manifest when changing this consumer contract.
 
 MCP exports use one row per package entrypoint, with raw-deflate/base64 declaration columns,
 SHA-256, decoded length and symbol count. Loading is lazy and cached. The legacy compressed-source
