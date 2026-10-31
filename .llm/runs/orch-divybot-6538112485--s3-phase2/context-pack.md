@@ -20,3 +20,14 @@ Slice2 terminal PASS:3 Actions components with contracts/registry/carriers,
 source check and negative keyboard mutation. Independent same-session review
 FAIL_FIX (stale manual bundle) -> one correction -> PASS. Next: commit/push,
 merge newly landed Figma handoff5db9515, then Forms primitives slice3.
+
+Slice3 implementation/test gates in flight:4 native Forms primitives, contracts
+73 shipped,114 renders and52 real browser cases pass. Consumer test renamed to
+gaps-install.test.ts and now covers every registry component tagged contract.
+Independent same reviewer evaluating slice3 before commit. Do not start slice4
+(Calendar/DatePicker) until this slice is terminal. Handoff now present on main.
+
+Slice3 terminal PASS after one correction of a native two-thumb pointer trap.
+All121 focused and60 browser cases pass; source controls remain native. Save
+this source/evidence commit and continue Calendar/DatePicker. Handoff is merged;
+S2 registry is still being handled separately and must be merged once landed.

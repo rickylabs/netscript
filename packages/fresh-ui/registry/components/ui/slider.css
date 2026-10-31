@@ -1,0 +1,16 @@
+.ns-slider { position: relative; inline-size: 100%; min-inline-size: var(--ns-space-10); block-size: var(--ns-control-height); color: var(--ns-fg); }
+.ns-slider__track { position: absolute; inset-inline: var(--ns-space-2); inset-block-start: calc(50% - 2px); block-size: var(--ns-space-1); background: var(--ns-muted); border-radius: var(--ns-radius-full); }
+.ns-slider [data-part='range'] { position: absolute; block-size: 100%; background: var(--ns-primary); border-radius: inherit; }
+.ns-slider input { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; appearance: none; background: transparent; margin: 0; }
+.ns-slider[data-thumbs='2'] input { pointer-events: none; }
+.ns-slider input::-webkit-slider-runnable-track { background: transparent; }
+.ns-slider input::-moz-range-track { background: transparent; }
+.ns-slider input::-webkit-slider-thumb { appearance: none; pointer-events: auto; inline-size: var(--ns-space-4); block-size: var(--ns-space-4); border: 2px solid var(--ns-primary); border-radius: 50%; background: var(--ns-card); cursor: grab; }
+.ns-slider input::-moz-range-thumb { pointer-events: auto; inline-size: var(--ns-space-4); block-size: var(--ns-space-4); border: 2px solid var(--ns-primary); border-radius: 50%; background: var(--ns-card); cursor: grab; }
+.ns-slider input:focus-visible, .ns-slider[data-state='focus'] input { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-slider [data-part='value-label'] { position: absolute; inset-block-start: 100%; font-family: var(--ns-font-data); font-size: var(--ns-text-small); }
+.ns-slider[data-orientation='vertical'] { inline-size: var(--ns-control-height); block-size: calc(var(--ns-control-height) * 5); }
+.ns-slider[data-orientation='vertical'] input { writing-mode: vertical-lr; direction: rtl; }
+.ns-slider[data-orientation='vertical'] .ns-slider__track { inset-block: var(--ns-space-2); inset-inline-start: calc(50% - 2px); inline-size: var(--ns-space-1); block-size: auto; }
+.ns-slider[data-orientation='vertical'] [data-part='range'] { inline-size: 100%; inset-inline-start: 0; }
+.ns-slider[data-state='disabled'] { opacity: 0.38; }

@@ -1,10 +1,14 @@
+import { freshUiRegistryManifest } from '../../registry.manifest.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 
 const repo = fromFileUrl(new URL('../../../../', import.meta.url));
 
-Deno.test('Actions install through the registry and preserve their source/consumer API', async () => {
-  const root = await Deno.makeTempDir({ prefix: 'fresh-ui-actions-' });
+Deno.test('Phase-two registry gaps preserve installed source and consumer APIs', async () => {
+  const names = freshUiRegistryManifest.items.filter((item) =>
+    item.kind === 'component' && item.tags.includes('contract')
+  ).map((item) => item.name);
+  const root = await Deno.makeTempDir({ prefix: 'fresh-ui-gaps-' });
   const run = async (cwd: string, args: string[]) => {
     const result = await new Deno.Command(Deno.execPath(), {
       cwd,
@@ -29,7 +33,7 @@ Deno.test('Actions install through the registry and preserve their source/consum
         },
       }),
     );
-    for (const name of ['button-group', 'toggle-group']) {
+    for (const name of names) {
       await run(repo, [
         'run',
         '-A',
@@ -44,7 +48,7 @@ Deno.test('Actions install through the registry and preserve their source/consum
         '--force',
       ]);
     }
-    for (const name of ['button-group', 'toggle', 'toggle-group']) {
+    for (const name of names) {
       const installed = await Deno.readTextFile(join(root, 'components/ui', name + '.tsx'));
       const source = await Deno.readTextFile(
         join(repo, 'packages/fresh-ui/registry/components/ui', name + '.tsx'),
@@ -56,16 +60,12 @@ Deno.test('Actions install through the registry and preserve their source/consum
     await run(root, [
       'check',
       '--unstable-kv',
-      'components/ui/button-group.tsx',
-      'components/ui/toggle.tsx',
-      'components/ui/toggle-group.tsx',
+      ...names.map((name) => `components/ui/${name}.tsx`),
     ]);
     await run(root, [
       'lint',
       '--rules-include=jsx-curly-braces',
-      'components/ui/button-group.tsx',
-      'components/ui/toggle.tsx',
-      'components/ui/toggle-group.tsx',
+      ...names.map((name) => `components/ui/${name}.tsx`),
     ]);
   } finally {
     await Deno.remove(root, { recursive: true });

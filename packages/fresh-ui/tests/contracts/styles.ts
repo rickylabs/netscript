@@ -1,3 +1,4 @@
+import { formFixtures, formKeyboard } from './utility-forms.tsx';
 import { actionFixtures, actionKeyboard } from './utility-actions.tsx';
 import { componentContracts } from '../../contracts.ts';
 import { basicFixtures } from './utility-basic.tsx';
@@ -12,6 +13,12 @@ export const registeredContractStyles: readonly string[] = ['Utility'];
 export const contractStyleProviders: readonly ContractStyleProvider[] = [{
   style: 'Utility',
   contracts: componentContracts.components,
-  fixtures: [...basicFixtures, ...compositeFixtures, ...actionFixtures, proseFixture],
-  keyboard: actionKeyboard,
+  fixtures: [
+    ...basicFixtures,
+    ...compositeFixtures,
+    ...actionFixtures,
+    ...formFixtures,
+    proseFixture,
+  ],
+  keyboard: [...actionKeyboard, ...formKeyboard],
 }];
