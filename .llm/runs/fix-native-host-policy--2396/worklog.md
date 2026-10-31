@@ -172,3 +172,22 @@ After push, mark the original draft ready, notify the coordinator to arm require
 and run final exact-head evaluation in this same session. Terminal CI/final verdicts are
 published on the PR and canonical final file handoff; they must not be inferred from this
 pre-readiness checkpoint. No merge readiness is claimed while required CI is unproven.
+
+IMPL round3 CHANGES at2a9efb05bcb49e38f5c6bbba454e0a51db5b595c: source remains
+accepted, but current main advanced and conflicts prevent core pull_request CI from starting.
+Fetched current main4aa734e2b6ca93119462ec2e0cd34b729df51bfd (telemetry/locked fixture
+repair #2476 and worker retry/dead-letter #2481). Merge conflicts affect only canonical prose
+and publish-asset carriers. No authored runtime conflict. Resolve carriers from incoming main
+then regenerate canonically over the union; also regenerate the auto-merged export corpus.
+Incoming root/member/fixture lock changes are exact main, not local dependency churn. Both
+prerequisite PRs still merge cleanly, so their stable reviewed heads are not rewritten.
+Broaden final union validation for the new worker runtime and telemetry interactions. Record
+current-main documentation baseline separately; preserve initial6a71cd05 comparison history.
+
+Current-main merge source reconciliation:4aa734e2b6ca93119462ec2e0cd34b729df51bfd is
+integrated with no authored runtime/test conflict. Canonical prose regeneration and both
+asset generators pass over both main's worker retry docs and the host guide. Only generated
+carrier conflicts needed resolution; incoming source/locks were retained exactly. Commit the
+merge locally so the export-corpus generator can inspect a clean source tree, regenerate its
+auto-merged carrier, then push the complete coherent union. Local runtime/tests/quality and
+publication gates must be refreshed for new main before the final same-session evaluation.

@@ -6,5 +6,8 @@
     "@prisma/client": "catalog:",
     "@prisma/instrumentation-contract": "catalog:",
     "pg": "catalog:"
+  },
+  "devDependencies": {
+    "prisma": "catalog:"
   }
 }

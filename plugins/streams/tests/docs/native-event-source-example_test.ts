@@ -1,3 +1,4 @@
+import { prepareLockedFixture } from '../../../../.llm/tools/testing/locked-fixture.ts';
 import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { useLocalWorkspaceImports } from '../../../../packages/cli/tests/support/local-workspace-imports.ts';
 import { assert, assertStringIncludes } from '@std/assert';
@@ -42,10 +43,11 @@ Deno.test('official native EventSource example is copy-exact and type-checks', a
     );
     await useLocalWorkspaceImports(resolve(temporaryRoot), repoRoot);
     await Deno.writeTextFile(examplePath, source);
+    const frozen = await prepareLockedFixture(temporaryRoot, [examplePath]);
     const checked = await checkGeneratedFiles({
       args: [
         'check',
-        '--no-lock',
+        ...frozen,
         '--unstable-kv',
         '--config',
         `${temporaryRoot}/deno.json`,

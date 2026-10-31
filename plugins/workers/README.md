@@ -61,6 +61,25 @@ delay timers. Forward `context.signal` to cancellable operations. Task-executor 
 separate path. Optional `queue` and `taskQueue` dependencies use the existing `MessageQueue` ports;
 this worker owns and stops supplied queues as it does the defaults.
 
+## Job retries and dead letters
+
+Declare `retry: { maxRetries, backoff, delayMs, maxDelayMs }` on a discovered schema-backed handler
+with `Object.assign(handler, { id, retry })`, or use the core builder's `.retry(...)` method. Handler
+fields override definition defaults, and both registry generators preserve the policy. In-process
+and polyglot jobs share one bounded retry executor: `maxRetries` counts retries after the initial
+attempt, and zero still runs once. Timeout is terminal; shutdown requeues without a job dead letter.
+
+Exhausted jobs are stored through `Worker.deadLetters` before the transport acknowledges them. Its
+default is a KV-backed specialization of the queue's canonical dead-letter port in a separate
+namespace. `WorkerOptions.deadLetters` accepts a replacement; the port supports listing, depth and
+controlled reprocessing. `Worker.readHealthStatus()` and the generated background health route read
+durable depth, and a storage outage makes dependency readiness unavailable. Job retries retain one
+delivery, so size visibility and active-claim leases for the full retry budget and make effects
+idempotent across transport redelivery.
+
+See [Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/)
+for handler examples, backoff formulas, precedence, replay, and time-budget sizing.
+
 ## Install
 
 From the root of a NetScript project:

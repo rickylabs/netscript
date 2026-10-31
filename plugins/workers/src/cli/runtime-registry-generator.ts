@@ -270,7 +270,7 @@ function createRegistryHeader(target: RuntimeRegistryTarget): string[] {
     ' */',
     '',
     target.kind === 'workers-job'
-      ? `import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
+      ? `import { jobRetryRegistration } from '${target.typeImport.from}';\nimport type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
       : `import type { ${target.typeImport.name} } from '${target.typeImport.from}';`,
     '',
   ];
@@ -457,13 +457,13 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
     'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',
     'export const definitions: ReadonlyMap<string, RegisterJobInput> = jobDefinitions;',
     '',
-    'function createConfiguredJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(policy: RegisterJobInput & { readonly id: TId }, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    ...policy,\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+    'function createConfiguredJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(policy: RegisterJobInput & { readonly id: TId }, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    ...policy,\n    ...jobRetryRegistration(policy, handler),\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
     '',
     'function createLocalJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "local", handler);\n}',
     '',
     'function createPluginJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, pluginId: string, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "plugin", handler, pluginId);\n}',
     '',
-    'function createJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+    'function createJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    ...jobRetryRegistration({}, handler),\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
     '',
     'function toRegisterJobInput(definition: RegisterJobInput): RegisterJobInput {\n  const { handler: _handler, payloadSchema: _payloadSchema, ...registration } = definition;\n  return registration;\n}',
     '',

@@ -13,6 +13,18 @@ import {
 import type { RuntimeJobKvKeyFactories } from './runtime-types.ts';
 
 export { DEFAULT_TOPIC, SSEEventTypes };
+export { executeJobWithRetry, isJobAbort } from './job-retry.ts';
+export {
+  JOB_RETRY_BACKOFFS,
+  jobRetryRegistration,
+  resolveJobRetryPolicy,
+} from '../domain/job-retry-policy.ts';
+export type {
+  JobHandlerRetryPolicy,
+  JobRetryDefinition,
+  JobRetryOptions,
+  JobRetryPolicy,
+} from '../domain/job-retry-policy.ts';
 export { JobPayloadValidationError, validateJobPayload } from '../domain/mod.ts';
 export type {
   JobHandlerDefinition,

@@ -60,3 +60,14 @@ services/src/tests/service-test-fixture.ts into that directory's test_utils/ chi
 its four local imports. This reuses existing publish exclusions without adding any filter or
 changing fixture logic, tests, source cap or API. Re-run native worker tests, scoped wrappers,
 workers dry-run and native pack file-list inspection, then re-steer the same evaluator.
+
+IMPL round3 CHANGES at2a9efb05bcb49e38f5c6bbba454e0a51db5b595c: source remains
+accepted, but current main advanced and conflicts prevent core pull_request CI from starting.
+Fetched current main4aa734e2b6ca93119462ec2e0cd34b729df51bfd (telemetry/locked fixture
+repair #2476 and worker retry/dead-letter #2481). Merge conflicts affect only canonical prose
+and publish-asset carriers. No authored runtime conflict. Resolve carriers from incoming main
+then regenerate canonically over the union; also regenerate the auto-merged export corpus.
+Incoming root/member/fixture lock changes are exact main, not local dependency churn. Both
+prerequisite PRs still merge cleanly, so their stable reviewed heads are not rewritten.
+Broaden final union validation for the new worker runtime and telemetry interactions. Record
+current-main documentation baseline separately; preserve initial6a71cd05 comparison history.

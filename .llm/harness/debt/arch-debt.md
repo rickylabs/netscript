@@ -1,5 +1,25 @@
 # Architecture Debt Registry
 
+## packages/plugin-workers-core — WORKERS-RETRY-DOMAIN-CARDINALITY (13 immediate domain children)
+
+- **Reason:** A cohesive retry-policy schema and resolver are a separate domain concern. This adds
+  one immediate child to the existing domain directory, exceeding the F-16 advisory cap of 12 by
+  one. Moving unrelated job/task contracts in this runtime fix would widen its review surface.
+- **Owner:** Workers core maintainers.
+- **Target:** Next workers domain organization review after milestone 0.0.9.
+- **Linked plan:** `.llm/runs/orch-divybot-6536190825--2144/plan.md`, issue #2144.
+- **Created:** 2026-10-31
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-16: JSR package audit reports at most 12 immediate domain children without merging
+  independent retry behavior into an unrelated contract file.
+- **Notes:** Cost is one additional sibling to navigate; no dependency-direction violation or
+  runtime overhead is accepted. Existing parent/executor-adapter cardinality warnings predate this
+  change. The plugin's already-over-cap `worker/` directory grows from 22 to 25 immediate children:
+  one retry regression file, one typed job DLQ specialization module and its regression file.
+  Cost is three more sibling entries in the existing runtime folder. The same maintainers' next
+  worker organization review owns that F-16 follow-up; closing evidence must also remove this
+  folder-cardinality increase without combining independent runtime concerns.
+
 Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2026-04-29. Entries
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
 verdicts are not seeded here.
@@ -3107,8 +3127,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **ID:** `WORKERS-HOST-METADATA-CARDINALITY-2396`.
 - **Reason:** Exact main has 19 immediate workers package-root entries under the generic audit;
-  the required export/migration `CHANGELOG.md` makes 20. Existing `worker/` 22 and `src/cli/` 13
-  findings are unchanged. New service source/test grouping meets cap 12 in both plugins.
+  the required export/migration `CHANGELOG.md` makes 20. Other workers source cardinality findings are inherited from main
+  and outside this metadata-only scope. New service source/test grouping meets cap 12 in both plugins.
 - **Exact scope:** `plugins/workers/` package-root metadata only, bounded at 20 entries. No new
   runtime folder, public symbol, scan exclusion, file-size or native facade exception.
 - **Why deferred:** Consolidating the existing public CLI/runtime/resource roots requires a
