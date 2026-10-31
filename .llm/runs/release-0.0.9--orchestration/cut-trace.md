@@ -39,3 +39,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 12:44 | `46b22e636` | #2525 | #2377 | W4 (C1) | continuation of the #2382 worker |
 | 2026-10-31 13:11 | `7afe557fe` | #2526 | #2374 | W4 (B1) | B1 done except #2159's held follow-up |
 | 2026-10-31 13:14 | `e4875a56c` | #2528 | #2373 | W4 (C1) | test-only (published testing helper) |
+| 2026-10-31 13:28 | `a9620a34e` | #2519 | #2149 | W3 (B2) | two e2e repair rounds (SQLite VarChar, Postgres auth start); one force-push (relayed instruction) |

@@ -70,7 +70,7 @@
       "id": "issue:2108",
       "kind": "issue",
       "issueNumber": 2108,
-      "lane": "features",
+      "lane": "fixes",
       "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers"
     },
     {

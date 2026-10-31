@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "e4875a56c13e91503b5f168e6fa6d95b093c5a8a",
+  "currentMainSha": "a9620a34e14e067c56bb6af025ec015f7252b7aa",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -70,7 +70,8 @@
         2382,
         2383,
         2390,
-        2395
+        2395,
+        2108
       ]
     },
     {
@@ -79,7 +80,6 @@
       "issueNumbers": [
         1367,
         1912,
-        2108,
         2132,
         2144,
         2151,
@@ -964,7 +964,7 @@
     {
       "id": "B2-2149",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2519,
       "headSha": "85364cb3aee0883e6c0774381c8c4c0f4206b399",
@@ -973,7 +973,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2149",
       "receiptRefs": [],
-      "note": "Postgres auth startup fix 85364cb; Opus MERGE; READY; e2e queued after #2526"
+      "note": "READY 85364cb (after SQLite + Postgres auth repairs); Opus MERGE; 31/31 incl both runtime tiers + close-gate rerun; carriers fresh",
+      "mergeCommit": "a9620a34e14e067c56bb6af025ec015f7252b7aa",
+      "mergedAt": "2026-10-31T13:28:47Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2149"
     },
     {
       "id": "C1-1367",
@@ -1097,7 +1100,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2529,
-      "headSha": "afbbb66e504a58764aff204f00b6becdeef8b663",
+      "headSha": "c9d5bb04275d2f8a64dc5f80e2484580088d0ba0",
       "issueNumbers": [
         2269
       ],
@@ -1107,7 +1110,7 @@
     {
       "id": "F1-2384",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2530,
       "headSha": "d9c3d6a1a68527c36008e629df55398e64b6336e",
@@ -1115,7 +1118,8 @@
         2384
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2384",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY; Opus MERGE d9c3d6a; e2e per READY"
     }
   ],
   "expensiveGates": [
@@ -1424,11 +1428,21 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2519,
       "headSha": "85364cb3aee0883e6c0774381c8c4c0f4206b399",
       "startedAt": "2026-10-31T13:12:00Z",
-      "via": "label e2e-cli-gate (re-armed at READY)"
+      "via": "label e2e-cli-gate (re-armed at READY)",
+      "result": "SUCCESS at 85364cb (scaffold-runtime + scaffold-runtime-sqlite)",
+      "completedAt": "2026-10-31T13:26:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2520,
+      "headSha": "b3537c21f18405743926d46830ff084aeeec7dff",
+      "startedAt": "2026-10-31T13:29:05Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1460,11 +1474,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T13:14:15Z",
-    "nextReportDueAt": "2026-10-31T14:14:15Z",
+    "lastReportAt": "2026-10-31T13:29:05Z",
+    "nextReportDueAt": "2026-10-31T14:29:05Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2528 (#2373)",
-    "currentMainSha": "e4875a56c13e91503b5f168e6fa6d95b093c5a8a",
+    "headline": "merged #2519 (#2149, B2 done except #2108); e2e on #2520",
+    "currentMainSha": "a9620a34e14e067c56bb6af025ec015f7252b7aa",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1650,7 +1664,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T13:16:23Z",
+  "updatedAt": "2026-10-31T13:30:02Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2039,6 +2053,26 @@
       "commentId": 6543850655,
       "postedAt": "2026-10-31T13:16:23Z",
       "route": "codex gpt-6.1-sol high",
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-31T13:21:55Z"
+    },
+    {
+      "issue": 2379,
+      "lane": "internals",
+      "commentId": null,
+      "postedAt": "2026-10-31T13:18:29Z",
+      "route": "codex gpt-6.1-sol (continuation of the #2373 worker)",
+      "state": "claimed-continuation",
+      "pr": null,
+      "claimRef": "#2474 comment"
+    },
+    {
+      "issue": 2108,
+      "lane": "fixes",
+      "commentId": 6543997755,
+      "postedAt": "2026-10-31T13:30:02Z",
+      "route": "codex gpt-6.1-sol xhigh",
       "state": "posted",
       "pr": null
     }

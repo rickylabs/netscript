@@ -248,3 +248,10 @@
 - 13:12:00Z: **merged** #2526 (`7afe557fe`) for #2374 (B1). Closing #2374 is delayed until its worker's continuation state is known. **expensive-gate.acquired** on #2519 (#2149) at `85364cb`.
 - 13:14:15Z: **merged** #2528 (`e4875a56c`) for #2373 (C1). Issue close delayed until the claim check.
 - 13:16:23Z: dispatched #2390 (investigation, fixes; all B1 edges merged), comment 6543850655. Validator green. #2374 closed with evidence (no continuation claim from its worker).
+- 13:16:50Z: #2384 READY (PR #2530 at `d9c3d6a`), Opus MERGE `d9c3d6a`.
+- 13:16:56Z: #2530 (#2384) needs e2e; queue: #2519 (running) → #2520 → #2530.
+- 13:23:28Z: #2390 started 13:21Z.
+- 13:23:44Z: Continuation: the #2373 worker claimed #2379 (F1, internals) at 13:18Z. #2373 is kept OPEN until #2379 reaches READY (closing it would tear down the run); explained on #2373.
+- 13:28:53Z: **merged** #2519 (`a9620a34e`) for #2149 (B2). #2149 is kept open while its worker is live (continuation check). #2108 is now unblocked (all requires edges merged).
+- 13:29:05Z: **expensive-gate.acquired** on #2520 (#1367) at `b3537c2` (merge-tree with main clean).
+- 13:30:02Z: dispatched #2108 (B2 capstone, moved features → fixes; drift recorded), comment 6543997755. Validator green.

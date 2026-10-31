@@ -75,7 +75,7 @@
       "number": 2108,
       "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers",
       "disposition": "active",
-      "lane": "features",
+      "lane": "fixes",
       "group": "B2"
     },
     {
