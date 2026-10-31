@@ -9,3 +9,5 @@ Routing: inspected `deno task agentic:matrix --tier feature --json`. Primary imp
 Scope extension authorized by the assigned end-to-end implementation mandate after PLAN-EVAL: scoped CLI schema-copy/integrity files/tests, database scripts migration runner/helper/tests, `.llm/tools/command-postgres-conformance.sh`, package READMEs/changelogs, dated lesson and generated docs/assets/corpus carriers. No engine path or unrelated scaffold changes.
 
 The scoped command-postgres workflow path filters and CLI installation probe are included in the authorized migration proof surface.
+
+CI repair extension: the owner's subsequent request to fix every red check authorizes the Linux native E2E driver and its focused launcher-discovery tests. The remote manual E2E run selected this existing lane and reproduced an inherited packaging-name mismatch. Keep production packaging and saga/database behavior unchanged; discover the installed launch entry rather than deriving it from a runtime library filename.
