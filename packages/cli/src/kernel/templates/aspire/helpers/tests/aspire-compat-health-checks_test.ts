@@ -20,6 +20,19 @@ const compatContent = await Deno.readTextFile(
   ),
 )
 
+// Dynamic imports from the scratch helper still participate in the parent test's lock graph.
+const workspaceConfig: { catalog: Record<string, string> } = JSON.parse(
+  await Deno.readTextFile(new URL('../../../../../../../../deno.json', import.meta.url)),
+)
+const postgresClientSpecifier = `npm:pg@${workspaceConfig.catalog.pg}`
+const workspaceLockUrl = new URL('../../../../../../../../deno.lock', import.meta.url)
+const workspaceLockBefore = await Deno.readTextFile(workspaceLockUrl)
+const workspaceLock: { specifiers: Record<string, string> } = JSON.parse(workspaceLockBefore)
+assert(
+  Object.hasOwn(workspaceLock.specifiers, postgresClientSpecifier),
+  'The PostgreSQL fixture must use an already-locked workspace catalog specifier',
+)
+
 const generatedRoot = resolve(
   await Deno.makeTempDir({
     prefix: 'netscript-aspire-health-',
@@ -105,7 +118,7 @@ await Deno.writeTextFile(
   runtimeCompatPath,
   runtimeCompatContent.replace(
     POSTGRES_CLIENT_MODULE_DECLARATION,
-    "const POSTGRES_CLIENT_MODULE = 'npm:pg@^8.21.0';",
+    `const POSTGRES_CLIENT_MODULE = ${JSON.stringify(postgresClientSpecifier)};`,
   ),
 )
 const clientlessCompatPath = `${helpersDir}/_aspire-compat.clientless.mts`
@@ -128,7 +141,15 @@ const clientlessCompatModule = await import(
 )
 
 afterAll(async () => {
-  await Deno.remove(generatedRoot, { recursive: true })
+  try {
+    assertEquals(
+      await Deno.readTextFile(workspaceLockUrl),
+      workspaceLockBefore,
+      'Generated health tests must not change the workspace lock',
+    )
+  } finally {
+    await Deno.remove(generatedRoot, { recursive: true })
+  }
 })
 
 describe('generated Aspire listener readiness helpers', () => {

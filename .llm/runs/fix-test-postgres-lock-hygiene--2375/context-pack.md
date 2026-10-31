@@ -1,3 +1,5 @@
 # Resume
 
-#2375 F1, fix/test-postgres-lock-hygiene from main46b22e6. No implementation yet. Test-only stale pg override found; derive from root catalog, assert existing lock entry and byte identity. Production helper/output untouched. Reproduce old test under --frozen, then prove focused plus full combined CLI/database suite. PLAN-EVAL N/A; independent IMPL-EVAL required before commit and at exact final head. Only coordinator merges; no labels/milestones/local scaffold runtime.
+#2375 / PR2532. Test-only locked-catalog fixture and root-lock invariant implemented. Source IMPL-EVAL round1 PASS; reviewer reran23 frozen tests and proved cleanup/hash. Full combined suite PASS {'passed': 2473, 'failed': 0, 'ignored': 4, 'totalResults': 2477, 'uniqueFailures': 0} under executable task-owned TMPDIR; first environment failure retained. Lock unchanged byte-for-byte, no restore. Static one-file wrappers and quality pass. Source hash and exact commands in gate-results.json. PLAN-EVAL N/A; no production/scaffold/runtime/exports changed.
+
+Next: push sign-off commit, ready for CI, exact pushed head independent attestation, current check/thread gates and READY. No labels/milestones/local scaffold.runtime/merge/release. Only coordinator merges.
