@@ -50,3 +50,13 @@ S6 manual final image inspection caught a DataTable header order dependency: lat
 ## CI repair — default-aware design browser matrix
 
 CI at e501f41 exposed design-browser assertions that still assume the scaffold defaults to NS One. Extend the write surface to `tools/fresh-ui-browser/` to cover the actual Studio Utility default and retain explicit NS One preview coverage. The baseline migration must preserve existing legacy findings, permit no new contrast exclusions, and be independently reviewed with complete axe reports. Core test shard failures are also under investigation; no READY claim.
+
+## CodeBlock review repair
+
+The coordinator requires the bare highlight.js import and a shared ^11 registry dependency,
+plus per-instance code/language memoization. The real browser fixture proves the call-count
+contract and its deliberate no-memo failure. The package import declaration also requires the
+Expo and desktop reference lock metadata to be refreshed by native Deno tooling; this extends
+the original write surface solely for lock consistency. Resolved versions remain unchanged.
+Optional Utility photo-download suppression is deferred because Avatar has no SSR preset input;
+CSS-only hiding cannot prevent the download, and preserving legacy photos needs a theme contract.

@@ -24,3 +24,8 @@ The queried feature matrix selects Sol/Muse for implementation, GLM/Fable for pl
 No merge, release, force-push, labels, session ids in public artifacts, or assignment-file commit.
 
 CI repair surface: `tools/fresh-ui-browser/` test matrix, README and reviewed accessibility baseline migration for the new default; no workflow or production changes inferred.
+
+CodeBlock review repair surface: browser component fixture and call-count regression under
+`tools/fresh-ui-browser/`; the existing Expo and desktop reference locks must reflect the new
+package authoring import declaration. These native lock refreshes add only workspace dependency
+metadata; no new resolved package versions.

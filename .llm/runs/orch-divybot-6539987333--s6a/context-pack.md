@@ -23,3 +23,27 @@ Owner-routed finding extends S6a: `design.css.template` rules-dont text must use
 Destructive follow-up local gates PASS: actual reverted declaration exits 1 and names the nested CLI template; restored declaration exits 0. Scoped check/lint/fmt, 13 root check tasks, quality gate, docs accuracy, token validation and release preflight pass. Generated carrier regenerated; no lock/token/exclusion changes. Full current source frozen in current-source-hashes.json (101 paths); same evaluator review running.
 
 Destructive follow-up independent review: PASS. Reviewer verified all101 current hashes, exactly one -text insertion in the embedded carrier, recursive nested-template coverage, intentional border/fill preservation and the actual negative/positive reports. Sign-off commit/push next; READY requires new exact-head CI. Failure streak remains zero.
+
+## Coordinator CodeBlock blocker after 87a9acf
+
+Use bare highlight.js/lib/common through the registry dependency and package authoring import map, with the same ^11 range as Markdown. Memoize escaped highlight output on code+lang per component instance. Extend the existing real browser harness to count highlight calls through Message re-renders and prove red without memoization. Keep SSR escaping and clipboard tests. Same evaluator, carriers, exact-head CI and Refs #2419 remain required. Previous READY superseded.
+
+Optional Avatar image omission is deferred: preset selection is CSS-only, and server-rendered Avatar has no request-scoped theme input. A safe omission while retaining legacy photos needs a separate theme-context contract; DOM detection after SSR cannot prevent the download. No speculative provider/API change in this blocker repair.
+
+CodeBlock repair source frozen:109 paths in current-source-hashes.json. Bare registry dependency
+shares ^11 with Markdown; memoization depends on code+lang. Browser matrix passes36/36 with
+zero skips; the no-memo mutation fails4/4 specifically on call counts, then restoration passes.
+Fixture type check and final4-case replay pass after adding explicit snapshot types. All13 root
+checks, package check/lint/fmt, browser check/lint/fmt, broad quality/architecture, docs accuracy,
+token quality, release preflight, JSR audit and scaffold production build pass. Native audit
+retains53 existing advisories; all four lock resolved graphs are unchanged. Full package test
+run pending, then same independent evaluator review and exact-head CI before renewed READY.
+No labels added by this lane; an externally applied e2e-cli-gate label is now present on PR2503.
+
+Full package test completes:334 PASS,0failures,0ignored. All local applicable gates terminal;
+same independent reviewer is evaluating the frozen CodeBlock repair before sign-off.
+
+CodeBlock independent IMPL-EVAL:PASS; all109hashes verified, both requested blockers fixed
+and negative control substantive. Avatar conditional deferral accepted; failure streak0.
+Sign-off commit next. Main advanced to14816a4; two merge conflicts require reconciliation
+and same-evaluator review before final push/READY.

@@ -29,7 +29,15 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-Playwright starts and stops the app's dev task. The design routes are intentionally excluded from
+Playwright reinstalls Message and Markdown with `ui:add --force` into the owned test scaffold before starting its dev task,
+verifies that both use the same `highlight.js` `^11` import mapping, and stops the server afterward.
+The full matrix has 36 tests: 20 route/axe captures, 12 navigation cases, and four CodeBlock
+re-render cases. The CodeBlock fixture mounts the installed Message in Chromium and counts calls
+to the real highlighter across streamed text, filename, code, language and mount changes.
+Unknown-language and plain text remain escaped, and the clipboard retains the original code.
+External-server mode skips these four cases because it cannot install the fixture.
+
+The design routes are intentionally excluded from
 production builds, so use development mode. A startup failure or missing browser fails the run.
 The test runner never reuses an unrelated server.
 
@@ -84,6 +92,12 @@ under an already-known rule), `duplicate` (an extra copy of a scanned blocking n
 (one fewer scanned blocking node). These deliberately make the same validator fail; use a
 comma-separated list to exercise them in one server lifecycle. Never set it for normal captures.
 `accessibility.contract.ts` also proves the multiset contract with deterministic fixtures.
+
+Set `FRESH_UI_CODE_NEGATIVE_CONTROL=1` and run `npm test -- --grep "CodeBlock memoizes"`
+to remove memoization from the generated fixture copy. All four unchanged call-count assertions
+must fail. A subsequent normal run reinstalls the original registry component. This control never
+changes repository source, and baseline recording rejects it. The fixture and its assertion live in
+`fixtures/code-block-rerender.ts.template` and `tests/code-block.spec.ts`.
 
 ## Existing accessibility findings
 

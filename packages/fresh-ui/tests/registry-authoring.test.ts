@@ -27,7 +27,7 @@ Deno.test('JSON authoring preserves legacy contracts plus the reviewed syntax de
   // S6a adds syntax rendering; retain the historical fixture and declare only this reviewed delta.
   const expected = {
     ...legacyBaseline,
-    'code-block': { ...legacyBaseline['code-block'], dependencies: ['npm:highlight.js@11.11.1'] },
+    'code-block': { ...legacyBaseline['code-block'], dependencies: ['npm:highlight.js@^11'] },
   };
   assertEquals<unknown>(actual, expected);
   assertEquals(
@@ -72,4 +72,12 @@ Deno.test('every internal dependency in authored registry tracks the package rel
       assertEquals(dependency.split('@')[2].split('/')[0], FRESH_UI_PACKAGE_VERSION, item.name);
     }
   }
+});
+
+Deno.test('CodeBlock and Markdown share one highlight.js dependency range', () => {
+  const dependency = (name: string) =>
+    freshUiRegistryManifest.items.find((item) => item.name === name)
+      ?.dependencies?.filter((value) => value.startsWith('npm:highlight.js@'));
+  assertEquals(dependency('code-block'), ['npm:highlight.js@^11']);
+  assertEquals(dependency('markdown'), dependency('code-block'));
 });

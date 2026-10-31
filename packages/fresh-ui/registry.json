@@ -2343,7 +2343,7 @@
         "theme-seed"
       ],
       "dependencies": [
-        "npm:highlight.js@11.11.1"
+        "npm:highlight.js@^11"
       ],
       "type": "registry:component",
       "files": [

@@ -8,7 +8,8 @@
  */
 
 import type { JSX, VNode } from 'preact';
-import hljs from 'npm:highlight.js@11.11.1/lib/common';
+import { useMemo } from 'preact/hooks';
+import hljs from 'highlight.js/lib/common';
 import { cn } from '../../lib/cn.ts';
 
 interface CodeBlockProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class'> {
@@ -28,9 +29,14 @@ export function CodeBlock(
   { code, filename, lang, class: className, ...props }: CodeBlockProps,
 ): VNode {
   // highlight.js escapes source before adding its own spans; unknown languages use Preact text.
-  const highlighted = lang && hljs.getLanguage(lang)
-    ? hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
-    : undefined;
+  // A streaming parent may re-render while this completed code block is unchanged.
+  const highlighted = useMemo(
+    () =>
+      lang && hljs.getLanguage(lang)
+        ? hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
+        : undefined,
+    [code, lang],
+  );
   return (
     <div {...props} class={cn('ns-code', className)} data-part='root' data-scope='code-block'>
       <div class='ns-code__head' data-part='head' data-scope='code-block'>
