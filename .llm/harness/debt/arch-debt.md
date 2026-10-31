@@ -3084,3 +3084,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   discoverable through the index, pass frozen token build/freshness and registry copy tests, and
   remove these directory-cardinality advisories from `deno task arch:check` without adding scan
   exclusions.
+
+## Host policy plugin publish graph — post-publish consumer gate (#2396)
+
+- **ID:** `HOST-POLICY-PUBLISHED-GRAPH-2396`.
+- **Reason:** The additive workers/streams `./service` exports change plugin publish shape.
+  A local graph and publication dry-run cannot prove a JSR consumer before that version exists.
+- **Owner:** 0.0.9 release coordinator, tracked by #2474, with repository maintainer rickylabs.
+- **Target:** First exact 0.0.9 canary containing #2396, necessarily before stable publication.
+- **Status:** Proposed `DEBT_ACCEPTED` under `.llm/harness/gates/release-gates.md`; requires
+  independent implementation acceptance. No production consumer PASS is claimed.
+- **Cost:** One release-owned published CLI/plugin runtime run plus exact public factory imports;
+  stable readiness remains blocked until that real graph passes.
+- **Scope:** Post-publish graph proof only. No waiver for pre-merge check/tests, native policy,
+  publication dry-run, source/runtime CI, type identity or existing facade debt limits.
+- **Closing gate:** Publish the exact canary through the release workflow, prove both singular
+  factory imports and consumer types against that package graph, and pass `e2e-cli-prod` for the
+  same exact canary. Record the run/version evidence before stable. No implicit renewal.

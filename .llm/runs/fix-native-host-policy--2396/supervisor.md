@@ -36,3 +36,8 @@ S3 allowed documentation addition: docs/site/services-sdk/how-to/index.md, one r
 
 S3 original branch: fix/native-host-policy, PR #2421. Integrates main and the independently
 reviewed service/header prerequisite source. This is the final bounded startup-options leaf.
+
+S3 measured scope expansion before repair: plugins/workers/tests/public/type-refs_test.ts
+contains the pre-existing exact export-target list. The complete plugin suite returned230 pass,
+1 fail because the new ./service is absent from that list. Add the singular entrypoint while
+retaining every legacy target and all precision/doc-lint controls. No acceptance reduction.

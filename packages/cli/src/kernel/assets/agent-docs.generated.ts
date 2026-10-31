@@ -53,7 +53,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/plugin-sagas-core": [".","./abstracts","./adapters","./agent","./builders","./config","./contracts/v1","./discovery","./domain","./integration/commands","./integration/publisher","./integration/workers","./middleware","./ports","./presets","./runtime","./stores","./stores/backends","./streams","./telemetry","./testing","./transports"],
 
-  "@netscript/plugin-streams": [".","./adapter-cli","./aspire","./cli","./e2e","./scaffold","./services"],
+  "@netscript/plugin-streams": [".","./adapter-cli","./aspire","./cli","./e2e","./scaffold","./service","./services"],
 
   "@netscript/plugin-streams-core": [".","./admin","./discovery","./integration/commands","./sse","./telemetry","./testing"],
 
@@ -61,7 +61,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/plugin-triggers-core": [".","./adapters","./builders","./config","./contracts/v1","./discovery","./domain","./ports","./public","./runtime","./stores","./telemetry","./testing"],
 
-  "@netscript/plugin-workers": [".","./adapter-cli","./aspire","./cli","./contracts","./doctor","./jobs/health-check.ts","./runtime","./scaffold","./services","./streams","./streams/server","./worker"],
+  "@netscript/plugin-workers": [".","./adapter-cli","./aspire","./cli","./contracts","./doctor","./jobs/health-check.ts","./runtime","./scaffold","./service","./services","./streams","./streams/server","./worker"],
 
   "@netscript/plugin-workers-core": [".","./abstracts","./builders","./config","./contracts/v1","./discovery","./executor","./integration/commands","./presets","./registry","./runtime","./schemas","./shutdown","./state","./stores","./streams","./telemetry","./testing","./workflow"],
 

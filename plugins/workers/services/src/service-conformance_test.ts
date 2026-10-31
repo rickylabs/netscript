@@ -17,6 +17,8 @@ const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
 const NATIVE_POLICY_ERROR =
   'Service auth requires { authn: { authenticator }, authz?: { authorizer } } or { public: true, reason: "nonblank explanation" }; do not combine guarded and public fields.';
 const DENIED_PORT_ERROR = 'Requires env access to "PORT", run again with the --allow-env flag';
+/** Checked facade children compile the complete workers graph, like the HTTP compiler controls. */
+const COMPILER_DEADLINE_MS = 30_000;
 
 /** Child-side `auth` expressions the native assertion rejects (`guarded` = `{ authenticator }`). */
 const INVALID_POLICIES: readonly string[] = [
@@ -159,7 +161,11 @@ Deno.test({
   async fn() {
     await using sandbox = await createSandbox();
     for (const { name, source, diagnostics } of COMPILE_CASES) {
-      const run = await sandbox.run(source, { cwd: PLUGIN_ROOT, check: true });
+      const run = await sandbox.run(source, {
+        cwd: PLUGIN_ROOT,
+        check: true,
+        deadlineMs: COMPILER_DEADLINE_MS,
+      });
       const rejected = diagnostics.length > 0;
       const expected = rejected ? [1, ''] : [0, 'typed\n'];
       assertEquals([run.code, run.stdout], expected, `${name}\n${run.stderr}`);

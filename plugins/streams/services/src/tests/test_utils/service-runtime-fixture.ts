@@ -23,6 +23,10 @@ interface RuntimeOptions {
   readonly denyAllocator?: boolean;
   readonly denyFfi?: boolean;
   readonly denyWrite?: boolean;
+  /** Only the legacy CLI probe signals its own process through the native shutdown handler. */
+  readonly allowSelfSignal?: boolean;
+  /** The combined workers/streams host probe also opens its caller-owned Deno KV. */
+  readonly unstableKv?: boolean;
 }
 
 interface Sandbox extends AsyncDisposable {
@@ -121,7 +125,9 @@ export async function createRuntimeSandbox(label: string): Promise<Sandbox> {
           : ['0.0.0.0:0', ...options.preferredPorts.map((port) => `0.0.0.0:${port}`)]),
       ];
       const args = [
-        ...base,
+        ...base.filter((arg) => !options.allowSelfSignal || arg !== '--deny-run'),
+        ...(options.allowSelfSignal ? ['--allow-run'] : []),
+        ...(options.unstableKv ? ['--unstable-kv'] : []),
         `--allow-net=${net.join(',')}`,
         options.denyWrite ? '--deny-write' : `--allow-write=${scratch}`,
         options.denyFfi ? '--deny-ffi' : `--allow-ffi=${addonPaths.join(',')}`,

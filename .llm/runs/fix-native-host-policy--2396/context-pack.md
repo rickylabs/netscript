@@ -44,3 +44,40 @@ the downstream private-reference finding without adding facade exports, casts or
 root check, quality and service/MCP static publish gates pass at that source head. Incoming
 source and generated corpus merged without manual conflict resolution. Final union gates remain
 necessary; no prerequisite runtime CI result is inherited as PASS.
+
+S3 baseline memory: workers OpenAPI document returnsHTTP500 on exact main
+6a71cd0599673d70cd6311de3bb20b2d6a9dde2c using the public legacy factory and owned KV.
+The host-policy test compares legacy/factory parity; it does not assert a healthy document.
+SDK describe/listJobs, REST, canonical/deprecated RPC, actual SSE and stream publication pass.
+Missing guarded credentials still401 before OpenAPI handling. This inherited router defect is
+not introduced or fixed by startup policy. No secret material is published in evidence.
+
+Native auth defaults protect/api only. Raw streams hosts must explicitly selectprotect:['/']
+or their intended prefix. All singular examples and the one host guide now say so; factories
+forward native policy unchanged. Shared runtime sandbox flags are opt-in for DenoKV and native
+self-signal only; negative permission controls and existing budgets remain unchanged. Checked
+workers compiler consumers alone use30s after two isolated10s deadline failures.
+
+Full initial integrated plugin suite230/1/0: only failure was the stale exact export list;
+all native host, lifecycle, TLS, storage and compiler controls passed. Corrected that list
+without removing any target; complete suite is rerunning. Plugin lint/fmt204 files pass;
+quality/architecture passes, full JSDoc examples479 checked/no exemptions pass, site snippets
+26 pass, all three new guide examples compile with root lock unchanged. Docs links and
+exports drift pass. Singular factory doc lint0 each; full packages workers2/streams3 match
+main, as measured by normalized per-file/rule counts. See final gate summary when complete.
+
+S3 authored source slice is complete: final full workers/streams suite231 passed,0 failed,
+0 ignored. The only prior full-suite failure was repaired by retaining all legacy published
+export targets and adding./service to the exact expected list. Both package JSR static audits
+have no FAIL findings; raw publication dry-runs follow source freeze. Native lint/fmt204/204
+pass, including the export-list repair. Quality/architecture, all479 JSDoc examples, all26 site
+snippets, three new guide examples, docs links and export drift pass. New factory facades have
+zero doc diagnostics and normalized full-package findings equal exact main. Canonical prose,
+asset-barrel and publish-asset generation succeeded; only owning carriers changed. Root check
+is still running, publication checks and final generated-corpus freshness remain next.
+
+Reconcile: streams legacy now delegates with unchanged public reason/wildcard CORS, while
+the singular factory keeps native workspace defaults. The combined worker fixture uses a real
+stream server and producer; no fake transport, cast or suppression was added. All new test flags
+are opt-in and do not change permission-negative defaults. Source and evidence are preserved
+on the adopted branch; no assignment/lock/private transcript is staged.

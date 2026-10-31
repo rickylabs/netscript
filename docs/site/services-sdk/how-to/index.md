@@ -15,3 +15,6 @@ the sidebar.
 {{ for recipe of nav.menu(url, navQuery, navSort)?.children ?? [] -}}
 - [{{ recipe.data.title }}]({{ recipe.data.url }}){{ recipe.data.description ? ": " + recipe.data.description : "" }}
 {{ /for }}
+
+- [Host workers and streams services](/services-sdk/how-to/host-plugin-services/) with explicit
+  native authentication, CORS, listener options and lifecycle ownership.

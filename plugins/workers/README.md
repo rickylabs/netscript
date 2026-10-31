@@ -267,3 +267,6 @@ Atomic version checks prevent it from deleting a record updated after inspection
 records and open executions are preserved. This endpoint also removes legacy execution records
 written without TTL; normal new-record expiry is performed by the KV backend and needs no app
 session. Job/task definitions remain configuration rather than expiring execution history.
+
+For native policy/CORS/listener composition and explicit SDK credentials, see
+[Host workers and streams services](https://rickylabs.github.io/netscript/services-sdk/how-to/host-plugin-services/).

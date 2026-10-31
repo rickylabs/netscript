@@ -74,7 +74,7 @@ const DEFAULT_EXPOSE_HEADERS: readonly string[] = Object.freeze([
  *   credentials: { local: { subject: 'service:streams', scopes: [], roles: ['service'] } },
  * });
  * const running = await startStreamsService({
- *   auth: { authn: { authenticator } },
+ *   auth: { authn: { authenticator, protect: ['/'] } },
  *   serve: { hostname: '127.0.0.1', port: 0 },
  * });
  * console.log(running.addr.port);
