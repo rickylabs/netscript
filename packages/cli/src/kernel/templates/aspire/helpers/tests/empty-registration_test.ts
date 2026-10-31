@@ -4,6 +4,7 @@ import { toFileUrl } from 'jsr:@std/path@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { generateRegisterBackground } from '../register/generate-register-background.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
+import { generateRegisterTools } from '../register/generate-register-tools.ts';
 import { MINIMAL_DENO_DEFAULTS } from './generators-test-support.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
@@ -14,16 +15,24 @@ const cases = [
     name: 'registerPlugins',
     source: () => generateRegisterPlugins({ ...options, plugins: {} }),
     argumentCount: 5,
+    returnsMap: true,
   },
   {
     name: 'registerBackgroundProcessors',
     source: () => generateRegisterBackground({ ...options, processors: {} }),
     argumentCount: 6,
+    returnsMap: true,
+  },
+  {
+    name: 'registerTools',
+    source: () => generateRegisterTools({ tools: {} }),
+    argumentCount: 4,
+    returnsMap: false,
   },
 ];
 
 for (const fixture of cases) {
-  Deno.test(`${fixture.name}: empty output lints and returns a fresh map without accessing resources`, async () => {
+  Deno.test(`${fixture.name}: empty output lints and preserves its contract without accessing resources`, async () => {
     const directory = await Deno.makeTempDir({ prefix: 'empty-registration-' });
     try {
       const path = `${directory}/registration.mts`;
@@ -48,10 +57,15 @@ for (const fixture of cases) {
       assert(pending instanceof Promise);
       const first: unknown = await pending;
       const second: unknown = await register(...Array(fixture.argumentCount).fill(unreadable));
-      assert(first instanceof Map && second instanceof Map);
-      assertEquals(first.size, 0);
-      assertEquals(second.size, 0);
-      assert(first !== second, 'Each invocation must own its result map');
+      if (fixture.returnsMap) {
+        assert(first instanceof Map && second instanceof Map);
+        assertEquals(first.size, 0);
+        assertEquals(second.size, 0);
+        assert(first !== second, 'Each invocation must own its result map');
+      } else {
+        assertEquals(first, undefined);
+        assertEquals(second, undefined);
+      }
     } finally {
       await Deno.remove(directory, { recursive: true });
     }

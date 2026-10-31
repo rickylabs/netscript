@@ -17,3 +17,5 @@ Owner evaluator override: `claude -p --model claude-opus-5-5 --effort high`, sep
 - Local excluded runtime/output under project runs or artifacts; temporary files use TMPDIR.
 
 No lock churn, labels/milestones, merge, tag or publication. Assignment and final report handoff remain uncommitted. Public records omit operator paths, session IDs, hostnames and allocated endpoints.
+
+Demonstrated acceptance refinements: `packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler.ts`, its BFF template, helper assets/manifest/embedded carrier, helper generator tests, and `plugins/workers/src/cli/runtime-registry-generator.ts` are included to repair the generated lint failures.

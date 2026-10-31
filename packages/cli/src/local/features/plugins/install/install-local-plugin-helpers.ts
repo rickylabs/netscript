@@ -6,13 +6,13 @@ import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.t
 import { generatePluginServiceContext } from '../../../../kernel/templates/plugins/plugin-generators.ts';
 import { findOfficialPluginSourceRoot } from '../../../../maintainer/maintainer-api.ts';
 
-/** Register local package exports used by plugin-owned userland modules. */
+/** Register local exports and return the package's local service entrypoint, when exported. */
 export async function ensureLocalPluginImports(
   projectRoot: string,
   packageRoot: string,
   packageName: string,
   fs: FileSystemPort,
-): Promise<void> {
+): Promise<string | undefined> {
   const packageConfigPath = join(packageRoot, 'deno.json');
   if (!await fs.exists(packageConfigPath)) return;
   const packageConfig: { exports?: string | Readonly<Record<string, string>> } = JSON.parse(
@@ -33,6 +33,8 @@ export async function ensureLocalPluginImports(
     rootConfig.imports[specifier] = path.startsWith('.') ? path : `./${path}`;
   }
   await fs.writeFile(rootConfigPath, `${JSON.stringify(rootConfig, null, 2)}\n`);
+  const service = exports.find(([subpath]) => subpath === './services');
+  return service ? resolve(packageRoot, service[1]) : undefined;
 }
 
 /** Merge explicit references with default dependency references. */

@@ -30,6 +30,13 @@ import { renderTemplateAssetSync } from '../../../../adapters/templates/template
 export function generateRegisterTools(options: RegisterToolsOptions): string {
   const { tools } = options;
   const entries = Object.entries(tools);
+  if (entries.length === 0) {
+    return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireEmptyTools, {
+      header: fileHeader('register-tools.mts'),
+      sdk: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
+      compat: SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT,
+    });
+  }
 
   const registrationBlocks: string[] = [];
 

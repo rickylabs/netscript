@@ -322,7 +322,8 @@ export function createRespPingCheck(
         socket.write(RESP_PING_COMMAND);
       });
       socket.on('data', (data) => {
-        received = appendRespBytes(received, data);
+        const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+        received = appendRespBytes(received, bytes);
         if (received.length > RESP_REPLY_LIMIT_BYTES) {
           finish(respFailure(options.host, port, 'EPROTO', startedAt, received));
           return;

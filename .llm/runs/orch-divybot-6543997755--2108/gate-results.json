@@ -1,0 +1,95 @@
+{
+  "gates": [
+    {
+      "gate": "check",
+      "rawExitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 17,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "gate": "lint",
+      "rawExitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 17,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 17,
+        "filesProcessed": 17,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "fmt",
+      "rawExitCode": 0,
+      "summary": {
+        "filesSelected": 17,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 17,
+        "filesProcessed": 17,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "consumer",
+      "rawExitCode": 0,
+      "summary": {
+        "passed": 65,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 65,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "focused",
+      "rawExitCode": 0,
+      "summary": {
+        "passed": 98,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 98,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "install-generate",
+      "rawExitCode": 0,
+      "summary": {
+        "passed": 35,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 35,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "quality:gate",
+      "rawExitCode": 0,
+      "evidence": "quality scan ok=true, findings=[], allowCount=7; doctrine all roots FAIL=0"
+    }
+  ]
+}
