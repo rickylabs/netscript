@@ -28,5 +28,21 @@
     "unrelatedRowsChanged": false
   },
   "newHeadIndependentAttestation": "UNPROVEN",
-  "scaffoldRuntime": "UNPROVEN_COORDINATOR_OWNED"
+  "scaffoldRuntime": "UNPROVEN_COORDINATOR_OWNED",
+  "qualityCarrierRepair": {
+    "failedGate": "mcp-export-corpus",
+    "ciJob": "https://github.com/rickylabs/netscript/actions/runs/41198069396/job/124528298926",
+    "mainQuality": "PASS at main15cffa2",
+    "changedExportRows": [
+      "plugin .",
+      "plugin ./protocol",
+      "plugin-auth ./scaffold"
+    ],
+    "checks": {
+      "mcpExportCorpus": "PASS",
+      "assetsBarrel": "PASS",
+      "publishAssets": "PASS"
+    },
+    "authoredImplementationChanged": false
+  }
 }

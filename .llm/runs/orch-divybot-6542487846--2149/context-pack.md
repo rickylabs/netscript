@@ -1,3 +1,11 @@
+# Resume — CI carrier repair; new-head acceptance required
+
+Latest user CI activity identified quality failure at b798a187636da64e90dff28d42fcac5170527854. The failed job's receipt names mcp-export-corpus freshness; preceding quality gates passed and main15c quality passed. Canonical export/publish generation fixes it. Exactly plugin root, plugin ./protocol and plugin-auth ./scaffold export rows change, plus the MCP fallback prose from the changed llms index. check:mcp-export-corpus, check:assets-barrel, check:publish-assets and whitespace checks pass. No authored implementation or gate changed. Push this asset-refresh commit normally; its new exact head supersedes the pending acceptance request at b798.
+
+Close-gate currently fails for two unproven claims: independent acceptance of the new head after rebase and required scaffold.runtime CI. Coordinator has been asked to authorize one same-session delta review (round 3's extra grant is spent) and arm e2e-cli-gate. Do not relabel old MERGE or tick unproven boxes. Keep current head concrete and stable for the coordinator. No fourth round has been launched. No local expensive E2E, labels/milestones or merge/release action.
+
+## Previous integration record
+
 # Resume — conflict resolved on latest main; new-head acceptance required
 
 Latest direct user instruction explicitly requested rebasing and force-pushing the merge-conflict repair, superseding the earlier merge-only rule. Five leaf commits rebased onto main 15cffa2; sole conflict was generated agent-docs prose carrier and it was canonically regenerated. All 20 owned framework/test TypeScript blobs match prior reviewed head 2f02788071fd4d8088b7b9e21dfa2394d04f2bc5. Current integration evidence: 27 focused tests pass, 21-file check passes, docs build/accuracy/links/carrier freshness pass. See rebase-source-equivalence.json, rebase-evidence.json and newest worklog entry. Preserve incoming main and the original historical review records.
