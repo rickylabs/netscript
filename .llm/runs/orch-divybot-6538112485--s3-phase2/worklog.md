@@ -132,3 +132,25 @@ pass, including four actual pointer regressions and strict axe. Source check17
 and browser checks3+3 pass; source lint6/format17 pass; broader quality passes.
 No local token/dependency/lock changes. Source scope remains Forms primitives.
 Next is the Calendar/DatePicker slice, with a separate category review.
+
+## User-requested rebase and S2 integration
+
+Rebased four own commits onto main6b7f152 (merged S2 registry v2). All existing
+S2 sources/schema/installer remain.7 gap items now authored in registry.json with
+native file types/metadata, style-utility mappings and Actions/Forms collections.
+Compatibility manifest is main's unmodified projection. Carriers regenerated.
+Native registry inventory93 and collection docs updated. Browser60/60 and broad
+quality PASS on rebased code. Initial focused124 tests passed after inventory/
+collection repair; expanded legacy-authoring audit then required explicit post-v1
+allowlisting. Frozen legacy-v1.json is unchanged; negative controls protect
+missing/changed baseline and unexpected/missing new items. Generic consumer test
+now requires the exact7 reviewed component names, so an empty selection fails.
+Same reviewer corrective re-review and expanded tests pending. No READY claim.
+
+Registry integration repair is independently PASS after one correction. Expanded
+130 focused tests pass (contracts, installed copies, frozen compatibility negative
+controls, published schemas and static registry build). Rebuilt-source browser60
+passes; source wrappers5 check/lint pass; quality gate, release preflight and
+updated docs accuracy111/111 pass. Source commit precedes carrier generation to
+honor the MCP generator's clean-read-set guard. User-authorized force-with-lease
+will replace only the known old branch headf6d9ae4 after freshness validation.

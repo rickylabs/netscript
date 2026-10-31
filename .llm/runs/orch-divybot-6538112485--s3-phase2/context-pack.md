@@ -31,3 +31,11 @@ Slice3 terminal PASS after one correction of a native two-thumb pointer trap.
 All121 focused and60 browser cases pass; source controls remain native. Save
 this source/evidence commit and continue Calendar/DatePicker. Handoff is merged;
 S2 registry is still being handled separately and must be merged once landed.
+
+User requested a rebase/force push to repair conflicts. Rebased onto6b7f152
+(S2 merged); canonical registry.json now owns all7 items/style maps/collections.
+Compatibility TS projection and frozen legacy-v1.json are unchanged. Explicit
+post-v1 addition list and negative guards protect the snapshot.130 tests/60
+browser/quality/preflight/docs accuracy111 pass; independent rebase review PASS.
+Next: clean-source carrier refresh/freshness checks, force-with-lease known old
+head, then restore saved6 Calendar files and continue slice4. No READY yet.

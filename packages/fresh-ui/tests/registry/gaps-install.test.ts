@@ -1,3 +1,4 @@
+import { POST_V1_COMPONENTS } from './post-v1-items.ts';
 import { freshUiRegistryManifest } from '../../registry.manifest.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
@@ -8,6 +9,11 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
   const names = freshUiRegistryManifest.items.filter((item) =>
     item.kind === 'component' && item.tags.includes('contract')
   ).map((item) => item.name);
+  assertEquals(
+    [...names].sort(),
+    [...POST_V1_COMPONENTS].sort(),
+    'Every reviewed gap must be exercised; an empty projection cannot pass.',
+  );
   const root = await Deno.makeTempDir({ prefix: 'fresh-ui-gaps-' });
   const run = async (cwd: string, args: string[]) => {
     const result = await new Deno.Command(Deno.execPath(), {
