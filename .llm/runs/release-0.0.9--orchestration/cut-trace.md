@@ -33,3 +33,6 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 10:54 | `da3d08f3d` | #2509 | #2162 | W3 (B2) | steered after e2e red (doctor check rename) |
 | 2026-10-31 11:33 | `462f15c09` | #2517 | #2160 | W5 (B1) | v1 sagas contract response shape documented |
 | 2026-10-31 11:37 | `15cffa2fe` | #2421 | #2396 (final PR) | W1 (D1) | F-5 debt 23/22 (literal-union closure); **canary .1 contents complete**; readiness posted 11:52 (main green: ci 41197652794, e2e-cli 41197676281, command-postgres 41197674602) |
+| 2026-10-31 12:19 | `14816a409` | #2522 | #2382 | W6 (B1) | B1 chain complete except #2374 and #2159's held follow-up; status migration |
+| 2026-10-31 12:40 | `a5bca5312` | #2523 | #2394 | W4 (E1) | **E1 complete** |
+| 2026-10-31 12:42 | `b11c26c2f` | #2521 | #2268 (partial) | W5 (E2) | box 1 live-AppHost proof owed (issue open) |

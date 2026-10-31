@@ -3,15 +3,15 @@
 - A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
 - A2 DONE: #2395 (#2483), #2351 (#2496 67d4704b4)
 - A3 DONE: #2144 #2151 #2161 #2400 (#2482 02a66ba6d) all closed
-- B1 #2159 slice 1 MERGED #2499 (issue OPEN for Eric follow-up); #2383 MERGED #2512 20583c83c (closed; also fixed the Garnet CI flake); #2160 → PR #2517 (implementing) → #2382; #2374: next
-- B2 #2162 MERGED #2509 da3d08f3d (closed); #2149 DISPATCHED 10:58Z; #2369 MERGED (closed); #2108 (after #2149 + all B1): W7
-- C1 #2267 #2132 #2338 MERGED (closed); #1367 re-dispatched (orphaned continuation; AppHost opt-in + restart proof); #2377 next; #2373 internals; #2390 after all B1
-- D1 #2396: #2421 r3 at 32264fc (literal-union closure 23/22, debt re-review PASS, Opus MERGE, required CI green), e2e running, READY pending → CANARY .1 LAST ITEM; #2259 BLOCKED → Eric (06:09Z)
-- E1 #2392 MERGED #2511, #2401 MERGED #2515 (closed); #2394 after #2421 · E2 #2385 #2155 #1491 MERGED (closed); #2268 re-dispatched (orphaned continuation); #2269: W5
+- B1 #2159 slice 1 MERGED (issue OPEN for Eric follow-up); #2383 #2160 #2382 MERGED (closed); #2374 → PR #2526 (implementing); #2390 after all B1
+- B2 #2162 #2369 MERGED (closed); #2149 → PR #2519 at 3b219fd (SQLite repair) e2e RUNNING; #2108 after #2149 + #2374
+- C1 #2267 #2132 #2338 MERGED (closed); #1367 PR #2520 READY (e2e queued); #2377 PR #2525 READY (required CI); #2373 dispatched 12:41Z (orphaned claim); #2390 after B1
+- D1 #2396 all 3 PRs MERGED; issue OPEN for release-owned published-graph proof on canary .1; #2259 BLOCKED → Eric
+- E1 DONE: #2392 #2401 #2394 (closed) · E2 #2385 #2155 #1491 MERGED (closed); #2268 MERGED partial #2521 (box 1 live-AppHost proof owed); #2269 dispatched 12:44Z (embedded-docs decision in brief)
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 — CHECK #2406/#2409 vs Fresh UI S6a (#2419 studio-utility default preset) before dispatch; flag Cockpit on conflict
 - G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
 - H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
 - Open for Eric: #2159 follow-up; #2259 options; #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate; #2421 debt FYI (veto window); Garnet CI issue (likely moot); file upstream Aspire report (#2401 run record)
-- PLAN-EVAL: APPROVED round 2. Merges (29) incl. today 2505 2494 2499 2510 2482 2512 2514 2511 2515 2509. Garnet flake fixed by #2512.
+- CANARY .1 READY TO CUT at 15cffa2fe (posted 11:52Z, comment 6542998232); Eric cuts. One expensive gate at a time; drop the label when a PR e2e completes.
 - Dispatch rule: before posting any /swarm, check the issue for a claim comment or an open PR (orchid continuation workers self-claim plan issues).
 - Live leaves (herdr dispatch): never relaunch a leaf with a live workspace (label codex-<commentId>); check before any relaunch.

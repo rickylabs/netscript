@@ -215,3 +215,19 @@
 - 12:00:25Z: #2522 (#2382) Opus MERGE at `f0cd86e`; waiting for READY.
 - 12:02:05Z: #2519 (#2149): round-3 MERGE at `2f02788`, then a relayed instruction made the worker rebase and force-push (11:43Z) for a carrier conflict, plus a CI quality repair → `ce431da`. Drift recorded. Authorized one delta review at `ce431da`, then READY and e2e.
 - 12:02:20Z: #2382 READY (PR #2522, Opus MERGE `f0cd86e`); **expensive-gate.acquired** on #2522. #2394 → PR #2523.
+- 12:05:51Z: #2519 (#2149) delta Opus MERGE at `ce431da`; waiting for READY; e2e queued after #2522.
+- 12:19:44Z: **merged** #2522 (`14816a409`) for #2382 (B1); #2382 closed with evidence. B1 left: #2374 (dispatching) and #2159's held follow-up. #2523 (#2394) Opus MERGE at `d7163af`; waiting for READY.
+- 12:20:25Z: dispatched #2374 (fixes), comment 6543282848. Validator green before posting. The 11:36Z continuation claim was orphaned (no branch, PR or worker).
+- 12:20:40Z: #2519 (#2149) READY at `ce431da`; **expensive-gate.acquired** on #2519. #2394 READY (PR #2523, Opus MERGE `d7163af`; current head `d7163af`); e2e queued next.
+- 12:22:46Z: dispatched #2374 (fixes), comment 6543282848 (the 11:36Z claim was orphaned). The #2382 worker claimed #2377 at 12:21Z; the scripted #2377 post was stopped before posting (no duplicate). #2382 was closed at 12:19Z, so watch for source-closed teardown.
+- 12:23:31Z: #2519 (#2149) e2e RED at `ce431da`: SQLite tier `database.codegen` fails, VarChar native type in workers.prisma on sqlite (product failure, likely the per-backend schema contribution). Steered the live worker with the evidence, removed the label; **expensive-gate.released**. Next gate: #2523 (#2394).
+- 12:23:40Z: **expensive-gate.acquired** on #2523 (#2394) at `d7163af`.
+- 12:25:30Z: #2520 (#1367) Opus MERGE at `b3537c2`; waiting for READY.
+- 12:25:42Z: #2374 started 12:25Z.
+- 12:30:47Z: #1367 READY (PR #2520 at `b3537c2`, Opus MERGE `b3537c2`); e2e queued after #2523. #2374 → PR #2526.
+- 12:32:53Z: #2377 READY (PR #2525 at `014f2c4`, continuation of the #2382 worker), Opus MERGE; kv bridge only, so required CI suffices.
+- 12:34:51Z: #2521 (#2268) new head `0bee3eb` with Opus MERGE (shard-5 fix); waiting for re-READY and CI.
+- 12:40:39Z: **merged** #2523 (`a5bca5312`) for #2394; #2394 closed with evidence. **E1 complete.** #2519 (#2149) READY at `3b219fd` (SQLite repair), Opus MERGE; **expensive-gate.acquired** on #2519 (B2 critical path, ahead of #2520).
+- 12:41:28Z: dispatched #2373 (C1 test-only, internals), comment 6543487801. The 12:34Z continuation claim (the #2382/#2377 worker) was orphaned: workspace gone, no PR. Validator green.
+- 12:42:49Z: **merged** #2521 (`b11c26c2f`) for #2268, partial (Refs); #2268 stays open for the box-1 live-AppHost proof (proof leaf to dispatch).
+- 12:43:43Z: dispatched #2269 (E2, internals), comment 6543511422, with the embedded-docs decision: one corpus generated once, served by get_doc, find_guidance and search_docs; the leaf picks the package seam under PLAN-EVAL. Validator green.
