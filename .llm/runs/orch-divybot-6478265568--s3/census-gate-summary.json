@@ -1,0 +1,42 @@
+{
+  "sourceHead": "8f9394c7146fda19c621acabebc7588310795f42",
+  "commandCensus": {
+    "ratified": 99,
+    "documented": 99,
+    "recursive": 164,
+    "missing": []
+  },
+  "gates": [
+    {
+      "command": "deno task docs:accuracy",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task docs:links",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task --cwd docs/site build (via gen:agent-docs-prose)",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:publish-assets",
+      "exitCode": 0
+    }
+  ],
+  "independentImplEval": "PASS",
+  "lockfileChanges": [],
+  "remoteRequiredQuality": "PENDING; must be SUCCESS at final pushed head before READY"
+}

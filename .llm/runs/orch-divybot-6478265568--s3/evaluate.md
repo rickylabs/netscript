@@ -7,3 +7,7 @@ The reviewer explicitly left two operational conditions to the supervisor: the n
 The required scaffold.runtime command exited 1 during Aspire/Docker preflight. Docker daemon unavailable; runtime acceptance remains UNPROVEN, as the owner expressly permits disclosing at READY. No merge/tag/release or later-phase completion is claimed.
 
 Final main reconciliation: merged main 6a71cd059 (#2480) and kept its independently reviewed docs fixture fix. Fresh UI, CLI and browser tool code has zero diff from the evaluated bdb959d10 source. The original fixture bridge passes and quality:gate/arch:check passes on reconciled source c433b6e398781fbc586ddcace4d0c7811c9b7f5e. No additional implementation repair or review round was needed.
+
+## Coordinator census follow-up
+
+A separate read-only re-steer of the independent Claude Opus reviewer returns PASS for source 8f9394c71 (delta from 63ce2730a), retaining the original product review. Full verdict: census-impl-eval.md. Full named docs:accuracy and all four carrier checks are now terminal PASS on that committed source; docs:links and site build also pass. The final follow-up evidence commit has no source changes. Exact-head remote required quality remains the coordinator's mandatory READY gate, to be linked in the new READY report after success.
