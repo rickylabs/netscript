@@ -66,3 +66,31 @@ startup is still required and no Aspire claim has been made.
 S1 commit-selection correction: the worker golden expectation was omitted from the explicit
 stage list although included in validation and independent review. Committing it immediately
 with this record; no source behavior changed and the same 64-test result covers the expectation.
+
+## S2 consumer proof and documentation
+
+Fresh maintainer no-DB init, all three no-samples installs (sagas KV), generate plugins (3 written)
+and plugin doctor exit 0. Full commands and boundaries are in installed-proof.md. Required
+production startup specimen: 1 passed / 0 failed / 0 ignored, exit 0 with default sanitizers.
+All three generated registry sizes are zero; production startup APIs reach normal ready state
+with registryReady/dependencyReady true; saga definitionCount is zero. Workers streams dependency
+uses an isolated HTTP test double. No Aspire startup or durable-stream behavior is claimed.
+README for each plugin now documents no-samples installation, empty warning, idle readiness and
+regeneration after adding/removing definitions. No runtime lifecycle branch was needed.
+
+
+### S2 review and publication
+
+Independent same-session Opus IMPL-EVAL/S2 review returned PASS, no blockers. It confirmed actual
+production startup with zero definitions, normal readiness and cleanup, docs, preserved negative
+controls and committed type fixes. Final exact pushed-head review follows ready transition.
+
+Full export-map doc lint is not clean: sagas has 30 existing private-type-ref diagnostics;
+workers has 2 in unchanged core contract types. Saga adapter's existing public constants still
+use the same imported InstallStarterResource/NetScriptPlugin annotations; no public exports or
+type annotations changed in this work. Recorded diagnostics rather than claiming a clean gate.
+JSR dry runs pass. Review thread gate: PASS, threads=0, unanswered=0.
+
+S2 reconcile: #2162 is open, #2509 remains the only implementation PR; coordinator-owned CI
+runtime evidence is still required. No issue boxes, labels or milestones changed. No new debt
+accepted; only inherited doc-lint findings remain outside this change.

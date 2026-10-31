@@ -10,3 +10,13 @@ Final issue report uses atomic Orchid handoff; final evaluator must attest exact
 
 S1 golden expectation is included in the immediate follow-up commit after d2dd7cc; it was already
 validated and independently reviewed with the corresponding generator type fix.
+
+S2 consumer proof passed from a fresh fixture. Read installed-proof.md and empty-startup.specimen.ts.
+All three production APIs reach ready with zero definitions; isolated KV and streams test double,
+normal resource sanitizers. README changes done. Aspire runtime CI is still unproven/required.
+
+
+Precommit independent IMPL-EVAL/S2 review PASS. Final source gates remain 64 tests and 14-file
+check/lint/fmt, quality:gate PASS. Broad doc lint has inherited private-type-ref failures (sagas 30,
+workers 2), detailed in validation.md; do not call that gate green. Next: push S2, ready PR,
+review exact pushed head with same evaluator, capture CI state, queue READY handoff and stop.
