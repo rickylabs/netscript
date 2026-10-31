@@ -33,3 +33,17 @@ After Connection: close in the real-server fixture, 20 consecutive structured fo
 ## Source slice sign-off and reconciliation
 
 Independent source/slice IMPL-EVAL PASS, no blockers; reviewer independently reproduced and localized the test-server shutdown stall and confirmed the test-only fix, then independently passed the focused 9-test suite. Full source gates: 87 passed, 0 failed, 0 ignored; check/lint/fmt 64 files, zero findings. No outstanding PR comments or reviews. Changes remain within declared source/test/docs scope; final generated carriers are next. Reviewed source slice is signed off by the independent supervisor review, not self-certified by implementation.
+
+## Generated slice
+
+Native generators refreshed exactly two files: MCP export corpus (core root + sdk/streams rows) and CLI prose carrier. No publish twins needed changes. Full docs build and rendered-output check pass. Native check:mcp-export-corpus, check:agent-docs-prose and check:publish-assets pass. Generated corpus/prose tests: 10 passed, 0 failed. No lock changes.
+
+Read-only leak reporter completed. Reviewed all 24 entries: pre-existing/unproven Aspire resources and the reporter's own transient probe; no ownership proof for this run, none mutated. No server resource from the completed stream tests remains. Operational raw report stays outside public Git artifacts under the assignment privacy rule.
+
+A dated lesson and focused memory notes are retained. Final exact-head IMPL-EVAL will be attached to the PR/canonical final report after pushing, avoiding a new commit that would invalidate its own reviewed SHA. Coordinator-owned e2e-cli remains required before merge.
+
+Generated TypeScript check selects both changed carriers and passes. Repository lint/fmt config deliberately excludes the CLI encoded prose carrier: a two-file wrapper selection correctly refused partial coverage. Narrowed lint/fmt to the maintained MCP corpus (PASS) and used native prose freshness plus type-check for the encoded carrier; no suppression/config exemption added. Runtime source check/lint/fmt remain green across all 64 selected files.
+
+## Generated slice sign-off and reconciliation
+
+Independent generated-slice review PASS, no blockers; reviewer decoded the streams prose, confirmed exactly the core/sdk corpus rows, and independently reran all three native freshness checks successfully. No new source or lock changes. No new PR comments requiring a reply. The implementation is ready for the final pushed-head review and coordinator-owned CI gate. Observed evaluator model matches requested claude-opus-5-5; all rounds used the same separate Anthropic review session. Final verdict remains external to the immutable head as described in validation.md.
