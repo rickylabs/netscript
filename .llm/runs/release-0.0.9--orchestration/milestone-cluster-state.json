@@ -50,8 +50,7 @@
         2406,
         2411,
         2438,
-        2478,
-        2547
+        2478
       ]
     },
     {
@@ -462,13 +461,6 @@
       "evidence": [
         "https://github.com/rickylabs/netscript/pull/2480",
         "https://github.com/rickylabs/netscript/actions/runs/41148483243"
-      ]
-    },
-    {
-      "number": 2547,
-      "state": "closed",
-      "evidence": [
-        "duplicate of #2548"
       ]
     }
   ],
@@ -2025,7 +2017,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T20:11:01Z",
+  "updatedAt": "2026-10-31T20:11:39Z",
   "dispatches": [
     {
       "issue": 2438,

@@ -390,9 +390,14 @@
       "number": 2547,
       "title": "fix(release): canary prep leaves 0.0.8 residue in Fresh UI registry v2 artifacts",
       "disposition": "close-duplicate",
-      "lane": "internals",
       "group": "REL",
-      "note": "duplicate of #2548 (design-system lane owns the cause)"
+      "note": "duplicate of #2548 (design-system lane owns the cause)",
+      "reason": "Duplicate of #2548 (Fresh UI design-system lane owns the registry pins and dispatched the fix)",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2547#issuecomment-6548547769",
+        "https://github.com/rickylabs/netscript/issues/2548"
+      ],
+      "lane": null
     }
   ]
 }
