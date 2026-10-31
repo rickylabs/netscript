@@ -3,7 +3,7 @@ import { resolve } from '@std/path';
 import { parseUiRegistryJson } from '../../../domain/ui/ui-config.ts';
 import { uiContentHash, uiFileDiff } from '../../../domain/ui/ui-lock.ts';
 import { importEntryForDependency } from '../registry-deno-json.ts';
-import { removeUiRegistryItem, updateUiRegistryItems } from '../registry.ts';
+import { listUiRegistryItems, removeUiRegistryItem, updateUiRegistryItems } from '../registry.ts';
 import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
 import { installUiRegistry } from './install-registry.ts';
 import { reconcileUiStyles } from './registry-effects.ts';
@@ -18,8 +18,16 @@ export async function updateUiRegistry(
   deps: UiRegistryDependencies,
 ): Promise<{ readonly updated: readonly string[]; readonly drifted: readonly string[] }> {
   const lock = await readUiLock(root, deps.fs);
+  const installed = new Set(Object.keys(lock?.items ?? {}));
+  if (!lock && names.length) {
+    const legacy = await listUiRegistryItems(root, deps.fs, { includePartial: true });
+    for (const item of legacy.items) if (item.installed) installed.add(item.name);
+    for (const collection of legacy.collections) {
+      if (collection.items.some((name) => installed.has(name))) installed.add(collection.name);
+    }
+  }
   for (const name of names) {
-    if (!lock || !Object.hasOwn(lock.items, name)) {
+    if (!installed.has(name)) {
       throw new Error(`Registry item '${name}' is not installed. Use ui:add to install it first.`);
     }
   }

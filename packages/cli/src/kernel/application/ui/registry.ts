@@ -131,10 +131,11 @@ export async function installUiRegistryItems(
   };
 }
 
-/** List manifest items with installed state derived from their target files. */
+/** List target-file install state, optionally including partial copies for legacy restoration. */
 export async function listUiRegistryItems(
   projectRootInput: string,
   fs: FileSystemPort,
+  options: { readonly includePartial?: boolean } = {},
 ): Promise<
   {
     readonly items: readonly UiRegistryListEntry[];
@@ -143,12 +144,16 @@ export async function listUiRegistryItems(
 > {
   const { freshUiRegistryManifest } = await import('@netscript/fresh-ui/registry');
   const projectRoot = resolve(projectRootInput);
-  const items = await Promise.all(freshUiRegistryManifest.items.map(async (item) => ({
-    ...item,
-    installed: item.files.length > 0 && (await Promise.all(
+  const items = await Promise.all(freshUiRegistryManifest.items.map(async (item) => {
+    const present = await Promise.all(
       item.files.map((file) => fs.exists(resolveTarget(projectRoot, file.target))),
-    )).every(Boolean),
-  })));
+    );
+    return {
+      ...item,
+      installed: item.files.length > 0 &&
+        (options.includePartial ? present.some(Boolean) : present.every(Boolean)),
+    };
+  }));
   return { items, collections: freshUiRegistryManifest.collections };
 }
 
