@@ -13,3 +13,5 @@
 - Public store/port additions make the generated MCP export corpus stale. Regenerate its exact
   checked-in artifact after the clean source commit and include it in the same PR. This extends
   the declared generated write surface only; MCP behavior is unchanged.
+- Repeated runtime CI failure requires focused generated-entrypoint coverage and pre-cleanup
+  diagnostic evidence in the E2E gate. The doctor verdict and readiness contract remain unchanged.

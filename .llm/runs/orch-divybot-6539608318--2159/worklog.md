@@ -87,3 +87,15 @@ as the full objective.
 Generated corpus refreshed successfully after the CI repair: 35 packages, 304 subpaths, 9031 symbols.
 Reconcile: retain all original saga/HTTP/retention assertions and the full-objective audit. Pushing
 this generated follow-up before final exact-head review; required current-head CI is still pending.
+
+## Runtime CI investigation
+
+Core CI now passes at da931b7. Both hosted runtime tiers fail only the final plugin doctor gate;
+an unchanged SQLite retry repeats the same failure. Earlier all-child readiness succeeds. A focused
+process test boots the actual generated saga entrypoint on default KV with a non-empty registry and
+validates its ready payload with the doctor's parser: PASS. The presumed startup capability failure
+is not reproduced. Add bounded endpoint/payload-shape diagnostics before cleanup, retaining the exact
+doctor exit code. Six focused tests pass, including diagnostic exit-code and redaction controls.
+
+Reconcile: this is diagnostic progress, not a runtime repair or full-goal completion. Effects remain
+unimplemented. No local full scaffold runtime, lock changes, label changes or merge action performed.

@@ -73,7 +73,15 @@ export function createBehaviorPluginHealthGates(): readonly GateDefinition[] {
       GATE.BEHAVIOR_PLUGINS_HEALTH,
       'Check installed plugin health',
       GATE_PHASE.BEHAVIOR,
-      (context) => cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot),
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run',
+        '--allow-net=localhost,127.0.0.1',
+        new URL('./runtime/diagnose-plugin-health.ts', import.meta.url).pathname,
+        context.project.appHost,
+        ...cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot),
+      ],
     ),
   ];
 }
