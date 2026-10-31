@@ -2,16 +2,16 @@
 - H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
 - A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
 - A2 DONE: #2395 (#2483), #2351 (#2496 67d4704b4)
-- A3 #2144 MERGED #2481 (closed); #2400 PR #2482 READY dfa2502 + Opus PASS, e2e PG tier garnet flake → rerun; #2151 MERGED #2484 (closed); #2161 MERGED #2497 (closed)
-- B1 #2159 → PR #2499 (worker LIVE w46; e2e green at d21257f, await READY) → #2383 → #2160 → #2382; #2374: W4; #2159 follow-up = Eric decision (06:06Z)
-- B2 #2162 DISPATCHED 08:19Z (6541068260); #2149: next fixes slot; #2369 MERGED #2487 (closed); #2108 (after B2 pair + all B1): W7
-- C1 (features) #2267 MERGED #2502, #2132 MERGED #2505 a2fe36aee (closed); #2338 DISPATCHED 08:20Z (6541084410); #1367 #2377 next; #2373 internals (W4), #2390 (after all B1): W7
-- D1 #2396: #2422 #2423 MERGED; #2421 r2 worker LIVE (w4J) merging main at c875e38 → delta review + e2e; post-canary published-graph proof owed; #2367 #2115 #2290 MERGED (closed); #2259 BLOCKED → Eric decision (06:09Z)
-- E1 #2392 next (brief ready, internals); #2394 after #2421 (same plugin service entrypoints); #2401: W4 · E2 #2385 MERGED #2489, #2155 MERGED #2494 1d274c16b (closed); #1491: W5 · #2268 #2269 (internals): W5
+- A3 #2144 #2151 #2161 MERGED (closed); #2400 PR #2482 approved+green at dfa2502 but conflicts with main (prose carrier after #2494) → r3 finish posted 08:52Z (6541366578)
+- B1 #2159 slice 1 MERGED #2499 f68394636 (issue OPEN for Eric follow-up decision); #2383 NEXT (brief ready, waits for a builder slot) → #2160 → #2382; #2374: W4
+- B2 #2162 → PR #2509 (implementing); #2149: next fixes slot; #2369 MERGED #2487 (closed); #2108 (after B2 pair + all B1): W7
+- C1 (features) #2267 #2132 MERGED (closed); #2338 → PR #2510 (implementing); #1367 #2377 next; #2373 internals (W4), #2390 (after all B1): W7
+- D1 #2396: #2422 #2423 MERGED; #2421 r2 CHANGES (ProcedureErrorCode closure) → coordinator debt decision 08:41Z on #2474 → r3 finish posted 08:54Z (6541384172); #2367 #2115 #2290 MERGED (closed); #2259 BLOCKED → Eric decision (06:09Z)
+- E1 #2392 posted 08:30Z (held); #2394 after #2421 (same plugin service entrypoints); #2401: W4 · E2 #2385 #2155 MERGED (closed); #1491: W5 · #2268 #2269 (internals): W5
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6 — CHECK #2406/#2409 vs Fresh UI S6a (#2419 studio-utility default preset) before dispatch; flag Cockpit on conflict
 - G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
 - H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)
 - Open for Eric: #2465 placement; PRs #2424/#2433; failed-canary policy; DS1 stable gate
-- PLAN-EVAL: APPROVED round 2. Merges: 2476 2477 2480 2481 2422 2423 2484 2485 2483 2489 2487 2492 2479 2496 2498 2497 2502 2505 2494 (19). One expensive gate at a time.
+- PLAN-EVAL: APPROVED round 2. Merges (20): 2476 2477 2480 2481 2422 2423 2484 2485 2483 2489 2487 2492 2479 2496 2498 2497 2502 2505 2494 2499. Builders 5/5 (2162 2338 2392 2400r3 2396r3).
 - Dispatch rule: before posting any /swarm, check the issue for a claim comment or an open PR (orchid continuation workers self-claim plan issues).
 - Live leaves (herdr dispatch): never relaunch a leaf with a live workspace (label codex-<commentId>); check before any relaunch.
