@@ -21,3 +21,5 @@ two consecutive terminal failures stop the leaf.
   `packages/mcp/src/embedded-docs-corpus.generated.ts`, `.llm/assets/agent-docs/provenance.json`.
 
 Never commit the assignment or lock churn. No labels or milestones; coordinator merges.
+
+CI follow-up authorized by owner request to keep PR green: canonical generated inventory `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv` is added to the write surface.

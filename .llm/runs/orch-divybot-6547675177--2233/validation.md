@@ -40,3 +40,20 @@ Scoped check/lint/fmt use `.llm/tools/run-deno-{check,lint,fmt}.ts` with the two
 ## Size impact
 
 The only shipped change adds 707 bytes to the CLI adapter; the test and run records are excluded from publication. MCP and stored carriers are byte unchanged. Original accepted package-size evidence remains #2234 (CLI −15.2%, MCP +8.8%; coordinator Step 0). No added dependency or export.
+
+## Required CI repair
+
+CI run 41231957471 passed type-check and browser lanes but quality exposed missing
+Aspire inventory membership for the newly expanded integration test. Main run 41226320355
+passed. Canonical regeneration:
+
+```sh
+deno run --allow-read --allow-run=git --allow-write=.llm/tools/validation/fixtures .llm/tools/validation/aspire-surface-manifest.ts
+deno task check:aspire-version-parity
+```
+
+Exactly one generated row added; no scan rules or gate semantics changed. Local parity PASS,
+exit 0, manifestFresh=true, zero failures/missing; existing deferred/info findings retained.
+Product code and its tests are unchanged from the 45-test/source-hash evidence above.
+
+Generated inventory SHA-256 after repair: `cecebe6cf986cdc18bd0c337df077238b8e3d432dcb2eeec4a4c3de7abaeb65f`. Durable repair invocation `issue-2233-aspire-repair`: PASS, exit 0.

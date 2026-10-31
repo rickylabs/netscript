@@ -1,14 +1,14 @@
 # Resume context
 
-PR #2546, issue #2233, branch orch/divybot-6547675177. PLAN-EVAL PASS;
-separate pre-sign-off IMPL-EVAL PASS (Claude Opus 5.5 high). evaluate.md records scope and proof.
-45 tests and scoped check/lint/fmt pass. Quality, all four carrier freshness checks and native
-CLI publish dry-run pass. Four negative controls prove strict byte comparison catches missing
-or volatile rows. See validation.md for commands and source hashes, acceptance.md for all boxes.
-No generated output or lock churn; no new architectural debt.
+PR #2546, issue #2233, branch orch/divybot-6547675177. Product implementation and tests
+unchanged from approved head 2464145. PLAN-EVAL and implementation evaluation PASS.
+Required CI exposed one missing Aspire surface inventory row for the new test's Aspire seam.
+Canonical generator adds exactly that row; local parity and durable repair gate PASS.
+Same independent evaluator reviewed repair before sign-off: PASS (repair-eval.md).
+45-test and scoped source/hash evidence remains valid; see validation.md.
 
-After committing this reviewed implementation: push, mark PR ready, inspect current CI,
-resume the same independent evaluator on exact pushed SHA, run final review-thread gate,
-and write the canonical READY report via .divybot-final-report.tmp -> .md. Final exact-head
-verdict belongs in PR phase comment/report so recording it does not invalidate its own head.
-No scaffold E2E required. Coordinator owns metadata and merge. Do not merge/tag/release.
+PR temporarily draft during repair. Next: push repair commit, resume same evaluator for final
+exact-head verdict (fourth implementation evaluation pass), restore ready with completed
+checklist, verify current CI and threads, refresh canonical READY file to final head.
+Old-head deferred rerun helper was stopped; new ready event will run corrected close-gate.
+No scaffold E2E required. No labels, milestone, merge, force-push, lock churn or release.

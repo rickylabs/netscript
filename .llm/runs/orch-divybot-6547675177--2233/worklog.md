@@ -54,3 +54,24 @@ will be recorded on PR #2546 and in the canonical READY report without moving th
 
 Reconcile: no new review threads; thread gate PASS (zero threads). No issue metadata changes.
 Only the three declared product/test/docs files and scoped run artifacts are included.
+
+## CI repair slice
+
+Current main CI at intake baseline passed: run 41226320355. PR run 41231957471
+quality failed at `Aspire version parity (phase 1)`, after carrier freshness checks.
+Reproduced locally: manifestFresh=false, sole failure is generated inventory freshness.
+Canonical generator adds exactly one row for deno-agent-docs-generator_test.ts (agent-init).
+`deno task check:aspire-version-parity` now passes: manifestFresh=true, zero failures,
+1021 checked and zero missing (existing deferred/info entries retained).
+
+Close-gate failure independently read the earlier unchecked draft checklist. Live checker
+passes after body correction. CI repair will push a fresh run without rebasing or force-push.
+The obsolete deferred rerun helper for the old head was stopped (run-owned process only).
+Pending same-session read-only slice review before sign-off; final exact-head review follows.
+
+Same-session read-only repair review PASS before sign-off (repair-eval.md).
+Factual clarification: the test file was already tracked; its newly added Aspire mention
+requires an inventory row. The omitted local parity gate allowed this freshness issue through.
+Temporarily returned PR to draft for repair; will restore ready after pushed-head review so
+required CI starts with completed checklist and the repaired inventory together.
+Reconcile: canonical repair is one generated row; product source/tests/locks unchanged.
