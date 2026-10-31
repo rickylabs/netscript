@@ -37,3 +37,5 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 12:40 | `a5bca5312` | #2523 | #2394 | W4 (E1) | **E1 complete** |
 | 2026-10-31 12:42 | `b11c26c2f` | #2521 | #2268 (partial) | W5 (E2) | box 1 live-AppHost proof owed (issue open) |
 | 2026-10-31 12:44 | `46b22e636` | #2525 | #2377 | W4 (C1) | continuation of the #2382 worker |
+| 2026-10-31 13:11 | `7afe557fe` | #2526 | #2374 | W4 (B1) | B1 done except #2159's held follow-up |
+| 2026-10-31 13:14 | `e4875a56c` | #2528 | #2373 | W4 (C1) | test-only (published testing helper) |

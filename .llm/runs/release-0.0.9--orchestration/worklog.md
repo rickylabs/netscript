@@ -238,3 +238,13 @@
 - 12:52:23Z: #2373 → PR #2528.
 - 12:54:35Z: #2519 (#2149) e2e RED at `3b219fd`: Postgres tier aspire-start, the auth resource exits (state=Finished). Product failure. Steered the worker, removed the label; **expensive-gate.released**.
 - 12:54:46Z: #2269 → PR #2529; #2384 → PR #2530. **expensive-gate.acquired** on #2526 (#2374) at `621f5df`.
+- 12:55:35Z: #2526 (#2374) quality red at `621f5df` (README fence integrity); steered the live worker. e2e continues at this head as evidence.
+- 12:57:38Z: #2526 pushed `95a15f2` (README fence fix); the `621f5df` e2e was cancelled; e2e re-runs at the new head. #2528 (#2373) Opus MERGE at `2d9be85`; waiting for READY.
+- 12:59:30Z: #2373 READY (PR #2528 at `2d9be85`), Opus MERGE; test-only, so required CI suffices.
+- 13:00:05Z: #2528 (#2373) quality red at `2d9be85` (MCP export corpus freshness); steered the live worker to merge main and regenerate.
+- 13:01:56Z: #2526 (#2374) Opus MERGE at `95a15f2`; e2e running; waiting for re-READY.
+- 13:02:20Z: #2528 (#2373) new head `bd49114` with Opus MERGE (main merged, corpus fixed).
+- 13:07:26Z: #2519 (#2149) READY at `85364cb` (Postgres auth start-up fix), Opus MERGE; e2e queue: #2526 (running) → #2519 → #2520.
+- 13:12:00Z: **merged** #2526 (`7afe557fe`) for #2374 (B1). Closing #2374 is delayed until its worker's continuation state is known. **expensive-gate.acquired** on #2519 (#2149) at `85364cb`.
+- 13:14:15Z: **merged** #2528 (`e4875a56c`) for #2373 (C1). Issue close delayed until the claim check.
+- 13:16:23Z: dispatched #2390 (investigation, fixes; all B1 edges merged), comment 6543850655. Validator green. #2374 closed with evidence (no continuation claim from its worker).
