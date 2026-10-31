@@ -1,3 +1,4 @@
+import type { SagaStorePort } from '@netscript/plugin-sagas-core/runtime';
 import type { SagaDurabilityTier, SagaInstanceStatus } from '@netscript/plugin-sagas-core/domain';
 
 /** Service context available to V1 saga route handlers. */
@@ -8,7 +9,9 @@ export type SagaServiceContext = Readonly<{
   sagaRuntime?: SagaServiceRuntime;
   /** Maximum time an HTTP request may wait for durable publish acceptance. */
   publishTimeoutMs?: number;
-  /** Read instances from the KV projection when Prisma saga delegates are unavailable. */
+  /** Canonical store used by direct GET when the query projection is KV or disabled. */
+  sagaStore?: Pick<SagaStorePort, 'findByCorrelation' | 'load'>;
+  /** List instances from the KV projection. */
   useKvProjection?: boolean;
 }>;
 
@@ -219,41 +222,6 @@ export type SagaHistoryResponseEntry = Readonly<{
   transitionAt: string;
 }>;
 
-/** Saga instance state returned by durable saga stores. */
-export interface SagaInstanceState {
-  /** Durable record identifier. */
-  id: string;
-  /** Saga correlation identifier. */
-  correlationId: string;
-  /** State version. */
-  version: number;
-  /** Whether the saga has completed. */
-  isCompleted: boolean;
-  /** Creation timestamp from the store. */
-  createdAt?: Date;
-  /** Last update timestamp from the store. */
-  updatedAt?: Date;
-  /** Optional nested saga metadata. */
-  metadata?: {
-    /** Saga definition identifier. */
-    sagaId?: string;
-    /** Metadata version. */
-    version?: number;
-    /** Metadata creation timestamp. */
-    createdAt?: string | Date;
-    /** Metadata update timestamp. */
-    updatedAt?: string | Date;
-    /** Metadata completion flag. */
-    isCompleted?: boolean;
-    /** W3C traceparent header. */
-    traceParent?: string | null;
-    /** W3C tracestate header. */
-    traceState?: string | null;
-  };
-  /** Additional business state fields. */
-  [key: string]: unknown;
-}
-
 /** JSON path shape accepted by Prisma JSON filters across supported providers. */
 export type SagaPrismaJsonPath = string | string[];
 
@@ -344,6 +312,10 @@ export interface SagaHistoryEntry {
 export interface SagaServiceDatabaseClient {
   /** Saga instance table access. */
   sagaInstance: {
+    /** Read one row through the existing saga-name/correlation index, without sorting. */
+    findFirst(args: {
+      where: { sagaName: string; correlationId: string };
+    }): Promise<PrismaRecord | null>;
     /** List saga instance records. */
     findMany(args: {
       where?: SagaInstanceWhereInput;

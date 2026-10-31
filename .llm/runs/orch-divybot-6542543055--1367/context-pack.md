@@ -28,3 +28,9 @@ embedded streams page; no runtime changes or removed corpus entries. Close-gate'
 now carry executed evidence; only the full-runtime CI checkbox remains genuinely unproven. Existing
 e2e-cli workflow was manually dispatched on GitHub-hosted VMs without labels, in response to owner
 CI repair requests. New-head dispatch must supersede old-head CI after this prose-only commit.
+
+Latest remediation: normal pending merge of main 15cffa2 (#2517/#2421); upstream native streams
+service factory preserved, no custom source conflicts or lock edits. Native MCP export corpus
+regenerated for directory signature changes; all derived asset freshness checks required as a
+complete closure. Focused combined tests still 258/258. See drift/worklog. Awaiting independent
+combined-artifact/slice review before commit/push, then E2E at the refreshed head and final review.

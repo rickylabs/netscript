@@ -1,0 +1,15 @@
+{
+  "profile": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s5-astra-20261028/consumers\\owned-profile-a4438ba87f5a9ad7",
+  "removed": true,
+  "residue": [],
+  "temporaryConsumers": [
+    "C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/__s5_consumer_identity-21_7dd81b3a-7220-464b-9f48-e8109b414c8f.ts",
+    "C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/__s5_consumer_negative-auth_bad617a6-7624-4537-94b5-21f02cca4a7c.ts",
+    "C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/__s5_consumer_negative-serve_5527b445-27e7-4fb1-884a-2c160a381dc0.ts",
+    "C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/__s5_consumer_function-example-1_b3ccb484-8be0-4d67-9b61-9886e3b99891.ts",
+    "C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/__s5_consumer_module-example-1_374ba716-1907-4b8e-a565-acd01263864f.ts",
+    "C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/__s5_consumer_module-example-2_b4bcf6f6-54d4-4089-8c9f-b42c72615f10.ts"
+  ],
+  "allConsumersRemoved": true,
+  "recursiveDelete": false
+}

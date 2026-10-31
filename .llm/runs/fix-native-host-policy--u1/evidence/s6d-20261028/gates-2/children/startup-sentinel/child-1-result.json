@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "{\"mode\":\"sentinel\",\"nativeError\":{\"name\":\"Error\",\"message\":\"S6D_CALLER_HOSTNAME_SENTINEL\"}}\n{\"mode\":\"sentinel\",\"observedBound\":1,\"hostnameReads\":1,\"blockerPreserved\":false,\"identityPreserved\":true,\"returnedHandle\":false,\"reboundPorts\":[51593]}\ns6d-streams: startup rejection and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n",
+  "pid": 81152,
+  "startedAt": "2026-10-28T04:58:47.368Z",
+  "finishedAt": "2026-10-28T04:58:48.822Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

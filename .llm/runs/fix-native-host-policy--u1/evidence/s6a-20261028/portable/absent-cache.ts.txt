@@ -1,0 +1,50 @@
+import { createRuntimeSandbox } from '../../../plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts';
+const output = 'C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6a-portable-20261028/absent-cache';
+await Deno.mkdir(output);
+const profile = await Deno.makeTempDir({ dir: output, prefix: 'owned-profile-' });
+const owned = await Deno.realPath(profile);
+const old = Deno.env.toObject();
+const keys = 'HOME USERPROFILE APPDATA LOCALAPPDATA TMP TEMP TMPDIR XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME'.split(' ');
+let failure: unknown;
+try {
+  for (const key of keys) Deno.env.set(key, profile);
+  Deno.env.set('NETSCRIPT_S6A_EVIDENCE_DIR', output);
+  Deno.env.delete('DENO_DIR');
+  try {
+    await using sandbox = await createRuntimeSandbox('absent-cache');
+    console.log(JSON.stringify({ unexpectedDiscovery: sandbox.addonPaths }));
+  } catch (error) { failure = error; }
+  const cache = JSON.parse(await Deno.readTextFile(output + '/absent-cache/cache-info.json'));
+  const discovery = JSON.parse(await Deno.readTextFile(output + '/absent-cache/discovery-result.json'));
+  const parsed = JSON.parse(cache.stdout);
+  const receipt = {
+    purpose: 'Actual fixture cache-info boundary with DENO_DIR absent and empty synthetic default cache; no HTTP qualification',
+    explicitDenoDir: cache.explicitDenoDir,
+    cacheInfoCode: cache.code,
+    denoDir: parsed.denoDir,
+    npmCache: parsed.npmCache,
+    discoveryCode: discovery.code,
+    discoveryStderr: discovery.stderr,
+    error: failure instanceof Error ? failure.message : String(failure),
+  };
+  await Deno.writeTextFile(output + '/boundary.json', JSON.stringify(receipt, null, 2));
+  console.log(JSON.stringify(receipt));
+  if (cache.explicitDenoDir || cache.code !== 0 || !parsed.denoDir || !parsed.npmCache) {
+    throw new Error('Absent cache-info boundary failed');
+  }
+  if (discovery.code !== 1 || !/not found in cache|not cached|cache.+not found|--cached-only/i.test(discovery.stderr)) {
+    throw new Error('Empty synthetic cache refusal was not the expected frozen/cached setup failure');
+  }
+} finally {
+  for (const key of [...keys, 'DENO_DIR', 'NETSCRIPT_S6A_EVIDENCE_DIR']) {
+    if (old[key] === undefined) Deno.env.delete(key); else Deno.env.set(key, old[key]);
+  }
+  const resolved = await Deno.realPath(profile);
+  const parent = await Deno.realPath(output);
+  if (resolved !== owned || (!resolved.startsWith(parent + '\\') && !resolved.startsWith(parent + '/'))) {
+    throw new Error('Owned cache profile boundary differs');
+  }
+  const residue = Array.from(Deno.readDirSync(profile), v => v.name);
+  await Deno.remove(profile, { recursive: true });
+  await Deno.writeTextFile(output + '/cleanup.json', JSON.stringify({ profile, owned, residue, removed: true }));
+}

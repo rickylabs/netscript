@@ -1,0 +1,49 @@
+{
+  "root": "plugins/streams",
+  "pkg": "streams",
+  "totals": {
+    "fail": 0,
+    "warn": 5,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A3",
+      "level": "WARN",
+      "message": "README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "F-5/F-6",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "cli.ts",
+      "line": 18
+    },
+    {
+      "ref": "F-5/F-6",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "scaffold.ts",
+      "line": 23
+    },
+    {
+      "ref": "F-5/F-6",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "src\\adapter\\resources\\consumer\\consumer.stub.ts",
+      "line": 78
+    },
+    {
+      "ref": "F-5/F-6",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "src\\adapter\\resources\\stream\\stream.stub.ts",
+      "line": 84
+    }
+  ]
+}

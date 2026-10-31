@@ -29,6 +29,21 @@ without provisioning any database.
 > [`@netscript/plugin-streams-core`](https://jsr.io/@netscript/plugin-streams-core) — this package
 > wires the streams service into a NetScript host.
 
+## Host-owned startup
+
+Import `startStreamsService` from `@netscript/plugin-streams/service` to choose native auth, CORS
+and listener options. This singular import is inert. Required `auth` is validated before runtime
+I/O; guarded raw stream routes need native `authn.protect: ['/']` or the intended stream prefix.
+Supply `cors.origin` for an exact allowlist, or omit it for `NETSCRIPT_CORS_ORIGINS`. The factory
+retains stream protocol headers/methods and returns a native `RunningService`; `stop()` drains its
+front listener and stops its owned upstream. Host `serve.port`, including zero, takes precedence
+over `PORT` and `STREAMS_PORT`; `serve.hostname`, TLS and signal options remain native.
+
+The plural `@netscript/plugin-streams/services` entrypoint retains its existing start-on-import
+public/wildcard policy and delegates to the same factory. The full typed recipe and adoption
+boundary are in
+[Host workers and streams services](https://rickylabs.github.io/netscript/services-sdk/how-to/host-plugin-services/).
+
 ## Storage contract and operations
 
 The runtime manifest records `metadata.storage.defaultMode = "memory"`, `ephemeral = true`, and the

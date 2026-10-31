@@ -478,3 +478,34 @@ A <code>SagaHandler</code> returns <code>readonly CascadedMessage[]</code>. It i
 Build the checkout saga, with a compensation branch, in the
 [storefront tutorial](/tutorials/storefront/04-checkout-saga/). The full API is in the
 {{ comp.xref({ key: "ref:sagas", text: "sagas reference" }) }}.
+
+## Reading instance state and migrating consumers
+
+The instance API keeps your state under `response.state` and runtime metadata in
+sibling fields. For example, a checkout can return
+`{ "state": { "status": "payment_pending" }, "status": "running" }`.
+The nested status is your workflow's business value; the sibling status is the
+runtime lifecycle. The same separation applies to lists and single-instance reads,
+for both KV and Prisma projections. Your state's `metadata`, identifiers, dates,
+and other properties also remain unchanged.
+
+If you read runtime fields from `response.state` in an earlier release, move those
+reads to the top-level response fields: `response.status`, `response.instanceId`,
+`response.version`, `response.createdAt`, and `response.updatedAt`. Your business
+fields stay under `response.state`. Prisma's JSON projection now has
+`projectionVersion: 2`; direct database consumers read its nested `state` property
+for business data. The API and stream startup reconciliation handle the persisted
+version for you.
+
+Legacy projection rows remain in their earlier shape until the next committed
+transition or retention cleanup. Fields already overwritten by the old projection
+cannot be reconstructed from that projection; use canonical state or an
+application-controlled replay to refresh them.
+
+`GET /instances/{sagaName}/{correlationId}` resolves the correlation index and loads
+the canonical instance when the projection is KV or disabled. An existing instance
+on KV takes exactly two reads, independent of the number of instances. A Prisma
+projection uses one indexed query. Direct canonical reads may omit optional
+`lastMessageType`, and a missing canonical instance returns `NOT_FOUND` even if an
+old query projection is still present. Disabling projections keeps list results
+empty while direct reads continue to work.

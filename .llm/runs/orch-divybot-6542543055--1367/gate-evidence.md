@@ -28,3 +28,13 @@ regeneration refreshed only the embedded streams page (208 entries retained, zer
 `check:agent-docs-prose`: exit 0, fresh true, no stale paths. `check:publish-assets`: exit 0.
 Independent same-session slice review decoded before/after content and returned PASS. No runtime
 source, tests, dependencies or locks changed. New-head CI and exact-head review remain required.
+
+## Coherent main integration and complete generated closure
+
+Normal main merge to 15cffa2 (#2517/#2421), no custom source conflict. Native MCP corpus generation
+updates four API rows for directory declarations/constructor; no removed rows. All four freshness
+checks pass: MCP export corpus, agent-docs prose, publish assets and staged assets barrel.
+quality:gate passes and 258 focused/regression tests pass. Explicit current-source generated-plugin
+sync followed by the actual minimal Aspire restart proof passes with main's native service factory;
+exact focused AppHost stopped. Independent combined-slice review PASS. Clone-based corpus tests
+must be rerun after committing, because they clone HEAD rather than the working directory.

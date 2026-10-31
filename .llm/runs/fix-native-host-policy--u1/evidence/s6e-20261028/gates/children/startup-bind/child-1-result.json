@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "{\"mode\":\"bind\",\"nativeError\":{\"name\":\"AddrInUse\",\"message\":\"Une seule utilisation de chaque adresse de socket (protocole/adresse réseau/port) est habituellement autorisée. (os error 10048)\"}}\n{\"mode\":\"bind\",\"observedBound\":1,\"hostnameReads\":1,\"blockerPreserved\":true,\"blockerEndpoint\":{\"hostname\":\"127.0.0.1\",\"port\":49700,\"transport\":\"tcp\",\"servePort\":49700},\"identityPreserved\":false,\"returnedHandle\":false,\"reboundPorts\":[49699,49700]}\ns6d-streams: startup rejection and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n",
+  "pid": 49072,
+  "startedAt": "2026-10-28T05:10:33.977Z",
+  "finishedAt": "2026-10-28T05:10:35.240Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

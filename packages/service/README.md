@@ -397,7 +397,7 @@ HTTP clients can branch on the JSON `code`: `procedure_retired` is the applicati
 show “client too old” or request an upgrade; `procedure_not_found` means no procedure is served at
 that guarded path. These pre-dispatch middleware errors are not contract-defined oRPC errors;
 clients reading raw HTTP responses should inspect the JSON code rather than parse `message`.
-`PROCEDURE_ERROR_CODES` and its derived `ProcedureErrorCode` type are exported from both the package
+`PROCEDURE_ERROR_CODES` and the `ProcedureErrorCode` union are exported from both the package
 root and `@netscript/service/auth`. `AuthzDecision.code` carries the optional typed failure, and
 `ProcedurePolicyResolution.retired` marks a matched retired declaration for the shared auth stages.
 Overlay authorizers never set that marker and retain their existing fallback behavior.

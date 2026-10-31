@@ -1,0 +1,197 @@
+{
+  "sourceMain": "1d274c16bd3163eb72a40ea3f2e3f0523861159f",
+  "note": "Raw command receipts are stored outside Git. They prove execution on the staged source union, with actual HEAD2d62297b0 recorded by the runner; final pushed-head review is separate and never inferred from these dirty-tree command receipts.",
+  "gates": [
+    {
+      "gate": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15708
+    },
+    {
+      "gate": "aspire-version-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 392
+    },
+    {
+      "gate": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3669
+    },
+    {
+      "gate": "check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 166397
+    },
+    {
+      "gate": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9065
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14757
+    },
+    {
+      "gate": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 875
+    },
+    {
+      "gate": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15124
+    }
+  ],
+  "combinedTests": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 1872,
+      "failed": 1,
+      "ignored": 18,
+      "totalResults": 1891,
+      "uniqueFailures": 1
+    },
+    "durationMs": 691998,
+    "failure": {
+      "name": "workers non-contract entrypoints have no documentation diagnostics",
+      "file": "plugins/workers/tests/public/type-refs_test.ts",
+      "reason": "Incoming native AuthzDecision references ProcedureErrorCode outside the unchanged factory facade closure."
+    },
+    "ignored": "18 inherited ignored controls; no skip added or widened by this reconciliation. Redis-dependent CI proof remains separate."
+  },
+  "initialPass": {
+    "sourceMain": "7ee9c3ed04607eb0967f9ef0ef4cd874652817aa",
+    "combinedTests": {
+      "exitCode": 1,
+      "summary": {
+        "passed": 1526,
+        "failed": 1,
+        "ignored": 16,
+        "totalResults": 1543,
+        "uniqueFailures": 1
+      },
+      "failure": {
+        "name": "workers non-contract entrypoints have no documentation diagnostics",
+        "file": "plugins/workers/tests/public/type-refs_test.ts",
+        "reason": "Native AuthzDecision now references ProcedureErrorCode introduced by incoming main; factory facade lacks that public type closure. Existing exact22/21 export-debt bounds forbid silently adding exports."
+      }
+    },
+    "gates": [
+      {
+        "gate": "agent-docs-prose",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 22749
+      },
+      {
+        "gate": "aspire-version-parity",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 475
+      },
+      {
+        "gate": "assets-barrel",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 2762
+      },
+      {
+        "gate": "check",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 280678
+      },
+      {
+        "gate": "docs-accuracy",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 10233
+      },
+      {
+        "gate": "mcp-export-corpus",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 12101
+      },
+      {
+        "gate": "publish-assets",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 573
+      },
+      {
+        "gate": "quality-gate",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 27303
+      }
+    ],
+    "rootCheck": {
+      "files": 4034,
+      "batches": 34,
+      "diagnostics": 0,
+      "exitCode": 0
+    }
+  },
+  "sourceBaseline": "c875e3893458f92a701239ff10461df2c56c2c9f",
+  "rootCheck": {
+    "files": 4039,
+    "batches": 34,
+    "diagnostics": 0,
+    "exitCode": 0
+  },
+  "corpus": {
+    "packages": 35,
+    "subpaths": 306,
+    "symbols": 9074
+  },
+  "factoryDocLint": {
+    "workers": {
+      "errors": 1,
+      "privateTypeRef": 1
+    },
+    "streams": {
+      "errors": 1,
+      "privateTypeRef": 1
+    },
+    "reason": "AuthzDecision references incoming-main ProcedureErrorCode; native closure/debt disposition remains required."
+  },
+  "runtimeCI": "UNPROVEN; coordinator-owned opt-in, no local scaffold.runtime",
+  "publishedGraph": "UNPROVEN; existing release-owned HOST-POLICY-PUBLISHED-GRAPH-2396 unchanged",
+  "testScope": [
+    "packages/service",
+    "packages/plugin",
+    "packages/fresh",
+    "packages/fresh-ui",
+    "plugins/workers",
+    "plugins/streams",
+    "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+    "packages/sdk/tests/internal-credential-contribution_test.ts",
+    "packages/sdk/tests/client-contribution-validation_test.ts",
+    "packages/sdk/tests/client-contribution-observability_test.ts",
+    "packages/sdk/tests/integration/client-contribution-adapter_test.ts",
+    "packages/sdk/tests/discovery/env-ordering_test.ts",
+    "packages/kv/tests/list-contract_test.ts",
+    "packages/kv/tests/bridge-list_test.ts"
+  ],
+  "reviewThreads": {
+    "threads": 0,
+    "unanswered": 0,
+    "exitCode": 0
+  },
+  "sourceReconciliation": {
+    "authoredFactorySourceAndTests": "unchanged from reviewed c875e3893458f92a701239ff10461df2c56c2c9f",
+    "incomingKv": "byte-identical to main1d274c16bd3163eb72a40ea3f2e3f0523861159f",
+    "locks": "exact incoming main; no leaf churn",
+    "debt": "both sides retained; exact original bounds and dates unchanged"
+  }
+}

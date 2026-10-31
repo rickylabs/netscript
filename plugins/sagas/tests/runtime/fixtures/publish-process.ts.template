@@ -68,7 +68,7 @@ function refuseReadModel(): never {
   throw new Error('Publish conformance must not read the metadata projection');
 }
 const unusedReadModel: SagaServiceDatabaseClient = {
-  sagaInstance: { findMany: refuseReadModel, count: refuseReadModel },
+  sagaInstance: { findFirst: refuseReadModel, findMany: refuseReadModel, count: refuseReadModel },
   sagaExecutionHistory: { findMany: refuseReadModel, count: refuseReadModel },
 };
 

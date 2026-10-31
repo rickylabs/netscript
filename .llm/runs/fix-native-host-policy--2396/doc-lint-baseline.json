@@ -1,0 +1,63 @@
+{
+  "mainHead": "6a71cd0599673d70cd6311de3bb20b2d6a9dde2c",
+  "packages": {
+    "workers": {
+      "current": {
+        "totalPackages": 1,
+        "totalErrors": 2,
+        "totalPrivateTypeRef": 2,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "main": {
+        "totalPackages": 1,
+        "totalErrors": 2,
+        "totalPrivateTypeRef": 2,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "sameNormalizedFindings": true,
+      "findings": [
+        {
+          "path": "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0
+        }
+      ],
+      "singularServiceFindings": 0
+    },
+    "streams": {
+      "current": {
+        "totalPackages": 1,
+        "totalErrors": 3,
+        "totalPrivateTypeRef": 1,
+        "totalMissingJSDoc": 2,
+        "totalOther": 0
+      },
+      "main": {
+        "totalPackages": 1,
+        "totalErrors": 3,
+        "totalPrivateTypeRef": 1,
+        "totalMissingJSDoc": 2,
+        "totalOther": 0
+      },
+      "sameNormalizedFindings": true,
+      "findings": [
+        {
+          "path": "packages/plugin/src/config/domain/plugin-contributions.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0
+        },
+        {
+          "path": "plugins/streams/src/cli/streams-cli.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 2,
+          "other": 0
+        }
+      ],
+      "singularServiceFindings": 0
+    }
+  }
+}

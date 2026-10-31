@@ -1,0 +1,158 @@
+{
+  "count": 21,
+  "names": [
+    "AuthenticatorPort",
+    "AuthnOptions",
+    "AuthnRequest",
+    "AuthnResult",
+    "AuthorizerPort",
+    "AuthzDecision",
+    "AuthzOptions",
+    "AuthzRequest",
+    "CorsOptions",
+    "Principal",
+    "RunningService",
+    "RunningServiceAddress",
+    "ServeOptions",
+    "ServiceApp",
+    "ServiceAuthPolicy",
+    "ServiceEnvironment",
+    "ServiceGuardedAuthPolicy",
+    "ServicePublicAuthPolicy",
+    "ServiceTlsOptions",
+    "StreamsServiceOptions",
+    "startStreamsService"
+  ],
+  "nativeOriginCount": 19,
+  "origins": [
+    {
+      "name": "startStreamsService",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts"
+      ],
+      "functionExample": true
+    },
+    {
+      "name": "StreamsServiceOptions",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts"
+      ]
+    },
+    {
+      "name": "CorsOptions",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "RunningService",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "RunningServiceAddress",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "ServeOptions",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "ServiceApp",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "ServiceEnvironment",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "ServiceTlsOptions",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts"
+      ]
+    },
+    {
+      "name": "AuthenticatorPort",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "AuthnOptions",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts"
+      ]
+    },
+    {
+      "name": "AuthnRequest",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "AuthnResult",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "AuthorizerPort",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "AuthzDecision",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "AuthzOptions",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts"
+      ]
+    },
+    {
+      "name": "AuthzRequest",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "Principal",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts"
+      ]
+    },
+    {
+      "name": "ServiceAuthPolicy",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts"
+      ]
+    },
+    {
+      "name": "ServiceGuardedAuthPolicy",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts"
+      ]
+    },
+    {
+      "name": "ServicePublicAuthPolicy",
+      "origins": [
+        "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts"
+      ]
+    }
+  ],
+  "functionOwnExample": true,
+  "numericF5": "DEBT_ACCEPTED_NOT_PASS"
+}

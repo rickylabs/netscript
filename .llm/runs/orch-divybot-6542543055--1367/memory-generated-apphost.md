@@ -15,3 +15,8 @@ import.meta.resolve('zod') (same native dependency), or bare zod cannot resolve.
 CLI source is excluded by root fmt settings. Use the structured wrappers with a style-only config
 (copy root fmt/lint fields without selection exclusions), require selected == processed; never
 call a partial-exclusion refusal PASS.
+
+After main integration, sync plugin inferred the generated fixture itself as the source, producing
+a source/destination-same error. Pass --source-root <actual-monorepo> explicitly when refreshing an
+existing generated fixture. Only the successful explicit sync plus restart proof counts as the
+updated-source acceptance. Stop the exact focused AppHost after proof; no local full E2E needed.

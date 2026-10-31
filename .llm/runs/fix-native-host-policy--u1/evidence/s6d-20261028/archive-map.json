@@ -1,0 +1,857 @@
+{
+  "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028",
+  "rows": [
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/authorized-correction.diff",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/authorized-correction.diff",
+      "bytes": 1970,
+      "sha256": "cc8e7f9868de1e383f086642ab881ddaf1f7c55a6a9960b5359799a1695f47da"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/CORRECTION_AUTHORITY.md",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/CORRECTION_AUTHORITY.md",
+      "bytes": 1191,
+      "sha256": "2024437125be3e212fb9b924d331c220590a0658850d5dd932e3154b06139d51"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/final-verification.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/final-verification.json",
+      "bytes": 7398,
+      "sha256": "1840faffc3caf7342346c6498e5369aa1019965183dc7144cb9767d8855e9eff"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/FIRST_FAILURE.md",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/FIRST_FAILURE.md",
+      "bytes": 1783,
+      "sha256": "786f91cf1e2873fb9e1535ef43b55b3523581ad6de332966f4a0db15576a7e65"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gate-hashes-2.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gate-hashes-2.json",
+      "bytes": 1833,
+      "sha256": "610b38d4790c33a0999512de638c48168af169556a0d499cbca989197ac0bc16"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gate-hashes.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gate-hashes.json",
+      "bytes": 1821,
+      "sha256": "45bb0e2a7c95c237eb4d22fdf85fd79fe7da7231d5014f25e7f8edbbafe303c2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/allocator-denied/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/cache-info.json",
+      "bytes": 1305,
+      "sha256": "caee235a6bd6f3c4be7e81949133940306bfa2c7d91c0bb4e2e4d66600819c88"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/allocator-denied/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/child-1-input.json",
+      "bytes": 17557,
+      "sha256": "0abce0c26176f046d3dc9d73d6aaa08fedc365c6e8960850c663b300b1bbff3e"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/allocator-denied/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/child-1-result.json",
+      "bytes": 957,
+      "sha256": "6b8e244374d4831b7073349bfba0db09625994e5ef611065ba7da30cda87c6ba"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/allocator-denied/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/cleanup.json",
+      "bytes": 472,
+      "sha256": "128c7badbe9c496d16ff72cbe949d9791b7d5a5416f8b2ce5e3769db9b1e27e9"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/allocator-denied/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/discovery-input.json",
+      "bytes": 6749,
+      "sha256": "d6e45ea82353af4948b49af0cb2e6ed48365f1192bb1af82c51fb6b0f75eaedf"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/allocator-denied/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/discovery-result.json",
+      "bytes": 9003,
+      "sha256": "beecadbb8a43df1ec8fcf7e271c5d58e90a4e6c477a8c23075b405de4db0c683"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/approved/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/cache-info.json",
+      "bytes": 1306,
+      "sha256": "d4ef6f92800ce85c307161a07f4da292e1bb454562cec4f31fb4c645aa5b9ae3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/approved/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/child-1-input.json",
+      "bytes": 17595,
+      "sha256": "beefc63a2a05b45d7c261d1e062848509b54d9a908576d9a43efef25d170bcca"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/approved/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/child-1-result.json",
+      "bytes": 694,
+      "sha256": "5932d2f5742d8fa4830c16adc704860249ab734d303015759f28c9d82c08af37"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/approved/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/cleanup.json",
+      "bytes": 472,
+      "sha256": "5e4310d2bdcbdb4e4d4e363f9cca35c6e2899fc7f1c346d1d11cafd9f67eb0f5"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/approved/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/discovery-input.json",
+      "bytes": 6749,
+      "sha256": "d18e8b8f7a65fcc93f4030a2ca39a70e29399fe7f87fbfa70eb896a77c28ad08"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/approved/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "5908307ef42edf847618d89ea4ca38de92cb22fc2891a87115869e11c6386b6d"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/ffi-denied/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/cache-info.json",
+      "bytes": 1306,
+      "sha256": "5e63c704450729b9c1a1fadbe5331515f2310aafa8292d73c477354c59027cb0"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/ffi-denied/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/child-1-input.json",
+      "bytes": 17186,
+      "sha256": "e05a56839a6c59343ee106363f6aea10904587e7edd6127d67913c74cf1f2c07"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/ffi-denied/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/child-1-result.json",
+      "bytes": 1204,
+      "sha256": "aef10b22a118de6fdc6a25d490de09ab171aa1013a00a8281fdb5091c67f8464"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/ffi-denied/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/cleanup.json",
+      "bytes": 470,
+      "sha256": "57c7c154e3b403e523a60faf18f0d631a4e97de3865494ef69f8ae54610d4de4"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/ffi-denied/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/discovery-input.json",
+      "bytes": 6737,
+      "sha256": "a1cf2000d3fa12af608c3d537a9fc9a86f3132c739411bdd9e39ffb4aaf68646"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/ffi-denied/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "ac70bb893e1d4a86cdb86e05c51b0a6ea958e60a7c5be2485e023eff7b593658"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/http/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/cache-info.json",
+      "bytes": 1307,
+      "sha256": "87722f1a7d3745df6594c0b5f7a058c942f1ce7429a6b42c4cba28e846df3c32"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/http/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/child-1-input.json",
+      "bytes": 23247,
+      "sha256": "a7dc4d3334cf99168847fc0356357930846f5f453e353f967444e4e1e9ca7ae3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/http/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/child-1-result.json",
+      "bytes": 4068,
+      "sha256": "59b2e3c5fff30c3a9700bf36dd7ce17c72962b0166112f2b23167765d85e8d87"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/http/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/cleanup.json",
+      "bytes": 472,
+      "sha256": "839f7435dc7453a41a4f7d1decdb60540b8782203239d0be001617796bdcbc49"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/http/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/discovery-input.json",
+      "bytes": 6749,
+      "sha256": "c320b5fd80b27cd385087af67b5ae3eee07888b59213407855d51deeab67aa83"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/http/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/discovery-result.json",
+      "bytes": 9003,
+      "sha256": "c002983647b091c9f8055b3395766275341d8360e7aae12e87340509c0095192"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/startup-bind/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/cache-info.json",
+      "bytes": 1306,
+      "sha256": "a637d2803498a80788f96d3dad9d84b3b02f45b64ef3e5132cf13cd829e2d6dc"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/startup-bind/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/child-1-input.json",
+      "bytes": 19267,
+      "sha256": "01d285a51bae20923dfc79c67cd28e1b1514666ac536b8ba502869c4035411ca"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/startup-bind/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/child-1-result.json",
+      "bytes": 946,
+      "sha256": "165dc2eafe0dcb7f2a16177c8739a7148651277efe6ae147b7206b3277d8b0d4"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/startup-bind/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/cleanup.json",
+      "bytes": 472,
+      "sha256": "2296f310cc70f35d8ea57d5c8d672dd3ece6d4adee767c40f8ef19b985eeeaa1"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/startup-bind/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/discovery-input.json",
+      "bytes": 6749,
+      "sha256": "53784960db55633dc537817fce1438cce4cb9a366027ed1a45fba96d4471f05b"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/startup-bind/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "1fdd03614b4482b02aad2b8b3e29efbee946792a7eb536cbe8f4dc07084b7b79"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/tls/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/cache-info.json",
+      "bytes": 1306,
+      "sha256": "febadad96733a7c3eefa2ae4454ba2ed8ec3132731002ea3da31b9ed391cff40"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/tls/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/child-1-input.json",
+      "bytes": 21793,
+      "sha256": "7e2c618788f373a7538a3b5c92b2eae02d3d632478aa6f6dcbfe4252adab50d1"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/tls/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/child-1-result.json",
+      "bytes": 2378,
+      "sha256": "f89c0e71379059a5e985a5532ca86931f9caec4edc94f00d7b21872560b67672"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/tls/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/cleanup.json",
+      "bytes": 472,
+      "sha256": "c504154a881bfbcaad3ac4be25768df16937277b471745b64418dc43c6018095"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/tls/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/discovery-input.json",
+      "bytes": 6749,
+      "sha256": "4875efaceb72a2f33a506a79f06c78277754d324c4885d74036eba3c5cdc2cf3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/children/tls/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "32025ff87571f53ec15a4d7dbbb51379bc0a9bb809e0c17fa4121a7b0f0b9b81"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/cleanup.json",
+      "bytes": 231,
+      "sha256": "392fa0af789d15bf3229739ce1ae3b96983656678cd3b4a6b1ccd4f9773b973a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/execution.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/execution.json",
+      "bytes": 10403,
+      "sha256": "70fd263478d26fed6367b2759e342ddb420936ae50d5f37f46f2e973a768268c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/fmt.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/fmt.report.json",
+      "bytes": 309,
+      "sha256": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/fmt.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/fmt.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/fmt.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/fmt.stdout.log",
+      "bytes": 239,
+      "sha256": "f434f4c5105544a033dc8e2b1b237a660083ec29afccb68b9221a76b2538b23c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/format-edited.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/format-edited.report.json",
+      "bytes": 301,
+      "sha256": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/format-edited.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/format-edited.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/format-edited.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/format-edited.stdout.log",
+      "bytes": 249,
+      "sha256": "78e6db192865bc7bbae1aa53bc354d90bce5d199b336084a58ee3810facd4095"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/lint.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/lint.report.json",
+      "bytes": 360,
+      "sha256": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/lint.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/lint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/lint.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/lint.stdout.log",
+      "bytes": 234,
+      "sha256": "41a025e1ad7efc8c874a2f43d088c1aee599f1e178fd6c7581c5530b0b47f575"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/quality-new.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/quality-new.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/quality-new.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/quality-new.stdout.log",
+      "bytes": 172,
+      "sha256": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/tests.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/tests.report.json",
+      "bytes": 2314,
+      "sha256": "7e82d4cfd1f6cbb06ab057462e890cbca7bec57c30fd0440d31c193ff575b4ca"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/tests.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/tests.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/tests.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/tests.stdout.log",
+      "bytes": 230,
+      "sha256": "b158baf8dbfa1c7f53de36c15d9cc76c097c873068a5536b9164d49df28b9d42"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/types.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/types.report.json",
+      "bytes": 335,
+      "sha256": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/types.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/types.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates/types.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/types.stdout.log",
+      "bytes": 235,
+      "sha256": "e6a130d4d662f9e7addb65f4a34801f507b6684d3498ca25db79821bd7f754d3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/allocator-denied/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/cache-info.json",
+      "bytes": 1306,
+      "sha256": "21843a25e0fb94ecaaf9cd27d413b5ccbac43f0e9c329b2a26273e57d23bdf1e"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/allocator-denied/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/child-1-input.json",
+      "bytes": 17557,
+      "sha256": "ede70bbc507a2b4fe2c4ebc08e0814726dd42989f192a87a4d4ccdb310c987b8"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/allocator-denied/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/child-1-result.json",
+      "bytes": 957,
+      "sha256": "3fbd28f61e6975e67b3add36ce5606aad7eab8873d35166c1e70da86360b2326"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/allocator-denied/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/cleanup.json",
+      "bytes": 472,
+      "sha256": "2a1f66ccd5a6dc90533aa5d457a7eccc9a76be04d1a07b7405a4acf374664b33"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/allocator-denied/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/discovery-input.json",
+      "bytes": 6749,
+      "sha256": "1ea8903e6c58eb487c54a0015e6c40bcb87bdea62d2b5edfa7959222d0f66c10"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/allocator-denied/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "da2de1ba4d3d421f012bb9ea6cdcd736e1a1e03bf83e60ed8a07547fc748a82a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/approved/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/cache-info.json",
+      "bytes": 1306,
+      "sha256": "58442e429f74a6d7de307382d326932956aa1d994734f6055f6aa3876dc9d50c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/approved/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/child-1-input.json",
+      "bytes": 17623,
+      "sha256": "926af2712a91c75948789e2e61d5ef711e203461b01fa9465895ed9b038d8d61"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/approved/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/child-1-result.json",
+      "bytes": 694,
+      "sha256": "875154e284237dd9dbd74e6cbeba30dc9b9a0e65f02bb4adb012de0a0221c3d4"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/approved/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/cleanup.json",
+      "bytes": 476,
+      "sha256": "04f768a91ec4c677da5913c5b109c6843c923300c3792d69e60b24486d5ad6c4"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/approved/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/discovery-input.json",
+      "bytes": 6773,
+      "sha256": "486ad611565b2535bf83ca0a68e782788d5fb1b80504ee32e98a57f0c51b3ffc"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/approved/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "bcbd651bf51bd7faf621288cc8eed8ffa2518c4ff65b957568ea909a44a10d2c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/ffi-denied/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/cache-info.json",
+      "bytes": 1306,
+      "sha256": "9fd8af0e3b95d66c850f4c9ad7a772e2790012fc2d2bbfbd6478b0fc8e71fbdb"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/ffi-denied/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/child-1-input.json",
+      "bytes": 17228,
+      "sha256": "36ff6028611ea0bcfe5b40c217d1d7d54cb2371ebf8c3f49cf8870ae39df7f68"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/ffi-denied/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/child-1-result.json",
+      "bytes": 1203,
+      "sha256": "15e06e98b5da446c7eea02d370abc575d71746dce4e7dfa4ecb749733c8373f8"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/ffi-denied/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/cleanup.json",
+      "bytes": 476,
+      "sha256": "25584ae582614464decd7c928da35003ace8273c4ac48ea16cf290ab53e7fd32"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/ffi-denied/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/discovery-input.json",
+      "bytes": 6773,
+      "sha256": "37755667ca3b6ed15444e428ad4c431db091fa821c6c2feb7d9d74c6b1a65489"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/ffi-denied/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "9e8dbe83c68a6bfa0bd46e911198b391b718ab39f2bc40a6de06169dc05a9024"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/http/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/cache-info.json",
+      "bytes": 1306,
+      "sha256": "47791daf7ae55c29a77dd5561e5779bfc87a3e16566588e35b3d8f0b03c7306c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/http/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/child-1-input.json",
+      "bytes": 23275,
+      "sha256": "ac8656ca43fd71778dabd4bd52d2455b14f50dae340c2109c8f0b90687801ba9"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/http/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/child-1-result.json",
+      "bytes": 4069,
+      "sha256": "04a9f8e692e33323f227656e8168222bdda31e023be25913d859acd3da153086"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/http/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/cleanup.json",
+      "bytes": 476,
+      "sha256": "26e36972d432c3e357235408981b17b2744f41b46e2087c80b897bcb0f6c078a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/http/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/discovery-input.json",
+      "bytes": 6773,
+      "sha256": "07031da39d85d934ecc598e4618593d7ef6455f92f6032db492a517f6fbf6e21"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/http/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "1a6e0d30416bbe481f064c0c97e26869faa11f0db721a459ecae25705cfed1d3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/cache-info.json",
+      "bytes": 1307,
+      "sha256": "ec6c66cbd5aadf94d441668589e30569875c43bf51e8452fefad2da3b7bc7ece"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/child-1-input.json",
+      "bytes": 19560,
+      "sha256": "f4136bb11700cc8469b2ed420b00cbcb2c8d8ce2860c26de33d225bbcaa7799a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/child-1-result.json",
+      "bytes": 876,
+      "sha256": "d93d677586b56ce3cce3ce4c50c094fdc055b7654bca721b26a37a8a3092681f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/cleanup.json",
+      "bytes": 476,
+      "sha256": "d1d42c9108b33ad9cdadf2127540ee474acf13761db9aca621a1b82f78307b9e"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/discovery-input.json",
+      "bytes": 6773,
+      "sha256": "41b9b7bc2ebb9e3bb43c2bf470f4e326fd643bd56eb5cceddf6add170ea3b806"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "0fbe0eae10b61a786f7cacf57e73ed97207c0062fa9ce1da71f6d5fab2c3f54c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/cache-info.json",
+      "bytes": 1306,
+      "sha256": "2331ac175cbb48e6c889cc6cb5691d0d53e1a599e7ddcf755c2e41bd217ea6f7"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/child-1-input.json",
+      "bytes": 19560,
+      "sha256": "b54ade7d2d9f0c824bbac8856b724e82ecaa09668f0b3556f6ba4544c0c407ed"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/child-1-result.json",
+      "bytes": 692,
+      "sha256": "cbb584a4b53f78959c03403139035dee17720d9fbba661802507ed501a442eda"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/cleanup.json",
+      "bytes": 476,
+      "sha256": "3baca9b5e271fd7ca6dd84b87cbe48971f5c613cd29d8a1659ae035bad2841c5"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/discovery-input.json",
+      "bytes": 6773,
+      "sha256": "66d62c6b1a79d4c8ef88026092d0cc9700232d78976baa72d23af10f741ee0cf"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "c39749a429d177b3591742566f2d5466ed2c0e03ef8e8f683e005446467f7a28"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/cache-info.json",
+      "bytes": 1306,
+      "sha256": "1fb53be75ed4ffdda95953ddf8fe5b36dd086b05ec3bb4bfa4ef559f4a9919fa"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/child-1-input.json",
+      "bytes": 19550,
+      "sha256": "d9aec20a07459fda50821570b454d1222bb0310f8fc62f9a94da3ef00d65363b"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/child-1-result.json",
+      "bytes": 666,
+      "sha256": "17e701fd8423887019430d4e82618b225eed93dc6f1a3af42d926df99fa6026b"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/cleanup.json",
+      "bytes": 474,
+      "sha256": "1a58b6b5995b505508797a12c91e73dea473488ddff123db86e721bb6279de06"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/discovery-input.json",
+      "bytes": 6761,
+      "sha256": "27c2f2b268d1bf415d305fa2de8c27cd263e6fb4d2a650e1c9e456495c3c9806"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/discovery-result.json",
+      "bytes": 9003,
+      "sha256": "9efdf318cae9fe3c80c0533b55fa97228b06d535d323ee819d1045230799ae90"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/tls/cache-info.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/cache-info.json",
+      "bytes": 1306,
+      "sha256": "e4aff1d6257cb9cc172b120a5f159305a766fde208bae3aa499c8d42ccca2252"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/tls/child-1-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/child-1-input.json",
+      "bytes": 21821,
+      "sha256": "527060231efdc02ba908d9edb06e4a4a2593dd47e9140a17b510df8a41b86c1f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/tls/child-1-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/child-1-result.json",
+      "bytes": 2379,
+      "sha256": "a2f50da001699da85ee27d523fbcc9e214b4842a8dd751b6a4983a2972adb4b2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/tls/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/cleanup.json",
+      "bytes": 476,
+      "sha256": "36ce5ec38089b494f1b4a8cfbb62b841e88c3775ded0396f6024afdfd6a17523"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/tls/discovery-input.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/discovery-input.json",
+      "bytes": 6773,
+      "sha256": "652cfc77d1c5f20ed568e8d82be9988cb8ad0e867271974e0ca3c8136dfc62a9"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/tls/discovery-result.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/discovery-result.json",
+      "bytes": 9002,
+      "sha256": "ae780a2c32cc70aa68279f1bf3ec11a4bc317aa2423e5bfa0cd2273498fffad4"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/cleanup.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/cleanup.json",
+      "bytes": 233,
+      "sha256": "8564166c36d47b70db82cd4156f697b3c553d57fc004dd69fd4b69440b95b5b3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/execution.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/execution.json",
+      "bytes": 10441,
+      "sha256": "242080a89d1378efe587796dd679d491871203733565d7b61f96052b373d6637"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/fmt.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/fmt.report.json",
+      "bytes": 309,
+      "sha256": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/fmt.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/fmt.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/fmt.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/fmt.stdout.log",
+      "bytes": 241,
+      "sha256": "f249420864c195bd26022b4ca0ac2378452c5fe5352f5d73101a4cf904ee3f38"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/format-edited.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/format-edited.report.json",
+      "bytes": 301,
+      "sha256": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/format-edited.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/format-edited.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/format-edited.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/format-edited.stdout.log",
+      "bytes": 251,
+      "sha256": "d5e09c9cfe46d6e9819ad86d37734acb5f13d35bf21882093c640015578414b3"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/lint.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/lint.report.json",
+      "bytes": 360,
+      "sha256": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/lint.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/lint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/lint.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/lint.stdout.log",
+      "bytes": 236,
+      "sha256": "b43fb4cf34aff6afec8cbad34784425cd3734f7c27a0333479c9382b8dc35d8e"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/quality-new.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/quality-new.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/quality-new.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/quality-new.stdout.log",
+      "bytes": 172,
+      "sha256": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/tests.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/tests.report.json",
+      "bytes": 1189,
+      "sha256": "007a24f06ce440ed1a66e1bdfa04d8e1dab2e27f7f2eb6d7c5f64a18e6d2ca41"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/tests.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/tests.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/tests.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/tests.stdout.log",
+      "bytes": 232,
+      "sha256": "dbcc191d388981994686647a733469e65a73f4121fa843f53b11e75a1e3cd57c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/types.report.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/types.report.json",
+      "bytes": 335,
+      "sha256": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/types.stderr.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/types.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/types.stdout.log",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/types.stdout.log",
+      "bytes": 237,
+      "sha256": "afbb9af50166c3acff8d66896d780b20cf4018a8a6ab7a76cd5e5cd3b9570a78"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/prepare-gates.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/prepare-gates.ts.txt",
+      "bytes": 1289,
+      "sha256": "f846ac69d39df7cc1cb7fe6af9fdcbd9754bfcba5c8e3af0f22e00c27b8ce69c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/protected-bindings.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/protected-bindings.json",
+      "bytes": 19078,
+      "sha256": "2573fc3f15fc9b78148c062f7baeac9c6ed595810985c3f6dd8143b32842b248"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/prove-source.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/prove-source.ts.txt",
+      "bytes": 4659,
+      "sha256": "1ccad6fe771c6d769d206202a1504c437107286679cccb67c8bc42dd16b08110"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/REPORT.md",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/REPORT.md",
+      "bytes": 4745,
+      "sha256": "3ad62a9368b9ef8528ed384b5808ccfd17e100a923880d17730c862c8f4ca2a5"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/run-gates-2.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/run-gates-2.ts.txt",
+      "bytes": 4015,
+      "sha256": "0dd9e9afb5526323418960b923c36e131e9ea1131312d76404321399c13e87f0"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/run-gates.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/run-gates.ts.txt",
+      "bytes": 4013,
+      "sha256": "d58b7a71c798e59091f5e09ad99fde6fda4e59ca8ba36b64a4fb4d88ec6cf7ee"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source-2.diff",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-2.diff",
+      "bytes": 7015,
+      "sha256": "2d7c9b747822aca2017a3d32a72996266fb7cb685cc33353166fbf463a22f728"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source-first.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-first.ts.txt",
+      "bytes": 6046,
+      "sha256": "fe0badb3b89163882a27a18495be528f5b24c2f841642702456107a9d77daba0"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source-proof-2.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-proof-2.json",
+      "bytes": 145715,
+      "sha256": "331dd6826b93501d7ecbad995e0a23fdab64707c363db5afc570d7595223a136"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source-proof.json",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-proof.json",
+      "bytes": 119809,
+      "sha256": "d35d3e8984a76b602e6c1b5f767c1db339d0ec5d0b593a713068fa1df9482d09"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source.diff",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source.diff",
+      "bytes": 6750,
+      "sha256": "5b66c44f6595a7089aaf0c2c53cb8554d8a0b51cace0fe8c52a335d3b7573998"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source.final-2.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source.final-2.ts.txt",
+      "bytes": 6584,
+      "sha256": "769b9a73f46c8b3a24dc4e0c2f44b27a6e9c40bd5b2b31186445c0205d5634b8"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source.final.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source.final.ts.txt",
+      "bytes": 6323,
+      "sha256": "c5cd5dfc31cd78be0271d54b12ccfda8a7633adecaa5ca85af6489bf4a553096"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/verify-final.ts",
+      "archive": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/verify-final.ts.txt",
+      "bytes": 2732,
+      "sha256": "79ea888ea1ef2826a5dccb51e0cba7945c50b272071bf8ff89d433231a45c731"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+--- a/plugins/workers/services/mod.ts
++++ b/plugins/workers/services/mod.ts
+@@ -74 +74 @@
+-// surface is self-complete for the JSR `private-type-ref` doc rule. The resulting 22-symbol count
++// surface is self-complete for the JSR `private-type-ref` doc rule. The resulting 24-symbol count
+@@ -95,0 +96,2 @@
++  ProcedureErrorCode,
++  PROCEDURE_ERROR_CODES,
+--- a/plugins/streams/services/mod.ts
++++ b/plugins/streams/services/mod.ts
+@@ -55 +55 @@
+-// Exact native identity closure for public doc-lint; all 21 names count as numeric F5 debt.
++// Exact native identity closure for public doc-lint; all 23 names count as numeric F5 debt.
+@@ -75,0 +76,2 @@
++  ProcedureErrorCode,
++  PROCEDURE_ERROR_CODES,

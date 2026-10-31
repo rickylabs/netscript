@@ -1,0 +1,2214 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/mod.ts": {
+      "module_doc": {
+        "doc": "Caller-policy entrypoint for the streams proxy service.\n\nImporting `@netscript/plugin-streams/service` is inert. {@link startStreamsService} validates\nthe required native auth posture before environment reads, storage or either listener starts.\nThe legacy `./services` entrypoint keeps its existing start-on-import behavior separately.\n\nAn explicit `serve.port`, including 0, wins over process `PORT`, then `STREAMS_PORT`.\nAuth and serve objects are forwarded unchanged; native hostname, TLS, signal and drain options\nremain owned by the caller. The returned native handle owns front-listener drain and invokes\nthe upstream stop hook. Startup failures attempt upstream stop while preserving the primary\nerror; a rejected cleanup is not proof that resources were released.\n\nCORS supplies the existing six methods, nine allowed headers and twelve exposed headers only.\nCaller arrays replace their respective defaults by reference. Omitted origin stays absent for\nnative environment behavior; credentials and maxAge are present only when supplied. There is\nno wildcard origin default. Native CORS policy validation remains authoritative.\n\nStartup reads environment variables and uses network access for the front/upstream listeners\nand proxy. The current native storage backend also needs read/write, sys and ffi permissions;\nhosts scope those permissions to their deployment. STREAMS_DATA_DIR retains its existing\nfail-fast write/read probe; an omitted directory selects ephemeral memory. The factory has\nno KV context and never closes global KV resources.\n",
+        "tags": [
+          {
+            "kind": "example",
+            "doc": "Guarded service with caller-owned listener options\n```ts\nimport { createStaticCredentialAuthenticator } from '@netscript/service/auth';\nimport { startStreamsService } from '@netscript/plugin-streams/service';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: { local: { subject: 'service:streams', scopes: [], roles: ['service'] } },\n});\nconst running = await startStreamsService({\n  auth: { authn: { authenticator } },\n  serve: { hostname: '127.0.0.1', port: 0 },\n});\nawait running.stop();\n```\n"
+          },
+          {
+            "kind": "example",
+            "doc": "Explicit public posture with a reviewed reason\n```ts\nimport { startStreamsService } from '@netscript/plugin-streams/service';\n\nconst running = await startStreamsService({\n  auth: { public: true, reason: 'Internal mesh; ingress authenticates upstream.' },\n});\nawait running.stop();\n```\n"
+          },
+          {
+            "kind": "module"
+          }
+        ]
+      },
+      "symbols": [
+        {
+          "name": "startStreamsService",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts",
+                "line": 83,
+                "col": 0,
+                "byteIndex": 3062
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Starts the native streams proxy and its factory-owned upstream server.\n\nAuth is asserted before any environment, storage or listener access. Auth and serve objects,\nand caller CORS arrays, retain identity. Only omitted protocol arrays receive copied defaults.\nThe native running handle drains the front listener and stops the upstream through its shutdown\nhook. Before that handle exists, startup failure attempts native upstream stop and preserves the\nidentical primary error even if cleanup rejects. No unrelated or global resources are closed.\n",
+                "tags": [
+                  {
+                    "kind": "param",
+                    "name": "options",
+                    "doc": "Required native auth posture and optional CORS/listener configuration."
+                  },
+                  {
+                    "kind": "return",
+                    "doc": "The native running handle; its stop and caller signal use native drain semantics."
+                  },
+                  {
+                    "kind": "throws",
+                    "tsType": {
+                      "repr": "TypeError",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TypeError",
+                        "resolution": {
+                          "kind": "typeParam"
+                        }
+                      }
+                    },
+                    "doc": "When the caller's auth posture is invalid."
+                  },
+                  {
+                    "kind": "throws",
+                    "tsType": {
+                      "repr": "Error",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Error",
+                        "resolution": {
+                          "kind": "typeParam"
+                        }
+                      }
+                    },
+                    "doc": "When no explicit port or host PORT/STREAMS_PORT value is available.\n"
+                  },
+                  {
+                    "kind": "example",
+                    "doc": "Guarded streams service on an ephemeral loopback port\n```ts\nimport { createStaticCredentialAuthenticator } from '@netscript/service/auth';\nimport { startStreamsService } from '@netscript/plugin-streams/service';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: { local: { subject: 'service:streams', scopes: [], roles: ['service'] } },\n});\nconst running = await startStreamsService({\n  auth: { authn: { authenticator } },\n  serve: { hostname: '127.0.0.1', port: 0 },\n});\nconsole.log(running.addr.port);\nawait running.stop();\n```"
+                  }
+                ]
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "options",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "StreamsServiceOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "StreamsServiceOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "Promise",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "RunningService",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "RunningService",
+                          "resolution": {
+                            "kind": "import",
+                            "specifier": "@netscript/service",
+                            "name": "RunningService"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "Promise"
+                  }
+                },
+                "hasBody": true,
+                "isAsync": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamsServiceOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts",
+                "line": 10,
+                "col": 0,
+                "byteIndex": 443
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Native caller policy for one streams service instance."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "auth",
+                    "jsDoc": {
+                      "doc": "Native guards or an explicit public posture with a nonblank reason."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts",
+                      "line": 12,
+                      "col": 2,
+                      "byteIndex": 563
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "ServiceAuthPolicy",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "ServiceAuthPolicy",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "@netscript/service/auth",
+                          "name": "ServiceAuthPolicy"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "cors",
+                    "jsDoc": {
+                      "doc": "Caller fields override streams protocol defaults; omitted origin keeps native behavior."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts",
+                      "line": 14,
+                      "col": 2,
+                      "byteIndex": 696
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "CorsOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "CorsOptions",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "@netscript/service",
+                          "name": "CorsOptions"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "serve",
+                    "jsDoc": {
+                      "doc": "Passed unchanged to the native listener; explicit port, including 0, wins over host env."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/services/src/service.ts",
+                      "line": 16,
+                      "col": 2,
+                      "byteIndex": 825
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "ServeOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "ServeOptions",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "@netscript/service",
+                          "name": "ServeOptions"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CorsOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 301,
+                "col": 0,
+                "byteIndex": 8757
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "CORS options supported by `withCors()`.\n\n`origin` accepts an exact origin, an allowlist array, or an upstream resolver.\nWhen omitted, `NETSCRIPT_CORS_ORIGINS` supplies a comma-separated allowlist;\nan unset or blank value denies cross-origin access. Only an explicit\n`origin: '*'` opts into wildcard access, and it cannot enable credentials.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```ts\nimport type { CorsOptions } from '@netscript/service';\nconst cors: CorsOptions = { origin: ['https://app.example'] };\n```"
+                  }
+                ]
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "indexedAccess",
+                  "value": {
+                    "objType": {
+                      "repr": "Parameters",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "cors",
+                            "kind": "typeQuery",
+                            "value": "cors"
+                          }
+                        ],
+                        "typeName": "Parameters"
+                      }
+                    },
+                    "indexType": {
+                      "repr": "0",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "number",
+                        "number": 0.0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "RunningService",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 45,
+                "col": 0,
+                "byteIndex": 1434
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Running service handle returned by `serve()` and `defineService()`."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "stop",
+                    "jsDoc": {
+                      "doc": "Stops the listener and waits for shutdown to finish."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 53,
+                      "col": 2,
+                      "byteIndex": 1697
+                    },
+                    "params": [],
+                    "returnType": {
+                      "repr": "Promise",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "void",
+                            "kind": "keyword",
+                            "value": "void"
+                          }
+                        ],
+                        "typeName": "Promise"
+                      }
+                    }
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "app",
+                    "jsDoc": {
+                      "doc": "Mountable service app backing the running listener."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 47,
+                      "col": 2,
+                      "byteIndex": 1531
+                    },
+                    "tsType": {
+                      "repr": "ServiceApp",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "ServiceApp",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "addr",
+                    "jsDoc": {
+                      "doc": "Address selected by Deno for the listener."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 50,
+                      "col": 2,
+                      "byteIndex": 1603
+                    },
+                    "tsType": {
+                      "repr": "RunningServiceAddress",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "RunningServiceAddress",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RunningServiceAddress",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 33,
+                "col": 0,
+                "byteIndex": 1167
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Network address assigned to a running service listener."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "hostname",
+                    "jsDoc": {
+                      "doc": "Listener hostname."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 35,
+                      "col": 2,
+                      "byteIndex": 1238
+                    },
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "port",
+                    "jsDoc": {
+                      "doc": "Listener port."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 38,
+                      "col": 2,
+                      "byteIndex": 1283
+                    },
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "transport",
+                    "jsDoc": {
+                      "doc": "Listener transport."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 41,
+                      "col": 2,
+                      "byteIndex": 1329
+                    },
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "tcp",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "tcp"
+                          }
+                        },
+                        {
+                          "repr": "unix",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "unix"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServeOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 189,
+                "col": 0,
+                "byteIndex": 4957
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Options for starting a service listener.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```typescript\nimport { createService, type ServiceRouter } from '@netscript/service';\n\ndeclare const router: ServiceRouter;\n\nconst running = await createService(router, { name: 'users' })\n  .withHealth()\n  .serve({\n    port: 3000,\n    hostname: '127.0.0.1', // loopback-only; omit to bind all interfaces\n    drainTimeoutMs: 10_000,\n    handleSignals: true,\n  });\n\nawait running.stop();\n```"
+                  }
+                ]
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "port",
+                    "jsDoc": {
+                      "doc": "Preferred listener port; use `0` for an ephemeral port."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 191,
+                      "col": 2,
+                      "byteIndex": 5056
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "hostname",
+                    "jsDoc": {
+                      "doc": "Interface the listener binds to, forwarded unchanged to `Deno.serve` on both\nthe plain and the TLS branch. Pass `'127.0.0.1'` to keep the listener\nloopback-only. When omitted, Deno's default applies and the listener binds\nall IPv4 interfaces (`0.0.0.0`)."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 199,
+                      "col": 2,
+                      "byteIndex": 5361
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "signal",
+                    "jsDoc": {
+                      "doc": "External signal that stops the listener when aborted."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 202,
+                      "col": 2,
+                      "byteIndex": 5446
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "AbortSignal",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "AbortSignal"
+                      }
+                    }
+                  },
+                  {
+                    "name": "drainTimeoutMs",
+                    "jsDoc": {
+                      "doc": "Max time to wait for in-flight requests and shutdown hooks. Defaults to `30_000`."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 205,
+                      "col": 2,
+                      "byteIndex": 5562
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "handleSignals",
+                    "jsDoc": {
+                      "doc": "Install SIGINT/SIGTERM or SIGBREAK handlers. Defaults to `true`."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 208,
+                      "col": 2,
+                      "byteIndex": 5664
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "tls",
+                    "jsDoc": {
+                      "doc": "Opt-in TLS material. When present, the listener serves HTTPS and negotiates\nHTTP/2 via ALPN. When absent, the listener falls back to the\n`NETSCRIPT_TLS_CERT_FILE` / `NETSCRIPT_TLS_KEY_FILE` env pair (both must be\nset) before defaulting to plain HTTP/1.1."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 216,
+                      "col": 2,
+                      "byteIndex": 5979
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "ServiceTlsOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "ServiceTlsOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServiceApp",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 20,
+                "col": 0,
+                "byteIndex": 719
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Minimal mountable service application returned by `build()`."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "fetch",
+                    "jsDoc": {
+                      "doc": "Handles a Web Platform request without starting a listener."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 22,
+                      "col": 2,
+                      "byteIndex": 820
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "request",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "Request",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "Request"
+                          }
+                        }
+                      },
+                      {
+                        "kind": "identifier",
+                        "name": "env",
+                        "optional": true,
+                        "tsType": {
+                          "repr": "ServiceEnvironment",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "ServiceEnvironment",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "Response",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "Response"
+                          }
+                        },
+                        {
+                          "repr": "Promise",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "Response",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "Response"
+                                }
+                              }
+                            ],
+                            "typeName": "Promise"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "request",
+                    "jsDoc": {
+                      "doc": "Executes an in-memory request against the service app."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 25,
+                      "col": 2,
+                      "byteIndex": 968
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "input",
+                        "optional": false,
+                        "tsType": {
+                          "kind": "union",
+                          "value": [
+                            {
+                              "repr": "Request",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "Request"
+                              }
+                            },
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            },
+                            {
+                              "repr": "URL",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "URL"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "kind": "identifier",
+                        "name": "init",
+                        "optional": true,
+                        "tsType": {
+                          "repr": "RequestInit",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "RequestInit"
+                          }
+                        }
+                      },
+                      {
+                        "kind": "identifier",
+                        "name": "env",
+                        "optional": true,
+                        "tsType": {
+                          "repr": "ServiceEnvironment",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "ServiceEnvironment",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "Response",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "Response"
+                          }
+                        },
+                        {
+                          "repr": "Promise",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "Response",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "Response"
+                                }
+                              }
+                            ],
+                            "typeName": "Promise"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServiceEnvironment",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 14,
+                "col": 0,
+                "byteIndex": 498
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Socket connection metadata supplied by the listener or a mounting host."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "remoteAddr",
+                    "jsDoc": {
+                      "doc": "Socket peer address, preserved for Hono's Deno getConnInfo adapter."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 16,
+                      "col": 2,
+                      "byteIndex": 615
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "Deno.Addr",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Deno.Addr"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServiceTlsOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                "line": 160,
+                "col": 0,
+                "byteIndex": 4271
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "TLS material for a service listener.\n\nWhen supplied, the listener serves HTTPS and Deno automatically negotiates\nHTTP/2 with clients that support it over ALPN (HTTP/1.1 remains available as a\nfallback). The fields mirror `Deno.serve`'s `cert`/`key` PEM inputs.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```typescript\nconst tls: ServiceTlsOptions = {\n  cert: await Deno.readTextFile('cert.pem'),\n  key: await Deno.readTextFile('key.pem'),\n};\n```"
+                  }
+                ]
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "cert",
+                    "jsDoc": {
+                      "doc": "PEM-encoded certificate chain."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 162,
+                      "col": 2,
+                      "byteIndex": 4350
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "key",
+                    "jsDoc": {
+                      "doc": "PEM-encoded private key for the certificate."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/types.ts",
+                      "line": 165,
+                      "col": 2,
+                      "byteIndex": 4430
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthenticatorPort",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 74,
+                "col": 0,
+                "byteIndex": 2526
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Authentication boundary that turns a request into a principal or a rejection."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "authenticate",
+                    "jsDoc": {
+                      "doc": "Authenticates a request and returns a principal or a rejection reason."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 76,
+                      "col": 2,
+                      "byteIndex": 2645
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "request",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "AuthnRequest",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "AuthnRequest",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "Promise",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "AuthnResult",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "AuthnResult",
+                                  "resolution": {
+                                    "kind": "local"
+                                  }
+                                }
+                              }
+                            ],
+                            "typeName": "Promise"
+                          }
+                        },
+                        {
+                          "repr": "AuthnResult",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "AuthnResult",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthnOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                "line": 23,
+                "col": 0,
+                "byteIndex": 634
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Authentication middleware options for `withAuthn()` and `defineService({ auth })`."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "authenticator",
+                    "jsDoc": {
+                      "doc": "Authenticator implementation."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 25,
+                      "col": 2,
+                      "byteIndex": 707
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "AuthenticatorPort",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "AuthenticatorPort",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "AuthenticatorPort"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "protect",
+                    "jsDoc": {
+                      "doc": "Path prefixes the auth stage guards. Defaults to `[\"/api\"]`."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 27,
+                      "col": 2,
+                      "byteIndex": 822
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "allowAnonymous",
+                    "jsDoc": {
+                      "doc": "Path prefixes always left public even under a guarded prefix. Defaults to `[\"/health\"]`."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 29,
+                      "col": 2,
+                      "byteIndex": 960
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthnRequest",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 60,
+                "col": 0,
+                "byteIndex": 1969
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Input handed to an authenticator."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "header",
+                    "jsDoc": {
+                      "doc": "Reads a request header by lowercase or canonical name."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 62,
+                      "col": 2,
+                      "byteIndex": 2067
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "name",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        },
+                        {
+                          "repr": "undefined",
+                          "kind": "keyword",
+                          "value": "undefined"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "jsDoc": {
+                      "doc": "Returns the full request headers for provider SDKs that validate sessions from header sets."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 64,
+                      "col": 2,
+                      "byteIndex": 2212
+                    },
+                    "params": [],
+                    "returnType": {
+                      "repr": "Headers",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Headers"
+                      }
+                    }
+                  },
+                  {
+                    "name": "cookie",
+                    "jsDoc": {
+                      "doc": "Reads a cookie value by name from the Cookie header."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 66,
+                      "col": 2,
+                      "byteIndex": 2296
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "name",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        },
+                        {
+                          "repr": "undefined",
+                          "kind": "keyword",
+                          "value": "undefined"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "method",
+                    "jsDoc": {
+                      "doc": "Request method."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 68,
+                      "col": 2,
+                      "byteIndex": 2365
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "path",
+                    "jsDoc": {
+                      "doc": "Request path."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 70,
+                      "col": 2,
+                      "byteIndex": 2415
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthnResult",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 48,
+                "col": 0,
+                "byteIndex": 1500
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Result of an authentication attempt."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "ok",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 50,
+                              "col": 4,
+                              "byteIndex": 1536
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "true",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "boolean",
+                                "boolean": true
+                              }
+                            }
+                          },
+                          {
+                            "name": "principal",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 51,
+                              "col": 4,
+                              "byteIndex": 1559
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "Principal",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "Principal",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "name": "responseHeaders",
+                            "jsDoc": {
+                              "doc": "Response headers the authenticator wants written after successful auth."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 53,
+                              "col": 4,
+                              "byteIndex": 1677
+                            },
+                            "readonly": true,
+                            "optional": true,
+                            "tsType": {
+                              "repr": "Readonly",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "Record",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeParams": [
+                                        {
+                                          "repr": "string",
+                                          "kind": "keyword",
+                                          "value": "string"
+                                        },
+                                        {
+                                          "repr": "string",
+                                          "kind": "keyword",
+                                          "value": "string"
+                                        }
+                                      ],
+                                      "typeName": "Record"
+                                    }
+                                  }
+                                ],
+                                "typeName": "Readonly"
+                              }
+                            }
+                          },
+                          {
+                            "name": "setCookies",
+                            "jsDoc": {
+                              "doc": "Set-Cookie header values emitted by refresh-on-read session authenticators."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 55,
+                              "col": 4,
+                              "byteIndex": 1829
+                            },
+                            "readonly": true,
+                            "optional": true,
+                            "tsType": {
+                              "kind": "typeOperator",
+                              "value": {
+                                "operator": "readonly",
+                                "tsType": {
+                                  "kind": "array",
+                                  "value": {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "ok",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 57,
+                              "col": 6,
+                              "byteIndex": 1880
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "false",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "boolean",
+                                "boolean": false
+                              }
+                            }
+                          },
+                          {
+                            "name": "reason",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 57,
+                              "col": 26,
+                              "byteIndex": 1900
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthorizerPort",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 100,
+                "col": 0,
+                "byteIndex": 3416
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Authorization boundary that decides whether a principal may proceed."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "authorize",
+                    "jsDoc": {
+                      "doc": "Authorizes a principal for a request path and method."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 102,
+                      "col": 2,
+                      "byteIndex": 3515
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "request",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "AuthzRequest",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "AuthzRequest",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "Promise",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "AuthzDecision",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "AuthzDecision",
+                                  "resolution": {
+                                    "kind": "local"
+                                  }
+                                }
+                              }
+                            ],
+                            "typeName": "Promise"
+                          }
+                        },
+                        {
+                          "repr": "AuthzDecision",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "AuthzDecision",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthzDecision",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 95,
+                "col": 0,
+                "byteIndex": 3226
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Authorization decision."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "allow",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 96,
+                              "col": 6,
+                              "byteIndex": 3260
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "true",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "boolean",
+                                "boolean": true
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "allow",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 97,
+                              "col": 6,
+                              "byteIndex": 3289
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "false",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "boolean",
+                                "boolean": false
+                              }
+                            }
+                          },
+                          {
+                            "name": "reason",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                              "line": 97,
+                              "col": 29,
+                              "byteIndex": 3312
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthzOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                "line": 33,
+                "col": 0,
+                "byteIndex": 1097
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Authorization middleware options for `withAuthz()` and `defineService({ auth })`."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "authorizer",
+                    "jsDoc": {
+                      "doc": "Authorizer implementation."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 35,
+                      "col": 2,
+                      "byteIndex": 1167
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "AuthorizerPort",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "AuthorizerPort",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "AuthorizerPort"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "denyByDefault",
+                    "jsDoc": {
+                      "doc": "Fail closed when no decision is reachable. Defaults to `true`."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 37,
+                      "col": 2,
+                      "byteIndex": 1278
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AuthzRequest",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 80,
+                "col": 0,
+                "byteIndex": 2758
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Authorization decision input."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "principal",
+                    "jsDoc": {
+                      "doc": "Authenticated principal being authorized."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 82,
+                      "col": 2,
+                      "byteIndex": 2843
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Principal",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Principal",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "method",
+                    "jsDoc": {
+                      "doc": "Request method."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 84,
+                      "col": 2,
+                      "byteIndex": 2901
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "path",
+                    "jsDoc": {
+                      "doc": "Request path."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 86,
+                      "col": 2,
+                      "byteIndex": 2951
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "rawPath",
+                    "jsDoc": {
+                      "doc": "Undecoded request pathname, exactly as the oRPC handlers match it. Set by the service\nmiddleware; contract-policy authorizers resolve procedures from it when present."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 91,
+                      "col": 2,
+                      "byteIndex": 3165
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Principal",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                "line": 28,
+                "col": 0,
+                "byteIndex": 620
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Identity established for an authenticated request."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "subject",
+                    "jsDoc": {
+                      "doc": "Stable subject identifier such as a user id, service id, or API-key id."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 30,
+                      "col": 2,
+                      "byteIndex": 732
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "scopes",
+                    "jsDoc": {
+                      "doc": "Granted scopes for RPC or REST operation permissions."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 32,
+                      "col": 2,
+                      "byteIndex": 823
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "roles",
+                    "jsDoc": {
+                      "doc": "Granted roles for role-based access checks."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 34,
+                      "col": 2,
+                      "byteIndex": 914
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "scheme",
+                    "jsDoc": {
+                      "doc": "Authentication scheme that established the principal."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 36,
+                      "col": 2,
+                      "byteIndex": 1014
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "api-key",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "api-key"
+                          }
+                        },
+                        {
+                          "repr": "bearer",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "bearer"
+                          }
+                        },
+                        {
+                          "repr": "trusted-header",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "trusted-header"
+                          }
+                        },
+                        {
+                          "repr": "custom",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "custom"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "claims",
+                    "jsDoc": {
+                      "doc": "Opaque verified claims for consumer-specific authorization.\n\nAdapter packages should use `scheme: \"custom\"` plus this claim bag for\nprovider-specific identity such as organization id, tenant id, session id,\nprovider permissions, or normalized WorkOS/better-auth session metadata."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/types.ts",
+                      "line": 44,
+                      "col": 2,
+                      "byteIndex": 1401
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Readonly",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "Record",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeParams": [
+                                {
+                                  "repr": "string",
+                                  "kind": "keyword",
+                                  "value": "string"
+                                },
+                                {
+                                  "repr": "unknown",
+                                  "kind": "keyword",
+                                  "value": "unknown"
+                                }
+                              ],
+                              "typeName": "Record"
+                            }
+                          }
+                        ],
+                        "typeName": "Readonly"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServiceAuthPolicy",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                "line": 112,
+                "col": 0,
+                "byteIndex": 4573
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "A service must choose either native guards or a recorded public opt-out."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "ServiceGuardedAuthPolicy",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "ServiceGuardedAuthPolicy",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    },
+                    {
+                      "repr": "ServicePublicAuthPolicy",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "ServicePublicAuthPolicy",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServiceGuardedAuthPolicy",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                "line": 88,
+                "col": 0,
+                "byteIndex": 3547
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Explicit service posture using the native authentication and authorization stages."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "authn",
+                    "jsDoc": {
+                      "doc": "Authentication options passed unchanged to the service builder."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 90,
+                      "col": 2,
+                      "byteIndex": 3666
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "AuthnOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "AuthnOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "authz",
+                    "jsDoc": {
+                      "doc": "Optional authorization options passed unchanged to the service builder."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 92,
+                      "col": 2,
+                      "byteIndex": 3779
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "AuthzOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "AuthzOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "public",
+                    "jsDoc": {
+                      "doc": "Public and guarded postures cannot be combined."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 94,
+                      "col": 2,
+                      "byteIndex": 3869
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "never",
+                      "kind": "keyword",
+                      "value": "never"
+                    }
+                  },
+                  {
+                    "name": "reason",
+                    "jsDoc": {
+                      "doc": "A public opt-out reason is not valid on a guarded posture."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 96,
+                      "col": 2,
+                      "byteIndex": 3964
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "never",
+                      "kind": "keyword",
+                      "value": "never"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServicePublicAuthPolicy",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                "line": 100,
+                "col": 0,
+                "byteIndex": 4069
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Deliberate public service posture with an auditable, nonblank reason."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "public",
+                    "jsDoc": {
+                      "doc": "Explicitly opts out of service authentication and authorization."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 102,
+                      "col": 2,
+                      "byteIndex": 4188
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "true",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "boolean",
+                        "boolean": true
+                      }
+                    }
+                  },
+                  {
+                    "name": "reason",
+                    "jsDoc": {
+                      "doc": "Explains why the service is public; whitespace-only reasons are rejected."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 104,
+                      "col": 2,
+                      "byteIndex": 4296
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "authn",
+                    "jsDoc": {
+                      "doc": "Authentication cannot accompany a public opt-out."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 106,
+                      "col": 2,
+                      "byteIndex": 4382
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "never",
+                      "kind": "keyword",
+                      "value": "never"
+                    }
+                  },
+                  {
+                    "name": "authz",
+                    "jsDoc": {
+                      "doc": "Authorization cannot accompany a public opt-out."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/packages/service/src/auth/options.ts",
+                      "line": 108,
+                      "col": 2,
+                      "byteIndex": 4466
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "never",
+                      "kind": "keyword",
+                      "value": "never"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

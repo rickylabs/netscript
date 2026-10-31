@@ -87,3 +87,30 @@ CI remediation slice review: independent same-session reviewer PASS, decoded bot
 content. check:agent-docs-prose exits 0 (fresh:true, no stale paths); check:publish-assets exits 0.
 Commit/push the generated-only correction and refresh runtime CI and exact-head review; preserve
 all pending E2E claims as unchecked. Prior 57193c4 review remains historical evidence only.
+
+## Combined CI asset repair / normal main merge
+
+The new quality run passes agent-docs-prose, then fails mcp-export-corpus. This additional owned
+artifact was missed by the first docs-only repair. Refresh the complete native generated closure.
+Main's #2517/#2421 landed meanwhile; merge origin/main normally at
+15cffa2fee5b6d543ecae2981a3563b1b74ca789. No source conflict; preserve upstream host-policy and
+saga changes and all tracked run records. No manual edits to those sources or lock files.
+
+Native MCP generator uses --allow-dirty only for generation from the pending merge's coherent
+read set, as its documented workflow permits. New corpus differs from main in the optional directory
+surface; downstream prose/publish generation preserves both upstream docs and this streams opt-in.
+Focused combined test set passes 258/258 against the merged native streams service entrypoint.
+Freshness/quality gates and independent review follow before merge-commit push.
+
+Combined integration slice review: PASS from the same independent reviewer. Compared task source
+against main: storage config, contribution, generation, tests and docs survive byte-identically;
+MCP corpus changes exactly four of 306 rows for the optional directory surface, no rows removed.
+Upstream host-policy/read-model work remains imported unchanged. All four asset freshness checks
+and quality:gate exit 0. Focused generated-project proof rerun with explicit current-source plugin
+sync passes through the new native streams entrypoint; exact owned AppHost stopped afterward.
+
+New CI test-4 failures are also stale-corpus failures: clone-based write/check tests expect the
+committed corpus to match current APIs, and the large failing artifact comparison exhausts the
+assertion diff buffer. Do not weaken these tests. After committing the corrected corpus, rerun the
+two exact failures from the committed tree (their fixture clones HEAD). Aggregated check-test fails
+because of that shard; it is not an additional independently diagnosed failure.

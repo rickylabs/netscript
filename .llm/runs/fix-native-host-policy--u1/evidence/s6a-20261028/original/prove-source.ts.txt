@@ -1,0 +1,40 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6a-astra-20261028';
+const decode=new TextDecoder();
+const read=async(path:string)=>JSON.parse((await Deno.readTextFile(out+'/'+path)).replace(/^\uFEFF/,''));
+const sha=async(path:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await Deno.readFile(path))),b=>b.toString(16).padStart(2,'0')).join('');
+const before=await read('protected-before.json');
+const protectedRows=[];
+for(const row of before.rows){const actual=await sha(root+'/'+row.path);protectedRows.push({path:row.path,expected:row.expected,actual,matches:actual===row.expected});}
+const paths=['plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts','plugins/streams/services/src/service-runtime_test.ts'];
+const owners=[];let diff='';
+for(const [i,path]of paths.entries()){
+ const bytes=await Deno.readFile(root+'/'+path);const text=decode.decode(bytes);
+ owners.push({path,sha256:await sha(root+'/'+path),bytes:bytes.length,lines:text.trimEnd().split('\n').length,cap:i===0?300:430});
+ const result=await new Deno.Command('git',{args:['diff','--no-index','--','/dev/null',path],cwd:root,stdout:'piped',stderr:'piped'}).output();
+ if(result.code!==1||result.stderr.length)throw new Error('No-index source diff failed: '+decode.decode(result.stderr));
+ diff+=decode.decode(result.stdout);
+ await Deno.writeFile(out+'/'+(i===0?'fixture.final.ts':'runtime.final.ts'),bytes,{createNew:true});
+}
+await Deno.writeTextFile(out+'/source.diff',diff,{createNew:true});
+const cleanup=[];
+const childRuns=[];
+for(const gate of ['gates','gates-2','gates-3']){
+ const profile=await read(gate+'/cleanup.json');
+ let profileAbsent=false;try{await Deno.stat(profile.profile);}catch(error){if(error instanceof Deno.errors.NotFound)profileAbsent=true;else throw error;}
+ cleanup.push({gate,...profile,absentVerified:profileAbsent});
+ if(gate==='gates')continue;
+ for(const label of ['approved','allocator-denied','ffi-denied','http']){
+  const entry=await read(gate+'/children/'+label+'/cleanup.json');
+  let absent=false;try{await Deno.stat(entry.scratch);}catch(error){if(error instanceof Deno.errors.NotFound)absent=true;else throw error;}
+  cleanup.push({gate,label,...entry,absentVerified:absent});
+  const result=await read(gate+'/children/'+label+'/child-1-result.json');
+  const input=await read(gate+'/children/'+label+'/child-1-input.json');
+  childRuns.push({gate,label,pid:result.pid,code:result.code,statusSettled:result.statusSettled,pipesSettled:result.pipesSettled,stdinSettled:result.stdinSettled,args:input.args,clearEnv:input.clearEnv,addons:input.addons,stdoutBytes:new TextEncoder().encode(result.stdout).length,stderrBytes:new TextEncoder().encode(result.stderr).length,markerCount:result.stdout.split('s6a-streams: assertions and native cleanup settled').length-1,reboundPorts:result.stdout.split('\n').filter((line:string)=>line.startsWith('{"reboundPorts":'))});
+ }
+}
+const tracked=await new Deno.Command('git',{args:['diff','--name-only'],cwd:root,stdout:'piped',stderr:'piped'}).output();
+const result={head:'816fcf7ea7b20efb398bc0640f5b60f283248c08',owners,protectedCount:protectedRows.length,protectedMatched:protectedRows.filter(row=>row.matches).length,protectedRows,trackedDiff:decode.decode(tracked.stdout),tests:await read('gates-3/tests.report.json'),types:await read('gates-3/types.report.json'),lint:await read('gates-3/lint.report.json'),fmt:await read('gates-3/fmt.report.json'),quality:await read('gates-3/quality-new.stdout.log'),arch:await read('gates-2/arch.report.json'),childRuns,cleanup,earlierFailures:['gates/tests.report.json','gates/types.report.json','gates/arch.stderr.log','gates-2/tests.report.json'],limits:['Windows x64 approved addon qualification only','No whole-host guarding claim: native metadata root stays public','No later S6b-g source application or inference/checkpoint']};
+await Deno.writeTextFile(out+'/source-proof.json',JSON.stringify(result,null,2)+'\n',{createNew:true});
+if(result.protectedMatched!==result.protectedCount||result.trackedDiff||cleanup.some(row=>!row.absentVerified)||owners.some(owner=>owner.lines>owner.cap))throw new Error('Protected/footprint/cleanup proof failed');
+console.log(JSON.stringify({owners,protectedCount:result.protectedCount,matched:result.protectedMatched,cleanupRows:cleanup.length,childRuns:childRuns.length,tests:result.tests.summary,sourceDiffSha256:await sha(out+'/source.diff'),proofSha256:await sha(out+'/source-proof.json')}));

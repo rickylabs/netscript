@@ -1,0 +1,367 @@
+{
+  "scope": "scratch research only; no candidate applied",
+  "inventory": {
+    "workers": 24,
+    "streams": 23
+  },
+  "probes": [
+    {
+      "plugin": "workers",
+      "omitted": null,
+      "exitCode": 0,
+      "privateTypeRefs": []
+    },
+    {
+      "plugin": "workers",
+      "omitted": "PluginServiceContext",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'startWorkersService' references private type 'PluginServiceContext'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "CorsOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'WorkersServiceOptions[\"cors\"]' references private type 'CorsOptions'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "RunningService",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'startWorkersService' references private type 'RunningService'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "RunningServiceAddress",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'RunningService[\"addr\"]' references private type 'RunningServiceAddress'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServeOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'WorkersServiceOptions[\"serve\"]' references private type 'ServeOptions'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServiceApp",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'RunningService[\"app\"]' references private type 'ServiceApp'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServiceEnvironment",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceApp[\"fetch\"]' references private type 'ServiceEnvironment'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServiceTlsOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServeOptions[\"tls\"]' references private type 'ServiceTlsOptions'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthenticatorPort",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthnOptions[\"authenticator\"]' references private type 'AuthenticatorPort'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthnOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceGuardedAuthPolicy[\"authn\"]' references private type 'AuthnOptions'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthnRequest",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthenticatorPort[\"authenticate\"]' references private type 'AuthnRequest'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthnResult",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthenticatorPort[\"authenticate\"]' references private type 'AuthnResult'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthorizerPort",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthzOptions[\"authorizer\"]' references private type 'AuthorizerPort'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthzDecision",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthorizerPort[\"authorize\"]' references private type 'AuthzDecision'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthzOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceGuardedAuthPolicy[\"authz\"]' references private type 'AuthzOptions'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "AuthzRequest",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthorizerPort[\"authorize\"]' references private type 'AuthzRequest'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "Principal",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthnResult' references private type 'Principal'",
+        "public type 'AuthzRequest[\"principal\"]' references private type 'Principal'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ProcedureErrorCode",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthzDecision' references private type 'ProcedureErrorCode'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "PROCEDURE_ERROR_CODES",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ProcedureErrorCode' references private type 'PROCEDURE_ERROR_CODES'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServiceAuthPolicy",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'WorkersServiceOptions[\"auth\"]' references private type 'ServiceAuthPolicy'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServiceGuardedAuthPolicy",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceAuthPolicy' references private type 'ServiceGuardedAuthPolicy'"
+      ]
+    },
+    {
+      "plugin": "workers",
+      "omitted": "ServicePublicAuthPolicy",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceAuthPolicy' references private type 'ServicePublicAuthPolicy'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": null,
+      "exitCode": 0,
+      "privateTypeRefs": []
+    },
+    {
+      "plugin": "streams",
+      "omitted": "CorsOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'StreamsServiceOptions[\"cors\"]' references private type 'CorsOptions'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "RunningService",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'startStreamsService' references private type 'RunningService'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "RunningServiceAddress",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'RunningService[\"addr\"]' references private type 'RunningServiceAddress'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServeOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'StreamsServiceOptions[\"serve\"]' references private type 'ServeOptions'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServiceApp",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'RunningService[\"app\"]' references private type 'ServiceApp'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServiceEnvironment",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceApp[\"fetch\"]' references private type 'ServiceEnvironment'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServiceTlsOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServeOptions[\"tls\"]' references private type 'ServiceTlsOptions'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthenticatorPort",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthnOptions[\"authenticator\"]' references private type 'AuthenticatorPort'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthnOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceGuardedAuthPolicy[\"authn\"]' references private type 'AuthnOptions'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthnRequest",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthenticatorPort[\"authenticate\"]' references private type 'AuthnRequest'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthnResult",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthenticatorPort[\"authenticate\"]' references private type 'AuthnResult'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthorizerPort",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthzOptions[\"authorizer\"]' references private type 'AuthorizerPort'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthzDecision",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthorizerPort[\"authorize\"]' references private type 'AuthzDecision'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthzOptions",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceGuardedAuthPolicy[\"authz\"]' references private type 'AuthzOptions'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "AuthzRequest",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthorizerPort[\"authorize\"]' references private type 'AuthzRequest'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "Principal",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthnResult' references private type 'Principal'",
+        "public type 'AuthzRequest[\"principal\"]' references private type 'Principal'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ProcedureErrorCode",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'AuthzDecision' references private type 'ProcedureErrorCode'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "PROCEDURE_ERROR_CODES",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ProcedureErrorCode' references private type 'PROCEDURE_ERROR_CODES'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServiceAuthPolicy",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'StreamsServiceOptions[\"auth\"]' references private type 'ServiceAuthPolicy'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServiceGuardedAuthPolicy",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceAuthPolicy' references private type 'ServiceGuardedAuthPolicy'"
+      ]
+    },
+    {
+      "plugin": "streams",
+      "omitted": "ServicePublicAuthPolicy",
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "public type 'ServiceAuthPolicy' references private type 'ServicePublicAuthPolicy'"
+      ]
+    }
+  ]
+}
