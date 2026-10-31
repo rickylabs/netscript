@@ -28,6 +28,8 @@ export interface DurableStreamProducerSupervisorOptions {
   readonly retention?: StreamRetentionPolicyV1;
   /** Stable producer identity. */
   readonly producerId: string;
+  /** Persisted session epoch; omission retains legacy stale-epoch auto-claim. */
+  readonly initialEpoch?: number;
   /** Protocol transport adapter. */
   readonly transport: StreamProducerTransportPort;
   /** Backoff clock adapter. */

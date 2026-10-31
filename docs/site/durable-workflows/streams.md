@@ -114,8 +114,9 @@ validates and emits State Protocol `ChangeEvent`s. The supported `Operation` set
 `createDurableStream(options)` takes a `DurableStreamProducerOptions` and returns a
 `DurableStreamProducer`. It is a **singleton factory keyed by `streamPath`**: a second call with the
 same path and compatible configuration returns the same live producer, and a stopped or failed
-one can be replaced. Protocol retries retain the producer identity, epoch and sequence so a lost
-acknowledgement does not require a new append identity. A new application write, including a job
+one can be replaced. For restart safety, allocate a higher persisted `initialEpoch` for each
+recreated producer with the same path and ID. Protocol retries retain the producer identity, epoch
+and sequence so a lost acknowledgement does not require a new append identity. A new application write, including a job
 retry, is a new operation; use stable entity keys to materialize the latest state.
 
 {{ comp.apiTable({
@@ -123,7 +124,8 @@ retry, is a new operation; use stable entity keys to materialize the latest stat
   rows: [
     { name: "streamPath", type: "string (required)", desc: "Stream path relative to the base URL, e.g. '/workers/executions'. This is the singleton key and the path consumers read over HTTP/SSE." },
     { name: "schema", type: "StateSchema<TDef> (required)", desc: "The frozen schema returned by defineStreamSchema; binds the producer to its collection map." },
-    { name: "producerId", type: "string (required)", desc: "Stable producer identity used for idempotent delivery. Keep it stable across restarts for duplicate-safe writes." },
+    { name: "producerId", type: "string (required)", desc: "Stable producer identity used for idempotent delivery. Keep it stable and allocate a higher persisted initialEpoch on each restart." },
+    { name: "initialEpoch", type: "number?", desc: "Non-negative safe integer allocated atomically from persistent storage per stream path and producer ID. Increase on restart; explicit epochs fence stale writers instead of auto-claiming." },
     { name: "retention", type: "StreamRetentionPolicyV1?", desc: "TTL or absolute expiry applied when the stream is created. Omit for unbounded retention." },
     { name: "reconnectPolicy", type: "Partial<StreamProducerReconnectPolicyV1>?", desc: "Finite connection and delivery retry overrides. Omitted fields use the exported defaults." },
     { name: "bufferPolicy", type: "Partial<StreamProducerBufferPolicyV1>?", desc: "Bounds accepted pending writes by event count and UTF-8 bytes." },
@@ -286,6 +288,56 @@ still own reader credential and browser bootstrap policy.
 | `baseUrl` | `'https://streams.example.test'` |
 | Resolved endpoint | `'https://streams.example.test/v1/stream/netscript/workers/executions'` |
 
+## Producer sessions across restarts
+
+A stable `producerId` identifies a writer; it does **not** persist its epoch or next sequence.
+Follow the [Durable Streams restart flow](https://github.com/durable-streams/durable-streams/blob/main/PROTOCOL.md#521-idempotent-producers):
+atomically allocate and persist a monotonically increasing epoch for each `(streamPath, producerId)`
+session, then pass it as `initialEpoch` before producing the first changed document. Epoch 0 is
+valid for the first session. Each recreated session starts its sequence at 0 under its new epoch.
+The first append establishes that epoch on the server; construction, readiness, flush of an empty
+queue, and `stop()` append no claim event and do not advance the stream offset.
+
+```ts
+// Application-owned storage must allocate a strictly higher epoch atomically.
+// Keep the epoch counter for as long as the stream's producer state exists.
+const initialEpoch = await feedStore.allocateNextEpoch(streamPath, producerId);
+const producer = createServiceStreamProducer({ streamPath, producerId, initialEpoch, schema });
+await producer.waitUntilReady();
+try {
+  // Compare against the application's persisted checkpoint before producing.
+  if (await feedStore.hasChanged(document)) {
+    const outcome = await producer.upsert("execution", document).completion;
+    if (outcome.status !== "delivered") throw new Error(`Feed write: ${outcome.status}`);
+    await feedStore.checkpoint(document);
+  }
+} finally {
+  await producer.stop(); // Leave the stream open for the next session.
+}
+```
+
+`feedStore` is your application's storage contract, not a streams-core API. Allocate once per
+session, never once per retry or repeated singleton lookup. A live path singleton rejects a
+changed epoch configuration; await `stop()` before replacing it. Do not expire or reset the epoch
+counter while the stream retains producer state, and do not infer epochs from wall clocks or random
+numbers. `initialEpoch` must be an integer between 0 and `Number.MAX_SAFE_INTEGER` inclusive;
+invalid values throw before network IO.
+
+With an explicit epoch, a `403` stale-epoch response is terminal: the producer reports failure
+instead of taking over another session. A lost acknowledgement retries the same serialized bytes
+and `(producerId, epoch, sequence)` tuple, so the server's duplicate response appends nothing.
+Without `initialEpoch`, legacy producers start at epoch 0 and auto-claim only after a stale-epoch
+response. **That default is insufficient for stable-ID restart safety:** if epoch 0 already exists,
+a different first document at sequence 0 may be acknowledged as a duplicate without an append.
+Migrate stable restarted producers to explicit persisted epochs.
+
+Unchanged documents append nothing **when the caller skips `upsert` using its checkpoint**.
+Streams core does not compare document contents: each explicit `upsert` is a new operation, even
+for an identical entity value. Transport retry deduplication applies within a session; an operation
+with an unknown result before a process crash can be emitted again under a new epoch. Coordinate
+checkpoints and make downstream processing idempotent where that crash window matters. The consumer
+HTTP/SSE State Protocol contract and opaque offset format are unchanged.
+
 ## Storage mode and restart operations
 
 {{ comp callout { type: "caution", title: "Memory storage loses data on restart" } }}
@@ -373,8 +425,9 @@ before dependent producers write.
 
 ## Production notes
 
-- **Keep `producerId` stable across restarts.** Idempotent delivery is keyed by it; a changing id
-  defeats duplicate safety.
+- **Keep `producerId` stable and allocate a higher persisted `initialEpoch` on restart.** A
+  stable ID alone cannot distinguish a new session from a duplicate retry. Filter unchanged source
+  documents with an application checkpoint before calling `upsert`.
 - **Treat a `flush()` rejection on shutdown as a real delivery failure**, not noise. Bring Aspire,
   or an explicit `DURABLE_STREAMS_URL`, up before producers start.
 - **Set the auth secret on both ends.** When the server expects a bearer token, export

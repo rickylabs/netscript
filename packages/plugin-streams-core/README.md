@@ -98,6 +98,20 @@ before that call. `stop()` cancels local work without sending durable EOF; `clos
 writes and resolves only after the server acknowledges terminal `streamClosed`. SSE offsets remain
 consumer-owned opaque tokens and are never parsed or advanced by the producer.
 
+For stable producer IDs across restarts, pass `initialEpoch` in producer options. Allocate it once
+per session from an atomic persistent counter scoped to `(streamPath, producerId)`, retaining the
+counter while stream history exists. Each recreated session needs a strictly higher epoch and
+starts at sequence zero. Explicit epochs disable stale-epoch auto-claim: a fenced writer fails
+rather than taking over another session. Transport retries keep the same bytes and tuple.
+Omitting `initialEpoch` retains legacy epoch-zero auto-claim and is insufficient for restart safety.
+The option must be a non-negative safe integer and participates in singleton compatibility.
+
+Session setup and `stop()` append nothing. Use your application's persisted checkpoint to skip
+unchanged source documents before calling `upsert`; every explicit upsert remains a new event.
+Delivery deduplication does not span a process crash into a newly allocated epoch. See the
+[producer restart guide](https://rickylabs.github.io/netscript/durable-workflows/streams/#producer-sessions-across-restarts)
+for the storage contract, crash window and migration example.
+
 Resolve the endpoint and inspect a schema before wiring a producer:
 
 ```typescript

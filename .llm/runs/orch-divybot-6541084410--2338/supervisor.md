@@ -10,3 +10,4 @@
 - No label/milestone changes; no local scaffold runtime; coordinator owns e2e-cli CI and merge.
 - Privacy: public artifacts use repository-relative paths, no machine identifiers or raw reviewer events.
 - Scope refinement before planning: extend existing reference-server suite at `plugins/streams/tests/service/durable-stream-producer-idempotency_test.ts`; this is test-only, no streams server implementation changes.
+- Freshness scope refinement before generation: `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, `packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`, `packages/cli/src/kernel/assets/agent-docs.generated.ts`, `packages/cli/src/kernel/assets/embedded.generated.ts`, and any generator-owned publish twins for this API/docs change. Native freshness checks require these outputs; no handwritten bundle edits.

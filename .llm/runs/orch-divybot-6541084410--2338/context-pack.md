@@ -1,5 +1,7 @@
 # Resume context
 
-Issue #2338 C1, coordinator #2474. Branch and baseline in supervisor. Research complete; plan is ready for independent PLAN-EVAL before any implementation. Proposed supported persisted initialEpoch seam follows upstream restart flow; explicit epoch fences stale producers and preserves retry tuples. Unchanged-source filtering remains caller-owned; evaluator must assess acceptance before implementation.
+PR #2510; PLAN-EVAL PASS. Source implemented as planned: public initialEpoch seam, safe integer pre-IO validation, singleton compatibility, explicitly allocated stale epoch is terminal for append/close. Default omission retains legacy behavior. Docs explain checkpoint boundary and restart caveat.
 
-Next: PLAN-EVAL, bootstrap commit/push/draft PR, implementation after PASS, structured gates/real server + negative controls, IMPL-EVAL, ready, exact pushed-head final review. Request coordinator-owned e2e-cli CI in READY. Never merge/tag/release or change taxonomy.
+85 local core+real-server tests pass; scoped check/lint/fmt green; combined doc-lint and native publish dry-run green. Full-revert runtime negative control fails all 8 new tests; semantic unchanged filtering and byte freezing were pre-existing, see negative-controls.md. Independent source/slice review next before sign-off, then commit/push, native generated API/docs freshness slice, final gates/review/ready. e2e-cli CI remains coordinator-owned and mandatory, no local scaffold runtime.
+
+Source/slice IMPL-EVAL PASS with no blockers; evidence in impl-eval-source.md. Current full suite is 87 pass including retention. Test-only Connection: close removes upstream shutdown flake, 20 repeated focused suites pass. Source commit/push now; then native generated carrier refresh and final exact-head evaluation.
