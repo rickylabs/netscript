@@ -1,0 +1,152 @@
+{
+  "task": 2464,
+  "focusedTests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "packages/cli/src/kernel/templates/app/production-theme_test.ts",
+      "packages/cli/src/kernel/templates/app/design-theme_test.ts",
+      "packages/cli/src/kernel/application/tokens/app-tokens_test.ts",
+      "packages/cli/src/kernel/templates/app/generators-config_test.ts",
+      "packages/cli/src/kernel/templates/app/route-templates_test.ts",
+      "packages/cli/src/public/features/init/init-preset-safety_test.ts"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "durationMs": 12081,
+    "summary": {
+      "passed": 85,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 85,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "qualityGate": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "scoped": {
+    "check": {
+      "source": {
+        "mode": "selection",
+        "cwd": "."
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "lint": {
+      "source": {
+        "mode": "command",
+        "cwd": ".",
+        "exitCode": 0
+      },
+      "selection": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 3,
+        "filesProcessed": 3,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "fmt": {
+      "command": "deno fmt --check",
+      "cwd": ".",
+      "mode": "check",
+      "summary": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 3,
+        "filesProcessed": 3,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "findings": []
+    }
+  },
+  "generatedConsumerCheck": {
+    "source": {
+      "mode": "selection",
+      "cwd": "generated-consumer-fixture"
+    },
+    "command": "deno check --unstable-kv <files>",
+    "selection": {
+      "filesSelected": 2,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "negativeControls": [
+    {
+      "case": "missing-vite-exclusion",
+      "exitCode": 1,
+      "expectedFinding": "Production Vite routes must exclude"
+    },
+    {
+      "case": "wrong-vite-pattern",
+      "exitCode": 1,
+      "expectedFinding": "Production Vite routes must exclude"
+    },
+    {
+      "case": "production-catalog-import",
+      "exitCode": 1,
+      "expectedFinding": "Production imports full manifest"
+    }
+  ],
+  "carriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "publish-assets": "PASS",
+    "aspire-version-parity": "PASS",
+    "assets-barrel": "PASS"
+  },
+  "releasePreflight": "PASS",
+  "scaffoldRuntime": {
+    "outcome": "UNPROVEN",
+    "exitCode": 1,
+    "reason": "Aspire doctor fails; Docker daemon unavailable; no scaffold AppHost started"
+  },
+  "lockGraph": "all npm/JSR versions and integrity entries unchanged in both maintained locks",
+  "portabilityControls": {
+    "LF": "PASS",
+    "CRLF": "PASS"
+  }
+}

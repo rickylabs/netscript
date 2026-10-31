@@ -1,3 +1,4 @@
+import { TOKEN_PRESET_FILE } from '../../domain/tokens/token-config.ts';
 import {
   type AppTokenDependencies,
   appTokenPath,
@@ -14,7 +15,7 @@ export async function cleanAppTokens(
   await assertTokenApp(root, fs);
   const outputFiles = await tokenEngine.outputFiles(true);
   const removed: string[] = [];
-  for (const name of outputFiles.filter((name) => name !== 'theme-preset.json')) {
+  for (const name of outputFiles.filter((name) => name !== TOKEN_PRESET_FILE)) {
     const file = tokenOutputFile(name);
     const path = appTokenPath(root, file);
     if (await fs.exists(path)) {
