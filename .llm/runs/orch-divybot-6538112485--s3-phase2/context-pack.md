@@ -1,47 +1,35 @@
 # Resume S3 phase 2
 
-Baseline204a71b; branch orch/divybot-6538112485. Read plan.md/research.md/worklog.md.
-Product implementation has not begun; mandatory separate Claude PLAN-EVAL is next.
-The Figma input is branch docs/figma-library-handoff (PR2486), not main yet.
-S2 registry PR2468 is open; merge main once it lands. Do not duplicate Phase1.
-All104 contracts, two category-group review units; no tokens/locks changed.
-Never commit .divybot-goal.md or final report files. No labels or session IDs.
+Read plan.md, research.md and worklog.md. Branch orch/divybot-6538112485,
+draft PR2488, baseline now main ad252e8. Operator says Refs #2416 only, no
+labels/session IDs, no tokens/lock churn, stop at READY; Cockpit merges.
+Never commit assignment/final-report files. Same separate Claude Opus5.5 high
+read-only evaluator has reviewed each slice; final IMPL-EVAL remains required.
 
-Slice1 is implemented and independently reviewed PASS. Contract suite81/0,
-catalog4/0, scoped check/lint/fmt54/54 and quality/preflight pass. Full package
-baseline check is still in flight. Next: finish that process, commit/push source
-with this context/worklog, then Actions plus dedicated browser fixture suite.
+Completed and independently PASS: all104 typed/JSON contracts;3 Actions gap
+components;4 native Forms gap controls; migration onto main's S2 registry.json.
+73 shipped/31 gaps remain. Legacy-v1 snapshot unchanged; explicit post-v1 item
+allowlist has7 components and no support items. Keep that list, native registry
+count, style-utility maps and collection docs current for each new item.
 
-Full package suite300/0/0 and asset-barrel generation now pass. Slice1 terminal.
-Next: Actions3 components, registry publication and real browser fixture suite.
+Rebase repair gates:130 focused tests,60 real browser cases, quality,
+release preflight, docs accuracy111, four carrier checks pass. Full package
+run347 passed/1 stale design-sync count, corrected with targeted9/9 PASS;
+repeat whole suite at phase final. Required CI skipped on draft, no READY.
+Latest main advanced after first force push; six commits replayed cleanly onto
+ad252e8. Push using explicit lease8d093a9, confirm mergeable, then continue.
 
-Slice2 terminal PASS:3 Actions components with contracts/registry/carriers,
-107 focused tests,20 rebuilt-source browser cases, strict axe, actual installed
-source check and negative keyboard mutation. Independent same-session review
-FAIL_FIX (stale manual bundle) -> one correction -> PASS. Next: commit/push,
-merge newly landed Figma handoff5db9515, then Forms primitives slice3.
+Next slice4:6 untracked Calendar/DatePicker files restored from recovery stash.
+Two pure Gregorian-date tests pass; no registry/contracts/browser integration
+yet. Fix date-picker CSS nonexistent --ns-raised to --ns-surface-raised.
+Integrate calendar-date support item plus Calendar and DatePicker through S2
+registry.json, style maps, forms-core, contracts and actual copy installer test.
+Add render and real browser keyboard/accessibility/focus/disabled/range tests.
+Do not commit/start next category before scoped gates and same reviewer PASS.
 
-Slice3 implementation/test gates in flight:4 native Forms primitives, contracts
-73 shipped,114 renders and52 real browser cases pass. Consumer test renamed to
-gaps-install.test.ts and now covers every registry component tagged contract.
-Independent same reviewer evaluating slice3 before commit. Do not start slice4
-(Calendar/DatePicker) until this slice is terminal. Handoff now present on main.
-
-Slice3 terminal PASS after one correction of a native two-thumb pointer trap.
-All121 focused and60 browser cases pass; source controls remain native. Save
-this source/evidence commit and continue Calendar/DatePicker. Handoff is merged;
-S2 registry is still being handled separately and must be merged once landed.
-
-User requested a rebase/force push to repair conflicts. Rebased onto6b7f152
-(S2 merged); canonical registry.json now owns all7 items/style maps/collections.
-Compatibility TS projection and frozen legacy-v1.json are unchanged. Explicit
-post-v1 addition list and negative guards protect the snapshot.130 tests/60
-browser/quality/preflight/docs accuracy111 pass; independent rebase review PASS.
-Next: clean-source carrier refresh/freshness checks, force-with-lease known old
-head, then restore saved6 Calendar files and continue slice4. No READY yet.
-
-Rebase freshness done: prose/corpus/assets/publish checks PASS, docs accuracy111,
-review-thread gate0 unanswered. Full348-case package run found only the stale
-legacy design-sync count; its targeted count/source check is corrected without
-changing product behavior. Push the repair with force-with-lease against old
-f6d9ae439782d39d768ce8e057d3b97fc24b5d56, then restore saved Calendar WIP.
+Browser instructions in tools/fresh-ui-browser/README.md; suite rebuilds current
+source automatically. System Chromium libs from a read-only existing project
+run must be supplied only to npm/Playwright, not restricted Deno spawn wrappers.
+Review transport/private identity is outside repository in project's run folder.
+Remaining phase2a: Navigation, Overlays, Data display + Feedback/docs gap audit.
+Then stacked phase2b: Layout, AI, Desktop, Docs kit and all-style harness.
