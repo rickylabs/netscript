@@ -95,6 +95,43 @@ contributions. The install emits `RequiresDb: false` for both the API and the ba
 processor. Both processes still require KV, and their background work runs independently of the
 web app.
 
+For a new project with no SQL database, use `--db none` when scaffolding and `--no-db` when
+installing each plugin. Workers and sagas declare streams as a composition dependency, so install
+it as well. This example also installs auth with its KV backend:
+
+```sh
+netscript init kv-only --db none --cache false --ci --yes
+cd kv-only
+netscript plugin install streams --no-db --no-samples
+netscript plugin install workers --no-db --no-samples
+netscript plugin install sagas --no-db --no-samples
+netscript plugin install triggers --no-db --no-samples
+netscript plugin auth backend set kv-oauth
+netscript plugin install auth --no-db --no-samples
+netscript generate plugins
+netscript generate runtime-schemas
+netscript plugin doctor
+```
+
+`--cache false` omits the scaffold's optional Redis cache. The installed plugins provision their
+declared shared KV dependency. No database initialization, Prisma generation or SQL migration is
+needed for this composition. Empty registries are valid: doctor warns that there are no
+definitions and succeeds. Add your own jobs, sagas and triggers, then regenerate the registries.
+The `--no-samples` flag avoids example workflows with application-specific dependencies.
+
+Before starting Aspire, configure and export auth's provider settings and KV encryption key using
+[Configure authentication](/identity-access/how-to/add-authentication/). Credentials belong in the
+process environment; generated helpers refuse credential literals in appsettings. Start the stack
+with `cd aspire && aspire start --isolated`, then check both the API resources and the separate
+workers, sagas and triggers children. Each child's `/health` response must report `state: ready`,
+`registryReady: true` and `dependencyReady: true`. A healthy API alone does not prove that its
+background processor can execute work.
+
+Canonical saga state and its query projection are separate choices. The API and the runner use
+the same store resolver for `NETSCRIPT_SAGA_STORE` and `Sagas.Store.Backend`; select `kv` for both
+entries in this composition. A runner started directly outside Aspire must receive the same KV
+connection and registry configuration. It does not need a database client or a web session.
+
 Saga query storage is a separate choice, set with `sagas.projection.backend`:
 
 | Value | Query model | Notes |

@@ -1,3 +1,3 @@
 # Resource hygiene
 
-Read-only maint:leak-check exited 0 during the failed startup. Reports included foreign and unknown-owner resources; none were mutated. Raw host details remain in private local evidence. Each failed proof AppHost was stopped by its exact path; no global stop or container removal was used.
+Final read-only maint:leak-check exited 0. Survivor ownership counts: {"unproven": 1}. Foreign and unknown-owner entries were left untouched. Every acceptance AppHost was stopped using its exact path; the detached child was stopped and reaped. No global stop, container removal or cache deletion was used. Raw process/host details remain private local evidence.

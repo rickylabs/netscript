@@ -90,6 +90,60 @@
       "gate": "quality:gate",
       "rawExitCode": 0,
       "evidence": "quality scan ok=true, findings=[], allowCount=7; doctrine all roots FAIL=0"
+    },
+    {
+      "gate": "generated shared plugin context check",
+      "rawExitCode": 0,
+      "summary": {
+        "filesSelected": 1,
+        "failedBatches": 0,
+        "totalOccurrences": 0
+      }
+    },
+    {
+      "gate": "workers JSR audit",
+      "rawExitCode": 0,
+      "summary": {
+        "dryRun": "OK",
+        "newPublicExports": 0
+      }
+    },
+    {
+      "gate": "docs source format",
+      "rawExitCode": 0
+    },
+    {
+      "gate": "docs accuracy",
+      "rawExitCode": 0,
+      "summary": {
+        "publishedPages": 214,
+        "directCommands": 111
+      }
+    },
+    {
+      "gate": "docs links",
+      "rawExitCode": 0,
+      "summary": {
+        "brokenLinks": 0,
+        "brokenAnchors": 0,
+        "orphans": 0
+      }
+    },
+    {
+      "gate": "agent docs prose semantic freshness",
+      "rawExitCode": 0
+    },
+    {
+      "gate": "MCP export corpus freshness",
+      "rawExitCode": 0
+    },
+    {
+      "gate": "review threads",
+      "rawExitCode": 0,
+      "summary": {
+        "threads": 0,
+        "unanswered": 0
+      }
     }
   ]
 }
