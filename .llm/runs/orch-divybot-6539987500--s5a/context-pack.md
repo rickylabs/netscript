@@ -133,3 +133,30 @@ quality96inputs PASS. Four carrier generators, release preflight, docs accuracy,
 Aspire manifest parity and publish-assets check all PASS. Other failed original
 shards2/5/6 contain the same stale-inventory cause only. New push must receive
 fresh exact-head required CI; no READY yet.
+
+
+Fresh UI full-suite CI exposed one isolated source-copy test omission: original
+workspace member import scopes do not apply outside the workspace, so the copied
+public tokens entrypoint could not resolve its new zod alias. Repair only the
+test fixture by giving copied modules a config with package imports and the
+actual workspace catalog/catalogs. Retain --frozen private lock, all stale/
+missing negative controls and exact output restoration. No production change,
+dependency pin change or lock churn. Targeted test and independent review next.
+
+
+The standalone fixture config attempt failed the real frozen lock's workspace
+context and was rejected by independent review (FAIL_FIX, round1 retained).
+Final repair keeps original --config and private --lock --frozen, and supplies
+an explicit import map for the external copied modules using the root catalog's
+existing zod range. Temp files stay in TMPDIR per user policy. Targeted original
+frozen-artifact test now1/0/0, preserving every stale/missing/nonrepair/exact-byte
+assertion. Final source wrappers1file each pass; retained repair review round2
+in progress. No lock, version, product API or generated carrier changes.
+
+
+Frozen-copy fixture repair terminal PASS (retained independent round2). Targeted
+original frozen check1/0/0 in107seconds; check/lint/fmt1file each,0findings.
+Original workspace config + explicit catalog-derived alias map preserves the
+private lock and every negative control. Earlier formal IMPL-EVAL and merged-
+tree review stand. Push the reviewed test-only slice, then require full Fresh
+UI job and all required checks green on that exact next head before READY.

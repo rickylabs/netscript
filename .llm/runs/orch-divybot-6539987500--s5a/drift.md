@@ -46,3 +46,22 @@ shard failure is an ambient Node Timeout type at the bundle test's number timer;
 use ReturnType<typeof setTimeout>. No production contract changes.
 Re-run plugin/token/native/carrier gates and retained independent evaluation
 before the next push. READY remains pending actual exact-head CI.
+
+
+Fresh UI full-suite CI exposed one isolated source-copy test omission: original
+workspace member import scopes do not apply outside the workspace, so the copied
+public tokens entrypoint could not resolve its new zod alias. Repair only the
+test fixture by giving copied modules a config with package imports and the
+actual workspace catalog/catalogs. Retain --frozen private lock, all stale/
+missing negative controls and exact output restoration. No production change,
+dependency pin change or lock churn. Targeted test and independent review next.
+
+
+The standalone fixture config attempt failed the real frozen lock's workspace
+context and was rejected by independent review (FAIL_FIX, round1 retained).
+Final repair keeps original --config and private --lock --frozen, and supplies
+an explicit import map for the external copied modules using the root catalog's
+existing zod range. Temp files stay in TMPDIR per user policy. Targeted original
+frozen-artifact test now1/0/0, preserving every stale/missing/nonrepair/exact-byte
+assertion. Final source wrappers1file each pass; retained repair review round2
+in progress. No lock, version, product API or generated carrier changes.

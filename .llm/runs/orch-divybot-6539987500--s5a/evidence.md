@@ -91,3 +91,11 @@ quality96inputs PASS. Four carrier generators, release preflight, docs accuracy,
 Aspire manifest parity and publish-assets check all PASS. Other failed original
 shards2/5/6 contain the same stale-inventory cause only. New push must receive
 fresh exact-head required CI; no READY yet.
+
+
+Frozen-copy fixture repair terminal PASS (retained independent round2). Targeted
+original frozen check1/0/0 in107seconds; check/lint/fmt1file each,0findings.
+Original workspace config + explicit catalog-derived alias map preserves the
+private lock and every negative control. Earlier formal IMPL-EVAL and merged-
+tree review stand. Push the reviewed test-only slice, then require full Fresh
+UI job and all required checks green on that exact next head before READY.
