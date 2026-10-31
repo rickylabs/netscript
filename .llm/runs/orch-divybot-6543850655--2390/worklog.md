@@ -37,3 +37,11 @@ Independent implementation/slice review round 1: PASS, no blockers. Evaluator ve
 Merged current main `a9620a34e14e067c56bb6af025ec015f7252b7aa` normally after the reviewed reproduction sign-off `d0171ab5`. Its only advancement is #2519 (auth database contribution selection); no saga/streams/worker/provider-driver changes overlap this slice. No rebase or force push. The independent review cleared the reproduction; this merge records baseline currency without changing its source. Post-merge exact-head reproduction/static/quality receipts and final same-session evaluation follow.
 
 Reconcile: PR slice comment links the committed gates/review; #2390 remains open, no labels/milestones changed. Full scaffold.runtime remains coordinator-owned CI.
+
+## Close / coordinator handoff
+
+Implementation/main-merge head `3dca25d8aa585622445a77a0b86933c4c50bbc1d` passed exact-head durable reproduction (3/0/0) and quality receipts, with zero static findings. Same-session round-2 independent review ends `VERDICT: MERGE 3dca25d8aa585622445a77a0b86933c4c50bbc1d`. See evaluate.md and final-gate-index.json. This final evidence-only slice changes no tested source; exact pushed-head confirmation follows in the PR phase comment without another artifact commit.
+
+PR #2534 is ready. First current-head CI snapshot: zero current failures, core check/test/quality and command-postgres running; scaffold runtime skipped pending coordinator e2e-cli-gate. No full runtime verdict claimed. Review-thread gate PASS, zero threads/unanswered. Owned PostgreSQL cluster stopped cleanly; test-owned servers, workers, queues and schema fixtures close in finally. No unknown resources were mutated. Dated lesson and reusable memory are recorded; no debt accepted.
+
+Reconcile: only coordinator merges/closes and arms full scaffold.runtime; #2390 remains a reference. No labels/milestones or release artifacts changed. Canonical READY report is delivered through excluded .divybot-final-report.md, never posted directly by gh. Final CI snapshot and exact-head evaluator line live in that report and the PR phase comment.

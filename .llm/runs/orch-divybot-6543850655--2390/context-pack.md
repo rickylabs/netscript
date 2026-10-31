@@ -1,9 +1,12 @@
-# Resume issue 2390
+# Resume / coordinator handoff — issue 2390
 
-PR #2534, branch `orch/divybot-6543850655`, baseline `e4875a56c13e91503b5f168e6fa6d95b093c5a8a`. PLAN-EVAL passed before implementation. Read evidence.md for the result: supported full Prisma flow and reduced KV flow pass with producer/processor lifecycle reconstructions; KV atomic worker outbox refuses registration. Exact canary.8 full fixture lacks APIs, but unchanged focused producer probe proves acknowledged missing append there, passes on main. Forced epoch-zero makes both integrated flows red.
+PR: https://github.com/rickylabs/netscript/pull/2534 (ready). Branch `orch/divybot-6543850655`. Implementation is complete; no source repair remains. Read evidence.md for the full bounded investigation and evaluate.md for independent review. The final evidence-only close commit leaves all fixture/production/lock hashes unchanged; its exact pushed-head approval is in the final PR IMPL-EVAL comment and excluded READY report.
 
-Source check/lint/fmt and quality gate pass; neighbors 81 pass/6 provider skips. New reproduction 3 pass/0 skip. No production source change or lock churn. Independent slice/IMPL-EVAL pending, then sign-off commit/push; final same-session evaluation must bind exact pushed head. No local scaffold.runtime, labels/milestones, merge/release. Request coordinator-owned CI e2e-cli-gate and record current CI state honestly. Final visible report uses excluded `.divybot-final-report.md` handoff.
+- Full real Prisma projected atomic worker→relay→stream receipt→recorded query passes. Supported persisted KV receipt path and explicit unsupported worker-outbox guard pass. Producer/processor lifecycles are reconstructed in-process over persistent storage, not killed OS processes.
+- Exact canary.8 full fixture lacks newer APIs; unchanged focused probe proves acknowledged missing append there and passes on main. Forcing epoch zero makes both integrated flows red. No original process-exit cause is inferred.
+- New reproduction 3 passed/0 failed/0 ignored; neighbors 81 passed/6 backend skips; source check/lint/fmt zero findings; full quality/dependency/architecture and JSR audit pass with inherited advisories. No dependency/export/production-source/lock change.
+- Same separate Opus 5.5 high evaluator passed the slice and exact implementation head. Durable exact-head local receipt summaries: final-gate-index.json. Any final exact-head confirmation is posted to the PR without moving its head.
+- PR ready; initial CI snapshot has zero current failures, core/provider checks pending. Scaffold runtime is skipped until coordinator arms e2e-cli-gate. Full CI scaffold.runtime required before merge, never run locally. Review-thread gate: zero unanswered.
+- Owned PostgreSQL test cluster stopped; test-owned resources cleaned. No debt. Lesson and memory retained. No labels/milestones, merge, tag, release or issue closure performed.
 
-Round-1 independent slice/implementation review PASS, no blockers; source ready for sign-off commit. Merge current main (auth-only advancement) normally, then validate the exact pushed head and perform final same-session review.
-
-Current main `a9620a34e14e067c56bb6af025ec015f7252b7aa` merged normally. Reproduction source is unchanged from reviewed/passing slice `d0171ab5`. Next: exact-head local receipts, ready PR, final same-session Opus review, thread gate and CI snapshot, then READY handoff. Do not merge or relabel.
+Next owner action: obtain final-head core/provider CI and full e2e-cli scaffold.runtime verdict, then decide merge/issue closure. Canonical visible READY report uses excluded `.divybot-final-report.md` handoff; publication is queued by rename and is not assumed accepted.
