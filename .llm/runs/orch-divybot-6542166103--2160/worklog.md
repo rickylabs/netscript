@@ -109,3 +109,13 @@ and check:publish-assets pass. check:assets-barrel follows commit because its
 verdict includes git diff --exit-code against generated files. These repairs do
 not change production saga behavior. S2 commit/push now supersedes the prior SHA;
 final round 5 will review the exact new pushed head and both CI corrections.
+
+## S3 generated publish fixture alignment
+
+At 25d06691ff55fc391db2450cdcf5f2d01b3993c4 the command-postgres run
+41194911820 passes all real atomic projection and compensation tests, and the
+relay cohort, then fails compiling the next generated HTTP publish fixture: its
+unusedReadModel fake lacks findFirst. Add the same refuseReadModel stub as the
+existing findMany/count methods. No production behavior changes; any read during
+publish still throws. Template census finds no sibling service fake needing this.
+Final same-session round 5 will review the exact corrected pushed head.

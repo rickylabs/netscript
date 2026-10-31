@@ -39,3 +39,9 @@
   actually change them. Use gen:agent-docs-prose then gen:publish-assets; inspect
   every output and retain only semantically required generated changes. No gate
   policy/label changes or local scaffold runtime.
+- CI at 25d0669 passes the repaired real PostgreSQL projection suite and relay
+  cohort, then reaches a generated publish-process.ts.template fake missing the
+  required findFirst query method. Add findFirst: refuseReadModel to that test fake,
+  preserving its no-read-on-publish invariant. A census of saga/core/database
+  templates finds no other such service-client fake. This is a mechanical test-port
+  alignment with the S1 contract already independently reviewed; no production edit.

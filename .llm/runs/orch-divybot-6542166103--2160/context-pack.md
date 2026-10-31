@@ -27,3 +27,9 @@ Tests close their resource handles; no unknown resources were encountered.
 
 Do not commit assignment/report files, raw evaluator logs, identifiers or operator
 paths. Final READY uses atomic excluded .divybot-final-report.md handoff.
+
+S2 pushed at 25d06691ff55fc391db2450cdcf5f2d01b3993c4. Post-commit assets-barrel
+passes. Live PostgreSQL projection/compensation and relay tests now pass in CI.
+The next generated publish fixture needs a missing findFirst: refuseReadModel
+stub; S3 is this mechanical fixture-only alignment. Final round 5 remains reserved
+for the exact final pushed head after the current CI rerun is green.
