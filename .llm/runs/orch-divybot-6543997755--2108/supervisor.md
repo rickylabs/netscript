@@ -16,6 +16,14 @@ Owner evaluator override: `claude -p --model claude-opus-5-5 --effort high`, sep
 - `docs/site/orchestration-runtime/how-to/add-a-plugin.md`, related source documentation and required generated documentation carriers.
 - Local excluded runtime/output under project runs or artifacts; temporary files use TMPDIR.
 
-No lock churn, labels/milestones, merge, tag or publication. Assignment and final report handoff remain uncommitted. Public records omit operator paths, session IDs, hostnames and allocated endpoints.
+No unrelated lock churn, labels/milestones, merge, tag or publication. Assignment and final report handoff remain uncommitted. Public records omit operator paths, session IDs, hostnames and allocated endpoints.
 
 Demonstrated acceptance refinements: `packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler.ts`, its BFF template, helper assets/manifest/embedded carrier, helper generator tests, and `plugins/workers/src/cli/runtime-registry-generator.ts` are included to repair the generated lint failures.
+
+Post-ready validation surface: `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv`, canonical generated inventory only (six new fixture/test rows).
+
+CI-repair generated surface: `packages/mcp/src/publish-assets.generated.ts`, canonical publish-assets wrapper for the already-reviewed docs corpus.
+
+CI-repair test support: root `deno.json` declares the emitted BFF's existing cookie dependency for in-process dynamic imports and subprocess fixture maps that inherit root imports. `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts` follows the new empty-tools template's no-op contract. No dependency version or runtime behavior change is intended; the necessary lock metadata exception is documented below.
+
+Necessary lock metadata surface: `deno.lock` and `packages/fresh-ui/deno.lock` must reflect the existing cookie dependency now declared at root. Native lock writers only; require unchanged resolved versions and integrity and explain the exact metadata delta in the PR. This is the operator's reviewed-fix exception, not permission for unrelated lock churn.

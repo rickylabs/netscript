@@ -11,3 +11,11 @@
 
 - Main advanced to da81516; integrated via merge, canonical asset regeneration resolved the only stash conflict.
 - Local-source proof found published JSR service launch metadata. Fixed the local install and generic runtime-package discovery, and asserted source entrypoints rather than applying test-only helper rewrites.
+
+- Final inventory validation discovered a generated Aspire manifest freshness gap. Add the six canonical inventory rows and re-review the new head; runtime proof remains unchanged because executable source is unchanged.
+
+- The CI quality failure is publish-assets freshness, not the later parity step: regenerate the MCP publish wrapper after updating its docs corpus. check:publish-assets passes. Include both generated repairs in S3.
+
+- CI shards test-2 through test-6 exposed inherited test-map cookie resolution and an outdated empty-tools assertion in addition to the stale MCP provenance. Root test support now declares the same emitted dependency; no version or runtime change; the necessary lock metadata exception is documented below. Preserve every behavioral auth/regression control. Aggregate check-test is red because these shards failed.
+
+- Root cookie alias requires native root/private-lock workspace dependency metadata synchronization: frozen fixture subprocesses and private-lock parity reject the alias without it. Record and independently review only this necessary metadata change; compare resolved package versions and integrity. Initial regression run also found the host browser needed an explicit existing executable; no product/test behavior change for that.

@@ -56,3 +56,11 @@ Detached proof: stop only the Aspire `sagas` resource; launch its generated runt
 | Documentation release-gate note | main inspection | Old separate-release-acceptance note is already absent; record verified absence, no deletion needed |
 
 Expected controls are targeted production mutations in disposable copies, preserving tests. Restore any temporary mutation before normal gates, compare hashes and report failing test names/raw exit codes. Do not spend a third PLAN-EVAL round.
+
+## S3 validation inventory repair
+
+After readiness, the full Aspire parity gate requires refreshing its generated surface manifest for the new fixtures. Regenerate `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv` with the canonical script; gate check:aspire-version-parity plus independent six-row review, commit/push with run context, then re-evaluate the exact final pushed head. No executable or runtime change; prior positive consumer proof remains applicable.
+
+S3 also refreshes `packages/mcp/src/publish-assets.generated.ts` after CI identified its docs-corpus wrapper as stale. Gate: canonical gen/check:publish-assets; independent supplemental artifact review before the same S3 commit. No executable behavior changes.
+
+S3 CI regression support also declares the existing BFF cookie alias in the root test import map and updates the empty-tools pipeline expectation to its current Promise no-op contract. Run all twelve files named by the five failing shard reports; retain cookie/CORS/public-route and generated-browser negative controls unchanged.

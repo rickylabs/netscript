@@ -310,6 +310,11 @@ packages/cli/CHANGELOG.md	cli:other	S4	grep-verified in the S4 member table; no 
 packages/cli/deno.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/e2e/fixtures/desktop-native/deno.lock	lockfile	N/A	dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)
 packages/cli/e2e/fixtures/desktop-native/src/constants.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/fixtures/kv-only/detached.ts.template	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/fixtures/kv-only/README.md	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/fixtures/kv-only/run-adoption.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/fixtures/kv-only/runtime.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/fixtures/kv-only/scaffold.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/fixtures/outbound-webhook/run-adoption.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/mod.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/README.md	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -665,6 +670,7 @@ packages/cli/src/kernel/templates/workspace/generators_test.ts	generator:workspa
 packages/cli/src/kernel/templates/workspace/netscript-config.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner_test.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
+packages/cli/src/local/composition/kv-only-plugins_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/composition/local-browser-auth-lifecycle_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

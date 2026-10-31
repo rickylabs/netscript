@@ -144,6 +144,65 @@
         "threads": 0,
         "unanswered": 0
       }
+    },
+    {
+      "gate": "Aspire version parity after inventory regeneration",
+      "rawExitCode": 0,
+      "counts": {
+        "checked": 1018,
+        "fail": 0,
+        "deferred": 14,
+        "info": 4,
+        "skipped": 3,
+        "missing": 0
+      },
+      "manifestFresh": true
+    },
+    {
+      "gate": "publish assets after docs-wrapper regeneration",
+      "rawExitCode": 0,
+      "changedGeneratedFiles": [
+        "packages/mcp/src/publish-assets.generated.ts"
+      ]
+    },
+    {
+      "gate": "CI repair check/lint/fmt",
+      "rawExitCode": 0,
+      "filesSelectedEach": 1,
+      "droppedFiles": 0,
+      "findings": 0
+    },
+    {
+      "gate": "quality:gate after root import metadata synchronization",
+      "rawExitCode": 0,
+      "evidence": "quality scan findings=[], allowCount=7; deps/private-lock checks PASS; doctrine FAIL=0"
+    },
+    {
+      "gate": "publish:dry-run (all units)",
+      "rawExitCode": 0,
+      "receipt": "repo-native run-gate.ts publish-dry-run receipt retained locally"
+    },
+    {
+      "gate": "lock metadata parity",
+      "rawExitCode": 0,
+      "changedFiles": [
+        "deno.lock",
+        "packages/fresh-ui/deno.lock"
+      ],
+      "addedMetadataEach": [
+        "workspace.dependencies: jsr:@std/http@1"
+      ],
+      "resolvedVersionsAndIntegrityUnchanged": true
+    },
+    {
+      "gate": "CI affected-file regressions",
+      "rawExitCodeBrowserRerun": 0,
+      "summary": {
+        "passedNonBrowser": 83,
+        "passedBrowser": 3,
+        "finalFailed": 0
+      },
+      "evidence": "ci-regression-results.json retains the initial mixed batch and final same-source browser result"
     }
   ]
 }
