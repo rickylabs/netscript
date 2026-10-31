@@ -33,6 +33,7 @@
         1667,
         1668,
         2068,
+        2115,
         2185,
         2233,
         2259,
@@ -83,7 +84,6 @@
       "issueNumbers": [
         1912,
         2108,
-        2115,
         2144,
         2151,
         2351,
@@ -588,16 +588,16 @@
     {
       "id": "B2-2369",
       "lane": "features",
-      "phase": "ready",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2487,
-      "headSha": "5fdab9bfc63d791c1d291239591fa9089fba068d",
+      "headSha": "07a77f077c7879f690b47189bcfa6fbae8c7d3aa",
       "issueNumbers": [
         2369
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2369",
       "receiptRefs": [],
-      "note": "READY at 5fdab9b; needs e2e after #2483 gate"
+      "note": "READY at 5fdab9b; Opus MERGE; e2e-cli-gate armed"
     },
     {
       "id": "E2-2385",
@@ -619,14 +619,28 @@
     {
       "id": "D1-2290",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2492,
-      "headSha": "7d27bf03c53f6a7d705798ea38274ec1db226700",
+      "headSha": "4d1ebfb02b4d4f27e0637aa1c57cea44e0ed000f",
       "issueNumbers": [
         2290
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2290",
+      "receiptRefs": [],
+      "note": "READY at 4d1ebfb; e2e queued after #2487"
+    },
+    {
+      "id": "E2-2155",
+      "lane": "docs",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2494,
+      "headSha": "4d68d1f6a3932a6a6645382840802bba54eb5422",
+      "issueNumbers": [
+        2155
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2155",
       "receiptRefs": []
     }
   ],
@@ -700,6 +714,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS both tiers",
       "completedAt": "2026-10-31T04:12:20Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2487,
+      "headSha": "5fdab9bfc63d791c1d291239591fa9089fba068d",
+      "startedAt": "2026-10-31T04:14:25.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -898,7 +920,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T04:13:58.000Z",
+  "updatedAt": "2026-10-31T04:27:41.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1014,7 +1036,7 @@
     },
     {
       "issue": 2115,
-      "lane": "features",
+      "lane": "internals",
       "commentId": null,
       "postedAt": "2026-10-31T03:10:47Z",
       "route": "codex gpt-6.1-sol (continuation of #2151 worker)",
@@ -1045,7 +1067,16 @@
       "commentId": 6538837985,
       "postedAt": "2026-10-31T04:11:07.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "posted",
+      "state": "pr-open",
+      "pr": 2494
+    },
+    {
+      "issue": 2351,
+      "lane": "features",
+      "commentId": 6538963429,
+      "postedAt": "2026-10-31T04:24:12.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "started",
       "pr": null
     }
   ],

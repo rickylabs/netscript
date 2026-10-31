@@ -1,13 +1,13 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
 - H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
 - A1 #2165 MERGED #2477 7907293f3 23:31Z (closed); #2187 r1 → PR #2479 (implementing)
-- A2 #2395 MERGED #2483 1c9da73d0 (closed); #2351 unblocked → dispatch next
+- A2 #2395 MERGED #2483 1c9da73d0 (closed); #2351 started 04:2xZ (features)
 - A3 #2144 MERGED #2481 4aa734e2b (closed); #2400 → PR #2482 (continuation of #2438 worker); #2151 MERGED #2484 (closed); #2161: W2 (needs fixes slot)
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
 - B2 #2162 (after #2161) #2149: W3; #2369 → PR #2487 (implementing); #2108 (after B2 pair + all B1): W7
 - C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (after all B1): W7
 - D1 #2396: #2422 MERGED 727542963, #2423 MERGED 204a71b1e, #2421 (final) awaiting READY at new head 94393bc then e2e; post-canary published-graph proof owed; #2367 MERGED #2485 (closed); #2115 claimed by continuation 03:10Z (features); #2290 → PR #2492 (implementing); #2259: W3
-- E1 #2392 #2394 #2401: W4 · E2 #2385 MERGED #2489 (closed); #2155 #1491: W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
+- E1 #2392 #2394 #2401: W4 · E2 #2385 MERGED #2489 (closed); #2155 → PR #2494 (implementing); #1491: W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6
 - G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
 - H02 #2478 MERGED #2480 6a71cd059, Code quality green on main (closed)

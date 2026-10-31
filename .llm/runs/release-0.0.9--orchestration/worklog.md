@@ -86,3 +86,7 @@
 - 04:00:42Z: dispatched #2290 (D1, internals), comment 6538732825; started 04:03:59Z. #2155 (docs) is scripted for ~04:11Z after a claim check.
 - 04:12Z: **merged** #2483 (`1c9da73d0`) for #2395 (A2); #2395 closed; #2351 is unblocked (requires edge satisfied).
 - 04:13Z: **merged** #2489 (`ad252e8c8`) for #2385; #2385 closed. **Rule violation:** the #2385 leaf force-pushed (rebase) at 04:00:47Z. Contained: fresh MERGE at the new head `c3f2c46`, CI 33/33. Recorded in drift.md; the brief template now spells out merge-not-rebase.
+- 04:14Z: **expensive-gate.acquired** on #2487 (#2369) at `5fdab9b` (Opus MERGE at the head). #2155 posted 04:11:07Z. Builders are full (#2187, #2400, #2115, #2290, #2155); #2351 waits for a slot or a continuation claim.
+- 04:11:07Z: dispatched #2155 (E2, docs), comment 6538837985; started 04:15:23Z.
+- 04:23Z: #2492 (#2290) READY at `4d1ebfb` (packages/service auth only: 404 procedure_not_found / 410 procedure_retired for authenticated callers). e2e queued after #2487's gate (service runtime is in every generated service).
+- 04:24Z: dispatched #2351 (A2, features), comment 6538963429; #2115 moved back to internals (drift.md).
