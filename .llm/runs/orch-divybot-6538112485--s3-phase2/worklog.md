@@ -267,3 +267,19 @@ complete this slice before Overlays starts.
 
 Slice5 source de67b38 signed off; all four carrier freshness checks PASS after
 clean-source MCP regeneration. No lock churn. Push/comment closes this slice.
+
+## User-reported current CI build failure
+
+Paused Overlay research (no Overlay implementation yet). Currency gate confirms
+current-fail build at6b42a62, Pages run41171444610/job124450236782. Failed step
+was docs:exports-drift: published Fresh UI reference omitted new role vocabulary
+ACTION_MENU_ITEM_ROLES and ActionMenuItemRole. Added both to the actual public
+inventory and explained choice state, closeOnSelect and initialFocus behavior.
+Running the Pages export/snippet/build/link/caveat checks before repair push;
+no gate weakening or new product implementation in this repair.
+
+CI documentation repair independently PASS. Exact docs:exports-drift and
+docs:snippets PASS; full Lume build253 HTML PASS via prose generation;23734
+internal links resolve and13 caveat markers resolve. Prose regenerated. No source
+behavior, export or lock change. Clean-source corpus/publication and all carrier
+freshness checks follow this reviewed source commit before push.
