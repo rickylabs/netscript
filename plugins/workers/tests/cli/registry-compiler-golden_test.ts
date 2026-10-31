@@ -125,7 +125,7 @@ export const jobDefinitionsById: GeneratedJobDefinitionRegistry = Object.freeze(
   ["deep-job"]: createLocalJobDefinition("deep-job", "./nested/deep-job.ts", jobHandlersById["deep-job"]),
 });
 
-const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries(jobDefinitionsById)
+const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries<RegisterJobInput>(jobDefinitionsById)
   .map(([id, definition]) => [id, toRegisterJobInput(definition)]);
 
 export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);

@@ -7,3 +7,6 @@ Real no-samples saga KV / workers / triggers install, generate plugins and docto
 in ignored local-source fixture. S2 still owes required production startup proof and docs.
 No full runtime E2E locally, labels/milestones, merge or release; all remain coordinator-owned.
 Final issue report uses atomic Orchid handoff; final evaluator must attest exact pushed SHA.
+
+S1 golden expectation is included in the immediate follow-up commit after d2dd7cc; it was already
+validated and independently reviewed with the corresponding generator type fix.

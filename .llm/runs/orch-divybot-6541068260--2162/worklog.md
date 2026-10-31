@@ -62,3 +62,7 @@ with inherited cardinality warnings and a banner mistakenly counted as a slow-ty
 
 S1 reconcile: no intervening issue directives; draft #2509 remains review surface. S2 consumer
 startup is still required and no Aspire claim has been made.
+
+S1 commit-selection correction: the worker golden expectation was omitted from the explicit
+stage list although included in validation and independent review. Committing it immediately
+with this record; no source behavior changed and the same 64-test result covers the expectation.
