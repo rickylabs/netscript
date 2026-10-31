@@ -1,0 +1,37 @@
+{
+  "slice": 3,
+  "components": [
+    "radio-group",
+    "input-group",
+    "input-otp",
+    "slider"
+  ],
+  "catalogEntries": 104,
+  "shipped": 73,
+  "unshipped": 31,
+  "focusedTests": {
+    "passed": 121,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 60,
+    "failed": 0,
+    "newSeriousCriticalViolations": 0,
+    "freshBundle": true,
+    "pointerRedControl": "Old Slider stays100 when coincident endpoint thumb is dragged left; expected failure reproduced",
+    "pointerGreen": "Mouse drags separate both endpoints in all4 projects"
+  },
+  "qualityGate": "PASS",
+  "sourceCheck": 17,
+  "sourceLint": 6,
+  "sourceFormat": 17,
+  "browserCheck": [
+    3,
+    3
+  ],
+  "independentReview": [
+    "FAIL_FIX",
+    "PASS"
+  ],
+  "localLockChanges": false
+}

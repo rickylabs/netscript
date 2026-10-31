@@ -1533,15 +1533,8 @@
       "specId": "F6",
       "category": "Forms",
       "priority": "P0",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "checked": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
-        },
         "state": {
           "kind": "enum",
           "values": [
@@ -1558,43 +1551,63 @@
             "horizontal",
             "vertical"
           ]
+        },
+        "name": {
+          "kind": "text",
+          "required": true
+        },
+        "legend": {
+          "kind": "slot",
+          "required": true
+        },
+        "options": {
+          "kind": "collection",
+          "required": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "required": {
+          "kind": "boolean"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "control",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "indicator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -1602,6 +1615,9 @@
           "values": [
             "false",
             "true"
+          ],
+          "parts": [
+            "control"
           ]
         },
         "data-state": {
@@ -1612,7 +1628,11 @@
             "disabled",
             "invalid"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "root",
+            "control"
+          ]
         },
         "data-orientation": {
           "values": [
@@ -1642,7 +1662,8 @@
         "surface/card"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "Design checked belongs to individual Radio controls; the group public API uses value/defaultValue and native name. Disabled fieldset applies to every option."
       ]
     },
     {
@@ -1935,7 +1956,7 @@
       "specId": "F9",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "align": {
           "kind": "enum",
@@ -1956,37 +1977,36 @@
           ]
         },
         "control": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "addon": {
+          "kind": "slot"
+        },
+        "text": {
           "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "addon",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "control",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "text",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -2017,6 +2037,10 @@
         {
           "name": "addon",
           "part": "addon"
+        },
+        {
+          "name": "text",
+          "part": "text"
         }
       ],
       "apg": "native input group",
@@ -2026,7 +2050,8 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "For invalid state, callers supply aria-invalid and aria-describedby on the native control slot; a fieldset cannot propagate invalid semantics."
       ]
     },
     {
@@ -2034,7 +2059,7 @@
       "specId": "F10",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "length": {
           "kind": "enum",
@@ -2050,14 +2075,6 @@
             "2"
           ]
         },
-        "content": {
-          "kind": "enum",
-          "values": [
-            "empty",
-            "value",
-            "caret"
-          ]
-        },
         "state": {
           "kind": "enum",
           "values": [
@@ -2066,27 +2083,45 @@
             "disabled",
             "invalid"
           ]
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "required": {
+          "kind": "boolean"
+        },
+        "name": {
+          "kind": "text"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "group",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "slot",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "separator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         }
       ],
       "attributes": {
@@ -2107,6 +2142,9 @@
             "empty",
             "value",
             "caret"
+          ],
+          "parts": [
+            "slot"
           ]
         },
         "data-state": {
@@ -2116,13 +2154,30 @@
             "disabled",
             "invalid"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "root",
+            "slot"
+          ]
         }
       },
       "booleans": [],
       "slots": [],
       "apg": "native one-time-code input",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "ArrowLeft/ArrowRight/Home/End",
+          "action": "Move the native input selection"
+        },
+        {
+          "key": "Backspace/Delete",
+          "action": "Edit the native code input"
+        },
+        {
+          "key": "Paste",
+          "action": "Replace the native selection with sanitized digits"
+        }
+      ],
       "tokenRoles": [
         "border/input",
         "destructive/default",
@@ -2131,7 +2186,8 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "One real text input handles selection, autofill and form value; grouped slots are aria-hidden mirrors. content is slot anatomy, not a caller prop. Paste normalizes ASCII digits and preserves native selection replacement."
       ]
     },
     {
@@ -2139,7 +2195,7 @@
       "specId": "F11",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -2166,38 +2222,66 @@
         },
         "value": {
           "kind": "boolean"
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "labels": {
+          "kind": "collection"
+        },
+        "name": {
+          "kind": "text"
+        },
+        "min": {
+          "kind": "number",
+          "default": 0
+        },
+        "max": {
+          "kind": "number",
+          "default": 100
+        },
+        "step": {
+          "kind": "number",
+          "default": 1
+        },
+        "values": {
+          "kind": "collection"
+        },
+        "defaultValues": {
+          "kind": "collection"
+        },
+        "onValuesChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "track",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "range",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "thumb",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "value-label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -2244,7 +2328,9 @@
         "surface/card"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "value is the design value-label visibility boolean; numeric positions use values/defaultValues. One/two native range inputs keep shared min/max geometry and clamp crossing requests.",
+        "Coincident upper-half thumbs put the lower native input on top; at the lower half the upper input stays on top, so pointer users can separate endpoint thumbs."
       ]
     },
     {

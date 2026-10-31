@@ -94,3 +94,41 @@ Same reviewer round2 PASS. Source checks16 package files +2 browser spec/config
 +2 fixture/server pass;23-file fmt and focused lint pass. quality:gate, release
 preflight and docs:accuracy99/99 pass. No local lock changes. Utility light/dark
 captures retained; no pixel identity with Figma/CI claimed. Slice2 terminal PASS.
+
+## Slice3 — Forms primitives
+
+Native RadioGroup, InputGroup, InputOTP and Slider implemented and registered;
+73 shipped/31 remaining gaps. Radio uses fieldset/legend/named inputs; InputGroup
+keeps DOM and visual tab order aligned and uses disabled fieldset propagation.
+OTP has one real native code input with grouped aria-hidden slot mirrors,
+selection-aware sanitized paste and controlled refusal. Slider has one/two native
+ranges, shared min/max geometry and clamped crossing requests, with native key
+steps and form names. Design checked/content axes belong to controls/slots;
+operational group APIs are documented in contract notes. No backend/network code.
+
+114 contract tests PASS; generic consumer install/source/type/lint proof covers
+all7 registered gap items. Browser52/52 PASS, including actual clipboard paste,
+controlled rejection for radio/OTP/range, radio form values, disabled controls,
+tab order, native keys, two-thumb boundaries and vertical direction. Four
+width/scheme projects; zero serious/critical axe. New browser tests/config and
+fixture/server check3+3 PASS; source check5/lint6 PASS. Quality and independent
+review are running; slice not yet committed. Figma handoff5db9515 merged normally.
+
+Independent slice3 review FAIL_FIX: coincident native range thumbs could trap
+pointer users at the maximum. One corrective pass is adding a pointer regression
+and derived thumb stacking; capture the actual pre-fix failure, then rebuild and
+run all browser projects. Invalid form-control semantics will also be exercised.
+
+Slice3 repair proof: real pointer regression reproduced at coincident max100
+before the source change (lower stayed100), then passed at both max and min in
+all four browser projects. Final browser60/60 PASS; strict axe includes invalid
+radio/control error relationships. Final focused121 tests PASS. Same evaluator
+round2 and final source wrappers are pending. No new public stacking axis;
+native-input layering derives only from existing thumb values.
+
+Slice3 terminal PASS: same independent reviewer FAIL_FIX -> pointer/accessibility
+correction -> PASS. Final121 focused tests and60 rebuilt-source browser cases
+pass, including four actual pointer regressions and strict axe. Source check17
+and browser checks3+3 pass; source lint6/format17 pass; broader quality passes.
+No local token/dependency/lock changes. Source scope remains Forms primitives.
+Next is the Calendar/DatePicker slice, with a separate category review.

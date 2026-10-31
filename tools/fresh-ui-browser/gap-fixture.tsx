@@ -1,3 +1,4 @@
+import { Forms } from './gap-forms-fixture.tsx';
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
 import { ButtonGroup } from '../../packages/fresh-ui/registry/components/ui/button-group.tsx';
@@ -47,6 +48,7 @@ function Actions() {
         ))}
       </section>
       <button type='button' id='after'>After components</button>
+      <Forms />
     </main>
   );
 }
