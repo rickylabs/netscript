@@ -300,3 +300,9 @@
 - 14:49:30Z: **merged** #2541 (`8a2cbc1f3`) for #2068 (partial). The issue auto-closed through the linked-issue reference and was reopened with an explanation (EIS-Chat box pending Eric).
 - 14:51:43Z: #2542 (#1366) e2e RED at `99cda63`: gate generated.deno-fmt-check (generated project not fmt-clean). Steered the worker, removed the label; **expensive-gate.released**.
 - 14:52:01Z: Asked Cockpit and the Fresh UI lane to refresh #2408 (stale since 10-28; delivers #2406), or agree to a separate #2406 leaf.
+- 14:57:02Z: #2535 (#2108) Opus MERGE at `d92acd5`; waiting for READY.
+- 14:58:56Z: #2108 READY (PR #2535 at `d92acd5`): KV-only proof complete; Opus MERGE; **expensive-gate.acquired** on #2535 (B2 capstone, last canary .2 code item).
+- 15:05:29Z: #2542 (#1366) fmt fix `0a945ea` with Opus MERGE; e2e queued after #2535.
+- 15:07:35Z: #2535 (#2108) e2e RED at `d92acd5`: SQLite tier runtime.flow-b-fixture (workers-api resource lacks the Deno config argument). Steered the worker, removed the label; **expensive-gate.released**.
+- 15:07:46Z: **expensive-gate.acquired** on #2542 (#1366) at `0a945ea`.
+- 15:24:50Z: **merged** #2542 (`7312ba498`) for #1366 box 6; #1366 stays open (box 5 and consumer proof with Eric). The gate is free.

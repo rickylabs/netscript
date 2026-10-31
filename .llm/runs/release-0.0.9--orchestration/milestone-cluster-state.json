@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "8a2cbc1f34501e7b6137397877a7ed5b9a013102",
+  "currentMainSha": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -1184,12 +1184,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2535,
-      "headSha": "6a62a6fdb000fa045cb5e901aa64fe78c70cb374",
+      "headSha": "d92acd5ba42ed4d282f4f18d3ab8a9133f312fd1",
       "issueNumbers": [
         2108
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2108",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "e2e red at d92acd5: flow-b-fixture workers-api --config; steered"
     },
     {
       "id": "G1-1912",
@@ -1276,16 +1277,19 @@
     {
       "id": "G1-1366",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2542,
-      "headSha": "99cda632399925cf2431a1ba391b50e53de23f55",
+      "headSha": "0a945ea472c41157ceb808fa0a98bcc80439961b",
       "issueNumbers": [
         1366
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1366",
       "receiptRefs": [],
-      "note": "e2e red at 99cda63: generated.deno-fmt-check; steered"
+      "note": "box 6 crash-loop detection (sagas, triggers); READY + fixes (test-5, fmt) 0a945ea; Opus MERGE; 31/31 incl both runtime tiers",
+      "mergeCommit": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
+      "mergedAt": "2026-10-31T15:24:44Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-1366"
     },
     {
       "id": "G1-2068",
@@ -1669,6 +1673,26 @@
       "note": "e1c68e5 run cancelled by fix push; re-running at 99cda63",
       "result": "FAILURE generated.deno-fmt-check (both tiers) \u2014 product failure; label removed",
       "completedAt": "2026-10-31T14:50:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "complete",
+      "prNumber": 2535,
+      "headSha": "d92acd5ba42ed4d282f4f18d3ab8a9133f312fd1",
+      "startedAt": "2026-10-31T14:58:56Z",
+      "via": "label e2e-cli-gate",
+      "result": "FAILURE sqlite tier runtime.flow-b-fixture (workers-api missing --config arg) \u2014 product failure; label removed",
+      "completedAt": "2026-10-31T15:06:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "complete",
+      "prNumber": 2542,
+      "headSha": "0a945ea472c41157ceb808fa0a98bcc80439961b",
+      "startedAt": "2026-10-31T15:07:46Z",
+      "via": "label e2e-cli-gate (re-armed after fmt fix)",
+      "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
+      "completedAt": "2026-10-31T15:22:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1700,11 +1724,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:49:30Z",
-    "nextReportDueAt": "2026-10-31T15:49:30Z",
+    "lastReportAt": "2026-10-31T15:24:50Z",
+    "nextReportDueAt": "2026-10-31T16:24:50Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2541 (#2068 partial)",
-    "currentMainSha": "8a2cbc1f34501e7b6137397877a7ed5b9a013102",
+    "headline": "merged #2542 (#1366 box 6)",
+    "currentMainSha": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1890,7 +1914,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:51:44Z",
+  "updatedAt": "2026-10-31T15:24:50Z",
   "dispatches": [
     {
       "issue": 2438,
