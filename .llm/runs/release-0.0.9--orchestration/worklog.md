@@ -117,3 +117,6 @@
 - 05:55:21Z: #2259 started.
 - 05:58Z: **merged** #2498 (`3d83caf1c`) for #2115; #2115 closed.
 - 05:59Z: #2482 e2e green at `6597b64` but it now conflicts with main; steered via PR comment to merge main and re-READY. **expensive-gate.acquired** on #2497 (#2161).
+- 06:00Z: #2259 → PR #2501.
+- 06:06Z: #2499 (#2159) READY at `155051c`: slice 1 only (atomic applied key, envelope and transition; crash proofs on KV, Redis, Postgres and command-Postgres), Opus MERGE. Slice 2 (effects outbox) is deferred. Owner decision recorded: file the follow-up in Durable Background Work, then close #2159. e2e queued after #2497.
+- 06:09Z: #2259 (PR #2501, research-only draft) BLOCKED on a negative spike: Aspire 13.5.3 cannot mask composed connection strings. Owner decision posted on #2474 (recommend deferring to #2278). The leaf is blocked with an open decision record.

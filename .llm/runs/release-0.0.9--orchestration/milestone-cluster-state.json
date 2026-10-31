@@ -719,7 +719,7 @@
     {
       "id": "B1-2159",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2499,
       "headSha": "155051c5c1dce7f51a4cd583e919f3872a615ed6",
@@ -727,7 +727,22 @@
         2159
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2159",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY 155051c (slice 1; slice 2 split pending Eric); Opus MERGE; e2e queued after #2497"
+    },
+    {
+      "id": "D1-2259",
+      "lane": "internals",
+      "phase": "blocked",
+      "baseBranch": "main",
+      "prNumber": 2501,
+      "headSha": "f32e8a75e55a3419943f7227527ec29b7c7b76c4",
+      "issueNumbers": [
+        2259
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2259",
+      "receiptRefs": [],
+      "note": "negative spike: Aspire 13.5.3 cannot mask composed connection strings; owner decision on #2474 (defer to #2278 recommended)"
     }
   ],
   "expensiveGates": [
@@ -1048,7 +1063,32 @@
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
     },
-    "ownerDecisions": []
+    "ownerDecisions": [
+      {
+        "id": "2159-followup",
+        "question": "File the #2159 slice-2 follow-up \"feat(sagas): atomically persist and recover scheduled and cascaded effects\", and in which milestone?",
+        "recommendation": "File it in Durable Background Work (the plan scoped #2159 to its applied-key part for 0.0.9); close #2159 once filed.",
+        "costOfWrong": "If it should be in 0.0.9, B1 grows by one dependent leaf on saga-engine.ts and canary .2 slips.",
+        "askedAt": "2026-10-31T06:07:00Z",
+        "ref": "#2474",
+        "whyOwnerOnly": "Filing a new issue and choosing its milestone is an owner board decision.",
+        "blockedItems": [
+          2159
+        ]
+      },
+      {
+        "id": "2259-scope",
+        "question": "#2259: defer to Aspire 13.6 epic #2278, authorize an Aspire update, or scope an alternative credential-delivery design for 0.0.9?",
+        "recommendation": "Option 1: defer to #2278 (Backlog) with the spike evidence; option 3 if Eric wants it fixed in 0.0.9.",
+        "costOfWrong": "Option 1 ships 0.0.9 with the documented pre-existing exposure; option 3 adds about one large leaf.",
+        "askedAt": "2026-10-31T06:10:00Z",
+        "ref": "#2474",
+        "whyOwnerOnly": "Moving an issue out of 0.0.9 or authorizing an Aspire upgrade changes release scope.",
+        "blockedItems": [
+          2259
+        ]
+      }
+    ]
   },
   "exactMainEvidence": {
     "gitHead": "30c800958dbf512a4951d640f08748703a8b59e3",
@@ -1065,7 +1105,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T05:59:30.000Z",
+  "updatedAt": "2026-10-31T06:09:38.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1254,7 +1294,16 @@
       "commentId": 6539763986,
       "postedAt": "2026-10-31T05:51:43.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "started",
+      "state": "blocked",
+      "pr": 2501
+    },
+    {
+      "issue": 2267,
+      "lane": "features",
+      "commentId": 6539917426,
+      "postedAt": "2026-10-31T06:09:13.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "posted",
       "pr": null
     }
   ],
