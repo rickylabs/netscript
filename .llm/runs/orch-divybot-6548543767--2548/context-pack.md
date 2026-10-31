@@ -9,3 +9,5 @@ REVIEW REQUIRED: two independent Claude source rounds returned FAIL_FIX; their F
 Local scaffold.runtime unproven: no Docker daemon; Aspire doctor fails before startup. Foreign leak-check resources left untouched. Runtime CI on ordinary PRs requires opt-in labels; owner forbids labels.
 
 No merge, publication, labels, rebase, force-push, or assignment-file commit. PR uses Refs #2548 only. Final visible GitHub report is atomically queued via excluded .divybot-final-report.tmp → .divybot-final-report.md; Orchid posts it, and file creation alone does not prove publication.
+
+Continuation added full production stable-freshness positive/negative verification on source e9236a3; see reports/stable-freshness-production.json and completion-audit.md. Default production verifier accepts clean source and rejects a committed stale compressed carrier at registry:embed:check. No publisher invoked. No owner decision or new review appeared; exhausted evaluator loop remains the blocking condition.

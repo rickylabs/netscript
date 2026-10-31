@@ -70,3 +70,11 @@ Final focused release/specifier/publication wrapper suite: **92 passed, 0 failed
 Source hashes in reports/source-hashes.json identify the validated implementation independently of later run-artifact commits. Evaluation decision: both source-review findings repaired, no third evaluation under supplied leaf stop rule. Draft implementation delivery is **review-required**, never self-signed-off or READY.
 
 Reconcile: source scope includes release staging and stable freshness dependencies found by independent review; no labels, no merge, no publication. Canonical final report will use the excluded atomic file handoff to Orchid.
+
+## Continuation — production stable-freshness proof
+
+Revalidated PR #2549 remains open draft at e9236a3, with no new independent review or owner decision; main fetch shows no conflicts. Source hashes match the tested implementation. Previous turn classified as progress.
+
+Executed assertPreparedReleaseGeneratedOutputsFresh with its default production dependencies in a disposable clean checkout: exit 0. Then changed only the encoded registry carrier to contain a stale sdk pin, committed that fixture only inside the disposable clone, and ran the entire production verifier again. It rejected at registry:embed:check with Stale embedded registry assets; the expected-rejection harness exited 0. No publication invoked. See reports/stable-freshness-production.json and completion-audit.md.
+
+Independent PASS and non-draft CI remain unproven. The two-failure stop is still in force; no third evaluator or READY claim.
