@@ -836,7 +836,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T03:26:46.000Z",
+  "updatedAt": "2026-10-31T03:37:33.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -957,6 +957,15 @@
       "postedAt": "2026-10-31T03:10:47Z",
       "route": "codex gpt-6.1-sol (continuation of #2151 worker)",
       "state": "claimed",
+      "pr": null
+    },
+    {
+      "issue": 2385,
+      "lane": "docs",
+      "commentId": 6538461367,
+      "postedAt": "2026-10-31T03:33:22.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "started",
       "pr": null
     }
   ],
