@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-streams",
-  "version": "0.0.8",
+  "version": "0.0.9-canary.1",
   "description": "Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.",
   "license": "Apache-2.0",
   "exports": {
@@ -14,11 +14,11 @@
     "./service": "./services/mod.ts"
   },
   "imports": {
-    "@netscript/aspire": "jsr:@netscript/aspire@0.0.8",
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.8",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.8",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8",
-    "@netscript/service": "jsr:@netscript/service@0.0.8",
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.9-canary.1",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.9-canary.1",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.9-canary.1",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.9-canary.1",
+    "@netscript/service": "jsr:@netscript/service@0.0.9-canary.1",
     "@std/net": "jsr:@std/net@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.13.13",
