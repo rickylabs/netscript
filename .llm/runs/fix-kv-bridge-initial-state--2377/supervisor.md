@@ -13,3 +13,5 @@ Workflow retained from the owner-authorized milestone leaf process: separate rea
 - .llm/runs/fix-kv-bridge-initial-state--2377/**: plan, research, design, evaluations, evidence, memory and dated lesson.
 
 Retain prior run artifacts. No lock/dependency churn, no labels/milestones or coordinator control-plane mutation, no merge/tag/release. No local scaffold.runtime or expensive-gate overlap. Public artifacts omit operator paths, hostnames, ports and session ids. Native runner evidence stays outside the Git tree.
+
+PLAN-EVAL implementation scope refinement: new dedicated `packages/kv/tests/bridge-watch-initial_test.ts` replaces extending the already 384-line initial-watch suite with unrelated third-party fallback cases. No source or runtime scope change.

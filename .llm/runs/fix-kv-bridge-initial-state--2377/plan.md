@@ -10,7 +10,7 @@
 
 ## Slices
 
-S0: run plan/research/design and early draft PR. S1: adapters/denokv-bridge.ts and tests/watch-initial_test.ts (bridge_test.ts only if needed), with local regression/negative-control/quality evidence, independent slice review, normal commit/push and phase comment. Closure includes dated lesson/context; final exact-head review recorded in PR timeline after readiness to preserve reviewed SHA.
+S0: run plan/research/design and early draft PR. S1: adapters/denokv-bridge.ts and tests/bridge-watch-initial_test.ts (existing bridge/watch suites unchanged), with local regression/negative-control/quality evidence, independent slice review, normal commit/push and phase comment. Closure includes dated lesson/context; final exact-head review recorded in PR timeline after readiness to preserve reviewed SHA.
 
 ## Proof / gates
 
