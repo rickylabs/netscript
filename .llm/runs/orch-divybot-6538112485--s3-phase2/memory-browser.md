@@ -42,3 +42,5 @@ Utility text. A scoped existing-role pair can satisfy AA without palette changes
 but record the visual divergence and let the token workstream own the canonical fix.
 
 2026-10-31 A desktop viewport is not touch coverage. Touch may emit pointerenter and focus before click, causing hover/focus opening to be toggled closed by click. Preview only mouse pointer events, suppress focus opening during a pointer press, and exercise real hasTouch/tap plus a delay beyond the close grace. Keep ordinary keyboard focus opening and desktop hover/click transitions covered separately.
+
+Parallel worktrees can collide on the default gap-server port. Set FRESH_UI_GAP_PORT to a free per-run port; gap.playwright.config.ts validates it and passes it consistently to baseURL/server command/health URL. Keep reuseExistingServer=false so another checkout cannot supply stale source. Leave an occupied server alone unless resource ownership is positively proven. Native leak-check writes a detailed report to its slice directory, so use the private evidence directory and commit only verdict/counts.

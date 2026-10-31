@@ -29,8 +29,20 @@ export const POST_V1_COMPONENTS: readonly string[] = [
 export const POST_V1_SUPPORT: readonly string[] = ['calendar-date', 'menu-items'];
 
 /** Existing copies missing only their actual package runtime dependency. */
-export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = ['command-palette', 'code-block'] as const;
+export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = [
+  'command-palette',
+  'code-block',
+  'pagination',
+] as const;
 
 /** The registry and its package-owned runtime must install at the same release. */
 export const FRESH_UI_RUNTIME_DEPENDENCY: string =
   `jsr:@netscript/fresh-ui@${FRESH_UI_PACKAGE_VERSION}`;
+
+/** Updated baseline copies also receive real consumer install/type-check coverage. */
+export const AUDITED_BASELINE_COMPONENTS: readonly string[] = [
+  'code-block',
+  'label',
+  'card',
+  'pagination',
+];

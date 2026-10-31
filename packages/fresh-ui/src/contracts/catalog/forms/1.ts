@@ -23,6 +23,8 @@ export const forms_1: readonly ComponentContract[] = [
           'disabled',
           'invalid',
         ],
+        'description':
+          'Presentation snapshot; the associated control owns disabled/invalid semantics.',
       },
       'children': {
         'kind': 'slot',
@@ -37,6 +39,11 @@ export const forms_1: readonly ComponentContract[] = [
       },
       'optional': {
         'kind': 'boolean',
+      },
+      'optionalText': {
+        'kind': 'slot',
+        'description':
+          'Optional hint content; rendered when optional is true and required is false.',
       },
     },
     'parts': [
@@ -67,9 +74,6 @@ export const forms_1: readonly ComponentContract[] = [
           'default',
           'eyebrow',
         ],
-        'plannedValues': [
-          'eyebrow',
-        ],
       },
       'data-state': {
         'values': [
@@ -80,14 +84,36 @@ export const forms_1: readonly ComponentContract[] = [
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
       },
+      'data-sr-only': {
+        'values': [
+          'false',
+          'true',
+        ],
+        'default': 'false',
+      },
     },
     'booleans': [
       'required',
       'optional',
+      'srOnly',
     ],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'children',
+        'part': 'text',
+      },
+      {
+        'name': 'optionalText',
+        'part': 'optional-hint',
+      },
+    ],
     'apg': 'native label',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Move between associated controls; the label adds no focus target',
+      },
+    ],
     'tokenRoles': [
       'destructive/text',
       'text/fg',
@@ -95,6 +121,7 @@ export const forms_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Required wins over optional. srOnly preserves the native accessible label and suppresses its decorative required mark.',
     ],
   },
   {
