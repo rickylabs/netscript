@@ -99,3 +99,9 @@ doctor exit code. Six focused tests pass, including diagnostic exit-code and red
 
 Reconcile: this is diagnostic progress, not a runtime repair or full-goal completion. Effects remain
 unimplemented. No local full scaffold runtime, lock changes, label changes or merge action performed.
+
+Diagnostic follow-up at 4824597 includes a normal main merge. Focused tests and corpus freshness
+still pass after that merge. Real isolated Redis startup/health proof also passes. Hosted quality
+finds the Aspire surface inventory stale because of the new diagnostic and generated-runner test;
+native regeneration adds exactly those two paths. Repaired parity checks 994 paths with zero failures.
+Keep this inventory repair local until the running diagnostic E2E completes so its evidence survives.

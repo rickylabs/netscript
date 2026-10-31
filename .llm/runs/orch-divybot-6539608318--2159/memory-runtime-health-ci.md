@@ -14,3 +14,11 @@ Six focused generated-process, diagnostic/redaction and existing gate tests pass
 
 CI checks the PR merge ref, which includes newer main queue/registry changes absent from the branch.
 Align with main by a normal merge before final review, never rebase or force-push.
+
+Normal main merge and diagnostic push are 4824597. An isolated native Redis process also boots the
+generated runner and retains a valid ready payload. Latest merged PRs #2496 and #2497 each have green
+Postgres/SQLite runtime checks, a more recent comparison than the older main-branch workflow run.
+
+Adding an Aspire-related diagnostic or test changes the tracked surface inventory. Regenerate with
+aspire-surface-manifest.ts and run check:aspire-version-parity; the two added paths are the entire
+generated diff. Local repaired parity is fresh, 994 paths checked, zero failures. No version bump.
