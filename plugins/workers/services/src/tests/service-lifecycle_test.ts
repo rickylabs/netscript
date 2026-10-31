@@ -2,7 +2,7 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { stripAnsiCode } from 'jsr:@std/fmt@1/colors';
 import { fromFileUrl } from '@std/path';
-import { createSandbox } from './service-test-fixture.ts';
+import { createSandbox } from './test_utils/service-test-fixture.ts';
 
 const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const SUCCESS_MARKER = 's3e-caller-abort: assertions and cleanup settled';

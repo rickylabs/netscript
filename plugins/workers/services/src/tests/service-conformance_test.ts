@@ -10,7 +10,7 @@
 
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl } from '@std/path';
-import { createSandbox } from './service-test-fixture.ts';
+import { createSandbox } from './test_utils/service-test-fixture.ts';
 
 const PUBLIC_SUBPATH = '@netscript/plugin-workers/service';
 const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));

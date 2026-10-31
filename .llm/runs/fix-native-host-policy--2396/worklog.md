@@ -139,3 +139,26 @@ documentation errors remain explicitly FAIL, with exact normalized comparison. N
 scaffold runtime, label edit, lock churn, release, merge or private transcript is included.
 Source is ready for independent preliminary implementation review. Final review will use the
 exact pushed head; CI cannot be claimed green while draft.
+
+Independent IMPL round1: CHANGES at6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e.
+The sole blocker is workers service-test-fixture.ts matching services/**/*.ts but missing
+existing publish exclusions. All other source/migration behavior was accepted; draft CI was
+correctly unproven and not counted as a source blocker. Both proposed postpublish/metadata
+debts and unchanged native facade debts were accepted. Exact fix scope before editing: move
+services/src/tests/service-test-fixture.ts into that directory's test_utils/ child and update
+its four local imports. This reuses existing publish exclusions without adding any filter or
+changing fixture logic, tests, source cap or API. Re-run native worker tests, scoped wrappers,
+workers dry-run and native pack file-list inspection, then re-steer the same evaluator.
+
+IMPL round1 blocker repaired: workers helper now lives under the existing excluded
+services/src/tests/test_utils/ convention. No publication filter was changed. Native JSR
+dry-run debug included-file inspection proves92 intended files, both factory/legacy entries
+and no tests/helper; sanitized list is publish-file-list.json. Full workers tests148/0/0,
+all6 current worker helper/test files check, worker lint/fmt131/131 and full quality/architecture
+PASS. Streams source/tests remain byte-identical to the83 passing controls in the prior full
+231/0/0 union. Both proposed debt entries are now marked independently DEBT_ACCEPTED at
+the exact round1 head; no bounds, expiry, runtime gate or numeric facade verdict was relaxed.
+
+Same independent evaluator must now review this corrected pushed head. Round1 found no other
+source blocker. CI is still draft/unproven. Final acceptance-evidence.md maps all eight issue
+entries, with published graph and runtime CI limits explicit.

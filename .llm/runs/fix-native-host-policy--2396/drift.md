@@ -50,3 +50,13 @@ Update parent-relative module URLs, plugin-root resolution and fixture imports o
 all assertions, test names, budgets, permissions, fixture content and public source. This exact
 path relocation is allowed scope; no new F16 exception or scan exclusion is introduced.
 Historical records retain their original source paths; final evidence will use current paths.
+
+Independent IMPL round1: CHANGES at6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e.
+The sole blocker is workers service-test-fixture.ts matching services/**/*.ts but missing
+existing publish exclusions. All other source/migration behavior was accepted; draft CI was
+correctly unproven and not counted as a source blocker. Both proposed postpublish/metadata
+debts and unchanged native facade debts were accepted. Exact fix scope before editing: move
+services/src/tests/service-test-fixture.ts into that directory's test_utils/ child and update
+its four local imports. This reuses existing publish exclusions without adding any filter or
+changing fixture logic, tests, source cap or API. Re-run native worker tests, scoped wrappers,
+workers dry-run and native pack file-list inspection, then re-steer the same evaluator.

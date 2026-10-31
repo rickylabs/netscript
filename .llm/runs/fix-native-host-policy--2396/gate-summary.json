@@ -172,6 +172,24 @@
       "outcome": "PASS",
       "exitCode": 0,
       "durationMs": 15095
+    },
+    {
+      "receipt": "fixture-quality.json",
+      "gateId": "quality-gate",
+      "gitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "actualGitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17444
+    },
+    {
+      "receipt": "fixture-publish-workers.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "actualGitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13509
     }
   ],
   "rootCheck": {
@@ -251,5 +269,28 @@
   "prerequisiteEvidence": {
     "service": ".llm/runs/fix-native-service-policy--2396/gate-summary.json",
     "readerHeaders": ".llm/runs/fix-browser-stream-headers--2396/gate-summary.json"
+  },
+  "fixtureCorrection": {
+    "workersTests": {
+      "passed": 148,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 148,
+      "uniqueFailures": 0
+    },
+    "sourceCheckFiles": 6,
+    "workersLintFmtFiles": 131,
+    "findings": 0,
+    "testHelperExcludedFromNativeJsrIncludedFileList": true,
+    "includedFileCount": 92,
+    "fileList": "publish-file-list.json",
+    "streamsUnchangedTests": 83
+  },
+  "independentPreliminaryReview": {
+    "head": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+    "verdict": "CHANGES",
+    "blockers": 1,
+    "blocker": "Published worker test helper; corrected in this slice",
+    "debtDecisions": "Accepted unchanged facade, postpublish and bounded metadata entries"
   }
 }

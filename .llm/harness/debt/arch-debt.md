@@ -3092,8 +3092,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   A local graph and publication dry-run cannot prove a JSR consumer before that version exists.
 - **Owner:** 0.0.9 release coordinator, tracked by #2474, with repository maintainer rickylabs.
 - **Target:** First exact 0.0.9 canary containing #2396, necessarily before stable publication.
-- **Status:** Proposed `DEBT_ACCEPTED` under `.llm/harness/gates/release-gates.md`; requires
-  independent implementation acceptance. No production consumer PASS is claimed.
+- **Status:** Open, `DEBT_ACCEPTED` by independent implementation round1 at
+  `6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e` under `.llm/harness/gates/release-gates.md`.
+  No production consumer PASS is claimed.
 - **Cost:** One release-owned published CLI/plugin runtime run plus exact public factory imports;
   stable readiness remains blocked until that real graph passes.
 - **Scope:** Post-publish graph proof only. No waiver for pre-merge check/tests, native policy,
@@ -3115,7 +3116,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   obligation; unrelated source moves are outside this startup policy change.
 - **Owner:** Workers package maintainers with the 0.0.9 coordinator, #2474.
 - **Target:** Package layout review before 0.0.9 stable, no later than 2026-11-10. No renewal or growth.
-- **Status:** Proposed `DEBT_ACCEPTED`; independent implementation review must accept it.
+- **Status:** Open, `DEBT_ACCEPTED` by independent implementation round1 at
+  `6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e`; see the issue2396 run evaluate-round-1.md.
 - **Cost:** One additional metadata entry and its advisory; no runtime or type-system cost.
 - **Closing gate:** Consolidate the workers package-root layout to cap 12 while preserving every
   public export and release note; pass publication dry-run and all native consumer tests.

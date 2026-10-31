@@ -11,7 +11,11 @@
 
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl } from '@std/path';
-import { CHILD_OUTPUT_CAP, type ChildRun, createSandbox } from './service-test-fixture.ts';
+import {
+  CHILD_OUTPUT_CAP,
+  type ChildRun,
+  createSandbox,
+} from './test_utils/service-test-fixture.ts';
 
 const PUBLIC_SUBPATH = '@netscript/plugin-workers/service';
 const PUBLIC_MODULE = new URL('../../mod.ts', import.meta.url).href;
