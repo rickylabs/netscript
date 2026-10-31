@@ -120,7 +120,7 @@ export type SagaRuntimeCorrelationWrite = Readonly<{
   instanceId: string;
 }>;
 
-/** Existing #1932 replay-marker delegate; conflict-ignore inserts keep replays transactional. */
+/** Replay-marker delegate shared with worker commands; conflict-ignore inserts keep replays transactional. */
 export type SagaRuntimeAppliedKeyDelegate = Readonly<{
   findUnique(
     args: {

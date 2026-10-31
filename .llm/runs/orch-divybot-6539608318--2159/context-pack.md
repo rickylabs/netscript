@@ -28,3 +28,7 @@ and KV/Redis/Postgres crash proofs after commit/before dispatch. Do not claim fu
 Generated public API corpus refreshed natively after source commit 53413b0. Only the existing
 export-surface-corpus.generated.ts artifact changes outside the saga/run scope. Next evaluator
 must inspect the resulting full pushed head, including generated metadata.
+
+Continuation: root CI found test-5/test-6 failures omitted by the package-only suite. Two service
+fixtures need createProjectingSagaStore instead of the legacy constructor, and the public JSDoc
+codename scanner rejects the issue-number reference. Repairing these before full effects work.

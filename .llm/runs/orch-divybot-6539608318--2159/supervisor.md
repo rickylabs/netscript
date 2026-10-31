@@ -20,3 +20,6 @@ implementation 5. Reuse evaluator across rounds; final evaluation names exact pu
 Generated write-surface extension: packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts.
 The existing public-export freshness gate requires regenerating this artifact after the source
 commit; no MCP behavior or unrelated export changes are authorized.
+
+CI repair write-surface extension: plugins/sagas/services/src/prisma-retention_test.ts.
+The service/API regression must use the atomic-capability-preserving projection factory.

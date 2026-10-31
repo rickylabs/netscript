@@ -63,3 +63,17 @@ No hand-edited generated content. This follow-up commit includes the required ru
 Reconcile: PR body describes the final atomic scope, true local gates and the single effects
 follow-up. No taxonomy mutation. Next: exact-pushed-head review, ready transition, final review and
 READY file handoff; applicable CI and e2e-cli status must be stated truthfully.
+
+## CI repair — test-5 / test-6
+
+Latest goal continuation retains the full original effects objective; previous turn is classified
+progress (three pushed commits plus real-adapter and negative-control evidence), not completion.
+PR-head CI artifacts identify three failures in two shards: two service fixtures still instantiate
+the granular ProjectingSagaStore, losing canonical atomic capabilities, and published JSDoc names
+an internal issue id. Migrate those service fixtures to createProjectingSagaStore and remove the
+internal issue reference from the public API comment. No acceptance or tests are weakened.
+
+CI repair validation: all seven tests covering both failed service cases and the whole published
+JSDoc policy pass (0 failures), with structured scoped check/lint clean. The aggregate check-test
+failure reports the same test-5/test-6 failures; all other shard checks pass at the original head.
+Reconcile: repair preserves canonical atomic capability, HTTP scheduling and query-model retention.
