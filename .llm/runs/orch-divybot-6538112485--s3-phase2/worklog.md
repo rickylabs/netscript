@@ -215,3 +215,7 @@ reviewer round2 PASS. Native browser-forced repeated Escape is documented as a
 platform limitation; normal controlled rejection, native focus and submission
 are covered. Local Linux screenshots reviewed against Utility handoff anatomy
 and retained under review/. No cross-platform pixel-identity claim.
+
+Slice4 source committed; clean-source MCP corpus and all four carrier freshness
+checks PASS. Docs build253 HTML/97 registry artifacts; no docs lock churn.
+Push/comment completes this slice; next is Navigation.
