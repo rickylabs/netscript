@@ -84,7 +84,7 @@
   "qualityArchitecture": {
     "verdict": "PASS",
     "exitCode": 0,
-    "scope": "Source working-tree gate before source commit; refreshed committed-head evidence follows"
+    "sourceCommit": "d4d330a5b4b90321e8d4e6a1272405a708cecb9a"
   },
   "preflight": "PASS",
   "docsAccuracy": "PASS",
@@ -97,13 +97,39 @@
   "nativeMemberPublishDryRun": {
     "verdict": "PASS",
     "exitCode": 0,
-    "slowTypes": 0
+    "slowTypes": 0,
+    "sourceCommit": "d4d330a5b4b90321e8d4e6a1272405a708cecb9a"
   },
   "publicationAudit": "slice10a-publication-audit.json",
   "independentDesignReview": "PASS_AFTER_ROUND1_ACCESSIBILITY_FIX",
   "independentSourceReview": "PASS",
-  "independentEvidenceReview": "PENDING",
-  "carriers": "PENDING_AFTER_SOURCE_COMMIT",
+  "independentEvidenceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
   "inventory": {
     "total": 104,
     "shipped": 94,
@@ -113,5 +139,12 @@
   "runtime": "NEW_HEAD_UNPROVEN",
   "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
   "wholePhase2b": "IN_PROGRESS",
-  "ready": false
+  "ready": false,
+  "sourceCommit": "d4d330a5b4b90321e8d4e6a1272405a708cecb9a",
+  "generatedCarriersAfterSource": [],
+  "reviewThreads": {
+    "pr": 2538,
+    "verdict": "PASS",
+    "unanswered": 0
+  }
 }

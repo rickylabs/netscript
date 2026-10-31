@@ -257,3 +257,26 @@ layout wrapper has no data axis; canonical bindings remain on declared parts.
 Source26files, inventory104/94/10/123; no lock churn. Reconciled reviewed source
 against the current branch; source commit and committed-head carrier/quality/
 publication checks are next. No next-unit product code started.
+
+
+## AI10a committed-source gates
+
+Source d4d330a5 is committed:26 source/carrier files and8 run files. Canonical
+corpus/publication generation and all four freshness checks PASS at that source;
+raw git reports no generated source delta. Refreshed durable quality/architecture
+receipt matches the actual committed head and PASS; native member publication
+refresh PASS,0 slow types. No product/carrier/lock changes after source commit.
+The same independent evidence evaluator is next. Inventory104/94/10/123 remains
+accurate; whole assignment in progress, runtime/current required CI unproven.
+
+
+## AI10a terminal reconciliation
+
+Same independent evidence review PASS at source d4d330a5. All committed-source
+carriers and refreshed quality/publication evidence reconcile with reviewed bytes;
+there is no generated source delta and no maintained product edit after source.
+Review-thread gate passes0 unanswered. Evidence-only commit records the verdict.
+The mandatory public audit must pass before the normal push and PR2538 comment.
+Next implementation unit is AI10b MessageScroller/Questionnaire, with a fresh
+seven-item checkpoint and the same evaluator design gate before product edits.
+Remaining scope is still required; no READY and no runtime/remote-CI green claim.
