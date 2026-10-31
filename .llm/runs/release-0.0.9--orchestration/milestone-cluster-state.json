@@ -1782,10 +1782,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T17:30:41Z",
-    "nextReportDueAt": "2026-10-31T18:30:41Z",
-    "lastReportRef": "worklog.md",
-    "headline": "merged #2536 (#2409)",
+    "lastReportAt": "2026-10-31T17:31:08Z",
+    "nextReportDueAt": "2026-10-31T18:31:08Z",
+    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
+    "headline": "status 6: 48 merged / 44 closed; remaining all Eric/Fresh UI/release-owned",
     "currentMainSha": "19bca622338b7ac79913def27d17051b097329b6",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -1972,7 +1972,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T17:30:42Z",
+  "updatedAt": "2026-10-31T17:31:08Z",
   "dispatches": [
     {
       "issue": 2438,

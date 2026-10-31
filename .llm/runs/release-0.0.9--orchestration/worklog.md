@@ -317,3 +317,4 @@
 - 17:14:47Z: #2409 r1 started 17:13Z.
 - 17:18:29Z: #2536 r1 READY at `b4742da` (merge main + regenerated carrier); coordinator Opus delta review VERDICT: MERGE `b4742da` (receipt). Waiting for CI and e2e at the new head.
 - 17:30:41Z: **merged** #2536 (`19bca6223`) for #2409 (F1); #2409 closed with evidence.
+- 17:31:08Z: status 6 posted on #2474: consolidated decision table for Eric (#2159 #2259 #1655 #2185 #2268 #1366 #2068 #2233); #2406 waits on the Fresh UI lane; #2396 on the first published canary.
