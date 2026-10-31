@@ -287,3 +287,7 @@
 - 14:25:13Z: #2537 (#1912) parity fix `74790b4` with Opus MERGE; waiting for CI.
 - 14:32:47Z: **merged** #2533 (`9fc6d01fa`) for #2379 (F1); #2379 auto-closed, evidence posted. #2373 stays open (its worker continues on #1655).
 - 14:33:09Z: dispatched #2185 (G1 box 5: one local scaffold.runtime run on a local Docker engine), comment 6544753737; **expensive-gate.acquired** (reserved) for it. Validator green.
+- 14:33:32Z: #2542 (#1366) Opus MERGE at `e1c68e5`; waiting for READY.
+- 14:35:23Z: #1366 READY (PR #2542, box 6), Opus MERGE `e1c68e5`; e2e queued after the #2185 local gate.
+- 14:37:28Z: #1655: option B fails for WorkersContractDefinition (NetScript-owned). Decision for Eric posted on #2474 (recommend moving it out of 0.0.9 and keeping the debt rows with an upstream trigger). Leaf blocked with the decision record. #2185 started 14:36Z.
+- 14:38:02Z: **merged** #2537 (`45c7d5880`) for #1912 (G1 box 8).

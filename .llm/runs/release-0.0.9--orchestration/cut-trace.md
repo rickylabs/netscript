@@ -47,3 +47,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 14:05 | `da8151643` | #2529 | #2269 | W5 (E2) | one docs corpus owned by @netscript/mcp/docs; scoped F-16 debt accepted |
 | 2026-10-31 14:16 | `19a677ece` | #2534 | #2390 | W7 (C1) | investigation closed: stall no longer reproduces on main |
 | 2026-10-31 14:32 | `9fc6d01fa` | #2533 | #2379 | W6 (F1) | continuation of the #2373 worker |
+| 2026-10-31 14:37 | `45c7d5880` | #2537 | #1912 | W7 (G1) | published generated-surface smoke Linux + Windows |

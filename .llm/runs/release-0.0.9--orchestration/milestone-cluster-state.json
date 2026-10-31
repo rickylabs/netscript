@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "9fc6d01fa5aca89893d3355484c8e384addd5720",
+  "currentMainSha": "45c7d58803dc2659f4a81e628729488f0b569bd9",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -140,7 +140,10 @@
     },
     {
       "number": 1912,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2537 45c7d5880 + box 8 evidence"
+      ]
     },
     {
       "number": 2068,
@@ -1185,7 +1188,7 @@
     {
       "id": "G1-1912",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2537,
       "headSha": "74790b41707bd5889f24bce2f258f32bfdfb2574",
@@ -1194,7 +1197,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1912",
       "receiptRefs": [],
-      "note": "parity fix 74790b4; Opus MERGE; CI pending"
+      "note": "box 8 published smoke Linux+Windows; PR adds e2e-cli-prod job + script; Opus MERGE at 74790b4; 25/25",
+      "mergeCommit": "45c7d58803dc2659f4a81e628729488f0b569bd9",
+      "mergedAt": "2026-10-31T14:37:58Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-1912"
     },
     {
       "id": "F1-2375",
@@ -1233,16 +1239,16 @@
     {
       "id": "G1-1655",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
       "prNumber": 2539,
-      "headSha": "d615b7fbb93b373d29cc996c0932409db11aac28",
+      "headSha": "da47496133bbbdd3942294edd0f0cf41496e4487",
       "issueNumbers": [
         1655
       ],
       "implementerAgentId": "codex-gpt-6.1-sol (continuation chain of the #2373 worker)",
       "receiptRefs": [],
-      "note": "BLOCKED \u2192 coordinator decision B (doctrine 02 oRPC boundary exception, traced)"
+      "note": "BLOCKED: WorkersContractDefinition is NetScript-owned (not covered by doctrine 02); decision for Eric posted on #2474 (recommend move out of 0.0.9)"
     },
     {
       "id": "F1-2379",
@@ -1264,7 +1270,7 @@
     {
       "id": "G1-1366",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2542,
       "headSha": "e1c68e5e7a666ab2abc9d8ba728375ef6d8417b0",
@@ -1272,7 +1278,8 @@
         1366
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1366",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY box 6; Opus MERGE e1c68e5; e2e queued after the #2185 local gate"
     }
   ],
   "expensiveGates": [
@@ -1657,11 +1664,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:32:47Z",
-    "nextReportDueAt": "2026-10-31T15:32:47Z",
+    "lastReportAt": "2026-10-31T14:38:12Z",
+    "nextReportDueAt": "2026-10-31T15:38:12Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2533 (#2379)",
-    "currentMainSha": "9fc6d01fa5aca89893d3355484c8e384addd5720",
+    "headline": "merged #2537 (#1912 closed)",
+    "currentMainSha": "45c7d58803dc2659f4a81e628729488f0b569bd9",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1847,7 +1854,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:33:09Z",
+  "updatedAt": "2026-10-31T14:38:12Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2315,8 +2322,9 @@
       "commentId": 6544753737,
       "postedAt": "2026-10-31T14:33:09Z",
       "route": "codex gpt-6.1-sol medium",
-      "state": "posted",
-      "pr": null
+      "state": "started",
+      "pr": null,
+      "startedAt": "2026-10-31T14:36:14Z"
     }
   ],
   "coordinatorArtifactPr": 2475,
