@@ -10,7 +10,7 @@ import { h } from 'preact';
 import type { ComponentChildren, JSX } from 'preact';
 
 /*!
- * arrow-left and arrow-right paths: Lucide / Feather.
+ * arrow-left, arrow-right, bell, circle-check and circle-alert paths: Lucide / Feather.
  * https://github.com/lucide-icons/lucide/tree/main/icons
  *
  * ISC License
@@ -52,12 +52,18 @@ export const ICON_PATHS = {
   'alert-triangle': ['M12 3 22 21H2Z', 'M12 9v4', 'M12 17h.01'],
   'arrow-left': ['m12 19-7-7 7-7', 'M19 12H5'],
   'arrow-right': ['M5 12h14', 'm12 5 7 7-7 7'],
+  bell: [
+    'M10.268 21a2 2 0 0 0 3.464 0',
+    'M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326',
+  ],
   calendar: ['M3 5h18v16H3Z', 'M8 3v4', 'M16 3v4', 'M3 11h18'],
   check: ['M20 6 9 17l-5-5'],
   'chevron-down': ['M6 9l6 6 6-6'],
   'chevron-left': ['M15 18l-6-6 6-6'],
   'chevron-right': ['M9 18l6-6-6-6'],
   'chevron-up': ['M18 15l-6-6-6 6'],
+  'circle-alert': ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z', 'M12 8v4', 'M12 16h.01'],
+  'circle-check': ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z', 'm16 9-5.5 5.5L8 12'],
   copy: [
     'M8 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z',
     'M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2',
