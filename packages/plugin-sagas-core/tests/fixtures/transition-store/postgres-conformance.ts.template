@@ -1,5 +1,6 @@
 import { DenoKvAdapter } from '@netscript/kv';
 import { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from '@netscript/plugin-sagas-core/stores';
+import { parseSagaInstanceReadModel, SAGA_INSTANCE_PROJECTION_VERSION } from 'REPO_URLplugins/sagas/src/runtime/saga-instance-projection.ts';
 import { SagaRuntimeSupervisor } from 'REPO_URLplugins/sagas/src/runtime/saga-supervisor.ts';
 import type { SagaState } from '@netscript/plugin-sagas-core/domain';
 import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
@@ -120,7 +121,7 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
   let failProjection = true;
   const projection = new PrismaSagaInstanceProjection(root);
   const job = defineJob('projection-job').payload(z.object({ documentId: z.string() })).entrypoint('job.ts').build();
-  const definition = defineSaga('document').durableWorkerCommands().state({ count: 0 }).on('start', saga => {
+  const definition = defineSaga('document').durableWorkerCommands().state({ count: 0, status: 'business-pending' }).on('start', saga => {
     saga.state.count++;
     return [workerJobEffect(job, { documentId: 'one' }, { destination: 'workers', topic: 'document' })];
   }).build();
@@ -155,7 +156,10 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
     await projection.upsert({ ...request.correlation, envelope, transition: history[0] });
     const row = await root.sagaInstance.findUniqueOrThrow({ where: { sagaName_id: { sagaName: 'document', id: request.correlation.instanceId } } });
     assertEquals(row.version, 1);
-    assertEquals((row.state as { count: number }).count, 1);
+    z.object({ projectionVersion: z.literal(SAGA_INSTANCE_PROJECTION_VERSION) }).parse(row.state);
+    const firstProjection = parseSagaInstanceReadModel(row.state);
+    assertEquals(firstProjection.state, { count: 1, status: 'business-pending' });
+    assertEquals(firstProjection.status, 'running');
     const restarted = await createDurableSagaRuntime({ store, projection: guardedProjection });
     try {
       await restarted.runtime.register([definition]);
@@ -176,7 +180,9 @@ Deno.test('PostgreSQL projected atomic runtime commits once and repairs projecti
       assertEquals(await counts(), [2,2,2,1,1]);
       const next = await root.sagaInstance.findUniqueOrThrow({ where: { sagaName_id: { sagaName: 'document', id: request.correlation.instanceId } } });
       assertEquals(next.version, 2);
-      assertEquals((next.state as { count: number }).count, 2);
+      const nextProjection = parseSagaInstanceReadModel(next.state);
+      assertEquals(nextProjection.state, { count: 2, status: 'business-pending' });
+      assertEquals(nextProjection.status, 'running');
     } finally {
       await nextRuntime.runtime.stop();
       await nextRuntime.dispose();

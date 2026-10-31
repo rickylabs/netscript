@@ -60,3 +60,21 @@ exact; the negative-control mutations are not committed.
    1 state-preservation failure. New shared validator/version-aware mapper
    restored; legacy behavior is covered separately. Full suite after review fix:
    328 pass, 0 fail, 18 environment-dependent skips; scoped gates select 262 files.
+
+## S2 current-CI corrections
+
+- `command-postgres` run 41194298113 failed two old-format fixture assumptions
+  (first failure reached; second would follow). Latest main run 41152000845 passed.
+  Both assertions now validate nested state, including business status, preserving
+  all transition/replay/compensation proof. Live rerun is required on the next head.
+- Local saga wrapper suite after fixture repair: exit 0, 328 passed, 18 skips;
+  `reports/tests-s2.json`. The live PostgreSQL template remains skipped locally.
+- `quality` job 124517429796 failed only stale agent-docs-prose after its lint,
+  formatting, examples and README gates passed. Generated the updated saga page
+  carrier through gen:agent-docs-prose then gen:publish-assets; both exit 0.
+- `check:agent-docs-prose`: exit 0, fresh=true, stalePaths=[];
+  `check:mcp-export-corpus`: exit 0; `check:publish-assets`: exit 0.
+- Canonical generation changes exactly one page row in the CLI carrier, which
+  decodes identically to docs/site/_site/durable-workflows/sagas/index.md.
+- `check:assets-barrel` is the post-commit validation because it compares generated
+  outputs against Git. No source or policy gate has been weakened.

@@ -80,3 +80,32 @@ implementation commit includes worklog/context-pack and all local proof. Next:
 push, phase comment, ready-for-review transition, exact-pushed-head final review
 in that same evaluator session, review-thread gate and current CI snapshot.
 The final immutable verdict is posted as PR evidence, avoiding a post-review commit.
+
+## S2 CI repair
+
+The independent exact-head review at 5acb515435e1d3b44cc8ef3d269d6aaf842adc5d
+passed (round 3), then the current CI snapshot exposed command-postgres red in
+`PostgreSQL projected atomic runtime commits once and repairs projection without
+repeating worker intent`: old flat count assertion saw undefined. Latest main
+workflow run 41152000845 succeeded. The other 17 real PostgreSQL inner tests passed
+in the PR run, including ordinary/command compensation and crash/replay cases.
+
+Repair: migrate both fixture projection assertions to the versioned document;
+add a business `status` collision and assert it survives initial recovery and a
+second transition while runtime status stays running. No production code changes.
+The previously approved exact-head verdict must be superseded after this commit.
+
+## S2 sign-off and generated docs repair
+
+Same-session round 4 PASS independently approved the PostgreSQL fixture repair.
+The quality job's failing gate was check:agent-docs-prose: the rendered sagas
+migration page differed from its CLI carrier. Canonical gen:agent-docs-prose and
+gen:publish-assets succeeded. The sole generated diff is one compressed row for
+pages/durable-workflows/sagas/index.md, decoded and compared byte-for-byte with
+the rendered page. No other generated outputs or locks changed.
+
+check:agent-docs-prose passes (fresh=true, stalePaths=[]), check:mcp-export-corpus
+and check:publish-assets pass. check:assets-barrel follows commit because its
+verdict includes git diff --exit-code against generated files. These repairs do
+not change production saga behavior. S2 commit/push now supersedes the prior SHA;
+final round 5 will review the exact new pushed head and both CI corrections.

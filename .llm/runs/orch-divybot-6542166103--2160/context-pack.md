@@ -11,11 +11,13 @@ indexed findFirst. Backend settings loader is shared with runner, including
 processor overrides. All six backend combinations have coverage. Migration docs
 explain legacy rows and optional direct-GET lastMessageType.
 
-Independent IMPL-EVAL round 2 PASS approved S1's implementation commit (evaluate.md).
+S1 committed at 5acb515435e1d3b44cc8ef3d269d6aaf842adc5d; independent IMPL-EVAL rounds 2 and 3 passed.
 Round 1's stream-reconciliation blocker was repaired with a shared validator and
-negative control; all four controls and full gates were rerun. Next: commit/push,
-ready transition, final same-session review of exact pushed head, review-thread
-gate and CI snapshot. Final immutable verdict will be in the PR phase comment
+negative control; all four controls and full gates were rerun. PR is ready. CI found two old flat-state assertions in the live PostgreSQL
+fixture; S2 updates both and adds business-status checks. Latest main workflow
+passed; see ci-5acb515.md. Local suite passes again (328/18 skips). Next: same-session
+round 4 PASS approved fixture repair. The quality failure was a stale CLI prose carrier; canonical regeneration changes only the sagas page row. Docs/MCP/publish freshness checks now pass. Commit/push these S2 repairs, then final exact-new-head round 5,
+thread check and CI snapshot. Previous exact-head verdict must be superseded. Final immutable verdict will be in the PR phase comment
 and excluded report handoff rather than a new commit invalidating its own SHA.
 
 Coordinator alone arms e2e-cli-gate and merges. Required scaffold.runtime remains

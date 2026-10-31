@@ -23,3 +23,19 @@
   projection version. Add a negative control restoring the old stream mapper.
   This repairs a direct consumer of the changed persisted format, within owned
   saga read models; no #2382 status-list/query work is introduced.
+- Exact-head CI at 5acb515 found command-postgres red: the generated-client
+  postgres-conformance.ts.template still asserted flat row.state.count at two
+  projection checks. Latest main run of that workflow (41152000845, a410a815)
+  passed; the PR's failure is specific to the intentional JSON-format migration.
+  Update only that saga-core fixture's projection assertions, preserve transaction,
+  replay and compensation tests, and add a business-status collision assertion to
+  the real PostgreSQL projection scenario. This is an S2 validation repair within
+  the assigned core read-model surface. Full runtime E2E remains coordinator-owned.
+- CI quality failed agent-docs-prose freshness because the sagas migration page
+  changes its CLI-shipped Markdown twin. Extend the mechanical S2 generation
+  surface to packages/cli/src/kernel/assets/agent-docs-prose.generated.ts,
+  its dependent CLI publish-asset carriers, packages/mcp/src/publish-assets.generated.ts
+  and .llm/assets/agent-docs/provenance.json only if the canonical generators
+  actually change them. Use gen:agent-docs-prose then gen:publish-assets; inspect
+  every output and retain only semantically required generated changes. No gate
+  policy/label changes or local scaffold runtime.
