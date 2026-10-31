@@ -22,3 +22,7 @@
 
 - Independent implementation evaluator classifies new runtime dependency import as requiring
   e2e-cli CI before merge. Earlier tentative no-wiring/no-E2E assessment is superseded.
+
+- CI quality follow-up: workers docs change requires the shipped CLI prose carrier refresh.
+  Scope extends to packages/cli/src/kernel/assets/agent-docs-prose.generated.ts; exactly one
+  generated page row changes. Owner explicitly requested fixing the red CI.

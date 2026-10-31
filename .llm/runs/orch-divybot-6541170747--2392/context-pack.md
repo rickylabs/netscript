@@ -13,3 +13,13 @@ review thread gate, excluded final report file handoff. No local scaffold.runtim
 Independent slice IMPL-EVAL PASS, reviewer reran 25 dispatcher tests. Commit/push authorized.
 Reviewer requires e2e-cli CI before merge for the new runtime import; coordinator arms label.
 Final SHA-bound same-session review follows ready status. No local E2E or merge.
+
+## CI repair follow-up
+
+Original quality CI failed agent-docs-prose freshness after the workers page edit. Owner requested
+fix/push. Canonical generator refresh changes exactly the workers page row in the CLI prose carrier.
+Exact agent-docs-prose run-gate replay passes exit 0. No worker logic, lock or dependency changes.
+Independent evaluator review in progress before commit; then push and final exact-head review.
+
+CI follow-up slice review round 3 PASS; independent decode confirms one page delta and valid
+integrity metadata. Commit/push next, followed by exact-head review and fresh CI evidence.

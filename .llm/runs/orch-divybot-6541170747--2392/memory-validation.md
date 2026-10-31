@@ -13,3 +13,7 @@ LogTape setup is process-local; service logger initialization does not configure
 
 Fresh-UI lock:update can rewrite existing better-auth peer keys during refresh. Inspect the diff
 and retain only the required worker workspace membership entry for this logging change.
+
+Workers docs edits also require `deno task gen:agent-docs-prose`. CI quality runs
+check:agent-docs-prose and fails on stale CLI carrier. This workers change alters exactly the
+compressed pages/background-processing/workers/index.md row; decode row data to verify scope.

@@ -83,3 +83,26 @@ E2E classification: required in CI before merge because logger import is new run
 even without scaffold/queue/host composition changes. Coordinator owns e2e-cli-gate label.
 No local scaffold.runtime executed. Ready-for-review will enable checks; CI may remain pending
 at handoff and must not be represented as green. Final exact-head review follows push/readiness.
+
+## CI follow-up: stale docs carrier
+
+Owner reports quality red. gh pr checks identifies quality job 124499683027 in run 41188272922.
+Run-wide log-failed refuses while sibling jobs run; completed job logs fetched through GitHub API.
+Actual failing gate is agent-docs-prose: generated CLI prose carrier stale after workers page edit.
+This is a required generated-artifact refresh, not a runtime/test-discovery failure.
+
+Canonical gen:agent-docs-prose succeeds. Semantic decode/diff: exactly one carrier row changed,
+`pages/background-processing/workers/index.md`, containing the new lifecycle logging section.
+All other compressed page rows are byte-identical; no provenance, source or lock churn.
+Exact failing CI gate replay through run-gate agent-docs-prose is running.
+
+Exact failing gate replay: `deno run --allow-read --allow-write --allow-run --allow-env
+.llm/tools/gates/run-gate.ts --gate agent-docs-prose` with unique receipt id/output: PASS,
+exit 0, duration 16114ms. Canonical check rebuilds docs and compares the shipped carrier.
+Semantic decoded row inspection confirms only workers page changes, all other rows unchanged.
+Independent same-session evaluator reviewing this mechanical CI-repair slice before commit.
+
+Independent slice review round 3 PASS before commit. Evaluator decoded 203 rows, verified only
+workers page differs and SHA-256/size match; all 202 others unchanged. No blockers.
+Reconcile: main unchanged, PR remains ready; this commit repairs stale generated docs carrier.
+Full CI must rerun on the pushed head; no green remote verdict claimed in advance.

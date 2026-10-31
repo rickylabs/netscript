@@ -15,3 +15,6 @@ Scope addition: `plugins/workers/deno.json` direct logger import declaration.
 
 Scope addition justified by frozen dependency gates: root deno.lock and maintained Expo/desktop
 reference locks, exactly one workspace dependency-membership line each; no resolved changes.
+
+CI follow-up scope: owner requests fix red quality job. Regenerate the CLI agent docs prose carrier
+and its provenance metadata via canonical gen:agent-docs-prose; docs source change requires this artifact.
