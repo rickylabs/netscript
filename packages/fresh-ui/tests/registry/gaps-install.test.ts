@@ -1,4 +1,4 @@
-import { POST_V1_COMPONENTS } from './post-v1-items.ts';
+import { FRESH_UI_RUNTIME_DEPENDENCY, POST_V1_COMPONENTS } from './post-v1-items.ts';
 import { freshUiRegistryManifest } from '../../registry.manifest.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join, toFileUrl } from '@std/path';
@@ -34,10 +34,6 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         version: '0.0.0',
         imports: {
           preact: 'npm:preact@^10.29.2',
-          '@netscript/fresh-ui/interactive':
-            toFileUrl(join(repo, 'packages/fresh-ui/interactive.ts')).href,
-          '@netscript/fresh-ui/primitives':
-            toFileUrl(join(repo, 'packages/fresh-ui/primitives.tsx')).href,
           '@preact/signals': 'npm:@preact/signals@2.11.3',
         },
         compilerOptions: {
@@ -62,6 +58,18 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         '--force',
       ]);
     }
+    const installedConfig = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    assertEquals(
+      installedConfig.imports['@netscript/fresh-ui'],
+      FRESH_UI_RUNTIME_DEPENDENCY,
+      'The installer must contribute its runtime package mapping; local subpath aliases cannot prove that.',
+    );
+    // Compile the unreleased local API only after proving the production root mapping was installed.
+    installedConfig.imports['@netscript/fresh-ui/interactive'] =
+      toFileUrl(join(repo, 'packages/fresh-ui/interactive.ts')).href;
+    installedConfig.imports['@netscript/fresh-ui/primitives'] =
+      toFileUrl(join(repo, 'packages/fresh-ui/primitives.tsx')).href;
+    await Deno.writeTextFile(join(root, 'deno.json'), JSON.stringify(installedConfig));
     for (const name of names) {
       const installed = await Deno.readTextFile(join(root, 'components/ui', name + '.tsx'));
       const source = await Deno.readTextFile(

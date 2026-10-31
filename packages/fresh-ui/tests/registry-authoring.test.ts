@@ -1,5 +1,10 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import { POST_V1_COMPONENTS, POST_V1_SUPPORT } from './registry/post-v1-items.ts';
+import {
+  FRESH_UI_RUNTIME_DEPENDENCY,
+  LEGACY_RUNTIME_DEPENDENCY_REPAIRS,
+  POST_V1_COMPONENTS,
+  POST_V1_SUPPORT,
+} from './registry/post-v1-items.ts';
 import legacyBaseline from './registry/legacy-v1.json' with { type: 'json' };
 import { freshUiRegistryManifest } from '../registry.manifest.ts';
 import { generatedThemes } from '../registry.theme-items.generated.ts';
@@ -7,13 +12,28 @@ import { TOKEN_PRESETS } from '../src/tokens/domain/token-presets.ts';
 import { PREVIEW_TOKEN_FILES } from '../src/tokens/domain/token-output.ts';
 import { FRESH_UI_PACKAGE_VERSION } from '../src/package-metadata.generated.ts';
 
-/** Existing entries remain byte-for-byte contracts; new identities need an explicit review list. */
+/** Preserve every historical field, with only named additive runtime dependency repairs. */
 function assertLegacyCompatibility(actual: Readonly<Record<string, unknown>>): void {
   const baselineNames = new Set(Object.keys(legacyBaseline));
   const existing = Object.fromEntries(
     Object.entries(actual).filter(([name]) => baselineNames.has(name)),
   );
-  assertEquals<unknown>(existing, legacyBaseline);
+  const repairs = new Set<string>(LEGACY_RUNTIME_DEPENDENCY_REPAIRS);
+  const expected = Object.fromEntries(
+    Object.entries(legacyBaseline).map(([name, item]) => [
+      name,
+      repairs.has(name)
+        ? {
+          ...item,
+          dependencies: [
+            ...('dependencies' in item ? item.dependencies : []),
+            FRESH_UI_RUNTIME_DEPENDENCY,
+          ],
+        }
+        : item,
+    ]),
+  );
+  assertEquals<unknown>(existing, expected);
   const additions = Object.keys(actual).filter((name) => !baselineNames.has(name)).sort();
   const themes = TOKEN_PRESETS.map((preset) => `theme-${preset.id}`).filter((name) =>
     !baselineNames.has(name)
@@ -42,6 +62,23 @@ Deno.test('JSON authoring preserves every legacy file target, dependency, CSS co
     assertLegacyCompatibility({ ...actual, button: { ...actual.button, files: [] } })
   );
   assertThrows(() => assertLegacyCompatibility({ ...actual, 'unexpected-post-v1': actual.button }));
+  assertThrows(() =>
+    assertLegacyCompatibility({
+      ...actual,
+      'render-ui': {
+        ...actual['render-ui'],
+        dependencies: actual['render-ui'].dependencies?.filter((dependency) =>
+          !dependency.startsWith('jsr:@netscript/ai@')
+        ) ?? [],
+      },
+    })
+  );
+  assertThrows(() =>
+    assertLegacyCompatibility({
+      ...actual,
+      'command-palette': { ...actual['command-palette'], dependencies: [] },
+    })
+  );
   const { toggle: _toggle, ...missingAddition } = actual;
   assertEquals(_toggle.name, 'toggle');
   assertThrows(() => assertLegacyCompatibility(missingAddition));
