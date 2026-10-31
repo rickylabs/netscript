@@ -108,7 +108,9 @@ import { Card } from './components/ui/card.tsx';
 import { Pagination } from './components/ui/pagination.tsx';
 import { Alert } from './components/ui/alert.tsx';
 import { CommandPalette } from './components/ui/command-palette.tsx';
+import { PageHeader } from './components/ui/page-header.tsx';
 console.log(JSON.stringify({
+  'page-header': render(h(PageHeader, { title: 'Overview', eyebrow: 'Commerce', description: 'Recent orders', variant: 'with-status', status: 'Operational', actions: h('button', {children: 'Create order'}) })),
   'command-palette': render(h(CommandPalette, { scrim: false, groups: [{id: 'docs', label: 'Docs', items: [{id: 'start', label: 'Start', type: 'page', excerpt: 'Read the guide', shortcut: 'Enter'}]}] })),
   'code-block': render(h(CodeBlock, { tabs: [{ value: 'source', label: 'Source', code: 'x' }] })),
   label: render(h(Label, { children: 'Email', variant: 'eyebrow', optional: true })),
