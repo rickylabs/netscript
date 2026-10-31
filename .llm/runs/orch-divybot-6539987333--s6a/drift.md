@@ -96,3 +96,8 @@ Owner explicitly requires per-variant backgrounds/borders to win over the later 
 override and secondary-text as the info fallback. This supersedes the earlier transparent/currentColor
 paint choice; anatomy/dot and semantic token values are unchanged. CSS-size growth and QueryResult
 duplication belong to separate issue scope, not this PR round.
+
+
+Current-main19a677e reconciliation imports upstream changes only; canonical docs ownership is
+now MCP. Generator removes the oldCLIprosecarrier and preserves209MCPpages, with exactly two
+Utility-default page differences frommain. No badge source changes; no CSS-size/QueryResult work.

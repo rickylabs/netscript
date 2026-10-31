@@ -74,6 +74,21 @@ export function createRuntimeGates(
 ): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.RUNTIME_STREAMS_STORAGE_FIXTURE,
+      'Generate AppHost-owned streams file storage and ephemeral control',
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/prepare-streams-storage-fixture.ts`,
+        context.project.projectRoot,
+        context.project.cliEntrypoint.startsWith('jsr:')
+          ? context.project.cliEntrypoint
+          : resolve(context.project.repoRoot, context.project.cliEntrypoint),
+      ],
+    ),
+    commandGate(
       GATE.RUNTIME_ASPIRE_RESTORE,
       'Restore Aspire TypeScript SDK',
       GATE_PHASE.RUNTIME,

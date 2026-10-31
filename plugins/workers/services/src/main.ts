@@ -38,9 +38,17 @@ type PluginServiceBootstrap = {
  */
 export default async function createWorkersService(
   ctx: PluginServiceContext,
+  options: Readonly<{
+    /** Request-start level; defaults to debug rather than the native middleware's info. */
+    readonly requestLevel?: 'debug' | 'info';
+    /** Successful-response level; defaults to debug rather than the native middleware's info. */
+    readonly responseLevel?: 'debug' | 'info';
+  }> = {},
 ): Promise<RunningService> {
   return await startWorkersService(ctx, {
     auth: { public: true, reason: LEGACY_WORKERS_PUBLIC_REASON },
+    requestLevel: options.requestLevel,
+    responseLevel: options.responseLevel,
   });
 }
 

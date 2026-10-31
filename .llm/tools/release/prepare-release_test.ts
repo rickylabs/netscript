@@ -10,7 +10,7 @@ import {
 } from './prepare-release.ts';
 
 const AGENT_DOCS_OUTPUTS = [
-  'packages/cli/src/kernel/assets/agent-docs-prose.generated.ts',
+  'packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts',
   '.llm/assets/agent-docs/provenance.json',
 ] as const;
 

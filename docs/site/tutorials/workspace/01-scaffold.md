@@ -85,7 +85,7 @@ running a health probe; no fixed service port is required.
   caption: "netscript init options used here",
   rows: [
     { name: "--service --service-name workspace", type: "example service", desc: "Include an example oRPC service named 'workspace' at its allocated endpoint. You protect it in chapter 5." },
-    { name: "--db postgres", type: "database workspace", desc: "Scaffold a Postgres database workspace. The auth plugin's auth.prisma migration (chapter 2) aggregates into this primary datasource." },
+    { name: "--db postgres", type: "database workspace", desc: "Scaffold a Postgres database workspace. This primary datasource is available for application data; chapter 2 uses KV-backed auth without an auth SQL migration." },
     { name: "--dry-run", type: "plan only", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
 }) }}
@@ -142,7 +142,7 @@ list shows the exact port each resource bound.
 {{ comp callout { type: "important", title: "Database commands need Aspire running" } }}
 The Postgres container exists only while <code>aspire start</code> is up. Run
 <code>netscript db init</code>, <code>db generate</code> and <code>db seed</code>, which you use from
-chapter 2 onward, <strong>after</strong> Aspire has started. Without Aspire, a db command fails fast:
+chapter 3 onward, <strong>after</strong> Aspire has started. Without Aspire, a db command fails fast:
 there is no Postgres for it to reach.
 {{ /comp }}
 

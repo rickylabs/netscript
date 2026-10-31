@@ -3,7 +3,7 @@ import {
   readAgentDocsPages,
   renderAgentDocsPages,
 } from '../docs/agent-docs-page-carrier.ts';
-import { agentDocsFullCorpus } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
+import { agentDocsFullCorpus } from '../../../packages/mcp/docs.ts';
 import {
   assertEquals,
   assertNotEquals,
@@ -200,7 +200,7 @@ async function createRenderedCanaryPairFixture(
       join(literal, PAIR_PROVENANCE_PATH),
       JSON.stringify(await testAgentDocsProvenance(previousVersion, initialCompressed)),
     );
-    await Deno.mkdir(join(root, 'packages/cli/src/kernel/assets'), { recursive: true });
+    await Deno.mkdir(join(root, 'packages/mcp/src/infrastructure/docs'), { recursive: true });
     await Deno.copyFile(prosePath, join(root, PAIR_PROSE_PATH));
     await Deno.writeTextFile(
       join(literal, 'packages', 'cli', 'deno.json'),

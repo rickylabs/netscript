@@ -72,6 +72,38 @@ framework emits from what is a scaffold stub.
 | OTLP export and dashboard | The generated AppHost configures an OTLP endpoint and the Aspire dashboard, so traces, metrics and logs from every resource land in one place with no collector to deploy. |
 | Browser console logs | Generated app resources call `withBrowserLogs()` (the AppHost pins `Aspire.Hosting.Browsers`). A Fresh/Vite app's browser console output, including a client-side `TypeError` an island throws, appears in that resource's **Console logs** in the dashboard, correlated with the server-side spans of the same request. |
 
+## Plugin HTTP request logging
+
+First-party plugin API services (workers, streams, auth, sagas and triggers) emit routine
+`HTTP request started` and successful `HTTP request completed` records at **Debug** by default.
+Internal service traffic is frequent; keeping these pairs below Information leaves application
+logs easier to scan. Each factory accepts optional `requestLevel` and `responseLevel` fields,
+with the same `'debug' | 'info'` values as the native `@netscript/service` logger middleware.
+Each omitted field independently defaults to `'debug'`.
+
+Pass these fields in the existing options argument to `startWorkersService(context, options)`,
+`startStreamsService(options)`, `createTriggersService(context, options)` or
+`startTriggersService(options)`. The legacy workers, auth and sagas default factories accept
+an optional second options argument after their host context. Legacy streams startup uses the
+Debug defaults; use `startStreamsService` when the host needs to configure them.
+
+```ts
+import { startStreamsService } from '@netscript/plugin-streams/service';
+
+await startStreamsService({
+  auth: { public: true, reason: 'Internal example; ingress authenticates callers' },
+  requestLevel: 'debug',
+  responseLevel: 'info',
+});
+```
+
+These options forward through `createPluginService`'s existing `logger` configuration into
+`ServiceBuilder.withLogger()`. They select record severity; the process logging threshold
+still decides which records are retained. Configure the plugin process at Debug to see its
+Debug records. The native middleware continues skipping health probe paths and logging 4xx/5xx
+responses at Warning; failures are not quieted by the new defaults. Ordinary service builder
+logging retains its Information defaults unless the caller supplies levels to `.withLogger()`.
+
 ## What is traced automatically
 
 The `@netscript/telemetry` instrumentation is wired into the worker dispatcher, the executor and the

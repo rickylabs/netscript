@@ -304,10 +304,12 @@ code and the posture choices.
 
 ## Database & runtime events
 
-The plugin contributes a package-provided `auth.prisma` schema with four better-auth-shaped models:
+Only when the selected backend is `better-auth` does the plugin contribute a package-provided
+`auth.prisma` schema with four models:
 `AuthUser` → `auth_users`, `AuthSession` → `auth_sessions`, `AuthAccount` → `auth_accounts` and
 `AuthVerification` → `auth_verifications`. These tables back the better-auth adapter; `kv-oauth`
-keeps its sessions in Deno KV, and WorkOS is stateless. better-auth persists through Prisma, so the
+keeps its sessions in Deno KV, and WorkOS keeps revocation state in host KV. Neither contributes
+SQL tables or requires a database. better-auth persists through Prisma, so the
 tables follow the engine you scaffolded with `--db` (Postgres is recommended; `mysql`, `mssql` and
 `sqlite` also work). As with every plugin schema, run the database workflow after Aspire is up; see
 [Database migrations](/data-persistence/how-to/database-migration/).

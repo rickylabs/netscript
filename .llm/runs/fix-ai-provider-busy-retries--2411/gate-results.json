@@ -1,0 +1,147 @@
+{
+  "baseline": "46b22e63608eb4ba067145445b523536d6e48aa9",
+  "tests": {
+    "baselinePassed": 174,
+    "passed": 200,
+    "failed": 0,
+    "ignored": 0,
+    "command": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/ai/tests/"
+  },
+  "structuredCheck": {
+    "files": 104,
+    "failedBatches": 0
+  },
+  "structuredLint": "PASS",
+  "structuredFmt": "PASS",
+  "qualityGate": "PASS",
+  "aiQualityScan": {
+    "ok": true,
+    "allowCount": 0,
+    "findings": []
+  },
+  "docLint": {
+    "combinedExit": 0,
+    "individualDiagnostics": [
+      {
+        "path": "./agent.ts",
+        "privateTypeRef": 20,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 20
+      },
+      {
+        "path": "./anthropic.ts",
+        "privateTypeRef": 5,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 5
+      },
+      {
+        "path": "./mcp.ts",
+        "privateTypeRef": 0,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 0
+      },
+      {
+        "path": "./mod.ts",
+        "privateTypeRef": 26,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 26
+      },
+      {
+        "path": "./ollama.ts",
+        "privateTypeRef": 5,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 5
+      },
+      {
+        "path": "./openai-compatible.ts",
+        "privateTypeRef": 8,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 8
+      },
+      {
+        "path": "./openai-embeddings.ts",
+        "privateTypeRef": 0,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 0
+      },
+      {
+        "path": "./openrouter.ts",
+        "privateTypeRef": 5,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 5
+      },
+      {
+        "path": "./src/contracts/mod.ts",
+        "privateTypeRef": 0,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 0
+      },
+      {
+        "path": "./src/ports/mod.ts",
+        "privateTypeRef": 35,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 35
+      },
+      {
+        "path": "./src/skills/mod.ts",
+        "privateTypeRef": 0,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 0
+      },
+      {
+        "path": "./src/testing/mod.ts",
+        "privateTypeRef": 17,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 17
+      },
+      {
+        "path": "./tools.ts",
+        "privateTypeRef": 7,
+        "missingJSDoc": 0,
+        "other": 0,
+        "total": 7
+      }
+    ],
+    "individualExitCodes": {
+      "./agent.ts": 1,
+      "./anthropic.ts": 1,
+      "./mcp.ts": 0,
+      "./mod.ts": 1,
+      "./ollama.ts": 1,
+      "./openai-compatible.ts": 1,
+      "./openai-embeddings.ts": 0,
+      "./openrouter.ts": 1,
+      "./src/contracts/mod.ts": 0,
+      "./src/ports/mod.ts": 1,
+      "./src/skills/mod.ts": 0,
+      "./src/testing/mod.ts": 1,
+      "./tools.ts": 1
+    },
+    "identicalToBaseline": true,
+    "existingDebt": "ai-doc-private-ref-baseline-2036"
+  },
+  "jsrAudit": "PASS; existing ports cardinality warning; slow-type banner is not a diagnostic",
+  "publishDryRun": {
+    "exit": 0,
+    "newSlowTypeWarnings": 0
+  },
+  "negativeControls": "five targeted mutants fail semantic regressions; no process/compile failures",
+  "e2eCliRequired": false,
+  "e2eCliReason": "AI adapter and retry contract only; no scaffold/plugin/runtime wiring",
+  "carrierFreshness": {
+    "mcpExportCorpus": "PASS; generated from reviewed source using --allow-dirty",
+    "publishAssets": "PASS; no refresh needed"
+  }
+}

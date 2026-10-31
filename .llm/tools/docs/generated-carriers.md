@@ -17,18 +17,21 @@ carrier; `check:agent-docs-prose` renders the site and compares decoded page con
 valid page, entrypoint and README transports are retained when writing, so a compressor patch does
 not create false drift.
 
-The CLI owns the only stored full prose corpus, `agent-docs-prose.generated.ts`. Each sorted page
+MCP owns the only stored full prose corpus,
+`packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts`, exposed through
+`@netscript/mcp/docs`. The CLI consumes that public subpath; MCP never imports CLI internals.
+Add pages in the docs site and use the generation chain above; there is no curated MCP page list. Each sorted page
 row contains gzip/base64 text, its SHA-256 and decoded length. Blank separators allow Git to merge
 adjacent independent edits. The CLI derives `llms-full.txt` from the page twins at installation. The
 composition policy lives in `docs/site/_plugins/llms-policy.ts`; the prose generator copies that
-source to the CLI, and the site uses the same functions and canonical location. The provenance
+source to MCP, and the site uses the same functions and canonical location. The provenance
 sidecar contains only schema and framework versions. API docs still come from the exact installed
 package exports. Installed `MANIFEST.md` omits the old source-commit and extraction time rows; its
 API generation time is still the caller's clock.
 
 MCP exports use one row per package entrypoint, with raw-deflate/base64 declaration columns,
 SHA-256, decoded length and symbol count. Loading is lazy and cached. The legacy compressed-source
-constructor override remains supported. MCP's selected offline prose, the CLI skill bundle and
+constructor override remains supported. MCP's full offline prose, the CLI skill bundle and
 agent-tool bundle store one source entry at a time; aggregate hashes and counts are computed from
 those entries. Their bounded aggregate hashes are computed once at module load.
 
@@ -47,12 +50,12 @@ The audit covers every tracked `*.generated.ts` under packages and plugins:
 
 | Carrier family                     | Shape and decision                                                            |
 | ---------------------------------- | ----------------------------------------------------------------------------- |
-| CLI full-corpus policy             | One generated copy of the docs site composition source; no independent policy |
-| CLI prose                          | One sorted, compressed page per row; no binary twin or full-text aggregate    |
+| Shared full-corpus policy             | One generated copy of the docs site composition source; no independent policy |
+| Shared MCP/CLI prose                          | One sorted, compressed page per row; no binary twin or full-text aggregate    |
 | MCP export surfaces                | One sorted, independently compressed entrypoint per row                       |
 | CLI agent docs export map          | One sorted package export map per row                                         |
 | CLI skills and agent tools         | One sorted source file per row; derive aggregate hashes                       |
-| MCP published prose                | One source document per row; derive aggregate provenance                      |
+| MCP published prose                | Derive from shared page rows; no second stored prose corpus                      |
 | CLI templates and plugin skeletons | One source template per constant; existing separate rows                      |
 | Fresh UI registry                  | Each registry source file has its own constant; existing separate rows        |
 | CLI published schema               | One schema source asset, not a multi-source corpus; retain its literal        |

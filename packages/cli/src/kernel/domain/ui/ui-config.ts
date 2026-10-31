@@ -26,14 +26,18 @@ export function isUiRelativePath(path: string): boolean {
 }
 
 const localPath = z.string().refine(isUiRelativePath, 'Registry paths must remain inside the app');
-const registryUrl = z.string().min(1).refine((value) => {
-  try {
-    uiRegistryUrl(value.replaceAll('{name}', '__item__'));
-    return true;
-  } catch {
-    return false;
-  }
-}, 'Registry URLs must be HTTP, HTTPS or public GitHub sources without embedded credentials');
+const HTTP_LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+const registryUrl = z.string().min(1).refine(
+  (value) => {
+    try {
+      uiRegistryUrl(value.replaceAll('{name}', '__item__'));
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  'Registry URLs require HTTPS or public GitHub sources without embedded credentials (HTTP is allowed only for loopback)',
+);
 /** A static item URL template or a source registry catalog, with unresolved header templates. */
 export const UiRegistrySourceSchema = z.union([
   registryUrl,
@@ -65,7 +69,7 @@ export type UiConfig = z.infer<typeof UiConfigSchema>;
 /** One configured namespace source, preserving environment placeholders. */
 export type UiRegistrySource = z.infer<typeof UiRegistrySourceSchema>;
 
-/** Normalize GitHub source repositories and reject URLs that could persist credentials. */
+/** Normalize public GitHub sources and require HTTPS, except HTTP on exact loopback hosts. */
 export function uiRegistryUrl(input: string): string {
   let value = input;
   if (value.startsWith('github:')) {
@@ -76,11 +80,14 @@ export function uiRegistryUrl(input: string): string {
     value = `https://raw.githubusercontent.com/${repository}/HEAD/registry.json`;
   }
   const url = new URL(value);
-  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-    throw new Error('Registry URLs require HTTP or HTTPS');
-  }
   if (url.username || url.password || url.search || url.hash) {
     throw new Error('Registry credentials belong in environment-backed headers, not URLs');
+  }
+  if (
+    url.protocol !== 'https:' &&
+    !(url.protocol === 'http:' && HTTP_LOOPBACK_HOSTS.has(url.hostname))
+  ) {
+    throw new Error(`Registry URLs require HTTPS (HTTP is allowed only for loopback): ${input}`);
   }
   if (url.hostname === 'github.com') {
     const [owner, repo, marker, ref, ...path] = url.pathname.split('/').filter(Boolean);

@@ -1,0 +1,162 @@
+{
+  "note": "Public summaries derived from structured wrapper output; not run-gate receipts. No local runtime E2E was run.",
+  "sourceFiles": [
+    "packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler.ts",
+    "packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+    "packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts",
+    "packages/cli/src/local/features/plugins/install/install-local-plugin.ts",
+    "packages/cli/src/public/domain/plugin-install-plan.ts",
+    "packages/cli/src/public/domain/service-add-plan.ts",
+    "packages/cli/src/public/features/plugins/install/install-plugin-command.ts",
+    "packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts",
+    "packages/cli/src/public/features/plugins/install/install-plugin.ts",
+    "packages/cli/src/public/features/plugins/remove/remove-plugin-command.ts",
+    "packages/cli/src/public/features/plugins/remove/remove-plugin.ts",
+    "packages/cli/src/public/features/plugins/update/update-plugin-command.ts",
+    "packages/cli/src/public/features/plugins/update/update-plugin-command_test.ts",
+    "packages/cli/src/public/features/services/add/add-service-command.ts",
+    "packages/cli/src/public/features/services/add/add-service.ts",
+    "packages/cli/src/public/features/services/remove/remove-service-command.ts",
+    "packages/cli/src/public/features/services/remove/remove-service.ts",
+    "packages/cli/tests/browser-auth-reporting_test.ts",
+    "packages/cli/src/kernel/presentation/output/render-doctor-report.ts"
+  ],
+  "results": {
+    "reporting-tests-restored": {
+      "summary": {
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 28,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "lifecycle-tests": {
+      "summary": {
+        "passed": 67,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 67,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 19,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "exitCode": 0
+    },
+    "lint-final": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 19,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 19,
+        "filesProcessed": 19,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "exitCode": 0
+    },
+    "fmt-final": {
+      "summary": {
+        "filesSelected": 19,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 19,
+        "filesProcessed": 19,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "exitCode": 0
+    },
+    "negative-envelope": {
+      "summary": {
+        "passed": 0,
+        "failed": 6,
+        "ignored": 0,
+        "totalResults": 6,
+        "uniqueFailures": 2
+      },
+      "exitCode": 1,
+      "failedTests": [
+        "browser-auth reporting: authored topology reports absent and present skips without writes",
+        "browser-auth reporting: each divergent file is informational in structured and human output and preserved",
+        "browser-auth reporting: mixed ownership reports only authored routes and divergent shared helpers",
+        "authored browser layouts outside generated resource directories remain informational",
+        "browser-auth reporting: fresh project emits files without findings",
+        "browser-auth reporting: canonical generator-owned rerun is silent and byte-idempotent"
+      ]
+    },
+    "negative-findings": {
+      "summary": {
+        "passed": 2,
+        "failed": 4,
+        "ignored": 0,
+        "totalResults": 6,
+        "uniqueFailures": 3
+      },
+      "exitCode": 1,
+      "failedTests": [
+        "browser-auth reporting: authored topology reports absent and present skips without writes",
+        "browser-auth reporting: each divergent file is informational in structured and human output and preserved",
+        "authored browser layouts outside generated resource directories remain informational",
+        "browser-auth reporting: mixed ownership reports only authored routes and divergent shared helpers"
+      ]
+    },
+    "negative-command-output": {
+      "summary": {
+        "passed": 0,
+        "failed": 3,
+        "ignored": 0,
+        "totalResults": 3,
+        "uniqueFailures": 2
+      },
+      "exitCode": 1,
+      "failedTests": [
+        "plugin install prints informational browser-auth preservation for authored topology",
+        "plugin install prints informational browser-auth preservation for scaffold topology",
+        "plugin update renders browser-auth findings after staged commit without leaking staging paths"
+      ]
+    }
+  },
+  "broaderGates": {
+    "quality:gate": {
+      "exitCode": 0
+    },
+    "doc:lint --root packages/cli": {
+      "exitCode": 0,
+      "entrypoints": 3
+    },
+    "audit-jsr-package --root packages/cli": {
+      "exitCode": 0,
+      "findings": 23,
+      "baselineFindings": 23,
+      "publishDryRun": "OK",
+      "slowTypeWarnings": 1
+    }
+  },
+  "requiredBeforeMerge": "coordinator-owned e2e-cli CI verdict"
+}

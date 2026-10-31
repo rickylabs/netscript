@@ -128,6 +128,15 @@ const VARIANTS: readonly Variant[] = [
   { name: 'plugins-empty', source: plugins({}) },
   { name: 'plugins-streams-only', source: plugins({ streams: STREAMS_PLUGIN }) },
   {
+    name: 'plugins-streams-file-storage',
+    source: plugins({
+      streams: {
+        ...STREAMS_PLUGIN,
+        DataDirectories: { STREAMS_DATA_DIR: '.netscript/data/streams' },
+      },
+    }),
+  },
+  {
     name: 'plugins-auth-and-streams',
     source: plugins({ auth: AUTH_PLUGIN, streams: STREAMS_PLUGIN }),
   },

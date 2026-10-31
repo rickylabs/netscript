@@ -208,3 +208,17 @@ All14rootchecks, scopedcheck/lint/fmt, quality/architecture, docsaccuracy, relea
 carrier freshnessPASS. Same Opus evaluatorPASS; requested visual evidence descriptions corrected
 and package test completion verified before commit.119sourcehashes match; failurestreak0.
 Only badge CSS plus its carrier/test/docs changed; excluded scope untouched.
+
+## Badge head / current-main reconciliation
+
+0202367 exact-head CI passed27checks with7policy skips; full PostgreSQL122 and SQLite115 passed
+with0failures/0skips and hydration/refetch/cleanup. Before READY the live PR became conflicting
+with newer main. Fetched main19a677e and merged without force push; local merge driver reconciled
+without unresolved paths. Only authored overlap is ui-config.ts: retain UI_DEFAULT_THEME plus
+main's centralized HTTPS/exact-loopback registry validation. Generated embedded assets are rebuilt.
+Badge source and tests remain unchanged. Reconcile gates and same evaluator precede merge commit;
+new exact-head CI/fullruntime precede READY. CSS-size/QueryResult scope remains excluded.
+
+Main reconciliation independent OpusPASS. All120hashes verified; no authored change fromeither
+parent lost. 37CLI/52browser/29installed-typecheck/14rootchecks and productionbuild pass. Failure
+streak0. Merge commit now authorized by the independent sign-off; newheadCI precedesREADY.

@@ -43,3 +43,25 @@ Deno.test('StreamsAspireContribution registers the streams service and health ch
   });
   assertEquals('declareHealthChecks' in contribution, false);
 });
+
+Deno.test('StreamsAspireContribution opts into AppHost-owned file storage explicitly', () => {
+  const builder = new MemoryAspireBuilder();
+  const ctx = createContributionContextFixture({ projectRoot: '/workspace/app' });
+  const contribution = new StreamsAspireContribution({ dataDir: '.netscript/data/streams' });
+  contribution.contribute(builder, ctx);
+  const spec = builder.resources[0].metadata?.spec;
+  assert(spec && typeof spec === 'object');
+  assertEquals(Reflect.get(spec, 'dataDirectories'), {
+    STREAMS_DATA_DIR: '.netscript/data/streams',
+  });
+  assertEquals(Reflect.get(spec, 'env').STREAMS_DATA_DIR, '.netscript/data/streams');
+});
+
+Deno.test('StreamsAspireContribution default declares no persistent directory or file env', () => {
+  const builder = new MemoryAspireBuilder();
+  new StreamsAspireContribution().contribute(builder, createContributionContextFixture());
+  const spec = builder.resources[0].metadata?.spec;
+  assert(spec && typeof spec === 'object');
+  assertEquals(Reflect.get(spec, 'dataDirectories'), undefined);
+  assertEquals(Reflect.get(spec, 'env').STREAMS_DATA_DIR, undefined);
+});

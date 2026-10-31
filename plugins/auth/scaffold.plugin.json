@@ -8,7 +8,7 @@
     "@netscript/plugin": "0.0.8"
   },
   "capabilities": {
-    "hasDatabaseMigrations": true,
+    "hasDatabaseMigrations": false,
     "hasRoutes": true,
     "hasBackgroundWorkers": false
   },
@@ -16,8 +16,12 @@
     "export": "./scaffold",
     "requiredPermissions": {
       "net": [],
-      "read": ["<workspaceRoot>"],
-      "write": ["<workspaceRoot>"]
+      "read": [
+        "<workspaceRoot>"
+      ],
+      "write": [
+        "<workspaceRoot>"
+      ]
     }
   },
   "provider": {
@@ -36,14 +40,16 @@
     "watchFlag": "--watch",
     "defaultEntrypoint": "services/src/main.ts",
     "defaultServiceEntrypoint": "services/src/main.ts",
-    "defaultRequiresDb": true,
+    "defaultRequiresDb": false,
     "defaultRequiresKv": true,
     "pluginType": "utility",
     "supportsConcurrency": false,
     "concurrencyEnvVar": null,
     "defaultConcurrency": null,
     "defaultTelemetry": true,
-    "infrastructureRequires": ["db", "kv"],
+    "infrastructureRequires": [
+      "kv"
+    ],
     "infrastructureOptionalDeps": []
   },
   "officialSource": {
@@ -51,7 +57,7 @@
     "pluginDir": "auth",
     "serviceEntrypoint": "services/src/main.ts",
     "serviceConfigKey": "auth",
-    "requiresDb": true,
+    "requiresDb": false,
     "requiresKv": true,
     "permissions": [
       "--unstable-kv",
@@ -61,5 +67,31 @@
       "--allow-sys",
       "--allow-ffi"
     ]
+  },
+  "databaseRequirement": {
+    "environmentVariable": "NETSCRIPT_AUTH_BACKEND",
+    "defaultValue": "kv-oauth",
+    "appsettingsPaths": [
+      [
+        "NetScript",
+        "Plugins",
+        "auth",
+        "Environment",
+        "NETSCRIPT_AUTH_BACKEND"
+      ],
+      [
+        "auth",
+        "backend"
+      ],
+      [
+        "Auth",
+        "Backend"
+      ]
+    ],
+    "values": {
+      "kv-oauth": false,
+      "workos": false,
+      "better-auth": true
+    }
   }
 }

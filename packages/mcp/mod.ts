@@ -180,6 +180,7 @@ export type {
 } from './src/domain/docs/guidance-contract.ts';
 export { createFindGuidanceFlow } from './src/application/docs/find-guidance-flow.ts';
 export type {
+  DocsCorpusCitation,
   DocsCorpusPort,
   DocsDocument,
   DocsSearchMatch,
@@ -258,3 +259,5 @@ export type {
   UiRegistryCatalogPort,
   UiRegistryItemSummary,
 } from './src/ports/ui-registry-catalog-port.ts';
+
+export type { TelemetryProvenance } from './src/domain/telemetry/telemetry-snapshot.ts';

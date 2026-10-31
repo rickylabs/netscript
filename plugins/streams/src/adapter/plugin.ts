@@ -30,7 +30,7 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'streams/plugin.ts',
-        `/** Generated streams control-plane module. Storage is ephemeral by default; opt in through NetScript.Plugins.streams.Environment.STREAMS_DATA_DIR with an existing persistent directory. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
+        `/** Generated streams control-plane module. Storage is ephemeral by default; opt in through NetScript.Plugins.streams.DataDirectories.STREAMS_DATA_DIR for AppHost-provisioned storage. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
           NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
             `  { callee: '${builder.callee}', axis: ${
               builder.axis === null ? 'null' : `'${builder.axis}'`

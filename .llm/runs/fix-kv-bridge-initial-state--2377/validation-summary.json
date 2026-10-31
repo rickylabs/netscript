@@ -1,0 +1,97 @@
+{
+  "baseline-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 74,
+      "failed": 0,
+      "ignored": 11,
+      "totalResults": 85,
+      "uniqueFailures": 0
+    }
+  },
+  "implementation-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 80,
+      "failed": 0,
+      "ignored": 11,
+      "totalResults": 91,
+      "uniqueFailures": 0
+    }
+  },
+  "negative-control": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    }
+  },
+  "restored-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 6,
+      "uniqueFailures": 0
+    }
+  },
+  "check": {
+    "selection": {
+      "filesSelected": 58,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "lint": {
+    "selection": {
+      "filesSelected": 2,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    }
+  },
+  "fmt": {
+    "summary": {
+      "filesSelected": 2,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "doc-lint": {
+    "summary": {
+      "totalPackages": 1,
+      "totalErrors": 0,
+      "totalPrivateTypeRef": 0,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    }
+  },
+  "quality-gate": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "source-command-exits": {
+    "full-kv-check": 0,
+    "lint": 0,
+    "fmt": 0,
+    "doc-lint": 0,
+    "jsr-audit": 0
+  }
+}

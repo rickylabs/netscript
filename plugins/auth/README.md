@@ -5,12 +5,12 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **The authentication plugin for NetScript: one install wires a unified auth API, pluggable backends,
-the auth database schema, and durable session streams into your app.**
+backend-specific persistence, and durable session streams into your app.**
 
 Authentication is the feature every app needs and no team wants to rebuild — providers, sessions,
 cookies, schema, and the operational glue around all four. `@netscript/plugin-auth` ships it as one
 declarative manifest: `netscript plugin install auth` scaffolds the auth workspace, registers the
-`auth-api` service, provisions the auth schema and session storage, and adds everything to your
+`auth-api` service, provisions the selected backend's storage, and adds everything to your
 Aspire AppHost. Your app talks to one versioned auth API; which identity backend answers is a
 configuration choice, not a rewrite.
 
@@ -32,12 +32,14 @@ them to a NetScript host.
   sign-in.
 - **Capability differences surface, not crash** — operations a backend does not support return typed
   auth-provider errors at the API boundary instead of failing deep in a handler.
-- **Schema included** — the plugin ships the auth-owned Prisma schema, so generated workspaces
-  provision auth tables alongside the rest of the database.
+- **Backend-specific persistence** — `kv-oauth` uses KV and needs no database or Prisma tables;
+  `workos` contributes no SQL schema. Only `better-auth` installs the auth-owned Prisma schema
+  and provisions auth tables alongside the rest of the database.
 - **Durable session streams** — the browser-safe `./streams` subpath builds a durable-stream
   projection for the `authSession` entity, with server-side emit helpers on `./streams/server`.
-- **Provisioning recorded up front** — auth requires Postgres (schema) and Deno KV (sessions); the
-  install records both from the manifest so `netscript db` and Aspire provision them for you.
+- **Provisioning recorded up front** — installation resolves `NETSCRIPT_AUTH_BACKEND` before
+  database planning. The default `kv-oauth` backend records KV without a SQL requirement;
+  `better-auth` also records database wiring so `netscript db` and Aspire can provision it.
 - **Typed bearer client opt-in** — the manifest advertises a browser/server-safe bearer factory, and
   install emits `auth/sdk-client.ts` for explicit placement on the `auth-api` client only.
 
@@ -64,8 +66,8 @@ netscript plugin install auth --name auth
 ```
 
 The plugin owns its setup — the CLI ships no embedded templates. The scaffolder wires the auth API
-service, the auth database schema, session streams, and Aspire resources into your workspace, then
-pins the matching `@netscript/*` versions.
+service, the selected backend's persistence, session streams, and Aspire resources into your
+workspace, then pins the matching `@netscript/*` versions.
 
 By default Aspire allocates the `auth-api` host port at every start. An OAuth callback registered
 with an identity provider must keep its port, so pin it when you use the interactive `kv-oauth`
@@ -216,8 +218,9 @@ upstream failures remain `AUTH_PROVIDER_ERROR` (502).
 
 ## Compatibility
 
-The auth API service requires Deno 2.9+ and needs Postgres for the auth schema and Deno KV for
-sessions (both provisioned through `netscript db` and Aspire). The manifest, typed SDK contribution
+The auth API service requires Deno 2.9+ and Deno KV for session-related state. Only the
+`better-auth` backend also needs a SQL database and its auth schema, provisioned through
+`netscript db` and Aspire. The manifest, typed SDK contribution
 reference, generated bearer starter, and browser-safe `./streams` subpath are importable in any
 TypeScript environment.
 

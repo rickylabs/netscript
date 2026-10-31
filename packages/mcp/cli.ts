@@ -3,6 +3,7 @@
  * @module
  */
 import { createMcpServer } from './src/application/runner/mcp-server.ts';
+import { AspireTelemetrySnapshot } from './src/infrastructure/telemetry/aspire-telemetry-snapshot.ts';
 import type { McpServer } from './src/application/runner/mcp-server.ts';
 import { createDocsFlows } from './src/application/docs/docs-flows.ts';
 import { FetchTelemetryProbe } from './src/infrastructure/fetch-telemetry-probe.ts';
@@ -10,7 +11,7 @@ import {
   createAspireDashboardFetch,
   createResolvedTelemetryQuery,
   readTelemetryEndpointEnvironment,
-} from './src/infrastructure/telemetry-query-adapter.ts';
+} from './src/infrastructure/telemetry/telemetry-query-adapter.ts';
 import { runNewlineStdio } from './src/infrastructure/stdio-transport.ts';
 import {
   FilesystemDocsCorpus,
@@ -130,6 +131,11 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     ...(options.endpoint ? { NETSCRIPT_TELEMETRY_ENDPOINT: options.endpoint } : {}),
   };
   const query = createResolvedTelemetryQuery(undefined, environment, { aspirePs });
+  const snapshot = new AspireTelemetrySnapshot({
+    projectRoot,
+    endpoint: options.endpoint ?? environment.NETSCRIPT_TELEMETRY_ENDPOINT,
+    dashboardPort: environment.ASPIRE_DASHBOARD_PORT,
+  });
   const configuredDocsRoot = options.docsRoot ??
     resolveDocsRoot([], Deno.env.get('NETSCRIPT_DOCS_ROOT'), projectRoot);
   const docsCorpus = configuredDocsRoot
@@ -183,7 +189,7 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
       ),
       get_app_status: withReceipt(
         createGetAppStatusFlow(
-          query,
+          snapshot,
           options.projectDoctor ?? new UnwiredProjectDoctor(),
           options.projectRoot ?? '.',
         ),
@@ -206,13 +212,13 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         warnEvidence,
       ),
       analyze_service_performance: withReceipt(
-        createAnalyzeServicePerformanceFlow(query),
+        createAnalyzeServicePerformanceFlow(snapshot),
         evidence,
         'mcp analyze_service_performance',
         warnEvidence,
       ),
       analyze_db_bottlenecks: withReceipt(
-        createAnalyzeDbBottlenecksFlow(query),
+        createAnalyzeDbBottlenecksFlow(snapshot),
         evidence,
         'mcp analyze_db_bottlenecks',
         warnEvidence,

@@ -2339,6 +2339,22 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
   doc-lint, and publish dry-run must remain green.
 
+### 2026-10-31 maintenance extension — #2269
+
+- **Reason:** Release citations add 10 lines to the already-deferred central contract table
+  (459 → 469). The shared full corpus adds one real documentation asset group under
+  `src/infrastructure` (17 → 18 immediate children), beyond the existing F-16 cap of 12.
+  It replaces the CLI's stored corpus and MCP's curated copy; it does not introduce another corpus.
+- **Cost:** Ten more schema lines remain in the central registry and one additional adapter-layer
+  group must be considered during the existing MCP shape cleanup. No runtime resource or eager
+  full-corpus decoding cost is accepted.
+- **Owner:** MCP / internals maintainers; coordination in #2474, implementation #2269.
+- **Target:** Before the next MCP documentation-tool or corpus-surface expansion.
+- **Status:** DEBT_ACCEPTED for this scoped maintenance extension, subject to coordinator review.
+- **Gate:** Extract the documentation schemas into their domain module and group existing docs
+  adapters with the documentation assets so F-16 does not grow; preserve schema parity, every-page
+  retrieval, independent citations, and green check/test/lint/fmt/doc-lint and carrier freshness.
+
 ## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
 
 - **Reason:** PR #1427 deepens `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906
@@ -3184,3 +3200,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open.
 - **Gate:** Split emphasis font-style and font-weight names with an explicit migration, preserve Figma round-trip, and pass DTCG schema/name/CSS tests across every preset.
 - **Notes:** Cost: standard DTCG consumers see regular weight for Italic unless they read the style extension; CSS consumers cannot use the mixed source WEB name in one fixed property across every preset. No current in-repo component consumes these names. Preserve exact original export and expose the limitation until the naming migration is ratified. Independent slice-review F1 identified this risk; scoped owner authorization covers recording it, not closing the design burn-down.
+
+## packages/cli — CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE
+
+- **ID:** `CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE`
+- **Reason:** Issue #2149 adds backend-dependent SQL selection before install planning. The existing
+  public install module grows from 712 to 758 lines, above the 500-line F-1 warning threshold, and
+  its existing over-cap directory grows from 15 to 18 immediate children. The selector, schema
+  resolver and colocated regression remain named, focused modules rather than further inlining.
+- **Cost:** Three additional sibling entries and 46 orchestration lines in an already oversized
+  feature; no new runtime process, service abstraction or per-request work.
+- **Why deferred:** Splitting unrelated installer confirmation, metadata persistence and dispatch
+  responsibilities would widen the auth persistence fix beyond its consumer acceptance proof.
+- **Owner:** CLI plugin-install maintainers.
+- **Target:** Before adding another plugin persistence selection axis.
+- **Linked plan:** `.llm/runs/orch-divybot-6542487846--2149/plan.md`.
+- **Created:** 2026-10-31.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Split install orchestration below 500 lines and feature folders to at most 12 immediate
+  children while preserving plugin install/dispatch/mutator tests, auth backend consumer proofs,
+  package publish dry-run and the coordinator's full `scaffold.runtime` verdict.

@@ -183,7 +183,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     symbolCoverage: {
       mode: 'entrypoints-only',
       reason:
-        'The page guarantees all three entrypoints while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.',
+        'The page guarantees all four entrypoints, including the shared docs transport, while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.',
     },
   },
   {

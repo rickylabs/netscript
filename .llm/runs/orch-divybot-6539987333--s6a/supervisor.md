@@ -29,3 +29,8 @@ CodeBlock review repair surface: browser component fixture and call-count regres
 `tools/fresh-ui-browser/`; the existing Expo and desktop reference locks must reflect the new
 package authoring import declaration. These native lock refreshes add only workspace dependency
 metadata; no new resolved package versions.
+
+Current-main reconciliation also regenerates canonical MCP prose/publish carriers under
+`packages/mcp/src/infrastructure/docs/` and `packages/mcp/src/publish-assets.generated.ts`;
+main moved documentation ownership there and removes the legacy CLI prose carrier.
+No authored MCP behavior changes.

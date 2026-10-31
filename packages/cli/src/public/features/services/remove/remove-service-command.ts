@@ -1,3 +1,4 @@
+import { renderDoctorReport } from '../../../../kernel/presentation/output/render-doctor-report.ts';
 import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
@@ -37,6 +38,7 @@ export function createServiceRemoveCommand(
         projectRoot,
         keepContract: flags.keepContract ?? false,
       }, dependencies);
+      renderDoctorReport(result.browserAuthReport);
       outputText(
         `Removed service "${name}", ${result.removedContracts.length} contract file(s), and ` +
           `regenerated ${result.helperFiles.length} Aspire helper file(s).`,

@@ -4,6 +4,10 @@ import { decodeEnvelope, encodeEnvelope, encodeStoredValue } from '../adapters/r
 import { WatchBatchQueue } from '../adapters/redis/watch-batch-queue.ts';
 import { BIGINT_VALUES, MARKER_SHAPED_VALUES } from '../src/testing/values.ts';
 
+// Natural debounce expiry must not satisfy abort completion within the hang guard.
+const ABORT_DEBOUNCE_MS = 60_000;
+const ABORT_TIMEOUT_MS = 5_000;
+
 Deno.test('Redis codec round-trips bigint values at any depth', () => {
   for (const value of BIGINT_VALUES) {
     assertEquals(decodeEnvelope(encodeStoredValue(value, 'v1')), { value, versionstamp: 'v1' });
@@ -75,11 +79,17 @@ Deno.test('WatchBatchQueue keeps events queued after an earlier debounced batch'
 Deno.test('WatchBatchQueue ends an active debounce window on abort', async () => {
   const queue = new WatchBatchQueue<string>();
   const controller = new AbortController();
-  const batch = queue.next(1_000, controller.signal);
-  queue.push('a');
-  await delay(10);
-  controller.abort();
-  assertEquals(await deadline(batch, 100), []);
+  const batch = queue.next(ABORT_DEBOUNCE_MS, controller.signal);
+  try {
+    queue.push('a');
+    // next() resumes from arrival and starts its debounce before this continuation.
+    await Promise.resolve();
+    controller.abort();
+    assertEquals(await deadline(batch, ABORT_TIMEOUT_MS), []);
+    assertEquals(await deadline(queue.next(undefined, controller.signal), ABORT_TIMEOUT_MS), []);
+  } finally {
+    controller.abort();
+  }
 });
 
 Deno.test('WatchBatchQueue resolves a pending wait with an empty batch on abort', async () => {

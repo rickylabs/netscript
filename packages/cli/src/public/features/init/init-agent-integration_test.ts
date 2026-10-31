@@ -32,10 +32,11 @@ async function fixture(
   const command = () =>
     createInitCommand({
       ...dependencies,
-      applyPreset: async (input) => {
-        assert(await new DenoAgentInitFileSystem().exists(join(root, 'deno.json')));
-        presets.push(input);
-      },
+      preparePreset: () =>
+        Promise.resolve(async (input) => {
+          assert(await new DenoAgentInitFileSystem().exists(join(root, 'deno.json')));
+          presets.push(input);
+        }),
       // Keep the real scaffold writers and installer; do not launch external processes.
       initContext: {
         ...dependencies.initContext,

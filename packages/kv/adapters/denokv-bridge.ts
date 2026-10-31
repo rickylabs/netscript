@@ -569,6 +569,13 @@ export class WatchableKvBridge {
    * versionstamps and publication order never determine write order. Batches
    * whose stored state is unchanged do not produce a frame.
    *
+   * Wrapped adapters may return a plain iterable without readiness and ignore
+   * `initial`. If their first batch has no initial events, one full `getMany`
+   * (or per-key reads when unavailable) seeds the frame before reconciliation.
+   * This fallback observes current storage, not an acknowledged snapshot boundary;
+   * a silent source produces no initial frame until its first batch arrives.
+   * Later batches read only their affected keys and retain the other entries.
+   *
    * kvdex's `createWatcher` reads from this stream via `.getReader()`.
    */
   watch<T = unknown>(
@@ -584,6 +591,7 @@ export class WatchableKvBridge {
     const state = new Map<string, DenoKvEntryMaybe<T>>();
     // Keep delete stamps separately: kvdex's absent entry must expose null.
     const versions = new Map<string, string>();
+    let initialized = false;
     let ended = false;
 
     return new ReadableStream<DenoKvEntryMaybe<T>[]>({
@@ -600,6 +608,28 @@ export class WatchableKvBridge {
               return;
             }
             let changed = false;
+            if (!initialized) {
+              initialized = true;
+              if (!events.some((event) => event.initial)) {
+                const entries = kv.getMany
+                  ? await kv.getMany<T>(keys)
+                  : await Promise.all(keys.map((key) => kv.get<T>(key)));
+                if (ended) return;
+                for (let index = 0; index < keys.length; index++) {
+                  const key = keys[index];
+                  const entry = entries[index];
+                  const keyString = keyToString(key);
+                  state.set(keyString, {
+                    key,
+                    value: entry ? entry.value : null,
+                    versionstamp: entry?.versionstamp ?? null,
+                  } as DenoKvEntryMaybe<T>);
+                  if (entry?.versionstamp != null) versions.set(keyString, entry.versionstamp);
+                }
+                // Even absent or unchanged keys constitute the initial full frame.
+                changed = true;
+              }
+            }
             const affected = new Map<string, WatchEvent<T>>();
             for (const event of events) {
               const key = keyToString(event.key);
