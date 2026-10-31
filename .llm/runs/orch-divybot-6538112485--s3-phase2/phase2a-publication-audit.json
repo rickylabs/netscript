@@ -107,5 +107,9 @@
     "slowTypeWarnings": 0,
     "isRuntimePublishProof": false
   },
-  "ready": false
+  "ready": false,
+  "followUpIssue": 2531,
+  "owner": "Fresh UI package maintainers",
+  "target": "Before next stable Fresh UI design-system publication",
+  "independentFinalDisposition": "Pending"
 }
