@@ -531,16 +531,16 @@
     {
       "id": "A2-2395",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2483,
-      "headSha": "966c3ef2f27bb5e43363b860086d6c16a5c53105",
+      "headSha": "002ce25b680991be5920eb4752c5a7d1f7496faa",
       "issueNumbers": [
         2395
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2395",
       "receiptRefs": [],
-      "note": "re-planning: fresh PLAN-EVAL cycle authorized 01:11Z (briefs/2395.steer-1.md)"
+      "note": "READY at 002ce25; Opus MERGE at head; e2e-cli-gate armed"
     },
     {
       "id": "A3-2151",
@@ -582,11 +582,24 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2487,
-      "headSha": "72cb6aad669f528df2209922baa96310b074c338",
+      "headSha": "b48b556c661e87b15720bddad460f50d9025652d",
       "issueNumbers": [
         2369
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2369",
+      "receiptRefs": []
+    },
+    {
+      "id": "E2-2385",
+      "lane": "docs",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2489,
+      "headSha": "055899211c9261f3ad205f118bfecddf6ec0ab1b",
+      "issueNumbers": [
+        2385
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2385",
       "receiptRefs": []
     }
   ],
@@ -650,6 +663,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS both tiers (PR event)",
       "completedAt": "2026-10-31T03:26:09Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2483,
+      "headSha": "002ce25b680991be5920eb4752c5a7d1f7496faa",
+      "startedAt": "2026-10-31T03:57:09.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -836,7 +857,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T03:37:33.000Z",
+  "updatedAt": "2026-10-31T03:57:09.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -965,8 +986,8 @@
       "commentId": 6538461367,
       "postedAt": "2026-10-31T03:33:22.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "started",
-      "pr": null
+      "state": "pr-open",
+      "pr": 2489
     }
   ],
   "coordinatorArtifactPr": 2475,

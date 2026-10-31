@@ -80,3 +80,5 @@
 - 03:26Z: **merged** #2485 (`2f426b970`) for #2367; #2367 closed. The expensive gate is free. The #2367 worker may self-claim next; check claims before any dispatch.
 - 03:33Z: no continuation claims after #2485; dispatched #2385 (E2, docs), comment 6538461367.
 - 03:37Z: #2385 started.
+- 03:43Z: #2385 → PR #2489 (draft).
+- 03:57Z: #2483 (#2395, A2) READY at `002ce25`, Opus MERGE at the head (after the authorized re-plan: CHANGES at `1edb71e`, then MERGE). The Redis lease uses private modules for atomic scripts, receipts and recovery. Extra files: e2e startup diagnostics, the native-desktop driver and a small Aspire register template change (CI reliability; evaluator-approved). Advisory debt: redis-lease-cardinality (F-16). **expensive-gate.acquired** on #2483.
