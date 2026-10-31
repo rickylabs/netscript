@@ -1,0 +1,7 @@
+Check plugins/workers/tests/streams/u3-docs-recipe-284d175c4bc17e6f/negative.ts
+TS2322 [ERROR]: Type 'number' is not assignable to type 'string | (() => MaybePromise<string>)'.
+  headers: { authorization: 1 },
+             ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/tests/streams/u3-docs-recipe-284d175c4bc17e6f/negative.ts:4:14
+
+error: Type checking failed.

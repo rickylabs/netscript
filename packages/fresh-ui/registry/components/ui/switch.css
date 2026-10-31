@@ -39,6 +39,6 @@
   transform: translateX(1rem);
 }
 
-.ns-choice--error .ns-switch__track {
+:where(.ns-choice)[data-invalid='true'] .ns-switch__track {
   border-color: var(--ns-destructive);
 }

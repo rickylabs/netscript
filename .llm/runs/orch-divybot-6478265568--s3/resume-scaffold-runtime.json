@@ -1,0 +1,13 @@
+{
+  "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+  "gitHead": "6e66b74a1011911f7d9b70d00e02a977ac0cf76e",
+  "exitCode": 1,
+  "passed": 1,
+  "failed": 2,
+  "failures": [
+    "preflight.aspire",
+    "cleanup.aspire-stop"
+  ],
+  "reason": "Aspire doctor fails; Docker daemon is unavailable. No generated runtime started.",
+  "runtimeAcceptance": "UNPROVEN"
+}

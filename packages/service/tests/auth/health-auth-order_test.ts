@@ -1,0 +1,332 @@
+import {
+  assertEquals,
+  assertInstanceOf,
+  assertObjectMatch,
+  assertRejects,
+  assertThrows,
+} from '@std/assert';
+import { Hono } from 'hono';
+import { type AuthnOptions, createService, type Principal } from '../../mod.ts';
+
+function test(name: string, fn: Deno.TestDefinition['fn']): void {
+  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
+}
+
+test('health preserves native defaults, configured checks and deferred-route precedence', async (t) => {
+  for (const allowAnonymous of [undefined, [], ['/health']]) {
+    await t.step(`default=${JSON.stringify(allowAnonymous)}`, async () => {
+      let authn = 0;
+      let health = 0;
+      let ready = 0;
+      let raw = 0;
+      const builder = createService({}, { name: 'health-defaults', version: 'test-version' })
+        .withAuthn({
+          authenticator: {
+            authenticate: () => {
+              authn++;
+              return { ok: false, reason: 'must-not-run' };
+            },
+          },
+          protect: ['/'],
+          allowAnonymous,
+        }).withHealth().route('all', '/*', (c) => {
+          raw++;
+          return c.text('raw');
+        });
+      builder.withHealthCheck({
+        name: 'late-check',
+        check: () => {
+          health++;
+          return Promise.resolve({ healthy: true, message: 'live-array' });
+        },
+      });
+      const app = builder.build();
+      // Native readiness retains its live array; health checks snapshot on installation.
+      builder.withReadinessCheck(() => {
+        ready++;
+        return Promise.resolve(false);
+      });
+      for (const path of ['/health', '/health/live', '/health/ready']) {
+        for (const method of ['GET', 'HEAD']) {
+          const response = await app.request(path, { method });
+          const body = await response.text();
+          assertEquals(response.status, path.endsWith('/ready') ? 503 : 200);
+          if (method === 'HEAD') assertEquals(body, '');
+          if (method === 'GET' && path === '/health') {
+            const expected = { name: 'late-check', healthy: true, message: 'live-array' };
+            const data = JSON.parse(body);
+            assertEquals(data.version, 'test-version');
+            assertEquals(data.checks.length, 1);
+            assertObjectMatch(data.checks[0], expected);
+          }
+        }
+      }
+      assertEquals([authn, health, ready, raw], [0, 2, 2, 0]);
+    });
+  }
+});
+
+test('health is opt-in and late configuration installs once on the next build', async () => {
+  let raw = 0;
+  const without = createService({}, { name: 'no-health' })
+    .withAuthn({
+      protect: ['/'],
+      authenticator: { authenticate: () => ({ ok: false, reason: 'guarded' }) },
+    }).route('all', '/*', (c) => {
+      raw++;
+      return c.text('raw');
+    }).build();
+  assertInstanceOf(without, Hono);
+  assertEquals(without.routes.filter((route) => route.path.startsWith('/health')).length, 0);
+  const fallback = await without.request('/health');
+  assertEquals(await fallback.text(), 'raw');
+  assertEquals([fallback.status, raw], [200, 1]);
+
+  let calls = 0;
+  const builder = createService({}, { name: 'late-health' });
+  const app = builder.build();
+  assertInstanceOf(app, Hono);
+  assertEquals(app.routes.filter((route) => route.path === '/health').length, 0);
+  builder.withHealth({
+    checks: [{
+      name: 'late',
+      check: () => {
+        calls++;
+        return Promise.resolve({ healthy: true });
+      },
+    }],
+  });
+  assertEquals(app.routes.filter((route) => route.path === '/health').length, 0);
+  assertEquals(builder.build(), app);
+  assertEquals(builder.build(), app);
+  for (const path of ['/health', '/health/live', '/health/ready']) {
+    assertEquals(
+      app.routes.filter((route) => route.method === 'GET' && route.path === path).length,
+      1,
+    );
+  }
+  const response = await app.request('/health');
+  await response.text();
+  assertEquals([response.status, calls], [200, 1]);
+});
+
+test('repeated health/build/serve preserves one configuration and one auth installation', async () => {
+  let configured = 0;
+  let ignored = 0;
+  let authn = 0;
+  let authz = 0;
+  let raw = 0;
+  const principal: Principal = {
+    subject: 'test',
+    scopes: [],
+    roles: [],
+    scheme: 'custom',
+    claims: {},
+  };
+  const builder = createService({}, { name: 'health-once', port: 0 }).withAuthn({
+    protect: ['/'],
+    authenticator: {
+      authenticate: () => {
+        authn++;
+        return { ok: true, principal };
+      },
+    },
+  }).withAuthz({
+    authorizer: {
+      authorize: () => {
+        authz++;
+        return { allow: true };
+      },
+    },
+  }).withHealth({
+    includeDetails: false,
+    checks: [{
+      name: 'configured',
+      check: () => {
+        configured++;
+        return Promise.resolve({ healthy: true });
+      },
+    }],
+  }).withHealth({
+    includeDetails: true,
+    checks: [{
+      name: 'ignored',
+      check: () => {
+        ignored++;
+        return Promise.resolve({ healthy: false });
+      },
+    }],
+  }).route('get', '/guarded', (c) => {
+    raw++;
+    return c.text('guarded');
+  });
+  const app = builder.build();
+  assertInstanceOf(app, Hono);
+  const routes = app.routes.length;
+  builder.build();
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const running = await builder.serve({ hostname: '127.0.0.1', port: 0 });
+    try {
+      assertEquals(running.app, app);
+      assertEquals(app.routes.length, routes);
+      const response = await fetch(`http://127.0.0.1:${running.addr.port}/health`);
+      assertEquals(response.status, 200);
+      assertEquals((await response.json()).checks, []);
+      const guarded = await app.request('/guarded');
+      assertEquals(await guarded.text(), 'guarded');
+      assertEquals([configured, ignored, authn, authz, raw], [
+        attempt + 1,
+        0,
+        attempt + 1,
+        attempt + 1,
+        attempt + 1,
+      ]);
+    } finally {
+      await running.stop();
+    }
+  }
+  assertEquals(
+    app.routes.filter((route) => route.method === 'GET' && route.path === '/health').length,
+    1,
+  );
+});
+
+test('invalid rules reject every build and serve without partial middleware or listeners', async () => {
+  for (const failAtAuthz of [false, true]) {
+    let authn = 0;
+    let authz = 0;
+    let health = 0;
+    let raw = 0;
+    let listeners = 0;
+    let reads = 0;
+    const options: AuthnOptions = {
+      protect: ['/'],
+      authenticator: {
+        authenticate: () => {
+          authn++;
+          return { ok: false, reason: 'guarded' };
+        },
+      },
+    };
+    // Untyped caller data: when requested, authn validates before authz sees the invalid rule.
+    Object.defineProperty(options, 'allowAnonymous', {
+      configurable: true,
+      enumerable: true,
+      get: () => [{ method: failAtAuthz && ++reads % 2 === 1 ? 'GET' : 'get', path: '/health' }],
+    });
+    const builder = createService({}, { name: 'invalid-rule', port: 0 }).withAuthn(options)
+      .withAuthz({
+        authorizer: {
+          authorize: () => {
+            authz++;
+            return { allow: false, reason: 'guarded' };
+          },
+        },
+      }).withHealth({
+        checks: [{
+          name: 'never',
+          check: () => {
+            health++;
+            return Promise.resolve({ healthy: true });
+          },
+        }],
+      }).route('all', '/*', (c) => {
+        raw++;
+        return c.text('raw');
+      });
+    const serveDescriptor = Object.getOwnPropertyDescriptor(Deno, 'serve');
+    Object.defineProperty(Deno, 'serve', {
+      configurable: true,
+      value: () => {
+        listeners++;
+        throw new Error('listener must not start');
+      },
+    });
+    try {
+      assertThrows(() => builder.build(), TypeError, 'invalid anonymous request');
+      assertThrows(() => builder.build(), TypeError, 'invalid anonymous request');
+      await assertRejects(() => builder.serve(), TypeError, 'invalid anonymous request');
+      assertEquals([authn, authz, health, raw, listeners], [0, 0, 0, 0, 0]);
+    } finally {
+      if (serveDescriptor) Object.defineProperty(Deno, 'serve', serveDescriptor);
+    }
+    // A valid retry exposes any middleware accidentally registered by an earlier failed build.
+    Object.defineProperty(options, 'allowAnonymous', { value: ['/health'] });
+    const app = builder.build();
+    assertInstanceOf(app, Hono);
+    // One tracing stage, two auth stages, three health routes and the raw catch-all.
+    assertEquals(app.routes.length, 7);
+    const denied = await app.request('/guarded');
+    await denied.text();
+    assertEquals([denied.status, authn, authz, health, raw], [401, 1, 0, 0, 0]);
+  }
+});
+
+for (const cors of [false, true]) {
+  test(`health respects a custom anonymous list, CORS=${cors}`, async (t) => {
+    let authn = 0;
+    let authz = 0;
+    let health = 0;
+    let raw = 0;
+    const builder = createService({}, { name: 'health-order' });
+    if (cors) builder.withCors({ origin: ['https://allowed.example'] });
+    const app = builder.withAuthn({
+      authenticator: {
+        authenticate: () => {
+          authn++;
+          return { ok: false, reason: 'missing-credential' };
+        },
+      },
+      protect: ['/'],
+      allowAnonymous: ['/other'],
+    }).withAuthz({
+      authorizer: {
+        authorize: () => {
+          authz++;
+          return { allow: false, reason: 'must-not-run' };
+        },
+      },
+    }).withHealth({
+      checks: [{
+        name: 'count-health',
+        check: () => {
+          health++;
+          return Promise.resolve({ healthy: true });
+        },
+      }],
+    }).withReadinessCheck(() => {
+      health++;
+      return Promise.resolve(true);
+    }).route('all', '/*', (c) => {
+      raw++;
+      return c.text('raw');
+    }).build();
+    for (
+      const [method, path] of [
+        ['GET', '/health'],
+        ['HEAD', '/health'],
+        ['GET', '/health/live'],
+        ['HEAD', '/health/ready'],
+        ['POST', '/health'],
+        ['POST', '/guarded'],
+        ['GET', '/other'],
+        ['POST', '/other'],
+      ]
+    ) {
+      await t.step(`${method} ${path}`, async () => {
+        authn =
+          authz =
+          health =
+          raw =
+            0;
+        const response = await app.request(path, { method });
+        await response.text();
+        const anonymous = path === '/other';
+        assertEquals(
+          [response.status, authn, authz, health, raw],
+          [anonymous ? 200 : 401, anonymous ? 0 : 1, 0, 0, anonymous ? 1 : 0],
+        );
+      });
+    }
+  });
+}

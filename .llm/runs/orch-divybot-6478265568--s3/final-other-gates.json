@@ -1,0 +1,26 @@
+{
+  "freshUiPublishDryRun": {
+    "command": "deno publish --dry-run --allow-dirty --no-check=remote --frozen",
+    "cwd": "packages/fresh-ui",
+    "exitCode": 0,
+    "scope": "Static dry-run; no publication performed"
+  },
+  "contractFacadeDocLint": {
+    "exitCode": 0
+  },
+  "wholePackageDocLint": {
+    "baselineDiagnostics": 123,
+    "currentDiagnostics": 124,
+    "newDiagnostic": "JSON data export has no JSDoc annotation surface; TypeScript facade is clean",
+    "suppressed": false
+  },
+  "reviewThreads": {
+    "threads": 0,
+    "unanswered": 0,
+    "exitCode": 0
+  },
+  "lockHygiene": {
+    "changedLockfiles": []
+  },
+  "mcpGuidance": "Consulted before implementation; guidance retained in guidance.jsonl"
+}

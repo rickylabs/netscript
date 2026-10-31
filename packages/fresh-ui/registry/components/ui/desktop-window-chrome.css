@@ -70,7 +70,7 @@
   outline-offset: -3px;
 }
 
-.ns-desktop-window-chrome__action--close:hover {
+:where(.ns-desktop-window-chrome__action)[data-action='close']:hover {
   background: var(--ns-destructive);
   color: var(--ns-destructive-fg);
 }

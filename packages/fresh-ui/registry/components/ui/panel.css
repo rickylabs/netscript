@@ -3,11 +3,11 @@
   color: var(--ns-fg);
 }
 
-.ns-panel--muted {
+:where(.ns-panel)[data-variant='muted'] {
   background: color-mix(in srgb, var(--ns-muted) 14%, var(--ns-surface));
 }
 
-.ns-panel--raised {
+:where(.ns-panel)[data-variant='raised'] {
   background: var(--ns-surface-raised);
   box-shadow: var(--ns-shadow-xs);
 }

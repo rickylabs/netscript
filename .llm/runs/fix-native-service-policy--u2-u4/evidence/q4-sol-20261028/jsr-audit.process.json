@@ -1,0 +1,24 @@
+﻿{
+    "name":  "jsr-audit",
+    "startedUtc":  "2026-10-28T01:59:06.5105519Z",
+    "finishedUtc":  "2026-10-28T01:59:07.0643698Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-read",
+                      "--allow-write",
+                      "--allow-run",
+                      "--allow-env",
+                      ".llm/tools/fitness/audit-jsr-package.ts",
+                      "--root",
+                      "packages/service",
+                      "--no-dry-run",
+                      "--out",
+                      ".llm/tmp/native-service-q4-sol-20261028/jsr-audit.json"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\jsr-audit.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\jsr-audit.stderr.log"
+}

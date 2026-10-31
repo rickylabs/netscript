@@ -1,0 +1,47 @@
+[
+  {
+    "path": "packages/service/src/diagnostics/database-connectivity.ts",
+    "lines": 471,
+    "sha256": "2bd5d9084dd6628ebd8fb3dfcef021d75300fed54ffccc7e18d61b52f4eb13fe"
+  },
+  {
+    "path": "packages/service/tests/database-connectivity_test.ts",
+    "lines": 76,
+    "sha256": "fcc88cdf095886f776a9d2fd152b2ca82fb8f72181d99197dc6bc72288e4aa8c"
+  },
+  {
+    "path": "packages/service/tests/define-service_test.ts",
+    "lines": 197,
+    "sha256": "4ce566039d75488f81eda1ef89998e2ddd2fc437a9947439b50597bde4165686"
+  },
+  {
+    "path": "packages/service/tests/legacy-abort_test.ts",
+    "lines": 152,
+    "sha256": "aa504ceb712a6b9228580151e655fb629b9e30dd2eb943f86d0ef104f7a05d14"
+  },
+  {
+    "path": "packages/service/tests/_fixtures/legacy-abort-service.ts",
+    "lines": 44,
+    "sha256": "c827d489353f28a0627351f5a1c7687a18b22059d4b769de32b70b51a7adde40"
+  },
+  {
+    "path": "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+    "lines": 196,
+    "sha256": "89046708df9f01e2338a82e69ce446c116404b109fabdbfbc03a4781a76f92cc"
+  },
+  {
+    "path": "packages/service/tests/body-limit_test.ts",
+    "lines": 254,
+    "sha256": "91877ee10614193217271a0ff299c1e9aa155eaf4a6092720c058568ae171e66"
+  },
+  {
+    "path": "packages/service/src/primitives/body-limit.ts",
+    "lines": 112,
+    "sha256": "86fd3dd5e193353dd1a916b76decc7d3f9efd5428b083f68b8d373fa2816ed2a"
+  },
+  {
+    "path": "packages/service/tests/rate-limit-address-key_test.ts",
+    "lines": 205,
+    "sha256": "b34460a150dc9772bc59c4209c7664a246539233ab98efc3139e617b79be490e"
+  }
+]

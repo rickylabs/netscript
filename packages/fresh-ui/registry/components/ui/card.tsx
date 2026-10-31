@@ -12,6 +12,8 @@ import type { Renderable } from '../../lib/public-types.ts';
 interface CardSectionProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
+  'data-part'?: string;
+  'data-scope'?: string;
 }
 
 interface CardProps extends CardSectionProps {
@@ -20,6 +22,7 @@ interface CardProps extends CardSectionProps {
 
 interface CardTextProps
   extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
+  'data-scope'?: string;
   children: Renderable;
   class?: string;
 }
@@ -36,7 +39,13 @@ function CardRoot({ children, class: className, interactive = false, ...props }:
   return (
     <div
       {...props}
-      class={cn('ns-card', interactive && 'ns-card--interactive', className)}
+      class={cn('ns-card', className)}
+      data-interactive={interactive ? ('true') : undefined}
+      data-variant='default'
+      data-size='md'
+      data-state='rest'
+      data-part={props['data-part'] ?? 'root'}
+      data-scope={props['data-scope'] ?? 'card'}
     >
       {children}
     </div>
@@ -44,23 +53,68 @@ function CardRoot({ children, class: className, interactive = false, ...props }:
 }
 
 function CardHeader({ children, class: className, ...props }: CardSectionProps): VNode {
-  return <div {...props} class={cn('ns-card__header', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-card__header', className)}
+      data-part='header'
+      data-scope={props['data-scope'] ?? 'card'}
+    >
+      {children}
+    </div>
+  );
 }
 
 function CardTitle({ children, class: className, ...props }: CardTextProps): VNode {
-  return <p {...props} class={cn('ns-card__title', className)}>{children}</p>;
+  return (
+    <p
+      {...props}
+      class={cn('ns-card__title', className)}
+      data-part='title'
+      data-scope={props['data-scope'] ?? 'card'}
+    >
+      {children}
+    </p>
+  );
 }
 
 function CardDescription({ children, class: className, ...props }: CardTextProps): VNode {
-  return <p {...props} class={cn('ns-card__description', className)}>{children}</p>;
+  return (
+    <p
+      {...props}
+      class={cn('ns-card__description', className)}
+      data-part='description'
+      data-scope={props['data-scope'] ?? 'card'}
+    >
+      {children}
+    </p>
+  );
 }
 
 function CardBody({ children, class: className, ...props }: CardSectionProps): VNode {
-  return <div {...props} class={cn('ns-card__body', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-card__body', className)}
+      data-part='body'
+      data-scope={props['data-scope'] ?? 'card'}
+    >
+      {children}
+    </div>
+  );
 }
 
 function CardFooter({ children, class: className, ...props }: CardSectionProps): VNode {
-  return <div {...props} class={cn('ns-card__footer', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-card__footer', className)}
+      data-part='footer'
+      data-scope={props['data-scope'] ?? 'card'}
+    >
+      {children}
+    </div>
+  );
 }
 
 /**

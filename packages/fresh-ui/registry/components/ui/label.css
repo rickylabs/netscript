@@ -6,7 +6,7 @@
   margin-bottom: var(--ns-space-1);
 }
 
-.ns-label--required::after {
+:where(.ns-label)[data-required='true']::after {
   content: ' *';
   color: var(--ns-destructive);
 }

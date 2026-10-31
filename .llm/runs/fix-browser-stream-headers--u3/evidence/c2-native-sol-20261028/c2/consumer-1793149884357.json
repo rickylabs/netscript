@@ -1,0 +1,14 @@
+{
+  "selected": "consumer",
+  "args": [
+    "check",
+    "--frozen",
+    "--unstable-kv",
+    "plugins/workers/tests/streams/live-query-consumer_type.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:11:24.360Z",
+  "ended": "2026-10-28T01:11:24.543Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/consumer-1793149884357"
+}

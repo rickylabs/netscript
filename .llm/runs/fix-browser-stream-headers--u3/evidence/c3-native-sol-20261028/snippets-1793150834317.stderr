@@ -1,0 +1,1 @@
+Task docs:snippets deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-snippets.ts

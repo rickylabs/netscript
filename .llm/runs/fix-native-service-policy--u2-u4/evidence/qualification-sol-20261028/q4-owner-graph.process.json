@@ -1,0 +1,16 @@
+﻿{
+    "name":  "q4-owner-graph",
+    "startedUtc":  "2026-10-28T01:28:52.9991130Z",
+    "finishedUtc":  "2026-10-28T01:28:53.1150673Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "info",
+                      "--cached-only",
+                      "--frozen",
+                      "--json",
+                      "packages/service/src/primitives/body-limit.ts"
+                  ],
+    "exitCode":  1,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\q4-owner-graph.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\q4-owner-graph.stderr.log"
+}

@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008","mode":"check","summary":{"filesSelected":127,"batches":2,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":127,"filesProcessed":127,"droppedFiles":[],"refusals":[]},"findings":[]}

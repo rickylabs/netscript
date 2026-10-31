@@ -1,0 +1,13 @@
+# Service independent implementation checkpoint
+
+PR #2422, source HEAD `de9f6df3561d9e27587dd63687c8825254e9c3d5`: the revised complete independent report is PASS with bounded **DEBT_ACCEPTED**, not a fitness or merge PASS. Root has read and accepted both complete reports. No source fix is requested by this checkpoint; the three low findings remain recorded.
+
+The original report's 20 complete EOF reads and own relevant NetScript MCP calls remain history. Its debt NOT RE-READ limitation is preserved. The same evaluator session `ses_e7f6de463ffeReuJZAVbOznsLd` then read three supplemental views through EOF, including the full canonical service debt entry, and issued the revised report. Other registry entries were not re-read. Original and revised reports, coverage, identity, guards and result are kept separately.
+
+Observed model: `openrouter/x-ai/grok-4.7`; requested xhigh. Actual provider effort is not independently attested. No equivalence to a differently named historical model is claimed. Both owned native child statuses/pipes settled with code 0 and no guard failures. This preparation launches no model and creates no new allowance or account action.
+
+The revised report accepts only the recorded F-1 scope: builder 633 <= 661, types 335 inspect-only, tests <=480, +14/-0 canonical debt delta, deadline 2026-11-10 or the stable API line (earlier wins), no automatic extension. The old parent arch:check sentence is stale, not a current PASS. F-10, composite DB/architecture, historical Windows mapped-IPv4, security/quality/close-gate, e2e, browser/CEF/EIS and release remain unwaived. The report's BetterAuth/security row is historical; separate unintegrated security work is not silently substituted into this source HEAD.
+
+Only public review evidence and inert driver source archives are copied. All account/key/window snapshots remain in ignored originals; the sanitized admission receipt preserves only planned estimates and predicates. The hash-resolution map gives private ignored resolutions for omitted snapshots and any omitted native events. Native tool output, including source-packet/root-context strings, was inspected for embedded snapshot payloads; the audit records whether it remains byte-identical or contains explicit omission markers. Public prices, model-reported cost and token counts are distinct from account snapshots.
+
+Prepared for root checkpoint review only; no staging, commit, push, source/debt change, CI rerun or runtime/inference occurred. Original source packets, outputs, seals and failed preparation history remain unchanged in ignored storage.

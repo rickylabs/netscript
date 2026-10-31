@@ -1,8 +1,9 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { type Context, Hono } from 'hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../../src/auth/auth-middleware.ts';
 import type { ProcedurePolicyResolver } from '../../src/auth/contract/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, Principal } from '../../src/auth/types.ts';
+import type { AnonymousRule, AuthnOptions } from '../../src/auth/mod.ts';
 
 type AuthTestEnv = {
   Variables: {
@@ -324,3 +325,153 @@ Deno.test('authn middleware guards a matched required procedure outside legacy p
   assertEquals(response.status, 401);
   assertEquals(authenticatorCalls, 1);
 });
+
+function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
+  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
+}
+
+exactTest('exact anonymous rules validate in both middleware factories', () => {
+  const invalid = [
+    { method: 'get', path: '/health' },
+    { method: 'OPTIONS', path: '/health' },
+    { method: 'ALL', path: '/health' },
+    ...[
+      'health',
+      '/health/',
+      '//health',
+      '/he%61lth',
+      '/health*',
+      '/health?x',
+      '/health#f',
+      '/health/{id}',
+      '/health :x',
+      '/health\\x',
+      '',
+    ].map((path) => ({ method: 'GET', path })),
+  ];
+  for (const rule of invalid) {
+    const options: AuthnOptions = {
+      authenticator: { authenticate: () => ({ ok: true, principal }) },
+    };
+    Object.defineProperty(options, 'allowAnonymous', { value: [rule] });
+    assertThrows(() => createAuthnMiddleware(options), TypeError, 'invalid anonymous request');
+    const authorizer: AuthorizerPort = { authorize: () => ({ allow: true }) };
+    const authz = { authorizer };
+    Object.defineProperty(authz, 'allowAnonymous', { value: [rule] });
+    assertThrows(() => createAuthzMiddleware(authz), TypeError, 'invalid anonymous request');
+  }
+  for (const factory of [createAuthnMiddleware, createAuthzMiddleware]) {
+    factory({
+      authenticator: { authenticate: () => ({ ok: true, principal }) },
+      authorizer: { authorize: () => ({ allow: true }) },
+      allowAnonymous: [{ method: 'GET', path: '/' }, { method: 'GET', path: '/' }],
+    });
+  }
+});
+
+exactTest(
+  'exact anonymous method/path matrix counts dispatch and keeps contract precedence',
+  async (t) => {
+    type Row = {
+      rules?: readonly AnonymousRule[];
+      method: string;
+      path: string;
+      anonymous: boolean;
+      policy?: 'none' | 'required';
+      throwing?: boolean;
+    };
+    const get: AnonymousRule[] = [{ method: 'GET', path: '/health' }];
+    const rows: Row[] = [];
+    for (const rules of [undefined, [], ['/health'], ['/health/']]) {
+      rows.push({ rules, method: 'POST', path: '/health/anything', anonymous: true });
+      rows.push({ rules, method: 'DELETE', path: '/health%2Fx', anonymous: false });
+    }
+    for (const method of ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']) {
+      rows.push({ rules: get, method, path: '/health', anonymous: method === 'GET' });
+    }
+    for (
+      const path of [
+        '/health?x=1',
+        '/x/../health',
+        '/health/live',
+        '/health/x',
+        '/healthz',
+        '/health/',
+        '//health',
+        '/HEALTH',
+        '/he%61lth',
+        '/health%2Fx',
+        '/health%2F..%2Fx',
+      ]
+    ) {
+      rows.push({
+        rules: get,
+        method: 'GET',
+        path,
+        anonymous: path.includes('?') || path === '/x/../health',
+      });
+    }
+    const head: AnonymousRule[] = [{ method: 'HEAD', path: '/health' }];
+    rows.push(
+      { rules: head, method: 'HEAD', path: '/health', anonymous: true },
+      { rules: head, method: 'GET', path: '/health', anonymous: false },
+      { rules: ['/api/docs', ...get], method: 'POST', path: '/api/docs/anything', anonymous: true },
+      { rules: ['/api/docs', ...get], method: 'POST', path: '/health', anonymous: false },
+      { rules: get, method: 'GET', path: '/api/public', anonymous: true, policy: 'none' },
+      { rules: get, method: 'GET', path: '/health', anonymous: false, policy: 'required' },
+      { rules: get, method: 'POST', path: '/health', anonymous: false, throwing: true },
+    );
+    for (const row of rows) {
+      await t.step(
+        `${row.method} ${row.path} ${JSON.stringify(row.rules)} ${row.policy ?? ''}`,
+        async () => {
+          let authn = 0;
+          let authz = 0;
+          let handler = 0;
+          const app = new Hono<AuthTestEnv>();
+          const policy = row.policy
+            ? { authentication: row.policy, requiredScopes: [], requiredRoles: [] }
+            : undefined;
+          const policyResolver: ProcedurePolicyResolver = {
+            resolve: () => policy ? { matched: true, policy } : { matched: false },
+          };
+          const options = { protect: ['/'], allowAnonymous: row.rules, policyResolver };
+          const authenticator: AuthenticatorPort = {
+            authenticate: () => {
+              authn++;
+              if (row.throwing) throw new Error('synthetic-private-detail');
+              return { ok: false, reason: 'guarded' };
+            },
+          };
+          const authorizer: AuthorizerPort = {
+            authorize: () => {
+              authz++;
+              return { allow: false, reason: 'guarded' };
+            },
+          };
+          app.use('*', createAuthnMiddleware({ ...options, authenticator }));
+          app.use('*', createAuthzMiddleware({ ...options, authorizer }));
+          app.all('/*', (c) => {
+            handler++;
+            return c.text('handled');
+          });
+          const response = await app.request(`http://localhost${row.path}`, { method: row.method });
+          const body = await response.text();
+          assertEquals([response.status, authn, authz, handler], [
+            row.anonymous ? 200 : row.throwing ? 503 : 401,
+            row.anonymous ? 0 : 1,
+            0,
+            row.anonymous ? 1 : 0,
+          ]);
+          if (row.method === 'HEAD') assertEquals(body, '');
+          if (row.throwing) {
+            assertEquals(JSON.parse(body), {
+              error: 'SERVICE_UNAVAILABLE',
+              message: 'Authentication service unavailable',
+            });
+          }
+        },
+      );
+    }
+  },
+);

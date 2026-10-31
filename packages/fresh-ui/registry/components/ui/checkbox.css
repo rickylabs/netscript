@@ -25,6 +25,6 @@
   color: var(--ns-primary-fg);
 }
 
-.ns-choice--error .ns-checkbox__indicator {
+:where(.ns-choice)[data-invalid='true'] .ns-checkbox__indicator {
   border-color: var(--ns-destructive);
 }

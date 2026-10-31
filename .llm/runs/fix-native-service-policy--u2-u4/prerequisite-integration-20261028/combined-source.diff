@@ -1,0 +1,3330 @@
+diff --git a/.llm/harness/debt/arch-debt.md b/.llm/harness/debt/arch-debt.md
+index 7e7ab6708..cde51dabf 100644
+--- a/.llm/harness/debt/arch-debt.md
++++ b/.llm/harness/debt/arch-debt.md
+@@ -2820,6 +2820,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
+ - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
+   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
+   green. `arch:check` currently exits zero with these size warnings.
++- **U4 health-registration delta (root disposition, 2026-10-27):** Numeric F-1 remains
++  **DEBT_ACCEPTED**, not PASS. Only health state / `installHealth()` may grow the existing
++  `service-builder-impl.ts` baseline of 629 physical/logical lines by at most 32 (maximum 661,
++  using the same count convention); no broad decomposition or size waiver is granted.
++  - **Owner:** NetScript service migration coordinator + rickylabs.
++  - **Remediation deadline:** 2026-11-10 or the stable API line, whichever is earlier; no automatic
++    extension. Remediate this additional growth within the existing builder decomposition debt.
++  - **Authority:** `.llm/runs/fix-native-service-policy--u2-u4/plan.md` revision 4 and
++    `root-policy-addendum.md` targeted owner disposition. Independent PLAN-EVAL must assess this
++    bounded delta before implementation; this entry does not authorize source by itself.
++  - `src/types.ts` stays inspect-only at its existing 335-line baseline. Runtime, behavior-test,
++    docs, publication/release and independent review gates remain required. This F-1 delta does not
++    waive F-10: all affected test files must stay at or below 480 physical lines; an explicit
++    conditional focused health-order proving owner may be selected before implementation.
+ 
+ ## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
+ 
+diff --git a/.llm/tools/deps/check-db-alignment.ts b/.llm/tools/deps/check-db-alignment.ts
+index 5ee740a82..b3b806943 100644
+--- a/.llm/tools/deps/check-db-alignment.ts
++++ b/.llm/tools/deps/check-db-alignment.ts
+@@ -1,10 +1,10 @@
+ /** Guard the Collection identity shared by SDK query and Fresh stream adapters. */
+-import { join } from '@std/path';
++import { join, toFileUrl } from '@std/path';
+ import { parseRegistrySpecifier, readJsonFile } from './workspace.ts';
+ 
+ interface DependencyGraph {
+   readonly npmPackages?: Readonly<Record<string, unknown>>;
+-  readonly modules?: readonly { readonly error?: unknown }[];
++  readonly modules?: readonly { readonly kind?: string; readonly error?: unknown }[];
+ }
+ 
+ /** Cold graph verdict; identities include peer-resolution suffixes. */
+@@ -22,7 +22,11 @@ export function analyzeDbGraph(graph: DependencyGraph): DbAlignmentReport {
+   if (identities.length !== 1) {
+     findings.push('Expected exactly one complete @tanstack/db identity');
+   }
+-  if ((graph.modules ?? []).some((module) => module.error !== undefined)) {
++  const modules = graph.modules ?? [];
++  if (!modules.some((module) => typeof module.kind === 'string' && module.kind !== 'external')) {
++    findings.push('Consumer graph contains no resolved modules');
++  }
++  if (modules.some((module) => module.error !== undefined)) {
+     findings.push('Consumer graph contains unresolved modules');
+   }
+   return { identities, findings };
+@@ -60,7 +64,14 @@ async function checkColdConsumer(root: string, freshOnly: boolean): Promise<bool
+       ).join('\n'),
+     );
+     const result = await new Deno.Command(Deno.execPath(), {
+-      args: ['info', '--json', '--no-config', '--no-lock', '--node-modules-dir=none', entry],
++      args: [
++        'info',
++        '--json',
++        '--no-config',
++        '--no-lock',
++        '--node-modules-dir=none',
++        toFileUrl(entry).href,
++      ],
+       env: { DENO_DIR: join(directory, 'cache') },
+       stdout: 'piped',
+       stderr: 'piped',
+diff --git a/.llm/tools/deps/check-db-alignment_test.ts b/.llm/tools/deps/check-db-alignment_test.ts
+index 8ea3ab1c7..7c3fe34b0 100644
+--- a/.llm/tools/deps/check-db-alignment_test.ts
++++ b/.llm/tools/deps/check-db-alignment_test.ts
+@@ -1,21 +1,86 @@
+ import { assertEquals } from '@std/assert';
++import { join, toFileUrl } from '@std/path';
+ import { analyzeDbGraph } from './check-db-alignment.ts';
+ 
+ Deno.test('DB guard requires one complete Collection identity and a resolved graph', () => {
+   const core = '@tanstack/db@0.6.17_typescript@7.0.2';
+-  assertEquals(analyzeDbGraph({ npmPackages: { [core]: {} } }).findings, []);
++  const modules = [{ kind: 'esm', error: undefined }];
++  assertEquals(analyzeDbGraph({ npmPackages: { [core]: {} }, modules }).findings, []);
+   for (
+     const other of [
+       '@tanstack/db@0.7.0_typescript@7.0.2',
+       '@tanstack/db@0.6.17_typescript@6.0.2',
+     ]
+   ) {
+-    assertEquals(analyzeDbGraph({ npmPackages: { [core]: {}, [other]: {} } }).findings.length, 1);
++    assertEquals(
++      analyzeDbGraph({ npmPackages: { [core]: {}, [other]: {} }, modules }).findings.length,
++      1,
++    );
+   }
+-  assertEquals(analyzeDbGraph({ npmPackages: {} }).findings.length, 1);
++  assertEquals(analyzeDbGraph({ npmPackages: {}, modules }).findings.length, 1);
+   assertEquals(
+-    analyzeDbGraph({ npmPackages: { [core]: {} }, modules: [{ error: 'not resolved' }] })
++    analyzeDbGraph({
++      npmPackages: { [core]: {} },
++      modules: [{ ...modules[0], error: 'not resolved' }],
++    })
+       .findings.length,
+     1,
+   );
+ });
++
++for (
++  const [name, modules] of [
++    ['missing', undefined],
++    ['empty', []],
++    ['external-only', [{ kind: 'external', error: undefined }]],
++    ['kind-less', [{}]],
++  ] as const
++) {
++  Deno.test({
++    name: `DB guard rejects ${name} module graphs despite identity metadata`,
++    sanitizeOps: true,
++    sanitizeResources: true,
++    sanitizeExit: true,
++    fn: () => {
++      const graph = { npmPackages: { '@tanstack/db@0.13.0_typescript@7.0.2': {} }, modules };
++      assertEquals(analyzeDbGraph(graph).findings, ['Consumer graph contains no resolved modules']);
++    },
++  });
++}
++
++Deno.test({
++  name: 'native info resolves a cold local file URL with spaces and a fragment character',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  fn: async () => {
++    const directory = await Deno.makeTempDir({ prefix: 'netscript-db-info-' });
++    const controller = new AbortController();
++    const deadline = setTimeout(() => controller.abort(), 10_000);
++    try {
++      const entry = join(directory, 'consumer space #.ts');
++      await Deno.writeTextFile(entry, 'export const value = 1;\n');
++      const fileUrl = toFileUrl(entry).href;
++      const result = await new Deno.Command(Deno.execPath(), {
++        args: ['info', '--json', '--no-config', '--no-lock', '--node-modules-dir=none', fileUrl],
++        env: { DENO_DIR: join(directory, 'cache') },
++        signal: controller.signal,
++        stdout: 'piped',
++        stderr: 'piped',
++      }).output();
++      assertEquals(result.success, true, new TextDecoder().decode(result.stderr));
++      const graph: {
++        roots: string[];
++        modules: { kind: string; specifier: string; error?: unknown }[];
++      } = JSON.parse(new TextDecoder().decode(result.stdout));
++      assertEquals(graph.roots, [fileUrl]);
++      assertEquals(graph.modules.map(({ kind, specifier }) => ({ kind, specifier })), [
++        { kind: 'esm', specifier: fileUrl },
++      ]);
++      assertEquals(graph.modules.filter((module) => module.error !== undefined), []);
++    } finally {
++      clearTimeout(deadline);
++      await Deno.remove(directory, { recursive: true });
++    }
++  },
++});
+diff --git a/.llm/tools/docs/check-exports-drift.ts b/.llm/tools/docs/check-exports-drift.ts
+index 8fa53d26e..a141990d2 100644
+--- a/.llm/tools/docs/check-exports-drift.ts
++++ b/.llm/tools/docs/check-exports-drift.ts
+@@ -834,7 +834,7 @@ export async function discoverReferencePagePaths(root: string = Deno.cwd()): Pro
+   const paths: string[] = [];
+   for await (const entry of Deno.readDir(referenceRoot)) {
+     if (!entry.isDirectory) continue;
+-    const relativePath = join('docs/site/reference', entry.name, 'index.md');
++    const relativePath = `docs/site/reference/${entry.name}/index.md`;
+     try {
+       if ((await Deno.stat(join(root, relativePath))).isFile) paths.push(relativePath);
+     } catch (error) {
+diff --git a/.llm/tools/docs/check-exports-drift_test.ts b/.llm/tools/docs/check-exports-drift_test.ts
+index 94725b9cc..bec11a7f4 100644
+--- a/.llm/tools/docs/check-exports-drift_test.ts
++++ b/.llm/tools/docs/check-exports-drift_test.ts
+@@ -1,9 +1,12 @@
+-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+-import { join, relative } from '@std/path';
++import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
++import { dirname, fromFileUrl, join, relative } from '@std/path';
+ import {
++  AUTHORITATIVE_MAPPING,
+   checkDrift,
+   checkExportsDrift,
+   deriveExpectedExports,
++  discoverReferencePagePaths,
++  EXCLUDED_REFERENCE_PAGES,
+   type PackageMapping,
+   parseDocContent,
+   validateReferencePageCoverage,
+@@ -151,6 +154,44 @@ Deno.test('reference page coverage refuses pages in neither classification', ()
+   );
+ });
+ 
++Deno.test('native reference discovery retains canonical identifiers and complete coverage', async () => {
++  const root = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
++  const paths = await discoverReferencePagePaths(root);
++  assert(paths.length > 0, 'reference discovery must select real pages');
++  assert(paths.every((path) => /^docs\/site\/reference\/[^/\\]+\/index\.md$/.test(path)));
++  assertEquals(
++    validateReferencePageCoverage(paths, AUTHORITATIVE_MAPPING, EXCLUDED_REFERENCE_PAGES),
++    [],
++  );
++  const referenceRoot = join(root, 'docs/site/reference');
++  let pageCount = 0;
++  for await (const entry of Deno.readDir(referenceRoot)) {
++    if (!entry.isDirectory) continue;
++    try {
++      if ((await Deno.stat(join(referenceRoot, entry.name, 'index.md'))).isFile) pageCount++;
++    } catch (error) {
++      if (!(error instanceof Deno.errors.NotFound)) throw error;
++    }
++  }
++  assertEquals(paths.length, pageCount, 'every existing reference index must be classified');
++  const missing = paths[0]!;
++  assertEquals(
++    validateReferencePageCoverage(
++      paths,
++      AUTHORITATIVE_MAPPING.filter(({ docPath }) => docPath !== missing),
++      EXCLUDED_REFERENCE_PAGES.filter(({ docPath }) => docPath !== missing),
++    ).length,
++    1,
++  );
++  assertEquals(
++    validateReferencePageCoverage(paths, [{ docPath: missing }], [{
++      docPath: missing,
++      reason: 'Duplicate classification control.',
++    }]).filter((error) => error.includes('is in both')).length,
++    1,
++  );
++});
++
+ Deno.test('reference page coverage refuses pages in both classifications', () => {
+   const duplicated = 'docs/site/reference/duplicated/index.md';
+   assertEquals(
+diff --git a/.llm/tools/docs/jsdoc-example-compiler.ts b/.llm/tools/docs/jsdoc-example-compiler.ts
+index 7b3344cc5..574cdbe3b 100644
+--- a/.llm/tools/docs/jsdoc-example-compiler.ts
++++ b/.llm/tools/docs/jsdoc-example-compiler.ts
+@@ -443,6 +443,14 @@ export async function compileJsdocExamples(
+     );
+     const tempLockPath = join(tempRoot, 'deno.lock');
+     await Deno.copyFile(rootLockPath, tempLockPath);
++    // Keep the Windows command line bounded while checking every isolated example module.
++    const entryPath = join(tempRoot, 'examples.ts');
++    await Deno.writeTextFile(
++      entryPath,
++      `${
++        modules.map((module) => `import ${JSON.stringify(toFileUrl(module.path).href)};`).join('\n')
++      }\n`,
++    );
+     const output = await new Deno.Command(Deno.execPath(), {
+       cwd: repositoryRoot,
+       env: { FORCE_COLOR: '0', NO_COLOR: '1' },
+@@ -453,7 +461,7 @@ export async function compileJsdocExamples(
+         tempLockPath,
+         '--config',
+         configPath,
+-        ...modules.map((module) => module.path),
++        entryPath,
+       ],
+       stdout: 'piped',
+       stderr: 'piped',
+diff --git a/.llm/tools/docs/jsdoc-example-compiler_test.ts b/.llm/tools/docs/jsdoc-example-compiler_test.ts
+index e009f5d6f..7bf5674fc 100644
+--- a/.llm/tools/docs/jsdoc-example-compiler_test.ts
++++ b/.llm/tools/docs/jsdoc-example-compiler_test.ts
+@@ -1,5 +1,5 @@
+-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+-import { dirname, fromFileUrl } from '@std/path';
++import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
++import { dirname, fromFileUrl, join } from '@std/path';
+ import type {
+   JsdocExampleAnalysis,
+   JsdocExampleBlock,
+@@ -124,6 +124,100 @@ Deno.test('relative and undeclared NetScript subpath controls fail without execu
+   assertStringIncludes(result.diagnostics, 'undeclared NetScript subpath');
+ });
+ 
++Deno.test('many example modules exceed Windows argv limits and retain tail diagnostics', async () => {
++  const moduleOwner: JsdocExampleOwner = {
++    memberName: '@netscript/test',
++    memberRoot: 'packages/test',
++    sourcePath: 'packages/test/mod.ts',
++    kind: 'module',
++  };
++  // Even a short temporary root gives the former 1,500-path argv more than 32,767 characters.
++  const blocks = Array.from(
++    { length: 1500 },
++    (_, index) => block(moduleOwner, 'const repeated: number = 1;\nvoid repeated;', index + 1),
++  );
++  const selected = analysis(blocks);
++  assertEquals(selected.census.checked, blocks.length);
++  assertEquals(selected.census.candidates, blocks.length);
++  const valid = await compileJsdocExamples(selected, repositoryRoot);
++  assertEquals(valid.code, 0, valid.diagnostics);
++  assertEquals(valid.enforcedFailureCount, 0);
++  assert(valid.denoCheckSpawned);
++  assert(valid.rootLockUnchanged);
++
++  const tail = blocks[blocks.length - 1]!;
++  tail.body = 'const tail: string = 1;\nvoid tail;';
++  const invalid = await compileJsdocExamples(analysis(blocks), repositoryRoot);
++  assertEquals(invalid.code, 1, invalid.diagnostics);
++  assert(invalid.denoCheckSpawned);
++  assert(invalid.rootLockUnchanged);
++  assertEquals(invalid.enforcedFailureCount, 1);
++  assertEquals(invalid.failureCensus.typeError, 1);
++  assertEquals(
++    invalid.typeErrorExamples.map(({ fenceOrdinal, tsCodes }) => ({
++      fenceOrdinal,
++      tsCodes,
++    })),
++    [{ fenceOrdinal: blocks.length, tsCodes: [2322] }],
++  );
++  assertStringIncludes(invalid.diagnostics, `fence ${blocks.length}:1:7`);
++  assertStringIncludes(invalid.diagnostics, 'TS2322');
++});
++
++Deno.test('private compiler files are removed on success, type failure, and root-lock refusal', async () => {
++  const originalMakeTempDir = Deno.makeTempDir;
++  const originalReadTextFile = Deno.readTextFile;
++  const rootLockPath = join(repositoryRoot, 'deno.lock');
++  const rootLock = await originalReadTextFile(rootLockPath);
++  const profile = ['USERPROFILE', 'TEMP', 'TMP', 'DENO_DIR'].map((key) => Deno.env.get(key));
++  const scratchRoot = join(repositoryRoot, '.llm', 'tmp');
++  await Deno.mkdir(scratchRoot, { recursive: true });
++  const temporaryRoots: string[] = [];
++  Deno.makeTempDir = async (options) => {
++    const path = await originalMakeTempDir({ ...options, dir: scratchRoot });
++    temporaryRoots.push(path);
++    return path;
++  };
++  const moduleOwner: JsdocExampleOwner = {
++    memberName: '@netscript/test',
++    memberRoot: 'packages/test',
++    sourcePath: 'packages/test/mod.ts',
++    kind: 'module',
++  };
++  try {
++    const valid = await compileJsdocExamples(
++      analysis([block(moduleOwner, 'const value: number = 1;\nvoid value;')]),
++      repositoryRoot,
++    );
++    assertEquals(valid.code, 0, valid.diagnostics);
++    const invalid = await compileJsdocExamples(
++      analysis([block(moduleOwner, 'const value: string = 1;\nvoid value;')]),
++      repositoryRoot,
++    );
++    assertEquals(invalid.code, 1, invalid.diagnostics);
++    assertEquals(invalid.failureCensus.typeError, 1);
++    let lockReads = 0;
++    Deno.readTextFile = async (path, options) => {
++      const text = await originalReadTextFile(path, options);
++      return path === rootLockPath && ++lockReads === 2 ? `${text}\n` : text;
++    };
++    await assertRejects(
++      () => compileJsdocExamples(analysis([block(moduleOwner, 'export {};')]), repositoryRoot),
++      Error,
++      'tracked root deno.lock changed during JSDoc check',
++    );
++  } finally {
++    Deno.makeTempDir = originalMakeTempDir;
++    Deno.readTextFile = originalReadTextFile;
++  }
++  assertEquals(temporaryRoots.length, 3);
++  for (const path of temporaryRoots) {
++    await assertRejects(() => Deno.stat(path), Deno.errors.NotFound);
++  }
++  assertEquals(await originalReadTextFile(rootLockPath), rootLock);
++  assertEquals(['USERPROFILE', 'TEMP', 'TMP', 'DENO_DIR'].map((key) => Deno.env.get(key)), profile);
++});
++
+ Deno.test('scaffold aliases align to app and service generators per documented owner', async () => {
+   const generatorProbe = await new Deno.Command(Deno.execPath(), {
+     cwd: repositoryRoot,
+diff --git a/.llm/tools/docs/jsdoc-example-policy.ts b/.llm/tools/docs/jsdoc-example-policy.ts
+index c89f15745..9f7a17d21 100644
+--- a/.llm/tools/docs/jsdoc-example-policy.ts
++++ b/.llm/tools/docs/jsdoc-example-policy.ts
+@@ -169,7 +169,7 @@ function declarationKind(kind: unknown): 'value' | 'type' | 'class' {
+ 
+ function sourcePath(repositoryRoot: string, filename: string): string {
+   const path = filename.startsWith('file:') ? fromFileUrl(filename) : filename;
+-  return normalize(relative(repositoryRoot, path));
++  return normalize(relative(repositoryRoot, path)).replaceAll('\\', '/');
+ }
+ 
+ function symbolExamples(
+@@ -319,7 +319,7 @@ function moduleExampleOwner(file: PublishedSourceFile, repositoryRoot: string):
+   return {
+     memberName: file.member.name,
+     memberRoot: file.member.root,
+-    sourcePath: normalize(relative(repositoryRoot, file.path)),
++    sourcePath: normalize(relative(repositoryRoot, file.path)).replaceAll('\\', '/'),
+     kind: 'module',
+   };
+ }
+@@ -350,7 +350,7 @@ export async function analyzeJsdocExamples(
+   const blocks: JsdocExampleBlock[] = [];
+   const findings: JsdocExampleFinding[] = [];
+   const publishedPaths = new Set(
+-    files.map((file) => normalize(relative(repositoryRoot, file.path))),
++    files.map((file) => normalize(relative(repositoryRoot, file.path)).replaceAll('\\', '/')),
+   );
+   for (const file of files) {
+     const module = docModule(await getDoc(file.path), file.path);
+diff --git a/deno.json b/deno.json
+index fc4d72cd1..46a3d76c4 100644
+--- a/deno.json
++++ b/deno.json
+@@ -271,7 +271,7 @@
+     "@tanstack/react-db": "0.5.8",
+     "@tailwindcss/vite": "^4.3.3",
+     "amqplib": "^2.2.0",
+-    "better-auth": "^1.6.20",
++    "better-auth": "^1.7.7",
+     "clsx": "^2.1.1",
+     "ioredis": "^5.11.1",
+     "jose": "^6.2.12",
+diff --git a/deno.lock b/deno.lock
+index 1665f7e40..e6e27b71b 100644
+--- a/deno.lock
++++ b/deno.lock
+@@ -185,8 +185,7 @@
+     "npm:amqplib@^2.2.0": "2.2.0",
+     "npm:amqplib@~0.10.3": "0.10.9",
+     "npm:asn1js@^3.0.10": "3.0.10",
+-    "npm:better-auth@1.6.20": "1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2",
+-    "npm:better-auth@^1.6.20": "1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2",
++    "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
+     "npm:byte-encodings@^1.0.11": "1.0.11",
+     "npm:clsx@^2.1.1": "2.1.1",
+     "npm:devalue@^5.8.1": "5.9.4",
+@@ -1016,13 +1015,12 @@
+         "@babel/helper-validator-identifier"
+       ]
+     },
+-    "@better-auth/core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_@opentelemetry+api@1.9.1_better-call@1.3.6_jose@6.2.12_kysely@0.29.2_nanostores@1.3.0": {
+-      "integrity": "sha512-y73I1xNXuNYiHBFduWGRcJ2ro2rNuVDEYkgVMJtIaRXtbosdXHs9gfyQrHecgeHMHKx1SYSBT/CExak0vVMTng==",
++    "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-ByhdrGVwp/el+hoTYKSVOHIH23/lQj9TQ1txdGcWOg22tnfr3hJ6ukzySooeYj/R36XsQgBhkJqIp8mKsNeErA==",
+       "dependencies": [
+         "@better-auth/utils",
+         "@better-fetch/fetch",
+         "@opentelemetry/api",
+-        "@opentelemetry/semantic-conventions@1.43.0",
+         "@standard-schema/spec",
+         "better-call",
+         "jose",
+@@ -1034,15 +1032,15 @@
+         "@opentelemetry/api"
+       ]
+     },
+-    "@better-auth/drizzle-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12": {
+-      "integrity": "sha512-hJHfCdAiZrC7EmZAt3NAiGgcNo9Y5Qz3PLL+a9rODXaAJGCMvzUJniqef9wHuJBwU0SWW+2f4wXe8xQmaC/IKQ==",
++    "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-5RC8Ec5Ur15FWsS4As9/VrlRbB3+9EfShxIpA5A1FcD6IgPxFvzQNkAm2+FYx9LUSqx47NPf9hBTG2GUCMP9Ig==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils"
+       ]
+     },
+-    "@better-auth/kysely-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_kysely@0.29.2_jose@6.2.12": {
+-      "integrity": "sha512-Uvpmgbx5y8JqXroVanNzDdKzOl3HojoTz+/X6MR6zOUr25IzlYz660mjnu0rxKiIF55kD3CroqFsDzjNUw7ERw==",
++    "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5": {
++      "integrity": "sha512-4wkqj8a8JVpWDYLlgzfbk7eOaWCFkL6HHQd6CLamFKaC8vNsXew1x4v5dE5O6dGr8j4g5qMISS+BAvOuIvBevg==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils",
+@@ -1052,22 +1050,22 @@
+         "kysely"
+       ]
+     },
+-    "@better-auth/memory-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12": {
+-      "integrity": "sha512-J5Ni0LlFijbzXlwu2rFHaD8zEFocmajyzWkRnHsq8LhV/Dk4iWQwwnqzLrPoDQEj8roECAUF03hrIeMzqWRqJQ==",
++    "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-Ojv9BcmFyHuTHha9ZM/NUW1ut9J84wLngta+07Es0Ejn8kekqP5aHBpZd5Z8AvADs5iJUOWvQGFmGlPWAKJgBg==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils"
+       ]
+     },
+-    "@better-auth/mongo-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12": {
+-      "integrity": "sha512-ClDBJf6h4g85WJswxwQwxLaiyRU67Gmz/uaIf19tY1gqlLJDykSGjmqRNSBMG5rWABNzcNqbO4KG31rYUldbIw==",
++    "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-6IA0RSPZFMdRwwnLZ9oWnDIiD0y0o0azTHUfa01BNU2AFJgMDkeiASUV3bKcJBskzQoyQrff74eFYTsTSeeVUQ==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils"
+       ]
+     },
+-    "@better-auth/prisma-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@prisma+client@7.10.0_typescript@7.0.2": {
+-      "integrity": "sha512-WhYdhSGuVSfu1peCSf2snmmVzfWjRaEvbSrsNCusiwGE9l94HlES4mjSPM48fed24hL7yg4j1dYK/yjEt87FpQ==",
++    "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-mF6t5xqeZNWzUe0ErmrSdzQmtslJscmu9X8Mp5QmROlpnnAzvSc70RILu8lHms8CePt7N34+KRH1QvYjGFrVGQ==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils",
+@@ -1077,22 +1075,22 @@
+         "@prisma/client"
+       ]
+     },
+-    "@better-auth/telemetry@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_jose@6.2.12": {
+-      "integrity": "sha512-3BhbY3naQDERvdJvJ7fGszVY6rpsVfc6c9uyBVZlC1coVEF/rkM0rIcjtMVI1GUH7vWy1wjR6qF5vQnMun3XNQ==",
++    "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-PtKFzsH7gje/WJuUPDjckOoNFazsq8NMt3AdiXIPzHl7tZULcNGTKAX8K7+yn0rG6cO/4mtMgpOjhtilElOnmg==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils",
+         "@better-fetch/fetch"
+       ]
+     },
+-    "@better-auth/utils@0.4.2": {
+-      "integrity": "sha512-AUxrvu+HaaODsUyzDxFgwd/8RZ1yZaYo42LXKSrU2oGgR38pS1ij8nqQKNgtTWoYGpNevNXtCfgTy6loHveW9A==",
++    "@better-auth/utils@0.5.1": {
++      "integrity": "sha512-WETqw5vQ52uQ/xwWR4E8rTgT6fDEr/wnS+otDNkBCa/69281FCF32OKDdQUcahMCnjsvqXBNiEvAQHFB0EVRRg==",
+       "dependencies": [
+-        "@noble/hashes@2.2.0"
++        "@noble/hashes@2.4.0"
+       ]
+     },
+-    "@better-fetch/fetch@1.3.1": {
+-      "integrity": "sha512-ABkD1WhyfPZprKRQI3bhATjeiFuNWC9PXhfGWqL+sg/gKrM977oFrYkdb4msM3hgUGonr7KlOsOFT5TU2rht9g=="
++    "@better-fetch/fetch@1.3.3": {
++      "integrity": "sha512-U6SlDt/GUWtK2JAxS/NhdoYTEim+EL1G5byz2TUj83KjLZBUpYzb5SmX0aXaCnbGkAjFKnV/o/0+cyXMbEcqqg=="
+     },
+     "@bundled-es-modules/deepmerge@4.3.2": {
+       "integrity": "sha512-q8doe7ndrY2IolUOFIn0A0++JBX38pMhN7kFhTF4cnjIcILf6X6H2yWczInyv8ZFdR0lrE8088X8XS5efxXz8A==",
+@@ -1631,14 +1629,14 @@
+     "@neophi/sieve-cache@1.5.0": {
+       "integrity": "sha512-9T3nD5q51X1d4QYW6vouKW9hBSb2Tb/wB/2XoTr4oP5SCGtp3a7aTHHewQFylred1B21/Bhev6gy4x01FPBcbQ=="
+     },
+-    "@noble/ciphers@2.2.0": {
+-      "integrity": "sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA=="
++    "@noble/ciphers@2.4.0": {
++      "integrity": "sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw=="
+     },
+     "@noble/hashes@1.8.0": {
+       "integrity": "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="
+     },
+-    "@noble/hashes@2.2.0": {
+-      "integrity": "sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg=="
++    "@noble/hashes@2.4.0": {
++      "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
+     },
+     "@opentelemetry/api-logs@0.223.0": {
+       "integrity": "sha512-Oepm6etVPFCn0VWB1t833iOTgz1eYBDUPxcrOR/XvwzD1+Ag9VzSPSrrKAFNJ/haatj+8CXbG47pZXvdNQKDJw==",
+@@ -1709,7 +1707,8 @@
+         "@opentelemetry/core@2.8.0_@opentelemetry+api@1.9.1",
+         "@opentelemetry/resources@2.8.0_@opentelemetry+api@1.9.1",
+         "@opentelemetry/semantic-conventions@1.43.0"
+-      ]
++      ],
++      "deprecated": true
+     },
+     "@opentelemetry/semantic-conventions@1.41.1": {
+       "integrity": "sha512-/UhIkaZgPutTFmQ7RnIJGgDXZmtEJ7Dvi86xNTFWcnRxVRNk/aotsqDJYeEvDP+FSMB2SdW+pQzNMcWP0rwuNA=="
+@@ -1778,7 +1777,7 @@
+         "@orpc/shared",
+         "@orpc/standard-server",
+         "json-schema-typed",
+-        "rou3"
++        "rou3@0.7.12"
+       ]
+     },
+     "@orpc/otel@1.15.5_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.223.0": {
+@@ -2575,8 +2574,8 @@
+       "integrity": "sha512-br0LOmjJqr6Rt4AEkadbcNf67Zpo7EPwKsWbjnRrJIa1QYFHQBqM4C7F2WTbV8ahTEcg1Eo+Y0aWjjORInYFyA==",
+       "bin": true
+     },
+-    "better-auth@1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2": {
+-      "integrity": "sha512-fSpGHGRKiGRiYVd3QTQtuVZ8oxpiSe/7ip0Rpvt/Sy8zQbEbVKUPMOhE0gLXg+FjqTUsIo7582hxUYxtEcqUpA==",
++    "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1": {
++      "integrity": "sha512-QxDCI0pOCCHDYmruisKhKyrvOJ6Icv9xg0RA6ZUysfKFXENYwhNNpwUlkE/NmViH2nDMgkKcymmLr55pnpR9vw==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/drizzle-adapter",
+@@ -2588,7 +2587,7 @@
+         "@better-auth/utils",
+         "@better-fetch/fetch",
+         "@noble/ciphers",
+-        "@noble/hashes@2.2.0",
++        "@noble/hashes@2.4.0",
+         "@prisma/client",
+         "better-call",
+         "defu",
+@@ -2607,12 +2606,12 @@
+         "react"
+       ]
+     },
+-    "better-call@1.3.6_zod@4.6.5": {
+-      "integrity": "sha512-no1jI+h6Bkxs1NVBo4rONbVIzsPjZ8IUu7IHaJBiFwVX1XEQGN8KpHots5fSWmXe9nNyLuLIcgx6WEUcE6EDaA==",
++    "better-call@1.4.4_zod@4.6.5": {
++      "integrity": "sha512-Gq4XdGFy4dmUxFEAX2nj0ycFcFbD9ZWh8YROouZoyXeF1M11TpYbplk0pDByTFF8Wz+MYa6W9052c9m7dD+mfw==",
+       "dependencies": [
+         "@better-auth/utils",
+         "@better-fetch/fetch",
+-        "rou3",
++        "rou3@0.9.2",
+         "set-cookie-parser",
+         "zod@4.6.5"
+       ],
+@@ -3330,8 +3329,8 @@
+     "ky@1.14.3": {
+       "integrity": "sha512-9zy9lkjac+TR1c2tG+mkNSVlyOpInnWdSMiue4F+kq8TwJSgv6o8jhLRg8Ho6SnZ9wOYUq/yozts9qQCfk7bIw=="
+     },
+-    "kysely@0.29.2": {
+-      "integrity": "sha512-s6WVJyEZrbm6jhBpiKHsGHyePMrVQKJ85wZCFCr9W4QHv6WTjWIrdvTmO9hDEA3bNK0xkrE2DqrHsXMLWuZpQg=="
++    "kysely@0.29.7": {
++      "integrity": "sha512-fmIq+7kv4WbFm2tcfznRzikqB4cuNpgZ40PSU2fAJ2/OO5XhojqnTPrmgrCjYSRJVwBln03XcRXJGnw9H099IQ=="
+     },
+     "lmdb@3.5.7": {
+       "integrity": "sha512-cSXt4RnfRAaGRXVI3hiJS3fQPQebj/c7RCRBvUL2cH5gTLpgvuGFqGJbH+ZkI2sFgvSlzwJw3GTw6ffFmN/uUw==",
+@@ -3505,8 +3504,8 @@
+       "integrity": "sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==",
+       "bin": true
+     },
+-    "nanostores@1.3.0": {
+-      "integrity": "sha512-XPUa/jz+P1oJvN9VBxw4L9MtdFfaH3DAryqPssqhb2kXjmb9npz0dly6rCsgFWOPr4Yg9mTfM3MDZgZZ+7A3lA=="
++    "nanostores@1.5.5": {
++      "integrity": "sha512-FixtE239Gl6Gz0ZGCK0WzvNwObNCIwVT+L7zQcf1QgcA6AzBxblzqe9OT88qiucNkhsjSOqiogSaF5jVbJiqSA=="
+     },
+     "native-duplexpair@1.0.0": {
+       "integrity": "sha512-E7QQoM+3jvNtlmyfqRZ0/U75VFgCls+fSkbml2MpgWkWyz3ox8Y58gNhfuziuQYGNNQAbFZJQck55LHCnCK6CA=="
+@@ -3870,6 +3869,9 @@
+     "rou3@0.7.12": {
+       "integrity": "sha512-iFE4hLDuloSWcD7mjdCDhx2bKcIsYbtOTpfH5MHHLSKMOUyjqQXTeZVa289uuwEGEKFoE/BAPbhaU4B774nceg=="
+     },
++    "rou3@0.9.2": {
++      "integrity": "sha512-3SOzvaAg8rkHrXtRjpCvCvbyO5to9oOO27Z/XqHEYXfMRVSw/qMIVdmaOk9W2lcRLtR6dlqTjo9hDeJk70QBYQ=="
++    },
+     "router@2.2.0": {
+       "integrity": "sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==",
+       "dependencies": [
+@@ -3930,8 +3932,8 @@
+         "send"
+       ]
+     },
+-    "set-cookie-parser@3.1.0": {
+-      "integrity": "sha512-kjnC1DXBHcxaOaOXBHBeRtltsDG2nUiUni+jP92M9gYdW12rsmx92UsfpH7o5tDRs7I1ZZPSQJQGv3UaRfCiuw=="
++    "set-cookie-parser@3.2.1": {
++      "integrity": "sha512-Npd1Pt+4zb3BrSZDPd2qFwRpS6b1EUEasRrO8xS0zMJi0fApXXK5YuzP0minyJnxwnFHoVoJwA55q0A0cu63gQ=="
+     },
+     "set-function-length@1.2.2": {
+       "integrity": "sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==",
+@@ -4322,7 +4324,7 @@
+         ],
+         "packageJson": {
+           "dependencies": [
+-            "npm:better-auth@^1.6.20"
++            "npm:better-auth@^1.7.7"
+           ]
+         }
+       },
+diff --git a/packages/fresh-ui/deno.lock b/packages/fresh-ui/deno.lock
+index dbe3c6ae6..c24c707dd 100644
+--- a/packages/fresh-ui/deno.lock
++++ b/packages/fresh-ui/deno.lock
+@@ -152,7 +152,7 @@
+     "npm:amqplib@^2.0.1": "2.2.0",
+     "npm:amqplib@^2.2.0": "2.2.0",
+     "npm:asn1js@^3.0.10": "3.0.10",
+-    "npm:better-auth@^1.6.20": "1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2",
++    "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
+     "npm:byte-encodings@^1.0.11": "1.0.11",
+     "npm:clsx@^2.1.1": "2.1.1",
+     "npm:es-toolkit@^1.46.1": "1.49.0",
+@@ -726,13 +726,12 @@
+     "@babel/runtime@7.29.7": {
+       "integrity": "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="
+     },
+-    "@better-auth/core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_@opentelemetry+api@1.9.1_better-call@1.3.6__zod@4.6.5_jose@6.2.12_kysely@0.29.2_nanostores@1.3.0": {
+-      "integrity": "sha512-y73I1xNXuNYiHBFduWGRcJ2ro2rNuVDEYkgVMJtIaRXtbosdXHs9gfyQrHecgeHMHKx1SYSBT/CExak0vVMTng==",
++    "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-ByhdrGVwp/el+hoTYKSVOHIH23/lQj9TQ1txdGcWOg22tnfr3hJ6ukzySooeYj/R36XsQgBhkJqIp8mKsNeErA==",
+       "dependencies": [
+         "@better-auth/utils",
+         "@better-fetch/fetch",
+         "@opentelemetry/api",
+-        "@opentelemetry/semantic-conventions@1.43.0",
+         "@standard-schema/spec",
+         "better-call",
+         "jose",
+@@ -744,15 +743,15 @@
+         "@opentelemetry/api"
+       ]
+     },
+-    "@better-auth/drizzle-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12": {
+-      "integrity": "sha512-hJHfCdAiZrC7EmZAt3NAiGgcNo9Y5Qz3PLL+a9rODXaAJGCMvzUJniqef9wHuJBwU0SWW+2f4wXe8xQmaC/IKQ==",
++    "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-5RC8Ec5Ur15FWsS4As9/VrlRbB3+9EfShxIpA5A1FcD6IgPxFvzQNkAm2+FYx9LUSqx47NPf9hBTG2GUCMP9Ig==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils"
+       ]
+     },
+-    "@better-auth/kysely-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_kysely@0.29.2_jose@6.2.12": {
+-      "integrity": "sha512-Uvpmgbx5y8JqXroVanNzDdKzOl3HojoTz+/X6MR6zOUr25IzlYz660mjnu0rxKiIF55kD3CroqFsDzjNUw7ERw==",
++    "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5": {
++      "integrity": "sha512-4wkqj8a8JVpWDYLlgzfbk7eOaWCFkL6HHQd6CLamFKaC8vNsXew1x4v5dE5O6dGr8j4g5qMISS+BAvOuIvBevg==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils",
+@@ -762,22 +761,22 @@
+         "kysely"
+       ]
+     },
+-    "@better-auth/memory-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12": {
+-      "integrity": "sha512-J5Ni0LlFijbzXlwu2rFHaD8zEFocmajyzWkRnHsq8LhV/Dk4iWQwwnqzLrPoDQEj8roECAUF03hrIeMzqWRqJQ==",
++    "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-Ojv9BcmFyHuTHha9ZM/NUW1ut9J84wLngta+07Es0Ejn8kekqP5aHBpZd5Z8AvADs5iJUOWvQGFmGlPWAKJgBg==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils"
+       ]
+     },
+-    "@better-auth/mongo-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12": {
+-      "integrity": "sha512-ClDBJf6h4g85WJswxwQwxLaiyRU67Gmz/uaIf19tY1gqlLJDykSGjmqRNSBMG5rWABNzcNqbO4KG31rYUldbIw==",
++    "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-6IA0RSPZFMdRwwnLZ9oWnDIiD0y0o0azTHUfa01BNU2AFJgMDkeiASUV3bKcJBskzQoyQrff74eFYTsTSeeVUQ==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils"
+       ]
+     },
+-    "@better-auth/prisma-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@prisma+client@7.10.0_typescript@7.0.2": {
+-      "integrity": "sha512-WhYdhSGuVSfu1peCSf2snmmVzfWjRaEvbSrsNCusiwGE9l94HlES4mjSPM48fed24hL7yg4j1dYK/yjEt87FpQ==",
++    "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-mF6t5xqeZNWzUe0ErmrSdzQmtslJscmu9X8Mp5QmROlpnnAzvSc70RILu8lHms8CePt7N34+KRH1QvYjGFrVGQ==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils",
+@@ -787,22 +786,22 @@
+         "@prisma/client"
+       ]
+     },
+-    "@better-auth/telemetry@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_jose@6.2.12": {
+-      "integrity": "sha512-3BhbY3naQDERvdJvJ7fGszVY6rpsVfc6c9uyBVZlC1coVEF/rkM0rIcjtMVI1GUH7vWy1wjR6qF5vQnMun3XNQ==",
++    "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5": {
++      "integrity": "sha512-PtKFzsH7gje/WJuUPDjckOoNFazsq8NMt3AdiXIPzHl7tZULcNGTKAX8K7+yn0rG6cO/4mtMgpOjhtilElOnmg==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/utils",
+         "@better-fetch/fetch"
+       ]
+     },
+-    "@better-auth/utils@0.4.2": {
+-      "integrity": "sha512-AUxrvu+HaaODsUyzDxFgwd/8RZ1yZaYo42LXKSrU2oGgR38pS1ij8nqQKNgtTWoYGpNevNXtCfgTy6loHveW9A==",
++    "@better-auth/utils@0.5.1": {
++      "integrity": "sha512-WETqw5vQ52uQ/xwWR4E8rTgT6fDEr/wnS+otDNkBCa/69281FCF32OKDdQUcahMCnjsvqXBNiEvAQHFB0EVRRg==",
+       "dependencies": [
+-        "@noble/hashes@2.2.0"
++        "@noble/hashes@2.4.0"
+       ]
+     },
+-    "@better-fetch/fetch@1.3.1": {
+-      "integrity": "sha512-ABkD1WhyfPZprKRQI3bhATjeiFuNWC9PXhfGWqL+sg/gKrM977oFrYkdb4msM3hgUGonr7KlOsOFT5TU2rht9g=="
++    "@better-fetch/fetch@1.3.3": {
++      "integrity": "sha512-U6SlDt/GUWtK2JAxS/NhdoYTEim+EL1G5byz2TUj83KjLZBUpYzb5SmX0aXaCnbGkAjFKnV/o/0+cyXMbEcqqg=="
+     },
+     "@bundled-es-modules/deepmerge@4.3.2": {
+       "integrity": "sha512-q8doe7ndrY2IolUOFIn0A0++JBX38pMhN7kFhTF4cnjIcILf6X6H2yWczInyv8ZFdR0lrE8088X8XS5efxXz8A==",
+@@ -1309,14 +1308,14 @@
+     "@neophi/sieve-cache@1.5.0": {
+       "integrity": "sha512-9T3nD5q51X1d4QYW6vouKW9hBSb2Tb/wB/2XoTr4oP5SCGtp3a7aTHHewQFylred1B21/Bhev6gy4x01FPBcbQ=="
+     },
+-    "@noble/ciphers@2.2.0": {
+-      "integrity": "sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA=="
++    "@noble/ciphers@2.4.0": {
++      "integrity": "sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw=="
+     },
+     "@noble/hashes@1.4.0": {
+       "integrity": "sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg=="
+     },
+-    "@noble/hashes@2.2.0": {
+-      "integrity": "sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg=="
++    "@noble/hashes@2.4.0": {
++      "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
+     },
+     "@opentelemetry/api-logs@0.223.0": {
+       "integrity": "sha512-Oepm6etVPFCn0VWB1t833iOTgz1eYBDUPxcrOR/XvwzD1+Ag9VzSPSrrKAFNJ/haatj+8CXbG47pZXvdNQKDJw==",
+@@ -1382,7 +1381,8 @@
+         "@opentelemetry/resources@2.9.0_@opentelemetry+api@1.9.1",
+         "@opentelemetry/sdk-trace",
+         "@opentelemetry/semantic-conventions@1.43.0"
+-      ]
++      ],
++      "deprecated": true
+     },
+     "@opentelemetry/sdk-trace@2.9.0_@opentelemetry+api@1.9.1": {
+       "integrity": "sha512-sGA19HvtrrSKYsseHphluH6j3p6Xa3fqc7c7y8f/7mYWejc1lyDFcpSdD1kYa50HCLUeEo4zA5bW0pniaPszuw==",
+@@ -1451,7 +1451,7 @@
+         "@orpc/shared",
+         "@orpc/standard-server",
+         "json-schema-typed",
+-        "rou3"
++        "rou3@0.7.12"
+       ]
+     },
+     "@orpc/otel@1.15.5_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.223.0": {
+@@ -2170,8 +2170,8 @@
+     "base64-js@1.5.1": {
+       "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+     },
+-    "better-auth@1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2": {
+-      "integrity": "sha512-fSpGHGRKiGRiYVd3QTQtuVZ8oxpiSe/7ip0Rpvt/Sy8zQbEbVKUPMOhE0gLXg+FjqTUsIo7582hxUYxtEcqUpA==",
++    "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1": {
++      "integrity": "sha512-QxDCI0pOCCHDYmruisKhKyrvOJ6Icv9xg0RA6ZUysfKFXENYwhNNpwUlkE/NmViH2nDMgkKcymmLr55pnpR9vw==",
+       "dependencies": [
+         "@better-auth/core",
+         "@better-auth/drizzle-adapter",
+@@ -2183,7 +2183,7 @@
+         "@better-auth/utils",
+         "@better-fetch/fetch",
+         "@noble/ciphers",
+-        "@noble/hashes@2.2.0",
++        "@noble/hashes@2.4.0",
+         "@prisma/client",
+         "better-call",
+         "defu",
+@@ -2202,12 +2202,12 @@
+         "react"
+       ]
+     },
+-    "better-call@1.3.6_zod@4.6.5": {
+-      "integrity": "sha512-no1jI+h6Bkxs1NVBo4rONbVIzsPjZ8IUu7IHaJBiFwVX1XEQGN8KpHots5fSWmXe9nNyLuLIcgx6WEUcE6EDaA==",
++    "better-call@1.4.4_zod@4.6.5": {
++      "integrity": "sha512-Gq4XdGFy4dmUxFEAX2nj0ycFcFbD9ZWh8YROouZoyXeF1M11TpYbplk0pDByTFF8Wz+MYa6W9052c9m7dD+mfw==",
+       "dependencies": [
+         "@better-auth/utils",
+         "@better-fetch/fetch",
+-        "rou3",
++        "rou3@0.9.2",
+         "set-cookie-parser",
+         "zod@4.6.5"
+       ],
+@@ -2883,8 +2883,8 @@
+     "ky@1.14.3": {
+       "integrity": "sha512-9zy9lkjac+TR1c2tG+mkNSVlyOpInnWdSMiue4F+kq8TwJSgv6o8jhLRg8Ho6SnZ9wOYUq/yozts9qQCfk7bIw=="
+     },
+-    "kysely@0.29.2": {
+-      "integrity": "sha512-s6WVJyEZrbm6jhBpiKHsGHyePMrVQKJ85wZCFCr9W4QHv6WTjWIrdvTmO9hDEA3bNK0xkrE2DqrHsXMLWuZpQg=="
++    "kysely@0.29.7": {
++      "integrity": "sha512-fmIq+7kv4WbFm2tcfznRzikqB4cuNpgZ40PSU2fAJ2/OO5XhojqnTPrmgrCjYSRJVwBln03XcRXJGnw9H099IQ=="
+     },
+     "lmdb@3.5.7": {
+       "integrity": "sha512-cSXt4RnfRAaGRXVI3hiJS3fQPQebj/c7RCRBvUL2cH5gTLpgvuGFqGJbH+ZkI2sFgvSlzwJw3GTw6ffFmN/uUw==",
+@@ -3049,8 +3049,8 @@
+       "integrity": "sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==",
+       "bin": true
+     },
+-    "nanostores@1.3.0": {
+-      "integrity": "sha512-XPUa/jz+P1oJvN9VBxw4L9MtdFfaH3DAryqPssqhb2kXjmb9npz0dly6rCsgFWOPr4Yg9mTfM3MDZgZZ+7A3lA=="
++    "nanostores@1.5.5": {
++      "integrity": "sha512-FixtE239Gl6Gz0ZGCK0WzvNwObNCIwVT+L7zQcf1QgcA6AzBxblzqe9OT88qiucNkhsjSOqiogSaF5jVbJiqSA=="
+     },
+     "native-duplexpair@1.0.0": {
+       "integrity": "sha512-E7QQoM+3jvNtlmyfqRZ0/U75VFgCls+fSkbml2MpgWkWyz3ox8Y58gNhfuziuQYGNNQAbFZJQck55LHCnCK6CA=="
+@@ -3400,6 +3400,9 @@
+     "rou3@0.7.12": {
+       "integrity": "sha512-iFE4hLDuloSWcD7mjdCDhx2bKcIsYbtOTpfH5MHHLSKMOUyjqQXTeZVa289uuwEGEKFoE/BAPbhaU4B774nceg=="
+     },
++    "rou3@0.9.2": {
++      "integrity": "sha512-3SOzvaAg8rkHrXtRjpCvCvbyO5to9oOO27Z/XqHEYXfMRVSw/qMIVdmaOk9W2lcRLtR6dlqTjo9hDeJk70QBYQ=="
++    },
+     "router@2.2.0": {
+       "integrity": "sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==",
+       "dependencies": [
+@@ -3456,8 +3459,8 @@
+         "send"
+       ]
+     },
+-    "set-cookie-parser@3.1.1": {
+-      "integrity": "sha512-vM9SUhjsUYs6UeJUmygc5Ofm5eQGe85riob5ju6XCgFGJI5PLV4nrDAQpQjd+LkFBpAkADn5BQQpZ9EUNkyLuA=="
++    "set-cookie-parser@3.2.1": {
++      "integrity": "sha512-Npd1Pt+4zb3BrSZDPd2qFwRpS6b1EUEasRrO8xS0zMJi0fApXXK5YuzP0minyJnxwnFHoVoJwA55q0A0cu63gQ=="
+     },
+     "set-function-length@1.2.2": {
+       "integrity": "sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==",
+@@ -3817,7 +3820,7 @@
+         ],
+         "packageJson": {
+           "dependencies": [
+-            "npm:better-auth@^1.6.20"
++            "npm:better-auth@^1.7.7"
+           ]
+         }
+       },
+diff --git a/packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts b/packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts
+index 13d9befe5..99b33e6c0 100644
+--- a/packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts
++++ b/packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts
+@@ -559,9 +559,9 @@ export const EXPORT_SURFACE_ROWS: readonly (readonly [string, string, string, st
+ 
+   ["sdk","./telemetry","io5W8s1MSclJLU8sSvVIzEvJSS1S0kES80utKFHSUcovSc1BCCrF6kQrFaWmpRal5iWnKungYKOoUsBmDzZZqI0IKSx2K+mAUWwsAAAA//8DAA==","VZUlq+u4Nqn+E0SewaN3c4YwvdwLnKjzzNlRTLKBuBo=",192,3],
+ 
+-  ["service",".","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",34743,107],
++  ["service",".","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",35647,109],
+ 
+-  ["service","./auth","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",11181,51],
++  ["service","./auth","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",11311,53],
+ 
+   ["service","./commands","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",11690,48],
+ 
+diff --git a/packages/plugin/tests/service/create-plugin-service-auth_test.ts b/packages/plugin/tests/service/create-plugin-service-auth_test.ts
+index 56c245695..7ba9e613b 100644
+--- a/packages/plugin/tests/service/create-plugin-service-auth_test.ts
++++ b/packages/plugin/tests/service/create-plugin-service-auth_test.ts
+@@ -1,4 +1,5 @@
+ import { assertEquals } from '@std/assert';
++import { fromFileUrl } from '@std/path';
+ import { baseContract, SuccessSchema } from '@netscript/contracts';
+ import { implement, os } from '@orpc/server';
+ import {
+@@ -120,7 +121,7 @@ Deno.test('plugin factory guards REST, RPC and raw routes independently of confi
+   }
+ });
+ 
+-Deno.test('plugin factory preserves native health routes and anonymous-prefix replacement', async () => {
++Deno.test('plugin factory applies anonymous-prefix replacement to native health routes', async () => {
+   const app = createPluginService(router, {
+     ...config(),
+     auth: { authn: { authenticator, protect: ['/'], allowAnonymous: ['/api/openapi.json'] } },
+@@ -130,7 +131,7 @@ Deno.test('plugin factory preserves native health routes and anonymous-prefix re
+   assertEquals(spec.status, 200);
+   await spec.arrayBuffer();
+   const health = await app.request('/health');
+-  assertEquals(health.status, 200);
++  assertEquals(health.status, 401);
+   await health.arrayBuffer();
+   const privateHealth = await app.request('/health/private');
+   assertEquals(privateHealth.status, 401);
+@@ -175,7 +176,7 @@ Deno.test('plugin factory reports verifier failure as redacted unavailable', asy
+ 
+ Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript caller boundary', async () => {
+   const moduleUrl = new URL('../../src/service/mod.ts', import.meta.url).href;
+-  const configPath = new URL('../../../../deno.json', import.meta.url).pathname;
++  const configPath = fromFileUrl(new URL('../../../../deno.json', import.meta.url));
+   const source = `
+     import { createPluginService } from ${JSON.stringify(moduleUrl)};
+     for (const auth of [undefined, {}, { public: true }, { public: true, reason: 'test', authn: undefined }]) {
+@@ -187,10 +188,17 @@ Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript ca
+       throw new Error('Malformed policy was accepted');
+     }
+   `;
+-  const result = await new Deno.Command(Deno.execPath(), {
+-    args: ['eval', '--config', configPath, source],
+-    stdout: 'piped',
+-    stderr: 'piped',
+-  }).output();
+-  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
++  const controller = new AbortController();
++  const deadline = setTimeout(() => controller.abort(), 15_000);
++  try {
++    const result = await new Deno.Command(Deno.execPath(), {
++      args: ['eval', '--config', configPath, source],
++      stdout: 'piped',
++      stderr: 'piped',
++      signal: controller.signal,
++    }).output();
++    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
++  } finally {
++    clearTimeout(deadline);
++  }
+ });
+diff --git a/packages/service/CHANGELOG.md b/packages/service/CHANGELOG.md
+index 96a86ef2f..673eea907 100644
+--- a/packages/service/CHANGELOG.md
++++ b/packages/service/CHANGELOG.md
+@@ -2,6 +2,22 @@
+ 
+ ## Unreleased
+ 
++- **Added:** `AnonymousRequestMatch` and `AnonymousRule` support exact method/path entries in
++  `allowAnonymous`, exported from the root and `./auth`. Legacy string prefixes and omitted/empty
++  defaults remain; GET and HEAD need separate entries. Invalid exact entries fail before listen.
++- **Changed (breaking impact):** Health routes now install after auth. Custom nonempty anonymous
++  lists excluding `/health` previously bypassed auth for health GET/HEAD (200); those requests now
++  return 401 under a rejecting authenticator. Add `'/health'` to preserve the prefix capability, or
++  list GET and HEAD for `/health`, `/health/live` and `/health/ready` explicitly. Default and empty
++  lists keep public health. Failed auth construction remains failed on repeated build/serve.
++
++- **Fixed:** Under `withCors()`, every response (RPC, OpenAPI, raw routes, proxied upstreams, health
++  and errors) now carries exactly the native service CORS decision: all six access-control headers,
++  present or absent, with the union of existing `Vary` tokens preserved. Handler, upstream and
++  oRPC-default access-control headers are replaced. Migrate their `exposeHeaders`, `allowHeaders`
++  and `allowMethods` declarations to `withCors()`. Services that never call `withCors()` are
++  unchanged.
++
+ - **Breaking (0.0.8, #1382):** `defineService()` now requires `auth: ServiceAuthPolicy` and
+   validates it before configuring the builder or starting IO. Missing policy is a type error and a
+   runtime `TypeError` for JavaScript callers. Keep native guards as
+diff --git a/packages/service/README.md b/packages/service/README.md
+index b702c2a99..331ff24c3 100644
+--- a/packages/service/README.md
++++ b/packages/service/README.md
+@@ -120,8 +120,55 @@ only scaffold-owned opt-outs are reconciled by service add or plugin installatio
+ leaves authored inputs unchanged. Public examples below are demonstrations; declare contract access
+ before using them for private operations.
+ 
++### Exact anonymous requests
++
++`allowAnonymous` accepts exact method/path objects alongside legacy string prefixes. An exact `GET`
++entry does not admit `HEAD`, descendants, encoded spellings or slash/case variants. Use six entries
++to leave the native health probes public while guarding every other request:
++
++```typescript
++import { createService } from '@netscript/service';
++import type { AuthenticatorPort } from '@netscript/service/auth';
++
++declare const authenticator: AuthenticatorPort;
++const app = createService({}, { name: 'guarded-health' })
++  .withAuthn({
++    authenticator,
++    protect: ['/'],
++    allowAnonymous: [
++      { method: 'GET', path: '/health' },
++      { method: 'GET', path: '/health/live' },
++      { method: 'GET', path: '/health/ready' },
++      { method: 'HEAD', path: '/health' },
++      { method: 'HEAD', path: '/health/live' },
++      { method: 'HEAD', path: '/health/ready' },
++    ],
++  })
++  .withHealth()
++  .route('all', '/*', (c) => c.text('guarded'))
++  .build();
++```
++
++Omitted or empty `allowAnonymous` keeps the method-blind `/health` prefix default. A nonempty list
++replaces that default; matched contract access declarations still take precedence. Invalid exact
++entries throw `TypeError` when middleware is constructed, before requests or a listener. `OPTIONS`
++is not an exact anonymous method; configure `withCors()` for native preflight handling.
++
++Health is now installed after authentication. A custom nonempty legacy list excluding `/health`
++previously let health GET/HEAD return 200 by registration order; a rejecting authenticator now
++returns 401. Add `'/health'` to retain the prefix capability, or use the six exact entries above.
++Omitted, empty and `['/health']` lists preserve public health. Configure health checks before
++`build()`; health checks snapshot when installed, while readiness checks retain their live array.
++
+ ## CORS migration (breaking in 0.0.8)
+ 
++Under `withCors()`, the service's native CORS decision is authoritative on every response, including
++RPC/OpenAPI projections, raw routes, proxied upstreams, health and errors. All six access-control
++headers are restored to the configured decision, including absence; handler, upstream and oRPC
++headers are replaced. Declare `exposeHeaders`, `allowHeaders` and `allowMethods` on `withCors()`.
++`Vary` retains the union of tokens present before and after downstream handling, deduplicated
++case-insensitively (`*` wins). Services that never call `withCors()` are unchanged.
++
+ `withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
+ omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
+ comma-separated exact HTTP(S) origins, with no path or trailing slash:
+diff --git a/packages/service/mod.ts b/packages/service/mod.ts
+index 06e6a179c..835c20ca9 100644
+--- a/packages/service/mod.ts
++++ b/packages/service/mod.ts
+@@ -86,6 +86,8 @@ export {
+ } from './src/primitives/health.ts';
+ 
+ export type {
++  AnonymousRequestMatch,
++  AnonymousRule,
+   AuthnOptions,
+   AuthzOptions,
+   ContractAuthorizerOptions,
+diff --git a/packages/service/src/auth/auth-middleware.ts b/packages/service/src/auth/auth-middleware.ts
+index 153ed5e1b..8dd54a012 100644
+--- a/packages/service/src/auth/auth-middleware.ts
++++ b/packages/service/src/auth/auth-middleware.ts
+@@ -22,7 +22,7 @@
+ 
+ import type { Context, MiddlewareHandler } from 'hono';
+ import { createLogger, type Logger } from '@netscript/logger';
+-import type { AuthnOptions, AuthzOptions } from './options.ts';
++import type { AnonymousRule, AuthnOptions, AuthzOptions } from './options.ts';
+ import type {
+   ProcedurePolicyResolution,
+   ProcedurePolicyResolver,
+@@ -49,7 +49,7 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
+ 
+   return async (c, next) => {
+     const policy = resolvePolicy(options.policyResolver, c);
+-    if (!requiresAuthentication(c.req.path, guard, policy)) {
++    if (!requiresAuthentication(c, guard, policy)) {
+       return await next();
+     }
+ 
+@@ -92,8 +92,8 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
+ export interface AuthzMiddlewareOptions extends AuthzOptions {
+   /** Path prefixes the authz stage guards. Defaults to `["/api"]`. */
+   readonly protect?: readonly string[];
+-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
+-  readonly allowAnonymous?: readonly string[];
++  /** Legacy path prefixes or exact requests left public. Defaults to `["/health"]`. */
++  readonly allowAnonymous?: readonly AnonymousRule[];
+   /** Shared resolver used to recognize matched public procedures before principal lookup. */
+   readonly policyResolver?: ProcedurePolicyResolver;
+ }
+@@ -110,7 +110,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
+       if (isPublicProcedure(policy)) {
+         return await next();
+       }
+-      if (!policy?.matched && !isGuardedPath(c.req.path, guard)) {
++      if (!policy?.matched && !isGuardedRequest(c, guard)) {
+         return await next();
+       }
+ 
+@@ -177,15 +177,20 @@ function rawPathname(c: Context): string {
+   return end < 0 ? url.slice(start) : url.slice(start, start + end);
+ }
+ 
++interface RequestGuard {
++  readonly protect: readonly string[];
++  readonly allowAnonymous: readonly AnonymousRule[];
++}
++
+ function requiresAuthentication(
+-  path: string,
+-  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
++  c: Context,
++  guard: RequestGuard,
+   resolution: ProcedurePolicyResolution | undefined,
+ ): boolean {
+   if (resolution?.matched) {
+     return resolution.policy?.authentication !== 'none';
+   }
+-  return isGuardedPath(path, guard);
++  return isGuardedRequest(c, guard);
+ }
+ 
+ function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): boolean {
+@@ -194,21 +199,46 @@ function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): b
+ 
+ function normalizeGuard(options: {
+   readonly protect?: readonly string[];
+-  readonly allowAnonymous?: readonly string[];
+-}): { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] } {
++  readonly allowAnonymous?: readonly AnonymousRule[];
++}): RequestGuard {
+   return {
+-    protect: options.protect?.length ? options.protect : DEFAULT_PROTECTED_PREFIXES,
+-    allowAnonymous: options.allowAnonymous?.length
+-      ? options.allowAnonymous
+-      : DEFAULT_ANONYMOUS_PREFIXES,
++    protect: [...(options.protect?.length ? options.protect : DEFAULT_PROTECTED_PREFIXES)],
++    allowAnonymous:
++      (options.allowAnonymous?.length ? options.allowAnonymous : DEFAULT_ANONYMOUS_PREFIXES).map(
++        normalizeAnonymousRule,
++      ),
+   };
+ }
+ 
+-function isGuardedPath(
+-  path: string,
+-  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
+-): boolean {
+-  if (guard.allowAnonymous.some((prefix) => matchesPrefix(path, prefix))) {
++function normalizeAnonymousRule(rule: AnonymousRule): AnonymousRule {
++  if (typeof rule === 'string') return rule;
++  const methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
++  if (!rule || !methods.includes(rule.method)) {
++    throw new TypeError(
++      `[netscript.service.auth] invalid anonymous request: ${rule?.method} ${rule?.path}: unsupported method`,
++    );
++  }
++  const path = rule.path;
++  if (
++    typeof path !== 'string' || !path.startsWith('/') || /[%*:{}?#\\\s]/.test(path) ||
++    path.includes('//') || (path !== '/' && path.endsWith('/'))
++  ) {
++    throw new TypeError(
++      `[netscript.service.auth] invalid anonymous request: ${rule.method} ${path}: invalid exact path`,
++    );
++  }
++  return { method: rule.method, path };
++}
++
++function isGuardedRequest(c: Context, guard: RequestGuard): boolean {
++  const path = c.req.path;
++  if (
++    guard.allowAnonymous.some((rule) =>
++      typeof rule === 'string'
++        ? matchesPrefix(path, rule)
++        : c.req.method === rule.method && rawPathname(c) === rule.path && path === rule.path
++    )
++  ) {
+     return false;
+   }
+   return guard.protect.some((prefix) => matchesPrefix(path, prefix));
+diff --git a/packages/service/src/auth/mod.ts b/packages/service/src/auth/mod.ts
+index 5e09ce952..15a2cd1de 100644
+--- a/packages/service/src/auth/mod.ts
++++ b/packages/service/src/auth/mod.ts
+@@ -34,6 +34,8 @@
+ 
+ export type { ServiceEnv, ServiceVariables } from './hono-context.ts';
+ export type {
++  AnonymousRequestMatch,
++  AnonymousRule,
+   AuthnOptions,
+   AuthzOptions,
+   ContractAuthorizerOptions,
+diff --git a/packages/service/src/auth/options.ts b/packages/service/src/auth/options.ts
+index 05acd5aa0..d42b45f68 100644
+--- a/packages/service/src/auth/options.ts
++++ b/packages/service/src/auth/options.ts
+@@ -20,14 +20,48 @@
+ import type { InternalCallerPredicate } from './contract/contract-policy.ts';
+ import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
+ 
++/**
++ * One anonymous request with an uppercase method and byte-exact absolute path.
++ *
++ * GET does not admit HEAD. Descendants, encoded spellings and slash/case variants are not
++ * admitted; query strings are ignored. OPTIONS is excluded: use `withCors()` for preflight.
++ *
++ * @example
++ * ```ts
++ * import type { AnonymousRequestMatch } from '@netscript/service/auth';
++ * const health: readonly AnonymousRequestMatch[] = [
++ *   { method: 'GET', path: '/health' },
++ *   { method: 'GET', path: '/health/live' },
++ *   { method: 'GET', path: '/health/ready' },
++ *   { method: 'HEAD', path: '/health' },
++ *   { method: 'HEAD', path: '/health/live' },
++ *   { method: 'HEAD', path: '/health/ready' },
++ * ];
++ * ```
++ */
++export interface AnonymousRequestMatch {
++  /** Exact request method; bodyless probes require an explicit HEAD entry. */
++  readonly method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
++  /** Absolute path without encoding, parameters, wildcards, query or fragment. */
++  readonly path: string;
++}
++
++/** A legacy path prefix or one exact anonymous request. */
++export type AnonymousRule = string | AnonymousRequestMatch;
++
+ /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
+ export interface AuthnOptions {
+   /** Authenticator implementation. */
+   readonly authenticator: AuthenticatorPort;
+   /** Path prefixes the auth stage guards. Defaults to `["/api"]`. */
+   readonly protect?: readonly string[];
+-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
+-  readonly allowAnonymous?: readonly string[];
++  /**
++   * Requests left public by both auth stages. Strings are method-blind path prefixes; objects
++   * match one exact method/path. Omitted or empty retains the `/health` prefix default; a
++   * nonempty list replaces it. Invalid objects throw TypeError when middleware is constructed,
++   * before requests or listeners. Matched contract access declarations take precedence.
++   */
++  readonly allowAnonymous?: readonly AnonymousRule[];
+ }
+ 
+ /** Authorization middleware options for `withAuthz()` and `defineService({ auth })`. */
+diff --git a/packages/service/src/builder/service-builder-impl.ts b/packages/service/src/builder/service-builder-impl.ts
+index 145cd03c4..e88177bbb 100644
+--- a/packages/service/src/builder/service-builder-impl.ts
++++ b/packages/service/src/builder/service-builder-impl.ts
+@@ -86,6 +86,8 @@ export class ServiceBuilderImpl<
+   private openApiConfigured = false;
+   private docsConfigured = false;
+   private healthConfigured = false;
++  private healthInstalled = false;
++  private healthIncludeDetails = true;
+   private startupHooks: Array<() => Promise<void>> = [];
+   private shutdownHooks: ShutdownHook[] = [];
+   private contextFactory: ContextFactory<TCustom> = () => ({}) as TCustom;
+@@ -418,19 +420,23 @@ export class ServiceBuilderImpl<
+     if (options?.checks) {
+       this.healthChecks.push(...options.checks);
+     }
++    this.healthIncludeDetails = options?.includeDetails ?? true;
++    return this;
++  }
+ 
++  private installHealth(): void {
++    if (!this.healthConfigured || this.healthInstalled) return;
+     this.app.get(
+       '/health',
+       createHealthHandler({
+         checks: this.healthChecks,
+         version: this.config.version,
+-        includeDetails: options?.includeDetails ?? true,
++        includeDetails: this.healthIncludeDetails,
+       }),
+     );
+     this.app.get('/health/live', createLivenessHandler());
+     this.app.get('/health/ready', createReadinessHandler(this.readinessChecks));
+-
+-    return this;
++    this.healthInstalled = true;
+   }
+ 
+   /**
+@@ -503,6 +509,7 @@ export class ServiceBuilderImpl<
+     for (const options of this.corsOptions) assertServiceCorsOptions(options);
+     this.installAuth();
+     this.installBodyLimit();
++    this.installHealth();
+     this.installDeferredRoutes();
+     this.app.notFound(createNotFoundHandler(this.config.name));
+     this.app.onError(createErrorHandler(this.config.name));
+@@ -511,24 +518,21 @@ export class ServiceBuilderImpl<
+ 
+   private installAuth(): void {
+     if (this.authInstalled) return;
+-    this.authInstalled = true;
+     const policyResolver = this.bindContractPolicy();
+-
+-    if (this.authnOptions) {
+-      this.app.use('*', createAuthnMiddleware({ ...this.authnOptions, policyResolver }));
+-    }
+-
+-    if (this.authzOptions) {
+-      this.app.use(
+-        '*',
+-        createAuthzMiddleware({
+-          ...this.authzOptions,
+-          protect: this.authnOptions?.protect,
+-          allowAnonymous: this.authnOptions?.allowAnonymous,
+-          policyResolver,
+-        }),
+-      );
+-    }
++    const authn = this.authnOptions
++      ? createAuthnMiddleware({ ...this.authnOptions, policyResolver })
++      : undefined;
++    const authz = this.authzOptions
++      ? createAuthzMiddleware({
++        ...this.authzOptions,
++        protect: this.authnOptions?.protect,
++        allowAnonymous: this.authnOptions?.allowAnonymous,
++        policyResolver,
++      })
++      : undefined;
++    if (authn) this.app.use('*', authn);
++    if (authz) this.app.use('*', authz);
++    this.authInstalled = true;
+   }
+ 
+   private installBodyLimit(): void {
+diff --git a/packages/service/src/diagnostics/database-connectivity.ts b/packages/service/src/diagnostics/database-connectivity.ts
+index 666a0bd71..711faa66d 100644
+--- a/packages/service/src/diagnostics/database-connectivity.ts
++++ b/packages/service/src/diagnostics/database-connectivity.ts
+@@ -286,18 +286,20 @@ function resolveDatabaseEndpoint(engineCfg: EngineConfig): { host: string; port:
+ 
+ async function checkTcpPort(host: string, port: number, timeoutMs: number): Promise<boolean> {
+   const resolvedHost = host === LOCALHOST ? LOCALHOST_IPV4 : host;
++  const controller = new AbortController();
++  const timeout = setTimeout(() => controller.abort(new Error('TCP timeout')), timeoutMs);
+ 
+   try {
+-    const conn = await Promise.race([
+-      Deno.connect({ hostname: resolvedHost, port }),
+-      new Promise<never>((_, reject) =>
+-        setTimeout(() => reject(new Error('TCP timeout')), timeoutMs)
+-      ),
+-    ]);
+-    conn.close();
+-    return true;
++    const conn = await Deno.connect({ hostname: resolvedHost, port, signal: controller.signal });
++    try {
++      return !controller.signal.aborted;
++    } finally {
++      conn.close();
++    }
+   } catch {
+     return false;
++  } finally {
++    clearTimeout(timeout);
+   }
+ }
+ 
+diff --git a/packages/service/src/middleware/service-cors.ts b/packages/service/src/middleware/service-cors.ts
+index 4d1d3a717..abfba7231 100644
+--- a/packages/service/src/middleware/service-cors.ts
++++ b/packages/service/src/middleware/service-cors.ts
+@@ -1,9 +1,18 @@
+-/** NetScript CORS defaults and validation; Hono owns the HTTP middleware. */
++/** NetScript CORS configuration and response authority; Hono resolves the policy. */
+ import { cors } from 'hono/cors';
+ import type { CorsOptions, ServiceMiddleware } from '../types.ts';
+ 
+ type ResolvedCorsOptions = NonNullable<CorsOptions>;
+ 
++const ACCESS_CONTROL_RESPONSE_HEADERS = [
++  'access-control-allow-origin',
++  'access-control-allow-credentials',
++  'access-control-expose-headers',
++  'access-control-allow-methods',
++  'access-control-allow-headers',
++  'access-control-max-age',
++] as const;
++
+ /** Resolve and snapshot configuration once, before serving requests. */
+ export function resolveServiceCorsOptions(options?: CorsOptions): ResolvedCorsOptions {
+   const origin = options?.origin ?? readWorkspaceOrigins();
+@@ -41,17 +50,58 @@ export function assertServiceCorsOptions(options: ResolvedCorsOptions): void {
+   }
+ }
+ 
+-/** Keep upstream origin resolvers from emitting a credentialed wildcard. */
++/**
++ * Preserve Hono's once-resolved CORS decision across handlers and proxied responses.
++ * Snapshot all six headers, including absence, before downstream code runs; restore
++ * them on the final response and retain the union of checkpoint and final Vary tokens.
++ * Native preflight short-circuits unchanged. Credentialed resolvers cannot emit '*'.
++ */
+ export function createServiceCorsMiddleware(options: ResolvedCorsOptions): ServiceMiddleware {
+   const resolveOrigin = options.origin;
+-  if (options.credentials && typeof resolveOrigin === 'function') {
+-    return cors({
++  const upstream = options.credentials && typeof resolveOrigin === 'function'
++    ? cors({
+       ...options,
+       origin: async (origin, context) => {
+         const allowed = await resolveOrigin(origin, context);
+         return allowed === '*' ? null : allowed;
+       },
++    })
++    : cors(options);
++  return async (c, next) => {
++    let checkpoint: { headers: Map<string, string | null>; vary: string | null } | undefined;
++    const preflight = await upstream(c, async () => {
++      checkpoint = {
++        headers: new Map(
++          ACCESS_CONTROL_RESPONSE_HEADERS.map((name) => [name, c.res.headers.get(name)]),
++        ),
++        vary: c.res.headers.get('vary'),
++      };
++      await next();
+     });
++    if (preflight) return preflight;
++    if (!checkpoint) return;
++
++    const vary = unionVary(checkpoint.vary, c.res.headers.get('vary'));
++    // Hono's finalized-safe API rewraps even immutable responses without its
++    // response setter reapplying stale headers. Call it once; then headers are mutable.
++    c.header('vary', vary);
++    for (const [name, value] of checkpoint.headers) {
++      if (value === null) c.res.headers.delete(name);
++      else c.res.headers.set(name, value);
++    }
++    return;
++  };
++}
++
++function unionVary(checkpoint: string | null, final: string | null): string | undefined {
++  const tokens = new Map<string, string>();
++  for (const value of [checkpoint, final]) {
++    for (const part of value?.split(',') ?? []) {
++      const token = part.trim();
++      if (token === '*') return '*';
++      const key = token.toLowerCase();
++      if (token && !tokens.has(key)) tokens.set(key, token);
++    }
+   }
+-  return cors(options);
++  return tokens.size ? [...tokens.values()].join(', ') : undefined;
+ }
+diff --git a/packages/service/src/primitives/body-limit.ts b/packages/service/src/primitives/body-limit.ts
+index 9ac427833..997763fc2 100644
+--- a/packages/service/src/primitives/body-limit.ts
++++ b/packages/service/src/primitives/body-limit.ts
+@@ -98,10 +98,50 @@ export function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): Ser
+     maxBytes,
+   };
+ 
+-  return bodyLimit({
++  const limit = bodyLimit({
+     maxSize: maxBytes,
+     onError: (c: Context) => c.json(rejection, 413),
+   });
++  return async (c, next) => {
++    const request = c.req.raw;
++    const source = request.body;
++    if (
++      !source ||
++      (request.headers.has('content-length') && !request.headers.has('transfer-encoding'))
++    ) {
++      return await limit(c, next);
++    }
++    // Hono retains its rejected reader. Own its native source without prefetch;
++    // remove this adapter when Hono cancels/releases that reader itself.
++    let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
++    let completed = false;
++    const body = new ReadableStream<Uint8Array>({
++      async pull(controller) {
++        reader ??= source.getReader();
++        const { done, value } = await reader.read();
++        if (done) {
++          completed = true;
++          controller.close();
++        } else {
++          controller.enqueue(value);
++        }
++      },
++    }, { highWaterMark: 0 });
++    c.req.raw = new Request(request, { body, signal: request.signal });
++    try {
++      return await limit(c, next);
++    } finally {
++      if (reader) {
++        try {
++          if (!completed) await reader.cancel();
++        } catch {
++          // Preserve Hono's rejection or primary error if transport cleanup fails.
++        } finally {
++          reader.releaseLock();
++        }
++      }
++    }
++  };
+ }
+ 
+ function assertMaxBytes(maxBytes: number): number {
+diff --git a/packages/service/tests/auth/builder-auth_test.ts b/packages/service/tests/auth/builder-auth_test.ts
+index 0d32e8497..21c64f442 100644
+--- a/packages/service/tests/auth/builder-auth_test.ts
++++ b/packages/service/tests/auth/builder-auth_test.ts
+@@ -2,13 +2,15 @@ import { assertEquals } from '@std/assert';
+ import { implement, os } from '@orpc/server';
+ import { baseContract, SuccessSchema } from '@netscript/contracts';
+ import {
++  type AnonymousRequestMatch,
++  type AnonymousRule,
+   type ContractAuthorizerRawRoute,
+   createContractAuthorizer,
+   createService,
+ } from '../../mod.ts';
+ import { createScopeAuthorizer } from '../../src/auth/scope-authorizer.ts';
+ import { createStaticCredentialAuthenticator } from '../../src/auth/static-credential-authenticator.ts';
+-import type { Principal } from '../../src/auth/types.ts';
++import type { AuthenticatorPort, Principal } from '../../src/auth/types.ts';
+ 
+ const authenticator = createStaticCredentialAuthenticator({
+   credentials: {
+@@ -293,3 +295,139 @@ Deno.test('declared raw route admits a service-identity bearer and enforces decl
+     message: 'authz.missing-role:service',
+   });
+ });
++
++function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++const exactHealth: readonly AnonymousRequestMatch[] = [
++  { method: 'GET', path: '/health' },
++  { method: 'GET', path: '/health/live' },
++  { method: 'GET', path: '/health/ready' },
++  { method: 'HEAD', path: '/health' },
++  { method: 'HEAD', path: '/health/live' },
++  { method: 'HEAD', path: '/health/ready' },
++];
++
++exactTest('builder admits only six explicit health probes and native CORS preflight', async (t) => {
++  let authn = 0;
++  let authz = 0;
++  let raw = 0;
++  let rpc = 0;
++  const router = os.router({
++    ping: os.handler(() => {
++      rpc++;
++      return 'pong';
++    }),
++  });
++  const app = createService(router, { name: 'exact-health' })
++    .withCors({ origin: ['https://allowed.example'] })
++    .withAuthn({
++      authenticator: {
++        authenticate: () => {
++          authn++;
++          return { ok: false, reason: 'guarded' };
++        },
++      },
++      protect: ['/'],
++      allowAnonymous: exactHealth,
++    }).withAuthz({
++      authorizer: {
++        authorize: () => {
++          authz++;
++          return { allow: false, reason: 'guarded' };
++        },
++      },
++    }).withHealth().route('all', '/*', (c) => {
++      raw++;
++      return c.text('raw');
++    }).withRPC().build();
++  for (
++    const path of ['/health', '/health/live', '/health/ready', '/health/ready/x', '/api/rpc/ping']
++  ) {
++    for (const method of ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']) {
++      await t.step(`${method} ${path}`, async () => {
++        authn =
++          authz =
++          raw =
++          rpc =
++            0;
++        const response = await app.request(path, { method });
++        const body = await response.text();
++        const admitted = exactHealth.some((rule) => rule.path === path && rule.method === method);
++        assertEquals([response.status, authn, authz, raw, rpc], [
++          admitted ? 200 : 401,
++          admitted ? 0 : 1,
++          0,
++          0,
++          0,
++        ]);
++        if (method === 'HEAD') assertEquals(body, '');
++      });
++    }
++  }
++  authn =
++    authz =
++    raw =
++    rpc =
++      0;
++  const response = await app.request('/health', {
++    method: 'OPTIONS',
++    headers: { origin: 'https://allowed.example', 'access-control-request-method': 'POST' },
++  });
++  assertEquals(await response.text(), '');
++  assertEquals([response.status, authn, authz, raw, rpc], [204, 0, 0, 0, 0]);
++  assertEquals(response.headers.get('access-control-allow-origin'), 'https://allowed.example');
++});
++
++exactTest('builder snapshots exact rules and preserves authz deny and error shapes', async () => {
++  const principal: Principal = {
++    subject: 'test',
++    scopes: [],
++    roles: [],
++    scheme: 'custom',
++    claims: {},
++  };
++  for (const mode of ['deny', 'throw-closed', 'throw-open']) {
++    let authn = 0;
++    let calls = 0;
++    let handlers = 0;
++    const rules: AnonymousRule[] = [{ method: 'GET', path: '/health' }];
++    const protect = ['/'];
++    const authenticate: AuthenticatorPort['authenticate'] = () => {
++      authn++;
++      return { ok: true, principal };
++    };
++    const authorize = () => {
++      calls++;
++      if (mode !== 'deny') throw new Error('private');
++      return { allow: false, reason: 'denied' };
++    };
++    const app = createService({}, { name: 'auth-snapshots' })
++      .withAuthn({ protect, allowAnonymous: rules, authenticator: { authenticate } })
++      .withAuthz({ denyByDefault: mode !== 'throw-open', authorizer: { authorize } })
++      .route('all', '/*', (c) => {
++        handlers++;
++        return c.text('handled');
++      }).build();
++    rules.push('/');
++    protect.splice(0);
++    const get = await app.request('/health');
++    assertEquals(await get.text(), 'handled');
++    assertEquals([get.status, authn, calls, handlers], [200, 0, 0, 1]);
++    const post = await app.request('/health', { method: 'POST' });
++    const body = await post.text();
++    assertEquals([post.status, authn, calls, handlers], [
++      mode === 'throw-open' ? 200 : 403,
++      1,
++      1,
++      mode === 'throw-open' ? 2 : 1,
++    ]);
++    if (mode !== 'throw-open') {
++      assertEquals(JSON.parse(body), {
++        error: 'FORBIDDEN',
++        message: mode === 'deny' ? 'denied' : 'authz.error',
++      });
++    }
++  }
++});
+diff --git a/packages/service/tests/auth/define-service-auth_test.ts b/packages/service/tests/auth/define-service-auth_test.ts
+index f2e7cab5d..68eb594c8 100644
+--- a/packages/service/tests/auth/define-service-auth_test.ts
++++ b/packages/service/tests/auth/define-service-auth_test.ts
+@@ -217,3 +217,83 @@ Deno.test('defineService guarded policy supports authentication without authoriz
+     await running.stop();
+   }
+ });
++
++function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++exactTest(
++  'defineService passes exact health rules to a real listener without implicit HEAD',
++  async () => {
++    let calls = 0;
++    const running = await defineService({}, {
++      name: 'exact-preset',
++      port: 0,
++      auth: {
++        authn: {
++          protect: ['/'],
++          allowAnonymous: [{ method: 'GET', path: '/health' }],
++          authenticator: {
++            authenticate: () => {
++              calls++;
++              return { ok: false, reason: 'guarded' };
++            },
++          },
++        },
++      },
++    });
++    try {
++      const origin = clientOrigin(running.addr.hostname, running.addr.port);
++      for (const method of ['GET', 'HEAD', 'POST']) {
++        calls = 0;
++        const response = await fetch(`${origin}/health`, { method });
++        const body = await response.text();
++        assertEquals([response.status, calls], method === 'GET' ? [200, 0] : [401, 1]);
++        if (method === 'HEAD') assertEquals(body, '');
++      }
++    } finally {
++      await running.stop();
++    }
++  },
++);
++
++exactTest(
++  'defineService invalid exact rules reject before handlers and listener creation',
++  async () => {
++    let handlers = 0;
++    let listeners = 0;
++    const options: DefineServiceOptions = {
++      name: 'invalid-exact-preset',
++      port: 0,
++      auth: {
++        authn: {
++          authenticator: {
++            authenticate: () => {
++              handlers++;
++              return { ok: false, reason: 'guarded' };
++            },
++          },
++          allowAnonymous: [{ method: 'GET', path: '/health/' }],
++        },
++      },
++      middleware: [async (_c, next) => {
++        handlers++;
++        await next();
++      }],
++    };
++    const descriptor = Object.getOwnPropertyDescriptor(Deno, 'serve');
++    Object.defineProperty(Deno, 'serve', {
++      configurable: true,
++      value: () => {
++        listeners++;
++        throw new Error('listener must not start');
++      },
++    });
++    try {
++      await assertRejects(() => defineService({}, options), TypeError, 'invalid anonymous request');
++      assertEquals([handlers, listeners], [0, 0]);
++    } finally {
++      if (descriptor) Object.defineProperty(Deno, 'serve', descriptor);
++    }
++  },
++);
+diff --git a/packages/service/tests/auth/health-auth-order_test.ts b/packages/service/tests/auth/health-auth-order_test.ts
+new file mode 100644
+index 000000000..b04122cc2
+--- /dev/null
++++ b/packages/service/tests/auth/health-auth-order_test.ts
+@@ -0,0 +1,332 @@
++import {
++  assertEquals,
++  assertInstanceOf,
++  assertObjectMatch,
++  assertRejects,
++  assertThrows,
++} from '@std/assert';
++import { Hono } from 'hono';
++import { type AuthnOptions, createService, type Principal } from '../../mod.ts';
++
++function test(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++test('health preserves native defaults, configured checks and deferred-route precedence', async (t) => {
++  for (const allowAnonymous of [undefined, [], ['/health']]) {
++    await t.step(`default=${JSON.stringify(allowAnonymous)}`, async () => {
++      let authn = 0;
++      let health = 0;
++      let ready = 0;
++      let raw = 0;
++      const builder = createService({}, { name: 'health-defaults', version: 'test-version' })
++        .withAuthn({
++          authenticator: {
++            authenticate: () => {
++              authn++;
++              return { ok: false, reason: 'must-not-run' };
++            },
++          },
++          protect: ['/'],
++          allowAnonymous,
++        }).withHealth().route('all', '/*', (c) => {
++          raw++;
++          return c.text('raw');
++        });
++      builder.withHealthCheck({
++        name: 'late-check',
++        check: () => {
++          health++;
++          return Promise.resolve({ healthy: true, message: 'live-array' });
++        },
++      });
++      const app = builder.build();
++      // Native readiness retains its live array; health checks snapshot on installation.
++      builder.withReadinessCheck(() => {
++        ready++;
++        return Promise.resolve(false);
++      });
++      for (const path of ['/health', '/health/live', '/health/ready']) {
++        for (const method of ['GET', 'HEAD']) {
++          const response = await app.request(path, { method });
++          const body = await response.text();
++          assertEquals(response.status, path.endsWith('/ready') ? 503 : 200);
++          if (method === 'HEAD') assertEquals(body, '');
++          if (method === 'GET' && path === '/health') {
++            const expected = { name: 'late-check', healthy: true, message: 'live-array' };
++            const data = JSON.parse(body);
++            assertEquals(data.version, 'test-version');
++            assertEquals(data.checks.length, 1);
++            assertObjectMatch(data.checks[0], expected);
++          }
++        }
++      }
++      assertEquals([authn, health, ready, raw], [0, 2, 2, 0]);
++    });
++  }
++});
++
++test('health is opt-in and late configuration installs once on the next build', async () => {
++  let raw = 0;
++  const without = createService({}, { name: 'no-health' })
++    .withAuthn({
++      protect: ['/'],
++      authenticator: { authenticate: () => ({ ok: false, reason: 'guarded' }) },
++    }).route('all', '/*', (c) => {
++      raw++;
++      return c.text('raw');
++    }).build();
++  assertInstanceOf(without, Hono);
++  assertEquals(without.routes.filter((route) => route.path.startsWith('/health')).length, 0);
++  const fallback = await without.request('/health');
++  assertEquals(await fallback.text(), 'raw');
++  assertEquals([fallback.status, raw], [200, 1]);
++
++  let calls = 0;
++  const builder = createService({}, { name: 'late-health' });
++  const app = builder.build();
++  assertInstanceOf(app, Hono);
++  assertEquals(app.routes.filter((route) => route.path === '/health').length, 0);
++  builder.withHealth({
++    checks: [{
++      name: 'late',
++      check: () => {
++        calls++;
++        return Promise.resolve({ healthy: true });
++      },
++    }],
++  });
++  assertEquals(app.routes.filter((route) => route.path === '/health').length, 0);
++  assertEquals(builder.build(), app);
++  assertEquals(builder.build(), app);
++  for (const path of ['/health', '/health/live', '/health/ready']) {
++    assertEquals(
++      app.routes.filter((route) => route.method === 'GET' && route.path === path).length,
++      1,
++    );
++  }
++  const response = await app.request('/health');
++  await response.text();
++  assertEquals([response.status, calls], [200, 1]);
++});
++
++test('repeated health/build/serve preserves one configuration and one auth installation', async () => {
++  let configured = 0;
++  let ignored = 0;
++  let authn = 0;
++  let authz = 0;
++  let raw = 0;
++  const principal: Principal = {
++    subject: 'test',
++    scopes: [],
++    roles: [],
++    scheme: 'custom',
++    claims: {},
++  };
++  const builder = createService({}, { name: 'health-once', port: 0 }).withAuthn({
++    protect: ['/'],
++    authenticator: {
++      authenticate: () => {
++        authn++;
++        return { ok: true, principal };
++      },
++    },
++  }).withAuthz({
++    authorizer: {
++      authorize: () => {
++        authz++;
++        return { allow: true };
++      },
++    },
++  }).withHealth({
++    includeDetails: false,
++    checks: [{
++      name: 'configured',
++      check: () => {
++        configured++;
++        return Promise.resolve({ healthy: true });
++      },
++    }],
++  }).withHealth({
++    includeDetails: true,
++    checks: [{
++      name: 'ignored',
++      check: () => {
++        ignored++;
++        return Promise.resolve({ healthy: false });
++      },
++    }],
++  }).route('get', '/guarded', (c) => {
++    raw++;
++    return c.text('guarded');
++  });
++  const app = builder.build();
++  assertInstanceOf(app, Hono);
++  const routes = app.routes.length;
++  builder.build();
++  for (let attempt = 0; attempt < 2; attempt++) {
++    const running = await builder.serve({ hostname: '127.0.0.1', port: 0 });
++    try {
++      assertEquals(running.app, app);
++      assertEquals(app.routes.length, routes);
++      const response = await fetch(`http://127.0.0.1:${running.addr.port}/health`);
++      assertEquals(response.status, 200);
++      assertEquals((await response.json()).checks, []);
++      const guarded = await app.request('/guarded');
++      assertEquals(await guarded.text(), 'guarded');
++      assertEquals([configured, ignored, authn, authz, raw], [
++        attempt + 1,
++        0,
++        attempt + 1,
++        attempt + 1,
++        attempt + 1,
++      ]);
++    } finally {
++      await running.stop();
++    }
++  }
++  assertEquals(
++    app.routes.filter((route) => route.method === 'GET' && route.path === '/health').length,
++    1,
++  );
++});
++
++test('invalid rules reject every build and serve without partial middleware or listeners', async () => {
++  for (const failAtAuthz of [false, true]) {
++    let authn = 0;
++    let authz = 0;
++    let health = 0;
++    let raw = 0;
++    let listeners = 0;
++    let reads = 0;
++    const options: AuthnOptions = {
++      protect: ['/'],
++      authenticator: {
++        authenticate: () => {
++          authn++;
++          return { ok: false, reason: 'guarded' };
++        },
++      },
++    };
++    // Untyped caller data: when requested, authn validates before authz sees the invalid rule.
++    Object.defineProperty(options, 'allowAnonymous', {
++      configurable: true,
++      enumerable: true,
++      get: () => [{ method: failAtAuthz && ++reads % 2 === 1 ? 'GET' : 'get', path: '/health' }],
++    });
++    const builder = createService({}, { name: 'invalid-rule', port: 0 }).withAuthn(options)
++      .withAuthz({
++        authorizer: {
++          authorize: () => {
++            authz++;
++            return { allow: false, reason: 'guarded' };
++          },
++        },
++      }).withHealth({
++        checks: [{
++          name: 'never',
++          check: () => {
++            health++;
++            return Promise.resolve({ healthy: true });
++          },
++        }],
++      }).route('all', '/*', (c) => {
++        raw++;
++        return c.text('raw');
++      });
++    const serveDescriptor = Object.getOwnPropertyDescriptor(Deno, 'serve');
++    Object.defineProperty(Deno, 'serve', {
++      configurable: true,
++      value: () => {
++        listeners++;
++        throw new Error('listener must not start');
++      },
++    });
++    try {
++      assertThrows(() => builder.build(), TypeError, 'invalid anonymous request');
++      assertThrows(() => builder.build(), TypeError, 'invalid anonymous request');
++      await assertRejects(() => builder.serve(), TypeError, 'invalid anonymous request');
++      assertEquals([authn, authz, health, raw, listeners], [0, 0, 0, 0, 0]);
++    } finally {
++      if (serveDescriptor) Object.defineProperty(Deno, 'serve', serveDescriptor);
++    }
++    // A valid retry exposes any middleware accidentally registered by an earlier failed build.
++    Object.defineProperty(options, 'allowAnonymous', { value: ['/health'] });
++    const app = builder.build();
++    assertInstanceOf(app, Hono);
++    // One tracing stage, two auth stages, three health routes and the raw catch-all.
++    assertEquals(app.routes.length, 7);
++    const denied = await app.request('/guarded');
++    await denied.text();
++    assertEquals([denied.status, authn, authz, health, raw], [401, 1, 0, 0, 0]);
++  }
++});
++
++for (const cors of [false, true]) {
++  test(`health respects a custom anonymous list, CORS=${cors}`, async (t) => {
++    let authn = 0;
++    let authz = 0;
++    let health = 0;
++    let raw = 0;
++    const builder = createService({}, { name: 'health-order' });
++    if (cors) builder.withCors({ origin: ['https://allowed.example'] });
++    const app = builder.withAuthn({
++      authenticator: {
++        authenticate: () => {
++          authn++;
++          return { ok: false, reason: 'missing-credential' };
++        },
++      },
++      protect: ['/'],
++      allowAnonymous: ['/other'],
++    }).withAuthz({
++      authorizer: {
++        authorize: () => {
++          authz++;
++          return { allow: false, reason: 'must-not-run' };
++        },
++      },
++    }).withHealth({
++      checks: [{
++        name: 'count-health',
++        check: () => {
++          health++;
++          return Promise.resolve({ healthy: true });
++        },
++      }],
++    }).withReadinessCheck(() => {
++      health++;
++      return Promise.resolve(true);
++    }).route('all', '/*', (c) => {
++      raw++;
++      return c.text('raw');
++    }).build();
++    for (
++      const [method, path] of [
++        ['GET', '/health'],
++        ['HEAD', '/health'],
++        ['GET', '/health/live'],
++        ['HEAD', '/health/ready'],
++        ['POST', '/health'],
++        ['POST', '/guarded'],
++        ['GET', '/other'],
++        ['POST', '/other'],
++      ]
++    ) {
++      await t.step(`${method} ${path}`, async () => {
++        authn =
++          authz =
++          health =
++          raw =
++            0;
++        const response = await app.request(path, { method });
++        await response.text();
++        const anonymous = path === '/other';
++        assertEquals(
++          [response.status, authn, authz, health, raw],
++          [anonymous ? 200 : 401, anonymous ? 0 : 1, 0, 0, anonymous ? 1 : 0],
++        );
++      });
++    }
++  });
++}
+diff --git a/packages/service/tests/auth/middleware_test.ts b/packages/service/tests/auth/middleware_test.ts
+index 8b24a4547..d89cd90f4 100644
+--- a/packages/service/tests/auth/middleware_test.ts
++++ b/packages/service/tests/auth/middleware_test.ts
+@@ -1,8 +1,9 @@
+-import { assertEquals, assertRejects } from '@std/assert';
++import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+ import { type Context, Hono } from 'hono';
+ import { createAuthnMiddleware, createAuthzMiddleware } from '../../src/auth/auth-middleware.ts';
+ import type { ProcedurePolicyResolver } from '../../src/auth/contract/contract-policy.ts';
+ import type { AuthenticatorPort, AuthorizerPort, Principal } from '../../src/auth/types.ts';
++import type { AnonymousRule, AuthnOptions } from '../../src/auth/mod.ts';
+ 
+ type AuthTestEnv = {
+   Variables: {
+@@ -324,3 +325,153 @@ Deno.test('authn middleware guards a matched required procedure outside legacy p
+   assertEquals(response.status, 401);
+   assertEquals(authenticatorCalls, 1);
+ });
++
++function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++exactTest('exact anonymous rules validate in both middleware factories', () => {
++  const invalid = [
++    { method: 'get', path: '/health' },
++    { method: 'OPTIONS', path: '/health' },
++    { method: 'ALL', path: '/health' },
++    ...[
++      'health',
++      '/health/',
++      '//health',
++      '/he%61lth',
++      '/health*',
++      '/health?x',
++      '/health#f',
++      '/health/{id}',
++      '/health :x',
++      '/health\\x',
++      '',
++    ].map((path) => ({ method: 'GET', path })),
++  ];
++  for (const rule of invalid) {
++    const options: AuthnOptions = {
++      authenticator: { authenticate: () => ({ ok: true, principal }) },
++    };
++    Object.defineProperty(options, 'allowAnonymous', { value: [rule] });
++    assertThrows(() => createAuthnMiddleware(options), TypeError, 'invalid anonymous request');
++    const authorizer: AuthorizerPort = { authorize: () => ({ allow: true }) };
++    const authz = { authorizer };
++    Object.defineProperty(authz, 'allowAnonymous', { value: [rule] });
++    assertThrows(() => createAuthzMiddleware(authz), TypeError, 'invalid anonymous request');
++  }
++  for (const factory of [createAuthnMiddleware, createAuthzMiddleware]) {
++    factory({
++      authenticator: { authenticate: () => ({ ok: true, principal }) },
++      authorizer: { authorize: () => ({ allow: true }) },
++      allowAnonymous: [{ method: 'GET', path: '/' }, { method: 'GET', path: '/' }],
++    });
++  }
++});
++
++exactTest(
++  'exact anonymous method/path matrix counts dispatch and keeps contract precedence',
++  async (t) => {
++    type Row = {
++      rules?: readonly AnonymousRule[];
++      method: string;
++      path: string;
++      anonymous: boolean;
++      policy?: 'none' | 'required';
++      throwing?: boolean;
++    };
++    const get: AnonymousRule[] = [{ method: 'GET', path: '/health' }];
++    const rows: Row[] = [];
++    for (const rules of [undefined, [], ['/health'], ['/health/']]) {
++      rows.push({ rules, method: 'POST', path: '/health/anything', anonymous: true });
++      rows.push({ rules, method: 'DELETE', path: '/health%2Fx', anonymous: false });
++    }
++    for (const method of ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']) {
++      rows.push({ rules: get, method, path: '/health', anonymous: method === 'GET' });
++    }
++    for (
++      const path of [
++        '/health?x=1',
++        '/x/../health',
++        '/health/live',
++        '/health/x',
++        '/healthz',
++        '/health/',
++        '//health',
++        '/HEALTH',
++        '/he%61lth',
++        '/health%2Fx',
++        '/health%2F..%2Fx',
++      ]
++    ) {
++      rows.push({
++        rules: get,
++        method: 'GET',
++        path,
++        anonymous: path.includes('?') || path === '/x/../health',
++      });
++    }
++    const head: AnonymousRule[] = [{ method: 'HEAD', path: '/health' }];
++    rows.push(
++      { rules: head, method: 'HEAD', path: '/health', anonymous: true },
++      { rules: head, method: 'GET', path: '/health', anonymous: false },
++      { rules: ['/api/docs', ...get], method: 'POST', path: '/api/docs/anything', anonymous: true },
++      { rules: ['/api/docs', ...get], method: 'POST', path: '/health', anonymous: false },
++      { rules: get, method: 'GET', path: '/api/public', anonymous: true, policy: 'none' },
++      { rules: get, method: 'GET', path: '/health', anonymous: false, policy: 'required' },
++      { rules: get, method: 'POST', path: '/health', anonymous: false, throwing: true },
++    );
++    for (const row of rows) {
++      await t.step(
++        `${row.method} ${row.path} ${JSON.stringify(row.rules)} ${row.policy ?? ''}`,
++        async () => {
++          let authn = 0;
++          let authz = 0;
++          let handler = 0;
++          const app = new Hono<AuthTestEnv>();
++          const policy = row.policy
++            ? { authentication: row.policy, requiredScopes: [], requiredRoles: [] }
++            : undefined;
++          const policyResolver: ProcedurePolicyResolver = {
++            resolve: () => policy ? { matched: true, policy } : { matched: false },
++          };
++          const options = { protect: ['/'], allowAnonymous: row.rules, policyResolver };
++          const authenticator: AuthenticatorPort = {
++            authenticate: () => {
++              authn++;
++              if (row.throwing) throw new Error('synthetic-private-detail');
++              return { ok: false, reason: 'guarded' };
++            },
++          };
++          const authorizer: AuthorizerPort = {
++            authorize: () => {
++              authz++;
++              return { allow: false, reason: 'guarded' };
++            },
++          };
++          app.use('*', createAuthnMiddleware({ ...options, authenticator }));
++          app.use('*', createAuthzMiddleware({ ...options, authorizer }));
++          app.all('/*', (c) => {
++            handler++;
++            return c.text('handled');
++          });
++          const response = await app.request(`http://localhost${row.path}`, { method: row.method });
++          const body = await response.text();
++          assertEquals([response.status, authn, authz, handler], [
++            row.anonymous ? 200 : row.throwing ? 503 : 401,
++            row.anonymous ? 0 : 1,
++            0,
++            row.anonymous ? 1 : 0,
++          ]);
++          if (row.method === 'HEAD') assertEquals(body, '');
++          if (row.throwing) {
++            assertEquals(JSON.parse(body), {
++              error: 'SERVICE_UNAVAILABLE',
++              message: 'Authentication service unavailable',
++            });
++          }
++        },
++      );
++    }
++  },
++);
+diff --git a/packages/service/tests/body-limit_test.ts b/packages/service/tests/body-limit_test.ts
+index 070a94cae..a8859c93d 100644
+--- a/packages/service/tests/body-limit_test.ts
++++ b/packages/service/tests/body-limit_test.ts
+@@ -1,5 +1,6 @@
+ import { assert, assertEquals, assertThrows } from '@std/assert';
+ import { os } from '@orpc/server';
++import { Hono } from 'hono';
+ import { z } from 'zod';
+ import { createBodyLimitMiddleware, createService, defineService } from '../mod.ts';
+ import { createStaticCredentialAuthenticator } from '../src/auth/static-credential-authenticator.ts';
+@@ -133,11 +134,13 @@ for (const projection of PROJECTIONS) {
+       port: 0,
+       cors: { origin: ['https://app.example'] },
+       middleware: [async (c, next) => {
++        const nativeBody = c.req.header('transfer-encoding') ? c.req.raw.body : null;
+         framing.push({
+           contentLength: c.req.header('content-length'),
+           transferEncoding: c.req.header('transfer-encoding'),
+         });
+         await next();
++        if (nativeBody) assertEquals(nativeBody.locked, false);
+       }],
+       bodyLimit: { maxBytes: LIMIT },
+     });
+@@ -154,6 +157,14 @@ for (const projection of PROJECTIONS) {
+       assertEquals(under.status, 200);
+       await under.body?.cancel();
+ 
++      const streamed = await fetch(url, {
++        method: 'POST',
++        headers,
++        body: chunkedBody(projection.encode('a'.repeat(LIMIT / 2))),
++      });
++      assertEquals(streamed.status, 200);
++      await streamed.arrayBuffer();
++
+       const declared = await fetch(url, {
+         method: 'POST',
+         headers,
+@@ -169,6 +180,7 @@ for (const projection of PROJECTIONS) {
+         body: chunkedBody(projection.encode('a'.repeat(LIMIT * 2))),
+       });
+       assertEquals(chunked.status, 413);
++      assertEquals(chunked.headers.get('access-control-allow-origin'), 'https://app.example');
+       assertEquals(await chunked.json(), PAYLOAD_TOO_LARGE);
+       // The chunked request reached the service without a Content-Length header.
+       assertEquals(framing.at(-1), { contentLength: undefined, transferEncoding: 'chunked' });
+@@ -252,3 +264,59 @@ Deno.test('createBodyLimitMiddleware rejects a non-positive or fractional maxByt
+     assertThrows(() => createBodyLimitMiddleware({ maxBytes }), RangeError);
+   }
+ });
++
++for (const mode of ['disconnect', 'handler-error'] as const) {
++  Deno.test({
++    name: `body limit settles its native source after ${mode} without replacing the primary error`,
++    sanitizeOps: true,
++    sanitizeResources: true,
++    sanitizeExit: true,
++    async fn() {
++      const primary = new Error('primary handler failure');
++      const ended = Promise.withResolvers<Error>();
++      let handlerEntries = 0;
++      const app = new Hono().use(createBodyLimitMiddleware({ maxBytes: LIMIT }));
++      app.onError((error) => {
++        ended.resolve(error);
++        return new Response('primary', { status: 503 });
++      });
++      app.post('/owned', async (c) => {
++        handlerEntries += 1;
++        assertEquals(await c.req.text(), 'ok');
++        throw primary;
++      });
++      const stop = new AbortController();
++      const server = Deno.serve({ hostname: '127.0.0.1', port: 0, signal: stop.signal }, app.fetch);
++      let client: Deno.TcpConn | undefined;
++      const deadline = setTimeout(() => {
++        ended.reject(new Error('native body fixture deadline'));
++        stop.abort();
++      }, 5000);
++      try {
++        if (mode === 'disconnect') {
++          client = await Deno.connect({ hostname: '127.0.0.1', port: server.addr.port });
++          await client.write(new TextEncoder().encode(
++            'POST /owned HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: chunked\r\n\r\n2\r\nok\r\n',
++          ));
++          client.close();
++          client = undefined;
++          assert(await ended.promise !== primary);
++        } else {
++          const response = await fetch(`http://127.0.0.1:${server.addr.port}/owned`, {
++            method: 'POST',
++            body: chunkedBody('ok'),
++          });
++          assertEquals(response.status, 503);
++          assertEquals(await response.text(), 'primary');
++          assertEquals(await ended.promise, primary);
++        }
++        assertEquals(handlerEntries, mode === 'disconnect' ? 0 : 1);
++      } finally {
++        clearTimeout(deadline);
++        client?.close();
++        stop.abort();
++        await server.finished;
++      }
++    },
++  });
++}
+diff --git a/packages/service/tests/cors-response-authority_test.ts b/packages/service/tests/cors-response-authority_test.ts
+new file mode 100644
+index 000000000..916641c28
+--- /dev/null
++++ b/packages/service/tests/cors-response-authority_test.ts
+@@ -0,0 +1,480 @@
++import { assert, assertEquals, assertStrictEquals } from '@std/assert';
++import { os } from '@orpc/server';
++import { type CorsOptions, createOpenAPIHandler, createRPCHandler, createService } from '../mod.ts';
++import { createStaticCredentialAuthenticator } from '../src/auth/mod.ts';
++
++function test(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++const allowed = 'https://app.example';
++const hostile = 'https://hostile.example';
++const origins = [allowed, hostile, `${allowed}.attacker.example`, 'null', undefined];
++const cookies = ['first=1; Path=/; HttpOnly', 'second=2; Path=/; SameSite=Lax'];
++const payload = 'data: first\n\ndata: second\n\n';
++const headers = [
++  'access-control-allow-origin',
++  'access-control-allow-credentials',
++  'access-control-expose-headers',
++  'access-control-allow-methods',
++  'access-control-allow-headers',
++  'access-control-max-age',
++];
++const router = os.router({
++  ping: os.handler(() => ({ ok: true })),
++  status: os.route({ method: 'GET', path: '/status' }).handler(() => ({ ok: true })),
++  boom: os.handler(() => {
++    throw new Error('procedure failure');
++  }),
++});
++
++function policy(credentials = true): NonNullable<CorsOptions> {
++  return {
++    origin: [allowed],
++    credentials,
++    exposeHeaders: credentials ? ['X-Trace'] : [],
++    allowMethods: ['GET', 'POST'],
++    allowHeaders: ['Authorization', 'Content-Type'],
++    maxAge: 600,
++  };
++}
++
++function upstream(vary = 'origin, Accept-Encoding'): Response {
++  const responseHeaders = new Headers({
++    'access-control-allow-origin': '*',
++    'access-control-allow-credentials': 'true',
++    'access-control-expose-headers': 'Stream-Next-Offset',
++    'access-control-allow-methods': 'GET, POST',
++    'access-control-allow-headers': 'authorization, content-type',
++    'access-control-max-age': '600',
++    vary,
++    'stream-next-offset': '42',
++    'content-type': 'text/event-stream',
++    etag: '"upstream"',
++  });
++  for (const cookie of cookies) responseHeaders.append('set-cookie', cookie);
++  const body = new ReadableStream<Uint8Array>({
++    start(controller) {
++      controller.enqueue(new TextEncoder().encode(payload.slice(0, 13)));
++      controller.enqueue(new TextEncoder().encode(payload.slice(13)));
++      controller.close();
++    },
++  });
++  return new Response(body, {
++    status: 202,
++    statusText: 'Upstream Accepted',
++    headers: responseHeaders,
++  });
++}
++
++function fixture(options: CorsOptions | false = policy()) {
++  const calls = { authn: 0, authz: 0, handler: 0 };
++  const observed: {
++    body: ReadableStream<Uint8Array> | null;
++    bytes?: ArrayBuffer;
++    statusText?: string;
++  } = { body: null };
++  const staticAuthenticator = createStaticCredentialAuthenticator({
++    credentials: { fixture: { subject: 'test', scopes: [], roles: [] } },
++  });
++  const builder = createService(router, { name: 'cors-authority' });
++  if (options !== false) builder.withCors(options);
++  const app = builder.use(async (c, next) => {
++    if (c.req.path === '/middleware') {
++      c.header('access-control-allow-origin', '*');
++      return c.text('middleware');
++    }
++    await next();
++    observed.bytes = await c.res.clone().arrayBuffer();
++    observed.statusText = c.res.statusText;
++    observed.body = c.res.body;
++    return;
++  }).withAuthn({
++    protect: ['/api'],
++    authenticator: {
++      authenticate(request) {
++        calls.authn++;
++        if (request.path === '/api/unavailable') throw new Error('authenticator failure');
++        return staticAuthenticator.authenticate(request);
++      },
++    },
++  }).withAuthz({
++    authorizer: {
++      authorize(request) {
++        calls.authz++;
++        return request.path === '/api/deny'
++          ? { allow: false, reason: 'fixture-denied' }
++          : { allow: true };
++      },
++    },
++  }).withBodyLimit({ maxBytes: 64 }).withHealth().withRPC()
++    .route('get', '/raw', () => {
++      calls.handler++;
++      return upstream();
++    })
++    .route('get', '/raw-no-origin-vary', () => upstream('Accept-Encoding'))
++    .route('get', '/redirect', () => Response.redirect('https://destination.example/', 302))
++    .route('get', '/cookie', (c) => {
++      for (const cookie of cookies) c.header('set-cookie', cookie, { append: true });
++      return c.text('cookie');
++    })
++    .route('get', '/error', () => {
++      throw new Error('raw failure');
++    })
++    .build();
++  return { app, calls, observed };
++}
++
++function corsValues(response: Response): Array<string | null> {
++  return headers.map((name) => response.headers.get(name));
++}
++
++function assertVary(response: Response, expected: string[]): void {
++  const tokens = response.headers.get('vary')?.split(',').map((token) => token.trim()) ?? [];
++  assertEquals(tokens.map((token) => token.toLowerCase()).sort(), [...expected].sort());
++}
++
++function requestHeaders(origin?: string): Headers {
++  const result = new Headers({
++    authorization: 'Bearer fixture',
++    'content-type': 'application/json',
++  });
++  if (origin !== undefined) result.set('origin', origin);
++  return result;
++}
++
++interface Surface {
++  path: string;
++  status: number;
++  method?: string;
++  body?: string;
++  unauthenticated?: boolean;
++  text?: string;
++}
++
++const surfaces: Surface[] = [
++  { path: '/api/rpc/ping', method: 'POST', body: '{}', status: 200, text: '{"json":{"ok":true}}' },
++  { path: '/api/status', status: 200, text: '{"ok":true}' },
++  { path: '/raw', status: 202, text: payload },
++  { path: '/raw', method: 'HEAD', status: 202, text: '' },
++  { path: '/redirect', status: 302, text: '' },
++  { path: '/cookie', status: 200, text: 'cookie' },
++  { path: '/health', status: 200 },
++  { path: '/missing', status: 404 },
++  { path: '/api/rpc/boom', method: 'POST', body: '{}', status: 500 },
++  { path: '/error', status: 500 },
++  { path: '/api/status', unauthenticated: true, status: 401 },
++  { path: '/api/deny', status: 403 },
++  { path: '/api/unavailable', status: 503 },
++  { path: '/api/rpc/ping', method: 'POST', body: 'x'.repeat(65), status: 413 },
++  { path: '/middleware', status: 200, text: 'middleware' },
++];
++
++for (const credentials of [true, false]) {
++  test(`CORS authority covers every response (credentials=${credentials})`, async (t) => {
++    const { app, observed } = fixture(policy(credentials));
++    for (const origin of origins) {
++      for (const surface of surfaces) {
++        await t.step(
++          `${origin ?? 'absent'} ${surface.method ?? 'GET'} ${surface.path} ${surface.status}`,
++          async () => {
++            const reqHeaders = requestHeaders(origin);
++            if (surface.unauthenticated) reqHeaders.delete('authorization');
++            const response = await app.request(surface.path, {
++              method: surface.method,
++              body: surface.body,
++              headers: reqHeaders,
++            });
++            assertEquals(response.status, surface.status);
++            assertEquals(corsValues(response), [
++              origin === allowed ? allowed : null,
++              credentials ? 'true' : null,
++              credentials ? 'X-Trace' : null,
++              null,
++              null,
++              null,
++            ]);
++            assertVary(
++              response,
++              surface.path === '/raw' ? ['origin', 'accept-encoding'] : ['origin'],
++            );
++            if (surface.path === '/raw') {
++              assertEquals(response.statusText, 'Upstream Accepted');
++              assertEquals(response.headers.get('content-type'), 'text/event-stream');
++              assertEquals(response.headers.get('stream-next-offset'), '42');
++              assertEquals(response.headers.get('etag'), '"upstream"');
++              if (surface.method !== 'HEAD') assertStrictEquals(response.body, observed.body);
++            }
++            assertEquals(
++              response.headers.getSetCookie(),
++              ['/raw', '/cookie'].includes(surface.path) ? cookies : [],
++            );
++            if (surface.path === '/redirect') {
++              assertEquals(response.headers.get('location'), 'https://destination.example/');
++            }
++            const body = await response.text();
++            if (surface.path !== '/middleware') {
++              assertEquals(response.statusText, observed.statusText);
++              if (surface.method !== 'HEAD') {
++                assertEquals(new TextEncoder().encode(body).buffer, observed.bytes);
++              }
++            }
++            if (surface.text !== undefined) assertEquals(body, surface.text);
++            else {
++              assert(body.length > 0);
++              if (surface.path === '/health') assertEquals(JSON.parse(body).status, 'healthy');
++              else {
++                assert(body.includes(
++                  surface.status === 500
++                    ? 'INTERNAL'
++                    : surface.status === 404
++                    ? 'NOT_FOUND'
++                    : surface.status === 401
++                    ? 'UNAUTHORIZED'
++                    : surface.status === 403
++                    ? 'FORBIDDEN'
++                    : surface.status === 503
++                    ? 'SERVICE_UNAVAILABLE'
++                    : 'PAYLOAD_TOO_LARGE',
++                ));
++              }
++            }
++          },
++        );
++      }
++    }
++  });
++}
++
++test('CORS native preflight short-circuits all surfaces before authentication', async (t) => {
++  for (const credentials of [true, false]) {
++    const { app, calls } = fixture(policy(credentials));
++    for (const origin of origins) {
++      for (const path of ['/api/rpc/ping', '/api/status', '/raw', '/health']) {
++        await t.step(`${credentials} ${origin ?? 'absent'} ${path}`, async () => {
++          const reqHeaders = requestHeaders(origin);
++          reqHeaders.delete('authorization');
++          reqHeaders.set('access-control-request-method', 'POST');
++          reqHeaders.set('access-control-request-headers', 'Authorization,Content-Type');
++          const response = await app.request(path, { method: 'OPTIONS', headers: reqHeaders });
++          assertEquals(response.status, 204);
++          assertEquals(await response.text(), '');
++          assertEquals(corsValues(response), [
++            origin === allowed ? allowed : null,
++            credentials ? 'true' : null,
++            credentials ? 'X-Trace' : null,
++            'GET,POST',
++            'Authorization,Content-Type',
++            '600',
++          ]);
++          // Native Hono varies on request headers even when allowHeaders is configured.
++          assertVary(response, ['origin', 'access-control-request-headers']);
++          assertEquals(calls, { authn: 0, authz: 0, handler: 0 });
++        });
++      }
++    }
++  }
++  const { app } = fixture({ origin: [allowed] });
++  const response = await app.request('/raw', {
++    method: 'OPTIONS',
++    headers: { origin: allowed, 'access-control-request-headers': 'X-Requested' },
++  });
++  assertEquals(corsValues(response), [
++    allowed,
++    null,
++    null,
++    'GET,HEAD,PUT,POST,DELETE,PATCH,QUERY',
++    'X-Requested',
++    null,
++  ]);
++  assertVary(response, ['origin', 'access-control-request-headers']);
++  assertEquals(await response.text(), '');
++});
++
++test('CORS wildcard preserves supplied Vary without forcing Origin', async () => {
++  const { app } = fixture({ origin: '*' });
++  for (const origin of origins) {
++    for (const path of ['/api/rpc/ping', '/api/status', '/raw', '/raw-no-origin-vary']) {
++      const response = await app.request(path, {
++        headers: requestHeaders(origin),
++        ...(path.includes('/rpc/') ? { method: 'POST', body: '{}' } : {}),
++      });
++      assertEquals(corsValues(response), ['*', null, null, null, null, null]);
++      // oRPC and /raw supply Origin; native wildcard policy does not invent or remove it.
++      assertVary(
++        response,
++        path === '/raw-no-origin-vary'
++          ? ['accept-encoding']
++          : path === '/raw'
++          ? ['origin', 'accept-encoding']
++          : ['origin'],
++      );
++      assertEquals(
++        await response.text(),
++        path.startsWith('/raw')
++          ? payload
++          : path.includes('/rpc/')
++          ? '{"json":{"ok":true}}'
++          : '{"ok":true}',
++      );
++    }
++  }
++});
++
++test('CORS Vary union retains checkpoint tokens, first spelling, and wildcard', async () => {
++  const app = createService({}, { name: 'vary-union' })
++    .use(async (c, next) => {
++      c.header('vary', 'Accept-Encoding', { append: true });
++      await next();
++    }).withCors({ origin: [allowed] })
++    .route('get', '/overwrite', (c) => {
++      c.header('vary', 'Cookie');
++      return c.text('overwrite');
++    })
++    .route('get', '/dedupe', (c) => {
++      c.header('vary', 'Cookie, cookie, ACCEPT-ENCODING, origin');
++      return c.text('dedupe');
++    })
++    .route('get', '/response', () => new Response('response', { headers: { vary: 'Cookie' } }))
++    .route('get', '/star', (c) => {
++      c.header('vary', 'Cookie, *, Origin');
++      return c.text('star');
++    }).build();
++  for (
++    const [path, vary] of [
++      ['/overwrite', 'Accept-Encoding, Cookie, Origin'],
++      ['/dedupe', 'Accept-Encoding, Cookie, origin'],
++      // Hono's own response setter lets the placeholder win over returned Response headers.
++      ['/response', 'Accept-Encoding, Origin'],
++      ['/star', '*'],
++    ]
++  ) {
++    const response = await app.request(path, { headers: { origin: allowed } });
++    assertEquals(response.headers.get('vary'), vary);
++    assertEquals(corsValues(response), [allowed, null, null, null, null, null]);
++    assertEquals(await response.text(), path.slice(1));
++  }
++});
++
++test('CORS resolves once and rejects async credentialed wildcard on real projections', async () => {
++  for (const wildcard of [false, true]) {
++    let calls = 0;
++    const { app } = fixture({
++      credentials: true,
++      origin: async (origin) => {
++        calls++;
++        await Promise.resolve();
++        return wildcard ? '*' : origin === allowed ? origin : null;
++      },
++    });
++    for (const path of ['/api/rpc/ping', '/api/status', '/raw']) {
++      for (const origin of origins) {
++        const before = calls;
++        const response = await app.request(path, {
++          headers: requestHeaders(origin),
++          ...(path.includes('/rpc/') ? { method: 'POST', body: '{}' } : {}),
++        });
++        assertEquals(calls, before + 1);
++        assertEquals(corsValues(response), [
++          !wildcard && origin === allowed ? allowed : null,
++          'true',
++          null,
++          null,
++          null,
++          null,
++        ]);
++        await response.arrayBuffer();
++      }
++    }
++  }
++});
++
++test('CORS snapshots environment and caller arrays before requests', async () => {
++  const previous = Deno.env.get('NETSCRIPT_CORS_ORIGINS');
++  try {
++    Deno.env.set('NETSCRIPT_CORS_ORIGINS', allowed);
++    const { app } = fixture({});
++    Deno.env.set('NETSCRIPT_CORS_ORIGINS', hostile);
++    const options = policy();
++    const explicit = fixture(options);
++    options.exposeHeaders?.push('Mutated');
++    options.allowHeaders?.push('Mutated');
++    options.allowMethods = ['DELETE'];
++    if (Array.isArray(options.origin)) options.origin.push(hostile);
++    for (const path of ['/api/rpc/ping', '/raw']) {
++      for (const origin of [allowed, hostile]) {
++        for (const [target, credentials] of [[app, false], [explicit.app, true]] as const) {
++          const response = await target.request(path, {
++            headers: requestHeaders(origin),
++            ...(path.includes('/rpc/') ? { method: 'POST', body: '{}' } : {}),
++          });
++          assertEquals(corsValues(response), [
++            origin === allowed ? allowed : null,
++            credentials ? 'true' : null,
++            credentials ? 'X-Trace' : null,
++            null,
++            null,
++            null,
++          ]);
++          await response.arrayBuffer();
++        }
++      }
++    }
++    const preflight = await explicit.app.request('/raw', {
++      method: 'OPTIONS',
++      headers: { origin: allowed },
++    });
++    assertEquals(corsValues(preflight), [
++      allowed,
++      'true',
++      'X-Trace',
++      'GET,POST',
++      'Authorization,Content-Type',
++      '600',
++    ]);
++    await preflight.arrayBuffer();
++  } finally {
++    if (previous === undefined) Deno.env.delete('NETSCRIPT_CORS_ORIGINS');
++    else Deno.env.set('NETSCRIPT_CORS_ORIGINS', previous);
++  }
++});
++
++test('no withCors and standalone RPC/OpenAPI preserve their existing CORS boundary', async () => {
++  const { app } = fixture(false);
++  const raw = await app.request('/raw', { headers: { origin: hostile } });
++  assertEquals(corsValues(raw), [
++    '*',
++    'true',
++    'Stream-Next-Offset',
++    'GET, POST',
++    'authorization, content-type',
++    '600',
++  ]);
++  assertVary(raw, ['origin', 'accept-encoding']);
++  assertEquals(raw.headers.getSetCookie(), cookies);
++  assertEquals(await raw.text(), payload);
++  for (const origin of [hostile, undefined]) {
++    const req = new Request('http://localhost/api/rpc/ping', {
++      method: 'POST',
++      headers: requestHeaders(origin),
++      body: '{}',
++    });
++    const rpc = await createRPCHandler(router).handle(req, { prefix: '/api/rpc' });
++    const rest = await createOpenAPIHandler(router).handle(
++      new Request('http://localhost/api/status', { headers: requestHeaders(origin) }),
++      { prefix: '/api' },
++    );
++    const built = await app.request('/api/rpc/ping', {
++      method: 'POST',
++      headers: requestHeaders(origin),
++      body: '{}',
++    });
++    for (const response of [rpc.response, rest.response, built]) {
++      assert(response);
++      assertEquals(response.status, 200);
++      assertEquals(corsValues(response), [origin ?? '', null, null, null, null, null]);
++      assertVary(response, ['origin']);
++      await response.arrayBuffer();
++    }
++  }
++});
+diff --git a/packages/service/tests/database-connectivity_test.ts b/packages/service/tests/database-connectivity_test.ts
+index 117fc1857..b33a8b962 100644
+--- a/packages/service/tests/database-connectivity_test.ts
++++ b/packages/service/tests/database-connectivity_test.ts
+@@ -1,5 +1,9 @@
+-import { assertEquals } from '@std/assert';
+-import { resolveProbeEngine } from '../src/diagnostics/database-connectivity.ts';
++import { assert, assertEquals } from '@std/assert';
++import {
++  createDatabaseConnectivityStartupHook,
++  resolveProbeEngine,
++} from '../src/diagnostics/database-connectivity.ts';
++import type { Database } from '../src/types.ts';
+ 
+ // Regression coverage for #175: a service scaffolded with
+ // PrimaryDatabase=sqlite must NOT run (and thus must not log a spurious ERR
+@@ -74,3 +78,216 @@ function restoreEnv(name: string, value: string | undefined): void {
+     Deno.env.set(name, value);
+   }
+ }
++
++async function runProbe(port: number, database: Database): Promise<void> {
++  const environment = {
++    DB_PROVIDER: 'mysql',
++    MYSQLDB_HOST: 'localhost',
++    MYSQLDB_PORT: String(port),
++    MYSQLDB_URI: undefined,
++    ConnectionStrings__mysqldb: undefined,
++  };
++  const previous = Object.keys(environment).map((key) => [key, Deno.env.get(key)] as const);
++  try {
++    for (const [key, value] of Object.entries(environment)) restoreEnv(key, value);
++    await createDatabaseConnectivityStartupHook({ serviceName: 'probe-fixture', database })();
++  } finally {
++    for (const [key, value] of previous) restoreEnv(key, value);
++  }
++}
++
++Deno.test({
++  name: 'database TCP probe closes its native loopback connection before querying',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  async fn() {
++    const listener = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++    let peer: Deno.TcpConn | undefined;
++    const deadline = setTimeout(() => {
++      listener.close();
++      peer?.close();
++    }, 10_000);
++    let queries = 0;
++    const observation = (async () => {
++      peer = await listener.accept();
++      assertEquals(await peer.read(new Uint8Array(1)), null, 'probe must send EOF');
++    })();
++    try {
++      await runProbe(listener.addr.port, {
++        $queryRaw(query) {
++          assertEquals([...query], ['SELECT 1']);
++          queries += 1;
++          return Promise.resolve(1);
++        },
++      });
++      await observation;
++      assertEquals(queries, 1);
++    } finally {
++      clearTimeout(deadline);
++      listener.close();
++      peer?.close();
++      await observation.catch(() => undefined);
++    }
++  },
++});
++
++Deno.test({
++  name: 'database TCP probe retries a native refused endpoint and returns without querying',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  async fn() {
++    const reservation = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++    const port = reservation.addr.port;
++    reservation.close();
++    let queries = 0;
++    const started = performance.now();
++    await runProbe(port, {
++      $queryRaw() {
++        queries += 1;
++        return Promise.resolve(1);
++      },
++    });
++    assertEquals(queries, 0);
++    assert(performance.now() - started >= 4000, 'retain both 2000 ms retry delays');
++    assert(performance.now() - started < 15_000, 'refused endpoint must remain bounded');
++  },
++});
++
++// Supplemental unit scheduling evidence; native success/refusal controls above stay live.
++for (const mode of ['reject', 'throw', 'abort', 'late'] as const) {
++  Deno.test({
++    name: `database TCP probe unit ${mode}: owns abort, settlement and timeout cleanup`,
++    sanitizeOps: true,
++    sanitizeResources: true,
++    sanitizeExit: true,
++    async fn() {
++      const originalConnect = Deno.connect;
++      const originalTimeout = globalThis.setTimeout;
++      const originalClear = globalThis.clearTimeout;
++      const descriptors = [
++        Object.getOwnPropertyDescriptor(Deno, 'connect')!,
++        Object.getOwnPropertyDescriptor(globalThis, 'setTimeout')!,
++        Object.getOwnPropertyDescriptor(globalThis, 'clearTimeout')!,
++      ];
++      const timers = new Map<ReturnType<typeof setTimeout>, number>();
++      const cleared = new Set<ReturnType<typeof setTimeout>>();
++      const active = new Set<ReturnType<typeof setTimeout>>();
++      const signals: Array<AbortSignal | undefined> = [];
++      const events: string[] = [];
++      const connections: Deno.TcpConn[] = [];
++      const peers: Deno.TcpConn[] = [];
++      const pending: Array<() => void> = [];
++      let queries = 0;
++      let timedOut = false;
++      const close = (connection: Deno.TcpConn) => {
++        try {
++          connection.close();
++        } catch (error) {
++          if (!(error instanceof Deno.errors.BadResource)) throw error;
++        }
++      };
++      const deadline = originalTimeout(() => {
++        timedOut = true;
++        for (const connection of [...connections, ...peers]) close(connection);
++      }, 10_000);
++      const listener = mode === 'late'
++        ? Deno.listen({ hostname: '127.0.0.1', port: 0 })
++        : undefined;
++      try {
++        if (listener) {
++          for (let i = 0; i < 3; i++) {
++            const accepted = listener.accept();
++            connections.push(
++              await originalConnect({ hostname: '127.0.0.1', port: listener.addr.port }),
++            );
++            peers.push(await accepted);
++          }
++        }
++        Object.defineProperty(globalThis, 'setTimeout', {
++          configurable: true,
++          writable: true,
++          value(callback: () => void, ms: number) {
++            const timer = originalTimeout(() => {
++              active.delete(timer);
++              callback();
++            }, 0);
++            timers.set(timer, ms);
++            active.add(timer);
++            return timer;
++          },
++        });
++        Object.defineProperty(globalThis, 'clearTimeout', {
++          configurable: true,
++          writable: true,
++          value(timer: ReturnType<typeof setTimeout>) {
++            cleared.add(timer);
++            active.delete(timer);
++            originalClear(timer);
++          },
++        });
++        Object.defineProperty(Deno, 'connect', {
++          configurable: true,
++          writable: true,
++          value(options: Deno.ConnectOptions): Promise<Deno.TcpConn> {
++            const attempt = signals.length;
++            signals.push(options.signal);
++            if (mode === 'throw') throw new Error('unit synchronous connection error');
++            if (mode === 'reject') return Promise.reject(new Error('unit connection refusal'));
++            return new Promise((resolve, reject) => {
++              pending.push(() => reject(new Error('unit cleanup')));
++              options.signal?.addEventListener('abort', () => {
++                events.push(`abort:${attempt}`);
++                queueMicrotask(() => {
++                  events.push(`settled:${attempt}`);
++                  if (mode === 'late') resolve(connections[attempt]);
++                  else reject(options.signal?.reason);
++                });
++              }, { once: true });
++            });
++          },
++        });
++        await runProbe(3306, {
++          $queryRaw() {
++            queries += 1;
++            return Promise.resolve(1);
++          },
++        });
++        assertEquals(signals.length, 3, 'retain three TCP attempts');
++        assert(
++          signals.every((signal) => signal instanceof AbortSignal),
++          'each connect gets a signal',
++        );
++        assertEquals([...timers.values()], [3000, 2000, 3000, 2000, 3000]);
++        for (const [timer, ms] of timers) {
++          if (ms === 3000) assert(cleared.has(timer), 'clear every probe deadline in finally');
++        }
++        assertEquals(active.size, 0);
++        assertEquals(queries, 0, 'failed or timed-out connections never run SELECT 1');
++        if (mode === 'abort' || mode === 'late') {
++          assert(signals.every((signal) => signal?.aborted), 'timeout aborts every connect');
++          assertEquals(events, [
++            'abort:0',
++            'settled:0',
++            'abort:1',
++            'settled:1',
++            'abort:2',
++            'settled:2',
++          ], 'connect settlement precedes hook completion');
++          for (const peer of peers) assertEquals(await peer.read(new Uint8Array(1)), null);
++          assert(!timedOut, 'late connections must close before the unit deadline');
++        }
++      } finally {
++        Object.defineProperty(Deno, 'connect', descriptors[0]);
++        Object.defineProperty(globalThis, 'setTimeout', descriptors[1]);
++        Object.defineProperty(globalThis, 'clearTimeout', descriptors[2]);
++        for (const timer of timers.keys()) originalClear(timer);
++        originalClear(deadline);
++        for (const reject of pending) reject();
++        for (const connection of [...connections, ...peers]) close(connection);
++        listener?.close();
++      }
++    },
++  });
++}
+diff --git a/packages/service/tests/legacy-abort_test.ts b/packages/service/tests/legacy-abort_test.ts
+index 4e0802a72..1edf4c969 100644
+--- a/packages/service/tests/legacy-abort_test.ts
++++ b/packages/service/tests/legacy-abort_test.ts
+@@ -14,8 +14,9 @@
+  */
+ 
+ import { assert, assertStringIncludes } from '@std/assert';
++import { fromFileUrl } from '@std/path';
+ 
+-const FIXTURE = new URL('./_fixtures/legacy-abort-service.ts', import.meta.url).pathname;
++const FIXTURE = fromFileUrl(new URL('./_fixtures/legacy-abort-service.ts', import.meta.url));
+ const DEPRECATION_NEEDLE = 'request.signal aborts on successful responses';
+ 
+ interface SpawnedFixture {
+@@ -23,31 +24,58 @@ interface SpawnedFixture {
+   readonly port: number;
+   readonly stdoutLines: AsyncIterableIterator<string>;
+   readonly stderr: Promise<string>;
++  readonly stdoutAbort: AbortController;
+ }
+ 
+-function lineReader(stream: ReadableStream<Uint8Array>): AsyncIterableIterator<string> {
++function lineReader(
++  stream: ReadableStream<Uint8Array>,
++  signal: AbortSignal,
++): AsyncIterableIterator<string> {
+   const reader = stream.getReader();
+   const decoder = new TextDecoder();
+   let buffer = '';
+   return (async function* () {
+-    for (;;) {
+-      const { value, done } = await reader.read();
+-      if (done) {
+-        buffer += decoder.decode();
+-        if (buffer.trim().length > 0) yield buffer.trim();
+-        return;
++    let cancellation: Promise<void> | undefined;
++    const cancel = () => {
++      cancellation = reader.cancel();
++      void cancellation.catch(() => undefined);
++    };
++    signal.addEventListener('abort', cancel, { once: true });
++    try {
++      for (;;) {
++        const { value, done } = await reader.read();
++        if (done) {
++          buffer += decoder.decode();
++          if (buffer.trim().length > 0) yield buffer.trim();
++          return;
++        }
++        buffer += decoder.decode(value, { stream: true });
++        let index = buffer.indexOf('\n');
++        while (index !== -1) {
++          yield buffer.slice(0, index).trim();
++          buffer = buffer.slice(index + 1);
++          index = buffer.indexOf('\n');
++        }
+       }
+-      buffer += decoder.decode(value, { stream: true });
+-      let index = buffer.indexOf('\n');
+-      while (index !== -1) {
+-        yield buffer.slice(0, index).trim();
+-        buffer = buffer.slice(index + 1);
+-        index = buffer.indexOf('\n');
++    } finally {
++      signal.removeEventListener('abort', cancel);
++      try {
++        await cancellation;
++      } finally {
++        reader.releaseLock();
+       }
+     }
+   })();
+ }
+ 
++function killFixture(child: Deno.ChildProcess): void {
++  try {
++    child.kill('SIGKILL');
++  } catch {
++    // already exited
++  }
++}
++
+ async function spawnFixture(extraFlags: readonly string[]): Promise<SpawnedFixture> {
+   const command = new Deno.Command(Deno.execPath(), {
+     args: ['run', '-A', ...extraFlags, FIXTURE],
+@@ -55,31 +83,53 @@ async function spawnFixture(extraFlags: readonly string[]): Promise<SpawnedFixtu
+     stderr: 'piped',
+   });
+   const child = command.spawn();
+-  const stdoutLines = lineReader(child.stdout);
++  const stdoutAbort = new AbortController();
++  const stdoutLines = lineReader(child.stdout, stdoutAbort.signal);
+   const stderr = new Response(child.stderr).text();
++  const fixture = { child, port: 0, stdoutLines, stderr, stdoutAbort };
++  const deadline = setTimeout(() => killFixture(child), 10_000);
+ 
+   // Wait for the READY <port> banner. Use manual `.next()` (not `for await`) so
+   // breaking out does not call `.return()` and close the shared line reader —
+   // later tests continue reading the same stream for `CANCELLED`.
+-  for (;;) {
+-    const { value, done } = await stdoutLines.next();
+-    if (done) break;
+-    const match = value.match(/^READY (\d+)$/);
+-    if (match) {
+-      return { child, port: Number(match[1]), stdoutLines, stderr };
++  try {
++    for (;;) {
++      const { value, done } = await stdoutLines.next();
++      if (done) break;
++      const match = value.match(/^READY (\d+)$/);
++      if (match) return { ...fixture, port: Number(match[1]) };
+     }
++    throw new Error('fixture exited before reporting READY');
++  } catch (error) {
++    await shutdown(fixture);
++    throw error;
++  } finally {
++    clearTimeout(deadline);
+   }
+-  throw new Error('fixture exited before reporting READY');
+ }
+ 
+ async function shutdown(fixture: SpawnedFixture): Promise<string> {
++  killFixture(fixture.child);
++  let timedOut = false;
++  const deadline = setTimeout(() => {
++    timedOut = true;
++    fixture.stdoutAbort.abort();
++    killFixture(fixture.child);
++  }, 3000);
+   try {
+-    fixture.child.kill('SIGKILL');
+-  } catch {
+-    // already exited
++    const drained = (async () => {
++      for await (const _line of fixture.stdoutLines) { /* retain stdout through EOF */ }
++    })();
++    const results = await Promise.allSettled([fixture.child.status, fixture.stderr, drained]);
++    assert(!timedOut, 'fixture shutdown timed out before stdout EOF');
++    for (const result of results) {
++      if (result.status === 'rejected') throw result.reason;
++    }
++    const stderr = results[1];
++    return stderr.status === 'fulfilled' ? stderr.value : '';
++  } finally {
++    clearTimeout(deadline);
+   }
+-  await fixture.child.status;
+-  return await fixture.stderr;
+ }
+ 
+ Deno.test('legacy Deno.serve behavior warns on successful requests (baseline repro)', async () => {
+@@ -129,22 +179,19 @@ Deno.test('client disconnect still cancels the in-flight request with the flag',
+     // The fixture prints CANCELLED only if the handler's request signal fired,
+     // i.e. genuine cancellation still propagates under the non-legacy behavior.
+     let cancelled = false;
+-    const deadline = setTimeout(() => {
+-      try {
+-        fixture.child.kill('SIGKILL');
+-      } catch {
+-        // ignore
+-      }
+-    }, 3000);
+-    for (;;) {
+-      const { value, done } = await fixture.stdoutLines.next();
+-      if (done) break;
+-      if (value === 'CANCELLED') {
+-        cancelled = true;
+-        break;
++    const deadline = setTimeout(() => killFixture(fixture.child), 3000);
++    try {
++      for (;;) {
++        const { value, done } = await fixture.stdoutLines.next();
++        if (done) break;
++        if (value === 'CANCELLED') {
++          cancelled = true;
++          break;
++        }
+       }
++    } finally {
++      clearTimeout(deadline);
+     }
+-    clearTimeout(deadline);
+     assert(cancelled, 'expected the handler request signal to abort on client disconnect');
+   } finally {
+     await shutdown(fixture);
+diff --git a/plugins/auth/tests/services/better-auth-global-logout-http_test.ts b/plugins/auth/tests/services/better-auth-global-logout-http_test.ts
+index f84c4ac27..c7611ef69 100644
+--- a/plugins/auth/tests/services/better-auth-global-logout-http_test.ts
++++ b/plugins/auth/tests/services/better-auth-global-logout-http_test.ts
+@@ -5,8 +5,8 @@
+  */
+ 
+ import { assert, assertEquals } from '@std/assert';
+-import { betterAuth } from 'npm:better-auth@^1.6.20';
+-import { memoryAdapter } from 'npm:better-auth@^1.6.20/adapters/memory';
++import { betterAuth } from 'npm:better-auth@^1.7.7';
++import { memoryAdapter } from 'npm:better-auth@^1.7.7/adapters/memory';
+ import { createBetterAuthBackend } from '@netscript/auth-better-auth';
+ import { createAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
+ import { serveAuthTestService } from '../testing/auth-service-fixture.ts';
+diff --git a/plugins/auth/tests/services/unsupported-revocation-http_test.ts b/plugins/auth/tests/services/unsupported-revocation-http_test.ts
+index 37ca40860..3f130bdbf 100644
+--- a/plugins/auth/tests/services/unsupported-revocation-http_test.ts
++++ b/plugins/auth/tests/services/unsupported-revocation-http_test.ts
+@@ -1,8 +1,8 @@
+ /** Provider capability failures must never masquerade as successful operator revocation. */
+ 
+ import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+-import { betterAuth } from 'npm:better-auth@^1.6.20';
+-import { memoryAdapter } from 'npm:better-auth@^1.6.20/adapters/memory';
++import { betterAuth } from 'npm:better-auth@^1.7.7';
++import { memoryAdapter } from 'npm:better-auth@^1.7.7/adapters/memory';
+ import { createBetterAuthBackend } from '@netscript/auth-better-auth';
+ import { createWorkosBackend } from '@netscript/auth-workos';
+ import { type AuthBackendPort, createAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';

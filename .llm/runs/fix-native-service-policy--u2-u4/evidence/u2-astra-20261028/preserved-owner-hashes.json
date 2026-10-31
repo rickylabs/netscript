@@ -1,0 +1,34 @@
+﻿[
+    {
+        "path":  ".llm/runs/fix-native-service-policy--u2-u4/plan.md",
+        "sha256":  "516901bb12ef088b7b967d628c9d4c0134dad1096c0eaa97bb2bada5983d5058"
+    },
+    {
+        "path":  ".llm/runs/fix-native-service-policy--u2-u4/decisions.md",
+        "sha256":  "2da4ab40cf0eee24d1c9f2fe92fb641dc007ef46866c8128648dee9638ddfda6"
+    },
+    {
+        "path":  ".llm/runs/fix-native-service-policy--u2-u4/plan-eval.md",
+        "sha256":  "234a77914ec162e0a8b31a5bed7eda3a76c009cb9307b65b5d9d8e2bcb666159"
+    },
+    {
+        "path":  ".llm/runs/fix-native-service-policy--u2-u4/plan-eval-recheck1.md",
+        "sha256":  "dcf8daeb73961347ad9d3f18ddfcc91f12e2a4e7083af4e2beefc4c52977b014"
+    },
+    {
+        "path":  ".llm/harness/debt/arch-debt.md",
+        "sha256":  "74e43f6a6c914c5af55edd107d9c5a06a289ae795d5b980d37af89c0a38d7fb9"
+    },
+    {
+        "path":  "deno.json",
+        "sha256":  "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870"
+    },
+    {
+        "path":  "deno.lock",
+        "sha256":  "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+        "path":  "package.json",
+        "absent":  true
+    }
+]

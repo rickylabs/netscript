@@ -50,7 +50,7 @@ Deno.test('DesktopNotification renders a request preview without requesting perm
     }),
   );
 
-  assertStringIncludes(html, 'data-part="desktop-notification"');
+  assertStringIncludes(html, 'data-part="root"');
   assertStringIncludes(html, 'data-state="disabled"');
   assertStringIncludes(html, 'Build complete');
   assertStringIncludes(html, 'Ready for review.');
@@ -66,7 +66,7 @@ Deno.test('DesktopWindowChrome renders only declared documented actions and stat
     }),
   );
 
-  assertStringIncludes(html, 'data-part="window-chrome"');
+  assertStringIncludes(html, 'data-part="root"');
   assertStringIncludes(html, 'data-state="disabled"');
   assertStringIncludes(html, 'data-desktop-action="show"');
   assertStringIncludes(html, 'data-desktop-action="focus"');

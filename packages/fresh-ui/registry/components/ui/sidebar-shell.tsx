@@ -62,8 +62,21 @@ function SidebarShellNavGroup(
   },
 ): VNode {
   return (
-    <div class='ns-dashboard__nav-group' role='list'>
-      {label && <span class='ns-dashboard__nav-group-label'>{label}</span>}
+    <div
+      class='ns-dashboard__nav-group'
+      data-part='nav-group'
+      data-scope='sidebar'
+      role='list'
+    >
+      {label && (
+        <span
+          class='ns-dashboard__nav-group-label'
+          data-part='nav-group-label'
+          data-scope='sidebar'
+        >
+          {label}
+        </span>
+      )}
       {items.map((item) => {
         const active = isItemActive(pathname, item);
         return (
@@ -71,13 +84,25 @@ function SidebarShellNavGroup(
             key={item.href}
             href={item.href}
             role='listitem'
-            class={cn('ns-dashboard__nav-item', active && 'is-active')}
+            class={cn('ns-dashboard__nav-item')}
+            data-state={active ? ('selected') : undefined}
+            data-part='nav-item'
+            data-scope='sidebar'
             aria-current={active ? 'page' : undefined}
           >
             {item.icon && (
-              <span class='ns-dashboard__nav-icon' aria-hidden='true'>{item.icon}</span>
+              <span
+                class='ns-dashboard__nav-icon'
+                data-part='nav-icon'
+                data-scope='sidebar'
+                aria-hidden='true'
+              >
+                {item.icon}
+              </span>
             )}
-            <span class='ns-dashboard__nav-label'>{item.label}</span>
+            <span class='ns-dashboard__nav-label' data-part='nav-label' data-scope='sidebar'>
+              {item.label}
+            </span>
           </a>
         );
       })}
@@ -105,21 +130,53 @@ export function SidebarShell(
   }: SidebarShellProps,
 ): ComponentResult {
   return (
-    <div {...props} class={cn('ns-dashboard', className)}>
-      <div class='ns-dashboard__sidebar-backdrop' data-sidebar-backdrop aria-hidden='true' />
+    <div
+      {...props}
+      class={cn('ns-dashboard', className)}
+      data-part='root'
+      data-scope='app-shell'
+    >
+      <div
+        class='ns-dashboard__sidebar-backdrop'
+        data-part='sidebar-backdrop'
+        data-scope='app-shell'
+        data-sidebar-backdrop
+        aria-hidden='true'
+      />
 
-      <aside class='ns-dashboard__sidebar' data-sidebar>
-        <div class='ns-dashboard__sidebar-header'>
-          <div class='ns-dashboard__brand-group'>
+      <aside
+        class='ns-dashboard__sidebar'
+        data-part='root'
+        data-scope='sidebar'
+        data-sidebar
+      >
+        <div
+          class='ns-dashboard__sidebar-header'
+          data-part='sidebar-header'
+          data-scope='sidebar'
+        >
+          <div class='ns-dashboard__brand-group' data-part='brand-group' data-scope='sidebar'>
             {brand}
           </div>
           {brandBadge}
         </div>
 
-        <nav class='ns-dashboard__sidebar-body' aria-label={navLabel}>
+        <nav
+          class='ns-dashboard__sidebar-body'
+          data-part='sidebar-body'
+          data-scope='sidebar'
+          aria-label={navLabel}
+        >
           {navigation.map((section, index) => (
             <div key={section.label ?? `section-${index}`}>
-              {index > 0 && <div class='ns-dashboard__nav-divider' role='separator' />}
+              {index > 0 && (
+                <div
+                  class='ns-dashboard__nav-divider'
+                  data-part='nav-divider'
+                  data-scope='sidebar'
+                  role='separator'
+                />
+              )}
               <SidebarShellNavGroup
                 label={section.label}
                 items={section.items}
@@ -129,20 +186,37 @@ export function SidebarShell(
           ))}
         </nav>
 
-        {footer && <div class='ns-dashboard__sidebar-footer'>{footer}</div>}
+        {footer && (
+          <div
+            class='ns-dashboard__sidebar-footer'
+            data-part='sidebar-footer'
+            data-scope='sidebar'
+          >
+            {footer}
+          </div>
+        )}
       </aside>
 
-      <div class='ns-dashboard__main'>
-        <header class='ns-dashboard__topbar'>
-          <div class='ns-dashboard__topbar-start'>
+      <div class='ns-dashboard__main' data-part='main' data-scope='app-shell'>
+        <header class='ns-dashboard__topbar' data-part='root' data-scope='top-bar'>
+          <div
+            class='ns-dashboard__topbar-start'
+            data-part='topbar-start'
+            data-scope='top-bar'
+          >
             {topbarStart}
           </div>
-          <div class='ns-dashboard__topbar-end'>
+          <div class='ns-dashboard__topbar-end' data-part='topbar-end' data-scope='top-bar'>
             {topbarEnd}
           </div>
         </header>
 
-        <main class='ns-dashboard__content' id={contentId}>
+        <main
+          class='ns-dashboard__content'
+          data-part='content'
+          data-scope='app-shell'
+          id={contentId}
+        >
           {children}
         </main>
       </div>

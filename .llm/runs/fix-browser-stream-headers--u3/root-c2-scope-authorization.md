@@ -1,0 +1,9 @@
+# Root C2 scope authorization
+
+Root read the complete c2-workers-brief.md in native-sol evidence (SHA prefix1dbe7a42) and the separate F15 replay brief. Authorize C2 after accepted C1 checkpoint and the separately accepted Fresh F15 application. Existing native Sol/xhigh generator in the same initialized worktree; no additional dispatch, paid fallback or repeated intake.
+
+Exactly three C2 owners: workers streams/factory.ts (+12/-2), new workers/tests/streams/factory-headers_test.ts (root selects400 readable physical-line cap, superseding the proposed160 to budget all real wire/compiler/cleanup controls), existing workers/tests/streams/live-query-consumer_type.ts (+4, preserve all existing entity/query assertions). No added helper, config/lock/dependency/lifecycle/return-surface/schema/alias/aggregate owner or debt.
+
+Retain every concrete brief control: unchanged-production meaningful RED, native HeadersRecord identity/live-record/static+sync+async callback behavior without eager calls, actual per-request rotation, collection identity, partitioned absence-versus-empty credentials, bounded public-runtime-shape preload/close without cast/public widening, owned listener/native-reader/env/body lifetime cleanup with all sanitizers, actual positive target plus three intended TS2322 compiler negatives and bounded/drained children. No Fresh checkpoint/reconnect claim for this native worker wrapper.
+
+Run the scoped owning/discovery/consumer/compiler/type/lint/fmt/quality/doctrine/doc/publish gates in the brief. Fresh F15 exception is not transferable: workers documentation baseline and any new native header closure diagnostic require explicit separate disposition; no type export or debt addition is implied. Source/gates return for substantive root acceptance before checkpoint. Root's C1 acceptance and original plans/verdicts/failures remain immutable. No independent IMPL verdict, readiness, issue closure, merge or release.

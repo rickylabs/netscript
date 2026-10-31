@@ -1,0 +1,478 @@
+{
+  "at": "2026-10-28T05:53:14.114Z",
+  "combinedHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "originalService": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+  "acceptedMain": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+  "acceptedWindows": "728c0a52f48cc5e440df273783c2e03134b745b8",
+  "shippingOwners": 32,
+  "debtOwnerCount": 1,
+  "canonicalSourceOriginIndexHeadMatches": true,
+  "protectedCarrierCount": 85,
+  "finalCanonicalBindings": 119,
+  "rawWorkingRepresentationExceptions": [
+    {
+      "path": "deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "rawWorkingSha256": "5dcfdb2db97e8dad21be5b8443f7a1ccff0bd2da85f4b85a5a1c093502472d4f",
+      "rawWorkingBytes": 191928,
+      "physicalLines": 4877,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "rawWorkingSha256": "62302d6ca42931e4d495e2e5a2aae83a918759d3ee06a1bba7095f9408d633f1",
+      "rawWorkingBytes": 169204,
+      "physicalLines": 4373,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "19b696407ac44fd39e8afca7f60fd3b2cf6cb49bf7447fe7a0756be1bc4f9e1b",
+      "rawWorkingSha256": "99537c6196d90ca77dbc4b5e074acb213136e2bf86cbdd8643a79749152a14c1",
+      "rawWorkingBytes": 2734,
+      "physicalLines": 84,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "7c82ccb53fe9b4ac00aadb9324fd86784f5c300726ae9ae48568a48bcdc4eec8",
+      "rawWorkingSha256": "ba1b593c2be6b5097a9a4d7c168a6c1abe9ab1df96d8fd635d9fe396735e2c93",
+      "rawWorkingBytes": 12759,
+      "physicalLines": 396,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": "deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "rawWorkingSha256": "5dcfdb2db97e8dad21be5b8443f7a1ccff0bd2da85f4b85a5a1c093502472d4f",
+      "rawWorkingBytes": 191928,
+      "physicalLines": 4877,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": "docs/site/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "32f9de401220c4c75c7de3d5820cd03139b0dcb9053285a7a853efbf1e2d35aa",
+      "rawWorkingSha256": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057",
+      "rawWorkingBytes": 40776,
+      "physicalLines": 505,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "38e163af37ddb53492f97386243e83a9806827c0c52a3b8dd4e4c27c6a6b3f2e",
+      "rawWorkingSha256": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a",
+      "rawWorkingBytes": 19647,
+      "physicalLines": 560,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "rawWorkingSha256": "62302d6ca42931e4d495e2e5a2aae83a918759d3ee06a1bba7095f9408d633f1",
+      "rawWorkingBytes": 169204,
+      "physicalLines": 4373,
+      "representation": "Exact reversible CRLF checkout"
+    },
+    {
+      "path": "resources/examples/expo-streams/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "9296652037d05594e0e844571d560841920874d04ce69d33cef5d8b6b3cfdd16",
+      "rawWorkingSha256": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e",
+      "rawWorkingBytes": 23348,
+      "physicalLines": 640,
+      "representation": "Exact reversible CRLF checkout"
+    }
+  ],
+  "scopedOwningSummary": {
+    "passed": 461,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 461,
+    "uniqueFailures": 0
+  },
+  "scopedTestInputs": [
+    "packages/service/tests/auth/",
+    "packages/service/tests/cors-policy_test.ts",
+    "packages/service/tests/cors-topology_test.ts",
+    "packages/service/tests/cors-response-authority_test.ts",
+    "packages/service/tests/body-limit_test.ts",
+    "packages/service/tests/handlers_test.ts",
+    "packages/plugin/tests/service/create-plugin-service-auth_test.ts"
+  ],
+  "testSanitizers": "Runner --sanitize-ops --sanitize-resources --trace-leaks; native default exit sanitation retained, test options unchanged",
+  "policyCorpus": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 7,
+    "uniqueFailures": 0
+  },
+  "immutablePolicyCorpus": [
+    {
+      "path": ".llm/tools/docs/jsdoc-example-policy_test.ts",
+      "sha256": "e0f3e4976f18a0eab7e14c2ea48ae7bc294529be1e42d6e66d712da040654fc1",
+      "acceptedOriginSha256": "e0f3e4976f18a0eab7e14c2ea48ae7bc294529be1e42d6e66d712da040654fc1"
+    },
+    {
+      "path": ".llm/tools/docs/jsdoc-example-corpus_test.ts",
+      "sha256": "bd1f87bab5dd583055a71f4274262c3be199e712ddd447ab0fb6dbaad97bd277",
+      "acceptedOriginSha256": "bd1f87bab5dd583055a71f4274262c3be199e712ddd447ab0fb6dbaad97bd277"
+    }
+  ],
+  "static": {
+    "types": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "lint": {
+      "selection": {
+        "filesSelected": 5,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 5,
+        "filesProcessed": 5,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 5,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 5,
+        "filesProcessed": 5,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "gates": [
+    {
+      "name": "focused-service-policy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11207,
+      "stdout": {
+        "bytes": 185,
+        "sha256": "f0519bb2d0a72bd9dc4905ace526392a057a8d04cc1a56983f04264269663721",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      }
+    },
+    {
+      "name": "windows-types",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1048,
+      "stdout": {
+        "bytes": 177,
+        "sha256": "97f33f723ca9d5cb33e19df853e461ebf8301082397256055150e898ca10bfac",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      }
+    },
+    {
+      "name": "windows-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 215,
+      "stdout": {
+        "bytes": 176,
+        "sha256": "263f4f5ac9606d8dbecfeb6f1bc0e41e7c5affa15eda7da24044dab044aa948e",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      }
+    },
+    {
+      "name": "windows-fmt",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 236,
+      "stdout": {
+        "bytes": 181,
+        "sha256": "fba5f8da966e07f52daeb97debbd259de55369964d7a79a1f0bc909ab6d7aa4f",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      }
+    },
+    {
+      "name": "windows-policy-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 101848,
+      "stdout": {
+        "bytes": 180,
+        "sha256": "eab4d68e7087046418c3c24de8ee1bb10daa945e7a8e9bd9128937db3232029a",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      }
+    },
+    {
+      "name": "exports-drift",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9065,
+      "stdout": {
+        "bytes": 13345,
+        "sha256": "83f15ce3404499c38dd69139bdbc2d200144a061d61eccc92a797931bb507027",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 112,
+        "sha256": "6b3227ef695597fbc2c2bf0c3350f5ee5251e894020513f33412a26568c1294f",
+        "truncated": false
+      }
+    },
+    {
+      "name": "jsdoc-examples",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 76040,
+      "stdout": {
+        "bytes": 330,
+        "sha256": "ebb1d19093c84d3d16f49f4f8f581de6669ecd516e6ad0d0d39c34cb3f2488ff",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 216,
+        "sha256": "64924caee521f4c5ffa930e8eb9cb328c838b1e3db044f27561e591d80843c4b",
+        "truncated": false
+      }
+    },
+    {
+      "name": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12172,
+      "stdout": {
+        "bytes": 332,
+        "sha256": "6d0dfd39f3ee906d8dbd523616d0249883c9b53827426c1a7bf022c2626e945f",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 134,
+        "sha256": "b99f2bd553696ea6522afb6a2a84126543f759f1aa8b2d154f14cbf7c7451e98",
+        "truncated": false
+      }
+    },
+    {
+      "name": "audit-critical",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 905,
+      "stdout": {
+        "bytes": 75,
+        "sha256": "ad243fc31fc43a63836efa8f029ab1a206d535634583e2a9d20c05857f679492",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 48,
+        "sha256": "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9",
+        "truncated": false
+      }
+    },
+    {
+      "name": "arch-check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 35744,
+      "stdout": {
+        "bytes": 48308,
+        "sha256": "37639f7419f0c8578231c5ce1408927d0e56e34e224c43d54e03584464a537ff",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 1746,
+        "sha256": "69a4fd6dc9665500f80425d2999ecb5cd5a7e36ab2f9129981f1a075137018b9",
+        "truncated": false
+      }
+    },
+    {
+      "name": "mcp-corpus-freshness",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 20490,
+      "stdout": {
+        "bytes": 232,
+        "sha256": "e537b7291a93a75f6eb22f8d549609670dc750d6fd5268702b76bf5c8cff7808",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 148,
+        "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+        "truncated": false
+      }
+    },
+    {
+      "name": "docs-links",
+      "outcome": "FAIL",
+      "exitCode": 1,
+      "durationMs": 552,
+      "stdout": {
+        "bytes": 791,
+        "sha256": "409c34130cc05d84603b7b26750c1fc56905ab483e8189f9a2ca13f11d9203e8",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 107,
+        "sha256": "a789770265a6e1c50f2b2bb2891179d218dff314fb09ea60934b9b6b0f01520e",
+        "truncated": false
+      }
+    }
+  ],
+  "exportsSummary": [
+    "Reference page coverage: PASS (36/36; mapped=35; excluded=1)",
+    "Exports & Symbols drift check: PASS"
+  ],
+  "examplesSummary": "jsdoc examples: PASS members=35 files=2317 examples=472 candidates=471 checked=471 exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0\nenforcedFailureCensus={\"badSpecifier\":0,\"typeError\":0,\"unfenced\":0,\"malformed\":0,\"unboundName\":0}\ntypeErrorExamples=.llm/tmp/native-service-prerequisite-integration-20261028/jsdoc-type-errors.md\n",
+  "docsAccuracy": "docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 208 published source pages, 190 shipped corpus files, one query dialect exception page, 4 cache-first loader pages, mutation-map columns, 93/93 root/direct public commands from 158 recursive paths, 3 valid @netscript/fresh root imports checked)\n",
+  "coldIdentities": [
+    "db-alignment sdk-fresh identities=@tanstack/db@0.13.0_typescript@7.0.2",
+    "db-alignment fresh-only identities=@tanstack/db@0.13.0_typescript@7.0.2",
+    "db-alignment PASS"
+  ],
+  "doctrineRoots": 36,
+  "doctrineAllFailZero": true,
+  "archFullNativeStreams": true,
+  "criticalSummary": [
+    "Found 47 vulnerabilities",
+    "Severity: 4 low, 23 moderate, 20 high, 0 critical",
+    ""
+  ],
+  "mcpFreshness": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"0b5bfcba686348fe5b32ad684156b4335c4dcd4c2fba51f60f1ffaa206f25981\",\"uncompressedBytes\":2571873,\"compressedBytes\":389323,\"packageCount\":35,\"subpathCount\":299,\"symbolCount\":8902}\n",
+  "docsLinksActualFail": "# Internal-doc link / anchor / orphan check\n  docs=131 broken-links=5 broken-anchors=0 orphans=0 (orphans informational; pass --check-orphans to enforce)\n  BROKEN-LINK .agents/skills/aspire-init/SKILL.md:25 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-init/SKILL.md:53 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-orchestration/SKILL.md:149 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-orchestration/SKILL.md:182 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-orchestration/references/app-commands.md:44 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n",
+  "boundedOwners": [
+    {
+      "path": "packages/service/src/builder/service-builder-impl.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9",
+      "rawWorkingSha256": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9",
+      "rawWorkingBytes": 20069,
+      "physicalLines": 633,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/src/types.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "rawWorkingSha256": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "rawWorkingBytes": 9929,
+      "physicalLines": 335,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/src/primitives/body-limit.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1",
+      "rawWorkingSha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1",
+      "rawWorkingBytes": 4666,
+      "physicalLines": 152,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/tests/body-limit_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0",
+      "rawWorkingSha256": "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0",
+      "rawWorkingBytes": 11489,
+      "physicalLines": 322,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/tests/auth/builder-auth_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa",
+      "rawWorkingSha256": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa",
+      "rawWorkingBytes": 14264,
+      "physicalLines": 433,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/tests/auth/define-service-auth_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2",
+      "rawWorkingSha256": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2",
+      "rawWorkingBytes": 9475,
+      "physicalLines": 299,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/tests/auth/health-auth-order_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb",
+      "rawWorkingSha256": "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb",
+      "rawWorkingBytes": 10519,
+      "physicalLines": 332,
+      "representation": "Exact accepted bytes"
+    },
+    {
+      "path": "packages/service/tests/auth/middleware_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05",
+      "rawWorkingSha256": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05",
+      "rawWorkingBytes": 16594,
+      "physicalLines": 477,
+      "representation": "Exact accepted bytes"
+    }
+  ],
+  "debtDeadline": "2026-11-10 or stable API earlier, no growth/automatic extension; exact accepted registry bytes retained",
+  "cleanup": {
+    "at": "2026-10-28T05:53:13.934Z",
+    "ownedTempEntries": 0,
+    "workspaceCompilerScratchEntries": 0,
+    "rootPackageJsonExists": false,
+    "ownedNativeProcesses": [],
+    "allGateOuterCommandsSettled": true,
+    "noGlobalProfileOrCacheCleanup": true
+  },
+  "firstRawLockGuardFailurePreserved": true,
+  "noManualNormalizationOrGeneratedCarrierEdits": true,
+  "knownMappedIpv4AndWindowsAuthBaselineNotRerunOrWaived": true,
+  "mandatoryIndependentIntegrationVerdict": "NOT RUN; root source review first",
+  "actualNewHeadCi": "NOT RUN; no push yet",
+  "noInference": true,
+  "noPushOrEvidenceCheckpoint": true
+}

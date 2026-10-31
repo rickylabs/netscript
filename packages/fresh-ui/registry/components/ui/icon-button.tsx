@@ -51,7 +51,20 @@ type IconButtonProps = IconButtonAsButtonProps | IconButtonAsLinkProps;
  */
 export function IconButton({ icon, label, ...props }: IconButtonProps): VNode {
   return (
-    <Button {...props} size='icon' icon={icon} aria-label={label} title={props.title ?? label}>
+    <Button
+      {...props}
+      size='icon'
+      data-scope='icon-button'
+      data-size='md'
+      data-icon='true'
+      icon={
+        <span data-part='glyph' data-scope='icon-button' style={{ display: 'contents' }}>
+          {icon}
+        </span>
+      }
+      aria-label={label}
+      title={props.title ?? label}
+    >
       <span class='sr-only'>{label}</span>
     </Button>
   );

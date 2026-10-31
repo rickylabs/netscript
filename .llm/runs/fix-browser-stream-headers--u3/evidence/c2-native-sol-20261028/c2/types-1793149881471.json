@@ -1,0 +1,26 @@
+{
+  "selected": "types",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-check.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "--file",
+    "plugins/workers/tests/streams/live-query-consumer_type.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--deno-arg",
+    "--frozen",
+    "--deno-arg",
+    "--unstable-kv"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:11:21.474Z",
+  "ended": "2026-10-28T01:11:23.795Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/types-1793149881471"
+}

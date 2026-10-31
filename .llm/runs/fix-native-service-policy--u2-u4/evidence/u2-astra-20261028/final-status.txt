@@ -1,0 +1,18 @@
+﻿ M .llm/harness/debt/arch-debt.md
+ M packages/service/CHANGELOG.md
+ M packages/service/README.md
+ M packages/service/src/middleware/service-cors.ts
+?? .agents/skills/aspire-deployment/
+?? .agents/skills/aspire-init/
+?? .agents/skills/aspire-monitoring/
+?? .agents/skills/aspire-orchestration/
+?? .agents/skills/deno/
+?? .agents/skills/help.md
+?? .agents/skills/netscript-build/
+?? .agents/skills/netscript-operate/
+?? .agents/skills/netscript/
+?? .llm/runs/fix-native-service-policy--u2-u4/
+?? .llm/tools/release.json
+?? .mcp.json
+?? .netscript/
+?? packages/service/tests/cors-response-authority_test.ts

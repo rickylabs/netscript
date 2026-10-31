@@ -1,0 +1,5 @@
+Root formatting excludes CLI source, even with its member config. The structured wrapper correctly refuses all-excluded coverage. For the new migration files, use an explicit exact file list with `deno fmt --no-config --single-quote --line-width 100`; check with the same options plus `--check`. Do not interpret the excluded wrapper as a PASS.
+
+Literal migration needs disjoint attribute-span edits, not whole-opening-tag replacement: JSX inside an attribute expression overlaps its containing tag. The lexer visits those nested elements, and replacements preserve the original quote delimiter so custom utility classes containing apostrophes remain valid. Skip self-closing JSX slashes when classifying JS regular expressions. The complete archived scaffold replay guards these cases together.
+
+Do not prefilter structural copies solely by an ns class string: IconButton delegates to Button and had no ns string before migration. Recognize versioned edit signatures as well. Compare every copied source to the authored registry (normalizing installer import relocation) to catch a silently skipped wrapper.

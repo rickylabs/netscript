@@ -398,6 +398,29 @@ component style; additional source maps use the same shared contract. Theme item
 See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) and the
 [Fresh UI reference](/reference/fresh-ui/).
 
+## `ui:migrate` — migrate app-owned Fresh UI copies
+
+`netscript ui:migrate` shows the available migrations. `netscript ui:migrate variants` converts
+0.0.8 Utility component modifiers and anatomy to the shared data-attribute contract.
+
+Preview the changes before applying them:
+
+```sh
+netscript ui:migrate variants --project-root apps/dashboard --dry-run
+```
+
+Run the same command without `--dry-run` to apply, then run the app's `deno task check`.
+`--project-root <path>` accepts a workspace or Fresh app; `--app <name>` selects an app in a workspace.
+The migration preserves custom classes, base/element hooks, strings and comments. Customized
+structural edits or detected unsupported dynamic classes stop preflight before any writes and need a
+manual merge. This includes JSX spreads without a later explicit class when the file still contains
+legacy component modifiers or state classes: convert the spread's class producer to data attributes first. Indirect
+class producers imported from other files require manual review; the migration does not evaluate
+JavaScript. CSS state selectors match component classes in either order, including
+`.is-active.ns-citation`. Controlled component overrides require conversion to their public props;
+layout utility aliases remain supported. Use the matching CLI and Fresh UI release together. Dependency copies
+and registry ownership hashes remain untouched.
+
 ## `deploy` — cloud and container targets
 
 The [CLI cheat sheet](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy) paths. The

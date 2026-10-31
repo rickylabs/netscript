@@ -19,6 +19,7 @@ import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
 import { createAgentCommand } from '../agent/agent-group.ts';
 import { createUiListCommand } from '../ui/list/list-ui-command.ts';
 import { createUiUpdateCommand } from '../ui/update/update-ui-command.ts';
+import { createUiMigrateCommand } from '../ui/migrate/migrate-ui-command.ts';
 import { createUiRemoveCommand } from '../ui/remove/remove-ui-command.ts';
 import {
   createPublicCommandDependencies,
@@ -167,6 +168,15 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
       }),
   });
   registry.register('ui:preset', { id: 'ui:preset', create: () => createUiPresetCommand() });
+  registry.register('ui:migrate', {
+    id: 'ui:migrate',
+    create: ({ dependencies }) =>
+      createUiMigrateCommand({
+        fs: dependencies.uiInstallDependencies.fs,
+        formatter: dependencies.uiPageFormatter,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
+      }),
+  });
 
   registry.register('ui:remove', {
     id: 'ui:remove',

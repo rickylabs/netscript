@@ -1,0 +1,37 @@
+Check packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts
+TS2322 [ERROR]: Type '() => { authorization: string; }' is not assignable to type 'HeadersRecord'.
+  Index signature for type 'string' is missing in type '() => { authorization: string; }'.
+const fresh: FreshHeaders = () => ({ authorization: 'value' });
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts:11:29
+
+    Did you mean to call this expression?
+    const fresh: FreshHeaders = () => ({ authorization: 'value' });
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts:11:29
+
+TS2322 [ERROR]: Type '() => { authorization: string; }' is not assignable to type 'HeadersRecord'.
+  Index signature for type 'string' is missing in type '() => { authorization: string; }'.
+const input: InputHeaders = () => ({ authorization: 'value' });
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts:12:29
+
+    Did you mean to call this expression?
+    const input: InputHeaders = () => ({ authorization: 'value' });
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts:12:29
+
+TS2322 [ERROR]: Type '() => { authorization: string; }' is not assignable to type 'HeadersRecord'.
+  Index signature for type 'string' is missing in type '() => { authorization: string; }'.
+const workers: WorkersHeaders = () => ({ authorization: 'value' });
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts:13:33
+
+    Did you mean to call this expression?
+    const workers: WorkersHeaders = () => ({ authorization: 'value' });
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts:13:33
+
+Found 3 errors.
+
+error: Type checking failed.

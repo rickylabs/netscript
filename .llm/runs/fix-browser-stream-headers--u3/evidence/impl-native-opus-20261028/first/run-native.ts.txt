@@ -1,0 +1,73 @@
+import {runClaudePrint} from '../../tools/agentic/claude/claude-print.ts';
+import {OwnedSpawn} from './owned-spawn-corrected.ts';
+import {PublicCapture} from './native-public.ts';
+import {audit} from './audit.ts';
+import {directory,root,head,executable,nativeModel,environment,guard,hash,json} from './common.ts';
+if(Deno.args[0]!=='--launch')throw new Error('Launch only after separate root native admission; no inference probe.');
+await guard();
+const preparation=JSON.parse(await Deno.readTextFile(`${directory}/preparation.json`));
+for(const[path,sha]of Object.entries(preparation.seals)){if(await hash(path)!==sha)throw new Error('Review seal drift.');}
+const approval=JSON.parse(await Deno.readTextFile(`${directory}/root-native-launch.json`));
+if(approval.authorizer!=='/root'||approval.inferenceApproved!==true||approval.nativeAllowanceQualified!==true||
+  approval.nativeCapabilityQualified!==true||approval.nativeAdvertisedCapabilityOnly!==true||approval.nativeMaxBudgetUsd!==6.5||
+  approval.transport!=='native_claude_first_party'||approval.nativeExpenseDecision!=='included_allowance_allowed'||
+  typeof approval.transportDisposition!=='string'||!approval.transportDisposition.trim()||
+  approval.model!==nativeModel||approval.effort!=='xhigh'||approval.head!==head||
+  approval.driverSha256!==await hash(`${directory}/run-native.ts`)||approval.preparationSha256!==await hash(`${directory}/preparation.json`)||
+  !Number.isFinite(Date.parse(approval.capturedAt))||Date.now()-Date.parse(approval.capturedAt)>15*60000||Date.parse(approval.capturedAt)>Date.now()||
+  !Array.isArray(approval.nativeAdmissionEvidence)||!approval.nativeAdmissionEvidence.length)throw new Error('Fresh root-qualified native allowance/capability evidence absent.');
+for(const proof of approval.nativeAdmissionEvidence){
+  if(typeof proof.path!=='string'||await hash(proof.path)!==proof.sha256)throw new Error('Native admission evidence seal differs.');
+  // This is root's actual supported CLI UI receipt, not a fabricated provider quota API.
+  const usage=JSON.parse(await Deno.readTextFile(proof.path));
+  if(usage.authorizer!=='/root'||usage.noInference!==true||usage.operationalStateDoNotCommit!==true||
+    usage.extraUsageEnabledOrPurchasedByRoot!==false||usage.nativeApiDurationSeconds!==0||
+    usage.nativeSessionInputTokens!==0||usage.nativeSessionOutputTokens!==0||
+    !Number.isFinite(Date.parse(usage.capturedAt))||Date.now()-Date.parse(usage.capturedAt)>15*60000||
+    Date.parse(usage.capturedAt)>Date.now())throw new Error('Fresh root native UI usage predicate unavailable; refresh metadata-only receipt.');
+  for(const id of ['current_session','current_week_all_models']){
+    const window=usage.windows?.find((entry:{id:string})=>entry.id===id);
+    if(window?.available!==true||!Number.isFinite(window.usedPercent)||window.usedPercent<0||window.usedPercent>=100)throw new Error('Positive current included allowance unqualified.');
+  }
+}
+await json('native-allowance-public-predicate.json',{qualified:true,authorizer:'/root',source:'supported native CLI UI',
+  currentIncludedAllowancePositive:true,advertisedCapabilityQualified:true,actualReviewIdentityStillRequired:true,
+  nativeCostAccountingConfigured:true,operationalWindowsAndBalancesOmitted:true});
+const owner=new OwnedSpawn();const session=crypto.randomUUID();const env=environment();
+const output=await Deno.open(`${directory}/native.public.jsonl`,{write:true,createNew:true});
+let child:Deno.ChildProcess|undefined;let statusDone=false;let failure:string|undefined;
+const readers:ReadableStreamDefaultReader<Uint8Array>[]=[];const done=[false,false];const pipes:Promise<void>[]=[];const cancellations:Promise<void>[]=[];
+let deadline:ReturnType<typeof setTimeout>|undefined;let escalation:ReturnType<typeof setTimeout>|undefined;let drainTimer:ReturnType<typeof setTimeout>|undefined;
+const byteCounts=[0,0];const cleanupFailures:string[]=[];
+function stop(message:string){failure??=message;try{child?.kill('SIGTERM');}catch{/* Exited. */}
+  readers.forEach((reader,i)=>{if(!done[i])cancellations.push(reader.cancel().catch(()=>{cleanupFailures.push('Owned native pipe cancellation failed.');}));});
+  escalation??=setTimeout(()=>{if(!statusDone){try{child?.kill('SIGKILL');}catch{/* Exited. */}}},1000);}
+const publicCapture=new PublicCapture(async text=>{const bytes=new TextEncoder().encode(text);let offset=0;while(offset<bytes.length)offset+=await output.write(bytes.subarray(offset));});
+async function pipe(index:number,stream:ReadableStream<Uint8Array>,limit:number){const reader=stream.getReader();readers[index]=reader;
+  try{while(true){const next=await reader.read();if(next.done)break;byteCounts[index]+=next.value.length;if(byteCounts[index]>limit){stop('Native streaming byte cap exceeded.');break;}
+    if(index===0)await publicCapture.add(next.value);}if(index===0&&!failure)await publicCapture.finish();}
+  catch{stop('Native framing/write/pipe failed.');}finally{done[index]=true;reader.releaseLock();}}
+try{
+  const code=await runClaudePrint({model:nativeModel,effort:'xhigh',prompt:`${directory}/prompt.md`,enforceOpenEvaluatorModels:false},
+    {env,clearEnv:true,spawn(name,options){
+      if(name!=='claude')throw new Error('Normative native executable mismatch.');
+      const args=[...options.args];const permission=args.indexOf('--permission-mode');
+      if(permission<0||args[permission+1]!=='bypassPermissions')throw new Error('Normative argv changed.');args[permission+1]='dontAsk';
+      args.unshift('--settings',`${directory}/native-settings.json`,'--setting-sources','','--mcp-config',`${directory}/native-mcp.json`,
+        '--restricted','--strict-mcp-config','--tools','Read,Glob,Grep','--max-turns','6','--max-budget-usd','6.50','--session-id',session);
+      child=owner.spawn(()=>new Deno.Command(executable,{...options,args,cwd:root,stdout:'piped',stderr:'piped',clearEnv:true}).spawn());
+      void child.status.then(()=>{statusDone=true;drainTimer=setTimeout(()=>{if(done.some(x=>!x))stop('Native post-exit drain deadline.');},1000);},()=>{statusDone=true;stop('Owned native child status rejected.');});
+      pipes.push(pipe(0,child.stdout,24*1024*1024),pipe(1,child.stderr,65536));deadline=setTimeout(()=>stop('Native20minute deadline.'),1200000);return child;
+    }});
+  await Promise.all(pipes);await Promise.all(cancellations);output.close();
+  if(code!==0||failure)throw new Error('Native review incomplete.');await guard();await audit(session);
+}finally{
+  if(child&&!statusDone)stop('Native run interrupted.');await Promise.allSettled(pipes);await Promise.all(cancellations);
+  const settlement=await owner.settle(async()=>{await Promise.all(pipes);});
+  if(deadline!==undefined)clearTimeout(deadline);if(escalation!==undefined)clearTimeout(escalation);if(drainTimer!==undefined)clearTimeout(drainTimer);
+  try{output.close();}catch{/* Closed. */}
+  const failures=[...cleanupFailures,...settlement.failures];try{await guard();}catch(error){failures.push(String(error));}
+  await json('final-guards.json',{session,head,requestedModel:nativeModel,requestedEffort:'xhigh',actualEffortIndependentlyAttested:false,
+    settlement,byteCounts,done,failure,failures,nativeProfileCopied:false,privateReasoningPersisted:false});
+  if(failures.length)Deno.exitCode=2;
+}

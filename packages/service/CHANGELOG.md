@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **Added:** `AnonymousRequestMatch` and `AnonymousRule` support exact method/path entries in
+  `allowAnonymous`, exported from the root and `./auth`. Legacy string prefixes and omitted/empty
+  defaults remain; GET and HEAD need separate entries. Invalid exact entries fail before listen.
+- **Changed (breaking impact):** Health routes now install after auth. Custom nonempty anonymous
+  lists excluding `/health` previously bypassed auth for health GET/HEAD (200); those requests now
+  return 401 under a rejecting authenticator. Add `'/health'` to preserve the prefix capability, or
+  list GET and HEAD for `/health`, `/health/live` and `/health/ready` explicitly. Default and empty
+  lists keep public health. Health routes are deferred until build, so registered middleware and
+  body limits now precede them; configure probes before building. Service-info remains immediate.
+  Failed auth construction remains failed on repeated build/serve.
+
+- **Fixed:** Under `withCors()`, every response (RPC, OpenAPI, raw routes, proxied upstreams, health
+  and errors) now carries exactly the native service CORS decision: all six access-control headers,
+  present or absent, with the union of existing `Vary` tokens preserved. Handler, upstream and
+  oRPC-default access-control headers are replaced. Migrate their `exposeHeaders`, `allowHeaders`
+  and `allowMethods` declarations to `withCors()`. Services that never call `withCors()` are
+  unchanged.
+
 - **Breaking (0.0.8, #1382):** `defineService()` now requires `auth: ServiceAuthPolicy` and
   validates it before configuring the builder or starting IO. Missing policy is a type error and a
   runtime `TypeError` for JavaScript callers. Keep native guards as

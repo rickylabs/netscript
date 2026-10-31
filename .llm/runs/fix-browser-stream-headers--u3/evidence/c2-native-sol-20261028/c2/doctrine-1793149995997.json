@@ -1,0 +1,16 @@
+{
+  "selected": "doctrine",
+  "args": [
+    "run",
+    "--frozen",
+    "--allow-read",
+    "--allow-run",
+    ".llm/tools/fitness/check-doctrine.ts",
+    "--all-roots"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:13:16.001Z",
+  "ended": "2026-10-28T01:13:27.420Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doctrine-1793149995997"
+}

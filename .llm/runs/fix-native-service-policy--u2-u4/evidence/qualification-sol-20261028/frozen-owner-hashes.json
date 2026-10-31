@@ -1,0 +1,62 @@
+﻿[
+    {
+        "path":  "packages/service/src/middleware/service-cors.ts",
+        "sha256":  "BF8084A59737382AC3B9E79293D9C45FA873DC58CC70D0492E95FAB8D81245D0"
+    },
+    {
+        "path":  "packages/service/tests/cors-response-authority_test.ts",
+        "sha256":  "E2668AE9CE623A28CAED562BED4D9C6B43AF46737857599B99BACD8653AC9BC3"
+    },
+    {
+        "path":  "packages/service/src/auth/options.ts",
+        "sha256":  "6F32F887B8DEA35FEF1F11BF19E244C678E30FA87A4E3A2848062AF7E0FA75B2"
+    },
+    {
+        "path":  "packages/service/src/auth/auth-middleware.ts",
+        "sha256":  "AE16FB44CA55D048D867BD06F669EA2895E46AF51287B5C8F5CECBEA9EE5CB32"
+    },
+    {
+        "path":  "packages/service/src/auth/mod.ts",
+        "sha256":  "9C384B7B34FF323E171718F1A43C65538BE89105C53A510C3ED3030A19E7DAB7"
+    },
+    {
+        "path":  "packages/service/mod.ts",
+        "sha256":  "19F94D3D99C5C5CE8411335CF896D33E9F0129F3C38EE5D576D254CA1B7F9E9E"
+    },
+    {
+        "path":  "packages/service/tests/auth/middleware_test.ts",
+        "sha256":  "67443947ED85B05D07324E85326CE5B522168F81ED877F8AE4C7DA2BD2C42A05"
+    },
+    {
+        "path":  "packages/service/tests/auth/builder-auth_test.ts",
+        "sha256":  "09B8B83A399105716607ED1D4CB9EF1EE5F7818570CB6475F8F030BC2EF681FA"
+    },
+    {
+        "path":  "packages/service/tests/auth/define-service-auth_test.ts",
+        "sha256":  "E725E29E30F6423297AF9B2A8EABAC960EA2AEA69B4CCFF732527C8299A372F2"
+    },
+    {
+        "path":  "packages/service/src/builder/service-builder-impl.ts",
+        "sha256":  "74090BB6EC406B4F648A0E77D2EBEE4E63CC202A4D4023D5D9DE37103C4130B9"
+    },
+    {
+        "path":  "packages/service/src/types.ts",
+        "sha256":  "0921E0D2D013FE5A7DCDEB4839A91AA68975B8FE4A4043388B2689696DDB2F1C"
+    },
+    {
+        "path":  "packages/service/README.md",
+        "sha256":  "11F556FF05D88FF15B36B700A9E36E944DEB2F0C13709AC31891C3430149174A"
+    },
+    {
+        "path":  "packages/service/CHANGELOG.md",
+        "sha256":  "4AB70C6E658F082E1231587D04C7EB52712817D8EC726833D91BC1CC3F9D428F"
+    },
+    {
+        "path":  "deno.json",
+        "sha256":  "B1FF8E07A20969535AE8BEDAFA869C8FC5A792AFE0857D1BE1FD71C785B90870"
+    },
+    {
+        "path":  "deno.lock",
+        "sha256":  "F53F7A5D017E002582B43B886003F64D19C0EDBC137EBE74674C2E59DF4A5D32"
+    }
+]

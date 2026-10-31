@@ -1,0 +1,115 @@
+interface CaptureObservations {
+ stdoutCapturedBytes: number;
+ stderrCapturedBytes: number;
+ statusAwaited: boolean;
+ pipesAwaited: boolean;
+ terminationRequested: boolean;
+}
+export class OwnedCaptureError extends Error {
+ constructor(message: string, readonly observations: CaptureObservations) { super(message); }
+}
+export async function captureOwnedCommand(
+ executable: string,
+ args: string[],
+ host: string,
+ env: Record<string, string>,
+ deadlineMs = 30_000,
+): Promise<Deno.CommandOutput & {observations:CaptureObservations}> {
+ const child = new Deno.Command(executable, {
+  args, cwd: host, env, clearEnv: true, stdin: 'null', stdout: 'piped', stderr: 'piped',
+ }).spawn();
+ const stdoutReader = child.stdout.getReader();
+ const stderrReader = child.stderr.getReader();
+ const observations: CaptureObservations = {
+  stdoutCapturedBytes: 0, stderrCapturedBytes: 0,
+  statusAwaited: false, pipesAwaited: false, terminationRequested: false,
+ };
+ let failure: Error | undefined;
+ let escalation: ReturnType<typeof setTimeout> | undefined;
+ const cancellations: Promise<void>[] = [];
+ const cancellationFailures: string[] = [];
+ function stop(error: Error) {
+  if (failure) return;
+  failure = error;
+  observations.terminationRequested = true;
+  try { child.kill('SIGTERM'); } catch { /* Already exited. */ }
+  for (const reader of [stdoutReader, stderrReader]) {
+   cancellations.push(reader.cancel().catch(() => {
+    cancellationFailures.push('Owned pipe cancellation failed.');
+   }));
+  }
+  escalation = setTimeout(() => {
+   if (!observations.statusAwaited) {
+    try { child.kill('SIGKILL'); } catch { /* Already exited. */ }
+   }
+  }, 1_000);
+ }
+ async function capture(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  limit: number,
+  field: 'stdoutCapturedBytes' | 'stderrCapturedBytes',
+ ): Promise<Uint8Array[]> {
+  const chunks: Uint8Array[] = [];
+  try {
+   while (true) {
+    const next = await reader.read();
+    if (next.done) break;
+    if (observations[field] + next.value.length > limit) {
+     stop(new Error(`${field} exceeds ${limit} bytes.`));
+     break;
+    }
+    observations[field] += next.value.length;
+    chunks.push(next.value);
+   }
+  } catch {
+   stop(new Error(`${field} pipe read failed.`));
+  }
+  return chunks;
+ }
+ const status = child.status.then((value) => {
+  observations.statusAwaited = true;
+  return value;
+ }, (error) => {
+  observations.statusAwaited = true;
+  stop(new Error('Owned child status failed.'));
+  throw error;
+ });
+ const deadline = setTimeout(() => stop(new Error('Own session export deadline.')), deadlineMs);
+ const pipes = [
+  capture(stdoutReader, 12 * 1024 * 1024, 'stdoutCapturedBytes'),
+  capture(stderrReader, 64 * 1024, 'stderrCapturedBytes'),
+ ];
+ try {
+  const [captured, settled] = await Promise.all([Promise.all(pipes), status]);
+  const [stdout, stderr] = captured;
+  await Promise.all(cancellations);
+  observations.pipesAwaited = true;
+  if (failure || cancellationFailures.length) {
+   throw new OwnedCaptureError(
+    [failure?.message, ...cancellationFailures].filter(Boolean).join(' '), observations,
+   );
+  }
+  const combine = (chunks: Uint8Array[], size: number) => {
+   const bytes = new Uint8Array(size);
+   let offset = 0;
+   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+   return bytes;
+  };
+  return {
+   ...settled,
+   stdout: combine(stdout, observations.stdoutCapturedBytes),
+   stderr: combine(stderr, observations.stderrCapturedBytes),
+   observations,
+  };
+ } finally {
+  clearTimeout(deadline);
+  if (!observations.statusAwaited) stop(new Error('Owned export capture interrupted.'));
+  await status.catch(() => {});
+  await Promise.allSettled(pipes);
+  await Promise.all(cancellations);
+  observations.pipesAwaited = true;
+  if (escalation !== undefined) clearTimeout(escalation);
+  stdoutReader.releaseLock();
+  stderrReader.releaseLock();
+ }
+}

@@ -1,0 +1,63 @@
+# Drift: U2/U4 architecture plan (generator session c2672910-4296-4cbf-b7be-4652f52837eb)
+
+Status: PLAN only; nothing implemented; no gate run. Each entry: observation → decision/consequence.
+
+## D1 Environment remap observed in the generator session
+
+`deno info --json` exited 2 and revealed `DENO_DIR` pointing at
+`C:/Users/ericc/source/repos/eis-chat-netscript-008-workers-runtime/.netscript/agent/worker-health-checks/state/cache`
+and `LOCALAPPDATA` remapped to `.llm/tmp/native-service-policy-plan-20261027/runtime/localappdata`.
+Neither location held the Hono/oRPC pins. **Decision:** no cache reload/override; the real user caches
+(`C:/Users/ericc/AppData/Local/deno/{npm,remote}`) were read read-only and the exact pinned files
+were hashed ([source-receipt.json](source-receipt.json)). The JSR cache carries no `.metadata.json`
+sidecars; files were resolved by sha256 of the module URL. Implementers should expect the same remap
+inside this task-owned environment and must not treat the empty remapped `DENO_DIR` as a reason to
+run `deno cache --reload` (rule 6).
+
+## D2 EIS candidate footprints vs. locked footprints
+
+| Leaf | EIS candidate (`s16-remediation-footprint-20261027.md`) | Locked (plan.md) | Why |
+| --- | --- | --- | --- |
+| U2 | 3–4 paths: `service-cors.ts`, `service-builder-impl.ts`, `tests/cors-rpc-policy_test.ts`, README | 8 paths: + `primitives/handlers.ts`, `builder/service-rpc.ts`, `tests/handlers_test.ts`, CHANGELOG (+ conditional docs page); `service-builder-impl.ts` becomes inspect-only | The oRPC `CORSPlugin` is instantiated unconditionally in `createRPCPlugins` (`handlers.ts:77`) and only reachable from `wireRpc` (`service-rpc.ts:68-69`). It cannot be removed from `service-cors.ts`/`service-builder-impl.ts`. Standalone compatibility needs its own owner. |
+| U4 | 5 paths: `auth/options.ts`, `auth/auth-middleware.ts`, middleware test, builder-auth test, README | 9 paths: + `src/auth/mod.ts`, `mod.ts`, `tests/auth/define-service-auth_test.ts`, CHANGELOG | `AuthnOptions` is public from both `./auth` and the root; `doc:lint` requires reachable types → two re-export owners. `defineService` is the preset most consumers use and rejects at `serve()`, so pre-listener rejection needs its own owner. |
+
+Both are additive to the brief's "candidate, not authority to omit a proving owner".
+
+## D3 Documentation vs. source behavior (pre-existing, motivates U2)
+
+`docs/site/reference/service/index.md` (CORS origins section) and `packages/service/README.md`
+state that origins outside the allowlist receive no `access-control-allow-origin`. Source derivation
+(research.md §2.2–2.3): builder-wired RPC/OpenAPI **success** responses reflect any `Origin` through
+oRPC's default `CORSPlugin`, emit `access-control-allow-origin: ""` with no `Origin`, and carry a
+duplicated `Vary` token. Error/auth/body-limit/raw/health responses match the docs. **Decision:**
+docs are the intended policy; U2 makes the source conform; no doc retraction. Recorded as negative
+controls that must be red on HEAD.
+
+## D4 EIS approach (response-preservation middleware) not adopted
+
+EIS evidence proposed preserving Hono's headers over oRPC's output. Rejected in D-U2-1: it would keep
+two engines and re-merge headers after Hono's own `set res` re-application. The chosen mechanism
+(disable the inner plugin via `RPCHandlerConfig.cors: false`) is a smaller, source-level fix. This
+is a deliberate divergence from the proposal, not from the brief.
+
+## D5 U4 canonical path: stricter than legacy, differs from deny-side normalization
+
+Legacy strings compare on the decoded `c.req.path`; deny-side raw routes `normalizePath` (strip
+trailing slashes). D-U4-2 requires byte equality on **both** `rawPathname(c)` and `c.req.path`, so
+`/health/` and `/he%61lth` are *not* anonymous while `/x/../health` (URL-normalized before Hono) is.
+Recorded so the evaluator can challenge the asymmetry: widening denial is safe; widening anonymity is
+not.
+
+## D6 Tooling notes
+
+- `rtk grep` returned no output for repository-wide searches in this session; the Grep tool was used.
+  No tool was installed or reconfigured.
+- Harmless NetScript MCP calls (`get_doc` ×2, `search_docs` ×1) were made as required; results
+  matched the checked-in docs and added no new facts beyond research.md §1.
+- No product, test, config, lock, U1 or other-worktree file was modified. Only run metadata under
+  `.llm/runs/fix-native-service-policy--u2-u4/` was written.
+
+## D7 Still-open policy (not drift, cross-reference)
+
+M-U2-1, M-U2-2, M-U4-1 in [decisions.md](decisions.md) remain MUST RESOLVE; Q-U2-3/Q-U2-4/Q-U4-2/
+Q-U4-3 deferred. No runtime gate has been run; all verdicts in plan.md are prospective.

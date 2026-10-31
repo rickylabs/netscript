@@ -1,0 +1,9 @@
+{
+  "command": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --frozen packages/fresh-ui/tests",
+  "exitCode": 0,
+  "summary": {
+    "passed": 222,
+    "failed": 0,
+    "ignored": 0
+  }
+}

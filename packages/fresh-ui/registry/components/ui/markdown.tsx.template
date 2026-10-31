@@ -119,7 +119,11 @@ export function Markdown(
   const content = createMarkdownProcessor({ activeCite, onCite }).processSync(source).result;
 
   return (
-    <div class={className ? `ns-markdown ${className}` : 'ns-markdown'}>
+    <div
+      class={className ? `ns-markdown ${className}` : 'ns-markdown'}
+      data-part='root'
+      data-scope='prose'
+    >
       {content}
     </div>
   );

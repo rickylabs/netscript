@@ -1,0 +1,26 @@
+﻿ M .llm/harness/debt/arch-debt.md
+ M packages/plugin/tests/service/create-plugin-service-auth_test.ts
+ M packages/service/CHANGELOG.md
+ M packages/service/README.md
+ M packages/service/mod.ts
+ M packages/service/src/auth/auth-middleware.ts
+ M packages/service/src/auth/mod.ts
+ M packages/service/src/auth/options.ts
+ M packages/service/src/builder/service-builder-impl.ts
+ M packages/service/tests/auth/builder-auth_test.ts
+ M packages/service/tests/auth/define-service-auth_test.ts
+ M packages/service/tests/auth/middleware_test.ts
+?? .agents/skills/aspire-deployment/
+?? .agents/skills/aspire-init/
+?? .agents/skills/aspire-monitoring/
+?? .agents/skills/aspire-orchestration/
+?? .agents/skills/deno/
+?? .agents/skills/help.md
+?? .agents/skills/netscript-build/
+?? .agents/skills/netscript-operate/
+?? .agents/skills/netscript/
+?? .llm/runs/fix-native-service-policy--u2-u4/root-u4-factual-addendum.md
+?? .llm/tools/release.json
+?? .mcp.json
+?? .netscript/
+?? packages/service/tests/auth/health-auth-order_test.ts

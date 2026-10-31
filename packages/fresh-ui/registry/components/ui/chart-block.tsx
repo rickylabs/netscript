@@ -62,30 +62,54 @@ export function ChartBlock(
   if (variant === 'column') {
     const ticks = Array.from({ length: TICKS + 1 }, (_, i) => (max / TICKS) * (TICKS - i));
     return (
-      <div {...props} class={cn('ns-colchart', className)}>
-        {title ? <div class='ns-chart__title'>{title}</div> : null}
-        {sub ? <div class='ns-chart__sub'>{sub}</div> : null}
-        <div class='ns-colchart__plot'>
-          <div class='ns-colchart__yaxis'>
+      <div
+        {...props}
+        class={cn('ns-colchart', className)}
+        data-part='root'
+        data-scope='chart-block'
+      >
+        {title
+          ? (
+            <div class='ns-chart__title' data-part='title' data-scope='chart-block'>
+              {title}
+            </div>
+          )
+          : null}
+        {sub
+          ? <div class='ns-chart__sub' data-part='sub' data-scope='chart-block'>{sub}</div>
+          : null}
+        <div class='ns-colchart__plot' data-part='plot' data-scope='chart-block'>
+          <div class='ns-colchart__yaxis' data-part='yaxis' data-scope='chart-block'>
             {ticks.map((tick, i) => (
-              <span key={i} class='ns-colchart__ytick'>{formatTick(tick)}</span>
+              <span
+                key={i}
+                class='ns-colchart__ytick'
+                data-part='ytick'
+                data-scope='chart-block'
+              >
+                {formatTick(tick)}
+              </span>
             ))}
           </div>
-          <div class='ns-colchart__grid'>
+          <div class='ns-colchart__grid' data-part='grid' data-scope='chart-block'>
             {data.map((datum, i) => (
-              <div key={i} class='ns-colchart__col'>
+              <div key={i} class='ns-colchart__col' data-part='col' data-scope='chart-block'>
                 <div
                   class='ns-colchart__bar'
+                  data-part='bar'
+                  data-scope='chart-block'
                   data-tone={datum.tone}
                   style={{ height: `${(datum.value / max) * 100}%` }}
                 >
-                  <span class='ns-colchart__val'>{`${datum.value}${unit}`}</span>
+                  <span class='ns-colchart__val' data-part='val' data-scope='chart-block'>
+                    {`${datum.value}${unit}`}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div class='ns-colchart__xaxis'>
+        <div class='ns-colchart__xaxis' data-part='xaxis' data-scope='chart-block'>
           {data.map((datum, i) => <span key={i}>{datum.label}</span>)}
         </div>
       </div>
@@ -93,20 +117,28 @@ export function ChartBlock(
   }
 
   return (
-    <div {...props} class={cn('ns-chart', className)}>
-      {title ? <div class='ns-chart__title'>{title}</div> : null}
-      {sub ? <div class='ns-chart__sub'>{sub}</div> : null}
+    <div {...props} class={cn('ns-chart', className)} data-part='root' data-scope='chart-block'>
+      {title
+        ? <div class='ns-chart__title' data-part='title' data-scope='chart-block'>{title}</div>
+        : null}
+      {sub ? <div class='ns-chart__sub' data-part='sub' data-scope='chart-block'>{sub}</div> : null}
       {data.map((datum) => (
-        <div class='ns-chart__row'>
-          <span class='ns-chart__label'>{datum.label}</span>
-          <span class='ns-chart__track'>
+        <div class='ns-chart__row' data-part='row' data-scope='chart-block'>
+          <span class='ns-chart__label' data-part='label' data-scope='chart-block'>
+            {datum.label}
+          </span>
+          <span class='ns-chart__track' data-part='track' data-scope='chart-block'>
             <span
               class='ns-chart__bar'
+              data-part='bar'
+              data-scope='chart-block'
               data-tone={datum.tone}
               style={{ width: `${(datum.value / max) * 100}%` }}
             />
           </span>
-          <span class='ns-chart__value'>{`${datum.value}${unit}`}</span>
+          <span class='ns-chart__value' data-part='value' data-scope='chart-block'>
+            {`${datum.value}${unit}`}
+          </span>
         </div>
       ))}
     </div>

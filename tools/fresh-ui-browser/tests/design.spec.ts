@@ -47,7 +47,7 @@ for (const destination of ['Home', 'Components', 'Gallery button']) {
       const sidebarToggle = page.getByRole('button', { name: 'Open sidebar', exact: true });
       if (await sidebarToggle.isVisible()) {
         await sidebarToggle.click();
-        await expect(page.locator('[data-sidebar]')).toHaveClass(/is-open/);
+        await expect(page.locator('[data-sidebar]')).toHaveAttribute('data-state', 'open');
       }
       await page.locator('a.ns-dashboard__nav-item', { hasText: destination }).click();
     }

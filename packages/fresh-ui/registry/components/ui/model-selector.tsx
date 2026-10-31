@@ -42,14 +42,33 @@ export function ModelSelector(
   const current = models.find((model) => model.id === value) ?? models[0];
 
   return (
-    <details {...props} class={cn('ns-model-selector', className)} data-align={align}>
-      <summary class='ns-model-selector__btn'>
+    <details
+      {...props}
+      class={cn('ns-model-selector', className)}
+      data-part='root'
+      data-scope='model-selector'
+      data-align={align}
+    >
+      <summary class='ns-model-selector__btn' data-part='btn' data-scope='model-selector'>
         {current?.provider
-          ? <span class='ns-model-selector__provider'>{current.provider}</span>
+          ? (
+            <span
+              class='ns-model-selector__provider'
+              data-part='provider'
+              data-scope='model-selector'
+            >
+              {current.provider}
+            </span>
+          )
           : null}
-        <span>{current?.label}</span>
+        <span data-part='label' data-scope='model-selector'>{current?.label}</span>
       </summary>
-      <div class='ns-model-selector__menu' role='listbox'>
+      <div
+        class='ns-model-selector__menu'
+        data-part='menu'
+        data-scope='model-selector'
+        role='listbox'
+      >
         {models.map((model) => {
           const selected = model.id === value;
           return (
@@ -58,14 +77,40 @@ export function ModelSelector(
               type='button'
               role='option'
               aria-selected={selected ? 'true' : 'false'}
-              class={cn('ns-model-opt', selected && 'is-active')}
+              class={cn('ns-model-opt')}
+              data-state={selected ? ('selected') : undefined}
+              data-part='opt'
+              data-scope='model-selector'
               onClick={() => onChange?.(model.id)}
             >
-              <span class='ns-model-opt__main'>
-                <span class='ns-model-opt__label'>{model.label}</span>
-                {model.desc ? <span class='ns-model-opt__desc'>{model.desc}</span> : null}
+              <span class='ns-model-opt__main' data-part='main' data-scope='model-selector'>
+                <span class='ns-model-opt__label' data-part='label' data-scope='model-selector'>
+                  {model.label}
+                </span>
+                {model.desc
+                  ? (
+                    <span
+                      class='ns-model-opt__desc'
+                      data-part='desc'
+                      data-scope='model-selector'
+                    >
+                      {model.desc}
+                    </span>
+                  )
+                  : null}
               </span>
-              {selected ? <span class='ns-model-opt__check' aria-hidden='true'>✓</span> : null}
+              {selected
+                ? (
+                  <span
+                    class='ns-model-opt__check'
+                    data-part='check'
+                    data-scope='model-selector'
+                    aria-hidden='true'
+                  >
+                    ✓
+                  </span>
+                )
+                : null}
             </button>
           );
         })}

@@ -1,0 +1,37 @@
+[
+    {
+        "file":  "research.md",
+        "bytes":  22835,
+        "sha256":  "04c8b3968b1881647b823fa12ee2d2af0b1e70f02998efe3e74a9a0470c26ce9"
+    },
+    {
+        "file":  "decisions.md",
+        "bytes":  17882,
+        "sha256":  "2810bb69915547b3e17011fb547bb6f5a69a8209def06e4e9679418f30d623da"
+    },
+    {
+        "file":  "plan.md",
+        "bytes":  32445,
+        "sha256":  "8c20cf6c3ce176f03d642f104254a65580e512c7af462be0214f28a96895a1cc"
+    },
+    {
+        "file":  "context-pack.md",
+        "bytes":  7798,
+        "sha256":  "b0826a68ba18486ec7c58f9a42131654ebc9d6ebce1e515b9ced41537bf46d12"
+    },
+    {
+        "file":  "drift.md",
+        "bytes":  9388,
+        "sha256":  "3cb791829af5500ee1341a83348b551bad4493733d5083f9091302ac316372dd"
+    },
+    {
+        "file":  "source-receipt.json",
+        "bytes":  13445,
+        "sha256":  "bffffbc271721e74ee35d4b18b78a8bb5171cc65ac7ea985d06e4ca5bad54303"
+    },
+    {
+        "file":  "worklog.md",
+        "bytes":  11033,
+        "sha256":  "2b8b19323e704cac3ed52fd6443953f9a82b0f0de4608586af60ebb4a7791463"
+    }
+]

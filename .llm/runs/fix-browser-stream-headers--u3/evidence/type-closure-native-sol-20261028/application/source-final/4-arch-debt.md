@@ -1,0 +1,2978 @@
+# Architecture Debt Registry
+
+Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2026-04-29. Entries
+track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
+verdicts are not seeded here.
+
+Reference trust note: AP/F refs in this registry use the current doctrine catalog (`AP-1` through
+`AP-25`, `F-1` through `F-19`). Historical checker-only refs are translated in
+`docs/architecture/doctrine/ref-migration-map.md`; do that translation before carrying an old run
+finding into a debt entry.
+
+## plugins/auth — AUTH-BACKEND-ENV-CENTRALIZATION
+
+- **ID:** `AUTH-BACKEND-ENV-CENTRALIZATION`
+- **Title:** Per-backend auth environment construction remains connector-local.
+- **Context:** Plugin re-architecture v2 Decision C centralizes manifest inspection, service router
+  assembly, and health routing for `@netscript/plugin-auth`, but locked decision Q4 defers widening
+  the per-backend environment construction helpers into a shared auth-core sibling contract.
+- **Why deferred:** Moving backend-specific env construction is a breaking auth backend contract
+  change and needs a separately gated sub-wave with backend compatibility tests.
+- **Owner:** Future auth backend contract wave.
+- **Target:** Before beta auth backend API freeze.
+- **Linked plan:** `.llm/tmp/run/chore-plugin-rearch-v2--184/plan.md` (Q4).
+- **Created:** 2026-07-01
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when env construction moves behind an auth-core contract and all configured
+  backends pass compatibility and service boot tests.
+
+## packages/cli — CLI-BROWSER-SESSION-CONTRACT-DETECTION
+
+- **ID:** `CLI-BROWSER-SESSION-CONTRACT-DETECTION`
+- **Reason:** Browser auth reconciliation identifies generated session contracts by matching
+  `session: baseContract` in source. Renamed builders can miss detection; comments or strings can
+  produce false positives. Authored-contract capability detection needs a structural marker.
+- **Why deferred:** PR #2274 scopes the generated app/service proof; review accepts this bounded
+  heuristic pending a structural capability contract.
+- **Owner:** CLI auth reconciliation follow-up under #1382.
+- **Target:** Before extending session-route reconciliation to authored contracts.
+- **Created:** 2026-10-11
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Replace source sniffing with a template-owned capability or manifest field; verify
+  renamed/reformatted builders and comments/strings cannot silently skip or invent a route.
+
+## packages/cli — PLUGIN-USERLAND-SOURCE-COPY
+
+- **Reason:** Maintainer/local `plugin add` copied full first-party plugin source into generated
+  userland by default, and the public/prod path needed a regression lock proving it never copies
+  source.
+- **Owner:** CLI plugin copy flag gate.
+- **Target:** PR #133.
+- **Linked plan:** `.llm/tmp/run/fix-cli-plugin-copy-flag-gate--copy-gate/plan.md`
+- **Created:** 2026-06-26
+- **Status:** closed 2026-06-26 — local maintainer copy is now explicitly flag-gated with
+  `--no-copy-source` as the opt-out while preserving runtime e2e's default first-party behavior;
+  public `netscript plugin add` remains hardcoded to JSR stub generation and has a no-copy
+  regression test.
+- **Gate:** plugin-add unit tests, `packages/cli` publish dry-run, `scaffold.plugins`, and
+  `scaffold.runtime`.
+
+## packages/runtime-config — doctrine verdict Refactor
+
+- **Reason:** Split single-file `mod.ts`; add subpaths if exports grow.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-05-01 — Phase 11 completed the Archetype 6 v2 layout: public/maintainer
+  feature slices, kernel adapters, template assets, binary edges, and executable CLI fitness gates
+  now cover the former monoliths.
+- **Gate:** F-1, F-5, F-6, F-7
+- **Wave 1 closure evidence:** `feat-package-quality-wave1-contracts--contracts` slice 10 split
+  `packages/runtime-config/mod.ts` into `src/domain/types.ts`, `src/application/loader.ts`,
+  `src/application/watcher.ts`, and `src/diagnostics/summary.ts`; `deno check`, `deno doc --lint`,
+  `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, and
+  `deno fmt --check` pass for the package.
+
+## packages/config — AP-1 / doctrine verdict Refactor (schema.ts 945 LOC)
+
+- **Reason:** `schema.ts` is above the doctrine file-size threshold and should split by concept.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-05-01 — public local-source and monorepo behavior moved behind the
+  maintainer command graph; `deno task arch:check` enforces public/maintainer isolation.
+- **Gate:** F-1, F-5, F-10
+
+## packages/config — AP-16 root helpers.ts
+
+- **Reason:** Root `helpers.ts` held saga authoring input types behind a generic helper name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slice 11 renamed `helpers.ts` to `src/domain/saga-inputs.ts` and
+  kept the public `defineSagas`/input type exports stable through `src/public/mod.ts`.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/config/src/domain/mod.ts — justified domain barrel
+
+- **Reason:** `src/domain/mod.ts` is a sub-barrel, but it intentionally curates the domain schema
+  surface consumed by `src/public/mod.ts` and future docs/reference generation.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when generated reference tooling can crawl individual schema modules.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — slice 17 added `arch:barrel-ok` justification in the file.
+- **Gate:** F-18, `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'`
+
+## packages/contracts — AP-16 helpers directory
+
+- **Reason:** Root `helpers/` held query and transform helpers behind a generic folder name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slices 19 and 20 moved `paginated-query.ts` and `transform.ts`
+  into `src/application/` as role-named modules and removed the `helpers/` directory.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/contracts/crud — accepted root subpath layout
+
+- **Reason:** `crud/` remains at the package root to preserve the established `./crud` subpath
+  export and avoid broad downstream import churn during S1.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when subpath exports can move without consumer breakage.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — locked decision L8 keeps `contracts/crud/` at package root.
+- **Gate:** F-5/F-6 remain green for `@netscript/contracts`; consumer validation in slices 25-27.
+
+## packages/contracts — T4 slow-type publish carve-out
+
+- **Reason:** Heavy Zod-derived contract helpers still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Narrow public contract helper return types before beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
+- **Gate:** F-6; close when `packages/contracts` dry-run passes without `--allow-slow-types`.
+
+## root toolchain — T5 deferred esbuild audit advisory
+
+- **Reason:** `deno audit` reports GHSA-gv7w-rqvm-qjhr for transitive `esbuild <0.28.1`. The
+  runtime-reachable critical `@orpc/client` advisory was remediated by moving ORPC imports to
+  `^1.14.6`; this remaining high advisory is deferred as approved toolchain debt because it is tied
+  to the Vite/esbuild stack rather than a NetScript runtime dependency path.
+- **Owner:** Toolchain upgrade T5 follow-up.
+- **Target:** Revisit when the Vite/esbuild dependency chain can move to `esbuild >=0.28.1`.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (A-9).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task audit:critical`; close when full `deno audit` passes without suppressing the
+  deferred high-severity advisory.
+
+## packages/cli — CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred
+
+- **Reason:** The scaffold still uses `_aspire-compat.mts` plus generated
+  `builder.addExecutable(...)` registrations for Deno resources. Aspire 13.5.3 restore evidence
+  proves `CommunityToolkit.Aspire.Hosting.Deno` projects `addDenoApp` and `addDenoTask` into the
+  TypeScript SDK, but 0.0.7 retains the proven executable path until its dedicated adoption slice.
+  First-party Deno hosting is scheduled upstream for Aspire 13.6 (aspire#18627, aspire#18628, and
+  aspire#16218). SQLite remains modeled through `builder.addConnectionString(...)`.
+- **Owner:** Aspire 13.5 S12 adoption slice.
+- **Target:** Adopt the restored CommunityToolkit Deno projection in S12/0.0.8; reassess SQLite in
+  the same dedicated integration slice without coupling it to S4 emission re-validation.
+- **Linked plan:** `.llm/runs/chore-aspire-13-5-s4-generator-revalidation--impl/plan.md` (D-4)
+- **Created:** 2026-06-27
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close after S12 replaces the Deno executable registration and compatibility path with
+  the restored CommunityToolkit projection, preserves documented SQLite connection-string modeling,
+  and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the superseded
+  workaround removed.
+
+## packages/cli — ISSUE-167-PLUGIN-REMOVE-UNINSTALL
+
+- **ID:** `ISSUE-167-PLUGIN-REMOVE-UNINSTALL`
+- **Title:** `plugin remove` / uninstall is not implemented.
+- **Context:** Issue #167 makes plugin install add-only: the CLI resolves, validates, confirms, runs
+  the plugin-owned `./scaffold`, verifies integrity, and applies deterministic artifacts. No reverse
+  operation removes generated files, config entries, DB schema additions, Aspire contributions, or
+  post-install side effects.
+- **Why deferred:** The approved #167 scope is the marketplace install foundation. D5 intentionally
+  required deterministic, self-contained scaffold outputs so uninstall can be designed later without
+  blocking official plugin installation or the true-userland no-copy gate.
+- **Trigger to revisit:** User-gated `plugin remove` / uninstall program; require an uninstall
+  manifest or reverse-plan contract plus add/remove/re-add e2e coverage for at least one official
+  plugin before advertising removal.
+- **Reason:** Add-only install is intentionally accepted for #167; removal semantics need separate
+  design for ownership, conflict handling, generated DB artifacts, and user-edited files.
+- **Owner:** Future CLI plugin lifecycle program.
+- **Target:** Before marketplace uninstall is documented or exposed as supported.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope, D5, S12).
+- **Created:** 2026-06-28
+- **Status:** closed by #1236 / PR #1237 (2026-08-04).
+- **Gate:** New uninstall contract and `e2e:cli` add/remove/re-add suite pass without orphaned
+  generated artifacts or user-authored file deletion.
+- **Closure evidence:** Installed package metadata now drives a preflight removal plan; host cleanup
+  is rollback-safe, and the public install/remove/doctor lifecycle test restores owned config and
+  generated wiring. The full `scaffold.runtime` retry passed 71/71 with cleanup.
+
+## marketplace — ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES
+
+- **ID:** `ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES`
+- **Title:** Marketplace portal and publisher-signature curation are future work.
+- **Context:** Issue #167 establishes the JSR package scope, static plugin protocol, trust tiers,
+  and confirmation boundary needed for a marketplace, but it does not build `market.netscript.dev`,
+  `plugin search`, curated registry metadata, publisher signatures, provenance attestations, or
+  verified publisher workflows.
+- **Why deferred:** The approved slice set was the install foundation. Portal discovery and
+  signature curation require product, trust, release, and governance decisions that should be
+  user-gated and evaluated separately from the installer mechanics.
+- **Trigger to revisit:** Marketplace roadmap Phase 2/3 or any plan to advertise curated third-party
+  plugin discovery; require a publisher trust model, provenance gate, registry ingestion policy, and
+  UI/API ownership decision.
+- **Reason:** Static JSR validation plus confirmation is sufficient for #167; curated discovery and
+  publisher-signature trust are deliberately not claimed.
+- **Owner:** Future NetScript marketplace program.
+- **Target:** Before public marketplace discovery or verified-publisher trust claims.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope,
+  Marketplace roadmap, S12).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Marketplace plan lands with signature/provenance validation, curated registry policy,
+  and e2e evidence that installer confirmation/trust metadata matches the portal's claims.
+
+## plugins/* — ISSUE-167-OPTION-B-PACKAGE-RENAME
+
+- **ID:** `ISSUE-167-OPTION-B-PACKAGE-RENAME`
+- **Title:** Option B package rename from `@netscript/plugin-<kind>` to `@netscript/<kind>`
+  deferred.
+- **Context:** D1 kept the existing published package names and added a bare-kind alias map
+  (`workers` -> `@netscript/plugin-workers`, etc.) as the verified-scope guard. The cleaner
+  marketplace identity of `@netscript/<kind>` was considered and explicitly deferred.
+- **Why deferred:** Renaming all official packages would break alpha consumers, require republishing
+  and import-map migration, orphan existing package identities, and distract from the install
+  foundation. The alias map solves the immediate typosquat and bare-name DX problem without forcing
+  a package identity migration.
+- **Trigger to revisit:** Marketplace identity/versioning program or beta naming freeze; require a
+  migration plan for existing alpha imports, package deprecation messaging, and dual-name install
+  compatibility if needed.
+- **Reason:** D1 is intentionally locked for #167; Option B remains a separate identity decision.
+- **Owner:** Future marketplace identity / package naming program.
+- **Target:** Before beta naming freeze, only if user approves package identity migration.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (D1, Non-Scope,
+  Open-Decision Sweep).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Approved rename plan with compatibility tests for bare-kind resolution, JSR install,
+  docs, import maps, and deprecation behavior.
+
+## packages/plugin — ISSUE-167-STANDALONE-PLUGIN-PROTOCOL
+
+- **ID:** `ISSUE-167-STANDALONE-PLUGIN-PROTOCOL`
+- **Title:** Dedicated `@netscript/plugin-protocol` package extraction deferred.
+- **Context:** S1 published the manifest and scaffolder protocol from the neutral existing
+  `@netscript/plugin/protocol` subpath and re-exported it from `@netscript/plugin`. This avoided a
+  new package while keeping plugin authors and the CLI on a shared contract.
+- **Why deferred:** A standalone package is additive and not required for #167. Extracting it would
+  add package/release choreography before the protocol has enough independent lifecycle pressure to
+  justify its own package.
+- **Trigger to revisit:** Multiple non-plugin packages need the protocol without depending on
+  `@netscript/plugin`, or protocol versioning needs to move independently from plugin authoring
+  APIs.
+- **Reason:** D8/D3-backlog intentionally chose inline-first protocol publication in
+  `@netscript/plugin`; standalone extraction is future work.
+- **Owner:** Plugin platform maintainers.
+- **Target:** Before protocol versioning needs an independent release cadence.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (D8, D3 backlog, S1
+  drift).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** New package plan proves export compatibility, migration path, publish dry-run, and
+  consumer updates for CLI plus all first-party plugins.
+
+## packages/cli — ISSUE-167-PROD-JSR-SCAFFOLD-E2E
+
+- **ID:** `ISSUE-167-PROD-JSR-SCAFFOLD-E2E`
+- **Title:** Production `deno x jsr:<pkg>/scaffold` validation is post-publish.
+- **Context:** S4 drift established that local files must run with `deno run`, not `deno x`; S11
+  therefore validates a true userland project outside the checkout with explicit `--local-path`. The
+  production JSR command shape remains `deno x <flags> jsr:@netscript/plugin-<kind>/scaffold` and
+  cannot be fully exercised until the new `./scaffold` exports are published.
+- **Why deferred:** Pre-merge validation cannot execute unpublished JSR package exports. Claiming
+  prod-JSR green before alpha.13 would overstate the evidence.
+- **Trigger to revisit:** Immediately after alpha.13 publication; run `e2e-cli-prod` against the
+  published CLI and official plugin packages.
+- **Reason:** The #167 implementation is green for local-path true userland and maintainer runtime
+  gates; the post-publish production JSR leg remains a release validation item.
+- **Owner:** Release / e2e-cli-prod owner for alpha.13.
+- **Target:** Alpha.13 post-publish verification.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Hidden Scope, Risk
+  Register, S11 Scope Boundary); `.llm/tmp/run/issue-167-marketplace-plugin-install/drift.md` (S4
+  local-path drift).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED until alpha.13 post-publish smoke passes.
+- **Gate:** `e2e-cli-prod` proves official plugin install through
+  `deno x jsr:@netscript/plugin-<kind>/scaffold` after alpha.13; close by recording raw exit code
+  and suite/test counts.
+
+## packages/cli — Deno KV cache backend TypeScript AppHost resource emission deferred
+
+- **Reason:** Alpha.11 Slice C adds `netscript init --cache-backend deno-kv` config/schema support,
+  but the generated TypeScript AppHost does not create a managed Deno KV cache resource. It emits
+  `NetScript.Cache["deno-kv"]` with `Engine: "DenoKv"` and a file-backed infrastructure comment
+  only. Redis and Garnet have concrete container resource emission in this slice.
+- **Owner:** CLI Aspire scaffold follow-up.
+- **Target:** Dedicated Deno KV runtime/AppHost integration slice before beta if `deno-kv` is kept
+  as a first-class init backend.
+- **Linked plan:** `.llm/tmp/run/alpha11-fixtrain--c/plan.md`
+- **Created:** 2026-06-27
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `--cache-backend deno-kv` produces a generated workspace whose AppHost can
+  provide the intended KV runtime/env contract and a focused runtime smoke proves it.
+
+## packages/cron — AP-17 / doctrine verdict Refactor
+
+- **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-06-07 — corrected during Wave 2c after the previous 2026-05-01 closure
+  note was found to reference unrelated CLI permission documentation while
+  `packages/cron/interfaces/` still existed. Real evidence: `packages/cron/interfaces/` was renamed
+  to `packages/cron/ports/`, the public `./types` export was replaced with `./ports`, and
+  `tasks.check` now checks `ports/mod.ts`.
+- **Gate:** F-3, F-11
+
+## packages/database — AP-17 / doctrine verdict Refactor
+
+- **Reason:** `interfaces/` should become `ports/`; composition root needs confirmation.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** open
+- **Gate:** F-3, F-11
+
+## packages/queue — AP-16 / doctrine verdict Refactor
+
+- **Reason:** `utils/` needed role-named placement under the doctrine vocabulary; the carried-in
+  `internal/` concern is not debt because F-11 and doctrine folder vocabulary explicitly allow
+  `internal/`.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-06-07 — Wave 2c slice 1 renamed `packages/queue/utils/` to
+  `packages/queue/validation/` and `packages/queue/interfaces/` to `packages/queue/ports/`.
+  `packages/queue/internal/` is retained as F-11-allowed. The older doctrine handoff wording that
+  said to lift `internal/` conflicts with the F-11 allow-list; the gate is the source of truth for
+  this closure.
+- **Gate:** F-3, F-11
+
+## packages/kv — AP-1 / doctrine verdict Refactor (bridge_test.ts 1,039 LOC)
+
+- **Reason:** `bridge_test.ts` is a god test file; adapters need audit.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** open
+- **Gate:** F-10, F-3
+
+## packages/telemetry — doctrine verdict Refactor
+
+- **Reason:** Confirm port/adapter split and expose OTEL adapter as a subpath export.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed (2026-07-06, #403 T2 — branch `feat/403-telemetry-t2`)
+- **Gate:** F-3, F-5, F-6
+- **Resolution:**
+  - **F-3 (layering):** Forbidden `core/` removed — types moved to `src/domain/`, span/tracer
+    lifecycle to `src/application/`, registry lifecycle to `src/application/registry/`. Provider
+    ports live in `src/ports/`; OTEL provider adapters in `src/adapters/otel/`. Adapters import
+    `ports` + the external `@opentelemetry/api` client only; `application` never imports `adapters`.
+    Dead `src/instrumentation/sse.ts` (zero consumers) deleted; orphan `src/public/mod.ts` confirmed
+    absent.
+  - **F-5 (public surface):** OTEL adapter exposed as the dedicated `@netscript/telemetry/otel`
+    subpath; added `@netscript/telemetry/query` (read-model) and `@netscript/telemetry/testing`
+    (in-memory recorder); `@netscript/telemetry/registry` given a real facade; root `mod.ts` barrel
+    completed with the primary tracing surface. `deno doc --lint` clean across the full
+    11-entrypoint export set.
+  - **F-6 (JSR publishability):** `deno publish --dry-run` green; `workspace-mutator` JSR
+    rewrite-map covers every telemetry subpath (root, `/orpc`, `/otel`, `/query`, `/registry`,
+    `/testing`). Env config validated with Standard Schema. All consumers in `packages/` +
+    `plugins/` still compile; T1 TC-1..14 convention contract preserved.
+
+## packages/triggers — doctrine verdict Restructure
+
+- **Reason:** Flat files should lift into `application/`, `state/`, and `runtime/`.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** RESOLVED 2026-07-03 (superseded) — the top-level `packages/triggers` package named in
+  this heading no longer exists; it was superseded by `packages/plugin-triggers-core` (plus the
+  `plugins/triggers` connector) during the plugin re-architecture. The successor package carries a
+  doctrine-compliant role-named layout (`domain/`, `ports/`, `runtime/`, `adapters/`, `stores/`,
+  `builders/`, `config/`, `contracts/`, `telemetry/`, `testing/`, `public/`) with no flat root-level
+  source files, so the Restructure concern (lift flat files into role folders) is fully addressed by
+  the successor rather than relocated. Heading retained as the historical record.
+- **Gate:** F-3, F-11, F-13
+
+## packages/plugin-triggers-core — T4 slow-type publish carve-out
+
+- **Reason:** Trigger DSL and runtime inference types still require
+  `deno publish --allow-slow-types` under Deno 2.8 publish analysis. This is accepted
+  score-impacting debt for the toolchain upgrade, not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Split trigger inference types and publish explicit public definition interfaces before
+  beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
+- **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
+  `--allow-slow-types`.
+
+## plugins/triggers — deferred trigger action scheduler missing (`triggers-defer-unsupported`)
+
+- **Reason:** `DeferAction` models `kind: 'defer'` with an `until` timestamp, but the runtime has no
+  one-shot scheduler/replay port that can re-dispatch the processed trigger action later. S2 now
+  rejects the action through `TriggersError.unsupportedOperation` and DLQ instead of silently
+  dropping it.
+- **Owner:** Capability caveats follow-up.
+- **Target:** Before advertising deferred trigger action dispatch as supported.
+- **Linked plan:** `.llm/tmp/run/cap-s2-defer/brief.md`
+- **Created:** 2026-06-19
+- **Status:** closed 2026-08-04 by #1283. The core now publishes a one-shot defer/replay port and
+  KV-backed scheduler; the plugin composes durable replay through the live definition registry.
+- **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
+  scheduler/replay port is designed.
+
+## plugins/triggers — connector SOUND convergence deferred (`triggers-connector-sound-deferred`)
+
+- **Reason:** The #172a-2d slice (commit `74656d71`) landed Hole-A contract soundness on
+  `@netscript/plugin-triggers-core`, but the triggers connector (`plugins/triggers/services`) is a
+  raw Hono + `Deno.serve` service that does NOT bind the oRPC contract: only ~3 of the 10 business
+  routes are implemented (list/get events, webhook ingress, health), and the webhook ingress reads
+  the raw `Request` (`c.req.raw`) to verify HMAC signatures over the exact bytes — incompatible with
+  oRPC's Zod input parsing, which would consume and transform the body and break signature
+  verification. Converging it to the `createPluginService` + contract-bound-implementer shape (as
+  workers/sagas/auth now do) requires implementing the 8 missing routes AND adding a new
+  `createPluginService` raw-route escape hatch in `@netscript/plugin/service` for HMAC webhooks — a
+  feature build + package-core change, not a soundness refactor. Split out per user decision ("Defer
+  to planned slice"); the other four plugins (workers/sagas/triggers-core/auth) are now SOUND.
+- **Owner:** #172 plugin convergence — triggers connector slice.
+- **Target:** Before #172 is considered fully converged (all five plugins on the canonical
+  thin-connector shape).
+- **Linked plan:** to be authored — PLAN-EVAL-gated, daemon-attached WSL Codex slice (per harness
+  implementation lane; this is a framework-source + feature build, not a doc/contract refactor).
+- **Created:** 2026-06-30
+- **Status:** open
+- **Gate:** triggers connector assembled via `triggersContractV1.$context<...>().router()` with all
+  10 business routes + describe implemented, the raw-body webhook served through a sanctioned
+  `createPluginService` raw-route capability, `main.ts` migrated to
+  `createPluginService(...).serve()`, zero `any` / `Record<string,unknown>` handler maps; scoped
+  check/lint/test green and `deno publish --dry-run` Success without `--allow-slow-types`.
+
+## plugins/streams — connector SOUND convergence deferred (`streams-connector-sound-deferred`)
+
+- **Reason:** Streams is the one plugin with NO oRPC contract surface —
+  `@netscript/plugin-streams-core` exposes producer ports, the `defineStreamSchema` /
+  `createDurableStream` builders, domain event types, diagnostics, and telemetry, but no
+  `contracts/v1`. So there is no "Hole A" contract-soundness slice to run (unlike
+  workers/sagas/triggers-core/auth). The streams connector (`plugins/streams/services/src/main.ts`)
+  is a **pure transparent proxy**: it starts the upstream `@durable-streams/server`
+  `DurableStreamTestServer` on an internal port and fronts it with a Hono app that serves
+  `/health[/live|/ready]` and then `app.all('/*')` proxies every other request (including the raw
+  streaming body, via `c.req.raw.body` + `duplex: 'half'`) to the upstream. That catch-all
+  passthrough cannot be expressed as an oRPC router, and `createPluginService`
+  (`@netscript/plugin/service`) is entirely `withRPC`-driven — so migrating the connector to the
+  canonical `createPluginService(...).serve()` shape requires the **same raw-route escape hatch**
+  the deferred triggers connector needs (see `triggers-connector-sound-deferred`). The connector
+  itself has no `any` / `Record<string,unknown>` handler maps; its only escapes are a platform-gap
+  `@ts-ignore` for `RequestInit.duplex` (not yet in Deno's lib types) in the proxy body.
+  Pre-existing minor `-core` casts unrelated to service-typesafety: `import.meta.env as any`
+  cross-runtime env probe in `stream-url-resolver.ts` and two `as unknown as` bridges to the
+  upstream `@durable-streams` generic types in `define-stream-schema.ts` — neither is an oRPC
+  Hole-A/Hole-B hole; left as-is pending the connector slice.
+- **Owner:** #172 plugin convergence — proxy-connector slice (fold with
+  `triggers-connector-sound-deferred`: both connectors are blocked on the one `createPluginService`
+  raw-route capability and should land in the same PLAN-EVAL-gated, daemon-attached WSL Codex slice
+  that builds it once).
+- **Target:** Before #172 is considered fully converged (all five plugins on the canonical
+  thin-connector shape).
+- **Linked plan:** to be authored jointly with the triggers connector slice — framework-source +
+  feature build (the raw-route escape hatch), not a doc/contract refactor.
+- **Created:** 2026-06-30
+- **Status:** open
+- **Gate:** streams connector `main.ts` migrated to `createPluginService(...).serve()` with the
+  upstream proxy served through the sanctioned `createPluginService` raw-route capability, base-meta
+  (`describe` + health) preserved, the `duplex` platform escape kept only if no typed Deno
+  equivalent exists; scoped check/lint/test green and `deno publish --dry-run` Success without
+  `--allow-slow-types`.
+
+## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
+
+- **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
+  applied-key storage remain backed by KV (`KvSagaIdempotencyStore` / `KvSagaAppliedKeyStore`).
+  Prisma `SagaIdempotencyPort` parity is intentionally out of scope for the sagas-prisma-store
+  slice.
+- **Owner:** Prime-time saga durability follow-up.
+- **Target:** Before advertising fully Prisma-only saga runtime persistence.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`
+- **Created:** 2026-06-20
+- **Status:** open
+- **Gate:** F-13; add Prisma idempotency/applied-key adapter tests and a Prisma-backed duplicate
+  message runtime test.
+
+## auth layer — AS7 documentation architecture metadata warnings
+
+- **Reason:** AS7's auth-scoped doctrine gate is hard-fail clean, but reports documentation
+  warnings: `packages/plugin-auth-core/README.md` has one TypeScript example instead of the doctrine
+  proxy's two-example target, `packages/plugin-auth-core/docs/architecture.md` does not include an
+  explicit `Archetype: <n>` token, and the auth backend packages/plugin omit package-local
+  `docs/architecture.md` files because their READMEs carry the public contract.
+- **Owner:** Auth architecture follow-up.
+- **Target:** Before auth beta documentation freeze.
+- **Linked plan:** `conformance-report.md`, `fitness-gates.md`, `jsr-scorecard.md` in branch
+  `feat/prime-time/auth-as7-fitness`.
+- **Created:** 2026-06-21
+- **Update (2026-06-24, PR2 #117):** the `docs/architecture.md` `Archetype:`-token portion of this
+  warning is now moot — all per-package `docs/` folders (incl.
+  `packages/plugin-auth-core/docs/architecture.md`) were removed in PR2; package public contracts
+  live solely in the rewritten READMEs + the published docs site. The README two-example-target
+  portion remains the live, open part of this debt.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task arch:check`; close when the auth-scoped doctrine warnings are zero or
+  explicitly demoted in the checker with documented rationale.
+
+## repo doctrine task — full historical scan remains red
+
+- **Reason:** Before AS7 wiring, `deno run --allow-read .llm/tools/fitness/check-doctrine.ts` from
+  the repository root exited nonzero on unrelated historical CLI/plugin doctrine debt. AS7 preserved
+  that full scan as `deno task arch:check:repo` and made `deno task arch:check` run the auth-owned
+  surfaces so the final auth slice has a green mechanical gate without refactoring out-of-scope
+  packages.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`.
+- **Created:** 2026-06-21
+- **Status:** RESOLVED 2026-08-12 by #1585 — `arch:check:repo` now iterates the same
+  `discoverDoctrineRoots()` selector as the curated task instead of evaluating the repository root
+  as a package. Its only remaining mechanical A14 failure was the checker's own negative-control
+  fixture string; the narrow leading quote/backtick data-line guard removes that self-reference
+  while a real unresolved global remains a failing control. The task exits 0 across all 36 roots.
+- **Gate:** `deno task arch:check:repo` exits 0 with no root-as-package A1 finding and no
+  self-referential A14 finding; `deno task arch:check` remains green.
+
+## release provenance — OIDC publish workflow deferred
+
+- **Reason:** JSR's provenance/SLSA score factor is publish-time only. AS7 originally found only
+  dry-runs and deferred OIDC publication.
+- **Owner:** Release process automation follow-up.
+- **Target:** Before first public auth package release.
+- **Linked plan:** `jsr-scorecard.md` in branch `feat/prime-time/auth-as7-fitness`.
+- **Created:** 2026-06-21
+- **Status:** RESOLVED 2026-07-17 by #811 — stable and canary workflows use the checked-in
+  `run-publish.ts` real-publish path with `id-token: write`; canary-first readiness and exact
+  production-E2E evidence now gate stable publication. The first live canary remains runtime
+  acceptance evidence and does not reopen this obsolete wiring debt.
+- **Gate:** add a GitHub Actions publish workflow with `permissions: id-token: write` and JSR
+  provenance enabled; satisfied structurally by `publish.yml` and `release-canary.yml` plus their
+  workflow contract tests.
+
+## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
+
+- **Reason:** `task-executor.ts` needs supervisor/executor/dispatcher split.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** RESOLVED 2026-07-06 (superseded) — the top-level `packages/workers` package named in
+  this heading no longer exists; it was superseded by `packages/plugin-workers-core` (plus the
+  `plugins/workers` connector) during the plugin re-architecture. The 1,287 LOC monolith is gone:
+  the successor `packages/plugin-workers-core/src/abstracts/task-executor.ts` is a 26 LOC abstract,
+  so the supervisor/executor/dispatcher split concern is fully addressed by the successor rather
+  than relocated. Heading retained as the historical record.
+- **Gate:** F-1, F-3, F-13
+
+## packages/sagas — AP-1 / doctrine verdict Refactor (list-transport.ts 847 LOC)
+
+- **Reason:** `list-transport.ts` should split; compensation should be a builder method.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-06-09 — Wave 4c slice C13 split the saga transport monoliths in
+  `@netscript/plugin-sagas-core`: `src/transports/list-transport.ts` now owns the transport class
+  and stable public re-exports while list command/key/recovery mechanics live in
+  `src/transports/list-transport-commands.ts`; `src/transports/redis-transport.ts` was split the
+  same way into `src/transports/redis-transport-commands.ts`. All four files are below the F-1 cap
+  and the transport entrypoint still passes raw `deno check --unstable-kv`. Supersession note
+  (2026-07-03): the top-level `packages/sagas` directory named in this heading no longer exists —
+  the code and this resolved debt live entirely in `packages/plugin-sagas-core`; the heading is
+  retained as the historical record.
+- **Gate:** F-1, F-13
+
+## packages/fresh — AP-1 / doctrine verdict Restructure (builders/mod.ts 1,110 LOC)
+
+- **Reason:** `builders/mod.ts` should split per builder concern with subpath exports.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** RESOLVED 2026-06-14 — Wave 5 consolidation Phase D split `builders/mod.ts` (1,110 LOC)
+  into `src/application/builders/` per-concern modules; max file now 497 LOC (< 500). Independent
+  IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED) confirmed F-1/F-5/F-11 PASS.
+- **Gate:** F-1, F-5, F-11
+
+## packages/fresh — F-7 full package doc-lint residue after 5d1
+
+- **Reason:** 5d1 support-spine FAIL_FIX cannot make broad `deno task doc-lint` pass without
+  implementing later 5d-owned public surfaces. The remaining diagnostics are concentrated in
+  builders/defer/form/streams/query, including direct upstream TanStack/durable-streams public type
+  exposure and missing JSDoc on later-slice symbols.
+- **Owner:** Wave 5d `@netscript/fresh` chain; final closeout owner is 5d6 query/server/package
+  surface.
+- **Target:** Close before merging 5d into Wave 5 apps; 5d6 must prove `deno task doc-lint` passes
+  from `packages/fresh`.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md`;
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
+- **Created:** 2026-06-13
+- **Status:** RESOLVED 2026-06-14 — `deno task doc-lint` now passes from `packages/fresh` (0
+  findings, 12 entrypoints). Independent IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED)
+  confirmed F-7/F-5 PASS at HEAD.
+- **Gate:** F-7, F-5, `deno task doc-lint` from `packages/fresh`.
+
+## packages/service — doctrine verdict Refactor
+
+- **Reason:** `presets/` and `assets/` need role clarification.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** open
+- **Gate:** F-3, F-11
+
+## packages/service — assets/scalar.min.js (3.3 MB vendored in publish)
+
+- **Reason:** `assets/scalar.min.js` (3.3 MB) is vendored and included in the JSR publish so that
+  offline/no-CDN Scalar docs work for JSR-installed consumers. The size is acceptable for alpha but
+  should be revisited before beta (lazy npm specifier, optional peer dependency, or CDN-only mode).
+- **Owner:** Wave 5a `@netscript/service` generator (D-9).
+- **Target:** Revisit before beta; no 2027-Q1 commitment unless publish-size limits change.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5a-service/plan.md` (D-9).
+- **Created:** 2026-06-15 (PLAN-EVAL advisory finding #2).
+- **Status:** open, DEBT_ACCEPTED. Locked decision D-9 keeps the vendored asset; this entry tracks
+  the revisit.
+- **Gate:** F-14, JSR publish-size limits; close when an alternative delivery mechanism (lazy
+  specifier, optional peer, or CDN-only flag) replaces the vendored file without breaking offline
+  docs.
+
+## packages/service — T4 slow-type publish carve-out
+
+- **Reason:** Hono/oRPC service builder schemas still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Make Zod schemas source-of-truth behind explicit exported service interfaces before
+  beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
+- **Gate:** F-6; close when `packages/service` dry-run passes without `--allow-slow-types`.
+
+## packages/plugin — AP-1 / doctrine verdict Restructure (types.ts 1,005 LOC)
+
+- **Reason:** `types.ts` should split per concept and introduce `domain/` plus `ports/`.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-06-08 — Wave 3 `@netscript/plugin` host track verified the old monolithic
+  `types.ts` no longer exists. The package now exposes role-named `src/domain/`, `src/ports/`,
+  `src/config/`, `src/cli/`, `src/sdk/`, `src/testing/`, and diagnostics surfaces through curated
+  entrypoints. Remaining builder size debt is tracked separately below.
+- **Gate:** F-1, F-3, F-5, F-11
+
+## packages/plugin — T4 slow-type publish carve-out
+
+- **Reason:** Plugin manifest/builder generic helpers still require
+  `deno publish --allow-slow-types` under Deno 2.8 publish analysis. This is accepted
+  score-impacting debt for the toolchain upgrade, not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Reduce generic helper leakage behind explicit public plugin definition interfaces
+  before beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
+- **Gate:** F-6; close when `packages/plugin` dry-run passes without `--allow-slow-types`.
+
+## packages/plugin/src/config/builders/plugin-builder.ts — F-1 size (360 LOC)
+
+- **Reason:** `plugin-builder.ts` remains above the doctrine 300 LOC planning cap (343 LOC at base
+  `89071df`, 360 LOC after Wave 3 added public JSDoc in slice 4). It is a typestate-generic fluent
+  builder and splitting it during Wave 3 risks breaking the public chain.
+- **Owner:** Wave 3 `@netscript/plugin` host generator.
+- **Target:** Pre-beta builder refactor.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave3-plugin--host/plan.md` (LD-3, slice 19).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED
+- **Gate:** F-1, A4 builder split follow-up
+
+## packages/plugin/src/sdk/discovery/ast-extractor.ts — PLG-WALKER-AST (extractor precision)
+
+- **Reason:** Group G needs walker-generated registries now, but a full TypeScript AST resolver with
+  symbol binding, import graph traversal, and expression evaluation exceeds the polish slice. The
+  implementation intentionally uses a bounded regex extractor for direct
+  `export const name = defineJob|defineSaga|defineWebhook(...)` call sites and records this debt
+  before slice G10-3 as required by evaluator finding 3.
+- **Owner:** Plugin platform maintainers.
+- **Target:** Replace with compiler-backed AST extraction before plugin platform stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-plat-impl-polish--plan-and-impl/plan.md` (G10-3).
+- **Created:** 2026-05-20
+- **Status:** open
+- **Gate:** PLG-WALKER-AST, F-5, F-11
+
+## packages/plugin-streams-core — AP-13 console.warn runtime reporting
+
+- **Reason:** `DurableStreamProducer` previously used `console.warn` for connection, pending-event,
+  serialization, and primary-key visibility in published runtime code. The warning debt was accepted
+  for alpha operator visibility until structured producer telemetry was available.
+- **Owner:** `@netscript/plugin-streams-core` maintainers.
+- **Target:** Completed by the #1326 reconnect supervisor telemetry integration.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (D6, slice 4).
+- **Created:** 2026-06-08
+- **Status:** closed 2026-08-09 by #1402; no broader AP-13 waiver or closure is implied.
+- **Gate:** F-14, AP-13. `DurableStreamProducer` now emits receipt outcomes, retry/recovery/state
+  metrics, and one publish span across reconnect. Manual F-14 evidence finds no executable
+  `console.*` below `packages/plugin-streams-core/src`; the sole match is a documentation example in
+  `src/diagnostics/inspect-stream-topic.ts`.
+
+## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
+
+- **Reason:** Generic durable topic publish/subscribe transport remains deferred. The existing
+  `@netscript/plugin-streams-core` `createDurableStream` transport publishes State Protocol
+  upsert/delete events through `@durable-streams/client`; it does not expose a generic topic
+  consumer/subscriber channel for `StreamTopicDefinition<TPayload>` payloads. That capability
+  requires a cross-package runtime contract and consumer SDK, beyond entity-state replication.
+- **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
+- **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
+- **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.
+- **Created:** 2026-06-19
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a real durable topic transport exists with producer delivery, consumer
+  subscription/unsubscribe semantics, and runtime tests proving a published payload reaches a
+  subscribed handler without relying on manifest-layer no-ops.
+
+- **0.0.8 remediation (#1369):** Removed the unconditional-throw producer/consumer helpers, handle
+  types, and unsupported-operation error factories from the plugin root and implementation. The
+  public-consumer regression rejects those root exports; README and streams documentation migrate
+  publishing to `@netscript/plugin-streams-core` and consumption to HTTP/SSE. The generic topic
+  transport remains deferred under this entry's existing gate. Documenting a caveat does not close a
+  defect; removing the unsupported public contract resolves the root honesty defect without claiming
+  a new topic transport.
+
+## packages/watchers — AP-13 console.warn runtime reporting
+
+- **Reason:** `FileWatcher` and `HybridWatchStrategy` currently use `console.warn` for native
+  watcher fallback and runtime access-failure visibility. The warnings are intentionally retained
+  for alpha operator diagnostics; replacing them correctly requires a structured telemetry or logger
+  dependency that is outside Wave 4a's package-quality scope.
+- **Owner:** `@netscript/watchers` maintainers.
+- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (S23 final debt sweep).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-14, AP-13; close when watcher runtime warnings emit through a structured reporter and
+  `console.warn` is absent from `packages/watchers/src/file-watcher.ts` and
+  `packages/watchers/src/strategies/hybrid.ts`.
+
+## packages/cli — AP-1 / doctrine verdict Restructure
+
+- **Reason:** `pipeline.ts` and `official-plugin-copier.ts` are monoliths; package should move
+  toward Archetype 6 layout.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** closed 2026-06-17 — Wave 6 completed the bounded A6 promotion for `@netscript/cli`:
+  command registry/deploy target seams, scaffold/init pipeline split, JSON init output, preset
+  extension seam, schema mirror, and final F-CLI gate sweep. The local `scaffold.runtime` fixture
+  stayed `passed=41 failed=0`, CLI doc lint and CLI publish dry-run passed, and focused F-CLI gates
+  pass. The only remaining related sub-item is the deliberately deferred
+  `scaffold.published.runtime` proof, tracked to post-S3 step F rather than AP-1.
+- **Gate:** F-1, F-3, F-10, AP-18 manual review
+- **Slice 8 update:** `commands/init/pipeline.ts` was decomposed into
+  `src/public/application/init/**`; this entry remains open for `official-plugin-copier.ts` and
+  remaining CLI debt.
+
+## packages/cli — cli/maintainer-mode-mixing
+
+- **Reason:** Public CLI code currently exposes local-source and monorepo concepts that must move
+  behind the workspace-only `netscript-dev` command graph.
+- **Owner:** refactor-cli-doctrine-rewrite.
+- **Target:** Close after slice 25.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md`
+- **Created:** 2026-04-30
+- **Status:** open
+- **Gate:** F-CLI-3, F-CLI-4, F-CLI-11
+
+## packages/cli — cli/no-permissions-doc
+
+- **Reason:** The CLI permissions contract is not documented by command and binary, which leaves
+  public and maintainer runtime requirements ambiguous.
+- **Owner:** refactor-cli-doctrine-rewrite.
+- **Target:** Close after slice 28.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md`
+- **Created:** 2026-04-30
+- **Status:** open
+- **Gate:** F-CLI-8, F-CLI-10
+
+## packages/cli — cli/doctrine-drift-phase-10
+
+- **Reason:** Phase 10 removed the audited master-era roots, but post-PR review found the package
+  still failed the stricter readability and consistency bar now codified in Archetype 6 v2: command
+  surfaces remain too flat, composition still owns command body shape, templates and adapters need
+  normalized placement, and output/exit edges need hard enforcement.
+- **Owner:** refactor-cli-doctrine-rewrite.
+- **Target:** Close by slice 63.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md`
+- **Created:** 2026-05-01
+- **Status:** closed 2026-05-01 — Phase 11 slices 49-63 completed the kernel rename, binary
+  extraction, vertical slicing, declarative composition, exit discipline, template consolidation,
+  and executable F-CLI-1..31 gate wiring for the CLI package.
+- **Gate:** F-CLI-1..31 plus universal F-16, F-17, F-18
+
+## packages/cli — cli/archetype-6-v2-pending-scripts
+
+- **Reason:** Slice 48 registers Archetype 6 v2 gates F-CLI-14 through F-CLI-31 before all
+  enforcement scripts exist. Temporary manual evidence is allowed only while Phase 11 implements the
+  scripts.
+- **Owner:** refactor-cli-doctrine-rewrite.
+- **Target:** Close by slice 62.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md`
+- **Created:** 2026-05-01
+- **Status:** closed 2026-05-01 — slice 62 added and wired the F-CLI-14..31 fitness scripts;
+  `deno
+  task arch:check` runs without `pending-script marker` output.
+- **Gate:** F-CLI-14..31
+
+## packages/shared — AP-2 / doctrine verdict Rewrite (datetime.ts 1,112 LOC)
+
+- **Reason:** `utils/datetime.ts` should be replaced by `@std/datetime` or platform primitives;
+  `shared` should shrink to cross-package identifiers.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** RESOLVED 2026-07-06 (superseded) — the `packages/shared` package named in this heading
+  no longer exists; the whole package was removed during the re-architecture. `utils/datetime.ts`
+  was already deleted in Wave 0, and with the package itself gone the "shrink `shared` to
+  cross-package identifiers" concern and the residual `@shared/utils` compatibility tracking are
+  both moot. Heading retained as the historical record. (Prior note, retained: partially closed
+  2026-06-05 — datetime helper deleted; published surface free of generic datetime helpers.)
+- **Gate:** F-1 and F-2 closed for datetime; residual F-11 concern moot now that `packages/shared`
+  is deleted
+
+## plugins/triggers — doctrine verdict Refactor
+
+- **Reason:** Confirm `verify-plugin.ts` exists and plugin verification shape matches Archetype 5.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** open
+- **Gate:** F-3, F-9, F-11
+
+## plugins/workers — doctrine verdict Refactor
+
+- **Reason:** Confirm `verify-plugin.ts` exists and review `worker/` versus `jobs/` split.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
+- **Created:** 2026-04-29
+- **Status:** open
+- **Gate:** F-3, F-9, F-11
+
+## packages/cli — public-api doc completeness (`cli/public-api-doc-completeness`)
+
+- **Reason:**
+  `deno doc --lint packages/cli/mod.ts packages/cli/scaffolding.ts packages/cli/testing.ts` reports
+  48 residual `private-type-ref` errors after the Phase 12 evaluator pass. Public `Add*Dependencies`
+  interfaces name concrete kernel adapter classes (`DatabaseWorkspaceMutator`,
+  `PluginWorkspaceMutator`, `ServiceWorkspaceResolver`, `PortAllocator`, `DbEngineRegistry`,
+  `PluginKindRegistry`) and through them surface internal collaborators (`Registry`,
+  `DiscoveredService`, `PluginScaffoldResult`, `ResolvedXxxConfig`, `CompileResult`, etc.). Plan
+  goal #3 ("100% JSR documentation score") is not fully met.
+- **Owner:** `@netscript/cli` maintainers.
+- **Target:** before the next public minor; tracked as plan slice 67.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md` (slice 67).
+- **Created:** 2026-05-01 (evaluator pass).
+- **Status:** open. Publish dry-run still passes; this is doc-completeness, not a publish blocker.
+- **Gate:** F-CLI-8 (doc score), F-7 (universal doc-score gate).
+
+## packages/aspire — public schema doc-lint completeness (`aspire-public-schema-doc-lint`)
+
+- **Reason:** `deno doc --lint packages/aspire/mod.ts` reports 32 pre-existing public API doc-lint
+  errors in `config.ts` and `types.ts`: exported Zod schema constants lack explicit type
+  annotations, and public types derived with `z.infer` reference Zod's private `output` helper type.
+  The slice 1 OTEL vocabulary change adds an explicit dashboard env constant and does not introduce
+  these schema/type failures. `deno publish --dry-run --allow-dirty --no-check=remote` from
+  `packages/aspire` fails on the same slow-type class, while
+  `deno publish --dry-run --allow-dirty --no-check=remote --allow-slow-types` succeeds. Fixing the
+  package-wide Zod public surface would exceed the OTEL parity slice.
+- **Owner:** `@netscript/aspire` maintainers.
+- **Target:** before the next public Aspire package release.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slice 1 doc-lint gate).
+- **Created:** 2026-05-03
+- **Status:** superseded by `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl`: root
+  `deno doc --lint packages/aspire/mod.ts` now passes after narrowing the root contract. Schema
+  subpath/public schema publish hardening remains owned by the future Aspire/schema package work if
+  that subpath is promoted as stable.
+- **Gate:** F-5, F-7
+
+## packages/telemetry/src/instrumentation/{saga,worker,scheduler}.ts — AP-1/F-1 active compatibility debt (`telemetry-plugin-instrumentation-extraction`)
+
+- **Reason:** `saga.ts`, `worker.ts`, and `scheduler.ts` remain active and exported from
+  `@netscript/telemetry/instrumentation` because current worker/scheduler/saga packages and official
+  plugins still import those helper symbols. Removing them during Group A would break consumer
+  coherence. This intentionally defers the extraction that was partially reversed by the
+  compatibility restoration.
+- **Owner:** Future worker, scheduler, saga, and plugin runtime package groups.
+- **Target:** Move domain-specific instrumentation to the owning future plugin/package subpaths
+  before the next plugin-platform stabilization pass.
+- **Linked plan:** `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/plan.md` and
+  `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/drift.md`.
+- **Created:** 2026-05-08
+- **Status:** open, DEBT_ACCEPTED for Foundation alpha only.
+
+## packages/config — plugin-specific schema/config ownership (`config-plugin-specific-schema-debt`)
+
+- **Reason:** Core config still owns plugin-specific concerns in `src/schema/plugins/mod.ts`,
+  `src/domain/worker-schema.ts`, `src/domain/saga-schema.ts`, `src/domain/trigger-schema.ts`,
+  `src/domain/runtime-config-schema.ts`, and deploy/runtime plugin config surfaces. These remain
+  temporarily because the future plugin-specific packages/subpaths that should own them are not
+  present yet and CLI/generated project consumers depend on the current shapes.
+- **Owner:** Group D (workers) for worker/job/permissions schemas; future groups for
+  sagas/triggers/runtime.
+- **Target:** Move worker/job/permissions schemas to `@netscript/plugin-workers-core/config` in
+  Group D. Move saga/trigger/runtime schemas in their respective groups. Keep `@netscript/config`
+  focused on project-level loader/composition contracts.
+- **Linked plan:** `.llm/tmp/run/feat-plat-impl-workers--plan-and-impl/plan.md` slice D-config.
+- **Created:** 2026-05-08
+- **Status:** in-progress: workers extracted; sagas/triggers pending
+- **Gate:** F-3, F-5, F-7, plugin import/platform fitness gates
+- **Notes:** Group D rescoped plan (2026-05-10) adds D-config slice to extract worker/job config
+  schemas to `@netscript/plugin-workers-core/config/`. The accepted D4 path is no-shim TRUE_CLOSE:
+  workers core does not import or re-export through `@netscript/config`. Legacy config ownership
+  remains only until D28-D29 migrate consumers and delete the old worker config copies.
+
+## packages/aspire/deno.json — `./helpers` alpha compatibility subpath (`aspire-helpers-subpath-shim`)
+
+- **Reason:** The forbidden `helpers/` folder was removed, but
+  `./helpers -> ./src/application/mod.ts` remains as an alpha compatibility subpath while generated
+  AppHost/helper consumers migrate to `@netscript/aspire/application`.
+- **Owner:** Future Aspire/AppHost generator migration group.
+- **Target:** Remove the `./helpers` export after generated projects and package consumers import
+  `@netscript/aspire/application`.
+- **Linked plan:** `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/plan.md` and
+  `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/drift.md`.
+- **Created:** 2026-05-08
+- **Status:** closed 2026-06-07 — Wave 2a slice 8 (`37665e2`) removed the `./helpers` export from
+  `packages/aspire/deno.json`; grep for `@netscript/aspire/helpers` across `packages/` and
+  `plugins/` returns zero consumers. F-5 (public surface matches export map), F-7 (doc-lint clean on
+  all 8 entrypoints), F-11 (no `helpers/` folder) verified by IMPL-EVAL.
+- **Gate:** F-5, F-7, F-11, F-18
+
+## runtime — Aspire OTEL CLI Dashboard API discovery fails (`aspire-otel-cli-discovery`)
+
+- **Reason:** Slice 5 can start the master C# AppHost and verify Deno runtime resources with full
+  OTEL env (`OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318`, protocol `http/protobuf`, sampler
+  `always_on`). Direct Aspire Dashboard telemetry API probes return `200` for
+  `/api/telemetry/resources`, `/api/telemetry/logs`, and `/api/telemetry/traces`, but
+  `aspire otel
+  logs` and `aspire otel traces` still fail with "Dashboard API is not available."
+  This blocks CLI-command evidence, not trace capture itself.
+- **Owner:** runtime validation / Aspire CLI environment.
+- **Target:** before claiming `aspire otel ...` CLI parity as PASS.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slices 5-6 runtime parity
+  procedure).
+- **Created:** 2026-05-03
+- **Status:** open. Slice 5 records `PASS_WITH_CLI_DEBT` evidence in
+  `.llm/tmp/run/feat-cli-aspire-otel-parity/baseline-csharp-trace.md`; slice 6 may compare trace
+  shape through the Dashboard API, but final PR must not claim the `aspire otel` CLI path passed.
+- **Aspire 13.5.3 re-verification (2026-08-30, #1714):** The generated-project runtime pass
+  reproduced the same discovery boundary: bare `aspire otel logs --format Json -n 10` exited 12 in
+  0.34 s with `dashboard unavailable`, while the same probe with the exact `--dashboard-url` exited
+  0 in 0.62 s. The debt remains open and the generated telemetry fallback remains required.
+  Evidence: `.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v4-*`.
+- **Gate:** runtime - C# baseline, runtime - telemetry
+
+## packages/cli — legacy C# scaffold plugin-add incompatibility (`legacy-csharp-scaffold-plugin-add`)
+
+- **Reason:** The runtime plan required a generated C# scaffold covering official plugins, handmade
+  plugin, db, service, worker, trigger, saga, and frontend. `netscript init --legacy-aspire` creates
+  a legacy C# AppHost project under `dotnet/AppHost`, but `netscript plugin add worker` then fails
+  while regenerating helpers because it expects an `aspire/` directory. The command partially writes
+  plugin files and `appsettings.json`, but the generated C# `Program.cs` remains frontend-only.
+- **Owner:** CLI scaffold/runtime maintainers.
+- **Target:** before using generated legacy C# scaffolds for full plugin runtime parity baselines.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slice 5 scaffolded project
+  spec).
+- **Created:** 2026-05-03
+- **Status:** open. Slice 5 used the master checkout itself as the C# reference after recording
+  drift; no C# package edits were made.
+- **Gate:** runtime - C# baseline, regression
+
+## runtime — generated TS scaffold local import overlay (`generated-ts-scaffold-local-import-overlay`)
+
+- **Reason:** Slice 6 generated TS scaffolds reference unpublished `@netscript/*` package imports,
+  while the current `netscript init` command no longer accepts the documented `--local` mode.
+  Runtime validation required an ignored local import-map overlay that maps package exports to
+  worktree file URLs and pins `@logtape/logtape@^2.0`.
+- **Owner:** CLI scaffold/runtime maintainers.
+- **Target:** before declaring generated scaffold runtime parity without harness-only overlays.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slice 6 runtime parity).
+- **Created:** 2026-05-03
+- **Status:** open. The overlay is documented in `scaffold.md`; generated source was not committed.
+- **Gate:** runtime - generate, runtime - start
+
+## runtime — generated TS frontend React reference (`generated-ts-frontend-react-reference`)
+
+- **Reason:** Slice 6 generated frontend route fails with `ReferenceError: React is not defined`.
+  The dashboard trace exists and includes Fresh/page spans, but it is a 500 trace rather than a
+  successful frontend-origin E2E parity trace.
+- **Owner:** Fresh/frontend scaffold maintainers.
+- **Target:** before claiming `runtime - E2E trace` as plain PASS.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slice 6 runtime parity).
+- **Created:** 2026-05-03
+- **Status:** open. Trace `5e7adbe64e93c5cc4b0da94d6dfb1b20` records the failure and confirms OTEL
+  ingestion works for the frontend resource.
+- **Gate:** runtime - E2E trace, runtime - span attrs
+
+## runtime — generated TS sample E2E chain missing (`generated-ts-sample-e2e-chain`)
+
+- **Reason:** The generated TS scaffold's sample resources expose healthy service/plugin API
+  endpoints and Deno OTel spans, but they do not provide the same trigger -> queue -> worker chain
+  captured from the master C# baseline. A manual Deno probe proves traceparent propagation for a
+  client fetch into the `users` service, but not the required full parity chain.
+- **Owner:** CLI sample/runtime maintainers.
+- **Target:** before claiming generated TS trace shape parity with the C# baseline.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slice 6 runtime parity).
+- **Created:** 2026-05-03
+- **Status:** open. `ts-apphost-trace.md` records healthy resource traces and the missing chain.
+- **Gate:** runtime - E2E trace, runtime - span attrs
+
+## runtime — DB lifecycle conflicts with strict container hygiene (`runtime-db-hygiene-persistent-container`)
+
+- **Reason:** Removing the generated persistent Postgres container between `db init`/`db seed` and
+  final `aspire start` erases the migrated database, causing `otel-parity-db` health to fail with
+  `database "otel-parity-db" does not exist`. The successful Slice 6 run preserved the migrated
+  generated Postgres container between DB lifecycle and final trace capture.
+- **Owner:** runtime validation / generated DB orchestration maintainers.
+- **Target:** before requiring strict container removal between generated DB lifecycle and AppHost
+  trace capture.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (run hygiene).
+- **Created:** 2026-05-03
+- **Status:** open. Final cleanup stopped AppHost, removed generated containers, and confirmed ports
+  `4318` and `18888` were free.
+- **Gate:** runtime - start, runtime - describe
+
+## packages/cli — runtime schema generation plugin dependency gap (`cli-runtime-schemas-plugin-dependency`)
+
+- **Reason:** Slice 7 regression exercised the current project-level generation surface. The
+  historical `netscript generate` gate in the plan is stale: the current command group only exposes
+  `generate runtime-schemas`. Running `generate runtime-schemas --dry-run` against a fresh scaffold
+  after `plugin add worker` failed because the temporary generated plugin registry imports
+  `@netscript/plugin`, but the scaffold's import map/dependencies do not resolve that package.
+- **Owner:** CLI generation/plugin maintainers.
+- **Target:** before treating `generate runtime-schemas` as a clean generated-project regression
+  gate.
+- **Linked plan:** `.llm/tmp/run/feat-cli-aspire-otel-parity/plan.md` (slice 7 validation matrix,
+  `runtime - generate`).
+- **Created:** 2026-05-03
+- **Status:** open. The OTEL-related regeneration paths still passed through `db add` and
+  `plugin add`, each of which regenerated 12 Aspire helper files. The failing command is recorded as
+  `DEBT_ACCEPTED` for Slice 7 rather than folded into the OTEL implementation.
+- **Gate:** runtime - generate, regression
+
+## packages/plugin-workers-core/contracts — structural server contract export (`workers-contract-structural-server-export`)
+
+- **Reason:** `workersContractV1` is exported as a structural server-contract type to keep JSR
+  slow-type findings at 0. The shape preserves route keys but weakens deep handler-options inference
+  inside the workers service routers, so the server contract uses a narrow structural handler shim
+  instead of exporting the full inferred oRPC server type.
+- **Owner:** Workers core maintainer.
+- **Target:** Remove the structural handler shim and restore deep server-contract inference once
+  oRPC exposes a wrapper that preserves JSR slow-type cleanliness, or once TypeScript/JSR no longer
+  reports slow types for the inferred server contract.
+- **Linked plan:** `.llm/tmp/run/feat-plat-impl-workers-v2--plan-and-impl/plan.md`,
+  `.llm/tmp/run/feat-plat-impl-workers-v2--plan-and-impl/drift.md`, and
+  `.llm/tmp/run/feat-plat-impl-workers-v2--plan-and-impl/evaluate.md`.
+- **Created:** 2026-05-11
+- **Status:** open, DEBT_ACCEPTED for Group D merge.
+- **Gate:** core/plugin `deno publish --dry-run --allow-dirty` stays at 0 slow-type errors, then
+  remove the structural contract shim without reintroducing service-router casts or slow types.
+
+## packages/cli — maintainer sync isolated-declarations slow types (`cli-maintainer-sync-isolated-declarations`)
+
+- **Reason:** `deno check` on the `@netscript/cli` public graph (task `check`, via `maintainer.ts`)
+  reports 3 isolated-declarations slow-type errors (TS9016/TS9027) on the shorthand `_internal`
+  object export in `packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin.ts:205`.
+  The object needs an explicit type annotation (or non-shorthand entries) to satisfy
+  `--isolatedDeclarations`.
+- **Owner:** `@netscript/cli` maintainers / CLI doctrine track (Archetype 6).
+- **Target:** Next CLI package-quality wave; not the Wave 2c messaging sub-wave.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md` (CLI track).
+- **Created:** 2026-06-07 (Wave 2c IMPL-EVAL).
+- **Status:** open, DEBT_ACCEPTED for Wave 2c. Pre-existing on base `55f6108`; the file is
+  byte-identical to base and imports neither `@netscript/queue` nor `@netscript/cron`, so it is
+  unrelated to the 2c rename. The 2c slice-16 consumer gate surfaced it. The actual queue/cron
+  consumers — `plugins/triggers` and `plugins/workers` — both pass `deno task check`, confirming the
+  `interfaces/`→`ports/` and `./types`→`./ports` rename is non-breaking.
+- **Gate:** `deno check ./maintainer.ts` from `packages/cli` reports 0 TS9016/TS9027 errors.
+
+## root toolchain — R3 held dependency majors (`toolchain-r3-held-dependency-majors`)
+
+| Status        | Package                     | Reason                                                            | Revisit                                                |
+| ------------- | --------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------ |
+| DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
+
+- **Owner:** Toolchain upgrade R3 follow-up.
+- **Target:** Before beta dependency freeze.
+- **Linked plan:**
+  `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/sub-agent-briefs/R3.md`.
+- **Created:** 2026-06-16.
+- **Status:** open, DEBT_ACCEPTED. R3 follow-up removed `@fedify/amqp`, `@fedify/denokv`,
+  `@fedify/redis`, `@durable-streams/state`, and `amqplib` from this debt after maintainer approval
+  and green validation.
+- **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
+  targeted package checks and `deno task publish:dry-run` pass after each migration.
+
+## plugins/sagas/src/runtime — saga runtime folder cardinality (`sagas-runtime-folder-cardinality`)
+
+- **Reason:** The `sagas-prisma-store` slice adds a Prisma durable state adapter and backend
+  resolver beside the existing saga runtime modules. The public runtime export remains stable, but
+  the folder now exceeds the doctrine cardinality warning threshold and needs a follow-up split of
+  store/backend implementation files into a role-named subfolder without changing the exported
+  runtime API.
+- **Owner:** saga runtime maintainers.
+- **Target:** before beta package-quality freeze.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED for `sagas-prisma-store`; no `SagaStorePort` or `KvSagaStore`
+  behavior changes are included in the debt.
+- **Gate:** F-16 folder cardinality is back under threshold and F-13 saga runtime invariants remain
+  green.
+
+## packages/auth-{workos,better-auth} — duplicated backend error + token helpers (`AS2-CONSOLIDATION`)
+
+- **Reason:** AS2a refactored `@netscript/auth-workos` and `@netscript/auth-better-auth` into pure
+  `AuthBackendPort` backends. Each package independently defines an identical
+  `AuthBackendOperationUnsupportedError` class (backendName/operation/reason) and a duplicated
+  `signSessionToken` / `verifySessionToken` helper pair. The shared shape belongs in
+  `@netscript/plugin-auth-core` so all backends (incl. kv-oauth and future tier-2) reference one
+  error type and one token-helper implementation.
+- **Owner:** Track-5 auth-plugin program; AS3 (unified `plugins/auth` oRPC service) is the
+  consolidation point.
+- **Target:** Lift the shared error class + token helpers into `@netscript/plugin-auth-core` during
+  AS3, then have AS2 backends import them.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2a-backends-refactor/evaluate.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED at AS2a PASS (qwen3.7-max run 27874783640, PR #87). Non-blocking;
+  both backends compile/test/lint/fmt clean with the duplicated definitions.
+- **Gate:** `AuthBackendOperationUnsupportedError` and `sign/verifySessionToken` are defined once in
+  `@netscript/plugin-auth-core` and imported by both backends; backend tests stay green.
+
+## packages/auth-kv-oauth — OIDC e2e coverage + RFC 9207 iss validation (`AS2B-KV-OAUTH-DEBT`)
+
+- **Reason:** AS2b landed `@netscript/auth-kv-oauth` as a pure KV-backed OAuth2/OIDC
+  `AuthBackendPort` backend. The OIDC branch (nonce + id_token via `@panva/oauth4webapi`) is
+  correctly wired but **untested end-to-end** — the test provider fixture is `kind:'oauth'` and
+  never exercises `kind:'oidc'`. Separately, the callback `iss` response param is stored in the txn
+  but not passed as `expectedIssuer` to `validateAuthResponse`, so RFC 9207 issuer validation is not
+  enforced (defense-in-depth; state + PKCE already bind the response).
+- **Owner:** Track-5 auth-plugin program. Item 1 (OIDC e2e) folds naturally into AS3, where the
+  unified oRPC service exercises the OIDC flow end-to-end.
+- **Target:** Add an OIDC-kind provider fixture (with issuer) validating nonce round-trip + id_token
+  claim extraction; pass `expectedIssuer` on callback validation. Address by/within AS3.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2b-kv-oauth/evaluate.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED at AS2b PASS (qwen3.7-max run 27874924828, PR #88). Non-blocking;
+  evaluator classified both items as good first follow-ups, not merge blockers. v1-deferred extras
+  (PAR/DPoP opt-in, active key-rotation, tier-2/generic presets, global-logout index) remain per
+  LD-12.
+- **Gate:** An OIDC-kind e2e test asserts nonce + id_token claims; callback passes `expectedIssuer`
+  to `validateAuthResponse`; package tests stay green.
+
+## plugins/*/services — oRPC router-composition `any` + external-boundary casts (cross-plugin) (`plugin-service-router-composition-any`)
+
+This entry covers **two classes** of accepted, pre-existing, cross-plugin type drift that every
+current feature / quality-hardening / auth slice must LEAVE IN PLACE (they pre-date the slices and
+match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining either class.
+
+### Class A — oRPC router-composition `any` (top-level `router.ts`)
+
+- **Reason:** Every plugin service confines one-or-more `// deno-lint-ignore no-explicit-any` casts
+  to its **top-level router-composition file** (`plugins/<plugin>/services/src/router.ts`): the
+  `v1: any` version group, `os.prefix('/v1/<plugin>').router(<map> as any)`, and
+  `router: any = os.router({ v1 })`. The handler map in
+  `plugins/<plugin>/services/src/routers/v1-handlers.ts` is correspondingly typed
+  `Record<string, unknown>`. Root cause is the shared contract wrapper: `<plugin>ContractV1` is
+  built as `implement(<def>) as unknown as <Plugin>ContractV1`, whose `$context<T>()` exposes a
+  hand-rolled `.handler(fn): TOutput` that returns the handler **output** rather than a typed oRPC
+  _procedure_, so `os.router(map)` cannot type-check the map without `any`. This is the
+  consumer-side manifestation of the contract-side debt `workers-contract-structural-server-export`
+  (structural server-contract shim that weakens deep handler-options inference). Confirmed present
+  in the merged exemplar `plugins/sagas/services/src/router.ts:39-44,71-75`; the same pattern exists
+  (or is being made to match it) in `workers`, `triggers`, `streams`, and `auth`.
+
+### Class B — external-boundary `as unknown as` / `as <T>` casts (SDK adapters, KV/db clients, bootstrap)
+
+- **Reason:** Every plugin service carries pre-existing single-step boundary casts where an
+  **external or untyped surface** is narrowed to the plugin's internal port type. These are NOT in
+  handler business logic — they sit at the I/O seam between third-party SDKs / Deno KV / Prisma
+  clients / plugin-bootstrap context and the service's typed interior. They are arbitrary in the
+  sense that the external surface cannot be made to flow its own precise type to the port without a
+  dedicated adapter-typing pass. Confirmed in the merged exemplar:
+  `plugins/sagas/services/src/main.ts:89,102` (`dbClient as unknown as PrismaSagaStoreClient`,
+  `... as unknown as SagaStreamPrismaClient`), `v1-helpers.ts` (KV deserialization), and the same
+  class exists across `workers`, `triggers`, `streams`, and `auth`. In `auth` specifically:
+  `services/src/backend-registry.ts` (WorkOS SDK session client, `ArrayBuffer` views),
+  `services/src/init.ts` (`WatchableKv`, `PluginServiceContext`), `services/src/main.ts`
+  (`ServiceDatabaseClient`, the `AuthRunningService` builder return, `PluginServiceBootstrap`).
+- **Owner:** Future cross-plugin oRPC-seam fix branch (one dedicated branch reworking the shared
+  `$context` contract wrapper to the native oRPC `implement(<contractDefinition>).$context<T>()`
+  builder so `.router({...})` returns properly-typed procedures and `os.router(map)` type-checks
+  with ZERO `as any` — AND introducing per-adapter typed shims that retire the Class-B boundary
+  casts). NOT owned by any feature, quality-hardening, or auth slice.
+- **Target:** Post-framework-prime-time, before beta. All plugins migrate together so the contract
+  wrapper and every `router.ts` change in lock-step.
+- **Linked plan:** related contract-side debt `workers-contract-structural-server-export` (above).
+- **Created:** 2026-06-21.
+- **Status:** open, DEBT_ACCEPTED. **SANCTIONED for now** — matching the merged sagas exemplar
+  (casts confined to the top-level router-composition file, each with `deno-lint-ignore`, zero casts
+  elsewhere) is the conformant target for all current slices.
+- **Agent directive (read before failing a slice on this):** Do NOT attempt to remove the Class-A
+  composition `any` casts, un-widen the `Record<string, unknown>` handler maps, change the contract
+  package, OR rewrite the Class-B external-boundary `as unknown as` / `as <T>` casts, inside a
+  feature / quality-hardening / auth slice. Mirroring the sagas exemplar IS conformant and IMPL-EVAL
+  must NOT FAIL a slice for retaining EITHER the sanctioned router-composition casts (Class A) or
+  the pre-existing external-boundary casts (Class B) that match sagas. The only out-of-scope cast
+  error is a **NEW** cast a slice INTRODUCES in handler / business-logic / contract code (outside
+  `router.ts` and outside the established I/O-adapter seams) — those remain strictly zero-cast. Auth
+  S2/S6/S7 and AS7 explicitly mirror sagas and leave BOTH debt classes in place; each plugin gets
+  its arbitrary-types fix in the dedicated cross-plugin seam branch, not in these slices.
+- **Gate:** Close when (A) the shared contract wrapper returns properly-typed procedures and every
+  `plugins/*/services/src/router.ts` type-checks under `deno check --unstable-kv` with zero `as any`
+  / `: any` / `deno-lint-ignore no-explicit-any` and the per-plugin handler maps no longer need
+  `Record<string, unknown>` widening, AND (B) every external-boundary surface (SDK / KV / db /
+  bootstrap) reaches its port through a typed adapter so the `as unknown as` / `as <T>` boundary
+  casts are gone across all plugin services.
+
+## packages/auth-better-auth — seamless better-auth integration roadmap (`seamless-auth-roadmap`)
+
+- **Reason:** The audit (docs-v4 Phase-0, `.llm/tmp/run/docs-v4-ia-deepening/seam-coverage.md`)
+  found the only real build-seam gap in the framework: all 9 better-auth plugins (`organization`,
+  `twoFactor`, `magicLink`, `admin`, `passkey`, `multiSession`, `apiKey`, `bearer`, `jwt`) are
+  mountable today ONLY via the undocumented escape hatch
+  `createBetterAuthBackend({ auth: betterAuth({ plugins: [...] }) })`. The documented convenience
+  factory `createNetscriptBetterAuth` has a closed `NetscriptBetterAuthOptions` (no `plugins`
+  field), so the documented path can enable none of them. The Principal mapper already consumes
+  org/role/permission claims, so the wiring half is done — only the on-ramp and ergonomics are
+  missing.
+- **Owner:** Auth layer follow-up (docs-v4 run + a dedicated auth-DX program).
+- **Created:** 2026-06-22
+- **User directive (2026-06-22):** "build the passthrough and document in the harness what should be
+  planned to build (seams, additional adapters, helpers, fluent builder) to make it absolutely
+  seamless in NetScript." So the minimal passthrough ships now; the rest is this tracked roadmap.
+
+- **R0 — passthrough seam (BUILD NOW, this run, IMPL-EVAL-gated WSL Codex slice):** add a `plugins`
+  / `betterAuthOptions` passthrough to `createNetscriptBetterAuth` so the documented factory can
+  mount any better-auth plugin (forwarded into `BetterAuthOptions`). Status: planned.
+
+- **R1 — DB schema generation for plugins (REQUIRED for R0 to be usable):** plugins that need tables
+  (`organization` → org/member/invitation, `twoFactor`, `passkey`, `apiKey`) do nothing until their
+  Prisma models + migration exist. Wrap better-auth's schema-generation CLI through `netscript db` /
+  scaffold so enabling a plugin also generates its required schema. Without R1, R0 enables the
+  plugin at the better-auth layer but it fails at runtime on a missing table — docs MUST state this
+  honestly until R1 lands.
+
+- **R2 — interactive-flow seam (`InteractiveFlowPort`) for the better-auth backend:** today the
+  better-auth backend is non-interactive, so `/signin` and `/callback` return `AUTH_PROVIDER_ERROR`
+  and `magicLink`/`passkey` sign-in can't be driven through NetScript (only kv-oauth implements
+  `InteractiveFlowPort`). Implement the port over better-auth's own handler to make
+  magic-link/passkey/social interactive flows first-class. This is the largest item and the blocker
+  for full plugin parity.
+
+- **R3 — NetScript-native organization / multi-tenancy helpers:** typed org/tenant/role primitives
+  layered over the `organization` plugin (instead of reading raw claim string keys), so apps and the
+  `tutorials/workspace` track get a real framework org primitive. Resolves the "NetScript ships no
+  organization primitive" caveat at its root.
+
+- **R4 — fluent auth builder (`defineAuth()`):** a NetScript-idiomatic builder mirroring
+  `definePage`/`defineSaga`/`defineTask` that composes backend + plugins + principal mapping +
+  schema declaratively, replacing hand-wiring of `betterAuth()` + `createBetterAuthBackend` +
+  adapter. This is the "absolutely seamless" endpoint of the roadmap.
+
+- **R5 — plugin-aware Principal mapping + adapters:** typed accessors/mappers per plugin output
+  (`apiKey` permissions, `admin` roles, `multiSession`) plus any additional better-auth adapter
+  wiring beyond Prisma, and CLI support (e.g. `netscript auth add-plugin <name>`) to scaffold the
+  plugin + its schema + wiring in one step.
+
+- **Status:** OPEN — R0 scheduled in the docs-v4 run; R1–R5 tracked here as the seamless-auth
+  program for a dedicated future run (needs its own PLAN-EVAL). Docs authored in docs-v4 must (a)
+  document the R0 factory path, (b) state the R1 schema-generation requirement honestly, and (c)
+  reference this roadmap rather than silently omitting the gaps.
+- **Gate:** Close R0 when `createNetscriptBetterAuth({ plugins: [...] })` type-checks and forwards
+  to `BetterAuthOptions` with a green IMPL-EVAL; close the program when R1–R5 land under their own
+  plan.
+
+## docs/runtime — alpha scaffold specifiers point at future stable ranges (`alpha-specifiers-forward-looking`)
+
+- **Reason:** Several generated/scaffolded examples previously pinned future
+  `jsr:@netscript/*@^1.0.0` ranges while the aligned package train was still pre-1.0. PR1 changes
+  scaffold/docs examples to exact alpha-1 pins; keep this debt open until publish dry-run evidence
+  confirms the corrected public package train.
+- **Owner:** Release/publish readiness program.
+- **Target:** PR1 (`chore/jsr-alpha1-publish-prep`) updates scaffold/docs examples to exact
+  `0.0.1-alpha.1` pins. Close only after `deno task publish:dry-run` passes post-merge against the
+  alpha-1 train.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges,
+  and scaffold output no longer emits forward-looking stable ranges.
+
+## packages/auth-better-auth — cookie-cache residual window outside NetScript (`auth-better-auth-cookie-cache-window`)
+
+- **Reason:** better-auth's optional `session.cookieCache` keeps a signed `session_data` cookie
+  that its own reads trust until `maxAge` (default 300 s). `@netscript/auth-better-auth` reads every
+  session with `disableCookieCache` (#1384), so revocation is immediate for everything behind
+  NetScript. Two gaps remain:
+  - better-auth's own `/api/auth/*` endpoints and client helpers still accept a revoked session's
+    cache cookie until `maxAge`;
+  - the NetScript signout response does not clear the caller's better-auth cookies. The auth
+    service forwards backend `Set-Cookie` from interactive sign-out flows (#2189), but
+    better-auth's `revokeSessions` sets none, and better-auth has no interactive sign-out port.
+- **Owner:** Auth layer follow-up.
+- **Created:** 2026-10-10.
+- **Status:** open, DEBT_ACCEPTED.
+- **Target:** auth layer follow-up. Signout on better-auth should also return better-auth's own
+  cookie-clearing headers (its `api.signOut` response), carried by the #2189 propagation. The
+  cross-device window on better-auth's own endpoints is upstream behavior bounded by
+  `session.cookieCache.maxAge`, and is documented on the better-auth page.
+- **Gate:** Close when the auth service signout response expires the caller's better-auth
+  `session_token` and `session_data` cookies (test against a real instance with the cookie cache
+  on), and the better-auth docs still state the upstream `maxAge` window.
+
+## packages/auth-workos — subject-wide revocation unsupported (`auth-workos-subject-revocation`)
+
+- **Reason:** `AuthSessionStorePort.revokeSubjectSessions` (#1384) backs `signout { everywhere:
+  true }` and must do bounded work per call. kv-oauth meets it with a per-subject revocation
+  instant, and better-auth wraps its upstream `api.revokeSessions`. `@workos-inc/node` has no
+  user-wide revocation call, only paginated `listSessions` plus per-session `revokeSession`.
+  WorkOS access tokens are also verified locally until they expire, so `@netscript/auth-workos`
+  still throws `AuthBackendOperationUnsupportedError`. Global logout on a WorkOS deployment
+  therefore returns `AUTH_PROVIDER_ERROR` (502).
+- **Owner:** Auth layer follow-up (#2190).
+- **Created:** 2026-10-10.
+- **Status:** closed, 2026-10-11 (PR #2316).
+- **Resolution:** Atomic KV subject fence/outbox and a service-owned bounded page worker. Cookie,
+  session lookup, and configured bearer authenticators share the fence. Session
+  tombstones retain refreshed-token protection through upstream success plus maximum token lifetime
+  and clock skew. Provider and storage failures retry indefinitely with capped backoff. Tests in
+  `packages/auth-workos/tests/subject-revocation_test.ts`,
+  `packages/auth-workos/tests/workos-access-token_test.ts`,
+  `plugins/auth/tests/services/workos-global-logout-http_test.ts`, and
+  `plugins/auth/tests/services/workos-revocation-worker_test.ts` prove immediate sibling refusal,
+  subject isolation, bounded paging/retry, recovery after prolonged outages, shipped registry/main
+  composition, signal-triggered shutdown drain, tombstone TTL, clock skew, and REST/both RPC signout 200.
+  Shipped lifecycle proofs are in `plugins/auth/tests/services/workos-composition_test.ts`.
+- **Target:** 0.0.8 milestone (#2190, triage).
+- **Gate:** Close when the WorkOS backend implements `revokeSubjectSessions`. Every session of the
+  subject must fail authentication immediately, with no per-session work in the request, and
+  `signout { everywhere: true }` must return 200 on a WorkOS deployment under test.
+
+## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
+
+- **Reason:** `@netscript/plugin-auth` composes exactly one backend selected by
+  `NETSCRIPT_AUTH_BACKEND`. It does not yet support multi-active routing, cross-backend account
+  linking, global logout across backend stores, or historical session replay. The docs should mark
+  this as a deliberate v1 boundary wherever the limitation is surfaced.
+- **Owner:** Auth layer follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a planned auth design introduces multi-backend routing/account-linking
+  semantics, or the docs stop presenting provider swapping as anything beyond one active backend per
+  deployment.
+
+## packages/fresh — hosted example sandboxes missing (`fresh-hosted-example-sandboxes`)
+
+- **Reason:** The Web Layer examples page promises hosted, one-click sandboxes as planned, but the
+  current docs site only points readers to local tutorial source.
+- **Owner:** Docs experience follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the Web Layer examples page links to maintained hosted sandboxes or removes
+  the planned-sandbox statement.
+
+## packages/cli — deployment artifacts are not generated (`cli-deploy-artifacts-missing`)
+
+- **Reason:** The scaffold records enough process and AppHost facts for manual deployment, but it
+  does not generate Dockerfiles, Docker Compose files, Kubernetes manifests, or a first-class deploy
+  command.
+- **Owner:** Deployment tooling follow-up.
+- **Created:** 2026-06-22.
+- **Status:** partially resolved (#339 + #340, #342), narrowed to container/orchestrator artifacts.
+- **Update (2026-07-03, #339/#340):** `netscript deploy` now IS a first-class command that emits
+  bare-metal deployment artifacts: a self-contained single binary per service (`deno compile`,
+  OS-generic triple) managed as an OS service through the OS-agnostic `OsServicePort` (Servy on
+  Windows, systemd on Linux). Dockerfiles / Compose / Kubernetes manifests are still not generated —
+  the container/orchestrator lane is tracked by the Aspire-compose deploy adapter (#343).
+- **Update (2026-07-03, #342 Deploy-S6):** a first-class cloud deploy target now exists —
+  `netscript deploy deno-deploy` (`plan`/`up`/`down`/`status`/`logs`) via the `DenoDeployTarget`
+  adapter behind the canonical `DeployTargetPort`. `rollback`/`secrets` remain declared-unsupported
+  pending the deploy-core convention seam (#341/#364) — the adapter delegates to the seam by design
+  and omits the ops until it lands, rather than forking. The unstable-API preflight guard is
+  best-effort (`deno.json` + entrypoint, not the full transitive module graph).
+- **Update (2026-07-04, #341 / PR #374):** the deploy-core convention seam the #342 note was
+  "pending" has now landed. Deploy-S5 centralized `secrets`/`rollback`/health-gate/OTEL as pure,
+  target-agnostic primitives in `packages/cli/src/kernel/domain/deploy/`, and the bare-metal
+  `ServiceDeployTarget` now advertises + delegates `rollback`/`secrets` (with health-gated `up`)
+  when the core ports are injected — so the marquee `deno-deploy` target's declared-unsupported
+  `rollback`/`secrets` are unblocked to delegate to the shipped core rather than fork (tracked by
+  `DEPLOY-SECRETS-ROLLBACK-CORE`). This entry stays open narrowed strictly to the
+  container/orchestrator artifact-generation gate below (Dockerfile / Compose / Kubernetes via the
+  Aspire-compose adapter, #343).
+- **Gate:** Close when `netscript deploy` (or scaffold generation) also emits the container /
+  orchestrator artifacts, or the deployment docs are rewritten to remove generated-artifact
+  expectations for those targets.
+
+## packages/cli — bare-metal deploy targets ship without rollback/secrets bodies (`cli-deploy-target-rollback-secrets-deferred`)
+
+- **Reason:** The canonical `DeployTargetPort` contract declares seven operations; the bare-metal
+  service targets (`WindowsServiceDeployTarget`, `LinuxServiceDeployTarget`) implement six (`plan` /
+  `emit` / `up` / `down` / `status` / `logs`) and leave `rollback?` / `secrets?`
+  declared-unsupported (omitted from the shared `ServiceDeployTarget` base per LD-4). The
+  kernel-domain `DeployTargetRegistry` descriptors are also not yet wired to inject the public
+  `OsServicePort` + compile pipeline (a kernel→public import would violate hexagonal layering — see
+  worklog drift D-S8); the live deploy path runs `deploy-group.ts` → `install-service-deploy` /
+  `buildWindowsDeployment` directly, so the descriptors are scaffolding consumed only by tests
+  today.
+- **Owner:** Deployment-hardening follow-up (#341).
+- **Created:** 2026-07-03 (#339/#340).
+- **Update (2026-07-04, #341 / PR #374):** the operation bodies + delegation seam landed. Deploy-S5
+  promoted `ServiceDeployTarget` to a genuine 7-op adapter — `WindowsServiceDeployTarget` and
+  `LinuxServiceDeployTarget` now advertise `rollback`/`secrets` and delegate to the shipped
+  deploy-core primitives (`secrets-convention`/`rollback-convention`/`health-gate`/
+  `activation-convention`), with `up` health-gated, when the core ports are injected. The one
+  residual — composing the registry descriptors onto the public `OsServicePort` + compile pipeline
+  so `deploy <target> up|rollback|secrets` executes end-to-end off the descriptor path — is a
+  kernel→public layering boundary and is now tracked distinctly by `DEPLOY-BAREMETAL-PUBLIC-WIRING`.
+- **Status:** RESOLVED 2026-07-04 (superseded) — the `rollback`/`secrets` (+ health/OTEL) bodies and
+  the injected execution-delegation seam landed in #341/#374; superseded by
+  `DEPLOY-SECRETS-ROLLBACK-CORE` (bodies + seam) and `DEPLOY-BAREMETAL-PUBLIC-WIRING` (residual
+  public-path wiring).
+- **Gate:** Closed — bodies + delegation seam landed in #341/#374; residual public-path wiring
+  tracked by `DEPLOY-BAREMETAL-PUBLIC-WIRING`.
+
+## packages/cli — Linux systemd deploy lane is unit-tested but not integration-exercised (`cli-deploy-linux-integration-untested`)
+
+- **Reason:** The systemd adapter, unit renderer, and OS-routing are covered by unit + OS-routing
+  e2e-lite tests, but the implementation host is Windows-only, so the end-to-end Linux systemd
+  install/start/status path is not exercised against a live `systemctl`/`journalctl`. The
+  merge-readiness `scaffold.runtime` gate likewise runs on Windows and does not touch the Linux
+  lane.
+- **Owner:** Deployment CI follow-up.
+- **Created:** 2026-07-03 (#339/#340).
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a Linux CI job (or containerized systemd harness) runs the bare-metal deploy
+  lifecycle against a real systemd and asserts unit install/enable/status/logs.
+
+## packages/plugin-workers-core — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
+
+- **Reason:** `.permissions(...)` compiles into Deno `--allow-*` flags only for `runtime("deno")`.
+  Python, .NET, shell, PowerShell, cmd, executable, and custom subprocess runtimes inherit the
+  worker host's OS privileges unless the caller adds an external sandbox.
+- **Path note (2026-07-06):** the concern was recorded against the former `packages/workers`, which
+  no longer exists; the public task-runtime API now lives in `packages/plugin-workers-core`. Debt
+  remains **open** — relocated, not resolved.
+- **Owner:** Workers runtime hardening follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when non-Deno task runtimes have a documented, enforced per-task sandbox or the
+  public task runtime API explicitly models this as a permanent trust boundary.
+
+## packages/auth-{better-auth,workos} — Archetype-2 folder layout + WorkOS feature-surface parity (`AUTH-ARCHETYPE-LAYOUT`)
+
+- **Reason:** A user review (2026-06-22) flagged two related gaps in the landed auth backends that
+  existing auth-debt entries do not cover:
+  - **(L) Archetype-2 folder layout non-conformance.** Both `@netscript/auth-better-auth` and
+    `@netscript/auth-workos` declare **Archetype-2 (Integration)** in their READMEs but do not
+    follow the canonical layout from `.llm/harness/archetypes/ARCHETYPE-2-integration.md` / doctrine
+    `04`/`05`:
+    - Composition-root factories (`createBetterAuthBackend`, `createWorkosBackend`,
+      `createNetscriptBetterAuth`, `createWorkos*Authenticator`) live directly in top-level
+      `src/better-auth-backend.ts` / `src/workos-backend.ts` / `src/workos-authenticator.ts` instead
+      of `src/application/create-*.ts`.
+    - Domain types (e.g. `BetterAuthSessionPayload`, `WorkosSessionAuthenticationSuccess`) are
+      inline in the backend files instead of `src/domain/types.ts`.
+    - No `src/testing/` test doubles are exported, so consumers must hand-mock `BetterAuthInstance`
+      / the WorkOS session client themselves.
+    - `src/ports/` is **legitimately** omitted (the consumed port `AuthBackendPort` lives in the
+      consuming `@netscript/plugin-auth-core`, per the doctrine "port lives in the consumer" rule),
+      and the one-adapter-per-package shape correctly skips an `adapters/` split — but neither
+      omission is documented in the package, which is what makes the layout read as "confusing."
+      This is the folder-layout dimension; it is distinct from (and complements) the existing
+      `auth layer — AS7 documentation architecture metadata` entry (missing `Archetype: <n>` token /
+      `docs/architecture.md`) and `AS2-CONSOLIDATION` (duplicated error/token helpers).
+  - **(P) WorkOS feature-surface parity.** The `seamless better-auth integration roadmap` (R0–R5)
+    gave `auth-better-auth` a `plugins`/`betterAuthOptions` passthrough (R0, commit `539b808b`) plus
+    a tracked program for schema-gen, interactive-flow, org primitives, and a fluent `defineAuth()`
+    builder. `auth-workos` received **no equivalent program**. The likely justification is
+    structural — WorkOS AuthKit is a managed hosted service with a fixed API and no
+    better-auth-style plugin ecosystem to pass through — so a 1:1 "plugins passthrough" is not
+    meaningful. **However**, WorkOS exposes rich product surface (organizations, SSO connections,
+    directory sync / SCIM, MFA, audit logs) that NetScript currently surfaces only as a pure backend
+    (sealed sessions + JWT/JWKS verification). Whether those warrant a parallel WorkOS
+    feature-surfacing / parity program (or an explicit "WorkOS is intentionally backend-only"
+    doctrine note) is an **open question to resolve**, not a settled non-gap.
+- **Owner:** Track-5 auth-plugin program / auth-layer doctrine follow-up.
+- **Target:** Fold (L) into the next auth-layer doctrine-conformance run (alongside
+  `AS2-CONSOLIDATION` and the AS7 metadata warnings — they share the same packages and a single
+  refactor pass can close all three). Resolve (P) as a user-facing parity decision before the auth
+  beta documentation freeze.
+- **Linked entries:** `seamless better-auth integration roadmap` (R0–R5), `AS2-CONSOLIDATION`,
+  `auth layer — AS7 documentation architecture metadata warnings`.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED — recorded at user direction ("record it in arch debt for now and
+  take care of that later") during the JSR-readiness umbrella merge/cleanup pass. Recording only; no
+  refactor in this pass. Both packages compile/test/lint/fmt clean with the current layout.
+- **Gate:** Close (L) when `auth-better-auth` and `auth-workos` either match the Archetype-2 layout
+  (`src/application/create-*.ts`, `src/domain/types.ts`, `src/testing/` fakes) or carry a documented
+  in-package justification for each omission, with `deno task arch:check` green. Close (P) when the
+  WorkOS feature-surface decision is recorded (either a parity program is planned or an explicit
+  backend-only scope note lands in the package README + auth doctrine).
+
+## docs tutorials/erp-sync/02-import-job — hand-rolled CSV parsing instead of @std/csv or in-memory DuckDB (`TUTORIAL-CSV-PARSE`)
+
+- **Reason:** A user review (2026-06-22) flagged that the published ERP-sync tutorial step
+  `tutorials/erp-sync/02-import-job` (live at
+  `https://rickylabs.github.io/netscript/tutorials/erp-sync/02-import-job/`) demonstrates **manual,
+  hand-written CSV parsing** (e.g. `split('\n')` / `split(',')`-style field slicing). This models a
+  bad practice for readers: hand-rolled CSV parsing silently mishandles quoted fields, embedded
+  commas/newlines, escaped quotes, BOM, and delimiter variation. The tutorial is a teaching surface,
+  so the pattern propagates to user code.
+- **Recommended fix (depends on task complexity):**
+  - **Simple parse:** use the standard library — `@std/csv` (`parse` / `CsvParseStream`), which
+    correctly handles RFC-4180 quoting/escaping and streams. This is the "wrap, don't reinvent"
+    doctrine default (Web/`@std` first).
+  - **Heavier/analytical import:** use **in-memory DuckDB** via the Node-Neo client
+    (`@duckdb/node-api`) — `https://duckdb.org/docs/current/clients/node_neo/overview` and its CSV
+    reader `https://duckdb.org/docs/current/data/csv/overview` (`read_csv` auto-detects schema,
+    types, delimiters; runs SQL over the file). Appropriate when the import job does filtering,
+    typing, joins, or aggregation rather than a trivial row pass-through. An ERP "import job" that
+    validates/transforms rows is squarely in this category.
+- **Owner:** Docs tutorials track (ERP-sync tutorial author) + a follow-up decision on whether the
+  framework should offer a first-class CSV/file-import helper or recommend DuckDB-in-memory as the
+  canonical analytical-import path.
+- **Target:** Next docs tutorial-accuracy pass (alongside any tutorial code-quality sweep). Confirm
+  the exact source file under `docs/site/tutorials/erp-sync/02-import-job/` (deploy branch) when the
+  fix is scheduled — this entry records the observation; the precise code block is to be located at
+  fix time.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED — recorded at user direction during the JSR-readiness umbrella
+  merge/cleanup pass. Recording only; no tutorial edit in this pass.
+- **Gate:** Close when the import-job tutorial step parses CSV via `@std/csv` (simple case) or
+  in-memory DuckDB `read_csv` (analytical case) instead of hand-rolled string splitting, and the
+  surrounding prose explains the choice.
+
+## plugin-workers-core + plugin-triggers-core — CRON-SUBSYSTEM-DUP (workers `.schedule()` vs triggers `defineScheduledTrigger`)
+
+- **Reason:** Two parallel cron subsystems exist with no unification. Workers
+  `defineJob().schedule(cron)` flows through `JobBuilder.schedule()` → `JobDefinition.schedule`
+  field → in-process `Scheduler` class → `@netscript/cron`. Triggers `defineScheduledTrigger()`
+  flows through `CronTriggerSchedulerAdapter` → `@netscript/cron`. They are NOT equivalent: separate
+  runtime adapters, separate scaffolds (`job-scaffolders.ts:64-65` vs
+  `trigger-scaffolders.ts:86-88`), separate CLI flags, separate docs, and
+  `plugins/workers/deno.json` has NO dependency on `@netscript/plugin-triggers-core`. The workers
+  `.schedule()` builder method is marked
+  `@deprecated → defineScheduledTrigger(...).enqueueJob(...)`, but that path does NOT yet replace
+  in-process cron job scheduling — so `.schedule()` is a **live feature, not a removable shim**.
+- **Why it is debt:** PR-B slice S3b originally claimed the trigger path replaces `.schedule()`.
+  PLAN-EVAL cycle 1 (openhands-run-27986503722-1) proved that false against the tree. Removing the
+  workers `schedule` field/method/Scheduler/scaffold/CLI/docs with no replacement would orphan a
+  documented public capability. Correct sequencing: unify the two cron subsystems (or formally bless
+  one) FIRST, then retire the other's surface.
+- **Decision needed from maintainer (only user-blocking item):** which cron subsystem is canonical —
+  (a) keep workers in-process `Scheduler` and undeprecate `.schedule()`; (b) make
+  `defineScheduledTrigger` the single canonical path + build a real migration (workers depends on
+  triggers-core, scaffold/CLI/docs rewrite, working delegation shim) before any removal; or (c) keep
+  both as intentional distinct capabilities (in-process cron vs durable trigger) and drop the
+  `@deprecated` tag on `.schedule()`.
+- **Owner:** Framework architecture (maintainer call).
+- **Target:** Pre-1.0; must precede any workers `.schedule()` surface removal. EXCLUDED from PR-B
+  (#113) and PR-C (alpha-1 legacy purge).
+- **Linked plan:** `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` (2026-06-22 cycle-1 +
+  2026-06-23 option-(b) deferral).
+- **Created:** 2026-06-23
+- **Status:** open, DECISION_PENDING — recorded under the overnight don't-block mandate so the
+  alpha-1 zero-legacy / JSR-readiness program proceeds without halting on this redesign.
+- **Gate:** none (record-only until the maintainer decision; a future unification run selects
+  gates).
+
+## plugin-triggers-core — CRON-NEXT-FIRE-ENGINE
+
+- **ID:** `CRON-NEXT-FIRE-ENGINE`
+- **Reason:** #181 Slice 5 introduced a triggers-core-owned `computeNextFireTimes` helper so the
+  connector can back `previewSchedule` without calling the `@netscript/cron` scheduler heuristic.
+  The helper is deliberately bounded and self-contained: it parses five-field cron expressions,
+  projects UTC minutes through `Intl.DateTimeFormat`, preserves fall-back duplicates, and maps
+  spring-forward nonexistent wall times to the first valid minute after the gap. It covers the
+  locked DST/timezone/leap-day table, but it is still a preview engine, not yet a shared canonical
+  cron subsystem for workers, triggers, and durable scheduling.
+- **Why it is debt:** The repo still has multiple cron-related surfaces (`@netscript/cron`, workers
+  `.schedule()`, trigger scheduler adapters, and this preview helper). Follow-up should either
+  upstream the preview semantics into the canonical cron primitive or replace this helper with an
+  equivalent shared engine once the cron subsystem decision is made, without regressing the #181 DST
+  table.
+- **Candidate shared engine:** `@netscript/cron` UTC helper; unlike the triggers preview engine, it
+  rejects Sunday `7` and numeric steps such as `0/2`, and its Deno path uses OR for restricted day
+  fields.
+- **Owner:** `@netscript/plugin-triggers-core` runtime + cron subsystem maintainers.
+- **Target:** Cron subsystem unification follow-up after #181.
+- **Linked plan:** `.llm/tmp/run/feat-triggers-feature-backing--181/plan.md` Slice 5 / L6.
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `computeNextFireTimes` is backed by the canonical shared cron engine or the
+  helper is explicitly blessed as that engine, with table coverage for spring-forward skip,
+  fall-back duplicate, fixed-offset timezone, omitted `from`, one-shot `persistent: false`, leap
+  day, impossible dates, and every-N-minutes intervals.
+
+## repo-wide — RUN-ARTIFACT-ARCHIVAL-POLICY (`.llm/tmp/run/` evidence tonnage)
+
+- **Reason:** `.llm/tmp/run/` carries large tracked harness-evidence volume. The bulk is durable by
+  doctrine but dominated by completed or closed programs: OpenHands PR-eval traces, completed
+  package-quality wave run directories, and one-off evaluator archives. `.gitignore` ignores runtime
+  `.llm/tmp/openhands/` scratch but intentionally tracks `.llm/tmp/run/openhands/` as durable
+  evidence.
+- **Why it is debt:** this is doctrine-tracked evidence, not junk. Bulk removal needs a retention
+  policy, not a blind sweep. Candidate policies include pruning run dirs for PRs merged or closed
+  past a fixed age while keeping verdict artifacts, or moving historical run evidence to an archive
+  ref.
+- **Decision needed from maintainer:** define and apply a retention policy, move historical run
+  evidence to an archive branch/ref, or keep all run evidence tracked and accept the volume.
+- **Owner:** Harness/process.
+- **Target:** Before JSR publish slim-down / task #36 lock-hygiene pass.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** none until policy is chosen.
+
+## packages/fresh — PAGEBUILDER-LEGACY-COMPAT-TREE (`@netscript/fresh/builders` `PageBuilder`)
+
+- **Reason:** `packages/fresh/src/application/builders/define-page/page-compat.ts` plus
+  `page-compat/**` is a public "legacy page-builder compatibility types" tree kept beside the
+  successor `DefinePageBuilder`. It is re-exported through the builders surface and asserted in
+  surface tests.
+- **Why it is debt:** removing `PageBuilder` is a deliberate public API break, not mechanical
+  hygiene. It requires dropping the export, the compatibility tree, and the surface-test rows.
+- **Decision needed from maintainer:** deprecate now and schedule removal for a later alpha, break
+  now in the alpha zero-legacy sweep, or keep both as intentional parallel builder surfaces.
+- **Owner:** Fresh framework architecture.
+- **Target:** Pre-1.0.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** If removed, scoped check/lint/fmt plus `deno doc --lint` for Fresh, surface-test update,
+  `arch:check`, `publish:dry-run`, and a named grep over templates/docs/scaffold for `PageBuilder`.
+
+## packages/fresh — FORMPAGEPROPS-PLAYGROUND-MIGRATION (`FormPageProps` transitional type)
+
+- **Reason:** `FormPageProps` is a live transitional page-form props type consumed by playground
+  routes while they migrate from legacy page builders. It is not a removable shim while those routes
+  still depend on it.
+- **Decision needed from maintainer:** schedule and complete the playground form migration off
+  legacy page builders, then retire `FormPageProps`. Tie sequencing to
+  `PAGEBUILDER-LEGACY-COMPAT-TREE`.
+- **Owner:** Fresh framework architecture.
+- **Target:** Pre-1.0, after the page-builder decision.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** none until migration is scheduled.
+
+## packages/kv — REDIS-LEGACY-VALUE-FALLBACK (pre-`StoredValue` envelope read path)
+
+- **Reason:** `packages/kv/adapters/redis.adapter.ts` has a fallback for values stored before the
+  current `StoredValue<T>` envelope write path.
+- **Why it is debt:** removing the fallback can break reads of old un-enveloped Redis data. This is
+  a data-migration concern, not pure hygiene.
+- **Decision needed from maintainer:** keep the fallback, ship a one-time backfill that rewrites
+  legacy values into the envelope and remove the fallback later, or declare a hard pre-1.0 data
+  break and remove now.
+- **Owner:** KV package + data-migration.
+- **Target:** Pre-1.0.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** If removed, scoped check/lint/fmt, `deno task test` for KV, and a Redis read-compat test
+  note.
+
+## repo-wide — DEBT-1 version timing (`0.0.1-alpha.0` lockstep)
+
+- **Reason:** PR-C removes public alpha-era compatibility surfaces, but per-package version bumps
+  would break the repository's lockstep package version scheme.
+- **Decision:** Hold all packages at `0.0.1-alpha.0` during this purge. The repo-wide breaking bump
+  lands once during JSR publish preparation instead of per package/per slice.
+- **Owner:** Release/JSR publish preparation.
+- **Target:** JSR publish prep / task #36.
+- **Created:** 2026-06-23.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the repo-wide lockstep alpha version bump lands with the release notes that
+  call out the PR-C breaking removals.
+
+## cli e2e — DEBT-2 db-init e2e flake (pre-existing)
+
+- **Reason:** The scaffold runtime/db-init lane has a known pre-existing flake observed during the
+  alpha/JSR readiness program. GitHub Actions scaffold-runtime evidence was green separately, so
+  this purge should not silently broaden scope to debug the flake.
+- **Owner:** CLI E2E / scaffold runtime maintainers.
+- **Target:** Follow-up stabilization task #68.
+- **Created:** 2026-06-23.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the db-init scaffold runtime E2E is deterministic across local WSL and GitHub
+  Actions, with raw exit-code evidence recorded on the follow-up task/PR.
+
+## packages/cli — scaffolded `aspire/package.json` ships no companion lock (`scaffold-aspire-npm-island-no-lock`)
+
+- **Reason:** The CLI scaffold's TypeScript AppHost generator
+  (`packages/cli/src/kernel/.../render-ts-apphost.ts:51-77`) emits an `aspire/package.json` npm
+  island into generated projects with no companion lockfile (`package-lock.json` / `deno.lock`).
+  Consumers must run a manual `npm install` in `aspire/` before the AppHost resolves, and the
+  install is unpinned. This is a pre-existing generated-project DX gap, unrelated to the Deno 2.9
+  toolchain adoption — Deno 2.9's lock/install changes do not seed a lock for an emitted npm package
+  that has no foreign lock to import. The Deno 2.9 adoption plan (D5) decided this gap out-of-scope;
+  this entry makes that "pre-existing arch-debt" citation verifiable per PLAN-EVAL finding F-3.
+- **Owner:** CLI scaffold / Aspire AppHost generator maintainers.
+- **Target:** Before advertising the generated TS AppHost as zero-manual-step; revisit alongside the
+  generated-project task DX follow-up (Deno 2.9 plan C6).
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/plan.md` (D5);
+  `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/research.md` (npm-island note).
+- **Created:** 2026-06-25.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the scaffolded `aspire/package.json` ships with a pinned companion lock (or
+  the npm island is removed) so a generated AppHost resolves without an unpinned manual
+  `npm install`.
+
+## plugins/triggers connector — TRIGGERS-CONNECTOR-DEFERRED-ROUTES + missing triggers-core backing (#172)
+
+- **Reason:** The triggers connector (`plugins/triggers/services/src/`) was converged onto the
+  canonical thin-connector shape (`createPluginService(router, {...}).serve()`) and now serves the
+  full 11-route `@netscript/plugin-triggers-core` v1 contract. Five routes are **backed** by real
+  runtime state (`describe`, `listTriggers`, `getTrigger`, `listEvents`, `getEvent`) and the raw
+  HMAC webhook ingress is preserved as a `rawRoutes` entry. The remaining **six** routes
+  (`fireTrigger`, `testWebhook`, `previewSchedule`, `enableTrigger`, `disableTrigger`,
+  `subscribeEvents`) are **honestly deferred**: each throws with a "pending triggers-core runtime
+  backing" message that oRPC maps to a server error (`subscribeEvents` is an async generator that
+  throws immediately and never yields, so its SSE output schema is never violated). No backing was
+  fabricated and no triggers-core capability was invented in this slice.
+- **Why it is debt:** the deferred routes have no sound runtime seam in
+  `@netscript/plugin-triggers-core` yet, and two backed routes synthesize/omit fields because the
+  domain lacks them. The net-new triggers-core surface required to fully back the contract:
+  1. **Manual / test-fire helper** — a runtime entrypoint to dispatch a trigger on demand (backs
+     `fireTrigger`) and a webhook test-delivery helper (backs `testWebhook`).
+  2. **Persistent enabled-state store** — there is no enabled/disabled store, so `listTriggers`/
+     `getTrigger` currently **synthesize `enabled: true`** for every definition; `enableTrigger`/
+     `disableTrigger` cannot persist state. Needs an enabled-state port plus
+     `TriggerDefinitionBase.enabled` (and a domain `name` field — the connector currently **omits
+     `name`** because the domain carries none, though the contract response allows it).
+  3. **Cron preview engine** — a next-fire-times computation over a scheduled trigger's cron spec
+     (backs `previewSchedule`).
+  4. **Event-subscription / SSE seam** — a live event-stream port (backs `subscribeEvents`).
+  - Note: the connector is **cast-free** — the raw webhook handler resolves the external path
+    parameter against the loaded definitions and passes the definition's already-branded `.id` to
+    `ingress.accept` (the same brand-free string-equality pattern as `listEvents`/`getEvent`), so no
+    `TriggerId` brand cast is retained. A public `toTriggerId` / `toTriggerEventId` constructor in
+    `@netscript/plugin-triggers-core/domain` would still be a convenience for net-new write paths,
+    but it is **not** connector-soundness debt.
+  - Separately: the triggers v1 contract erases its typed `errors` map through the sanctioned
+    `as unknown as Parameters<typeof oc.errors>[0]` cast, so handlers cannot call
+    `errors.INTERNAL(...)`; deferral throws a plain `Error` (oRPC -> 5xx) and `notFound` is used via
+    the centralized `@netscript/contracts` helper (which casts `errors` internally). A typed
+    `internalError({ errors, message })` helper in `@netscript/contracts` (mirroring `notFound`)
+    would let deferrals/500s carry the typed `INTERNAL` shape.
+- **Owner:** Triggers plugin + `@netscript/plugin-triggers-core` runtime (framework architecture).
+- **Target:** A PLAN-EVAL-gated triggers-core runtime follow-up that adds the seams above; each
+  unblocks its routes one at a time. Any `TriggerDefinitionBase` field addition (`enabled`, `name`)
+  and any new domain brand constructor is a `@netscript/plugin-triggers-core` source change and must
+  run as a WSL Codex daemon-attached slice, not the connector slice.
+- **Linked plan:** `feat/scaffold-surface-167` triggers thin-connector convergence slice (#172).
+- **Created:** 2026-06-30.
+- **Status:** closed 2026-06-30 by #181 Slices 1-6. The connector now backs the six deferred routes
+  through triggers-core seams: enabled/name fields + enabled-state store, manual dispatcher, webhook
+  test delivery, cron preview engine, and in-process event subscription.
+
+## packages/cli deploy — DEPLOY-S7-APPHOST-COMPOSE-GEN (#343)
+
+- **ID:** `DEPLOY-S7-APPHOST-COMPOSE-GEN`
+- **Title:** Aspire AppHost compose-publishing generation (compose environment + Deno
+  `denoland/deno:2` Dockerfile weave + config→`Parameters__*`) is deferred as a shared, cross-slice
+  primitive.
+- **Context:** Deploy-S7 (#343) shipped the config member (S1), the Aspire compose/docker adapter
+  (S5, `aspire-compose-deploy-target.ts`), and the thin `deploy docker|compose` router (S6). The
+  adapter delegates `plan`→`aspire publish`. For `aspire publish` to actually emit a docker-compose
+  artifact, the generated `aspire/apphost.mts` must (a) declare the official `Aspire.Hosting.Docker`
+  NuGet in `aspire.config.json` and (b) call `await builder.addDockerComposeEnvironment("compose")`.
+  Aspire then auto-publishes all resources as compose services. **But** NetScript registers Deno
+  resources as `builder.addExecutable('deno', …)` (see `generate-aspire-config.ts` L44-56);
+  executables are not containers, so publishing them to compose requires a `denoland/deno:2`
+  `addDockerfileBuilder` / container-resource weave across the shared `register-services` /
+  `register-apps` / `register-background` generators, plus config→`Parameters__*` mapping.
+- **Why deferred:** (1) Runtime correctness — whether `aspire publish` emits a valid compose for
+  NetScript's Deno executable resources — cannot be validated without the Aspire .NET SDK + a Docker
+  daemon (`aspire restore`→`aspire publish`→`docker compose config`), i.e. the S8/S9 merge-readiness
+  environment; a snapshot test would lock the string but not prove Aspire accepts it. (2) The
+  per-resource compose-publishing generation is a SHARED publishing convention (R-DEPLOY-3 /
+  core-centralization law), and the concurrent #342 Deno Deploy adapter needs the same
+  apphost-publishing surface — forking it per-target on one branch would violate the centralization
+  law and risk a merge collision with the live deployment-epic agents.
+- **Owner:** NetScript deployment epic (#327) coordinator; implement once as a shared
+  apphost-publishing primitive in coordination with #342.
+- **Target:** Deployment-epic merge-readiness pass, before the Docker/Compose target is declared
+  end-to-end.
+- **Linked plan:** `.llm/tmp/run/deploy-s7-aspire/plan.md` (S4); drift `D7`.
+- **Aspire API grounding:** aspire.dev `docker-integration` (TS AppHost:
+  `addDockerComposeEnvironment`, `publishAsDockerComposeService`, `addParameterFromConfiguration`,
+  `addDockerfileBuilder`).
+- **Created:** 2026-07-03.
+- **Status:** open — S5 adapter + S6 router shipped and work unchanged the moment the apphost gains
+  the compose environment; the generation is cleanly separable.
+- **Gate:** Close when scaffolded `apphost.mts` emits the compose environment + Deno
+  `denoland/deno:2` service, `deno task e2e:cli run scaffold.runtime` stays green, and
+  `netscript deploy compose plan` produces a `docker-compose.yaml` that passes
+  `docker compose config`.
+
+## packages/cli deploy — DEPLOY-SECRETS-ROLLBACK-CORE (#341 / #343)
+
+- **ID:** `DEPLOY-SECRETS-ROLLBACK-CORE`
+- **Title:** Centralized `secrets` + `rollback` deploy-convention primitives are not yet on main;
+  adapters declare them unsupported until the core lands.
+- **Context:** The 7-op `DeployTargetPort` (landed by S0/#370) includes `rollback` and `secrets` as
+  optional ops. Doctrine R-DEPLOY-3 requires both to be centralized in the deploy core (shared,
+  restricted-perm secret env-file backed by Aspire `Parameters__*`; rollback = redeploy the
+  last-good emitted artifact/image), never re-implemented per adapter. Those core primitives do not
+  exist on main yet — they are the #341 deployment-hardening work (PR #364). Per the port doc
+  comment, adapters may omit the two methods (declare unsupported) rather than provide silent
+  no-ops.
+- **Why deferred:** Cross-slice dependency — forking secrets/rollback inside the Aspire adapter
+  would violate R-DEPLOY-3. The Deploy-S7 adapter therefore ships the supported subset
+  (`plan`/`emit`/`up`/`down`/`status`/`logs`) and omits `rollback`/`secrets`.
+- **Owner:** #341 deployment-hardening core (deploy core in
+  `packages/cli/src/kernel/domain/deploy`).
+- **Target:** When #341/#364 lands the shared primitives; adapters then advertise the ops and call
+  the core.
+- **Linked plan:** `.llm/tmp/run/deploy-s7-aspire/plan.md` (S3); drift `D2`.
+- **Created:** 2026-07-03.
+- **Update (2026-07-04, #341 / PR #374):** the blocking core conventions now exist. Deploy-S5 landed
+  the target-agnostic core primitives in `packages/cli/src/kernel/domain/deploy/`:
+  `secrets-convention.ts` (`reconcileSecrets` + `SecretsStorePort`), `rollback-convention.ts`
+  (`retainReleases`/`selectRollbackTarget`/`rollbackToPrevious` + `ActivationPort`),
+  `health-gate.ts` (`runHealthGate` + `HealthProbePort`), `activation-convention.ts`
+  (`activateWithHealthGate`), and `observability-convention.ts` (`observabilityEnv`). The bare-metal
+  reference binding is complete: `EnvFileSecretsStore`, `Fetch­HealthProbe`,
+  `Symlink`/`DirSwapActivationPort`, and a 7-op `ServiceDeployTarget` that advertises + delegates
+  `rollback`/`secrets` (and health-gates `up`) when the core ports are injected. The Aspire
+  compose/docker adapter delegation (this entry's own gate) remains open and is now unblocked.
+- **Status:** open — core primitives landed (#341/#374); remaining scope is the Aspire adapter
+  delegating to them.
+- **Gate:** Close when the Aspire compose/docker adapter advertises both ops by delegating to the
+  now-shipped deploy-core `secrets`/`rollback` primitives.
+- **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper ->
+  `fireTrigger`
+  - `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
+  - un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
+    seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
+    test extended to assert the now-backed behavior. Remove the webhook brand cast when a public
+    brand constructor lands.
+- **Closing evidence:** #181 per-slice gates passed with scoped core/connector check/lint/fmt,
+  focused contract/connector tests, `deno publish --dry-run --allow-dirty` for
+  `@netscript/plugin-triggers-core` and `@netscript/plugin-triggers`, and `deno task arch:check`
+  exiting 0 (`FAIL=0`). Slice 6 connector smoke asserts `subscribeEvents` streams a heartbeat.
+
+## plugin-triggers-core — TRIGGERS-SSE-MULTI-REPLICA
+
+- **ID:** `TRIGGERS-SSE-MULTI-REPLICA`
+- **Reason:** #181 Slice 6 backs `subscribeEvents` with `createEventSubscription`, an in-process
+  single-replica event hub. It is appropriate for local service/runtime smoke and preserves the thin
+  connector boundary, but it does not fan out events across multiple service replicas or processes.
+- **Why it is debt:** Production deployments with more than one triggers service replica need a
+  shared subscription backend, likely KV watch, pub/sub, or the eventual durable trigger event bus.
+  Without that backend, a client subscribed to replica A will not receive lifecycle messages
+  published by replica B.
+- **Owner:** `@netscript/plugin-triggers-core` runtime + triggers connector deployment maintainers.
+- **Target:** Multi-replica triggers service follow-up after #181.
+- **Linked plan:** `.llm/tmp/run/feat-triggers-feature-backing--181/plan.md` Slice 6 / L11.
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `TriggerEventSubscriptionPort` has a shared backend with tests proving
+  cross-process or cross-replica delivery while keeping the current in-process adapter as the local
+  testing/smoke implementation.
+
+## plugins/{sagas,triggers,workers} — PLUGIN-RUNTIME-ADAPTER-RELOCATION (#172b/c/d)
+
+- **Reason:** Two coupled defects in three connectors that still ship runtime stores/adapters under
+  `plugins/<kind>/src/runtime/`. (1) **Placement:** by the #157→#172 thin-connector law these
+  port→backend adapters belong in `@netscript/plugin-<kind>-core` (`adapters/`/`stores/`), leaving
+  the connector with specifics only. (2) **Primitive-bypass / engine lock:** the **sagas** and
+  **triggers** KV stores hardwire raw `Deno.Kv`/`Deno.openKv` + the Deno-native fluent atomic,
+  bypassing the engine-agnostic `@netscript/kv` primitive — locking them to Deno KV and forfeiting
+  Redis / in-memory / kvdex / reactive-watch. The **workers** `KvWorkerIdempotencyStore` already
+  does it right (depends on `@netscript/kv` types + a `KvStore`-shaped structural port) and is the
+  reference. The PASSed `feat/scaffold-surface-167` plan covered the scaffold-surface contract
+  (S1–S7), not runtime-store placement or engine choice — so this is net-new scope, PLAN-EVAL-gated
+  separately.
+- **Relocation + migration set (grounded against the worktree):**
+  - **sagas (#172b):** `prisma-saga-store.ts` (dep-free structural Prisma delegate, relocate as-is),
+    `kv-saga-store.ts`, `kv-saga-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
+    `@netscript/kv`**), `saga-store-backend.ts` → `packages/plugin-sagas-core/src/stores/`. **Adds
+    `@netscript/kv` dep — desired.**
+  - **triggers (#172c):** `kv-trigger-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
+    `@netscript/kv`**) + `cron-trigger-scheduler-adapter.ts` / `watchers-file-watcher-adapter.ts` →
+    `packages/plugin-triggers-core/src/{stores,adapters}/`. Adds **`@netscript/kv` +
+    `@netscript/cron`
+    - `@netscript/watchers`** to triggers-core (currently `@std/assert`+`zod` only).
+  - **workers (#172d):** `worker/worker-idempotency-store.ts` (already on `@netscript/kv`, relocate
+    only) → `packages/plugin-workers-core/src/{stores,adapters}/`. Adds the `@netscript/kv` dep to
+    workers-core.
+- **Why it is debt (open):** authored but PLAN-EVAL-gated and not yet implemented. Decisions
+  deferred to PLAN-EVAL: (D-KV) migrate sagas+triggers KV stores onto `@netscript/kv` (`KvStore` +
+  `AtomicCheck/
+  Mutation/Result`, injected handle, workers structural-port pattern), preserving
+  optimistic-concurrency
+  - idempotency semantics; (D2) the zero-compat public-surface break — stores move from
+    `@netscript/plugin-<kind>/runtime` to `@netscript/plugin-<kind>-core/{stores,adapters}` with no
+    shim. **Note:** an earlier draft framed a "D1" decision over whether `-core` may take
+    `@netscript/*` deps; that was removed — `-core` depending on NetScript primitives is the
+    **encouraged** direction (the reference behavior for community plugin/plugin-core authors), not
+    a tradeoff to weigh.
+- **Owner:** Plugin connectors + `@netscript/plugin-<kind>-core` (framework architecture).
+- **Target:** PLAN-EVAL-gated relocation slices under #172; close when all three merge.
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md` (+
+  `research.md`).
+- **Created:** 2026-06-30.
+- **Status:** open, PLAN-EVAL pending — research + plan authored; no implementation slice before
+  PASS.
+- **Gate:** per touched package scoped check/lint/fmt (`--ext ts,tsx`) + targeted
+  `deno test
+  --unstable-kv` + `deno publish --dry-run --allow-dirty` (no new slow types) +
+  `deno task arch:check` (no connector→core leak); new workspace deps land via normal resolution, no
+  `deno.lock` hand-edit.
+
+## packages/plugin-auth-core — AUTH-FITNESS-GATE-OVERFLAG
+
+- **ID:** `AUTH-FITNESS-GATE-OVERFLAG`
+- **Reason:** `AS7/F-AUTH-CAST` over-flagged two sanctioned auth type-soundness sites: the
+  centralized oRPC error-map contract cast in `src/contracts/v1/auth.contract.ts`, and test-only
+  `@ts-expect-error` / `as unknown` guards in `tests/contracts/auth-contract-soundness_test.ts`. The
+  production auth code was already type-sound; the fitness gate was stricter than the AS7 intent and
+  stricter than the equivalent sagas/workers contract soundness test treatment.
+- **Fix:** Narrowed `.llm/tools/fitness/check-doctrine.ts` so the auth scanner recognizes the exact
+  centralized `Parameters<typeof oc.errors>[0]` contract cast, keeps the router `any` exemplar as
+  the only router exception, and exempts test paths (`tests/`, `_test.ts`, `.test.ts`) from the auth
+  cast / `@ts-*` scan without relaxing production source checks.
+- **Owner:** Architecture fitness gate maintainers.
+- **Target:** #172 follow-up S-e.
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md`
+- **Created:** 2026-06-30.
+- **Status:** closed 2026-06-30 — gate-correctness fix landed; auth production source and auth
+  soundness tests were not edited.
+- **Gate:** `deno task arch:check` green over all 13 configured roots (`FAIL=0` for every root).
+
+## packages/cli — PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER
+
+- **ID:** `PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER`
+- **Reason:** After the centralized scaffold-CLI bridge restored execution of all five official
+  plugin scaffolders, `scaffold.runtime` advanced past every `scaffold.plugin.*` install gate and
+  failed at `scaffold.plugin-list`. The generated project contains the plugin sample files under
+  `workers/`, `sagas/`, `triggers/`, `streams/`, and `auth/`, but `netscript plugin list` reads
+  `plugins/<name>/scaffold.plugin.json`; the install path does not materialize that manifest under
+  the generated `plugins/` registry tree.
+- **Why deferred:** This is a distinct host install/list registration defect, not the S-f scaffold
+  subprocess bridge regression. Expanding S-f into the plugin registry/list contract would fold in a
+  separate #173 sub-phase.
+- **Owner:** CLI plugin install/list registration seam.
+- **Target:** Follow-up #173 plugin registry/list slice.
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-f.
+- **Created:** 2026-06-30.
+- **Status:** closed by S-g (`fix(cli): reconcile plugin install list contract`).
+- **Gate:** Close when `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` reaches
+  `failed=0` past `scaffold.plugin-list` without weakening plugin scaffold execution.
+- **Closing evidence:** S-g fresh-project reproduction changed from `plugin list` exit 1 on missing
+  `plugins/workers/scaffold.plugin.json` to exit 0 with `workers` listed from `./workers/mod.ts`.
+  The full `scaffold.runtime` suite now passes `scaffold.plugin-list` and advances to the distinct
+  `runtime.wait.workers-api` boundary recorded below.
+
+## plugin packages — PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS
+
+- **ID:** `PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS`
+- **Reason:** The #157 thin-dependency model forbids copying official plugin internals into
+  generated projects. After S-g reconciled config registration and `plugin list`, the full runtime
+  E2E fails at `runtime.wait.workers-api` because appsettings runtime resources still point at
+  copied-package workdirs such as `plugins/workers`, which are intentionally absent. Moving runtime
+  resources to package-spec execution requires an explicit public plugin executable-entrypoint
+  contract for both service and background processes. Service packages already expose `./services`;
+  background executables such as `@netscript/plugin-workers/bin/combined.ts` are not exported today.
+- **Why deferred:** Adding exported runtime executable subpaths is a new public package-surface
+  contract, not an install/register/list reconciliation. S-g's escape hatch required stopping rather
+  than folding that contract into this slice.
+- **Owner:** CLI plugin runtime / official plugin package maintainers.
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-g.
+- **Status:** closed by PR #172 runtime-launch finalization (`8aaddbc1`, `4a991d16`).
+- **Gate:** Close when official plugin packages expose supported executable entrypoints for the
+  thin-dependency runtime and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+  reaches `failed=0` without copying plugin internals into generated user projects.
+- **Closing evidence:** `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited 0
+  on 2026-06-30 with `Summary: passed=48 failed=0`. The run used package-launched service/background
+  plugin resources, passed every service/background wait gate, accepted the generic trigger webhook,
+  listed trigger events, and validated the cross-service OTEL trace.
+
+## packages/cli — DB-GENERATE-ASPIRE-COUPLING
+
+- **ID:** `DB-GENERATE-ASPIRE-COUPLING`
+- **Reason:** `netscript db generate` is pure, DB-less codegen (Prisma client + `@database/zod`
+  schemas + the `schema/.generated/zod/crud.ts` barrel) but is **Aspire-coupled**: the shared
+  `DbOperationRunner.executeDetached`
+  (`packages/cli/src/kernel/adapters/database/operations/operation-runner.ts`) always runs
+  `aspire start --apphost apphost.mts` and polls `aspire describe` before executing any db
+  operation. So `db generate` cannot run where the aspire CLI / .NET is absent (deno-only CI,
+  containerless dev), failing fast (~243ms, `aspire` command-not-found) even though no database,
+  docker, or AppHost is required for codegen.
+- **Evidence:** PR #208 `scaffold-static (deno-only)` CI failed at the `database.generate` e2e gate
+  in 243ms while passing on aspire-equipped boxes and in `scaffold-runtime`. The scaffolded project
+  already ships a standalone Aspire-less path — the db-workspace `deno task db:generate`
+  (`prisma generate --generator client` + `scripts/generate-zod.ts` + `scripts/fix-zod-imports.ts`
+  - `patch-prisma-client.ts`), which C14 wired into the static suites via the new `database.codegen`
+    gate. That harness workaround unblocks CI but does not remove the coupling from the CLI command.
+- **Why deferred:** Decoupling `db generate` from Aspire is a cross-package refactor of the CLI
+  database kernel (`DbOperationRunner` / operation classification): pure-codegen operations must run
+  their prisma/zod pipeline directly (as the scaffolded `db:generate` task already does) without
+  booting the AppHost, while connect-requiring operations (`init`/`migrate`/`seed`) keep the Aspire
+  path. That is a distinct DX slice from the #153 scaffold-surface work and out of scope for PR
+  #208.
+- **Owner:** CLI database kernel maintainers.
+- **Target:** Follow-up DX slice (aspire-less `db generate`).
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-crud-surface--impl/drift.md` (2026-07-01
+  scaffold-static root-cause), PR #208 C14 (`fee58a6b`).
+- **Created:** 2026-07-01.
+- **Status:** open — worked around in the e2e harness (C14 `database.codegen` gate); the CLI command
+  itself remains Aspire-coupled.
+- **Progress (2026-10-10, #1996 / PR #2170):** projects without `aspire/apphost.mts` (`init
+  --no-aspire`) now run every `db` operation through the database workspace task
+  (`DbWorkspaceTaskRunner`, selected by `selectDbOperationExecutor` in
+  `packages/cli/src/kernel/adapters/database/operations/`). Projects that have an AppHost still route
+  `db generate` through it, so this entry stays open for the Aspire-project codegen path.
+- **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
+  (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
+  of the standalone `deno task db:generate` workaround.
+
+## deployment — Archetype-7 core-centralization + F-DEPLOY seed (`deploy-archetype-7-core-seed`)
+
+- **ID:** `DEPLOY-ARCHETYPE-7-CORE-SEED`
+- **Reason:** Doctrine Archetype 7 (Deployment Target Adapter) names a package-agnostic LAW — the
+  `OsServicePort`/cloud-adapter seam, the uniform 7-op adapter contract, and the thin-router /
+  core-centralization rule — but the deployment **core** that would own the convention-bearing
+  primitives (health gating, OTEL, secrets, rollback) and the target registry does **not exist
+  yet**. Deploy today lives inside `packages/cli` (Archetype 6, `src/public/features/deploy/`). The
+  archetype's archetype-specific gates `F-DEPLOY-1` (uniform 7-op contract) and `F-DEPLOY-2` (no
+  target business logic in the command surface) are therefore seeded **`reviewed`**, not `gated`,
+  across the doctrine (`06-archetypes.md`), the harness archetype file
+  (`ARCHETYPE-7-deploy-target-adapter.md`), and the gate matrix.
+- **Why deferred:** Extracting a deployment core and its adapters is the work of deployment epic
+  #327 slices #339 (systemd) / #340 (deno-deploy) / #342 (docker/compose) / #343 (aca). Promoting
+  the gates to `gated` before those packages exist would red CI against unbuilt code. This entry
+  tracks both the future core-centralization obligation and the `reviewed → gated` promotion.
+- **Cross-link:** The eventual `OsServicePort` extraction out of the CLI deploy feature ties into
+  the existing `packages/cli — AP-1 / doctrine verdict Restructure` entry (Wave 6 "command
+  registry/deploy target seams"); do not duplicate that restructure debt — the deployment core
+  extraction is its downstream continuation.
+- **Seed expansion (3-op → 7-op):** A placeholder port already ships on main — the 3-op
+  `DeployTargetPort` (`build`/`install`/`uninstall`, all optional) plus its stub adapter
+  `WindowsServiceDeployTarget` (key `windows-service`) in `packages/cli`, landed by commit
+  `3137e455` (an unrelated command-registry slice, not this epic). It maps to the canonical
+  lifecycle as `build → plan`/`emit`, `install → up`, `uninstall → down`, and lacks
+  `status`/`logs`/`rollback`/`secrets`. The epic must expand this seed to the full 7-op
+  `OsServicePort`/cloud-adapter contract across #339–#343 and migrate/retire the `windows-service`
+  stub — never entrench the 3-op surface. Verb-vocabulary lock (keep `build`/`install`/`uninstall`,
+  adopt `up`/`down`, or a hybrid) is deferred to the first real adapter (#339/#340); closing gate
+  for this obligation = `F-DEPLOY-1` promoted `gated`. Authoritative reconciliation:
+  `.llm/tmp/run/deploy-s2-doctrine/contract-reconciliation.md` (epic #327 supervisor decision,
+  surfaced by the #342 PLAN-EVAL).
+- **Owner:** Deployment epic #327.
+- **Target:** Phase 1 of #327 (first landed target adapter, #339+).
+- **Linked plan:** `.llm/tmp/run/deploy-s2-doctrine/plan.md` (Slice 3);
+  `docs/architecture/doctrine/06-archetypes.md#archetype-7--deployment-target-adapter`.
+- **Created:** 2026-07-03
+- **Update (2026-07-04, #341 / PR #374):** the core-centralization obligation is materially
+  advanced. The convention-bearing primitives (health gating, OTEL, secrets, rollback) now live in
+  the deploy core `packages/cli/src/kernel/domain/deploy/` as pure, target-agnostic modules with
+  injected ports (`secrets-convention.ts`, `rollback-convention.ts`, `health-gate.ts`,
+  `activation-convention.ts`, `observability-convention.ts`), and the bare-metal reference binding
+  proves them against systemd + SERVY (see `DEPLOY-SECRETS-ROLLBACK-CORE`). The
+  `windows-service`/`linux-service` `ServiceDeployTarget` is now a genuine 7-op adapter
+  (rollback/secrets advertised + delegated when the core ports are injected). Still open for full
+  closure: the primitives live in `packages/cli` (not a standalone deployment core package), the
+  target registry is CLI-local, and `F-DEPLOY-1`/`F-DEPLOY-2` remain `reviewed` (not `gated`).
+- **Status:** open, DEBT_ACCEPTED — convention primitives centralized (#341/#374); `F-DEPLOY-1/2`
+  remain `reviewed` pending a standalone deployment core package + full adapter matrix.
+- **Gate:** Close when the deployment core owns the centralized health/OTEL/secrets/rollback
+  primitives and the target registry, every landed target adapter satisfies the uniform 7-op
+  contract, and `F-DEPLOY-1`/`F-DEPLOY-2` are promoted from `reviewed` to `gated` in all three
+  surfaces (doctrine, harness archetype file, gate matrix).
+
+## packages/cli deploy — DEPLOY-BAREMETAL-PUBLIC-WIRING (#341 / PR #374)
+
+- **ID:** `DEPLOY-BAREMETAL-PUBLIC-WIRING`
+- **Title:** The bare-metal 7-op adapter is proven via injected ports but not yet composed onto the
+  public deploy execution path.
+- **Context:** Deploy-S5 (#341) landed the target-agnostic core conventions, the bare-metal
+  reference bindings (`EnvFileSecretsStore`, `FetchHealthProbe`, `Symlink`/`DirSwapActivationPort`),
+  and a `ServiceDeployTarget` that delegates `rollback`/`secrets` and health-gates `up` **when the
+  core ports are injected**. The registry-seeded descriptors (`WindowsServiceDeployTarget`/
+  `LinuxServiceDeployTarget`) are still constructed with **no** ports, so at runtime they advertise
+  only the 6-op subset. The production composition that constructs a fully-wired target — resolving
+  the release candidate + probe spec + secret bundle and injecting the real `OsServicePort`-backed
+  activation store on the public deploy path — is intentionally not built here.
+- **Why deferred:** The activation adapters depend on the public `OsServicePort` seam, so the wiring
+  is a public-layer composition concern (`public/adapters/**` + the deploy command dependencies),
+  out of the kernel-domain S5/S6 scope (hexagonal boundary; see run drift `D-S8`). Wiring it also
+  needs a release-id/candidate resolution + secret-source pipeline that has no first-party caller
+  yet. The delegation seam is fully unit-proven with fake ports; only the composition root is
+  missing.
+- **Owner:** Deployment epic #327 — public deploy composition slice (systemd/#339, servy).
+- **Target:** When the public deploy path constructs `ServiceDeployTarget` with the real bare-metal
+  ports so `deploy <target> up|rollback|secrets` executes end-to-end.
+- **Linked plan:** `.llm/tmp/run/deploy-s5-hardening/plan.md`;
+  `.llm/tmp/run/deploy-s5-hardening/drift.md` (`D-S8`).
+- **Created:** 2026-07-04
+- **Status:** open, DEBT_ACCEPTED — delegation seam proven via injected ports; production
+  composition deferred.
+- **Gate:** Close when the registry seeds a port-wired `ServiceDeployTarget` (or the deploy command
+  injects the bare-metal ports) and an e2e/runtime smoke exercises health-gated `up`, `rollback`,
+  and `secrets` against a real systemd/SERVY service.
+
+## packages/mcp — brief-locked horizontal Archetype-6 skeleton (`MCP-A6-V2-SHAPE`)
+
+- **ID:** `MCP-A6-V2-SHAPE`
+- **Title:** The S1 MCP protocol engine uses the owner-locked horizontal Archetype-6 folder law
+  instead of the current v2 kernel/vertical CLI surface shape.
+- **Context:** S1 creates a small stdio protocol engine with one implemented flow and no Cliffy
+  command tree, templates, output renderers, extension registries, public/maintainer surfaces, or
+  CLI composition. Its accepted brief explicitly requires
+  `src/{domain,application/{flows,runner},presentation,infrastructure}`. The newer harness profile
+  expects `src/kernel` plus vertical command surfaces for full CLI packages.
+- **Why deferred:** Inventing kernel spine abstracts and vertical CLI features before the CLI
+  integration slice would create speculative seams and conflict with the owner-approved S1 scope.
+- **Owner:** Agentic-combo epic #721, CLI integration slice S7.
+- **Target:** Reassess when S7 adds `netscript agent mcp` and the package has a real CLI surface;
+  migrate to the v2 shape if the engine owns that surface rather than remaining a library engine.
+- **Linked plan:** `.llm/runs/mcp-skills--orchestrator/s1/plan.md` decision D8.
+- **Created:** 2026-07-12
+- **Status:** open, DEBT_ACCEPTED — explicit owner-brief compatibility deviation.
+- **Gate:** Close when S7 either migrates `packages/mcp` to the normative Archetype-6 v2
+  kernel/vertical shape and passes F-CLI-1..31, or doctrine/harness formally classify the package as
+  a protocol-engine subtype whose horizontal shape is normative.
+
+## docs/architecture/doctrine/06-archetypes.md — Archetype 5 folder-shape reconciliation deferred (`doctrine-06-archetype-5-folder-shape`)
+
+- **Reason:** The doctrine-06 "Archetype 5 — Plugin Package" Minimum shape nests contribution
+  folders (`services/`, `database/`, `jobs/`, `streams/`, `verify-plugin.ts`) under `src/` and names
+  sibling contract packages `@netscript/sagas` / `@netscript/workers`. Neither matches reality: real
+  first-party `plugins/*` place those contribution folders at the **top level** as siblings of
+  `src/` (with top-level `contracts.ts`/`mod.ts`/`verify-plugin.ts`), and the sibling contract
+  packages were renamed to `@netscript/plugin-*-core` during the plugin re-architecture. The harness
+  archetype-5 profile already treats the observed `plugins/*` layout as authoritative until this
+  chapter is reconciled.
+- **Why deferred:** Reconciling the doctrine chapter is a rewrite that must land coherently with the
+  plugin-v2 folder conventions (AI-stack #238 / plugin re-architecture sequencing), not a drive-by
+  edit inside a chore run. The #306 harness/skills revamp is doc-and-spec scope; a doctrine
+  folder-shape rewrite is the #305/#306 doctrine-revamp lane's own slice.
+- **Owner:** Doctrine-revamp lane (#305/#306) — plugin-v2 folder-convention slice.
+- **Target:** When plugin-v2 folder conventions are frozen; reconcile the doctrine-06 Minimum shape
+  (top-level contribution folders + `@netscript/plugin-*-core` sibling names) and drop the
+  "authoritative until reconciled" note from `ARCHETYPE-5-plugin.md`.
+- **Linked plan:** `.llm/harness/archetypes/ARCHETYPE-5-plugin.md` § Minimum Folder Shape; issue
+  #306.
+- **Created:** 2026-07-06
+- **Status:** open, DEBT_ACCEPTED (assessed and deferred during the #306 remainder run).
+- **Gate:** Close when doctrine-06 Archetype 5 Minimum shape matches the observed authoritative
+  `plugins/*` layout and sibling package names, and the archetype-5 profile no longer defers to the
+  observed layout.
+
+## packages/cli — published plugin doctor module resolution (`cli-plugin-doctor-published-module`)
+
+- **Reason:** Issue #1022 adds manifest-declared `.ts` doctor adapter modules resolved relative to
+  copied plugin roots. Local and copied-source paths are tested, but a compiled CLI consuming a
+  remotely published JSR plugin may not have a filesystem-backed `.ts` path at that root.
+- **Owner:** CLI/plugin runtime integration.
+- **Target:** Before claiming published-binary parity for plugin-contributed doctor checks.
+- **Linked plan:** `.llm/runs/fix-1022-plugin-doctor-truth--codex/plan.md`; PR #1045.
+- **Created:** 2026-08-01
+- **Status:** closed 2026-08-12 by #1454 / PR #1574. The CLI now retains a package-backed source
+  discriminator, transports the published manifest through a versioned bounded-child envelope,
+  resolves the existing public `./doctor` export, and executes the contributed workers registry
+  checks without a copied plugin root.
+- **Gate:** Close when a compiled/public CLI installs a JSR plugin, resolves its doctor adapter,
+  executes a contributed check, and reports import failures as structured doctor errors.
+- **Closure evidence:** `behavior.package-backed-plugin-doctor` was demonstrated red before the
+  product fix, red again after deliberately dropping bounded-probe permission metadata, and green in
+  both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
+  executed 88 printed named gates with 0 failures and 0 skips, including the published workers
+  doctor adapter. Its summary counts an unprinted 89th passed step because `suite-runner.ts` adds
+  the Docker prune step without emitting a reporter event; see the W2-H `evidence.md`.
+
+## documentation lane authored framework source (`docs-lane-framework-source-1020`)
+
+- **Reason:** PR #1079 (documentation-sequencing slice, `docs/1068-task-routing`) landed framework
+  source on the documentation lane. Commit `fb5d7a0de` added
+  `plugins/streams/services/src/durability.ts` (new `describeStorageDurability` module, 29 lines),
+  `durability_test.ts` (38 lines), a startup warning wired into
+  `plugins/streams/services/src/main.ts`, and a `plugins/streams/deno.json` task change — plus JSDoc
+  in `packages/fresh`, `packages/plugin-workers-core` and `packages/sdk`. `CLAUDE.md`'s
+  documentation-authoring exception is explicit that authoring touches **no `packages/`/`plugins/`
+  source code**, and that any framework-source change stays a WSL Codex daemon-attached slice. This
+  crossed that boundary.
+- **Root cause is upstream of the slice:** issue #1020 is labelled `type:docs`, but its acceptance
+  ("the non-durable in-memory default is unsurfaced" → a startup warning) **requires code**. A
+  `type:docs` issue whose acceptance cannot be met by prose should not be routed to the
+  documentation lane. The slice followed its brief; the routing decision was wrong, and the
+  orchestrator's pre-merge review checked the router change (#1068) without auditing the
+  changed-file list for framework paths.
+- **Owner:** 0.0.4 release orchestrator (routing + merge review).
+- **Decision:** **DEBT_ACCEPTED, not reverted.** The change is small, additive, unit-tested, and was
+  required by the issue's own acceptance; it passed the full CI surface including
+  `scaffold-runtime`, `quality:scan` (byte-identical to the pre-change baseline) and `arch:check`
+  (FAIL=0). Reverting green, tested, required work to satisfy a lane boundary would cost more than
+  it protects. The deviation is recorded rather than buried.
+- **Created:** 2026-08-03
+- **Status:** open, DEBT_ACCEPTED — **owner-reviewed 2026-08-03**: content assessed directly and
+  judged acceptable ("mostly comments and test"). The code stands as merged. The **process** finding
+  is upheld, not waived: this must not recur, so the gate below remains the closing condition.
+- **Gate:** Close when (a) issue triage classifies a `type:docs` issue whose acceptance requires
+  source changes as `type:fix`/`type:feat` with an `area:docs` tag instead, and (b) the pre-merge
+  review step for any documentation-lane PR audits the changed-file list for `packages/**` and
+  `plugins/**` paths before merge. Until then, assume the docs lane can silently acquire source
+  scope.
+
+## `@netscript/cli` scaffold — unreachable `Mode: 'Local'` cache arm (`cache-local-arm-unreachable-1158`)
+
+- **Reason:** `generate-register-infrastructure.ts:164-171` implements a `DenoKv` + `Mode: 'Local'`
+  arm that registers **no Aspire resource** (in-process `Deno.openKv()`), but **nothing in the
+  scaffold ever emits `Mode: 'Local'`**. `buildCacheBlock('deno-kv')`
+  (`generate-appsettings.ts:251-259`) emits `Mode: 'External'`, and plugin install's
+  `ensureSharedCache` writes `Mode: 'Auto'`. So the only genuinely container-free cache path in the
+  generator is dead code, reachable solely by hand-editing `appsettings.json`.
+- **Why it matters, discovered by #1158:** the sqlite runtime tier set out to eliminate every
+  container. Because `Local` is unreachable, the tier had to fall back to the `Auto` arm, and when
+  the Docker-less Garnet **executable** sub-arm proved unreliable (drift D-14/R-3), the tier settled
+  for one Garnet container. A reachable `Local` arm would plausibly have delivered the original
+  zero-container goal.
+- **Owner:** CLI scaffold / Aspire generator.
+- **Target:** Revisit when the reduced-container tier is promoted, or when a consumer needs an
+  in-process KV cache.
+- **Linked plan:** `.llm/runs/test-e2e-sqlite-runtime-tier--1158/plan.md` (§ Arch-Debt
+  Implications); issue #1158; PR #1220.
+- **Created:** 2026-08-04
+- **Status:** open — recorded, not fixed. #1158 deliberately did not change scaffold cache defaults.
+- **Gate:** Close when either (a) a scaffold flag emits `Mode: 'Local'` and an E2E tier proves a
+  genuinely container-free cache, or (b) the arm is judged unwanted and removed so the generator
+  carries no unreachable branch.
+
+## `@netscript/cli` scaffold — default cache backend forces a container (`scaffold-default-cache-container-1158`)
+
+- **Reason:** `SCAFFOLD_DEFAULTS.CACHE_BACKEND` is `'redis'`
+  (`constants/scaffold/scaffold-defaults.ts:12`), and `buildCacheBlock('redis')` emits
+  `{ Engine: 'Redis', Mode: 'Container' }` — a hard Docker container with **no** Auto/Executable
+  fallback, unlike the `Garnet`/`Auto` entry plugin install adds. Every `netscript init` that does
+  not pass `--cache=false` therefore commits the user to Docker for the cache alone.
+- **Why it matters, discovered by #1158:** this — not garnet — was the cache-side Docker cost the
+  research pass had to correct the carried-in plan about (research findings 3–5). The E2E works
+  around it per-suite with `--cache=false`; **users have no such default**.
+- **Owner:** CLI scaffold defaults.
+- **Target:** Consider alongside the `Local` arm above; a default change affects every scaffold, so
+  it needs its own decision and canary.
+- **Linked plan:** `.llm/runs/test-e2e-sqlite-runtime-tier--1158/plan.md` (§ Non-Scope, § Arch-Debt
+  Implications); issue #1158; PR #1220.
+- **Created:** 2026-08-04
+- **Status:** open — explicitly out of scope for #1158, which must not change product defaults.
+- **Gate:** Close when the default cache backend either gains a Docker-less fallback arm (as
+  `Garnet`/`Auto` has) or is changed with a recorded owner decision and a release canary.
+
+## packages/mcp — guidance contracts deepen over-cap tool-contract table (`mcp-tool-contracts-a8-1102`)
+
+- **Reason:** PR #1404 adds the public `find_guidance` schemas to `src/domain/tool-contracts.ts`,
+  deepening the evaluator-counted file from 301 to 367 lines against the 300-line A8/AP-1/F-1 cap.
+  The same doctrine warning already exists on `origin/main`, so the package-root verdict adds no new
+  finding, but growth inside an over-cap file is still debt.
+- **Owner:** MCP contract-surface follow-up.
+- **Target:** Before the next MCP public-tool expansion.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/plan.md`; issue #1102;
+  PR #1404.
+- **Created:** 2026-08-09
+- **Status:** open, DEBT_ACCEPTED for #1404; recorded after IMPL-EVAL cycle 1.
+- **Gate:** Split docs/guidance input and output schemas into one role-named domain module consumed
+  by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
+  doc-lint, and publish dry-run must remain green.
+
+## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
+
+- **Reason:** PR #1427 deepens `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906
+  lines against the 500-line A8/AP-1/F-1 cap while adding the named-app and browser-reference gates.
+  The same slice grows the scaffold gate directory from 41 to 43 direct children against F-16. Both
+  were already over their doctrine limits; splitting the established runtime registry during the
+  release-blocking scaffold feature would mix an architecture migration into behavioral acceptance.
+- **Owner:** CLI E2E scaffold-runtime maintainers.
+- **Target:** Before the next scaffold runtime gate or probe is added.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue
+  #1333; PR #1427.
+- **Created:** 2026-08-09
+- **Status:** open, DEBT_ACCEPTED for #1427; registry entry added after IMPL-EVAL cycle 1. **Not
+  deepened by PR #1449** (2026-08-11) — see the stop-condition note below.
+- **Gate:** Split the BEHAVIOR gate declarations and probe registration into role-named modules and
+  group scaffold probes behind a bounded subdirectory surface; focused CLI E2E tests, doctrine,
+  scoped check/lint/fmt, and the one-pass `scaffold.runtime` suite must remain green.
+- **Stop-condition encounter — PR #1449 / issue #1447 (2026-08-11):** this PR is the "next scaffold
+  runtime gate" the target names. It adds `runtime.service-env-fixture` and `behavior.service-env`,
+  and it honors the stop condition in the shape this **Gate** line prescribes rather than
+  re-authorizing further growth. Measured: `runtime-gates.ts` is **906 lines**, byte-identical to
+  its state before the PR (the two gate declarations live in the role-named
+  `gates/scaffold/service-env/service-env-gates.ts`, registered from
+  `scaffold-capability-gates.ts`); the scaffold gate directory holds **44 direct children** — the
+  baseline 43 plus the one bounded `service-env/` subdirectory, whose own **12** files sit **exactly
+  at** the 12-child cap — not comfortably inside it. IMPL-EVAL recorded 10 here; the remediation
+  slices then added `gate-permission-probe.ts` and `service-env-gates_test.ts`, and the count was
+  not re-measured, so the record was a false-done. Corrected by measurement at head. **Stop
+  condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a sibling
+  directory, requires the owed `runtime-gates.ts` split first rather than another bounded
+  subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
+  entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
+  so the full split is still owed, and the next gate faces the same condition.
+
+## packages/aspire — `config.ts` grows further past the 500-line cap (`aspire-config-length-1447`)
+
+- **Reason:** PR #1449 (issue #1447) adds the `Environment` / deprecated `Env` contract to
+  `ServiceEntry` and `PluginEntry`, taking `packages/aspire/config.ts` from **812 to 855 lines**
+  against the 500-line AP-1/F-1 cap. The file was already 312 lines over at baseline. The added 43
+  lines are the private `EnvironmentFields` Zod shape plus two documented interface member pairs, in
+  the same place as the existing `HostPortFields` / `Port` pairing they are modelled on; splitting
+  the single-file config contract of an A2 package would move every exported schema's module path
+  and is a restructure, not a P0 environment fix.
+- **Owner:** `@netscript/aspire` contract maintainers.
+- **Target:** Before the next contract member is added to `config.ts` — this entry exists so that
+  addition is a decision rather than a default.
+- **Linked plan:** `.llm/runs/fix-1447-service-env--impl/plan.md`; issue #1447; PR #1449.
+- **Created:** 2026-08-11
+- **Status:** open, DEBT_ACCEPTED for #1449; recorded during IMPL-EVAL cycle 1 remediation after the
+  measurement was taken rather than assumed.
+- **Gate:** Split `config.ts` into role-named schema modules behind the existing `./config` subpath
+  export (entry schemas, infrastructure schemas, root config), keeping the public surface and the
+  generated `appsettings.schema.json` byte-identical; `deno test packages/aspire`, doc-lint, publish
+  dry-run, and `arch:check` must remain green.
+
+## packages/telemetry — cache attributes deepen over-cap attribute folder (`telemetry-attributes-f16-1562`)
+
+- **Reason:** Issue #1562 and its PLAN-EVAL advisory A1 require `src/attributes/cache.ts` beside the
+  package's existing published attribute modules. The addition increases `src/attributes/` from 13
+  to 14 immediate children against the F-16 cap of 12.
+- **Owner:** `@netscript/telemetry` public attribute-surface maintainers.
+- **Target:** Before the next telemetry attribute domain is added.
+- **Linked plan:** `.llm/runs/release-0.0.6-features--orchestration/slices/plan-1562.md`; issue
+  #1562; PR #1605.
+- **Created:** 2026-08-12.
+- **Status:** open, DEBT_ACCEPTED for #1562; recorded in implementation slice S1.
+- **Gate:** Group the established attribute domains behind role-named bounded subdirectories while
+  preserving the `@netscript/telemetry/attributes` export map and symbol names; telemetry package
+  tests, scoped gates, full-export doc lint, publish dry-run, and `quality:gate` must remain green.
+
+## plugins/workers — published export private-type references (`workers-private-type-ref-1655`)
+
+- **Reason:** Full-export `deno doc --lint` over all 13 `@netscript/plugin-workers` export targets
+  reports exactly 20 pre-existing `private-type-ref` diagnostics. The same audit reports zero
+  `missing-jsdoc` and zero other diagnostics. Removing these references is a package API repair
+  outside the quality-scanner leaf; hiding them or claiming this audit green would make the
+  publication evidence untruthful.
+- **Owner:** `@netscript/plugin-workers` public-surface maintainers; issue #1655 in milestone 0.0.8.
+- **Target:** Resolve in #1655 without increasing or adding a diagnostic class before that repair.
+- **Linked plan:**
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/plan.md`;
+  issues #1378, #1545, and #1655; PR #1653.
+- **Created:** 2026-08-15.
+- **Status:** open, DEBT_ACCEPTED with a ratcheted ceiling of 4 `private-type-ref` diagnostics
+  across the same 13 export targets. The earlier ceiling of 20 is historical and no longer allowed.
+- **Gate:** Until #1655 closes, allow only the four measured references on `./contracts`
+  (`./contracts/v1/mod.ts`): three to `WorkersContractDefinition` and one to upstream oRPC
+  `implement`. Require zero diagnostics on each of the other 12 export targets, zero
+  `missing-jsdoc`, and zero other diagnostic classes. Any additional reference, relocation to
+  another target, or new diagnostic class is `FAIL_DEBT`. Closure requires the full-export audit to
+  exit 0 with zero diagnostics while Workers publish dry-run and `quality:gate` remain green.
+- **Evidence:**
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
+  records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
+
+- **0.0.8 reconciliation (#2218):** The current main full-export baseline is 20; the type-only
+  vocabulary repair reduces the combined total to 4 across the same 13 targets. All 12 non-contract
+  targets are clean. The contract target retains three references to the precise
+  `WorkersContractDefinition` and one oRPC `implement` reference. This row remains open: exporting
+  the definition exposes its private route/schema graph, and the oRPC reference falls under doctrine
+  02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
+  proven. Evidence is kept in the run record and PR #2218.
+
+- **0.0.8 public contract graph (#2292):** Public values now name the owned `WorkersContract`
+  contract. New owned route and schema aliases preserve all 22 procedures, concrete schema methods,
+  literal payload binding, and handler inference. The full 13-target plugin lint falls from four to
+  two existing references: `WorkersContract` still names the private precise definition, and
+  `workersContractV1` still names oRPC `implement`. Both debt entries remain open; exact zero,
+  publication and quality evidence are still required for closure. No upstream internals are
+  re-exported and no signatures are erased. Consumer controls are in
+  `plugins/workers/tests/public/contract-graph_test.ts`.
+
+- **0.0.8 named implementer annotation (#2313):** The context-bindable value now names the owned
+  `WorkersContractV1` contract, backed by the additive `WorkersContractImplementer<TContext>` alias.
+  Bidirectional upstream compatibility and consumer rejection controls preserve all 22 routes and
+  the middleware, router, lazy-router, configuration, and context-binding capabilities. Full-export
+  lint remains at two findings: the private `WorkersContractDefinition` and oRPC `implement` now
+  referenced by the named implementer alias. Merely publishing the definition exposes its private
+  route/schema graph; substituting oRPC's `Implementer` annotation also retains a private reference.
+  Neither diagnostic is suppressed, and no zero-diagnostic acceptance is claimed. This row and
+  `workers-doc-baseline-2066` remain open with their existing closing gates. Evidence is kept in the
+  run record and PR #2313.
+
+## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
+
+- **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
+  but `Aspire.Hosting.Browsers` has no stable 13.5.x package. The accepted OF-2a fallback is
+  `13.5.3-preview.1.26425.3`, preserving a single 13.5 train without holding back the stable
+  surface.
+- **Owner:** CLI Aspire scaffold maintainers.
+- **Target:** Replace the preview pin as soon as a stable 13.5.x `Aspire.Hosting.Browsers` package
+  is available.
+- **Linked plan:** Issue #1713; epic #1712; PR #1727;
+  `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/`.
+- **Created:** 2026-08-29.
+- **Status:** open, DEBT_ACCEPTED for #1713 under research decision D-1 / OF-2a.
+- **Gate:** Drop when a stable 13.5.x Browsers package exists. E-12 (`check:scaffold-versions`)
+  scans `SCAFFOLD_VERSIONS` only and never sees `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; until then,
+  `check:aspire-version-parity` (exact-pin allow-list), `generate-aspire-config_test.ts`, and both
+  CI-owned `scaffold.runtime` tiers must retain the exact accepted preview pin and remain green.
+
+## packages/cli — resource-command composition IO extraction (`cli-resource-composition-io-1354`)
+
+- **ID:** `cli-resource-composition-io-1354`
+- **Title:** Resource-command staging and procedure discovery remain in the public composition root.
+- **Context:** Slice F for issue #1354 / PR #1956 absorbed Slice E's deferred dependency-composition
+  item in `public/features/root/public-command-dependencies.ts`. Its resource stager directly uses
+  temporary-directory and filesystem operations, while its procedure resolver launches `deno eval`
+  and parses the selected service name. IMPL-EVAL M-2 found that these are adapter-grade effects,
+  not declarative wiring under R-COMP-DECL/AP-25. The same path and the resource use case also
+  retain Slice E LOW-2: non-reconciler pre-apply failures surface as plain `Error` instead of
+  `CliExitError`.
+- **Why deferred:** PR #1956 is a post-evaluation closeout with product-code changes explicitly
+  prohibited. The command behavior and production composition are integration-tested; moving the
+  effects and normalizing errors require a separately reviewed adapter/error-boundary slice.
+- **Owner:** CLI resource-generation maintainers / issue #1354 follow-up.
+- **Target:** Slice G or the next dedicated `generate resource` architecture follow-up, before
+  another resource-command dependency is added to the public composition root.
+- **Linked plan:** `.llm/runs/feat-cli-resource-slice-activate--1354-f/plan.md`; issue #1354; PR
+  #1956; `.llm/runs/feat-cli-resource-slice-activate--1354-f/evaluate.md` (M-2, L-4).
+- **Created:** 2026-09-03.
+- **Status:** open, DEBT_ACCEPTED for PR #1956 closeout only.
+- **Gate:** Move staging and procedure discovery behind role-named `kernel/adapters/`
+  implementations of the existing filesystem/process seams, add focused adapter tests (including
+  service-name extraction), and normalize every non-reconciler pre-apply failure to `CliExitError`;
+  focused resource-command tests, the full CLI unit suite, structured CLI check, `arch:check`,
+  `quality:gate`, and CLI publish dry-run must all remain green.
+
+## packages/plugin contract mount — upstream oRPC doc-lint visibility
+
+- **Reason:** `mountPluginContract` references the actual upstream `AnyContractRouter` and
+  `EnhancedContractRouter` types. Deno doc-lint reports two `privateTypeRef` findings on this
+  signature, although package publish dry-run passes without `--allow-slow-types` and native
+  contract/authorizer type checks pass. Erasing the types, re-exporting upstream types solely to
+  appease the checker, or suppressing lint is not accepted. Independent evaluation found no verified
+  sound repair and returned FAIL_DEBT for this exact delta.
+- **Owner:** Cockpit milestone coordinator, NetScript issue #1383 / PR #2003.
+- **Target:** Re-evaluate at the next oRPC contract dependency change or Deno doc-lint upgrade,
+  whichever occurs first; keep the measured baseline comparison in subsequent public-surface work.
+- **Linked plan:** `.llm/runs/plugin-service-auth--1383/binding-repair-plan.md`; independent
+  disposition D2 in `.llm/runs/plugin-service-auth--1383/evaluate.md`.
+- **Created:** 2026-09-08.
+- **Status:** open, DEBT_ACCEPTED by the milestone coordinator following independent D2 analysis;
+  acceptance is limited to these two checker findings and does not certify PR merge readiness.
+- **Gate:** The raw package doc-lint result remains FAIL (17, including the prior 15). The scoped
+  fitness exception permits exactly the two cited upstream-type findings at
+  `src/contract-base/domain/contract-mount.ts`, with no new missing-JSDoc/other findings or increase
+  elsewhere. Publish dry-run must continue to pass without `--allow-slow-types`.
+- **Closing gate:** Both named findings disappear without type erasure, upstream re-export solely
+  for lint, or suppression; compare file/category deltas against the original 15-finding receipt.
+  Merely resetting the baseline to 17 or reducing unrelated findings does not close this debt.
+- **Evidence:** `s6-doclint-comparison.json`, `s6-doclint-qualified-types.json`, and
+  `s6-generation-receipt.json` in the linked run; evaluator independently reproduced the two
+  diagnostics and successful publish analysis. [observed - evaluate.md D2; contract-mount.ts public
+  signature; docs/architecture/doctrine/02-public-surface.md public types and oRPC boundary]
+
+## plugins/streams/services/src/bounded-file-store.ts — A11 upstream storage extension seam
+
+- **ID:** `STREAMS-BOUNDED-NATIVE-IO-HOOKS`
+- **Reason:** `AP-4` cross-package implementation inheritance / `A11` dependency coupling. Native
+  durable-streams/server buffers full append logs during recovery and suffix reads, but exposes
+  neither protected segment I/O hooks nor store injection. The NetScript adapter replaces exactly
+  two TS-private virtual hooks on its own subclass before native constructor recovery. No upstream
+  prototype is modified. Retaining the native store preserves LMDB/protocol/fork semantics.
+- **Owner:** NetScript streams maintainers.
+- **Target:** The upstream bounded-I/O/store-injection release tracked by
+  https://github.com/durable-streams/durable-streams/issues/420.
+- **Linked plan:** `.llm/runs/orch-divybot-636--bounded-stream-storage/plan.md`; NetScript #2080.
+- **Created:** 2026-10-07
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
+  fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory
+  ceiling.
+- **Substrate:** The production composition still uses `DurableStreamTestServer` for its native HTTP
+  protocol implementation. This is accepted within the same named debt; it is not a production
+  durability certification. File mode is startup-probed and producer restart-tested; memory mode is
+  explicitly ephemeral.
+- **Exit condition:** Replace `DurableStreamTestServer` with an upstream supported production
+  server/store-injection API after durable-streams#420 lands, preserving the bounded store, real
+  producer write/process-restart/read, framing, fork and RSS regression proofs.
+- **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
+  checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
+  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
+  cold historical framing scans for fixed memory without a storage migration or persistent index.
+
+## packages/ai — existing doc-lint private references (`ai-doc-private-ref-baseline-2036`)
+
+- **Reason:** Single-entrypoint doc lint returns private-type references on unchanged main and on
+  the peer-compatibility slice. All per-entrypoint diagnostic counts and exits match; source public
+  contracts are unchanged. Combined-summary zero counts do not override those failing exits.
+- **Owner:** AI framework maintainers.
+- **Target:** Before stable release readiness is claimed.
+- **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
+- **Status:** Open, existing baseline finding recorded for independent source-slice adjudication; no
+  blanket green documentation claim.
+- **Gate:** F-7; full-export `deno task doc:lint --root packages/ai` must pass when resolved.
+
+## packages/fresh — unchanged all-export doc lint (`fresh-doc-baseline-2036`)
+
+- **Reason:** Current main and AI-family amendment have identical all-export per-entry diagnostics
+  and exits: builders 3 private references, query 8, route 8 plus 17 missing JSDoc, streams 11;
+  other exports including AI have zero diagnostics. Combined-summary zeros do not supersede failing
+  native exits. The previously resolved June row does not describe this newer baseline.
+- **Owner:** Fresh framework maintainers.
+- **Target:** Before stable release readiness is claimed.
+- **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
+- **Status:** Open, unchanged baseline recorded for independent F-7 adjudication; this dependency
+  amendment introduces no doc diagnostic.
+- **Gate:** All-export `deno task doc:lint --root packages/fresh` must pass at resolution. RSS
+  negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold
+  historical framing scans for fixed memory without a storage migration or persistent index.
+
+## SDK/Fresh — unchanged public documentation baseline during Collection-family qualification
+
+- **ID:** `db-doc-baseline-2039`
+- **Reason:** F-JSR-7 existing public documentation residue predates the exact DB family and
+  additive optional StreamDB lifecycle members. SDK combined doc sweep reports three private
+  references; Fresh combined sweep reports 28 private references and 17 missing docs. Every
+  individual export entrypoint diagnostic count and exit code exactly matches the baseline; combined
+  sweep alone is not the evidence.
+- **Owner:** SDK/Fresh maintainers.
+- **Target:** 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-db-collection-runtime-family--c2/plan.md`; NetScript #2039.
+- **Created:** 2026-10-08.
+- **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL PASS at
+  51d074443efa241af0d24153a6de608f78ef429b.
+- **Gate:** All-export doc lint must reach zero with existing types preserved. This change
+  introduces no additional diagnostic or private reference at any entrypoint. Release requires
+  qualified published consumer resolution; source qualification does not fulfill publication.
+- **Evidence:** Private baseline/current structured doc reports and complete per-entrypoint
+  comparison; run worklog records both raw failing exits and unchanged baseline, never false green.
+  Raw dry-run publication analysis gates the changed owning packages.
+
+## Fresh — unchanged documentation baseline during pure route utility repair
+
+- **ID:** `route-doc-baseline-2040`
+- **Reason:** Existing all-export public documentation diagnostics predate the URL purity repair.
+  Combined Fresh sweep reports 28 private references and 17 missing docs. Every export entrypoint
+  diagnostic and exit code exactly matches current-main baseline; complete structured stdout is
+  byte-identical.
+- **Owner:** Fresh maintainers.
+- **Target:** 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-pure-route-url-utilities--c2/plan.md`; NetScript #2040.
+- **Created:** 2026-10-08.
+- **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL at
+  dd452c4b1330044cfe12ebabef1a8bb345cb71d7.
+- **Gate:** All-export doc lint reaches zero with existing public types preserved. This repair
+  introduces no additional entrypoint diagnostic. Publication and qualified published consumer
+  remain owner release gates.
+- **Evidence:** Complete private baseline/current reports and entrypoint comparison; worklog retains
+  both failing raw doc exits, passing owning JSR audit and actual publish dry-run.
+
+## workers packages — unchanged doc baseline (`workers-doc-baseline-2066`)
+
+- **Reason:** Main baseline retains public private-type references across plugin-workers-core and
+  workers exports; cancellation source removes every newly introduced diagnostic. Corrected
+  per-entry counts and exit codes match baseline exactly (core combined 9, plugin combined 22;
+  combined summaries alone are insufficient). Existing workers-private-type-ref-1655 row has an
+  older narrower baseline and is not treated as approval for growth.
+- **Owner:** Workers package public-surface maintainers.
+- **Target:** Before the next stable workers release, no later than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
+- **Created:** 2026-10-08.
+- **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged source
+  baseline.
+- **Gate:** F-7: all worker export doc-lint diagnostics zero.
+
+- **0.0.8 reconciliation (#2218):** Runtime and streams vocabulary is exported without type erasure.
+  The workers contract repair is still pending under #1655, so this zero-diagnostic closing gate
+  remains open; the earlier cancellation baseline does not authorize any growth.
+
+## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
+
+- **Reason:** The historical cancellation baseline lacked `@module` JSDoc on public `doctor.ts`,
+  producing an unchanged F-JSR-2 failure. PR #2218 adds the tag and proves this module gate.
+- **Owner:** Workers plugin public-surface maintainers.
+- **Target:** Before the next stable workers release, no later than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
+- **Created:** 2026-10-08.
+- **Status:** closed by PR #2218: `doctor.ts` carries `@module`, and the plugin JSR audit passes.
+- **Gate:** F-JSR-2 module tag present and plugin JSR audit passes.
+
+- **Evidence (#2218):**
+  `deno run --allow-all .llm/tools/fitness/audit-jsr-package.ts --root
+  plugins/workers` exits 0
+  with zero FAIL findings. The module-documentation audit reports no F-JSR-2 finding. Existing
+  source-layout and slow-type warnings remain separate from this satisfied module-tag gate. Full
+  output is kept in the run record.
+
+## workers-core source layout — required adapter directory (`workers-core-layout-2066`)
+
+- **Reason:** Pre-existing src cardinality exceeds the doctrine cap; source now has 19 immediate
+  children versus main's 18 because the approved native clock adapter belongs in adapters/. Moving
+  the clock into runtime would violate adapter placement. No unrelated source expansion;
+  restructuring existing worker core is deferred.
+- **Owner:** Workers core maintainers.
+- **Target:** Existing source layout consolidation before the next stable workers release, no later
+  than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`; original PLAN-EVAL advisory
+  A3 approves adapter placement.
+- **Created:** 2026-10-08.
+- **Status:** open; evaluator adjudication required.
+- **Gate:** F-16 source cardinality at or below 12, preserving domain/port/adapter ownership.
+
+## desktop-doc-baseline-2041 — unchanged SDK/Fresh documentation baseline
+
+- **Owner:** SDK, Fresh and MCP maintainers.
+- **Target:** 2026-10-15.
+- **Status:** open, DEBT_ACCEPTED by independent Google IMPL-EVAL at
+  `510856423f270333499f7e8e3639a117c6d7a6ff` (desktop-doc-baseline-2041).
+- **Scope:** The all-export documentation reports at baseline
+  `8aad14940c52cd3a4db7efa57d56d50ae131df6c` and completed desktop source are byte-identical,
+  including every entrypoint diagnostic and exit. SDK combined diagnostics: 3 private type
+  references; Fresh: 28 private type references and 17 missing JSDoc. Both raw gates exit one. MCP
+  combined diagnostics are zero, but cli.ts/mod.ts each retain three private references and raw
+  entrypoint exits one, making the wrapper raw exit one. The pristine baseline MCP structured report
+  is byte-identical, including all three entrypoints. The optional native document epoch handler
+  parameter is documented; no new diagnostic or slow type is introduced. Owning JSR audit and actual
+  publication dry-runs pass.
+- **Evidence:** `.llm/runs/fix-desktop-document-reconnect--c2/worklog.md`; complete raw structured
+  baseline and final reports retained for independent comparison. No suppression or baseline reset.
+  Publication/final release qualification remains separate.
+- **Closing gate:** Repair the pre-existing all-export documentation findings and obtain raw
+  documentation exit zero; receipt equivalence does not close this debt.
+
+### Fresh rich send all-entrypoint documentation baseline (#2068)
+
+- **ID:** `chat-send-doc-baseline-2068`
+- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type
+  references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count
+  and raw exit are unchanged after rich send; the new owned type is fully documented. MCP corpus
+  ownership additionally retains an identical pristine-main report: combined zero, two entrypoints
+  with three private-type diagnostics each and raw task exit one. Raw doc gates remain failed, no
+  suppression.
+- **Owner:** Fresh and MCP package public-surface maintainers.
+- **Target:** Before the next stable Fresh release, no later than 2026-10-15.
+- **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export
+  entrypoint.
+- **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at
+  `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits
+  match pristine main; closing gate remains owner work.
+
+## Fresh AI — derived native chat send documentation references (`fresh-ai-native-send-doc-2087`)
+
+- **Reason:** PR #2087 requires deriving `NetScriptChatSendMessage` from installed TanStack 0.65
+  UI/Model types so native consumer messages compile without casts. Focused AI doc lint introduces
+  exactly two `private-type-ref` diagnostics (`UIMessage`, `ModelMessage`) at the derived alias.
+  Re-exporting vendor types conflicts with F-15; copying the role union repeats the drift that broke
+  CI. Keep the sound derived contract and report the failing doc gate openly; no lint suppression or
+  slow-types flag is introduced.
+- **Owner:** Fresh AI public-surface maintainers / PR #2087.
+- **Target:** Before stable Fresh AI publication readiness is claimed.
+- **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--ci-2087/plan.md`.
+- **Status:** Open; DEBT_ACCEPTED by independent GLM IMPL-EVAL for this CI repair (see linked run's
+  evaluate.md). No blanket green documentation or release claim.
+- **Gate:** Focused `deno doc --lint packages/fresh/src/runtime/ai/mod.ts` returns zero diagnostics
+  while native activity/UI/Model consumers compile without casts and opaque forward-compatible
+  payloads remain intact.
+- **Evidence:** Initial native check exit 1 with six role errors; derived contract check, Fresh
+  check, all 42 AI tests, peer guard, frozen install, Fresh lint and touched-source formatting
+  exit 0. Focused doc lint exit 1 with only the two named references. Project
+  runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
+
+## packages/fresh — `create-chat-connection.ts` grows further past the 500-line cap (`fresh-ai-chat-connection-a8-2067`)
+
+- **Reason:** PR #2138 (issue #2067) adds the optional `producer` member to
+  `NetScriptChatResponseOptions` and to the `toResponse` seam input, plus the fenced-turn JSDoc
+  example on `toNetScriptChatResponse`. That takes
+  `packages/fresh/src/runtime/ai/create-chat-connection.ts` from **652 to 684 lines** (as counted by
+  `arch:check`) against the 500-line A8/AP-1/F-1 cap. The file was already 152 lines over at
+  baseline (same doctrine WARN on `origin/main`). The fenced writer itself lives in the separate
+  `fenced-chat-session-writer.ts`, and the producer contract and error in `chat-producer.ts`; only
+  the option member, the seam field and their documentation are added to the over-cap module. The
+  remediation trimmed the duplicated seam input type to keep the growth to those lines.
+- **Owner:** Fresh AI public-surface maintainers (`@netscript/fresh/ai`).
+- **Target:** Before the next public member is added to `create-chat-connection.ts`, and before
+  stable Fresh AI publication readiness is claimed.
+- **Linked plan:** Issue #2067; PR #2138 (IMPL-EVAL finding 2).
+- **Created:** 2026-10-10
+- **Status:** open, DEBT_ACCEPTED for #2138 pending independent IMPL-EVAL.
+- **Gate:** Split `create-chat-connection.ts` into role-named modules behind the unchanged `./ai`
+  barrel (session addressing and connection, durable session response, snapshot and the
+  one-projection reducer), each under 500 lines. The exported symbol set and `deno doc` output of
+  `src/runtime/ai/mod.ts` stay identical; `deno test packages/fresh/src/runtime/ai`, the
+  streams-service fencing regression, doc-lint, publish dry-run and `arch:check` stay green.
+
+## auth-kv-oauth — explicit boolean proxy trust (`auth-trusted-proxy-hops-2026`)
+
+- **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
+  HTTPS/cookie policy. It requires a perimeter that replaces protocol headers and blocks direct
+  access; it cannot authenticate a chain of proxy hops or source CIDRs. Direct-TLS refresh now
+  supports explicit `cookie.secure` / `NETSCRIPT_AUTH_COOKIE_SECURE`; automatic host TLS metadata
+  propagation into URL-less `AuthnRequest` remains deferred against #2191.
+- **Owner:** Auth package and plugin maintainers.
+- **Target:** Backlog / Triage; before recommending trust in multi-hop deployments.
+- **Linked plan:** #2026 option A decision; follow-up #2191.
+- **Created:** 2026-10-10.
+- **Status:** open; option B deferred by coordinator, option C rejected as spoofable.
+- **Gate:** F-2/F-3 trusted-hop/CIDR contract and spoofing regression tests covering both flow and
+  cookie derivation, with documented migration from boolean trust. Outbound OAuth transport stays
+  independent.
+
+## Auth integration — unchanged raw documentation lint baseline (`auth-doc-baseline-2026`)
+
+- **Reason:** The #2026 transport fix preserves the complete raw doc-lint reports from pristine
+  baseline `e876d98847298ee8a902a6ab95942ec912e1e3aa`: plugin-auth-core has four combined private
+  type references; plugins/auth has thirteen. Every entrypoint count and exit is identical.
+  auth-kv-oauth has zero findings. The findings include the existing private contract shape and
+  upstream oRPC implementer plus stream types. No type erasure, lint suppression, gate relaxation,
+  or additional slow-types flag is introduced.
+- **Owner:** Auth and streams public-surface maintainers; coordinator adjudicates readiness.
+- **Target:** Before raw all-export documentation gates are claimed green.
+- **Linked plan:** #2026; PR #2188. Raw baseline/final reports kept in the run record.
+- **Created:** 2026-10-10.
+- **Status:** open; raw doc-lint remains exit 1. Coordinator accepted the baseline-identical debt
+  for PR #2188 readiness; the independent evaluator confirmed no new lint findings.
+- **Gate:** F-7 raw all-export doc-lint exits zero with sound public contracts and no vendor
+  re-export or erased types.
+
+## packages/auth-workos — AUTH-WORKOS-BEARER-PARITY
+
+- **ID:** `AUTH-WORKOS-BEARER-PARITY`
+- **Title:** The WorkOS backend `authenticate` does not yet meet the bearer/cookie resolution-parity
+  port contract.
+- **Reason:** PR #2178 (fixing #2120) states on `AuthBackendPort.authenticate`
+  (`packages/plugin-auth-core/src/ports/mod.ts`) that a request credential must resolve exactly as
+  `sessions.getSession({ token: readBearerCredential(request), request })` does, so a well-formed
+  bearer beats the session cookie. `kv-oauth` conforms in #2178, and `better-auth` already conforms
+  because both of its paths read the request headers. `createWorkosBackend().authenticate` delegates
+  to `createWorkosAuthenticator`, which reads only the sealed-session cookie, while its `getSession`
+  honours `lookup.token`. On `workos`, a bearer-only `me` therefore stays signed out while
+  `/session` accepts the same bearer.
+- **Why deferred:** #2120 is scoped to `kv-oauth`. Conforming `workos` means either changing the
+  published standalone `createWorkosAuthenticator` cookie semantics or adding a backend-only
+  credential path with its own refresh/`Set-Cookie` rule. Either one needs its own decision and
+  backend tests.
+- **Owner:** Auth backend maintainers (`@netscript/auth-workos`).
+- **Target:** Before the 0.0.9 release, no later than 2026-11-15.
+- **Linked issue:** [#2180](https://github.com/rickylabs/netscript/issues/2180).
+- **Created:** 2026-10-10
+- **Status:** open; pending DEBT_ACCEPTED adjudication by the independent IMPL-EVAL of PR #2178.
+- **Gate:** Close when a backend-level conformance test in `packages/auth-workos/tests/`, failing on
+  its base commit, proves that `createWorkosBackend().authenticate` resolves the same session as
+  `sessions.getSession` given `token: readBearerCredential(request)` and the request, for cookie,
+  bearer, competing cookie+bearer, and malformed bearer requests, and that a bearer-borne refresh
+  emits no `Set-Cookie`.
+
+## packages/service — residual F-1 builder and type-module size (#1386 L2)
+
+- **Reason:** The service builder and public type module already exceeded their F-1 size caps before
+  #1386 L2. The CORS contract and middleware registration add lines to those existing modules. CORS
+  policy itself is extracted to the focused `src/middleware/service-cors.ts`; further decomposition
+  of the existing builder and public types remains separate work.
+- **Owner:** NetScript service maintainers / architecture follow-up.
+- **Target:** Next service architecture decomposition pass, before the stable public API line.
+- **Linked change:** [Leaf X-1386, PR #2193](https://github.com/rickylabs/netscript/pull/2193).
+- **Created:** 2026-10-10.
+- **Status:** open; residual size debt recorded, no closure claimed by this leaf.
+- **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
+  `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
+  green. `arch:check` currently exits zero with these size warnings.
+
+## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
+
+- **ID:** `SAGAS-WORKER-DISPATCH-FIXTURE`
+- **Reason:** The PostgreSQL publish-process test fixture imports the workers dispatcher, pool
+  factory, and dispatch context across plugin internals to prove real durable worker execution. The
+  public `@netscript/plugin-workers/worker` exports Worker and WorkerPoolOptions, but does not
+  expose these three seams; workers-core exports primitives rather than this plugin dispatcher.
+- **Owner:** Workers runtime maintainers.
+- **Target:** Next workers runtime testing-contract review.
+- **Status:** open, test-only coupling accepted for PR #2213.
+- **Exit condition:** Replace these imports with a supported public execution/testing contract that
+  preserves the physical PostgreSQL effect and durable duplicate-execution proof.
+- **Gate:** Real HTTP/PostgreSQL publish-process conformance and worker idempotency assertions.
+
+## SDK fetch stream-source placement (F-16, #2100)
+
+- **ID:** `sdk-stream-source-placement-2100`
+- **Reason:** The stream transport is a separate concern temporarily placed in
+  `packages/sdk/src/client/stream-source/`. SDK already has 14 source-root directories against
+  F-16's limit of 12; adding another root would worsen that baseline. Nesting under the client
+  concern leaves the concern boundary imperfect and requires an explicit consolidation follow-up.
+- **Owner:** SDK architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release.
+- **Status:** Open; pending independent evaluator acceptance for PR #2212.
+- **Closing gate:** Consolidate SDK source roots to at most 12 and place the transport in a proper
+  stream concern while preserving the public consumer subpath and its import-graph guard.
+- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
+  OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.
+
+## packages/plugin-workers-core — WINDOWS-PROCESS-RUNNER-PARITY
+
+- **ID:** `WINDOWS-PROCESS-RUNNER-PARITY`
+- **Reason:** Deno.Command replaced Dax for bounded stdin/stream control. Windows PATHEXT lookup for
+  bare `.cmd`/`.bat` shims and `taskkill /PID <owned-pid> /T /F` termination lack Windows-host
+  execution evidence; Linux results do not establish Windows parity.
+- **Owner:** Workers maintainers, coordinated through #2103.
+- **Target:** Windows verification by 2026-10-27, before the 0.0.8 stable cut.
+- **Linked review:** PR #2201, IMPL-EVAL at `08421b92f` (finding 4); issue #2110.
+- **Plan:** Run native-executable stdin/EOF, command-shim resolution, and cmd-wrapper abort/timeout
+  fixtures on Windows. Compare bare shim launch to the former Dax behavior; restore PATHEXT-aware
+  resolution if parity fails. Keep batch scripts on the existing CmdRuntimeAdapter meanwhile.
+- **Created:** 2026-10-10.
+- **Status:** open; verification deferred because the implementation host is Linux.
+- **Closing gate:** Windows-backed tests prove stdin isolation/EOF, `.cmd`/`.bat` lookup with
+  arguments, and that cancellation/timeout stop a cmd wrapper and its pipe-holding grandchild.
+
+## SDK/Fresh stream materializer convergence (#2100)
+
+- **ID:** `sdk-fresh-stream-materializer-convergence-2100`
+- **Reason:** `@netscript/sdk/streams/collections` materializes one State Protocol entity type with
+  `parse` and `getKey`, while `@netscript/fresh` `createNetScriptStreamDB` uses multi-type
+  `StateSchema` and `@durable-streams/state`. They share TanStack DB but duplicate the materializer
+  seam, with different URL/auth resolution, retry policy, readiness, failure, and disposal
+  contracts.
+- **Why deferred:** The injected Expo transport must remain DOM-independent. Replacing either
+  adapter without reconciling its schema and recovery semantics would change an existing consumer
+  contract; PR #2244 preserves both and documents their differences.
+- **Owner:** SDK and Fresh architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release, no later than 2026-11-15.
+- **Plan:** Specify one platform-neutral entity/schema and lifecycle contract; reconcile auth/URL
+  resolution, replay, readiness, fatal failure, and finite retry policy explicitly. Move shared
+  materialization into one core seam with thin injected-transport SDK and Fresh adapters, preserving
+  the published single-type and multi-type entrypoints through compatibility adapters and migration
+  documentation. Do not make native consumers import Fresh or server telemetry.
+- **Linked change:** [PR #2244](https://github.com/rickylabs/netscript/pull/2244).
+- **Created:** 2026-10-10.
+- **Status:** Open; recorded for independent evaluator adjudication, no convergence claimed here.
+- **Closing gate:** Both adapters use the shared materializer and pass the same conformance matrix
+  for inserts/updates/deletes, schema/key validation, filtered live queries, control-committed
+  replay, reconnect without gaps/duplicates, preload/fatal errors, cancellation, and disposal.
+  Preserve the SDK non-DOM import-graph guard, Fresh schema/recovery tests, and Expo-pinned React
+  lifecycle tests; verify native Hermes/Expo acceptance separately before claiming cross-runtime
+  equivalence.
+
+## Fresh chat — retain Deno fetch response until subscription teardown (`fresh-chat-response-gc-2324`)
+
+- **Owner:** NetScript Fresh maintainers; issue #2324.
+- **Target:** Remove retention after
+  [denoland/deno#37006](https://github.com/denoland/deno/issues/37006) is fixed in the supported
+  Deno release and the forced-GC cancellation regression still passes.
+- **Gate:** `chat-response-gc_test.ts` runs the public chat connection with real streaming fetch,
+  forced GC and no fixture retention, then waits for the server body's cancellation event.
+- **Status:** Temporary upstream workaround. `chat-stream-subscription.ts` retains one response per
+  physical subscription, replaces it on reconnect, and releases it after cancellation. The public
+  subscription hub continues to own sharing, last-reader cancellation and disposal. The upstream
+  JSON stream owns parsing and backpressure; its consumed offset owns resume.
+- **Audit:**
+  - SDK `src/client/stream-source/internal/connection.ts`: unaffected. The abort listener explicitly
+    calls `reader.cancel()` and the finally block cancels/releases the reader, so cleanup does not
+    depend on Deno's lost fetch abort link. The SDK forced-GC regression proves server cancellation.
+  - SDK stream collections and React bindings: use the same fetch event source and its `close()`;
+    collection disposal closes that source. No independent body parser.
+  - Expo/React Native reference transport `resources/examples/expo-streams/expo-fetch.ts`: injects
+    `expo/fetch` into that SDK consumer. Hermes is outside the Deno bug, and the SDK still
+    explicitly cancels its reader. This audit makes no claim of new native-device execution.
+  - Fresh StreamDB recovery: deliberately uses finite `live: false` reads with `live=long-poll`
+    parameters, then `session.text()`. No detached SSE reader; the upstream response session retains
+    its finite response during body consumption, and recovery cancels/releases each attempt.
+  - Fresh chat proxy: passes the upstream body unbuffered into a server response rather than parsing
+    it. Downstream body cancellation propagates to that same stream; it does not rely solely on
+    fetch-signal cancellation. Existing proxy tests cover signal forwarding and byte passthrough.
+  - Snapshot materialization and chat writes: finite JSON/text or bodyless responses, rather than
+    detached long-lived SSE parsing. Snapshot reads retain the stream session until `json()`
+    settles.
+- **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
+  diagnostics are preserved, with only status and signal observations in the fixture; the runtime
+  now retains the Response. No fixture-only Response retention remains.
+
+## Fresh/workers reader headers — native public type closure
+
+- **ID:** `U3-NATIVE-READER-HEADER-TYPE-CLOSURE`
+- **Reason:** U3 preserves exact native client0.2.7 `HeadersRecord` identity for
+  string/sync/async values. Actual copied owning graphs measure Fresh10/12/10 and
+  workers0/1/0 for baseline/current/candidate. Both `HeadersRecord` and its native
+  `MaybePromise` dependency must be public at the four measured source/aggregate
+  sites. This is a bounded upstream-type and facade-growth exception, not a scanner PASS.
+- **Owner:** Milestone coordinator + rickylabs.
+- **Target:** 2026-11-10, fixed; no extension or growth under this disposition.
+- **Status:** Open, `DEBT_ACCEPTED` for this precise U3 delta after independent SAME
+  GLM5.3 corrective PLAN review and root acceptance; implementation gates remain required.
+- **Exact sites:** `packages/fresh/src/runtime/streams/create-stream-db.ts`, its
+  `mod.ts`, `plugins/workers/streams/factory.ts` and its `mod.ts`. Export only native
+  `HeadersRecord` and native `MaybePromise` by identity, type-only, without aliases.
+- **Boundary:** No fifth source site, extra native name, package, runtime value,
+  resolver/serializer, dependency/version, config/lock, authentication/issuer/bootstrap
+  policy or lifecycle change. Consumers still prefer their upstream type owner;
+  this is no general NetScript vendoring precedent.
+- **Gate:** Closure is `DEBT_ACCEPTED` for two distinct acknowledged violations:
+  upstream native type re-export (chapter02/AP-14/F-15) and measured two-name aggregate
+  facade growth (chapter11/F-5; Fresh52-to54, workers24-to26, prior surplus unwaived),
+  never an unqualified F-15 or F-5 PASS. Warning-free actual owning Fresh12-to10 must
+  retain exactly the same ten baseline finding identities; workers1-to0; nonempty
+  native declarations at all four sites; positive mutual identities/anti-any plus
+  three meaningful negative controls; unchanged runtime controls; scoped type/lint/fmt,
+  doctrine, quality, package/publish dry-run and independent IMPL evidence.
+  `MaybePromise` is exported solely because measured closure requires its public
+  shape; the closing gate removes both names together.
+- **Reference parity:** Pending root-scoped gate for the two added names per package.
+  Root selected no waiver. A genuinely green qualified existing reference contract
+  satisfies the gate without an invented page edit. Concrete missing-name findings
+  require a retained failing-parity receipt and exact root-authorized page scope.
+  A failing Windows coverage prerequisite or unrun parity never satisfies it.
+- **History:** The earlier `FRESH-NATIVE-HEADERS-TYPE-CLOSURE` PLAN verdict remains
+  immutable. Its source-only application failed owning12-to10 and was archived/reverted
+  with the appended debt. This corrective exception does not promote that failed
+  premise or transfer its narrower scope. Existing oRPC debt, ten Fresh baseline
+  findings and prior facade surplus remain separate and unwaived.
+- **Closing gate:** Remove both native facade names together through a compatible
+  public-doc solution retaining exact header identity and all controls, OR obtain
+  a separately reviewed doctrine amendment. No automatic renewal, baseline reset,
+  checker override, type erasure/cast/suppression or unrelated diagnostic reduction.
+- **Evidence:** [Actual corrective verdict](../../runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md),
+  SHA256 `c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4`;
+  [root scope/disposition](../../runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md),
+  SHA256 `6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c`.

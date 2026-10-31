@@ -1,0 +1,13 @@
+{
+  "selected": "snippets",
+  "args": [
+    "task",
+    "docs:snippets"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:27:14.320Z",
+  "ended": "2026-10-28T01:27:24.819Z",
+  "originalOutputAwaited": true,
+  "deadlineAborted": false,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/snippets-1793150834317"
+}

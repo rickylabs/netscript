@@ -1,0 +1,27 @@
+﻿param([Parameter(Mandatory=$true)][string]$Name, [Parameter(Mandatory=$true)][string[]]$DenoArguments)
+$ErrorActionPreference = 'Stop'
+$taskRoot = 'C:\Users\ericc\source\repos\netscript-native-service-policy-008'
+Set-Location -LiteralPath $taskRoot
+$denoExe = 'C:\Users\ericc\source\repos\eis-chat-netscript-008-s01\.netscript\agent\toolchains\deno-2.9.7\deno.exe'
+$env:PATH = (Split-Path -Parent $denoExe) + ';' + $env:PATH.Replace('/', '\')
+$env:PATHEXT = '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC'
+$env:DENO_DIR = 'C:\Users\ericc\source\repos\netscript-native-host-policy-008\.llm\tmp\native-host-policy-preflight\cache'
+$env:DENO_TLS_CA_STORE = 'mozilla,system'
+$env:HTTP_PROXY = 'http://127.0.0.1:3128'
+$env:HTTPS_PROXY = 'http://127.0.0.1:3128'
+$env:NO_PROXY = 'localhost,127.0.0.1,::1'
+$env:NO_COLOR = '1'
+$env:DENO_NO_PROMPT = '1'
+$taskEvidence = Join-Path $taskRoot '.llm\tmp\native-service-q4-sol-20261028'
+$started = [DateTime]::UtcNow.ToString('o')
+$stdout = Join-Path $taskEvidence ($Name + '.stdout.log')
+$stderr = Join-Path $taskEvidence ($Name + '.stderr.log')
+$ErrorActionPreference = 'Continue'
+& $denoExe @DenoArguments 1> $stdout 2> $stderr
+$nativeExitCode = $LASTEXITCODE
+$ErrorActionPreference = 'Stop'
+$record = [ordered]@{ name=$Name; startedUtc=$started; finishedUtc=[DateTime]::UtcNow.ToString('o'); executable=$denoExe; arguments=$DenoArguments; exitCode=$nativeExitCode; stdout=$stdout; stderr=$stderr }
+$record | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $taskEvidence ($Name + '.process.json')) -Encoding utf8
+$record | ConvertTo-Json -Depth 8
+exit $nativeExitCode
+

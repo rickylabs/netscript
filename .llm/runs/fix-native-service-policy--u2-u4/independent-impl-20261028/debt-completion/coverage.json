@@ -1,0 +1,62 @@
+{
+  "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+  "sameSession": true,
+  "reads": [
+    {
+      "name": "debt-completion-20261028/canonical-entry.md",
+      "expectedLines": 29,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "debt-completion-20261028/original-public-final.utf8.md",
+      "expectedLines": 67,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "debt-completion-20261028/root-gap-and-debt-delta.md",
+      "expectedLines": 62,
+      "complete": true,
+      "calls": 1
+    }
+  ],
+  "steps": [
+    {
+      "reason": "tool-calls",
+      "cost": 0.837464,
+      "tokens": {
+        "total": 210966,
+        "input": 207718,
+        "output": 258,
+        "reasoning": 46,
+        "cache": {
+          "write": 0,
+          "read": 2944
+        }
+      }
+    },
+    {
+      "reason": "stop",
+      "cost": 0.313056,
+      "tokens": {
+        "total": 222938,
+        "input": 5755,
+        "output": 2958,
+        "reasoning": 3665,
+        "cache": {
+          "write": 0,
+          "read": 210560
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "targetHead": "de9f6df3561d9e27587dd63687c8825254e9c3d5",
+  "priorCoverage": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/coverage.json",
+  "originalNotReadFinal": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/final-verdict.utf8.md",
+  "ownRelevantMcpAlreadyProvedInSameSession": true,
+  "freshMcpRequired": false,
+  "publicReportsRequired": 1,
+  "rootManualCompleteReportDebtRelevanceAndVerdictRequired": true
+}

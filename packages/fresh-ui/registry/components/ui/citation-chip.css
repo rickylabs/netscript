@@ -36,7 +36,7 @@
   outline-offset: var(--ns-space-px);
 }
 
-.ns-citation.is-active {
+.ns-citation[data-state='active'] {
   background: var(--ns-primary);
   border-color: var(--ns-primary);
   color: var(--ns-primary-fg);

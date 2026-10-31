@@ -1,0 +1,15 @@
+{
+  "selected": "publish-fresh",
+  "args": [
+    "task",
+    "--cwd",
+    "packages/fresh",
+    "publish:dry-run"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:21:34.346Z",
+  "ended": "2026-10-28T02:21:37.053Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343"
+}

@@ -1,0 +1,309 @@
+{
+  "capturedAt": "2026-10-28T01:15:33.878Z",
+  "sourceAcceptance": "PENDING root source review; no C2 commit",
+  "sources": [
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "lines": 73,
+      "sha256": "ed94832c5778bf942fd7b0c1d8c38ea4a2ef416e893243249a65bc858ec76763",
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/source-final/factory.ts"
+    },
+    {
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "lines": 237,
+      "sha256": "fb4341d5e31cd32f3dca71c7df45c19217193ff3b35bf4f5d0ea4cb7c70f6e17",
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/source-final/factory-headers_test.ts"
+    },
+    {
+      "path": "plugins/workers/tests/streams/live-query-consumer_type.ts",
+      "lines": 65,
+      "sha256": "aec81ac4ed550c8cb71766ddeb5ae6ffff32f8eb1a1062378f56741bc4156dc9",
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/source-final/live-query-consumer_type.ts"
+    },
+    {
+      "path": "plugins/workers/tests/streams/live-query-consumer_test.ts",
+      "lines": 35,
+      "sha256": "c2df5eb747e6373ef7df529e3ea02c2f4c06f3dc7473a7cb82a7f5628b61ec58",
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/source-final/live-query-consumer_test.ts"
+    }
+  ],
+  "gates": [
+    {
+      "selected": "red",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "-A",
+        "--filter",
+        "U3 workers native headers",
+        "plugins/workers/tests/streams/factory-headers_test.ts"
+      ],
+      "code": 1,
+      "started": "2026-10-28T01:09:13.392Z",
+      "ended": "2026-10-28T01:09:15.501Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/red-1793149753389",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/red-1793149753389.json",
+      "sha256": "b6bca2c115bceb1f7fb2bcb646b90e97ca944c77acd4225583e901fea547dd10"
+    },
+    {
+      "selected": "tests",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "-A",
+        "plugins/workers/tests/streams/factory-headers_test.ts",
+        "plugins/workers/tests/streams/factory-discovery_test.ts",
+        "plugins/workers/tests/streams/live-query-consumer_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:12:41.036Z",
+      "ended": "2026-10-28T01:12:47.446Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/tests-1793149961033",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/tests-1793149961033.json",
+      "sha256": "51443ce7af84e66ecd3bc7db18bfd01059475dc2d93a70910824578aa822bf1f"
+    },
+    {
+      "selected": "types",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-check.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/tests/streams/factory-headers_test.ts",
+        "--file",
+        "plugins/workers/tests/streams/live-query-consumer_type.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--deno-arg",
+        "--frozen",
+        "--deno-arg",
+        "--unstable-kv",
+        "--file",
+        "plugins/workers/tests/streams/live-query-consumer_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:13:10.434Z",
+      "ended": "2026-10-28T01:13:11.668Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/types-1793149990430",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/types-1793149990430.json",
+      "sha256": "d825d826f4ca1ec1ef3490374bbb6fec597c8d28d568edd75c28965b5cb284b7"
+    },
+    {
+      "selected": "consumer",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "plugins/workers/tests/streams/live-query-consumer_type.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:11:24.360Z",
+      "ended": "2026-10-28T01:11:24.543Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/consumer-1793149884357",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/consumer-1793149884357.json",
+      "sha256": "a61f29f466f3c71ea23a3b74f315cd4eb8e795bb3d5477cd0ab97daada040a30"
+    },
+    {
+      "selected": "package-check",
+      "args": [
+        "task",
+        "--cwd",
+        "plugins/workers",
+        "check"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:11:25.128Z",
+      "ended": "2026-10-28T01:11:29.488Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/package-check-1793149885125",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/package-check-1793149885125.json",
+      "sha256": "6a65abae8c8790b7b3cf0bcc5a3388b20feef19aa664f4e9fabc4b316c19cfcd"
+    },
+    {
+      "selected": "lint",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-lint.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/tests/streams/factory-headers_test.ts",
+        "--file",
+        "plugins/workers/tests/streams/live-query-consumer_type.ts",
+        "--ext",
+        "ts",
+        "--file",
+        "plugins/workers/tests/streams/live-query-consumer_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:13:12.263Z",
+      "ended": "2026-10-28T01:13:13.270Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/lint-1793149992259",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/lint-1793149992259.json",
+      "sha256": "4b1e5cf00961ce10bfa62e9e7c5f527f20ea539ba21751e91234fc225b46409a"
+    },
+    {
+      "selected": "fmt",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-fmt.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/tests/streams/factory-headers_test.ts",
+        "--file",
+        "plugins/workers/tests/streams/live-query-consumer_type.ts",
+        "--ext",
+        "ts",
+        "--file",
+        "plugins/workers/tests/streams/live-query-consumer_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:13:13.872Z",
+      "ended": "2026-10-28T01:13:14.091Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/fmt-1793149993868",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/fmt-1793149993868.json",
+      "sha256": "0eaaa1d8e5b485b63ae40eaa0aeff53aa509acdf512174eee28724045ebc1e63"
+    },
+    {
+      "selected": "quality",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/quality/scan-code-quality.ts",
+        "--root",
+        "plugins/workers",
+        "--max-allow",
+        "7"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:13:14.679Z",
+      "ended": "2026-10-28T01:13:15.349Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/quality-1793149994676",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/quality-1793149994676.json",
+      "sha256": "c63bf9687320351e6b52a7df596d67bfaaf2e86a087edf05dcafe2e85b159e1e"
+    },
+    {
+      "selected": "doc",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "plugins/workers/streams/mod.ts"
+      ],
+      "code": 1,
+      "started": "2026-10-28T01:11:33.771Z",
+      "ended": "2026-10-28T01:11:33.957Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doc-1793149893767",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doc-1793149893767.json",
+      "sha256": "815bafa59b26277a1cb2774a03142c7c37aee2043b368ff9305f0a2584dfcb1c"
+    },
+    {
+      "selected": "doctrine",
+      "args": [
+        "run",
+        "--frozen",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/fitness/check-doctrine.ts",
+        "--all-roots"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:13:16.001Z",
+      "ended": "2026-10-28T01:13:27.420Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doctrine-1793149995997",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doctrine-1793149995997.json",
+      "sha256": "ade8b689149bb3ab4b2d58a88db93c176eb63a711f9f0cbbcae8b5df4292b172"
+    },
+    {
+      "selected": "publish",
+      "args": [
+        "task",
+        "--cwd",
+        "plugins/workers",
+        "publish:dry-run"
+      ],
+      "code": 0,
+      "started": "2026-10-28T01:14:02.975Z",
+      "ended": "2026-10-28T01:14:06.498Z",
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/publish-1793150042972",
+      "receipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/publish-1793150042972.json",
+      "sha256": "c0c8a0de6a431ea7449bf58646de1b7f97c30bf478aa695f6b008432d0eeb64e"
+    }
+  ],
+  "guards": [
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a"
+    },
+    {
+      "path": "plugins/workers/package.json",
+      "sha256": "564376c32ad1fccc5a9eb8c313b81ee3228f5d76f9a26cd42dcac23fb8d49429"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f"
+    },
+    {
+      "path": "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+      "sha256": "e83c140f5770a509fef2ff80a0494f0fe503a97af0195930479e14c1d1b4f5bb"
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042"
+    }
+  ],
+  "docBaseline": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doc-1793149768370.json",
+  "docBaselineCount": 0,
+  "docNewCount": 1,
+  "publicDocStatus": "RED/new HeadersRecord private-type-ref; no transferred Fresh exception or added export/debt",
+  "negativeCompilerSetup": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/excluded-temp-setup-proof.json",
+  "fourthOwnerAuthority": "Root message authorizes native fromFileUrl, bounded native compiler, no-target/unresolved rejection and retained four-factory oracle.",
+  "cleanup": {
+    "projectTempDirectories": [],
+    "gateTempEntries": [],
+    "explicitSanitizers": [
+      "ops",
+      "resources",
+      "exit"
+    ],
+    "allOwnedCommandOutputAwaited": true,
+    "historicalOrGlobalCleanlinessClaimed": false
+  },
+  "architecture": "Latest arch:check failed existing DB identity prerequisite in separately retained F15 attempt; final direct doctrine passes with existing warnings, no waiver.",
+  "noC2CommitOrNewExportDebt": true
+}

@@ -59,18 +59,36 @@ export function DesktopWindowChrome({
   return (
     <header
       class={classes('ns-desktop-window-chrome', className)}
-      data-part='window-chrome'
+      data-scope='window-chrome'
+      data-part='root'
       data-state={disabled ? 'disabled' : 'active'}
     >
-      <div class='ns-desktop-window-chrome__identity' data-part='identity'>
-        {leading === undefined
-          ? null
-          : <span class='ns-desktop-window-chrome__leading'>{leading}</span>}
-        <span class='ns-desktop-window-chrome__title'>{title}</span>
+      <div
+        class='ns-desktop-window-chrome__identity'
+        data-scope='window-chrome'
+        data-part='identity'
+      >
+        {leading === undefined ? null : (
+          <span
+            class='ns-desktop-window-chrome__leading'
+            data-part='leading'
+            data-scope='window-chrome'
+          >
+            {leading}
+          </span>
+        )}
+        <span
+          class='ns-desktop-window-chrome__title'
+          data-part='title'
+          data-scope='window-chrome'
+        >
+          {title}
+        </span>
       </div>
       <div
         aria-label='Window controls'
         class='ns-desktop-window-chrome__actions'
+        data-scope='window-chrome'
         data-part='actions'
         role='group'
       >
@@ -80,10 +98,9 @@ export function DesktopWindowChrome({
             <button
               type='button'
               aria-label={presentation.label}
-              class={classes(
-                'ns-desktop-window-chrome__action',
-                action === 'close' ? 'ns-desktop-window-chrome__action--close' : undefined,
-              )}
+              class={classes('ns-desktop-window-chrome__action')}
+              data-action={(action === 'close') ? ('close') : undefined}
+              data-scope='window-chrome'
               data-desktop-action={action}
               data-part='action'
               data-state={disabled ? 'disabled' : 'enabled'}

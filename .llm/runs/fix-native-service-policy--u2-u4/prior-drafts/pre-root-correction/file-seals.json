@@ -1,0 +1,37 @@
+﻿[
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\research.md",
+        "bytes":  17363,
+        "sha256":  "235175a36893b974bdc48cbc02d1e3247fd656d54cb817e6cc99a3bd4ba2e92a"
+    },
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\plan.md",
+        "bytes":  20377,
+        "sha256":  "5831d342f6e75ae3812f3512aea93d7f51010af79cf5226003351811a723e0bb"
+    },
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\decisions.md",
+        "bytes":  10432,
+        "sha256":  "f3b3208c38048d13ff51654345aa85e789715b05ccc10d8915ce65d21a6410ef"
+    },
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\context-pack.md",
+        "bytes":  5663,
+        "sha256":  "a423c3a25931a731f652dbe541011dca54feaa2bd583d962e99f96220fae1c68"
+    },
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\drift.md",
+        "bytes":  4696,
+        "sha256":  "4a8dc6b0b8adc3d838660027742fe172237e80d3126394bc067a227eb364886c"
+    },
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\source-receipt.json",
+        "bytes":  9454,
+        "sha256":  "11943b9b6d37dcfc3d7fdad6838abf323af28066c910165d90f0fb649edd4baf"
+    },
+    {
+        "path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\prior-drafts\\pre-root-correction\\worklog.md",
+        "bytes":  4621,
+        "sha256":  "e3164410556e2dca3803bebeaf802ac84419b25778e109ea622801117f591554"
+    }
+]

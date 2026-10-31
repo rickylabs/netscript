@@ -96,25 +96,25 @@
 }
 
 /* User — right-aligned solid primary bubble (iMessage idiom, matches prototype) */
-.ns-message--user {
+:where(.ns-message)[data-role='user'] {
   flex-direction: row-reverse;
   margin-inline-start: auto;
   max-width: min(82%, 640px);
 }
 
-.ns-message--user .ns-message__main {
+:where(.ns-message)[data-role='user'] .ns-message__main {
   align-items: flex-end;
 }
 
-.ns-message--user .ns-message__head {
+:where(.ns-message)[data-role='user'] .ns-message__head {
   flex-direction: row-reverse;
 }
 
-.ns-message--user .ns-message__time {
+:where(.ns-message)[data-role='user'] .ns-message__time {
   margin-inline-start: 0;
 }
 
-.ns-message--user .ns-message__body {
+:where(.ns-message)[data-role='user'] .ns-message__body {
   align-items: flex-end;
   padding: var(--ns-space-3) var(--ns-space-4);
   border-radius: var(--ns-radius-xl) var(--ns-radius-xl) var(--ns-radius-sm) var(--ns-radius-xl);
@@ -123,15 +123,15 @@
 }
 
 /* System — centered muted note */
-.ns-message--system {
+:where(.ns-message)[data-role='system'] {
   justify-content: center;
 }
 
-.ns-message--system .ns-message__avatar {
+:where(.ns-message)[data-role='system'] .ns-message__avatar {
   display: none;
 }
 
-.ns-message--system .ns-message__body {
+:where(.ns-message)[data-role='system'] .ns-message__body {
   text-align: center;
   font-size: var(--ns-text-xs);
   color: var(--ns-muted-fg);

@@ -1,0 +1,95 @@
+{
+  "tool": "mcp__netscript__find_guidance",
+  "result": {
+    "intent": "Implement accepted U4 in @netscript/service: additive exact method/path anonymous rules shared by authn/authz, preserve contract access precedence, defer opt-in health installation until after auth/body-limit, construct both auth middlewares atomically before registration, with real builder/defineService tests.",
+    "confidence": "high",
+    "recommendations": [
+      {
+        "stage": "implementation",
+        "slug": "pages/services-sdk/services",
+        "section": "service-layer-authn-authz-middleware",
+        "heading": "Service-layer authn / authz middleware",
+        "why": "Matches the task through: in, netscript, service, method.",
+        "excerpt": "The service builder ships a **provider-agnostic** authentication and authorization seam in `@netscript/service/auth`. It is a thin Hono-middleware layer over the request pipeline — deliberately **distinct from the auth plugin**, which composes a sign-in/session backend (kv-oauth, WorkOS, better-auth). Use this seam when a service needs to gate its own routes — verify a credential, trust an upstream identity header, or check a scope — without taking on an interactive identity provider. Two stages wrap the request: `.withAuthn()` resolves a `Principal` (authentication) via an `AuthenticatorPort`",
+        "code": [
+          {
+            "language": "ts",
+            "code": "// Gate a service with a static credential + scope check\nimport { createService } from '@netscript/service';\nimport {\n  createStaticCredentialAuthenticator,\n  createScopeAuthorizer,\n} from '@netscript/service/auth';\nimport { router } from './router.ts';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: {\n    [Deno.env.get('SERVICE_API_KEY') ?? '']: {\n      subject: 'service:ci',\n      scopes: ['users:write'],\n    },\n  },\n});\nconst authorizer = createScopeAuthorizer({\n  rules: [{ match: () => true, requireScopes: ['users:write'] }],\n  denyByDefault: true,\n});\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 }) // note: your scaffold's port will differ\n  .withRPC()\n  .withAuthn({ authenticator })\n  .withAuthz({ authorizer })\n  .withHealth() // /health stays anonymous\n  .serve();",
+            "source": {
+              "slug": "pages/services-sdk/services",
+              "section": "service-layer-authn-authz-middleware",
+              "heading": "Service-layer authn / authz middleware"
+            }
+          },
+          {
+            "language": "ts",
+            "code": "// Trust identity asserted by an upstream proxy/gateway\nimport { createTrustedHeaderAuthenticator } from '@netscript/service/auth';\n\n// The Principal is assembled internally from these header NAMES — point at the\n// headers your gateway sets; you do not map values yourself.\nconst authenticator = createTrustedHeaderAuthenticator({\n  subjectHeader: 'x-forwarded-user',\n  scopesHeader: 'x-forwarded-scopes', // optional; space/comma-separated\n});\n\n// then: .withAuthn({ authenticator })",
+            "source": {
+              "slug": "pages/services-sdk/services",
+              "section": "service-layer-authn-authz-middleware",
+              "heading": "Service-layer authn / authz middleware"
+            }
+          }
+        ]
+      },
+      {
+        "stage": "implementation",
+        "slug": "pages/services-sdk/services",
+        "section": "services-contracts",
+        "heading": "Services & contracts",
+        "why": "Matches the task through: implement, accept, in, netscript.",
+        "excerpt": "**Establish the public contract once; the handler, typed client, and OpenAPI surface are all derived from it — so an agent (or a teammate) never spends a turn keeping them in sync.** A NetScript **service** is a typed HTTP runtime that *implements* an `@orpc/contract` definition. You establish the versioned public contract (route + Zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting router on a Hono + oRPC runtime. The contract object is the single source of truth: the same object a typed client imports is the one the server implements, so caller and server **canno",
+        "code": [
+          {
+            "language": "ts",
+            "code": "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\n\nexport const UsersContractV1 = {\n  health: oc.route({ method: 'GET' }).input(z.object({}).optional()).output(UsersHealthSchemaV1),\n  list: oc.route({ method: 'POST' }).input(UsersListInputSchemaV1).output(UsersListResponseSchemaV1),\n  updateStatus: oc.route({ method: 'POST' }).input(UsersUpdateStatusInputSchemaV1).output(UsersUpdateStatusResponseSchemaV1),\n};\n\n// `implement()` produces the .handler()-bindable object the service router consumes.\nexport const UsersV1 = implement(UsersContractV1);",
+            "source": {
+              "slug": "pages/services-sdk/services",
+              "section": "services-contracts",
+              "heading": "Services & contracts"
+            }
+          },
+          {
+            "language": "ts",
+            "code": "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});",
+            "source": {
+              "slug": "pages/services-sdk/services",
+              "section": "services-contracts",
+              "heading": "Services & contracts"
+            }
+          }
+        ]
+      },
+      {
+        "stage": "implementation",
+        "slug": "pages/services-sdk/services",
+        "section": "headline-api-two-ways-to-construct-a-service",
+        "heading": "Headline API: two ways to construct a service",
+        "why": "Matches the task through: implement, accept, in, netscript.",
+        "excerpt": "NetScript ships **two** service-construction APIs, and the example project uses both. Workspace services use the one-call `defineService(router, options)` — the right default for the 80% case. Plugin API services (workers, sagas, auth) use the fluent `createService(router, options).with*().serve()` builder when they need to add CORS, OpenAPI, a database client, auth middleware, or custom context step by step. Both stand up the same Hono + oRPC runtime; `defineService` is a curated preset over the same builder. Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; t",
+        "code": [
+          {
+            "language": "ts",
+            "code": "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});",
+            "source": {
+              "slug": "pages/services-sdk/services",
+              "section": "headline-api-two-ways-to-construct-a-service",
+              "heading": "Headline API: two ways to construct a service"
+            }
+          },
+          {
+            "language": "ts",
+            "code": "// plugins/workers/services/src/main.ts — step-by-step composition\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDocs()\n  .withDatabase(dbClient)\n  .withContext(() => ({ workers: runtime }))\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .withServiceInfo()\n  .onStartup(async () => {/* seed, warm caches */})\n  .serve();",
+            "source": {
+              "slug": "pages/services-sdk/services",
+              "section": "headline-api-two-ways-to-construct-a-service",
+              "heading": "Headline API: two ways to construct a service"
+            }
+          }
+        ]
+      }
+    ],
+    "related": [],
+    "truncated": true
+  }
+}

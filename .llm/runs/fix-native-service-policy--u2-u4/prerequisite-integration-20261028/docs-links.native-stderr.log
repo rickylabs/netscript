@@ -1,0 +1,1 @@
+Task docs:links deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty

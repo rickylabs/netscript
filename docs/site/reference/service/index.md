@@ -106,7 +106,8 @@ timeout.
 | 4 | Caller middleware, in order | `use()` / `DefineServiceOptions.middleware` |
 | 5 | Authentication, then authorization | `withAuthn()` / `withAuthz()`, installed by `build()` |
 | 6 | Request-body limit | `withBodyLimit()` / `DefineServiceOptions.bodyLimit`, installed by `build()` |
-| 7 | OpenAPI spec, docs, RPC and OpenAPI projections, custom routes | `build()` |
+| 7 | Health, liveness and readiness routes | `withHealth()`, installed by `build()` |
+| 8 | OpenAPI spec, docs, RPC and OpenAPI projections, custom routes | `build()` |
 
 `use()` registers middleware immediately, so builder middleware runs in call order relative to
 `withCors()` and `withLogger()`. It always runs before the stages that `build()` installs. A
@@ -115,8 +116,9 @@ rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 ## Rate limits and client addresses
 
 `createService(...).withRateLimit(options)` adds middleware through `use()`. It runs in call order,
-before deferred routes and both RPC/REST projections. Install it before immediate health/info routes
-if those routes should be limited. Repeated calls add stages.
+before deferred health routes and both RPC/REST projections, including when added after
+`withHealth()`. Install it before `withServiceInfo()` if the immediate service-info route should
+be limited. Repeated calls add stages. Configure health checks before building.
 
 The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimitStore`,
 `RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.

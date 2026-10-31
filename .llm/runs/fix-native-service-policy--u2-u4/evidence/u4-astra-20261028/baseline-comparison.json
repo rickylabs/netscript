@@ -1,0 +1,48 @@
+﻿{
+    "service":  {
+                    "baseline":  {
+                                     "passed":  521,
+                                     "failed":  8,
+                                     "ignored":  0,
+                                     "totalResults":  529,
+                                     "uniqueFailures":  4
+                                 },
+                    "current":  {
+                                    "passed":  615,
+                                    "failed":  8,
+                                    "ignored":  0,
+                                    "totalResults":  623,
+                                    "uniqueFailures":  4
+                                },
+                    "sameNames":  true,
+                    "names":  [
+                                  "client disconnect still cancels the in-flight request with the flag",
+                                  "defineService bodyLimit rejects OpenAPI bodies over a real listener",
+                                  "defineService bodyLimit rejects RPC bodies over a real listener",
+                                  "defineService disconnects a capable database client on stop",
+                                  "defineService skips disconnect hook for non-capable database client",
+                                  "dual-stack listener keeps distinct mapped IPv4 socket peers in independent quotas",
+                                  "legacy Deno.serve behavior warns on successful requests (baseline repro)",
+                                  "no legacy-abort deprecation on successful requests with --unstable-no-legacy-abort"
+                              ]
+                },
+    "consumer":  {
+                     "baseline":  {
+                                      "passed":  25,
+                                      "failed":  1,
+                                      "ignored":  0,
+                                      "totalResults":  26,
+                                      "uniqueFailures":  1
+                                  },
+                     "current":  {
+                                     "passed":  25,
+                                     "failed":  1,
+                                     "ignored":  0,
+                                     "totalResults":  26,
+                                     "uniqueFailures":  1
+                                 },
+                     "sameNames":  true,
+                     "names":  "plugin factory rejects missing or ambiguous policy at a JavaScript caller boundary"
+                 },
+    "note":  "Baseline source/owner hash proof and unchanged U1 comparison were recorded in U2; no new U1 operation performed. Name/count/category comparison is not byte-identical full errors."
+}

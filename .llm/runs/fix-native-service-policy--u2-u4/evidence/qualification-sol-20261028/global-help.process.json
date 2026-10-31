@@ -1,0 +1,12 @@
+﻿{
+    "name":  "global-help",
+    "startedUtc":  "2026-10-28T01:30:28.7029840Z",
+    "finishedUtc":  "2026-10-28T01:30:28.7346665Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "--help=full"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\global-help.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\global-help.stderr.log"
+}

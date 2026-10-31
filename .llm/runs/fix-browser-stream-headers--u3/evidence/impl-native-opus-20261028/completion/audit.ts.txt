@@ -1,0 +1,31 @@
+import {directory,head,nativeModel,json,resumeSession,hash,predecessor} from './common.ts';
+export async function audit(expectedSession:string):Promise<void>{
+  const prior=JSON.parse(await Deno.readTextFile(`${directory}/original-offline-coverage.json`));
+  if(prior.session!==resumeSession||prior.all19ReadsComplete!==true||prior.reads.length!==19||prior.reads.some((row:{complete:boolean})=>!row.complete)||
+    await hash(`${predecessor}/native.public.jsonl`)!==prior.originalPublicSha256)throw new Error('Prior complete coverage binding changed.');
+  const bytes=await Deno.readFile(`${directory}/native.public.jsonl`);
+  if(bytes.length>24*1024*1024)throw new Error('Continuation public output exceeds cap.');
+  const events=new TextDecoder('utf-8',{fatal:true}).decode(bytes).trim().split('\n').map(line=>JSON.parse(line));
+  const ids=[...new Set(events.map(e=>e.session_id).filter(Boolean))];
+  const init=events.find(e=>e.type==='system'&&e.subtype==='init');
+  const models=events.filter(e=>e.type==='assistant').map(e=>e.message?.model).filter(Boolean);
+  const results=events.filter(e=>e.type==='result');const result=results.at(-1);
+  const efforts=[init?.effort,init?.effortLevel,init?.outputEffort].filter((value:unknown)=>typeof value==='string');
+  const final=typeof result?.result==='string'?result.result:'';
+  const failures:string[]=[];
+  if(expectedSession!==resumeSession||ids.length!==1||ids[0]!==resumeSession||init?.model!==nativeModel||
+    !models.length||models.some(model=>model!==nativeModel))failures.push('Exact resumed native model/session identity unqualified.');
+  if(init?.permissionMode!=='dontAsk'||init?.mcp_servers?.length!==1||init.mcp_servers[0]?.name!=='netscript'||
+    init.mcp_servers[0]?.status!=='connected')failures.push('Same strict readonly/sole-MCP init unqualified.');
+  if(efforts.some(value=>value!=='xhigh'))failures.push('Observed native effort differs from selected xhigh.');
+  if(results.length!==1||result?.subtype!=='success'||result.is_error||!Number.isInteger(result.num_turns)||result.num_turns<1||result.num_turns>2)failures.push('Native finite continuation did not complete successfully.');
+  if(!final.includes(head)||!/^VERDICT:\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT)\s*$/m.test(final))failures.push('Complete canonical exact-head public verdict absent.');
+  await json('coverage.json',{session:resumeSession,sameSession:true,newSession:false,requestedModel:nativeModel,models,
+    requestedEffort:'xhigh',observedEfforts:efforts,actualEffortIndependentlyAttested:efforts.includes('xhigh'),
+    effortResponseAbsentIsQualificationLimit:!efforts.length,priorAll19ReadsComplete:true,priorCoverage:`${directory}/original-offline-coverage.json`,
+    priorOwnRelevantMcpCalls:prior.mcp.map((row:{name:string;input:unknown})=>({name:row.name,input:row.input})),
+    freshReadsOrMcpRequired:false,nativeTurns:result?.num_turns,resultSubtype:result?.subtype,failures,
+    rootManualCompleteReportRelevanceIdentityAndVerdictRequired:true});
+  if(final)await Deno.writeTextFile(`${directory}/final-verdict.md`,final,{createNew:true});
+  if(failures.length)throw new Error(failures.join(' '));
+}

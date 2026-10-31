@@ -1,0 +1,125 @@
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      }
+    ],
+    "exactNativeVersion": "0.2.7",
+    "positiveIdentityAssertions": 13,
+    "negativeControls": 3,
+    "negativeSeamErrors": 9,
+    "ownedFixtureRemoved": true,
+    "sourceExecuted": false
+  },
+  "externalReferenceContract": {
+    "commit": "0d5b982b0a3050b94172770a435581c931c93b22",
+    "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tools/docs/check-exports-drift.ts",
+    "sha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269",
+    "receipt": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.json",
+    "policy": "Supporting read-only external-tool result against U3 CWD/config; no source import/cherry-pick and no original parent task PASS. Fresh/workers mapping contract is entrypoints-only, not exhaustive per-name reference prose.",
+    "coverage": "36/36; mapped35/excluded1; full declared contract PASS; no genuine missing-symbol finding"
+  },
+  "doctrine": "DEBT_ACCEPTED for exact F15/upstream type exposure AND F5 two-name facade growth. Direct scanner exit0 does not certify those as PASS; prior surplus remains unwaived.",
+  "stillOpen": [
+    "Fresh ten baseline doc findings",
+    "architecture existing DB identity prerequisite",
+    "original docs:accuracy Windows coverage prerequisite",
+    "prior C3 links/JSDoc/global format failures",
+    "independent IMPL/readiness/release"
+  ],
+  "cleanup": {
+    "ownedCompilerFixtureDirectories": [],
+    "originalOutputAwaited": true
+  },
+  "guardInputs": [
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "unchanged": true
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "unchanged": true
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "unchanged": true
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "unchanged": true
+    }
+  ],
+  "diff": {
+    "path": ".llm/tmp/u3-type-closure-application-20261028/final.diff",
+    "sha256": "0a687159db3156c00e761bfa520ef8825a5dabeb8d90eed839eba8cad589fe67"
+  },
+  "sourceOwnerFootprint": "12 product/test/guide owners plus canonical registry=13, excluding explicit run/evidence provenance"
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.stdout
+
+Original-byte SHA256:5c8902c4eeb355adcd649bf62c1fa405abb21fe9b48ea01bf6e55afed20aacef (JSON pretty view where parsable, no truncation)
+
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--frozen",
+    "-A",
+    "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+    "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+    "packages/fresh/tests/streamdb-headers-contract_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "exitCode": 0,
+  "durationMs": 11382,
+  "summary": {
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 20,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.stdout
+
+Original-byte SHA256:c7e6fac422e0085ec95586e976cf058a35add3cbc641e0e9541910812e5e4d0b (JSON pretty view where parsable, no truncation)
+
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--frozen",
+    "-A",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "plugins/workers/tests/streams/factory-discovery_test.ts",
+    "plugins/workers/tests/streams/live-query-consumer_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "exitCode": 0,
+  "durationMs": 6982,
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 5,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}
+

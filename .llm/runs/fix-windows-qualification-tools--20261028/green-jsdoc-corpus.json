@@ -1,0 +1,38 @@
+{
+  "gateId": "jsdoc-example-compile",
+  "invocationId": "green-jsdoc-corpus",
+  "argv": [
+    "deno",
+    "task",
+    "docs:jsdoc-examples",
+    "--type-error-output",
+    ".llm/runs/fix-windows-qualification-tools--20261028/jsdoc-type-errors.md"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 300000,
+  "runnerIdentity": "worker:67492",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "7683a077056ef4871b3b7c4ccf7b45076b28223bf5dc15366757ea55a9c4d7c4",
+  "lifecycleId": "worker:67492:green-jsdoc-corpus:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T01:48:54.714Z",
+  "startedAt": "2026-10-28T01:48:54.720Z",
+  "finishedAt": "2026-10-28T01:50:22.275Z",
+  "durationMs": 87547,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 324,
+    "sha256": "dfdf62ca02378e816de513477162c12da2f0dd49d6b7c6f67558c65da4a80547",
+    "tail": "jsdoc examples: PASS members=35 files=2317 examples=471 candidates=470 checked=470 exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0\nenforcedFailureCensus={\"badSpecifier\":0,\"typeError\":0,\"unfenced\":0,\"malformed\":0,\"unboundName\":0}\ntypeErrorExamples=.llm/runs/fix-windows-qualification-tools--20261028/jsdoc-type-errors.md\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 210,
+    "sha256": "c3f35d49e1b5ddcf30c4b5f1c81ed9cf85e90945f0ab98e8f07f6eb708e9e72d",
+    "tail": "Task docs:jsdoc-examples deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts '--type-error-output' '.llm/runs/fix-windows-qualification-tools--20261028/jsdoc-type-errors.md'\n",
+    "truncated": false
+  }
+}

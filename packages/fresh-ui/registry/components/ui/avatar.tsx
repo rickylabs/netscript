@@ -35,12 +35,6 @@ interface AvatarProps extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class'>
   class?: string;
 }
 
-const SIZE_CLASSES: Record<AvatarSize, string> = {
-  sm: 'ns-avatar--sm',
-  md: 'ns-avatar--md',
-  lg: 'ns-avatar--lg',
-};
-
 /**
  * Derives up to two uppercase initials from a name.
  */
@@ -62,10 +56,32 @@ export function Avatar(
       {...props}
       role='img'
       aria-label={name}
-      class={cn('ns-avatar', SIZE_CLASSES[size], agent && 'ns-avatar--agent', className)}
+      class={cn('ns-avatar', className)}
+      data-size={size}
+      data-content={agent ? 'agent' : src ? 'image' : 'initials'}
+      data-part='root'
+      data-scope='avatar'
     >
-      {src ? <img src={src} alt='' /> : initials ?? deriveInitials(name)}
-      {presence ? <span class='ns-avatar__presence' data-presence={presence} /> : null}
+      {src ? <img data-part='image' data-scope='avatar' src={src} alt='' /> : (
+        <span
+          data-part={agent ? 'agent-icon' : 'initials'}
+          data-scope='avatar'
+          style={{ display: 'contents' }}
+        >
+          {initials ?? deriveInitials(name)}
+        </span>
+      )}
+      {presence
+        ? (
+          <span
+            class='ns-avatar__presence'
+            data-part='presence'
+            data-scope='avatar'
+            data-presence={presence}
+            data-status={presence}
+          />
+        )
+        : null}
     </span>
   );
 }

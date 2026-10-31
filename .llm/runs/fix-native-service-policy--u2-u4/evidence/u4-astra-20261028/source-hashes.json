@@ -1,0 +1,62 @@
+﻿[
+    {
+        "path":  "packages/service/src/auth/options.ts",
+        "sha256":  "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2",
+        "physicalLines":  147
+    },
+    {
+        "path":  "packages/service/src/auth/auth-middleware.ts",
+        "sha256":  "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32",
+        "physicalLines":  332
+    },
+    {
+        "path":  "packages/service/src/auth/mod.ts",
+        "sha256":  "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7",
+        "physicalLines":  102
+    },
+    {
+        "path":  "packages/service/mod.ts",
+        "sha256":  "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e",
+        "physicalLines":  216
+    },
+    {
+        "path":  "packages/service/src/builder/service-builder-impl.ts",
+        "sha256":  "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9",
+        "physicalLines":  633
+    },
+    {
+        "path":  "packages/service/tests/auth/middleware_test.ts",
+        "sha256":  "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05",
+        "physicalLines":  477
+    },
+    {
+        "path":  "packages/service/tests/auth/builder-auth_test.ts",
+        "sha256":  "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa",
+        "physicalLines":  433
+    },
+    {
+        "path":  "packages/service/tests/auth/define-service-auth_test.ts",
+        "sha256":  "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2",
+        "physicalLines":  299
+    },
+    {
+        "path":  "packages/service/tests/auth/health-auth-order_test.ts",
+        "sha256":  "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb",
+        "physicalLines":  332
+    },
+    {
+        "path":  "packages/service/README.md",
+        "sha256":  "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a",
+        "physicalLines":  759
+    },
+    {
+        "path":  "packages/service/CHANGELOG.md",
+        "sha256":  "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f",
+        "physicalLines":  58
+    },
+    {
+        "path":  "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+        "sha256":  "89046708df9f01e2338a82e69ce446c116404b109fabdbfbc03a4781a76f92cc",
+        "physicalLines":  196
+    }
+]

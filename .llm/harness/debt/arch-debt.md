@@ -2840,6 +2840,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
   green. `arch:check` currently exits zero with these size warnings.
+- **U4 health-registration delta (root disposition, 2026-10-27):** Numeric F-1 remains
+  **DEBT_ACCEPTED**, not PASS. Only health state / `installHealth()` may grow the existing
+  `service-builder-impl.ts` baseline of 629 physical/logical lines by at most 32 (maximum 661,
+  using the same count convention); no broad decomposition or size waiver is granted.
+  - **Owner:** NetScript service migration coordinator + rickylabs.
+  - **Remediation deadline:** 2026-11-10 or the stable API line, whichever is earlier; no automatic
+    extension. Remediate this additional growth within the existing builder decomposition debt.
+  - **Authority:** `.llm/runs/fix-native-service-policy--u2-u4/plan.md` revision 4 and
+    `root-policy-addendum.md` targeted owner disposition. Independent PLAN-EVAL must assess this
+    bounded delta before implementation; this entry does not authorize source by itself.
+  - `src/types.ts` stays inspect-only at its existing 335-line baseline. Runtime, behavior-test,
+    docs, publication/release and independent review gates remain required. This F-1 delta does not
+    waive F-10: all affected test files must stay at or below 480 physical lines; an explicit
+    conditional focused health-order proving owner may be selected before implementation.
 
 ## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
 
@@ -2948,6 +2962,54 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
   diagnostics are preserved, with only status and signal observations in the fixture; the runtime
   now retains the Response. No fixture-only Response retention remains.
+
+## Fresh/workers reader headers — native public type closure
+
+- **ID:** `U3-NATIVE-READER-HEADER-TYPE-CLOSURE`
+- **Reason:** U3 preserves exact native client0.2.7 `HeadersRecord` identity for
+  string/sync/async values. Actual copied owning graphs measure Fresh10/12/10 and
+  workers0/1/0 for baseline/current/candidate. Both `HeadersRecord` and its native
+  `MaybePromise` dependency must be public at the four measured source/aggregate
+  sites. This is a bounded upstream-type and facade-growth exception, not a scanner PASS.
+- **Owner:** Milestone coordinator + rickylabs.
+- **Target:** 2026-11-10, fixed; no extension or growth under this disposition.
+- **Status:** Open, `DEBT_ACCEPTED` for this precise U3 delta after independent SAME
+  GLM5.3 corrective PLAN review and root acceptance; implementation gates remain required.
+- **Exact sites:** `packages/fresh/src/runtime/streams/create-stream-db.ts`, its
+  `mod.ts`, `plugins/workers/streams/factory.ts` and its `mod.ts`. Export only native
+  `HeadersRecord` and native `MaybePromise` by identity, type-only, without aliases.
+- **Boundary:** No fifth source site, extra native name, package, runtime value,
+  resolver/serializer, dependency/version, config/lock, authentication/issuer/bootstrap
+  policy or lifecycle change. Consumers still prefer their upstream type owner;
+  this is no general NetScript vendoring precedent.
+- **Gate:** Closure is `DEBT_ACCEPTED` for two distinct acknowledged violations:
+  upstream native type re-export (chapter02/AP-14/F-15) and measured two-name aggregate
+  facade growth (chapter11/F-5; Fresh52-to54, workers24-to26, prior surplus unwaived),
+  never an unqualified F-15 or F-5 PASS. Warning-free actual owning Fresh12-to10 must
+  retain exactly the same ten baseline finding identities; workers1-to0; nonempty
+  native declarations at all four sites; positive mutual identities/anti-any plus
+  three meaningful negative controls; unchanged runtime controls; scoped type/lint/fmt,
+  doctrine, quality, package/publish dry-run and independent IMPL evidence.
+  `MaybePromise` is exported solely because measured closure requires its public
+  shape; the closing gate removes both names together.
+- **Reference parity:** Pending root-scoped gate for the two added names per package.
+  Root selected no waiver. A genuinely green qualified existing reference contract
+  satisfies the gate without an invented page edit. Concrete missing-name findings
+  require a retained failing-parity receipt and exact root-authorized page scope.
+  A failing Windows coverage prerequisite or unrun parity never satisfies it.
+- **History:** The earlier `FRESH-NATIVE-HEADERS-TYPE-CLOSURE` PLAN verdict remains
+  immutable. Its source-only application failed owning12-to10 and was archived/reverted
+  with the appended debt. This corrective exception does not promote that failed
+  premise or transfer its narrower scope. Existing oRPC debt, ten Fresh baseline
+  findings and prior facade surplus remain separate and unwaived.
+- **Closing gate:** Remove both native facade names together through a compatible
+  public-doc solution retaining exact header identity and all controls, OR obtain
+  a separately reviewed doctrine amendment. No automatic renewal, baseline reset,
+  checker override, type erasure/cast/suppression or unrelated diagnostic reduction.
+- **Evidence:** [Actual corrective verdict](../../runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md),
+  SHA256 `c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4`;
+  [root scope/disposition](../../runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md),
+  SHA256 `6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c`.
 
 ## packages/fresh-ui — TOKEN-EXPORT-DIRECTORY-CARDINALITY
 

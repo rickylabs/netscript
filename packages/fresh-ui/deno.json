@@ -13,7 +13,9 @@
     "./registry": "./registry.ts",
     "./tokens": "./tokens.ts",
     "./token-config": "./token-config.ts",
-    "./registry-v2": "./registry-v2.ts"
+    "./registry-v2": "./registry-v2.ts",
+    "./contracts": "./contracts.ts",
+    "./contracts.json": "./contracts.json"
   },
   "imports": {
     "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.8/auto-update",
@@ -33,7 +35,9 @@
       "README.md",
       "tokens/README.md",
       "src/registry/README.md",
-      "src/registry/schemas/LICENSE"
+      "src/registry/schemas/LICENSE",
+      "src/contracts/README.md",
+      "contracts.json"
     ],
     "exclude": [
       "scripts/**",

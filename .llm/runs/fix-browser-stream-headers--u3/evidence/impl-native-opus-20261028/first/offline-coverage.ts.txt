@@ -1,0 +1,41 @@
+const root='C:/Users/ericc/source/repos/netscript-browser-stream-headers-008';
+const prior=`${root}/.llm/tmp/u3-opus-native-impl-successor-20261028`;
+const directory=`${root}/.llm/tmp/u3-opus-native-impl-continuation-1-20261028`;
+const session='a4d71fd7-efc6-4444-8141-7fa312a2977a';
+async function hash(path:string):Promise<string>{return [...new Uint8Array(await crypto.subtle.digest('SHA-256',await Deno.readFile(path)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
+async function json(name:string,value:unknown){await Deno.writeTextFile(`${directory}/${name}`,JSON.stringify(value,null,2),{createNew:true});}
+const bytes=await Deno.readFile(`${prior}/native.public.jsonl`);
+if(bytes.length>24*1024*1024)throw new Error('Original public output bound violated.');
+const events=new TextDecoder('utf-8',{fatal:true}).decode(bytes).trim().split('\n').map(line=>JSON.parse(line));
+const ids=[...new Set(events.map(e=>e.session_id).filter(Boolean))];
+if(ids.length!==1||ids[0]!==session)throw new Error('Exact original native session differs.');
+const calls=events.filter(e=>e.type==='assistant').flatMap(e=>e.message.content).filter(p=>p.type==='tool_use');
+const outputs=events.filter(e=>e.type==='user').flatMap(e=>e.message.content).filter(p=>p.type==='tool_result');
+const text=(p:any):string=>typeof p.content==='string'?p.content:(p.content??[]).map((x:{text:string})=>x.text).join('\n');
+const manifest=JSON.parse(await Deno.readTextFile(`${prior}/packet-manifest.json`));
+const reads=[];
+for(const entry of manifest.requiredReads){
+  const expected=(await Deno.readTextFile(`${prior}/inputs/${entry.name}`)).trimEnd().split('\n').map(line=>line.replace(/\r$/,''));
+  const matching=calls.filter(p=>p.name==='Read'&&String(p.input?.file_path??'').replaceAll('\\','/')===`${prior}/inputs/${entry.name}`&&(p.input.offset===undefined||p.input.offset===1));
+  const details=matching.flatMap(call=>outputs.filter(p=>p.tool_use_id===call.id&&!p.is_error).map(output=>{
+    const numbered=new Map(text(output).split('\n').flatMap(line=>{const m=line.match(/^\s*(\d+)(?:\t|\u2192)(.*)$/);return m?[[Number(m[1]),m[2]]]:[];}));
+    const missing=expected.flatMap((line,index)=>numbered.get(index+1)===line?[]:[index+1]);
+    return {callId:call.id,expectedLines:expected.length,matchedLines:expected.length-missing.length,missingLines:missing,complete:missing.length===0};
+  }));
+  reads.push({name:entry.name,expectedLines:expected.length,complete:details.some(value=>value.complete),calls:matching.length,details});
+}
+const mcp=[];
+for(const call of calls.filter(p=>/^mcp__netscript__(search_docs|get_doc|find_guidance|find_export|get_export)$/.test(p.name))){
+  const results=outputs.filter(p=>p.tool_use_id===call.id);
+  mcp.push({name:call.name,input:call.input,callId:call.id,results:results.map(p=>({isError:p.is_error===true,publicOutput:text(p)}))});
+}
+const init=events.find(e=>e.type==='system'&&e.subtype==='init');
+const result=events.filter(e=>e.type==='result').at(-1);
+const assistantTexts=events.filter(e=>e.type==='assistant').flatMap(e=>e.message.content).filter(p=>p.type==='text').map(p=>p.text);
+const audit={session,model:init?.model,requestedEffort:'xhigh',observedEffort:init?.effort??init?.effortLevel??init?.outputEffort??null,
+  all19ReadsComplete:reads.length===19&&reads.every(r=>r.complete),reads,mcp,originalResult:result,
+  assistantPublicTexts:assistantTexts,canonicalVerdictPresent:assistantTexts.some(t=>/^VERDICT:\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT)\s*$/m.test(t)),
+  originalPublicSha256:await hash(`${prior}/native.public.jsonl`),originalGuardsSha256:await hash(`${prior}/final-guards.json`),
+  privateReasoningReadOrPersisted:false,requiresFinal:false,sourceGateReruns:false,noInference:true};
+await json('original-offline-coverage.json',audit);
+console.log(JSON.stringify({all19ReadsComplete:audit.all19ReadsComplete,readCoverage:reads.map(r=>({name:r.name,complete:r.complete,missing:r.details.map(d=>d.missingLines.slice(0,8))})),mcpCalls:mcp.map(p=>({name:p.name,input:p.input,success:p.results.some(r=>!r.isError)})),originalSubtype:result?.subtype,originalTurns:result?.num_turns,canonicalVerdictPresent:audit.canonicalVerdictPresent}));

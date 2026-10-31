@@ -1,0 +1,40 @@
+{
+  "gateId": "doc-lint",
+  "invocationId": "native-service-q4-sol-doc-lint-20261028",
+  "argv": [
+    "deno",
+    "task",
+    "doc:lint",
+    "--root",
+    "packages/service",
+    "--output",
+    ".llm/tmp/native-service-q4-sol-20261028/doc-lint-child.json"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008",
+  "gitHead": "7cfa593e198ade668d531d2bdafa336ff6ca5709",
+  "actualGitHead": "7cfa593e198ade668d531d2bdafa336ff6ca5709",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:24840",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "3353b914d7eab8dc2cb719cebfb390431623ebb61f6ce28416e18c94979e2320",
+  "lifecycleId": "worker:24840:native-service-q4-sol-doc-lint-20261028:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T01:59:06.053Z",
+  "startedAt": "2026-10-28T01:59:06.059Z",
+  "finishedAt": "2026-10-28T01:59:09.473Z",
+  "durationMs": 3414,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 66,
+    "sha256": "5c6cb33e4782a26a554b72218ed098905eda55d211c3e73ead85c3e609364039",
+    "tail": "Wrote .llm/tmp/native-service-q4-sol-20261028/doc-lint-child.json\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 195,
+    "sha256": "060ff3f95f6c53fa781aa734837426d84a7de1b9abdbcba9a104cbe941b2dbb1",
+    "tail": "Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service' '--output' '.llm/tmp/native-service-q4-sol-20261028/doc-lint-child.json'\n",
+    "truncated": false
+  }
+}

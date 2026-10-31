@@ -1,0 +1,320 @@
+{
+  "head": "9288ea2939f56eeb75fa53b6260f6cf1e91f31f0",
+  "canonicalReportSha256": "6aad36bb5dddc131e71cf32017bdf64b96f8f97b69857b0615ce2b872f6807c2",
+  "rows": [
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evaluate.md",
+      "sha256": "6aad36bb5dddc131e71cf32017bdf64b96f8f97b69857b0615ce2b872f6807c2",
+      "bytes": 25605,
+      "gitBlob": "930afc671f5e041fcdaf4cdc38973c8aea1810af"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/native.public.jsonl.txt",
+      "sha256": "c3ea0a7817a32ff9f0f1c94dc6f4fef85409849675cd2dd6cd102d9a97378bc4",
+      "bytes": 635172,
+      "gitBlob": "4e84d36c92c8a2331e0ed8cdceddd88c6a74ce0e"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/final-guards.json.txt",
+      "sha256": "220c5bcaba002bb0a33afb59c68e7ac6ca19e5e230f6c01d850a7961fb1c6dcf",
+      "bytes": 531,
+      "gitBlob": "e6824b8eb472516bce31732a63fd8a0205795cd8"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/run-native.ts.txt",
+      "sha256": "d14dc53882202f13db00289ba1a4309b09b53805be98a4c1064af804b65c2f0b",
+      "bytes": 7281,
+      "gitBlob": "9cfdfb3c7699d4ece5769224f584be951797de86"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/common.ts.txt",
+      "sha256": "6dc8759bc339b1db4a4552a524e8a2eb81d5aac8584e74cda75d5f92c2bbf7e7",
+      "bytes": 3395,
+      "gitBlob": "56b77fb4e08606a7f3a3358f0747f13b023377d7"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/native-public.ts.txt",
+      "sha256": "64c459da5ae89a607bb92641e5b0676713a9bda8deae2d19f888a8d8235345cf",
+      "bytes": 2437,
+      "gitBlob": "842a81e89d4a06db61b7cf7fc13d380f2264129a"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/audit.ts.txt",
+      "sha256": "0b2810f6427242195ff8e66d1281d686ec67ae1947b8179b868ddd60959ba140",
+      "bytes": 3525,
+      "gitBlob": "1605d79be930598903be2d8e527f111860093a51"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/owned-spawn-corrected.ts.txt",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f",
+      "bytes": 1929,
+      "gitBlob": "7475960574b2cd5f4abb0676dba75aa24d494e5d"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/owned-capture.ts.txt",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c",
+      "bytes": 3891,
+      "gitBlob": "a2b21ebb048770a1858bac70509ca77fd95c3865"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/native-settings.json.txt",
+      "sha256": "75cf522e50f09973ae49eb5aad61d7d2e6b3221c34df8b8a2dadb05bd7bb2e65",
+      "bytes": 761,
+      "gitBlob": "04b0c779ac913b69470da5e8ced7329a18a0547d"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/native-mcp.json.txt",
+      "sha256": "b783539c2a0ef37bfe896e156bbd80279e6c740508efc6c882d4986d3c601e92",
+      "bytes": 595,
+      "gitBlob": "85b94a2643a8132686812945c883516b457a2a8f"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/prompt.md.txt",
+      "sha256": "f9e8f80461aefdbeebc7a20247a29244b6eea5c62602f1f250829543614b029e",
+      "bytes": 4686,
+      "gitBlob": "eda8b498fc77ec4f4e0378a4b30c0e99dafc35b3"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/native.public.jsonl.txt",
+      "sha256": "941304f62ea2134c09c0e58fbd9b29d0798da3116681d2eff2998c3ac4fd1a68",
+      "bytes": 52053,
+      "gitBlob": "45d69fd8ca19684cf772457c57afcf4e66d530ec"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/final-guards.json.txt",
+      "sha256": "59577048879b44a4e8097afb08bc4872a54865367543048123f9c324ba6ea59c",
+      "bytes": 529,
+      "gitBlob": "b11c5aeb680b4951417a036cfd51b746379d8b0a"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/run-native.ts.txt",
+      "sha256": "eec01571baaf5bcee50ffe8b87ced566ee2c27d177211d4e93b2a2ef08c06f4b",
+      "bytes": 7754,
+      "gitBlob": "44595fbd4abe05b5605d4b1805902e49ad36df48"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/common.ts.txt",
+      "sha256": "7fcd34e64857a49ae4142aca98e75638fe6c3318a7cf707d744c0da4d5b17531",
+      "bytes": 3708,
+      "gitBlob": "cea7ba5f650c75256353675eb8c1bc42a8e5bfc5"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/native-public.ts.txt",
+      "sha256": "64c459da5ae89a607bb92641e5b0676713a9bda8deae2d19f888a8d8235345cf",
+      "bytes": 2437,
+      "gitBlob": "842a81e89d4a06db61b7cf7fc13d380f2264129a"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/audit.ts.txt",
+      "sha256": "cddda5660e5a8b16768fbd2598f59829f9379d41582b1f164fe580910c896c92",
+      "bytes": 3158,
+      "gitBlob": "93e6397fc8c5c69e39591003ee9833b78456a590"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/owned-spawn-corrected.ts.txt",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f",
+      "bytes": 1929,
+      "gitBlob": "7475960574b2cd5f4abb0676dba75aa24d494e5d"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/owned-capture.ts.txt",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c",
+      "bytes": 3891,
+      "gitBlob": "a2b21ebb048770a1858bac70509ca77fd95c3865"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/native-settings.json.txt",
+      "sha256": "75cf522e50f09973ae49eb5aad61d7d2e6b3221c34df8b8a2dadb05bd7bb2e65",
+      "bytes": 761,
+      "gitBlob": "04b0c779ac913b69470da5e8ced7329a18a0547d"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/native-mcp.json.txt",
+      "sha256": "b783539c2a0ef37bfe896e156bbd80279e6c740508efc6c882d4986d3c601e92",
+      "bytes": 595,
+      "gitBlob": "85b94a2643a8132686812945c883516b457a2a8f"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/prompt.md.txt",
+      "sha256": "05ebb172085450ecdaff5a7e9779641aebc0842ea8059c81ec5d691f47280602",
+      "bytes": 2748,
+      "gitBlob": "1c72ba9d445334d12f37d01074082c96d9142d79"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/coverage.json.txt",
+      "sha256": "58f1f3d80ea566f8ccadc46a3182085d605732d42362bc7cf42eefd10a5c7727",
+      "bytes": 1948,
+      "gitBlob": "997bd0f85aa659bd0b25543c8346285cc01d6742"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/native-result.json.txt",
+      "sha256": "654b277dfd88580dc2c8d57e03fb25b7b82a5a16c21f2669221b3fd3601b6c95",
+      "bytes": 294,
+      "gitBlob": "88c670491c326521713a998eae2d513d9f266a5b"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/completion/final-verdict.md.txt",
+      "sha256": "6aad36bb5dddc131e71cf32017bdf64b96f8f97b69857b0615ce2b872f6807c2",
+      "bytes": 25605,
+      "gitBlob": "930afc671f5e041fcdaf4cdc38973c8aea1810af"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/offline-coverage.json.txt",
+      "sha256": "1fdb5c7864eba1fefb7d1d2d36103112652da5e251b5e736573854ed03b0febf",
+      "bytes": 16625,
+      "gitBlob": "b572cf86ff3a507b395cf66cb4556ff02f90a9e9"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/first/offline-coverage.ts.txt",
+      "sha256": "d8e7171e46053ee4066e843f7d3c06e62a6b297bef9b4d18bf38ca87e5f75264",
+      "bytes": 4191,
+      "gitBlob": "89273f13dc7da4031965b116caf97005bab78c87"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/qualification/root-offline-qualification.json.txt",
+      "sha256": "035b1c8d2f55ffb08f87fb3ca3469fe558995e817ad796623b04bc8e19a518b4",
+      "bytes": 5299,
+      "gitBlob": "e0ed091a87e0195909b35f5565b89c044f8a8ed0"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/qualification/root-offline-qualification.ts.txt",
+      "sha256": "304cdaa9c094fda6c7fa3926e1338ffd1be1079de96e2788f7a0df1e52a50d2a",
+      "bytes": 5994,
+      "gitBlob": "8fed2545cb2d3c3c3e6c617dd2db6e17d2ff4c65"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/source-bindings.json.txt",
+      "sha256": "354aa19fbb746eb998bae0f598ed803f449188cf9e0c3922885e2b4242eb86a0",
+      "bytes": 54372,
+      "gitBlob": "ae62f0cddcfe45927ea4b61ebcf2fc653e8b6fd4"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/packet-manifest.json.txt",
+      "sha256": "4dfaee3959dbd81aace6c24192bb36c2124700fe4e0b1ed74e1a6d4e2d68a0ed",
+      "bytes": 4486,
+      "gitBlob": "bd8e8d5769dbb6af92eb9c21c00827d44cefd6d5"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/generation-ten-blob-receipt.json.txt",
+      "sha256": "082ebec8d0111f29f646a945886739cc212dd23c9b851fb44e733ea90cb57d62",
+      "bytes": 1946,
+      "gitBlob": "23ec19c8d4b23aa746af9c3f4da485cf159e9041"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-01.md.txt",
+      "sha256": "7638626a92ad53eac5eaf8a7ceca9efa1d379c1ae7d5863d7b588bf8dc5ce095",
+      "bytes": 29962,
+      "gitBlob": "93ed4d24664dfec757f7be77484eb90c938efd1e"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-02.md.txt",
+      "sha256": "c9e86fdc048d42f4925ee018c3606ac1374d1cfce4f5425fcf0a7bdbc485c15b",
+      "bytes": 29987,
+      "gitBlob": "8ad7b7a79c71ee107455a42dfbb204e407c3e4e5"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-03.md.txt",
+      "sha256": "1345630d4b0f3a83585e03cb85eafb09290224fa8ef3879fb9fb3d106ace5275",
+      "bytes": 29991,
+      "gitBlob": "49a519d5153e7ab29518bb3fbf5db920f6648b27"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-04.md.txt",
+      "sha256": "25c225d27eece410203fabfc7c4a4cb981bf0ff15b979823453813ec2f28cfc6",
+      "bytes": 29951,
+      "gitBlob": "36e864b91c6658195689d6c4ae09e8930aaf455a"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-05.md.txt",
+      "sha256": "776a2cd8eab7d60ece88183c328422bd38d8aa29c4bee75eb390f2b40b5683c4",
+      "bytes": 29988,
+      "gitBlob": "1f271f925c892b0cd0ae6664c21d077ab3b24308"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-06.md.txt",
+      "sha256": "807bc5fb08a976e875d4d986c8086da23c930b587dab83b60ca608a4ea81e8a2",
+      "bytes": 29952,
+      "gitBlob": "8c48f7bceab23b139f1ffbd4f2fbf63fe5e6a3d0"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-07.md.txt",
+      "sha256": "976096b34b3905eac4be5585117cecb29d8fc7bf9e8920f554a2ebf565e021a7",
+      "bytes": 29981,
+      "gitBlob": "f7f8f0d7f559fe36f4e5766453811dd73cb944d2"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-08.md.txt",
+      "sha256": "de61738903da52e40ab4c6b25ba56866df60fd82a90cb38e1240b6a4b8522dee",
+      "bytes": 29951,
+      "gitBlob": "142f6cc066959cef1ae100ef279045192700388f"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-09.md.txt",
+      "sha256": "ee992f720633124222bdaf6f40cda36db3c5f07ec099a4f7551857421ec2dc3f",
+      "bytes": 29945,
+      "gitBlob": "afd3eb231729c593042ef0f23b493bbe93063ee8"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-10.md.txt",
+      "sha256": "2740d9d3c2868434a27e47bfb4ed917ea533dd590af7b0ec89b6d6ef675b2b6a",
+      "bytes": 29580,
+      "gitBlob": "f494b6ca30e6efc7e5a3c1c86e0581c764f40723"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-11.md.txt",
+      "sha256": "85d019c1d5b1f7806c7dee3f9ca36b4467b29f01627355bcbeec8d6489f516a4",
+      "bytes": 29992,
+      "gitBlob": "f1c5d9475b90d8c3991e922d99cecb7c626be311"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-12.md.txt",
+      "sha256": "132a97fcdf3a1289cb7c410e197d772e947db8fa7f9a74772ace5405668d0792",
+      "bytes": 29932,
+      "gitBlob": "88c34ad40091cd763898e75c27dc25bffcf8e97d"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-13.md.txt",
+      "sha256": "23719c0d489caa7b3a6ccfe240749da7fdb8355bef6236fb9b451972811242d8",
+      "bytes": 29494,
+      "gitBlob": "17a235c4e26ba67272d2015a02a9d72de2b05540"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-14.md.txt",
+      "sha256": "960b6c39a22d3649c78f57d58102ebb0f7e8adf92e673a80ff2fdbf5590bddb5",
+      "bytes": 29932,
+      "gitBlob": "31a1a48ad91cd5e401788ebd23bf3764bb6603f3"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-15.md.txt",
+      "sha256": "2aee251b6261bc91b36a804ff1b2be31b7f9c15a40391e41885aec1d78be082f",
+      "bytes": 29919,
+      "gitBlob": "e19a79057a7dac05d5157c8a092d67478e6040e8"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-16.md.txt",
+      "sha256": "8427377b12aad0b5d5421ca41a57fa5a7c03b6958450cbc5f5d84c8d5251779c",
+      "bytes": 29896,
+      "gitBlob": "8ba68a308f428baa13cd889ddb7fab60fb179d73"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-17.md.txt",
+      "sha256": "b3a0a0452d7564e3bd5b1c1907485d388b54139b95a4b741bcd7b7e03ba62320",
+      "bytes": 29934,
+      "gitBlob": "8055b2b56215bfb044bb6675cf01095a3238eb5f"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-18.md.txt",
+      "sha256": "c45af4d31a8036b12f90ed871beb30f9002f71909166efc60e6eb4422b4a386d",
+      "bytes": 29970,
+      "gitBlob": "d3c41b88c92bb1ec390800b54585d80074438a3c"
+    },
+    {
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/impl-native-opus-20261028/inputs/review-part-19.md.txt",
+      "sha256": "d4f03a2e06bac9da257e355a2b4e0a0ee250ebdf96972a5af6a1857fbabe43f1",
+      "bytes": 4601,
+      "gitBlob": "1f8504973a8327996ffcf54dc0979d78ce9a0c3f"
+    }
+  ],
+  "operationalSealsExcluded": true,
+  "rawCopiesByteIdentical": true
+}

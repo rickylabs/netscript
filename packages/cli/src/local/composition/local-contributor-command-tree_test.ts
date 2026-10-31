@@ -38,6 +38,7 @@ describe('local contributor CLI composition', () => {
       'ui:info',
       'ui:registry',
       'ui:preset',
+      'ui:migrate',
       'ui:remove',
     ]);
   });

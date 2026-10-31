@@ -1,0 +1,1 @@
+Task docs:exports-drift deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts

@@ -1,0 +1,1 @@
+Task audit:critical deno audit --level critical

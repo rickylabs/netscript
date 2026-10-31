@@ -1,0 +1,73 @@
+{
+  "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+  "assistants": [
+    {
+      "id": "msg_180921d23001BeBvZiVwheQKCi",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "tool-calls",
+      "cost": 0.04104,
+      "tokens": {
+        "total": 17814,
+        "input": 14877,
+        "output": 1329,
+        "reasoning": 456,
+        "cache": {
+          "write": 0,
+          "read": 1152
+        }
+      }
+    },
+    {
+      "id": "msg_180926eed001hKYYCd9lxTp4ys",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "tool-calls",
+      "cost": 0.434424,
+      "tokens": {
+        "total": 192488,
+        "input": 158126,
+        "output": 68,
+        "reasoning": 18294,
+        "cache": {
+          "write": 0,
+          "read": 16000
+        }
+      }
+    },
+    {
+      "id": "msg_180962fa9001cB77ejzQrGmMot",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "stop",
+      "cost": 0.225168,
+      "tokens": {
+        "total": 209792,
+        "input": 19036,
+        "output": 2808,
+        "reasoning": 13868,
+        "cache": {
+          "write": 0,
+          "read": 174080
+        }
+      }
+    }
+  ],
+  "freshTaskProfile": true,
+  "rawExportSha256": "8eea1bcabf8e1dce65ec9a535e938f2c22a94daaef66892a9f7b0af7ca0a463b",
+  "capture": {
+    "stdoutCapturedBytes": 2661159,
+    "stderrCapturedBytes": 50,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  },
+  "requestedVariant": "xhigh; actual provider effort not independently attested",
+  "privateReasoningPersisted": false
+}

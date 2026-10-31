@@ -1,0 +1,178 @@
+{
+  "capturedAt": "2026-10-27T21:29:57.479Z",
+  "sourceHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "branch": "fix/browser-stream-headers",
+  "selectedTier": "feature",
+  "selectedRole": "plan",
+  "requestedModel": "claude-fable-5-1",
+  "requestedEffort": "low",
+  "effortIndependentAttestation": false,
+  "route": "normal existing native subscription through existing runClaudePrint",
+  "profileOrCredentialsCopied": false,
+  "paidProviderFallbackUsed": false,
+  "nativeToolingMcpFlagsAreNotShippingLockOrAgeWaiver": true,
+  "initialProposalStatus": "retained verbatim; planning defects required correction",
+  "correctedProposalStatus": "coordinator read and independent plan verdict pending",
+  "attempts": [
+    {
+      "number": 1,
+      "exit": {
+        "started": "2026-10-27T21:18:19.784Z",
+        "finished": "2026-10-27T21:22:15.969Z",
+        "code": 0,
+        "failure": null,
+        "timedOut": false,
+        "session": "641b2185-ebd6-4204-bce0-53ab1befe734",
+        "actualModel": "claude-fable-5-1",
+        "requestedEffort": "low",
+        "effortIndependentlyAttested": false,
+        "mcpQualified": true,
+        "docsToolCalls": 1,
+        "childStatusAwaited": true,
+        "guardFailures": [],
+        "sourceImplementationAuthorized": false,
+        "rootPlanReadAndIndependentVerdictPending": true
+      },
+      "driverPid": 48480,
+      "nativeChildPid": 103332,
+      "actualAssistantModels": [
+        "claude-fable-5-1"
+      ],
+      "toolNames": [
+        "Read",
+        "Grep",
+        "Glob",
+        "mcp__netscript__find_guidance"
+      ],
+      "toolCallCount": 36,
+      "explicitReadPaths": [
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.llm\\runs\\fix-browser-stream-headers--u3\\worklog.md",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.llm\\runs\\fix-browser-stream-headers--u3\\research.md",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\src\\runtime\\streams\\create-stream-db.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\streams\\factory.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\plugin-streams-core\\src\\application\\stream-url-resolver.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\src\\runtime\\streams\\create-stream-db_test.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\tests\\_fixtures\\stream-db-server.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\src\\runtime\\streams\\stream-db-recovery-adapter.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\tests\\streams\\factory-discovery_test.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\tests\\streams\\live-query-consumer_test.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\tests\\streams\\live-query-consumer_type.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\tests\\type-fixtures\\streamdb-wrapper_type.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\package.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\plugins\\workers\\streams\\mod.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\docs\\site\\durable-workflows\\streams.md",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\deno.json",
+        "C:\\Users\\ericc\\AppData\\Local\\deno\\npm\\registry.npmjs.org\\@durable-streams\\client\\0.2.7\\dist\\index.d.ts",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\tests\\type-fixtures\\streamdb-consumer-deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\src\\runtime\\streams\\mod.ts"
+      ],
+      "publicProtectedPathCount": 87,
+      "files": {
+        "raw": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/attempt-1/native.stdout.jsonl",
+          "sha256": "3d1c0739a3388a0de3aa5a68d24c94112c655c3737cecf8e7b67822ae9b9c652"
+        },
+        "plan": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/runs/fix-browser-stream-headers--u3/plan-initial-native.md",
+          "sha256": "f9cb79badb6234671b026fe9f720c3118a4953e3f1beaec958ac742747f9efcb"
+        },
+        "identity": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/attempt-1/identity.json",
+          "sha256": "39739eb422f82044520378a7bb2e13bda5cc2f3efb59009823f2dbcdf1945749"
+        },
+        "exit": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/attempt-1/exit.json",
+          "sha256": "33ee2c38898aeaaf8fb997ce536ed953728243f178aeda0ca3151bc8afe755f3"
+        }
+      }
+    },
+    {
+      "number": 2,
+      "exit": {
+        "started": "2026-10-27T21:25:35.170Z",
+        "finished": "2026-10-27T21:28:01.399Z",
+        "code": 0,
+        "failure": null,
+        "timedOut": false,
+        "session": "641b2185-ebd6-4204-bce0-53ab1befe734",
+        "actualModel": "claude-fable-5-1",
+        "requestedEffort": "low",
+        "effortIndependentlyAttested": false,
+        "mcpQualified": true,
+        "docsToolCalls": 1,
+        "childStatusAwaited": true,
+        "guardFailures": [],
+        "sourceImplementationAuthorized": false,
+        "rootPlanReadAndIndependentVerdictPending": true
+      },
+      "driverPid": 79180,
+      "nativeChildPid": 35236,
+      "actualAssistantModels": [
+        "claude-fable-5-1"
+      ],
+      "toolNames": [
+        "Read",
+        "Grep",
+        "mcp__netscript__search_docs"
+      ],
+      "toolCallCount": 5,
+      "explicitReadPaths": [
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.llm\\tools\\run-deno-doc-lint.ts"
+      ],
+      "publicProtectedPathCount": 87,
+      "files": {
+        "raw": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/attempt-2/native.stdout.jsonl",
+          "sha256": "a20ad5525c2d86e476d303d959b9acfc40ed17872b9faab3c7fe2908649c2223"
+        },
+        "plan": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/runs/fix-browser-stream-headers--u3/plan.md",
+          "sha256": "7fd0f254c5eb8d209e6aa54ec38c85fb0cd3f1e15440477a214e65924c165271"
+        },
+        "identity": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/attempt-2/identity.json",
+          "sha256": "44bf98e9a4fc8c700a61401924672dd9aa7b2b6bd1594ab48cd9abbf92497a2e"
+        },
+        "exit": {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/attempt-2/exit.json",
+          "sha256": "c7a9b44b41e2e8c87060ba710da8bbb5f97b9634a80e141251d0aad8009358d0"
+        }
+      }
+    }
+  ],
+  "sealed": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/run-plan.ts",
+      "sha256": "7b0a45eb75a92308c0b68881efe117d8cd9caedc3c1ae284b2a9913336d5bcc4"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/run-plan-correction.ts",
+      "sha256": "251ea180e91ca3bbe5790df4c16a35c14c3b035b048a14a7751c83990bd99c90"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/prompt.md",
+      "sha256": "09fc0054cd965dc52e538fb77c93faa8c53de47cae774c12a96be3dd700b808d"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/correction-prompt.md",
+      "sha256": "d10567e6dcb14628a475b0d9110d93239ec2792d094b6c4f6a44eb7aa18e26ea"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/native-settings.json",
+      "sha256": "d9cc082b81d5c1c85c082a3f6b13dbebb0779c8a14938c9b8162dbe4634cf1d3"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/native-mcp.json",
+      "sha256": "6e406cb23ac464868738f46b6c1cefd49afeb978b9cd69244cd28824a467c7e4"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/preflight.json",
+      "sha256": "4185182cfe13c95323b337b353fd86b85290467c173d70059ff98cb7b42c875f"
+    }
+  ],
+  "productImplementationOrTestsRun": false,
+  "preparationTypeAndFormatFindings": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan/preflight.json"
+}

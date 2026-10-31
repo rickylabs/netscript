@@ -1,0 +1,42 @@
+[
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json",
+    "sha256": "f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json",
+    "sha256": "7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json",
+    "sha256": "6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json",
+    "sha256": "b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review-v2.ts.txt",
+    "sha256": "2de6e64501d0f83f21ff0ce6ce83940c4b69c89d57bd6fbed6421a4d27ea9adb"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review.ts.txt",
+    "sha256": "bbcf053383e533b82700fb354c77f1be9e6b19209d0d23649eb48ee9a3ba82f0"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/root-audit.json",
+    "sha256": "7a3cbbb78e7eee3560020300a54e19bca2d2e069c60f8e689e4359d7962bbf67"
+  },
+  {
+    "path": ".llm/runs/fix-browser-stream-headers--u3/root-ci-generation-acceptance-20261028.md",
+    "sha256": "eef7d04ca74b2d26bc4f46ee40c398a5e6eef04777fbec4dd8070ceae0b6c2e6"
+  },
+  {
+    "path": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "sha256": "22d0110ceccac7956008746785a5bfbc684cb77d18f6d8c7bcf7a7347de98498"
+  },
+  {
+    "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+    "sha256": "83ec73db03b7cef8142387a5fd2dfa49ab678342f8f543db3aa3e2e02c6c73b1"
+  }
+]

@@ -14,6 +14,8 @@ export interface PanelProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'cl
   children: ComponentChildren;
   class?: string;
   tone?: PanelTone;
+  /** Canonical visual axis; tone is a compatibility alias. */
+  variant?: PanelTone;
 }
 
 interface PanelSectionProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
@@ -27,34 +29,75 @@ interface PanelTextProps
   class?: string;
 }
 
-const TONE_CLASSES: Record<PanelTone, string | undefined> = {
-  default: undefined,
-  muted: 'ns-panel--muted',
-  raised: 'ns-panel--raised',
-};
-
-function PanelRoot({ children, class: className, tone = 'default', ...props }: PanelProps): VNode {
-  return <div {...props} class={cn('ns-panel', TONE_CLASSES[tone], className)}>{children}</div>;
+function PanelRoot(
+  { children, class: className, tone = 'default', variant, ...props }: PanelProps,
+): VNode {
+  return (
+    <div
+      {...props}
+      class={cn('ns-panel', className)}
+      data-variant={variant ?? tone}
+      data-part='root'
+      data-scope='panel'
+    >
+      {children}
+    </div>
+  );
 }
 
 export function PanelHeader({ children, class: className, ...props }: PanelSectionProps): VNode {
-  return <div {...props} class={cn('ns-panel__header', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-panel__header', className)}
+      data-part='header'
+      data-scope='panel'
+    >
+      {children}
+    </div>
+  );
 }
 
 export function PanelTitle({ children, class: className, ...props }: PanelTextProps): VNode {
-  return <p {...props} class={cn('ns-panel__title', className)}>{children}</p>;
+  return (
+    <p {...props} class={cn('ns-panel__title', className)} data-part='title' data-scope='panel'>
+      {children}
+    </p>
+  );
 }
 
 export function PanelDescription({ children, class: className, ...props }: PanelTextProps): VNode {
-  return <p {...props} class={cn('ns-panel__description', className)}>{children}</p>;
+  return (
+    <p
+      {...props}
+      class={cn('ns-panel__description', className)}
+      data-part='description'
+      data-scope='panel'
+    >
+      {children}
+    </p>
+  );
 }
 
 export function PanelBody({ children, class: className, ...props }: PanelSectionProps): VNode {
-  return <div {...props} class={cn('ns-panel__body', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-panel__body', className)} data-part='body' data-scope='panel'>
+      {children}
+    </div>
+  );
 }
 
 export function PanelFooter({ children, class: className, ...props }: PanelSectionProps): VNode {
-  return <div {...props} class={cn('ns-panel__footer', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-panel__footer', className)}
+      data-part='footer'
+      data-scope='panel'
+    >
+      {children}
+    </div>
+  );
 }
 
 type PanelNamespace =

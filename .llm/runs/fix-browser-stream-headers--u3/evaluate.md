@@ -1,0 +1,139 @@
+# evaluate.md — IMPL-EVAL, U3 caller-provided durable-stream reader headers
+
+**Exact HEAD: `9288ea2939f56eeb75fa53b6260f6cf1e91f31f0`**
+
+## VERDICT: PASS
+
+Scope of this PASS: the authored U3 source/test/doc slices (C1, C2, C3), the bounded four-site native type closure with its canonical debt entry, and the two canonical generated carriers — at this exact head, under the stated unresolved gates. This is **not** a whole-CI, merge, readiness, release, authentication, issuer, browser/CEF, or EIS-adoption pass, and it is **not** an F-15 or F-5 compliance pass.
+
+---
+
+## 1. Evaluator identity, inputs, independence
+
+| Item | Value |
+| --- | --- |
+| Phase | IMPL-EVAL (final, separate session from every generator) |
+| Session | `a4d71fd7-efc6-4444-8141-7fa312a2977a`, continued; no new session/model |
+| Route | native Anthropic `claude-opus-5` / xhigh; eligible because Meta (Muse, incomplete authoring) and OpenAI (Sol, implementation) generated this leaf — both vendor families skipped |
+| Inputs | 19/19 review packets read from offset 1 to EOF, limit 2000+, in batches (parts 01–19); no truncation encountered |
+| Own MCP qualification | 7 calls in this session: `search_docs` (reader-header query), `find_export HeadersRecord`, `find_export MaybePromise`, `get_export createNetScriptStreamDB`, `get_export HeadersRecord`, `get_export NetScriptStreamDBOptions`, `get_export createWorkersStreamDB` — all `truncated:false`; no preparer/preflight query substituted |
+| Not used | no file writing, no shell, no gate execution, no delegation, no model fallback, no entitlement/usage probe |
+
+MCP results I rely on as my own evidence: `HeadersRecord` and `MaybePromise` each resolve to exactly two first-party surfaces — `@netscript/fresh ./streams` and `@netscript/plugin-workers ./streams` (`total:2`, both `typeAlias`) — matching the four approved sites and no fifth. `NetScriptStreamDBOptions` renders `headers?: HeadersRecord`. The `HeadersRecord` JSDoc carried into the corpus states functions are called **for each request**, not once per session, which is the exact semantic the runtime tests prove.
+
+---
+
+## 2. Control-by-control findings (evidence-backed)
+
+Severity key: **C** blocking · **M** material, non-blocking at this head · **I** informational/qualification.
+
+| # | Control | Evidence (file:line) | Sev | Disposition |
+| --- | --- | --- | --- | --- |
+| 1 | Native identity, no copy/serializer | `packages/fresh/src/runtime/streams/create-stream-db.ts:241` forwards `options.headers` by reference; `plugins/workers/streams/factory.ts:617` identical; proof `packages/fresh/tests/streamdb-headers-contract_test.ts:122` `captured.streamOptions.headers === suppliedHeaders` | — | Satisfied. No framework serializer, no map clone, no eager resolution. |
+| 2 | Omitted vs explicit-empty (replacement, not merge) | `create-stream-db.ts:241` and `factory.ts:617` both `options.headers === undefined ? getStreamsAuth() : options.headers`; wire proof `streamdb-headers-contract_test.ts:244-291` (`{}` → every `authorization === null` with `STREAMS_SECRET` set; absence → `Bearer u3-synthetic-producer`); workers twin `plugins/workers/tests/streams/factory-headers_test.ts:838-854` | — | Satisfied on both factories, proven on the real wire, not only at the port. |
+| 3 | `null` is not an undocumented fallback | Option typed `headers?: HeadersRecord`; no `??`, no truthiness branch | — | Satisfied; `null` is a compile error, consistent with plan §1. |
+| 4 | Lazy callbacks, post-construction mutation | `streamdb-headers-contract_test.ts:123-124` (`syncCalls`/`asyncCalls` 0 after construction); `factory-headers_test.ts:812-819` mutates `headers['x-u3-static']` **after** construction and observes `workers-static` on the first real request | — | Satisfied. Mutation visibility is the strongest available proof that the record is not snapshotted. |
+| 5 | Per-request rotation on real requests | Fresh `streamdb-headers-contract_test.ts:195-207` (v1 → v2 on a later long-poll, static/sync intact); workers `factory-headers_test.ts:820-831` (`rotated.live === 'long-poll'`, `syncCalls >= 2`, `asyncCalls >= 2`) | — | Satisfied. Rotation is observed from wire records, not from callback counters alone. |
+| 6 | Checkpoint non-empty, never `-1`, restart at retained offset | `streamdb-headers-contract_test.ts:210-213` (`checkpoint.length > 0 && checkpoint !== '-1'`), `:228-230` (`reads[reconnectStart]?.offset === checkpoint`, every reconnect read `!== '-1'`) | — | Satisfied; no full-log replay after kill/restart on the same port. |
+| 7 | Rotation **across** reconnect | `streamdb-headers-contract_test.ts:217` sets `Bearer u3-v3` while the server is dead; `:231` asserts a post-reconnect read carries v3 | — | Satisfied. This is the control that distinguishes per-request resolution from per-session. |
+| 8 | Collection and entity identity preserved | `streamdb-headers-contract_test.ts:224-226` (`db.collections.events === collection`, `collection.get(before) === originalEntity`); workers `factory-headers_test.ts:832-833` | — | Satisfied. Recovery does not replace collections or re-materialize entities. |
+| 9 | Callback failure: zero requests, no ambient fallback | `streamdb-headers-contract_test.ts:336-382`: rejecting `Error` → terminal (`calls` 1), throwing `TypeError` → recoverable, bounded to 2 by `maxRetries: 1`; both assert `requests === 0`, original error identity, `failed` → `stopped` | — | Satisfied. "All errors terminal" is correctly **not** claimed; the TypeError path honestly exercises `isRecoverableReadError` (`stream-db-recovery-adapter.ts:213-221`). |
+| 10 | Default status/stop/dispose semantics | `create-stream-db.ts:266-283` single `stop` bound to `close`/`stop`/`dispose`, `status` delegated; asserted `stopped` at `streamdb-headers-contract_test.ts:233`, `273-276`, and post-stop preload rejects with `DOMException` `:278` | — | Satisfied; idempotent and abort-aware. Unchanged adapter (`stream-db-recovery-adapter.ts`) not copied. |
+| 11 | Permission-scoped env denial | `streamdb-headers-contract_test.ts:293-334` with `{ env: false, net: true, read: true }`: explicit headers succeed; absent headers throw an error naming `STREAMS_SECRET` and env capability | **I** | Satisfied **as scoped**. The test must disable the native `warnOnHttp` (`:311-318`) because the upstream client reads `NODE_ENV` for the HTTP warning (original failure preserved at part 17, `tests-1793144524427-0.stdout`). So "works with env denied" holds for the configured native port over `http://`, not for the default port over `http://`. Correctly commented in-test and flagged in root acceptance; no doc claims otherwise. No remedy required at this head; do not later restate this as a general env-free guarantee. |
+| 12 | Resource/ops/exit sanitizers | `streamdb-headers-contract_test.ts:25-38` and `factory-headers_test.ts:693-695` set all three explicitly on every registration; `live-query-consumer_test.ts:61-65` upgraded likewise | — | Satisfied for all new/edited registrations. The pre-existing `create-stream-db_test.ts` keeps plain `Deno.test` (root scope was extraction/imports only) — not a regression. |
+| 13 | Owned-resource cleanup on failure paths | `streamdb-headers-contract_test.ts:40-50` aggregating `cleanup`, `:74-89` fetch-drain + body-cancel + `signal.aborted` assertions; workers `:697-707`, `:776-786` (readers → server → env order) | — | Satisfied. Locked-body and live-native-read assertions are real controls, not cosmetic. |
+| 14 | Compiler contract: positive | Fresh `streamdb-headers-contract_test.ts:384-396` (fixture + config, exit 0, no `TS\d+`/`No matching`/`No target`); fixture `type-fixtures/streamdb-wrapper_type.ts:493-518` incl. port round-trip `input.streamOptions.headers` ↔ `HeadersRecord`; workers `factory-headers_test.ts:856` → `live-query-consumer_type.ts:115-129` preserving all four factories | — | Satisfied. Positive targets are non-empty and selection-proven, closing the `deno check` exit-0 trap. |
+| 15 | Compiler contract: three negatives | Fresh `:397-412`, workers `:10-30`: `{authorization:1}`, `{authorization:()=>1}`, whole-map factory — each asserts non-zero exit, the file name present, `TS2322`, a `MaybePromise|HeadersRecord|not assignable` diagnostic, and **absence** of `TS2307`/`TS2305` | — | Satisfied. The no-`TS2307`/`TS2305` assertion is what makes these genuine contract failures rather than resolution failures. |
+| 16 | Compiler child deadlines, drain, cleanup | Fresh `:427-448` and workers `:36-51`: 30 s `AbortController`, `signal.throwIfAborted()` after `output()`, `clearTimeout` in `finally`, temp dirs removed in `finally` | — | Satisfied; finite, awaited, no orphaned children. |
+| 17 | Negative sources inside a discovery root | `factory-headers_test.ts:857-859` creates the temp dir **under** `plugins/workers/tests/streams/` (`dir: fromFileUrl(new URL('./'))`) | **M** | Accepted risk, root-authorized as the owned fallback. Invalid `.ts` files exist transiently inside the repo test tree; a concurrent discovery-based check/test could observe them. Removal is in `finally` and C2 evidence records owned-directory removal. Remedy (follow-up, not this head): prefer an out-of-tree temp dir with an explicit `--config`, or a `.`-prefixed/ignored directory name, if workspace resolution permits. |
+| 18 | No casts/suppressions/`any` | No `as any`/`as unknown as`/`@ts-expect-error`/`deno-lint-ignore` in any changed file; runtime-shape checks use `Reflect.get` + `typeof` (`factory-headers_test.ts:762-775`), quality scan 0 findings / 0 allowances (Fresh) and one unchanged pre-existing producer allowance (workers) | — | Satisfied. |
+| 19 | No hand-rolled transport or header serializer | Production adds no fetch path; `observeFetch` is an observation wrapper, `upToDateStub`/`Deno.serve` are test doubles; the unchanged recovery adapter was not duplicated | — | Satisfied, matching the explicit prohibition. |
+| 20 | Public-surface honesty, workers return type | `plugins/workers/streams/factory.ts:571-579` still returns collections-only `WorkersStreamDB`, while the runtime object also carries `preload`/`close` (reached via `Reflect.get`) | **M** | Pre-existing shape, not introduced here, and deliberately not widened (root condition). Remedy (separate scope): model the workers lifecycle on the declared type rather than leaving consumers to discover it reflectively. |
+| 21 | Doc accuracy vs code | `docs/site/durable-workflows/streams.md:309-329`: native string/sync/async values, per-request resolution incl. after reconnect, `{}` replaces ambient auth, undefined-only legacy, custom-port migration ("forward the record unchanged"), explicit "neither issues credentials nor authenticates a reader" | — | Every prescriptive sentence traces to code at `create-stream-db.ts:241`/`factory.ts:617` and to controls 2, 4, 5, 7. No issuer/bootstrap/CEF claim. |
+| 22 | Port widening disclosed | `create-stream-db.ts:149-156` JSDoc + `:189-195`; drift recorded as significant; docs carry the migration sentence | **I** | Honest. A `breaking`-class label/semver note for external string-serializing adapters is not evidenced on the PR surface; that is a release-surface item, not a source defect. |
+
+---
+
+## 3. Caps, footprint, doctrine, process
+
+| Gate | Evidence | Result |
+| --- | --- | --- |
+| Fresh new test ≤ 480 physical lines | diff `packages/fresh/tests/streamdb-headers-contract_test.ts` `@@ -0,0 +1,478 @@` | **478 / 480**, and under the doctrine 500-LOC test boundary (F-10 substance) |
+| Workers new test ≤ 400 | diff `plugins/workers/tests/streams/factory-headers_test.ts` `@@ -0,0 +1,237 @@` | **237 / 400** |
+| Fresh product delta ≤ +18/−8 | `create-stream-db.ts` diff hunks (module JSDoc, type import/export, port field, option, composition) | Within cap |
+| Workers product delta ≤ +12/−2 | `factory.ts` diff hunks | Within cap |
+| Helper extraction only | `packages/fresh/tests/_fixtures/stream-db-test-runtime.ts` 80 lines, anchors `./stream-db-server.ts` + `../../../../deno.json`; old test loses exactly the inlined harness and gains one import | Satisfied; no second harness, no abstraction invented |
+| Type closure exactly four sites, +8/−2 | `create-stream-db.ts` (−1/+2), `fresh …/streams/mod.ts` (+2), `factory.ts` (−1/+2), `workers streams/mod.ts` (+2) = **+8/−2**; my `find_export` returns `total:2` per name, i.e. no fifth site | Satisfied, independently corroborated |
+| Positive-only type fixtures | `streamdb-wrapper_type.ts`, `live-query-consumer_type.ts` additions are positive; sagas/triggers/auth lines untouched | Satisfied |
+| Archetypes | A-1 (Fresh small-contract surface) and A-5 (workers plugin) applied; workers remains thin glue — imports `buildStreamUrl`/`getStreamsAuth` from `plugin-streams-core`, redefines no core convention | Satisfied |
+| AP checks | No AP-1 (largest new file 478), no AP-7 (typed options object), no AP-13 (no new `console.*`), no AP-22 (edits are declared subpath entries). **AP-14/F-15 is knowingly violated** at the four type-export sites | Recorded as debt, see §4 |
+| Design/slice process | `worklog.md` carries design + per-slice checkpoints; PLAN-EVAL `PASS` (`2d2f36ec…`) landed **before** C1; corrective SAME-evaluator PLAN `PASS` as DEBT_ACCEPTED (`c12eef08…`) before the closure; root source acceptance recorded per slice with independently recomputed hashes (17 / 4+7 / 13) | Satisfied; generator ≠ evaluator held in every cycle |
+| Agent-brief `## SKILL` chapter | Present on this evaluation brief | Satisfied (protocol rule 13; PR bodies exempt) |
+| Feature-tier loop policy | This is the first IMPL-EVAL cycle of max 5, owner notification after 3; same-session correction consumed to deliver this complete report, with the prior incomplete result preserved | Satisfied |
+
+---
+
+## 4. Debt disposition — numeric closure is **not** F-15/F-5 compliance
+
+Canonical entry `.llm/harness/debt/arch-debt.md:2932`, file SHA256 `d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3`, ID `U3-NATIVE-READER-HEADER-TYPE-CLOSURE`. I checked it against the verdict-definitions validity bar:
+
+- **Both violations named, explicitly:** upstream native type re-export (chapter 02 / AP-14 / **F-15**) **and** measured two-name aggregate facade growth (chapter 11 / **F-5**; Fresh 52→54, workers 24→26). Stated as `DEBT_ACCEPTED`, "never an unqualified F-15 or F-5 PASS". ✔
+- **Target `2026-11-10`, fixed, no extension, no growth.** ✔ Owner: milestone coordinator + rickylabs. ✔ Status: Open. ✔
+- **Boundary:** no fifth source site, no extra native name, no runtime value/resolver/serializer, no dependency/version/config/lock, no auth/issuer/bootstrap or lifecycle change; "no general NetScript vendoring precedent". ✔ My `find_export`/`get_export` results are consistent with that boundary at this head.
+- **Closing gate:** remove both names together via a compatible public-doc solution retaining exact header identity, or a separately reviewed doctrine amendment; no renewal, baseline reset, checker override, erasure/cast/suppression. ✔
+- **Unwaived, explicitly:** **Fresh 10 baseline doc-lint findings** (exact ten identities enumerated in `type-closure…/application/final-evidence.json` `owningDocs.identities` and reproduced verbatim in `doc-fresh-1793154019653.stderr`) and **prior facade surplus**. Workers shipping doc-lint is **0**. ✔
+- **History:** the earlier `FRESH-NATIVE-HEADERS-TYPE-CLOSURE` verdict stays immutable; its source-only application **failed** the owning 12→10 condition and was archived/reverted (`failed-f15/application-failed.json`, restored `fe27fb21…` / `d502eafa…`). The current exception does not promote that failed premise. ✔
+- **Reference parity:** pending root-scoped gate, **no waiver taken**; satisfied only under the declared entrypoints-only contract, evidenced by the read-only external Windows checker `0d5b982b` / `df2c50fb…` at 36/36 with empty stderr. **Not** exhaustive per-name prose, **not** a parent `docs:accuracy` PASS. ✔ Recorded here as a qualification, not a closure.
+
+Scanner state does not change this: `check-doctrine.ts --all-roots` exits 0 with existing warnings, which the run itself labels as scanner blindness rather than compliance. I concur — the `import type` + `export type {}` spelling evades F-15's literal patterns.
+
+**New finding (I).** The closure buys doc-lint measurement, not agent-facing type fidelity: in the canonical corpus both names render as `type HeadersRecord = unknown` and `type MaybePromise<T> = unknown`, and `createWorkersStreamDB` renders `(arg0: unknown)`. I observed this directly via `get_export` in this session, and it matches `decoded-delta.json`. Against the shipping sources (`create-stream-db.ts:95-96`, `factory.ts:559-560`) and the positive/negative compiler evidence (13 identity/anti-any assertions; 3 negatives × 3 intended `TS2322`; native `0.2.7` declarations non-empty at all four JSON roots), the real public shape is exact and type-safe — the `unknown` is a **corpus representational limit for npm-sourced aliases**, not a surface defect. Consequence for the Nov 10 decision: the F-15/F-5 cost currently purchases `deno doc --lint` closure plus the retained JSDoc (which does carry the per-request semantics), but **not** a machine-readable shape for MCP consumers. Remedy to weigh at closure, not now: a first-party structural type in `@netscript/*` core that preserves assignability (my `find_export` shows no such first-party owner exists today), which would satisfy the closing gate and fix the `unknown` rendering together.
+
+---
+
+## 5. Gate rows at this head (receipts, not claims)
+
+| Gate | Command / receipt | Result |
+| --- | --- | --- |
+| Fresh runtime suite | `run-deno-test.ts -- --frozen -A` over `create-stream-db_test.ts`, `stream-db-recovery-adapter_test.ts`, `streamdb-headers-contract_test.ts` — `c1-tests-1793154021321` | **20 / 0 / 0**, exit 0, 11.4 s |
+| Workers runtime suite | same wrapper over `factory-headers_test.ts`, `factory-discovery_test.ts`, `live-query-consumer_test.ts` — `c2-tests-1793154032967` | **5 / 0 / 0**, exit 0, 7.0 s |
+| Meaningful RED preserved | `red-1793140216669-0` (Fresh 0/1, "must reach the factory port by reference"); `tests-1793144524427-0` (**18/2**); `red-1793149753389` (workers 0/1, observed `Bearer u3-workers-synthetic` instead of `Bearer workers-v1`) | Genuine pre-implementation RED retained, distinct from final GREEN |
+| Types (4 inputs) | `run-deno-check.ts --file ×4 --frozen --unstable-kv` — `types-1793154040205` | exit 0 |
+| Lint / fmt (4 inputs) | `run-deno-lint.ts`, `run-deno-fmt.ts`, `--ext ts` — `lint-1793154043228`, `fmt-1793154044722` | exit 0, no findings/drops |
+| Authored consumers | `--cwd packages/fresh check:streams-types`; `deno check --frozen --unstable-kv live-query-consumer_type.ts` | exit 0 both |
+| Package checks | `--cwd packages/fresh check`; `--cwd plugins/workers check` | exit 0 both |
+| Quality scan | `scan-code-quality.ts --root packages/fresh` / `--root plugins/workers`, `--max-allow 7` | exit 0; Fresh 0 findings/0 allowances, workers 1 pre-existing producer allowance |
+| Doctrine | `check-doctrine.ts --all-roots` | exit 0 with existing warnings — **not** F-15/F-5 compliance |
+| Publish dry-run | `--cwd packages/fresh publish:dry-run`; `--cwd plugins/workers publish:dry-run` | exit 0 both; **no publication occurred** |
+| Owning doc-lint | `doc --lint` on `fresh …/streams/mod.ts` → **10** (exactly the ten baseline identities, warning-free); on `workers streams/mod.ts` → **0** ("Checked 1 file") | Shipping Fresh 10 / workers 0; the ten remain **RED and unwaived** |
+| Native compiler oracle | `compiler-proof.json`: positive exit 0 / `ts2322Count` 0; three negatives exit 1 with `ts2322Count` 3 each (**9** intended); `exactNativeVersion 0.2.7`; `positiveIdentityAssertions` 13; `ownedFixtureRemoved: true`; `sourceExecuted: false` | Satisfied; fixtures removed |
+| Generated carriers | `check:agent-docs-prose` **PASS** exit 0 (14.476 s) and `check:mcp-export-corpus` **PASS** exit 0 (15.985 s), both at recorded `actualGitHead` matching `gitHead`; 7 embedded-corpus/export-flow tests **7/0/0** with ops+resource sanitizers and `--trace-leaks` | Canonical generators only — **2** carriers: `packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`, `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` |
+| Generated delta bounded | `decoded-delta.json`: 299 surfaces, only `fresh/./streams` + `plugin-workers/./streams` changed (options gain `headers?`; both expose the two native names); 189 prose pages, only the C3-authored `durable-workflows/streams` page (29 971 → 31 006 bytes); no removals | Satisfied; 9 protected bindings re-verified unchanged (sources, `arch-debt.md` `d7ada055…`, `deno.json`, `deno.lock`, both package configs) |
+| Hand-authored source unchanged by the carrier commit | `root-audit.json` `authoredSourceUnchanged: true` at `4de0d3d6a`, protected rows matching the packet SHAs for all four sources | Satisfied — the HEAD commit adds generated output only |
+
+### Open / unrun / failed — explicitly **not** waived
+
+| Gate | State | Note |
+| --- | --- | --- |
+| `arch:check` | **FAIL** exit 1 | pre-existing DB-identity prerequisite (`identities=<none>`); not caused here; separate DB repair **not integrated** |
+| `deno task quality:gate` (composite) | **not green** | its `quality:scan` half is green; its `arch:check` half fails as above |
+| `docs:accuracy` / reference coverage | **FAIL** exit 1 | 36 Windows reference-path prerequisites; the external checker's 36/36 does **not** convert this to a PASS |
+| `docs:links` | **FAIL** | 5 installed Aspire-skill targets |
+| `docs:jsdoc-examples` | **FAIL** | Windows spawn error 206 (command length); never reached its deadline |
+| Full scoped Markdown fmt | **2 findings** | reproduced from unchanged HEAD files; no formatting waiver |
+| `docs:snippets` | PASS 27 checked / 14 exempt | **does not cover** this streams page; page-level proof is the separate exact-fence compiler control (new fence compiles; numeric header → `TS2322`) |
+| Fresh 10 baseline doc-lint + facade surplus | **RED, unwaived** | tracked separately from the U3 exception |
+| Quality-critical (BetterAuth) | **FAIL** | separate, unintegrated; no waiver here |
+| Close-gate | **FAIL** | merge-level; `status:ready-merge` is **not** satisfied |
+| Full CLI E2E (`e2e:cli` / `scaffold.runtime --cleanup`) | **no receipt in evidence** | **finding (M)**: plan declared it non-waived for merge. This change touches no scaffold/plugin-registry surface, so it does not gate the implementation verdict — it gates merge. Remedy: produce a raw-exit-code receipt before any readiness transition. |
+| CI `40625858274` | all 6 test shards + typecheck + check-test PASS; docs build PASS | the two failures above persist; **no whole-CI or merge PASS is claimed** |
+
+---
+
+## 6. Why PASS and not FAIL_FIX / FAIL_RESCOPE / FAIL_DEBT
+
+- **Not FAIL_RESCOPE.** The plan proved materially correct: absence-only legacy, replace-not-merge, native `HeadersRecord` reuse, per-request resolution owned upstream. The two in-flight corrections (helper extraction to respect the 500-line test boundary; the corrective four-site closure after the source-only attempt failed its owning 12→10 condition) were handled through the proper route — root addendum and a SAME-evaluator corrective PLAN review — not by silent scope drift. Archetypes 1/5 fit; no package/API redesign surfaced.
+- **Not FAIL_DEBT.** The one knowingly introduced doctrine violation carries a valid, bounded entry naming **both** F-15 and F-5, with owner, fixed non-extendable target, boundary, closing gate, and linked evidence. No pre-existing entry was deepened: the candidate's two header findings are closed, returning Fresh to its 10-finding baseline rather than above it, and workers to 0. The failed predecessor is archived, reverted, and honestly recorded instead of being recast as a success.
+- **Not FAIL_FIX.** Every approved slice is complete, with meaningful RED preserved before GREEN, real-wire proof on both factories (not port-level only), reconnect-crossing rotation, retained-checkpoint restart, entity/collection identity, bounded callback-failure semantics with zero requests and no ambient fallback, all three sanitizers on new registrations, finite and drained compiler children, and three genuine `TS2322` negatives per surface with `TS2307`/`TS2305` excluded. No casts, suppressions, `any`, or transport clones. Docs match code sentence by sentence and claim no authentication. The remaining red gates are pre-existing, out-of-scope, or merge-level, and each is reported as such rather than waived — findings 11, 17, 20, 22, the corpus-`unknown` qualification, and the missing E2E receipt are material or informational, none blocking at this head.
+
+**Carried forward, unresolved and unwaived:** `arch:check` DB identity; `quality:gate` composite; `docs:accuracy`, `docs:links`, `docs:jsdoc-examples`, two Markdown fmt findings; Fresh 10 baseline doc-lint findings and facade surplus; the F-15 + F-5 exception expiring **2026-11-10** (fixed, no extension, no growth); reference parity as a pending root-scoped gate under the entrypoints-only contract; quality-critical BetterAuth; close-gate; full CLI E2E receipt. Nothing in this verdict authorizes merge, readiness, publication, release, authentication/issuer design, browser or CEF acceptance, or EIS adoption.
