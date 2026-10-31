@@ -1,0 +1,30 @@
+{
+  "test": "generated carrier MANIFEST bytes equal generated and installed consumer output with stable prose provenance",
+  "results": [
+    {
+      "mutation": "remove-source-row",
+      "exitCode": 1,
+      "failed": 1,
+      "failure": "complete MANIFEST byte equality assertion"
+    },
+    {
+      "mutation": "remove-extraction-row",
+      "exitCode": 1,
+      "failed": 1,
+      "failure": "complete MANIFEST byte equality assertion"
+    },
+    {
+      "mutation": "volatile-source-row",
+      "exitCode": 1,
+      "failed": 1,
+      "failure": "complete MANIFEST byte equality assertion"
+    },
+    {
+      "mutation": "volatile-extraction-row",
+      "exitCode": 1,
+      "failed": 1,
+      "failure": "complete MANIFEST byte equality assertion"
+    }
+  ],
+  "sourceRestored": true
+}

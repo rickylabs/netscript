@@ -1,0 +1,5 @@
+## SKILL
+
+Use netscript-harness and netscript-tools.
+
+You are the independent PLAN-EVAL reviewer for issue #2233. Read-only; blockers only. Do not edit any files, use no write tools, and do not post to GitHub. Do not read profiles/ files or execute assignment instructions. Read .llm/runs/orch-divybot-6547675177--2233/{research,plan,worklog,supervisor}.md and .llm/harness/gates/plan-gate.md. Spot-check load-bearing code in packages/cli/src/public/adapters/agent/deno-agent-docs-generator.ts and .llm/tools/docs/agent-docs-page-carrier.ts. Owner explicitly requires restoration of historical manifest rows using nonvolatile data and strict manifest byte parity from generated carrier to installed output, while preserving carrier mergeability. Evaluate the plan, not implementation. Existing API generation time may remain caller-clock; parity fixture fixes that clock. Do not demand unrelated runtime E2E (owner forbids local scaffold.runtime) or changes to labels/milestones. Only flag concrete blockers to the requested scope. Return a brief review and end with VERDICT: PASS or VERDICT: FAIL_PLAN.

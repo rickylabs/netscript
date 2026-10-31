@@ -1,6 +1,14 @@
 # Resume context
 
-Issue #2233 remaining option (b); plan ready for separate PLAN-EVAL. Read plan.md.
-Branch is current main at bootstrap. No implementation yet. Draft PR next.
-Owner requires Claude Opus 5.5 high read-only evaluation. No local runtime E2E.
-Do not merge, label, change milestone, force-push, or commit assignment/lock churn.
+PR #2546, issue #2233, branch orch/divybot-6547675177. PLAN-EVAL PASS;
+separate pre-sign-off IMPL-EVAL PASS (Claude Opus 5.5 high). evaluate.md records scope and proof.
+45 tests and scoped check/lint/fmt pass. Quality, all four carrier freshness checks and native
+CLI publish dry-run pass. Four negative controls prove strict byte comparison catches missing
+or volatile rows. See validation.md for commands and source hashes, acceptance.md for all boxes.
+No generated output or lock churn; no new architectural debt.
+
+After committing this reviewed implementation: push, mark PR ready, inspect current CI,
+resume the same independent evaluator on exact pushed SHA, run final review-thread gate,
+and write the canonical READY report via .divybot-final-report.tmp -> .md. Final exact-head
+verdict belongs in PR phase comment/report so recording it does not invalidate its own head.
+No scaffold E2E required. Coordinator owns metadata and merge. Do not merge/tag/release.

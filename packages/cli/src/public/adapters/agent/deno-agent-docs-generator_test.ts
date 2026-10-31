@@ -1,3 +1,6 @@
+import { readAgentDocsPages } from '../../../../../../.llm/tools/docs/agent-docs-page-carrier.ts';
+import { DenoAgentInitFileSystem } from '../../features/agent/init/agent-init-file-system.ts';
+import { initAgent } from '../../features/agent/init/init-agent.ts';
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join, resolve, toFileUrl } from '@std/path';
 import { EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS } from '../../../kernel/assets/agent-docs.generated.ts';
@@ -163,6 +166,76 @@ Deno.test('missing lock evidence, version mismatch, and launch throws fail loudl
       () => new DenoAgentDocsGenerator(missingBinary).generate(root),
       Error,
       'Failed to launch deno doc',
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('generated carrier MANIFEST bytes equal generated and installed consumer output with stable prose provenance', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await writeProject(root, {
+      '@netscript/config': `jsr:@netscript/config@${NETSCRIPT_RELEASE_VERSION}`,
+    });
+    // Read the canonical carrier as data, independently of the adapter's imported page snapshot.
+    const prose = await readAgentDocsPages(
+      new URL(
+        '../../../../../mcp/src/infrastructure/docs/agent-docs-prose.generated.ts',
+        import.meta.url,
+      ),
+      NETSCRIPT_RELEASE_VERSION,
+    );
+    const orderedProse: Record<string, string> = {};
+    for (const path of Object.keys(prose).sort()) orderedProse[path] = prose[path];
+    const canonicalBytes = new TextEncoder().encode(
+      JSON.stringify({ schemaVersion: 1, files: orderedProse }),
+    );
+    const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', canonicalBytes)).toHex();
+    const proseCount = Object.keys(prose).length;
+    const exportCount = EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS['@netscript/config'].length;
+    const apiTime = '2026-08-03T10:00:00.000Z';
+    // Keep the complete contract independent of the production manifest renderer.
+    const expectedManifest = `# NetScript offline documentation
+
+Generated for the exact NetScript packages installed in this project. Start with \`llms.txt\` for the task router and use \`llms-full.txt\` as the grep target.
+
+| Field | Value |
+| --- | --- |
+| Framework / CLI version | \`${NETSCRIPT_RELEASE_VERSION}\` |
+| Prose source commit | \`sha256:${digest}\` |
+| Prose extraction time | \`release:${NETSCRIPT_RELEASE_VERSION}\` |
+| API generation time | \`${apiTime}\` |
+| Prose files | ${proseCount} |
+| Total files | ${proseCount + 2} |
+| API packages / export subpaths | 1 / ${exportCount} |
+
+## Documented installed packages
+
+| Package | Exact version |
+| --- | --- |
+| \`@netscript/config\` | \`${NETSCRIPT_RELEASE_VERSION}\` |
+`;
+    const expectedBytes = new TextEncoder().encode(expectedManifest);
+    const generator = new DenoAgentDocsGenerator(new RecordingRunner(), () => new Date(apiTime));
+    const generated = await generator.generate(root);
+    assertEquals(new TextEncoder().encode(generated.files['MANIFEST.md']), expectedBytes);
+
+    await initAgent({ projectRoot: root, host: 'claude', withDocs: true }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: { initialize: () => Promise.resolve({ ok: true }) },
+      docsGenerator: generator,
+    });
+    assertEquals(await Deno.readFile(join(root, '.netscript/docs/MANIFEST.md')), expectedBytes);
+
+    const laterTime = '2030-01-01T00:00:00.000Z';
+    const later = await new DenoAgentDocsGenerator(
+      new RecordingRunner(),
+      () => new Date(laterTime),
+    ).generate(root);
+    assertEquals(
+      new TextEncoder().encode(later.files['MANIFEST.md']),
+      new TextEncoder().encode(expectedManifest.replace(apiTime, laterTime)),
     );
   } finally {
     await Deno.remove(root, { recursive: true });
