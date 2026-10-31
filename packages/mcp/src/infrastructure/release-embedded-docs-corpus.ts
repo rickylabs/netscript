@@ -1,4 +1,6 @@
+import { normalizeDocsSlug } from '../domain/docs/docs-corpus-port.ts';
 import type {
+  DocsCorpusCitation,
   DocsCorpusPort,
   DocsDocument,
   DocsSearchMatch,
@@ -6,7 +8,6 @@ import type {
 } from '../domain/docs/docs-corpus-port.ts';
 import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
 import {
-  MCP_EMBEDDED_DOCS,
   MCP_EMBEDDED_DOCS_PROVENANCE,
   MCP_PACKAGE_README,
   MCP_PACKAGE_VERSION,
@@ -45,58 +46,85 @@ export interface ReleaseEmbeddedDocsCorpusOptions {
   readonly additionalDocuments?: readonly EmbeddedDocsSource[];
 }
 
-const DEFAULT_SOURCE: ReleaseEmbeddedDocsSource = {
-  documents: MCP_EMBEDDED_DOCS,
-  provenance: MCP_EMBEDDED_DOCS_PROVENANCE,
-};
+let defaultSource: Promise<ReleaseEmbeddedDocsSource> | undefined;
+
+/** Decode the shared release pages only when a docs tool needs them, once per module. */
+export function loadReleaseDocsSource(): Promise<ReleaseEmbeddedDocsSource> {
+  return defaultSource ??= (async () => {
+    const { EMBEDDED_AGENT_DOCS_PAGES, decodeAgentDocsPages } = await import('../../docs.ts');
+    const files = await decodeAgentDocsPages(EMBEDDED_AGENT_DOCS_PAGES);
+    return {
+      documents: Object.entries(files).map(([path, source]) => ({
+        path,
+        source,
+        slug: normalizeDocsSlug(path),
+      })),
+      provenance: MCP_EMBEDDED_DOCS_PROVENANCE,
+    };
+  })();
+}
 
 /** Filesystem-independent generated docs adapter that rejects stale release provenance. */
 export class ReleaseEmbeddedDocsCorpus implements DocsCorpusPort {
-  readonly #source: ReleaseEmbeddedDocsSource;
-  readonly #delegate: EmbeddedDocsCorpus;
-  #integrity?: Promise<void>;
+  /** Exact release and canonical digest shared by all documentation tools. */
+  readonly citation: DocsCorpusCitation;
+  readonly #source?: ReleaseEmbeddedDocsSource;
+  readonly #expectedVersion: string;
+  readonly #additional: readonly EmbeddedDocsSource[];
+  #delegate?: Promise<EmbeddedDocsCorpus>;
 
   /** Validate synchronous provenance and prepare the bounded embedded corpus. */
   constructor(options: ReleaseEmbeddedDocsCorpusOptions = {}) {
-    this.#source = options.source ?? DEFAULT_SOURCE;
-    const expectedVersion = options.expectedFrameworkVersion ?? MCP_PACKAGE_VERSION;
-    validateProvenance(this.#source, expectedVersion);
-    this.#delegate = new EmbeddedDocsCorpus({
-      documents: [
-        { slug: 'mcp', source: MCP_PACKAGE_README },
-        ...this.#source.documents.map(({ slug, source }) => ({ slug, source })),
-        ...(options.additionalDocuments ?? []),
-      ],
-    });
+    this.#source = options.source;
+    this.#expectedVersion = options.expectedFrameworkVersion ?? MCP_PACKAGE_VERSION;
+    this.#additional = options.additionalDocuments ?? [];
+    const provenance = this.#source?.provenance ?? MCP_EMBEDDED_DOCS_PROVENANCE;
+    if (provenance.frameworkVersion !== this.#expectedVersion) {
+      throw new Error(
+        `embedded docs version ${provenance.frameworkVersion} does not match ${this.#expectedVersion}`,
+      );
+    }
+    if (this.#source) validateProvenance(this.#source, this.#expectedVersion);
+    this.citation = { frameworkVersion: this.#expectedVersion, sha256: provenance.sha256 };
   }
 
   /** List release-matched fallback summaries after verifying generated integrity. */
   async list(): Promise<readonly DocsSummary[]> {
-    await this.#verifyIntegrity();
-    return await this.#delegate.list();
+    const delegate = await this.#corpus();
+    return await delegate.list();
   }
 
   /** Search release-matched fallback prose after verifying generated integrity. */
   async search(query: string): Promise<readonly DocsSearchMatch[]> {
-    await this.#verifyIntegrity();
-    return await this.#delegate.search(query);
+    const delegate = await this.#corpus();
+    return await delegate.search(query);
   }
 
   /** Retrieve one release-matched fallback document after verifying generated integrity. */
   async get(slug: string): Promise<DocsDocument | undefined> {
-    await this.#verifyIntegrity();
-    return await this.#delegate.get(slug);
+    const delegate = await this.#corpus();
+    return await delegate.get(slug);
   }
 
   /** Resolve release-matched section guidance after verifying generated integrity. */
   async findGuidance(intent: string): Promise<GuidanceResult> {
-    await this.#verifyIntegrity();
-    return await this.#delegate.findGuidance(intent);
+    const delegate = await this.#corpus();
+    return await delegate.findGuidance(intent);
   }
 
-  #verifyIntegrity(): Promise<void> {
-    this.#integrity ??= verifyHash(this.#source);
-    return this.#integrity;
+  #corpus(): Promise<EmbeddedDocsCorpus> {
+    return this.#delegate ??= (async () => {
+      const source = this.#source ?? await loadReleaseDocsSource();
+      validateProvenance(source, this.#expectedVersion);
+      await verifyHash(source);
+      return new EmbeddedDocsCorpus({
+        documents: [
+          { slug: 'mcp', source: MCP_PACKAGE_README },
+          ...source.documents,
+          ...this.#additional,
+        ],
+      });
+    })();
   }
 }
 

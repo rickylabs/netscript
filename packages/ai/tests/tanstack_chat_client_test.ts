@@ -4,11 +4,18 @@
  * @module
  */
 
-import { assert, assertEquals, assertStrictEquals, assertThrows } from '@std/assert';
+import {
+  assert,
+  assertEquals,
+  assertInstanceOf,
+  assertStrictEquals,
+  assertThrows,
+} from '@std/assert';
 import { EventType } from '@tanstack/ai';
 import type { AnyTextAdapter, StreamChunk, TokenUsage } from '@tanstack/ai';
 
 import type { ChatClientEvent } from '../src/ports/chat-client.ts';
+import { AiRateLimitError } from '../src/contracts/errors.ts';
 import { toTanstackChatClient } from '../src/adapters/tanstack-chat-client.ts';
 
 const FULL_USAGE = {
@@ -129,6 +136,28 @@ async function collectChunks(chunks: readonly StreamChunk[]): Promise<ChatClient
   }
   return events;
 }
+
+Deno.test('bridge validates busy retry delays and keeps only the safe provider code', async () => {
+  for (const retryAfterMs of [0, 12, -1, NaN, Infinity]) {
+    const events = await collectChunks([{
+      type: EventType.RUN_ERROR,
+      message: 'busy',
+      code: '503',
+      retryAfterMs,
+      rawEvent: { privateRequest: 'do-not-retain' },
+    }]);
+    const event = events.find((value) => value.type === 'error');
+    assert(event?.type === 'error');
+    assertInstanceOf(event.cause, AiRateLimitError);
+    assertEquals(event.cause.status, 503);
+    assertEquals(event.cause.cause, '503');
+    assertEquals(
+      event.cause.retryAfterMs,
+      retryAfterMs >= 0 && Number.isFinite(retryAfterMs) ? retryAfterMs : undefined,
+    );
+    assert(!JSON.stringify(events).includes('do-not-retain'));
+  }
+});
 
 function leafEntries(value: unknown, prefix = ''): string[] {
   if (typeof value !== 'object' || value === null) {

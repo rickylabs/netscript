@@ -1,0 +1,122 @@
+{
+  "purpose": "Sanitized index of structured wrapper reports; not an independent gate verdict or immutable-head receipt",
+  "baseline": "e4875a56c13e91503b5f168e6fa6d95b093c5a8a",
+  "reports": {
+    "reproduction": {
+      "reportSha256": "a5711718c0362b51a27688b2199a85cca7c2fca8afec3c2b64a668fdf1e7cc57",
+      "summary": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 3,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "neighbors": {
+      "reportSha256": "b726a158ddba000a4bdf1ba2e58f48bda66b0ca007d3b2ebadbe40491e18bb6b",
+      "summary": {
+        "passed": 81,
+        "failed": 0,
+        "ignored": 6,
+        "totalResults": 87,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "producer-main": {
+      "reportSha256": "46b966542367efc1820b9454870e6f549e4f8ffed277cd511386c4808bad37d7",
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "producer-canary8": {
+      "reportSha256": "c1f40d7576cb721653df7db9e2e4485343ef614993d95bcf6dddaebe3102286c",
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "exitCode": 1
+    },
+    "epoch-zero": {
+      "reportSha256": "f3cc5d28c48e14fc490fd0d4e60e97818b0e26ceb6e94a63a71c318e10dec513",
+      "summary": {
+        "passed": 1,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 3,
+        "uniqueFailures": 2
+      },
+      "exitCode": 1
+    },
+    "check": {
+      "reportSha256": "445e16b4ef16fad4279521a44925b080a72c6411bbcb6421f950774924b4b422",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "exitCode": null
+    },
+    "lint": {
+      "reportSha256": "b584834e24ea1b21d7fbe123c72916b53f0b4cfd0b754eac3ad581b5b7b04029",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "exitCode": 0
+    },
+    "fmt": {
+      "reportSha256": "f1fecbb7194f54dfb1df5dbf021c751e81fda8d410f3608c66ec7a99bdcafe43",
+      "summary": {
+        "filesSelected": 4,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "exitCode": null
+    },
+    "jsr-audit": {
+      "reportSha256": "52473011b25778df8b674a32880fe11b58cb2235c9ee1aa59783d90db5eb0bb1",
+      "summary": null,
+      "exitCode": null,
+      "publishDryRunOk": true,
+      "findings": [
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 15 immediate children; doctrine cap is 12"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 20 immediate children; doctrine cap is 12"
+        },
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "WARN",
+          "message": "Checking for slow types in the public API..."
+        }
+      ]
+    }
+  },
+  "fixtureSha256": {
+    "plugins/sagas/tests/runtime/projected-receipt_test.ts": "939c0cdb683a9bb32cb754c28c136a6f48235676018e06383de355039f9718ff",
+    "plugins/sagas/tests/runtime/projected-receipt-postgres_test.ts": "d9833f0fb96c7533cc697c608cbb0968d9b94e2e6d72c4c37a7e2b948f74176c",
+    "plugins/sagas/tests/runtime/fixtures/projected-receipt-flow.ts": "b626a363e8445ab47062337554483eb57e25f31560d19df48cc14cbb345c31b3",
+    "plugins/sagas/tests/runtime/fixtures/projected-receipt-worker.ts": "2fc7d932a534d2b44c3208d336eaf3b5f2df506b6716c353807b8df014ad538d",
+    "plugins/sagas/tests/runtime/fixtures/projected-receipt-postgres.ts.template": "577434a6bfd505fbc37857757597532773bc6e62be40f751dde54e8ab837098c"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "controls": [
+    {
+      "control": "runner-env-ignored",
+      "pristineExit": 0,
+      "mutationExit": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failingTests": [
+        "canonical runner prisma from env matches API selection and persists replay"
+      ],
+      "sourceRestored": true
+    },
+    {
+      "control": "projection-setting-ignored",
+      "pristineExit": 0,
+      "mutationExit": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failingTests": [
+        "runner boots with none projection, archiveToDb=false; real KV replay"
+      ],
+      "sourceRestored": true
+    },
+    {
+      "control": "duplicate-protection-removed",
+      "pristineExit": 0,
+      "mutationExit": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failingTests": [
+        "runner boots with kv projection, archiveToDb=false; real KV replay"
+      ],
+      "sourceRestored": true
+    }
+  ]
+}

@@ -180,10 +180,23 @@ export async function installLocalPlugin(
         resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
     },
   );
+  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
+  const localServiceEntrypoint =
+    resolvedPlugin?.source.kind === 'local-path' && request.dryRun !== true
+      ? await ensureLocalPluginImports(
+        plan.projectRoot,
+        resolvedPlugin.source.path,
+        resolvedPlugin.descriptor.manifest.name,
+        dependencies.fs,
+      )
+      : undefined;
+  const runtimeProvider = localServiceEntrypoint
+    ? { ...plan.provider, defaultServiceEntrypoint: localServiceEntrypoint }
+    : plan.provider;
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,
     rendered.plugin,
-    plan.provider,
+    runtimeProvider,
     {
       serviceReferences: mergeUniqueReferences(plan.serviceReferences, rendered.serviceReferences),
       pluginReferences: mergeUniqueReferences(plan.pluginReferences, rendered.pluginReferences),
@@ -198,15 +211,6 @@ export async function installLocalPlugin(
     pluginOwned === undefined ? rendered.plugin.pluginDir : pluginConfigDirectory,
     pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
-  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
-  if (resolvedPlugin?.source.kind === 'local-path' && request.dryRun !== true) {
-    await ensureLocalPluginImports(
-      plan.projectRoot,
-      resolvedPlugin.source.path,
-      resolvedPlugin.descriptor.manifest.name,
-      dependencies.fs,
-    );
-  }
   const provisionedCache = plan.provider.defaultRequiresKv
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;
@@ -226,7 +230,7 @@ export async function installLocalPlugin(
     await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
   }
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
-  const browserAuthFiles = await reconcileBrowserAuth(
+  const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,
     dependencies.formatter,
@@ -251,6 +255,7 @@ export async function installLocalPlugin(
     provisionedCache,
     schemaCopies,
     helperFiles,
+    browserAuthReport,
   };
 }
 

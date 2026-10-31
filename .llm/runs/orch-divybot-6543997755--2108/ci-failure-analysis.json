@@ -1,0 +1,85 @@
+{
+  "head": "6a62a6fdb000fa045cb5e901aa64fe78c70cb374",
+  "run": "https://github.com/rickylabs/netscript/actions/runs/41210435015",
+  "qualityFailure": "Publish asset freshness: stale generated MCP docs provenance",
+  "testShards": [
+    {
+      "shard": "test-2",
+      "summary": {
+        "passed": 1467,
+        "failed": 2,
+        "ignored": 6,
+        "totalResults": 1475,
+        "uniqueFailures": 2
+      },
+      "failedFiles": [
+        "./packages/cli/e2e/tests/application/gates/scaffold/browser-auth-topology_test.ts"
+      ]
+    },
+    {
+      "shard": "test-3",
+      "summary": {
+        "passed": 1488,
+        "failed": 9,
+        "ignored": 12,
+        "totalResults": 1509,
+        "uniqueFailures": 8
+      },
+      "failedFiles": [
+        "./.llm/tools/docs/guarded-client-docs_test.ts",
+        "./packages/cli/e2e/tests/application/gates/scaffold/generated-browser-conformance_test.ts",
+        "./packages/mcp/tests/docs_test.ts",
+        "./packages/mcp/tests/route-management-guidance_test.ts"
+      ]
+    },
+    {
+      "shard": "test-4",
+      "summary": {
+        "passed": 1586,
+        "failed": 19,
+        "ignored": 16,
+        "totalResults": 1621,
+        "uniqueFailures": 4
+      },
+      "failedFiles": [
+        "./packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts",
+        "./packages/mcp/tests/issue-2269-guidance_test.ts",
+        "./packages/mcp/tests/stream-retention-guidance_test.ts"
+      ]
+    },
+    {
+      "shard": "test-5",
+      "summary": {
+        "passed": 1433,
+        "failed": 11,
+        "ignored": 15,
+        "totalResults": 1459,
+        "uniqueFailures": 8
+      },
+      "failedFiles": [
+        "./packages/cli/e2e/tests/application/gates/scaffold/generated-browser-auth-policy_test.ts",
+        "./packages/mcp/tests/published-docs-corpus_test.ts",
+        "./packages/mcp/tests/release-embedded-docs-corpus_test.ts"
+      ]
+    },
+    {
+      "shard": "test-6",
+      "summary": {
+        "passed": 2121,
+        "failed": 1,
+        "ignored": 7,
+        "totalResults": 2129,
+        "uniqueFailures": 1
+      },
+      "failedFiles": [
+        "./packages/cli/e2e/src/application/gates/scaffold/generated-guarded-service_test.ts"
+      ]
+    }
+  ],
+  "causes": [
+    "MCP docs provenance did not follow the updated compressed corpus",
+    "Generated BFF bare cookie import missing in root map inherited by isolated test modules and subprocesses",
+    "Empty-tools pipeline assertion still expected the superseded comment"
+  ],
+  "aggregate": "check-test fails because its required test shards failed; no separate test failure"
+}

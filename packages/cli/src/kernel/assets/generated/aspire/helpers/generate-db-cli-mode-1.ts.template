@@ -389,8 +389,8 @@ function presentDbCliResult(result: DbCliResultRecord): DbCliCommandResult {
 }
 
 function resolveTargets(
-  appHostDir: string,
-  infrastructure: InfrastructureContext,
+  {{appHostDirParameter}}: string,
+  {{infrastructureParameter}}: InfrastructureContext,
 ): DbCliTarget[] {
   const targets: Record<string, DbCliTarget> = {
 {{__slot3__}}

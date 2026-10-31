@@ -2,13 +2,14 @@ import { assertEquals } from '@std/assert';
 import { dirname } from '@std/path';
 import type { GuidanceResult } from '../mod.ts';
 import { activatedGuidanceConcepts } from '../src/domain/docs/guidance-result.ts';
-import { MCP_EMBEDDED_DOCS } from '../src/publish-assets.generated.ts';
+import { loadReleaseDocsSource } from '../src/infrastructure/release-embedded-docs-corpus.ts';
+const { documents: MCP_EMBEDDED_DOCS } = await loadReleaseDocsSource();
 import { EmbeddedDocsCorpus } from '../src/infrastructure/embedded-docs-corpus.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 
 interface EvaluationCase {
   readonly intent: string;
-  readonly mode: 'exact' | 'rank-one' | 'required-set';
+  readonly mode: 'exact' | 'rank-one' | 'required-set' | 'ordered-prefix';
   readonly rankingAxis?: 'score';
   readonly expected: readonly string[];
 }
@@ -60,6 +61,14 @@ function assertExpectedTopThree(evaluation: EvaluationCase, result: GuidanceResu
   const actual = result.recommendations.slice(0, 3).map(({ slug, section }) =>
     `${slug}#${section}`
   );
+  if (evaluation.mode === 'ordered-prefix') {
+    assertEquals(
+      actual.slice(0, evaluation.expected.length),
+      evaluation.expected,
+      evaluation.intent,
+    );
+    return;
+  }
   if (evaluation.mode === 'rank-one') {
     assertEquals(actual.slice(0, 1), evaluation.expected, evaluation.intent);
     return;

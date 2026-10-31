@@ -1,0 +1,7 @@
+# Process-history implementation and regression recipe
+
+The generated background launcher uses Deno --watch by default. OS identity alone is insufficient: persist both processId and a fatal-failure marker. Healthy reloads within one watcher process do not increment; recorded failures do, even when processId matches. Fatal grace-period drain must not clear the failure marker. A distinct OS process replacing an active unclean predecessor increments once. Default threshold remains three restarts / 60 seconds.
+
+Run generated sagas/triggers glue from temporary isolated project roots with --config pointing to the repo config, CACHE_PROVIDER=denokv, and isolated DENO_KV_URL / NETSCRIPT_SAGA_KV_PATH / NETSCRIPT_TRIGGER_KV_PATH. Saga registry override is SAGAS_REGISTRY_MODULE; trigger override is NETSCRIPT_TRIGGER_REGISTRY_MODULE. Saga projection override is NETSCRIPT_SAGA_PROJECTION (not a *_BACKEND suffix). A registry that throws proves real runtime startup failure; exported empty definitions prove healthy startup. Generated-process proof needs no Aspire or external database.
+
+Watch-mode HTTP listeners may change while stderr is consumed. Continuously drain stderr, use the latest listener diagnostic, and bound fetch/deadline waits. Both generated plugins now pass crash-loop, stable-restart and healthy/failing watcher tests (six cases). Do not classify a connection-refused transition during reload as an implementation failure without checking the current listener.

@@ -1,3 +1,5 @@
+import type { DocsCorpusCitation } from './docs-corpus-port.ts';
+
 /** Version of the faithful get_doc response and cursor contract. */
 export const DOC_RETRIEVAL_VERSION = 2;
 /** Maximum serialized content bytes in a default retrieval or full page. */
@@ -15,6 +17,8 @@ export interface DocOutlineEntry {
 
 /** Versioned faithful retrieval response. */
 export interface DocRetrievalResult {
+  /** Exact release identity when served from published pages. */
+  readonly citation?: DocsCorpusCitation;
   readonly contractVersion: typeof DOC_RETRIEVAL_VERSION;
   readonly slug: string;
   readonly title: string;

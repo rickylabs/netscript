@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { createFindGuidanceFlow, type GuidanceResult } from '../mod.ts';
-import { MCP_EMBEDDED_DOCS } from '../src/publish-assets.generated.ts';
+import { loadReleaseDocsSource } from '../src/infrastructure/release-embedded-docs-corpus.ts';
+const { documents: MCP_EMBEDDED_DOCS } = await loadReleaseDocsSource();
 import { EmbeddedDocsCorpus } from '../src/infrastructure/embedded-docs-corpus.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 import {

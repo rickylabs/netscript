@@ -9,6 +9,7 @@ import {
   webhookScaffolder,
 } from './mod.ts';
 import { webhookStub } from './webhook/webhook.stub.ts';
+import { fromFileUrl } from '@std/path';
 
 const FORBIDDEN_PREFIXES = [
   'plugins/',
@@ -111,6 +112,32 @@ Deno.test('triggers install starter sources are format-stable at generator bound
   assertStringIncludes(artifactText(fileWatch!), "paths: ['./shared/incoming']");
   assertStringIncludes(artifactText(fileWatch!), "patterns: ['*.json', '*.csv']");
   assertStringIncludes(artifactText(fileWatch!), "ignored: ['*.tmp', '.*']");
+});
+
+Deno.test('triggers install runtime is already formatted by the consumer formatting policy', async () => {
+  const runtime = collectInstallArtifacts(triggersAdapterPlugin).find((artifact) =>
+    artifact.path === 'triggers/runtime.ts'
+  );
+  const source = artifactText(runtime!);
+  const formatter = new Deno.Command(Deno.execPath(), {
+    args: [
+      'fmt',
+      '--config',
+      fromFileUrl(new URL('../../../../../deno.json', import.meta.url)),
+      '--ext',
+      'ts',
+      '-',
+    ],
+    stdin: 'piped',
+    stdout: 'piped',
+    stderr: 'piped',
+  }).spawn();
+  const writer = formatter.stdin.getWriter();
+  await writer.write(new TextEncoder().encode(source));
+  await writer.close();
+  const result = await formatter.output();
+  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+  assertEquals(source, new TextDecoder().decode(result.stdout));
 });
 
 Deno.test('triggers install emits only userland glue under triggers', () => {

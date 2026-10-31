@@ -29,9 +29,11 @@ export function agentDocsFullCorpus(
   files: Readonly<Record<string, string>>,
   version: string,
 ): string {
-  const pages = Object.keys(files).filter((path) => path.startsWith('pages/')).map((path) => ({
+  const pages = Object.entries(files).filter(([path]) => path.startsWith('pages/')).map((
+    [path, markdown],
+  ) => ({
     url: '/' + path.slice('pages/'.length).replace(/index\.md$/, ''),
-    markdown: files[path],
+    markdown,
   }));
   return buildLlmsFull(pages, new URL(DOCS_SITE_LOCATION), version);
 }

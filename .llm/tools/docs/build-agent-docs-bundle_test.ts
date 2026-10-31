@@ -1,4 +1,4 @@
-import { agentDocsFullCorpus } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
+import { agentDocsFullCorpus } from '../../../packages/mcp/docs.ts';
 import { assertEquals, assertRejects } from '@std/assert';
 import { join } from '@std/path';
 import {

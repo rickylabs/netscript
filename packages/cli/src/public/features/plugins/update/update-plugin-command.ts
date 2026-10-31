@@ -1,3 +1,4 @@
+import { renderDoctorReport } from '../../../../kernel/presentation/output/render-doctor-report.ts';
 /** Host-owned installed-name plugin update and regeneration flow. */
 import { Command } from '@cliffy/command';
 import { join } from '@std/path';
@@ -63,6 +64,7 @@ export function createUpdatePluginCommand(
           );
         }
         await stage.commit();
+        renderDoctorReport(result.browserAuthReport, print);
         const version = result.resolvedPlugin?.version ?? 'local';
         print(
           `Updated ${name} to ${version}; generated ${emissions.length} registries.`,

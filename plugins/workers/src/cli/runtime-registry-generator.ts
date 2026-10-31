@@ -471,17 +471,37 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
     'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',
     'export const definitions: ReadonlyMap<string, RegisterJobInput> = jobDefinitions;',
     '',
-    'function createConfiguredJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(policy: RegisterJobInput & { readonly id: TId }, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    ...policy,\n    ...jobRetryRegistration(policy, handler),\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+    ...(entries.some((entry) => entry.policy)
+      ? [
+        'function createConfiguredJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(policy: RegisterJobInput & { readonly id: TId }, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    ...policy,\n    ...jobRetryRegistration(policy, handler),\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+      ]
+      : []),
     '',
-    'function createLocalJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "local", handler);\n}',
+    ...(entries.some((entry) => entry.source === 'local' && !entry.policy)
+      ? [
+        'function createLocalJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "local", handler);\n}',
+      ]
+      : []),
     '',
-    'function createPluginJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, pluginId: string, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "plugin", handler, pluginId);\n}',
+    ...(entries.some((entry) => entry.source === 'plugin' && !entry.policy)
+      ? [
+        'function createPluginJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, pluginId: string, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "plugin", handler, pluginId);\n}',
+      ]
+      : []),
     '',
-    'function createJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    ...jobRetryRegistration({}, handler),\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+    ...(entries.some((entry) => !entry.policy)
+      ? [
+        'function createJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    ...jobRetryRegistration({}, handler),\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+      ]
+      : []),
     '',
     'function toRegisterJobInput(definition: RegisterJobInput): RegisterJobInput {\n  const { handler: _handler, payloadSchema: _payloadSchema, ...registration } = definition;\n  return registration;\n}',
     '',
-    'function toJobName(id: string): string {\n  return id.split("-").filter(Boolean).map((part) =>\n    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`\n  ).join(" ");\n}',
+    ...(entries.some((entry) => !entry.policy)
+      ? [
+        'function toJobName(id: string): string {\n  return id.split("-").filter(Boolean).map((part) =>\n    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`\n  ).join(" ");\n}',
+      ]
+      : []),
     '',
   );
   if (entries.some((entry) => entry.source === 'plugin' && entry.policy)) {
@@ -493,7 +513,11 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
   lines.push(
     'type ResolvedJobHandler<TModule> =\n  TModule extends { readonly default: infer TDefault }\n    ? TDefault extends SchemaBackedJobHandler ? TDefault : never\n    : TModule extends { readonly handler: infer THandler }\n      ? THandler extends SchemaBackedJobHandler ? THandler : never\n      : never;',
     '',
-    'function resolveJobHandler<TModule extends Record<string, unknown>>(module: TModule, path: string): ResolvedJobHandler<TModule> {\n  const candidate = module.default ?? module.handler;\n  if (typeof candidate !== "function" || !("payloadSchema" in candidate)) {\n    throw new Error(`Worker job module ${path} must export a schema-backed handler as default or handler.`);\n  }\n  return candidate as ResolvedJobHandler<TModule>;\n}',
+    ...(entries.length > 0
+      ? [
+        'function resolveJobHandler<TModule extends Record<string, unknown>>(module: TModule, path: string): ResolvedJobHandler<TModule> {\n  const candidate = module.default ?? module.handler;\n  if (typeof candidate !== "function" || !("payloadSchema" in candidate)) {\n    throw new Error(`Worker job module ${path} must export a schema-backed handler as default or handler.`);\n  }\n  return candidate as ResolvedJobHandler<TModule>;\n}',
+      ]
+      : []),
     '',
   );
 }

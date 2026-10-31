@@ -39,7 +39,7 @@ import {
   isSiteGeneratedAgentDocsEntry,
   parseAgentDocsPages,
 } from '../docs/agent-docs-page-carrier.ts';
-import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
+import { decodeAgentDocsPages } from '../../../packages/mcp/docs.ts';
 import {
   githubField,
   githubRequest,
