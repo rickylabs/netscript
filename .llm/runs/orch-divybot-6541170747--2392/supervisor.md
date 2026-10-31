@@ -12,3 +12,6 @@ Primary implementation route sol; evaluator defaults glm_5_3 and muse_spark_1_3 
 No private environment/session metadata is retained in tracked artifacts.
 
 Scope addition: `plugins/workers/deno.json` direct logger import declaration.
+
+Scope addition justified by frozen dependency gates: root deno.lock and maintained Expo/desktop
+reference locks, exactly one workspace dependency-membership line each; no resolved changes.
