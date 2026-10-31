@@ -725,7 +725,7 @@
     {
       "id": "B1-2159",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2499,
       "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
@@ -734,7 +734,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2159",
       "receiptRefs": [],
-      "note": "READY 155051c; e2e armed"
+      "note": "e2e red both tiers at da931b7: behavior.plugins-health, sagas runner unhealthy; steered"
     },
     {
       "id": "D1-2259",
@@ -756,7 +756,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2502,
-      "headSha": "8b857c3ac30b80d024e161b1e9b142f45aad2e35",
+      "headSha": "29626e4b654057f8601335124fa20cea494a2674",
       "issueNumbers": [
         2267
       ],
@@ -887,11 +887,13 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2499,
       "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
       "startedAt": "2026-10-31T06:14:15.000Z",
-      "via": "label e2e-cli-gate"
+      "via": "label e2e-cli-gate",
+      "result": "FAILURE both tiers: behavior.plugins-health (sagas runner unhealthy) at da931b7",
+      "completedAt": "2026-10-31T06:28:41Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1127,7 +1129,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T06:17:28.000Z",
+  "updatedAt": "2026-10-31T06:29:26.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1327,6 +1329,15 @@
       "route": "codex gpt-6.1-sol",
       "state": "pr-open",
       "pr": 2502
+    },
+    {
+      "issue": 2132,
+      "lane": "features",
+      "commentId": 6540033818,
+      "postedAt": "2026-10-31T06:22:20.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "posted",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475,
