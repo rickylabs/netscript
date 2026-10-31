@@ -53,3 +53,8 @@ Lume253 HTML,23734 links and13 caveat markers. Prose generated; commit source,
 refresh clean-source corpus/publication, check all carriers and push. This fixes
 the user-reported build failure; Overlay remains unimplemented. For every new
 public export, run docs:exports-drift in addition to docs:accuracy.
+
+CI build repair complete locally: reviewed source f21bff4; all four carrier
+freshness checks PASS, no additional generated change after prose refresh.
+Exports/snippets/build/links/caveats all PASS. Push triggers fresh Pages CI;
+remote success remains pending. Resume Overlay slice after push/comment.
