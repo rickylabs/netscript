@@ -8,19 +8,25 @@ const CATEGORY_IDS: Readonly<Record<string, number>> = {
   O: 10,
   D: 14,
   B: 7,
+  Z: 1,
+  L: 12,
+  I: 12,
+  K: 6,
+  X: 9,
 };
 
 Deno.test('catalog covers every owner-approved Figma category in priority order', () => {
   const ids = componentContracts.components.map((component) => component.specId);
-  assertEquals(ids.length, 87);
+  assertEquals(ids.length, 104);
   assertEquals(new Set(ids).size, ids.length);
   assertEquals(new Set(componentContracts.components.map((c) => c.name)).size, ids.length);
   for (const [prefix, count] of Object.entries(CATEGORY_IDS)) {
     for (let index = 1; index <= count; index++) assert(ids.includes(`${prefix}${index}`));
   }
   assertEquals(componentContracts.components.filter((c) => c.shipped).length, 66);
-  assert(!ids.includes('I6'), 'unbuilt AI gaps are outside phase one');
-  assert(!ids.includes('L10'), 'unbuilt layout gaps are outside phase one');
+  assert(ids.includes('I6'));
+  assert(ids.includes('L10'));
+  assertEquals(componentContracts.components.filter((c) => !c.shipped).length, 38);
 });
 
 Deno.test('contracts are self-consistent and losslessly serializable', () => {

@@ -20,8 +20,8 @@ removing a required part or attribute fails the same checker.
 
 The owner-approved source is `design/component-contract-spec`,
 `.llm/runs/docs-fresh-ui-design-system--design-handoff/components/component-spec.md` (§0, §2,
-§4.5–4.6). Contracts cover shipped components and the six built Figma categories; other gaps stay
-outside the public catalog. Compatibility decisions are recorded in the S3 run's
+§4.5–4.6). Contracts cover all 104 identities across the completed Figma categories. Unimplemented
+gaps remain explicitly `shipped: false`; their render/keyboard coverage is required when they ship. Compatibility decisions are recorded in the S3 run's
 `naming-decisions.md`. Token/focus/shadow redesign is deferred to S6.
 
 Omit optional metadata fields rather than assigning `undefined`; catalog tests require a lossless
@@ -39,3 +39,16 @@ Message's bubble, context-only DesktopOnly, and copy-only Markdown in an install
 The checker ignores tag names and CSS classes, checks required/conditional parts and declared
 attribute values, and has real-render negative controls for missing parts/attributes and invalid
 values. Native and pseudo anatomy does not require extra layout nodes.
+
+The completed handoff is PR #2486 (`docs/figma-library-handoff`), under
+`.llm/runs/design-system-s4--language-review/figma-library/`. Its category
+ledgers take precedence over the earlier research spec. In particular FileTree
+is a read-only list, not an ARIA tree; native scrollbar internals and Direction
+context require no additional visual wrappers. No token values are copied.
+
+Source-style fixture registration lives in `tests/contracts/styles.ts`.
+`registeredContractStyles` declares source-style IDs independently of provider
+instances. CSS support registry items and token-only presets are excluded.
+Providers declare contracts, real render fixtures with their public input names,
+and semantic keyboard scenarios. Keyboard metadata alone is never behavioral
+proof: the dedicated browser suite must press the keys and assert outcomes.

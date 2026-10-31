@@ -9986,6 +9986,1634 @@
         "Native DOM attributes pass through where the implementation accepts them.",
         "Sanitized Markdown inner anatomy is native semantic HTML. Styles target those semantics without forcing extra wrapper nodes."
       ]
+    },
+    {
+      "name": "scroll-area",
+      "specId": "L9",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "vertical",
+            "horizontal",
+            "both"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "viewport",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "scrollbar",
+          "planned": true,
+          "representation": "native"
+        },
+        {
+          "name": "thumb",
+          "planned": true,
+          "representation": "native"
+        },
+        {
+          "name": "corner",
+          "planned": true,
+          "representation": "native"
+        }
+      ],
+      "attributes": {
+        "data-orientation": {
+          "values": [
+            "vertical",
+            "horizontal",
+            "both"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "viewport"
+        }
+      ],
+      "apg": "native scrollable region",
+      "keyboard": [
+        {
+          "key": "Arrow keys/PageUp/PageDown/Home/End",
+          "action": "Scroll the focused native viewport"
+        }
+      ],
+      "tokenRoles": [
+        "surface/card",
+        "border/default",
+        "radius/card",
+        "space/card/padding",
+        "studio/code/scroll-thumb"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-layout adds a bordered radius/card frame; scrollbar anatomy is native and must not require fake scrollbar elements."
+      ]
+    },
+    {
+      "name": "resizable",
+      "specId": "L10",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "direction": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "startContent": {
+          "kind": "slot"
+        },
+        "endContent": {
+          "kind": "slot"
+        },
+        "grip": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "panel-group",
+          "planned": true
+        },
+        {
+          "name": "panel",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "handle",
+          "planned": true
+        },
+        {
+          "name": "grip",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-direction": {
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        }
+      },
+      "booleans": [
+        "grip"
+      ],
+      "slots": [
+        {
+          "name": "startContent",
+          "part": "panel"
+        },
+        {
+          "name": "endContent",
+          "part": "panel"
+        }
+      ],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/",
+      "keyboard": [
+        {
+          "key": "Arrow keys",
+          "action": "Resize the adjacent panel in the matching direction"
+        },
+        {
+          "key": "Home/End",
+          "action": "Resize to the minimum/maximum"
+        }
+      ],
+      "tokenRoles": [
+        "border/default",
+        "border/strong",
+        "surface/muted",
+        "radius/badge",
+        "space/card/padding"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-layout: 10px grip glyph; fixed default start panel size 280 horizontal or 160 vertical instead of 50/50."
+      ]
+    },
+    {
+      "name": "aspect-ratio",
+      "specId": "L11",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "21:9"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "media",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-ratio": {
+          "values": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "21:9"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "media"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "radius/card",
+        "surface/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+      ]
+    },
+    {
+      "name": "direction",
+      "specId": "L12",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "dir": {
+          "kind": "enum",
+          "values": [
+            "ltr",
+            "rtl"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true,
+          "representation": "context"
+        }
+      ],
+      "attributes": {
+        "data-dir": {
+          "values": [
+            "ltr",
+            "rtl"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "surface/bg"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "No Figma set: direction context has no additional visual wrapper; native dir on the application boundary supplies mirroring."
+      ]
+    },
+    {
+      "name": "message-scroller",
+      "specId": "I3",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "scrollable": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "up",
+            "down",
+            "both"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "viewport",
+          "planned": true
+        },
+        {
+          "name": "content",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "item",
+          "planned": true
+        },
+        {
+          "name": "scroll-button",
+          "planned": true
+        },
+        {
+          "name": "edge-top",
+          "planned": true,
+          "representation": "pseudo"
+        },
+        {
+          "name": "edge-bottom",
+          "planned": true,
+          "representation": "pseudo"
+        }
+      ],
+      "attributes": {
+        "data-scrollable": {
+          "values": [
+            "none",
+            "up",
+            "down",
+            "both"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "content"
+        }
+      ],
+      "apg": "native scrollable region and button",
+      "keyboard": [
+        {
+          "key": "Arrow keys/PageUp/PageDown/Home/End",
+          "action": "Scroll the focused viewport"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the scroll-to-latest button"
+        }
+      ],
+      "tokenRoles": [
+        "surface/bg",
+        "space/section/gap",
+        "border/subtle",
+        "radius/control"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control."
+      ]
+    },
+    {
+      "name": "marker",
+      "specId": "I4",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "border",
+            "separator"
+          ]
+        },
+        "icon": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "icon",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "content",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-variant": {
+          "values": [
+            "default",
+            "border",
+            "separator"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "icon",
+          "part": "icon"
+        },
+        {
+          "name": "children",
+          "part": "content"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "text/muted",
+        "border/subtle",
+        "border/default",
+        "radius/input"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+      ]
+    },
+    {
+      "name": "trace",
+      "specId": "I5",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "status": {
+          "kind": "enum",
+          "values": [
+            "done",
+            "running",
+            "pending",
+            "error"
+          ]
+        },
+        "open": {
+          "kind": "enum",
+          "values": [
+            "false",
+            "true"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "duration": {
+          "kind": "slot"
+        },
+        "collapsible": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "line",
+          "planned": true
+        },
+        {
+          "name": "icon",
+          "planned": true
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "description",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "duration",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "collapsible-trigger",
+          "planned": true
+        },
+        {
+          "name": "collapsible-content",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "connector",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-status": {
+          "values": [
+            "done",
+            "running",
+            "pending",
+            "error"
+          ]
+        },
+        "data-open": {
+          "values": [
+            "false",
+            "true"
+          ]
+        }
+      },
+      "booleans": [
+        "collapsible"
+      ],
+      "slots": [
+        {
+          "name": "children",
+          "part": "collapsible-content"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "duration",
+          "part": "duration"
+        }
+      ],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
+      "keyboard": [
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the focused disclosure"
+        }
+      ],
+      "tokenRoles": [
+        "text/muted",
+        "success/text",
+        "destructive/text",
+        "border/subtle",
+        "space/inline/gap"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai adds duration and success check icon; running uses warning spinner. Status pending belongs to Trace line; the Trace aggregate draws running/done/error."
+      ]
+    },
+    {
+      "name": "questionnaire",
+      "specId": "I6",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "step": {
+          "kind": "enum",
+          "values": [
+            "question",
+            "freeform",
+            "complete"
+          ]
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "error": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "multiple": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "progress",
+          "planned": true
+        },
+        {
+          "name": "item",
+          "planned": true
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "description",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "choices",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "choice",
+          "planned": true
+        },
+        {
+          "name": "shortcut",
+          "planned": true
+        },
+        {
+          "name": "label",
+          "planned": true
+        },
+        {
+          "name": "indicator",
+          "planned": true
+        },
+        {
+          "name": "input",
+          "planned": true
+        },
+        {
+          "name": "error",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "actions",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-step": {
+          "values": [
+            "question",
+            "freeform",
+            "complete"
+          ]
+        }
+      },
+      "booleans": [
+        "multiple"
+      ],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "error",
+          "part": "error"
+        },
+        {
+          "name": "children",
+          "part": "choices"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        }
+      ],
+      "apg": "native form, radio and checkbox controls",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between native controls"
+        },
+        {
+          "key": "Arrow keys",
+          "action": "Move between radio choices"
+        },
+        {
+          "key": "Space",
+          "action": "Select the focused radio or checkbox"
+        },
+        {
+          "key": "Enter",
+          "action": "Submit the current form"
+        }
+      ],
+      "tokenRoles": [
+        "text/fg",
+        "text/muted",
+        "border/default",
+        "primary/stroke",
+        "surface/selected",
+        "destructive/text"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service."
+      ]
+    },
+    {
+      "name": "attachment",
+      "specId": "I7",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "state": {
+          "kind": "enum",
+          "values": [
+            "idle",
+            "uploading",
+            "processing",
+            "error",
+            "done"
+          ]
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "sm",
+            "xs"
+          ]
+        },
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "media": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "media",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "content",
+          "planned": true
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "description",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "actions",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-state": {
+          "values": [
+            "idle",
+            "uploading",
+            "processing",
+            "error",
+            "done"
+          ]
+        },
+        "data-size": {
+          "values": [
+            "default",
+            "sm",
+            "xs"
+          ]
+        },
+        "data-orientation": {
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "media",
+          "part": "media"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        }
+      ],
+      "apg": "native action controls in a noninteractive attachment surface",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between supplied native action controls"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the focused action"
+        }
+      ],
+      "tokenRoles": [
+        "surface/card",
+        "surface/muted",
+        "border/default",
+        "radius/input",
+        "text/muted",
+        "destructive/border",
+        "destructive/text"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai media sizes40/32/24; xs horizontal omits description and uses trailing state glyph."
+      ]
+    },
+    {
+      "name": "file-path-chip",
+      "specId": "X2",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "hover",
+            "focus",
+            "copied"
+          ]
+        },
+        "path": {
+          "kind": "slot"
+        },
+        "copy": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "path",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "copy",
+          "planned": true
+        },
+        {
+          "name": "focus-ring",
+          "planned": true,
+          "representation": "pseudo"
+        }
+      ],
+      "attributes": {
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "focus",
+            "copied"
+          ]
+        }
+      },
+      "booleans": [
+        "copy"
+      ],
+      "slots": [
+        {
+          "name": "path",
+          "part": "path"
+        }
+      ],
+      "apg": "native button",
+      "keyboard": [
+        {
+          "key": "Enter/Space",
+          "action": "Copy the path from the focused copy button"
+        }
+      ],
+      "tokenRoles": [
+        "surface/surface",
+        "border/subtle",
+        "radius/badge",
+        "radius/control",
+        "font/mono",
+        "text/fg",
+        "text/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs follows live padding2/5, height26, 20px copy target and size/icon/sm glyph."
+      ]
+    },
+    {
+      "name": "attribute-chip",
+      "specId": "X3",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md"
+          ]
+        },
+        "name": {
+          "kind": "slot"
+        },
+        "value": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "name",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "value",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-size": {
+          "values": [
+            "sm",
+            "md"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "name",
+          "part": "name"
+        },
+        {
+          "name": "value",
+          "part": "value"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "surface/surface",
+        "radius/badge",
+        "font/mono",
+        "text/muted",
+        "text/fg"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs: no border, following live docs CSS."
+      ]
+    },
+    {
+      "name": "toc",
+      "specId": "X4",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "breakpoint": {
+          "kind": "enum",
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        },
+        "level": {
+          "kind": "enum",
+          "values": [
+            "2",
+            "3"
+          ]
+        },
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "hover",
+            "current"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "links": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "eyebrow",
+          "planned": true
+        },
+        {
+          "name": "rail",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "item",
+          "planned": true
+        },
+        {
+          "name": "links",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "current",
+          "planned": true
+        },
+        {
+          "name": "marker",
+          "planned": true
+        },
+        {
+          "name": "chevron-down",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-breakpoint": {
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        },
+        "data-level": {
+          "values": [
+            "2",
+            "3"
+          ]
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "current"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "rail"
+        },
+        {
+          "name": "links",
+          "part": "links"
+        }
+      ],
+      "apg": "native navigation links and disclosure",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between section links and the mobile disclosure"
+        },
+        {
+          "key": "Enter",
+          "action": "Follow the focused section link"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the mobile disclosure"
+        }
+      ],
+      "tokenRoles": [
+        "text/muted",
+        "text/fg",
+        "border/subtle",
+        "surface/bg"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs mobile starts closed; open is native disclosure state, not a variant. Toc item13/20."
+      ]
+    },
+    {
+      "name": "file-tree",
+      "specId": "X5",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "type": {
+          "kind": "enum",
+          "values": [
+            "folder",
+            "file"
+          ]
+        },
+        "ownership": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "owned",
+            "generated",
+            "guidance"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "name": {
+          "kind": "slot"
+        },
+        "tag": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "row",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "indent",
+          "planned": true
+        },
+        {
+          "name": "icon",
+          "planned": true
+        },
+        {
+          "name": "name",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "tag",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-type": {
+          "values": [
+            "folder",
+            "file"
+          ]
+        },
+        "data-ownership": {
+          "values": [
+            "none",
+            "owned",
+            "generated",
+            "guidance"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "row"
+        },
+        {
+          "name": "name",
+          "part": "name"
+        },
+        {
+          "name": "tag",
+          "part": "tag"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "surface/bg",
+        "border/subtle",
+        "font/mono",
+        "text/fg",
+        "text/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs wins: read-only list, not an ARIA tree; no chevrons/hover/selection/open state/indent guides. Rows26 high, indent20. Ownership tags support owned config, generated history and CLI-managed annotations."
+      ]
+    },
+    {
+      "name": "figure",
+      "specId": "X6",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "width": {
+          "kind": "enum",
+          "values": [
+            "prose",
+            "wide"
+          ]
+        },
+        "media": {
+          "kind": "enum",
+          "values": [
+            "image",
+            "diagram"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "caption": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "media",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "caption",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-width": {
+          "values": [
+            "prose",
+            "wide"
+          ]
+        },
+        "data-media": {
+          "values": [
+            "image",
+            "diagram"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "media"
+        },
+        {
+          "name": "caption",
+          "part": "caption"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "border/subtle",
+        "surface/surface",
+        "surface/bg",
+        "text/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+      ]
+    },
+    {
+      "name": "anchor-nav",
+      "specId": "X7",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "scrolled"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "anchor",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "marker",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-state": {
+          "values": [
+            "rest",
+            "scrolled"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "anchor"
+        }
+      ],
+      "apg": "native navigation links",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between native section links"
+        },
+        {
+          "key": "Enter",
+          "action": "Follow the focused section link"
+        }
+      ],
+      "tokenRoles": [
+        "surface/bg",
+        "topbar/rule",
+        "text/fg",
+        "marker/default"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs: scrolled changes current anchor and pinned position, without extra Utility shadow."
+      ]
+    },
+    {
+      "name": "ruled-grid",
+      "specId": "X8",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "columns": {
+          "kind": "enum",
+          "values": [
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "ruled",
+            "feature"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "cell",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-columns": {
+          "values": [
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        "data-variant": {
+          "values": [
+            "ruled",
+            "feature"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "cell"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "border/subtle",
+        "topbar/rule",
+        "space/section/gap"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs uses private Docs card anatomy, not D3 Card; feature gap32 follows live CSS."
+      ]
+    },
+    {
+      "name": "hero",
+      "specId": "X9",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "layout": {
+          "kind": "enum",
+          "values": [
+            "split",
+            "centered"
+          ]
+        },
+        "breakpoint": {
+          "kind": "enum",
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        },
+        "eyebrow": {
+          "kind": "slot"
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "aside": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "display",
+          "planned": true
+        },
+        {
+          "name": "eyebrow",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "lede",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "actions",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "aside",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "path-stack",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-layout": {
+          "values": [
+            "split",
+            "centered"
+          ]
+        },
+        "data-breakpoint": {
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "part": "eyebrow"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "children",
+          "part": "lede"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        },
+        {
+          "name": "aside",
+          "part": "aside"
+        }
+      ],
+      "apg": "native action controls in a section",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between supplied action controls"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the focused action"
+        }
+      ],
+      "tokenRoles": [
+        "hero/bg",
+        "hero/pad",
+        "text/fg",
+        "text/muted",
+        "font/heading"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs places File path chips in aside path-stack, not display. Mobile uses existing title role; centered stacks aside below display."
+      ]
     }
   ]
 }

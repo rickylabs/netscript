@@ -60,6 +60,7 @@ async function renderCopiedProse(): Promise<string> {
 
 export const proseFixture: ContractRenderFixture = {
   component: 'prose',
+  props: [],
   scenario: 'copied Markdown',
   renderHtml: renderCopiedProse,
 };
