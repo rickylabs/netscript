@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "24d63fd80e11309f32886d62fa8b22eaa74870fb",
+  "currentMainSha": "02a66ba6dd62b34c69a245e16d3d640b751a28a1",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -342,7 +342,10 @@
     },
     {
       "number": 2400,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2482 02a66ba6d"
+      ]
     },
     {
       "number": 2401,
@@ -381,7 +384,7 @@
     {
       "id": "D1-2396-u1",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2421,
       "headSha": "4771da92972ac90c9cb4188ef9d043c628e1e73c",
@@ -390,7 +393,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2396 (adopted pre-run PRs)",
       "receiptRefs": [],
-      "note": "r3 BLOCKED: ProcedureErrorCode derives from a const; decision 09:24Z: explicit literal union at the source (23/22), fallback 24/23; r4 posts when the r3 worker ends"
+      "note": "r3 live again via orchid follow-up goal; implementing the 23/22 source-level closure (debt re-review PASS); r4 brief kept as fallback"
     },
     {
       "id": "D1-2396-svc",
@@ -557,7 +560,7 @@
     {
       "id": "A3-2400",
       "lane": "internals",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2482,
       "headSha": "aabea4ba752a2087e7683f22da3df22073f369e5",
@@ -566,7 +569,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2400-r1 (resumed orphaned PR)",
       "receiptRefs": [],
-      "note": "r3 READY aabea4b; Opus MERGE; e2e running"
+      "note": "r3 READY aabea4b; Opus MERGE; 30/30 incl both runtime tiers; combined-tree carriers fresh",
+      "mergeCommit": "02a66ba6dd62b34c69a245e16d3d640b751a28a1",
+      "mergedAt": "2026-10-31T09:36:03Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2400-r3"
     },
     {
       "id": "A2-2395",
@@ -809,7 +815,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2509,
-      "headSha": "f13b14c70e013871c6417d5860f035a645f59bb0",
+      "headSha": "d0ae5820cded794b3be92ade1eece7d7e877d255",
       "issueNumbers": [
         2162
       ],
@@ -851,7 +857,7 @@
     {
       "id": "B1-2383",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2512,
       "headSha": "5eece17b6ac3782296495a70b9ed4247351de1ce",
@@ -859,7 +865,8 @@
         2383
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2383",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY 5eece17; Opus MERGE; e2e required; queued after #2482"
     }
   ],
   "expensiveGates": [
@@ -1035,11 +1042,21 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2482,
       "headSha": "aabea4ba752a2087e7683f22da3df22073f369e5",
       "startedAt": "2026-10-31T09:21:37Z",
-      "via": "label e2e-cli-gate kept on the PR; push-triggered (concurrent with #2510)"
+      "via": "label e2e-cli-gate kept on the PR; push-triggered (concurrent with #2510)",
+      "result": "SUCCESS (scaffold-runtime + scaffold-runtime-sqlite)",
+      "completedAt": "2026-10-31T09:35:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2512,
+      "headSha": "5eece17b6ac3782296495a70b9ed4247351de1ce",
+      "startedAt": "2026-10-31T09:36:26Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1070,11 +1087,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T09:29:12Z",
-    "nextReportDueAt": "2026-10-31T10:29:12Z",
+    "lastReportAt": "2026-10-31T09:36:26Z",
+    "nextReportDueAt": "2026-10-31T10:36:26Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2510 (#2338); canary .1 left #2400 (e2e at aabea4b) and #2421 (r4)",
-    "currentMainSha": "24d63fd80e11309f32886d62fa8b22eaa74870fb",
+    "headline": "A3 complete (#2482 merged); canary .1 left: #2421 (#2396 r4)",
+    "currentMainSha": "02a66ba6dd62b34c69a245e16d3d640b751a28a1",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1260,7 +1277,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T09:29:13Z",
+  "updatedAt": "2026-10-31T09:37:35Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1514,6 +1531,25 @@
       "lane": "docs",
       "commentId": 6541665501,
       "postedAt": "2026-10-31T09:25:11Z",
+      "route": "codex gpt-6.1-sol high",
+      "state": "posted",
+      "pr": null
+    },
+    {
+      "issue": 1367,
+      "lane": "features",
+      "commentId": null,
+      "postedAt": "2026-10-31T09:31:18Z",
+      "route": "codex gpt-6.1-sol (continuation of the #2338 worker)",
+      "state": "claimed-continuation",
+      "pr": null,
+      "claimRef": "#2474 comment 6541722960"
+    },
+    {
+      "issue": 2401,
+      "lane": "internals",
+      "commentId": 6541778987,
+      "postedAt": "2026-10-31T09:37:34Z",
       "route": "codex gpt-6.1-sol high",
       "state": "posted",
       "pr": null
