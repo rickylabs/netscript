@@ -154,6 +154,31 @@ Deno.test('unmarked factory modules retain path-specific trigger and worker load
   });
 });
 
+Deno.test('both worker writers reject configuration pointing at an excluded module', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
+      'workers/jobs/valid.ts': VALID_JOB,
+      'workers/jobs/factory.ts': '// @netscript-registry-ignore\nexport function factory() {}\n',
+      'netscript.config.ts': `export default {
+  name: 'excluded-policy', databases: { config: [] },
+  workers: { jobs: [{ id: 'factory', name: 'Factory', entrypoint: './factory.ts', source: 'local' }] },
+};`,
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace manifest must win')),
+    });
+    const message = 'unmatched project path "workers/jobs/factory.ts"';
+    await assertRejects(() => generate({ dryRun: false, projectRoot }), Error, message);
+    await assertRejects(
+      () => compileWorkersRegistry(new LocalProjectFiles(projectRoot)),
+      Error,
+      message,
+    );
+  });
+});
+
 Deno.test('generated trigger registry loads definitions and excludes control-plane and runtime modules', async () => {
   await withTempProject(async (projectRoot) => {
     await writeWorkspaceProject(projectRoot, ['plugin-triggers'], {

@@ -15,7 +15,7 @@ The module-level option fits static registry generation: it can be checked witho
 
 - [x] S0 plan and independent PLAN-EVAL (round 2 PASS).
 - [x] S1 shared directive, generator selection, inspection and doctor evidence (60 focused tests, scoped gates and independent review PASS).
-- [ ] S2 installed-project proof and documentation.
+- [x] S2 installed-project proof, policy negative control, documentation, and generated MCP carrier refresh.
 
 ## Validation
 

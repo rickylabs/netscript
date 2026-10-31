@@ -25,3 +25,5 @@ Focused tests through run-deno-test.ts; scoped run-deno-check/lint/fmt.ts with e
 The workers standalone compile-registry command has a second selector; apply the same directive there. AI also produces protocol-2 runtime registries; apply the shared marker before its existing AST definition-shape selection so the mechanism is consistent for every installed runtime registry. Extend declared write surface with plugins/ai/src/cli/ai-registry-compiler.ts, its tests and README. These are scan-only changes, with no AI runtime changes.
 
 The triggers standalone compiler also consumes the shared selector. JSR audit skill read before implementation: exported selector result types and directive constant require explicit annotations/JSDoc; no new dependencies or export-map entries. Planned surface is covered by scoped doc lint and audit-jsr-package.ts.
+
+S2 verification addition: refresh the generated MCP export corpus for the additive @netscript/plugin/cli symbols and run its freshness gate. This is required CI carrier maintenance, not expanded runtime scope.

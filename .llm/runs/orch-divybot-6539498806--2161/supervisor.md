@@ -11,3 +11,5 @@
 - Research scope extension before implementation: plugins/ai/src/cli/ai-registry-compiler.ts, plugins/ai/src/cli/ai-registry-compiler.test.ts, plugins/ai/README.md; workers registry-compiler.ts and its existing tests. Correct documentation path is docs/site/orchestration-runtime/how-to/author-a-plugin.md.
 
 - Targeted generated fixture write surface: .llm/tmp/registry-opt-out-2161/ (ignored; no source ownership changes).
+
+- Required generated carrier write surface: packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts, regenerated with the repository generator for the additive shared CLI exports.

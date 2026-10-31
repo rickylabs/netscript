@@ -52,3 +52,15 @@ Initial 39 regression tests passed; new installed proof initially used saga file
 ## S1 sign-off and reconcile
 
 Independent S1 review PASS with substantive confirmation of each writer, protocol bounds, doctor output and test semantics. All conditional local gates are complete: 60 tests, 19-file check/lint/fmt, quality and new-selector doc lint. No source/lock changes outside the declared surface. Preserve version-coupled release and excluded-worker-policy edge case for S2 documentation/proof.
+
+## S2 in progress
+
+S1 committed as 913ae5d after independent sign-off. Added per-plugin registry exclusion documentation. Targeted installation initially hit inherited maintainer constraints: external targets rejected; installing into --no-aspire projects attempts helper regeneration. Retrying with a scaffolded AppHost, without restoring/starting Aspire. This is not the full runtime E2E suite.
+
+### S2 installed acceptance proof
+
+Actual maintainer init, official trigger/worker installation, generation and doctor all exit 0. Doctor names both factory paths. Targeted installed-startup-smoke_test.ts passes with both production runtimes ready (registryReady and dependencyReady true), isolated memory KV and a temporary streams test double; normal Deno resource/operation sanitizers pass. This is registry/startup acceptance evidence, not the full scaffold.runtime verdict. Reinstalling with factories already present verifies the original issue sequence. The excluded-worker-policy negative control passes for both writers.
+
+## S2 review and sign-off
+
+Independent review found one packaging blocker: the runnable fixture specimen used a _test.ts name under the tracked run directory, so root test discovery could execute it outside its generated project. Renamed the carrier to installed-startup-smoke.specimen.ts and updated the copy recipe to give it the _test.ts name only inside the generated fixture. The evaluator explicitly signed off S2 once this rename and the listed gates pass; both conditions are now met. Final gates: 61 focused tests + 29 plugin-check cases + 1 installed startup case, all passing with no ignored tests; check 20 framework TS files; lint/fmt 19 authored TS files; quality and corpus freshness PASS. Review-thread gate PASS, zero threads. Reconcile: current main has queue concurrency and trigger file-watch changes; neither changes this leaf's scan/doctor code. No history rewrite.
