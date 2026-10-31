@@ -79,7 +79,12 @@
     "corpusFreshness": "PASS",
     "publishAssetsFreshness": "PASS",
     "agentDocsProseFreshness": "PASS",
-    "assetsBarrel": "Registry/token and deterministic generation PASS; final git diff requires S2 commit, then rerun before READY",
+    "assetsBarrel": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "committedHead": "72048a3aa032cc2090da0bc580fa2c80ecbbf1f2",
+      "workingTreeAfter": "clean"
+    },
     "combinedRuntime": {
       "exitCode": 0,
       "durationMs": 171429,
