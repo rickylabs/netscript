@@ -51,3 +51,15 @@ Reconcile: #2159 remains open; slice 2 is deferred exactly as owner permits, as 
 follow-up for the coordinator. No closing keyword, taxonomy change, merge, tag or release.
 No local scaffold.runtime; e2e-cli CI must be armed by the coordinator. Source is ready for the
 slice commit, push and exact-head review. No lock changes.
+
+## Generated public API metadata
+
+Source slice pushed as 53413b07dc1c56eb24ff34ae09e282bf61ad74a8 and reported on PR #2499.
+The MCP freshness gate correctly detected the new atomic state predicate, port methods and Prisma
+transaction/delegate types. Native `gen:mcp-export-corpus` refreshed the single generated corpus
+from the clean committed package/plugin read set (35 packages, 304 subpaths, 9031 symbols).
+No hand-edited generated content. This follow-up commit includes the required run updates.
+
+Reconcile: PR body describes the final atomic scope, true local gates and the single effects
+follow-up. No taxonomy mutation. Next: exact-pushed-head review, ready transition, final review and
+READY file handoff; applicable CI and e2e-cli status must be stated truthfully.

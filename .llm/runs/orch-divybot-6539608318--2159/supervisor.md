@@ -16,3 +16,7 @@ Implementation evaluator primary muse_spark_1_3/xhigh, fallback opus_5/xhigh.
 Owner override, verbatim: "Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only."
 This override preserves separate sessions and different vendor families. Maximum rounds: plan 2,
 implementation 5. Reuse evaluator across rounds; final evaluation names exact pushed SHA.
+
+Generated write-surface extension: packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts.
+The existing public-export freshness gate requires regenerating this artifact after the source
+commit; no MCP behavior or unrelated export changes are authorized.

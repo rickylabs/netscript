@@ -24,3 +24,7 @@ Scheduled/cascaded effect recovery remains unproven. Coordinator files ONE follo
 "feat(sagas): atomically persist and recover scheduled and cascaded effects" covering same-commit
 intents, stable keys, bounded/fenced restart dispatch, scheduler deduplication, compensation ordering
 and KV/Redis/Postgres crash proofs after commit/before dispatch. Do not claim full #2159 closure.
+
+Generated public API corpus refreshed natively after source commit 53413b0. Only the existing
+export-surface-corpus.generated.ts artifact changes outside the saga/run scope. Next evaluator
+must inspect the resulting full pushed head, including generated metadata.

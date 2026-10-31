@@ -10,3 +10,6 @@
 - Full-export doc-lint reports the same seven inherited private-type references on baseline and
   implementation (six telemetry, one saga contract). Changed port/store/testing surfaces introduce
   none. JSR dry-run passes; its audit's slow-types warning is the known banner false positive.
+- Public store/port additions make the generated MCP export corpus stale. Regenerate its exact
+  checked-in artifact after the clean source commit and include it in the same PR. This extends
+  the declared generated write surface only; MCP behavior is unchanged.
