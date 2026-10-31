@@ -154,3 +154,10 @@ passes; source wrappers5 check/lint pass; quality gate, release preflight and
 updated docs accuracy111/111 pass. Source commit precedes carrier generation to
 honor the MCP generator's clean-read-set guard. User-authorized force-with-lease
 will replace only the known old branch headf6d9ae4 after freshness validation.
+
+All four carrier freshness checks now pass, with public corpus refreshed from
+clean source. Full package run:347 passed and1 stale design-sync item-count
+assertion failed (85 ->92 after7 intentional additions). The design-sync gate now
+derives its count from the frozen v1 snapshot plus the explicit post-v1 list,
+and still refuses portable style-utility leakage. No product behavior changed.
+Targeted inventory rerun follows; do not call the initial full run all-green.
