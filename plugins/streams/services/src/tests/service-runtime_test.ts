@@ -1,10 +1,10 @@
 /** Real streams factory permission, policy, proxy and owned-listener qualification. @module */
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl } from 'jsr:@std/path@^1';
-import { type ChildRun, createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
+import { type ChildRun, createRuntimeSandbox } from './test_utils/service-runtime-fixture.ts';
 
 const PUBLIC_SUBPATH = '@netscript/plugin-streams/service';
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const MARKER = 's6a-streams: assertions and native cleanup settled';
 
 Deno.test({

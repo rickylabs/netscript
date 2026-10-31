@@ -13,8 +13,8 @@ import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/asse
 import { fromFileUrl } from 'jsr:@std/path@^1';
 
 const PUBLIC_SUBPATH = '@netscript/plugin-streams/service';
-const PUBLIC_MODULE = new URL('../mod.ts', import.meta.url).href;
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PUBLIC_MODULE = new URL('../../mod.ts', import.meta.url).href;
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const CHILD_DEADLINE_MS = 10_000;
 const SETTLE_GRACE_MS = 2_000;
 const CHILD_OUTPUT_CAP = 32 * 1024;

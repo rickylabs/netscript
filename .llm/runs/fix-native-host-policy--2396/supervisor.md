@@ -41,3 +41,12 @@ S3 measured scope expansion before repair: plugins/workers/tests/public/type-ref
 contains the pre-existing exact export-target list. The complete plugin suite returned230 pass,
 1 fail because the new ./service is absent from that list. Add the singular entrypoint while
 retaining every legacy target and all precision/doc-lint controls. No acceptance reduction.
+
+S3 measured layout correction before editing: adopted factory tests plus new host controls
+raise workers/streams services/src to17/19 immediate entries (generic audit counts17/18
+after its test-directory exclusion), above cap12. Move only service*_test.ts owners and the
+workers service-test-fixture.ts into services/src/tests/. Streams already has that directory.
+Update parent-relative module URLs, plugin-root resolution and fixture imports only. Preserve
+all assertions, test names, budgets, permissions, fixture content and public source. This exact
+path relocation is allowed scope; no new F16 exception or scan exclusion is introduced.
+Historical records retain their original source paths; final evidence will use current paths.

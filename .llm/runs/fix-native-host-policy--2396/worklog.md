@@ -115,3 +115,18 @@ failure limit ends S1 evaluator loop. Both decisions were surfaced on its PR and
 S2 exact7421a60f2 now has real green core/build/quality/close and both runtime tiers, plus
 its independent exact-head MERGE. The existing READY comment was updated, without moving head.
 Final factory publication/freshness gates and independent source review remain next.
+
+S3 layout slice PASS: complete native workers/streams suite231/0/0 after grouping adopted and
+new service tests under services/src/tests/. All19 moved-test/helper files type-check; plugin
+lint/fmt still covers204/204 files with no drops, and quality/architecture passes. Both service
+source directories now have exactly12 immediate entries. Workers JSR audit retains only root
+metadata20 (main19), worker22 and src/cli13 advisories; streams has no cardinality advisory.
+The required workers CHANGELOG is the sole new metadata entry, recorded as proposed bounded
+WORKERS-HOST-METADATA-CARDINALITY-2396 debt for independent acceptance; no public export,
+source cap, permission, budget, assertion or scan exclusion changed. Package layout migration
+of existing public roots is separate from this bounded startup seam.
+
+Reconcile: thirteen renames retain fixture content and all test names/controls. Only parent
+module URLs, plugin-root resolution and fixture imports change. Historical paths remain in
+old run evidence. Final current paths are under services/src/tests/. Two member dry-runs and
+canonical freshness follow this clean checkpoint; other member source remains identical.

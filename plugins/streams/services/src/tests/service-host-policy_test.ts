@@ -1,9 +1,9 @@
 /** Real streams host policy, exact CORS and protocol defaults over native listeners. @module */
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl } from '@std/path';
-import { createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
+import { createRuntimeSandbox } from './test_utils/service-runtime-fixture.ts';
 
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const MARKER = 'streams host policy: protocol, origins and cleanup complete';
 
 Deno.test({

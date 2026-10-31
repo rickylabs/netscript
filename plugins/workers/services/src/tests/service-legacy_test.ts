@@ -4,7 +4,7 @@ import { stripAnsiCode } from 'jsr:@std/fmt@1/colors';
 import { fromFileUrl } from '@std/path';
 import { createSandbox } from './service-test-fixture.ts';
 
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const SUCCESS_MARKER = 's3g-legacy: PORT precedence, fallback and missing PORT verified';
 const CLEANUP_MARKER = 's3g-legacy: native listeners and owned KV cleanup settled';
 

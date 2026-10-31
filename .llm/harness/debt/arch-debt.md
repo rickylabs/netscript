@@ -3101,3 +3101,21 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Closing gate:** Publish the exact canary through the release workflow, prove both singular
   factory imports and consumer types against that package graph, and pass `e2e-cli-prod` for the
   same exact canary. Record the run/version evidence before stable. No implicit renewal.
+
+## Workers package metadata cardinality — required changelog (#2396)
+
+- **ID:** `WORKERS-HOST-METADATA-CARDINALITY-2396`.
+- **Reason:** Exact main has 19 immediate workers package-root entries under the generic audit;
+  the required export/migration `CHANGELOG.md` makes 20. Existing `worker/` 22 and `src/cli/` 13
+  findings are unchanged. New service source/test grouping meets cap 12 in both plugins.
+- **Exact scope:** `plugins/workers/` package-root metadata only, bounded at 20 entries. No new
+  runtime folder, public symbol, scan exclusion, file-size or native facade exception.
+- **Why deferred:** Consolidating the existing public CLI/runtime/resource roots requires a
+  separate package layout/export migration. Removing release notes would drop a documentation
+  obligation; unrelated source moves are outside this startup policy change.
+- **Owner:** Workers package maintainers with the 0.0.9 coordinator, #2474.
+- **Target:** Package layout review before 0.0.9 stable, no later than 2026-11-10. No renewal or growth.
+- **Status:** Proposed `DEBT_ACCEPTED`; independent implementation review must accept it.
+- **Cost:** One additional metadata entry and its advisory; no runtime or type-system cost.
+- **Closing gate:** Consolidate the workers package-root layout to cap 12 while preserving every
+  public export and release note; pass publication dry-run and all native consumer tests.

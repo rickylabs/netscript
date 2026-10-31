@@ -7,9 +7,9 @@
  */
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { fromFileUrl } from 'jsr:@std/path@^1';
-import { createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
+import { createRuntimeSandbox } from './test_utils/service-runtime-fixture.ts';
 
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const MARKER = 's6d-streams: startup rejection and native cleanup settled';
 type FailureMode = 'bind' | 'sentinel' | 'cors';
 

@@ -14,8 +14,8 @@ import { fromFileUrl } from '@std/path';
 import { CHILD_OUTPUT_CAP, type ChildRun, createSandbox } from './service-test-fixture.ts';
 
 const PUBLIC_SUBPATH = '@netscript/plugin-workers/service';
-const PUBLIC_MODULE = new URL('../mod.ts', import.meta.url).href;
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PUBLIC_MODULE = new URL('../../mod.ts', import.meta.url).href;
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const NATIVE_POLICY_ERROR =
   'Service auth requires { authn: { authenticator }, authz?: { authorizer } } or { public: true, reason: "nonblank explanation" }; do not combine guarded and public fields.';
 const DENIED_PORT_ERROR = 'Requires env access to "PORT", run again with the --allow-env flag';

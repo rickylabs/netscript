@@ -1,9 +1,9 @@
 /** Legacy streams CLI keeps public startup/CORS and uses native signal shutdown. @module */
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl } from '@std/path';
-import { createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
+import { createRuntimeSandbox } from './test_utils/service-runtime-fixture.ts';
 
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const MARKER = 'legacy streams: public protocol and signal shutdown';
 
 Deno.test({

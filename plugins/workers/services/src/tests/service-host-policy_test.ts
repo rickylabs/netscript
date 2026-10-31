@@ -1,9 +1,9 @@
 /** Host policy, native SDK/discovery and compatibility over the real workers listener. @module */
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl } from '@std/path';
-import { createRuntimeSandbox } from '../../../streams/services/src/tests/test_utils/service-runtime-fixture.ts';
+import { createRuntimeSandbox } from '../../../../streams/services/src/tests/test_utils/service-runtime-fixture.ts';
 
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const MARKER = 'workers host policy: native calls and cleanup complete';
 const SYNTHETIC_SECRET = 'host-policy-fixture-material-00000000';
 

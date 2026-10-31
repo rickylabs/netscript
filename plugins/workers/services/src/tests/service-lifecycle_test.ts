@@ -4,7 +4,7 @@ import { stripAnsiCode } from 'jsr:@std/fmt@1/colors';
 import { fromFileUrl } from '@std/path';
 import { createSandbox } from './service-test-fixture.ts';
 
-const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const PLUGIN_ROOT = fromFileUrl(new URL('../../../', import.meta.url));
 const SUCCESS_MARKER = 's3e-caller-abort: assertions and cleanup settled';
 const CLEANUP_MARKER = 's3e-caller-abort: listener and owned KV cleanup settled';
 
