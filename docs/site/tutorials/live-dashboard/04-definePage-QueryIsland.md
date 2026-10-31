@@ -8,11 +8,10 @@ next: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stre
 
 # The page builder and the query island
 
-This is the heaviest chapter in the track, and the most rewarding. You will render the orders table
-with NetScript's `definePage` builder — its **layer / partial / island** triad — and hydrate a
-TanStack Query island so the table reads and mutates on the client. By the end the dashboard renders
-instantly from cache and refetches in the background. We flag where the surface is
-conceptually dense.
+In this chapter you render the orders table with NetScript's `definePage` builder and its
+**layer / partial / island** triad, and hydrate a TanStack Query island so the table reads and
+mutates on the client. At the end the dashboard renders from cache and refetches in the background.
+This is the longest chapter in the track.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -25,29 +24,27 @@ conceptually dense.
 
 ## What you will build
 
-An `/dashboard/orders/` route that renders a filterable orders table — the screen the fulfillment
-team keeps open. The server shell is a `definePage` page with a cache-first `list` layer; the
-interactive part is a `QueryIsland` that reads through the chapter-3 query helpers with `useQuery`
-and advances order status with an optimistic `useMutation`. Optimistic matters here: when a packer
-marks an order `shipped`, the row must move instantly — a badge that lags invites clicking it twice,
-and a double-advanced order is exactly the kind of quiet mistake this dashboard exists to prevent.
-You end with a page that paints from KV cache on first byte and stays live on the client.
+A `/dashboard/orders/` route that renders a filterable orders table. The server shell is a
+`definePage` page with a cache-first `list` layer. The interactive part is a `QueryIsland` that
+reads through the chapter 3 query helpers with `useQuery` and advances order status with an
+optimistic `useMutation`, so a row changes as soon as you act on it instead of inviting a second
+click. The page paints from the KV cache and stays live on the client.
 
 ## Before you begin
 
-You should have completed [chapter 3](/tutorials/live-dashboard/03-sdk-cache-first-query/):
-`apps/dashboard/lib/orders.ts` exports `ordersClient` and `ordersQueries`,
-and `deno task check` is clean. Confirm the query module is in place:
+You need [chapter 3](/tutorials/live-dashboard/03-sdk-cache-first-query/)'s
+`apps/dashboard/lib/orders.ts`, exporting `ordersClient` and `ordersQueries`, with
+`deno task check` clean. Confirm the query module is in place:
 
 ```sh
 deno check apps/dashboard/lib/orders.ts --unstable-kv
 ```
 
-A clean check means the typed client and query factory are ready to wire into a page.
+A clean check means the typed client and query factory are ready for a page.
 
 ## The mental model: layer / partial / island
 
-Before any code, hold these three words apart — most of the chapter is just them working together:
+Three terms carry this chapter:
 
 {{ comp.apiTable({
   caption: "The definePage triad",
@@ -58,13 +55,13 @@ Before any code, hold these three words apart — most of the chapter is just th
   ]
 }) }}
 
-A `definePage` page wires several layers into a layout, each fed by its own loader. The server
-renders every layer from cache; the island layer then takes over interactivity in the browser.
+A `definePage` page places several layers in a layout, each fed by its own loader. The server renders
+every layer from cache, and the island layer then handles interactivity in the browser.
 
 ## Step 1 — Declare the route contract
 
 A NetScript route declares its own typed search params. `defineRouteContract` from
-`@netscript/fresh/route` builds that schema; `paginationSearchSchema` and `fallback` give you safe
+`@netscript/fresh/route` builds the schema, and `paginationSearchSchema` and `fallback` give safe
 defaults for missing or malformed query strings. Create the route file:
 
 ```ts
@@ -89,18 +86,18 @@ export default defineRouteContract({ searchSchema: ORDERS_SEARCH_SCHEMA });
 export type OrdersSearch = ReturnType<typeof ORDERS_SEARCH_SCHEMA.parse>;
 ```
 
-`fallback(schema, default)` is the safety belt: a junk `?status=banana` resolves to the default
-instead of throwing, so a hand-edited URL never 500s the page. This is the same
-`paginationSearchSchema()` the framework uses site-wide — every route that paginates parses `limit`
-and `offset` through it rather than reading `searchParams` by hand.
+With `fallback(schema, default)`, a junk `?status=banana` resolves to the default instead of
+throwing, so a hand-edited URL never returns a 500. Every NetScript route that paginates parses
+`limit` and `offset` through the same `paginationSearchSchema()` instead of reading `searchParams` by
+hand.
 
 ## Step 2 — Define the page and cache-first resource pipeline
 
 The page reads data through request-scoped **resource factories**: `.withResource(name, factory)`
-computes a value once per render, however many layers ask for it. Two layers want the same cached
-orders slice — the server-rendered `list` table and the `ordersQuery` island seed — so the KV read
-happens once and both share it. Resolution order, the shared store, and dedup spans are in
-[Request-scoped resources](/web-layer/resources/):
+computes a value once per render, however many layers ask for it. The server-rendered `list` table
+and the `ordersQuery` island seed need the same cached orders slice, so the KV read happens once and
+both share it. [Request-scoped resources](/web-layer/resources/) covers resolution order, the shared
+store and dedup spans:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
@@ -141,27 +138,26 @@ miss or stale entry the runtime prewarms the `list` layer's `partial` route, who
 callable action. On a cold or expired cache the page still waits on `orders`, because it awaits the
 island's `dehydratedQuery` prefetch, which runs that action.
 
-`definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
-wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`
-type applied (`export function definePage() { return createDefinePage<State>(); }`), so every page in
-the app shares one typed context. Import the package builder directly and you lose that binding.
+`definePage` comes from `@app/utils.ts`, not directly from `@netscript/fresh/builders`. The scaffold
+wrote that module in chapter 1 as a thin wrapper that applies the app's `State` type
+(`export function definePage() { return createDefinePage<State>(); }`), so every page shares one
+typed context. Importing the package builder directly loses that binding.
 
-`spanName: 'dashboard.orders.list'` is not decoration: every render emits a span under that name in
-the Aspire dashboard's traces view, next to the service calls it made. When the table feels slow,
-that trace shows whether the time went to KV, the orders service, or the render.
+`spanName: 'dashboard.orders.list'` names the span every render emits in the Aspire dashboard's
+traces view, next to the service calls it made. When the table is slow, that trace shows whether the
+time went to KV, the orders service or the render.
 
-`dehydratedQuery` prefetches orders on the server and serialises the cache into the initial HTML, so
-the island does not refetch on hydrate.
+`dehydratedQuery` prefetches orders on the server and serializes the cache into the initial HTML, so
+the island doesn't refetch on hydrate.
 
 ## Step 3 — Add layers and partials
 
-Now compose the visual regions. You add the server-rendered table, the interactive query island, and
-a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`. The
-three layers resolve concurrently, so the page costs its slowest region rather than the sum — the
-loader contract, the full layer config, and slot placement are in
-[Layers, layout, and slots](/web-layer/layers/). The `partial` and `partialName` entries below are
-what turn a layer into a refreshable region; [Partials](/web-layer/partials/) covers the partial route
-on the other end:
+Now add the visual regions: the server-rendered table, the interactive query island, and a stats
+panel loaded asynchronously through a deferred partial. Then lay them out and call `build()`. The
+three layers resolve concurrently, so the page costs its slowest region, not the sum.
+[Layers, layout, and slots](/web-layer/layers/) covers the loader contract, the full layer config and
+slot placement. The `partial` and `partialName` entries turn a layer into a refreshable region;
+[Partials](/web-layer/partials/) covers the partial route on the other end:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx (continued)
@@ -224,7 +220,7 @@ export const { handler, default: page } = ordersListPage;
 export { page as default };
 ```
 
-Read the builder one call at a time:
+The builder, one call at a time:
 
 {{ comp.apiTable({
   caption: "definePage builder steps",
@@ -240,17 +236,30 @@ Read the builder one call at a time:
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "This is the dense part — and it earns its weight" } }}
-The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>. What <code>'balanced'</code>, <code>staleTime</code>, and <code>staleReloadMode</code> decide between them — prewarm on the server, refresh on the client, or neither — is <a href="/web-layer/defer-streaming-ui/">Deferred and streaming UI</a>.
+{{ comp callout { type: "note", title: "When to use definePage" } }}
+A layer config holds a <code>loader</code> (cache-first server read), a <code>partial</code> and
+<code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and
+<code>staleTime</code> and <code>staleReloadMode</code> (the staleness window and how it refreshes).
+That is more setup than a plain Fresh route, and in return each region renders from cache
+independently and refreshes without a full navigation. For a static page, a plain Fresh route is
+lighter; use <code>definePage</code> when a region must be cache-first and self-refreshing, as a live
+table is. See <a href="/web-layer/">the Fresh meta-framework</a>.
+<a href="/web-layer/defer-streaming-ui/">Deferred and streaming UI</a> explains how
+<code>'balanced'</code>, <code>staleTime</code> and <code>staleReloadMode</code> choose between
+prewarming on the server, refreshing on the client, or neither.
 {{ /comp }}
 
-{{ comp callout { type: "tip", title: "Deferred-loader composition" } }}
-Returning a promise like <code>statsPromise</code> lets the page's shell paint without waiting for stats. The stats region shows its fallback until the promise resolves. In the current non-streaming Fresh runtime, <code>Deferred</code> behaves as a Suspense-ready boundary; it becomes fully progressive — streaming the resolved block into the response — only once streaming delivery lands in Fresh.
+{{ comp callout { type: "tip", title: "Deferred loaders" } }}
+Returning a promise like <code>statsPromise</code> lets the page shell paint without waiting for the
+stats; the stats region shows its fallback until the promise resolves. The current Fresh runtime
+doesn't stream responses, so <code>Deferred</code> acts as a Suspense-ready boundary rather than
+streaming the resolved block into the response.
 {{ /comp }}
 
 ## Step 4 — Hydrate the QueryIsland client-side
 
-The client-side island receives the server-prefetched query state as props. You call `hydrateFromDehydrated` during mount to warm up the client cache, allowing `useQuery` to resolve without hitting the network:
+The island receives the server-prefetched query state as props. Call `hydrateFromDehydrated` during
+mount to warm the client cache, so `useQuery` resolves without a network call:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/(_islands)/OrdersQueryIsland.tsx
@@ -318,21 +327,25 @@ export default function OrdersQueryIsland(props) {
 }
 ```
 
-One constraint makes this work: the hydrated entries land in the island's shared QueryClient under
-the exact query keys the server used, so `useQuery` only benefits if `queryOptions(props.input)`
-produces the same key the server prefetched. `initialData` comes from the explicit `initialOrders`
-prop and wins the mount-time handoff even if the shared client already contains an older entry;
-`initialDataUpdatedAt` preserves the KV entry's real age. Later optimistic writes and refetches win
-over that seed.
+The hydrated entries land in the island's shared QueryClient under the exact query keys the server
+used, so `useQuery` benefits only if `queryOptions(props.input)` produces the key the server
+prefetched. `initialData` comes from the explicit `initialOrders` prop and wins the mount-time
+handoff even if the shared client already holds an older entry; `initialDataUpdatedAt` keeps the KV
+entry's real age. Later optimistic writes and refetches take precedence over that seed.
 
-The mutation clears two distinct tiers. `invalidateServerQueryCache()` reaches the JSON-only route
-that `defineFreshApp()` registers automatically, using `.key(props.input)` for the serialized KV
-key. Only after that succeeds does `invalidateQueries()` refresh the browser tier. No product-owned
-API route is required, and a reload between the two cannot read around the entry just invalidated.
+The mutation clears two cache tiers in order:
+
+1. `invalidateServerQueryCache()` calls the JSON-only route that `defineFreshApp()` registers
+   automatically, using `.key(props.input)` for the serialized KV key.
+2. Only after that succeeds, `invalidateQueries()` refreshes the browser tier.
+
+You need no API route of your own, and a reload between the two steps can't read around the entry
+just invalidated.
 
 ## Step 5 — Render the Deferred stats layer
 
-To display the stats layer that loaded asynchronously, use the `<Deferred>` component. It acts as a suspense boundary, wrapping the promise and rendering a fallback placeholder while it resolves:
+Render the asynchronously loaded stats with the `<Deferred>` component. It is a suspense boundary
+that wraps the promise and renders a fallback placeholder until it resolves:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/(_components)/StatsLayer.tsx
@@ -367,14 +380,12 @@ export default function StatsLayer(props: StatsProps) {
 
 ## Verify your progress
 
-Make sure `aspire start` is up, then open the route in a browser at `/dashboard/orders/`.
+With `aspire start` up, open `/dashboard/orders/` in a browser. A scaffolded Fresh app pins no host
+port, so Aspire allocates one at runtime: in the [Aspire dashboard](/explanation/aspire/) resource
+list, open the `dashboard` resource's endpoint and append `/dashboard/orders/`.
 
-You need the app's port to do that, and there is no number to memorize: a scaffolded Fresh app pins
-no host port, so Aspire allocates one at runtime. The [Aspire dashboard](/explanation/aspire/)
-resource list is the authority — find the `dashboard` resource, click its endpoint, and append `/dashboard/orders/`.
-You should see the orders table render
-immediately — populated from KV cache, not a spinner — and a "Refreshing" indicator flicker as it
-revalidates. Advancing an order's status should update its badge instantly. Type-check too:
+The orders table renders from the KV cache without a spinner, and a "Refreshing" indicator flickers
+as it revalidates. Advancing an order's status updates its badge at once. Then type-check:
 
 ```sh
 deno task check
@@ -388,14 +399,15 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "Table is empty or spinning forever?" } }}
-A perpetually empty table usually means the KV cache is cold and the loader returned <code>undefined</code> with nothing to refetch — confirm <code>aspire start</code> is up so <code>services__orders__http__0</code> resolves, and that <code>netscript db seed</code> ran. The first request warms the cache; reload once.
+A table that stays empty usually means the KV cache is cold and the loader returned
+<code>undefined</code> with nothing to refetch. Confirm <code>aspire start</code> is up, so
+<code>services__orders__http__0</code> resolves, and that <code>netscript db seed</code> ran. The
+first request warms the cache; reload once.
 {{ /comp }}
 
 ## What you built
 
-A `definePage` orders page that renders cache-first through the layer/partial/island triad, plus a
-hydrated `QueryIsland` that reads with `useQuery` and mutates optimistically with `useMutation` —
-all keyed off the same contract-derived helpers. The table is live on the client. Next you make it
-live from the *server*: rows pushed into an open page over a durable StreamDB.
-
-{{ comp.nextPrev({ prev: { label: "3 · Cache-first query", href: "/tutorials/live-dashboard/03-sdk-cache-first-query/" }, next: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" } }) }}
+A `definePage` orders page that renders cache-first through layers, partials and an island, and a
+hydrated `QueryIsland` that reads with `useQuery` and mutates optimistically with `useMutation`, all
+keyed off the same contract-derived helpers. The table is live on the client. Next, the *server*
+pushes rows into an open page over a durable StreamDB.

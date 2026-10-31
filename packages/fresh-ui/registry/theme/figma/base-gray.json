@@ -1,0 +1,505 @@
+{
+  "collection": "Base gray",
+  "modes": [
+    "Neutral",
+    "Slate",
+    "Sand",
+    "Mauve"
+  ],
+  "variables": [
+    {
+      "name": "gray/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/1"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/1"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/1"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/1"
+        }
+      }
+    },
+    {
+      "name": "gray/d/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/10"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/10"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/10"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/10"
+        }
+      }
+    },
+    {
+      "name": "gray/d/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/11"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/11"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/11"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/11"
+        }
+      }
+    },
+    {
+      "name": "gray/d/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/12"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/12"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/12"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/12"
+        }
+      }
+    },
+    {
+      "name": "gray/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/2"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/2"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/2"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/2"
+        }
+      }
+    },
+    {
+      "name": "gray/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/3"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/3"
+        }
+      }
+    },
+    {
+      "name": "gray/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/4"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/4"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/4"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/4"
+        }
+      }
+    },
+    {
+      "name": "gray/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/5"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/5"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/5"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/5"
+        }
+      }
+    },
+    {
+      "name": "gray/d/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/6"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/6"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/6"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/6"
+        }
+      }
+    },
+    {
+      "name": "gray/d/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/7"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/7"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/7"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/7"
+        }
+      }
+    },
+    {
+      "name": "gray/d/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/8"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/8"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/8"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/8"
+        }
+      }
+    },
+    {
+      "name": "gray/d/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/d/9"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/d/9"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/d/9"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/d/9"
+        }
+      }
+    },
+    {
+      "name": "gray/d/ink-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/ink-hover/gray/d"
+        },
+        "Slate": {
+          "alias": "Primitives/color/ink-hover/slate/d"
+        },
+        "Sand": {
+          "alias": "Primitives/color/ink-hover/sand/d"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/ink-hover/mauve/d"
+        }
+      }
+    },
+    {
+      "name": "gray/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/1"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/1"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/1"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/1"
+        }
+      }
+    },
+    {
+      "name": "gray/l/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/10"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/10"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/10"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/10"
+        }
+      }
+    },
+    {
+      "name": "gray/l/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/11"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/11"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/11"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/11"
+        }
+      }
+    },
+    {
+      "name": "gray/l/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/12"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/12"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/12"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/12"
+        }
+      }
+    },
+    {
+      "name": "gray/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/2"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/2"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/2"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/2"
+        }
+      }
+    },
+    {
+      "name": "gray/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/3"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/3"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/3"
+        }
+      }
+    },
+    {
+      "name": "gray/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/4"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/4"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/4"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/4"
+        }
+      }
+    },
+    {
+      "name": "gray/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/5"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/5"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/5"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/5"
+        }
+      }
+    },
+    {
+      "name": "gray/l/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/6"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/6"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/6"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/6"
+        }
+      }
+    },
+    {
+      "name": "gray/l/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/7"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/7"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/7"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/7"
+        }
+      }
+    },
+    {
+      "name": "gray/l/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/8"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/8"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/8"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/8"
+        }
+      }
+    },
+    {
+      "name": "gray/l/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/gray/l/9"
+        },
+        "Slate": {
+          "alias": "Primitives/color/slate/l/9"
+        },
+        "Sand": {
+          "alias": "Primitives/color/sand/l/9"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/mauve/l/9"
+        }
+      }
+    },
+    {
+      "name": "gray/l/ink-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Neutral": {
+          "alias": "Primitives/color/ink-hover/gray/l"
+        },
+        "Slate": {
+          "alias": "Primitives/color/ink-hover/slate/l"
+        },
+        "Sand": {
+          "alias": "Primitives/color/ink-hover/sand/l"
+        },
+        "Mauve": {
+          "alias": "Primitives/color/ink-hover/mauve/l"
+        }
+      }
+    }
+  ]
+}

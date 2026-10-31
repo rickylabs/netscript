@@ -1,0 +1,84 @@
+{
+  "route": {
+    "agent": "opencode",
+    "provider": "openrouter",
+    "profileId": "opencode-openrouter",
+    "model": "openrouter/z-ai/glm-5.3-flash",
+    "effort": "high",
+    "worktree": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+    "mobileRequired": false,
+    "logicalModel": "glm_5_3_flash",
+    "family": "zhipu",
+    "transport": "openrouter",
+    "requestedEffort": "provider_default",
+    "launchability": {
+      "status": "unverified",
+      "launcher": "opencode",
+      "model": "openrouter/z-ai/glm-5.3-flash",
+      "reason": "catalog-not-observed"
+    }
+  },
+  "catalog": {
+    "id": "glm_5_3_flash",
+    "family": "zhipu",
+    "capabilities": [
+      {
+        "transport": "opencode_go",
+        "model": "opencode-go/glm-5.3-flash",
+        "launch": {
+          "provider": "opencode_go",
+          "seam": "subagents",
+          "id": "opencode-go/glm-5.3-flash",
+          "transport": "openrouter",
+          "harness": "opencode",
+          "effortSupport": {
+            "status": "unknown"
+          },
+          "router": "opencode-go",
+          "profile": "opencode-go"
+        },
+        "profileId": "opencode-go"
+      },
+      {
+        "transport": "ollama",
+        "model": "ollama-cloud/glm-5.3-flash",
+        "launch": {
+          "provider": "ollama",
+          "seam": "subagents",
+          "id": "ollama-cloud/glm-5.3-flash",
+          "transport": "openrouter",
+          "harness": "opencode",
+          "effortSupport": {
+            "status": "unknown"
+          },
+          "router": "ollama-cloud",
+          "profile": "opencode-ollama"
+        },
+        "profileId": "opencode-ollama"
+      },
+      {
+        "transport": "openrouter",
+        "model": "openrouter/z-ai/glm-5.3-flash",
+        "launch": {
+          "provider": "openrouter",
+          "seam": "subagents",
+          "id": "openrouter/z-ai/glm-5.3-flash",
+          "transport": "openrouter",
+          "harness": "opencode",
+          "effortSupport": {
+            "status": "unknown"
+          },
+          "router": "openrouter",
+          "profile": "opencode-openrouter"
+        },
+        "profileId": "opencode-openrouter"
+      }
+    ]
+  },
+  "priorTransportDisposition": "Go/Ollama have no fresh allowance-proven admission in this preparation; not a model absence claim. OpenRouter selected-key candidate requires root launch disposition.",
+  "generatorFamily": "openai",
+  "evaluatorFamily": "zhipu",
+  "independentNewSession": true,
+  "automaticFallback": false,
+  "noInference": true
+}

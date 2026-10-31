@@ -1,0 +1,56 @@
+{
+  "pkg": {
+    "name": "@netscript/auth-better-auth",
+    "version": "0.0.8",
+    "description": "better-auth integration helpers for NetScript services.",
+    "root": "packages/auth-better-auth"
+  },
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "files": {
+    "total": 7,
+    "loc": 1174,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 1716
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 111,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true
+    },
+    "descriptionLen": 55
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "AuthBackendOperationUnsupportedError",
+        "createBetterAuthAuthenticator",
+        "createBetterAuthBackend",
+        "createNetscriptBetterAuth"
+      ],
+      "rawCount": 4
+    }
+  },
+  "tests": {
+    "fileCount": 4,
+    "files": [
+      "tests\\backend-error-interop_test.ts",
+      "tests\\better-auth-node-compat_test.ts",
+      "tests\\better-auth_test.ts",
+      "tests\\subject-revocation_test.ts"
+    ]
+  },
+  "gates": [],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

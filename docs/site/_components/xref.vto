@@ -7,4 +7,4 @@
             {{ comp.xref({ key: "ref:sagas", text: "saga reference" }) }}
    `text` overrides the key's default label. Styling keys off --ns-* via .ns-xref. #}}
 {{ set target = resolveXref(key) }}
-<a class="ns-xref" href="{{ target.href |> url }}">{{ text || target.label }}</a>
+<a class="ns-xref" data-variant="prose" href="{{ target.href |> url }}">{{ text || target.label }}</a>

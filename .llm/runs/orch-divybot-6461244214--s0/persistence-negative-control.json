@@ -1,0 +1,7 @@
+{
+  "command": "npm test -- --project light-390 --grep /design/tokens",
+  "mutation": "Remove localStorage.setItem only from the owned generated ThemeToggle copy",
+  "exitCode": 1,
+  "expected": "Intermediate theme persistence assertion fails; copied component restored in finally",
+  "observed": "After Enter: expected dark storage value; received null"
+}

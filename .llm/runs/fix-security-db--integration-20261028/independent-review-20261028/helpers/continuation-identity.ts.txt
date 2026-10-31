@@ -1,0 +1,6 @@
+export interface AssistantIdentity { id:string;sessionID:string;providerID:string;modelID:string;finish:string; }
+export function validateContinuationIdentity(assistants:AssistantIdentity[],baselineIds:string[],session:string,limit:number):AssistantIdentity[]{
+ if(baselineIds.length!==8||new Set(baselineIds).size!==8||assistants.length<=8||assistants.length>8+limit)throw new Error('Finite eight-message baseline plus continuation not proved.');
+ if(baselineIds.some((id,index)=>assistants[index]?.id!==id)||assistants.some(message=>message.sessionID!==session||message.providerID!=='openrouter'||message.modelID!=='z-ai/glm-5.3-flash'||message.finish==='length'))throw new Error('SAME original session/provider/model identity changed.');
+ const added=assistants.slice(8);if(added.at(-1)?.finish!=='stop')throw new Error('Completed continuation stop absent.');return added;
+}

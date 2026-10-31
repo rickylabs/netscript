@@ -1,0 +1,1 @@
+﻿Only ignored request JSON encoding corrected; original bytes and parser failures retained; no child gate launched by failed attempts.

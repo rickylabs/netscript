@@ -1,0 +1,109 @@
+{
+  "baseline": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "project": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6",
+  "liveOwnerEdited": false,
+  "nativeSh": "C:/Program Files/Git/bin/sh.exe",
+  "childPath": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7;C:\\Program Files\\Git\\bin;C:\\Users\\ericc\\.codex\\tmp\\arg0\\codex-arg0ABHY3j;C:\\Program Files\\OpenSSH\\;C:\\ProgramData\\Oracle\\Java\\javapath;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\windows\\System32\\OpenSSH\\;C:\\Program Files\\TortoiseGit\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\;C:\\Program Files (x86)\\Microsoft SQL Server\\150\\DTS\\Binn\\;C:\\Program Files\\Azure Data Studio\\bin;C:\\Program Files\\dotnet\\;C:\\Program Files\\Devart\\EntityDeveloper\\Console;C:\\Program Files\\Microsoft SQL Server\\130\\DTS\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft SQL Server\\170\\DTS\\Binn\\;C:\\Program Files (x86)\\Microsoft SQL Server\\170\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\180\\Tools\\Binn\\;C:\\Program Files\\Servy;C:\\Program Files\\GitHub CLI\\;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Netbird;C:\\Users\\ericc\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\ericc\\.aspire\\bin;C:\\Users\\ericc\\.proto\\shims;C:\\Users\\ericc\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\ericc\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\Azure Data Studio\\bin;C:\\Users\\ericc\\.dotnet\\tools;C:\\Users\\ericc\\.sqlite;C:\\Program Files\\Devart\\EntityDeveloper\\Console;C:\\Users\\ericc\\.deno\\bin;C:\\Users\\ericc\\.proto\\bin;C:\\Users\\ericc\\AppData\\Roaming\\npm;C:\\Users\\ericc\\.dotnet\\tools;C:\\Users\\ericc\\.dotnet\\tools;C:\\Users\\ericc\\AppData\\Local\\Crane;C:\\Program Files\\JetBrains\\DataGrip 2026.1.3\\bin;C:\\Users\\ericc\\.local\\bin;C:\\Users\\ericc\\.lmstudio\\bin;C:\\Users\\ericc\\.dotnet\\tools;c:\\Users\\ericc\\.vscode\\extensions\\openai.chatgpt-26.1007.21434-win32-x64\\bin\\windows-x86_64",
+  "results": [
+    {
+      "name": "baseline-doc-cookie-archive",
+      "nativeArgv": [
+        "git",
+        "archive",
+        "--format=tar",
+        "--output=C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6\\source.tar",
+        "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+        "deno.json",
+        "deno.lock",
+        "packages",
+        "plugins",
+        ".llm/tools/run-deno-test.ts",
+        ".llm/tools/run-deno-doc-lint.ts",
+        "docs/site/identity-access/how-to/add-authentication.md",
+        "docs/site/tutorials/workspace/02-auth.md"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "code": 0
+    },
+    {
+      "name": "baseline-doc-cookie-extract",
+      "nativeArgv": [
+        "C:/Windows/System32/tar.exe",
+        "-xf",
+        "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6\\source.tar",
+        "-C",
+        "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "code": 0
+    },
+    {
+      "name": "unchanged-auth-public-docs",
+      "nativeArgv": [
+        "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+        "run",
+        "--cached-only",
+        "--frozen",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "file:///C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/better-auth-security-sol-20261028/baseline-doc-cookie-184a08a898791df6/.llm/tools/run-deno-doc-lint.ts",
+        "--root",
+        "packages/auth-better-auth",
+        "--output",
+        "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\auth-public-docs-unchanged.json"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6",
+      "code": 1
+    },
+    {
+      "name": "unchanged-native-cookie-jar-gitpath",
+      "nativeArgv": [
+        "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+        "run",
+        "--cached-only",
+        "--frozen",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "file:///C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/better-auth-security-sol-20261028/baseline-doc-cookie-184a08a898791df6/.llm/tools/run-deno-test.ts",
+        "--cwd",
+        "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6",
+        "--output",
+        "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\native-cookie-jar-gitpath-unchanged.json",
+        "--",
+        "--cached-only",
+        "--frozen",
+        "--check",
+        "--allow-all",
+        "--sanitize-ops",
+        "--sanitize-resources",
+        "--trace-leaks",
+        "--filter",
+        "/^documented localhost curl cookie-jar flow works through the real service bootstrap$/",
+        "plugins/auth/tests/services/documented-cookie-jar_test.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-doc-cookie-184a08a898791df6",
+      "code": 1
+    }
+  ],
+  "docsSummary": {
+    "totalPackages": 1,
+    "totalErrors": 1,
+    "totalPrivateTypeRef": 1,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "cookieSummary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "cookieFailureMessages": [
+    "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   sess_5d3da183eda441b3aa74ab6a7c0ea930\n+   sess_5d3da183eda441b3aa74ab6a7c0ea930/r\n\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at proveDocumentedCookieJar (file:///<cwd>/plugins/auth/tests/testing/documented-cookie-jar.ts:<line>:<column>)\n    at async file:///<cwd>/plugins/auth/tests/services/documented-cookie-jar_test.ts:<line>:<column>"
+  ],
+  "actualBaselineRelease": "1.6.20",
+  "projectionRemoved": true
+}

@@ -6,10 +6,10 @@
   font-size: var(--ns-text-sm);
   color: var(--ns-fg);
   background: var(--ns-card);
-  border: 1px solid var(--ns-input-border);
-  border-radius: var(--ns-radius-md);
+  border: var(--ns-border-width) solid var(--ns-component-input-border);
+  border-radius: var(--ns-component-input-radius);
   padding: var(--ns-space-2) var(--ns-space-3);
-  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
+  transition: border-color var(--ns-motion-duration-normal) var(--ns-motion-easing-normal), box-shadow var(--ns-motion-duration-normal) var(--ns-motion-easing-normal);
 }
 
 .ns-input::placeholder,
@@ -53,4 +53,9 @@
 .ns-select--error:focus,
 .ns-textarea--error:focus {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-destructive) 15%, transparent);
+}
+
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) :is(.ns-input, .ns-select) {
+  min-height: var(--ns-component-input-height);
+  padding-inline: var(--ns-control-padding-x);
 }

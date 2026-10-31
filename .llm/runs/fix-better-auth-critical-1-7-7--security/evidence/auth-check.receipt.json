@@ -1,0 +1,60 @@
+{
+  "gateId": "auth-check",
+  "invocationId": "auth-check",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-check.ts",
+    "--root",
+    "packages/auth-better-auth",
+    "--root",
+    "plugins/auth",
+    "--ext",
+    "ts,tsx",
+    "--deno-arg",
+    "--cached-only",
+    "--deno-arg",
+    "--frozen",
+    "--output",
+    ".llm/tmp/better-auth-security-sol-20261028/auth-check.json"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "40880a73351d62d3016486d740dac9b60273c5c32e09c358eb9833fdf8bdb180",
+  "lifecycleId": "/root/service_qualification_sol:auth-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:17:55.377Z",
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/auth-check.json",
+  "startedAt": "2026-10-28T03:17:55.381Z",
+  "finishedAt": "2026-10-28T03:18:04.207Z",
+  "durationMs": 8826,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 159,
+    "sha256": "f3dd7ec3663f3b3db6abb845535587c8f0bdff33dcd65a0f2549ddcf1aaa1dc6",
+    "tail": "{\"report\":\".llm/tmp/better-auth-security-sol-20261028/auth-check.json\",\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/better-auth-security-sol-20261028/auth-check.json",
+    "bytes": 338,
+    "sha256": "301074d1a00ba03d10a93731611801b84431312ed555128d5996f4efcb298941",
+    "modifiedAt": "2026-10-28T03:18:04.188Z"
+  }
+}

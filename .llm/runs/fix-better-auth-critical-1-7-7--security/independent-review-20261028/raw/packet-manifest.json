@@ -1,0 +1,1021 @@
+{
+  "targetHeads": {
+    "Security2426": "aec36a68e65df77012d4b2add4692e0b0506290f"
+  },
+  "sourceOwners": 5,
+  "requiredReads": [
+    {
+      "name": "01-source-config.md",
+      "lines": 293,
+      "bytes": 22641,
+      "sha256": "208fdfcf0f039c8a5796bad1e8d36dda49dabd73a2f93d0576d5d1551accc83f",
+      "nativeReadUpperBound": 29229,
+      "originals": [
+        {
+          "path": "deno.json",
+          "sha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee"
+        }
+      ]
+    },
+    {
+      "name": "02-source-root-lock.md",
+      "lines": 623,
+      "bytes": 24855,
+      "sha256": "e6b3b6d00006329eb793c3e77860530eeffe999688925d8e86d48adfa0ba64cc",
+      "nativeReadUpperBound": 35403,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "03-source-root-lock.md",
+      "lines": 623,
+      "bytes": 23531,
+      "sha256": "b71d15d2b528f671b76c4c0508c67ca52b510b1401899dfc497830b2eda0bf93",
+      "nativeReadUpperBound": 34079,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "04-source-root-lock.md",
+      "lines": 623,
+      "bytes": 25100,
+      "sha256": "605bc5545c39ef451eb94d944e8a6088dff74060ca8a4dd54f20b280a1c04063",
+      "nativeReadUpperBound": 35648,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "05-source-root-lock.md",
+      "lines": 602,
+      "bytes": 25109,
+      "sha256": "14c5004768a72b78463da271a5a40860e24a591b5a1cad0825a9d340567ae7f7",
+      "nativeReadUpperBound": 35405,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "06-source-root-lock.md",
+      "lines": 623,
+      "bytes": 23623,
+      "sha256": "3333146cb0b6f74f2662ccc8ef745c84236760cffe99e74b016af6e9b8db2783",
+      "nativeReadUpperBound": 34171,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "07-source-root-lock.md",
+      "lines": 623,
+      "bytes": 23738,
+      "sha256": "fb82d8e2a1693d073be505a424b9e424e102c7e92d58a7675bc3bdf281d5c7f8",
+      "nativeReadUpperBound": 34286,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "08-source-root-lock.md",
+      "lines": 623,
+      "bytes": 25113,
+      "sha256": "f05c75067347ef5479c2ec96e67ef004d1d2a4adc68f05c483a31973d5f34134",
+      "nativeReadUpperBound": 35661,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "09-source-root-lock.md",
+      "lines": 564,
+      "bytes": 17424,
+      "sha256": "89d1cbc799cabd1f345bdd043b592b6acc8fc470d6ca1a2cff714c8d7f290ae1",
+      "nativeReadUpperBound": 27264,
+      "originals": [
+        {
+          "path": "deno.lock",
+          "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1"
+        }
+      ]
+    },
+    {
+      "name": "10-source-ui-lock.md",
+      "lines": 623,
+      "bytes": 23981,
+      "sha256": "1a71d6d8ff9bf72f85c961fd5c064bc782fd19d7ad72072bb5dd4506add6d94d",
+      "nativeReadUpperBound": 34529,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "11-source-ui-lock.md",
+      "lines": 623,
+      "bytes": 24622,
+      "sha256": "041d173fc5ad0c3d1770937e73017a9b52fb642c84f362a46db6c2ebf8de63e2",
+      "nativeReadUpperBound": 35170,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "12-source-ui-lock.md",
+      "lines": 605,
+      "bytes": 25132,
+      "sha256": "535257ef4bceff3a1756b6c6698d0c5e6231a535e35a195348b38c37215d4e64",
+      "nativeReadUpperBound": 35464,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "13-source-ui-lock.md",
+      "lines": 623,
+      "bytes": 24590,
+      "sha256": "5ec5741ba74c1d10002476d10f550efc8c42f5ebafa5d044ca3300faa0ad48c1",
+      "nativeReadUpperBound": 35138,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "14-source-ui-lock.md",
+      "lines": 623,
+      "bytes": 23245,
+      "sha256": "996a0988d0ccda68a873b0dc88c4f5adfd85d2176943a0093298c8652a3d165e",
+      "nativeReadUpperBound": 33793,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "15-source-ui-lock.md",
+      "lines": 623,
+      "bytes": 23381,
+      "sha256": "c549dea76a2f418461b84ba38cd0ab9915a5eeec3668b0122d65b755aba64bea",
+      "nativeReadUpperBound": 33929,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "16-source-ui-lock.md",
+      "lines": 623,
+      "bytes": 19386,
+      "sha256": "b22ee5c3b343ce0559347acd10c53994d0280734184b694ada146c99d5d0fb26",
+      "nativeReadUpperBound": 29934,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "17-source-ui-lock.md",
+      "lines": 57,
+      "bytes": 1946,
+      "sha256": "10ed8877e12d0976c5b0bd3d6d527d38d5a5f486775d4fee488dc8fd0095c2d9",
+      "nativeReadUpperBound": 5702,
+      "originals": [
+        {
+          "path": "packages/fresh-ui/deno.lock",
+          "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674"
+        }
+      ]
+    },
+    {
+      "name": "18-source-two-tests.md",
+      "lines": 272,
+      "bytes": 11302,
+      "sha256": "1d0caf85da5734964e80165d262e2b4b1acc517a63be51d5aa2c2e659a51f8da",
+      "nativeReadUpperBound": 17638,
+      "originals": [
+        {
+          "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+          "sha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac"
+        },
+        {
+          "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+          "sha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871"
+        }
+      ]
+    },
+    {
+      "name": "19-readonly-better-auth.md",
+      "lines": 623,
+      "bytes": 19507,
+      "sha256": "859365651f9c4d545728bb73740730200934010ace248313cc7f699751395b0f",
+      "nativeReadUpperBound": 30055,
+      "originals": [
+        {
+          "path": "packages/auth-better-auth/mod.ts",
+          "sha256": "d42b3f01291b096bab3cf727974b8d9925c2a6a50b044aa6a065b69b20c4e5d7"
+        },
+        {
+          "path": "packages/auth-better-auth/deno.json",
+          "sha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+        },
+        {
+          "path": "packages/auth-better-auth/package.json",
+          "sha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth.ts",
+          "sha256": "e8dc9c8cfb9a54c70c4bbed3ed0d22e8d493a7c96d749733dc33840649cd41e9"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth-backend.ts",
+          "sha256": "336fa7e09a90476c8b0c33923edafee352893e30897291cabce33a5ae1cf91cb"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth_test.ts",
+          "sha256": "bf3f7cd4f5859801a18628d1beb814de84a4275b744ebe13c50f09c5100bcea5"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth-node-compat_test.ts",
+          "sha256": "253c44d21ec21b950cacc7856718461cd3bce94e1243582c567f1c3a3ce6165a"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/backend-error-interop_test.ts",
+          "sha256": "dffdf3ee12e49b975b6303c5640a32bb53cc872d8afc7e600f0de7ac3f370c41"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/subject-revocation_test.ts",
+          "sha256": "59ec73a5a82e20ce0bcbbc52e904c97fa1d03cc0d54aed58507af8a4d9ac4f75"
+        }
+      ]
+    },
+    {
+      "name": "20-readonly-better-auth.md",
+      "lines": 622,
+      "bytes": 22040,
+      "sha256": "3b121cdeb846db1683000489d0e08b0faba408750cd0b5876d5c4f1a7d593a13",
+      "nativeReadUpperBound": 32576,
+      "originals": [
+        {
+          "path": "packages/auth-better-auth/mod.ts",
+          "sha256": "d42b3f01291b096bab3cf727974b8d9925c2a6a50b044aa6a065b69b20c4e5d7"
+        },
+        {
+          "path": "packages/auth-better-auth/deno.json",
+          "sha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+        },
+        {
+          "path": "packages/auth-better-auth/package.json",
+          "sha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth.ts",
+          "sha256": "e8dc9c8cfb9a54c70c4bbed3ed0d22e8d493a7c96d749733dc33840649cd41e9"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth-backend.ts",
+          "sha256": "336fa7e09a90476c8b0c33923edafee352893e30897291cabce33a5ae1cf91cb"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth_test.ts",
+          "sha256": "bf3f7cd4f5859801a18628d1beb814de84a4275b744ebe13c50f09c5100bcea5"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth-node-compat_test.ts",
+          "sha256": "253c44d21ec21b950cacc7856718461cd3bce94e1243582c567f1c3a3ce6165a"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/backend-error-interop_test.ts",
+          "sha256": "dffdf3ee12e49b975b6303c5640a32bb53cc872d8afc7e600f0de7ac3f370c41"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/subject-revocation_test.ts",
+          "sha256": "59ec73a5a82e20ce0bcbbc52e904c97fa1d03cc0d54aed58507af8a4d9ac4f75"
+        }
+      ]
+    },
+    {
+      "name": "21-readonly-better-auth.md",
+      "lines": 2,
+      "bytes": 172,
+      "sha256": "c6eeb86d87160a3baf8564580135580b780e40db9594eaf20a663e6a9d4e1a74",
+      "nativeReadUpperBound": 3268,
+      "originals": [
+        {
+          "path": "packages/auth-better-auth/mod.ts",
+          "sha256": "d42b3f01291b096bab3cf727974b8d9925c2a6a50b044aa6a065b69b20c4e5d7"
+        },
+        {
+          "path": "packages/auth-better-auth/deno.json",
+          "sha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+        },
+        {
+          "path": "packages/auth-better-auth/package.json",
+          "sha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth.ts",
+          "sha256": "e8dc9c8cfb9a54c70c4bbed3ed0d22e8d493a7c96d749733dc33840649cd41e9"
+        },
+        {
+          "path": "packages/auth-better-auth/src/better-auth-backend.ts",
+          "sha256": "336fa7e09a90476c8b0c33923edafee352893e30897291cabce33a5ae1cf91cb"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth_test.ts",
+          "sha256": "bf3f7cd4f5859801a18628d1beb814de84a4275b744ebe13c50f09c5100bcea5"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/better-auth-node-compat_test.ts",
+          "sha256": "253c44d21ec21b950cacc7856718461cd3bce94e1243582c567f1c3a3ce6165a"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/backend-error-interop_test.ts",
+          "sha256": "dffdf3ee12e49b975b6303c5640a32bb53cc872d8afc7e600f0de7ac3f370c41"
+        },
+        {
+          "path": "packages/auth-better-auth/tests/subject-revocation_test.ts",
+          "sha256": "59ec73a5a82e20ce0bcbbc52e904c97fa1d03cc0d54aed58507af8a4d9ac4f75"
+        }
+      ]
+    },
+    {
+      "name": "22-readonly-contracts.md",
+      "lines": 623,
+      "bytes": 21483,
+      "sha256": "680e8cf9665cc9ebd38d40d847965af35864faa9ed8cfe73b4f7873d0f88978e",
+      "nativeReadUpperBound": 32031,
+      "originals": [
+        {
+          "path": "packages/plugin-auth-core/src/ports/mod.ts",
+          "sha256": "9fa0612bc50398e42efd96772b7b6188b394d958e1a4e9c1902de48038d56336"
+        },
+        {
+          "path": "packages/plugin-auth-core/src/ports/ports_test.ts",
+          "sha256": "079ae74bbe61f46afe5df23bfb50cfa6b42485e175a08a7f64287abd618e50ff"
+        },
+        {
+          "path": "plugins/auth/services/src/backend-registry.ts",
+          "sha256": "e33ddaea16bfd98351ed9c4d9bd5fe7eb3b62b6cb5693555e1edf5ae92ec9ca0"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-handlers.ts",
+          "sha256": "e56620a73ecd5a5ce6c2c6255af579a788a6b359e5282cb3879956b214a69fc8"
+        },
+        {
+          "path": "plugins/auth/tests/testing/auth-service-fixture.ts",
+          "sha256": "e30c62992be4352e36eae8c1e291bb57e5c19575a139540e1c0d123d6af37897"
+        }
+      ]
+    },
+    {
+      "name": "23-readonly-contracts.md",
+      "lines": 623,
+      "bytes": 22032,
+      "sha256": "d0c092c5c042aee36a4fe6ef923c28eb4a07273680412a2821f9a6003fb936c9",
+      "nativeReadUpperBound": 32580,
+      "originals": [
+        {
+          "path": "packages/plugin-auth-core/src/ports/mod.ts",
+          "sha256": "9fa0612bc50398e42efd96772b7b6188b394d958e1a4e9c1902de48038d56336"
+        },
+        {
+          "path": "packages/plugin-auth-core/src/ports/ports_test.ts",
+          "sha256": "079ae74bbe61f46afe5df23bfb50cfa6b42485e175a08a7f64287abd618e50ff"
+        },
+        {
+          "path": "plugins/auth/services/src/backend-registry.ts",
+          "sha256": "e33ddaea16bfd98351ed9c4d9bd5fe7eb3b62b6cb5693555e1edf5ae92ec9ca0"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-handlers.ts",
+          "sha256": "e56620a73ecd5a5ce6c2c6255af579a788a6b359e5282cb3879956b214a69fc8"
+        },
+        {
+          "path": "plugins/auth/tests/testing/auth-service-fixture.ts",
+          "sha256": "e30c62992be4352e36eae8c1e291bb57e5c19575a139540e1c0d123d6af37897"
+        }
+      ]
+    },
+    {
+      "name": "24-readonly-contracts.md",
+      "lines": 371,
+      "bytes": 13767,
+      "sha256": "d6e0f3853d1f6751a87ba4598d9aadcf94800a829ce1ab6af8876f0d59d9f61f",
+      "nativeReadUpperBound": 21291,
+      "originals": [
+        {
+          "path": "packages/plugin-auth-core/src/ports/mod.ts",
+          "sha256": "9fa0612bc50398e42efd96772b7b6188b394d958e1a4e9c1902de48038d56336"
+        },
+        {
+          "path": "packages/plugin-auth-core/src/ports/ports_test.ts",
+          "sha256": "079ae74bbe61f46afe5df23bfb50cfa6b42485e175a08a7f64287abd618e50ff"
+        },
+        {
+          "path": "plugins/auth/services/src/backend-registry.ts",
+          "sha256": "e33ddaea16bfd98351ed9c4d9bd5fe7eb3b62b6cb5693555e1edf5ae92ec9ca0"
+        },
+        {
+          "path": "plugins/auth/services/src/routers/v1-handlers.ts",
+          "sha256": "e56620a73ecd5a5ce6c2c6255af579a788a6b359e5282cb3879956b214a69fc8"
+        },
+        {
+          "path": "plugins/auth/tests/testing/auth-service-fixture.ts",
+          "sha256": "e30c62992be4352e36eae8c1e291bb57e5c19575a139540e1c0d123d6af37897"
+        }
+      ]
+    },
+    {
+      "name": "25-readonly-failure-ownership.md",
+      "lines": 623,
+      "bytes": 16764,
+      "sha256": "a5a2ea2b3c0639fc853099ba62df4ba42e5183db5fdce0804bc0ed5d0224cc76",
+      "nativeReadUpperBound": 27312,
+      "originals": [
+        {
+          "path": "packages/kv/adapters/memory.adapter.ts",
+          "sha256": "e48f44221ebf98b8f1196abd3ec1bd60b84731bc3390cef894b079e09c102ec2"
+        },
+        {
+          "path": "plugins/auth/tests/testing/documented-cookie-jar.ts",
+          "sha256": "2a754c62944d7fd178343a4689e9daa85466cb6e79b0bc54da0694a5ac6ac4d6"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-composition_test.ts",
+          "sha256": "f358f159c8c175387dce09eaf798337e6af492220739563e6353f403560e7f56"
+        }
+      ]
+    },
+    {
+      "name": "26-readonly-failure-ownership.md",
+      "lines": 350,
+      "bytes": 14513,
+      "sha256": "354e7d6aa257e8d7125e7ae634470b1a7b785ca92a261a3c334dfb317a7a2207",
+      "nativeReadUpperBound": 21785,
+      "originals": [
+        {
+          "path": "packages/kv/adapters/memory.adapter.ts",
+          "sha256": "e48f44221ebf98b8f1196abd3ec1bd60b84731bc3390cef894b079e09c102ec2"
+        },
+        {
+          "path": "plugins/auth/tests/testing/documented-cookie-jar.ts",
+          "sha256": "2a754c62944d7fd178343a4689e9daa85466cb6e79b0bc54da0694a5ac6ac4d6"
+        },
+        {
+          "path": "plugins/auth/tests/services/workos-composition_test.ts",
+          "sha256": "f358f159c8c175387dce09eaf798337e6af492220739563e6353f403560e7f56"
+        }
+      ]
+    },
+    {
+      "name": "27-exact-diff.md",
+      "lines": 473,
+      "bytes": 25053,
+      "sha256": "63866e2ab9fbeb07e029c2504892a0a0876f16d0cd80b8d8ad3d206072a68d70",
+      "nativeReadUpperBound": 33801,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff",
+          "sha256": "0da3897f00d0b97bc272470ea1b7c3c143d1ac7ba033692d2abc7216583df15c"
+        }
+      ]
+    },
+    {
+      "name": "28-exact-diff.md",
+      "lines": 48,
+      "bytes": 2682,
+      "sha256": "9abf55037fba16f7b1c8101ec56abc5224e1e5a2d6c72139f3b610f72b22270a",
+      "nativeReadUpperBound": 6330,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff",
+          "sha256": "0da3897f00d0b97bc272470ea1b7c3c143d1ac7ba033692d2abc7216583df15c"
+        }
+      ]
+    },
+    {
+      "name": "29-root-contract.md",
+      "lines": 374,
+      "bytes": 25095,
+      "sha256": "fd9858846b77934853f4b14f11802ebd56a477a4b9b237ef78a3eefe35d6dc4c",
+      "nativeReadUpperBound": 32655,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-proposal.md",
+          "sha256": "11ac4de2906d874136f0bf6a436d05d6546ace224563e3bf1bddb61f26767d8f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/plan.md",
+          "sha256": "1811fa3c2adf6bc1e523f388c68c3381f46e465d7c1e6d97aab469725553091b"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-scope-authority.md",
+          "sha256": "9f759d8640300c3ba79bbfd0b7b0de8061bca77714d5b4f5e9b7ee8966d98ed4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-selection-amendment.md",
+          "sha256": "b9f920daa2fb2f6d4830ecb0be0f335aabeffbfc7068fb9bc0c451db7ae1344c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-acceptance-20261028.md",
+          "sha256": "4676ccaefcd0327ac321c16e3f47a950a4d4669088764693bfb642fbeca92731"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-20261028.json",
+          "sha256": "8ceedd7c0a6537c9d1224f3b37f98d68a383d95e38d451c131438b20d0e172ea"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-handoff.md",
+          "sha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9"
+        }
+      ]
+    },
+    {
+      "name": "30-root-contract.md",
+      "lines": 428,
+      "bytes": 24735,
+      "sha256": "0b1afc0e9cc35ff2a44429a976fc3d685035eebb532d168d120a49c6e3f53cd2",
+      "nativeReadUpperBound": 32943,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-proposal.md",
+          "sha256": "11ac4de2906d874136f0bf6a436d05d6546ace224563e3bf1bddb61f26767d8f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/plan.md",
+          "sha256": "1811fa3c2adf6bc1e523f388c68c3381f46e465d7c1e6d97aab469725553091b"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-scope-authority.md",
+          "sha256": "9f759d8640300c3ba79bbfd0b7b0de8061bca77714d5b4f5e9b7ee8966d98ed4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-selection-amendment.md",
+          "sha256": "b9f920daa2fb2f6d4830ecb0be0f335aabeffbfc7068fb9bc0c451db7ae1344c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-acceptance-20261028.md",
+          "sha256": "4676ccaefcd0327ac321c16e3f47a950a4d4669088764693bfb642fbeca92731"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-20261028.json",
+          "sha256": "8ceedd7c0a6537c9d1224f3b37f98d68a383d95e38d451c131438b20d0e172ea"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-handoff.md",
+          "sha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9"
+        }
+      ]
+    },
+    {
+      "name": "31-evaluator-contract.md",
+      "lines": 349,
+      "bytes": 25103,
+      "sha256": "2f46668b77e4fc8463614d70d31255d6b697cc60920b43f3312bacb49fb3f856",
+      "nativeReadUpperBound": 32363,
+      "originals": [
+        {
+          "path": ".agents/skills/netscript-harness/SKILL.md",
+          "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+        },
+        {
+          "path": ".llm/harness/evaluator/protocol.md",
+          "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+        },
+        {
+          "path": ".llm/harness/evaluator/verdict-definitions.md",
+          "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+        },
+        {
+          "path": ".llm/harness/workflow/run-loop.md",
+          "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+        },
+        {
+          "path": ".llm/harness/archetypes/SCOPE-service.md",
+          "sha256": "ab24ab54359d52db23b5adc30b5ab6fd1f1a2adf0675f201e562c903bc9f0cc7"
+        },
+        {
+          "path": ".llm/harness/workflow/lane-policy.md",
+          "sha256": "aaf406ad2f44409ffd81696ddd4796d4c0313fb77e615224722e096b1cbdf48b"
+        }
+      ]
+    },
+    {
+      "name": "32-evaluator-contract.md",
+      "lines": 460,
+      "bytes": 25160,
+      "sha256": "dfbbaffadab11cd6cf7ec3c6bc85749a4f815b5a31aa9933e568285e1e765f5c",
+      "nativeReadUpperBound": 33752,
+      "originals": [
+        {
+          "path": ".agents/skills/netscript-harness/SKILL.md",
+          "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+        },
+        {
+          "path": ".llm/harness/evaluator/protocol.md",
+          "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+        },
+        {
+          "path": ".llm/harness/evaluator/verdict-definitions.md",
+          "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+        },
+        {
+          "path": ".llm/harness/workflow/run-loop.md",
+          "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+        },
+        {
+          "path": ".llm/harness/archetypes/SCOPE-service.md",
+          "sha256": "ab24ab54359d52db23b5adc30b5ab6fd1f1a2adf0675f201e562c903bc9f0cc7"
+        },
+        {
+          "path": ".llm/harness/workflow/lane-policy.md",
+          "sha256": "aaf406ad2f44409ffd81696ddd4796d4c0313fb77e615224722e096b1cbdf48b"
+        }
+      ]
+    },
+    {
+      "name": "33-evaluator-contract.md",
+      "lines": 215,
+      "bytes": 15883,
+      "sha256": "a840bd8dc883568109d24d2c7f9eeee0a5379ed9180d29e7546abbda8fd9d85a",
+      "nativeReadUpperBound": 21535,
+      "originals": [
+        {
+          "path": ".agents/skills/netscript-harness/SKILL.md",
+          "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+        },
+        {
+          "path": ".llm/harness/evaluator/protocol.md",
+          "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+        },
+        {
+          "path": ".llm/harness/evaluator/verdict-definitions.md",
+          "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+        },
+        {
+          "path": ".llm/harness/workflow/run-loop.md",
+          "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+        },
+        {
+          "path": ".llm/harness/archetypes/SCOPE-service.md",
+          "sha256": "ab24ab54359d52db23b5adc30b5ab6fd1f1a2adf0675f201e562c903bc9f0cc7"
+        },
+        {
+          "path": ".llm/harness/workflow/lane-policy.md",
+          "sha256": "aaf406ad2f44409ffd81696ddd4796d4c0313fb77e615224722e096b1cbdf48b"
+        }
+      ]
+    },
+    {
+      "name": "34-runtime-skills.md",
+      "lines": 382,
+      "bytes": 25140,
+      "sha256": "56db8f78fd3e97b7ff5b2daf66d96d89a036cd090bad4eadae6632b02797b33f",
+      "nativeReadUpperBound": 32796,
+      "originals": [
+        {
+          "path": ".agents/skills/netscript-tools/SKILL.md",
+          "sha256": "e85a8e970fe53e26279203e7c77faf34a0a16c739b9e10d0ae83a2f29bf3e01f"
+        },
+        {
+          "path": ".agents/skills/deno/SKILL.md",
+          "sha256": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9"
+        }
+      ]
+    },
+    {
+      "name": "35-runtime-skills.md",
+      "lines": 152,
+      "bytes": 8583,
+      "sha256": "c080e81fb8bc04e8999a521fcb67ec7a86c1da20c0bce65d04baa535b7f3b1c7",
+      "nativeReadUpperBound": 13479,
+      "originals": [
+        {
+          "path": ".agents/skills/netscript-tools/SKILL.md",
+          "sha256": "e85a8e970fe53e26279203e7c77faf34a0a16c739b9e10d0ae83a2f29bf3e01f"
+        },
+        {
+          "path": ".agents/skills/deno/SKILL.md",
+          "sha256": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9"
+        }
+      ]
+    },
+    {
+      "name": "36-native-closure.md",
+      "lines": 191,
+      "bytes": 8910,
+      "sha256": "c4a58ac7165a52bc935992eaf541db3c1778833236f4b20a8ce0b1184d73a8a1",
+      "nativeReadUpperBound": 14274,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.receipt.json",
+          "sha256": "d6fe0a34e43eba83034996d0e2e67ea34f321bb45e06d15e21469d6ecfbeedb0"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.receipt.json",
+          "sha256": "8bba7947548a0f071f32a9661b10bc830ccc17b5a683534d09669b748179db2a"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.receipt.json",
+          "sha256": "7ce2efd20f8bfdcff61b18cbd32172359237b047aa1a5ce2505ca714b3e9a938"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.process.json",
+          "sha256": "61e9b64f443b14014526d4c5cc9a1bbe64ab50fde25083b96584c89c3ac6a733"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.process.json",
+          "sha256": "ee821618343391ce4b3870e6786f1eb9bc4810671fa334b2447f5c5d32f4361f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.stdout.log",
+          "sha256": "37975c8e9086ede794d552c6acb4b8c01aff2092599739904d2e1a722f334c57"
+        }
+      ]
+    },
+    {
+      "name": "37-auth-native-oracles.md",
+      "lines": 554,
+      "bytes": 25124,
+      "sha256": "aa2d9dacd86a950f663d0a2cb8d41df886fb039b1e07c314a0009df8dc7030e1",
+      "nativeReadUpperBound": 34844,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.json",
+          "sha256": "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls-unchanged-baseline.json",
+          "sha256": "429122eface2bf845afc17d8b2004461a13b0a302bb79bd795122c7c9024a04f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.receipt.json",
+          "sha256": "6d7856bc1b7c281eb97bc181408c329ae36bc026be1e749a88f19e1476162584"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.json",
+          "sha256": "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.json",
+          "sha256": "12f4030dd3b4c31a8115b877c72694bfc6a83a3cef0b22687f26ca38f3bdc336"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-unchanged.json",
+          "sha256": "dde7411d2dcbaa15c194f8fa7d41fdcfa09eeeac6d132e3fe507bef88db426c8"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.receipt.json",
+          "sha256": "e4ca8a4cd739a913a4fb40393aefa553e796af231928d2c648c98f0006e55464"
+        }
+      ]
+    },
+    {
+      "name": "38-auth-native-oracles.md",
+      "lines": 432,
+      "bytes": 24254,
+      "sha256": "22b8207500f46a4885b37c891642fa3632aba79513300b0eec3236631200e3ec",
+      "nativeReadUpperBound": 32510,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.json",
+          "sha256": "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls-unchanged-baseline.json",
+          "sha256": "429122eface2bf845afc17d8b2004461a13b0a302bb79bd795122c7c9024a04f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.receipt.json",
+          "sha256": "6d7856bc1b7c281eb97bc181408c329ae36bc026be1e749a88f19e1476162584"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.json",
+          "sha256": "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.json",
+          "sha256": "12f4030dd3b4c31a8115b877c72694bfc6a83a3cef0b22687f26ca38f3bdc336"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-unchanged.json",
+          "sha256": "dde7411d2dcbaa15c194f8fa7d41fdcfa09eeeac6d132e3fe507bef88db426c8"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.receipt.json",
+          "sha256": "e4ca8a4cd739a913a4fb40393aefa553e796af231928d2c648c98f0006e55464"
+        }
+      ]
+    },
+    {
+      "name": "39-static-quality-docs.md",
+      "lines": 335,
+      "bytes": 13888,
+      "sha256": "053930ddf20c5d9410e0d236a7fb93fdffe84873884586cd4020899b8a04122b",
+      "nativeReadUpperBound": 20980,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.json",
+          "sha256": "301074d1a00ba03d10a93731611801b84431312ed555128d5996f4efcb298941"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.json",
+          "sha256": "f3ed8878aef97d694fbf46f46466325046bba096ac53fde1c89a973cfc074aa4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.json",
+          "sha256": "0375a7da9944233fb1797b3685b3933ccba2f72cfe749c804cf29a14574ff645"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.native-receipt.json",
+          "sha256": "0d480ec8630f653c360373dd50bb74b91aef39a0305ee80aab2b9edbbb886f6c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.json",
+          "sha256": "923c4b8419dbe41845eac1d4ee4be9d2618ea3440873bf74b67b69318e19173c"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-unchanged.json",
+          "sha256": "bf03dfc4d4c8dd4c6586b63c7db34951f6c1bff6dd10d9a3d4e13e7747e09054"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.json",
+          "sha256": "ddbb210576aac92d2e15e2fbc0b05b6359bce11bdb8367178e497bbf684791c5"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.receipt.json",
+          "sha256": "85e458b513c05ecb8c8d8d8b1765360a799070826454efc2d377476a69c817b6"
+        }
+      ]
+    },
+    {
+      "name": "40-arch-publication-cleanup.md",
+      "lines": 228,
+      "bytes": 25013,
+      "sha256": "3e4f2f67eb76a1edf4e748634293706afbe6c3c3166bd40348af0a842166c239",
+      "nativeReadUpperBound": 30821,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.native-receipt.json",
+          "sha256": "9c024049bb1b6f0c32051cb3891d27e2020bc9152c0b34f9ccf8b05a3b292d49"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.native-receipt.json",
+          "sha256": "505296c0e0c9a66bb0d418e4718dc6607e43103b89a799cfd9891824a36f16e4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/cleanup-final.json",
+          "sha256": "34abc7d744bb2c9852036ee2e3ea28a4485bf486614529cbe733affdbdde1d5b"
+        }
+      ]
+    },
+    {
+      "name": "41-arch-publication-cleanup.md",
+      "lines": 70,
+      "bytes": 13374,
+      "sha256": "5bd23329c4cace8b6fe1269cfa26a8c4f6bf622daee11b09c0591518c6469052",
+      "nativeReadUpperBound": 17286,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.native-receipt.json",
+          "sha256": "9c024049bb1b6f0c32051cb3891d27e2020bc9152c0b34f9ccf8b05a3b292d49"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.native-receipt.json",
+          "sha256": "505296c0e0c9a66bb0d418e4718dc6607e43103b89a799cfd9891824a36f16e4"
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/cleanup-final.json",
+          "sha256": "34abc7d744bb2c9852036ee2e3ea28a4485bf486614529cbe733affdbdde1d5b"
+        }
+      ]
+    },
+    {
+      "name": "42-evidence-bindings.md",
+      "lines": 50,
+      "bytes": 2150,
+      "sha256": "46308fb589478867955c2938ed55e8b5dfd8082d7751d0471f78e08e387d95c0",
+      "nativeReadUpperBound": 5822,
+      "originals": [
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/pre-review-evidence-manifest.json",
+          "sha256": "7f71a8d9a633759ad789c43940981a737f35bfe37c5f209b1d9336d967d3fd6d",
+          "bytes": 67906,
+          "fullContentRequiredRead": false
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/archive-map.json",
+          "sha256": "2efc9f627d89c8115c0393f4854e2f1c21d54014638ddf39a015f44be545de38",
+          "bytes": 73757,
+          "fullContentRequiredRead": false
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-closure.json",
+          "sha256": "bba1db7e664e07cf7d3eabdf6b0ed81cc6efb7941f1c30f6c6e463abd84eb6c9",
+          "bytes": 39301,
+          "fullContentRequiredRead": false
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/protected-final.json",
+          "sha256": "7c710e05d57294ac4cf19de27f83b9e09661499cb91cd7fba0933055a9b96874",
+          "bytes": 28949,
+          "fullContentRequiredRead": false
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/checkpoint-index-audit.json",
+          "sha256": "09e7b442af905e8929c050364f2e8a692cb4f2808e47db924db75a98eef25112",
+          "bytes": 112171,
+          "fullContentRequiredRead": false
+        },
+        {
+          "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-first-attempt-20261028.ts.txt",
+          "sha256": "866c4bc7630b3ea08469ecbb2c1a57e6a35f5fba576bd14da2131a9d73924688",
+          "bytes": 2914,
+          "fullContentRequiredRead": false
+        }
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/pre-review-evidence-manifest.json",
+      "sha256": "7f71a8d9a633759ad789c43940981a737f35bfe37c5f209b1d9336d967d3fd6d",
+      "bytes": 67906,
+      "fullContentRequiredRead": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/archive-map.json",
+      "sha256": "2efc9f627d89c8115c0393f4854e2f1c21d54014638ddf39a015f44be545de38",
+      "bytes": 73757,
+      "fullContentRequiredRead": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-closure.json",
+      "sha256": "bba1db7e664e07cf7d3eabdf6b0ed81cc6efb7941f1c30f6c6e463abd84eb6c9",
+      "bytes": 39301,
+      "fullContentRequiredRead": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/protected-final.json",
+      "sha256": "7c710e05d57294ac4cf19de27f83b9e09661499cb91cd7fba0933055a9b96874",
+      "bytes": 28949,
+      "fullContentRequiredRead": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/checkpoint-index-audit.json",
+      "sha256": "09e7b442af905e8929c050364f2e8a692cb4f2808e47db924db75a98eef25112",
+      "bytes": 112171,
+      "fullContentRequiredRead": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-first-attempt-20261028.ts.txt",
+      "sha256": "866c4bc7630b3ea08469ecbb2c1a57e6a35f5fba576bd14da2131a9d73924688",
+      "bytes": 2914,
+      "fullContentRequiredRead": false
+    }
+  ],
+  "allSourceOwnersFull": true,
+  "partByteCeiling": 25000,
+  "nativeReadUpperBoundCeiling": 40960,
+  "readLineCeiling": 1500,
+  "allPartsNeedEOF": true
+}

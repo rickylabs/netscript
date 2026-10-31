@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008","mode":"check","summary":{"filesSelected":78,"batches":2,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":78,"filesProcessed":78,"droppedFiles":[],"refusals":[]},"findings":[]}

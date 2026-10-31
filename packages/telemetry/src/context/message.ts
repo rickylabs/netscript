@@ -1,4 +1,4 @@
-import { context } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 import type { Context } from '../application/mod.ts';
 import { extractContext, injectContext } from './w3c.ts';
 import type { PropagationHeaders } from './types.ts';
@@ -13,18 +13,18 @@ export function createMessageHeaders(
 }
 
 /**
- * Resolve a parent context from message propagation headers.
+ * Resolve the message's parent, or a fresh root when no valid carrier is present.
  */
 export function resolveParentContextFromHeaders(headers?: PropagationHeaders): Context {
   if (!headers) {
-    return context.active();
+    return ROOT_CONTEXT;
   }
 
   const normalizedHeaders: PropagationHeaders = {};
   for (const [key, value] of Object.entries(headers)) {
     let normalizedValue = value;
     const lowerKey = key.toLowerCase();
-    if (value.includes(',') && (lowerKey === 'traceparent' || lowerKey === 'tracestate')) {
+    if (value.includes(',') && lowerKey === 'traceparent') {
       normalizedValue = (value.split(',')[0] ?? '').trim();
     }
     normalizedHeaders[lowerKey] = normalizedValue;

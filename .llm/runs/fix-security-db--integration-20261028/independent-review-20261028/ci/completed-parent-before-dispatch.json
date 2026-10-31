@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-28T04:58:17.820Z",
+  "id": 40633645853,
+  "head": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "status": "completed",
+  "conclusion": "failure",
+  "runAttempt": 1,
+  "targetJob": {
+    "id": 122636200954,
+    "runId": 40633645853,
+    "name": "check-test-shard (test-5)",
+    "status": "completed",
+    "conclusion": "failure"
+  },
+  "freshSevenSourceOriginChecks": true
+}

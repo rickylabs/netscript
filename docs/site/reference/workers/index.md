@@ -5,50 +5,40 @@ title: "@netscript/plugin-workers"
 
 # `@netscript/plugin-workers`
 
-The NetScript background-workers plugin: background jobs, task execution, workflow
+The deployable NetScript background-workers plugin: background jobs, task execution, workflow
 orchestration, a Workers API service, CLI commands, a `./scaffold` adapter entrypoint, durable
-streams, and Aspire process wiring. This page is written against the package public surface
-reported by `deno doc`. For the full index of packages and plugins return to the
-[reference overview](/reference/).
-
-The deployable plugin (`@netscript/plugin-workers`) binds the host plugin system to the
-reusable worker primitives that live in
-[`@netscript/plugin-workers-core`](/reference/plugin-workers-core/). The plugin root
-entrypoint exposes the plugin manifest and a pure inspection helper; framework integrations
-are carried by sub-path exports documented below.
-
-## Plugin manifest (`@netscript/plugin-workers`)
-
-The root entrypoint exposes the plugin manifest consumed by the NetScript host. Shared manifest
-inspection is provided by `inspectPlugin` from `@netscript/plugin`.
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `workersPlugin` | variable | Plugin manifest for NetScript background workers. |
+streams and Aspire process wiring. It binds the host plugin system to the worker primitives in
+[`@netscript/plugin-workers-core`](/reference/plugin-workers-core/).
 
 ## Sub-path exports
 
-The following entrypoints are published alongside the plugin root export. Each is generated
-from its own `deno doc` surface.
-
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/plugin-workers` | `./mod.ts` | Plugin manifest and inspection helper (documented above). |
+| `@netscript/plugin-workers` | `./mod.ts` | [Plugin manifest](#plugin-manifest-netscriptplugin-workers) and inspection helper. |
 | `@netscript/plugin-workers/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
-| `@netscript/plugin-workers/aspire` | `./src/aspire/mod.ts` | Aspire AppHost contribution and resource ports. |
-| `@netscript/plugin-workers/cli` | `./src/cli/composition/main.ts` | Host-mounted workers CLI command group. |
-| `@netscript/plugin-workers/contracts` | `./contracts/v1/mod.ts` | Versioned oRPC worker service contracts and schemas. |
+| `@netscript/plugin-workers/aspire` | `./src/aspire/mod.ts` | [Aspire AppHost contribution and resource ports](#netscriptplugin-workersaspire). |
+| `@netscript/plugin-workers/cli` | `./src/cli/composition/main.ts` | [Host-mounted workers CLI command group](#netscriptplugin-workerscli). |
+| `@netscript/plugin-workers/contracts` | `./contracts/v1/mod.ts` | [Versioned oRPC worker service contracts and schemas](#netscriptplugin-workerscontracts). |
 | `@netscript/plugin-workers/doctor` | `./doctor.ts` | Static workers adapter used by plugin doctor. |
 | `@netscript/plugin-workers/jobs/health-check.ts` | `./jobs/health-check.ts` | Health-check job definition and its context, handler, and result contracts. |
 | `@netscript/plugin-workers/runtime` | `./bin/runtime.ts` | Generated job-registry loading and registration plus worker, scheduler, and combined-process start helpers. |
 | `@netscript/plugin-workers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
 | `@netscript/plugin-workers/service` | `./services/mod.ts` | Inert caller-policy Workers API factory and its native policy/listener types. |
-| `@netscript/plugin-workers/services` | `./services/src/main.ts` | Workers API service entrypoint. |
-| `@netscript/plugin-workers/streams` | `./streams/mod.ts` | Browser-facing StreamDB factory and entity schemas. |
-| `@netscript/plugin-workers/streams/server` | `./streams/server.ts` | Server-side durable stream producer wiring. |
-| `@netscript/plugin-workers/worker` | `./worker/mod.ts` | Worker and Scheduler runtime processes. |
+| `@netscript/plugin-workers/services` | `./services/src/main.ts` | [Workers API service entrypoint](#netscriptplugin-workersservices). |
+| `@netscript/plugin-workers/streams` | `./streams/mod.ts` | [Browser-facing StreamDB factory and entity schemas](#netscriptplugin-workersstreams). |
+| `@netscript/plugin-workers/streams/server` | `./streams/server.ts` | [Server-side durable stream producer wiring](#netscriptplugin-workersstreamsserver). |
+| `@netscript/plugin-workers/worker` | `./worker/mod.ts` | [Worker and Scheduler runtime processes](#netscriptplugin-workersworker). |
 
-### `@netscript/plugin-workers/aspire`
+## Plugin manifest (`@netscript/plugin-workers`)
+
+The plugin manifest consumed by the NetScript host. Inspect it with `inspectPlugin` from
+`@netscript/plugin`.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `workersPlugin` | const | Plugin manifest for NetScript background workers. |
+
+## `@netscript/plugin-workers/aspire`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -65,7 +55,7 @@ from its own `deno doc` surface.
 | `DenoServiceSpec` | interface | Deno service resource spec consumed by AspireBuilder. |
 | `EnvSource` | type alias | Source for an environment variable value in an AppHost composition. |
 
-### `@netscript/plugin-workers/cli`
+## `@netscript/plugin-workers/cli`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -89,15 +79,15 @@ from its own `deno doc` surface.
 | `LogsCommand` | class | Show logs for a worker execution. |
 | `RunJobCommand` | class | Run a configured worker job. |
 | `WorkersCliCommand` | class | Base class for concrete workers CLI commands. |
-| `WORKERS_CLI_COMMANDS` | variable | Worker CLI commands exposed through the plugin CLI subpath. |
+| `WORKERS_CLI_COMMANDS` | const | Worker CLI commands exposed through the plugin CLI subpath. |
 | `WorkersCliBackend` | interface | Backend invoked by concrete command classes. |
 | `WorkersCliCategory` | type alias | Worker CLI command category used for grouped help output. |
 | `WorkersCliCommandDefinition` | interface | Workers command definition mounted by the plugin CLI. |
 | `WorkersCliCommandName` | type alias | Worker CLI command identifier. |
 | `WorkersCliFlagDefinition` | interface | Flag metadata shown by host CLI help renderers. |
-| `workersCli` | variable | Default CLI instance used by the host CLI walker. |
+| `workersCli` | const | Default CLI instance used by the host CLI walker. |
 
-### `@netscript/plugin-workers/contracts`
+## `@netscript/plugin-workers/contracts`
 
 Versioned oRPC service contracts plus the request/response schemas and types used to generate worker service clients.
 
@@ -117,20 +107,19 @@ Versioned oRPC service contracts plus the request/response schemas and types use
 | `TaskExecutionOptions` | type alias | Options supplied when executing a task. |
 | `TaskMessage` | type alias | Message enqueued to trigger a task execution. |
 | `TaskResult` | type alias | Result returned by task execution. |
-| `ExecutionFiltersSchema` | variable | Schema for list-executions filters. |
-| `ExecutionRecordResponseSchema` | variable | Schema for worker execution record responses. |
-| `JobCreateInputSchema` | variable | Schema for creating worker job definitions. |
-| `JobDefinitionResponseSchema` | variable | Schema for worker job definition responses. |
-| `JobFiltersSchema` | variable | Schema for list-jobs filters. |
-| `JobTriggerInputSchema` | variable | Schema for triggering a worker job by id. |
-| `JobUpdateInputSchema` | variable | Schema for updating worker job definitions. |
-| `JobUpdateWithIdSchema` | variable | Schema for updating a worker job definition by id. |
-| `SSEEventSchema` | variable | Schema for server-sent event payloads emitted by the workers service. |
-| `TaskDefinitionResponseSchema` | variable | Schema for worker task definition responses. |
-| `TaskFiltersSchema` | variable | Schema for list-tasks filters. |
-| `workersContract` | variable | Worker service contract definition for client generation. |
-| `workersContractV1` | variable | Context-bindable worker service contract definition. |
-| `ContractProcedureLike` | type alias | Structural oRPC procedure reference used by worker contracts. |
+| `ExecutionFiltersSchema` | const | Schema for list-executions filters. |
+| `ExecutionRecordResponseSchema` | const | Schema for worker execution record responses. |
+| `JobCreateInputSchema` | const | Schema for creating worker job definitions. |
+| `JobDefinitionResponseSchema` | const | Schema for worker job definition responses. |
+| `JobFiltersSchema` | const | Schema for list-jobs filters. |
+| `JobTriggerInputSchema` | const | Schema for triggering a worker job by id. |
+| `JobUpdateInputSchema` | const | Schema for updating worker job definitions. |
+| `JobUpdateWithIdSchema` | const | Schema for updating a worker job definition by id. |
+| `SSEEventSchema` | const | Schema for server-sent event payloads emitted by the workers service. |
+| `TaskDefinitionResponseSchema` | const | Schema for worker task definition responses. |
+| `TaskFiltersSchema` | const | Schema for list-tasks filters. |
+| `workersContract` | const | Worker service contract definition for client generation. |
+| `workersContractV1` | const | Context-bindable worker service contract definition. |
 | `ContractSchema` | interface | Package-owned structural schema surface for worker contracts. |
 | `ContractSchemaResult` | type alias | Result returned by contract schema validation. |
 | `ExecutionRecordResponse` | type alias | Public response returned for worker execution records. |
@@ -138,41 +127,38 @@ Versioned oRPC service contracts plus the request/response schemas and types use
 | `JobTriggerInput` | type alias | Input accepted by the trigger-job procedure. |
 | `JobTriggerOutput` | type alias | Output returned by the trigger-job procedure. |
 | `SSEEvent` | type alias | Server-sent event payload emitted by the workers service. |
-| `StandardSchemaLike` | type alias | Structural Standard Schema reference used by contract metadata. |
 | `TaskDefinitionResponse` | type alias | Public response returned for worker task definitions. |
 | `TaskTriggerInput` | type alias | Input accepted by the trigger-task procedure. |
 | `TaskTriggerOutput` | type alias | Output returned by the trigger-task procedure. |
 | `WorkersContract` | type alias | Explicit public contract shape for worker service clients. |
 | `WorkersContractV1` | type alias | Context-binding contract wrapper for the v1 worker contract. |
-| `WorkersRouteHandler` | type alias | Structural route handler exposed by the implemented worker router. |
 | `WorkersRouter` | type alias | Structural worker router returned after binding a context. |
 
-#### Trigger procedures (RPC routes)
+### Trigger procedures (RPC routes)
 
 `workersContract` exposes two enqueue procedures. A generated typed client
 (`createServiceClient<typeof workersContract>({ contract: workersContract, serviceName:
 'workers-api', routerName: 'workers' })`) reaches them over `/api/rpc/*`; the same routes answer
-REST callers under `/api/v1/workers/...`. For each, the `{id}` path segment is the single source
-of truth for the target — a request-body `id` is optional and ignored when sent, and a missing id
-short-circuits to a typed `VALIDATION_ERROR` (HTTP 422) via the centralized `validationFailed`
-contract helper before any KV write.
+REST callers under `/api/v1/workers/...`. For each, the `{id}` path segment names the target: a
+request-body `id` is optional and ignored, and a missing id returns a typed `VALIDATION_ERROR`
+(HTTP 422) through the `validationFailed` contract helper before any KV write.
 
 | Procedure | Route | Input (`JobTriggerInput` / `TaskTriggerInput`) | Output |
 | --- | --- | --- | --- |
 | `triggerJob` | `POST /jobs/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId?, traceparent?, tracestate? }` | `{ jobId, triggered }` |
 | `triggerTask` | `POST /tasks/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId? }` | `{ taskId, triggered }` |
 
-See the [background-jobs capability page](/background-processing/workers/#trigger-a-job-from-a-typed-client)
+See the [background jobs guide](/background-processing/workers/#trigger-a-job-from-a-typed-client)
 for the typed-client walkthrough.
 
-### `@netscript/plugin-workers/services`
+## `@netscript/plugin-workers/services`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `PluginServiceContext` | interface | Context supplied to a plugin service at runtime. |
 | `default` | function | Starts the Workers API service using host-provided infrastructure. |
 
-### `@netscript/plugin-workers/streams`
+## `@netscript/plugin-workers/streams`
 
 Browser-facing StreamDB factory and the entity schemas mirrored from worker execution state.
 
@@ -182,9 +168,9 @@ Browser-facing StreamDB factory and the entity schemas mirrored from worker exec
 | `WorkerExecution` | type alias | Worker execution entity stored in the durable stream. |
 | `WorkerJob` | type alias | Worker job entity stored in the durable stream. |
 | `WorkersStreamDB` | type alias | Browser-facing StreamDB surface returned by the workers stream factory. |
-| `WorkerExecutionSchema` | variable | Stream entity schema for worker executions. |
-| `WorkerJobSchema` | variable | Stream entity schema for worker jobs. |
-| `workersStreamSchema` | variable | Stream schema definition for worker executions and jobs. |
+| `WorkerExecutionSchema` | const | Stream entity schema for worker executions. |
+| `WorkerJobSchema` | const | Stream entity schema for worker jobs. |
+| `workersStreamSchema` | const | Stream schema definition for worker executions and jobs. |
 | `StreamSchemaDefinition` | type alias | Structural stream schema definition map. |
 | `WorkersStreamDefinition` | type alias | Durable stream definition for worker execution and job entities. |
 | `WorkersStreamSchema` | type alias | Package-owned structural workers stream schema surface. |
@@ -192,7 +178,7 @@ Browser-facing StreamDB factory and the entity schemas mirrored from worker exec
 | `WorkerStreamEntitySchema` | interface | Package-owned structural schema surface for worker stream entities. |
 | `WorkerStreamStandardSchema` | interface | Standard Schema compatible public schema surface for stream entities. |
 
-### `@netscript/plugin-workers/streams/server`
+## `@netscript/plugin-workers/streams/server`
 
 Server-side wiring that mirrors execution-state changes into the durable stream producer.
 
@@ -207,9 +193,9 @@ Server-side wiring that mirrors execution-state changes into the durable stream 
 | `ExecutionStatus` | type alias | Execution status discriminator. |
 | `ExecutionTriggerType` | type alias | Execution trigger discriminator. |
 | `WorkersStreamProducer` | type alias | Durable stream producer type for the workers stream schema. |
-| `WorkerExecutionSchema` | variable | Stream entity schema for worker executions. |
-| `WorkerJobSchema` | variable | Stream entity schema for worker jobs. |
-| `workersStreamSchema` | variable | Stream schema definition for worker executions and jobs. |
+| `WorkerExecutionSchema` | const | Stream entity schema for worker executions. |
+| `WorkerJobSchema` | const | Stream entity schema for worker jobs. |
+| `workersStreamSchema` | const | Stream schema definition for worker executions and jobs. |
 | `StreamSchemaDefinition` | type alias | Structural stream schema definition map. |
 | `WorkerExecution` | type alias | Worker execution entity stored in the durable stream. |
 | `WorkerJob` | type alias | Worker job entity stored in the durable stream. |
@@ -219,7 +205,7 @@ Server-side wiring that mirrors execution-state changes into the durable stream 
 | `WorkerStreamEntitySchema` | interface | Package-owned structural schema surface for worker stream entities. |
 | `WorkerStreamStandardSchema` | interface | Standard Schema compatible public schema surface for stream entities. |
 
-### `@netscript/plugin-workers/worker`
+## `@netscript/plugin-workers/worker`
 
 The long-running runtime processes: the `Worker` job/task consumer and the cron `Scheduler`.
 
@@ -258,16 +244,17 @@ The long-running runtime processes: the `Worker` job/task consumer and the cron 
 
 ## Core package
 
-The separately published
-[`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) page is canonical for worker
-definition builders, runtime composition, registries, executors, streams, configuration, and testing
-exports. This page stays focused on the deployable plugin's manifest and integration entrypoints. The
-workflow example below uses core APIs intentionally; exhaustive core entrypoint and symbol tables
-live only on its reference page.
+[`@netscript/plugin-workers-core`](/reference/plugin-workers-core/) is canonical for worker
+definition builders, runtime composition, registries, executors, streams, configuration and testing
+exports.
 
-## Resumable Workflows and Idempotent Resume
+## Examples
 
-Durable workflows are defined using `defineWorkflow` and executed step-by-step using `WorkflowExecutor` (both from `@netscript/plugin-workers-core/workflow`). In the event of a step failure, operators can resume the workflow execution from the failed step while skipping already completed steps.
+### Resume a workflow idempotently
+
+Define a workflow with `defineWorkflow` and run it step by step with `WorkflowExecutor`, both from
+`@netscript/plugin-workers-core/workflow`. After a step fails, resume the execution from the failed
+step; completed steps are skipped.
 
 ```ts
 import { assertEquals } from "@std/assert";
@@ -340,7 +327,3 @@ Deno.test("WorkflowExecutor infrastructure-free testing and idempotent resume", 
   assertEquals(executedSteps, ["transform-data"]);
 });
 ```
-
----
-
-Back to the [reference overview](/reference/).

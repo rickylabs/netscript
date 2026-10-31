@@ -1,0 +1,5907 @@
+{
+  "collection": "Scheme",
+  "modes": [
+    "Light",
+    "Dark"
+  ],
+  "variables": [
+    {
+      "name": "accent/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-accent-border)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/6"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/6"
+        }
+      }
+    },
+    {
+      "name": "accent/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-accent)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "accent/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-accent-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/solid-fg"
+        }
+      }
+    },
+    {
+      "name": "accent/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-accent-hover)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/solid-hover"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/solid-hover"
+        }
+      }
+    },
+    {
+      "name": "accent/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-accent-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/3"
+        }
+      }
+    },
+    {
+      "name": "accent/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-accent-text)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/11"
+        }
+      }
+    },
+    {
+      "name": "action/primary-bg",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-action-primary-bg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": "#00000000"
+      }
+    },
+    {
+      "name": "action/primary-border",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-action-primary-border)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "action/primary-fg",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-action-primary-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/1"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "aurora/1",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-aurora-1)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/7"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/8"
+        }
+      }
+    },
+    {
+      "name": "aurora/2",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-aurora-2)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/violet/l/7"
+        },
+        "Dark": {
+          "alias": "Primitives/color/violet/d/8"
+        }
+      }
+    },
+    {
+      "name": "aurora/3",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-aurora-3)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/orange/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/orange/d/7"
+        }
+      }
+    },
+    {
+      "name": "aurora/4",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-aurora-4)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/indigo/d/8"
+        }
+      }
+    },
+    {
+      "name": "bevel/edge",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-edge)",
+      "values": {
+        "Light": "#1a17121a",
+        "Dark": "#ffffff0f"
+      }
+    },
+    {
+      "name": "bevel/glow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-glow)",
+      "values": {
+        "Light": "#ffffffe5",
+        "Dark": "#ffffff08"
+      }
+    },
+    {
+      "name": "bevel/highlight",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-highlight)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#ffffff12"
+      }
+    },
+    {
+      "name": "bevel/inset",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-inset)",
+      "values": {
+        "Light": "#1a171224",
+        "Dark": "#00000099"
+      }
+    },
+    {
+      "name": "bevel/lip",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-lip)",
+      "values": {
+        "Light": "#1a171229",
+        "Dark": "#0000008c"
+      }
+    },
+    {
+      "name": "bevel/solid-highlight",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-solid-highlight)",
+      "values": {
+        "Light": "#ffffff47",
+        "Dark": "#ffffff1f"
+      }
+    },
+    {
+      "name": "bevel/solid-lip",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bevel-solid-lip)",
+      "values": {
+        "Light": "#000000bf",
+        "Dark": "#00000059"
+      }
+    },
+    {
+      "name": "block/blue",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-block-blue)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/5"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/9"
+        }
+      }
+    },
+    {
+      "name": "block/green",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-block-green)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/lime/l/5"
+        },
+        "Dark": {
+          "alias": "Primitives/color/lime/d/9"
+        }
+      }
+    },
+    {
+      "name": "block/ink-text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-block-fg)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/black"
+        },
+        "Dark": {
+          "alias": "Primitives/color/black"
+        }
+      }
+    },
+    {
+      "name": "block/pink",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-block-pink)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/tomato/l/5"
+        },
+        "Dark": {
+          "alias": "Primitives/color/tomato/d/9"
+        }
+      }
+    },
+    {
+      "name": "block/purple",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-block-purple)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/violet/l/5"
+        },
+        "Dark": {
+          "alias": "Primitives/color/violet/d/9"
+        }
+      }
+    },
+    {
+      "name": "block/yellow",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-block-yellow)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/9"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/9"
+        }
+      }
+    },
+    {
+      "name": "bloom/butter",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-butter)",
+      "values": {
+        "Light": "#f8edb9",
+        "Dark": "#352f14"
+      }
+    },
+    {
+      "name": "bloom/canvas",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-canvas)",
+      "values": {
+        "Light": "#faf8f4",
+        "Dark": "#0f0e0d"
+      }
+    },
+    {
+      "name": "bloom/control-outline",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-bloom-control-outline)",
+      "values": {
+        "Light": "#151413",
+        "Dark": "#8a8377"
+      }
+    },
+    {
+      "name": "bloom/error",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-error)",
+      "values": {
+        "Light": "#b3261e",
+        "Dark": "#ffb4ab"
+      }
+    },
+    {
+      "name": "bloom/fg",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-fg)",
+      "values": {
+        "Light": "#151413",
+        "Dark": "#f2efea"
+      }
+    },
+    {
+      "name": "bloom/field-edge",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-bloom-field-edge)",
+      "values": {
+        "Light": "#8a8377",
+        "Dark": "#8a8377"
+      }
+    },
+    {
+      "name": "bloom/hero",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-hero)",
+      "values": {
+        "Light": "#151413",
+        "Dark": "#3b3631"
+      }
+    },
+    {
+      "name": "bloom/hero-accent",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-hero-accent)",
+      "values": {
+        "Light": "#d6f56a",
+        "Dark": "#d6f56a"
+      }
+    },
+    {
+      "name": "bloom/ink-card",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-ink-card)",
+      "values": {
+        "Light": "#151413",
+        "Dark": "#453a2c"
+      }
+    },
+    {
+      "name": "bloom/lavender",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-lavender)",
+      "values": {
+        "Light": "#e4dcfa",
+        "Dark": "#2a2240"
+      }
+    },
+    {
+      "name": "bloom/lime",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-lime)",
+      "values": {
+        "Light": "#d6f56a",
+        "Dark": "#3a4a10"
+      }
+    },
+    {
+      "name": "bloom/lime-strong",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-lime-strong)",
+      "values": {
+        "Light": "#9bc21a",
+        "Dark": "#c8eb52"
+      }
+    },
+    {
+      "name": "bloom/line",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-line)",
+      "values": {
+        "Light": "#e7e2d9",
+        "Dark": "#2c2a27"
+      }
+    },
+    {
+      "name": "bloom/mint",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-mint)",
+      "values": {
+        "Light": "#dcebe0",
+        "Dark": "#1c2b22"
+      }
+    },
+    {
+      "name": "bloom/muted",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-muted)",
+      "values": {
+        "Light": "#655f55",
+        "Dark": "#a39e95"
+      }
+    },
+    {
+      "name": "bloom/on-butter",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-butter)",
+      "values": {
+        "Light": "#3e2e00",
+        "Dark": "#ffe7a3"
+      }
+    },
+    {
+      "name": "bloom/on-hero",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-hero)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#f7e7cb"
+      }
+    },
+    {
+      "name": "bloom/on-hero-accent",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-hero-accent)",
+      "values": {
+        "Light": "#20310a",
+        "Dark": "#20310a"
+      }
+    },
+    {
+      "name": "bloom/on-ink-card",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-ink-card)",
+      "values": {
+        "Light": "#faf8f4",
+        "Dark": "#fbe6c6"
+      }
+    },
+    {
+      "name": "bloom/on-lime",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-lime)",
+      "values": {
+        "Light": "#20310a",
+        "Dark": "#d6f56a"
+      }
+    },
+    {
+      "name": "bloom/on-primary",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-primary)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#3b1263"
+      }
+    },
+    {
+      "name": "bloom/on-primary-container",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-primary-container)",
+      "values": {
+        "Light": "#2a0a4d",
+        "Dark": "#ebdcff"
+      }
+    },
+    {
+      "name": "bloom/on-rose",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-rose)",
+      "values": {
+        "Light": "#5a0b22",
+        "Dark": "#ffd9e1"
+      }
+    },
+    {
+      "name": "bloom/on-sky",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-sky)",
+      "values": {
+        "Light": "#00344f",
+        "Dark": "#cde8ff"
+      }
+    },
+    {
+      "name": "bloom/on-tangerine",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-on-tangerine)",
+      "values": {
+        "Light": "#4a1c00",
+        "Dark": "#ffdbc7"
+      }
+    },
+    {
+      "name": "bloom/outline",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-outline)",
+      "values": {
+        "Light": "#cfc9bf",
+        "Dark": "#4a4640"
+      }
+    },
+    {
+      "name": "bloom/peach",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-peach)",
+      "values": {
+        "Light": "#fbe6c6",
+        "Dark": "#3a2c1a"
+      }
+    },
+    {
+      "name": "bloom/primary",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-primary)",
+      "values": {
+        "Light": "#5b2a86",
+        "Dark": "#d2b6ff"
+      }
+    },
+    {
+      "name": "bloom/primary-container",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-primary-container)",
+      "values": {
+        "Light": "#ebdcff",
+        "Dark": "#4a2470"
+      }
+    },
+    {
+      "name": "bloom/rose",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-rose)",
+      "values": {
+        "Light": "#f7dad5",
+        "Dark": "#3a2120"
+      }
+    },
+    {
+      "name": "bloom/sky",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-sky)",
+      "values": {
+        "Light": "#d9e9ee",
+        "Dark": "#18292e"
+      }
+    },
+    {
+      "name": "bloom/success",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-success)",
+      "values": {
+        "Light": "#2f6b3f",
+        "Dark": "#9fd9ae"
+      }
+    },
+    {
+      "name": "bloom/surface",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-surface)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#191817"
+      }
+    },
+    {
+      "name": "bloom/surface-high",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-surface-high)",
+      "values": {
+        "Light": "#f2efe9",
+        "Dark": "#22201e"
+      }
+    },
+    {
+      "name": "bloom/tangerine",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-tangerine)",
+      "values": {
+        "Light": "#ffd9c2",
+        "Dark": "#6b3416"
+      }
+    },
+    {
+      "name": "bloom/warn",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-bloom-warn)",
+      "values": {
+        "Light": "#8a5a00",
+        "Dark": "#f0c46a"
+      }
+    },
+    {
+      "name": "border/control",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-border-control)",
+      "values": {
+        "Light": {
+          "alias": "Theme/ink/l"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "border/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-border)",
+      "values": {
+        "Light": {
+          "alias": "Theme/border/l/default"
+        },
+        "Dark": {
+          "alias": "Theme/border/d/default"
+        }
+      }
+    },
+    {
+      "name": "border/hover",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-border-hover)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/7"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/7"
+        }
+      }
+    },
+    {
+      "name": "border/ink",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR",
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-ink)",
+      "values": {
+        "Light": {
+          "alias": "Theme/ink/l"
+        },
+        "Dark": {
+          "alias": "Theme/ink/d"
+        }
+      }
+    },
+    {
+      "name": "border/input",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-input-border)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "border/ring",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR",
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-ring)",
+      "values": {
+        "Light": {
+          "alias": "Theme/ring/l"
+        },
+        "Dark": {
+          "alias": "Theme/ring/d"
+        }
+      }
+    },
+    {
+      "name": "border/strong",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-border-strong)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/8"
+        }
+      }
+    },
+    {
+      "name": "border/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-border-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Dark": {
+          "alias": "Theme/border/d/subtle"
+        }
+      }
+    },
+    {
+      "name": "control/ink",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-control-ink)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "cupertino/border-default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-border-default)",
+      "description": "Decorative separators and content edges",
+      "values": {
+        "Light": "#d5d8de",
+        "Dark": "#434953"
+      }
+    },
+    {
+      "name": "cupertino/border-input",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-border-input)",
+      "description": "Interactive control perimeters (&gt;=3:1)",
+      "values": {
+        "Light": "#69717d",
+        "Dark": "#7c899b"
+      }
+    },
+    {
+      "name": "cupertino/border-ring",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-border-ring)",
+      "description": "2px focus ring",
+      "values": {
+        "Light": "#0067cc",
+        "Dark": "#70b8ff"
+      }
+    },
+    {
+      "name": "cupertino/destructive-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-destructive-bg)",
+      "description": "Destructive tinted chip",
+      "values": {
+        "Light": "#ffedf0",
+        "Dark": "#42262d"
+      }
+    },
+    {
+      "name": "cupertino/destructive-text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-destructive-text)",
+      "description": "Destructive/invalid text, boundaries and icons",
+      "values": {
+        "Light": "#a21b2b",
+        "Dark": "#ff9ca5"
+      }
+    },
+    {
+      "name": "cupertino/field-fill",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-field-fill)",
+      "description": "Field material fill (light surface/card, dark surface/well)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#202329"
+      }
+    },
+    {
+      "name": "cupertino/info-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-info-bg)",
+      "description": "Info chip fill and selected-row / selected-item fill",
+      "values": {
+        "Light": "#e3efff",
+        "Dark": "#223b56"
+      }
+    },
+    {
+      "name": "cupertino/info-text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-info-text)",
+      "description": "Info text",
+      "values": {
+        "Light": "#0757aa",
+        "Dark": "#70b8ff"
+      }
+    },
+    {
+      "name": "cupertino/primary-default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-primary-default)",
+      "description": "Primary push-button fill, on-switch track, checked box",
+      "values": {
+        "Light": "#0b66c3",
+        "Dark": "#1f5d99"
+      }
+    },
+    {
+      "name": "cupertino/primary-edge",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-primary-edge)",
+      "description": "Primary material edge (light primary/default, dark border/input)",
+      "values": {
+        "Light": "#0b66c3",
+        "Dark": "#7c899b"
+      }
+    },
+    {
+      "name": "cupertino/primary-fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-primary-fg)",
+      "description": "Text/icon on primary fill",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#ffffff"
+      }
+    },
+    {
+      "name": "cupertino/primary-hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-primary-hover)",
+      "description": "Primary hover fill",
+      "values": {
+        "Light": "#0757aa",
+        "Dark": "#245f9c"
+      }
+    },
+    {
+      "name": "cupertino/primary-text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-primary-text)",
+      "description": "Accent text, selected sidebar icon, sparkline stroke",
+      "values": {
+        "Light": "#0757aa",
+        "Dark": "#70b8ff"
+      }
+    },
+    {
+      "name": "cupertino/push-fill",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-push-fill)",
+      "description": "Push material fill (light surface/card, dark surface/raised)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#2b2f37"
+      }
+    },
+    {
+      "name": "cupertino/success-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-success-bg)",
+      "description": "Success chip fill",
+      "values": {
+        "Light": "#e6f4e9",
+        "Dark": "#233c2d"
+      }
+    },
+    {
+      "name": "cupertino/success-text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-success-text)",
+      "description": "Success text",
+      "values": {
+        "Light": "#18652f",
+        "Dark": "#80d99b"
+      }
+    },
+    {
+      "name": "cupertino/surface-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-surface-bg)",
+      "description": "Window/chrome/content background (chrome material)",
+      "values": {
+        "Light": "#f5f5f7",
+        "Dark": "#181a1e"
+      }
+    },
+    {
+      "name": "cupertino/surface-card",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-surface-card)",
+      "description": "Opaque content card, table, grouped rows",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#22252b"
+      }
+    },
+    {
+      "name": "cupertino/surface-raised",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-surface-raised)",
+      "description": "Attached sidebar and docked inspector panes; zebra rows",
+      "values": {
+        "Light": "#f7f8fa",
+        "Dark": "#2b2f37"
+      }
+    },
+    {
+      "name": "cupertino/surface-well",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-surface-well)",
+      "description": "Segmented track, switch-off track, avatars, neutral chips",
+      "values": {
+        "Light": "#ededf1",
+        "Dark": "#202329"
+      }
+    },
+    {
+      "name": "cupertino/text-fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-text-fg)",
+      "description": "Primary text and icons",
+      "values": {
+        "Light": "#1c2024",
+        "Dark": "#eceef2"
+      }
+    },
+    {
+      "name": "cupertino/text-muted",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-text-muted)",
+      "description": "Secondary text, muted icons, switch-off thumb",
+      "values": {
+        "Light": "#525b67",
+        "Dark": "#bdc5d0"
+      }
+    },
+    {
+      "name": "cupertino/traffic-close",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-traffic-close)",
+      "description": "Window close control",
+      "values": {
+        "Light": "#ff5f57",
+        "Dark": "#ff5f57"
+      }
+    },
+    {
+      "name": "cupertino/traffic-minimize",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-traffic-minimize)",
+      "description": "Window minimize control",
+      "values": {
+        "Light": "#febc2e",
+        "Dark": "#febc2e"
+      }
+    },
+    {
+      "name": "cupertino/traffic-zoom",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-traffic-zoom)",
+      "description": "Window zoom control",
+      "values": {
+        "Light": "#28c840",
+        "Dark": "#28c840"
+      }
+    },
+    {
+      "name": "cupertino/warning-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-cupertino-warning-bg)",
+      "description": "Warning banner / chip fill",
+      "values": {
+        "Light": "#fff2c7",
+        "Dark": "#3c3019"
+      }
+    },
+    {
+      "name": "cupertino/warning-text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-cupertino-warning-text)",
+      "description": "Warning text and icon",
+      "values": {
+        "Light": "#624200",
+        "Dark": "#ffdb8a"
+      }
+    },
+    {
+      "name": "destructive/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-destructive-border)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/d/6"
+        }
+      }
+    },
+    {
+      "name": "destructive/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-destructive)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/9"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/d/9"
+        }
+      }
+    },
+    {
+      "name": "destructive/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-destructive-fg)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/white"
+        },
+        "Dark": {
+          "alias": "Primitives/color/white"
+        }
+      }
+    },
+    {
+      "name": "destructive/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-destructive-hover)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/10"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/d/10"
+        }
+      }
+    },
+    {
+      "name": "destructive/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-destructive-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/3"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/d/3"
+        }
+      }
+    },
+    {
+      "name": "destructive/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-destructive-text)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/12"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/d/11"
+        }
+      }
+    },
+    {
+      "name": "effect/shadow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-shadow-color)",
+      "values": {
+        "Light": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Dark": {
+          "alias": "Theme/shadow/d/color"
+        }
+      }
+    },
+    {
+      "name": "elevation/ambient",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-elevation-ambient)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/shadow/ambient-l"
+        },
+        "Dark": {
+          "alias": "Primitives/color/shadow/ambient-d"
+        }
+      }
+    },
+    {
+      "name": "elevation/key",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-elevation-key)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/shadow/fluent-l"
+        },
+        "Dark": {
+          "alias": "Primitives/color/shadow/fluent-d"
+        }
+      }
+    },
+    {
+      "name": "fluent/accent/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-accent-default)",
+      "values": {
+        "Light": "#005fb8",
+        "Dark": "#60cdff"
+      }
+    },
+    {
+      "name": "fluent/accent/disabled",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-accent-disabled)",
+      "values": {
+        "Light": "#00000037",
+        "Dark": "#ffffff28"
+      }
+    },
+    {
+      "name": "fluent/accent/secondary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-accent-secondary)",
+      "values": {
+        "Light": "#005fb8e5",
+        "Dark": "#60cdffe5"
+      }
+    },
+    {
+      "name": "fluent/accent/tertiary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-accent-tertiary)",
+      "values": {
+        "Light": "#0054a3",
+        "Dark": "#60cdffcc"
+      }
+    },
+    {
+      "name": "fluent/avatar/grape/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-grape-bg)",
+      "values": {
+        "Light": "#d9a7e0",
+        "Dark": "#4c0d55"
+      }
+    },
+    {
+      "name": "fluent/avatar/grape/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-grape-fg)",
+      "values": {
+        "Light": "#4c0d55",
+        "Dark": "#d9a7e0"
+      }
+    },
+    {
+      "name": "fluent/avatar/light-green/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-light-green-bg)",
+      "values": {
+        "Light": "#a7e3a5",
+        "Dark": "#0b5a08"
+      }
+    },
+    {
+      "name": "fluent/avatar/light-green/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-light-green-fg)",
+      "values": {
+        "Light": "#0b5a08",
+        "Dark": "#a7e3a5"
+      }
+    },
+    {
+      "name": "fluent/avatar/marigold/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-marigold-bg)",
+      "values": {
+        "Light": "#f9e2ae",
+        "Dark": "#835b00"
+      }
+    },
+    {
+      "name": "fluent/avatar/marigold/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-marigold-fg)",
+      "values": {
+        "Light": "#835b00",
+        "Dark": "#f9e2ae"
+      }
+    },
+    {
+      "name": "fluent/avatar/pumpkin/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-pumpkin-bg)",
+      "values": {
+        "Light": "#efc4ad",
+        "Dark": "#712d09"
+      }
+    },
+    {
+      "name": "fluent/avatar/pumpkin/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-pumpkin-fg)",
+      "values": {
+        "Light": "#712d09",
+        "Dark": "#efc4ad"
+      }
+    },
+    {
+      "name": "fluent/avatar/royal-blue/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-royal-blue-bg)",
+      "values": {
+        "Light": "#9abfdc",
+        "Dark": "#002c4e"
+      }
+    },
+    {
+      "name": "fluent/avatar/royal-blue/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-royal-blue-fg)",
+      "values": {
+        "Light": "#002c4e",
+        "Dark": "#9abfdc"
+      }
+    },
+    {
+      "name": "fluent/avatar/teal/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-teal-bg)",
+      "values": {
+        "Light": "#9bd9db",
+        "Dark": "#02494c"
+      }
+    },
+    {
+      "name": "fluent/avatar/teal/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-avatar-teal-fg)",
+      "values": {
+        "Light": "#02494c",
+        "Dark": "#9bd9db"
+      }
+    },
+    {
+      "name": "fluent/badge/brand/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-brand-bg)",
+      "values": {
+        "Light": "#eff6fc",
+        "Dark": "#002848"
+      }
+    },
+    {
+      "name": "fluent/badge/brand/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-brand-border)",
+      "values": {
+        "Light": "#c7e0f4",
+        "Dark": "#004c87"
+      }
+    },
+    {
+      "name": "fluent/badge/brand/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-brand-fg)",
+      "values": {
+        "Light": "#106ebe",
+        "Dark": "#3aa0f3"
+      }
+    },
+    {
+      "name": "fluent/badge/danger/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-danger-bg)",
+      "values": {
+        "Light": "#fdf3f4",
+        "Dark": "#3b0509"
+      }
+    },
+    {
+      "name": "fluent/badge/danger/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-danger-border)",
+      "values": {
+        "Light": "#eeacb2",
+        "Dark": "#c50f1f"
+      }
+    },
+    {
+      "name": "fluent/badge/danger/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-danger-fg)",
+      "values": {
+        "Light": "#b10e1c",
+        "Dark": "#dc626d"
+      }
+    },
+    {
+      "name": "fluent/badge/informative/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-informative-bg)",
+      "values": {
+        "Light": "#f0f0f0",
+        "Dark": "#0a0a0a"
+      }
+    },
+    {
+      "name": "fluent/badge/informative/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-informative-border)",
+      "values": {
+        "Light": "#e0e0e0",
+        "Dark": "#525252"
+      }
+    },
+    {
+      "name": "fluent/badge/informative/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-informative-fg)",
+      "values": {
+        "Light": "#616161",
+        "Dark": "#adadad"
+      }
+    },
+    {
+      "name": "fluent/badge/success/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-success-bg)",
+      "values": {
+        "Light": "#f1faf1",
+        "Dark": "#052505"
+      }
+    },
+    {
+      "name": "fluent/badge/success/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-success-border)",
+      "values": {
+        "Light": "#9fd89f",
+        "Dark": "#107c10"
+      }
+    },
+    {
+      "name": "fluent/badge/success/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-success-fg)",
+      "values": {
+        "Light": "#0e700e",
+        "Dark": "#54b054"
+      }
+    },
+    {
+      "name": "fluent/badge/warning/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-warning-bg)",
+      "values": {
+        "Light": "#fff9f5",
+        "Dark": "#4a1e04"
+      }
+    },
+    {
+      "name": "fluent/badge/warning/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-warning-border)",
+      "values": {
+        "Light": "#fdcfb4",
+        "Dark": "#f7630c"
+      }
+    },
+    {
+      "name": "fluent/badge/warning/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-badge-warning-fg)",
+      "values": {
+        "Light": "#bc4b09",
+        "Dark": "#faa06b"
+      }
+    },
+    {
+      "name": "fluent/card/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-card-default)",
+      "values": {
+        "Light": "#ffffffb3",
+        "Dark": "#ffffff0d"
+      }
+    },
+    {
+      "name": "fluent/card/secondary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-card-secondary)",
+      "values": {
+        "Light": "#f6f6f680",
+        "Dark": "#ffffff08"
+      }
+    },
+    {
+      "name": "fluent/control/alt-secondary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-alt-secondary)",
+      "values": {
+        "Light": "#00000006",
+        "Dark": "#00000019"
+      }
+    },
+    {
+      "name": "fluent/control/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-default)",
+      "values": {
+        "Light": "#ffffffb3",
+        "Dark": "#ffffff0f"
+      }
+    },
+    {
+      "name": "fluent/control/disabled",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-disabled)",
+      "values": {
+        "Light": "#f9f9f94d",
+        "Dark": "#ffffff0b"
+      }
+    },
+    {
+      "name": "fluent/control/input-active",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-input-active)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#1e1e1eb3"
+      }
+    },
+    {
+      "name": "fluent/control/secondary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-secondary)",
+      "values": {
+        "Light": "#f9f9f980",
+        "Dark": "#ffffff15"
+      }
+    },
+    {
+      "name": "fluent/control/solid",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-solid)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#454545"
+      }
+    },
+    {
+      "name": "fluent/control/strong",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-strong)",
+      "values": {
+        "Light": "#00000072",
+        "Dark": "#ffffff8b"
+      }
+    },
+    {
+      "name": "fluent/control/tertiary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-control-tertiary)",
+      "values": {
+        "Light": "#f9f9f94d",
+        "Dark": "#ffffff08"
+      }
+    },
+    {
+      "name": "fluent/elevation/accent-bottom",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-elevation-accent-bottom)",
+      "values": {
+        "Light": "#00000066",
+        "Dark": "#00000023"
+      }
+    },
+    {
+      "name": "fluent/elevation/control-bottom",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-elevation-control-bottom)",
+      "values": {
+        "Light": "#0000001c",
+        "Dark": "#ffffff00"
+      }
+    },
+    {
+      "name": "fluent/elevation/control-top",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-elevation-control-top)",
+      "values": {
+        "Light": "#00000000",
+        "Dark": "#ffffff07"
+      }
+    },
+    {
+      "name": "fluent/focus/inner",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-focus-inner)",
+      "values": {
+        "Light": "#ffffffb3",
+        "Dark": "#000000b3"
+      }
+    },
+    {
+      "name": "fluent/focus/outer",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-focus-outer)",
+      "values": {
+        "Light": "#000000e4",
+        "Dark": "#8d8d8d"
+      }
+    },
+    {
+      "name": "fluent/layer/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-layer-default)",
+      "values": {
+        "Light": "#ffffff80",
+        "Dark": "#3a3a3a4c"
+      }
+    },
+    {
+      "name": "fluent/mica/tint",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-mica-tint)",
+      "values": {
+        "Light": "#f3f3f3d1",
+        "Dark": "#202020db"
+      }
+    },
+    {
+      "name": "fluent/solid/base",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-solid-base)",
+      "values": {
+        "Light": "#f3f3f3",
+        "Dark": "#202020"
+      }
+    },
+    {
+      "name": "fluent/stroke/card",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-card)",
+      "values": {
+        "Light": "#0000000f",
+        "Dark": "#00000019"
+      }
+    },
+    {
+      "name": "fluent/stroke/control",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-control)",
+      "values": {
+        "Light": "#0000000f",
+        "Dark": "#ffffff12"
+      }
+    },
+    {
+      "name": "fluent/stroke/control-secondary",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-control-secondary)",
+      "values": {
+        "Light": "#00000029",
+        "Dark": "#ffffff18"
+      }
+    },
+    {
+      "name": "fluent/stroke/control-strong",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-control-strong)",
+      "values": {
+        "Light": "#00000072",
+        "Dark": "#ffffff8b"
+      }
+    },
+    {
+      "name": "fluent/stroke/divider",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-divider)",
+      "values": {
+        "Light": "#0000000f",
+        "Dark": "#ffffff15"
+      }
+    },
+    {
+      "name": "fluent/stroke/on-accent",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-on-accent)",
+      "values": {
+        "Light": "#ffffff14",
+        "Dark": "#ffffff14"
+      }
+    },
+    {
+      "name": "fluent/stroke/surface",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-stroke-surface)",
+      "values": {
+        "Light": "#75757566",
+        "Dark": "#75757566"
+      }
+    },
+    {
+      "name": "fluent/subtle/secondary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-subtle-secondary)",
+      "values": {
+        "Light": "#00000009",
+        "Dark": "#ffffff0f"
+      }
+    },
+    {
+      "name": "fluent/subtle/tertiary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-subtle-tertiary)",
+      "values": {
+        "Light": "#00000006",
+        "Dark": "#ffffff0a"
+      }
+    },
+    {
+      "name": "fluent/system/caution",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-system-caution)",
+      "values": {
+        "Light": "#9d5d00",
+        "Dark": "#fce100"
+      }
+    },
+    {
+      "name": "fluent/system/caution-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-system-caution-bg)",
+      "values": {
+        "Light": "#fff4ce",
+        "Dark": "#433519"
+      }
+    },
+    {
+      "name": "fluent/system/critical",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-system-critical)",
+      "values": {
+        "Light": "#c42b1c",
+        "Dark": "#ff99a4"
+      }
+    },
+    {
+      "name": "fluent/system/critical-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-system-critical-bg)",
+      "values": {
+        "Light": "#fde7e9",
+        "Dark": "#442726"
+      }
+    },
+    {
+      "name": "fluent/system/success",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fluent-system-success)",
+      "values": {
+        "Light": "#0f7b0f",
+        "Dark": "#6ccb5f"
+      }
+    },
+    {
+      "name": "fluent/system/success-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-system-success-bg)",
+      "values": {
+        "Light": "#dff6dd",
+        "Dark": "#393d1b"
+      }
+    },
+    {
+      "name": "fluent/text/accent",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-accent)",
+      "values": {
+        "Light": "#003e92",
+        "Dark": "#99ebff"
+      }
+    },
+    {
+      "name": "fluent/text/disabled",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-disabled)",
+      "values": {
+        "Light": "#0000005c",
+        "Dark": "#ffffff5d"
+      }
+    },
+    {
+      "name": "fluent/text/inverse",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-inverse)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#000000e4"
+      }
+    },
+    {
+      "name": "fluent/text/on-accent",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-on-accent)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#000000"
+      }
+    },
+    {
+      "name": "fluent/text/on-accent-disabled",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-on-accent-disabled)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#ffffff87"
+      }
+    },
+    {
+      "name": "fluent/text/on-accent-secondary",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-on-accent-secondary)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#000000"
+      }
+    },
+    {
+      "name": "fluent/text/primary",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-primary)",
+      "values": {
+        "Light": "#000000e4",
+        "Dark": "#ffffff"
+      }
+    },
+    {
+      "name": "fluent/text/secondary",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-secondary)",
+      "values": {
+        "Light": "#0000009e",
+        "Dark": "#ffffffc5"
+      }
+    },
+    {
+      "name": "fluent/text/tertiary",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-text-tertiary)",
+      "values": {
+        "Light": "#00000072",
+        "Dark": "#ffffff87"
+      }
+    },
+    {
+      "name": "fluent/wallpaper/base",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-wallpaper-base)",
+      "values": {
+        "Light": "#d7e6f4",
+        "Dark": "#07111f"
+      }
+    },
+    {
+      "name": "fluent/wallpaper/blue",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-wallpaper-blue)",
+      "values": {
+        "Light": "#6fa8e6",
+        "Dark": "#0f3b78"
+      }
+    },
+    {
+      "name": "fluent/wallpaper/deep",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-wallpaper-deep)",
+      "values": {
+        "Light": "#3c7bd0",
+        "Dark": "#0a2c5c"
+      }
+    },
+    {
+      "name": "fluent/wallpaper/mist",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-wallpaper-mist)",
+      "values": {
+        "Light": "#f4f8fc",
+        "Dark": "#0e2340"
+      }
+    },
+    {
+      "name": "fluent/wallpaper/periwinkle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-wallpaper-periwinkle)",
+      "values": {
+        "Light": "#a7bef2",
+        "Dark": "#1c2a66"
+      }
+    },
+    {
+      "name": "fluent/wallpaper/teal",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-fluent-wallpaper-teal)",
+      "values": {
+        "Light": "#5ccbc6",
+        "Dark": "#0b5560"
+      }
+    },
+    {
+      "name": "frame/ink",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-frame-ink)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/7"
+        }
+      }
+    },
+    {
+      "name": "info/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-info-border)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/6"
+        }
+      }
+    },
+    {
+      "name": "info/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-info)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/9"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/9"
+        }
+      }
+    },
+    {
+      "name": "info/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-info-fg)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/white"
+        },
+        "Dark": {
+          "alias": "Primitives/color/white"
+        }
+      }
+    },
+    {
+      "name": "info/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-info-hover)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/10"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/10"
+        }
+      }
+    },
+    {
+      "name": "info/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-info-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/3"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/3"
+        }
+      }
+    },
+    {
+      "name": "info/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-info-text)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/12"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/11"
+        }
+      }
+    },
+    {
+      "name": "ink/fg",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-ink-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/1"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "liquid/accent/system",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-accent-system)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #007AFF, dark #0A84FF.",
+      "values": {
+        "Light": "#007aff",
+        "Dark": "#0a84ff"
+      }
+    },
+    {
+      "name": "liquid/border/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-border-default)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #D2D2D7, dark #38383A.",
+      "values": {
+        "Light": "#d2d2d7",
+        "Dark": "#38383a"
+      }
+    },
+    {
+      "name": "liquid/border/input",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-border-input)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #86868B, dark #8E8E93.",
+      "values": {
+        "Light": "#86868b",
+        "Dark": "#8e8e93"
+      }
+    },
+    {
+      "name": "liquid/border/ring",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-border-ring)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #007AFF, dark #0A84FF.",
+      "values": {
+        "Light": "#007aff",
+        "Dark": "#0a84ff"
+      }
+    },
+    {
+      "name": "liquid/chart/area",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-chart-area)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #007AFF@0.1, dark #0A84FF@0.16.",
+      "values": {
+        "Light": "#007aff1a",
+        "Dark": "#0a84ff29"
+      }
+    },
+    {
+      "name": "liquid/destructive/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-destructive-bg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #FFEBEA, dark #3B1E1D.",
+      "values": {
+        "Light": "#ffebea",
+        "Dark": "#3b1e1d"
+      }
+    },
+    {
+      "name": "liquid/destructive/text",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-destructive-text)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #D70015, dark #FF7B72.",
+      "values": {
+        "Light": "#d70015",
+        "Dark": "#ff7b72"
+      }
+    },
+    {
+      "name": "liquid/effect/outline",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-outline)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #E3E3E6, dark #000000@0.6.",
+      "values": {
+        "Light": "#e3e3e6",
+        "Dark": "#00000099"
+      }
+    },
+    {
+      "name": "liquid/effect/refraction",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-refraction)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #000000@0.05, dark #000000@0.3.",
+      "values": {
+        "Light": "#0000000d",
+        "Dark": "#0000004d"
+      }
+    },
+    {
+      "name": "liquid/effect/shadow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-shadow)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #000000@0.08, dark #000000@0.5.",
+      "values": {
+        "Light": "#00000014",
+        "Dark": "#00000080"
+      }
+    },
+    {
+      "name": "liquid/effect/side",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-side)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #F2F2F2, dark #000000@0.3.",
+      "values": {
+        "Light": "#f2f2f2",
+        "Dark": "#0000004d"
+      }
+    },
+    {
+      "name": "liquid/effect/specular",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-specular)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FFFFFF@0.9, dark #FFFFFF@0.14.",
+      "values": {
+        "Light": "#ffffffe5",
+        "Dark": "#ffffff24"
+      }
+    },
+    {
+      "name": "liquid/effect/specular-low",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-specular-low)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FFFFFF@0.5, dark #FFFFFF@0.05.",
+      "values": {
+        "Light": "#ffffff80",
+        "Dark": "#ffffff0d"
+      }
+    },
+    {
+      "name": "liquid/effect/specular-tint",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-effect-specular-tint)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FFFFFF@0.35, dark #FFFFFF@0.18.",
+      "values": {
+        "Light": "#ffffff59",
+        "Dark": "#ffffff2e"
+      }
+    },
+    {
+      "name": "liquid/field/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-field-bg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #FFFFFF, dark #1C1C1E.",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#1c1c1e"
+      }
+    },
+    {
+      "name": "liquid/glass/edge",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-glass-edge)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #000000@0.1, dark #000000@0.55.",
+      "values": {
+        "Light": "#0000001a",
+        "Dark": "#0000008c"
+      }
+    },
+    {
+      "name": "liquid/info/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-info-bg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #E8F1FD, dark #17304F.",
+      "values": {
+        "Light": "#e8f1fd",
+        "Dark": "#17304f"
+      }
+    },
+    {
+      "name": "liquid/info/text",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-info-text)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #0066CC, dark #409CFF.",
+      "values": {
+        "Light": "#0066cc",
+        "Dark": "#409cff"
+      }
+    },
+    {
+      "name": "liquid/material/glass-control",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-material-glass-control)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FBFBFB, dark #2C2C2E.",
+      "values": {
+        "Light": "#fbfbfb",
+        "Dark": "#2c2c2e"
+      }
+    },
+    {
+      "name": "liquid/material/glass-float",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-material-glass-float)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #F7F7F8@0.72, dark #2C2C2E@0.7.",
+      "values": {
+        "Light": "#f7f7f8b8",
+        "Dark": "#2c2c2eb2"
+      }
+    },
+    {
+      "name": "liquid/material/glass-sheet",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-material-glass-sheet)",
+      "description": "Liquid r6 — macOS 27 kit-derived sheet glass. Light #F5F5F7@0.72, dark #262629@0.80.",
+      "values": {
+        "Light": "#f5f5f7b8",
+        "Dark": "#262629cc"
+      }
+    },
+    {
+      "name": "liquid/material/glass-sidebar",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-material-glass-sidebar)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #E6E6E9@0.97, dark #2A2A2D@0.97.",
+      "values": {
+        "Light": "#f3f3f694",
+        "Dark": "#1c1c1f85"
+      }
+    },
+    {
+      "name": "liquid/material/segment-thumb",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-material-segment-thumb)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #000000@0.09, dark #FFFFFF@0.14.",
+      "values": {
+        "Light": "#00000017",
+        "Dark": "#ffffff24"
+      }
+    },
+    {
+      "name": "liquid/material/tinted-primary",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-material-tinted-primary)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #0063E1@0.94, dark #0058D0@0.94.",
+      "values": {
+        "Light": "#0063e1f0",
+        "Dark": "#0058d0f0"
+      }
+    },
+    {
+      "name": "liquid/primary/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-primary-default)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #0063E1, dark #0058D0.",
+      "values": {
+        "Light": "#0063e1",
+        "Dark": "#0058d0"
+      }
+    },
+    {
+      "name": "liquid/primary/fg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-primary-fg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #FFFFFF, dark #FFFFFF.",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#ffffff"
+      }
+    },
+    {
+      "name": "liquid/primary/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-primary-hover)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #0058D0, dark #004FBD.",
+      "values": {
+        "Light": "#0058d0",
+        "Dark": "#004fbd"
+      }
+    },
+    {
+      "name": "liquid/primary/text",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-primary-text)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #0066CC, dark #409CFF.",
+      "values": {
+        "Light": "#0066cc",
+        "Dark": "#409cff"
+      }
+    },
+    {
+      "name": "liquid/sidebar/selection",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-sidebar-selection)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #000000@0.07, dark #FFFFFF@0.1.",
+      "values": {
+        "Light": "#00000012",
+        "Dark": "#ffffff1a"
+      }
+    },
+    {
+      "name": "liquid/state/hover-overlay",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-state-hover-overlay)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #1D1D1F@0.06, dark #F5F5F7@0.08.",
+      "values": {
+        "Light": "#1d1d1f0f",
+        "Dark": "#f5f5f714"
+      }
+    },
+    {
+      "name": "liquid/status/shipped-fg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-status-shipped-fg)",
+      "description": "Shipped status pill label + dot on the 14% accent tint.",
+      "values": {
+        "Light": "#005fbe",
+        "Dark": "#409cff"
+      }
+    },
+    {
+      "name": "liquid/success/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-success-bg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #E8F7EC, dark #1C3A24.",
+      "values": {
+        "Light": "#e8f7ec",
+        "Dark": "#1c3a24"
+      }
+    },
+    {
+      "name": "liquid/success/text",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-success-text)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #1E7B34, dark #30D158.",
+      "values": {
+        "Light": "#1e7b34",
+        "Dark": "#30d158"
+      }
+    },
+    {
+      "name": "liquid/surface/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-surface-bg)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FFFFFF, dark #1E1E1E.",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#1e1e1e"
+      }
+    },
+    {
+      "name": "liquid/surface/card",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-surface-card)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #F5F5F7, dark #2A2A2C.",
+      "values": {
+        "Light": "#f5f5f7",
+        "Dark": "#2a2a2c"
+      }
+    },
+    {
+      "name": "liquid/surface/raised",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-surface-raised)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #E8E8ED, dark #3A3A3C.",
+      "values": {
+        "Light": "#e8e8ed",
+        "Dark": "#3a3a3c"
+      }
+    },
+    {
+      "name": "liquid/surface/well",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-surface-well)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FFFFFF, dark #333336.",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#333336"
+      }
+    },
+    {
+      "name": "liquid/surface/zebra",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-surface-zebra)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #F5F5F7, dark #262628.",
+      "values": {
+        "Light": "#f5f5f7",
+        "Dark": "#262628"
+      }
+    },
+    {
+      "name": "liquid/switch/off-track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-switch-off-track)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #E9E9EB, dark #39393D.",
+      "values": {
+        "Light": "#e9e9eb",
+        "Dark": "#39393d"
+      }
+    },
+    {
+      "name": "liquid/switch/on-edge",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-switch-on-edge)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #248A3D, dark #30D158.",
+      "values": {
+        "Light": "#248a3d",
+        "Dark": "#30d158"
+      }
+    },
+    {
+      "name": "liquid/switch/on-track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-switch-on-track)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #34C759, dark #30D158.",
+      "values": {
+        "Light": "#34c759",
+        "Dark": "#30d158"
+      }
+    },
+    {
+      "name": "liquid/tag/gray",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-tag-gray)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #8E8E93, dark #8E8E93.",
+      "values": {
+        "Light": "#8e8e93",
+        "Dark": "#8e8e93"
+      }
+    },
+    {
+      "name": "liquid/tag/green",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-tag-green)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #34C759, dark #30D158.",
+      "values": {
+        "Light": "#34c759",
+        "Dark": "#30d158"
+      }
+    },
+    {
+      "name": "liquid/tag/orange",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-tag-orange)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #FF9500, dark #FF9F0A.",
+      "values": {
+        "Light": "#ff9500",
+        "Dark": "#ff9f0a"
+      }
+    },
+    {
+      "name": "liquid/tag/purple",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-tag-purple)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #AF52DE, dark #BF5AF2.",
+      "values": {
+        "Light": "#af52de",
+        "Dark": "#bf5af2"
+      }
+    },
+    {
+      "name": "liquid/tag/red",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-tag-red)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #FF3B30, dark #FF453A.",
+      "values": {
+        "Light": "#ff3b30",
+        "Dark": "#ff453a"
+      }
+    },
+    {
+      "name": "liquid/text/fg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-text-fg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #1D1D1F, dark #F5F5F7.",
+      "values": {
+        "Light": "#1d1d1f",
+        "Dark": "#f5f5f7"
+      }
+    },
+    {
+      "name": "liquid/text/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-text-muted)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #636366, dark #A1A1A6.",
+      "values": {
+        "Light": "#636366",
+        "Dark": "#a1a1a6"
+      }
+    },
+    {
+      "name": "liquid/toolbar/hairline",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-toolbar-hairline)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #000000@0.06, dark #000000@0.6.",
+      "values": {
+        "Light": "#0000000f",
+        "Dark": "#00000099"
+      }
+    },
+    {
+      "name": "liquid/toolbar/scroll-edge",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-toolbar-scroll-edge)",
+      "description": "Liquid r6 — macOS 27 kit-derived, contrast-corrected (L-02/L-03). Light #FFFFFF@0.85, dark #1E1E1E@0.85.",
+      "values": {
+        "Light": "#ffffffd9",
+        "Dark": "#1e1e1ed9"
+      }
+    },
+    {
+      "name": "liquid/warning/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-warning-bg)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #FFF4E5, dark #3A2A12.",
+      "values": {
+        "Light": "#fff4e5",
+        "Dark": "#3a2a12"
+      }
+    },
+    {
+      "name": "liquid/warning/text",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-liquid-warning-text)",
+      "description": "Liquid (macOS/iOS 27 Liquid Glass) r6 — Apple system value, contrast-corrected per L-02/L-03. Light #B25000, dark #FFB340.",
+      "values": {
+        "Light": "#b25000",
+        "Dark": "#ffb340"
+      }
+    },
+    {
+      "name": "liquid/window/close",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-window-close)",
+      "description": "Liquid (macOS 27 / iOS 27) role from liquid.redesign.json r5; light #ff5f57, dark #ff5f57",
+      "values": {
+        "Light": "#ff5f57",
+        "Dark": "#ff5f57"
+      }
+    },
+    {
+      "name": "liquid/window/minimize",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-window-minimize)",
+      "description": "Liquid (macOS 27 / iOS 27) role from liquid.redesign.json r5; light #febc2e, dark #febc2e",
+      "values": {
+        "Light": "#febc2e",
+        "Dark": "#febc2e"
+      }
+    },
+    {
+      "name": "liquid/window/zoom",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-liquid-window-zoom)",
+      "description": "Liquid (macOS 27 / iOS 27) role from liquid.redesign.json r5; light #28c840, dark #28c840",
+      "values": {
+        "Light": "#28c840",
+        "Dark": "#28c840"
+      }
+    },
+    {
+      "name": "material/fill",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-material-fill)",
+      "values": {
+        "Light": {
+          "alias": "Theme/material/l/fill"
+        },
+        "Dark": {
+          "alias": "Theme/material/d/fill"
+        }
+      }
+    },
+    {
+      "name": "material/fill-strong",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-material-fill-strong)",
+      "values": {
+        "Light": {
+          "alias": "Theme/material/l/fill-strong"
+        },
+        "Dark": {
+          "alias": "Theme/material/d/fill-strong"
+        }
+      }
+    },
+    {
+      "name": "material/stroke",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR",
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-material-stroke)",
+      "values": {
+        "Light": {
+          "alias": "Theme/material/l/stroke"
+        },
+        "Dark": {
+          "alias": "Theme/material/d/stroke"
+        }
+      }
+    },
+    {
+      "name": "material/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-material-track)",
+      "values": {
+        "Light": {
+          "alias": "Theme/material/l/track"
+        },
+        "Dark": {
+          "alias": "Theme/material/d/track"
+        }
+      }
+    },
+    {
+      "name": "pixel/destructive/face",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-destructive-face)",
+      "description": "Destructive button face (red 11). White label 5.2:1.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/l/11"
+        }
+      }
+    },
+    {
+      "name": "pixel/face/secondary-hover",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-face-secondary-hover)",
+      "description": "Hover face of paper (secondary) buttons.",
+      "values": {
+        "Light": "#f4efe6",
+        "Dark": "#322f2b"
+      }
+    },
+    {
+      "name": "pixel/focus/gap",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-focus-gap)",
+      "description": "Keyboard/controller focus: 2px inner gap between a control and the stepped amber ring. Ink in light, warm near-black in dark (never white).",
+      "values": {
+        "Light": "#21201c",
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "pixel/highlight/primary",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-highlight-primary)",
+      "description": "Hero button 2px top highlight. Band 1 in light, band 2 in dark (no near-white line on dark ground).",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/band/1"
+        },
+        "Dark": {
+          "alias": "Primitives/color/band/2"
+        }
+      }
+    },
+    {
+      "name": "pixel/lip/destructive",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-lip-destructive)",
+      "description": "Destructive button bottom lip.",
+      "values": {
+        "Light": "#a8222a",
+        "Dark": "#a8222a"
+      }
+    },
+    {
+      "name": "pixel/lip/primary",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-lip-primary)",
+      "description": "Extruded bottom lip under amber faces (buttons, selected tab, checked box) and the pressed-key inner shade. Band 5.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/band/5"
+        },
+        "Dark": {
+          "alias": "Primitives/color/band/5"
+        }
+      }
+    },
+    {
+      "name": "pixel/lip/secondary",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-lip-secondary)",
+      "description": "Bottom lip inside the ink outline of paper (secondary) buttons and page keys. Sand in light, warm near-black in dark.",
+      "values": {
+        "Light": "#e8e0d3",
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "pixel/recess/shade",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-recess-shade)",
+      "description": "Recessed inputs (fields, checkbox, switch track): 2px inner top and left shade inside the outline. Alpha so it tints rest, error and disabled faces alike.",
+      "values": {
+        "Light": "#8a75502e",
+        "Dark": "#00000073"
+      }
+    },
+    {
+      "name": "pixel/tag/lip-danger",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-tag-lip-danger)",
+      "description": "Status tag 2px bottom lip: hue step 7 in light (soft, label contrast untouched), warm near-black in dark.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/red/l/7"
+        },
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "pixel/tag/lip-info",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-tag-lip-info)",
+      "description": "Status tag 2px bottom lip: hue step 7 in light (soft, label contrast untouched), warm near-black in dark.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/7"
+        },
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "pixel/tag/lip-neutral",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-tag-lip-neutral)",
+      "description": "Status tag 2px bottom lip: hue step 7 in light (soft, label contrast untouched), warm near-black in dark.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/sand/l/7"
+        },
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "pixel/tag/lip-success",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-tag-lip-success)",
+      "description": "Status tag 2px bottom lip: hue step 7 in light (soft, label contrast untouched), warm near-black in dark.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/7"
+        },
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "pixel/tag/lip-warning",
+      "type": "COLOR",
+      "scopes": [
+        "ALL_FILLS",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-pixel-tag-lip-warning)",
+      "description": "Status tag 2px bottom lip: hue step 7 in light (soft, label contrast untouched), warm near-black in dark.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/7"
+        },
+        "Dark": "#12100e"
+      }
+    },
+    {
+      "name": "primary/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-primary-border)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/7"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/7"
+        }
+      }
+    },
+    {
+      "name": "primary/container",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-primary-container)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/4"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/4"
+        }
+      }
+    },
+    {
+      "name": "primary/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-primary)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "primary/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-primary-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/solid-fg"
+        }
+      }
+    },
+    {
+      "name": "primary/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-primary-hover)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/solid-hover"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/solid-hover"
+        }
+      }
+    },
+    {
+      "name": "primary/on-container",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-primary-on-container)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/12"
+        }
+      }
+    },
+    {
+      "name": "primary/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-primary-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/3"
+        }
+      }
+    },
+    {
+      "name": "primary/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-primary-text)",
+      "values": {
+        "Light": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Dark": {
+          "alias": "Theme/accent/d/11"
+        }
+      }
+    },
+    {
+      "name": "secondary/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-secondary-border)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/6"
+        }
+      }
+    },
+    {
+      "name": "secondary/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-secondary)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/3"
+        }
+      }
+    },
+    {
+      "name": "secondary/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-secondary-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "secondary/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-secondary-hover)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/4"
+        }
+      }
+    },
+    {
+      "name": "secondary/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-secondary-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/2"
+        }
+      }
+    },
+    {
+      "name": "secondary/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-secondary-text)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/11"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "state/disabled-container",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-state-disabled-container)",
+      "values": {
+        "Light": "#1c1a1f1f",
+        "Dark": "#ededf01f"
+      }
+    },
+    {
+      "name": "state/disabled-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-state-disabled-fg)",
+      "values": {
+        "Light": "#1c1a1f61",
+        "Dark": "#ededf061"
+      }
+    },
+    {
+      "name": "studio/badge-solid/destructive/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-destructive-bg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/destructive/text"
+        },
+        "Dark": {
+          "alias": "Primitives/color/red/d/5"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/destructive/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-destructive-fg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/surface/card"
+        },
+        "Dark": {
+          "alias": "Scheme/destructive/text"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/info/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-info-bg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/info/text"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/5"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/info/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-info-fg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/surface/card"
+        },
+        "Dark": {
+          "alias": "Scheme/info/text"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/neutral/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-neutral-bg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/text/muted"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/5"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/neutral/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-neutral-fg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/surface/card"
+        },
+        "Dark": {
+          "alias": "Scheme/text/muted"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/success/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-success-bg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/success/text"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/5"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/success/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-success-fg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/surface/card"
+        },
+        "Dark": {
+          "alias": "Scheme/success/text"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/warning/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-warning-bg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/warning/text"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/5"
+        }
+      }
+    },
+    {
+      "name": "studio/badge-solid/warning/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-badge-solid-warning-fg)",
+      "values": {
+        "Light": {
+          "alias": "Scheme/surface/card"
+        },
+        "Dark": {
+          "alias": "Scheme/warning/text"
+        }
+      }
+    },
+    {
+      "name": "studio/brand",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-brand)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Dark": {
+          "alias": "Studio flavor/brand/d"
+        }
+      }
+    },
+    {
+      "name": "studio/brand/on",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-brand-on)",
+      "description": "Glyph/ink drawn on the studio/brand tile (logo letter). Signal: #0b0f0b on lime; other flavors mirror primary/fg.",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/brand-on/l"
+        },
+        "Dark": {
+          "alias": "Studio flavor/brand-on/d"
+        }
+      }
+    },
+    {
+      "name": "studio/button/shadow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-button-shadow)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/button/l/shadow"
+        },
+        "Dark": {
+          "alias": "Studio flavor/button/d/shadow"
+        }
+      }
+    },
+    {
+      "name": "studio/card/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-card-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/card/l/bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/card/d/bg"
+        }
+      }
+    },
+    {
+      "name": "studio/card/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-card-border)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/card/l/border"
+        },
+        "Dark": {
+          "alias": "Studio flavor/card/d/border"
+        }
+      }
+    },
+    {
+      "name": "studio/card/footer",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-card-footer)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/card/l/footer"
+        },
+        "Dark": {
+          "alias": "Studio flavor/card/d/footer"
+        }
+      }
+    },
+    {
+      "name": "studio/code/scroll-thumb",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-code-scroll-thumb)",
+      "description": "Authored code-block scrollbar thumb (a control, &gt;=3:1 on the code surface). Not a decorative border.",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "studio/deco/tick",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-deco-tick)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/deco/l/tick"
+        },
+        "Dark": {
+          "alias": "Studio flavor/deco/d/tick"
+        }
+      }
+    },
+    {
+      "name": "studio/hero/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-hero-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/hero/l/bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/hero/d/bg"
+        }
+      }
+    },
+    {
+      "name": "studio/input/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-input-border)",
+      "description": "Field boundary. Utility: lightest gray measuring ≥3:1 (gray 9).",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/input/l/border"
+        },
+        "Dark": {
+          "alias": "Studio flavor/input/d/border"
+        }
+      }
+    },
+    {
+      "name": "studio/kpi/bg-1",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-bg-1)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/kpi/l/bg-1"
+        },
+        "Dark": {
+          "alias": "Studio flavor/kpi/d/bg-1"
+        }
+      }
+    },
+    {
+      "name": "studio/kpi/bg-2",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-bg-2)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/kpi/l/bg-2"
+        },
+        "Dark": {
+          "alias": "Studio flavor/kpi/d/bg-2"
+        }
+      }
+    },
+    {
+      "name": "studio/kpi/bg-3",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-bg-3)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/kpi/l/bg-3"
+        },
+        "Dark": {
+          "alias": "Studio flavor/kpi/d/bg-3"
+        }
+      }
+    },
+    {
+      "name": "studio/kpi/bg-4",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-bg-4)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/kpi/l/bg-4"
+        },
+        "Dark": {
+          "alias": "Studio flavor/kpi/d/bg-4"
+        }
+      }
+    },
+    {
+      "name": "studio/kpi/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-border)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/kpi/l/border"
+        },
+        "Dark": {
+          "alias": "Studio flavor/kpi/d/border"
+        }
+      }
+    },
+    {
+      "name": "studio/nav/active",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-nav-active)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/nav/l/active"
+        },
+        "Dark": {
+          "alias": "Studio flavor/nav/d/active"
+        }
+      }
+    },
+    {
+      "name": "studio/nav/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-nav-track)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/nav/l/track"
+        },
+        "Dark": {
+          "alias": "Studio flavor/nav/d/track"
+        }
+      }
+    },
+    {
+      "name": "studio/primary/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-primary-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/primary/l/bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/primary/d/bg"
+        }
+      }
+    },
+    {
+      "name": "studio/primary/bg-hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-primary-bg-hover)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/primary/l/bg-hover"
+        },
+        "Dark": {
+          "alias": "Studio flavor/primary/d/bg-hover"
+        }
+      }
+    },
+    {
+      "name": "studio/primary/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-primary-fg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/primary/l/fg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/primary/d/fg"
+        }
+      }
+    },
+    {
+      "name": "studio/primary/stroke",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-primary-stroke)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/primary/l/stroke"
+        },
+        "Dark": {
+          "alias": "Studio flavor/primary/d/stroke"
+        }
+      }
+    },
+    {
+      "name": "studio/signal/brand",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-signal-brand)",
+      "description": "Logo / brand mark only. Utility: Swiss red. Never errors, never markers.",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/signal/l/brand"
+        },
+        "Dark": {
+          "alias": "Studio flavor/signal/d/brand"
+        }
+      }
+    },
+    {
+      "name": "studio/signal/marker",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-signal-marker)",
+      "description": "Location marker (active nav/tab/TOC square, selected-row bar) and link hover underline. Utility: ink.",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/signal/l/marker"
+        },
+        "Dark": {
+          "alias": "Studio flavor/signal/d/marker"
+        }
+      }
+    },
+    {
+      "name": "studio/signal/underline",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-signal-underline)",
+      "description": "Resting link underline. Utility: soft gray; hover → studio/signal/marker.",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/signal/l/underline"
+        },
+        "Dark": {
+          "alias": "Studio flavor/signal/d/underline"
+        }
+      }
+    },
+    {
+      "name": "studio/table/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-table-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/bg"
+        }
+      }
+    },
+    {
+      "name": "studio/table/cell-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-table-cell-rule)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/cell-rule"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/cell-rule"
+        }
+      }
+    },
+    {
+      "name": "studio/table/head",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-table-head)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/head"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/head"
+        }
+      }
+    },
+    {
+      "name": "studio/table/head-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-table-head-rule)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/head-rule"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/head-rule"
+        }
+      }
+    },
+    {
+      "name": "studio/table/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-table-hover)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/hover"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/hover"
+        }
+      }
+    },
+    {
+      "name": "studio/table/row-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-table-row-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/row-bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/row-bg"
+        }
+      }
+    },
+    {
+      "name": "studio/table/row-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-table-row-rule)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/row-rule"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/row-rule"
+        }
+      }
+    },
+    {
+      "name": "studio/table/zebra",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-table-zebra)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/table/l/zebra"
+        },
+        "Dark": {
+          "alias": "Studio flavor/table/d/zebra"
+        }
+      }
+    },
+    {
+      "name": "studio/tabs/idle-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-idle-border)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/tabs/l/idle-border"
+        },
+        "Dark": {
+          "alias": "Studio flavor/tabs/d/idle-border"
+        }
+      }
+    },
+    {
+      "name": "studio/tabs/sel-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-sel-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/tabs/l/sel-bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/tabs/d/sel-bg"
+        }
+      }
+    },
+    {
+      "name": "studio/tabs/sel-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-sel-border)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/tabs/l/sel-border"
+        },
+        "Dark": {
+          "alias": "Studio flavor/tabs/d/sel-border"
+        }
+      }
+    },
+    {
+      "name": "studio/tabs/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-track)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/tabs/l/track"
+        },
+        "Dark": {
+          "alias": "Studio flavor/tabs/d/track"
+        }
+      }
+    },
+    {
+      "name": "studio/topbar/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-studio-topbar-bg)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/topbar/l/bg"
+        },
+        "Dark": {
+          "alias": "Studio flavor/topbar/d/bg"
+        }
+      }
+    },
+    {
+      "name": "studio/topbar/rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-studio-topbar-rule)",
+      "values": {
+        "Light": {
+          "alias": "Studio flavor/topbar/l/rule"
+        },
+        "Dark": {
+          "alias": "Studio flavor/topbar/d/rule"
+        }
+      }
+    },
+    {
+      "name": "success/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-success-border)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/6"
+        }
+      }
+    },
+    {
+      "name": "success/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-success)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/9"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/9"
+        }
+      }
+    },
+    {
+      "name": "success/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-success-fg)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/white"
+        },
+        "Dark": {
+          "alias": "Primitives/color/white"
+        }
+      }
+    },
+    {
+      "name": "success/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-success-hover)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/10"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/10"
+        }
+      }
+    },
+    {
+      "name": "success/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-success-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/3"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/3"
+        }
+      }
+    },
+    {
+      "name": "success/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-success-text)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/11"
+        }
+      }
+    },
+    {
+      "name": "surface/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-bg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Dark": {
+          "alias": "Theme/surface/d/canvas"
+        }
+      }
+    },
+    {
+      "name": "surface/card",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-card)",
+      "values": {
+        "Light": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Dark": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "surface/container",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-container)",
+      "values": {
+        "Light": {
+          "alias": "Theme/surface/l/container"
+        },
+        "Dark": {
+          "alias": "Theme/surface/d/container"
+        }
+      }
+    },
+    {
+      "name": "surface/container-high",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-container-high)",
+      "values": {
+        "Light": {
+          "alias": "Theme/surface/l/container-high"
+        },
+        "Dark": {
+          "alias": "Theme/surface/d/container-high"
+        }
+      }
+    },
+    {
+      "name": "surface/container-highest",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-container-highest)",
+      "values": {
+        "Light": {
+          "alias": "Theme/surface/l/container-highest"
+        },
+        "Dark": {
+          "alias": "Theme/surface/d/container-highest"
+        }
+      }
+    },
+    {
+      "name": "surface/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-hover)",
+      "values": {
+        "Light": {
+          "alias": "Theme/hover/l"
+        },
+        "Dark": {
+          "alias": "Theme/hover/d"
+        }
+      }
+    },
+    {
+      "name": "surface/inverse",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-inverse)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "surface/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-muted)",
+      "values": {
+        "Light": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Dark": {
+          "alias": "Theme/tone/d/muted"
+        }
+      }
+    },
+    {
+      "name": "surface/overlay",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-overlay)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/overlay/l"
+        },
+        "Dark": {
+          "alias": "Primitives/color/overlay/d"
+        }
+      }
+    },
+    {
+      "name": "surface/raised",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-surface-raised)",
+      "values": {
+        "Light": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Dark": {
+          "alias": "Theme/surface/d/raised"
+        }
+      }
+    },
+    {
+      "name": "surface/selected",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-selected)",
+      "values": {
+        "Light": {
+          "alias": "Theme/selected/l"
+        },
+        "Dark": {
+          "alias": "Theme/selected/d"
+        }
+      }
+    },
+    {
+      "name": "surface/surface",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-surface)",
+      "values": {
+        "Light": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Dark": {
+          "alias": "Theme/tone/d/sunken"
+        }
+      }
+    },
+    {
+      "name": "tactile/accent",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-accent)",
+      "values": {
+        "Light": "#1e7bff",
+        "Dark": "#3b8bff"
+      }
+    },
+    {
+      "name": "tactile/concave/end",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-concave-end)",
+      "values": {
+        "Light": "#e2e6ed",
+        "Dark": "#2b2f34"
+      }
+    },
+    {
+      "name": "tactile/concave/start",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-concave-start)",
+      "values": {
+        "Light": "#ccd4df",
+        "Dark": "#1b1d20"
+      }
+    },
+    {
+      "name": "tactile/convex/end",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-convex-end)",
+      "values": {
+        "Light": "#d5dce5",
+        "Dark": "#222428"
+      }
+    },
+    {
+      "name": "tactile/convex/start",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-convex-start)",
+      "values": {
+        "Light": "#ebeef3",
+        "Dark": "#32363c"
+      }
+    },
+    {
+      "name": "tactile/edge/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-edge-border)",
+      "values": {
+        "Light": "#d1d9e6",
+        "Dark": "#24272b"
+      }
+    },
+    {
+      "name": "tactile/edge/control",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-edge-control)",
+      "values": {
+        "Light": "#6a759e",
+        "Dark": "#7a8498"
+      }
+    },
+    {
+      "name": "tactile/glow/accent",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-glow-accent)",
+      "values": {
+        "Light": "#1e7bff73",
+        "Dark": "#3b8bff8c"
+      }
+    },
+    {
+      "name": "tactile/glow/amber",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-glow-amber)",
+      "values": {
+        "Light": "#f59e0b8c",
+        "Dark": "#fbbf2480"
+      }
+    },
+    {
+      "name": "tactile/glow/blue",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-glow-blue)",
+      "values": {
+        "Light": "#1e7bff80",
+        "Dark": "#3b8bff8c"
+      }
+    },
+    {
+      "name": "tactile/glow/green",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-glow-green)",
+      "values": {
+        "Light": "#22c55e8c",
+        "Dark": "#34d3998c"
+      }
+    },
+    {
+      "name": "tactile/glow/red",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-glow-red)",
+      "values": {
+        "Light": "#ef444480",
+        "Dark": "#f8717180"
+      }
+    },
+    {
+      "name": "tactile/groove/dark",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-groove-dark)",
+      "values": {
+        "Light": "#a3b1c699",
+        "Dark": "#1c1e21"
+      }
+    },
+    {
+      "name": "tactile/groove/light",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-groove-light)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#34383e"
+      }
+    },
+    {
+      "name": "tactile/inset/highlight",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-inset-highlight)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#34383e"
+      }
+    },
+    {
+      "name": "tactile/inset/shade",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-inset-shade)",
+      "values": {
+        "Light": "#a3b1c6bf",
+        "Dark": "#1c1e21"
+      }
+    },
+    {
+      "name": "tactile/led/amber",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-led-amber)",
+      "values": {
+        "Light": "#f59e0b",
+        "Dark": "#fbbf24"
+      }
+    },
+    {
+      "name": "tactile/led/blue",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-led-blue)",
+      "values": {
+        "Light": "#1e7bff",
+        "Dark": "#3b8bff"
+      }
+    },
+    {
+      "name": "tactile/led/green",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-led-green)",
+      "values": {
+        "Light": "#22c55e",
+        "Dark": "#34d399"
+      }
+    },
+    {
+      "name": "tactile/led/grey",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-led-grey)",
+      "values": {
+        "Light": "#9aa3b8",
+        "Dark": "#6b7387"
+      }
+    },
+    {
+      "name": "tactile/led/off",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-led-off)",
+      "values": {
+        "Light": "#c7cfdb",
+        "Dark": "#1c1e21"
+      }
+    },
+    {
+      "name": "tactile/led/red",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-led-red)",
+      "values": {
+        "Light": "#ef4444",
+        "Dark": "#f87171"
+      }
+    },
+    {
+      "name": "tactile/shadow/highlight",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-shadow-highlight)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#34383e"
+      }
+    },
+    {
+      "name": "tactile/shadow/shade",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-shadow-shade)",
+      "values": {
+        "Light": "#a3b1c699",
+        "Dark": "#1c1e21"
+      }
+    },
+    {
+      "name": "tactile/surface/accent",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-accent)",
+      "values": {
+        "Light": "#1a6fe8",
+        "Dark": "#1a6fe8"
+      }
+    },
+    {
+      "name": "tactile/surface/accent-end",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-accent-end)",
+      "values": {
+        "Light": "#1560cf",
+        "Dark": "#1560cf"
+      }
+    },
+    {
+      "name": "tactile/surface/accent-start",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-accent-start)",
+      "values": {
+        "Light": "#1a6fe8",
+        "Dark": "#1a6fe8"
+      }
+    },
+    {
+      "name": "tactile/surface/base",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-base)",
+      "values": {
+        "Light": "#e0e5ec",
+        "Dark": "#2a2d32"
+      }
+    },
+    {
+      "name": "tactile/surface/disabled",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-disabled)",
+      "values": {
+        "Light": "#dae0e8",
+        "Dark": "#2f3238"
+      }
+    },
+    {
+      "name": "tactile/surface/tone",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-tone)",
+      "values": {
+        "Light": "#dbe1e9",
+        "Dark": "#27292e"
+      }
+    },
+    {
+      "name": "tactile/surface/well",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tactile-surface-well)",
+      "values": {
+        "Light": "#d7dde6",
+        "Dark": "#23262a"
+      }
+    },
+    {
+      "name": "tactile/text/accent",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-accent)",
+      "values": {
+        "Light": "#1550b5",
+        "Dark": "#79b0ff"
+      }
+    },
+    {
+      "name": "tactile/text/body",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-body)",
+      "values": {
+        "Light": "#2b3852",
+        "Dark": "#c8ced8"
+      }
+    },
+    {
+      "name": "tactile/text/danger",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-danger)",
+      "values": {
+        "Light": "#a1262a",
+        "Dark": "#ff8a8a"
+      }
+    },
+    {
+      "name": "tactile/text/disabled",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-disabled)",
+      "values": {
+        "Light": "#9aa3b8",
+        "Dark": "#5c6477"
+      }
+    },
+    {
+      "name": "tactile/text/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-muted)",
+      "values": {
+        "Light": "#4a5672",
+        "Dark": "#9aa3b2"
+      }
+    },
+    {
+      "name": "tactile/text/on-accent",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-on-accent)",
+      "values": {
+        "Light": "#ffffff",
+        "Dark": "#ffffff"
+      }
+    },
+    {
+      "name": "tactile/text/strong",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-strong)",
+      "values": {
+        "Light": "#1b2840",
+        "Dark": "#f1f3f7"
+      }
+    },
+    {
+      "name": "tactile/text/success",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-success)",
+      "values": {
+        "Light": "#0e6a3b",
+        "Dark": "#4ade80"
+      }
+    },
+    {
+      "name": "tactile/text/warning",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tactile-text-warning)",
+      "values": {
+        "Light": "#7c4a08",
+        "Dark": "#fbbf24"
+      }
+    },
+    {
+      "name": "text/card",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-card-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "text/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "text/inverse",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-inverse-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/1"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/1"
+        }
+      }
+    },
+    {
+      "name": "text/muted",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-muted-fg)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/11"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "text/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-fg-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Theme/gray/l/11"
+        },
+        "Dark": {
+          "alias": "Theme/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "warning/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-warning-border)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/6"
+        }
+      }
+    },
+    {
+      "name": "warning/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-warning)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/9"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/9"
+        }
+      }
+    },
+    {
+      "name": "warning/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-warning-fg)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/sand/l/12"
+        },
+        "Dark": {
+          "alias": "Primitives/color/sand/d/1"
+        }
+      }
+    },
+    {
+      "name": "warning/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-warning-hover)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/10"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/10"
+        }
+      }
+    },
+    {
+      "name": "warning/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-warning-subtle)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/3"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/3"
+        }
+      }
+    },
+    {
+      "name": "warning/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-warning-text)",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/amber/l/12"
+        },
+        "Dark": {
+          "alias": "Primitives/color/amber/d/11"
+        }
+      }
+    }
+  ]
+}

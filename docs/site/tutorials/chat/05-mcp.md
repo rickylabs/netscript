@@ -8,12 +8,11 @@ next: { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/"
 
 # MCP tools & widgets
 
-Chapter 4's tool was code you wrote. Real products also need capabilities that live behind
-**Model Context Protocol** servers — a docs-search server, an ops server, a vendor's tool
-endpoint. In this chapter you connect the chat to a remote MCP server with the
-`@netscript/ai/mcp` client stack, call one of its tools from the same `authorize`-gated turn,
-and render the `ui://` **widget** an MCP tool result can carry — sandboxed and themed, never
-as raw HTML in your island tree.
+This chapter connects the chat to a remote **Model Context Protocol** server, such as a
+docs-search server, an ops server or a vendor's tool endpoint. You call one of its tools from the
+same `authorize`-gated turn with the `@netscript/ai/mcp` client stack, and render the `ui://`
+**widget** an MCP tool result can carry: sandboxed and themed, never as raw HTML in your island
+tree.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
@@ -24,9 +23,29 @@ as raw HTML in your island tree.
   { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
-## The pieces — all shipped, one boundary
+## What you will build
 
-Three seams do the work, and every one of them is published and installable today:
+A `searchRemote` tool whose handler runs on a remote server through an MCP transport pool. The
+model calls it like the chapter 4 tool. The result, including any `ui://` widget the server
+returns, lands in the durable transcript and renders in the chat, themed and isolated behind a
+per-response CSP.
+
+## Before you begin
+
+You need the working chat from chapters [1](/tutorials/chat/01-scaffold/)–[4](/tutorials/chat/04-tool-call/)
+and the engine package, which owns the MCP client stack:
+
+```sh
+deno add jsr:@netscript/ai{{ releaseSpecifier }}
+```
+
+You also need an MCP server to talk to. Any Streamable-HTTP MCP endpoint you have access to works;
+the examples use a docs-search server. Put its URL and token in the app environment next to your
+model key, never in code.
+
+## The pieces
+
+Three seams do the work:
 
 {{ comp.apiTable({
   caption: "The MCP surface this chapter uses",
@@ -38,37 +57,14 @@ Three seams do the work, and every one of them is published and installable toda
 }) }}
 
 {{ comp callout { type: "note", title: "Client, not server" } }}
-NetScript's shipped MCP surface is <strong>client-side</strong>: your app <em>consumes</em>
-external MCP servers as tools. There is no scaffolded NetScript MCP server in this release —
-this chapter points your chat <em>at</em> a server, it does not make your app one. See
-<a href="/ai/mcp/">the MCP guide</a> for the full client stack.
+NetScript's MCP surface is <strong>client-side</strong>: your app <em>consumes</em> external MCP servers as tools. NetScript does not scaffold an MCP server, and this chapter points your chat <em>at</em> a server rather than making your app one. <a href="/ai/mcp/">The MCP guide</a> covers the full client stack.
 {{ /comp }}
-
-## What you will build
-
-A `searchRemote` tool whose handler routes through an MCP transport pool instead of your own
-code: the model calls it like any chapter-4 tool, the pool executes it on the remote server,
-and the result — including any `ui://` widget the server returns — lands in the durable
-transcript and renders in the chat, themed and walled off behind a per-response CSP.
-
-## Before you begin
-
-You need the working chat from chapters [1](/tutorials/chat/01-scaffold/)–[4](/tutorials/chat/04-tool-call/),
-plus the engine package, which owns the MCP client stack:
-
-```sh
-deno add jsr:@netscript/ai{{ releaseSpecifier }}
-```
-
-You also need an MCP server to talk to — any Streamable-HTTP MCP endpoint you have access to
-works (a docs-search server is the running example below). Put its URL and token in the app
-environment next to your model key, never in code.
 
 ## Step 1 — Declare the server pool
 
-`createMcpTransportPool` turns server declarations into a connected tool surface. The configs
-are **serializable data** — kind, id, URL, auth — so they can live in configuration. Auth is
-injected here at the composition root, never baked into a transport:
+`createMcpTransportPool` turns server declarations into a connected tool surface. The configs are
+**serializable data** (kind, id, URL, auth), so they can live in configuration. Auth is injected
+here at the composition root, never baked into a transport:
 
 ```ts
 // apps/dashboard/lib/mcp/pool.ts
@@ -88,15 +84,15 @@ export const mcpPool = createMcpTransportPool({
 export const mcpTools = await mcpPool.connect({});
 ```
 
-The Streamable-HTTP transport is built for long-lived sessions: it reconnects with backoff,
-and `reconnecting` is a first-class `McpConnectionState`, not an error. Add a second server to
-the `servers` array and the pool keeps their tools namespaced — many servers, one surface.
+The Streamable-HTTP transport is built for long-lived sessions. It reconnects with backoff, and
+`reconnecting` is a first-class `McpConnectionState`, not an error. Add a second server to the
+`servers` array and the pool keeps each server's tools namespaced.
 
 ## Step 2 — Bridge a pooled tool into the chat turn
 
-Your route's model call runs on `@tanstack/ai` (chapter 2), so give the model a chapter-4-style
-tool whose **handler routes through the pool**. `callTool` sends the prefixed tool name to its
-server and hands back the result with any `ui://` resources already extracted:
+The route's model call runs on `@tanstack/ai` (chapter 2), so give the model a tool like the one in
+chapter 4, with a handler that **routes through the pool**. `callTool` sends the prefixed tool name
+to its server and returns the result with any `ui://` resources already extracted:
 
 ```ts
 // apps/dashboard/lib/tools/search-remote.ts
@@ -119,29 +115,23 @@ export const searchRemote = toolDefinition({
 });
 ```
 
-Add `searchRemote` to the same `tools` array as chapter 4's `searchDocs`. Nothing else in the
-route changes: the tool runs server-side, inside the `authorize`-gated turn, and the whole
-exchange — arguments, result, and the `ui://` references — is persisted as a transport `tool`
-part in the durable session.
+Add `searchRemote` to the same `tools` array as `searchDocs` from chapter 4. Nothing else in the
+route changes: the tool runs server-side inside the `authorize`-gated turn, and the arguments,
+result and `ui://` references are persisted as a transport `tool` part in the durable session.
 
 {{ comp callout { type: "note", title: "Two ways in — this track takes the bridge" } }}
-The engine-native path is <code>registerMcpTools(registry, pool)</code>, which surfaces remote
-tools into the engine's tool registry for its <a href="/ai/engine/">agent loop</a> to dispatch —
-registration is reversible via <code>.stop()</code>. This track bridges through a
-<code>@tanstack/ai</code> tool instead, because the durable session plane persists and replays
-TanStack chunk streams (the wire-shape note from chapter 2). Same pool, same servers — choose
-the entry point that matches your model-call layer.
+The engine-native path is <code>registerMcpTools(registry, pool)</code>, which surfaces remote tools in the engine's tool registry for its <a href="/ai/engine/">agent loop</a> to dispatch; <code>.stop()</code> reverses the registration. This track bridges through a <code>@tanstack/ai</code> tool instead, because the durable session plane persists and replays TanStack chunk streams (see chapter 2). Both paths use the same pool and servers; choose the one that matches your model-call layer.
 {{ /comp }}
 
-## Step 3 — Render the `ui://` widget, sandboxed
+## Step 3 — Mount the sandbox route
 
-An MCP tool result can embed `ui://` resources — **UI authored by the server, not by you**.
-They reach the page only through two guardrails, both already in your app:
+An MCP tool result can embed `ui://` resources: **UI authored by the server, not by you**. They
+reach the page only through two guardrails, the sandbox route and the widget island.
 
-1. **The sandbox route.** Mount `createMcpSandboxHandler` once; it serves a registered
-   resource selected by `?uri=`, injects the active theme's `--ns-*` custom properties, stamps
-   `data-theme`, and applies a per-response CSP derived from the resource URI. `?theme=` picks
-   a token set; an unknown theme falls back to `defaultThemeName` (`"default"`).
+Mount `createMcpSandboxHandler` once. It serves a registered resource selected by `?uri=`, injects
+the active theme's `--ns-*` custom properties, stamps `data-theme`, and applies a per-response CSP
+derived from the resource URI. `?theme=` picks a token set; an unknown theme falls back to
+`defaultThemeName` (`"default"`).
 
 ```ts
 // apps/dashboard/routes/mcp/sandbox.ts
@@ -159,18 +149,16 @@ export const handler = {
 };
 ```
 
-2. **The widget island.** The `ai` collection you copied in chapter 3 includes the
-   `McpUiWidget` island: hand it a `ui://` resource from the tool part's output and it renders
-   the widget in a sanitized, `no-referrer` sandboxed frame served through the route above. In
-   the chapter-4 render switch, a tool part whose output carries `uiResources` renders those
-   through `McpUiWidget` alongside (or instead of) the plain tool-call card.
+## Step 4 — Render the widget
 
-{{ comp callout { type: "important", title: "Server-authored UI never enters your island tree raw" } }}
-This is the same trust boundary as the generative-UI renderer: model- or server-authored UI
-reaches the page only through a curated renderer or the sandbox — sanitized, themed, CSP-guarded,
-frame-isolated. Never interpolate a <code>ui://</code> resource's content into your own markup.
-And do not build on <code>createNetScriptMcpSandbox</code> (the chat-activity tool sandbox): it
-is a skeleton stub in this release — the route + widget path above is the shipped one.
+The `ai` collection you copied in chapter 3 includes the `McpUiWidget` island. Hand it a `ui://`
+resource from the tool part's output, and it renders the widget in a sanitized, `no-referrer`
+sandboxed frame served through the route above. In the chapter 4 render switch, render a tool
+part whose output carries `uiResources` through `McpUiWidget`, alongside or instead of the plain
+tool-call card.
+
+{{ comp callout { type: "caution", title: "Server-authored UI never enters your island tree raw" } }}
+Model- or server-authored UI reaches the page only through a curated renderer or the sandbox: sanitized, themed, CSP-guarded and frame-isolated. This is the same trust boundary as the generative-UI renderer. Never interpolate the content of a <code>ui://</code> resource into your own markup.
 {{ /comp }}
 
 ## Verify your progress
@@ -178,26 +166,26 @@ is a skeleton stub in this release — the route + widget path above is the ship
 With `aspire start` running and your MCP server reachable:
 
 1. Ask a question that triggers the remote tool. The reply carries a tool-call card naming
-   `searchRemote` — its result came over MCP, not from your code.
-2. If the server returned a `ui://` resource, the **widget renders** inside the chat, themed
-   like the page around it.
+   `searchRemote`; its result came over MCP, not from your code.
+2. If the server returned a `ui://` resource, check that the **widget renders** inside the chat,
+   themed like the page around it.
 3. Probe the sandbox route directly and check the isolation headers:
 
-```sh
-# $APP is the app URL from the Aspire dashboard, as in chapter 2.
-curl -i "$APP/mcp/sandbox?uri=ui%3A%2F%2Fwidget%2Fdemo&theme=dark"
-```
+   ```sh
+   # $APP is the app URL from the Aspire dashboard, as in chapter 2.
+   curl -i "$APP/mcp/sandbox?uri=ui%3A%2F%2Fwidget%2Fdemo&theme=dark"
+   ```
 
-You should see the resolved resource with `data-theme="dark"` and the dark `--ns-*` tokens,
-under a `content-security-policy` response header derived from the resource URI.
+   You should see the resolved resource with `data-theme="dark"` and the dark `--ns-*` tokens,
+   under a `content-security-policy` response header derived from the resource URI.
 
-4. **Reload.** The tool card — and the widget reference in its output — replays from the
-   durable session, exactly like every other part of the transcript.
+4. **Reload.** The tool card and the widget reference in its output replay from the durable
+   session, like every other part of the transcript.
 5. Type-check the app:
 
-```bash
-deno task --cwd apps/dashboard check
-```
+   ```bash
+   deno task --cwd apps/dashboard check
+   ```
 
 - [ ] `deno add jsr:@netscript/ai{{ releaseSpecifier }}` resolved and the pool `connect()`s to your server.
 - [ ] Asking a relevant question triggers the `searchRemote` tool over MCP.
@@ -207,19 +195,12 @@ deno task --cwd apps/dashboard check
 - [ ] `deno task --cwd apps/dashboard check` is clean.
 
 {{ comp callout { type: "tip", title: "If the remote tool never fires" } }}
-Check the pool first: <code>connect()</code> returns the discovered tool descriptors — if your
-tool is missing, the server URL, auth mode, or token is wrong. A tool that fires but errors
-surfaces as an <code>error</code> tool card (chapter 4's rule), and a dropped connection shows
-as the transport's <code>reconnecting</code> state, not a crash — subscribe with
-<code>onStateChange</code> to watch the lifecycle while debugging.
+Check the pool first: <code>connect()</code> returns the discovered tool descriptors, so if your tool is missing, the server URL, auth mode or token is wrong. A tool that fires but errors surfaces as an <code>error</code> tool card (as in chapter 4). A dropped connection shows as the transport's <code>reconnecting</code> state, not a crash; subscribe with <code>onStateChange</code> to watch the lifecycle while debugging.
 {{ /comp }}
 
 ## What you built
 
-A chat whose tools no longer stop at your own code: a declared MCP server pool, a bridged tool
-the model calls like any other, and server-authored `ui://` widgets rendered through the
-sandbox route and the copied `McpUiWidget` island — durable in the transcript, isolated on the
-page. Next you make the whole transcript feel live — folding the model's chunks into the UI as
-they arrive instead of after each turn settles.
-
-{{ comp.nextPrev({ prev: { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" }, next: { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" } }) }}
+A declared MCP server pool, a bridged tool the model calls like any other, and server-authored
+`ui://` widgets rendered through the sandbox route and the copied `McpUiWidget` island: durable in
+the transcript, isolated on the page. Next, you make the transcript live, folding the model's
+chunks into the UI as they arrive instead of after each turn settles.

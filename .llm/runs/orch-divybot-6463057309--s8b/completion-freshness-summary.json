@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "provenance": "Sanitized projections of actual run-gate receipts; raw host-path receipts retained privately in TMPDIR, not rewritten or represented as public raw receipts.",
+  "gates": [
+    {
+      "gateId": "agent-docs-prose",
+      "argv": [
+        "deno",
+        "task",
+        "check:agent-docs-prose"
+      ],
+      "gitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "actualGitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "requestHash": "eaf101599d5395a4af6c8ebd40ee0f258ba5f8325b61f1be21b940f69a39e702",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12575,
+      "cwd": ".",
+      "stdoutSha256": "e5cf1db5156d094d8bac958f490dfe2f752a6866d4faa4e227204bc6d137f615",
+      "stderrSha256": "16eb3c12dc30b9513577d1603050a8b57d50b3c0702c9c61aa261b95f1899072"
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "argv": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "gitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "actualGitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "requestHash": "172df53bb886a9320498afcb9488ef7206b9e7c4b42d66aeb1ba3dda107fbfac",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9208,
+      "cwd": ".",
+      "stdoutSha256": "65f5a84d6d3bac716836a75d2c4620ffa9026506cf9194a3dda617dc2f2612b4",
+      "stderrSha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650"
+    },
+    {
+      "gateId": "assets-barrel",
+      "argv": [
+        "deno",
+        "task",
+        "check:assets-barrel"
+      ],
+      "gitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "actualGitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "requestHash": "2b08a3a8afff77660f87328be39c06c4928fd28782e9b5ed1a181bfa36712b78",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1090,
+      "cwd": ".",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "ff17dee5ed9a60bab446f528afb0947c6a7b2b25940e3311781aa295239009c6"
+    },
+    {
+      "gateId": "publish-assets",
+      "argv": [
+        "deno",
+        "task",
+        "check:publish-assets"
+      ],
+      "gitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "actualGitHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+      "requestHash": "b54301d5d1bc238c128ebc94d82a102443151f45dfab43a2b99c953a4a97da55",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 481,
+      "cwd": ".",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b"
+    }
+  ],
+  "actualCommittedCarrier": {
+    "designSystemMarkdownTwins": 15,
+    "mcpSourceBytes": 284489,
+    "mcpMaxBytes": 294912,
+    "mcpDocumentCount": 14,
+    "verdict": "PASS"
+  },
+  "sourceReviewContinuity": "Generator, renderer, fixture, section page entry point and section styles are byte-identical to independently approved implementation 1828064bf."
+}

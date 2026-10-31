@@ -1,0 +1,60 @@
+{
+  "gateId": "auth-controls",
+  "invocationId": "auth-controls",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-test.ts",
+    "--output",
+    ".llm/tmp/better-auth-security-sol-20261028/auth-controls.json",
+    "--",
+    "--cached-only",
+    "--frozen",
+    "--check",
+    "--allow-all",
+    "--sanitize-ops",
+    "--sanitize-resources",
+    "--trace-leaks",
+    "packages/auth-better-auth/tests/",
+    "plugins/auth/tests/services/"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "e010380bc5d36c58be476af382c9ea2aadfe4134ef69c8d91c4145c7f1985117",
+  "lifecycleId": "/root/service_qualification_sol:auth-controls:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-10-28T03:17:55.361Z",
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/auth-controls.json",
+  "startedAt": "2026-10-28T03:17:55.368Z",
+  "finishedAt": "2026-10-28T03:18:41.682Z",
+  "durationMs": 46314,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 161,
+    "sha256": "a1123d464b20aa2aa115152c6ba99a78a01271958b9f9c49f8897d00ef96822a",
+    "tail": "{\"report\":\".llm/tmp/better-auth-security-sol-20261028/auth-controls.json\",\"summary\":{\"passed\":98,\"failed\":16,\"ignored\":0,\"totalResults\":114,\"uniqueFailures\":9}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/better-auth-security-sol-20261028/auth-controls.json",
+    "bytes": 11627,
+    "sha256": "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e",
+    "modifiedAt": "2026-10-28T03:18:41.665Z"
+  }
+}

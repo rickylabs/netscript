@@ -4,6 +4,7 @@ import {
   README_FENCE_RATCHET,
   type ReadmeFenceCensus,
   readmeFenceRatchetFailures,
+  readmeFenceTypeErrorPaths,
 } from './readme-fence-policy.ts';
 
 const baseline: ReadmeFenceCensus = {
@@ -17,6 +18,41 @@ const baseline: ReadmeFenceCensus = {
   failingReadmes: README_FENCE_RATCHET.maximumFailingReadmes,
   unattributedFailure: false,
 };
+
+Deno.test('independent checks coalesce one missing module without masking a different missing target', () => {
+  const missing = (target: string, line: number) =>
+    `TS2307 [ERROR]: Cannot find module '${target}'.\n    at file://packages/sdk/README.md:${line}:1\n`;
+  assertEquals(
+    readmeFenceTypeErrorPaths(
+      missing('orders.ts', 10) + missing('orders.ts', 20) + missing('new-missing.ts', 30),
+    ),
+    ['packages/sdk/README.md', 'packages/sdk/README.md'],
+  );
+});
+
+Deno.test('type errors retain distinct locations and dependency failures cannot borrow README provenance', () => {
+  const mismatch = (path: string, line: number) =>
+    `TS2322 [ERROR]: Type 'number' is not assignable to type 'string'.\n    at file://${path}:${line}:1\n`;
+  assertEquals(
+    readmeFenceTypeErrorPaths(
+      mismatch('packages/dependency/mod.ts', 1) +
+        mismatch('packages/sdk/README.md', 10) +
+        mismatch('packages/sdk/README.md', 20) +
+        mismatch('packages/sdk/README.md', 20),
+    ),
+    ['packages/sdk/README.md', 'packages/sdk/README.md'],
+  );
+});
+
+Deno.test('unmapped bare imports remain distinct at different fence locations', () => {
+  const unmapped = (line: number) =>
+    'TS2307 [ERROR]: Import "@example/contracts" not a dependency and not in import map ' +
+    `from "file://packages/sdk/README.md"\n    at file://packages/sdk/README.md:${line}:1\n`;
+  assertEquals(
+    readmeFenceTypeErrorPaths(unmapped(10) + unmapped(20) + unmapped(20)),
+    ['packages/sdk/README.md', 'packages/sdk/README.md'],
+  );
+});
 
 Deno.test('the measured baseline passes and every ceiling sits at its exact census', () => {
   assertEquals(readmeFenceRatchetFailures(baseline), []);

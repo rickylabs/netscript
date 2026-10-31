@@ -1,0 +1,27 @@
+Task arch:check deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots
+Task deps:check deno task deps:check:reference-locks && deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno run --allow-read .llm/tools/deps/check-private-lock-workspace.ts && deno task deps:check:zod && deno task deps:check:db
+Task deps:check:reference-locks deno run --allow-read --allow-write --allow-run .llm/tools/deps/check-reference-locks.ts
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.7
+│  npm:msgpackr-extract@3.0.4
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.7
+│  npm:msgpackr-extract@3.0.4
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+Warning: config file file:///C:/Users/ericc/source/repos/netscript-better-auth-security-008/resources/examples/expo-streams/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-better-auth-security-008/. Ignoring the parent workspace config.
+Download https://registry.npmjs.org/react-test-renderer
+Task deps:check:zod deno run --allow-read .llm/tools/deps/check-zod-alignment.ts
+Task deps:check:db deno run --allow-read --allow-write --allow-env --allow-run .llm/tools/deps/check-db-alignment.ts

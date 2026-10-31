@@ -13,16 +13,48 @@ export interface Section {
   heading: string;
 }
 
+/** One section per docs lane, in top-bar order; `sectionOf` mirrors `getDocsLane`. */
 export const SECTIONS: readonly Section[] = [
-  { id: 'start', heading: 'Getting started' },
-  { id: 'tutorials', heading: 'Tutorials' },
-  { id: 'howto', heading: 'How-to guides' },
-  { id: 'capabilities', heading: 'Capabilities & hubs' },
+  { id: 'start', heading: 'Start' },
+  { id: 'tutorials', heading: 'Learn' },
+  { id: 'capabilities', heading: 'Build' },
   { id: 'reference', heading: 'Reference' },
-  { id: 'explanation', heading: 'Explanation' },
+  { id: 'explanation', heading: 'Concepts' },
+  { id: 'design-system', heading: 'Design system' },
 ];
 
-const HUB_PREFIXES = [
+const BUILD_PREFIXES = [
+  '/how-to/',
+  '/web-layer/',
+  '/services-sdk/',
+  '/background-processing/',
+  '/durable-workflows/',
+  '/ai/',
+  '/data-persistence/',
+  '/identity-access/',
+  '/orchestration-runtime/',
+  '/observability/',
+];
+
+export function sectionOf(url: string): string {
+  if (url.startsWith('/tutorials/')) return 'tutorials';
+  if (url.startsWith('/reference/') || url === '/cli-reference/' || url === '/glossary/') {
+    return 'reference';
+  }
+  if (url.startsWith('/explanation/') || url.startsWith('/comparisons/')) return 'explanation';
+  if (url.startsWith('/design-system/')) return 'design-system';
+  if (BUILD_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
+  return 'start';
+}
+
+/**
+ * Concatenation order of llms-full.txt, which has no section headings. It predates the lane
+ * sections above and stays fixed: the frozen carrier-parity fixture rebuilds the full corpus from
+ * its legacy pages and compares digests, so reordering it would break that guarantee.
+ */
+const CORPUS_ORDER = ['start', 'tutorials', 'howto', 'capabilities', 'reference', 'explanation'];
+
+const CORPUS_HUB_PREFIXES = [
   '/web-layer/',
   '/services-sdk/',
   '/background-processing/',
@@ -34,12 +66,12 @@ const HUB_PREFIXES = [
   '/capabilities/',
 ];
 
-export function sectionOf(url: string): string {
+function corpusGroupOf(url: string): string {
   if (url.startsWith('/tutorials/')) return 'tutorials';
   if (url.startsWith('/how-to/')) return 'howto';
   if (url.startsWith('/reference/')) return 'reference';
   if (url.startsWith('/explanation/')) return 'explanation';
-  if (HUB_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
+  if (CORPUS_HUB_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
   return 'start';
 }
 
@@ -48,10 +80,10 @@ export function buildLlmsFull(
   origin: URL,
   releaseVersion: string,
 ): string {
-  const order = new Map(SECTIONS.map((section, i) => [section.id, i]));
+  const order = new Map(CORPUS_ORDER.map((group, i) => [group, i]));
   const sorted = [...infos].sort((a, b) => {
-    const sa = order.get(sectionOf(a.url)) ?? 99;
-    const sb = order.get(sectionOf(b.url)) ?? 99;
+    const sa = order.get(corpusGroupOf(a.url)) ?? 99;
+    const sb = order.get(corpusGroupOf(b.url)) ?? 99;
     return sa !== sb ? sa - sb : a.url.localeCompare(b.url);
   });
 

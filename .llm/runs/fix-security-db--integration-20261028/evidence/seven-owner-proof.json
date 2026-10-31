@@ -1,0 +1,91 @@
+{
+  "proposalOnly": false,
+  "noIntegrationPerformed": false,
+  "base": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "securitySourceHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+  "acceptedDbHead": "ec3cc9161474ef1e1298e7a91148d1ee781cc61d",
+  "productionOwnerCount": 7,
+  "files": [
+    {
+      "path": "deno.json",
+      "origin": "Security2426",
+      "originHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "gitBlobSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "bytes": 22365,
+      "physicalLines": 287,
+      "cap": 287
+    },
+    {
+      "path": "deno.lock",
+      "origin": "Security2426",
+      "originHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "gitBlobSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "bytes": 187051,
+      "physicalLines": 4877,
+      "cap": 4877
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "origin": "Security2426",
+      "originHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "gitBlobSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "bytes": 164831,
+      "physicalLines": 4373,
+      "cap": 4373
+    },
+    {
+      "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+      "origin": "Security2426",
+      "originHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "gitBlobSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "bytes": 3198,
+      "physicalLines": 78,
+      "cap": 78
+    },
+    {
+      "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+      "origin": "Security2426",
+      "originHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+      "gitBlobSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "bytes": 7603,
+      "physicalLines": 184,
+      "cap": 184
+    },
+    {
+      "path": ".llm/tools/deps/check-db-alignment.ts",
+      "origin": "DB2425",
+      "originHead": "ec3cc9161474ef1e1298e7a91148d1ee781cc61d",
+      "gitBlobSha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1",
+      "bytes": 3995,
+      "physicalLines": 100,
+      "cap": 120
+    },
+    {
+      "path": ".llm/tools/deps/check-db-alignment_test.ts",
+      "origin": "DB2425",
+      "originHead": "ec3cc9161474ef1e1298e7a91148d1ee781cc61d",
+      "gitBlobSha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b",
+      "bytes": 3088,
+      "physicalLines": 86,
+      "cap": 140
+    }
+  ],
+  "proofBasis": "Native git show immutable leaf blobs; all seven must remain byte-identical in any proposed union. Security current review checkpoint is provenance-only.",
+  "actualMergeHead": "c243d31535027addc034c99e170cb43d2faf475a",
+  "actualParents": [
+    "77a3bfb17fe068315e87f1562dffb8dde0377b80",
+    "ec3cc9161474ef1e1298e7a91148d1ee781cc61d"
+  ],
+  "exactSevenSourceUnion": true,
+  "allOriginBytesMatch": true,
+  "noConflictResolution": true,
+  "sourceOwners": [
+    ".llm/tools/deps/check-db-alignment.ts",
+    ".llm/tools/deps/check-db-alignment_test.ts",
+    "deno.json",
+    "deno.lock",
+    "packages/fresh-ui/deno.lock",
+    "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+    "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+  ]
+}

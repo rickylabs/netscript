@@ -15,7 +15,7 @@ const STORAGE_KEY = 'ns-theme';
 
 /**
  * Resolves the initial theme without side effects. Order of authority:
- * an explicit `data-theme` already stamped by the host document, a stored
+ * an explicit `data-scheme` (or legacy `data-theme`) stamped by the host, a stored
  * user preference, then the OS preference. Tokens are light-by-default,
  * so light is the fallback.
  */
@@ -24,7 +24,8 @@ function getInitialTheme(): ThemeMode {
     return 'light';
   }
 
-  const stamped = document.documentElement.getAttribute('data-theme');
+  const stamped = document.documentElement.getAttribute('data-scheme') ??
+    document.documentElement.getAttribute('data-theme');
 
   if (stamped === 'light' || stamped === 'dark') {
     return stamped;
@@ -39,9 +40,17 @@ function getInitialTheme(): ThemeMode {
   return globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+/** Retain legacy app copies while leaving modern language/flavor/density attributes intact. */
+function applyScheme(scheme: ThemeMode): void {
+  const root = document.documentElement;
+  const legacy = root.getAttribute('data-theme');
+  root.setAttribute('data-scheme', scheme);
+  if (legacy === 'light' || legacy === 'dark') root.setAttribute('data-theme', scheme);
+}
+
 /**
  * Switches the active document theme and persists explicit selections.
- * @returns A hydrated button that flips the `data-theme` attribute.
+ * @returns A hydrated button that flips the scheme and retains the language preset.
  */
 export default function ThemeToggle(): VNode {
   const theme = useSignal<ThemeMode>(getInitialTheme());
@@ -49,13 +58,13 @@ export default function ThemeToggle(): VNode {
   useEffect(() => {
     // Reflect the resolved theme on the document, but never persist it:
     // only an explicit user toggle writes to storage.
-    document.documentElement.setAttribute('data-theme', theme.value);
+    applyScheme(theme.value);
   }, []);
 
   const toggle = () => {
     const next = theme.value === 'dark' ? 'light' : 'dark';
     theme.value = next;
-    document.documentElement.setAttribute('data-theme', next);
+    applyScheme(next);
     localStorage.setItem(STORAGE_KEY, next);
   };
 

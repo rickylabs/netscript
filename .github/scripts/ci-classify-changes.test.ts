@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^1.0.0';
+import { assertEquals } from '@std/assert';
 import {
   classifyDenoConfigChange,
   classifyPath,
@@ -536,6 +536,95 @@ Deno.test('Fresh UI and Pages selectors distinguish tasks-only root config', () 
   assertEquals(toolchain.needsFreshUi, true);
 });
 
+Deno.test('canonical design-system sources select docs builds and main-push deployment', async () => {
+  for (
+    const path of [
+      'docs/design-system/GUIDELINES.md',
+      'docs/design-system/themes/studio/DESIGN.md',
+      'docs/design-system/themes/studio/SKILL.md',
+      'docs/design-system/README.md',
+    ]
+  ) {
+    assertEquals((await Deno.stat(path)).isFile, true, `fixture must exist: ${path}`);
+    assertEquals(classifyPath(path).pages, true, path);
+    for (const eventName of ['pull_request', 'push']) {
+      const decision = decide({ eventName, files: [path], labels: [] });
+      assertEquals(decision.needsPages, true, `${eventName}: ${path}`);
+    }
+  }
+});
+
+Deno.test('future nested design-system config is conservatively a docs input', () => {
+  // Synthetic policy input, deliberately separate from the tracked-source fixture above.
+  assertEquals(classifyPath('docs/design-system/deno.json').pages, true);
+});
+
+Deno.test('Pages push opt-in skips non-rendered docs but preserves conservative defaults', () => {
+  for (const path of ['tools/docs-site/README.md', 'docs/site/_plan/08-decisions-locked.md']) {
+    assertEquals(
+      decide({ eventName: 'pull_request', files: [path], labels: [] }).needsPages,
+      false,
+    );
+    assertEquals(
+      decide({ eventName: 'push', classifyPush: true, files: [path], labels: [] }).needsPages,
+      false,
+    );
+    assertEquals(decide({ eventName: 'push', files: [path], labels: [] }).needsPages, true);
+  }
+  for (const eventName of ['push', 'workflow_dispatch', 'release']) {
+    for (const files of [[], ['unknown-input.blob']]) {
+      assertEquals(decide({ eventName, classifyPush: true, files, labels: [] }).needsPages, true);
+    }
+  }
+  assertEquals(
+    decide({ eventName: 'push', classifyPush: true, files: ['README.md'], labels: ['ci:full'] })
+      .needsPages,
+    true,
+  );
+});
+
+Deno.test('all docs browser inputs still select the Pages browser gate', () => {
+  for (
+    const path of [
+      'tools/fresh-ui-browser/docs-tests/docs.spec.ts',
+      'tools/fresh-ui-browser/docs.playwright.config.ts',
+      'tools/fresh-ui-browser/docs.deno.json',
+      'tools/fresh-ui-browser/package.json',
+      'tools/fresh-ui-browser/package-lock.json',
+      'tools/docs-site/style-policy.ts',
+      'docs/site/index.md',
+    ]
+  ) {
+    for (const eventName of ['pull_request', 'push']) {
+      assertEquals(
+        decide({ eventName, classifyPush: true, files: [path], labels: [] }).needsPages,
+        true,
+        `${eventName}: ${path}`,
+      );
+    }
+  }
+});
+
+Deno.test('Pages browser consumes classification and reproduces rendered content before tests', async () => {
+  const pages = await Deno.readTextFile('.github/workflows/pages.yml');
+  const browser = workflowJob(pages, 'utility-browser') ?? '';
+  assertEquals(browser.includes('needs: classify'), true);
+  assertEquals(
+    browser.includes(
+      "needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false'",
+    ),
+    true,
+  );
+  assertEquals(browser.includes('check-reproducible.ts --allow-pagefind-metadata'), true);
+  const classifier = workflowJob(pages, 'classify') ?? '';
+  assertEquals(classifier.includes('CLASSIFY_PUSH_DIFF:'), true);
+  assertEquals(classifier.includes('github.event.before'), true);
+  assertEquals(classifier.includes("github.event_name == 'push'"), true);
+  const deploy = workflowJob(pages, 'deploy') ?? '';
+  assertEquals(deploy.includes("needs.utility-browser.result == 'success'"), true);
+  assertEquals(deploy.includes("needs.classify.outputs.needs_pages != 'false'"), true);
+});
+
 Deno.test('Fresh browser selector is limited to Fresh, fresh-ui and their owners', () => {
   for (
     const path of [
@@ -620,6 +709,10 @@ Deno.test('Pages and Fresh UI consume their selectors and fail closed', async ()
     pages.includes(
       "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false' }}",
     ),
+    true,
+  );
+  assertEquals(
+    workflowJob(pages, 'deploy')?.includes("needs.classify.outputs.needs_pages != 'false'"),
     true,
   );
 
@@ -1021,4 +1114,32 @@ Deno.test('parseFiles: newline and comma forms', () => {
   assertEquals(parseFiles('a.md\nb.ts'), ['a.md', 'b.ts']);
   assertEquals(parseFiles('a.md,b.ts\n'), ['a.md', 'b.ts']);
   assertEquals(parseFiles(''), []);
+});
+
+Deno.test('design gallery and browser harness inputs schedule Fresh UI evidence', () => {
+  for (
+    const path of [
+      'tools/fresh-ui-browser/playwright.config.ts',
+      'tools/fresh-ui-browser/package-lock.json',
+      'tools/fresh-ui-browser/tests/design.spec.ts',
+      'tools/fresh-ui-browser/README.md',
+      'packages/fresh/src/runtime/server/mod.ts',
+      'packages/cli/src/kernel/assets/app/routes/(design)/design/tokens.tsx.template',
+      'packages/cli/src/kernel/assets/app/routes/(design)/design/components.tsx.template',
+      'packages/cli/src/kernel/assets/app/routes/_app.tsx.template',
+      'packages/cli/src/kernel/assets/embedded.generated.ts',
+      'packages/cli/src/kernel/assets/publish-assets.generated.ts',
+      '.llm/tools/run-deno-test.ts',
+      '.llm/tools/gates/catalog.ts',
+    ]
+  ) {
+    assertEquals(classifyPath(path).freshUi, true, path);
+    assertEquals(
+      decide({ eventName: 'pull_request', files: [path], labels: [] }).needsFreshUi,
+      true,
+      path,
+    );
+  }
+  assertEquals(classifyPath('tools/fresh-ui-browser/tests/design.spec.ts').scaffold, false);
+  assertEquals(classifyPath('packages/sdk/src/unrelated.ts').freshUi, false);
 });

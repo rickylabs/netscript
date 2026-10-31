@@ -1,0 +1,26 @@
+{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-read",
+                 "--allow-write",
+                 "--allow-run",
+                 ".llm/tools/run-deno-test.ts",
+                 "--output",
+                 ".llm/tmp/better-auth-security-sol-20261028/native-cookie-jar-gitpath.json",
+                 "--",
+                 "--cached-only",
+                 "--frozen",
+                 "--check",
+                 "--allow-all",
+                 "--sanitize-ops",
+                 "--sanitize-resources",
+                 "--trace-leaks",
+                 "--filter",
+                 "/^documented localhost curl cookie-jar flow works through the real service bootstrap$/",
+                 "plugins/auth/tests/services/documented-cookie-jar_test.ts"
+             ],
+    "timeoutMs":  120000,
+    "childReport":  ".llm/tmp/better-auth-security-sol-20261028/native-cookie-jar-gitpath.json"
+}

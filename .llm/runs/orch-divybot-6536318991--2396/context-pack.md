@@ -22,3 +22,6 @@ permission, TLS, durability and cleanup controls pass on Linux. Recheck the fail
 on the integrated graph with no concurrent heavy compiler jobs before changing any deadline.
 S2 independent exact-head review returned MERGE on7421a60f2, with current CI/runtime explicitly
 pending. S1 has no code blockers, but coordinator runtime arming and final CI proof are pending.
+
+S3 main merge preserves both complete debt groups and main reference navigation links,
+adding only the new singular service table row. No runtime source conflict resolution.

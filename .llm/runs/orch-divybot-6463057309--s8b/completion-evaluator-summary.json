@@ -1,0 +1,14 @@
+{
+  "requestedModel": "claude-opus-5-5",
+  "observedModels": [
+    "claude-opus-5-5"
+  ],
+  "requestedEffort": "high",
+  "sameIndependentSessionAsSourceReview": true,
+  "readOnly": true,
+  "stdin": "closed",
+  "isError": false,
+  "permissionDenials": 0,
+  "evaluatedHead": "9fa47591fd72a15f3e0044ffbaa05a0efe2966c6",
+  "scope": "Final native-generated CLI/MCP documentation data integration only; prior source sign-off retained"
+}

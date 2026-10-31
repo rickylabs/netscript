@@ -1,0 +1,9 @@
+{"kind":"history_validation","eventId":"unknown","reason":"provider_valid","assistantEventCount":0,"removedFragments":0,"removedEvents":0}
+{"kind":"history_validation","eventId":"msg_18081e295001yUdvleFl0G0R99","reason":"provider_valid","assistantEventCount":1,"removedFragments":0,"removedEvents":0}
+{"kind":"history_validation","eventId":"msg_1808222df001BrtPwo6dUFMdH8","reason":"provider_valid","assistantEventCount":2,"removedFragments":0,"removedEvents":0}
+{"kind":"history_validation","eventId":"msg_180823c74001htwgNxedoZQ9LR","reason":"provider_valid","assistantEventCount":3,"removedFragments":0,"removedEvents":0}
+{"kind":"history_validation","eventId":"msg_1808249f9001EXvTWYmhL98RV1","reason":"provider_valid","assistantEventCount":4,"removedFragments":0,"removedEvents":0}
+{"kind":"history_validation","eventId":"msg_18082576d001DzKsEKeJLsrf7f","reason":"provider_valid","assistantEventCount":5,"removedFragments":0,"removedEvents":0}
+{"kind":"discovery","eventId":"chatcmpl-tool-b98f07b52f0fbdca","toolId":"netscript_find_guidance","source":"mcp","callCount":1}
+{"kind":"discovery","eventId":"chatcmpl-tool-978d7a7214b7a82d","toolId":"netscript_search_docs","source":"mcp","callCount":1}
+{"kind":"history_validation","eventId":"msg_1808263f8001cLtOHhblEOEuSS","reason":"provider_valid","assistantEventCount":6,"removedFragments":0,"removedEvents":0}

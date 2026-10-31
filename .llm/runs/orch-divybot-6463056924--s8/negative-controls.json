@@ -1,0 +1,39 @@
+{
+  "note": "Each final control is injected through the normal gate. Gradient raw colour and semantic red border exercise the previously missed CSS shorthand paths. Neither modifies committed UI sources.",
+  "results": [
+    {
+      "control": "raw-colour",
+      "command": "DOCS_UI_NEGATIVE_CONTROL=raw-colour npm test -- --config docs.playwright.config.ts --project light-1280 --grep 'style policy: authored'",
+      "exitCode": 1,
+      "expectedExit": "nonzero",
+      "actualGateFailed": true,
+      "findings": [
+        {
+          "path": "styles/control.css",
+          "line": 1,
+          "kind": "raw-colour",
+          "selector": ".control",
+          "property": "background-image",
+          "value": "linear-gradient(rgb(255, 0, 0), rgb(255, 0, 0))"
+        }
+      ]
+    },
+    {
+      "control": "red-role",
+      "command": "DOCS_UI_NEGATIVE_CONTROL=red-role npm test -- --config docs.playwright.config.ts --project light-1280 --grep 'style policy: authored'",
+      "exitCode": 1,
+      "expectedExit": "nonzero",
+      "actualGateFailed": true,
+      "findings": [
+        {
+          "path": "styles/control.css",
+          "line": 1,
+          "kind": "red-outside-state",
+          "selector": ".control",
+          "property": "border-color",
+          "value": "var(--ns-studio-signal-brand)"
+        }
+      ]
+    }
+  ]
+}

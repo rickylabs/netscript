@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Expose OpenAPI & Scalar
+description: Serve the generated OpenAPI document and the Scalar reference UI for a service.
 templateEngine: [vento, md]
 order: 103
 oldUrl: /how-to/expose-openapi-scalar/
@@ -8,36 +9,31 @@ oldUrl: /how-to/expose-openapi-scalar/
 
 # Expose OpenAPI & Scalar
 
-Turn on the generated **OpenAPI** document and the interactive **Scalar** API
-reference UI for an existing oRPC service — as a one-line `defineService` option
-or by mounting the Layer-1 primitives onto any Hono app yourself.
+This recipe serves the generated OpenAPI document and the Scalar API reference UI for an existing
+oRPC service, either with one `defineService` option or by mounting the Layer-1 primitives on a
+Hono app.
 
 ## Prerequisites
 
-{{ comp.apiTable({
-  caption: "What you need before you start",
-  rows: [
-    { name: "An oRPC service", type: "router", desc: "An existing service with an oRPC router whose contract inputs/outputs are zod schemas. See the Services hub or the Build-a-service tutorial." },
-    { name: "@netscript/service", type: "package", desc: "Already a dependency of every generated service. Exposes defineService, the createService builder, and the createOpenAPISpec / createScalarDocs / createScalarJs primitives." },
-    { name: "zod schemas", type: "contract", desc: "Spec generation reads your contract's zod schemas via the ZodToJsonSchemaConverter; routes without zod input/output produce an empty schema for that operation." }
-  ]
-}) }}
+- An oRPC service whose contract inputs and outputs are Zod schemas. See
+  [Services & contracts](/services-sdk/services/) or [Add a service](/services-sdk/how-to/add-a-service/).
+- `@netscript/service`, already a dependency of every generated service. It exposes
+  `defineService`, the `createService` builder, and the `createOpenAPISpec`, `createScalarDocs` and
+  `createScalarJs` primitives.
+- Zod schemas on your routes. Spec generation reads them through the `ZodToJsonSchemaConverter`; a
+  route without Zod input or output produces an empty schema for that operation.
 
 {{ comp callout { type: "note", title: "Already on by default in the scaffold" } }}
-Generated service entrypoints call <code>defineService(router, { openapi: { … } })</code>,
-so a freshly scaffolded service <strong>already</strong> serves the spec at
-<code>/api/openapi.json</code> and the Scalar UI at <code>/api/docs</code>. This recipe is
-for adding the surface to a service that does not have it yet, or for hand-wiring the
+Generated service entrypoints call <code>defineService(router, { openapi: { … } })</code>, so a
+new service already serves the spec at <code>/api/openapi.json</code> and the Scalar UI at
+<code>/api/docs</code>. Use this recipe for a service that lacks the surface, or to wire the
 primitives into a custom Hono host.
 {{ /comp }}
 
-## Steps
+## 1. Turn it on with `defineService`
 
-### 1. Turn it on with `defineService` (the one-line path)
-
-Pass an `openapi` block to the preset. That single option enables the generated
-OpenAPI JSON spec, the Scalar docs page, and the bundled Scalar JS — no extra
-imports.
+Pass an `openapi` block to the preset. That one option enables the generated OpenAPI JSON document,
+the Scalar docs page, and the bundled Scalar JS:
 
 ```ts
 // services/users/src/main.ts
@@ -56,11 +52,11 @@ await defineService(router, {
 });
 ```
 
-Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
-of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
-fallback default — set the port there rather than editing this line.
+Aspire injects `PORT` at runtime. The typed source of truth is the `services.<name>.port` field in
+`netscript.config.ts`, which the scaffold wires as the fallback default; set the port there rather
+than editing this line.
 
-This wires three routes onto the service:
+The option adds three routes to the service:
 
 {{ comp.apiTable({
   caption: "Routes added by the openapi option",
@@ -71,11 +67,10 @@ This wires three routes onto the service:
   ]
 }) }}
 
-### 2. Hit the endpoints
+## 2. Check the endpoints
 
-With the service running (directly via `deno task --cwd services/users dev`, or
-under `aspire start` for DB-backed services), open the docs UI and fetch the raw
-spec:
+With the service running (`deno task --cwd services/users dev`, or `aspire start` for a
+database-backed service), fetch the document and open the docs UI:
 
 ```sh
 # from a shell — confirm both surfaces answer (replace <port> with your assigned port)
@@ -83,23 +78,15 @@ curl http://localhost:<port>/api/openapi.json   # raw OpenAPI document
 open http://localhost:<port>/api/docs           # Scalar reference UI in a browser
 ```
 
-The REST surface generated from the same contract is served under `/api/*`, and
-the typed oRPC endpoint stays at `/api/rpc/*` — the spec describes the former.
+The spec describes the REST surface under `/api/*`. The typed oRPC endpoint stays at `/api/rpc/*`.
 
-### 3. (Optional) Hand-wire the primitives onto a host app
+## 3. Mount the primitives on a host app (optional)
 
-When you need finer control — a custom path, a different theme, or mounting onto
-an existing Hono app that is not a `defineService` runtime — drop down to the
-three Layer-1 primitives. `createOpenAPISpec` serves the spec JSON,
-`createScalarDocs` serves the Scalar HTML, and `createScalarJs` serves the
-bundled runtime so the UI loads offline.
+For a custom path, a different theme, or a Hono app that is not a `defineService` runtime, use the
+builder or the three Layer-1 primitives. `createOpenAPISpec` serves the spec JSON, `createScalarDocs`
+serves the Scalar HTML, and `createScalarJs` serves the bundled runtime so the UI loads offline.
 
 {{ comp.tabbedCode({ tabs: [
-  {
-    label: "Preset — defineService({ openapi })",
-    lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One option turns on the spec, the Scalar UI, and the bundled JS.\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
-  },
   {
     label: "Builder — createService().withDocs()",
     lang: "ts",
@@ -114,7 +101,7 @@ bundled runtime so the UI loads offline.
 
 ## Option keys
 
-The primitives accept these confirmed option shapes (`@netscript/service`):
+The primitives in `@netscript/service` accept these options:
 
 {{ comp.apiTable({
   caption: "OpenAPIConfig (createOpenAPISpec)",
@@ -136,67 +123,32 @@ The primitives accept these confirmed option shapes (`@netscript/service`):
 }) }}
 
 {{ comp callout { type: "note", title: "Spec quality comes from your contract" } }}
-The OpenAPI document is generated by oRPC's <code>OpenAPIGenerator</code> from your
-router, with a <code>ZodToJsonSchemaConverter</code> turning each route's zod schemas
-into JSON Schema. Richer schemas — <code>.describe()</code>, explicit
-<code>.method()</code> on each contract route, named output shapes — produce a richer,
-more accurate reference. The spec is only as good as the contract behind it.
+oRPC's <code>OpenAPIGenerator</code> builds the document from your router, and a
+<code>ZodToJsonSchemaConverter</code> turns each route's Zod schemas into JSON Schema. Richer schemas
+(<code>.describe()</code>, an explicit <code>.method()</code> on each contract route, named output
+shapes) produce a more accurate reference.
 {{ /comp }}
 
-## In-production pitfalls
+## Production pitfalls
 
-{{ comp callout { type: "warning", title: "Before you ship the docs UI" } }}
-<ul>
-<li><strong>The Scalar JS is served from your origin, not a CDN.</strong>
-<code>/api/docs/scalar.js</code> streams the bundled runtime from the package's
-<code>assets/</code>. That keeps the UI working offline, but it also means the
-<code>/api/docs</code> page is <em>three</em> routes — if you hand-wire the primitives,
-mount all three (<code>createOpenAPISpec</code>, <code>createScalarDocs</code>,
-<code>createScalarJs</code>) or the page loads blank.</li>
-<li><strong>The docs and spec are public by default.</strong> With the service-auth
-seam installed, <code>.withAuthn()</code> protects <code>/api</code> — which includes
-<code>/api/openapi.json</code> and <code>/api/docs</code>. If you do <em>not</em> want
-your API surface publicly enumerable, gate it or set
-<code>allowAnonymous</code> deliberately; do not assume the docs are hidden.</li>
-<li><strong>The REST surface is <code>/api/*</code>; the typed RPC endpoint is
-<code>/api/rpc/*</code>.</strong> The OpenAPI document describes the REST routes —
-point human/integration consumers at those, and keep generated typed clients on the
-RPC path.</li>
-<li><strong>Routes without zod schemas under-document.</strong> A contract route with
-no zod input/output yields an empty operation schema in the spec. Add schemas (and
-<code>.describe()</code>) to get useful request/response docs.</li>
-</ul>
-{{ /comp }}
+> [!CAUTION]
+> The docs and spec are public unless you gate them. With the service-auth seam installed,
+> `.withAuthn()` protects `/api`, which includes `/api/openapi.json` and `/api/docs`. If your API
+> surface must not be publicly enumerable, gate it or set `allowAnonymous` deliberately.
 
-## See also
+- **Mount all three routes.** `/api/docs/scalar.js` streams the bundled runtime from the package's
+  `assets/`, so the UI works offline, and the `/api/docs` page depends on three routes. If you wire
+  the primitives by hand, mount `createOpenAPISpec`, `createScalarDocs` and `createScalarJs`, or the
+  page loads blank.
+- **REST and RPC are separate surfaces.** The OpenAPI document describes the REST routes under
+  `/api/*`. Point people and integrations at those, and keep generated typed clients on
+  `/api/rpc/*`.
+- **Routes without Zod schemas are under-documented.** A route with no Zod input or output yields an
+  empty operation schema. Add schemas, and `.describe()`, for useful request and response docs.
 
-{{ comp.xref({ key: "cap:services" }) }}
+## Next steps
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Understand — Services & contracts",
-    body: "The capability hub: how defineService, the fluent builder, and the OpenAPI/Scalar primitives fit together.",
-    href: "/capabilities/services/",
-    icon: "◎"
-  },
-  {
-    title: "Do — Discover services",
-    body: "Recipe: enumerate the services in a workspace and the endpoints each one exposes.",
-    href: "/services-sdk/how-to/discover-services/",
-    icon: "◆"
-  },
-  {
-    title: "Do — Graceful shutdown",
-    body: "Recipe: drain in-flight requests and run teardown hooks before the service process exits.",
-    href: "/orchestration-runtime/how-to/graceful-shutdown/",
-    icon: "◆"
-  },
-  {
-    title: "Look up — @netscript/service",
-    body: "The full generated API: the OpenAPI/Scalar primitives, the builder, and every option key.",
-    href: "/reference/service/",
-    icon: "≡"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Discover services", href: "/services-sdk/how-to/discover-services/" }, next: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" } }) }}
+Decide who may read the docs with the
+[service-layer auth middleware](/services-sdk/services/#service-layer-authn-authz-middleware). See
+also [Discover services](/services-sdk/how-to/discover-services/) and the
+[`@netscript/service` reference](/reference/service/).

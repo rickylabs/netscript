@@ -1,126 +1,73 @@
 ---
 layout: layouts/base.vto
 title: Add a plugin
+description: Install an official plugin, register it, and confirm it is healthy.
 templateEngine: [vento, md]
-order: 107
+order: 101
 oldUrl: /how-to/add-a-plugin/
 ---
 
 # Add a plugin
 
-**Goal:** add one of NetScript's official plugins — **workers**, **sagas**,
-**triggers**, **streams**, or **auth** — to an existing workspace, register it with the
-runtime, and confirm it is wired up and healthy.
+This recipe adds one of NetScript's official plugins (workers, sagas, triggers, streams or auth)
+to an existing workspace, registers it with the runtime, and confirms it is healthy. Each step is
+one command run from the workspace root, and [Step 4](#step-4-verify-the-plugin-is-registered)
+proves the plugin landed before you write application code.
 
-This is a task-oriented recipe. It assumes you already have a NetScript workspace (created
-with `netscript init`) and that the `netscript` command is on your path. Each step is a
-single command you run from your workspace root; the [Verify](#step-4-verify-the-plugin-is-registered)
-step proves the plugin landed before you write a line of application code. For the exact
-APIs each plugin exposes, follow the [reference links](#reference) at the end — this guide
-adds the plugin; the reference documents its surface.
+A plugin scaffolds its own workspace folder, registers itself in your runtime and, where it has
+an API, runs as its own Aspire service beside your application service.
+[Plugin architecture](/explanation/plugin-system/) explains the model.
 
-{{ comp callout { type: "note", title: "Plugins compose; they do not replace your service" } }}
-A plugin is an <strong>installable capability</strong> — a background-job runtime, a saga
-orchestrator, an auth service — that scaffolds its own workspace folder, registers itself in
-your runtime, and (where applicable) runs as its own Aspire service on a dedicated port. Your
-application service and your plugins run side by side. See
-<a href="/explanation/plugin-system/">Plugin architecture</a> for the design behind the model.
-{{ /comp }}
-
-## Before you start
+## Prerequisites
 
 You need:
 
-- **An existing NetScript workspace.** If you do not have one yet, create it first with
-  `netscript init` — walk through the [Quickstart](/quickstart/) or the
-  [tutorials index](/tutorials/).
-- **The `netscript` command on your path.** Run `netscript --help` to confirm it resolves,
-  and `netscript plugin --help` for the exact option spelling in your installed version. If
-  the command is missing, install it:
+- **A NetScript workspace** created with `netscript init`. If you don't have one, follow the
+  [Quickstart](/quickstart/).
+- **The `netscript` command on your path.** Install it if `netscript --help` doesn't resolve:
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Install the CLI", lang: "bash", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "" },
   { label: "Confirm it resolves", lang: "bash", code: "netscript --help\nnetscript plugin --help" }
 ] }) }}
 
-- **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
-  but several plugins (workers, sagas, auth) need a database and Redis to actually run. The
-  database is Postgres, the recommended engine (or `mysql` / `mssql` / `sqlite`, chosen at scaffold time
-  with `--db`). Bring
-  the local stack up first — `cd aspire && aspire start` — exactly as in
-  [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to
-  scaffold and register.
+- **Aspire running, if you plan to run the plugin.** Installing and registering a plugin works
+  offline. Workers, sagas and auth need a database and Redis to run: start the local stack with
+  `cd aspire && aspire start`, as in [Run the stack with Aspire](/explanation/aspire/).
 
-{{ comp callout { type: "tip", title: "Run commands from the workspace root" } }}
-Every command below runs from your workspace root. To target a different project, pass
-<code>--project-root &lt;path&gt;</code> — it defaults to the current directory. Run
-<code>netscript plugin install --help</code> for the version-accurate option list before you rely
-on any flag.
-{{ /comp }}
+Commands target the current directory. Pass `--project-root <path>` to target another workspace,
+and run `netscript plugin install --help` for the option list of your installed version.
 
 ## Step 1 — Choose the plugin kind
 
-Each official plugin has a *kind* you pass to the command and a conventional installed
-*name*. Use the conventional name unless you have a specific reason to differ — generated
-registries, ports, and docs all assume it.
+Each official plugin has a kind and a conventional installed name. Keep the conventional name:
+generated registries, ports and docs assume it. Every plugin service gets a
+randomized port (>= 49152).
 
 {{ comp apiTable {
   caption: "Official plugins",
-  columns: ["Kind", "Conventional name", "JSR package", "Port allocation", "Reference"],
+  columns: ["Kind", "Conventional name", "JSR package", "Use it for", "Reference"],
   rows: [
-    ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "Randomized (>= 49152)", "<a href=\"/reference/workers/\">workers</a>"],
-    ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "Randomized (>= 49152)", "<a href=\"/reference/sagas/\">sagas</a>"],
-    ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "Randomized (>= 49152)", "<a href=\"/reference/triggers/\">triggers</a>"],
-    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "Randomized (>= 49152)", "<a href=\"/capabilities/auth/\">auth</a>"],
-    ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "Randomized (>= 49152)", "<a href=\"/reference/streams/\">streams</a>"]
+    ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "Background job scheduling, task execution and the worker API, traced through Aspire from scheduler to subprocess.", "<a href=\"/reference/workers/\">workers</a>"],
+    ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "Durable saga orchestration with a <code>kv</code> or <code>prisma</code> store.", "<a href=\"/reference/sagas/\">sagas</a>"],
+    ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "Raw webhook ingress, typed oRPC management, scheduling and file watching.", "<a href=\"/reference/triggers/\">triggers</a>"],
+    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "An oRPC auth service (sign-in, callback, sign-out, session, me) with one backend: kv-oauth, WorkOS or better-auth.", "<a href=\"/identity-access/auth/\">auth</a>"],
+    ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "Durable change-data stream producers, served as their own Aspire service.", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}
 
-Pick the kind for the capability you need:
-
-- **workers** — background job scheduling, task execution, and worker API endpoints. Fully
-  traced through Aspire (scheduler → queue → worker → subprocess). See
-  [Background jobs](/capabilities/background-jobs/).
-- **sagas** — durable saga orchestration and long-running workflow APIs, with a selectable
-  durable store (`kv` or `prisma`). See [Durable sagas](/capabilities/durable-sagas/).
-- **triggers** — trigger ingress, scheduling, and file watching over raw Hono routes. See
-  [Triggers](/capabilities/triggers/).
-- **auth** — an oRPC auth service (sign-in, callback, sign-out, session, me) backed by a
-  single selectable backend (kv-oauth, WorkOS, or better-auth). See
-  [Authentication](/capabilities/auth/).
-- **streams** — durable, change-data stream producers served as their own Aspire service.
-  See [Streams](/capabilities/streams/).
-
-{{ comp callout { type: "note", title: "auth is a first-class official plugin" } }}
-Auth is now added the same way as workers, sagas, triggers, and streams — through
-<code>netscript plugin install auth</code>. It installs the <code>@netscript/plugin-auth</code>
-dependency, emits a user-owned <code>auth/mod.ts</code> glue barrel, registers the
-<code>auth-api</code> service on port <strong>8094</strong>, and contributes its package-provided
-Prisma models. The active backend is selected at runtime with
-<code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See
-<a href="/identity-access/how-to/add-authentication/">Configure authentication</a> for the backend setup.
-{{ /comp }}
-
 ## Step 2 — Add the plugin
 
-In the public `netscript` CLI, `plugin install` accepts either an official bare alias
-(`workers`, `sagas`, `triggers`, `auth`, `streams`) or a published plugin package specifier
-such as `@netscript/plugin-workers`. Add an official plugin by alias:
+`netscript plugin install` takes an official alias (`workers`, `sagas`, `triggers`, `auth`,
+`streams`) or a published package specifier. Add an official plugin by alias:
 
 ```bash
 netscript plugin install workers --name workers
 ```
 
-Repeat with the matching alias for the other plugins: `sagas`, `triggers`, `auth`, and
-`streams`. The package-spec forms also work, for example
+Repeat with the alias of each plugin you need. The package forms also work, for example
 `netscript plugin install @netscript/plugin-workers --name workers` or an explicit `jsr:`
-specifier. Run `netscript plugin install --help` for the version-accurate surface.
-
-### Useful options
-
-Run `netscript plugin install --help` for the full, version-accurate list. The public
-`netscript plugin install` command takes the plugin alias or package specifier and applies
-the workspace-level install flags before invoking the plugin-owned scaffolder:
+specifier.
 
 {{ comp apiTable {
   caption: "netscript plugin install — options",
@@ -136,123 +83,120 @@ the workspace-level install flags before invoking the plugin-owned scaffolder:
   ]
 } /}}
 
-{{ comp callout { type: "note", title: "Contributor CLI uses local sources" } }}
-The local contributor command
-<code>deno run -A packages/cli/bin/netscript-dev.ts plugin install &lt;kind&gt;</code>
-accepts the same framework-level install flags, but resolves against the monorepo checkout
-instead of the globally installed public CLI. Always run <code>netscript plugin install --help</code>
-for the option list your installed version actually exposes.
-{{ /comp }}
-
-{{ comp callout { type: "warning", title: "auth needs a database and KV" } }}
-The auth plugin sets <code>requiresDb</code> and <code>requiresKv</code>, and contributes its
-own Prisma models (<code>auth_users</code>, <code>auth_sessions</code>,
-<code>auth_accounts</code>, <code>auth_verifications</code>). Keep DB wiring on (do not pass
-<code>--no-db</code>) and run the database steps in
-<a href="#step-3-generate-registries-and-wire-the-database">Step 3</a> so its tables exist
-before the service starts.
+{{ comp callout { type: "warning", title: "Auth needs a database and KV" } }}
+<code>netscript plugin install auth</code> installs <code>@netscript/plugin-auth</code>, emits a user-owned <code>auth/mod.ts</code> glue barrel, registers the <code>auth-api</code> service and contributes Prisma models (<code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code>, <code>auth_verifications</code>). Keep database wiring on (don't pass <code>--no-db</code>) and run the database commands in <a href="#step-3-generate-registries-and-wire-the-database">Step 3</a> so the tables exist before the service starts. <code>NETSCRIPT_AUTH_BACKEND</code> selects the backend at runtime (default <code>kv-oauth</code>); <a href="/identity-access/how-to/add-authentication/">Configure authentication</a> covers the setup.
 {{ /comp }}
 
 ### KV-only installs and projection migration
 
-Install workers, sagas, or triggers with `--no-db --no-samples` to skip Prisma schema and
-migration contributions and emit `RequiresDb: false` for both the API and background processor.
-The processes still require KV. Their background work runs independently of the web app.
+Install workers, sagas or triggers with `--no-db --no-samples` to skip Prisma schema and migration
+contributions. The install emits `RequiresDb: false` for both the API and the background
+processor. Both processes still require KV, and their background work runs independently of the
+web app.
 
-Saga query storage is selected separately with `sagas.projection.backend` (`kv`, `prisma`,
-or `none`). In `appsettings.json`, put `Sagas.Projection.Backend` on both the saga API entry in
+Saga query storage is a separate choice, set with `sagas.projection.backend`:
+
+| Value | Query model | Notes |
+| --- | --- | --- |
+| `kv` | KV | `retention.archiveToDb: true` adds an explicit database archive for the configured saga group; the runner requests a host Prisma client for it. The default `archiveToDb: false` keeps KV-only installs free of a database. |
+| `prisma` | Prisma | Requires the host's saga Prisma delegates. Without them the API fails before listening and the runner fails before starting delivery. |
+| `none` | None | Disables the instance query projection, durable saga-stream hydration and database archival. Canonical saga state stays durable. |
+
+In `appsettings.json`, set `Sagas.Projection.Backend` on both the saga API entry in
 `NetScript.Plugins` and the saga runner entry in `NetScript.BackgroundProcessors`. Generated
-helpers forward the selector as `NETSCRIPT_SAGA_PROJECTION`; that environment value takes
-precedence over settings. `kv` writes the KV query model, `prisma` writes the Prisma query model,
-and `none` disables both the instance query projection and durable saga-stream hydration while
-canonical saga state remains durable. An explicitly selected `prisma` projection requires the host's
-saga Prisma delegates; the API fails before listening and the runner fails before starting delivery
-if those delegates are missing. With `kv`, `retention.archiveToDb: true` remains an explicit database
-archive opt-in for the configured saga group: the runner requests a host Prisma client and archives
-that group's instances while retaining KV queries. The default `archiveToDb: false` keeps KV-only
-installs DB-free. `none` also disables database archival.
+helpers forward it as `NETSCRIPT_SAGA_PROJECTION`, and that environment value takes precedence
+over settings.
 
-**Migration in 0.0.8:** re-run each plugin install with `--no-db --no-samples --force` and regenerate
-helpers to correct existing DB-dependent metadata. Preserve your user-owned configuration and
-samples when applying the generated changes. For existing saga entries without a projection
-selector, the query backend follows `Sagas.Store.Backend` (or `NETSCRIPT_SAGA_STORE`), defaulting
-to KV when neither is set. Select `prisma` explicitly when relational query storage is required;
-select `kv` on both entries when using `--no-db`. New saga installs default the projection to the
-selected store backend, which defaults to KV. A DB-enabled install can use KV queries: database
-availability alone does not imply that the host Prisma client contains saga models. To use a Prisma
-projection, provision the saga models and regenerate the host client before selecting `prisma` on
-both entries.
+> [!IMPORTANT]
+> **Changed in 0.0.8**
+>
+> Re-run each plugin install with `--no-db --no-samples --force` and regenerate helpers to
+> correct existing DB-dependent metadata. Preserve your user-owned configuration and samples
+> when you apply the generated changes.
 
-These install and runner paths have focused tests. The complete KV-only generated runtime across
-workers, sagas, and triggers is a separate release acceptance gate.
+- Existing saga entries without a projection selector follow `Sagas.Store.Backend` (or
+  `NETSCRIPT_SAGA_STORE`), and default to KV when neither is set.
+- New saga installs default the projection to the selected store backend, which defaults to KV.
+- With `--no-db`, select `kv` on both entries.
+- Select `prisma` only when you need relational query storage. A database being available
+  doesn't mean the host Prisma client contains saga models: provision the saga models and
+  regenerate the host client first, then select `prisma` on both entries.
 
 ## Step 3 — Generate registries and wire the database
 
-After adding plugins, regenerate the plugin registries so the runtime can discover them:
+1. Regenerate the plugin registries so the runtime can discover the new plugin:
 
-```bash
-netscript generate plugins
-```
+   ```bash
+   netscript generate plugins
+   ```
 
-If a plugin contributes runtime configuration schemas, also run:
+2. If the plugin contributes runtime configuration schemas, generate them too:
 
-```bash
-netscript generate runtime-schemas
-```
+   ```bash
+   netscript generate runtime-schemas
+   ```
 
-Plugins that contribute Prisma models (workers, sagas, and **auth**) need their tables
-created. With Aspire already running (`cd aspire && aspire start`), apply migrations and
-generate the client:
+3. For plugins that contribute Prisma models (workers, sagas and auth), create the tables with
+   Aspire running:
 
-{{ comp.tabbedCode({ tabs: [
-  { label: "Initialize + migrate", lang: "bash", code: "netscript db init --name add-plugin" },
-  { label: "Generate client", lang: "bash", code: "netscript db generate" },
-  { label: "Seed (optional)", lang: "bash", code: "netscript db seed" }
-] }) }}
+   ```bash
+   netscript db init --name add-plugin
+   ```
 
-{{ comp callout { type: "note", title: "Aspire is step 2, the database is step 3" } }}
-<code>netscript db</code> talks to the database that Aspire provisions — Postgres by
-default, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> if you chose a
-different engine with <code>--db</code> at scaffold time (sqlite is file-backed, so it has no
-Aspire container resource). Always
-<code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>db</code>
-command — see <a href="/explanation/aspire/">Run the stack with Aspire</a>. Skip these
-database steps only when every plugin you added is stateless.
+4. Generate the client:
+
+   ```bash
+   netscript db generate
+   ```
+
+5. Optionally, seed the database:
+
+   ```bash
+   netscript db seed
+   ```
+
+{{ comp callout { type: "important", title: "Start Aspire before any db command" } }}
+<code>netscript db</code> talks to the database that Aspire provisions: Postgres by default, or the <code>mysql</code>, <code>mssql</code> or <code>sqlite</code> engine you chose with <code>--db</code> at scaffold time (sqlite is file-backed and has no Aspire container resource). Run <code>cd aspire &amp;&amp; aspire start</code> first. Skip the database commands only when every plugin you added is stateless.
 {{ /comp }}
 
 ## Step 4 — Verify the plugin is registered
 
-List the registered plugins to confirm your new plugin appears:
+1. List the registered plugins. Each plugin you added appears in the inventory:
 
-```bash
-netscript plugin list
-```
+   ```bash
+   netscript plugin list
+   ```
 
-You should see your plugin in the inventory — for example, `workers`, `sagas`, `triggers`,
-`auth`, and `streams` if you added all five. Then run the health check:
+2. Run the health check. It reports wiring problems such as a missing registration, a port
+   collision or absent database tables; a clean run means the plugin is registered and wired:
 
-```bash
-netscript plugin doctor
-```
+   ```bash
+   netscript plugin doctor
+   ```
 
-`plugin doctor` checks installed NetScript plugin health and reports wiring problems
-(missing registration, port collisions, absent database tables). A clean run means the
-plugin is registered, wired, and ready to use.
+3. Optionally, inspect one plugin in detail:
 
-{{ comp.tabbedCode({ tabs: [
-  { label: "Inspect one plugin", lang: "bash", code: "# Detailed info for a single installed plugin\nnetscript plugin info @netscript/plugin-auth" },
-  { label: "Run the service", lang: "bash", code: "# Bring the whole stack up and exercise the plugin's service\ncd aspire && aspire start\n# Aspire dashboard: https://localhost:18888\n# auth-api:         http://localhost:<auth-port> (replace with your assigned auth port)" }
-] }) }}
+   ```bash
+   # Detailed info for a single installed plugin
+   netscript plugin info @netscript/plugin-auth
+   ```
 
-{{ comp callout { type: "tip", title: "Confirm in the Aspire dashboard" } }}
-Service-bearing plugins appear as resources in the Aspire dashboard at
-<a href="https://localhost:18888"><code>https://localhost:18888</code></a> once
-<code>aspire start</code> is up. A green resource on the plugin's assigned port confirms the plugin is live end to end. Discover yours in the dashboard or scaffold logs.
-{{ /comp }}
+4. Start the stack and exercise the plugin's service:
+
+   ```bash
+   # Bring the whole stack up and exercise the plugin's service
+   cd aspire && aspire start
+   # Aspire dashboard: the URL Aspire prints
+   # auth-api:         http://localhost:<auth-port> (replace with your assigned auth port)
+   ```
+
+Service-bearing plugins appear as resources in the
+the dashboard at the URL Aspire prints. A green resource on the plugin's assigned port
+confirms the plugin is live end to end; the dashboard and the scaffold logs show the port.
 
 ## Manage plugins later
 
-Once a plugin is installed you can inspect, update, and remove it without re-scaffolding:
+Inspect, update and remove an installed plugin without scaffolding again:
 
 {{ comp apiTable {
   caption: "Plugin lifecycle commands",
@@ -261,33 +205,14 @@ Once a plugin is installed you can inspect, update, and remove it without re-sca
     ["<code>netscript plugin list</code>", "List installed plugins in the current workspace."],
     ["<code>netscript plugin info &lt;name&gt;</code>", "Show detailed metadata for one installed plugin."],
     ["<code>netscript plugin doctor</code>", "Health-check installed plugins and report wiring problems."],
-    ["<code>netscript plugin update &lt;pkg&gt;</code>", "Dispatches the <code>update</code> verb to the plugin's own published CLI (e.g. <code>netscript plugin update @netscript/plugin-workers</code>). The argument is a JSR package specifier, not an installed plugin name."],
+    ["<code>netscript plugin update &lt;pkg&gt;</code>", "Dispatch the <code>update</code> verb to the plugin's own published CLI, for example <code>netscript plugin update @netscript/plugin-workers</code>. The argument is a JSR package specifier, not an installed plugin name."],
     ["<code>netscript plugin remove &lt;name&gt;</code>", "Remove an installed plugin from the workspace."]
   ]
 } /}}
 
-Run `netscript plugin --help` for the complete, version-accurate command set.
+Run `netscript plugin --help` for the complete command set of your installed version.
 
-## Reference
+## Next steps
 
-{{ comp featureGrid {
-  columns: 3,
-  items: [
-    { title: "workers", body: "Background jobs, scheduling, task execution.", href: "/reference/workers/" },
-    { title: "sagas", body: "Durable saga orchestration (kv | prisma store).", href: "/reference/sagas/" },
-    { title: "triggers", body: "Trigger ingress, scheduling, file watching.", href: "/reference/triggers/" },
-    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/capabilities/auth/" },
-    { title: "streams", body: "Durable change-data stream producers.", href: "/reference/streams/" },
-    { title: "All packages", body: "Browse the full package and plugin index.", href: "/reference/" }
-  ]
-} /}}
-
-### Where to go next
-
-- **Build on the plugin you just added.** Next up:
-  [Add a service](/services-sdk/how-to/add-a-service/) to give the plugin something to call, or
-  [Configure authentication](/identity-access/how-to/add-authentication/) if you added the auth plugin.
-- **Understand the model.** Read [Plugin architecture](/explanation/plugin-system/) for
-  the design behind installable capabilities, ports, and runtime registration.
-- **Browse capabilities.** The [capabilities](/capabilities/) section maps each plugin to the
-  problem it solves, with runnable examples.
+Give the plugin something to call: [Add a service](/services-sdk/how-to/add-a-service/). For
+each plugin's exported API, browse the [package reference](/reference/).

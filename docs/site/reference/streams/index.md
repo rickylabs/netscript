@@ -6,33 +6,29 @@ templateEngine: [vento, md]
 
 # `@netscript/plugin-streams`
 
-Durable Streams protocol plugin for NetScript: a plugin manifest plus CLI, scaffolding,
-end-to-end gate, and Aspire integration surfaces for an ephemeral change-data stream service
-with startup-probed file storage as an explicit opt-in supporting orderly process restart. This
-page is written against the plugin public surface reported by `deno doc`. For the full index of
-packages and plugins return to the [reference overview](/reference/).
+The deployable Durable Streams plugin for NetScript: the plugin manifest plus CLI, scaffolding,
+end-to-end gate and Aspire integration surfaces for an ephemeral change-data stream service. File
+storage that survives an orderly process restart is an explicit, startup-probed opt-in. Schemas,
+producers, telemetry, testing and diagnostics live in
+[`@netscript/plugin-streams-core`](/reference/plugin-streams-core/).
 
-The plugin ships seven published entrypoints. The root export (`@netscript/plugin-streams`) carries
-the manifest and the typed topic definition helper; six sub-path exports carry
-the framework integrations:
+## Sub-path exports
 
-- [`@netscript/plugin-streams/cli`](#sub-path-cli) — plugin CLI command group.
-- `@netscript/plugin-streams/adapter-cli` — executable plugin-adapter CLI entrypoint.
-- [`@netscript/plugin-streams/scaffold`](#sub-path-scaffolding) — scaffolder protocol entrypoint.
-- [`@netscript/plugin-streams/e2e`](#sub-path-e2e) — E2E gate definitions.
-- [`@netscript/plugin-streams/aspire`](#sub-path-aspire) — Aspire AppHost contribution.
-- `@netscript/plugin-streams/services` — executable Durable Streams service.
-
-The schema, producer, telemetry, testing, and diagnostics primitives that the plugin builds on live
-in the separately published
-[`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) package, which has its own
-canonical reference page.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-streams` | `./mod.ts` | [Plugin manifest](#plugin-manifest) and [typed topic definitions](#topic-authoring). |
+| `@netscript/plugin-streams/scaffold` | `./scaffold.ts` | [Executable plugin scaffolder entrypoint](#sub-path-scaffolding) and its shared scaffolding protocol types. |
+| `@netscript/plugin-streams/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
+| `@netscript/plugin-streams/cli` | `./src/cli/composition/main.ts` | [Plugin CLI command group](#sub-path-cli). |
+| `@netscript/plugin-streams/e2e` | `./src/e2e/mod.ts` | [End-to-end gate definitions](#sub-path-e2e). |
+| `@netscript/plugin-streams/aspire` | `./src/aspire/mod.ts` | [Aspire AppHost contribution](#sub-path-aspire) for the Durable Streams service. |
+| `@netscript/plugin-streams/services` | `./services/src/main.ts` | Executable Durable Streams proxy service. |
 
 ## Plugin manifest
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `streamsPlugin` | variable | `const streamsPlugin: PluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
+| `streamsPlugin` | const | `const streamsPlugin: PluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
 
 ## Topic authoring
 
@@ -43,23 +39,25 @@ canonical reference page.
 | `StreamPayloadSchema` | interface | `interface StreamPayloadSchema` | Package-owned structural payload schema accepted by stream topic definitions. |
 
 Runtime producers live in [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/): use
-`defineStreamSchema` with `createDurableStream` or `createServiceStreamProducer`. The former root
-producer/consumer helpers and their unsupported-operation types were removed in 0.0.8. See
-[the breaking migration](/durable-workflows/streams/#breaking-migration-in-008) for the collection
-model and HTTP/SSE consumption path.
+`defineStreamSchema` with `createDurableStream` or `createServiceStreamProducer`.
 
-> **Browser consumers read over HTTP/SSE.** There is no in-process `subscribe()`; a browser
-> consumes a stream by reading its HTTP/SSE endpoint (for example with `EventSource`). The local
-> AppHost serves the generated app over `http://`, and under HTTP/1.1 browsers typically allow only
-> about **six concurrent connections per origin** — so several long-lived stream subscriptions from
-> one page can starve later requests. Serve over HTTPS (HTTP/2) when a page needs many simultaneous
+> [!IMPORTANT]
+> The former root producer/consumer helpers and their unsupported-operation types were removed in
+> 0.0.8. See [the breaking migration](/durable-workflows/streams/#breaking-migration-in-008) for the
+> collection model and HTTP/SSE consumption path.
+
+Browsers read a stream over its HTTP/SSE endpoint, for example with `EventSource`; there is no
+in-process `subscribe()`.
+
+> [!WARNING]
+> The local AppHost serves the generated app over `http://`. Under HTTP/1.1, browsers typically allow
+> about six concurrent connections per origin, so several long-lived stream subscriptions from one
+> page can starve later requests. Serve over HTTPS (HTTP/2) when a page needs many simultaneous
 > stream consumers.
 
 ### Re-exported plugin framework types
 
-The root export re-exports the shared NetScript plugin-framework contribution types unchanged from
-[`@netscript/plugin`](/reference/plugin/). See the [`@netscript/plugin` reference](/reference/plugin/)
-for their full definitions.
+Re-exported unchanged from [`@netscript/plugin`](/reference/plugin/), which documents them.
 
 | Symbol | Kind |
 | --- | --- |
@@ -81,51 +79,36 @@ for their full definitions.
 | `PluginMetadata` | type alias |
 | `PluginMetadataValue` | type alias |
 | `PluginType` | type alias |
-| `PLUGIN_TYPES` | variable |
+| `PLUGIN_TYPES` | const |
 
-## Sub-path exports
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/plugin-streams` | `./mod.ts` | Plugin manifest and typed topic definitions. |
-| `@netscript/plugin-streams/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
-| `@netscript/plugin-streams/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
-| `@netscript/plugin-streams/cli` | `./src/cli/composition/main.ts` | Plugin CLI command group. |
-| `@netscript/plugin-streams/e2e` | `./src/e2e/mod.ts` | End-to-end gate definitions. |
-| `@netscript/plugin-streams/aspire` | `./src/aspire/mod.ts` | Aspire AppHost contribution for the Durable Streams service. |
-| `@netscript/plugin-streams/services` | `./services/src/main.ts` | Executable Durable Streams proxy service. |
-
-### `@netscript/plugin-streams/cli` {#sub-path-cli}
+## `@netscript/plugin-streams/cli` {#sub-path-cli}
 
 CLI command group for the plugin, mounted under `deno x -A jsr:@netscript/plugin-streams{{ releaseSpecifier }}/cli`.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `streamsCli` | variable | `const streamsCli: StreamsCli` | Default CLI instance for the streams plugin. |
+| `streamsCli` | const | `const streamsCli: StreamsCli` | Default CLI instance for the streams plugin. |
 | `StreamsCli` | class | `class StreamsCli` | CLI command group for `@netscript/plugin-streams`. |
 
-The CLI types `PluginCli`, `PluginCliArgs`, `PluginCliCommand`, and `PluginCliResult` are
-re-exported from [`@netscript/plugin`](/reference/plugin/) and document the base command contract
-`StreamsCli` extends.
+`PluginCli`, `PluginCliArgs`, `PluginCliCommand`, and `PluginCliResult` are re-exported from
+[`@netscript/plugin`](/reference/plugin/); they are the base command contract `StreamsCli` extends.
 
-### `@netscript/plugin-streams/scaffold` {#sub-path-scaffolding}
+## `@netscript/plugin-streams/scaffold` {#sub-path-scaffolding}
 
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `streamsScaffolder` | variable | `const streamsScaffolder: StreamsScaffolder` | Minimal scaffolder descriptor for streams plugin packages. |
-| `StreamsScaffolder` | interface | `interface StreamsScaffolder` | Scaffolding descriptor for the streams plugin package. |
+The default export is the streams adapter scaffold entrypoint, typed `PluginScaffoldEntrypoint`. The
+entrypoint also re-exports `PluginLogger`, `PluginScaffoldEntrypoint`, `ScaffolderContext` and
+`ScaffoldResult` from [`@netscript/plugin/adapter`](/reference/plugin/#netscriptpluginadapter).
 
-### `@netscript/plugin-streams/e2e` {#sub-path-e2e}
+## `@netscript/plugin-streams/e2e` {#sub-path-e2e}
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `getStreamsE2eGates` | function | `function getStreamsE2eGates()` | Return E2E gate definitions owned by the streams plugin. |
 | `StreamsE2eGate` | interface | `interface StreamsE2eGate` | E2E gate definition for the streams plugin. |
 
-### `@netscript/plugin-streams/aspire` {#sub-path-aspire}
+## `@netscript/plugin-streams/aspire` {#sub-path-aspire}
 
-The Aspire entrypoint contributes the ephemeral-by-default Durable Streams protocol service to
-an Aspire AppHost. File storage requires an explicit, existing writable directory and a successful
+Contributes the Durable Streams protocol service, ephemeral by default, to an Aspire AppHost. File storage requires an explicit, existing writable directory and a successful
 startup write/read probe; invalid opt-ins fail startup.
 
 | Symbol | Kind | Signature | Description |
@@ -139,15 +122,16 @@ from [`@netscript/aspire`](/reference/aspire/); see that reference page for thei
 
 ## Core package
 
-The separately published
-[`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) page is canonical for stream
-schemas, producers, configuration, telemetry, testing, and diagnostics. This page stays focused on
-the deployable plugin's manifest and integration entrypoints. The testing example below uses core
-APIs intentionally; exhaustive core entrypoint and symbol tables live only on its reference page.
+[`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) is canonical for stream schemas,
+producers, configuration, telemetry, testing and diagnostics.
 
-## Socket-Free Testing and Telemetry
+## Examples
 
-Use `MemoryStreamProducer` in unit and integration tests to verify change events are published without opening network sockets or starting a real streams server. Use `createStreamsInstrumentation` (from `./telemetry`) to verify context-propagation headers (like OpenTelemetry `traceparent`) are correctly injected.
+### Test publishing and telemetry without sockets
+
+`MemoryStreamProducer` verifies that change events are published without opening network sockets or
+starting a streams server. `createStreamsInstrumentation` (from `./telemetry`) verifies that
+context-propagation headers such as OpenTelemetry `traceparent` are injected.
 
 ```ts
 import { assertEquals, assertExists } from "@std/assert";
@@ -199,7 +183,3 @@ Deno.test("stream socket-free testing with MemoryStreamProducer and telemetry fa
   assertExists(traceHeaders.traceparent);
 });
 ```
-
----
-
-Back to the [reference overview](/reference/).

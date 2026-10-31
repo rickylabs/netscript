@@ -1,0 +1,13 @@
+﻿{
+    "name":  "root-lock-native-refresh",
+    "startedUtc":  "2026-10-28T03:04:07.8950885Z",
+    "finishedUtc":  "2026-10-28T03:04:12.0676873Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "install",
+                      "--lockfile-only"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\root-lock-native-refresh.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\root-lock-native-refresh.stderr.log"
+}

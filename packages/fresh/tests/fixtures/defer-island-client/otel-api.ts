@@ -25,6 +25,9 @@ export const context: {
   with: (_value, callback) => callback(),
 };
 
+/** Span-free root context used by the telemetry carrier extraction exports. */
+export const ROOT_CONTEXT: object = {};
+
 /** Minimal propagation surface retained by the telemetry facade exports. */
 export const propagation: {
   extract(value: object): object;

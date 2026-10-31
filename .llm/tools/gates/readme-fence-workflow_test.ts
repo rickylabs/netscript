@@ -9,7 +9,12 @@ Deno.test('README fence gate plumbing and blocking quality placement are exact',
   const config = JSON.parse(await Deno.readTextFile('deno.json')) as RootConfig;
   assertEquals(
     config.tasks?.['docs:readme-fences'],
-    'deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-readme-fences.ts',
+    'deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/docs/check-readme-fences.ts',
+  );
+  const entry = await Deno.readTextFile('.llm/tools/docs/check-readme-fences.ts');
+  assertEquals(
+    entry.split('\n')[0],
+    '#!/usr/bin/env -S deno run --allow-read --allow-write --allow-run --allow-env',
   );
   assertEquals(gateArgv('readme-fences'), ['deno', 'task', 'docs:readme-fences']);
 

@@ -1,0 +1,4 @@
+Merge accepted native DB qualification into atomic security candidate
+
+Preserve security and DB leaf histories and all seven accepted product blobs.
+Root integration authority SHA256: 9410cca810a7a4ceeaac6ec7932ed6dfc1c27c89144e76caac49b42cdade5b4c

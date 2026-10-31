@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Run a polyglot task
+description: Run a Python, shell, .NET, or other non-TypeScript script as a task with a permission sandbox.
 templateEngine: [vento, md]
 order: 102
 oldUrl: /how-to/run-a-polyglot-task/
@@ -8,35 +9,37 @@ oldUrl: /how-to/run-a-polyglot-task/
 
 # Run a polyglot task
 
-Define a non-TypeScript script — a Python program, a shell script, a .NET tool, or any
-executable — as a NetScript task, give it a permission sandbox, and run it through the
-multi-runtime executor with its `stdout`/`stderr` captured and its result parsed.
+This recipe turns a Python or shell script into a NetScript task, runs it through the workers CLI
+with its output captured, and sandboxes a Deno task with explicit permissions.
 {{ comp.badge({ status: "alpha" }) }}
 
-This is the task-focused **DO** companion to the [polyglot tasks](/capabilities/polyglot-tasks/)
-hub — read that first for the WHY (what a task is, how the subprocess seam works, the full
-`TaskResult` shape). This page wires one up.
+For the task model, the input and output contract and the full `TaskResult` shape, see
+[Polyglot tasks](/background-processing/polyglot-tasks/).
 
 ## Prerequisites
 
-{{ comp.apiTable({
-  caption: "What you need before defining a task",
-  rows: [
-    { name: "@netscript/plugin-workers-core", type: "package (alpha)", desc: "Provides defineTask (./builders) and createDefaultTaskExecutor (./executor)." },
-    { name: "The target toolchain", type: "host binary", desc: "The interpreter the task spawns must exist on the worker HOST: python3 (or a venv / py on Windows), bash, pwsh/powershell, the .NET SDK, or your prebuilt binary." },
-    { name: "An entrypoint script", type: "file path", desc: "The script or executable to run, e.g. ./scripts/score.py. The task passes it input as argv, env, or a bounded stdin payload." },
-    { name: "(deno tasks only) a permission set", type: "BuilderPermissions", desc: "net/read/write/env/run/ffi/import. Enforced ONLY for the deno runtime — see the sandbox note below." }
-  ]
-}) }}
+- `@netscript/plugin-workers-core` (alpha), which provides `defineTask` (`./builders`) and
+  `createDefaultTaskExecutor` (`./executor`).
+- The interpreter the task spawns, installed on the worker **host**: `python3` (or a venv, or `py`
+  on Windows), `bash`, `pwsh`/`powershell`, the .NET SDK, or your prebuilt binary.
+- An entrypoint script or executable, such as `./scripts/score.py`.
+- The `ns-workers` CLI, described below.
 
-## Steps
+`ns-workers` is a name you give the workers plugin's CLI; the scaffold does not create it. Install it
+once:
 
-### 1. Define the task
+```bash
+deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli
+```
 
-`defineTask(id)` returns a typestate builder; the default `runtime` is `'deno'`, so call
-`.runtime(type)` to target another language. Input reaches the script as **argv**
-(`.args(...)`) and **environment variables** (`.env({...})`). `.build()` is only callable
-once an `.entrypoint(path)` (subprocess) or `.handler(fn)` (in-process) has been set.
+Without the install, run each command as
+`deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli <verb …>`.
+
+## Step 1 — Define the task
+
+`defineTask(id)` returns a builder whose default `runtime` is `'deno'`; call `.runtime(type)` for
+another language. Pass input as arguments with `.args(...)` and as environment variables with
+`.env({...})`. `.build()` becomes callable once you set `.entrypoint(path)`.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -56,11 +59,11 @@ once an `.entrypoint(path)` (subprocess) or `.handler(fn)` (in-process) has been
   }
 ] }) }}
 
-### 2. Write the script so its result crosses the process boundary
+## Step 2 — Write the script
 
-The subprocess returns structured data by printing **one JSON object as the last line of
-`stdout`**. Everything else on `stdout`/`stderr` is captured as logs. Print diagnostics to
-`stderr`; emit the JSON result last, with no trailing output.
+The script returns structured data by printing **one JSON object as the last line of `stdout`**.
+Every other line on `stdout` or `stderr` is captured as a log. Print diagnostics to `stderr` and
+emit the JSON result last, with nothing after it.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -75,82 +78,17 @@ The subprocess returns structured data by printing **one JSON object as the last
   }
 ] }) }}
 
-### 2a. Send private input on stdin
+> [!TIP]
+> To pass private input without putting it in arguments or the environment, use `.stdin(...)` or
+> `options.stdin`. [Send private input on stdin](/background-processing/polyglot-tasks/#send-private-input-on-stdin)
+> covers the size limit, the errors and the queue-dispatch rules.
 
-Use `.stdin(bytesOrJson)` for a fixed task payload or `options.stdin` for input supplied at
-execution time. The execution option replaces the builder payload. JSON is encoded as UTF-8;
-`Uint8Array` values are sent unchanged. The runner writes the payload with backpressure and closes
-stdin, so the script can read to EOF. Absent input uses null stdin and never inherits input from the
-worker host. An explicitly supplied `undefined` payload fails with `MissingStdinPayload`.
+## Step 3 — Run the task with the workers CLI
 
-```ts
-import { defineTask } from '@netscript/plugin-workers-core/builders';
-import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
-
-const task = defineTask('private-input')
-  .runtime('python')
-  .entrypoint('./scripts/private-input.py')
-  .stdin({ uid: 'service-operator', roots: ['workspace-root'] })
-  .build();
-const executor = createDefaultTaskExecutor();
-const result = await executor.execute(task, {
-  stdin: { uid: 'another-operator', roots: ['another-root'] },
-  stdoutLimitBytes: 65_536,
-  stderrLimitBytes: 65_536,
-});
-console.log(result.success);
-```
-
-```python
-# scripts/private-input.py
-import json, sys
-
-payload = json.load(sys.stdin)
-# Use private input without putting it in argv, env, or diagnostics.
-print(json.dumps({'accepted': len(payload['roots'])}))
-```
-
-Stdin is capped at **1 MiB of encoded bytes**, including JSON punctuation and escaping. Builder
-input is validated and snapshotted when `.stdin()` is called; each `.build()` receives its own
-byte buffer, which the adapter passes directly to the runner. Execution input is validated before
-spawning. Oversized input produces `StdinPayloadTooLarge`. JSON accepts finite numbers, strings,
-booleans, null, arrays, and plain objects with at most 64 levels of nesting; cycles, accessors, and
-unsupported values produce `InvalidStdinPayload`. A subprocess that closes stdin before accepting
-the payload produces `StdinWriteFailed`.
-
-By default, stdout and stderr each retain only their **last 1 MiB** while continuing to read and
-stream all output. Healthy tasks can print more than 1 MiB without failing; a final stdout JSON
-object that fits in the retained tail remains available. Lines longer than 1 MiB of characters are delivered
-to log callbacks in bounded fragments. Set positive integer `stdoutLimitBytes` / `stderrLimitBytes`
-execution options, or configure them on
-`new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`, to opt into a total output
-cap. Exceeding an explicit cap terminates the process tree and returns `status: 'failed'`,
-`success: false`, and `StdoutLimitExceeded` or `StderrLimitExceeded`; explicit caps also apply with
-`streamLogs: false`. Runtime validation and write errors return failed task results; builder
-validation throws before building the task. Running aborts return `cancelled`, and timeouts return
-`timeout`, both with exit code `-1`. Subprocesses inherit the worker's process group so terminal and supervisor
-signals also reach active tasks.
-
-Builder `.stdin()` applies only to direct executor calls. KV task registration validates through a
-schema that strips this runtime field, and queue dispatch does not carry it. Supply private
-per-execution input in `options.stdin` when calling the executor in a worker. Stdin is not a CLI
-stdin flag. Scripts control their own stdout/stderr: do not print private payloads.
-
-### 3. Run it through the workers CLI
-
-{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
-<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
-not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
-works as written:
-<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
-Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
-<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
-that full form instead.
-{{ /comp }}
-
-`ns-workers run-task` resolves the generated task metadata and delegates to the same
-`MultiRuntimeTaskExecutor` used by the worker runtime. Pass argv and environment as JSON; stdout and
-stderr stream while the subprocess runs, followed by the complete `TaskResult`.
+`ns-workers run-task` resolves the generated task metadata and delegates to the
+`MultiRuntimeTaskExecutor` that the worker runtime uses. Pass arguments and environment as JSON.
+`stdout` and `stderr` stream while the subprocess runs, then the CLI prints the complete
+`TaskResult`.
 
 ```sh
 ns-workers run-task score-batch \
@@ -160,15 +98,12 @@ ns-workers run-task score-batch \
   --json
 ```
 
-The programmatic `createDefaultTaskExecutor()` API remains available for runtime integrations and
-custom adapters; ordinary task execution no longer needs a hand-written runner module.
+For runtime integrations and custom adapters, call `createDefaultTaskExecutor()` directly.
 
-### 4. Sandbox a `deno` task with explicit permissions
+## Step 4 — Sandbox a Deno task
 
-The `deno` runtime is the **only** one NetScript sandboxes: the `.permissions({...})` set is
-translated into `--allow-*` flags on the `deno run` command line. For `python`, `shell`,
-`powershell`, `cmd`, `dotnet`, and `executable`, those keys are ignored — the subprocess
-inherits the worker process's OS-level access. Gate those at the OS layer instead.
+The `deno` runtime is the only one NetScript sandboxes: `.permissions({...})` becomes `--allow-*`
+flags on the `deno run` command line.
 
 ```ts
 // workers/tasks/parse-feed.ts — a sandboxed deno task (least privilege)
@@ -188,52 +123,42 @@ export const parseFeed = defineTask('parse-feed')
 // Spawns: deno run --allow-net=api.example.com --allow-read=./feeds --allow-env=FEED_TOKEN ./scripts/parse-feed.ts
 ```
 
-{{ comp callout { type: "warning", title: "Omitting permissions on a deno task widens the sandbox to --allow-all" } }}
-Calling <code>.build()</code> on a <code>deno</code> task <em>without</em>
-<code>.permissions(...)</code> produces an <code>--allow-all</code> command line — full
-access. Always pass an explicit, least-privilege permission set for untrusted or third-party
-Deno task code. The <code>permissions</code> preset export
-(<code>permissions.readOnly</code>, <code>.network</code>, <code>.none</code>, …) gives you
-ready-made starting points.
-{{ /comp }}
+> [!CAUTION]
+> A `deno` task built without `.permissions(...)` runs with `--allow-all`. Pass an explicit,
+> least-privilege set for untrusted or third-party Deno task code. The `permissions` presets
+> (`permissions.readOnly`, `.network`, `.none`, …) are ready-made starting points; see
+> [Restrict worker task permissions](/background-processing/how-to/restrict-worker-task-permissions/).
 
-## In-production pitfalls
+## Troubleshooting
 
-{{ comp callout { type: "warning", title: "The result is the LAST stdout line — and only if it is a JSON object" } }}
-A trailing log line, a pretty-print, a JSON <em>array</em>, or a stray newline after the
-payload all make <code>result.result</code> <code>null</code> even though
-<code>result.success</code> is <code>true</code>. Emit the JSON object last, send everything
-else to <code>stderr</code>, and flush your own output — for Python the runtime runs
-<code>python3 -u</code> (unbuffered) for exactly this reason; other runtimes are not unbuffered.
-{{ /comp }}
+- **`result.result` is `null` but the task succeeded:** something followed the JSON object on
+  `stdout`, or the last line is not a single JSON object. See Step 2.
+- **Exit code `127` or `126`:** the interpreter is missing (*command not found*) or not executable
+  (*command not executable*). Both land in `result.error` with the first `stderr` line appended; a
+  missing interpreter fails the task rather than throwing.
+- **Status `timeout`, exit code `-1`:** the task exceeded its `timeout`.
+- **Status `cancelled` before any process starts:** the call received an already-aborted `signal`.
+- **A `cmd` task fails outside Windows:** `cmd` is Windows-only. The `powershell` runtime spawns
+  `powershell` on Windows and `pwsh` elsewhere.
 
-{{ comp callout { type: "important", title: "The runtime must exist on the worker host; read the exit code" } }}
-A missing interpreter surfaces as a failed task, not a thrown error. Exit code
-<code>127</code> is reported as <em>command not found</em> and <code>126</code> as
-<em>command not executable</em>; both land in <code>result.error</code> with the first
-<code>stderr</code> line appended. <code>cmd</code> and (on Windows) <code>powershell</code>
-are platform-specific. A task that exceeds its <code>timeout</code> resolves with status
-<code>timeout</code> and exit code <code>-1</code>; passing an already-aborted
-<code>signal</code> yields status <code>cancelled</code> before any process starts.
-{{ /comp }}
+## Production notes
 
-{{ comp callout { type: "important", title: "Non-Deno Runtime Sandboxing Boundary" } }}
-For non-Deno runtimes (such as Python, shell, or custom executables), NetScript does not enforce runtime-level sandboxing: subprocesses execute with the full OS privileges of the parent worker host, and Deno's <code>.permissions(...)</code> configurator has no effect. This boundary exists because arbitrary process sandboxing is delegated to the underlying operating system or container platform. Today, you must secure these runtimes by pinning entrypoints to verified scripts, using isolated virtual environments (e.g., <code>pythonConfig.venvPath</code>), and securing the host environment or container runtime. Note that trace context (<code>TRACEPARENT</code>/<code>TRACESTATE</code>/<code>CORRELATION_ID</code>) is still injected into the subprocess environment so cross-runtime spans stitch together; env precedence is <code>Deno.env</code> &lt; task <code>env</code> &lt; call <code>options.env</code>.
+> [!CAUTION]
+> **Non-Deno runtimes are not sandboxed.** Python, shell and custom executables run with the full OS
+> privileges of the worker host, and `.permissions(...)` has no effect on them; NetScript leaves
+> process sandboxing to the operating system or container platform. Pin entrypoints to verified
+> scripts, use isolated virtual environments such as `pythonConfig.venvPath`, and secure the host or
+> container runtime.
+
 <!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
-{{ /comp }}
 
-{{ comp callout { type: "note", title: "Alpha surface" } }}
-NetScript is in alpha; the polyglot task API can still shift. Treat the import subpaths
-(<code>/builders</code>, <code>/executor</code>) and the runtime-specific
-<code>metadata</code> configs as the current shape, and pin the version you build against.
-{{ /comp }}
+## Next steps
 
-## See also
+Lock down every Deno task you ship with
+[Restrict worker task permissions](/background-processing/how-to/restrict-worker-task-permissions/).
 
-{{ comp.xref({ key: "cap:polyglot-tasks" }) }}
-
-{{ comp.xref({ key: "cap:background-jobs" }) }}
-
-{{ comp.xref({ key: "ref:workers" }) }}
-
-{{ comp.nextPrev({ prev: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" }, next: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" } }) }}
+- [Polyglot tasks](/background-processing/polyglot-tasks/): the task model and the input and output
+  contract.
+- [Add a task runtime adapter](/background-processing/how-to/add-a-task-runtime-adapter/): run a
+  runtime NetScript does not ship.
+- {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}

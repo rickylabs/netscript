@@ -1,0 +1,11 @@
+{{# Stable code frame with optional filename. Keep the gutter outside code for clean copying. #}}
+{{ set source = code || "" }}
+{{ set language = lang || "text" }}
+{{ set detectedFile = source |> codeFilename }}
+{{ set file = filename || detectedFile }}
+{{ set label = language |> languageLabel }}
+{{ set escaped = source.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
+<div class="ns-code-block" data-code-block>
+  <div class="ns-code-header" data-twin-ignore data-pagefind-ignore>{{ if tabLabel }}<span class="ns-code-label">{{ tabLabel }}</span>{{ /if }}{{ if file }}<span class="ns-code-path" title="{{ file }}">{{ file }}</span>{{ /if }}<span class="ns-code-language">{{ label }}</span><button type="button" class="ns-copy-btn js-only" data-code-copy aria-label="Copy {{ file || label }} code">Copy</button></div>
+  <div class="ns-code-body"><div class="ns-code-gutter" aria-hidden="true" data-pagefind-ignore>{{ source.replace(/\n$/, "").split("\n").map((_, i) => i + 1).join("&#10;") }}</div><pre tabindex="0"><code class="language-{{ language }}">{{ escaped }}</code></pre></div>
+</div>

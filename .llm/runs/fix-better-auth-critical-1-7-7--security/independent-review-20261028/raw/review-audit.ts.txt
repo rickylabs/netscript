@@ -1,0 +1,51 @@
+import { captureOwnedCommand } from './owned-capture.ts';
+import { directory, host, executable, decode, json, digest, expectedHead } from './common-corrected.ts';
+export async function audit(env: Record<string, string>): Promise<void> {
+  const bytes = await Deno.readFile(`${directory}/native.stdout.jsonl`);
+  if (bytes.length > 24 * 1024 * 1024) throw new Error('Public output bound exceeded.');
+  const events = decode(bytes).trim().split(/\r?\n/).map(line => JSON.parse(line));
+  const ids = [...new Set(events.map(event => event.sessionID).filter(Boolean))];
+  if (ids.length !== 1 || !/^ses_[A-Za-z0-9]+$/.test(ids[0])) throw new Error('One new session not proved.');
+  const identity = await captureOwnedCommand(executable, ['export', ids[0]], host, env);
+  if (!identity.success) throw new Error('Owned session identity export failed.');
+  // Raw session/private reasoning remains in memory only; select public identity metadata.
+  const session: {info:{id:string};messages:{info:{id:string;role:string;sessionID:string;
+    providerID:string;modelID:string;finish:string;cost:number;tokens:unknown}}[]} = JSON.parse(decode(identity.stdout));
+  if (session.info?.id !== ids[0] || !Array.isArray(session.messages)) throw new Error('Own session mismatch.');
+  const assistants = session.messages.filter(message => message.info?.role === 'assistant')
+    .map(message => ({ id:message.info.id, sessionID:message.info.sessionID, providerID:message.info.providerID,
+      modelID:message.info.modelID, finish:message.info.finish, cost:message.info.cost, tokens:message.info.tokens }));
+  if (!assistants.length || assistants.length > 8 || assistants.some(message => message.sessionID !== ids[0] ||
+    message.providerID !== 'openrouter' || message.modelID !== 'z-ai/glm-5.3-flash' || message.finish === 'length') ||
+    assistants.at(-1)?.finish !== 'stop') throw new Error('Concrete finite model/stop identity failed.');
+  await json('observed-identity.json', { sessionID:ids[0], assistants, freshTaskProfile:true,
+    rawExportSha256:await digest(identity.stdout), capture:identity.observations,
+    requestedVariant:'provider_default; actual effort not independently attested', privateReasoningPersisted:false });
+  const manifest: {requiredReads:{name:string;lines:number}[]} = JSON.parse(await Deno.readTextFile(`${directory}/packet-manifest.json`));
+  const tools = events.filter(event => event.type === 'tool_use').map(event => event.part);
+  const reads = manifest.requiredReads.map(entry => {
+    const path = `${host}/${entry.name}`;
+    const matching = tools.filter(tool => tool.tool === 'read' &&
+      String(tool.state?.input?.filePath ?? tool.state?.input?.path ?? '').replaceAll('\\','/') === path);
+    const complete = matching.some(tool => tool.state?.status === 'completed' &&
+      tool.state?.metadata?.truncated !== true && typeof tool.state?.output === 'string' &&
+      /end of file/i.test(tool.state.output) && tool.state.output.includes(String(entry.lines)) &&
+      (tool.state.input.offset === undefined || tool.state.input.offset === 1));
+    return { name:entry.name, expectedLines:entry.lines, complete, calls:matching.length };
+  });
+  const mcp = tools.filter(tool => /^netscript_(search_docs|get_doc|find_guidance|find_export|get_export|search_exports|list_package_exports)$/.test(tool.tool) && tool.state?.status === 'completed');
+  const texts = events.filter(event => event.type === 'text' && event.part?.type === 'text').map(event => event.part.text);
+  const steps = events.filter(event => event.type === 'step_finish').map(event => ({ reason:event.part.reason, cost:event.part.cost, tokens:event.part.tokens }));
+  const failures: string[] = [];
+  if (reads.some(entry => !entry.complete)) failures.push('Full required source/contract/diff/gate read incomplete.');
+  if (!mcp.length) failures.push('Own relevant NetScript MCP query absent.');
+  if (!steps.length || steps.length > 8 || !texts.at(-1)?.trim()) failures.push('Finite complete public final absent.');
+  if (texts.length) await Deno.writeTextFile(`${directory}/final-verdict.utf8.md`, texts.at(-1), { createNew:true });
+  const final=texts.at(-1)??'';
+  const heading=`## Security PR2426 — ${expectedHead}`;
+  if(final.indexOf(heading)<0||final.indexOf(heading,final.indexOf(heading)+heading.length)>=0||!/^VERDICT:\s*(PASS|FAIL|FAIL_DEBT|FAIL_RESCOPE)\s*$/m.test(final))failures.push('One exact-head public security verdict absent.');
+  await json('coverage.json', { sessionID:ids[0], reads, mcp:mcp.map(tool => ({ tool:tool.tool, input:tool.state.input,
+    status:tool.state.status })), steps, failures, targetHeads:{Security2426:expectedHead},
+    distinctPublicReportsRequired:1,manualRootRelevanceAndVerdictRequired:true });
+  if (failures.length) throw new Error(failures.join(' '));
+}

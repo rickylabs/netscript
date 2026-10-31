@@ -1,6 +1,9 @@
+import { CALLOUT_TYPES, calloutType } from '../../../tools/docs-site/callout-types.ts';
 import { Page } from 'lume/core/file.ts';
 import { releaseVersion } from '../_data.ts';
 import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
+import { TREE_SOURCE_ATTRIBUTE } from './file-tree.ts';
+import { ALERT_ATTRIBUTE } from './callout.ts';
 
 /**
  * AI-affordance tooling for the NetScript docs site (SOTA study rec #1).
@@ -87,7 +90,7 @@ export function aiTooling(options: AiToolingOptions = {}) {
 
       for (const page of site.pages) {
         const outputPath = page.outputPath;
-        if (!outputPath.endsWith('.html')) continue;
+        if (!outputPath.endsWith('.html') || page.data.internal === true) continue;
 
         const doc = page.document;
         if (!doc) continue;
@@ -98,7 +101,7 @@ export function aiTooling(options: AiToolingOptions = {}) {
         const title = String(page.data.title ?? deriveTitle(article) ?? url);
 
         let body = articleToMarkdown(article, origin);
-        if (!/^#\s/.test(body)) {
+        if (!article.querySelector('h1')) {
           body = `# ${title}\n\n${body}`;
         }
 
@@ -151,6 +154,8 @@ function absoluteUrl(href: string, origin: URL): string {
   if (!trimmed || trimmed.startsWith('#')) return trimmed;
   if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed; // has a scheme
   try {
+    // Component `url` filters already include the project base; preserve it once.
+    if (trimmed.startsWith(origin.pathname)) return new URL(trimmed, origin.origin).href;
     const path = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
     return new URL(path, origin).href;
   } catch {
@@ -162,7 +167,8 @@ function absoluteUrl(href: string, origin: URL): string {
 /* HTML -> Markdown (rendered `.ns-prose` body)                        */
 /* ------------------------------------------------------------------ */
 
-function articleToMarkdown(article: Element, origin: URL): string {
+/** Serialize a rendered `.ns-prose` article as its Markdown twin. */
+export function articleToMarkdown(article: Element, origin: URL): string {
   return childBlocks(article, origin)
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -192,7 +198,7 @@ function hasBlockChild(el: Element): boolean {
 }
 
 function isDecorative(el: Element): boolean {
-  return el.getAttribute('aria-hidden') === 'true';
+  return el.getAttribute('aria-hidden') === 'true' || el.hasAttribute('data-twin-ignore');
 }
 
 /** Serialize a single node as a block-level Markdown string. */
@@ -218,14 +224,41 @@ function blockMd(node: ChildNode, origin: URL): string {
     }
     case 'p':
       return inlineChildren(el, origin).trim();
-    case 'ul':
+    case 'ul': {
+      // A fenced `tree` keeps its authored ASCII; the nested list is presentation only.
+      const tree = el.getAttribute(TREE_SOURCE_ATTRIBUTE);
+      if (tree !== null) return `\`\`\`text\n${tree}\n\`\`\``;
       return listMd(el, origin, false);
+    }
     case 'ol':
       return listMd(el, origin, true);
     case 'pre':
       return codeBlockMd(el);
+    case 'aside': {
+      // Preserve severity in twins when the visible label is an author's custom title.
+      const kind = el.getAttribute('data-variant');
+      const label = el.querySelector('.ns-callout__label');
+      const body = el.querySelector('.ns-callout__body');
+      // A Markdown alert is written back as authored: `[!TYPE]`, an optional `**title**`
+      // paragraph, then the body.
+      const marker = el.getAttribute(ALERT_ATTRIBUTE);
+      if (el.classList.contains('ns-callout') && kind && label && body && marker) {
+        const title = inlineChildren(label, origin).trim();
+        const head = title && title !== CALLOUT_TYPES[calloutType(kind)].label
+          ? `[!${marker}]\n**${title}**\n`
+          : `[!${marker}]`;
+        return quoteMd(`${head}\n${childBlocks(body, origin)}`);
+      }
+      if (el.classList.contains('ns-callout') && kind && label && body) {
+        return quoteMd(
+          `[!${CALLOUT_TYPES[calloutType(kind)].markdown}]\n${
+            inlineChildren(label, origin).trim()
+          }\n\n${childBlocks(body, origin)}`,
+        );
+      }
+      return quoteMd(childBlocks(el, origin));
+    }
     case 'blockquote':
-    case 'aside':
       return quoteMd(childBlocks(el, origin));
     case 'hr':
       return '---';
@@ -438,48 +471,48 @@ function buildLlmsIndex(infos: PageInfo[], origin: URL, hasFull: boolean): strin
     '',
     '## Task router',
     '',
-    `- **If you are building a service-backed UI:** 1. Read the Web Layer overview ([Web Layer](${
+    `- **If you are building a service-backed UI:** 1. Read the Web layer guide ([Web layer](${
       u('/web-layer/')
     })), then Live Dashboard chapters 4–5 ([Chapter 4](${
       u('/tutorials/live-dashboard/04-definePage-QueryIsland/')
     }), [Chapter 5](${
       u('/tutorials/live-dashboard/05-live-stream/')
     })); 2. inspect the scaffold you generated — its service route and \`components/ui/mod.ts\` — for the shape before writing a component; 3. use \`deno-doc/fresh.txt\` and \`deno-doc/fresh-ui.txt\` last, for symbol lookup. Fresh UI's visual components are copied into your app; do not hand-write a \`Button\`, \`Card\`, \`Badge\`, \`Input\` or \`FormField\`.`,
-    `- **If you are building a service + contract:** 1. Read the Services & SDK hub ([Services & SDK](${
+    `- **If you are building a service + contract:** 1. Read the Services & SDK guide ([Services & SDK](${
       u('/services-sdk/')
     })), then Live Dashboard chapters 2–3 ([Chapter 2](${
       u('/tutorials/live-dashboard/02-contract-to-service/')
     }), [Chapter 3](${
       u('/tutorials/live-dashboard/03-sdk-cache-first-query/')
     })); 2. inspect the scaffold you generated — its contract definition and service handler — for the shape; 3. use \`deno-doc/service.txt\` and \`deno-doc/sdk.txt\` last, for symbol lookup.`,
-    `- **If you are building a durable workflow / saga:** 1. Read the Durable Workflows hub ([Durable Workflows](${
+    `- **If you are building a durable workflow / saga:** 1. Read the Durable workflows guide ([Durable workflows](${
       u('/durable-workflows/')
     })), then Storefront chapter 4 ([Checkout saga](${
       u('/tutorials/storefront/04-checkout-saga/')
     })); 2. inspect the scaffold you generated — its saga definition and step handlers — for the shape; 3. use \`deno-doc/plugin-sagas.txt\` last, for symbol lookup.`,
-    `- **If you are building background jobs:** 1. Read the Background Processing hub ([Background Processing](${
+    `- **If you are building background jobs:** 1. Read the Background processing guide ([Background processing](${
       u('/background-processing/')
     })), then ERP Sync chapter 2 ([Import job](${
       u('/tutorials/erp-sync/02-import-job/')
     })); 2. inspect the scaffold you generated — its worker task definition and runner — for the shape; 3. use \`deno-doc/plugin-workers.txt\` last, for symbol lookup.`,
-    `- **If you are building persistence:** 1. Read the Data Persistence hub ([Data Persistence](${
+    `- **If you are building persistence:** 1. Read the Data & persistence guide ([Data & persistence](${
       u('/data-persistence/')
     })), then Workspace chapter 3 ([Workspace data](${
       u('/tutorials/workspace/03-workspace-data/')
     })); 2. inspect the scaffold you generated — its database schema and repository bindings — for the shape; 3. use \`deno-doc/database.txt\` and \`deno-doc/queue.txt\` last, for symbol lookup.`,
-    `- **If you are building auth:** 1. Read the Identity & Access hub ([Identity & Access](${
+    `- **If you are building auth:** 1. Read the Identity & access guide ([Identity & access](${
       u('/identity-access/')
     })), then Workspace chapter 2 ([Auth](${
       u('/tutorials/workspace/02-auth/')
     })); 2. inspect the scaffold you generated — its auth plugin configuration and route guards — for the shape; 3. use \`deno-doc/plugin-auth.txt\` last, for symbol lookup.`,
-    `- **If you are building streams:** 1. Read the Streams capability guide ([Streams](${
+    `- **If you are building streams:** 1. Read the Durable streams guide ([Durable streams](${
       u('/durable-workflows/streams/')
     })), then AI Chat chapter 2 ([Durable chat route](${
       u('/tutorials/chat/02-durable-chat-route/')
     })); 2. inspect the scaffold you generated — its stream producer and proxy route — for the shape; 3. use \`deno-doc/plugin-streams.txt\` last, for symbol lookup.`,
-    `- **If you are building observability:** 1. Read the Observability hub ([Observability](${
+    `- **If you are building observability:** 1. Read the Observability guide ([Observability](${
       u('/observability/')
-    })) and architecture explanation ([Observability explanation](${
+    })) and the Observability model essay ([Observability model](${
       u('/explanation/observability/')
     })); 2. inspect the scaffold you generated — its OpenTelemetry exporter and tracer setup — for the shape; 3. use \`deno-doc/telemetry.txt\` and \`deno-doc/logger.txt\` last, for symbol lookup.`,
     '',

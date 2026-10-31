@@ -1,0 +1,39 @@
+import { join, toFileUrl } from '@std/path';
+const evidence = await Deno.realPath('.llm/tmp/better-auth-security-sol-20261028');
+const root = Deno.cwd();
+const baseline = '1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d';
+const candidate = JSON.parse(await Deno.readTextFile(join(evidence, 'auth-controls.json')));
+const failed = candidate.failures.flatMap((row: {tests: {name: string; file: string}[]}) => row.tests);
+const files: string[] = [...new Set<string>(failed.map((row: {file: string}) => row.file))].sort();
+const names: string[] = failed.map((row: {name: string}) => row.name).sort();
+const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const filter = `/^(?:${names.map(escape).join('|')})$/`;
+const project = await Deno.makeTempDir({ dir: evidence, prefix: 'baseline-project-' });
+const archive = join(project, 'source.tar');
+const command = async (binary: string, args: string[]) => {
+  const result = await new Deno.Command(binary, { args, cwd: root, stdout: 'piped', stderr: 'piped' }).output();
+  if (!result.success) throw new Error(`Baseline setup failed: ${binary}: ${new TextDecoder().decode(result.stderr)}`);
+};
+const receipt: Record<string, unknown> = { baseline, project, files, names, originalSanitizersPreserved: true, liveOwnerEdited: false, selectedEnvironment: Object.fromEntries(['PATH', 'PATHEXT', 'DENO_DIR', 'DENO_TLS_CA_STORE', 'HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY'].map((name) => [name, Deno.env.get(name)])) };
+let timer: ReturnType<typeof setTimeout> | undefined;
+try {
+  await command('git', ['archive', '--format=tar', `--output=${archive}`, baseline, 'deno.json', 'deno.lock', 'packages', 'plugins', '.llm/tools/run-deno-test.ts', 'docs/site/identity-access/how-to/add-authentication.md', 'docs/site/tutorials/workspace/02-auth.md']);
+  await command('C:/Windows/System32/tar.exe', ['-xf', archive, '-C', project]);
+  const controller = new AbortController();
+  timer = setTimeout(() => controller.abort(), 120_000);
+  const args = ['run', '--cached-only', '--frozen', '--allow-read', '--allow-write', '--allow-run', toFileUrl(join(project, '.llm/tools/run-deno-test.ts')).href, '--cwd', project, '--output', join(evidence, 'auth-controls-unchanged-baseline.json'), '--', '--cached-only', '--frozen', '--check', '--allow-all', '--sanitize-ops', '--sanitize-resources', '--trace-leaks', '--filter', filter, ...files];
+  const result = await new Deno.Command(Deno.execPath(), { args, cwd: project, signal: controller.signal, stdout: 'piped', stderr: 'piped' }).output();
+  await Deno.writeFile(join(evidence, 'baseline-control.stdout.log'), result.stdout);
+  await Deno.writeFile(join(evidence, 'baseline-control.stderr.log'), result.stderr);
+  const report = JSON.parse(await Deno.readTextFile(join(evidence, 'auth-controls-unchanged-baseline.json')));
+  const observed = report.failures.flatMap((row: {tests: {name: string}[]}) => row.tests.map((test) => test.name)).sort();
+  Object.assign(receipt, { nativeArgv: [Deno.execPath(), ...args], exitCode: result.code, summary: report.summary, sameFailedTestNames: JSON.stringify(observed) === JSON.stringify(names), distinctFailedNames: observed.length });
+} finally {
+  if (timer !== undefined) clearTimeout(timer);
+  const resolved = await Deno.realPath(project);
+  if (!resolved.toLowerCase().startsWith((evidence + '\\baseline-project-').toLowerCase()) && !resolved.toLowerCase().startsWith((evidence + '/baseline-project-').toLowerCase())) throw new Error('Unexpected baseline cleanup target');
+  await Deno.remove(resolved, { recursive: true });
+  receipt.baselineProjectionRemoved = true;
+  await Deno.writeTextFile(join(evidence, 'baseline-control.receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
+}
+console.log(JSON.stringify(receipt));
