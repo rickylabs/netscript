@@ -21,3 +21,12 @@ carriers. This is a bounded documentation repair, not an architectural rescope. 
 round 1 has no source blockers; CI/runtime evidence remains pending outside this leaf's label
 permissions. Continue the independent reader slice after this terminal source review while
 coordinator-owned gate proof is pending; do not repeat the evaluator merely to rediscover it.
+
+Integrated factory doc lint reveals a private reference from native AuthnOptions.allowAnonymous
+to the newly named AnonymousRule. Preserve the exact existing public request shape by making
+AuthnOptions the sole field owner and deriving AnonymousRule/AnonymousRequestMatch type views
+from that field. This avoids expanding either factory facade or extending bounded F5 debt.
+A standalone native Deno doc-lint probe passes this standard TypeScript shape without erasing
+public types. This is a contract-definition repair in the already owned auth/options.ts; no
+runtime matching, field, default, guard, resolver or policy semantics change. Re-run native
+service tests/doc/publication gates and independently review the new exact service head.

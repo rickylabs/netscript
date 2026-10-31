@@ -37,3 +37,10 @@ S3 prerequisite integration: original reader-header branch at
 verdict is source acceptance with explicit pending CI/runtime qualification. Debt conflict
 preserves all complete factory/header/main entries without expiry or scope changes. No
 auth/header implementation conflict resolution was required. Final union gates are next.
+
+S3 native contract integration: merged service head37f26c1dc07da57a83a7cfbccc5344a349d1414c.
+Its anonymous-request contract keeps one native structural owner and derived aliases, removing
+the downstream private-reference finding without adding facade exports, casts or debt. Service
+root check, quality and service/MCP static publish gates pass at that source head. Incoming
+source and generated corpus merged without manual conflict resolution. Final union gates remain
+necessary; no prerequisite runtime CI result is inherited as PASS.

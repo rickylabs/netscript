@@ -71,3 +71,18 @@ from immediate service-info, and CHANGELOG describes middleware/body-limit order
 prose/build, assets-barrel and publish-assets generation succeeded; only the expected prose
 carrier changed. Runtime source remains byte-identical to the already tested source merge.
 Continue S2 while service runtime CI remains coordinator-owned and unproven.
+
+S3 integration found the new anonymous alias creates a private-type-ref at the downstream
+factory facade. Repairing the native owner definition in S1 avoids facade growth and retains
+the same public structural contract. This is a necessary integration fix, not an added API.
+Current service head will move; earlier exact-head verdict remains preserved and not relabeled.
+
+Native anonymous contract repair: AuthnOptions owns the exact same readonly string/request
+union; AnonymousRule and AnonymousRequestMatch are derived native public views. Service
+full-export doc lint remains0 and the complete service/plugin/docs-tool suite passes824/0/0.
+The change avoids adding any native factory facade exports or relaxing existing debt bounds.
+Scoped source lint/fmt pass. Regenerate the canonical native export corpus next.
+
+Canonical export-corpus regeneration for the native alias repair succeeded: 35 packages,
+301 subpaths, 8930 symbols, no export-count growth. The generator changes only its owning
+carrier. Runtime tests remain824/0/0 and native service doc lint0; final source gates follow.
