@@ -11,7 +11,7 @@ import { actionFixtures, actionKeyboard } from './utility-actions.tsx';
 import { componentContracts } from '../../contracts.ts';
 import { basicFixtures } from './utility-basic.tsx';
 import { compositeFixtures } from './utility-composites.tsx';
-import { proseFixture } from './utility-prose.ts';
+import { proseFixture, proseKeyboard } from './utility-prose.ts';
 import type { ContractStyleProvider } from './style-provider.ts';
 
 /** Source-style IDs; CSS support items and token-only presets are separate axes. */
@@ -47,5 +47,6 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...codeBlockKeyboard,
     ...docsPrimitiveKeyboard,
     ...alertKeyboard,
+    ...proseKeyboard,
   ],
 }];
