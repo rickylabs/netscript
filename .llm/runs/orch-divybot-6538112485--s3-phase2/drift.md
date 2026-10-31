@@ -90,3 +90,6 @@ component workarounds are no longer active. Native scrollbar/title-tooltip
 internals remain the previously documented platform boundary.
 
 7c4 certification is Utility/studio-utility only. Other token presets are not newly certified by these112 measurements; broader syntax-on-tint certification remains a token/visual-quality follow-up under #2450 and S6, rather than a claim of every-preset AA.
+
+
+Recovery6: latest main7feb24c7 advanced after the completed shell slice. Owner-authorized parent rebase replayed47commits; four generated-carrier conflicts resolved by regeneration from maintained source. All611FreshUI/browser files excluding the inherited private lock are byte-identical to037d048b; topic lock delta against main is zero. New main lock/tooling/runtime/docs changes retained. Full package and quality gates running; source carriers regenerated before integration source commit. Same evaluator review and audited leased push required. Child2cd89188 will be restacked only after the new parent is verified. NoREADY/current-headruntime claim.
