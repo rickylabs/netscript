@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "f89260ac93e7045fbf87e028b3e3e00b65dd68dd",
+  "currentMainSha": "4060d1e61da0a8324e77ed351b05a343d746a188",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009d",
     "trackingIssue": 2474
@@ -203,7 +203,10 @@
     },
     {
       "number": 2187,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/pull/2479"
+      ]
     },
     {
       "number": 2233,
@@ -499,7 +502,7 @@
     {
       "id": "A1-2187",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2479,
       "headSha": "15fa0c689249a92c17471709b739d23b323d5d65",
@@ -508,7 +511,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2187",
       "receiptRefs": [],
-      "note": "READY 00:05Z (missed by watcher gap); MERGE at 15fa0c6; e2e armed 05:1xZ"
+      "note": "READY 00:05Z (missed by watcher gap); MERGE at 15fa0c6; e2e armed 05:1xZ",
+      "mergeCommit": "4060d1e61da0a8324e77ed351b05a343d746a188",
+      "mergedAt": "2026-10-31T05:25:50Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2187"
     },
     {
       "id": "A3-2144",
@@ -533,7 +539,7 @@
       "phase": "blocked",
       "baseBranch": "main",
       "prNumber": 2482,
-      "headSha": "048bad37987ea86ee2fd67494c9ca96a04bcfcf4",
+      "headSha": "6597b6452b22c72277509189b61ab78fba507648",
       "issueNumbers": [
         2400
       ],
@@ -659,15 +665,16 @@
     {
       "id": "A2-2351",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2496,
-      "headSha": "8e833208d0a39d431e57e212801dea00a5b895bb",
+      "headSha": "7a46247adebce6905933656e571dc01e9e555e84",
       "issueNumbers": [
         2351
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2351",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY 7a46247; Opus MERGE; e2e armed"
     }
   ],
   "expensiveGates": [
@@ -760,6 +767,14 @@
       "via": "label e2e-cli-gate",
       "result": "SUCCESS both tiers (Postgres on rerun)",
       "completedAt": "2026-10-31T05:05:30Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2496,
+      "headSha": "7a46247adebce6905933656e571dc01e9e555e84",
+      "startedAt": "2026-10-31T05:26:30.000Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -790,11 +805,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T05:06:03.000Z",
-    "nextReportDueAt": "2026-10-31T06:06:03.000Z",
+    "lastReportAt": "2026-10-31T05:26:10.000Z",
+    "nextReportDueAt": "2026-10-31T06:26:10.000Z",
     "lastReportRef": "worklog.md",
     "headline": "H01 merged (#2476); A1 #2165 and H02 #2478 closed; #2187, #2144, #2396 building; #2395 held for the shared launch cap.",
-    "currentMainSha": "f89260ac93e7045fbf87e028b3e3e00b65dd68dd",
+    "currentMainSha": "4060d1e61da0a8324e77ed351b05a343d746a188",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -842,6 +857,7 @@
         2423,
         2476,
         2477,
+        2479,
         2480,
         2481,
         2483,
@@ -858,6 +874,7 @@
         2144,
         2151,
         2165,
+        2187,
         2290,
         2367,
         2369,
@@ -872,11 +889,11 @@
       "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
     },
     "scope": {
-      "openIssueCount": 41,
-      "ownedIssueCount": 41,
-      "scheduledIssueCount": 41,
+      "openIssueCount": 40,
+      "ownedIssueCount": 40,
+      "scheduledIssueCount": 40,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 8
+      "openPullRequestCount": 7
     },
     "mergeQueue": [
       {
@@ -886,6 +903,14 @@
         "state": "ready",
         "nextGate": "e2e-cli or exact-head verdict",
         "nextAction": "READY at a4dc705 (source MERGE); landing order #2422 -> #2423 -> #2421; e2e pending"
+      },
+      {
+        "prNumber": 2496,
+        "lane": "features",
+        "headSha": "7a46247adebce6905933656e571dc01e9e555e84",
+        "state": "ready",
+        "nextGate": "e2e-cli or exact-head verdict",
+        "nextAction": "READY at 7a46247; Opus MERGE; e2e queued after #2479"
       }
     ],
     "orchestratorMatrix": [
@@ -902,9 +927,7 @@
       {
         "lane": "internals",
         "state": "active",
-        "activeItems": [
-          "#2482"
-        ],
+        "activeItems": [],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
         "blocker": null,
         "nextAction": "Dispatch H01 #2438 first (main command-postgres red)."
@@ -912,9 +935,7 @@
       {
         "lane": "fixes",
         "state": "active",
-        "activeItems": [
-          "#2479"
-        ],
+        "activeItems": [],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
         "blocker": null,
         "nextAction": "Dispatch A1 leaves #2165 and #2187 in wave 1."
@@ -955,7 +976,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T05:08:00.000Z",
+  "updatedAt": "2026-10-31T05:26:30.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -983,7 +1004,7 @@
       "commentId": 6534990846,
       "postedAt": "2026-10-30T22:38:40Z",
       "route": "codex gpt-6.1-sol xhigh",
-      "state": "pr-open",
+      "state": "merged",
       "pr": 2479,
       "heldReason": "cockpit hourly_cap_reached",
       "relaunchCommentId": 6535845592,
@@ -1030,7 +1051,7 @@
       "commentId": null,
       "postedAt": "2026-10-31T00:39:24Z",
       "route": "codex gpt-6.1-sol (continuation of #2438 worker)",
-      "state": "relaunched",
+      "state": "started",
       "pr": 2482,
       "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)",
       "relaunchCommentId": 6539381089,
@@ -1078,9 +1099,11 @@
       "commentId": null,
       "postedAt": "2026-10-31T03:10:47Z",
       "route": "codex gpt-6.1-sol (continuation of #2151 worker)",
-      "state": "orphaned",
+      "state": "relaunched",
       "pr": null,
-      "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)"
+      "orphanedBy": "source issue of the continuing worker closed (orchid source-closed teardown)",
+      "relaunchCommentId": 6539541933,
+      "relaunchedAt": "2026-10-31T05:25:40Z"
     },
     {
       "issue": 2385,
@@ -1117,6 +1140,15 @@
       "route": "codex gpt-6.1-sol",
       "state": "pr-open",
       "pr": 2496
+    },
+    {
+      "issue": 2161,
+      "lane": "fixes",
+      "commentId": 6539498806,
+      "postedAt": "2026-10-31T05:20:38.000Z",
+      "route": "codex gpt-6.1-sol",
+      "state": "started",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475,

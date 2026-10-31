@@ -1,6 +1,6 @@
 # STATUS — 0.0.9 (one line per group; reread first after a compact)
 - H01 #2438 MERGED #2476 a410a815c, command-postgres green on main (closed)
-- A1 #2165 MERGED #2477 7907293f3 23:31Z (closed); #2187 → PR #2479 READY (MERGE 15fa0c6), e2e gating 05:08Z
+- A1 DONE: #2165 (#2477), #2187 (#2479 4060d1e61)
 - A2 #2395 MERGED #2483 1c9da73d0 (closed); #2351 → PR #2496 (implementing)
 - A3 #2144 MERGED #2481 4aa734e2b (closed); #2400 PR #2482 orphaned 01:02Z → resume r1 05:07Z; #2151 MERGED #2484 (closed); #2161: W2 (needs fixes slot)
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6

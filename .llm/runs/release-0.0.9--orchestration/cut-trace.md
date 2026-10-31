@@ -16,3 +16,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 04:13 | `ad252e8c8` | #2489 | #2385 | W5 (E2) | leaf force-pushed (rebase) at 04:00Z; fresh verdict at new head |
 | 2026-10-31 04:35 | `8902e1a58` | #2487 | #2369 | W4 (B2) | leaf force-pushed twice; fresh verdict + CI at final head |
 | 2026-10-31 05:05 | `f89260ac9` | #2492 | #2290 | W3 (D1) | Postgres tier rerun after garnet flake; leaf force-pushed |
+| 2026-10-31 05:25 | `4060d1e61` | #2479 | #2187 | W1 (A1) | READY 00:05 missed by watcher gap; rebased by leaf; MERGE at 15fa0c6 |

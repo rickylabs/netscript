@@ -99,3 +99,8 @@
 - 04:54Z: #2492 head moved `4d1ebfb` → `0d93cb3`. Postgres tier FAIL at aspire-start: garnet state=Finished, `garnet_resp` Unhealthy (the #2483 diagnostic). SQLite+garnet passed at the same head, and #2487's Postgres tier (including #2483) passed at 04:35, so this is treated as an infra flake. Reran the failed job once.
 - 05:05Z: **merged** #2492 (`f89260ac9`) for #2290; #2290 closed.
 - 05:07Z: **Found and fixed.** (1) The #2187 READY at 00:05:19Z was missed by a watcher restart gap. #2479 has since been rebased (force-push) and re-approved at `15fa0c6` (MERGE 03:25Z); e2e-cli-gate armed now. (2) Closing a leaf's issue tears down its orchid job (source-closed). That orphaned the continuation work on #2400 (PR #2482, worker gone at 01:02Z) and #2115 (claimed at 03:10Z, no PR). Re-dispatching both with resume briefs (`briefs/<n>.r1.md`). Lesson in memory.
+- 05:14Z: #2400 r1 started 05:12:18Z. #2496 (#2351) READY at `7a46247` with Opus MERGE: concurrency proven at 1/2/4 on real Redis and Garnet; bounded configurable intervals. Queue-only diff plus generated carriers; arch-debt row edited. e2e queued after #2479.
+- 05:20Z: #2161 was also orphaned (claimed at 00:57Z by the #2438 worker, which was torn down at 01:02Z). Dispatched #2161 (A3, fixes), comment 6539498806.
+- 05:25Z: #2161 started 05:25:22Z. The scripted #2115 relaunch at 05:17Z failed (empty brief path in the background subshell). Posted #2115 r1 now, comment 6539541933.
+- 05:25Z: **merged** #2479 (`4060d1e61`) for #2187; #2187 closed. **A1 complete.** The expensive gate is free: next #2496 (#2351).
+- 05:26Z: **expensive-gate.acquired** on #2496 (#2351).
