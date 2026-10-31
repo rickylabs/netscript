@@ -1,0 +1,3 @@
+# Environment and process
+
+RTK is absent in this execution environment; focused raw commands are necessary. Deno is 2.9.7. Prior run memory recommends structured test wrapper with --allow-all --unstable-kv --frozen. Git identity may require command-scoped author flags; do not change global configuration. Owner-specific instructions override the generic assignment footer: reference #1366 without closing it (only box 6 is delivered), no label/milestone mutation, stop at READY, and use the final report file handoff. Evaluator output containing session identity belongs outside Git; public evaluation reports contain sanitized findings only.

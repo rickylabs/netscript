@@ -1,0 +1,33 @@
+# Plan & Design — READY FOR REVIEW
+
+Deliver only #1366 box 6. PLAN-EVAL is required by the owner before implementation.
+
+## Locked decisions
+
+1. Extend ChildHealthMonitor with optional health options for a configurable crash-loop threshold, retaining the clock constructor and all default behavior. Default remains 3 restarts in 60 seconds, inclusive. Preserve workers' in-process restart budget unchanged.
+2. Add a synchronous ChildRestartHistoryPort and bounded ChildRestartHistory domain record (active, restart count, recent timestamps, latch). A shared FileChildRestartHistory adapter validates small records and replaces files atomically. Only lifecycle transitions and latch recovery write; HTTP polling does not read disk. Persist before runtime admission. No raw fatal errors are stored. A missing record is the first boot; a corrupt/unwritable record fails closed instead of resetting to green.
+3. An explicit monitor process-tracking method loads history once: an active prior process counts one restart, graceful stop marks inactive, abrupt termination retains active. Latch and restart count survive replacement; a fresh process cannot count downtime as clean running. Recovery still requires a complete uninterrupted ready window in the current process. Timestamp arrays are bounded by the configured threshold.
+4. Extend runChildHealthProcess with a backwards-compatible third options argument supporting an injected monitor and history path. Attach process history before bootstrap. Generated sagas/triggers glue opts into separate .data/child-health/<plugin>.json records, resolved relative to the child's existing project working directory. The specialized triggers monitor must also be the transport's monitor, preserving file-watch metadata. Workers does not opt into process history.
+5. One health-history file has one process owner, matching the existing single health listener per generated background resource. Replicas must configure distinct paths. State survives OS restarts within the same project filesystem; distributed replica tracking is deferred. Atomic replacement prevents partial readers after a process crash; use fixed bounded permissions and fail closed on invalid state. Storage failure during a request or runtime transition must yield unhealthy/terminate, never a false green.
+6. Keep lastFatalError redaction and timestamp unchanged (coordinator's box-4 decision). Dashboard and installed-consumer proof are outside this leaf.
+
+## Slices and gates
+
+- S0: commit this plan/run record and open a draft PR; gate: complete design checkpoint, independent PLAN-EVAL before code.
+- S1: shared contract/port/adapter/monitor + transport options, sagas/triggers glue, subprocess regression tests and health docs; files in declared supervisor surface plus glue stubs and canonical generated carriers. Gates: structured test/check/lint/fmt wrappers; affected monitor/transport/plugin runtime health and workers budget tests; negative control disables history detection and must fail both plugin crash-loop assertions; doctrine scan, doc lint, generated health/docs/publish freshness. Independent review before sign-off commit, push and report.
+- S2 if needed: evaluator/CI corrections and updated run evidence with the same scoped gates. Never rebase or force push. Final review pins exact pushed head after marking ready.
+
+## Proof
+
+Launch distinct OS children from generated sagas/triggers glue with deterministic failing registry/dependency setup. Retain the history path across three restarts (four process starts). Assert third restart reaches crash-looping and HTTP 503 within the default window, lower restart counts remain failed, restartCount increments across processes. Healthy one-restart-then-stable child stays ready; graceful shutdown does not count as crash. Kill ready children abruptly to prove active-marker detection. Verify custom threshold, boundary, recovery after full live ready window, corrupt records and per-resource isolation with focused monitor/adapter tests. Remove detector hook temporarily and rerun the two regression cases; record red results then restore byte-for-byte and rerun green.
+
+## Risks and mitigations
+
+- Triggers snapshot bypasses default monitor: inject the same specialized monitor into transport.
+- Saga shutdown can overwrite failed state: capture fatal snapshot/latch before stop and use retained failure payload.
+- Filesystem failure: fail closed, no silently empty history; bounded and validated record; atomic rename.
+- False positives on clean restart: clear active marker only after clean drain; keep crash latch until live recovery.
+- Working-directory collisions: plugin-specific paths and documented one-owner scope.
+- New exports / generated carriers: explicit type annotations, doc lint and canonical regeneration/freshness checks.
+
+Open-decision sweep: none that force rework. Distributed replicas and filesystem loss are safe to defer and documented. Local full scaffold.runtime is explicitly forbidden; required CI verdict is requested in READY, coordinator applies e2e-cli-gate. Other CI is inspected once at final head; no waiting loop. Do not merge or close #1366.
