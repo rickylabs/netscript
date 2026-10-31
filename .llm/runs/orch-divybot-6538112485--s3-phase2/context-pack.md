@@ -39,3 +39,9 @@ post-v1 addition list and negative guards protect the snapshot.130 tests/60
 browser/quality/preflight/docs accuracy111 pass; independent rebase review PASS.
 Next: clean-source carrier refresh/freshness checks, force-with-lease known old
 head, then restore saved6 Calendar files and continue slice4. No READY yet.
+
+Rebase freshness done: prose/corpus/assets/publish checks PASS, docs accuracy111,
+review-thread gate0 unanswered. Full348-case package run found only the stale
+legacy design-sync count; its targeted count/source check is corrected without
+changing product behavior. Push the repair with force-with-lease against old
+f6d9ae439782d39d768ce8e057d3b97fc24b5d56, then restore saved Calendar WIP.
