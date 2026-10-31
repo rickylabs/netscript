@@ -228,9 +228,10 @@ export class SagaBusBridge implements SagaBusPort {
   }
 
   #usesAtomicReplay(messageType: string): boolean {
-    return [...this.#definitions.values()].some((definition) =>
-      definition.durableWorkerCommands && definition.handledMessageTypes.includes(messageType)
-    );
+    return this.#engine.usesAtomicReplay ||
+      [...this.#definitions.values()].some((definition) =>
+        definition.durableWorkerCommands && definition.handledMessageTypes.includes(messageType)
+      );
   }
 
   async #reserve(target: SagaIdempotencyTarget, idempotencyKey: string): Promise<boolean> {

@@ -165,3 +165,30 @@ final verdict and CI snapshot belong on the exact-head PR comment and canonical 
 create another commit solely to store them, which would invalidate their head binding.
 Use the final-report file handoff for the canonical issue reply; queueing is not publication
 confirmation. Every acceptance entry must retain its stated limitations.
+
+## Active finishing relaunch mc009e-r3-2396
+
+Existing PR #2421, baseline d3a52cb1bf09e9baf0faf857a76e5102fa3c60a4. Follow
+finishing-plan.md; PLAN-EVAL required before source edits. Coordinator conditionally approves
+ProcedureErrorCode type closure at exactly workers23/streams22 only if no existing name can
+be removed. Preserve 2026-11-10, no extension/growth; independent F-5 review required.
+Final report uses excluded file handoff, not a direct canonical issue comment. No new PR.
+
+### Finishing stop branch reached — latest source union
+
+Mainf6839463668c5dae4ca7234d26909e74e10b89c0 merged normally, all four carriers generated
+canonically; freshness4/4 and quality:gate PASS. Source/test/debt/native-auth remain unchanged
+from d3a52cb1b; locks equal main. No authorized repair can clear the docs: ProcedureErrorCode
+also needs PROCEDURE_ERROR_CODES. One-name candidate fails both; two type-only names pass
+at24/23;43 omission controls all fail. Current public test3/1/0 remains red. See
+finishing-gates.json, finishing-blocker.md and the unapplied finishing-proposed-closure.patch.
+PLAN round1 FAIL_PLAN, same-session round2 PASS accepts the explicit STOP branch only.
+Next: independent merge-only source review, commit/push existing branch, exact-head delta
+review and canonical BLOCKED handoff. Do not apply24/23 without coordinator disposition;
+keep2026-11-10, no extension and independent debt re-review. No new source acceptance claimed.
+
+Independent substantive merge-only checkpoint review PASS is recorded in
+finishing-checkpoint-review.md. Commit/push the reviewed main union plus these run artifacts,
+then re-steer the same evaluator at that exact pushed head and publish its truthful CHANGES
+verdict on PR2421. Queue one canonical BLOCKED report via the excluded file handoff; do not
+wait for an answer or silently apply the out-of-bounds proposed repair.

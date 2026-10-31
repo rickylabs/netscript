@@ -90,3 +90,29 @@ execution metadata stays outside Git. No labels/milestones, local scaffold.runti
 force-push, main merge, tag, release or new PR.
 
 Follow-up merge scope: integrate1d274c16bd3163eb72a40ea3f2e3f0523861159f verbatim, including KV source and Aspire manifest. Only canonical prose/publish conflicts require regeneration. No factory source or debt bounds may change.
+
+## 2026-10-31 finishing relaunch mc009e-r3-2396
+
+Implementer: Codex, OpenAI family; feature tier, high effort. Existing PR #2421 only.
+Baseline: d3a52cb1bf09e9baf0faf857a76e5102fa3c60a4. Incoming fetched main:
+f6839463668c5dae4ca7234d26909e74e10b89c0. Branch: fix/native-host-policy.
+Write surface: this run directory; plugins/workers/services/mod.ts;
+plugins/streams/services/mod.ts; the two existing F-5 entries in
+.llm/harness/debt/arch-debt.md; canonical generated carriers and their generated inputs
+only through their existing generators. Incoming main may update other tracked paths
+verbatim. No authored runtime implementation or existing acceptance assertion changes.
+
+First seek a complete native identity closure at 22/21 names. Only if impossible, the
+coordinator explicitly authorizes ProcedureErrorCode identity type re-exports and exactly
+23/22-name debt bounds, preserving 2026-11-10, no extension and no further growth.
+Authority: issue #2474 comment 6541271527 and this relaunch's assignment.
+
+The feature matrix was queried with --json. The owner override remains verbatim:
+"Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with
+claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only."
+This relaunch expressly authorizes the bounded finishing-delta evaluation since d3a52cb1b,
+and a separate F-5 debt re-review, preserving all historical reviews. Re-steer each phase's
+same evaluator across repairs. No self-certification; evaluator performs substantive review.
+No local scaffold.runtime, labels/milestones, force push, rebase, merge to main, tag or release.
+Execution metadata and raw logs stay outside Git; sanitized evidence stays in this run.
+Canonical final issue report uses the excluded .divybot-final-report.md handoff.

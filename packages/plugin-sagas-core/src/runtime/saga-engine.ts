@@ -3,7 +3,10 @@ import {
   sagaCommandDigest,
 } from '../application/produce-worker-commands.ts';
 import type { StoredCommandOutbox } from '@netscript/database/commands';
-import { requireSagaTransitionStore } from '../ports/saga-transition-commit-port.ts';
+import {
+  requireSagaAtomicStore,
+  requireSagaTransitionStore,
+} from '../ports/saga-transition-commit-port.ts';
 import {
   type CascadedMessage,
   DEFAULT_RETRY_POLICY,
@@ -132,6 +135,11 @@ export class SagaEngine implements SagaBusPort {
     this.#instrumentation = options.instrumentation ?? new SagaInstrumentation();
   }
 
+  /** Whether durable replay is owned by the canonical transition commit instead of reservations. */
+  get usesAtomicReplay(): boolean {
+    return this.#store !== undefined;
+  }
+
   /** Start accepting saga messages. */
   start(): Promise<void> {
     this.#running = true;
@@ -151,6 +159,7 @@ export class SagaEngine implements SagaBusPort {
   ): Promise<void> {
     for (const definition of definitions) {
       if (definition.durableWorkerCommands) requireSagaTransitionStore(this.#store);
+      if (this.#store) requireSagaAtomicStore(this.#store);
     }
     for (const definition of definitions) {
       this.#definitions.set(definition.id, registeredSagaDefinition(definition));
@@ -247,11 +256,6 @@ export class SagaEngine implements SagaBusPort {
     if (!this.#store) return Object.freeze({ committed: true, status });
 
     const version = outcome.version + 1;
-    const replayKey = `${COMPENSATION_REPLAY_NAMESPACE}:${outcome.version}`;
-    if (!definition.durableWorkerCommands) {
-      const replay = await this.#appliedKeys.recordApplied(outcome.instanceId, replayKey);
-      if (!replay.applied) return Object.freeze({ committed: false, status, version });
-    }
     const loaded = await this.#store.load(outcome.instanceId);
     if (!loaded) throw SagasError.sagaInstanceNotFound(outcome.instanceId);
     const startedAt = performance.now();
@@ -367,9 +371,19 @@ export class SagaEngine implements SagaBusPort {
       const instanceId = await this.#resolveInstanceId(entry.sagaId, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
-      if (message.idempotencyKey && !entry.definition.durableWorkerCommands) {
-        const outcome = await this.#appliedKeys.recordApplied(instanceId, message.idempotencyKey);
-        if (!outcome.applied) {
+      if (message.idempotencyKey) {
+        const alreadyApplied = this.#store
+          ? await requireSagaAtomicStore(this.#store).hasAppliedTransition?.(
+            instanceId,
+            await sagaCommandDigest([
+              INBOUND_REPLAY_NAMESPACE,
+              entry.sagaId,
+              instanceId,
+              message.idempotencyKey,
+            ]),
+          )
+          : !(await this.#appliedKeys.recordApplied(instanceId, message.idempotencyKey)).applied;
+        if (alreadyApplied) {
           return Object.freeze({
             sagaId: entry.sagaId,
             instanceId,
@@ -476,7 +490,7 @@ export class SagaEngine implements SagaBusPort {
             now: context.now,
             replayIdentity: message.idempotencyKey === undefined
               ? undefined
-              : ['saga-inbound-v1', entry.sagaId, instanceId, message.idempotencyKey],
+              : [INBOUND_REPLAY_NAMESPACE, entry.sagaId, instanceId, message.idempotencyKey],
           });
           if (!committed) {
             if (completeSpan) this.#instrumentation.finishSpan(completeSpan, outcome);
@@ -610,23 +624,17 @@ export class SagaEngine implements SagaBusPort {
         occurredAt: input.message.occurredAt ?? input.now,
       },
     };
-    if (input.definition.durableWorkerCommands) {
-      const appliedKeyHash = input.replayIdentity === undefined
-        ? undefined
-        : await sagaCommandDigest(input.replayIdentity);
-      return (await requireSagaTransitionStore(this.#store).commitTransition({
-        expectedVersion: previousVersion,
-        envelope,
-        correlation,
-        record,
-        commands: input.commands,
-        ...(appliedKeyHash === undefined ? {} : { appliedKeyHash }),
-      })).committed;
-    }
-    await this.#store.save(envelope, { expectedVersion: input.expectedVersion, correlation });
-    await this.#store.saveCorrelation(correlation, envelope);
-    await this.#store.appendTransition(input.instanceId, record, envelope);
-    return true;
+    const appliedKeyHash = input.replayIdentity === undefined
+      ? undefined
+      : await sagaCommandDigest(input.replayIdentity);
+    return (await requireSagaAtomicStore(this.#store).commitTransition({
+      expectedVersion: previousVersion,
+      envelope,
+      correlation,
+      record,
+      commands: input.commands,
+      ...(appliedKeyHash === undefined ? {} : { appliedKeyHash }),
+    })).committed;
   }
 
   async #withConcurrency<TResult>(
@@ -708,6 +716,7 @@ function cloneState<TState extends SagaState>(state: TState): TState {
   return structuredClone(state);
 }
 
+const INBOUND_REPLAY_NAMESPACE = 'saga-inbound-v1';
 const COMPENSATION_REPLAY_NAMESPACE = 'saga-compensation-v1';
 const MAX_COMPENSATION_ERROR_MESSAGE_LENGTH = 1_024;
 

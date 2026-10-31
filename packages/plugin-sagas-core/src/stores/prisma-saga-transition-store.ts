@@ -110,6 +110,16 @@ class BoundPrismaSagaStore<TTx extends PostgresCommandClient> implements PrismaS
     }, { timeout: this.#timeout });
   }
 
+  /** Read the same committed inbound digest used by both ordinary and command transitions. */
+  async hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    const rows = await this.#root.$queryRawUnsafe<{ instance_id: string }[]>(
+      'SELECT instance_id FROM saga_runtime_command_applied_key WHERE instance_id=$1 AND key_hash=$2',
+      instanceId,
+      keyHash,
+    );
+    return rows.length > 0;
+  }
+
   async load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {

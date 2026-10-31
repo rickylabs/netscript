@@ -229,6 +229,7 @@ function createUnusedPrismaClient(): PrismaSagaStoreClient {
     throw new Error('Prisma client delegate should not be called during runtime construction.');
   };
   return {
+    sagaRuntimeCommandAppliedKey: { findUnique: fail, createMany: fail },
     sagaRuntimeState: {
       findUnique: fail,
       findMany: fail,

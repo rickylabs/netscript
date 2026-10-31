@@ -911,6 +911,7 @@ plugins/sagas/tests/aspire/sagas-contribution_test.ts	plugin:sagas	S5	SagaPublis
 plugins/sagas/tests/e2e/sagas-gates_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/public/deprecated-default-port_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/public/manifest_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/tests/runtime/generated-saga-health_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/runtime/saga-publisher_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/streams/factory-discovery_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/verify-plugin.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)

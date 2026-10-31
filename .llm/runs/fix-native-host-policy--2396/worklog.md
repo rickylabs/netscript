@@ -341,3 +341,65 @@ final verdict and CI snapshot belong on the exact-head PR comment and canonical 
 create another commit solely to store them, which would invalidate their head binding.
 Use the final-report file handoff for the canonical issue reply; queueing is not publication
 confirmation. Every acceptance entry must retain its stated limitations.
+
+## Design — finishing relaunch mc009e-r3-2396 (before implementation)
+
+1. Public surface: existing workers/streams ./service signatures retain native identity;
+   close the AuthzDecision public error-code reference, conditionally one export each.
+2. Domain vocabulary: ProcedureErrorCode is the native service authorization denial code,
+   introduced into AuthzDecision by main #2492; no new local vocabulary or representation.
+3. Ports: existing @netscript/service/auth type identity; no new runtime dependency or port.
+4. Constants: existing named debt IDs and gate catalog IDs, no new runtime string literal.
+5. Commit slices: one finishing source/debt/carrier/evidence slice, exact files and gate set
+   in finishing-plan.md; separate evaluator review required before its commit. A normal main
+   merge checkpoint may precede it and must include the same run's context/worklog update.
+6. Deferred scope: #829, #2364, broader signature redesign and actual published canary graph
+   remain their existing owners' work; required hosted e2e-cli remains coordinator-owned.
+7. Contributor path: plugins/workers/services/mod.ts shows the native closure pattern and
+   linked F-5 debt; streams uses the same pattern without PluginServiceContext.
+
+Owner routing override (verbatim): "Run PLAN-EVAL before implementing and IMPL-EVAL after,
+both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only,
+stdin closed, blockers only." The pinned matrix was queried as JSON; this owner-specific
+route preserves independent sessions and different vendor families. All prior verdicts stay
+historical; the relaunch expressly authorizes one finishing-delta evaluation.
+
+### PLAN-EVAL round 1: FAIL_PLAN, one blocker
+
+Independent Claude review identified the same transitive dependency as the scratch probes:
+ProcedureErrorCode refers to native PROCEDURE_ERROR_CODES. No implementation edits made.
+finishing-plan.md now explicitly stops if the approved single re-export remains red.
+All existing native names tested are still required; none is redundant. A second independent
+plan round reviews that stop branch; no fallback export or native source redesign is inferred.
+
+### Finishing merge-only slice: stop condition confirmed
+
+Same-session independent PLAN-EVAL round2 PASS authorizes only the conditional plan and
+its explicit STOP branch. Normally merged mainf6839463668c5dae4ca7234d26909e74e10b89c0
+from baseline d3a52cb1bf09e9baf0faf857a76e5102fa3c60a4 with no conflicts. All53 incoming
+changed paths match main except the canonical corpus union and the retained host-guide
+Aspire inventory row. Both factories and all their tests, native auth, accepted debt22/21
+and locks are unchanged. All four canonical generation tasks succeed; corpus generation
+uses its documented --allow-dirty on the coherent uncommitted merge, freshness uses --check.
+
+Gate receipts: all four carrier freshness checks and quality:gate PASS. Original public
+workers test remains3 passed/1 failed/0 ignored, exit1; the sole failing assertion is the
+same real documentation closure. Both actual facade doc-lint commands fail1. Post-merge
+scratch one-name candidates fail on PROCEDURE_ERROR_CODES; two type-only native names pass
+at24/23. All43 individual native-name omission controls fail (22 workers,21 streams).
+No production repair, assertion reduction, debt expansion or native representation change.
+Full combined suite, root check and publish revalidation were not rerun after this explicit
+STOP condition; no new-head proof is inferred from historical results. Review-thread gate0.
+
+Reconcile: current PR #2421 remains the sole branch/PR. Its prior supplementary research
+comment6541305379 independently documented this same two-name need. This run reconfirms it
+at the latest main union. Owner's one-name23/22 approval does not include24/23. The final
+canonical handoff must be BLOCKED with the one bounded disposition question and options.
+finishing-proposed-closure.patch is unapplied research; it does not amend accepted debt.
+
+Independent substantive checkpoint review: CHECKPOINT: PASS. The separate Anthropic reviewer
+verified all53 incoming paths, exact51 main-owned files plus the two carrier/inventory unions,
+unchanged factories/auth/tests/debt/locks, no unmerged files, and candid blocked evidence.
+finishing-checkpoint-review.md records that review. This is approval to commit the merge-only
+BLOCKED checkpoint, not feature acceptance. Final exact-head IMPL-EVAL follows in that same
+separate evaluator session after push; no later commit solely for its verdict.

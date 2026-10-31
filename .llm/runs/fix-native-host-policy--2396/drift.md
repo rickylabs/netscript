@@ -116,3 +116,19 @@ expressly forbids reimplementation; closure repair would grow the exact22/21 nam
 and requires coordinator disposition. Report acceptance8 and complete-suite proof as unproven.
 
 Slice1 committed/pushed2d62297b0 with root4034/34/zero diagnostics. Reconciled PR comment and review-thread gate. Slice2 merges main1d274c16bd3163eb72a40ea3f2e3f0523861159f normally: only prose/publish generated conflicts. Incoming KV source/lock state preserved exactly. Regenerate same four carriers; rerun root/combined union tests and freshness/quality gates.
+
+## mc009e-r3-2396 scope authority
+
+Coordinator #2474 comment6541271527 explicitly permits the minimal AuthzDecision closure
+repair beyond the previous carrier-only bounds, conditional on redundancy probes. All other
+source boundaries, runtime proof requirements and debt deadlines remain. RTK unavailable;
+focused raw inspection and repo-native structured gate receipts are used.
+
+### New transitive closure finding (before implementation)
+
+Scratch omission probes prove the approved ProcedureErrorCode addition remains red because
+its definition references PROCEDURE_ERROR_CODES. Independent PLAN-EVAL round 1 agrees.
+The recorded native type-only export of that constant makes the scratch closure pass but needs
+24/23 names, exceeding the exact authorized 23/22. No such export is applied. Native owner
+redesign is outside this authorized finishing delta. Stop after the coherent main merge and
+fresh source confirmation unless the single approved export can actually prove zero.

@@ -16,7 +16,7 @@ import {
 } from './saga-instance-projection.ts';
 
 Deno.test({
-  name: 'projection revives date strings from real Redis-persisted saga state',
+  name: 'projection formats decoded dates from real Redis-persisted saga state',
   ignore: !Deno.env.get('NETSCRIPT_TEST_REDIS_URL'),
   async fn() {
     const url = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
@@ -57,7 +57,10 @@ Deno.test({
 
       const persisted = await canonical.load(instanceId);
       assert(persisted);
-      assertEquals(typeof persisted.metadata.createdAt, 'string');
+      const raw = await kv.get<{ metadata: { createdAt: string } }>(['sagas', 'state', instanceId]);
+      assertEquals(typeof raw?.value.metadata.createdAt, 'string');
+      assert(persisted.metadata.createdAt instanceof Date);
+      assertEquals(persisted.metadata.createdAt.toISOString(), occurredAt.toISOString());
 
       await store.appendTransition(instanceId, transition);
 
