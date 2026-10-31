@@ -1,0 +1,157 @@
+{
+  "compat-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "plugins/workers/worker/job-retry_test.ts",
+      "plugins/workers/worker/job-dead-letters_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 4508,
+    "summary": {
+      "passed": 19,
+      "failed": 0,
+      "ignored": 4,
+      "totalResults": 23,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "compat-check": {
+    "source": {
+      "mode": "selection",
+      "cwd": "<worktree>"
+    },
+    "command": "deno check --unstable-kv --no-lock <files>",
+    "selection": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "compat-lint": {
+    "source": {
+      "mode": "command",
+      "cwd": "<worktree>",
+      "exitCode": 0
+    },
+    "selection": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 5,
+      "filesProcessed": 5,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "compat-fmt": {
+    "command": "deno fmt --check",
+    "cwd": "<worktree>",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 5,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 5,
+      "filesProcessed": 5,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "negative-direct-default": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "direct dispatcher consumers",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 2059,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "TypeError: Cannot read properties of undefined (reading 'append')\n    at recordJobDeadLetter (file://<cwd>/plugins/workers/worker/job-dead-letters.ts:<line>:<column>)\n    at deadLetter (file://<cwd>/plugins/workers/worker/job-dispatcher.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/worker/job-dispatcher.ts:<line>:<column>\n    at async withSpan.kind (file://<cwd>/packages/telemetry/src/instrumentation/worker.ts:<line>:<column>)\n    at async file://<cwd>/packages/telemetry/src/application/span.ts:<line>:<column>\n    at async withSpan (file://<cwd>/packages/telemetry/src/application/span.ts:<line>:<column>)\n    at async traceJobExecution (file://<cwd>/packages/telemetry/src/instrumentation/worker.ts:<line>:<column>)\n    at async processWorkerJob (file://<cwd>/plugins/workers/worker/job-dispatcher.ts:<line>:<column>)\n    at async file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "direct dispatcher consumers without a DLQ field keep the canonical durable default",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 258
+          }
+        ]
+      }
+    ]
+  },
+  "final-regression-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "packages/plugin-workers-core/tests/runtime",
+      "packages/plugin-workers-core/tests/config",
+      "plugins/workers/worker",
+      "plugins/workers/tests/runtime",
+      "plugins/workers/tests/cli",
+      "packages/plugin/src/runtime/child-health-monitor_test.ts",
+      "packages/plugin/src/presentation/run-child-health-process_test.ts",
+      "plugins/workers/src/adapter/resources/resources.test.ts",
+      "plugins/triggers/src/runtime/scheduled-idempotency_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 29787,
+    "summary": {
+      "passed": 139,
+      "failed": 0,
+      "ignored": 7,
+      "totalResults": 146,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  }
+}

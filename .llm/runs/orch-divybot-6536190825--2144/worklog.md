@@ -53,3 +53,13 @@ PASS from the same independent evaluator before any implementation. See plan-eva
 - S2 supervisor review: PASS in slice-2-review.md. Closed its thrown-exhaustion advisory by making the two-retry real-KV test throw from the handler; the zero-retry case returns failure. Remaining bounded at-least-once replay/pre-dispatch diagnostics are documented limitations, not blockers.
 - Final S2 regression: 135 passed, 0 failed, four unavailable Redis cases ignored. Structured check/lint/fmt over all 14 changed TS files exit 0; quality:gate exits 0; workers plugin JSR audit/dry-run exits 0. Full plugin doc-lint has only the same two inherited contract-type references after exporting all new sibling type dependencies.
 - S2 reconcile: no review comments or threads from other authors; command-postgres red confirmed independently on current main. PR remains draft; labels and milestone are coordinator-owned. S3 proceeds only after S2 commit/push.
+
+## CI compatibility correction
+
+- The second command-postgres alert was a distinct PR failure, not main's known dependency error. Its real generated saga consumer builds the existing WorkerDispatchContext shape without deadLetters; the required new field broke that fixture's type check.
+- Restored the prior shape with an optional direct-dispatch extension and a lazy canonical KV fallback. Worker still always owns a nonoptional port. A shared composition factory keeps one namespace/default, and omitted injection never bypasses persistence.
+- New real-KV direct-consumer test passes; removing only the fallback makes it fail (negative control exit 1). The fixture source remains unchanged. No database/saga behavior or dependency changes are needed.
+- Independent compatibility review: PASS. The same correction also preserves the saga publish-order and scheduled-trigger consumer contexts. See compatibility-review.md.
+- Incorporated main #2476, which separately fixes the inherited fixture dependency failure. No local lock/config changes remain in this PR's diff against main.
+- Post-integration regression: 139 passed, 0 failed, 7 unavailable Redis integrations ignored, including the scheduled-trigger consumers. Focused compatibility check/lint/fmt pass; quality:gate passes on the integrated graph.
+- Correction reconcile: prior S2 CI regression is addressed in code; current-head PostgreSQL conformance remains to be observed after push. No listener-supervisor, labels or milestones changed.

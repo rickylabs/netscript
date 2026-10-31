@@ -14,6 +14,7 @@ Temporarily restore production files from baseline `7907293f3dad3aeb557923809ddc
 | Remove await on terminal job persistence; filter `KV job DLQ persists` | exit 1; both zero/two-retry cases observe the queue callback return before durable write completes |
 | Remove DLQ-outage propagation flag; filter `DLQ write outage` | exit 1; the real Worker listener fails the required requeue/claim-release assertions |
 | Drop async child snapshot; real HTTP health test | exit 1; durable dead-letter details are absent from the response |
+| Remove the lazy KV fallback for a direct dispatcher context without deadLetters | exit 1; the compatibility regression fails instead of durably storing its terminal failure |
 
 The zero-retry single-attempt property already holds on baseline and is retained as a boundary guard. Slice 2 adds DLQ assertions so a failing zero-retry job also proves durable terminal handling. A baseline revert cannot truthfully make the original single-attempt property itself fail.
 

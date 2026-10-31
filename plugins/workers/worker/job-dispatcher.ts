@@ -1,4 +1,4 @@
-import { recordJobDeadLetter } from './job-dead-letters.ts';
+import { createDefaultJobDeadLetterStore, recordJobDeadLetter } from './job-dead-letters.ts';
 import {
   DEFAULT_TOPIC,
   type JobMessage,
@@ -61,14 +61,18 @@ export async function processWorkerJob(
   let executionSucceeded = false;
   const deadLetter = async (error: string, errorCode?: string): Promise<void> => {
     writingDeadLetter = true;
-    await recordJobDeadLetter(context.deadLetters, message, {
-      queueName: context.queueName ?? 'jobs',
-      executionId,
-      attempts,
-      error,
-      errorCode,
-      queueContext,
-    });
+    await recordJobDeadLetter(
+      context.deadLetters ?? createDefaultJobDeadLetterStore(context.queueName),
+      message,
+      {
+        queueName: context.queueName ?? 'jobs',
+        executionId,
+        attempts,
+        error,
+        errorCode,
+        queueContext,
+      },
+    );
     terminalRecorded = true;
     writingDeadLetter = false;
   };

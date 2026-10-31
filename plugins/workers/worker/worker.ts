@@ -1,5 +1,7 @@
-import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
-import { JOB_DEAD_LETTER_NAMESPACE, type JobDeadLetterStorePort } from './job-dead-letters.ts';
+import {
+  createDefaultJobDeadLetterStore,
+  type JobDeadLetterStorePort,
+} from './job-dead-letters.ts';
 /**
  * Worker process for the NetScript workers plugin.
  *
@@ -106,9 +108,7 @@ export class Worker {
   constructor(options: WorkerOptions) {
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
-    this.deadLetters = options.deadLetters ?? new KvDeadLetterStore<JobMessage>({
-      queueName: `${JOB_DEAD_LETTER_NAMESPACE}:${this.queueName}`,
-    });
+    this.deadLetters = options.deadLetters ?? createDefaultJobDeadLetterStore(this.queueName);
     this.suppliedQueue = options.queue;
     this.suppliedTaskQueue = options.taskQueue;
     this.concurrency = options.concurrency ?? 1;

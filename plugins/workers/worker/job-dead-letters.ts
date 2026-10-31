@@ -1,3 +1,4 @@
+import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import type { DeadLetterRecord, DeadLetterStorePort, MessageContext } from '@netscript/queue';
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
 
@@ -7,6 +8,13 @@ export type JobDeadLetterRecord = DeadLetterRecord<JobMessage>;
 export type JobDeadLetterStorePort = DeadLetterStorePort<JobMessage>;
 /** Namespace separating handler exhaustion from transport-level dead letters. */
 export const JOB_DEAD_LETTER_NAMESPACE = 'workers:job-dlq';
+
+/** Compose the canonical KV job failure store in its own queue namespace. */
+export function createDefaultJobDeadLetterStore(queueName = 'jobs'): JobDeadLetterStorePort {
+  return new KvDeadLetterStore<JobMessage>({
+    queueName: `${JOB_DEAD_LETTER_NAMESPACE}:${queueName}`,
+  });
+}
 
 /** Persist one exhausted job idempotently before its transport may acknowledge it. */
 export async function recordJobDeadLetter(

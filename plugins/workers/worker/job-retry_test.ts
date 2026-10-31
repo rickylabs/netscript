@@ -1,6 +1,6 @@
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import { assertEquals } from '@std/assert';
-import { DenoKvAdapter as KvStoreAdapter } from '@netscript/kv';
+import { closeKv, DenoKvAdapter as KvStoreAdapter, getKv, isKvInitialized } from '@netscript/kv';
 import { KvPollingAdapter } from '@netscript/queue/adapters/kv-polling';
 import { DenoKvAdapter as NativeKvQueue } from '@netscript/queue/adapters/deno-kv';
 import { RedisAdapter } from '@netscript/queue/adapters/redis';
@@ -104,7 +104,7 @@ for (const adapter of ['kv-polling', 'deno-kv', 'redis'] as const) {
         assertEquals(calls, 1);
         assertEquals(clock.delays, []);
         assertEquals(harness.completed.map((result) => result.status), ['failed']);
-        assertEquals(await harness.context.deadLetters.depth(), 1);
+        assertEquals(await harness.deadLetters.depth(), 1);
       } finally {
         await queue.stop();
         await harness.context.workerPool.shutdown();
@@ -169,7 +169,7 @@ Deno.test('Worker KV listener replays a job after shutdown during backoff and re
   const queue = makeQueue('kv-polling', kv) as KvPollingAdapter<JobMessage>;
   const options = {
     workerId: 'shutdown-replay',
-    deadLetters: harness.context.deadLetters,
+    deadLetters: harness.deadLetters,
     queue,
     registry: harness.context.registry,
     taskRegistry: harness.context.taskRegistry,
@@ -189,7 +189,7 @@ Deno.test('Worker KV listener replays a job after shutdown during backoff and re
     await bounded(started);
     assertEquals((await queue.getStats()).pending, 1, 'shutdown must preserve the queued job');
     assertEquals(disposed, 1);
-    assertEquals(await harness.context.deadLetters.depth(), 0);
+    assertEquals(await harness.deadLetters.depth(), 0);
     next = new Worker({
       ...options,
       retryClock: new RetryClock(),
@@ -246,12 +246,42 @@ Deno.test('polyglot timeout is terminal after one attempt and records timeout wi
     assertEquals(calls, 1);
     assertEquals(clock.delays, []);
     assertEquals(harness.completed.map((result) => result.status), ['timeout']);
-    const records = await harness.context.deadLetters.list();
+    const records = await harness.deadLetters.list();
     assertEquals(records.length, 1);
     assertEquals(records[0].deliveryCount, 1);
     assertEquals(records[0].errorCode, 'job.timeout');
   } finally {
     await harness.context.workerPool.shutdown();
+  }
+});
+
+Deno.test('direct dispatcher consumers without a DLQ field keep the canonical durable default', async () => {
+  assertEquals(isKvInitialized(), false);
+  const shared = await getKv({ provider: 'deno-kv', path: ':memory:', skipServiceDiscovery: true });
+  await using kv = await Deno.openKv(':memory:');
+  const harness = await dispatchHarness(kv, {
+    id: 'retry-job',
+    enabled: true,
+    maxRetries: 0,
+    handler: () => ({ success: false, error: 'direct consumer failure' }),
+  }, new RetryClock());
+  const { deadLetters: _providedStore, ...legacyContext } = harness.context;
+  const directConsumer: WorkerDispatchContext = legacyContext;
+  try {
+    await processWorkerJob(directConsumer, {
+      jobId: 'retry-job',
+      topic: 'jobs',
+      triggeredBy: 'queue',
+    });
+    const stored = new KvDeadLetterStore<JobMessage>({
+      queueName: 'workers:job-dlq:jobs',
+      kv: shared,
+    });
+    assertEquals(await stored.depth(), 1);
+    assertEquals((await stored.list())[0].errorMessage, 'direct consumer failure');
+  } finally {
+    await harness.context.workerPool.shutdown();
+    await closeKv();
   }
 });
 
@@ -272,9 +302,10 @@ async function dispatchHarness(kv: Deno.Kv, job: JobDefinition, retryClock: JobR
   await workerPool.initialize();
   const completed: WorkerCompleteExecutionOptions[] = [];
   let executions = 0;
+  const deadLetters = new KvDeadLetterStore<JobMessage>({ queueName: 'job-failures', denoKv: kv });
   const context: WorkerDispatchContext = {
     workerId: 'retry-test',
-    deadLetters: new KvDeadLetterStore<JobMessage>({ queueName: 'job-failures', denoKv: kv }),
+    deadLetters,
     concurrency: 1,
     registry: { get: () => Promise.resolve(job) },
     taskRegistry: { get: () => Promise.resolve(undefined) },
@@ -295,7 +326,7 @@ async function dispatchHarness(kv: Deno.Kv, job: JobDefinition, retryClock: JobR
     activeJobs: new Map(),
     workerSpan: null,
   };
-  return { context, completed };
+  return { context, completed, deadLetters };
 }
 
 async function consumeOnce(

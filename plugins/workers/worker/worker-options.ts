@@ -202,7 +202,8 @@ export interface WorkerJobResult {
 
 /** Context required by worker job dispatch helpers. */
 export interface WorkerDispatchContext {
-  readonly deadLetters: JobDeadLetterStorePort;
+  /** Defaults to the canonical KV job store for direct dispatcher consumers. */
+  readonly deadLetters?: JobDeadLetterStorePort;
   readonly queueName?: string;
   readonly workerId: string;
   /** Configured queue delivery concurrency, also reported on completed job spans. */
