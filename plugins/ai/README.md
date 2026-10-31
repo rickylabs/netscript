@@ -35,6 +35,44 @@ dependencies directly, so upgrading the engine never means regenerating your cod
   MCP server.
 - **Opt-in persistence** — thread persistence is a flag away, backed by a Deno KV thread store.
 
+## Excluding helpers from generated registries
+
+`netscript generate plugins` selects definition modules from `ai/tools/*.ts` and `ai/agents/*.ts`.
+Keep a helper or a dependency-injected factory beside those definitions by putting this exact
+comment on its first line:
+
+```ts
+// @netscript-registry-ignore
+export function scopedId(scope: string, name: string): string {
+  return `${scope}.${name}`;
+}
+```
+
+For example, add it to `ai/tools/helper.ts`. The directive is shared by all plugin runtime
+registries and standalone registry compilers. It excludes the whole module before generating
+imports; ordinary imports from your application keep working. Use a separate module for a top-level
+tool definition that should remain registered.
+
+The marker must be the complete first-line comment, before any license header or code. Indentation,
+a UTF-8 BOM and CRLF are accepted; a later comment, a string containing the marker, or extra text on
+the line does not opt out. Existing manifest suffix and filename exclusions still apply.
+
+Regenerate and inspect the result:
+
+```sh
+netscript generate plugins
+netscript plugin doctor
+```
+
+Doctor names eligible modules carrying the directive as `Explicitly excluded registry modules`, on
+both healthy and stale registries. Remove the directive and regenerate to register the module again.
+Unmarked modules retain the plugin's existing definition validation. Keep the CLI, shared plugin
+package and installed plugins on matching release versions so their selector and inspection protocol
+agree.
+
+AI tool definition-shape selection still applies after explicit exclusions. Factory-only tools that
+the existing shape check skips implicitly do not become explicitly excluded modules.
+
 ## Architecture
 
 ```mermaid

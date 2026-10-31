@@ -22,6 +22,69 @@ const NOOP_EVIDENCE: DiagnosticEvidencePort = {
   appendDrift: () => Promise.resolve(),
 };
 
+Deno.test('plugin doctor names excluded trigger and worker factories without writing project files', async () => {
+  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-doctor-opt-out-' });
+  try {
+    await writeProjectConfig(projectRoot);
+    const configPath = join(projectRoot, 'deno.json');
+    const config = JSON.parse(await Deno.readTextFile(configPath));
+    config.imports['@netscript/plugin-triggers/runtime'] = toFileUrl(
+      join(REPOSITORY_ROOT, 'plugins/triggers/src/runtime/mod.ts'),
+    ).href;
+    config.imports['@netscript/plugin-workers/runtime'] = toFileUrl(
+      join(REPOSITORY_ROOT, 'plugins/workers/bin/runtime.ts'),
+    ).href;
+    await Deno.writeTextFile(configPath, JSON.stringify(config));
+    await write(
+      join(projectRoot, 'appsettings.json'),
+      JSON.stringify({
+        NetScript: {
+          Plugins: {
+            triggers: { Entrypoint: netscriptJsrSpecifier('plugin-triggers', '/services') },
+            workers: { Entrypoint: netscriptJsrSpecifier('plugin-workers', '/services') },
+          },
+        },
+      }),
+    );
+    await write(
+      join(projectRoot, 'triggers/valid.ts'),
+      'export default { id: "valid", kind: "webhook", handler: async () => new Response() };',
+    );
+    await write(
+      join(projectRoot, 'workers/jobs/valid.ts'),
+      `
+const payloadSchema = { '~standard': { version: 1, vendor: 'test', validate: (value: unknown) => ({ value }) } } as const;
+export default Object.assign(async () => undefined, { payloadSchema });
+`,
+    );
+    const helpers = ['triggers/factory.ts', 'workers/jobs/factory.ts'];
+    for (const path of helpers) {
+      await write(
+        join(projectRoot, path),
+        '// @netscript-registry-ignore\nexport function factory() { return {}; }\n',
+      );
+    }
+    const fs = new DenoFileSystem();
+    const generate = createGenerator(fs);
+    await generate({ dryRun: false, projectRoot });
+    const before = await snapshotProjectFiles(projectRoot);
+    const { command, output } = createDoctorHarness(projectRoot, fs, generate);
+    await command.parse(['--project-root', projectRoot]);
+    for (const helper of helpers) {
+      assertStringIncludes(output.join('\n'), `Explicitly excluded registry modules: ${helper}.`);
+    }
+    assertEquals(await snapshotProjectFiles(projectRoot), before);
+    // Changing a selected module's membership still fails the ordinary drift check.
+    await write(join(projectRoot, 'triggers/late.ts'), 'export default {};');
+    const stale = createDoctorHarness(projectRoot, fs, generate);
+    await assertRejects(() => stale.command.parse(['--project-root', projectRoot]), RemoteError);
+    assertStringIncludes(stale.output.join('\n'), 'triggers/factory.ts');
+    assertStringIncludes(stale.output.join('\n'), 'Missing generated entry');
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
 Deno.test('plugin doctor fails when a saga is authored after generate plugins', async () => {
   const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-doctor-registry-drift-' });
   try {
