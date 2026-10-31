@@ -61,3 +61,7 @@ union; AnonymousRule and AnonymousRequestMatch are derived native public views. 
 full-export doc lint remains0 and the complete service/plugin/docs-tool suite passes824/0/0.
 The change avoids adding any native factory facade exports or relaxing existing debt bounds.
 Scoped source lint/fmt pass. Regenerate the canonical native export corpus next.
+
+Canonical export-corpus regeneration for the native alias repair succeeded: 35 packages,
+301 subpaths, 8930 symbols, no export-count growth. The generator changes only its owning
+carrier. Runtime tests remain824/0/0 and native service doc lint0; final source gates follow.
