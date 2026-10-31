@@ -27,3 +27,7 @@ Scope: SCOPE-docs; no package/plugin architectural changes, no JSR audit needed.
 ## Open decisions / deferred scope
 
 No unresolved design decisions. Carrier publication is safe to defer to coordinator as mandated by the docs lane; report it as unproven if required. General shell parsing and validation of all CLI verbs are outside this bounded defect. No CLI or runtime/scaffold changes, no local scaffold.runtime E2E, labels, milestones, merge, tag, or release.
+
+## PLAN-EVAL refinements before implementation
+
+PASS, no blockers. Adopt N2: reject `<pkg>`, `<package>`, `<specifier>` placeholders including HTML entities. N3 exact S1 files: docs/site/orchestration-runtime/how-to/add-a-plugin.md; docs/site/reference/cli/commands.md; .llm/tools/docs/{cli-example-policy.ts,snippet-policy.ts,snippet-extractor_test.ts,check-snippets-worker.ts,snippet-coverage.md}; .llm/tools/docs/fixtures/plugin-update-package-specifier/docs/site/page.md. N4 terminology is source-aligned to public CLI help (“installed plugin”). N1 carrier freshness is expected to fail until a coordinator-authorized refresh; a READY delivery is not a merge-ready claim while it fails.

@@ -1,4 +1,11 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import {
+  assert,
+  assertEquals,
+  assertRejects,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
+import { checkCliExamples } from './cli-example-policy.ts';
 import { dirname, fromFileUrl, join } from '@std/path';
 import { extractFencedBlocks } from './snippet-extractor.ts';
 import { analyzeSnippetSite } from './snippet-policy.ts';
@@ -270,4 +277,96 @@ Deno.test('site analysis excludes Lume build output without shrinking source cov
   } finally {
     await Deno.remove(temp, { recursive: true });
   }
+});
+
+Deno.test('CLI examples reject package update operands in fences, inline code and HTML tables', () => {
+  for (
+    const operand of [
+      '@netscript/plugin-workers',
+      'jsr:@netscript/plugin-workers@0.0.8',
+      '"@acme/plugin-example"',
+      "'jsr:@acme/plugin-example'",
+      '&quot;@netscript/plugin-workers&quot;',
+      '&#39;@netscript/plugin-workers&#39;',
+      '<pkg>',
+      '&lt;pkg&gt;',
+      '<package>',
+      '&lt;specifier&gt;',
+    ]
+  ) {
+    for (
+      const source of [
+        `# Guide\n\n\`\`\`sh\nnetscript plugin update ${operand}\n\`\`\`\n`,
+        `# Guide\nUse \`netscript plugin update ${operand}\`.\n`,
+        `# Guide\n["<code>netscript plugin update ${operand}</code>", "Update a plugin"]\n`,
+        `# Guide\nnetscript plugin\n  update\n  ${operand}\n`,
+      ]
+    ) {
+      const error = assertThrows(() => checkCliExamples(source, 'guide.md'), Error);
+      assertStringIncludes(error.message, 'guide.md:');
+      assertStringIncludes(error.message, 'plugin update requires an installed plugin name');
+    }
+  }
+});
+
+Deno.test('CLI example policy preserves installed names and other verbs and reports source lines', () => {
+  checkCliExamples(
+    [
+      'netscript plugin update workers',
+      'netscript plugin update custom-name --project-root .',
+      'netscript plugin update <name>',
+      'netscript plugin update &lt;name&gt;',
+      'netscript plugin update --help',
+      'netscript plugin install worker --name workers --jsr-url @netscript/plugin-workers',
+      'netscript plugin enable @acme/plugin-example',
+      'netscript plugin setup jsr:@acme/plugin-example',
+    ].join('\n'),
+    'commands.md',
+  );
+  assertThrows(
+    () =>
+      checkCliExamples(
+        '# Guide\r\n\r\n<code>netscript plugin update @netscript/plugin-workers</code>',
+        'guide.md',
+      ),
+    Error,
+    'guide.md:3: plugin update requires an installed plugin name',
+  );
+});
+
+Deno.test('site analysis guards CLI examples outside the TypeScript coverage floor', async () => {
+  const site = await Deno.makeTempDir({ prefix: 'plugin-update-docs-' });
+  try {
+    for (const file of ['guide.md', 'guide.vto']) {
+      const path = join(site, file);
+      await Deno.writeTextFile(
+        path,
+        '<code>netscript plugin update @netscript/plugin-workers</code>\n',
+      );
+      await assertRejects(
+        () => analyzeSnippetSite(site, { enforceCoverage: false }),
+        Error,
+        `${file}:1: plugin update requires an installed plugin name`,
+      );
+      await Deno.writeTextFile(path, '<code>netscript plugin update workers</code>\n');
+      assertEquals((await analyzeSnippetSite(site, { enforceCoverage: false })).census.scanned, 0);
+    }
+  } finally {
+    await Deno.remove(site, { recursive: true });
+  }
+});
+
+Deno.test('package-specifier negative fixture exits the actual snippets CLI non-zero', async () => {
+  const output = await new Deno.Command(Deno.execPath(), {
+    cwd: repositoryRoot,
+    args: ['task', 'docs:snippets:negative', 'plugin-update-package-specifier'],
+    stdin: 'null',
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(output.code, 1);
+  assertStringIncludes(
+    new TextDecoder().decode(output.stderr),
+    'page.md:4: plugin update requires an installed plugin name',
+  );
 });
