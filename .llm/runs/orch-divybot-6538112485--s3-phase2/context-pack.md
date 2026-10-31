@@ -35,3 +35,7 @@ run must be supplied only to npm/Playwright, not restricted Deno spawn wrappers.
 Review transport/private identity is outside repository in project's run folder.
 Remaining phase2a: Navigation, Overlays, Data display + Feedback/docs gap audit.
 Then stacked phase2b: Layout, AI, Desktop, Docs kit and all-style harness.
+
+Slice4 source committed; clean-source MCP corpus and all four carrier freshness
+checks PASS. Docs build253 HTML/97 registry artifacts; no docs lock churn.
+Push/comment completes this slice; next is Navigation.
