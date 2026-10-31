@@ -1,3 +1,4 @@
+import { docsStructureFixtures, docsStructureKeyboard } from './utility-docs-structure.tsx';
 import { aiInteractionFixtures, aiInteractionKeyboard } from './utility-ai-interaction.tsx';
 import { aiFixtures, aiKeyboard } from './utility-ai.tsx';
 import { dataTableFixtures, dataTableKeyboard } from './utility-data-table.tsx';
@@ -52,6 +53,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...dataTableFixtures,
     ...aiFixtures,
     ...aiInteractionFixtures,
+    ...docsStructureFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -74,6 +76,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...dataTableKeyboard,
     ...aiKeyboard,
     ...aiInteractionKeyboard,
+    ...docsStructureKeyboard,
     ...proseKeyboard,
   ],
 }];

@@ -1,3 +1,4 @@
+import { DocsStructureExamples } from './gap-docs-structure-fixture.tsx';
 import { AIInteractionExamples } from './gap-ai-interaction-fixture.tsx';
 import { AIExamples } from './gap-ai-fixture.tsx';
 import { DataTableExamples } from './gap-data-table-fixture.tsx';
@@ -90,6 +91,8 @@ if (location.pathname === '/shell-static') {
   hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
 } else if (location.pathname === '/ai-interaction-static') {
   hydrate(<AIInteractionExamples />, document.body);
+} else if (location.pathname === '/docs-structure') {
+  render(<DocsStructureExamples />, document.body);
 } else if (location.pathname === '/ai-interaction') {
   render(<AIInteractionExamples />, document.body);
 } else if (location.pathname === '/ai-static') {

@@ -99,13 +99,25 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           ),
         );
       }
-      if (['marker', 'trace', 'attachment', 'message-scroller', 'questionnaire'].includes(name)) {
+      if (
+        [
+          'marker',
+          'trace',
+          'attachment',
+          'message-scroller',
+          'questionnaire',
+          'file-path-chip',
+          'attribute-chip',
+          'file-tree',
+          'figure',
+        ].includes(name)
+      ) {
         assertEquals(
           await Deno.readTextFile(join(root, 'assets/ui', name + '.css')),
           await Deno.readTextFile(
             join(repo, 'packages/fresh-ui/registry/components/ui', name + '.css'),
           ),
-          'New AI styles must preserve actual installed CSS bytes.',
+          'Reviewed component styles must preserve actual installed CSS bytes.',
         );
       }
       if (names.includes(name)) {
@@ -151,7 +163,15 @@ import { Trace } from './components/ui/trace.tsx';
 import { Attachment } from './components/ui/attachment.tsx';
 import { MessageScroller } from './components/ui/message-scroller.tsx';
 import { Questionnaire } from './components/ui/questionnaire.tsx';
+import { FilePathChip } from './components/ui/file-path-chip.tsx';
+import { AttributeChip } from './components/ui/attribute-chip.tsx';
+import { FileTree } from './components/ui/file-tree.tsx';
+import { Figure } from './components/ui/figure.tsx';
 console.log(JSON.stringify({
+  'file-path-chip': render(<FilePathChip path='src/routes/index.tsx' />),
+  'attribute-chip': render(<AttributeChip name='data-variant' value='outline' />),
+  'file-tree': render(<FileTree items={[{id:'src',type:'folder',name:'src',ownership:'owned',children:[{id:'page',type:'file',name:<a href='#page'>index.tsx</a>,ownership:'generated',comment:'# generated route'}]}]} />),
+  figure: render(<Figure width='wide' media='diagram' caption={<a href='#diagram'>Architecture</a>}><svg role='img' aria-label='Application architecture' viewBox='0 0 20 10'><path d='M0 0h20v10H0z' /></svg></Figure>),
   'message-scroller': render(<MessageScroller label='Conversation' style={{height:320}}><MessageScroller.Item><a href='#source'>Read source</a></MessageScroller.Item></MessageScroller>),
   questionnaire: render(<Questionnaire title='Which storage?' options={[{value:'postgres',label:'PostgreSQL',shortcut:'1'},{value:'sqlite',label:'SQLite'}]} defaultValue={['postgres']} description='Choose project storage' error='Review the answer' actions={<button type='submit'>Next</button>} />),
   marker: render(<Marker variant='separator' icon='ⓘ' label='Restored' />),
@@ -188,6 +208,10 @@ console.log(JSON.stringify({
       'attachment',
       'message-scroller',
       'questionnaire',
+      'file-path-chip',
+      'attribute-chip',
+      'file-tree',
+      'figure',
     ];
     assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
     for (const name of renderedNames) {

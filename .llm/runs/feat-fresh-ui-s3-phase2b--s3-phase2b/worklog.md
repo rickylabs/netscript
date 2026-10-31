@@ -390,3 +390,63 @@ the verdict, then mandatory zero public audit precedes normal push/comment.
 Next unit11a FilePathChip/AttributeChip/FileTree/Figure requires its seven-item
 checkpoint and the same design evaluator before source. Remaining11b Desktop/
 Docs,12extensions/all-style and13final are still required; no READY.
+
+
+## Docs11a design checkpoint
+
+AI10b terminal pushed f08cafb7/d19cde3a with same independent source/evidence PASS.
+The seven-item slice11a-checkpoint.md precedes product edits. Actual X2/X3/X5/X6
+spec/ledger and all four Utility review images were read; verified primary Lucide
+folder glyph is needed for the read-only file tree and canonical Z1 coverage.
+No Docs11a product edits yet; same independent design gate is required next.
+
+
+Docs11a same independent design PASS; failure streak0. Implementation may start
+contract-first. Accessible copy descriptions reference exact path text; error
+feedback is visible as well as announced. Stale promise completions never clear
+status, while actual path/copy changes invalidate the previous outcome to avoid
+false Copied for a new path (reasoned clarification of the advisory). Ancestor
+cycle detection and separate ID uniqueness preserve local structural integrity.
+
+
+## Docs11a implementation and gate evidence
+
+FilePathChip/AttributeChip/FileTree/Figure now have actual typed/JSON contracts,
+registry/style/collection registration and installed TSX/CSS fidelity/compile/lint/
+SSR coverage. The L0 folder glyph matches the verified primary Lucide path with
+its notice retained and the complete public vocabulary checked. FilePathChip
+reports real native outcomes, gives its button the exact path description and
+ignores stale request/path/copy/unmount results. Error text is visible as well as
+announced. FileTree uses native nested lists with hidden folder/file equivalents
+and retained ownership annotation meaning. Figure preserves caller media ratio;
+AttributeChip escapes JSON-quoted scalar text without DOM attribute mutation.
+
+Current Chromium32PASS light/dark390/1280; forty private captures, zero page/
+console errors, serious/critical axe findings or allowances. All32 focused actual
+Firefox/WebKit cases passed; a final repeat includes the visual refinement that
+comments keep their natural flex basis instead of squeezing to single characters.
+No token/API dimension change. Real native clipboard writes pass all engines;
+Chromium additionally reads back only the known text just written. Mocks prove
+negative outcomes and deterministic races, supplementing actual native success.
+Final contracts/registry/embeddings603PASS and latest CSS installed/closure5PASS.
+Source14 and browser2fixture/1spec/lintfmt3 wrappers PASS0drop. Quality/architecture,
+preflight/docs accuracy/export drift/site259-page build/member publication PASS
+with0slow types. Full raw doc-lint124 remains the exact inherited123 TypeScript
+multiset plus one JSON limitation, accepted #2531; zero new diagnostics.
+
+Twenty-eight source/carrier files before the expected public Icon corpus update.
+Same independent SOURCE review follows terminal final browser evidence; source
+commit then all four carrier checks/current-head quality/publication/evidence
+review. Latest main changed again and parent2488 conflicts; recover/rebase parent
+and restack child after this unit, before next implementation. No READY; remaining
+11b Docs/Desktop,12 declared extensions/all-style and13 final remain required.
+
+Docs11a final current-source cross-engine32PASS, no failed/skipped cases. Same
+independent SOURCE review begins with full28-file source/carrier scope and current
+603+5 tests,32Chrome+32FFWK and40privatecaptures. Full goal remains in progress.
+
+Docs11a same independent SOURCE review PASS, no blockers, failure streak0.
+README incorporates the non-blocking distinction between JSON quote/newline
+escapes and HTML attribute escaping. Source remains28files before the expected
+public Icon corpus update. Source commit precedes carriers/current-head quality/
+publication and same evidence review; then parent rebase/restack before11b.

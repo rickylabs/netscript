@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 124,
+  'total': 128,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -827,6 +827,30 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Native answer form with caller-owned state, validation and progression.',
   },
+  {
+    'name': 'file-path-chip',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Exact copyable path with real clipboard outcomes and stale-result protection.',
+  },
+  {
+    'name': 'attribute-chip',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Escaped scalar attribute examples in two presentation sizes.',
+  },
+  {
+    'name': 'file-tree',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Read-only native nested file lists and ownership annotations.',
+  },
+  {
+    'name': 'figure',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native figure, caller media and optional semantic caption.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -958,6 +982,10 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'attachment',
       'message-scroller',
       'questionnaire',
+      'file-path-chip',
+      'attribute-chip',
+      'file-tree',
+      'figure',
     ],
   },
   {

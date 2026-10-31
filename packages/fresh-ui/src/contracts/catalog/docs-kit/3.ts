@@ -7,16 +7,47 @@ export const docs_kit_3: readonly ComponentContract[] = [
     'specId': 'X5',
     'category': 'Docs kit',
     'priority': 'P2',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'type': {
+      'items': {
+        'kind': 'collection',
+        'required': true,
+        'description':
+          'Readonly discriminated folder/file entries with stable unique nonblank IDs.',
+      },
+      'label': {
+        'kind': 'text',
+        'default': 'Project files',
+      },
+      'tag': {
+        'kind': 'boolean',
+        'default': true,
+        'description': 'Controls visible annotations; hidden annotation text remains accessible.',
+      },
+      'typeLabels': {
+        'kind': 'collection',
+        'description': 'Optional localizable folder/file equivalents; blank uses defaults.',
+      },
+      'Entry.id': {
+        'kind': 'text',
+        'required': true,
+      },
+      'Entry.type': {
         'kind': 'enum',
         'values': [
           'folder',
           'file',
         ],
+        'required': true,
       },
-      'ownership': {
+      'Entry.name': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Entry.comment': {
+        'kind': 'slot',
+      },
+      'Entry.ownership': {
         'kind': 'enum',
         'values': [
           'none',
@@ -24,44 +55,51 @@ export const docs_kit_3: readonly ComponentContract[] = [
           'generated',
           'guidance',
         ],
+        'default': 'none',
       },
-      'children': {
-        'kind': 'slot',
+      'Entry.tag': {
+        'kind': 'text',
+        'description': 'Full annotation text overriding default bracketed ownership.',
       },
-      'name': {
-        'kind': 'slot',
-      },
-      'tag': {
-        'kind': 'slot',
+      'Entry.children': {
+        'kind': 'collection',
+        'description': 'Folder-only readonly child entries; no collapse/selection state.',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
+      },
+      {
+        'name': 'list',
+      },
+      {
+        'name': 'node',
+        'when': 'when corresponding entries or annotations are supplied',
       },
       {
         'name': 'row',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
-      },
-      {
-        'name': 'indent',
-        'planned': true,
+        'when': 'when corresponding entries or annotations are supplied',
       },
       {
         'name': 'icon',
-        'planned': true,
+        'when': 'when corresponding entries or annotations are supplied',
       },
       {
         'name': 'name',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding entries or annotations are supplied',
+      },
+      {
+        'name': 'comment',
+        'when': 'when corresponding entries or annotations are supplied',
       },
       {
         'name': 'tag',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding entries or annotations are supplied',
+      },
+      {
+        'name': 'type-label',
+        'when': 'when corresponding entries or annotations are supplied',
       },
     ],
     'attributes': {
@@ -69,6 +107,9 @@ export const docs_kit_3: readonly ComponentContract[] = [
         'values': [
           'folder',
           'file',
+        ],
+        'parts': [
+          'row',
         ],
       },
       'data-ownership': {
@@ -78,25 +119,37 @@ export const docs_kit_3: readonly ComponentContract[] = [
           'generated',
           'guidance',
         ],
+        'parts': [
+          'row',
+        ],
+        'default': 'none',
       },
     },
-    'booleans': [],
+    'booleans': [
+      'tag',
+    ],
     'slots': [
       {
-        'name': 'children',
-        'part': 'row',
-      },
-      {
-        'name': 'name',
+        'name': 'Entry.name',
         'part': 'name',
       },
       {
-        'name': 'tag',
-        'part': 'tag',
+        'name': 'Entry.comment',
+        'part': 'comment',
       },
     ],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'apg': 'native read-only nested lists and supplied native child controls',
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Visit supplied native child controls; list frames add no tab stop',
+      },
+      {
+        'key': 'Enter/Space',
+        'action':
+          'Retain supplied native child control behavior; no tree selection or collapse keys',
+      },
+    ],
     'tokenRoles': [
       'surface/bg',
       'border/subtle',
@@ -107,6 +160,8 @@ export const docs_kit_3: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-desktop-docs wins: read-only list, not an ARIA tree; no chevrons/hover/selection/open state/indent guides. Rows26 high, indent20. Ownership tags support owned config, generated history and CLI-managed annotations.',
+      'Every row retains a static folder/file type equivalent. Ownership annotations remain readable when visually hidden. Duplicate IDs, cycles and file children fail structural validation; no filesystem inspection.',
+      'Native list/listitem roles preserve semantics under list-style:none. All nodes remain visible; names/comments may contain caller-owned native links.',
     ],
   },
   {
@@ -114,7 +169,7 @@ export const docs_kit_3: readonly ComponentContract[] = [
     'specId': 'X6',
     'category': 'Docs kit',
     'priority': 'P2',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'width': {
         'kind': 'enum',
@@ -122,6 +177,7 @@ export const docs_kit_3: readonly ComponentContract[] = [
           'prose',
           'wide',
         ],
+        'default': 'prose',
       },
       'media': {
         'kind': 'enum',
@@ -129,9 +185,11 @@ export const docs_kit_3: readonly ComponentContract[] = [
           'image',
           'diagram',
         ],
+        'default': 'image',
       },
       'children': {
         'kind': 'slot',
+        'required': true,
       },
       'caption': {
         'kind': 'slot',
@@ -140,17 +198,13 @@ export const docs_kit_3: readonly ComponentContract[] = [
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'media',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'caption',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when caption is supplied',
       },
     ],
     'attributes': {
@@ -159,12 +213,14 @@ export const docs_kit_3: readonly ComponentContract[] = [
           'prose',
           'wide',
         ],
+        'default': 'prose',
       },
       'data-media': {
         'values': [
           'image',
           'diagram',
         ],
+        'default': 'image',
       },
     },
     'booleans': [],
@@ -178,8 +234,17 @@ export const docs_kit_3: readonly ComponentContract[] = [
         'part': 'caption',
       },
     ],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'apg': 'native figure, caller media and optional figcaption',
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Visit supplied native media/link controls; figure adds no tab stop',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Retain supplied native child control behavior',
+      },
+    ],
     'tokenRoles': [
       'border/subtle',
       'surface/surface',
@@ -188,6 +253,8 @@ export const docs_kit_3: readonly ComponentContract[] = [
     ],
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
+      'Caller supplies actual media and alternative text/diagram name; no placeholder or fetch. Native intrinsic aspect ratio is preserved.',
+      'Widths reuse existing optional prose-measure/wide roles with100%fallback, matching Markdown; native figure attributes pass through.',
     ],
   },
   {

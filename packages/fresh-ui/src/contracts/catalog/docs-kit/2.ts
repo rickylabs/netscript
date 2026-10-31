@@ -7,42 +7,48 @@ export const docs_kit_2: readonly ComponentContract[] = [
     'specId': 'X2',
     'category': 'Docs kit',
     'priority': 'P2',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'hover',
-          'focus',
-          'copied',
-        ],
-      },
       'path': {
-        'kind': 'slot',
+        'kind': 'text',
+        'required': true,
+        'description': 'Exact original clipboard text, rendered escaped; never a JSX slot.',
       },
       'copy': {
         'kind': 'boolean',
+        'default': true,
+      },
+      'copyLabel': {
+        'kind': 'text',
+        'default': 'Copy path',
+      },
+      'copiedLabel': {
+        'kind': 'text',
+        'default': 'Path copied',
+      },
+      'errorLabel': {
+        'kind': 'text',
+        'default': 'Could not copy path',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'path',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+      },
+      {
+        'name': 'status',
       },
       {
         'name': 'copy',
-        'planned': true,
+        'when': 'when copy is true',
       },
       {
         'name': 'focus-ring',
-        'planned': true,
-        'representation': 'pseudo',
+        'when': 'when the native copy button is keyboard focused',
+        'representation': 'native',
       },
     ],
     'attributes': {
@@ -53,17 +59,15 @@ export const docs_kit_2: readonly ComponentContract[] = [
           'focus',
           'copied',
         ],
+        'default': 'rest',
+        'description':
+          'Derived actual rest/copied outcome; hover/focus use native CSS. Error feedback is visible status text, never a fake Copied variant.',
       },
     },
     'booleans': [
       'copy',
     ],
-    'slots': [
-      {
-        'name': 'path',
-        'part': 'path',
-      },
-    ],
+    'slots': [],
     'apg': 'native button',
     'keyboard': [
       {
@@ -83,6 +87,8 @@ export const docs_kit_2: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-desktop-docs follows live padding2/5, height26, 20px copy target and size/icon/sm glyph.',
+      'Copy description references exact path. Clipboard failures are visible and announced; stale/out-of-order/path-changed/unmounted completions cannot update current UI. No clipboard polyfill or automatic timer.',
+      'copy=false removes the native button. Native span attributes pass through; writable state is not a prop.',
     ],
   },
   {
@@ -90,36 +96,35 @@ export const docs_kit_2: readonly ComponentContract[] = [
     'specId': 'X3',
     'category': 'Docs kit',
     'priority': 'P2',
-    'shipped': false,
+    'shipped': true,
     'props': {
+      'name': {
+        'kind': 'text',
+        'required': true,
+      },
+      'value': {
+        'kind': 'text',
+        'required': true,
+        'description': 'Escaped String(value) in quotes; accepts string, number, boolean or null.',
+      },
       'size': {
         'kind': 'enum',
         'values': [
           'sm',
           'md',
         ],
-      },
-      'name': {
-        'kind': 'slot',
-      },
-      'value': {
-        'kind': 'slot',
+        'default': 'md',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'name',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'value',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
     ],
     'attributes': {
@@ -128,19 +133,11 @@ export const docs_kit_2: readonly ComponentContract[] = [
           'sm',
           'md',
         ],
+        'default': 'md',
       },
     },
     'booleans': [],
-    'slots': [
-      {
-        'name': 'name',
-        'part': 'name',
-      },
-      {
-        'name': 'value',
-        'part': 'value',
-      },
-    ],
+    'slots': [],
     'apg': 'noninteractive presentation',
     'keyboard': [],
     'tokenRoles': [
@@ -153,6 +150,7 @@ export const docs_kit_2: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-desktop-docs: no border, following live docs CSS.',
+      'Native escaped textual code example only, not a DOM attribute editor; zero/false/empty are preserved. Native span attributes pass through.',
     ],
   },
   {

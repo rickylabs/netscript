@@ -32,6 +32,10 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'attachment',
   'message-scroller',
   'questionnaire',
+  'file-path-chip',
+  'attribute-chip',
+  'file-tree',
+  'figure',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */

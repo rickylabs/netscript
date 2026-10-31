@@ -517,3 +517,62 @@ defaultValue/defaultText, and retains controlled accepted answers. Later changes
 to default* props do not change that initial reset baseline. Other supplied
 native form fields keep their own native reset behavior. Reset synthesizes no
 change or submit callback.
+
+
+### Documentation paths, attributes, file lists and figures
+
+Copy FilePathChip, AttributeChip, FileTree and Figure with `netscript ui:add`
+using the item names `file-path-chip`, `attribute-chip`, `file-tree` and `figure`.
+Import each component from its copied `@/components/ui/` module. FilePathChip and
+FileTree use the public L0 Icon surface; the curated folder glyph retains its
+Lucide ISC/Feather MIT notice. AttributeChip and Figure need no runtime package
+import. Each item installs its own CSS through the normal registry support.
+
+    <FilePathChip path='src/routes/index.tsx' />
+    <AttributeChip name='data-variant' value='outline' size='sm' />
+    <FileTree label='Project files' items={[
+      { id: 'src', type: 'folder', name: 'src', ownership: 'owned', children: [
+        { id: 'index', type: 'file', name: 'index.tsx', ownership: 'generated' },
+      ] },
+    ]} />
+    <Figure width='wide' media='image' caption='The application architecture'>
+      <img src='/architecture.svg' alt='Application modules and their dependencies' />
+    </Figure>
+
+FilePathChip displays escaped code and writes the exact original path through
+native `navigator.clipboard.writeText` on its optional button. Enter and Space
+retain native activation and focus. `copy={false}` removes the button and adds no
+tab stop. `copyLabel`, `copiedLabel` and `errorLabel` accept localized text; the
+button's accessible description is the exact displayed path. Copied state and
+its polite status follow a successful request. Missing access or rejection shows
+and announces an error. The button stays available during a pending request;
+only the latest request for the mounted path may update feedback. A new attempt,
+path change or copy change clears the previous outcome. Unmount invalidates
+pending feedback without claiming to cancel an OS clipboard write. There is no
+clipboard fallback or timer. Hover/focus remain native CSS states.
+
+AttributeChip renders a textual name, equals sign and JSON-quoted String(value).
+It preserves zero, false, null and empty strings and escapes embedded quotes,
+newlines and markup. Quotes and newlines use JSON escapes rather than HTML
+attribute escaping. It never applies that attribute to the document. `size`
+accepts `md` (default) or `sm`; both are borderless and add no focus target.
+
+FileTree is a read-only named group of native nested lists. Each entry has a
+unique nonblank `id`, `type` folder or file and a `name`; folders may have children.
+Duplicate IDs, cycles, invalid ownership and file children are rejected. Names
+and comments may contain caller links, which retain native Tab and activation.
+Every row stays visible. Ownership is caller-declared none, owned, generated or
+guidance; `tag` on an entry overrides its default annotation text. Root `tag={false}`
+hides those annotations visually while retaining their accessible meaning.
+`typeLabels` localizes the hidden folder/file equivalents; decorative glyphs
+never substitute for those labels. There is no filesystem access, selection,
+collapse model or tree keyboard manager.
+
+Figure uses native figure and figcaption with caller-owned image, diagram, video
+or controls. Supply meaningful alternative text or diagram labels yourself.
+`caption` preserves zero and empty content. `media` accepts image or diagram;
+`width` chooses prose or wide using the existing optional Studio prose roles
+(Utility currently 544px/720px), with a 100% fallback. Replaced media keeps its
+intrinsic ratio and shrinks for narrow containers. No placeholder, cropping,
+fetching or extra tab stop is introduced. Captions and native child controls
+remain part of the figure's ordinary semantics and keyboard order.
