@@ -44,5 +44,12 @@
   "sanitizerChanged": false,
   "phaseReady": false,
   "fullGoalComplete": false,
-  "independentFinalSourceAndEvidenceReview": "PASS"
+  "independentFinalSourceAndEvidenceReview": "PASS",
+  "sourceHead": "a1d6d4b76fe4c340e6521240acd19c907d81c6d2",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
 }
