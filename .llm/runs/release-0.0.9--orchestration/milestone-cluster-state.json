@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "a410a815ce1401d533b18f2a85eb75e266de94a5",
+  "currentMainSha": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009d",
     "trackingIssue": 2474
@@ -154,7 +154,10 @@
     },
     {
       "number": 2144,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/pull/2481"
+      ]
     },
     {
       "number": 2149,
@@ -339,7 +342,7 @@
       "phase": "blocked",
       "baseBranch": "main",
       "prNumber": 2421,
-      "headSha": "e48fc6d575e66df96c27311ae9a74fe2d8100c9f",
+      "headSha": "cef5fe57a69584e68712e764dd29552e8d548ce0",
       "issueNumbers": [
         2396
       ],
@@ -353,7 +356,7 @@
       "phase": "blocked",
       "baseBranch": "main",
       "prNumber": 2422,
-      "headSha": "0e24d2d67ec746fdb57100568a1ed1120b15bac3",
+      "headSha": "b2e31245020b651a32eb3b476c61a8198a1b42c0",
       "issueNumbers": [
         2396
       ],
@@ -480,16 +483,19 @@
     {
       "id": "A3-2144",
       "lane": "features",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2481,
-      "headSha": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "headSha": "6e902e314cc8e6fcb29f24742c4ef5113b018eef",
       "issueNumbers": [
         2144
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2144",
       "receiptRefs": [],
-      "note": "READY at d7e4db3; Opus MERGE; e2e-cli-gate armed"
+      "note": "READY at d7e4db3; Opus MERGE; e2e-cli-gate armed",
+      "mergeCommit": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
+      "mergedAt": "2026-10-31T01:37:39Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2144"
     },
     {
       "id": "A3-2400",
@@ -511,13 +517,26 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2483,
-      "headSha": "8aaec3bad30f4b540651da45d5f3d2a58a3f0cbf",
+      "headSha": "bc54b1b4eec5a89860ff6b62b3d59b1a6da6645c",
       "issueNumbers": [
         2395
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2395",
       "receiptRefs": [],
       "note": "re-planning: fresh PLAN-EVAL cycle authorized 01:11Z (briefs/2395.steer-1.md)"
+    },
+    {
+      "id": "A3-2151",
+      "lane": "features",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2484,
+      "headSha": "5ebaf96a46678706dbb6324c5ab84d2a8b0cb058",
+      "issueNumbers": [
+        2151
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2151",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [
@@ -543,11 +562,13 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2481,
       "headSha": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
       "startedAt": "2026-10-31T01:21:46.000Z",
-      "via": "label e2e-cli-gate"
+      "via": "label e2e-cli-gate",
+      "result": "SUCCESS (both runtime tiers) at 6e902e314",
+      "completedAt": "2026-10-31T01:36:55Z"
     }
   ],
   "canaryCheckpoints": [
@@ -578,11 +599,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T00:48:54.000Z",
-    "nextReportDueAt": "2026-10-31T01:48:54.000Z",
+    "lastReportAt": "2026-10-31T01:38:01.000Z",
+    "nextReportDueAt": "2026-10-31T02:38:01.000Z",
     "lastReportRef": "worklog.md",
     "headline": "H01 merged (#2476); A1 #2165 and H02 #2478 closed; #2187, #2144, #2396 building; #2395 held for the shared launch cap.",
-    "currentMainSha": "a410a815ce1401d533b18f2a85eb75e266de94a5",
+    "currentMainSha": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -628,12 +649,14 @@
       "mergedPullRequests": [
         2476,
         2477,
-        2480
+        2480,
+        2481
       ],
       "closedIssues": [
         1364,
         1667,
         1668,
+        2144,
         2165,
         2438,
         2478
@@ -644,11 +667,11 @@
       "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
     },
     "scope": {
-      "openIssueCount": 48,
-      "ownedIssueCount": 48,
-      "scheduledIssueCount": 48,
+      "openIssueCount": 47,
+      "ownedIssueCount": 47,
+      "scheduledIssueCount": 47,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 8
+      "openPullRequestCount": 9
     },
     "mergeQueue": [],
     "orchestratorMatrix": [
@@ -663,7 +686,9 @@
       {
         "lane": "internals",
         "state": "active",
-        "activeItems": [],
+        "activeItems": [
+          "#2482"
+        ],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
         "blocker": null,
         "nextAction": "Dispatch H01 #2438 first (main command-postgres red)."
@@ -672,7 +697,8 @@
         "lane": "fixes",
         "state": "active",
         "activeItems": [
-          "#2479"
+          "#2479",
+          "#2483"
         ],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
         "blocker": null,
@@ -681,9 +707,7 @@
       {
         "lane": "features",
         "state": "active",
-        "activeItems": [
-          "#2481"
-        ],
+        "activeItems": [],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
         "blocker": null,
         "nextAction": "Dispatch #2144; adopt PRs #2421-#2423 for #2396."
@@ -713,7 +737,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T01:25:19.000Z",
+  "updatedAt": "2026-10-31T01:38:18.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -753,7 +777,7 @@
       "commentId": 6534991233,
       "postedAt": "2026-10-30T22:38:40Z",
       "route": "codex gpt-6.1-sol xhigh",
-      "state": "pr-open",
+      "state": "merged",
       "pr": 2481,
       "heldReason": "cockpit hourly_cap_reached",
       "relaunchCommentId": 6536190825,
@@ -806,8 +830,8 @@
       "commentId": 6537103305,
       "postedAt": "2026-10-31T01:22:07.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "started",
-      "pr": null
+      "state": "pr-open",
+      "pr": 2484
     }
   ],
   "coordinatorArtifactPr": 2475

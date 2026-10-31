@@ -60,3 +60,5 @@
 - 01:21Z: #2481 (#2144) READY at `d7e4db3`, with all 3 slices (retry policy for in-process and polyglot jobs, the job DLQ port with a KV default, docs); 80 files, +3836/-64; no lock or listener-supervisor changes; Opus MERGE; 3 review threads answered. Accepted advisory debt: WORKERS-RETRY-DOMAIN-CARDINALITY (F-16 folder cap 13/12, has an owner and a gate). The coordinator judged that it needs no owner decision (advisory cap, doctrine debt mechanism) and will report it on #2474. **expensive-gate.acquired** on #2481.
 - 01:22Z: dispatched #2151 (A3, features), comment 6537103305. Builders: #2187, #2396, #2400, #2395, #2151.
 - 01:25:10Z: #2151 started.
+- 01:37Z: **merged** #2481 (`4aa734e2b`) for #2144. The head moved after READY (`d7e4db3` → `6e902e3`: a one-line generated `publish-assets` refresh that fixed a stale-carrier quality failure). The evaluator reviewed the delta (`publish-carrier-review.md`) and re-attested MERGE at `6e902e3` by editing its attestation comment. CI 48/48 including both e2e tiers at that head. #2144 closed. Gate note: a future head move needs a fresh verdict comment, not an edit.
+- 01:38Z: #2151 → PR #2484 (draft), implementing.
