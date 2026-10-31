@@ -16,3 +16,15 @@
 - Consulted S1b memory; RTK unavailable, no memory connector. Durable memory uses small run notes.
 - PLAN-EVAL: N/A for the bounded fixes specified by the owner; see plan.md.
 - Reconcile: full S1c is not duplicated by existing PRs; #2500 policy will be reused without importing its run logs.
+
+## Independent slice review repair
+
+FAIL_FIX: the darker NS One destructive fill regressed component error text because six stylesheets used the fill role as `color`. Repair maps those text/icon uses to destructive-text, with a repository stylesheet policy test. Source/token reports remain zero active failures; this correction connects real consumers to the measured semantic text use. Re-steer the same independent evaluator after the repair.
+
+## Implementation slice sign-off
+
+Independent same-evaluator repair review: **SLICE APPROVED** (slice-review.md). The source/test slice passes token+native publish tests 40/0, CLI consumer tests 10/0, frozen token/registry embedding and component policy tests 5/0. Structured source check/lint/fmt: 44 files / zero findings; registry lint: 49 files / zero findings; new consumer test format: one file / zero findings. Token source validation and 88-output freshness pass; all 48 preset/scheme report rows have zero active failures and exclusions are empty. Disabled uses: 58 exempt, 56 below active text AA.
+
+Release preflight, docs accuracy, quality/architecture and eight static root check tasks pass (static-gates.json). Prose/corpus/assets/publish generated; clean-source final checks pending this checkpoint. Runtime is UNPROVEN as explicitly allowed; see runtime-verdict.md and resource-verdict.json. Whole-package doclint remains the baseline 124 diagnostics (96 private type refs / 28 missing JSDoc); JSR audit retains preexisting contracts.json module-tag and slow-type/banner advisories. No debt added.
+
+Reconcile: related PRs cover only dependency export/inactive policy/default switch; no default selection or labels changed. No root/docs-site lock churn. Source checkpoint is ready for clean corpus regeneration and final immutable-head receipts. Full root structured check emitted 4,015 files and zero findings; its task exit needs re-verification through the receipt runner before being claimed green.

@@ -1,0 +1,57 @@
+[
+  {
+    "task": "release:preflight",
+    "exitCode": 0,
+    "elapsedSeconds": 1.8
+  },
+  {
+    "task": "quality:gate",
+    "exitCode": 0,
+    "elapsedSeconds": 13.8
+  },
+  {
+    "task": "docs:accuracy",
+    "exitCode": 0,
+    "elapsedSeconds": 6.5
+  },
+  {
+    "task": "check:desktop-native-fixture",
+    "exitCode": 0,
+    "elapsedSeconds": 0.2
+  },
+  {
+    "task": "check:emitted-samples",
+    "exitCode": 0,
+    "elapsedSeconds": 8.0
+  },
+  {
+    "task": "check:streams-types",
+    "exitCode": 0,
+    "elapsedSeconds": 1.2
+  },
+  {
+    "task": "check:child-health-docs",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3
+  },
+  {
+    "task": "check:scaffold-versions",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1
+  },
+  {
+    "task": "check:aspire-version-parity",
+    "exitCode": 0,
+    "elapsedSeconds": 0.4
+  },
+  {
+    "task": "check:netscript-jsr-specifiers",
+    "exitCode": 0,
+    "elapsedSeconds": 2.5
+  },
+  {
+    "task": "check:aspire-host-ports",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3
+  }
+]

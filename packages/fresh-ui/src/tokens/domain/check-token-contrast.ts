@@ -3,12 +3,17 @@ import type { TokenContextOutput } from './token-output.ts';
 import type {
   TokenContrastCoverage,
   TokenContrastExclusion,
+  TokenContrastExemptResult,
   TokenContrastPair,
   TokenContrastPort,
   TokenContrastReport,
   TokenContrastResult,
 } from './contrast-contract.ts';
-import { CONTROL_CONTRAST_MINIMUM, TEXT_CONTRAST_MINIMUM } from './contrast-contract.ts';
+import {
+  CONTROL_CONTRAST_MINIMUM,
+  INACTIVE_COMPONENT_CONTRAST,
+  TEXT_CONTRAST_MINIMUM,
+} from './contrast-contract.ts';
 
 const PACK_PREFIXES = [
   'studio',
@@ -70,6 +75,11 @@ export function assertContrastCoverage(
     }
     ids.add(pair.id);
     if (
+      pair.exemption !== undefined &&
+      (pair.exemption !== INACTIVE_COMPONENT_CONTRAST.exemption ||
+        !contexts.some((context) => applies(pair, context)))
+    ) throw new Error(`Unknown or stale contrast exemption: ${pair.id}`);
+    if (
       !pair.background.length ||
       ![TEXT_CONTRAST_MINIMUM, CONTROL_CONTRAST_MINIMUM].includes(pair.minimum)
     ) throw new Error(`Invalid contrast pair: ${pair.id}`);
@@ -94,6 +104,11 @@ export function assertContrastCoverage(
           throw new Error(`Unknown contrast color: ${context.preset.id}/${pair.id}/${name}`);
         }
       }
+      if (
+        pair.exemption !== undefined &&
+        (pair.minimum !== TEXT_CONTRAST_MINIMUM || !foregroundRole(pair.foreground, context) ||
+          !/^(?:state-disabled-.+|.+-disabled)$/.test(pair.foreground))
+      ) throw new Error(`Invalid inactive text contrast exemption: ${pair.id}`);
       foregrounds.add(pair.foreground);
       pair.background.forEach((name) => backgrounds.add(name));
       if (
@@ -195,6 +210,7 @@ export function evaluateTokenContrast(
   const used = new Set<string>();
   const seen = new Set<string>();
   const excluded: TokenContrastResult[] = [];
+  const exempt: TokenContrastExemptResult[] = [];
   const failures: TokenContrastResult[] = [];
   let checks = 0;
   for (const context of contexts) {
@@ -218,6 +234,10 @@ export function evaluateTokenContrast(
         pair: pair.id,
         minimum: pair.minimum,
       };
+      if (pair.exemption === INACTIVE_COMPONENT_CONTRAST.exemption) {
+        exempt.push({ ...result, ...INACTIVE_COMPONENT_CONTRAST });
+        continue;
+      }
       if (measurement.ratio >= pair.minimum) continue;
       const exclusion = allowed.get(key(result));
       if (
@@ -234,7 +254,7 @@ export function evaluateTokenContrast(
   for (const id of allowed.keys()) {
     if (!used.has(id)) throw new Error(`Stale or unused contrast exclusion: ${id}`);
   }
-  return { checks, excluded, failures };
+  return { checks, exempt, excluded, failures };
 }
 
 /** CI fails on every unapproved violation; exclusions are still reported explicitly. */

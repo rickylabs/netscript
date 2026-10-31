@@ -18,3 +18,7 @@ Structured targeted token/build/report/native-publish tests, check/lint/fmt; tok
 Keep faithful themes and S6a default selection unchanged. Reconcile current origin/main before final push, using merge if needed and no force push. Stale generated assets are addressed by full regeneration and committed-source freshness gates. Inherited unrelated doclint debt is reported rather than broadened. No new dependencies, abstractions, labels, issue closure, or merge. No unresolved design decisions remain.
 
 PLAN-EVAL: N/A. Owner supplied exact bounded causes, approved data, thresholds and acceptance; no material architecture change or unresolved trade-off. Mandatory independent IMPL-EVAL remains required.
+
+## Slice review repair
+
+Switch destructive component text/icon uses to the existing destructive-text role in six component stylesheets and add a source-policy regression. Fill/border declarations remain on their existing intended roles. Regenerate registry/publish carriers and validate the consumer change. This avoids the fill-versus-text luminance conflict caught by independent review.
