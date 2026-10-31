@@ -6,10 +6,29 @@
 2. **Domain vocabulary:** preset (tokens), style (component anatomy), scope/part (contract), scheme (light/dark), review state (native pseudo/state attributes). No new vocabulary.
 3. **Ports:** existing scaffold filesystem/token-builder and registry install seams; browser uses shipped rendering. No new port.
 4. **Constants:** existing preset ids and contract values; explicit studio-utility selection for new apps. All visual values from --ns-* roles.
-5. **Commit slices:** defaults/pages → Utility restyle → evidence/carriers, with paths and proving gates in plan.md.
+5. **Commit slices:** S1 defaults/pages → S2 actions/forms → S3 surfaces/feedback → S4 blocks/navigation → S5 AI/code/desktop → S6 evidence/carriers, with paths and proving gates in plan.md.
 6. **Deferred scope:** other themes, gap components, Figma token values.
 7. **Contributor path:** packages/fresh-ui/src/contracts/README.md plus the component-owned CSS pattern; add no parallel style engine.
 
 ## Intake
 
 Read complete assignment and previous run memory. Resolved matrix with JSON. Specific owner route and publication constraints take precedence over generic dispatcher boilerplate. No triage duplicate. RTK absent. PLAN-EVAL selected and pending.
+
+PLAN-EVAL round 1 FAIL_PLAN: required exact file-scoped families, preset-boundary choice and browser/visual acceptance method. Corrected in plan.md before code.
+
+PLAN-EVAL round 2 PASS. Implement S1–S6. Docker daemon unavailable at intake.
+
+## S1 validation in progress
+
+- Focused page-generation tests: 18 passed after updating the Design navigation expectation. Earlier combined run: 27 passed, 1 navigation expectation failed; the single failure is fixed and the complete page suite reran green. Native ui:init/apply and token compatibility tests passed in that run.
+- Structured source check: 11 files, zero diagnostics. Source lint/fmt: 11 selected/processed, zero findings. Generated layout check passed with Vite client types.
+- Local-source scaffold created 158 files and selected studio-utility with studio/utility/compact metadata. Production build passed.
+- Real Chromium health route: HTTP 200 at 390/1280, document width equals viewport, main begins exactly below header, development Design link visible. Initial browser failures identified and fixed real mobile and runtime-mode defects (drift.md). Production mode returned 200 with no Design link; repeat after final mode fix is pending.
+- Emitted QueryResult rendered null, empty array/object, records, nested fields, scalar and HTML-like text (escaped); loading/error render from the actual generator return template. Browser captures are private artifacts.
+- quality:gate passes with inherited warnings; release:preflight all four scans PASS.
+- Exact scaffold.runtime --cleanup command exits 1 at preflight/cleanup with unavailable Docker; runtime UNPROVEN. No runtime success claimed.
+- Separate read-only substantive S1 review is running.
+
+S1 review round 1 FAIL_FIX: layout chain wrapping and duplicate blank line in resource template. Both repaired; new canonical-form test covers layout, health and resource island. Reviewer independently ran 60 focused tests successfully. Existing topbar minimum retained at its legacy 52px while allowing wrapping; Utility role binding belongs to S4. Custom registry default documented in help. Explicit NS One preservation regression added. Final production build passed; production health HTTP 200 with zero Design links. Generated layout type check resolves vite/client successfully.
+
+Repaired S1 template suite: 19 passed. New native legacy preservation test: 1 passed. Leak-check: UNPROVEN, 24 unproven survivors, zero mutations; raw output private.
