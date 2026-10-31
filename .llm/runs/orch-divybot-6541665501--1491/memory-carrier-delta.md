@@ -1,0 +1,3 @@
+# Command guide carrier refresh
+
+Canonical generation changed only agent-docs-prose.generated.ts and mcp/publish-assets.generated.ts. CLI corpus went from 203 to 208 entries with five new command guide pages and four related entry updates, no removals, preserved context MDX. MCP prose is a curated 14-document selection, not all pages: the updated llms router carries new guide links; sourceBytes 248604 stays below 294912. Do not widen its selection or budget to mirror the CLI. Assets-barrel ends with a git diff check on the CLI prose carrier, so its authoritative pass must follow the reviewed carrier commit.

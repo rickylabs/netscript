@@ -1,0 +1,71 @@
+{
+  "note": "Privacy-safe extracts of native gate receipts; raw receipts retained outside Git. S2 working tree had canonical carrier changes; gitHead identifies command baseline, not an assertion that generated files were committed at invocation. The precommit assets comparison is expected to fail until its reviewed carrier is committed.",
+  "receipts": [
+    {
+      "gateId": "exports-drift",
+      "invocationId": "command1491-exports",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "9efc2b00add6f3b98632c3f58a7b7f99c8997b02",
+      "durationMs": 5853,
+      "requestHash": "867e96fa9443cd4cb0d1b5a9ef182b2f1a70c419525827b0c29d86ef399a124b",
+      "startedAt": "2026-10-31T09:59:05.955Z",
+      "finishedAt": "2026-10-31T09:59:11.808Z"
+    },
+    {
+      "gateId": "publish-assets",
+      "invocationId": "command1491-publish",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "9efc2b00add6f3b98632c3f58a7b7f99c8997b02",
+      "durationMs": 566,
+      "requestHash": "396dd82d5b3d5d74c37bd228c8ac7dd9d42b5bbfa87aee074b5c941884273c6c",
+      "startedAt": "2026-10-31T09:59:36.008Z",
+      "finishedAt": "2026-10-31T09:59:36.574Z"
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "invocationId": "command1491-mcp-exports",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "9efc2b00add6f3b98632c3f58a7b7f99c8997b02",
+      "durationMs": 10910,
+      "requestHash": "e8e9d8bbd289a0837f7a68ddfc1b9e6a0df5fd529eb9cc5dddd9554e021dcd44",
+      "startedAt": "2026-10-31T09:59:05.945Z",
+      "finishedAt": "2026-10-31T09:59:16.855Z"
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "invocationId": "command1491-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "9efc2b00add6f3b98632c3f58a7b7f99c8997b02",
+      "durationMs": 14453,
+      "requestHash": "c6acc1346ce87fa112718078f0f521c5ec00aa9bd4dd821a857cf1d3290c0f82",
+      "startedAt": "2026-10-31T09:59:36.006Z",
+      "finishedAt": "2026-10-31T09:59:50.460Z"
+    },
+    {
+      "gateId": "assets-barrel",
+      "invocationId": "command1491-assets-precommit",
+      "outcome": "FAIL",
+      "exitCode": 1,
+      "gitHead": "9efc2b00add6f3b98632c3f58a7b7f99c8997b02",
+      "durationMs": 2678,
+      "requestHash": "edbf26761d5897cce97b252f03e2552491696ae5e5adb47af52cdb9c80ad5179",
+      "startedAt": "2026-10-31T09:59:48.129Z",
+      "finishedAt": "2026-10-31T09:59:50.807Z"
+    },
+    {
+      "gateId": "docs-accuracy",
+      "invocationId": "command1491-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "9efc2b00add6f3b98632c3f58a7b7f99c8997b02",
+      "durationMs": 7204,
+      "requestHash": "7392160028f25bb8896387c18234009e8c7c80b63f5027097b93d2439232ca72",
+      "startedAt": "2026-10-31T09:59:36.016Z",
+      "finishedAt": "2026-10-31T09:59:43.220Z"
+    }
+  ]
+}

@@ -33,3 +33,35 @@ I didn't edit, run, post or delegate anything. I took the gate results from the 
 As agreed, I treated the generated carriers, the full docs-accuracy and freshness checks, and the pre-existing fake-Git interruption failure as outside S1.
 
 SLICE REVIEW: PASS
+
+
+# Independent S2 carrier review
+
+I found no S2 blockers. I decoded the carrier at HEAD and in the working tree with read-only Python (gzip and base64) and compared the two. I edited and posted nothing and re-ran no gates. Decode scratch went to a temporary directory, which I deleted.
+
+**CLI prose carrier** (`agent-docs-prose.generated.ts`)
+- **Entries:** 203 before, 208 after. Exactly five pages were added: `commands`, `command-relay`, `command-operations`, `command-security` and `command-compatibility`. None were removed.
+- **Changed entries:** exactly four.
+  - `llms.txt` gains five router links.
+  - `services-sdk/index.md` gains three navigation bullets.
+  - `reference/service/index.md` gains its two link paragraphs plus the envelope/record and relay-bounds tables. These match the S1 source.
+  - `outbound-webhooks/index.md` gains one link paragraph.
+- **Context preserved:** both context MDX entries are byte-identical to HEAD.
+- **Integrity:** all 208 entries carry a hash and size, and every one matches the decoded content.
+- **Rendering:**
+  - No raw template syntax is left in the new pages.
+  - The inbound-webhook cross-reference resolves to the storefront shipping-webhook tutorial in both relay and security.
+  - Each page has the same number of code fences as its source: 2, 1, 3, 1 and 1.
+
+**MCP carrier** (`publish-assets.generated.ts`)
+- The curated set is still the same 14 documents; only `llms.txt` changed, gaining the same five links.
+- The documents total 248,604 bytes, under the 294,912 budget. That is consistent with the note in `memory-carrier-delta.md` not to widen the selection to mirror the CLI corpus.
+
+**Evidence**
+- `gate-evidence.json` records PASS for accuracy, export drift, MCP export corpus, publish assets and prose.
+- `assets-barrel` shows FAIL at the S1 head with S2 files uncommitted. The note in the file states this honestly as a precommit artifact, so it isn't recorded as a pass. The authoritative assets-barrel run after the commit is still owed before READY.
+- The worklog, context-pack, memory note and evidence file contain no private paths, hosts or session identifiers.
+
+This approves the carrier delta and evidence for the S2 commit only. It is not final merge readiness for the exact pushed head.
+
+SLICE REVIEW: PASS

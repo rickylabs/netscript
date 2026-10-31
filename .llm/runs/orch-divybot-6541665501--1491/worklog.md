@@ -50,3 +50,25 @@ PLAN-EVAL round 2 PASS preceded all guide implementation. S1 awaits independent 
 Independent S1 review: **SLICE REVIEW: PASS**. The separate reviewer verified identity, atomicity, relay fencing/acceptance, public PostgreSQL/retention exports, reconciliation, privacy, compatibility and tooling against source. See slice-review.md. S1 sign-off is based on that substantive review, not automated gates alone.
 
 Reconcile S1: current main baseline unchanged for the slice; draft #2514 carries plan approval and no new owner instructions. All files remain inside the declared surface; labels/milestone and issue closure remain coordinator-owned.
+
+
+## S2 canonical carriers and gates (precommit)
+
+Canonical `gen:agent-docs-prose` and `gen:publish-assets` completed. Only the allowed CLI page carrier and MCP publish carrier changed; assets barrel generation caused no additional delta. Decoded CLI corpus: 203 → 208 entries, five expected new guide pages, no removals, four changed existing entries (llms router, services-sdk index, service reference and outbound webhooks), both context MDX sources preserved exactly. MCP curated corpus: 14 documents, 248,604 bytes of 294,912 budget. New guides are carried in CLI prose; the curated MCP router exposes their discovery links.
+
+| Gate | Result |
+| --- | --- |
+| `docs:accuracy` through native gate runner | PASS, exit 0 |
+| `docs:exports-drift` through native gate runner | PASS, exit 0; 35/35 reference entrypoint pages covered |
+| `check:mcp-export-corpus` through native gate runner | PASS, exit 0 |
+| `check:publish-assets` through native gate runner | PASS, exit 0 |
+| `check:agent-docs-prose` through native gate runner | PASS, exit 0, includes fresh site build/rendered output |
+| Rendered `check:links` after generation | PASS, exit 0, 25,036 internal links across 258 pages |
+| `docs:snippets` after generation | PASS, exit 0, 36 compiled fences and 13 unchanged exemptions |
+| `check:assets-barrel` precommit | Expected exit 1: its final git diff compares the intentionally modified uncommitted CLI prose carrier. Native embed checks/generation complete without extra changed paths; authoritative verdict must run after committing the reviewed carrier. |
+
+Native gate request/outcome/timing/head metadata is preserved without private paths in gate-evidence.json. The initial gate head is the S1 commit with S2 generated files in its working tree, not a false assertion of an already-committed S2 head. Final postcommit assets and exact-head evaluator evidence follow before READY.
+
+Independent S2 review: **SLICE REVIEW: PASS**, same separate reviewer. All 208 carrier hashes/sizes verified; exact expected five-page/four-update delta; MCP document set and byte budget preserved.
+
+Reconcile S2: no new PR review findings or owner scope changes; generated files stay in the two explicitly allowed carriers, no barrel/lock/runtime delta. Commit/push precedes the final assets diff verdict.
