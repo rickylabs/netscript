@@ -163,6 +163,50 @@ passing an `AbortSignal`, and per-call `connection` options override credentials
 one turn without touching provider defaults. Configuration errors identify missing field names but
 never include key or endpoint values.
 
+## Busy-provider retries
+
+OpenAI-compatible chat preserves known busy failures (`429`, `503`, and OpenAI's
+`rate_limit_exceeded`) as error events with an `AiRateLimitError` cause. The cause carries numeric
+`status` and the provider's `retryAfterMs`, when available. Unknown symbolic errors and
+`insufficient_quota` remain ordinary terminal error events. The shared TanStack bridge applies this
+classification to every provider using it; it never retains raw SDK request or header objects.
+
+Retry is opt-in. Set the chat provider's `maxRetries: 0` to disable the SDK's own retries, then wrap
+its client so one policy owns the attempt budget:
+
+```typescript
+import { withRetryingChatClient } from '@netscript/ai';
+import { OpenAiCompatibleModelProvider } from '@netscript/ai/openai-compatible';
+
+const provider = new OpenAiCompatibleModelProvider({
+  baseURL: 'https://provider.example/v1',
+  apiKey: 'your-key',
+  maxRetries: 0,
+});
+const client = withRetryingChatClient(provider.createChatClient('model'), {
+  maxAttempts: 3,
+  maxDelayMs: 120_000,
+});
+```
+
+`maxRetries` is also accepted by `getModelProvider('openai-compatible', config)`. Omitting it keeps
+the SDK default. Supply a number when building registry configuration; nonnumeric registry values
+fall back to that default. This configuration applies to chat; embedding SDK retry configuration is
+unchanged.
+
+The wrapper retries a busy error event or thrown failure only **before any event reaches the
+caller**. It never replays text, reasoning or tool calls after partial output. On exhaustion, including
+`maxAttempts: 1`, it throws `AiRateLimitError` with the original status/delay and actual attempt count;
+the agent loop converts this back to its error chunk. Unwrapped chat clients keep error events.
+
+`Retry-After` is a minimum, not a delay to shorten. For both retry wrappers (chat and embeddings), a
+provider delay above `maxDelayMs` fails immediately without another request or a sleep; the typed
+error retains that delay. The default ceiling is 5,000 ms. Raise it explicitly, as above, to honor a
+120-second response. Delays within the ceiling are honored exactly. Generated backoff and server
+waits have an absolute timer ceiling of 2³¹−1 ms, and all waits remain abortable. Without a provider
+delay the existing exponential full-jitter policy applies. This replaces the old behavior that
+clipped longer provider delays and retried too soon.
+
 ## Agent loop
 
 ```typescript

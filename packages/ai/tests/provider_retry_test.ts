@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { AiRateLimitError, withRetryingChatClient, withRetryingEmbeddingProvider } from '../mod.ts';
 import type { ChatClientPort, EmbeddingProviderPort } from '../src/ports/mod.ts';
+import type { ChatClientEvent } from '../src/ports/chat-client.ts';
 
 function rateLimit(retryAfter?: string): Error & { status: number; headers: Headers } {
   return Object.assign(new Error('limited'), {
@@ -153,4 +154,154 @@ Deno.test('chat retries before output but never replays a partial stream', async
     }
   });
   assertEquals(partialCalls, 1);
+});
+
+Deno.test('busy error events exhaust with typed status, attempts and original delay', async () => {
+  let calls = 0;
+  const delays: number[] = [];
+  const cause = new AiRateLimitError('busy', { status: 503, retryAfterMs: 20 });
+  const client: ChatClientPort = {
+    kind: 'text',
+    name: 'busy',
+    async *stream() {
+      calls++;
+      yield { type: 'error', message: 'busy', cause };
+    },
+  };
+  const wrapped = withRetryingChatClient(client, {
+    maxAttempts: 2,
+    sleep: (delay) => {
+      delays.push(delay);
+      return Promise.resolve();
+    },
+  });
+  const error = await assertRejects(() => Array.fromAsync(wrapped.stream({ messages: [] })));
+  assertInstanceOf(error, AiRateLimitError);
+  assertEquals(error.status, 503);
+  assertEquals(error.attempts, 2);
+  assertEquals(error.retryAfterMs, 20);
+  assertEquals(error.cause, cause);
+  assertEquals(calls, 2);
+  assertEquals(delays, [20]);
+});
+
+Deno.test('busy error events after any visible output never replay that output', async () => {
+  const output: ChatClientEvent[] = [
+    { type: 'text', delta: 'partial' },
+    { type: 'reasoning', delta: 'thought' },
+    { type: 'tool-call', toolCall: { id: 'one', name: 'effect', arguments: '{}' } },
+    { type: 'finish', finishReason: 'stop' },
+  ];
+  for (const first of output) {
+    let calls = 0;
+    const cause = new AiRateLimitError('busy', { status: 429 });
+    const terminal = { type: 'error', message: 'busy', cause } as const;
+    const client: ChatClientPort = {
+      kind: 'text',
+      name: 'partial',
+      async *stream() {
+        calls++;
+        yield first;
+        yield terminal;
+      },
+    };
+    const wrapped = withRetryingChatClient(client, {
+      maxAttempts: 3,
+      sleep: () => Promise.reject(new Error('must not sleep')),
+    });
+    assertEquals(await Array.fromAsync(wrapped.stream({ messages: [] })), [first, terminal]);
+    assertEquals(calls, 1);
+  }
+});
+
+Deno.test('Retry-After above the wait ceiling fails without sleeping or a second attempt', async () => {
+  let calls = 0;
+  const provider: EmbeddingProviderPort = {
+    embed() {
+      calls++;
+      return Promise.reject(rateLimit('120'));
+    },
+  };
+  const wrapped = withRetryingEmbeddingProvider(provider, {
+    maxAttempts: 3,
+    sleep: () => Promise.reject(new Error('must not sleep')),
+  });
+  const error = await assertRejects(() => wrapped.embed('hello'));
+  assertInstanceOf(error, AiRateLimitError);
+  assertEquals(error.retryAfterMs, 120_000);
+  assertEquals(error.status, 429);
+  assertEquals(error.attempts, 1);
+  assertEquals(calls, 1);
+});
+
+Deno.test('far-future Retry-After cannot overflow the real default timer', async () => {
+  let calls = 0;
+  const client: ChatClientPort = {
+    kind: 'text',
+    name: 'future',
+    async *stream() {
+      calls++;
+      yield await Promise.reject(rateLimit('Fri, 01 Jan 2100 00:00:00 GMT'));
+    },
+  };
+  const wrapped = withRetryingChatClient(client, {
+    maxAttempts: 2,
+    maxDelayMs: Number.MAX_SAFE_INTEGER,
+  });
+  const error = await assertRejects(() => Array.fromAsync(wrapped.stream({ messages: [] })));
+  assertInstanceOf(error, AiRateLimitError);
+  assertEquals(error.attempts, 1);
+  assert(error.retryAfterMs! > 2 ** 31 - 1);
+  assertEquals(calls, 1);
+});
+
+Deno.test('chat cancellation during a busy-event backoff prevents another attempt', async () => {
+  let calls = 0;
+  const abort = new AbortController();
+  const client: ChatClientPort = {
+    kind: 'text',
+    name: 'abort',
+    async *stream() {
+      calls++;
+      yield { type: 'error', message: 'busy', cause: rateLimit() };
+    },
+  };
+  const wrapped = withRetryingChatClient(client, {
+    maxAttempts: 3,
+    sleep: (_delay, signal) => {
+      abort.abort(new DOMException('cancelled', 'AbortError'));
+      signal.throwIfAborted();
+      return Promise.resolve();
+    },
+  });
+  await assertRejects(
+    () => Array.fromAsync(wrapped.stream({ messages: [] }, { signal: abort.signal })),
+    DOMException,
+  );
+  assertEquals(calls, 1);
+});
+
+Deno.test('generated backoff also respects the absolute timer ceiling', async () => {
+  let calls = 0;
+  const delays: number[] = [];
+  const provider: EmbeddingProviderPort = {
+    embed() {
+      calls++;
+      return calls === 1
+        ? Promise.reject(rateLimit())
+        : Promise.resolve({ embeddings: [[1]], model: 'test' });
+    },
+  };
+  const wrapped = withRetryingEmbeddingProvider(provider, {
+    maxAttempts: 2,
+    initialDelayMs: Number.MAX_SAFE_INTEGER,
+    maxDelayMs: Number.MAX_SAFE_INTEGER,
+    random: () => 1,
+    sleep: (delay) => {
+      delays.push(delay);
+      return Promise.resolve();
+    },
+  });
+  await wrapped.embed('hello');
+  assertEquals(delays, [2 ** 31 - 1]);
 });
