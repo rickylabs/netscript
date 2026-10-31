@@ -40,3 +40,13 @@ Workflow-policy test gate through run-deno-test.ts: **16 passed, 0 failed, exit 
 Optional scratch deletion declined: explicit assignment forbids deleting lock files or caches. Consumer fixtures stay in system temporary storage; hosted runners dispose of theirs. Optional extra clean checks declined to preserve exactly four requested check invocations. Original-byte restoration remains in finally blocks and the next hostile scenario starts after restoration.
 
 Independent substantive slice review: **SLICE REVIEW: PASS**, see slice-review.md. Supervisor signoff commit follows this review and the automated gates.
+
+## Windows first attempt and bounded setup repair
+
+Run https://github.com/rickylabs/netscript/actions/runs/41207980660 at 1af3160878aa64773a7a15f316fe243bfdf05643 failed during the extra normal `generate aspire` setup call with DNS lookup error 11003. It never reached any parity check and certifies no Windows result. The four-check smoke correctly failed rather than reporting clean.
+
+Removed that redundant setup call: init and plugin installation already write the canonical Aspire surface. Kept normal plugin generation because it prepares the consumer lock. This does not relax any parity assertion; the clean Aspire check still certifies the generated outputs. Added a word boundary to diagnostic Windows-drive redaction so it does not consume the tail of an HTTPS scheme. Linux rerun with the reduced setup still passes all four checks (exit 0 overall); scoped structured check/lint/fmt again exit 0. No workflow or product code changes in this repair.
+
+Reconcile: initial Windows failure remains explicitly recorded. Need a successful run at the repaired script before claiming READY. No issue closure, taxonomy changes or new scope.
+
+Independent same-session repair review: **SLICE REVIEW: PASS**; reviewer confirms inspecting init/plugin-generated Aspire directly is at least as strict, all four checks/assertions remain unchanged, and any Windows inspection/network failure still fails the job.

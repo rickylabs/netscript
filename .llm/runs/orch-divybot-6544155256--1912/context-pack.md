@@ -9,3 +9,7 @@ Linux four-command smoke PASS; see linux.json. Shared script and Windows opt-in 
 Slice reviewer requested diagnostic improvements and policy evidence; repaired. Policy suite: 16/16 PASS via structured test wrapper. Linux rerun and scoped wrappers PASS. Same reviewer re-steered for precommit signoff. No mandatory-final evaluator failures so far; slice review is separate from final exact-head evaluation.
 
 Independent slice review PASS (slice-review.md); ready to sign off and push the CI implementation, then run Windows.
+
+First Windows run 41207980660 failed before checks in redundant normal generate aspire due DNS lookup 11003. Removed only that extra setup call; init/plugin installation already generate Aspire. Linux four checks and scoped static wrappers still pass. Improved diagnostic redaction to preserve public HTTPS URLs. Same independent reviewer reviews this bounded setup repair before retry dispatch.
+
+Bounded Windows setup repair independently reviewed: SLICE REVIEW PASS; ready to commit and retry.

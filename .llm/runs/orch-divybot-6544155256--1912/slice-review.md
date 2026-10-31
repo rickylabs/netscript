@@ -5,3 +5,5 @@ Reviewer: separate read-only Claude session, requested `claude-opus-5-5`, effort
 **SLICE REVIEW: PASS**
 
 The reviewer verified fail-closed assertions, Windows PowerShell syntax, unchanged default production job selection, privacy-safe evidence and restored hostile mutations. Initial findings about diagnostics and missing workflow-policy evidence were repaired; it accepted the explicit retention of temporary consumer locks/caches. It confirmed the 16/16 passing policy test record and Linux four-command report, and treated full scaffold runtime as unproven rather than green. Windows evidence and exact-head final evaluation remain separate gates.
+
+Windows setup repair also received **SLICE REVIEW: PASS** from the same reviewer. It verified unchanged acceptance assertions, stricter direct inspection of init/plugin-generated Aspire outputs, preserved fail-closed network handling, and corrected diagnostic redaction.

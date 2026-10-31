@@ -58,7 +58,7 @@ function diagnose(result: Deno.CommandOutput): void {
   const tail = decoder.decode(result.stderr).slice(-3000)
     .replaceAll(scratch, '<scratch>')
     .replaceAll(Deno.cwd(), '<checkout>')
-    .replace(/(?:[A-Za-z]:[\\/]|\/(?:home|Users|tmp|ephemeral)\/)[^\s"'<>]+/g, '<path>');
+    .replace(/(?:\b[A-Za-z]:[\\/]|\/(?:home|Users|tmp|ephemeral)\/)[^\s"'<>]+/g, '<path>');
   console.error(`CLI exit ${result.code}; stderr tail: ${tail || '<empty>'}`);
 }
 
@@ -177,7 +177,7 @@ await prepare([
 ]);
 // Normal generation prepares the consumer lock and registry before read-only inspection.
 await prepare(['generate', 'plugins', '--project-root', project]);
-await prepare(['generate', 'aspire', '--project-root', project]);
+// Init and plugin installation already produce the canonical Aspire outputs.
 
 await check('plugins', false);
 await check('aspire', false);
