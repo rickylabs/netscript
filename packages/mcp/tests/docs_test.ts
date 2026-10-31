@@ -1,3 +1,4 @@
+import { ReleaseEmbeddedDocsCorpus } from '../src/infrastructure/release-embedded-docs-corpus.ts';
 import { assert, assertEquals, assertGreater } from '@std/assert';
 import { join, resolve } from '@std/path';
 import { createDocsFlows } from '../src/application/docs/docs-flows.ts';
@@ -137,7 +138,7 @@ Deno.test('an empty project probe falls back to an observable embedded corpus', 
     assertEquals(listed.corpus, {
       kind: 'embedded',
       root: null,
-      documentCount: listed.count,
+      documentCount: (await new ReleaseEmbeddedDocsCorpus().list()).length,
     });
   } finally {
     await Deno.remove(projectRoot, { recursive: true });

@@ -6,3 +6,5 @@
 - No new architectural debt accepted.
 
 - PLAN-EVAL R1 identified generated --watch reload semantics missing from the initial design. Persist processId plus fatal-failure flag; count same-process reloads only after failure, and test healthy/failing generated watch reloads. Owner explicitly scopes this leaf to sagas/triggers and preserving workers behavior; reviewer B2 asks for wider workers coverage, declined with this explicit authority. No new workers cross-process claim.
+
+- Normal main integration: merge 19a677eced816061b3196ef8dffcbc0ccd8b5ad4 (#2529 and #2534), preserving both parents and all owner/coordinator work. #2529 relocates the shared prose carrier from CLI to MCP and changes carrier generation. Followed its canonical generated-carriers.md chain, including the Aspire surface manifest; MCP publish assets require the regenerated corpus hash. No implementation source conflicts. Automated relay's rebase/force-push suggestion is ignored under the explicit assignment rule.

@@ -2339,6 +2339,22 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
   doc-lint, and publish dry-run must remain green.
 
+### 2026-10-31 maintenance extension — #2269
+
+- **Reason:** Release citations add 10 lines to the already-deferred central contract table
+  (459 → 469). The shared full corpus adds one real documentation asset group under
+  `src/infrastructure` (17 → 18 immediate children), beyond the existing F-16 cap of 12.
+  It replaces the CLI's stored corpus and MCP's curated copy; it does not introduce another corpus.
+- **Cost:** Ten more schema lines remain in the central registry and one additional adapter-layer
+  group must be considered during the existing MCP shape cleanup. No runtime resource or eager
+  full-corpus decoding cost is accepted.
+- **Owner:** MCP / internals maintainers; coordination in #2474, implementation #2269.
+- **Target:** Before the next MCP documentation-tool or corpus-surface expansion.
+- **Status:** DEBT_ACCEPTED for this scoped maintenance extension, subject to coordinator review.
+- **Gate:** Extract the documentation schemas into their domain module and group existing docs
+  adapters with the documentation assets so F-16 does not grow; preserve schema parity, every-page
+  retrieval, independent citations, and green check/test/lint/fmt/doc-lint and carrier freshness.
+
 ## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
 
 - **Reason:** PR #1427 deepens `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906

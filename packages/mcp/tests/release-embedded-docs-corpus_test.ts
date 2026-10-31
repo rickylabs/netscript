@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertThrows } from '@std/assert';
+import { assert, assertThrows } from '@std/assert';
 import { MCP_PACKAGE_VERSION } from '../src/publish-assets.generated.ts';
 import {
   ReleaseEmbeddedDocsCorpus,
@@ -7,23 +7,10 @@ import {
 
 Deno.test('generated release fallback contains the enumerated intent-guidance documents', async () => {
   const docs = await new ReleaseEmbeddedDocsCorpus().list();
-  assertEquals(docs.map((document) => document.slug), [
-    'llms',
-    'mcp',
-    'pages/data-persistence/how-to/use-a-second-database',
-    'pages/durable-workflows/how-to/bound-stream-retention',
-    'pages/explanation/contracts',
-    'pages/explanation/plugin-system',
-    'pages/orchestration-runtime/how-to/author-a-plugin',
-    'pages/services-sdk/services',
-    'pages/tutorials/live-dashboard/03-sdk-cache-first-query',
-    'pages/tutorials/live-dashboard/04-definePage-QueryIsland',
-    'pages/web-layer/builders',
-    'pages/web-layer/generated-surface',
-    'pages/web-layer/how-to/build-a-server-validated-form',
-    'pages/web-layer/query',
-    'pages/web-layer/route',
-  ]);
+  assert(docs.length > 200);
+  assert(docs.some(({ slug }) => slug === 'pages/reference/kv'));
+  assert(docs.some(({ slug }) => slug === 'pages/observability/telemetry'));
+  assert(docs.some(({ slug }) => slug === 'pages/durable-workflows/streams'));
 });
 
 Deno.test('outer CLI help augments rather than replaces the generated fallback', async () => {

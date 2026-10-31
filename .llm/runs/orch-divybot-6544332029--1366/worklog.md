@@ -35,3 +35,12 @@ Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL afte
 
 - S1 final gates: generated-process rerun 6/6, scaffold/aggregate tests 26/26, changed-entrypoint check 7/7, source lint/fmt 12 files green. Durable receipt gates assets-barrel, publish-assets, MCP export corpus, agent docs prose, health public doc lint and repository quality scan all exited 0. Sanitized gate-evidence.json records results and receipt digests.
 - Current main advanced by #2529 and #2534. S1 will commit/push first, then merge origin/main normally and regenerate carriers using its updated canonical tooling. No rebase or force push.
+
+## S2 main integration
+
+- Normally merged current main 19a677eced816061b3196ef8dffcbc0ccd8b5ad4; no source conflicts. The relay rebase/force-push notice is handled using the already-approved normal merge path.
+- Regenerated all carriers with the updated main chain; all four durable carrier freshness gates exited 0. The shared prose carrier now belongs to MCP, as required by main.
+- Combined focused tests on the merged tree: 83 passed, zero failed/ignored. No implementation logic changed from independent IMPL-EVAL R1.
+- Review-thread gate passed: zero threads/unanswered.
+- Reconciliation: implementation source remains identical to the reviewed S1 source; only canonical publication metadata needs additional output beyond the main merge. No lock churn, no lost source, no private run identity in this leaf's diff.
+- Commit and push this integration, mark PR ready because implementation review has no blockers, then require final independent IMPL-EVAL of that exact pushed head. Final verdict and live CI snapshot belong in the PR phase comment and canonical READY report, avoiding a self-referential extra commit after evaluation. Coordinator owns final merge and the e2e-cli gate label.

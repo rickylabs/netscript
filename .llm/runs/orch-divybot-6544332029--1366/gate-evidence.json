@@ -89,5 +89,39 @@
   },
   "unproven": [
     "e2e-cli scaffold.runtime CI verdict; owner forbids local full runtime suite"
-  ]
+  ],
+  "mainIntegration": {
+    "mainSha": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+    "method": "normal merge; no rebase or force push",
+    "focusedCombinedTests": {
+      "passed": 83,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 83,
+      "uniqueFailures": 0
+    },
+    "canonicalCarrierGates": {
+      "agent-docs": {
+        "exitCode": 0,
+        "receiptSha256": "45dc43707601024145bf1e2aaf8f877de55224f198ba6447e7a866df36b799e7"
+      },
+      "assets": {
+        "exitCode": 0,
+        "receiptSha256": "59005b08df77881be469ddda18c407f7c71db8c79ae5cbea39448eb6e344f161"
+      },
+      "corpus": {
+        "exitCode": 0,
+        "receiptSha256": "64c55b216cb86d8240a1fda264abb0466fc3eb05131897346210e56e22778cb6"
+      },
+      "publish-assets": {
+        "exitCode": 0,
+        "receiptSha256": "ee3951fda7edfc8987c794b164a6eb3cb72cb8033695e7ed2d45bf4a05830365"
+      }
+    },
+    "reviewThreads": {
+      "total": 0,
+      "unanswered": 0,
+      "exitCode": 0
+    }
+  }
 }

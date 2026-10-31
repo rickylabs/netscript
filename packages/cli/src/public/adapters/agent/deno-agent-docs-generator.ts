@@ -1,7 +1,4 @@
-import {
-  agentDocsFullCorpus,
-  decodeAgentDocsPages,
-} from '../../../kernel/assets/agent-docs-transport.ts';
+import { agentDocsFullCorpus, decodeAgentDocsPages } from '@netscript/mcp/docs';
 import { join, resolve, toFileUrl } from '@std/path';
 import {
   EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS,

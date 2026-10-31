@@ -52,7 +52,7 @@ Deno.test('MCP result types are re-exported from the root and cli entrypoints', 
 
 Deno.test('every MCP export-map entrypoint passes deno doc --lint on its own', async () => {
   const entrypoints = await readExportEntrypoints();
-  assertEquals(entrypoints, ['./mod.ts', './cli.ts', './openapi-projection.ts']);
+  assertEquals(entrypoints, ['./mod.ts', './cli.ts', './docs.ts', './openapi-projection.ts']);
   for (const entrypoint of entrypoints) {
     const output = await new Deno.Command(Deno.execPath(), {
       args: ['doc', '--lint', entrypoint],
