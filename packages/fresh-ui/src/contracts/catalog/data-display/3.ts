@@ -395,7 +395,7 @@ export const data_display_3: readonly ComponentContract[] = [
       'Legacy header none/title/tabs aliases remain; header=tabs without files renders a title header. Header=false removes file chrome/copy but never removes essential tab controls.',
       'Native horizontal scrollbar/thumb and native copy title tooltip are platform internals, not fabricated layout parts.',
       'Syntax content is a trusted application slot; plain raw text is escaped, with no tokenizer or unsafe HTML.',
-      'Syntax roles apply on code/bg. Tinted diff/highlight rows use text/fg until the token workstream certifies syntax pairs on those backgrounds.',
+      'Syntax roles apply directly on code/bg. Tinted diff/highlight rows retain each syntax hue with a contextual 80% syntax/20% text foreground mix; no shared token value changes.',
       'Clipboard result callbacks are separate from native onCopy. Actual status ignores stale file/text requests; controlled state may render a chosen visual snapshot.',
     ],
   },

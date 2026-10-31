@@ -190,30 +190,37 @@
   background: var(--ns-marker);
 }
 .ns-code [data-syntax='keyword'] {
-  color: var(--ns-code-syntax-keyword);
+  --ns-code-syntax-ink: var(--ns-code-syntax-keyword);
+  color: var(--ns-code-syntax-ink);
 }
 .ns-code [data-syntax='function'] {
-  color: var(--ns-code-syntax-function);
+  --ns-code-syntax-ink: var(--ns-code-syntax-function);
+  color: var(--ns-code-syntax-ink);
 }
 .ns-code [data-syntax='type'] {
-  color: var(--ns-code-syntax-type);
+  --ns-code-syntax-ink: var(--ns-code-syntax-type);
+  color: var(--ns-code-syntax-ink);
 }
 .ns-code [data-syntax='string'] {
-  color: var(--ns-code-syntax-string);
+  --ns-code-syntax-ink: var(--ns-code-syntax-string);
+  color: var(--ns-code-syntax-ink);
 }
 .ns-code [data-syntax='number'] {
-  color: var(--ns-code-syntax-number);
+  --ns-code-syntax-ink: var(--ns-code-syntax-number);
+  color: var(--ns-code-syntax-ink);
 }
 .ns-code [data-syntax='comment'] {
-  color: var(--ns-code-syntax-comment);
+  --ns-code-syntax-ink: var(--ns-code-syntax-comment);
+  color: var(--ns-code-syntax-ink);
 }
 .ns-code [data-syntax='punctuation'] {
-  color: var(--ns-code-syntax-punctuation);
+  --ns-code-syntax-ink: var(--ns-code-syntax-punctuation);
+  color: var(--ns-code-syntax-ink);
 }
 
-/* Syntax roles are certified on code/bg; tinted rows retain readable text/fg. */
+/* Tinted surfaces retain syntax hue with a contextual foreground mix for small-text AA. */
 .ns-code [data-line-variant]:not([data-line-variant='default']) [data-part='syntax'] {
-  color: var(--ns-fg);
+  color: color-mix(in srgb, var(--ns-code-syntax-ink, var(--ns-fg)) 80%, var(--ns-fg));
 }
 .ns-code [data-part='footer'] {
   display: flex;

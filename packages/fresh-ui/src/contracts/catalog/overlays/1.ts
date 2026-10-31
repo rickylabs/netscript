@@ -370,7 +370,7 @@ export const overlays_1: readonly ComponentContract[] = [
     'notes': [
       'Context-only Root composes public native Dialog. Native backdrop requires no extra DOM; no close icon or outside-click dismissal.',
       'Cancel receives initial focus. Native Escape requests cancel; pending disables only the action. App callbacks and asynchronous work remain caller-owned.',
-      'Action includes Button label/spinner parts. Existing destructive-text/card pair is inverted for accessible solid action contrast; canonical destructive/default palette remains owned by #2450.',
+      'Action includes Button label/spinner parts. Canonical destructive fill/foreground roles are preserved; the scoped hover uses destructive/hover rather than the generic legacy raw red ramp. Token values remain owned by #2450.',
       'Open/closed runtime hooks remain on trigger/content; browser-forced dismissal remains native behavior.',
     ],
   },
