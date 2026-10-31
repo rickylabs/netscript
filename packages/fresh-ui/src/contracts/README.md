@@ -203,3 +203,62 @@ Escape presses adjacent: automation DOM queries can grant user activation betwee
 presses and obscure the browser's forced-close path. See the
 [HTML close-request standard](https://html.spec.whatwg.org/dev/interaction.html)
 and [native dialog guidance](https://developer.chrome.com/docs/modern-web-guidance/guides/ui-components/dialog).
+
+
+### SidebarShell: one responsive shell family
+
+`ui:add sidebar-shell` installs the single AppShell/Sidebar/TopBar family; its
+existing copy target and inputs remain supported. `ui:add sidebar-toggle` adds
+an independently hydrated control for server-only shells. Both use the private
+copied `sidebar-support` item. Extend the public anatomy in the canonical L1,
+N4/N5/N10 catalogs before adding a new component part or attribute.
+
+The shell accepts required `pathname`, `navigation`, `brand` and `children`,
+plus the existing `brandBadge`, `footer`, `topbarStart`, `topbarEnd`, `contentId`
+(default `main-content`), `navLabel`, native root attributes and `class`.
+`layout` is `dashboard` (default), `chat` or `docs`; docs places its topbar across
+both columns. `sidebar` is `expanded` (default), `collapsed` or `none`; `nav=false`
+also selects none. `sidebarVariant` is `sidebar`, `floating` or `inset`.
+`topbarBrand` is optional, with app-owned logo/wordmark content.
+
+`rail=true` enables an optional 280px desktop `railContent` lane;
+`mobileRailContent` supplies its explicit mobile path. Chat places optional
+`session`, a scrollable `thread`, and optional `composer` in the bounded viewport.
+`children` supplies the thread unless `thread` is explicitly provided. Hosts own
+messages, forms, business effects and document content. `breakpoint` is measured
+after hydration, never an accepted input; the server omits the unknown attribute.
+
+Navigation sections keep `label`/`items` and can use `collapsible` with a required
+nonblank label and `defaultOpen` (default true). Items keep href/label/icon,
+matchPrefix and isActive; add optional level 1/2, disabled, count, marker (default
+true) and chevron (default false). They remain native list links, not an ARIA
+menu or tree. Disabled destinations omit href and tab stops; collapsed links
+retain an accessible label. Collapsible groups use native details/summary.
+
+SSR renders one initially open native details navigation. It remains in normal
+flow and works without JavaScript, including nested group summaries. The mobile
+fallback may initially be expanded and shift when whole-shell hydration selects
+the native mobile modal. A server-only Shell plus independently hydrated
+SidebarToggle keeps this native disclosure. Its default selectors connect only
+to the nearest shell; explicit selector overrides preserve standalone behavior.
+Disabled, absent or unconnected custom controls leave the built-in access path.
+
+Whole-shell hydration must happen within a Fresh island. All props crossing that
+boundary must be serializable: JSX slots and plain navigation records work;
+`isActive` functions and callback ports must be defined inside the island that
+owns the shell. The first client render matches the static server disclosure;
+a layout effect then chooses one desktop aside or one native mobile/tablet
+Dialog, with no duplicate navigation. Browser modality owns inertness, focus,
+Escape, backdrop and return. Native Tab may enter browser chrome; this is not a
+reason to install a document-level focus trap.
+
+`sidebarOpen`, `defaultSidebarOpen` (default false) and
+`onSidebarOpenChange(open, {reason})` govern only the hydrated mobile modal.
+The reason vocabulary is the existing Dialog vocabulary. A cancelable Escape or
+Close button proposal can be refused. A platform-forced `native-close` stands
+immediately: accept false to keep it closed, or retain true on a later parent
+render to reopen. Desktop geometry removes the modal without changing the
+host's accepted logical intent. A later mobile viewport projects that intent.
+No shell handler overrides document body overflow. Media-query and own-root
+listeners are removed on unmount; viewport focus handoff applies only when its
+own focused navigation branch is replaced.

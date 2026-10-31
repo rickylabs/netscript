@@ -131,7 +131,9 @@ import { ScrollArea } from './components/ui/scroll-area.tsx';
 import { AspectRatio } from './components/ui/aspect-ratio.tsx';
 import { Direction } from './components/ui/direction.tsx';
 import { Resizable } from './components/ui/resizable.tsx';
+import { SidebarShell } from './components/ui/sidebar-shell.tsx';
 console.log(JSON.stringify({
+  'sidebar-shell': render(<SidebarShell layout='docs' pathname='/orders' navigation={[{label:'Work',items:[{href:'/orders',label:'Orders',count:'12'}]}]} brand={<a href='/'>NetScript</a>} rail railContent={<a href='#installation'>Installation</a>} mobileRailContent={<details><summary>On this page</summary>Contents</details>}><h1>Orders</h1></SidebarShell>),
   resizable: render(<Resizable label='Contents' startContent={<button type='button'>Open chapter</button>} endContent={<a href='#chapter'>Read chapter</a>} style={{height: 240}} />),
   'scroll-area': render(h(ScrollArea, { label: 'Recent activity', orientation: 'both', children: h('a', { href: '#activity' }, 'Activity') })),
   'aspect-ratio': render(h(AspectRatio, { ratio: '4:3', children: h('button', { type: 'button' }, 'Play') })),
@@ -158,6 +160,22 @@ console.log(JSON.stringify({
     ];
     assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
     for (const name of renderedNames) {
+      if (name === 'sidebar-shell') {
+        for (const component of ['app-shell', 'sidebar', 'top-bar']) {
+          const contract = componentContracts.components.find((contract) =>
+            contract.name === component
+          )!;
+          assertEquals(
+            renderViolations(
+              contract,
+              { component, scenario: 'installed-shell', props: [] },
+              rendered[name],
+            ),
+            [],
+          );
+        }
+        continue;
+      }
       const contract = componentContracts.components.find((contract) => contract.name === name)!;
       assertEquals(
         renderViolations(contract, {

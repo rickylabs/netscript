@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 118,
+  'total': 119,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -441,7 +441,7 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'kind': 'block',
     'layer': 3,
     'description':
-      'Reusable dashboard sidebar shell that accepts app-owned IA, breadcrumbs, and topbar actions.',
+      'Responsive dashboard/chat/docs shell with native SSR disclosure, mobile modal navigation and app-owned slots.',
   },
   {
     'name': 'page-header',
@@ -789,6 +789,12 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description':
       'Native two-panel layout with bounded pixel proposals and pointer/keyboard resizing.',
+  },
+  {
+    'name': 'sidebar-support',
+    'kind': 'lib',
+    'layer': 3,
+    'description': 'Private copied navigation and native shell/toggle DOM interoperability.',
   },
 ];
 

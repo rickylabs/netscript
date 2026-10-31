@@ -1783,7 +1783,7 @@
     },
     {
       "name": "layout-objects",
-      "description": "Theme-independent CSS layout objects \u2014 Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold \u2014 consuming only semantic spacing and color tokens.",
+      "description": "Theme-independent CSS layout objects — Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold — consuming only semantic spacing and color tokens.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2259,7 +2259,7 @@
     },
     {
       "name": "avatar",
-      "description": "Identity chip for a person or agent \u2014 initials or image with size, presence, and agent variants.",
+      "description": "Identity chip for a person or agent — initials or image with size, presence, and agent variants.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2298,7 +2298,7 @@
     },
     {
       "name": "citation-chip",
-      "description": "Inline per-claim source marker [n] that pairs with a sources list \u2014 the grounded-agent citation UX.",
+      "description": "Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2460,7 +2460,7 @@
     },
     {
       "name": "chart-block",
-      "description": "Inline token-driven metric chart \u2014 horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
+      "description": "Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2499,7 +2499,7 @@
     },
     {
       "name": "donut",
-      "description": "Token-driven donut/pie chart \u2014 SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
+      "description": "Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2622,7 +2622,7 @@
     },
     {
       "name": "markdown",
-      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output \u2014 direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
+      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
@@ -2685,7 +2685,7 @@
     },
     {
       "name": "command-palette",
-      "description": "Modal \u2318K command palette \u2014 the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
+      "description": "Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
@@ -2730,7 +2730,7 @@
     },
     {
       "name": "search",
-      "description": "Compact nav search affordance \u2014 a button styled as an input with a \u2318K hint that opens the command palette.",
+      "description": "Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2770,7 +2770,7 @@
     },
     {
       "name": "dropzone",
-      "description": "File-drop affordance \u2014 a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
+      "description": "File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -3078,12 +3078,13 @@
     },
     {
       "name": "sidebar-shell",
-      "description": "Reusable dashboard sidebar shell that accepts app-owned IA, breadcrumbs, and topbar actions.",
+      "description": "Responsive dashboard/chat/docs shell with native SSR disclosure, mobile modal navigation and app-owned slots.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
         "layout-objects",
-        "breadcrumb"
+        "breadcrumb",
+        "sidebar-support"
       ],
       "type": "registry:block",
       "files": [
@@ -3105,7 +3106,10 @@
             "block"
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "page-header",
@@ -3517,7 +3521,8 @@
         "theme-seed",
         "layout-objects",
         "sidebar-shell",
-        "button"
+        "button",
+        "sidebar-support"
       ],
       "type": "registry:component",
       "files": [
@@ -3869,7 +3874,7 @@
     },
     {
       "name": "mcp-ui-widget",
-      "description": "Themed sandboxed MCP ui:// widget frame \u2014 an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
+      "description": "Themed sandboxed MCP ui:// widget frame — an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -5555,6 +5560,37 @@
               "layer": "components",
               "content": "@import './ui/resizable.css';"
             }
+          ]
+        }
+      }
+    },
+    {
+      "name": "sidebar-support",
+      "description": "Private copied navigation and native shell/toggle DOM interoperability.",
+      "type": "registry:lib",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/sidebar-events.ts",
+          "type": "registry:lib",
+          "target": "@lib/sidebar-events.ts"
+        },
+        {
+          "path": "packages/fresh-ui/registry/lib/sidebar-navigation.tsx",
+          "type": "registry:lib",
+          "target": "@lib/sidebar-navigation.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "support"
           ]
         }
       }

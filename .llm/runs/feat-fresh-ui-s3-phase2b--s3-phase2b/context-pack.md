@@ -104,3 +104,15 @@ Await same evaluator round2; failure streak1.
 
 
 9c0 independent committed-source evidence reconciliation PASS. All4carriers/source216a55f6 verified; whole phase2b in progress. Reconcile: only evidence since source; no lock/token/dependency/schema changes. Audit required before push/comment; next9c-a research becomes its own checkpoint, no source before design PASS.
+
+
+9c0 source216a55f6/evidenceaacd5108 pushed; PR2538 comment6545763940 retained. Starting9c-a shell checkpoint, no product source yet. Seven-item contract in slice9ca-checkpoint.md preserves static/native disclosure, independently hydrated SidebarToggle and whole-shell native mobile Dialog with one active nav; StatsGrid/DataTable remain next9c-b. Corrected9c0 negative aggregate to2 expected failures as reviewer noted. Same independent design review next.
+
+
+9c-a design checkpoint PASS; failure streak0. Implement now with hydration first-render static parity, stable useId targets, owned physical-state toggle notifications and native modal focus on geometry changes. SSR/browser build/server companions are included in focused browser tooling to prove no-JS and isolated-island compatibility. Fresh serialization/JSX slots and installed consumer proof remain required; functions in navigation metadata cannot cross a Fresh island boundary and server-only form remains supported.
+
+
+9c-a implementation complete; source review next.40Chromium shell cases PASS,2actual additional-engine controls PASS(Firefox/WebKit),2actual installed Fresh production serialization/hydration cases PASS,0page/console errors,0seriouscriticalaxe/noallowances;24private captures.418related contracts/runtime/registry cases and final3installed-consumer cases PASS.12source check/lint/fmt files plus browser wrappers PASS; broaderquality/architecture/preflight/docsaccuracy/exportdrift/nativepublish PASS. Raw124doclint FAIL remains unchanged2531exact123diagnostic multiset/0new/0removed. Native119->120 adds only actual shared sidebar-support,104/91/13 unchanged. N4native summary Enter/Space is now explicit canonical base metadata for the implemented planned disclosure, not a style mutation; future19promotions remain deferred. Source27files, no token/lock/version/newfamily/schema churn. Current copies retain Root slots, native SSR and isolated Toggle compatibility; dynamic selector mode clears stale aria-controls. SOURCEcommit/carriers/evidence review/privacy/push/comment remain before9c-b.
+
+
+9c-a substantive source review PASS and final small delta review PASS; streak0. Static summary now uses existing navLabel, with actual custom-label SSR assertion; desktop managed Toggle has an explicit hidden assertion. Other translation defaults stay documented; future localization ports are deferred rather than adding unplanned base API. Final356contracts/40browser and12source wrappers PASS. Positively owned private consumer server stopped, no raw artifacts staged. SOURCEcommit first; committed-source carriers and evidence review next. Whole assignment remains in progress.

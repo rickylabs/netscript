@@ -16,6 +16,7 @@
     "@netscript/fresh-ui/interactive": "../../packages/fresh-ui/interactive.ts",
     "@preact/signals": "npm:@preact/signals@2.11.3",
     "@netscript/fresh-ui/primitives": "../../packages/fresh-ui/primitives.tsx",
-    "highlight.js": "npm:highlight.js@^11"
+    "highlight.js": "npm:highlight.js@^11",
+    "preact-render-to-string": "catalog:"
   }
 }

@@ -1,7 +1,7 @@
 {
   "verdict": "EXPECTED_FAIL",
   "passed": 0,
-  "failed": 1,
+  "failed": 2,
   "ignored": 0,
   "finding": "Native Escape closed a controlled Dialog despite parent refusal; false proposal was observed before visibility failed.",
   "productionEditedBeforeNegative": false,

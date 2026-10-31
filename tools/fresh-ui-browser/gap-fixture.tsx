@@ -1,3 +1,5 @@
+import { ShellExamples } from './gap-shell-fixture.tsx';
+import SidebarToggle from '../../packages/fresh-ui/registry/islands/SidebarToggle.tsx';
 import { DialogOwnership } from './gap-dialog-ownership-fixture.tsx';
 import { Resizables } from './gap-resizable-fixture.tsx';
 import { PageHeaders } from './gap-page-header-fixture.tsx';
@@ -13,7 +15,7 @@ import { Overlays } from './gap-overlays-fixture.tsx';
 import { Navigation } from './gap-navigation-fixture.tsx';
 import { Calendars } from './gap-calendar-fixture.tsx';
 import { Forms } from './gap-forms-fixture.tsx';
-import { render } from 'preact';
+import { hydrate, render } from 'preact';
 import { useState } from 'preact/hooks';
 import { ButtonGroup } from '../../packages/fresh-ui/registry/components/ui/button-group.tsx';
 import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
@@ -80,4 +82,9 @@ function Actions() {
     </main>
   );
 }
-render(<Actions />, document.getElementById('app')!);
+if (location.pathname === '/shell-static') {
+  hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
+} else if (location.pathname === '/shell') {
+  document.body.style.padding = '0';
+  render(<ShellExamples />, document.getElementById('app')!);
+} else render(<Actions />, document.getElementById('app')!);

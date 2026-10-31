@@ -9,12 +9,30 @@ export const navigation_4: readonly ComponentContract[] = [
     'priority': 'P2',
     'shipped': true,
     'props': {
-      'open': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+      'class': {
+        'kind': 'text',
+      },
+      'sidebarSelector': {
+        'kind': 'text',
+        'default': '[data-sidebar]',
+      },
+      'backdropSelector': {
+        'kind': 'text',
+        'default': '[data-sidebar-backdrop]',
+      },
+      'openLabel': {
+        'kind': 'text',
+        'default': 'Open sidebar',
+      },
+      'closeLabel': {
+        'kind': 'text',
+        'default': 'Close sidebar',
+      },
+      'openIcon': {
+        'kind': 'slot',
+      },
+      'closeIcon': {
+        'kind': 'slot',
       },
     },
     'parts': [
@@ -28,6 +46,30 @@ export const navigation_4: readonly ComponentContract[] = [
           'false',
           'true',
         ],
+      },
+      'data-state': {
+        'values': [
+          'rest',
+        ],
+        'default': 'rest',
+      },
+      'data-variant': {
+        'values': [
+          'ghost',
+        ],
+        'default': 'ghost',
+      },
+      'data-size': {
+        'values': [
+          'sm',
+        ],
+        'default': 'sm',
+      },
+      'data-icon': {
+        'values': [
+          'true',
+        ],
+        'default': 'true',
       },
     },
     'booleans': [],
@@ -49,6 +91,7 @@ export const navigation_4: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Audited baseline: open is derived native state, never an accepted prop. Default selectors connect to the nearest shell; explicit overrides retain standalone behavior. aria-controls is absent until the owned target is connected; controlled refusal does not flip aria-expanded.',
     ],
   },
 ];

@@ -3471,57 +3471,89 @@
       "priority": "P0",
       "shipped": true,
       "props": {
-        "variant": {
+        "sidebarVariant": {
           "kind": "enum",
           "values": [
             "sidebar",
             "floating",
             "inset"
-          ]
+          ],
+          "default": "sidebar"
         },
-        "collapsible": {
+        "sidebar": {
           "kind": "enum",
           "values": [
             "expanded",
-            "icon",
-            "offcanvas"
-          ]
+            "collapsed",
+            "none"
+          ],
+          "default": "expanded"
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "selected",
-            "disabled"
-          ]
+        "navigation": {
+          "kind": "collection",
+          "required": true
         },
-        "level": {
+        "navigation[].collapsible": {
+          "kind": "boolean",
+          "default": false
+        },
+        "navigation[].defaultOpen": {
+          "kind": "boolean",
+          "default": true
+        },
+        "navigation[].label": {
+          "kind": "text",
+          "description": "Required nonblank for collapsible native sections."
+        },
+        "navigation[].items[].href": {
+          "kind": "text",
+          "required": true
+        },
+        "navigation[].items[].label": {
+          "kind": "text",
+          "required": true
+        },
+        "navigation[].items[].icon": {
+          "kind": "slot"
+        },
+        "navigation[].items[].count": {
+          "kind": "slot"
+        },
+        "navigation[].items[].level": {
           "kind": "enum",
           "values": [
             "1",
             "2"
-          ]
+          ],
+          "default": "1"
         },
-        "collapsed": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "navigation[].items[].disabled": {
+          "kind": "boolean",
+          "default": false
         },
-        "icon": {
-          "kind": "boolean"
+        "navigation[].items[].marker": {
+          "kind": "boolean",
+          "default": true
         },
-        "count": {
-          "kind": "boolean"
+        "navigation[].items[].chevron": {
+          "kind": "boolean",
+          "default": false
         },
-        "chevron": {
-          "kind": "boolean"
+        "navigation[].items[].matchPrefix": {
+          "kind": "boolean",
+          "default": false
         },
-        "marker": {
-          "kind": "boolean"
+        "navigation[].items[].isActive": {
+          "kind": "callback"
+        },
+        "brand": {
+          "kind": "slot"
+        },
+        "brandBadge": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
         }
       },
       "parts": [
@@ -3592,19 +3624,11 @@
             "sidebar",
             "floating",
             "inset"
-          ],
-          "plannedValues": [
-            "floating",
-            "inset"
           ]
         },
         "data-collapsible": {
           "values": [
             "expanded",
-            "icon",
-            "offcanvas"
-          ],
-          "plannedValues": [
             "icon",
             "offcanvas"
           ]
@@ -3617,30 +3641,61 @@
             "selected",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "nav-item"
+          ]
         },
         "data-level": {
           "values": [
             "1",
             "2"
+          ],
+          "parts": [
+            "nav-item"
           ]
         },
         "data-collapsed": {
           "values": [
             "false",
             "true"
+          ],
+          "parts": [
+            "nav-item"
           ]
         }
       },
       "booleans": [
-        "icon",
-        "count",
-        "chevron",
-        "marker",
-        "collapsible"
+        "navigation[].collapsible",
+        "navigation[].defaultOpen",
+        "navigation[].items[].disabled",
+        "navigation[].items[].marker",
+        "navigation[].items[].chevron",
+        "navigation[].items[].matchPrefix"
       ],
-      "slots": [],
-      "apg": "native navigation links",
+      "slots": [
+        {
+          "name": "brand",
+          "part": "brand-group"
+        },
+        {
+          "name": "brandBadge",
+          "part": "sidebar-header"
+        },
+        {
+          "name": "footer",
+          "part": "sidebar-footer"
+        },
+        {
+          "name": "navigation[].items[].icon",
+          "part": "nav-icon"
+        },
+        {
+          "name": "navigation[].items[].count",
+          "part": "count"
+        }
+      ],
+      "apg": "native navigation links and native details disclosures",
       "keyboard": [
         {
           "key": "Tab",
@@ -3649,6 +3704,10 @@
         {
           "key": "Enter",
           "action": "Follow link"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle a native collapsible section summary."
         }
       ],
       "tokenRoles": [
@@ -3662,7 +3721,9 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: research-only flat state/level/count/etc props are actual SidebarShell navigation records; variant maps to sidebarVariant. Native hover/focus are CSS, while rest/selected/disabled are derived. Root collapsible derives expanded/icon/offcanvas from desktop presentation and measured mobile geometry.",
+        "Native ul/li/a destinations retain aria-current; disabled items omit href, collapsed items retain accessible labels. Groups use native details/summary, independent of the outer static shell disclosure."
       ]
     },
     {
@@ -3672,19 +3733,23 @@
       "priority": "P0",
       "shipped": true,
       "props": {
-        "variant": {
-          "kind": "enum",
-          "values": [
-            "app",
-            "docs"
-          ]
+        "topbarStart": {
+          "kind": "slot"
         },
-        "breakpoint": {
+        "topbarEnd": {
+          "kind": "slot"
+        },
+        "topbarBrand": {
+          "kind": "slot"
+        },
+        "layout": {
           "kind": "enum",
           "values": [
-            "desktop",
-            "mobile"
-          ]
+            "dashboard",
+            "chat",
+            "docs"
+          ],
+          "default": "dashboard"
         }
       },
       "parts": [
@@ -3701,11 +3766,13 @@
         },
         {
           "name": "logo",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "context"
         },
         {
           "name": "wordmark",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "context"
         },
         {
           "name": "topbar-end",
@@ -3723,11 +3790,25 @@
           "values": [
             "desktop",
             "mobile"
-          ]
+          ],
+          "description": "Measured after hydration; absent on SSR, tablet and mobile both use mobile topbar geometry."
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "topbarStart",
+          "part": "topbar-start"
+        },
+        {
+          "name": "topbarEnd",
+          "part": "topbar-end"
+        },
+        {
+          "name": "topbarBrand",
+          "part": "brand"
+        }
+      ],
       "apg": "native buttons and links",
       "keyboard": [
         {
@@ -3748,7 +3829,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: SidebarShell owns this topbar. variant app/docs and breakpoint are derived, not independent accepted props. Host owns logo/wordmark within topbarBrand. No future post-canary navigation promotion is included."
       ]
     },
     {
@@ -4125,12 +4207,30 @@
       "priority": "P2",
       "shipped": true,
       "props": {
-        "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "class": {
+          "kind": "text"
+        },
+        "sidebarSelector": {
+          "kind": "text",
+          "default": "[data-sidebar]"
+        },
+        "backdropSelector": {
+          "kind": "text",
+          "default": "[data-sidebar-backdrop]"
+        },
+        "openLabel": {
+          "kind": "text",
+          "default": "Open sidebar"
+        },
+        "closeLabel": {
+          "kind": "text",
+          "default": "Close sidebar"
+        },
+        "openIcon": {
+          "kind": "slot"
+        },
+        "closeIcon": {
+          "kind": "slot"
         }
       },
       "parts": [
@@ -4144,6 +4244,30 @@
             "false",
             "true"
           ]
+        },
+        "data-state": {
+          "values": [
+            "rest"
+          ],
+          "default": "rest"
+        },
+        "data-variant": {
+          "values": [
+            "ghost"
+          ],
+          "default": "ghost"
+        },
+        "data-size": {
+          "values": [
+            "sm"
+          ],
+          "default": "sm"
+        },
+        "data-icon": {
+          "values": [
+            "true"
+          ],
+          "default": "true"
         }
       },
       "booleans": [],
@@ -4164,7 +4288,8 @@
         "text/fg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: open is derived native state, never an accepted prop. Default selectors connect to the nearest shell; explicit overrides retain standalone behavior. aria-controls is absent until the owned target is connected; controlled refusal does not flip aria-expanded."
       ]
     },
     {
@@ -8874,32 +8999,102 @@
             "dashboard",
             "chat",
             "docs"
-          ]
+          ],
+          "default": "dashboard"
         },
-        "breakpoint": {
+        "sidebar": {
           "kind": "enum",
           "values": [
-            "desktop",
-            "tablet",
-            "mobile"
-          ]
+            "expanded",
+            "collapsed",
+            "none"
+          ],
+          "default": "expanded"
         },
         "nav": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean",
+          "default": true
         },
         "rail": {
+          "kind": "boolean",
+          "default": false
+        },
+        "sidebarVariant": {
           "kind": "enum",
           "values": [
-            "false",
-            "true"
-          ]
+            "sidebar",
+            "floating",
+            "inset"
+          ],
+          "default": "sidebar"
+        },
+        "pathname": {
+          "kind": "text",
+          "required": true
+        },
+        "navigation": {
+          "kind": "collection",
+          "required": true
+        },
+        "brand": {
+          "kind": "slot",
+          "required": true
+        },
+        "brandBadge": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
+        },
+        "topbarStart": {
+          "kind": "slot"
+        },
+        "topbarEnd": {
+          "kind": "slot"
+        },
+        "topbarBrand": {
+          "kind": "slot"
         },
         "children": {
+          "kind": "slot",
+          "required": true
+        },
+        "railContent": {
           "kind": "slot"
+        },
+        "mobileRailContent": {
+          "kind": "slot"
+        },
+        "session": {
+          "kind": "slot"
+        },
+        "thread": {
+          "kind": "slot",
+          "description": "Replaces children in the chat thread when supplied."
+        },
+        "composer": {
+          "kind": "slot"
+        },
+        "sidebarOpen": {
+          "kind": "boolean"
+        },
+        "defaultSidebarOpen": {
+          "kind": "boolean",
+          "default": false
+        },
+        "onSidebarOpenChange": {
+          "kind": "callback"
+        },
+        "contentId": {
+          "kind": "text",
+          "default": "main-content"
+        },
+        "navLabel": {
+          "kind": "text",
+          "default": "Sidebar navigation"
+        },
+        "class": {
+          "kind": "text"
         }
       },
       "parts": [
@@ -8938,7 +9133,24 @@
         },
         {
           "name": "sidebar-backdrop",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Native modal ::backdrop on the composed Dialog content.",
+          "representation": "pseudo"
+        },
+        {
+          "name": "sidebar-disclosure",
+          "when": "Corresponding optional content or native disclosure is present."
+        },
+        {
+          "name": "sidebar-summary",
+          "when": "Corresponding optional content or native disclosure is present."
+        },
+        {
+          "name": "rail",
+          "when": "Corresponding optional content or native disclosure is present."
+        },
+        {
+          "name": "mobile-rail",
+          "when": "Corresponding optional content or native disclosure is present."
         }
       ],
       "attributes": {
@@ -8954,7 +9166,8 @@
             "desktop",
             "tablet",
             "mobile"
-          ]
+          ],
+          "description": "Measured after hydration; absent during SSR. Native media queries govern the static fallback."
         },
         "data-nav": {
           "values": [
@@ -8967,27 +9180,105 @@
             "false",
             "true"
           ]
+        },
+        "data-sidebar-presentation": {
+          "values": [
+            "expanded",
+            "collapsed",
+            "none"
+          ],
+          "default": "expanded"
+        },
+        "data-sidebar-mode": {
+          "values": [
+            "static",
+            "hydrated"
+          ],
+          "default": "static"
         }
       },
       "booleans": [
         "nav",
-        "rail"
+        "rail",
+        "sidebarOpen",
+        "defaultSidebarOpen"
       ],
       "slots": [
         {
           "name": "children",
           "part": "content"
+        },
+        {
+          "name": "brand",
+          "part": "sidebar"
+        },
+        {
+          "name": "brandBadge",
+          "part": "sidebar"
+        },
+        {
+          "name": "footer",
+          "part": "sidebar"
+        },
+        {
+          "name": "topbarStart",
+          "part": "topbar"
+        },
+        {
+          "name": "topbarEnd",
+          "part": "topbar"
+        },
+        {
+          "name": "topbarBrand",
+          "part": "topbar"
+        },
+        {
+          "name": "railContent",
+          "part": "rail"
+        },
+        {
+          "name": "mobileRailContent",
+          "part": "mobile-rail"
+        },
+        {
+          "name": "session",
+          "part": "session"
+        },
+        {
+          "name": "thread",
+          "part": "thread"
+        },
+        {
+          "name": "composer",
+          "part": "composer"
         }
       ],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native layout with progressive details navigation and composed native modal Dialog",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Follow native links/controls; hydrated mobile modal contains focus."
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the static native summary, a navigation group summary, or a sidebar button."
+        },
+        {
+          "key": "Escape",
+          "action": "Use composed native Dialog dismissal; cancelable proposals honor refusal and platform-forced close wins."
+        }
+      ],
       "tokenRoles": [
         "space/page/padding-x|y",
         "space/section/gap",
         "surface/bg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: breakpoint is derived, not a prop. SidebarShell is the single app-shell/sidebar/top-bar family. nav=false aliases sidebar=none; topbar derives docs/app.",
+        "Static SSR contains one initially open native details navigation in normal flow; whole-shell hydration selects one aside or mobile Dialog. Mobile expanded fallback may shift layout on hydration. sidebarOpen ports apply only to hydrated mobile navigation.",
+        "Server-only Shell plus independently hydrated SidebarToggle is supported; whole-shell islands require serializable props/JSX slots. Navigation isActive functions and callback ports must be defined inside the same island.",
+        "Chat children supply the thread unless thread is supplied; host owns messages, composer and business effects. Desktop rail is280px; mobileRailContent is its explicit mobile path."
       ]
     },
     {

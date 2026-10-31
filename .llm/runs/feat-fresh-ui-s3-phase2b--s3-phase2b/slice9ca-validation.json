@@ -1,0 +1,127 @@
+{
+  "verdict": "PASS",
+  "tests": {
+    "relatedContractsRuntimeRegistry": {
+      "exitCode": 0,
+      "passed": 418,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 418,
+      "uniqueFailures": 0
+    },
+    "finalInstalledConsumer": {
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 3,
+      "uniqueFailures": 0
+    },
+    "finalContractCatalog": {
+      "exitCode": 0,
+      "passed": 356,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 356,
+      "uniqueFailures": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 12,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 12,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 12,
+      "dropped": 0
+    },
+    "browser-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    },
+    "finalCatalogCheck": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "chromium": {
+      "passed": 40,
+      "failed": 0,
+      "ignored": 0,
+      "flaky": 0,
+      "scope": "Utility/studio-utility light/dark390/1280, focused768 and640/641/1024/1025 transitions, RTL390"
+    },
+    "additionalEngines": {
+      "firefox": {
+        "passed": 1,
+        "failed": 0
+      },
+      "webkit": {
+        "passed": 1,
+        "failed": 0
+      },
+      "scope": "Focused custom-control availability, malformed requests and two-shell isolation only. Native engines run with privately extracted host libraries; no product test is skipped."
+    },
+    "freshProductionConsumer": {
+      "passed": 2,
+      "failed": 0,
+      "widths": [
+        390,
+        1280
+      ],
+      "scope": "Actual ui:add copied sources; Fresh production island serialization/hydration of JSX brand, topbar and content; one mobile/desktop branch; zero page/console errors."
+    },
+    "seriousCriticalAxe": 0,
+    "allowances": 0,
+    "captures": 24,
+    "nativeOwnership": "No-JS and isolated Toggle SSR, single native modal, controlled refusal/acceptance/platform forced close, focus on resize, selector mode changes, owned listener cleanup and prior legacy overflow restoration."
+  },
+  "qualityArchitecture": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "preflight": {
+    "exitCode": 0,
+    "verdict": "PASS"
+  },
+  "docsAccuracy": {
+    "exitCode": 0,
+    "verdict": "PASS"
+  },
+  "docsExportsDrift": {
+    "exitCode": 0,
+    "verdict": "PASS"
+  },
+  "docsSiteBuild": "NOT_APPLICABLE_TO_SLICE_NO_DOCS_SITE_CHANGES",
+  "publicationAudit": "slice9ca-publication-audit.json",
+  "inventory": {
+    "total": 104,
+    "shipped": 91,
+    "pending": 13,
+    "nativeRegistryItems": 120
+  },
+  "sourceFiles": 27,
+  "carriers": "PENDING_AFTER_SOURCE_COMMIT",
+  "independentSourceReview": "PASS",
+  "wholePhase2b": "IN_PROGRESS"
+}

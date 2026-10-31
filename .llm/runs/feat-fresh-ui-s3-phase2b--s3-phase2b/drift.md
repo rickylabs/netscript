@@ -52,3 +52,17 @@ case. The native element is the physical source of truth, checked on each accept
 render without an internal forced-close re-render. Shared Dialog/Sheet policy,
 consumer veto, no immediate reopen/new API and precise gates are now locked.
 Await same evaluator round2; failure streak1.
+
+
+9c-a implementation findings: native Tab can move into browser chrome (BODY
+sentinel), while outside controls remain inert; no focus-trap clone was added.
+Actual viewport test caught a hidden built-in trigger being chosen before the
+connected custom control; a cancellable owned microtask selects a visible
+trigger after child layout effects. CSS specificity now keeps desktop/none
+custom buttons hidden despite later button CSS. SidebarToggle native typing
+now uses ButtonHTMLAttributes, so disabled is accepted rather than merely spread
+at runtime. Copied support dependencies and installed SSR checks pass; frozen
+legacy snapshot remains unchanged. New canonical app-shell axis uses
+ data-sidebar-presentation to avoid colliding with the legacy bare data-sidebar
+selector on the actual aside. Native ::backdrop represents the app-shell
+sidebar-backdrop part without a duplicate fake DOM layer.
