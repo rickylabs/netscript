@@ -1,0 +1,25 @@
+# Plan & Design — READY FOR REVIEW
+
+Public behavior: get_app_status, analyze_service_performance and analyze_db_bottlenecks use the server's existing --project-root binding (its aspire/apphost.mts) or an explicitly configured dashboard endpoint. No conventional dashboard fallback for these tools. Resolve live binding on every call through Aspire CLI, never cache a failed startup discovery. No polling or subprocess loops.
+
+Contract first: a TelemetrySnapshotPort reads a bounded window and optional service, optionally health logs, under AbortSignal. It returns a discriminated success snapshot or an unavailable/unbound diagnostic, never swallowed empty data. Provenance contains window start/end, span sample count (null for failed acquisition), servingRevision (MCP package version), observed service revisions when emitted, source, nativeMetrics=dashboard_only and bounded-snapshot semantics. Unknown service revisions remain absent; no fabricated commit identity. Native histogram/metric streams are dashboard Metrics-view-only; reported percentiles are computed from sampled spans.
+
+Adapter: reuse executeAspireCliCommand to run one non-interactive bounded aspire otel spans --format Json command per read, plus logs for status. Bind to exact AppHost from project root, or preserve full explicit dashboard login URL internally so Aspire performs its supported authentication exchange. No naked default endpoint. Reuse shared query normalization for supported OTLP envelopes; reject invalid JSON, missing/wrong envelope, nonzero command exits and thrown transport errors. Apply requested time/service filters locally, including upper boundary. Count telemetry emitter resources from resource identity on spans/logs. Preserve separate plugin doctor health. Cancellation is bounded by a named deadline and reaps the command child via its edge.
+
+Application: central snapshot acquisition converts typed failure to safe tool diagnostics with provenance. Known empty windows get telemetry_no_data with count 0 and an actionable hint, without numeric zero latency. App status may retain meaningful plugin health while annotating a successful empty telemetry snapshot as no_data/warn. Failures carry count null, no latency fields. DB analysis distinguishes observed span count from matching DB operation count. Schemas describe provenance and optional sinceUnixMs for app status. No config/command stdout/stderr/binding URL/path is copied to tool diagnostics. Redact known dashboard credential values from telemetry-derived labels as defense in depth.
+
+Ordered commit slices:
+1. Bootstrap run/design artifacts and draft PR; gate: independent PLAN-EVAL before source work.
+2. Snapshot contract, Aspire adapter, tool flows/schemas and focused fake dashboard tests. Files: packages/mcp/{cli.ts,src/domain,src/ports,src/application/flows,src/application/telemetry,src/infrastructure/telemetry,tests}. Gates: MCP suite; structured scoped check/lint/fmt; quality:gate; independent slice review before commit. Include worklog/context updates and negative controls.
+3. Public MCP README/documentation and required generated carrier refresh, any evaluator repairs, acceptance/gate receipts and lessons. Gates: doc lint, JSR audit/publish dry-run, relevant static Aspire checks if carrier changes; independent IMPL-EVAL. Commit/push, mark ready, review exact final pushed head and report current CI without waiting for it.
+
+Risk register:
+- CLI JSON differs from API envelope: inspect pinned CLI source and exercise an actual Aspire CLI against a local fake telemetry HTTP API. Inject command seam for failure/cancellation unit tests.
+- Bounded spans are not a complete population: report limit/snapshot semantics, enforce local window, do not present native metric percentiles.
+- No telemetry is not proof of good performance: explicit no_data and unavailable distinctions; null sample count on failures.
+- Credentials in command diagnostics/config/labels: fixed messages, output allowlist, known-input credential redaction, assert complete JSON-RPC response excludes sentinels.
+- Repository-wide baseline gates: record unrelated failures as baseline, never claim them proven. Do not commit lock churn.
+
+Open decisions: none that force implementation rework. Deferred: native metric query API (not supported), shared telemetry adapter fail-open compatibility for other tools, new polling/live subscriptions, arbitrary AppHost filename options beyond existing project seam. CLI runtime E2E is not required if scope stays within MCP diagnostic reads/docs; if scaffold/runtime wiring changes, require coordinator-owned CI gate, never run it locally.
+
+JSR rubric applied: no dependency/export-map changes; new interfaces have explicit annotations/JSDoc; package publish excludes tests. Run structured doc lint, package dry-run and JSR audit; inspect public CLI option types for private-type/slow-type regressions. Contributor extension path: packages/mcp/src/ports/telemetry-snapshot-port.ts, with README linking the adapter contract.
