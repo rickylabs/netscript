@@ -34,3 +34,9 @@ PLAN-EVAL round 2 PASS; implementation begins only after this verdict. Latest ma
 - Reconcile: issue remains open, draft PR #2487 targets main; no labels/milestones changed. Native diff exits zero without output if datasource config is omitted; proof now demands generated file and provides config. See memory-migration-delivery.md.
 
 S1 sign-off: independent substantive supervisor review PASS after fresh-install and line-ending repairs. Final real PostgreSQL: 2 passed (fresh contribution and copied-model adoption); 33 unit regressions pass; scoped check/lint/fmt and quality:gate exit 0. CI registration/path filters included. No engine or lock changes.
+
+## S1 CI repair
+
+PR command-postgres run https://github.com/rickylabs/netscript/actions/runs/41163470858 passed both install modes and existing command/relay, then failed P1012 duplicate outbox model in the provider fixture. Compared latest main run 41152000845 (green). Provider fixture now omits only the final copied outbox model before appending shipped saga schema. Independent supervisor PASS; real native PostgreSQL atomic-transition conformance passes, exit 0; scoped format exit 0. Pushing isolated correction while S2 remains in progress.
+
+Reconcile: read new PR activity and addressed CI finding; no review threads or external review comments yet.
