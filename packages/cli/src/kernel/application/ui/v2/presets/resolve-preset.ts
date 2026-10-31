@@ -7,14 +7,14 @@ export type ResolvedUiPreset =
   | { readonly kind: 'preset'; readonly preset: UiPreset }
   | { readonly kind: 'remote'; readonly url: string; readonly deps: UiRegistryDependencies };
 
-const HTTP_LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
-
 /** Distinguish local share links from fetched preset JSON and portable registry items. */
 export async function resolveUiPreset(
   input: string,
   deps: UiRegistryDependencies,
 ): Promise<ResolvedUiPreset> {
-  if (!/^[a-z][a-z0-9+.-]*:/i.test(input)) return { kind: 'preset', preset: decodeUiPreset(input) };
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(input)) {
+    return await registeredPreset(decodeUiPreset(input), deps);
+  }
   let url: URL;
   try {
     url = new URL(input);
@@ -22,17 +22,15 @@ export async function resolveUiPreset(
     throw new Error('Invalid UI preset URL');
   }
   if (url.username || url.password) throw new Error('UI preset URLs cannot contain credentials');
-  if (
-    url.protocol !== 'https:' &&
-    !(url.protocol === 'http:' && HTTP_LOOPBACK_HOSTS.has(url.hostname))
-  ) {
-    throw new Error(`UI preset URLs require HTTPS (HTTP is allowed only for loopback): ${input}`);
-  }
   if (url.searchParams.has('preset')) {
     if (!url.searchParams.get('preset')) {
       throw new Error('UI share URL has an empty preset parameter');
     }
-    return { kind: 'preset', preset: decodeUiPreset(input) };
+    // Share links carry choices in the query; their origin follows the shared transport rule.
+    url.search = '';
+    url.hash = '';
+    uiRegistryUrl(url.href);
+    return await registeredPreset(decodeUiPreset(input), deps);
   }
   const target = uiRegistryUrl(input);
   if (!deps.transport) throw new Error('Remote UI preset transport is not configured');
@@ -46,13 +44,7 @@ export async function resolveUiPreset(
   if (payload && typeof payload === 'object' && 'version' in payload && !('type' in payload)) {
     const preset = UiPresetSchema.safeParse(payload);
     if (!preset.success) throw new Error(`Invalid UI preset JSON: ${preset.error.message}`);
-    if (
-      preset.data.theme &&
-      !(await deps.tokenEngine?.defaults())?.presets.includes(preset.data.theme)
-    ) {
-      throw new Error('URL preset JSON theme must name a registered built-in token preset');
-    }
-    return { kind: 'preset', preset: preset.data };
+    return await registeredPreset(preset.data, deps);
   }
   const { validateRegistryItem } = await import('@netscript/fresh-ui/registry-v2');
   const item = validateRegistryItem(payload);
@@ -71,4 +63,17 @@ export async function resolveUiPreset(
       },
     },
   };
+}
+
+/** All code/share/JSON forms must select a known theme before init can write a scaffold. */
+async function registeredPreset(
+  preset: UiPreset,
+  deps: UiRegistryDependencies,
+): Promise<ResolvedUiPreset> {
+  if (preset.theme && !(await deps.tokenEngine?.defaults())?.presets.includes(preset.theme)) {
+    throw new Error(
+      `Unknown token preset: ${preset.theme}; theme must name a registered built-in token preset`,
+    );
+  }
+  return { kind: 'preset', preset };
 }

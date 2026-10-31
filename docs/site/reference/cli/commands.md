@@ -373,10 +373,12 @@ netscript init my-app --preset https://raw.githubusercontent.com/owner/themes/ma
 ```
 
 A URL with a nonempty `?preset=` parameter remains a shared preset link and is decoded locally.
-Preset URLs require HTTPS. For local development, HTTP is allowed only on loopback hosts
+Preset and registry URLs, including registry dependencies and `ui:add` sources, require HTTPS.
+For local development, HTTP is allowed only on loopback hosts
 `localhost`, `127.0.0.1`, and `[::1]` (with optional ports); this also applies to `init --preset`
 and `ui:apply --preset`. Other URLs fetch either strict version-1 preset JSON (its `theme` is a registered built-in
-preset ID) or a published-schema `registry:theme`/`registry:base` item. Malformed URLs, failed HTTP
+preset ID) or a published-schema `registry:theme`/`registry:base` item. Plain and `ns1_` preset codes,
+including shared links, also require a registered built-in theme. Malformed URLs, failed HTTP
 requests, invalid JSON/schema, unknown names and unsafe file targets produce an error. Registry
 theme items apply as a whole; `--only` remains available for preset codes and preset JSON.
 

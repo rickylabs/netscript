@@ -1,4 +1,10 @@
-import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
+import {
+  assert,
+  assertEquals,
+  assertRejects,
+  assertStringIncludes,
+  assertThrows,
+} from 'jsr:@std/assert@^1';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import { readTemplateAsset } from '../../../../kernel/adapters/templates/template-asset.ts';
@@ -19,6 +25,29 @@ export const appRoutes = {
   home: createRouteReference('/', { id: 'home', kind: 'page' }),
 } as const;
 `;
+
+Deno.test('ui:add rejects external HTTP registry URLs before fetching or writing', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const before = fs.getFiles();
+  const reads: string[] = [];
+  const registry = 'http://evil.example/widget.json';
+  const command = createUiAddCommand({
+    installDependencies: {
+      fs,
+      transport: {
+        read: (url) => {
+          reads.push(url);
+          return Promise.resolve(JSON.stringify({ name: 'widget', type: 'registry:ui' }));
+        },
+      },
+    },
+    resolveUiAppRoot: () => Promise.resolve(APP_ROOT),
+    print: () => {},
+  });
+  await assertRejects(() => command.throwErrors().parse([registry]), Error, registry);
+  assertEquals(reads, []);
+  assertEquals(fs.getFiles(), before);
+});
 
 Deno.test('ui:add help explains the page island query-loader triad', () => {
   const command = createUiAddCommand({

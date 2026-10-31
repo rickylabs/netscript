@@ -1,5 +1,17 @@
 # Worklog
 
+## Repair design checkpoint
+
+1. Public surface: existing public/maintainer `init --preset`, `ui:apply`, and `ui:add`; no new options or exports.
+2. Vocabulary: registered built-in token preset, portable preset code/share URL/JSON, registry theme/base, and loopback HTTP exception. Existing types suffice.
+3. Ports: existing token engine defaults enumerate registered presets; existing transport and filesystem ports prove rejection before requests/writes.
+4. Constants: move the existing exact HTTP loopback host set to the shared domain URL rule; reuse schema/type constants.
+5. Commit slices: one bounded repair slice in the existing resolver/domain URL rule and existing init/client/add tests, gated by red/green cases, targeted CLI suite, scoped check/lint/fmt, quality/architecture, release preflight, docs accuracy, JSR audit, and runtime smoke (or UNPROVEN); independent read-only review precedes sign-off. Final evidence-only slice if needed for exact-head CI.
+6. Deferred: broader issue boxes, redirect/SSRF policy, registry redesign, and optional refactors unrelated to the three findings. No new debt.
+7. Contributor path: `domain/ui/ui-config.ts` owns shared registry transport policy; `presets/resolve-preset.ts` owns early preset validation.
+
+PLAN-EVAL: N/A. The owner specifies the bounded repair, policy, and acceptance tests; no new architecture or unresolved design tradeoff. Prior run context/memory read first. Native tools used because RTK is absent. Same existing branch resumed exactly at `69951eb22268d40cfb51373f79b3da838150976b` without restarting implementation.
+
 ## Design
 
 1. Public surface: netscript init --preset and ui:apply --preset; maintainer init shares the same preparation. No new CLI option or package export.
@@ -67,3 +79,27 @@ CI repair validation: canonical generator adds exactly one row for init-preset-s
 Same independent read-only Claude evaluator returned CI repair PASS and independently reran parity: 998 checked, zero failures, manifestFresh=true. Supervisor accepts that substantive one-row repair review. Commit and push this slice with its run evidence, then verify current-head hosted quality. No labels, workflow or pin changes.
 
 Reconcile: the repeated owner notification refers to quality job 124522662224 on 411c058. This repair addresses its sole manifest-freshness finding. PR remains open with Refs #2516; no issue scope expansion or READY claim.
+
+## Repair regression and source evidence
+
+Baseline red via structured wrapper: exit 1, 11 failed/11 passed results. Eight zero-file steps failed for unknown plain/encoded/share codes across public and maintainer init, plus the parent; external HTTP dependency and ui:add rejection tests also failed. JSON unknown-theme and loopback controls already passed. Fixed focused run: exit 0, 23 passed, zero failed/ignored.
+
+Early-type mutation: temporarily remove only the resolver theme/base guard and run the native init safety test. Exit 1, 3 failed/16 passed results: exactly public/maintainer wrong-item-type zero-file assertions plus parent. Restore the guard exactly. The final broad run includes these restored green cases. No mutation remains.
+
+Scoped check/lint/fmt pass all five changed source/test files with zero findings, zero dropped files/refusals. quality:gate and docs:accuracy pass through durable gate runner (raw receipts retained privately); release:preflight and CLI JSR audit exit 0. Docs prose/publish carriers regenerated successfully. Full runtime command ran in one pass with cleanup: exit 1 at Docker environment preflight and cleanup inventory; runtime UNPROVEN under owner exception. Read-only leak inventory: 24 unproven survivors, none mutated. Public leak evidence retains verdict/counts only.
+
+Initial broader test invocation included a nonexistent protocol-preset directory and exited before running tests; corrected selection uses actual init/apply/add/v2 and separate protocol folders. This was an invocation error, not a source failure; final reports will identify the executed scopes.
+
+## Repair broad gates
+
+Corrected broad CLI suite: exit 0, 101 passed, zero failed/ignored (public and maintainer init, apply, add, all v2 preset/registry tests, legacy registry). Native protocol suite: exit 0, 4 passed, zero failed/ignored. Structured report summaries and command scope are in repair-tests.json. All 12 root check tasks except post-commit assets-barrel and separately invoked review-threads pass; review-threads also exits 0. All four docs-site checks pass. No docs-site lock changes. Independent reviewer has verified 34 focused tests and is running a broader compatibility pass; sign-off pending.
+
+## Repair independent slice review
+
+Separate read-only Claude Opus 5.5 returned PASS with no blockers. It independently ran 34 focused and 104 broader UI/registry tests, all passing, verified carrier prose and confirmed a single shared transport policy. Advisories concern missing-token-engine diagnostics, intended unknown-theme behavior for font-only apply, GitHub-origin share-link path restrictions, and the intended rejection of existing external-HTTP registries. No production source changes are needed for this bounded repair. Production wiring supplies the engine; docs describe the HTTPS change. The same reviewer is receiving the completed 101/4 local test summaries, final artifact files and a correction to its metadata filename reference before sign-off. No source/test/carrier changed during review.
+
+## Repair sign-off
+
+The same independent read-only evaluator reviewed the final artifact additions and completed generator reports and returned final PASS, no blockers. It corrected the settings filename advisory to components.json and confirmed scope/privacy. Source/test/doc/carrier are unchanged from its passing review. Supervisor accepts the substantive independent slice review and commits the repair with its evidence. assets-barrel is intentionally the post-commit check; remote required checks must clear at the final head before READY.
+
+Reconcile: PR #2518 is still open and mergeable on the existing branch. No review threads are unanswered; no new issue/PR duplicates, labels, closing keywords, or merges. Refs #2516 only. Optional unrelated refactors remain deferred and no new architecture debt is accepted.

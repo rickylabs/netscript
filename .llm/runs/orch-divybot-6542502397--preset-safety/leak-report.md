@@ -1,3 +1,6 @@
-# Leak-check verdict
+# Leak inventory
 
-Verdict: UNPROVEN. Counts: 24 unknown/unproven-owner survivors; 0 positively owned survivors. Docker inventory unavailable. No resources mutated.
+Verdict: UNPROVEN.
+
+- survivors: 24
+- unproven: 24
