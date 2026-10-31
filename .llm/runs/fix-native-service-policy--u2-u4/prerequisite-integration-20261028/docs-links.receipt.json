@@ -1,0 +1,28 @@
+{
+  "outcome": "FAIL",
+  "startedAt": "2026-10-28T05:47:50.398Z",
+  "finishedAt": "2026-10-28T05:47:50.950Z",
+  "durationMs": 552,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 791,
+    "sha256": "409c34130cc05d84603b7b26750c1fc56905ab483e8189f9a2ca13f11d9203e8",
+    "tail": "# Internal-doc link / anchor / orphan check\n  docs=131 broken-links=5 broken-anchors=0 orphans=0 (orphans informational; pass --check-orphans to enforce)\n  BROKEN-LINK .agents/skills/aspire-init/SKILL.md:25 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-init/SKILL.md:53 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-orchestration/SKILL.md:149 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-orchestration/SKILL.md:182 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n  BROKEN-LINK .agents/skills/aspire-orchestration/references/app-commands.md:44 -> .agents/skills/aspireify/SKILL.md: link target does not exist\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 107,
+    "sha256": "a789770265a6e1c50f2b2bb2891179d218dff314fb09ea60934b9b6b0f01520e",
+    "tail": "Task docs:links deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty\n",
+    "truncated": false
+  },
+  "gateId": "docs-links",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "task",
+    "docs:links"
+  ],
+  "timeoutMs": 120000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative"
+}

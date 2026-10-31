@@ -46,3 +46,9 @@ pending. S1 has no code blockers, but coordinator runtime arming and final CI pr
 
 S3 main merge preserves both complete debt groups and main reference navigation links,
 adding only the new singular service table row. No runtime source conflict resolution.
+
+S3 prerequisite integration: merged original service branch at
+0e24d2d67ec746fdb57100568a1ed1120b15bac3, whose runtime source was independently reviewed
+without code blockers at7dd579d7. The later delta is its reviewed documentation repair and
+canonical prose carrier. Required service CI/runtime proof is still pending, not inherited as
+PASS by this integration. No source conflict required manual resolution.

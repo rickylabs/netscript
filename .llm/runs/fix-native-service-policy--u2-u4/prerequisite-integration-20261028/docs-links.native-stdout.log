@@ -1,0 +1,7 @@
+# Internal-doc link / anchor / orphan check
+  docs=131 broken-links=5 broken-anchors=0 orphans=0 (orphans informational; pass --check-orphans to enforce)
+  BROKEN-LINK .agents/skills/aspire-init/SKILL.md:25 -> .agents/skills/aspireify/SKILL.md: link target does not exist
+  BROKEN-LINK .agents/skills/aspire-init/SKILL.md:53 -> .agents/skills/aspireify/SKILL.md: link target does not exist
+  BROKEN-LINK .agents/skills/aspire-orchestration/SKILL.md:149 -> .agents/skills/aspireify/SKILL.md: link target does not exist
+  BROKEN-LINK .agents/skills/aspire-orchestration/SKILL.md:182 -> .agents/skills/aspireify/SKILL.md: link target does not exist
+  BROKEN-LINK .agents/skills/aspire-orchestration/references/app-commands.md:44 -> .agents/skills/aspireify/SKILL.md: link target does not exist

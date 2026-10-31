@@ -1,0 +1,249 @@
+diff --git a/.llm/tools/docs/check-exports-drift.ts b/.llm/tools/docs/check-exports-drift.ts
+index 8fa53d26e..a141990d2 100644
+--- a/.llm/tools/docs/check-exports-drift.ts
++++ b/.llm/tools/docs/check-exports-drift.ts
+@@ -834,7 +834,7 @@ export async function discoverReferencePagePaths(root: string = Deno.cwd()): Pro
+   const paths: string[] = [];
+   for await (const entry of Deno.readDir(referenceRoot)) {
+     if (!entry.isDirectory) continue;
+-    const relativePath = join('docs/site/reference', entry.name, 'index.md');
++    const relativePath = `docs/site/reference/${entry.name}/index.md`;
+     try {
+       if ((await Deno.stat(join(root, relativePath))).isFile) paths.push(relativePath);
+     } catch (error) {
+diff --git a/.llm/tools/docs/check-exports-drift_test.ts b/.llm/tools/docs/check-exports-drift_test.ts
+index 94725b9cc..bec11a7f4 100644
+--- a/.llm/tools/docs/check-exports-drift_test.ts
++++ b/.llm/tools/docs/check-exports-drift_test.ts
+@@ -1,9 +1,12 @@
+-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+-import { join, relative } from '@std/path';
++import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
++import { dirname, fromFileUrl, join, relative } from '@std/path';
+ import {
++  AUTHORITATIVE_MAPPING,
+   checkDrift,
+   checkExportsDrift,
+   deriveExpectedExports,
++  discoverReferencePagePaths,
++  EXCLUDED_REFERENCE_PAGES,
+   type PackageMapping,
+   parseDocContent,
+   validateReferencePageCoverage,
+@@ -151,6 +154,44 @@ Deno.test('reference page coverage refuses pages in neither classification', ()
+   );
+ });
+ 
++Deno.test('native reference discovery retains canonical identifiers and complete coverage', async () => {
++  const root = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
++  const paths = await discoverReferencePagePaths(root);
++  assert(paths.length > 0, 'reference discovery must select real pages');
++  assert(paths.every((path) => /^docs\/site\/reference\/[^/\\]+\/index\.md$/.test(path)));
++  assertEquals(
++    validateReferencePageCoverage(paths, AUTHORITATIVE_MAPPING, EXCLUDED_REFERENCE_PAGES),
++    [],
++  );
++  const referenceRoot = join(root, 'docs/site/reference');
++  let pageCount = 0;
++  for await (const entry of Deno.readDir(referenceRoot)) {
++    if (!entry.isDirectory) continue;
++    try {
++      if ((await Deno.stat(join(referenceRoot, entry.name, 'index.md'))).isFile) pageCount++;
++    } catch (error) {
++      if (!(error instanceof Deno.errors.NotFound)) throw error;
++    }
++  }
++  assertEquals(paths.length, pageCount, 'every existing reference index must be classified');
++  const missing = paths[0]!;
++  assertEquals(
++    validateReferencePageCoverage(
++      paths,
++      AUTHORITATIVE_MAPPING.filter(({ docPath }) => docPath !== missing),
++      EXCLUDED_REFERENCE_PAGES.filter(({ docPath }) => docPath !== missing),
++    ).length,
++    1,
++  );
++  assertEquals(
++    validateReferencePageCoverage(paths, [{ docPath: missing }], [{
++      docPath: missing,
++      reason: 'Duplicate classification control.',
++    }]).filter((error) => error.includes('is in both')).length,
++    1,
++  );
++});
++
+ Deno.test('reference page coverage refuses pages in both classifications', () => {
+   const duplicated = 'docs/site/reference/duplicated/index.md';
+   assertEquals(
+diff --git a/.llm/tools/docs/jsdoc-example-compiler.ts b/.llm/tools/docs/jsdoc-example-compiler.ts
+index 7b3344cc5..574cdbe3b 100644
+--- a/.llm/tools/docs/jsdoc-example-compiler.ts
++++ b/.llm/tools/docs/jsdoc-example-compiler.ts
+@@ -443,6 +443,14 @@ export async function compileJsdocExamples(
+     );
+     const tempLockPath = join(tempRoot, 'deno.lock');
+     await Deno.copyFile(rootLockPath, tempLockPath);
++    // Keep the Windows command line bounded while checking every isolated example module.
++    const entryPath = join(tempRoot, 'examples.ts');
++    await Deno.writeTextFile(
++      entryPath,
++      `${
++        modules.map((module) => `import ${JSON.stringify(toFileUrl(module.path).href)};`).join('\n')
++      }\n`,
++    );
+     const output = await new Deno.Command(Deno.execPath(), {
+       cwd: repositoryRoot,
+       env: { FORCE_COLOR: '0', NO_COLOR: '1' },
+@@ -453,7 +461,7 @@ export async function compileJsdocExamples(
+         tempLockPath,
+         '--config',
+         configPath,
+-        ...modules.map((module) => module.path),
++        entryPath,
+       ],
+       stdout: 'piped',
+       stderr: 'piped',
+diff --git a/.llm/tools/docs/jsdoc-example-compiler_test.ts b/.llm/tools/docs/jsdoc-example-compiler_test.ts
+index e009f5d6f..7bf5674fc 100644
+--- a/.llm/tools/docs/jsdoc-example-compiler_test.ts
++++ b/.llm/tools/docs/jsdoc-example-compiler_test.ts
+@@ -1,5 +1,5 @@
+-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+-import { dirname, fromFileUrl } from '@std/path';
++import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
++import { dirname, fromFileUrl, join } from '@std/path';
+ import type {
+   JsdocExampleAnalysis,
+   JsdocExampleBlock,
+@@ -124,6 +124,100 @@ Deno.test('relative and undeclared NetScript subpath controls fail without execu
+   assertStringIncludes(result.diagnostics, 'undeclared NetScript subpath');
+ });
+ 
++Deno.test('many example modules exceed Windows argv limits and retain tail diagnostics', async () => {
++  const moduleOwner: JsdocExampleOwner = {
++    memberName: '@netscript/test',
++    memberRoot: 'packages/test',
++    sourcePath: 'packages/test/mod.ts',
++    kind: 'module',
++  };
++  // Even a short temporary root gives the former 1,500-path argv more than 32,767 characters.
++  const blocks = Array.from(
++    { length: 1500 },
++    (_, index) => block(moduleOwner, 'const repeated: number = 1;\nvoid repeated;', index + 1),
++  );
++  const selected = analysis(blocks);
++  assertEquals(selected.census.checked, blocks.length);
++  assertEquals(selected.census.candidates, blocks.length);
++  const valid = await compileJsdocExamples(selected, repositoryRoot);
++  assertEquals(valid.code, 0, valid.diagnostics);
++  assertEquals(valid.enforcedFailureCount, 0);
++  assert(valid.denoCheckSpawned);
++  assert(valid.rootLockUnchanged);
++
++  const tail = blocks[blocks.length - 1]!;
++  tail.body = 'const tail: string = 1;\nvoid tail;';
++  const invalid = await compileJsdocExamples(analysis(blocks), repositoryRoot);
++  assertEquals(invalid.code, 1, invalid.diagnostics);
++  assert(invalid.denoCheckSpawned);
++  assert(invalid.rootLockUnchanged);
++  assertEquals(invalid.enforcedFailureCount, 1);
++  assertEquals(invalid.failureCensus.typeError, 1);
++  assertEquals(
++    invalid.typeErrorExamples.map(({ fenceOrdinal, tsCodes }) => ({
++      fenceOrdinal,
++      tsCodes,
++    })),
++    [{ fenceOrdinal: blocks.length, tsCodes: [2322] }],
++  );
++  assertStringIncludes(invalid.diagnostics, `fence ${blocks.length}:1:7`);
++  assertStringIncludes(invalid.diagnostics, 'TS2322');
++});
++
++Deno.test('private compiler files are removed on success, type failure, and root-lock refusal', async () => {
++  const originalMakeTempDir = Deno.makeTempDir;
++  const originalReadTextFile = Deno.readTextFile;
++  const rootLockPath = join(repositoryRoot, 'deno.lock');
++  const rootLock = await originalReadTextFile(rootLockPath);
++  const profile = ['USERPROFILE', 'TEMP', 'TMP', 'DENO_DIR'].map((key) => Deno.env.get(key));
++  const scratchRoot = join(repositoryRoot, '.llm', 'tmp');
++  await Deno.mkdir(scratchRoot, { recursive: true });
++  const temporaryRoots: string[] = [];
++  Deno.makeTempDir = async (options) => {
++    const path = await originalMakeTempDir({ ...options, dir: scratchRoot });
++    temporaryRoots.push(path);
++    return path;
++  };
++  const moduleOwner: JsdocExampleOwner = {
++    memberName: '@netscript/test',
++    memberRoot: 'packages/test',
++    sourcePath: 'packages/test/mod.ts',
++    kind: 'module',
++  };
++  try {
++    const valid = await compileJsdocExamples(
++      analysis([block(moduleOwner, 'const value: number = 1;\nvoid value;')]),
++      repositoryRoot,
++    );
++    assertEquals(valid.code, 0, valid.diagnostics);
++    const invalid = await compileJsdocExamples(
++      analysis([block(moduleOwner, 'const value: string = 1;\nvoid value;')]),
++      repositoryRoot,
++    );
++    assertEquals(invalid.code, 1, invalid.diagnostics);
++    assertEquals(invalid.failureCensus.typeError, 1);
++    let lockReads = 0;
++    Deno.readTextFile = async (path, options) => {
++      const text = await originalReadTextFile(path, options);
++      return path === rootLockPath && ++lockReads === 2 ? `${text}\n` : text;
++    };
++    await assertRejects(
++      () => compileJsdocExamples(analysis([block(moduleOwner, 'export {};')]), repositoryRoot),
++      Error,
++      'tracked root deno.lock changed during JSDoc check',
++    );
++  } finally {
++    Deno.makeTempDir = originalMakeTempDir;
++    Deno.readTextFile = originalReadTextFile;
++  }
++  assertEquals(temporaryRoots.length, 3);
++  for (const path of temporaryRoots) {
++    await assertRejects(() => Deno.stat(path), Deno.errors.NotFound);
++  }
++  assertEquals(await originalReadTextFile(rootLockPath), rootLock);
++  assertEquals(['USERPROFILE', 'TEMP', 'TMP', 'DENO_DIR'].map((key) => Deno.env.get(key)), profile);
++});
++
+ Deno.test('scaffold aliases align to app and service generators per documented owner', async () => {
+   const generatorProbe = await new Deno.Command(Deno.execPath(), {
+     cwd: repositoryRoot,
+diff --git a/.llm/tools/docs/jsdoc-example-policy.ts b/.llm/tools/docs/jsdoc-example-policy.ts
+index c89f15745..9f7a17d21 100644
+--- a/.llm/tools/docs/jsdoc-example-policy.ts
++++ b/.llm/tools/docs/jsdoc-example-policy.ts
+@@ -169,7 +169,7 @@ function declarationKind(kind: unknown): 'value' | 'type' | 'class' {
+ 
+ function sourcePath(repositoryRoot: string, filename: string): string {
+   const path = filename.startsWith('file:') ? fromFileUrl(filename) : filename;
+-  return normalize(relative(repositoryRoot, path));
++  return normalize(relative(repositoryRoot, path)).replaceAll('\\', '/');
+ }
+ 
+ function symbolExamples(
+@@ -319,7 +319,7 @@ function moduleExampleOwner(file: PublishedSourceFile, repositoryRoot: string):
+   return {
+     memberName: file.member.name,
+     memberRoot: file.member.root,
+-    sourcePath: normalize(relative(repositoryRoot, file.path)),
++    sourcePath: normalize(relative(repositoryRoot, file.path)).replaceAll('\\', '/'),
+     kind: 'module',
+   };
+ }
+@@ -350,7 +350,7 @@ export async function analyzeJsdocExamples(
+   const blocks: JsdocExampleBlock[] = [];
+   const findings: JsdocExampleFinding[] = [];
+   const publishedPaths = new Set(
+-    files.map((file) => normalize(relative(repositoryRoot, file.path))),
++    files.map((file) => normalize(relative(repositoryRoot, file.path)).replaceAll('\\', '/')),
+   );
+   for (const file of files) {
+     const module = docModule(await getDoc(file.path), file.path);

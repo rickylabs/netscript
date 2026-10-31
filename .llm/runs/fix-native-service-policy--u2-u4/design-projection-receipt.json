@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT_AUTHORIZED_VERBATIM_DESIGN_PROJECTION_V1",
+  "projectedAt": "2026-10-27T21:34:09.024Z",
+  "nativeSession": "c2672910-4296-4cbf-b7be-4652f52837eb",
+  "generationHealthCorrectionTimedOut": true,
+  "sourceDecisionsSha256": "2810bb69915547b3e17011fb547bb6f5a69a8209def06e4e9679418f30d623da",
+  "priorWorklogSha256": "2b8b19323e704cac3ed52fd6443953f9a82b0f0de4608586af60ebb4a7791463",
+  "preservedPrefixBytes": 11033,
+  "priorWorklogPrefixByteIdentical": true,
+  "copied": [
+    {
+      "name": "D-U4-7",
+      "sourceByteOffset": 12047,
+      "byteLength": 3397,
+      "excerptSha256": "53de64d15acf71858e6d74242d21b8b939319d203332e35b2b6894bff969b89e",
+      "worklogByteOffset": 12114
+    },
+    {
+      "name": "D-U2-1 step 3 / Vary",
+      "sourceByteOffset": 2760,
+      "byteLength": 1069,
+      "excerptSha256": "cbdb283f10fa0dd09e62b4c5b95fe4e37de531b149183e86a80d99878187c608",
+      "worklogByteOffset": 15778
+    }
+  ],
+  "resultingWorklogSha256": "9c658fff895f10ce5ba7f28e9c13e80572f88c212a59342b366157a9abf38130",
+  "newArchitectureAuthoredByOrchestrator": false,
+  "independentEvaluation": "NOT_RUN"
+}

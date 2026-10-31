@@ -14,8 +14,9 @@
  */
 
 import { assert, assertStringIncludes } from '@std/assert';
+import { fromFileUrl } from '@std/path';
 
-const FIXTURE = new URL('./_fixtures/legacy-abort-service.ts', import.meta.url).pathname;
+const FIXTURE = fromFileUrl(new URL('./_fixtures/legacy-abort-service.ts', import.meta.url));
 const DEPRECATION_NEEDLE = 'request.signal aborts on successful responses';
 
 interface SpawnedFixture {
@@ -23,29 +24,56 @@ interface SpawnedFixture {
   readonly port: number;
   readonly stdoutLines: AsyncIterableIterator<string>;
   readonly stderr: Promise<string>;
+  readonly stdoutAbort: AbortController;
 }
 
-function lineReader(stream: ReadableStream<Uint8Array>): AsyncIterableIterator<string> {
+function lineReader(
+  stream: ReadableStream<Uint8Array>,
+  signal: AbortSignal,
+): AsyncIterableIterator<string> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
   return (async function* () {
-    for (;;) {
-      const { value, done } = await reader.read();
-      if (done) {
-        buffer += decoder.decode();
-        if (buffer.trim().length > 0) yield buffer.trim();
-        return;
+    let cancellation: Promise<void> | undefined;
+    const cancel = () => {
+      cancellation = reader.cancel();
+      void cancellation.catch(() => undefined);
+    };
+    signal.addEventListener('abort', cancel, { once: true });
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) {
+          buffer += decoder.decode();
+          if (buffer.trim().length > 0) yield buffer.trim();
+          return;
+        }
+        buffer += decoder.decode(value, { stream: true });
+        let index = buffer.indexOf('\n');
+        while (index !== -1) {
+          yield buffer.slice(0, index).trim();
+          buffer = buffer.slice(index + 1);
+          index = buffer.indexOf('\n');
+        }
       }
-      buffer += decoder.decode(value, { stream: true });
-      let index = buffer.indexOf('\n');
-      while (index !== -1) {
-        yield buffer.slice(0, index).trim();
-        buffer = buffer.slice(index + 1);
-        index = buffer.indexOf('\n');
+    } finally {
+      signal.removeEventListener('abort', cancel);
+      try {
+        await cancellation;
+      } finally {
+        reader.releaseLock();
       }
     }
   })();
+}
+
+function killFixture(child: Deno.ChildProcess): void {
+  try {
+    child.kill('SIGKILL');
+  } catch {
+    // already exited
+  }
 }
 
 async function spawnFixture(extraFlags: readonly string[]): Promise<SpawnedFixture> {
@@ -55,31 +83,53 @@ async function spawnFixture(extraFlags: readonly string[]): Promise<SpawnedFixtu
     stderr: 'piped',
   });
   const child = command.spawn();
-  const stdoutLines = lineReader(child.stdout);
+  const stdoutAbort = new AbortController();
+  const stdoutLines = lineReader(child.stdout, stdoutAbort.signal);
   const stderr = new Response(child.stderr).text();
+  const fixture = { child, port: 0, stdoutLines, stderr, stdoutAbort };
+  const deadline = setTimeout(() => killFixture(child), 10_000);
 
   // Wait for the READY <port> banner. Use manual `.next()` (not `for await`) so
   // breaking out does not call `.return()` and close the shared line reader —
   // later tests continue reading the same stream for `CANCELLED`.
-  for (;;) {
-    const { value, done } = await stdoutLines.next();
-    if (done) break;
-    const match = value.match(/^READY (\d+)$/);
-    if (match) {
-      return { child, port: Number(match[1]), stdoutLines, stderr };
+  try {
+    for (;;) {
+      const { value, done } = await stdoutLines.next();
+      if (done) break;
+      const match = value.match(/^READY (\d+)$/);
+      if (match) return { ...fixture, port: Number(match[1]) };
     }
+    throw new Error('fixture exited before reporting READY');
+  } catch (error) {
+    await shutdown(fixture);
+    throw error;
+  } finally {
+    clearTimeout(deadline);
   }
-  throw new Error('fixture exited before reporting READY');
 }
 
 async function shutdown(fixture: SpawnedFixture): Promise<string> {
+  killFixture(fixture.child);
+  let timedOut = false;
+  const deadline = setTimeout(() => {
+    timedOut = true;
+    fixture.stdoutAbort.abort();
+    killFixture(fixture.child);
+  }, 3000);
   try {
-    fixture.child.kill('SIGKILL');
-  } catch {
-    // already exited
+    const drained = (async () => {
+      for await (const _line of fixture.stdoutLines) { /* retain stdout through EOF */ }
+    })();
+    const results = await Promise.allSettled([fixture.child.status, fixture.stderr, drained]);
+    assert(!timedOut, 'fixture shutdown timed out before stdout EOF');
+    for (const result of results) {
+      if (result.status === 'rejected') throw result.reason;
+    }
+    const stderr = results[1];
+    return stderr.status === 'fulfilled' ? stderr.value : '';
+  } finally {
+    clearTimeout(deadline);
   }
-  await fixture.child.status;
-  return await fixture.stderr;
 }
 
 Deno.test('legacy Deno.serve behavior warns on successful requests (baseline repro)', async () => {
@@ -129,22 +179,19 @@ Deno.test('client disconnect still cancels the in-flight request with the flag',
     // The fixture prints CANCELLED only if the handler's request signal fired,
     // i.e. genuine cancellation still propagates under the non-legacy behavior.
     let cancelled = false;
-    const deadline = setTimeout(() => {
-      try {
-        fixture.child.kill('SIGKILL');
-      } catch {
-        // ignore
+    const deadline = setTimeout(() => killFixture(fixture.child), 3000);
+    try {
+      for (;;) {
+        const { value, done } = await fixture.stdoutLines.next();
+        if (done) break;
+        if (value === 'CANCELLED') {
+          cancelled = true;
+          break;
+        }
       }
-    }, 3000);
-    for (;;) {
-      const { value, done } = await fixture.stdoutLines.next();
-      if (done) break;
-      if (value === 'CANCELLED') {
-        cancelled = true;
-        break;
-      }
+    } finally {
+      clearTimeout(deadline);
     }
-    clearTimeout(deadline);
     assert(cancelled, 'expected the handler request signal to abort on client disconnect');
   } finally {
     await shutdown(fixture);

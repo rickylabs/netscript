@@ -1,0 +1,239 @@
+{
+  "pkg": {
+    "name": "@netscript/service",
+    "version": "0.0.8",
+    "description": "Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.",
+    "root": "packages/service"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./auth": "./src/auth/mod.ts",
+    "./rpc-path": "./src/primitives/rpc-path.ts",
+    "./internal-credential": "./src/auth/internal-credential/mod.ts",
+    "./commands": "./commands.ts",
+    "./commands/testing": "./commands-testing.ts",
+    "./commands/relay": "./commands-relay.ts",
+    "./rate-limit": "./src/rate-limit/mod.ts"
+  },
+  "files": {
+    "total": 126,
+    "loc": 20909,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 6200
+      },
+      {
+        "path": "src\\auth\\mod.ts",
+        "bytes": 2971
+      },
+      {
+        "path": "src\\primitives\\rpc-path.ts",
+        "bytes": 1660
+      },
+      {
+        "path": "src\\auth\\internal-credential\\mod.ts",
+        "bytes": 1274
+      },
+      {
+        "path": "commands.ts",
+        "bytes": 2432
+      },
+      {
+        "path": "commands-testing.ts",
+        "bytes": 3040
+      },
+      {
+        "path": "commands-relay.ts",
+        "bytes": 1533
+      },
+      {
+        "path": "src\\rate-limit\\mod.ts",
+        "bytes": 1187
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 760,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./auth": true,
+      "./rpc-path": true,
+      "./internal-credential": true,
+      "./commands": true,
+      "./commands/testing": true,
+      "./commands/relay": true,
+      "./rate-limit": true
+    },
+    "descriptionLen": 99
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "DEFAULT_RPC_API_PATH",
+        "DEFAULT_RPC_API_VERSION",
+        "HEALTH_STATUS",
+        "PAYLOAD_TOO_LARGE_ERROR",
+        "RUNTIME_HOST_SHUTDOWN_PHASES",
+        "assertServiceAuthPolicy",
+        "buildServiceRpcPath",
+        "createBodyLimitMiddleware",
+        "createContractAuthorizer",
+        "createContractOverlayAuthorizer",
+        "createErrorHandler",
+        "createHealthHandler",
+        "createLivenessHandler",
+        "createNotFoundHandler",
+        "createOpenAPIHandler",
+        "createOpenAPISpec",
+        "createRPCHandler",
+        "createRPCPlugins",
+        "createReadinessHandler",
+        "createRuntimeHost",
+        "createScalarDocs",
+        "createScalarJs",
+        "createService",
+        "defineService",
+        "healthChecks"
+      ],
+      "rawCount": 25
+    },
+    "./auth": {
+      "exported": [
+        "INSTALLATION_SECRET_FILE_ENV",
+        "INTERNAL_SERVICE_SUBJECT",
+        "assertServiceAuthPolicy",
+        "createCompositeAuthenticator",
+        "createContractAuthorizer",
+        "createContractOverlayAuthorizer",
+        "createInstallationSecret",
+        "createInternalCredentialAuthenticator",
+        "createScopeAuthorizer",
+        "createStaticCredentialAuthenticator",
+        "createTrustedHeaderAuthenticator",
+        "deriveInternalCredential",
+        "isInternalServicePrincipal",
+        "loadInstallationSecret"
+      ],
+      "rawCount": 14
+    },
+    "./rpc-path": {
+      "exported": [
+        "DEFAULT_RPC_API_PATH",
+        "DEFAULT_RPC_API_VERSION",
+        "ServiceRpcPathOptions",
+        "buildServiceRpcPath"
+      ],
+      "rawCount": 4
+    },
+    "./internal-credential": {
+      "exported": [
+        "INSTALLATION_SECRET_FILE_ENV",
+        "createInstallationSecret",
+        "deriveInternalCredential",
+        "loadInstallationSecret"
+      ],
+      "rawCount": 4
+    },
+    "./commands": {
+      "exported": [
+        "CommandError",
+        "canonicalCommandJson",
+        "commandTraceContext",
+        "createCommandExecutor",
+        "defineCommand",
+        "jsonCodec",
+        "parseCanonicalCommandJson"
+      ],
+      "rawCount": 7
+    },
+    "./commands/testing": {
+      "exported": [
+        "assertCommandDeterminism",
+        "assertCommandFaultBoundary",
+        "createCommandFaultController",
+        "createMemoryCommandConformanceFixture",
+        "createMemoryCommandStore",
+        "createTestingCommandExecutor",
+        "runCommandConformance"
+      ],
+      "rawCount": 7
+    },
+    "./commands/relay": {
+      "exported": [
+        "COMMAND_RELAY_FAILURE_CLASSES",
+        "CommandRelayError",
+        "createCommandOutboxRelay"
+      ],
+      "rawCount": 3
+    },
+    "./rate-limit": {
+      "exported": [
+        "createKvRateLimitStore",
+        "createMemoryRateLimitStore",
+        "createRateLimitMiddleware",
+        "resolveServiceClientAddress"
+      ],
+      "rawCount": 4
+    }
+  },
+  "tests": {
+    "fileCount": 46,
+    "files": [
+      "tests\\auth\\authenticators_test.ts",
+      "tests\\auth\\authorizer_test.ts",
+      "tests\\auth\\builder-auth_test.ts",
+      "tests\\auth\\contract-authorizer_test.ts",
+      "tests\\auth\\contract-procedure-index-conformance_test.ts",
+      "tests\\auth\\contract-projection-parity_test.ts",
+      "tests\\auth\\define-service-auth_test.ts",
+      "tests\\auth\\health-auth-order_test.ts",
+      "tests\\auth\\internal-credential_test.ts",
+      "tests\\auth\\internal-procedures_test.ts",
+      "tests\\auth\\middleware_test.ts",
+      "tests\\auth\\route-precedence_test.ts",
+      "tests\\auth\\service-auth-policy-soundness_test.ts",
+      "tests\\auth\\service-auth-policy_test.ts",
+      "tests\\body-limit_test.ts",
+      "tests\\client-address_test.ts",
+      "tests\\commands-codec_test.ts",
+      "tests\\commands-conformance_test.ts",
+      "tests\\commands-consumer_test.ts",
+      "tests\\commands-executor-effects_test.ts",
+      "tests\\commands-executor-identity_test.ts",
+      "tests\\commands-memory_test.ts",
+      "tests\\commands-relay_test.ts",
+      "tests\\commands-telemetry_test.ts",
+      "tests\\cors-policy_test.ts",
+      "tests\\cors-response-authority_test.ts",
+      "tests\\cors-topology_test.ts",
+      "tests\\database-connectivity_test.ts",
+      "tests\\define-service-middleware_test.ts",
+      "tests\\define-service_test.ts",
+      "tests\\handlers_test.ts",
+      "tests\\health_test.ts",
+      "tests\\hono-tracing_test.ts",
+      "tests\\legacy-abort_test.ts",
+      "tests\\listener-hostname_test.ts",
+      "tests\\rate-limit-address-key_test.ts",
+      "tests\\rate-limit_test.ts",
+      "tests\\rpc-debug-redaction_test.ts",
+      "tests\\rpc-path_test.ts",
+      "tests\\runtime-host_test.ts",
+      "tests\\runtime_test.ts",
+      "tests\\service-builder_test.ts",
+      "tests\\shutdown-coordinator_test.ts",
+      "tests\\tls-listener_test.ts",
+      "tests\\type-assignability_test.ts",
+      "tests\\_fixtures\\readme-examples_test.ts"
+    ]
+  },
+  "gates": [],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

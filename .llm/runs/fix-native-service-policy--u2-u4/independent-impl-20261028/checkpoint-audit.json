@@ -1,0 +1,751 @@
+{
+  "sourceHead": "de9f6df3561d9e27587dd63687c8825254e9c3d5",
+  "rootReportedFullReportAcceptance": true,
+  "checkpointRootReviewPending": true,
+  "sourceChanges": 0,
+  "originalReads": 20,
+  "supplementalReads": 3,
+  "sameSession": true,
+  "faithfulCopies": [
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/final-verdict.utf8.md",
+      "path": "original/final-verdict.utf8.md",
+      "sha256": "a839caaf0b26df3bc6aee66e2f1907f595ed6370c832bf70d5d918b798cb8ccb",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/coverage.json",
+      "path": "original/coverage.json",
+      "sha256": "c0825b8706111bc0c7125877258f8436b50ca08bb073940d6610043c6085ed00",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/observed-identity.json",
+      "path": "original/observed-identity.json",
+      "sha256": "4fddc70b8b004893356be9eac29ccfa7021829ddba798092285727046904676f",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/final-guards.json",
+      "path": "original/final-guards.json",
+      "sha256": "20c81c81ca191c565ce5e399178993a7cf06946dfc40a137133b0d3499934526",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/result.json",
+      "path": "original/result.json",
+      "sha256": "52aabe88587eeee2729fb780f5a27990002e18622fa9f39b34262753e5f422fa",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/mcp.jsonl",
+      "path": "original/mcp.jsonl",
+      "sha256": "18e6e472bdfc5be7254cb7f70a95d87b0e55c5e4f02d8666d5fce8e2cf963991",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/preparation.json",
+      "path": "original/preparation.json",
+      "sha256": "9f3319fb86c9b64219fd12182a4231c08e96b4c0242c9bb3313bf8fa7a191356",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/packet-manifest.json",
+      "path": "original/packet-manifest.json",
+      "sha256": "4efb44543bc2a0902723580c1693084d5397df4ff19035fab40c0e75341705ce",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/final-verdict.utf8.md",
+      "path": "debt-completion/final-verdict.utf8.md",
+      "sha256": "763e71409a859d0d0cdba1f204eae6bf1e8a2011ee153e1e48b5a467c92fc672",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/coverage.json",
+      "path": "debt-completion/coverage.json",
+      "sha256": "b5f97b334486b57ac4f8123345210b3373b493e4906907bdf98d3dc1c68dcd4d",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/observed-identity.json",
+      "path": "debt-completion/observed-identity.json",
+      "sha256": "66678cb1b8b2c22d30c01b8e03737763fbfb22895df3c3932495f3e56644b832",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/final-guards.json",
+      "path": "debt-completion/final-guards.json",
+      "sha256": "61c8d38746cb704147821d0ee9dff4ecb4a89c6f56982f0f8dece6f844930df0",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/result.json",
+      "path": "debt-completion/result.json",
+      "sha256": "5e683060142b5495f9a052e35cadce7b4cfbf124574df026ec0d29b3001a453d",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/mcp.jsonl",
+      "path": "debt-completion/mcp.jsonl",
+      "sha256": "21787df32cf1b06048e4476b3ad77f9d7b46f55eecefbcada57efa809e7476e4",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/preparation.json",
+      "path": "debt-completion/preparation.json",
+      "sha256": "4fb1658385cef805634ee01f2162d748fd3ec6c3c51ef159dced8466a6ad3359",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/packet-manifest.json",
+      "path": "debt-completion/packet-manifest.json",
+      "sha256": "6758d35587de60aa1faca5b785cb646711e2ec54647d9d032500a8822b08e4c6",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/canonical-entry.md",
+      "path": "canonical-entry.md",
+      "sha256": "57dab883258a1b544640f77cf60d8c9cc11d448df5b79b86fa556b6beaf86272",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/root-gap-and-debt-delta.md",
+      "path": "root-gap-and-debt-delta.md",
+      "sha256": "392553909b4654fbc182359798262cc2ae51b12c40171b22265cb75e57e85515",
+      "byteIdentical": true
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/baseline-head-debt.diff",
+      "path": "baseline-head-debt.diff",
+      "sha256": "56e1639ade8857906aabe063272c7007249991798c9ecd4028a413c5dd3ff169",
+      "byteIdentical": true
+    }
+  ],
+  "driverArchives": [
+    {
+      "attempt": "original",
+      "archive": "original/drivers.txt",
+      "sha256": "ba9c8a69fef319fd87e7e7eab70f919b080bd96ea7420206526521ce71199fef",
+      "sources": [
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/common.ts",
+          "sha256": "fdce26032587059737558915acb99373ec69db043107fc948fd5c2d02eaf73de",
+          "offset": 118,
+          "length": 9170
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/implementation-driver.ts",
+          "sha256": "9ca4e426fb0e825f360e8edf3466f5dbfc2815bdcd4850a0b6e42e6e2e4abdf6",
+          "offset": 9423,
+          "length": 13886
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/owned-capture.ts",
+          "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c",
+          "offset": 23435,
+          "length": 3891
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/owned-spawn-corrected.ts",
+          "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f",
+          "offset": 27460,
+          "length": 1929
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/public-events-corrected.ts",
+          "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97",
+          "offset": 29525,
+          "length": 2468
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/review-audit.ts",
+          "sha256": "6020dbb6fef8498209001ce4d90977ab5eae417a8bbe5cdb755b101cf5e9143f",
+          "offset": 32118,
+          "length": 4805
+        }
+      ]
+    },
+    {
+      "attempt": "debt-completion",
+      "archive": "debt-completion/drivers.txt",
+      "sha256": "a300b2a6fc6a1c6df5a117ee0437bc34f6db7064b9dcd40067bc30e8b146ab09",
+      "sources": [
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/common.ts",
+          "sha256": "f5be21665274855ad2b78c4855a7297aab26a3d16dd99773732a3c966441d789",
+          "offset": 118,
+          "length": 9490
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/implementation-driver.ts",
+          "sha256": "094c21a81e094fad410bf003010a365bee963290eea6b82ba9d842d1a53b9167",
+          "offset": 9743,
+          "length": 13962
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/owned-capture.ts",
+          "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c",
+          "offset": 23831,
+          "length": 3891
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/owned-spawn-corrected.ts",
+          "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f",
+          "offset": 27856,
+          "length": 1929
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/public-events-corrected.ts",
+          "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97",
+          "offset": 29921,
+          "length": 2468
+        },
+        {
+          "source": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/review-audit.ts",
+          "sha256": "21618359688a8a856d1399250c1e79ad4aaae161848922ba67ca9e61101cceeb",
+          "offset": 32514,
+          "length": 7116
+        }
+      ]
+    }
+  ],
+  "nativeOutputAudit": [
+    {
+      "attempt": "original",
+      "originalPrivatePath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/native.stdout.jsonl",
+      "originalSha256": "3b667bf4df001b0f5156366d4f99779a419f1114b22f2bacc4718b44458f7b31",
+      "checkpointSha256": "3b667bf4df001b0f5156366d4f99779a419f1114b22f2bacc4718b44458f7b31",
+      "events": 33,
+      "omittedOperationalEvents": [],
+      "byteIdentical": true
+    },
+    {
+      "attempt": "debt-completion",
+      "originalPrivatePath": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/native.stdout.jsonl",
+      "originalSha256": "ef7b0e46646207fb45238a15463ac7361d6d15379a9ddbe6b7f3bd69d91237d7",
+      "checkpointSha256": "ef7b0e46646207fb45238a15463ac7361d6d15379a9ddbe6b7f3bd69d91237d7",
+      "events": 9,
+      "omittedOperationalEvents": [],
+      "byteIdentical": true
+    }
+  ],
+  "verifiedPreparationSeals": [
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/common.ts",
+      "sha256": "fdce26032587059737558915acb99373ec69db043107fc948fd5c2d02eaf73de"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/owned-capture.ts",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/owned-spawn-corrected.ts",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/public-events-corrected.ts",
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/review-audit.ts",
+      "sha256": "6020dbb6fef8498209001ce4d90977ab5eae417a8bbe5cdb755b101cf5e9143f"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/implementation-driver.ts",
+      "sha256": "9ca4e426fb0e825f360e8edf3466f5dbfc2815bdcd4850a0b6e42e6e2e4abdf6"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/config-proposal.json",
+      "sha256": "361de299909dce5d882d66cb7116087fb47ddc408c56d130e9327aa39f4dc92a"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/source-snapshot.json",
+      "sha256": "59ece2fa2b148a2a096fb480ab48ec9716d174105b6bb5805accfda1f212e974"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/packet-manifest.json",
+      "sha256": "4efb44543bc2a0902723580c1693084d5397df4ff19035fab40c0e75341705ce"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/prompt.md",
+      "sha256": "d8c00246302f9dfe66fbf85c4cd9182f18d841c6af0ffef868b3bc2a7f942f59"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/route.json",
+      "sha256": "96b931107342ebed4c3ff789655d11f5bbe1b73dc21a4213bb806f5f4c0328de"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/effective-config.json",
+      "sha256": "366dcc6454e05d069ab66f04c1965bd9b892f161b3702bbd63010726669f855a"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/model-catalog.json",
+      "sha256": "ba394296f1fa09d106cdba48e8e250e1b8b1fbb4f0e59a14692b093a2042e91f"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/model-prepare-endpoints.json",
+      "sha256": "e98159ba805d9bfe3007a1bfea3ed3e537d949769238185966d6b66598740a43"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/price-prepare.json",
+      "sha256": "d0d1ee6af74b0acb06e27d313d28697078d9a6cbce7092c1baa7c1acb2b86b29"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/prepare-packet.ts",
+      "sha256": "95ba7bef4f3f402188281a58f8c9595d920e177c7aceb05b22012e96c587592d"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/predecessor-bindings.json",
+      "sha256": "364150036fa143cdc2a772c73659ec0251fcf10ef02fd94b20e69e5d45dc084a"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/authority-root-preparation.md",
+      "sha256": "b4e063ffe4025749fee4f6b36fab64089a12b96ad700181850b11a3d3f7c37f2"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/.mcp.json",
+      "sha256": "520ac1c2363bb7f1a12e3f1ba37926dad65b49e9a79b7e46c3e102d7f0318ca0"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-01.md",
+      "sha256": "de301e6d4ab1fdbdbf01d6e5611d3d3bdb56e1117a69e059d0f1ea4cc172cf38"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-02.md",
+      "sha256": "a2ebec40e1c1b803d83e69e25e525a38d4099048f9f48fda8201f89f8379ac6c"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-03.md",
+      "sha256": "a448d1e6b34dec6418dbff411fa283eb1f3c353fd2a15346e0965fa3e20e2035"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-04.md",
+      "sha256": "6f22fa208dbdddefde4f3471d397ea6d7ce2c239b668b7c7059f6ed5f26d92e1"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-05.md",
+      "sha256": "198dd682917b4f8957713c26292ac84ba371d3bd4d62d71040a545f5681d2606"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-06.md",
+      "sha256": "11cd6932b97db3fed7a9e26a1a566124aca7c09fd5e36b74b2d6976e77c3bb72"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-07.md",
+      "sha256": "5941a2944eaf4041d5857e656b336f20af1bf66a2a63bd2af1a2f479b34145e7"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-08.md",
+      "sha256": "946f2509ff6f9e08c1bfb06809df61c0bbbf5f128f4b93fee76e569a340fcf97"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-09.md",
+      "sha256": "b3a0a7f0de53f31c3ce15f61ce0f5d9a4f9b3607c6fd50e7589579cae1bc28ca"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-10.md",
+      "sha256": "7bdaf4364bc3960b1fde0ea522b7153e9737aa766d36aaee0201a48f8e5bc6cb"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-11.md",
+      "sha256": "99d3d26a5067c999035abebe31546f81ae2d5f6f81e03f4878936c61dd64ad32"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-12.md",
+      "sha256": "e4bab5efa62c08d790095575022e3d62a73c7996f86a39aac4cdb38709b08062"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-13.md",
+      "sha256": "5464d95d2e516a58de29afe3ec42575c1ba7ccb4696c201dc55e52f56e8192aa"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-14.md",
+      "sha256": "f86f7a9246ab1e51f6b86f92b9b372a325d1a854b7e7559cfe1f5b16bab5da63"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-15.md",
+      "sha256": "19829f1e10fc6bd41b1771043deb625c47b0f57caefbd971b07b39835b00c665"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-16.md",
+      "sha256": "cabbd5f59bc1052402cf24dc3dedbb580a7a9c00300c47ec3de41e5a88f181a5"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-17.md",
+      "sha256": "9c1a3ca850a8325e70702fc9c78d94c7eb51129bee37252e71f133cb82d9db33"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-18-current-delta.md",
+      "sha256": "61c74bdc2acd444c697756e438ddfe5344b0d36543b68be024fb9f803f3edf30"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/original-review-questions.md",
+      "sha256": "6d22c5178da1dfd1d56ab36689529acc0ef325ef3a40f9bf94d57a0aa9484e38"
+    },
+    {
+      "attempt": "original",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/current-ci-context.md",
+      "sha256": "ed4e5bf71179f9b96e295263d6fa25d5723c6e7e5a90740a96fd8bc7778ebc86"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/common.ts",
+      "sha256": "f5be21665274855ad2b78c4855a7297aab26a3d16dd99773732a3c966441d789"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/owned-capture.ts",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/owned-spawn-corrected.ts",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/public-events-corrected.ts",
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/review-audit.ts",
+      "sha256": "21618359688a8a856d1399250c1e79ad4aaae161848922ba67ca9e61101cceeb"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/implementation-driver.ts",
+      "sha256": "094c21a81e094fad410bf003010a365bee963290eea6b82ba9d842d1a53b9167"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/config-proposal.json",
+      "sha256": "25bc9eed86711a986eae881e55a3433d76133573ebd79823e2b5d6a46edc0c13"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/source-snapshot.json",
+      "sha256": "59ece2fa2b148a2a096fb480ab48ec9716d174105b6bb5805accfda1f212e974"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/packet-manifest.json",
+      "sha256": "6758d35587de60aa1faca5b785cb646711e2ec54647d9d032500a8822b08e4c6"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/prompt.md",
+      "sha256": "dd1c503c36a90980eb7f4ae0567819c3eea3f8e474926adad85e69c4f2b4bef7"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/route.json",
+      "sha256": "b81bcd789a2301a8ecb3322460617ac12f185b314eeaa831b097a930fb20a937"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/effective-config.json",
+      "sha256": "33d831d2c1bd55416d659716251a2a91dd7e1b6978ac43ed042a7375928f630c"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/catalog-binding.json",
+      "sha256": "c3b5f186f1ec7f68d510f5afb2d81236dc156b1b8da98b20eb2b0893e101c5a4"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/model-prepare-endpoints.json",
+      "sha256": "4f6424e38ccd57d4eb3940bf694f749bf807eec55db767f280ed03d58738a40e"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/price-prepare.json",
+      "sha256": "2b43b073b3949dfd51971b1f5d39b3c70f99682c63d3c230004efd9bc87bb748"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/prepare-packet.ts",
+      "sha256": "7f6b33e4fed3a47a8ccfb1180f5d4049c9e8077b225483ad7b7b23d8015d29f5"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/build-driver.ts",
+      "sha256": "7253cac32a95f26d125994074f3af13b006ca89e80892d140210b929b6f5e71a"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/predecessor-bindings.json",
+      "sha256": "81fe2dacf74184f958da2db605ecc859a1a49a599de63f58b22d70e1aad4f3c5"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/authority-root-preparation.md",
+      "sha256": "be3e4235f78bac5a6645d03d65ba5daf50c2fcf9418461f21f15254b656f3026"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/session-before.json",
+      "sha256": "522bdd00a6d60dbaedf7e635c34e49c5f1b47950864a7826a4a9df38fec9f8bf"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/baseline-head-debt.diff",
+      "sha256": "56e1639ade8857906aabe063272c7007249991798c9ecd4028a413c5dd3ff169"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/check-deno.json",
+      "sha256": "375e5f6cd321a635de2182a814d11910093555c3c2fa0d2c3f6794dd4e9c25bd"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/canonical-entry.md",
+      "sha256": "57dab883258a1b544640f77cf60d8c9cc11d448df5b79b86fa556b6beaf86272"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/original-public-final.utf8.md",
+      "sha256": "a839caaf0b26df3bc6aee66e2f1907f595ed6370c832bf70d5d918b798cb8ccb"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/root-gap-and-debt-delta.md",
+      "sha256": "392553909b4654fbc182359798262cc2ae51b12c40171b22265cb75e57e85515"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/implementation-driver.ts",
+      "sha256": "9ca4e426fb0e825f360e8edf3466f5dbfc2815bdcd4850a0b6e42e6e2e4abdf6"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/common.ts",
+      "sha256": "fdce26032587059737558915acb99373ec69db043107fc948fd5c2d02eaf73de"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/review-audit.ts",
+      "sha256": "6020dbb6fef8498209001ce4d90977ab5eae417a8bbe5cdb755b101cf5e9143f"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/owned-capture.ts",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/owned-spawn-corrected.ts",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/public-events-corrected.ts",
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/config-proposal.json",
+      "sha256": "361de299909dce5d882d66cb7116087fb47ddc408c56d130e9327aa39f4dc92a"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/source-snapshot.json",
+      "sha256": "59ece2fa2b148a2a096fb480ab48ec9716d174105b6bb5805accfda1f212e974"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/packet-manifest.json",
+      "sha256": "4efb44543bc2a0902723580c1693084d5397df4ff19035fab40c0e75341705ce"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/preparation.json",
+      "sha256": "9f3319fb86c9b64219fd12182a4231c08e96b4c0242c9bb3313bf8fa7a191356"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/coverage.json",
+      "sha256": "c0825b8706111bc0c7125877258f8436b50ca08bb073940d6610043c6085ed00"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/observed-identity.json",
+      "sha256": "4fddc70b8b004893356be9eac29ccfa7021829ddba798092285727046904676f"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/final-guards.json",
+      "sha256": "20c81c81ca191c565ce5e399178993a7cf06946dfc40a137133b0d3499934526"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/final-verdict.utf8.md",
+      "sha256": "a839caaf0b26df3bc6aee66e2f1907f595ed6370c832bf70d5d918b798cb8ccb"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/result.json",
+      "sha256": "52aabe88587eeee2729fb780f5a27990002e18622fa9f39b34262753e5f422fa"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/model-catalog.json",
+      "sha256": "ba394296f1fa09d106cdba48e8e250e1b8b1fbb4f0e59a14692b093a2042e91f"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-01.md",
+      "sha256": "de301e6d4ab1fdbdbf01d6e5611d3d3bdb56e1117a69e059d0f1ea4cc172cf38"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-02.md",
+      "sha256": "a2ebec40e1c1b803d83e69e25e525a38d4099048f9f48fda8201f89f8379ac6c"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-03.md",
+      "sha256": "a448d1e6b34dec6418dbff411fa283eb1f3c353fd2a15346e0965fa3e20e2035"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-04.md",
+      "sha256": "6f22fa208dbdddefde4f3471d397ea6d7ce2c239b668b7c7059f6ed5f26d92e1"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-05.md",
+      "sha256": "198dd682917b4f8957713c26292ac84ba371d3bd4d62d71040a545f5681d2606"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-06.md",
+      "sha256": "11cd6932b97db3fed7a9e26a1a566124aca7c09fd5e36b74b2d6976e77c3bb72"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-07.md",
+      "sha256": "5941a2944eaf4041d5857e656b336f20af1bf66a2a63bd2af1a2f479b34145e7"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-08.md",
+      "sha256": "946f2509ff6f9e08c1bfb06809df61c0bbbf5f128f4b93fee76e569a340fcf97"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-09.md",
+      "sha256": "b3a0a7f0de53f31c3ce15f61ce0f5d9a4f9b3607c6fd50e7589579cae1bc28ca"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-10.md",
+      "sha256": "7bdaf4364bc3960b1fde0ea522b7153e9737aa766d36aaee0201a48f8e5bc6cb"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-11.md",
+      "sha256": "99d3d26a5067c999035abebe31546f81ae2d5f6f81e03f4878936c61dd64ad32"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-12.md",
+      "sha256": "e4bab5efa62c08d790095575022e3d62a73c7996f86a39aac4cdb38709b08062"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-13.md",
+      "sha256": "5464d95d2e516a58de29afe3ec42575c1ba7ccb4696c201dc55e52f56e8192aa"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-14.md",
+      "sha256": "f86f7a9246ab1e51f6b86f92b9b372a325d1a854b7e7559cfe1f5b16bab5da63"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-15.md",
+      "sha256": "19829f1e10fc6bd41b1771043deb625c47b0f57caefbd971b07b39835b00c665"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-16.md",
+      "sha256": "cabbd5f59bc1052402cf24dc3dedbb580a7a9c00300c47ec3de41e5a88f181a5"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-17.md",
+      "sha256": "9c1a3ca850a8325e70702fc9c78d94c7eb51129bee37252e71f133cb82d9db33"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/part-18-current-delta.md",
+      "sha256": "61c74bdc2acd444c697756e438ddfe5344b0d36543b68be024fb9f803f3edf30"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/original-review-questions.md",
+      "sha256": "6d22c5178da1dfd1d56ab36689529acc0ef325ef3a40f9bf94d57a0aa9484e38"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/current-ci-context.md",
+      "sha256": "ed4e5bf71179f9b96e295263d6fa25d5723c6e7e5a90740a96fd8bc7778ebc86"
+    },
+    {
+      "attempt": "debt-completion",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/.mcp.json",
+      "sha256": "520ac1c2363bb7f1a12e3f1ba37926dad65b49e9a79b7e46c3e102d7f0318ca0"
+    }
+  ],
+  "privateSnapshotsExcluded": 10,
+  "credentialPatternMatches": 0,
+  "embeddedOperationalPayloadsInCheckpoint": 0,
+  "originalTopLevelFilesStillByteIdentical": 98,
+  "newInference": false,
+  "runtime": false,
+  "newMetadataHashes": {
+    "checkpoint.md": "f01e54e8a7f969068cacdfb5fbf936c83b0a4d0f03af183ddddf548344ec6aea",
+    "operational-admission.sanitized.json": "a8be89cdf9d3dbfc496e6b870e3f9aa0367f5c326a27a2813d36373abfe57fb0",
+    "private-hash-resolution.json": "253b7195998bdfe146387a55c13fdb54a5b6167aa3a0f1810d073d7871a35bc2"
+  }
+}

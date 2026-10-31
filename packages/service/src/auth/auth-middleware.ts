@@ -22,7 +22,7 @@
 
 import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
-import type { AuthnOptions, AuthzOptions } from './options.ts';
+import type { AnonymousRule, AuthnOptions, AuthzOptions } from './options.ts';
 import type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
@@ -49,7 +49,7 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
 
   return async (c, next) => {
     const policy = resolvePolicy(options.policyResolver, c);
-    if (!requiresAuthentication(c.req.path, guard, policy)) {
+    if (!requiresAuthentication(c, guard, policy)) {
       return await next();
     }
 
@@ -92,8 +92,8 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
 export interface AuthzMiddlewareOptions extends AuthzOptions {
   /** Path prefixes the authz stage guards. Defaults to `["/api"]`. */
   readonly protect?: readonly string[];
-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
-  readonly allowAnonymous?: readonly string[];
+  /** Legacy path prefixes or exact requests left public. Defaults to `["/health"]`. */
+  readonly allowAnonymous?: readonly AnonymousRule[];
   /** Shared resolver used to recognize matched public procedures before principal lookup. */
   readonly policyResolver?: ProcedurePolicyResolver;
 }
@@ -110,7 +110,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
       if (isPublicProcedure(policy)) {
         return await next();
       }
-      if (!policy?.matched && !isGuardedPath(c.req.path, guard)) {
+      if (!policy?.matched && !isGuardedRequest(c, guard)) {
         return await next();
       }
 
@@ -177,15 +177,20 @@ function rawPathname(c: Context): string {
   return end < 0 ? url.slice(start) : url.slice(start, start + end);
 }
 
+interface RequestGuard {
+  readonly protect: readonly string[];
+  readonly allowAnonymous: readonly AnonymousRule[];
+}
+
 function requiresAuthentication(
-  path: string,
-  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
+  c: Context,
+  guard: RequestGuard,
   resolution: ProcedurePolicyResolution | undefined,
 ): boolean {
   if (resolution?.matched) {
     return resolution.policy?.authentication !== 'none';
   }
-  return isGuardedPath(path, guard);
+  return isGuardedRequest(c, guard);
 }
 
 function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): boolean {
@@ -194,21 +199,46 @@ function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): b
 
 function normalizeGuard(options: {
   readonly protect?: readonly string[];
-  readonly allowAnonymous?: readonly string[];
-}): { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] } {
+  readonly allowAnonymous?: readonly AnonymousRule[];
+}): RequestGuard {
   return {
-    protect: options.protect?.length ? options.protect : DEFAULT_PROTECTED_PREFIXES,
-    allowAnonymous: options.allowAnonymous?.length
-      ? options.allowAnonymous
-      : DEFAULT_ANONYMOUS_PREFIXES,
+    protect: [...(options.protect?.length ? options.protect : DEFAULT_PROTECTED_PREFIXES)],
+    allowAnonymous:
+      (options.allowAnonymous?.length ? options.allowAnonymous : DEFAULT_ANONYMOUS_PREFIXES).map(
+        normalizeAnonymousRule,
+      ),
   };
 }
 
-function isGuardedPath(
-  path: string,
-  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
-): boolean {
-  if (guard.allowAnonymous.some((prefix) => matchesPrefix(path, prefix))) {
+function normalizeAnonymousRule(rule: AnonymousRule): AnonymousRule {
+  if (typeof rule === 'string') return rule;
+  const methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
+  if (!rule || !methods.includes(rule.method)) {
+    throw new TypeError(
+      `[netscript.service.auth] invalid anonymous request: ${rule?.method} ${rule?.path}: unsupported method`,
+    );
+  }
+  const path = rule.path;
+  if (
+    typeof path !== 'string' || !path.startsWith('/') || /[%*:{}?#\\\s]/.test(path) ||
+    path.includes('//') || (path !== '/' && path.endsWith('/'))
+  ) {
+    throw new TypeError(
+      `[netscript.service.auth] invalid anonymous request: ${rule.method} ${path}: invalid exact path`,
+    );
+  }
+  return { method: rule.method, path };
+}
+
+function isGuardedRequest(c: Context, guard: RequestGuard): boolean {
+  const path = c.req.path;
+  if (
+    guard.allowAnonymous.some((rule) =>
+      typeof rule === 'string'
+        ? matchesPrefix(path, rule)
+        : c.req.method === rule.method && rawPathname(c) === rule.path && path === rule.path
+    )
+  ) {
     return false;
   }
   return guard.protect.some((prefix) => matchesPrefix(path, prefix));
