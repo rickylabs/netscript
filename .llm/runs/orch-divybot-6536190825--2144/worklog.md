@@ -63,3 +63,10 @@ PASS from the same independent evaluator before any implementation. See plan-eva
 - Incorporated main #2476, which separately fixes the inherited fixture dependency failure. No local lock/config changes remain in this PR's diff against main.
 - Post-integration regression: 139 passed, 0 failed, 7 unavailable Redis integrations ignored, including the scheduled-trigger consumers. Focused compatibility check/lint/fmt pass; quality:gate passes on the integrated graph.
 - Correction reconcile: prior S2 CI regression is addressed in code; current-head PostgreSQL conformance remains to be observed after push. No listener-supervisor, labels or milestones changed.
+
+## S3 documentation
+
+- tune-worker-runtime now shows schema-backed handler retry and builder declarations, exact count/default/backoff/precedence rules, the KV job DLQ port and replay, durable health, and timeout/cancel/shutdown/lease semantics. Both package READMEs link to the canonical recipe.
+- Independent S3 review: PASS. Clarified its advisory that handler policy validates when the generated registry loads, rather than during source emission.
+- All three new TypeScript examples compile through the repository snippet compiler. Docs source-format passes; docs:links reports 105 docs with zero broken links, anchors or orphans. No source behavior changed in S3.
+- S3 reconcile: all requested implementation scope is delivered; no follow-up issue is needed. Redis integration runs and scaffold.runtime remain CI proof, with the coordinator owning e2e-cli-gate. Exact-head independent IMPL-EVAL is next, then the ready transition and final CI state.
