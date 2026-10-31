@@ -208,3 +208,10 @@
 - 11:39:15Z: #2519 (#2149) round-3 Opus MERGE at `2f02788` after the tutorial fixes; waiting for READY.
 - 11:42:38Z: #2382 → PR #2522.
 - 11:51:21Z: **Canary .1 readiness posted** on #2474: candidate `15cffa2fe`, all contents merged, main green (ci, quality, carriers, Fresh UI, docs, e2e-cli dispatch 41197676281 incl desktop-native, command-postgres 41197674602). Pre/post-cut items: #2396 published-graph proof, #2421 debt veto window, upstream Aspire report. Eric cuts.
+- 11:52:25Z: dispatched #2394 (E1, internals; unblocked by #2421), comment 6543008500. Validator green before posting.
+- 11:54:21Z: #2521 (#2268) Opus MERGE at `660f200`; waiting for READY.
+- 11:56:54Z: #2268 READY at `660f200` (PR #2521), Opus MERGE; no e2e needed (read-only MCP telemetry). Box 1 (live AppHost parity with the Aspire CLI) is honestly UNPROVEN: proven only against a fake dashboard API. Plan: merge as partial when CI is green and keep #2268 open for a live proof. check-test-shard test-5 red at this head; diagnosing once its log is available.
+- 11:58:42Z: #2394 started 11:57Z.
+- 12:00:25Z: #2522 (#2382) Opus MERGE at `f0cd86e`; waiting for READY.
+- 12:02:05Z: #2519 (#2149): round-3 MERGE at `2f02788`, then a relayed instruction made the worker rebase and force-push (11:43Z) for a carrier conflict, plus a CI quality repair → `ce431da`. Drift recorded. Authorized one delta review at `ce431da`, then READY and e2e.
+- 12:02:20Z: #2382 READY (PR #2522, Opus MERGE `f0cd86e`); **expensive-gate.acquired** on #2522. #2394 → PR #2523.

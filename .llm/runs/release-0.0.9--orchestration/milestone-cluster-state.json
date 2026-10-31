@@ -955,13 +955,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2519,
-      "headSha": "b798a187636da64e90dff28d42fcac5170527854",
+      "headSha": "ce431da325ca66bb89bab7c64c5073dbfe69ad89",
       "issueNumbers": [
         2149
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2149",
       "receiptRefs": [],
-      "note": "BLOCKED after 2 doc-only IMPL-EVAL FAIL_FIX; coordinator authorized round 3 after fixing the two tutorial lines; steered the live worker"
+      "note": "round-3 MERGE at 2f02788; then force-pushed rebase (relayed instruction) + CI repair \u2192 ce431da; one delta review authorized; e2e at final head"
     },
     {
       "id": "C1-1367",
@@ -969,7 +969,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2520,
-      "headSha": "bfc3e922cd38fb0e013a220232cd5ed7171eaf72",
+      "headSha": "b3537c21f18405743926d46830ff084aeeec7dff",
       "issueNumbers": [
         1367
       ],
@@ -979,7 +979,7 @@
     {
       "id": "E2-2268",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2521,
       "headSha": "660f20038e47ad1a9e038df3ffacd09ac5928d3d",
@@ -987,19 +987,34 @@
         2268
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2268",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY 660f200 (no e2e needed); Opus MERGE; box 1 live-AppHost proof UNPROVEN (fake-API parity only) \u2192 plan: merge partial, keep #2268 open for a live proof; test-5 shard red, diagnosing"
     },
     {
       "id": "B1-2382",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2522,
-      "headSha": "fa11024d190782ab4ffb1733d3a13fa98166ea2b",
+      "headSha": "f0cd86ed14a6ff8effa0326ee9438180e7547063",
       "issueNumbers": [
         2382
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2382",
+      "receiptRefs": [],
+      "note": "READY; Opus MERGE f0cd86e; e2e armed"
+    },
+    {
+      "id": "E1-2394",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2523,
+      "headSha": "aacf496e45b200c672520f2f76896a62a3bee1f8",
+      "issueNumbers": [
+        2394
+      ],
+      "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2394",
       "receiptRefs": []
     }
   ],
@@ -1255,6 +1270,14 @@
       "via": "workflow_dispatch on main (canary .1 control run 41197676281)",
       "result": "SUCCESS (both runtime tiers, static, desktop-native-linux)",
       "completedAt": "2026-10-31T11:50:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2522,
+      "headSha": "f0cd86ed14a6ff8effa0326ee9438180e7547063",
+      "startedAt": "2026-10-31T12:02:20Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1476,7 +1499,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T11:51:48Z",
+  "updatedAt": "2026-10-31T12:02:21Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1797,6 +1820,16 @@
       "route": "codex gpt-6.1-sol high",
       "state": "pr-open",
       "pr": 2522
+    },
+    {
+      "issue": 2394,
+      "lane": "internals",
+      "commentId": 6543008500,
+      "postedAt": "2026-10-31T11:52:25Z",
+      "route": "codex gpt-6.1-sol medium",
+      "state": "pr-open",
+      "pr": 2523,
+      "startedAt": "2026-10-31T11:57:30Z"
     }
   ],
   "coordinatorArtifactPr": 2475,
