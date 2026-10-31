@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import {
   FRESH_UI_RUNTIME_DEPENDENCY,
+  LEGACY_REGISTRY_DEPENDENCY_REPAIRS,
   LEGACY_RUNTIME_DEPENDENCY_REPAIRS,
   POST_V1_COMPONENTS,
   POST_V1_SUPPORT,
@@ -22,15 +23,25 @@ function assertLegacyCompatibility(actual: Readonly<Record<string, unknown>>): v
   const expected = Object.fromEntries(
     Object.entries(legacyBaseline).map(([name, item]) => [
       name,
-      repairs.has(name)
-        ? {
-          ...item,
-          dependencies: [
-            ...('dependencies' in item ? item.dependencies : []),
-            FRESH_UI_RUNTIME_DEPENDENCY,
-          ],
-        }
-        : item,
+      {
+        ...item,
+        ...(repairs.has(name)
+          ? {
+            dependencies: [
+              ...('dependencies' in item ? item.dependencies : []),
+              FRESH_UI_RUNTIME_DEPENDENCY,
+            ],
+          }
+          : {}),
+        ...(LEGACY_REGISTRY_DEPENDENCY_REPAIRS[name]
+          ? {
+            registryDependencies: [
+              ...('registryDependencies' in item ? item.registryDependencies : []),
+              ...LEGACY_REGISTRY_DEPENDENCY_REPAIRS[name],
+            ],
+          }
+          : {}),
+      },
     ]),
   );
   assertEquals<unknown>(existing, expected);
@@ -77,6 +88,12 @@ Deno.test('JSON authoring preserves every legacy file target, dependency, CSS co
     assertLegacyCompatibility({
       ...actual,
       'command-palette': { ...actual['command-palette'], dependencies: [] },
+    })
+  );
+  assertThrows(() =>
+    assertLegacyCompatibility({
+      ...actual,
+      'command-palette': { ...actual['command-palette'], registryDependencies: ['theme-seed'] },
     })
   );
   const { toggle: _toggle, ...missingAddition } = actual;

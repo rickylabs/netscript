@@ -1,3 +1,4 @@
+import { commandPaletteFixtures, commandPaletteKeyboard } from './utility-command-palette.tsx';
 import { alertFixtures, alertKeyboard } from './utility-alert.tsx';
 import { docsPrimitiveFixtures, docsPrimitiveKeyboard } from './utility-docs-primitives.tsx';
 import { codeBlockFixtures, codeBlockKeyboard } from './utility-code-block.tsx';
@@ -34,6 +35,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...codeBlockFixtures,
     ...docsPrimitiveFixtures,
     ...alertFixtures,
+    ...commandPaletteFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -47,6 +49,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...codeBlockKeyboard,
     ...docsPrimitiveKeyboard,
     ...alertKeyboard,
+    ...commandPaletteKeyboard,
     ...proseKeyboard,
   ],
 }];

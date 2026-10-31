@@ -2687,7 +2687,9 @@
       "description": "Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
       "author": "NetScript",
       "registryDependencies": [
-        "theme-seed"
+        "theme-seed",
+        "kbd",
+        "spinner"
       ],
       "type": "registry:component",
       "files": [
