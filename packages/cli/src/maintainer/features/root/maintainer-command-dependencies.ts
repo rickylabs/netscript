@@ -1,5 +1,5 @@
-import { applyInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
-import type { InitPresetInput } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
+import { prepareInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
+import type { PreparedInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { DenoUiRegistryPaths } from '../../../kernel/adapters/ui/deno-ui-registry-paths.ts';
 import { FetchUiRegistry } from '../../../kernel/adapters/ui/fetch-ui-registry.ts';
 import { FreshUiTokenEngine } from '../../../kernel/adapters/tokens/fresh-ui-token-engine.ts';
@@ -29,7 +29,7 @@ export interface MaintainerCommandDependencies {
   readonly process: DenoProcess;
   /** Dependencies for maintainer init. */
   readonly initDependencies: {
-    readonly applyPreset?: (input: InitPresetInput) => Promise<void>;
+    readonly preparePreset?: (preset: string) => Promise<PreparedInitPreset>;
     readonly cwd: () => string;
     readonly detectMonorepoRoot: typeof detectMonorepoRoot;
     readonly runInit: Parameters<typeof executeInit>[0] extends never ? never
@@ -82,7 +82,7 @@ export function createMaintainerCommandDependencies(
     tokenEngine: new FreshUiTokenEngine(),
   };
   const initDependencies = {
-    applyPreset: (input: InitPresetInput) => applyInitPreset(input, uiInstallDependencies),
+    preparePreset: (preset: string) => prepareInitPreset(preset, uiInstallDependencies),
     cwd: host.cwd,
     detectMonorepoRoot,
     runInit: (request: Parameters<typeof executeInit>[1]) =>

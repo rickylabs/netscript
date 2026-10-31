@@ -6,10 +6,10 @@ import {
   buildMcpEmbeddedDocs,
   generateMcpAssets,
   generatePublishAssets,
-  MCP_EMBEDDED_DOC_PATHS,
-  MCP_EMBEDDED_DOCS_MAX_BYTES,
   refreshAgentDocsProvenance,
 } from './generate-publish-assets.ts';
+
+const FIXTURE_DOC_PATHS = ['llms.txt', 'pages/reference/kv/index.md'] as const;
 
 const NOOP_GENERATOR = async (): Promise<void> => {};
 
@@ -51,22 +51,14 @@ Deno.test('CLI corpus integrity follows canonical content across gzip transport 
   }
 });
 
-Deno.test('MCP fallback is generated from the locked release prose within 288 KiB', async () => {
+Deno.test('MCP fallback uses every shared source page without a curated selection', async () => {
   const generated = await buildMcpEmbeddedDocs();
-  assertEquals(generated.provenance.paths, MCP_EMBEDDED_DOC_PATHS);
-  assertEquals(generated.provenance.documentCount, 14);
-  assertEquals(generated.provenance.documentCount, MCP_EMBEDDED_DOC_PATHS.length);
-  assertEquals(generated.documents.map((document) => document.path), [...MCP_EMBEDDED_DOC_PATHS]);
-  assertEquals(generated.documents[0]?.path, 'llms.txt');
-  assertEquals(generated.documents[0]?.slug, 'llms');
-  assert(
-    generated.documents.some(({ path, slug }) =>
-      path === 'pages/web-layer/generated-surface/index.md' &&
-      slug === 'pages/web-layer/generated-surface'
-    ),
-  );
+  assert(generated.provenance.documentCount > 200);
+  assertEquals(generated.provenance.documentCount, generated.documents.length);
+  assertEquals(generated.documents.map(({ path }) => path), generated.provenance.paths);
+  assert(generated.documents.some(({ slug }) => slug === 'pages/reference/kv'));
   assert(generated.documents.every((document) => document.source.length > 0));
-  assert(generated.provenance.sourceBytes <= MCP_EMBEDDED_DOCS_MAX_BYTES);
+  assert(!generated.documents.some(({ path }) => path === 'llms-full.txt'));
   assertEquals(generated.provenance.sha256.length, 64);
 });
 
@@ -122,7 +114,7 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
     );
     await Promise.all([
       Deno.mkdir(`${root}/packages/cli/src/kernel/assets`, { recursive: true }),
-      Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/mcp/src/infrastructure/docs`, { recursive: true }),
       Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
     ]);
     await Promise.all([
@@ -140,10 +132,10 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
       ),
       Deno.copyFile(
         new URL(
-          '../../packages/cli/src/kernel/assets/agent-docs-prose.generated.ts',
+          '../../packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts',
           import.meta.url,
         ),
-        `${root}/packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`,
+        `${root}/packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts`,
       ),
       Deno.writeTextFile(
         `${root}/.llm/assets/agent-docs/provenance.json`,
@@ -198,7 +190,7 @@ Deno.test('publish assets consume the genuinely rendered shared corpus without r
   try {
     await Promise.all([
       Deno.mkdir(`${root}/packages/cli/src/kernel/assets`, { recursive: true }),
-      Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/mcp/src/infrastructure/docs`, { recursive: true }),
       Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
     ]);
     await Promise.all([
@@ -222,7 +214,7 @@ Deno.test('publish assets consume the genuinely rendered shared corpus without r
 
     const bump = await coordinateVersionBump(root, nextVersion, 'canary');
     const files = Object.fromEntries(
-      MCP_EMBEDDED_DOC_PATHS.map((path, index) => [
+      FIXTURE_DOC_PATHS.map((path, index) => [
         path,
         index === 0
           ? `Shipped in ${nextVersion}. Install \`jsr:@netscript/plugin@${nextVersion}\`. ` +
@@ -327,14 +319,14 @@ Deno.test('MCP README check and write reuse a different valid gzip encoding of t
   const root = await Deno.makeTempDir();
   const rootUrl = toFileUrl(`${root}/`);
   try {
-    await Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true });
+    await Deno.mkdir(`${root}/packages/mcp/src/infrastructure/docs`, { recursive: true });
     await Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true });
     await Deno.writeTextFile(
       `${root}/packages/mcp/deno.json`,
       JSON.stringify({ version: '0.0.7' }),
     );
     await Deno.writeTextFile(`${root}/packages/mcp/README.md`, '# Fixture README\n');
-    const files = Object.fromEntries(MCP_EMBEDDED_DOC_PATHS.map((path) => [path, `# ${path}\n`]));
+    const files = Object.fromEntries(FIXTURE_DOC_PATHS.map((path) => [path, `# ${path}\n`]));
     await Deno.writeFile(
       `${root}/.llm/assets/agent-docs/prose.json.gz`,
       await gzip(new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }))),

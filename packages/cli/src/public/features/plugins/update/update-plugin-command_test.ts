@@ -1,3 +1,4 @@
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { workersStarterResources } from '../../../../../../../plugins/workers/src/adapter/plugin.ts';
 import { streamsStarterResources } from '../../../../../../../plugins/streams/src/adapter/plugin.ts';
 import { createContributionExtractor } from '../../../../kernel/adapters/plugin/contribution-extractor.ts';
@@ -541,3 +542,25 @@ async function createFixture(
     completionMessage: `Updated ${kind} to ${resolved.descriptor.version}; generated 1 registries.`,
   };
 }
+
+Deno.test('plugin update renders browser-auth findings after staged commit without leaking staging paths', async () => {
+  const fixture = await createFixture();
+  const fs = new DenoFileSystem();
+  try {
+    await writeInstalledAuthFixture(fs, fixture.root);
+    const path = join(fixture.root, 'auth/bff.ts');
+    await fs.writeFile(path, '// preserve staged helper\n');
+    await fixture.command.parse(['streams']);
+    const lines = fixture.messages().filter((line) => line.startsWith('browser-auth:'));
+    assertEquals(lines.length, 1);
+    assertStringIncludes(lines[0], 'auth/bff.ts: Skipped (already present)');
+    assertStringIncludes(lines[0], 'divergent');
+    assertEquals(lines[0].includes(fixture.root), false);
+    for (const stagedRoot of fixture.scaffoldRoots) {
+      assertEquals(lines[0].includes(stagedRoot), false);
+    }
+    assertEquals(await fs.readFile(path), '// preserve staged helper\n');
+  } finally {
+    await Deno.remove(fixture.root, { recursive: true });
+  }
+});

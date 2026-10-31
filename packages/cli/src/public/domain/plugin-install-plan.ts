@@ -1,3 +1,4 @@
+import type { DoctorReport } from '@netscript/plugin/adapter';
 import type { DatabaseScaffoldResult } from '../../kernel/domain/db-engine.ts';
 import type {
   PluginDbDetectionResult,
@@ -119,4 +120,7 @@ export interface InstallPluginResult extends PluginRenderResult {
 
   /** AppHost helper files regenerated after config mutation. */
   readonly helperFiles: readonly string[];
+
+  /** Informational browser-auth preservation checks; absent for a dry run. */
+  readonly browserAuthReport?: DoctorReport;
 }

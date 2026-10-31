@@ -46,6 +46,7 @@ function readOpenAiCompatibleConfig(
     baseURL: typeof config?.baseURL === 'string' ? config.baseURL : undefined,
     apiKey: typeof config?.apiKey === 'string' ? config.apiKey : undefined,
     name: typeof config?.name === 'string' ? config.name : undefined,
+    maxRetries: typeof config?.maxRetries === 'number' ? config.maxRetries : undefined,
     api: api === 'chat-completions' || api === 'responses' ? api : undefined,
     models: Array.isArray(models)
       ? models.filter((m): m is string => typeof m === 'string')

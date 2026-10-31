@@ -487,3 +487,12 @@ arguments directly to a process API after reviewing the installation; never join
 Registry metadata uses the server's normal output bounds. Views preserve exact file contents and
 fail with `tool_result_too_large` when the complete JSON-RPC response exceeds 64 KiB. Use
 `netscript ui:view <name>` for larger items.
+
+### Shared release documentation
+
+`@netscript/mcp/docs` exposes the complete generated Markdown page corpus and its verified
+`decodeAgentDocsPages` decoder. The CLI installs these same pages for offline documentation.
+`get_doc` accepts slugs with or without `pages/` and a trailing `/index`; release tool results
+include a `citation` with the exact `frameworkVersion` and corpus `sha256`. An empty literal
+`search_docs` result explicitly reports low confidence and no documented seam, directing API
+queries to `find_export` or `search_exports`.

@@ -1,3 +1,4 @@
+import { renderDoctorReport } from '../../../../kernel/presentation/output/render-doctor-report.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import {
@@ -85,6 +86,7 @@ export function createLocalPluginInstallCommand(
       );
       print(`Created ${result.plugin.scaffoldResult.filesCreated.length} plugin files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
+      renderDoctorReport(result.browserAuthReport, print);
     });
 }
 

@@ -1,0 +1,106 @@
+{
+  "rootTasks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "durationSeconds": 0.21
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "durationSeconds": 11.61
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "durationSeconds": 1.52
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "durationSeconds": 0.35
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "durationSeconds": 11.13
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "durationSeconds": 17.93
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "durationSeconds": 0.65
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "durationSeconds": 0.16
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "durationSeconds": 0.44
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "durationSeconds": 3.38
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "durationSeconds": 0.42
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "durationSeconds": 0.86
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "durationSeconds": 0.83
+    }
+  ],
+  "assetsBarrel": {
+    "task": "check:assets-barrel",
+    "exitCode": 0,
+    "gitHead": "4407df52b65c9a8a559b35e26980a66373fa58e0"
+  },
+  "siteTasks": [
+    {
+      "task": "check:source-format",
+      "exitCode": 0
+    },
+    {
+      "task": "check:rendered-output",
+      "exitCode": 0
+    },
+    {
+      "task": "check:links",
+      "exitCode": 0
+    },
+    {
+      "task": "check:caveats",
+      "exitCode": 0
+    }
+  ],
+  "finalDocsRefresh": [
+    {
+      "task": "docs:accuracy",
+      "exitCode": 0
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import type { DoctorReport } from '@netscript/plugin/adapter';
 import type { ContractScaffoldResult } from '../../kernel/adapters/contracts/types.ts';
 import type { PortAllocation, ServiceScaffoldResult } from '../../kernel/domain/service-shape.ts';
 
@@ -44,6 +45,9 @@ export interface ServiceRenderResult {
 export interface AddServiceResult extends ServiceRenderResult {
   /** AppHost helper files regenerated after config mutation. */
   readonly helperFiles: readonly string[];
+
+  /** Informational browser-auth preservation checks. */
+  readonly browserAuthReport: DoctorReport;
 
   /** Typed client/query module written for the service, when requested. */
   readonly clientPath?: string;

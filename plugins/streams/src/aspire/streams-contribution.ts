@@ -6,12 +6,23 @@ import {
   type EnvSource,
 } from '@netscript/aspire/public';
 
+/** Environment binding for the explicit file-storage opt-in. */
+const STREAMS_DATA_DIR = 'STREAMS_DATA_DIR';
+
 /** Aspire contribution for the ephemeral-by-default Durable Streams protocol service. */
 export class StreamsAspireContribution extends AspireNSPluginContribution {
   /** Plugin package name owning this contribution. */
   readonly pluginName = '@netscript/plugin-streams';
 
-  /** Register the ephemeral streams resource; file mode is an explicit host environment opt-in. */
+  /** Select a host-provisioned directory; omission preserves ephemeral storage. */
+  constructor(private readonly options: { readonly dataDir?: string } = {}) {
+    super();
+    if (options.dataDir !== undefined && options.dataDir.trim().length === 0) {
+      throw new Error('Streams dataDir must not be blank.');
+    }
+  }
+
+  /** Register streams and declare opt-in directory provisioning to the AppHost builder. */
   contribute(
     builder: AspireBuilder,
     ctx: ContributionContext,
@@ -31,7 +42,11 @@ export class StreamsAspireContribution extends AspireNSPluginContribution {
       ],
       env: {
         STREAMS_PLUGIN_VERSION: '0.0.1-alpha.0',
+        ...(this.options.dataDir === undefined ? {} : { [STREAMS_DATA_DIR]: this.options.dataDir }),
       },
+      ...(this.options.dataDir === undefined ? {} : {
+        dataDirectories: { [STREAMS_DATA_DIR]: this.options.dataDir },
+      }),
     });
 
     return [service];

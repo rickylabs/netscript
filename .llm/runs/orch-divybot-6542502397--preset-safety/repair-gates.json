@@ -1,0 +1,152 @@
+{
+  "gates": [
+    {
+      "gate": "quality-gate",
+      "verdict": "PASS",
+      "exitCode": 0,
+      "rawReceiptSha256": "51b335b290cfed5bdada56c58a2137633e8ae9c55c998e32a9043cc7dc40081a",
+      "note": "Working-tree validation at repair baseline; receipt does not assert future commit currency."
+    },
+    {
+      "gate": "docs-accuracy",
+      "verdict": "PASS",
+      "exitCode": 0,
+      "rawReceiptSha256": "0bedff18391c547b90852e0181709a14f86a502a43ab2238a144e3f9b80c5e1a",
+      "note": "Working-tree validation at repair baseline; receipt does not assert future commit currency."
+    }
+  ],
+  "rootChecks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0
+    }
+  ],
+  "siteChecks": [
+    {
+      "task": "check:source-format",
+      "exitCode": 0
+    },
+    {
+      "task": "check:rendered-output",
+      "exitCode": 0
+    },
+    {
+      "task": "check:links",
+      "exitCode": 0
+    },
+    {
+      "task": "check:caveats",
+      "exitCode": 0
+    }
+  ],
+  "releasePreflight": {
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "task",
+      "release:preflight"
+    ],
+    "rawOutputSha256": "1aa81de338e3c45f8ee9f17d7a7503709f4d754e5bf4773433a3f42bce3eaf1f"
+  },
+  "cliJsrAudit": {
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/fitness/audit-jsr-package.ts",
+      "--root",
+      "packages/cli",
+      "--text"
+    ],
+    "rawOutputSha256": "dee1f6afacd6c23a7e0bb141873684b5d11714ae489134f1b2f94234094cb11e"
+  },
+  "runtime": {
+    "verdict": "UNPROVEN",
+    "exitCode": 1,
+    "reason": "Docker daemon unavailable at environment preflight and cleanup inventory.",
+    "command": [
+      "deno",
+      "task",
+      "e2e:cli",
+      "run",
+      "scaffold.runtime",
+      "--cleanup",
+      "--format",
+      "pretty"
+    ],
+    "rawOutputSha256": "a453d0f66e8134e42109c21f28c709637a470551ebd32938f4bc3645f902e950"
+  },
+  "reviewThreads": {
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "task",
+      "check:review-threads",
+      "--",
+      "--repo",
+      "rickylabs/netscript",
+      "--pr",
+      "2518",
+      "--pretty"
+    ],
+    "rawOutputSha256": "ec5e811aecaa72aefc0e170a2920e42e16d5bc0116b4ba399e1a4020b0bc2e64"
+  },
+  "assetsBarrel": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "task",
+      "check:assets-barrel"
+    ],
+    "validatedHead": "97f8a05403e7dc3b6a55f3898e1500817ba1900c",
+    "rawOutputSha256": "8547bcd230d66be4223d6fe86989b690cce72ae8933dc2c93138071fedd4c34f"
+  }
+}

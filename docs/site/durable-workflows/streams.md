@@ -349,17 +349,39 @@ reports the mode in `checks[name="streams-storage"].storage`, with `mode: "memor
 `durable`, and `probe: "not-applicable" | "passed"`. Memory storage can be healthy while it reports
 `durable: false`.
 
-To opt in to file storage for the default resource working directory:
+To let the generated AppHost provision file storage, add this to the existing
+`NetScript.Plugins.streams` entry in `appsettings.json`:
 
-1. Create `.netscript/data/streams`, and ignore `.netscript/data/` in Git.
-2. Set `NetScript.Plugins.streams.Environment.STREAMS_DATA_DIR` in `appsettings.json` to that
-   path. Deployments must mount persistent storage separately.
-3. Regenerate the Aspire helpers with `netscript generate aspire`. The generated AppHost forwards
-   the environment value.
+```json
+{
+  "DataDirectories": {
+    "STREAMS_DATA_DIR": ".netscript/data/streams"
+  }
+}
+```
 
-An empty, missing or unwritable path fails startup; there is no memory fallback. A startup
-write/read probe must pass before health reports file mode. The probe verifies directory I/O, not
-historical integrity or repair.
+Run `netscript generate aspire`, then start the AppHost. Its generated registration creates the
+directory and missing parents, retains existing data, and sets `STREAMS_DATA_DIR` to the absolute
+path before starting streams. Relative paths resolve from the streams resource's `Workdir`
+(the project root in the default scaffold). Ignore `.netscript/data/` in Git. Omitting this
+opt-in keeps storage ephemeral. Directory bindings override conflicting `Environment` values.
+
+Programmatic hosts use `new StreamsAspireContribution({ dataDir: '.netscript/data/streams' })`
+from `@netscript/plugin-streams/aspire`; the contribution declares the directory and environment
+binding for the host builder without provisioning it during import.
+
+The existing `Environment.STREAMS_DATA_DIR` opt-in still requires a manually created directory.
+An empty, missing or unwritable manually configured path fails startup; there is no memory fallback.
+For AppHost-provisioned paths, directory-creation failure (such as a file at the target or an
+unwritable parent) aborts composition. An existing directory that cannot pass the startup write/read
+probe prevents the streams service from starting. The probe must pass before health reports file
+mode; it verifies directory I/O, not historical integrity or repair. Deployments must mount persistent storage separately;
+a folder in a disposable container does not provide persistence.
+
+To return to memory storage, remove the directory binding and any manual environment opt-in,
+regenerate the helpers and restart the AppHost. Retained files are not deleted. The full
+`scaffold.runtime` acceptance includes an ephemeral control and compares real producer document
+and tombstone history before and after an Aspire restart of the file-backed streams resource.
 
 File mode survives an orderly process restart. It does not cover power loss, replication, or
 multiple concurrent owners: one process owns a directory. Retention is unbounded until you

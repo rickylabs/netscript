@@ -3,10 +3,10 @@ import {
   agentDocsFullCorpus,
   type AgentDocsPage,
   decodeAgentDocsPages,
-} from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
+} from '../../../packages/mcp/docs.ts';
 
 export const AGENT_DOCS_PAGE_CARRIER =
-  'packages/cli/src/kernel/assets/agent-docs-prose.generated.ts';
+  'packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts';
 
 /** Entries rebuilt from the rendered site; every other entry is preserved from the carrier. */
 export function isSiteGeneratedAgentDocsEntry(path: string): boolean {

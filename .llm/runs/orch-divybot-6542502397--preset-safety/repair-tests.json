@@ -1,0 +1,38 @@
+{
+  "protocol": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 0
+    },
+    "scope": "packages/cli/src/public/features/ui/protocol",
+    "rawReportSha256": "3904fa90bc5c461f1808bd4fa750272ae29470cfd7cb09ff60d8e6be13c933d7"
+  },
+  "cliSuite": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 101,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 101,
+      "uniqueFailures": 0
+    },
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--no-check",
+      "packages/cli/src/public/features/init",
+      "packages/cli/src/maintainer/features/init",
+      "packages/cli/src/public/features/ui/apply",
+      "packages/cli/src/public/features/ui/add",
+      "packages/cli/src/kernel/application/ui/v2/tests",
+      "packages/cli/src/public/features/ui/registry.test.ts"
+    ],
+    "rawReportSha256": "80c9556159d1fd89b948ffae1f46e550a7865f3062d8e29530466cc6042588ab"
+  }
+}

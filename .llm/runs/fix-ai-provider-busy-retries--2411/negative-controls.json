@@ -1,0 +1,91 @@
+[
+  {
+    "control": "drop-busy-metadata",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 7,
+      "ignored": 0,
+      "totalResults": 7,
+      "uniqueFailures": 2
+    },
+    "tests": [
+      "chat-completions 429",
+      "chat-completions 503",
+      "chat-completions rate_limit_exceeded",
+      "responses 429",
+      "responses 503",
+      "responses rate_limit_exceeded",
+      "busy SDK responses preserve typed metadata and retry before output for both APIs"
+    ],
+    "processFailure": false
+  },
+  {
+    "control": "ignore-error-events",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "tests": [
+      "busy error events exhaust with typed status, attempts and original delay"
+    ],
+    "processFailure": false
+  },
+  {
+    "control": "drop-sdk-retry-option",
+    "exitCode": 1,
+    "summary": {
+      "passed": 4,
+      "failed": 7,
+      "ignored": 0,
+      "totalResults": 11,
+      "uniqueFailures": 2
+    },
+    "tests": [
+      "chat-completions registry=false",
+      "chat-completions registry=true",
+      "chat-completions nonbusy insufficient_quota",
+      "responses registry=false",
+      "responses registry=true",
+      "responses nonbusy insufficient_quota",
+      "SDK maxRetries works for direct and registry clients; quota and nonbusy errors do not retry"
+    ],
+    "processFailure": false
+  },
+  {
+    "control": "drop-registry-retry-option",
+    "exitCode": 1,
+    "summary": {
+      "passed": 8,
+      "failed": 3,
+      "ignored": 0,
+      "totalResults": 11,
+      "uniqueFailures": 2
+    },
+    "tests": [
+      "chat-completions registry=true",
+      "responses registry=true",
+      "SDK maxRetries works for direct and registry clients; quota and nonbusy errors do not retry"
+    ],
+    "processFailure": false
+  },
+  {
+    "control": "clip-server-delay",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "tests": [
+      "Retry-After above the wait ceiling fails without sleeping or a second attempt"
+    ],
+    "processFailure": false
+  }
+]
