@@ -1,0 +1,3 @@
+# CLI scope coverage on resume
+
+Migration feature source lives in packages/cli/src/public/features/ui/migrate (15 TS files), including migrate-ui-command.ts. Root lint/fmt exclusions skip CLI: for structured wrappers, copy only root fmt/lint rule settings to a project-run config without include/exclude keys and pass --config <that-config>. Require coverage.filesSelected == coverage.filesProcessed; this produced check/lint/fmt PASS for all 15 files. The source-hunk generator requires the exact baseline SHA argument (it has no --check mode); regenerate then use git diff --exit-code to verify freshness.

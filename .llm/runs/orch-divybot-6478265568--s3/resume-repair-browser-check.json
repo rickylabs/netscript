@@ -1,0 +1,1 @@
+{"source":{"mode":"selection","cwd":"./tools/fresh-ui-browser"},"command":"deno check --unstable-kv --no-config --no-lock --node-modules-dir=manual <files>","selection":{"filesSelected":1,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}

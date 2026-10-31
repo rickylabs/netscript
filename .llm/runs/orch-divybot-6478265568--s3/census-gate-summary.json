@@ -1,0 +1,56 @@
+{
+  "sourceHead": "8f9394c7146fda19c621acabebc7588310795f42",
+  "commandCensus": {
+    "ratified": 99,
+    "documented": 99,
+    "recursive": 164,
+    "missing": []
+  },
+  "gates": [
+    {
+      "command": "deno task docs:accuracy",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task docs:links",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task --cwd docs/site build (via gen:agent-docs-prose)",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:publish-assets",
+      "exitCode": 0
+    }
+  ],
+  "independentImplEval": "PASS",
+  "lockfileChanges": [],
+  "remoteRequiredQuality": "PENDING at the final pushed head; earlier success is not reused",
+  "additionalInventorySourceHead": "06cca412b62054bafbcfe104e348c0811c77e56a",
+  "contributorInventory": {
+    "expectedRoot": "ui:migrate",
+    "focusedTapResults": 2,
+    "failed": 0,
+    "checkLintFmt": "PASS",
+    "independentImplEval": "PASS"
+  },
+  "earlierRemoteQuality": {
+    "head": "a5077091afc444111b43f48d8ff23be8e51ff2dd",
+    "conclusion": "success",
+    "jobUrl": "https://github.com/rickylabs/netscript/actions/runs/41152993141/job/124393674022",
+    "note": "Superseded for final readiness because the related stale contributor test expectation was then corrected."
+  }
+}

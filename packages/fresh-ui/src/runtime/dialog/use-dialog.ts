@@ -58,7 +58,12 @@ export function useDialog({
       ...props,
       'aria-controls': contentId,
       'aria-expanded': open,
-      'data-part': 'trigger',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'trigger',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'dialog',
       'data-state': dataState,
       onClick: composeEventHandlers(props.onClick, () => setOpen(true, 'trigger')),
       type: props.type ?? 'button',
@@ -72,7 +77,12 @@ export function useDialog({
       'aria-describedby': props['aria-describedby'] ?? descriptionId,
       'aria-labelledby': props['aria-labelledby'] ?? titleId,
       'aria-modal': modal ? 'true' : undefined,
-      'data-part': 'content',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'content',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'dialog',
       'data-state': dataState,
       id: props.id ?? contentId,
       onCancel: composeEventHandlers(
@@ -126,7 +136,12 @@ export function useDialog({
   const getTitleProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLHeadingElement> = {}): DialogTitleElementProps => ({
       ...props,
-      'data-part': 'title',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'title',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'dialog',
       id: props.id ?? titleId,
     }),
     [titleId],
@@ -135,7 +150,12 @@ export function useDialog({
   const getDescriptionProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLParagraphElement> = {}): DialogDescriptionElementProps => ({
       ...props,
-      'data-part': 'description',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'description',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'dialog',
       id: props.id ?? descriptionId,
     }),
     [descriptionId],
@@ -144,7 +164,12 @@ export function useDialog({
   const getCloseProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): DialogCloseElementProps => ({
       ...props,
-      'data-part': 'close',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'close',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'dialog',
       onClick: composeEventHandlers(props.onClick, () => setOpen(false, 'close-button')),
       type: props.type ?? 'button',
     }),

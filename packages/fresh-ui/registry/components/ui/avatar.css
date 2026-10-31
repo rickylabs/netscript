@@ -17,24 +17,24 @@
   user-select: none;
 }
 
-.ns-avatar--sm {
+:where(.ns-avatar)[data-size='sm'] {
   width: var(--ns-avatar-sm);
   height: var(--ns-avatar-sm);
   font-size: var(--ns-text-3xs);
 }
 
-.ns-avatar--md {
+:where(.ns-avatar)[data-size='md'] {
   width: var(--ns-avatar-md);
   height: var(--ns-avatar-md);
 }
 
-.ns-avatar--lg {
+:where(.ns-avatar)[data-size='lg'] {
   width: var(--ns-avatar-lg);
   height: var(--ns-avatar-lg);
   font-size: var(--ns-text-xs);
 }
 
-.ns-avatar--agent {
+:where(.ns-avatar)[data-content='agent'] {
   background: var(--ns-primary);
   color: var(--ns-primary-fg);
 }

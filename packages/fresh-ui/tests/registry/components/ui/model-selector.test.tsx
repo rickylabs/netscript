@@ -1,4 +1,5 @@
 import { assert } from '@std/assert';
+import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { ModelSelector } from '../../../../registry/components/ui/model-selector.tsx';
 
 interface VNodeLike {
@@ -34,7 +35,7 @@ Deno.test('ModelSelector marks the selected option active + alignment', () => {
   const v = ModelSelector({ value: 'opus', models: MODELS, align: 'right' });
   assert(vnodeProps(v)['data-align'] === 'right', 'align passed through');
   const json = JSON.stringify(v);
-  assert(json.includes('is-active'), 'selected option active');
+  assert(render(v).includes('data-state="selected"'), 'selected option state');
   assert(json.includes('aria-selected'), 'options expose aria-selected');
 });
 

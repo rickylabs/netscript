@@ -218,22 +218,36 @@ export function Dropzone(
     <label
       {...props}
       class={cn('ns-dropzone', className)}
+      data-part='root'
+      data-scope='dropzone'
       data-active={active ? '' : undefined}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onPaste={handlePaste}
     >
-      <span class='ns-dropzone__icon' aria-hidden='true'>{icon ?? '↑'}</span>
-      <span class='ns-dropzone__label'>{label}</span>
-      {hint ? <span class='ns-dropzone__hint'>{hint}</span> : null}
+      <span class='ns-dropzone__icon' data-part='icon' data-scope='dropzone' aria-hidden='true'>
+        {icon ?? '↑'}
+      </span>
+      <span class='ns-dropzone__label' data-part='label' data-scope='dropzone'>{label}</span>
+      {hint
+        ? <span class='ns-dropzone__hint' data-part='hint' data-scope='dropzone'>{hint}</span>
+        : null}
       <input
         class='ns-dropzone__input'
+        data-part='input'
+        data-scope='dropzone'
         type='file'
         accept={accept}
         multiple={multiple}
         onChange={handlePickerChange}
       />
-      <span class='ns-dropzone__status' aria-live='polite' data-dropzone-status>
+      <span
+        class='ns-dropzone__status'
+        data-part='status'
+        data-scope='dropzone'
+        aria-live='polite'
+        data-dropzone-status
+      >
         No files selected.
       </span>
       {children}

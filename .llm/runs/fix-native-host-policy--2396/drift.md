@@ -87,3 +87,18 @@ bump. Reproduce native parity, inspect the exact diff, then run all remaining qu
 that CI skipped after parity so the final fifth evaluator round is not spent prematurely.
 The fourth implementation verdict is MERGE at a4dc70531c3e3a8c3139ecfa16419126c9551463;
 only one owner-authorized feature evaluation round remains. Reuse the same independent session.
+
+Current-state continuation after prerequisite merges: the coordinator merged #2422 and
+#2423 into main, alongside reviewed Fresh UI contracts #2467. Main is now
+204a71b1ef0133faa07ce5c191e4170b5cb76171. Exact94393bc8 code and fifth independent
+MERGE remain historical proof; live #2421 is now CONFLICTING. Read-only merge-tree preview
+finds only debt-registry and generated export-corpus conflicts. All main integration remains
+authorized under the original scope. Resolve both canonically, preserve every accepted debt
+entry, retain all incoming main source and refresh the relevant union gates.
+
+Evaluation boundary: all five owner-authorized feature rounds are spent. Do not launch a
+sixth round, reset the counter, replace the evaluator, or claim94393bc8's exact-head verdict
+as acceptance of a new commit. The concrete current-main integration and its tests can be
+prepared/pushed, but its new exact-head independent sign-off must stay UNPROVEN and be
+surfaced to the coordinator as an authorization/process decision. Source behavior itself
+was accepted in round5; a source equivalence claim is narrower than a new-head MERGE verdict.

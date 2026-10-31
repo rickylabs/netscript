@@ -10,6 +10,9 @@ import { cn } from '../../lib/cn.ts';
 import type { Renderable } from '../../lib/public-types.ts';
 
 interface SharedButtonProps {
+  'data-part'?: string;
+  'data-scope'?: string;
+  'data-size'?: ButtonSize;
   children: Renderable;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -63,21 +66,6 @@ type ButtonAsLinkProps =
 
 type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps;
 
-const VARIANT_CLASSES: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'ns-btn--primary',
-  secondary: 'ns-btn--secondary',
-  outline: 'ns-btn--outline',
-  ghost: 'ns-btn--ghost',
-  destructive: 'ns-btn--destructive',
-};
-
-const SIZE_CLASSES: Record<NonNullable<ButtonProps['size']>, string | undefined> = {
-  sm: 'ns-btn--sm',
-  md: undefined,
-  lg: 'ns-btn--lg',
-  icon: 'ns-btn--icon',
-};
-
 /**
  * Renders a semantic action control as either a button or a link.
  */
@@ -92,24 +80,51 @@ export function Button(props: ButtonProps): VNode {
     icon,
     iconPosition = 'left',
   } = props;
-  const classes = cn(
-    'ns-btn',
-    VARIANT_CLASSES[variant],
-    SIZE_CLASSES[size],
-    loading && 'ns-btn--loading',
-    className,
-  );
+  const classes = cn('ns-btn', className);
   const leadingIcon = loading
-    ? <span aria-hidden='true' class='ns-spinner ns-spinner--sm' />
+    ? (
+      <span
+        aria-hidden='true'
+        class='ns-spinner'
+        data-size='sm'
+        data-part='root'
+        data-scope='spinner'
+      />
+    )
     : iconPosition === 'left'
     ? icon
     : undefined;
   const trailingIcon = !loading && iconPosition === 'right' ? icon : undefined;
   const content = (
     <>
-      {leadingIcon}
-      <span>{children}</span>
-      {trailingIcon}
+      {leadingIcon && (
+        <span
+          data-part={loading
+            ? 'spinner'
+            : props['data-scope'] === 'icon-button'
+            ? undefined
+            : 'icon-start'}
+          data-scope={props['data-scope'] ?? 'button'}
+          style={{ display: 'contents' }}
+        >
+          {leadingIcon}
+        </span>
+      )}
+      <span
+        data-part={props['data-scope'] === 'icon-button' ? undefined : 'label'}
+        data-scope={props['data-scope'] ?? 'button'}
+      >
+        {children}
+      </span>
+      {trailingIcon && (
+        <span
+          data-part='icon-end'
+          data-scope={props['data-scope'] ?? 'button'}
+          style={{ display: 'contents' }}
+        >
+          {trailingIcon}
+        </span>
+      )}
     </>
   );
 
@@ -138,6 +153,11 @@ export function Button(props: ButtonProps): VNode {
         {...freshLinkProps}
         href={disabled || loading ? undefined : href}
         class={classes}
+        data-variant={variant}
+        data-size={props['data-size'] ?? size}
+        data-state={loading ? 'loading' : disabled ? 'disabled' : 'rest'}
+        data-part={props['data-part'] ?? 'root'}
+        data-scope={props['data-scope'] ?? 'button'}
         aria-disabled={disabled || loading ? 'true' : undefined}
         aria-busy={loading ? 'true' : undefined}
       >
@@ -168,6 +188,11 @@ export function Button(props: ButtonProps): VNode {
       disabled={disabled || loading}
       aria-busy={loading ? 'true' : undefined}
       class={classes}
+      data-variant={variant}
+      data-size={props['data-size'] ?? size}
+      data-state={loading ? 'loading' : disabled ? 'disabled' : 'rest'}
+      data-part={props['data-part'] ?? 'root'}
+      data-scope={props['data-scope'] ?? 'button'}
     >
       {content}
     </button>

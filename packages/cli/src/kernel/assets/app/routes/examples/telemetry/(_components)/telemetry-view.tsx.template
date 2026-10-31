@@ -71,7 +71,7 @@ export function TelemetryView({ data, examplesHref }: TelemetryViewProps) {
                 &larr; Examples
               </Button>
             </div>
-            <span class='ns-badge ns-badge--secondary w-fit'>Telemetry</span>
+            <span class='ns-badge w-fit' data-variant='secondary'>Telemetry</span>
             <h1 class='text-3xl font-semibold text-ns-fg sm:text-4xl'>
               Aspire Dashboard traces
             </h1>

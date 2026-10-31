@@ -232,3 +232,33 @@ from accepted a4dc7053. Push the coherent correction, keep both prerequisite hea
 and re-steer the same evaluator for feature round5 at the exact new head. This is the final
 allowed round; no fresh evaluator or sixth review is authorized. Existing runtime opt-in
 and postpublish proof remain coordinator-owned and unproven.
+
+Current-state continuation after prerequisite merges: the coordinator merged #2422 and
+#2423 into main, alongside reviewed Fresh UI contracts #2467. Main is now
+204a71b1ef0133faa07ce5c191e4170b5cb76171. Exact94393bc8 code and fifth independent
+MERGE remain historical proof; live #2421 is now CONFLICTING. Read-only merge-tree preview
+finds only debt-registry and generated export-corpus conflicts. All main integration remains
+authorized under the original scope. Resolve both canonically, preserve every accepted debt
+entry, retain all incoming main source and refresh the relevant union gates.
+
+Evaluation boundary: all five owner-authorized feature rounds are spent. Do not launch a
+sixth round, reset the counter, replace the evaluator, or claim94393bc8's exact-head verdict
+as acceptance of a new commit. The concrete current-main integration and its tests can be
+prepared/pushed, but its new exact-head independent sign-off must stay UNPROVEN and be
+surfaced to the coordinator as an authorization/process decision. Source behavior itself
+was accepted in round5; a source equivalence claim is narrower than a new-head MERGE verdict.
+
+Post-prerequisite integration resolution: retained the complete workers22/streams21 native
+closure entries at the sole debt conflict (incoming side empty), without expiry/scope edits.
+Other main debt entries merged untouched. Took incoming generated export corpus only as a
+generation seed; canonical regeneration follows this clean merge checkpoint. Canonical prose,
+asset-barrel and publish-asset generation succeeded; Aspire inventory regenerated. No authored
+feature/runtime/test conflict exists. Workers/streams service source, worker reader source,
+native service, Fresh stream runtime and both plugin export maps are byte-identical to the
+previously reviewed94393bc8; new UI source comes directly from reviewed main #2467.
+
+Both prerequisites are now merged by the coordinator: #2422 runtime reports120/0/0 and
+113/0/0 and close-gate/core CI PASS; #2423 all required CI/runtime PASS. This run performed
+no main merge or label edit. New integration independent sign-off remains UNPROVEN because
+the feature's five evaluator rounds are exhausted. Prepare source and gates for coordinator
+review; preserve94393bc8's final MERGE as historical/source-equivalence evidence only.

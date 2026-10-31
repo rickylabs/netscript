@@ -105,6 +105,6 @@
   font-size: var(--ns-text-sm);
 }
 
-.ns-model-opt.is-active .ns-model-opt__label {
+.ns-model-opt[data-state='selected'] .ns-model-opt__label {
   color: var(--ns-primary);
 }

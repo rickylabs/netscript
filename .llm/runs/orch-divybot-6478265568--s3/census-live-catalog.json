@@ -1,0 +1,12 @@
+{
+  "result": {
+    "auditedCount": 99,
+    "documentedCount": 99,
+    "recursiveCount": 164,
+    "missing": []
+  },
+  "migrationPaths": [
+    "ui:migrate",
+    "ui:migrate variants"
+  ]
+}

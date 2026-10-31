@@ -66,7 +66,7 @@ The runtime helpers work anywhere Preact renders:
 import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 
 // Merge class names safely (clsx + tailwind-merge semantics).
-const buttonClass = cn('ns-button', 'ns-button--primary');
+const buttonClass = cn('ns-btn', 'app-action');
 
 // Carry a redirect-flash toast across a server redirect.
 const redirectTo = withToast('/dashboard/deployments', {
@@ -173,6 +173,13 @@ Style Dictionary. Presets fix their own geometry. NS One stays the default;
 Studio Utility is available as `theme-studio-utility` in the registry. The
 three-tier source and extension guide is [tokens/README.md](tokens/README.md).
 
+## Component contracts
+
+Import types and the JSON serializer from `@netscript/fresh-ui/contracts`. This pure-data
+subpath describes props, anatomy, data attributes, slots, APG patterns, keyboard maps and token
+roles shared by styles. It performs no IO. See [the contributor guide](src/contracts/README.md)
+for native, pseudo-element and planned-part representations.
+
 ## Docs
 
 - **Web layer — the design system in context**:
@@ -197,3 +204,18 @@ Token build metadata is available from `@netscript/fresh-ui/token-config` withou
 loading Style Dictionary or the source corpus. See [token contribution and output
 budgets](tokens/README.md). Design preview styles are opt-in through
 `netscript ui:add theme-previews` or `netscript tokens build --previews`.
+
+The catalog is available as `componentContracts` from `./contracts`, or as a JSON module:
+
+```ts
+import { componentContracts, serializeComponentContracts } from '@netscript/fresh-ui/contracts';
+import catalog from '@netscript/fresh-ui/contracts.json' with { type: 'json' };
+
+console.log(componentContracts.components.find((component) => component.name === 'button'));
+console.log(serializeComponentContracts(componentContracts));
+console.log(catalog.schemaVersion);
+```
+
+Phase 1 includes 66 shipped inventory entries and 21 design-only contracts from the six built
+Figma categories. `shipped: false`, planned values and native/pseudo parts distinguish specified
+anatomy from a rendering implementation. It does not add gap components or token values.

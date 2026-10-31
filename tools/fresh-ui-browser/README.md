@@ -122,3 +122,45 @@ as the language. NS One remains the default. Utility has zero serious/critical
 allowances; its authored token failures stay in the separate exact token contrast
 report. Specimen captions use readable neutral surfaces without changing swatch
 values. Original S0 screenshots remain untouched.
+
+## Variant migration parity
+
+`render-variant-cases.mjs` renders 188 cases from a supplied Fresh UI source root, including every
+migrated modifier family, native disabled/error/checked combinations, both toggle islands and the
+app shell, selection toolbar, command palette and an open ActionMenu. Native popovers are promoted to the top layer before measuring floating position. `variant-parity.ts` compares baseline and migrated HTML with their actual registry CSS
+the shipped base tokens, and identical Studio Utility token bytes. Floating geometry and stacking order are included in computed comparisons. It measures computed styles in rest, hover, focus and
+pressed states, at 390/1280 in light/dark, and also requires identical full-page PNG bytes. It
+records input hashes, the browser version, comparison counts, differences and screenshot hashes in `parity.json`.
+The runner closes its browser on success and failure.
+
+For a replay, extract the chosen baseline with `git archive` into project run evidence, render it
+and the current package to separate JSON files, then run:
+
+```sh
+node tools/fresh-ui-browser/variant-parity.ts \
+  <baseline-fresh-ui-root> packages/fresh-ui \
+  <before.json> <after.json> <utility-token-output.css> <artifact-directory>
+```
+
+Both captures must use the package's same JSX precompile options. For an archive outside the
+workspace, place an isolated Deno config beside the archive, copy `compilerOptions` from
+`packages/fresh-ui/deno.json`, and use `variant-parity.imports.json` for its imports. Resolve those
+imports to the already-installed versions from the workspace lock; cached-only replay can use
+`--no-lock --cached-only` without changing a repository lock. Merely selecting a workspace member's
+config does not apply its compiler options to an external archive. Classic JSX and precompile
+serialize numeric inline line-height differently, so comparing them produces false differences.
+
+Supply the Studio Utility CSS returned by `buildTokens({ preset: 'studio-utility' })` to both
+captures. The renderer never changes token values, baseline sources, snapshots or a repository
+lockfile. The S3 run record contains the measured result; screenshots are project artifacts.
+
+Resolve the package self-import `@netscript/fresh-ui/interactive` to the corresponding source root
+for each capture, and copy the workspace catalog when the isolated config needs it. A baseline
+capture must use its own headless runtime, never the migrated runtime.
+
+For the app-copy migrator itself, `render-migrated-css.ts` builds a CSS-only fixture from the same
+baseline using the actual CLI transformer. Run it with `deno run -A --no-config --no-lock
+--cached-only --node-modules-dir=manual` (the browser tool directory owns a separate npm config),
+then supply that fixture as the after-root to `variant-parity.ts` with migrated HTML. This checks
+the CLI's selector mapping independently of the authored component CSS. Preserve both parity
+reports and their input hashes.

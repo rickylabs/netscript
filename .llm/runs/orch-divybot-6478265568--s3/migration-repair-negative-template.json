@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--frozen",
+    "--filter",
+    "registry TSX templates",
+    "packages/fresh-ui/tests/registry/markdown-renderer.test.ts"
+  ],
+  "cwd": ".",
+  "exitCode": 1,
+  "durationMs": 1010,
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Values are not equal: registry template lint failed with exit code 1\nCommand: deno lint --config <temp>/registry-template-lint-aa3b28a12c3dbe7f/deno.json <temp>/registry-template-lint-aa3b28a12c3dbe7f/0.tsx\n--- stdout ---\n<empty>\n--- stderr ---\nerror[jsx-curly-braces]: Curly braces are not needed here\n   --> <temp>/registry-template-lint-aa3b28a12c3dbe7f/0.tsx:<line>:<column>\n    | \n122 |     <div class={className ? `ns-markdown ${className}` : \"ns-markdown\"} data-part={\"root\"} data-scope='prose'>\n    |                                                                                   ^^^^^^^^\n    = hint: Remove curly braces around JSX attribute\n\n  docs: https://docs.deno.com/lint/rules/jsx-curly-braces\n\n\nFound 1 problem (1 fixable via --fix)\nChecked 1 file\n\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/fresh-ui/tests/registry/markdown-renderer.test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "registry TSX templates pass jsx-curly-braces before installation",
+          "file": "./packages/fresh-ui/tests/registry/markdown-renderer.test.ts",
+          "line": 263
+        }
+      ]
+    }
+  ]
+}

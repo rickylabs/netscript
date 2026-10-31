@@ -1,0 +1,8 @@
+{
+  "gate": "quality-gate",
+  "head": "15a806e933697b34749be9bb8a6de144b7f953aa",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 17477,
+  "note": "Portable projection of private atomic receipt; exact-final-head remote CI still required."
+}

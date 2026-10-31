@@ -1,0 +1,12 @@
+{
+  "command": "npm test",
+  "stats": {
+    "expected": 24,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "axeCases": 12,
+  "allowanceCountsPreserved": true,
+  "utilityCasesWithZeroAllowances": 4
+}

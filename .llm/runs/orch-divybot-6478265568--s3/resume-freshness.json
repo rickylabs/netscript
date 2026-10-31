@@ -1,0 +1,38 @@
+{
+  "sourceHead": "bdb959d102189f5ad530fd3e07d54d29a8dbc0c4",
+  "checks": [
+    {
+      "command": "deno task check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "command": "versioned migration data regeneration + git diff --exit-code",
+      "exitCode": 0
+    },
+    {
+      "command": "Fresh UI targeted export/reference drift",
+      "exitCode": 0
+    },
+    {
+      "command": "deno task check:review-threads -- --repo rickylabs/netscript --pr 2467 --pretty",
+      "exitCode": 0
+    }
+  ],
+  "lockfileChanges": [],
+  "retainedProofInputs": "Migration code and 0.0.8 app-copy inputs are unchanged; current component visuals are proven by two expanded 188-case parity runs including repaired ActionMenu.",
+  "reconciledHead": "c433b6e398781fbc586ddcace4d0c7811c9b7f5e",
+  "mainHead": "6a71cd0599673d70cd6311de3bb20b2d6a9dde2c",
+  "reconcileEvidence": "Zero diff from reviewed bdb959d10 in Fresh UI, CLI and browser tools; upstream docs fixture is identical to main and its original test bridge passes. Generated carrier inputs are unchanged."
+}

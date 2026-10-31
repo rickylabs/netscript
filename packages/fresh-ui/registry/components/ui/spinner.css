@@ -10,17 +10,17 @@
   animation: ns-spin 0.7s linear infinite;
 }
 
-.ns-spinner--sm {
+:where(.ns-spinner)[data-size='sm'] {
   width: 16px;
   height: 16px;
 }
 
-.ns-spinner--md {
+:where(.ns-spinner)[data-size='md'] {
   width: 24px;
   height: 24px;
 }
 
-.ns-spinner--lg {
+:where(.ns-spinner)[data-size='lg'] {
   width: 40px;
   height: 40px;
   border-width: 3px;
