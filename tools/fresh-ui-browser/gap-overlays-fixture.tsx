@@ -85,6 +85,12 @@ export function Overlays() {
             onCheckedChange: setBookmarks,
           },
           {
+            id: 'delete',
+            label: 'Delete order',
+            intent: 'destructive',
+            onSelect: () => setMenuAction('delete'),
+          },
+          {
             id: 'tools',
             kind: 'submenu',
             label: 'More tools',
