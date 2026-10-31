@@ -15,7 +15,9 @@ function assertLegacyCompatibility(actual: Readonly<Record<string, unknown>>): v
   );
   assertEquals<unknown>(existing, legacyBaseline);
   const additions = Object.keys(actual).filter((name) => !baselineNames.has(name)).sort();
-  const themes = TOKEN_PRESETS.map((preset) => `theme-${preset.id}`).filter((name) => !baselineNames.has(name));
+  const themes = TOKEN_PRESETS.map((preset) => `theme-${preset.id}`).filter((name) =>
+    !baselineNames.has(name)
+  );
   assertEquals(additions, [...themes, ...POST_V1_COMPONENTS, ...POST_V1_SUPPORT].sort());
 }
 
@@ -24,7 +26,9 @@ Deno.test('JSON authoring preserves every legacy file target, dependency, CSS co
   const actual = Object.fromEntries(freshUiRegistryManifest.items.map((item) => [item.name, {
     name: item.name,
     kind: item.kind,
-    files: item.name === 'theme-previews' ? item.files.filter((file) => previewSources.has(file.source)) : item.files,
+    files: item.name === 'theme-previews'
+      ? item.files.filter((file) => previewSources.has(file.source))
+      : item.files,
     ...(item.dependencies ? { dependencies: item.dependencies } : {}),
     ...(item.registryDependencies ? { registryDependencies: item.registryDependencies } : {}),
     ...(item.css ? { css: item.css } : {}),
