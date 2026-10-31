@@ -42,8 +42,34 @@
     "actualTouchCasesIncluded": true
   },
   "independentSourceReview": "PASS;initial and finalized source/evidence sign-off",
-  "carriers": "After source commit",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
   "captures": 20,
   "ready": false,
-  "fullGoalComplete": false
+  "fullGoalComplete": false,
+  "sourceCommit": "e38e597854273bc1f47900c0305d89d6f80fd668"
 }
