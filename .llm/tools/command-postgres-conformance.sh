@@ -29,3 +29,5 @@ deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- -
 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all packages/plugin-sagas-core/tests/saga-relay-cohort_test.ts
 
 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all plugins/sagas/tests/runtime/publish-process-postgres_test.ts
+
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all plugins/sagas/tests/runtime/projected-receipt-postgres_test.ts
