@@ -176,7 +176,10 @@
     },
     {
       "number": 2149,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2519 a9620a34e"
+      ]
     },
     {
       "number": 2151,
@@ -298,7 +301,10 @@
     },
     {
       "number": 2373,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2528 e4875a56c"
+      ]
     },
     {
       "number": 2374,
@@ -1628,11 +1634,21 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": null,
       "headSha": "9fc6d01fa5aca89893d3355484c8e384addd5720",
       "startedAt": "2026-10-31T14:33:09Z",
-      "via": "local run on the N5 for #2185 box 5 (reserved for the leaf)"
+      "via": "local run on the N5 for #2185 box 5 (reserved for the leaf)",
+      "result": "NOT RUN: leaf environment has no local Docker daemon; released",
+      "completedAt": "2026-10-31T14:39:00Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2542,
+      "headSha": "e1c68e5e7a666ab2abc9d8ba728375ef6d8417b0",
+      "startedAt": "2026-10-31T14:40:48Z",
+      "via": "label e2e-cli-gate"
     }
   ],
   "canaryCheckpoints": [
@@ -1664,10 +1680,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T14:38:12Z",
-    "nextReportDueAt": "2026-10-31T15:38:12Z",
+    "lastReportAt": "2026-10-31T14:40:48Z",
+    "nextReportDueAt": "2026-10-31T15:40:48Z",
     "lastReportRef": "worklog.md",
-    "headline": "merged #2537 (#1912 closed)",
+    "headline": "e2e on #2542; Eric asked about #1655 and #2185",
     "currentMainSha": "45c7d58803dc2659f4a81e628729488f0b569bd9",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -1854,7 +1870,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:38:12Z",
+  "updatedAt": "2026-10-31T14:40:49Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2322,9 +2338,10 @@
       "commentId": 6544753737,
       "postedAt": "2026-10-31T14:33:09Z",
       "route": "codex gpt-6.1-sol medium",
-      "state": "started",
+      "state": "blocked",
       "pr": null,
-      "startedAt": "2026-10-31T14:36:14Z"
+      "startedAt": "2026-10-31T14:36:14Z",
+      "note": "no local Docker in leaf env; decision for Eric on #2474 (recommend accepting CI runner run 41197676281)"
     }
   ],
   "coordinatorArtifactPr": 2475,

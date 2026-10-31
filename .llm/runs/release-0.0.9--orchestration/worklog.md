@@ -291,3 +291,6 @@
 - 14:35:23Z: #1366 READY (PR #2542, box 6), Opus MERGE `e1c68e5`; e2e queued after the #2185 local gate.
 - 14:37:28Z: #1655: option B fails for WorkersContractDefinition (NetScript-owned). Decision for Eric posted on #2474 (recommend moving it out of 0.0.9 and keeping the debt rows with an upstream trigger). Leaf blocked with the decision record. #2185 started 14:36Z.
 - 14:38:02Z: **merged** #2537 (`45c7d5880`) for #1912 (G1 box 8).
+- 14:38:33Z: Closed #2149 and #2373 with evidence (workers done).
+- 14:40:35Z: #2185 BLOCKED: the leaf environment has no local Docker daemon, so the run did not happen. **expensive-gate.released.** Decision for Eric posted (recommend accepting the CI runner's local-engine run 41197676281 as box 5 evidence). Next gate: #2542 (#1366).
+- 14:40:48Z: **expensive-gate.acquired** on #2542 (#1366) at `e1c68e5`.
