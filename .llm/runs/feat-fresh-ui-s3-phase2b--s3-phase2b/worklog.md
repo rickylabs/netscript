@@ -128,3 +128,6 @@ Await same evaluator round2; failure streak1.
 
 
 9c-a committed-source evidence reconciliation PASS. Source1de3962b/all4carriers/currentquality/nativepublish verified; final navLabel/desktop-toggle PASS retained in source review and highlighted at its top. Reconcile: evidence only since source, inventory104/91/13/120 unchanged, no lock/token/dependency/schema drift. Privacy audit must precede evidence push/comment; next9c-b remains research only until terminal. Whole original assignment stays active.
+
+
+Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently verified/pushed. Child restacked from2cd89188;636 maintained Fresh UI/browser files excluding only main-owned private lock are byte-identical. Three generated-only conflicts resolved by canonical regeneration. Full package/quality/carriers and same independent review next, then privacy audit and leased push. No9c-b product source; whole task active, runtime/new-headCI unproven.

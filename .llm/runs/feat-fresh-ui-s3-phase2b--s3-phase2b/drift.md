@@ -66,3 +66,6 @@ legacy snapshot remains unchanged. New canonical app-shell axis uses
  data-sidebar-presentation to avoid colliding with the legacy bare data-sidebar
 selector on the actual aside. Native ::backdrop represents the app-shell
 sidebar-backdrop part without a duplicate fake DOM layer.
+
+
+Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently verified/pushed. Child restacked from2cd89188;636 maintained Fresh UI/browser files excluding only main-owned private lock are byte-identical. Three generated-only conflicts resolved by canonical regeneration. Full package/quality/carriers and same independent review next, then privacy audit and leased push. No9c-b product source; whole task active, runtime/new-headCI unproven.
