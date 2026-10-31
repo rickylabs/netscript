@@ -1,0 +1,55 @@
+// Minimal public projection follows U3 review-audit.ts: text, tool results and step usage.
+export function publicEvent(value: any): Record<string, unknown> | null {
+  const type = value?.type;
+  const part = value?.part;
+  const base = { type, sessionID: value?.sessionID, timestamp: value?.timestamp };
+  if (type === 'text' && part?.type === 'text' && typeof part.text === 'string') {
+    return { ...base, part: { type: 'text', text: part.text } };
+  }
+  if (type === 'tool_use' && typeof part?.tool === 'string') {
+    const state = part.state ?? {};
+    return { ...base, part: { type: 'tool', tool: part.tool, callID: part.callID, state: {
+      input: state.input, status: state.status, output: state.output, error: state.error,
+      metadata: state.metadata, title: state.title,
+    } } };
+  }
+  if (type === 'step_start' || type === 'step_finish') {
+    return { ...base, part: { type: part?.type, reason: part?.reason, cost: part?.cost,
+      tokens: part?.tokens } };
+  }
+  if (type === 'error') return { ...base, error: {
+    name: value.error?.name, message: value.error?.message,
+  } };
+  // No private reasoning/thinking/unknown events or raw malformed text reach disk.
+  return null;
+}
+
+/** U1 public projection with a fatal UTF-8 decoder and an actual1MiB line-byte bound. */
+export class PublicEventCapture {
+  readonly #decoder=new TextDecoder('utf-8',{fatal:true});
+  #pending='';#lineBytes=0;
+  omittedEvents=0;publicEvents=0;
+  constructor(readonly write:(text:string)=>Promise<void>){}
+  async #line(line:string):Promise<void>{
+    if(!line.trim())return;
+    const event=publicEvent(JSON.parse(line));
+    if(!event){this.omittedEvents++;return;}
+    this.publicEvents++;await this.write(JSON.stringify(event)+'\n');
+  }
+  async add(bytes:Uint8Array):Promise<void>{
+    let offset=0;
+    while(offset<bytes.length){
+      const newline=bytes.indexOf(10,offset);const end=newline<0?bytes.length:newline;
+      this.#lineBytes+=end-offset;
+      if(this.#lineBytes>1024*1024)throw new Error('Public event UTF-8 line exceeds1MiB bound.');
+      this.#pending+=this.#decoder.decode(bytes.subarray(offset,end),{stream:true});
+      if(newline<0)break;
+      this.#pending+=this.#decoder.decode();await this.#line(this.#pending);
+      this.#pending='';this.#lineBytes=0;offset=newline+1;
+    }
+  }
+  async finish():Promise<void>{
+    this.#pending+=this.#decoder.decode();await this.#line(this.#pending);this.#pending='';this.#lineBytes=0;
+  }
+}
+

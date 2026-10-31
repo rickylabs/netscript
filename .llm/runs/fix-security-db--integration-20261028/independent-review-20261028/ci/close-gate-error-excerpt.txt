@@ -1,0 +1,7 @@
+Selected native error lines; full raw log retained privately, not reproduced here.
+RawSHA256:48a86c4be4b7825560631c384927e0106bf0c100c75265fbe594ff18f6f5f846;rawBytes:19598
+161: close-gate	UNKNOWN STEP	2026-10-28T04:42:13.0319747Z close-gate FAIL rickylabs/netscript#2426
+165: close-gate	UNKNOWN STEP	2026-10-28T04:42:13.0322511Z unchecked PR body: #2426 line 43 [Definition of Done] "Independent same-session integration verdict accepted for this exact combined checkpoint.". Fix: Tick PR #2426 box "Independent same-session integration verdict accepted for this exact combined checkpoint." only after its claim is true and evidenced.
+166: close-gate	UNKNOWN STEP	2026-10-28T04:42:13.0323698Z unchecked PR body: #2426 line 44 [Definition of Done] "Required new-head CI accepted.". Fix: Tick PR #2426 box "Required new-head CI accepted." only after its claim is true and evidenced.
+167: close-gate	UNKNOWN STEP	2026-10-28T04:42:13.0324654Z unchecked PR body: #2426 line 45 [Definition of Done] "Root final integration and merge acceptance complete.". Fix: Tick PR #2426 box "Root final integration and merge acceptance complete." only after its claim is true and evidenced.
+168: close-gate	UNKNOWN STEP	2026-10-28T04:42:13.0352940Z ##[error]Process completed with exit code 1.

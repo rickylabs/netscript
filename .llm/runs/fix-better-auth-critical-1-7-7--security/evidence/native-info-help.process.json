@@ -1,0 +1,13 @@
+﻿{
+    "name":  "native-info-help",
+    "startedUtc":  "2026-10-28T03:03:51.8409260Z",
+    "finishedUtc":  "2026-10-28T03:03:51.8565607Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "info",
+                      "--help"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\native-info-help.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\native-info-help.stderr.log"
+}

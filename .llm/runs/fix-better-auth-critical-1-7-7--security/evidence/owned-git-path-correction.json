@@ -1,0 +1,9 @@
+﻿{
+    "at":  "2026-10-28T03:27:50.1222624Z",
+    "change":  "Owned child PATH only; portable Deno first, exact existing Git/bin second",
+    "nativeSh":  "C:\\Program Files\\Git\\bin\\sh.exe",
+    "nativeShSha256":  "b38be6ec1d4e8ed77ab46bd5f8f61e997c5eae6318e5ad56b50c66b25cb508e8",
+    "originalHelper":  "original-owned-environment.ps1.txt",
+    "sameBaselineFailureCount":  16,
+    "sameBaselineFailureNames":  true
+}

@@ -1,0 +1,138 @@
+{
+  "bloom--dark.webp": {
+    "width": 1280,
+    "height": 1557
+  },
+  "bloom--light.webp": {
+    "width": 1280,
+    "height": 1557
+  },
+  "brutal--dark.webp": {
+    "width": 1280,
+    "height": 1672
+  },
+  "brutal--light.webp": {
+    "width": 1280,
+    "height": 1672
+  },
+  "cupertino--dark.webp": {
+    "width": 1280,
+    "height": 1366
+  },
+  "cupertino--light.webp": {
+    "width": 1280,
+    "height": 1366
+  },
+  "filigrane--dark.webp": {
+    "width": 1280,
+    "height": 1567
+  },
+  "filigrane--light.webp": {
+    "width": 1280,
+    "height": 1567
+  },
+  "fluent--dark.webp": {
+    "width": 1280,
+    "height": 1017
+  },
+  "fluent--light.webp": {
+    "width": 1280,
+    "height": 1017
+  },
+  "liquid--dark.webp": {
+    "width": 1280,
+    "height": 1031
+  },
+  "liquid--light.webp": {
+    "width": 1280,
+    "height": 1031
+  },
+  "pixel--dark.webp": {
+    "width": 1280,
+    "height": 1537
+  },
+  "pixel--light.webp": {
+    "width": 1280,
+    "height": 1537
+  },
+  "studio-atelier--dark.webp": {
+    "width": 1280,
+    "height": 1767
+  },
+  "studio-atelier--light.webp": {
+    "width": 1280,
+    "height": 1767
+  },
+  "studio-cloud--dark.webp": {
+    "width": 1280,
+    "height": 1490
+  },
+  "studio-cloud--light.webp": {
+    "width": 1280,
+    "height": 1490
+  },
+  "studio-ledger--dark.webp": {
+    "width": 1280,
+    "height": 1032
+  },
+  "studio-ledger--light.webp": {
+    "width": 1280,
+    "height": 1032
+  },
+  "studio-playful--dark.webp": {
+    "width": 1280,
+    "height": 1736
+  },
+  "studio-playful--light.webp": {
+    "width": 1280,
+    "height": 1736
+  },
+  "studio-signal--dark.webp": {
+    "width": 1280,
+    "height": 1054
+  },
+  "studio-signal--light.webp": {
+    "width": 1280,
+    "height": 1054
+  },
+  "studio-utility--dark.webp": {
+    "width": 1280,
+    "height": 1327
+  },
+  "studio-utility--light.webp": {
+    "width": 1280,
+    "height": 1327
+  },
+  "studio-workshop--dark.webp": {
+    "width": 1280,
+    "height": 1591
+  },
+  "studio-workshop--light.webp": {
+    "width": 1280,
+    "height": 1591
+  },
+  "tactile--dark.webp": {
+    "width": 1280,
+    "height": 2391
+  },
+  "tactile--light.webp": {
+    "width": 1280,
+    "height": 2391
+  },
+  "terminal--dark.webp": {
+    "width": 1280,
+    "height": 1052
+  },
+  "terminal--light.webp": {
+    "width": 1280,
+    "height": 1050
+  },
+  "tonal--dark.webp": {
+    "width": 1280,
+    "height": 1876
+  },
+  "tonal--light.webp": {
+    "width": 1280,
+    "height": 1876
+  }
+}

@@ -94,7 +94,7 @@ const KIND_BADGES: Record<RegistryItemKind, BadgeVariant> = {
   block: 'secondary',
   island: 'success',
   style: 'muted',
-  theme: 'warning',
+  theme: 'muted',
   lib: 'muted',
   hook: 'muted',
   support: 'muted',
@@ -211,7 +211,9 @@ function renderDemo(name: string): VNode | null {
             <Button size='lg' variant='secondary'>Large</Button>
             <Button loading>Deploying</Button>
             <Button disabled>Disabled</Button>
-            <Button type='link' href='/design/tokens' variant='outline'>Link form</Button>
+            <Button type='link' href='/design/tokens' clientNav={false} variant='outline'>
+              Link form
+            </Button>
           </div>
         </>
       );
@@ -675,7 +677,7 @@ function renderDemo(name: string): VNode | null {
     case 'theme-seed':
       return (
         <div class='ns-gallery-row'>
-          <Button type='link' href='/design/tokens' variant='outline'>
+          <Button type='link' clientNav={false} href='/design/tokens' variant='outline'>
             Browse the {tokenManifestMeta.total}-token vocabulary
           </Button>
         </div>
@@ -721,14 +723,14 @@ function GalleryItem({ item }: { item: RegistryCatalogItem }): VNode {
   );
 }
 
-export default function DesignComponentsView() {
+export default function DesignComponentsView({ themeLabel }: { themeLabel: string }) {
   return (
     <main class='ns-tokens-page'>
 
       <header class='ns-page-header'>
         <div class='ns-cluster ns-cluster--md'>
           <h1>Components</h1>
-          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='primary'>{themeLabel}</Badge>
           <Badge variant='muted'>
             {registryMeta.name} v{registryMeta.version}
           </Badge>

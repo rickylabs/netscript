@@ -2,83 +2,41 @@
 layout: layouts/base.vto
 title: Fresh UI & design
 templateEngine: [vento, md]
-prev: { label: "Telemetry & logging", href: "/observability/telemetry/" }
-next: { label: "Authentication", href: "/identity-access/auth/" }
-order: 12
+order: 17
 ---
 
 # Fresh UI & design
 
-A design system earns its keep when the person — or agent — changing the UI can open every file
-involved. NetScript's Fresh UI layer is **copy-source**: components are installed into your repo as
-readable TypeScript and CSS you own, driven by design tokens you can edit, with a live gallery
-inside your own scaffolded app showing every primitive rendered with *your* tokens. Nothing in the
-visual layer hides behind a package boundary.
+This page maps NetScript's web UI layer: the `@netscript/fresh` package, the scaffolded
+`apps/dashboard` app built on it, and the `@netscript/fresh-ui` component registry. Use it to decide
+where a change belongs and which commands manage the components you own.
 
-## Why copy-source, concretely
-
-The recurring failure in agent-edited UIs is not bad taste — it is a boundary. Ask for "a
-destructive variant of our button" against a conventional installed component library and the agent
-cannot edit the component (it lives in an immutable package), so it wraps it, overrides its styles
-from outside, or hand-writes a lookalike `div`. Repeat that a few times and the codebase carries
-three button dialects, none of them token-driven, and the next change costs more turns than the
-first.
-
-Here, `netscript ui:add button` copies the component's source and its CSS into
-`apps/dashboard/components/ui/`, wired to the token layer in `assets/tokens.json`. The variant is
-an edit to a file that is already in the repo, in the same grammar as every other component — and
-the `(design)` route group in the scaffolded app renders the result immediately, next to every
-other primitive, styled by the same tokens. One vocabulary, visible in one place, owned by you.
-
-The rest of this page maps that layer end to end — and disentangles the two things it is easiest to
-conflate on the way in.
-
-NetScript gives you a **front end with the same contracts-first rigor as the back end** — and it
-does so in two distinct layers that are easy to conflate. There is **`@netscript/fresh`, a real
-meta-framework** (a published package of Fresh runtime extensions, route/island builders, a
-TanStack-Query bridge, forms, and a streams client), and there is the **scaffolded dashboard app**
-(`apps/dashboard`) that the meta-framework *powers*. The package is the reusable engine; the app is
-one fully-wired showcase built on top of it. Both ship in every workspace, but they live at
-different addresses and you reach for them at different moments.
-
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for this layer when you need a <strong>typed, server-rendered web UI</strong> over your
-services — an internal admin panel, an operations console, or a customer-facing app — that cannot
-drift from your oRPC contracts. Use <strong><code>@netscript/fresh</code></strong> (the
-meta-framework) to build pages/islands in any Fresh app; use <strong><code>apps/dashboard</code></strong>
-(the scaffolded app) as the worked reference to copy patterns from. For the data boundary the UI
-renders see <a href="/services-sdk/services/">Services &amp; contracts</a>; to add or regenerate UI
-pieces see <a href="/web-layer/how-to/customize-fresh-ui/">Customize the Fresh UI</a>.
-{{ /comp }}
+The UI layer is copy-source. `netscript ui:add button` copies the component's TypeScript and CSS
+into `apps/dashboard/components/ui/`, wired to the design tokens in `assets/tokens.json`. A new
+variant is an edit to a file already in your repo, and the `(design)` route group renders it next
+to every other primitive with the same tokens.
 
 ## Two layers, one design grammar
+
+The package and the app are easy to conflate. `@netscript/fresh` is the reusable package you import
+into any Fresh app. `apps/dashboard` is one app that consumes it. On this page, "the dashboard"
+means the scaffolded app.
 
 {{ comp.apiTable({
   caption: "The meta-framework vs. the scaffolded app",
   rows: [
     { name: "@netscript/fresh", type: "meta-framework (package)", desc: "A published Deno package: Fresh runtime extensions, the definePage/island builders, a TanStack-Query bridge, forms, defer primitives, a streams client, and route contracts. Reusable across any Fresh app you build. Reference: /reference/fresh/." },
-    { name: "apps/dashboard", type: "scaffolded app", desc: "One concrete Fresh 2.x application generated into your repo, built ON @netscript/fresh and wired to your users service. The worked showcase you copy patterns from — not a finished product UI." },
-    { name: "@netscript/fresh-ui", type: "component registry", desc: "The copy-source component library + design tokens installed into apps/dashboard/components/ui/ via netscript ui:init / ui:add. You own the copied files. Reference: /reference/fresh-ui/." }
+    { name: "apps/dashboard", type: "scaffolded app", desc: "One Fresh 2.x application generated into your repo, built on @netscript/fresh and wired to your users service. A worked showcase to copy patterns from, not a finished product UI." },
+    { name: "@netscript/fresh-ui", type: "component registry", desc: "The copy-source component library and design tokens installed into apps/dashboard/components/ui/ by netscript ui:init and ui:add. You own the copied files. Reference: /reference/fresh-ui/." }
   ]
 }) }}
 
-{{ comp callout { type: "important", title: "Don't conflate the package with the app" } }}
-<code>@netscript/fresh</code> is a <strong>meta-framework you import</strong> — it exposes targeted
-subpaths (<code>/server</code>, <code>/builders</code>, <code>/route</code>, <code>/query</code>,
-<code>/form</code>, <code>/defer</code>, <code>/streams</code>, <code>/interactive</code>,
-<code>/vite</code>, <code>/testing</code>, <code>/error</code>) and can power <em>any</em> Fresh app,
-not just the scaffold. <code>apps/dashboard</code> is the <strong>app that consumes it</strong>. When
-this page says "the dashboard," it means the scaffolded app; when it says
-"<code>@netscript/fresh</code>," it means the reusable engine.
-{{ /comp }}
-
 ## The meta-framework: `@netscript/fresh`
 
-`@netscript/fresh` is a published package (`Fresh runtime extensions, builders, forms, defer
-primitives, and route contracts for NetScript`) built on `@fresh/core` 2.x + Preact. You consume it
-through **targeted subpath exports** rather than one fat barrel — import only the surface you need.
-The full generated API for every subpath lives at the
-[`@netscript/fresh` reference](/reference/fresh/); the table below is the map.
+`@netscript/fresh` is a published package (Fresh runtime extensions, builders, forms, defer
+primitives, and route contracts for NetScript) built on `@fresh/core` 2.x and Preact. Import the
+subpath you need; there is no single barrel. The table maps each subpath, and the
+[`@netscript/fresh` reference](/reference/fresh/) holds the full API.
 
 {{ comp.apiTable({
   caption: "@netscript/fresh subpath exports (the meta-framework surface)",
@@ -98,51 +56,52 @@ The full generated API for every subpath lives at the
 }) }}
 
 {{ comp callout { type: "note", title: "Distinct from the back-end stream producer" } }}
-The Fresh-side <code>@netscript/fresh/streams</code> client <em>consumes</em> durable streams over
-HTTP/SSE in the browser. The <strong>producer</strong> runtime — the thing that writes stream state
-— is real and lives server-side in <code>@netscript/plugin-streams-core</code>
-(<code>createDurableStream</code>), served as an Aspire service on
-its assigned port. See <a href="/durable-workflows/streams/">Streams</a> for the
+The <code>@netscript/fresh/streams</code> client consumes durable streams over HTTP/SSE in the
+browser. The producer runtime, which writes stream state, lives server-side in
+<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>) and runs as an Aspire
+service on its assigned port. See <a href="/durable-workflows/streams/">Streams</a> for the
 producer/consumer split.
 {{ /comp }}
 
 ## The scaffolded app: `apps/dashboard`
 
-Every NetScript workspace ships `apps/dashboard` — a [Fresh](https://fresh.deno.dev/) 2.x
-application built with Preact, Tailwind CSS v4, and Vite. It is a workspace member registered in the
-root `deno.json` and orchestrated by Aspire alongside your services. It boots through
-`defineFreshApp` from `@netscript/fresh/server`, the meta-framework's baseline bootstrap, so every
-NetScript Fresh app starts the same way. It is **not a placeholder**: the scaffold wires it directly
-to your oRPC contracts so the dashboard renders typed, server-prefetched data from the same `users`
-service the back end implements.
+Every NetScript workspace ships `apps/dashboard`, a [Fresh](https://fresh.deno.dev/) 2.x
+application built with Preact, Tailwind CSS v4, and Vite. It is a workspace member in the root
+`deno.json`, and Aspire runs it alongside your services. It boots through `defineFreshApp` from
+`@netscript/fresh/server`, so every NetScript Fresh app starts the same way. The scaffold wires it to
+your oRPC contracts, so it renders typed, server-prefetched data from the same `users` service the
+back end implements.
 
 {{ comp.apiTable({
-  caption: "apps/dashboard layout (verbatim from a fresh scaffold)",
+  caption: "apps/dashboard layout from a fresh scaffold",
   rows: [
     { name: "main.ts", type: "entry", desc: "App entry: export const app = defineFreshApp<State>({ name: 'dashboard' }). Reads PORT (assigned per-project at scaffold time) and logs a startup banner." },
     { name: "router.ts", type: "routing", desc: "Stable route entrypoint. Re-exports generated routePatterns + routes and builds typed appRoutes via createRouteReference." },
-    { name: "routes/", type: "pages", desc: "File-system routes: index.tsx, dashboard.tsx, health.tsx, examples/service/, examples/telemetry/, the (design) system pages, plus _app.tsx / _layout.tsx shells." },
+    { name: "utils.ts", type: "typed wiring", desc: "Exports the createDefine<State>() define helper and the definePage() builder." },
+    { name: "routes/", type: "pages", desc: "File-system routes: index.tsx, dashboard.tsx, health.tsx, examples/service/, examples/telemetry/, the (design) system pages, plus _app.tsx (HTML shell) and _layout.tsx (chrome). Groups such as (_components)/, (_shared)/ and (_islands)/ are non-routing co-location folders." },
     { name: "islands/", type: "interactivity", desc: "Client-hydrated Preact islands (e.g. ThemeToggle, SidebarToggle, Toast under islands/ui/)." },
-    { name: "components/ui/", type: "design system", desc: "The copy-source component library you own (@netscript/fresh-ui): button, card, data-table, form-field, badge, and more (tsx + matching CSS in assets/ui/)." },
+    { name: "components/ui/", type: "design system", desc: "The copy-source component library you own (@netscript/fresh-ui): button, card, data-table, form-field, badge, and more (tsx + matching CSS in assets/ui/). Barrel at components/ui/mod.ts." },
     { name: "lib/", type: "service wiring", desc: "example-service.ts builds a typed oRPC client + query factories from your contract; cn.ts, public-types.ts." },
-    { name: "assets/", type: "styling", desc: "design.css, tokens.css/json, theme-bridge.css, and per-component CSS — the Tailwind v4 + design-token layer." },
+    { name: "assets/", type: "styling", desc: "design.css, tokens.css/json, theme-bridge.css, and per-component CSS: the Tailwind v4 and design-token layer." },
+    { name: "vite.config.ts / deno.json", type: "build + deps", desc: "Vite, Fresh and Tailwind plugins and the @app/* aliases; deno.json pins fresh, preact, @preact/signals, tailwindcss, and the @netscript/fresh* imports." },
     { name: ".generated/", type: "generated", desc: "manifest.ts + routes.ts produced by the Fresh route generator; consume via router.ts, never directly." }
   ]
 }) }}
 
 {{ comp callout { type: "note", title: "Two ports, one app" } }}
-The dashboard's own dev server reads <code>PORT</code> and binds to its assigned port (health at <code>/health</code>). That is distinct from the
-<strong>Aspire dashboard</strong> at <a href="https://localhost:18888">https://localhost:18888</a>,
-which orchestrates the whole resource graph. Bring the platform up first with
-<code>cd aspire &amp;&amp; aspire start</code> (Postgres/Redis + every service), or run the app
-standalone with <code>deno task --cwd apps/dashboard dev</code>.
+The app's dev server reads <code>PORT</code> and binds to its assigned port, with health at
+<code>/health</code>. The <strong>Aspire dashboard</strong> at
+the dashboard at the URL Aspire prints is separate: it orchestrates the whole
+resource graph. Start the platform with <code>cd aspire &amp;&amp; aspire start</code> (Postgres,
+Redis and every service), or run the app on its own with
+<code>deno task --cwd apps/dashboard dev</code>.
 {{ /comp }}
 
 ## Contract-driven by default
 
-The dashboard does not hand-roll `fetch` calls. `apps/dashboard/lib/example-service.ts` imports your
-`UsersContractV1` and turns it into a typed client and TanStack-Query factories through the NetScript
-SDK — the same contract object the `users` service implements, so the UI cannot drift from the API.
+The dashboard has no hand-rolled `fetch` calls. `lib/example-service.ts` turns your
+`UsersContractV1` into a typed client and TanStack-Query factories through the NetScript SDK. The
+`users` service implements the same contract object, so the UI cannot drift from the API.
 
 ```ts
 // apps/dashboard/lib/example-service.ts
@@ -164,10 +123,10 @@ export const exampleServiceQueries = createQueryFactories({
 }).service;
 ```
 
-A **route** is declared with the meta-framework's `definePage()` builder (`@netscript/fresh/builders`)
-— it binds a typed route reference, declares server-loaded layers, and wires telemetry — while an
-**island** consumes the query factories above through the `@netscript/fresh/query` bridge for
-hydration, optimistic mutations, and cache invalidation on the client.
+A route declares itself with `definePage()` from `@netscript/fresh/builders`: it binds a typed route
+reference, declares server-loaded layers, and wires telemetry. An island consumes the query
+factories through the `@netscript/fresh/query` bridge for hydration, optimistic mutations, and cache
+invalidation on the client.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -183,45 +142,37 @@ hydration, optimistic mutations, and cache invalidation on the client.
 ] }) }}
 
 {{ comp callout { type: "important", title: "Islands are the only client code" } }}
-Fresh ships zero JavaScript by default. Anything under <code>islands/</code> is the <em>only</em>
-code hydrated in the browser; routes and components render on the server. The <code>users</code>
-showcase loads its list on the server, dehydrates the query cache, and the
-<code>ServiceShowcaseLab</code> island re-hydrates it for interactive refetch and optimistic status
-updates — the contract-to-pixel proof end to end.
+Fresh ships no JavaScript by default. Only code under <code>islands/</code> hydrates in the browser;
+routes and components render on the server. The <code>users</code> showcase loads its list on the
+server and dehydrates the query cache, and the <code>ServiceShowcaseLab</code> island rehydrates it
+for refetch and optimistic status updates.
 {{ /comp }}
 
 ## The design system & owned components
 
-The scaffold installs the NetScript Fresh UI foundation (`@netscript/fresh-ui`) into
-`apps/dashboard/components/ui/` and its CSS into `assets/ui/`, driven by design tokens in
-`assets/tokens.json` / `tokens.css`. Because the components are copied into your repo, editing the
-UI is editing your own files — there is no framework component you cannot open. The bundled
-`(design)` route group renders a live token, component, and composition gallery so you can see every
-primitive in your project.
+The scaffold installs the Fresh UI foundation (`@netscript/fresh-ui`) into
+`apps/dashboard/components/ui/` and its CSS into `assets/ui/`, styled by the design tokens in
+`assets/tokens.json` and `tokens.css`. The components are copies in your repo, so you can open and
+edit every one of them. The bundled `(design)` route group is a live gallery of tokens, components,
+and composition rules, rendered by your own app with your own tokens. Edit a token or a component
+and the gallery shows the result across the whole vocabulary.
 
-Astro's documentation answers "what does this look like?" with one-click browser sandboxes;
-NetScript answers it from inside your repo — the `(design)` gallery is a live preview of the
-components you actually installed, rendered with the tokens you actually set, served by your own
-app. When you edit a token or a copied component, the gallery is where you watch the whole
-vocabulary absorb the change.
-
-What ships falls into four groups, each installable by registry id (`ui:add <name>`) or as a named
-collection. The AI/workspace group is worth calling out: it is a finite, token-driven component
-vocabulary for agent-facing surfaces — message threads, tool-call cards, citations, charts — that
-an application can map structured model output onto, so generated UI lands in your design language
-instead of ad-hoc markup:
+The registry ships four groups. You install each item by registry id (`ui:add <name>`) or as part
+of a named collection. The AI and workspace group is a fixed, token-driven vocabulary for
+agent-facing surfaces (message threads, tool-call cards, citations, charts), so an app can map
+structured model output onto components in its own design language.
 
 {{ comp.apiTable({
   caption: "What the registry ships",
   rows: [
     { name: "Interactive namespaces", type: "@netscript/fresh-ui/interactive", desc: "Stateful, accessible compound primitives: Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip, and the headless Combobox seam (useCombobox) that powers the command palette and autocompletes." },
-    { name: "L0 primitives", type: "@netscript/fresh-ui/primitives", desc: "Small platform-contract helpers: Show (wrapper-free conditional render), VisuallyHidden and its SrOnly alias, and Icon — a first-class stroke-SVG icon primitive also re-exported from the package root." },
-    { name: "AI / workspace primitives", type: "ui:add", desc: "The agent-surface set: avatar, citation-chip, code-block, model-selector, tool-call-card, chart-block, donut, prompt-input (auto-grows to fit its content), message (renderInline + TypingIndicator), and dropzone (drag, clipboard-paste, and multi-file ingest) — plus the foundation set (button, card, badge, data-table, forms, feedback, dashboard blocks)." },
-    { name: "Command & search utilities", type: "ui:add", desc: "command-palette (.ns-cmdk — the ⌘K modal that wraps the Combobox) and search (.ns-search — a compact nav affordance with a ⌘K hint that opens it)." }
+    { name: "L0 primitives", type: "@netscript/fresh-ui/primitives", desc: "Small platform-contract helpers: Show (wrapper-free conditional render), VisuallyHidden and its SrOnly alias, and Icon, a stroke-SVG icon primitive also re-exported from the package root." },
+    { name: "AI / workspace primitives", type: "ui:add", desc: "The agent-surface set: avatar, citation-chip, code-block, model-selector, tool-call-card, chart-block, donut, prompt-input (auto-grows to fit its content), message (renderInline + TypingIndicator), and dropzone (drag, clipboard-paste, and multi-file ingest), plus the foundation set (button, card, badge, data-table, forms, feedback, dashboard blocks)." },
+    { name: "Command & search utilities", type: "ui:add", desc: "command-palette (.ns-cmdk, the ⌘K modal that wraps the Combobox) and search (.ns-search, a compact nav affordance with a ⌘K hint that opens it)." }
   ]
 }) }}
 
-You manage that library with two CLI commands (run from the workspace root):
+Two CLI commands manage the library. Run them from the workspace root:
 
 {{ comp.apiTable({
   caption: "Fresh UI CLI commands",
@@ -232,32 +183,27 @@ You manage that library with two CLI commands (run from the workspace root):
 }) }}
 
 {{ comp callout { type: "note", title: "DataGrid is a runtime export, not a ui:add block" } }}
-The generic <code>DataGrid</code> component — a typed <code>columns</code>/<code>rows</code> contract
-with <code>strong</code>/<code>num</code> cell variants and plain, button, or Fresh-navigation rows —
-is exported from the <code>@netscript/fresh-ui</code> package root, so you <strong>import it
-directly</strong> rather than <code>ui:add</code>-ing it. It is the runtime successor to the
-copy-source <code>data-table</code> block; both still ship, so reach for <code>DataGrid</code> when
-you want a templated grid you do not have to own and copy in. See the
-<a href="/reference/fresh-ui/">reference</a> for its full API.
+<code>DataGrid</code> is exported from the <code>@netscript/fresh-ui</code> package root, so you
+import it instead of copying it. It takes a typed <code>columns</code>/<code>rows</code> contract,
+supports <code>strong</code>/<code>num</code> cell variants, and renders plain, button, or
+Fresh-navigation rows. It is the runtime successor to the copy-source <code>data-table</code> block.
+Both still ship: use <code>DataGrid</code> for a templated grid you do not need to own. See the
+<a href="/reference/fresh-ui/">reference</a> for its API.
 {{ /comp }}
 
-{{ comp callout { type: "warning", title: "Copy-source ownership tradeoff" } }}
-Because <code>ui:add</code> copies code into your repo, you own it: customize freely, but you do
-<strong>not</strong> get automatic upstream updates. Re-running <code>ui:add … --force</code>
-re-copies the source — and overwrites your local edits — so treat foundation files as yours and keep
-heavy customization in your own components. Full options live behind
-<code>netscript ui:init --help</code> / <code>netscript ui:add --help</code> and in the
-<a href="/reference/fresh-ui/">@netscript/fresh-ui reference</a>.
+{{ comp callout { type: "caution", title: "Re-copying overwrites your edits" } }}
+Copied components are yours, so they get no automatic upstream updates. Re-running
+<code>ui:add … --force</code> re-copies the source and overwrites your local edits. Keep heavy
+customization in your own components. Run <code>netscript ui:add --help</code> for the full options.
 {{ /comp }}
 
 ## Scope
 
-The scaffolded dashboard is a working, contract-wired **showcase** — not a finished product UI. It
-ships the `users` example (server-prefetched list + optimistic status mutation), a telemetry
-example, a CRUD example, a health page, and the design gallery. Treat these as the canonical patterns
-to copy from, not features to ship as-is; build your real screens by following the same
-`definePage` + island + query-factory shape against `@netscript/fresh`. The meta-framework is the
-durable surface — the app is one application of it.
+The dashboard is a working, contract-wired showcase, not a finished product UI. It ships the `users`
+example (server-prefetched list and optimistic status mutation), a telemetry example, a CRUD example,
+a health page, and the design gallery. Copy these patterns rather than shipping them as features:
+build your screens with the same `definePage`, island, and query-factory shape on
+`@netscript/fresh`.
 
 ## Endpoints & ports
 
@@ -266,42 +212,15 @@ durable surface — the app is one application of it.
   rows: [
     { name: "Assigned", type: "port", desc: "Dashboard dev server (reads Deno.env.get('PORT')). Standalone: deno task --cwd apps/dashboard dev." },
     { name: "/health", type: "HTTP", desc: "App health route logged at startup (e.g. /health on its assigned port)." },
-    { name: ":18888", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; token printed by aspire start." },
-    { name: "Assigned", type: "upstream", desc: "The users service the dashboard's typed client calls — same UsersContractV1, no drift." },
+    { name: "the URL Aspire prints", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; the generated local profile allows anonymous access." },
+    { name: "Assigned", type: "upstream", desc: "The users service the dashboard's typed client calls, using the same UsersContractV1." },
     { name: "Assigned", type: "streams", desc: "The durable-streams Aspire service the @netscript/fresh/streams client consumes over HTTP/SSE (producer runtime in @netscript/plugin-streams-core)." }
   ]
 }) }}
 
-## Where to go next
+## Next steps
 
-This hub is intentionally thin — the full generated APIs live in the reference. Pick the lane that
-matches what you're doing.
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Build a service",
-    body: "Guided tutorial: contract → users service on its assigned port → typed client → the island that renders it in the dashboard.",
-    href: "/tutorials/storefront/02-catalog-service/",
-    icon: "→"
-  },
-  {
-    title: "Do — Customize the Fresh UI",
-    body: "Task recipe: ui:init / ui:add, the copy-source ownership model, and editing the design tokens.",
-    href: "/web-layer/how-to/customize-fresh-ui/",
-    icon: "◆"
-  },
-  {
-    title: "Look up — @netscript/fresh reference",
-    body: "The meta-framework's full generated API: defineFreshApp, definePage, the query/route/form/defer/streams builders, and the server runtime.",
-    href: "/reference/fresh/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — @netscript/fresh-ui reference",
-    body: "The component registry, foundation set, design tokens, and the ui:init / ui:add surface.",
-    href: "/reference/fresh-ui/",
-    icon: "≡"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Telemetry & logging", href: "/observability/telemetry/" }, next: { label: "Authentication", href: "/identity-access/auth/" } }) }}
+Install components and edit the tokens with [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+See also the [`@netscript/fresh` reference](/reference/fresh/), the
+[`@netscript/fresh-ui` reference](/reference/fresh-ui/), and the
+storefront tutorial chapter [A typed catalog service](/tutorials/storefront/02-catalog-service/).

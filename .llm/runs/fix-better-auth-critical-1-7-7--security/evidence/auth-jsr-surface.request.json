@@ -1,0 +1,16 @@
+{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-all",
+                 ".llm/tools/fitness/audit-jsr-package.ts",
+                 "--root",
+                 "packages/auth-better-auth",
+                 "--no-dry-run",
+                 "--out",
+                 ".llm/tmp/better-auth-security-sol-20261028/auth-jsr-surface.json"
+             ],
+    "timeoutMs":  120000,
+    "childReport":  ".llm/tmp/better-auth-security-sol-20261028/auth-jsr-surface.json"
+}

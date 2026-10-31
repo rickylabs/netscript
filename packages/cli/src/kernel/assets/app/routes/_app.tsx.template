@@ -1,11 +1,19 @@
 import { define } from '@app/utils.ts';
+import { appTheme } from '@app/lib/theme.ts';
 
 const THEME_INIT_SCRIPT =
-  `(function(){var t=localStorage.getItem('ns-theme');if(!t){t=matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)})()`;
+  `(function(){var t;try{t=localStorage.getItem('ns-theme')}catch(e){}if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-scheme',t)})()`;
 
-export default define.page(function AppShell({ Component }) {
+export default define.page(function AppShell({ Component, state }) {
+  const { preset, fontImports, previewStylesheet } = state.themePreview ?? appTheme();
   return (
-    <html lang='en' data-theme='dark'>
+    <html
+      lang='en'
+      data-theme={preset.language}
+      data-scheme='dark'
+      data-density={preset.density}
+      data-flavor={preset.flavor ?? undefined}
+    >
       <head>
         <meta charSet='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
@@ -17,13 +25,11 @@ export default define.page(function AppShell({ Component }) {
         <link rel='icon' href='data:,' />
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
-        <link
-          href='https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap'
-          rel='stylesheet'
-        />
-        <script>{THEME_INIT_SCRIPT}</script>
+        {fontImports.map((href) => <link key={href} href={href} rel='stylesheet' />)}
+        {previewStylesheet && <link href={previewStylesheet} rel='stylesheet' />}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body f-client-nav>
+      <body f-client-nav={!previewStylesheet}>
         <a href='#main-content' class='ns-skip-link'>Skip to main content</a>
         <div id='main-content' tabIndex={-1}>
           <Component />

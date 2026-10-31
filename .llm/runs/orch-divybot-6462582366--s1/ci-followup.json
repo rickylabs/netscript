@@ -1,0 +1,136 @@
+{
+  "ci-followup-package-tests-final.json": {
+    "sha256": "5803c8e9e1d1a3dd14fd70ab2b5ab733b8eb7e025f9faaafb7fc083a56749457",
+    "summary": {
+      "passed": 213,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 213,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "ci-followup-embed-tests.json": {
+    "sha256": "7b817c60f0710ff2666ac0c71605afc3f3ee54ac59d0c55c6862e94e5dc331cd",
+    "summary": {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "ci-followup-command-tree.json": {
+    "sha256": "ad950ce3ce25783dbdde74f08045b89137ec40c690a4b7236729a63b324e1430",
+    "summary": {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "ci-followup-check.json": {
+    "sha256": "13aa7c2cee7bab0ec8218a309b60b41bde4eaa540d6bfe3df276332bc49f0ccc",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "ci-followup-lint-final.json": {
+    "sha256": "4a8f1a8251f57e376d4e55579689132ae4e765d7b857d1b7fa3fa68bc9138c08",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    }
+  },
+  "ci-followup-fmt-final.json": {
+    "sha256": "a1ba404789d33dd2ccc462700ecd0069ef04218634f8d4eb06e4d5fec6ec2d5b",
+    "summary": {
+      "filesSelected": 40,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "ci-followup-quality-receipt.json": {
+    "sha256": "f02a84eae71bbe4a0b39d390736bdd78de84fa95149c207337bcb8d905fdfc53",
+    "exitCode": 0,
+    "outcome": "PASS",
+    "gateId": "quality-gate"
+  },
+  "browser": {
+    "cases": 24,
+    "passed": 24,
+    "logSha256": "e8fe3f6e36f485b7425aff5494d209bfdc4ab4fde460f072cdb17295cf8c6dc9"
+  },
+  "review": [
+    {
+      "verdict": "FAIL_FIX",
+      "rawSha256": "5c50723ce1c65dca37c43d3095d33c7d0651d34eb0a1b0b2f0ffcc1cbe0d5592"
+    },
+    {
+      "verdict": "PASS",
+      "rawSha256": "6b8c20c1264ca01cc1a1f110cb4e9ca89d9809567d7a69783ab01eab8475d711"
+    }
+  ],
+  "combinedTree": {
+    "ci-followup-corpus-regressions.json": {
+      "sha256": "ce07e02ab80fa680c14849cb4f6f89fed4e8bdaeb27d6b827743068f53daeea9",
+      "summary": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    "ci-followup-merged-quality.json": {
+      "sha256": "9617191ed4c15ac5ae20c3fc7db4332d6bafe74a4e9a51d74f8caca4681dfb75",
+      "gitHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "gateId": "quality-gate"
+    },
+    "ci-followup-root-lint-receipt.json": {
+      "sha256": "26d14b418f43214a10c360ff05d5242f15cf39adc4f67432a039e9a6edca1698",
+      "gitHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "gateId": "lint-report"
+    },
+    "ci-followup-root-fmt-receipt.json": {
+      "sha256": "4c60167976ed3e135b80ff1008f5a3aa1a815dee73b7bb546e96474bd656822a",
+      "gitHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+      "exitCode": 0,
+      "outcome": "PASS",
+      "gateId": "fmt-check-report"
+    },
+    "actualCli": {
+      "sha256": "816bcc7019565fd99dc9a5fcc94f54ae54149175e552ec29a0804f05e25affb8",
+      "codes": {
+        "ci-followup-cli-registry-theme-final": 0,
+        "ci-followup-cli-init-final": 0,
+        "ci-followup-cli-build-final": 0,
+        "ci-followup-cli-invalid-final": 1,
+        "ci-followup-cli-clean-final": 0,
+        "ci-followup-cli-rebuild-final": 0
+      },
+      "registryCopiesExactSelectedCss": true,
+      "generatedFiles": 23,
+      "allPreviewCssInheritsOverride": true,
+      "rawValueRejectedWithoutMutation": true,
+      "cleanPreservesOwnedBytes": true,
+      "rebuildMatches": true,
+      "cssExcerpt": "--ns-radius-md: var(--ns-radius-lg)"
+    }
+  }
+}

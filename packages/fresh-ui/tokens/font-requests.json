@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "description": "Provider-supported weights for the three mono families whose requests need explicit constraints. Font and role values remain in DTCG sources.",
+  "families": {
+    "Fragment Mono": [400],
+    "DM Mono": [400, 500],
+    "Space Mono": [400, 700]
+  }
+}

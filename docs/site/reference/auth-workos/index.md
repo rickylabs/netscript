@@ -5,14 +5,14 @@ title: '@netscript/auth-workos'
 
 # `@netscript/auth-workos`
 
-WorkOS-backed authenticator and backend adapter for NetScript auth. This page is written against the
-package's public surface reported by `deno doc`.
+WorkOS-backed authenticator and backend adapter for NetScript auth. Use it when WorkOS AuthKit is
+your identity provider, including subject-wide session revocation after logout.
 
-## Exports
+## Sub-path exports
 
-| Export                   | Path       |
-| ------------------------ | ---------- |
-| `@netscript/auth-workos` | `./mod.ts` |
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/auth-workos` | `./mod.ts` | [Factories](#factories), [options and result types](#options-and-result-types) and [re-exported auth contracts](#re-exported-auth-contracts). |
 
 ## Factories
 
@@ -43,24 +43,46 @@ package's public surface reported by `deno doc`.
 | `WorkosRevocationDelivery`              | interface  | Work item and optimistic storage version.                        |
 | `WorkosRevocationClient`                | interface  | Official SDK list/revoke boundary used by workers.               |
 
+## Re-exported auth contracts
+
+| Symbol                                 | Kind      | Description                                                   |
+| -------------------------------------- | --------- | ------------------------------------------------------------- |
+| `AuthBackendPort`                      | interface | Backend adapter port implemented by `createWorkosBackend`.    |
+| `AuthenticatorPort`                    | interface | Authenticator port used by request authentication.            |
+| `AuthnRequest`                         | interface | Authentication request shape.                                 |
+| `Principal`                            | interface | Principal payload returned by authenticators.                 |
+| `AuthBackendOperationUnsupportedError` | class     | Error for unsupported upstream operations.                    |
+| `InteractiveFlowPort`                  | interface | Interactive-flow port re-exported from the core auth package. |
+
 ## Subject-wide revocation
 
-The official auth plugin composes the KV fence and its background worker. Signout does one atomic
-fence/outbox commit without WorkOS enumeration. Each delivery processes at most 50 sessions using
-the service's API identity. It persists session tombstones before upstream revocation and
-checkpoints progress. Failed pages retry indefinitely with exponential backoff capped at 60 seconds.
-Storage failures are supervised and reported through the service logger and telemetry without raw
-errors or credentials. Idle replicas back off to one KV read per minute; a committed logout wakes
-the local service worker immediately, with idle polling retained as a recovery fallback. The
-shutdown hook aborts admission and drains an active delivery on SIGTERM, SIGINT, and manual stop;
-restart resumes pending pages.
+A subject-wide logout refuses every credential of that subject while upstream WorkOS sessions are
+revoked in the background.
 
-Standalone applications compose `createWorkosRevocationStore(kv, retention)` over an atomic host
-`@netscript/kv` store and share it with `createWorkosBackend`, `createWorkosAuthenticator`, and any
-`createWorkosAccessTokenAuthenticator`. Run
-`revokeWorkosSubjectPage(store, workos, delivery, signal)` in a service-owned worker, reading
-`store.nextDelivery(now)` and checkpointing retries. Without a store, subject-wide revocation
-remains explicitly unsupported.
+### Plugin worker
+
+The official auth plugin composes the KV fence and its background worker.
+
+- Signout does one atomic fence/outbox commit without WorkOS enumeration.
+- Each delivery processes at most 50 sessions using the service's API identity.
+- Session tombstones persist before upstream revocation, and progress is checkpointed.
+- Failed pages retry indefinitely with exponential backoff capped at 60 seconds.
+- Storage failures are supervised and reported through the service logger and telemetry, without
+  raw errors or credentials.
+- Idle replicas back off to one KV read per minute. A committed logout wakes the local service
+  worker immediately; idle polling remains a recovery fallback.
+- The shutdown hook aborts admission and drains an active delivery on SIGTERM, SIGINT and manual
+  stop. Restart resumes pending pages.
+
+### Standalone applications
+
+Compose `createWorkosRevocationStore(kv, retention)` over an atomic host `@netscript/kv` store and
+share it with `createWorkosBackend`, `createWorkosAuthenticator`, and any
+`createWorkosAccessTokenAuthenticator`. Run `revokeWorkosSubjectPage(store, workos, delivery, signal)`
+in a service-owned worker, reading `store.nextDelivery(now)` and checkpointing retries. Without a
+store, subject-wide revocation is explicitly unsupported.
+
+### Fences, tombstones and retention
 
 The fence refuses every credential of the subject while upstream cleanup is pending. After cleanup,
 the cutoff and session tombstones still refuse old or refreshed credentials; other subjects remain
@@ -74,41 +96,44 @@ future retries before choosing the earliest job in a window of at most 50 due en
 order cannot hide due work behind a future retry.
 
 Tombstones expire only after upstream revocation succeeds, plus the longest configured access-token
-lifetime and clock-skew padding. `WorkosRevocationRetention.maxAccessTokenLifetimeMs` defaults to
-one day, and `clockSkewMs` to one minute. In the plugin, set `WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS`
-to cover the longest access-token duration in your
+lifetime and clock-skew padding.
+
+| Setting | Default | Plugin variable |
+| --- | --- | --- |
+| `WorkosRevocationRetention.maxAccessTokenLifetimeMs` | one day | `WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS` |
+| `WorkosRevocationRetention.clockSkewMs` | one minute | `WORKOS_CLOCK_SKEW_MS` |
+
+Set the lifetime to cover the longest access-token duration in your
 [WorkOS application settings](https://workos.com/docs/authkit/sessions). After a subject logout,
 tokens missing expiry or exceeding the configured lifetime fail closed even after tombstone expiry.
-Set `WORKOS_CLOCK_SKEW_MS` for the allowed provider/local difference; the upstream cutoff includes
-that same margin, conservatively ending sessions within it while preserving later sessions.
+The clock skew is the allowed provider/local difference; the upstream cutoff includes that same
+margin, conservatively ending sessions within it while preserving later sessions.
+
+### Plugin configuration
+
+The plugin requires atomic host KV for WorkOS. It reads `NETSCRIPT_AUTH_COOKIE_NAME`, defaulting to
+`__Host-ns_session`. The CLI WorkOS preset sets `wos-session` to match AuthKit's SDK default.
+Configure your AuthKit issuer with the same name, or set `NETSCRIPT_AUTH_COOKIE_NAME=wos-session`
+for an existing cookie. Standalone callers must share the store across all authenticators and run
+the cleanup worker.
 
 ### Migration in 0.0.8
 
 The revocation outbox storage format changes: pending keys use compact ISO timestamp strings and
-retention repair uses per-job outstanding markers. Before upgrading an existing 0.0.8 canary
-installation, stop admitting new global logouts and let its old worker drain all pending revocations
-and retention repair. Then stop all old auth replicas and upgrade them together before resuming
-logouts. Keep subject fences and session tombstones; do not delete revocation state or run old and
-new workers together. Existing completed fences and retained tombstones remain compatible.
-`WorkosRevocationJob.tombstoneAfter` is now a repair-phase marker, not a key-order cursor.
+retention repair uses per-job outstanding markers. To upgrade an existing 0.0.8 canary
+installation:
 
-The plugin requires atomic host KV for WorkOS. It reads `NETSCRIPT_AUTH_COOKIE_NAME`, defaulting to
-`__Host-ns_session`. The CLI WorkOS preset explicitly sets `wos-session` to match AuthKit's SDK
-default. Configure your AuthKit issuer with the same name, or set
-`NETSCRIPT_AUTH_COOKIE_NAME=wos-session` for an existing cookie. Standalone callers must share the
-store across all authenticators and run the cleanup worker. Custom stores expose `clockSkewMs` and
-implement `confirmSessionRevoked` after upstream success; terminal `fail` is removed. Refresh
-identity changes use `workos_session_identity_changed`, distinct from concurrent logout.
+1. Stop admitting new global logouts.
+2. Let the old worker drain all pending revocations and retention repair.
+3. Stop all old auth replicas.
+4. Upgrade them together, then resume logouts.
 
-## Re-exported auth contracts
+> [!CAUTION]
+> Keep subject fences and session tombstones. Don't delete revocation state or run old and new
+> workers together.
 
-| Symbol                                 | Kind      | Description                                                   |
-| -------------------------------------- | --------- | ------------------------------------------------------------- |
-| `AuthBackendPort`                      | interface | Backend adapter port implemented by `createWorkosBackend`.    |
-| `AuthenticatorPort`                    | interface | Authenticator port used by request authentication.            |
-| `AuthnRequest`                         | interface | Authentication request shape.                                 |
-| `Principal`                            | interface | Principal payload returned by authenticators.                 |
-| `AuthBackendOperationUnsupportedError` | class     | Error for unsupported upstream operations.                    |
-| `InteractiveFlowPort`                  | interface | Interactive-flow port re-exported from the core auth package. |
-
-Back to the [auth reference hub](/reference/auth/).
+Existing completed fences and retained tombstones remain compatible.
+`WorkosRevocationJob.tombstoneAfter` is a repair-phase marker, not a key-order cursor. Custom stores
+expose `clockSkewMs` and implement `confirmSessionRevoked` after upstream success; terminal `fail`
+is removed. Refresh identity changes use `workos_session_identity_changed`, distinct from
+concurrent logout.

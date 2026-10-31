@@ -1,0 +1,20 @@
+import manifest from '@app/assets/tokens.json' with { type: 'json' };
+import { appTheme, type AppTheme, themeFontImports, themeLabel } from '@app/lib/theme.ts';
+
+type PresetId = keyof typeof manifest.presets;
+
+/** Only development design middleware and pages resolve preview presets. */
+export function designTheme(url: URL): AppTheme & { readonly id: PresetId } {
+  const configured = appTheme();
+  const requested = url.searchParams.get('preset');
+  const candidate = requested && Object.hasOwn(manifest.presets, requested) ? requested : configured.id;
+  if (!Object.hasOwn(manifest.presets, candidate)) throw new Error('Unknown configured token preset');
+  const id = candidate as PresetId;
+  return {
+    id,
+    preset: manifest.presets[id],
+    label: themeLabel(id),
+    fontImports: themeFontImports(id),
+    previewStylesheet: id === configured.id ? undefined : `/presets/${id}.css`,
+  };
+}

@@ -1,0 +1,4621 @@
+{
+  "collection": "Theme",
+  "modes": [
+    "Studio",
+    "Ledger",
+    "Filigrane",
+    "Signal",
+    "Tonal",
+    "Glass",
+    "Brutal",
+    "Fluent",
+    "Tactile",
+    "Pixel"
+  ],
+  "variables": [
+    {
+      "name": "accent/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/1"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/1"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/1"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/1"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/1"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/1"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/1"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/1"
+        }
+      }
+    },
+    {
+      "name": "accent/d/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/10"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/10"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/10"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/10"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/10"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/10"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/10"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/10"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/10"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/10"
+        }
+      }
+    },
+    {
+      "name": "accent/d/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/11"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/11"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/11"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/11"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/11"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/11"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/11"
+        },
+        "Fluent": "#99ebff",
+        "Tactile": "#79b0ff",
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/11"
+        }
+      }
+    },
+    {
+      "name": "accent/d/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/12"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/12"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/12"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/12"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/12"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/12"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/12"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/12"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/12"
+        }
+      }
+    },
+    {
+      "name": "accent/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/2"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/2"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/2"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/2"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/2"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/2"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/2"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/2"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/2"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/2"
+        }
+      }
+    },
+    {
+      "name": "accent/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/3"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/3"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/3"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/3"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/3"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/3"
+        }
+      }
+    },
+    {
+      "name": "accent/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/4"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/4"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/4"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/4"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/4"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/4"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/4"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/4"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/4"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/4"
+        }
+      }
+    },
+    {
+      "name": "accent/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/5"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/5"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/5"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/5"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/5"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/5"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/5"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/5"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/5"
+        }
+      }
+    },
+    {
+      "name": "accent/d/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/6"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/6"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/6"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/6"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/6"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/6"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/6"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/6"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/6"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/6"
+        }
+      }
+    },
+    {
+      "name": "accent/d/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/7"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/7"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/7"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/7"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/7"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/7"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/7"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/7"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/7"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/7"
+        }
+      }
+    },
+    {
+      "name": "accent/d/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/8"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/8"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/8"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/8"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/8"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/8"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/8"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/8"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/8"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/8"
+        }
+      }
+    },
+    {
+      "name": "accent/d/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/9"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/9"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/d/9"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/9"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/d/9"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/d/9"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/d/9"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/d/9"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/9"
+        }
+      }
+    },
+    {
+      "name": "accent/d/contrast",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/d/contrast"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/white"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/white"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/12"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/white"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/white"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/1"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/d/bg"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/9"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Fluent": "#60cdff",
+        "Tactile": "#1a6fe8",
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/9"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/d/fg"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/contrast"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/contrast"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/contrast"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/white"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/contrast"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/contrast"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/black"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/white"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/1"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/d/bg-hover"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/9-hover"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/10"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/10"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/10"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/10"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/10"
+        },
+        "Fluent": "#60cdffe5",
+        "Tactile": "#1560cf",
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/10"
+        }
+      }
+    },
+    {
+      "name": "accent/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/1"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/1"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/1"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/1"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/1"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/1"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/1"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/1"
+        }
+      }
+    },
+    {
+      "name": "accent/l/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/10"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/10"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/10"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/10"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/10"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/10"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/10"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/10"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/10"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/10"
+        }
+      }
+    },
+    {
+      "name": "accent/l/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/11"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/11"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/11"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/11"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/11"
+        },
+        "Fluent": "#003e92",
+        "Tactile": "#1550b5",
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/11"
+        }
+      }
+    },
+    {
+      "name": "accent/l/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/12"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/12"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/12"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/12"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/12"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/12"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/12"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/12"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/12"
+        }
+      }
+    },
+    {
+      "name": "accent/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/2"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/2"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/2"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/2"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/2"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/2"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/2"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/2"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/2"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/2"
+        }
+      }
+    },
+    {
+      "name": "accent/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/3"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/3"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/3"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/3"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/3"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/3"
+        }
+      }
+    },
+    {
+      "name": "accent/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/4"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/4"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/4"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/4"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/4"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/4"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/4"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/4"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/4"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/4"
+        }
+      }
+    },
+    {
+      "name": "accent/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/5"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/5"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/5"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/5"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/5"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/5"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/5"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/5"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/5"
+        }
+      }
+    },
+    {
+      "name": "accent/l/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/6"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/6"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/6"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/6"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/6"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/6"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/6"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/6"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/6"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/6"
+        }
+      }
+    },
+    {
+      "name": "accent/l/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/7"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/7"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/7"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/7"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/7"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/7"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/7"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/7"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/7"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/7"
+        }
+      }
+    },
+    {
+      "name": "accent/l/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/8"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/8"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/8"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/8"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/8"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/8"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/8"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/8"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/8"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/8"
+        }
+      }
+    },
+    {
+      "name": "accent/l/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/9"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/9"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/9"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/9"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/9"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/9"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/blue/l/9"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/blue/l/9"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/9"
+        }
+      }
+    },
+    {
+      "name": "accent/l/contrast",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/white"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/white"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/12"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/white"
+        },
+        "Glass": {
+          "alias": "Primitives/color/white"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/12"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/white"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/white"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/1"
+        }
+      }
+    },
+    {
+      "name": "accent/l/solid",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/9"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/11"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/11"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/11"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/9"
+        },
+        "Fluent": "#005fb8",
+        "Tactile": "#1a6fe8",
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/9"
+        }
+      }
+    },
+    {
+      "name": "accent/l/solid-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/10"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/tomato/l/11-hover"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/10"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/11"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/11-hover"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/10"
+        },
+        "Fluent": "#005fb8e5",
+        "Tactile": "#1560cf",
+        "Pixel": {
+          "alias": "Primitives/color/ember/l/10"
+        }
+      }
+    },
+    {
+      "name": "border/d/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/border/d/default"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/6"
+        }
+      }
+    },
+    {
+      "name": "border/d/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/border/d/subtle"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/4"
+        }
+      }
+    },
+    {
+      "name": "border/l/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/border/l/default"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/6"
+        }
+      }
+    },
+    {
+      "name": "border/l/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/border/l/subtle"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/4"
+        }
+      }
+    },
+    {
+      "name": "border/width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/border/width"
+        },
+        "Ledger": 1,
+        "Filigrane": 1,
+        "Signal": 1,
+        "Tonal": 1,
+        "Glass": 1,
+        "Brutal": 1,
+        "Fluent": 1,
+        "Tactile": 1,
+        "Pixel": 1
+      }
+    },
+    {
+      "name": "font/data",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-data)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/data"
+        },
+        "Ledger": "IBM Plex Mono",
+        "Filigrane": "Hanken Grotesk",
+        "Signal": "Geist Mono",
+        "Tonal": "Roboto Flex",
+        "Glass": "Inter",
+        "Brutal": "JetBrains Mono",
+        "Fluent": "Open Sans",
+        "Tactile": "Nunito Sans",
+        "Pixel": "JetBrains Mono"
+      }
+    },
+    {
+      "name": "font/heading",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-heading)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/heading"
+        },
+        "Ledger": "IBM Plex Sans",
+        "Filigrane": "Newsreader",
+        "Signal": "Geist Mono",
+        "Tonal": "Roboto Flex",
+        "Glass": "Inter",
+        "Brutal": "Space Grotesk",
+        "Fluent": "Open Sans",
+        "Tactile": "Nunito Sans",
+        "Pixel": "Pixelify Sans"
+      }
+    },
+    {
+      "name": "font/kpi",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-kpi)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/kpi"
+        },
+        "Ledger": "IBM Plex Mono",
+        "Filigrane": "Newsreader",
+        "Signal": "Geist Mono",
+        "Tonal": "Roboto Flex",
+        "Glass": "Inter",
+        "Brutal": "Space Grotesk",
+        "Fluent": "Open Sans",
+        "Tactile": "Nunito Sans",
+        "Pixel": "Pixelify Sans"
+      }
+    },
+    {
+      "name": "font/label",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-label)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Ledger": "IBM Plex Sans",
+        "Filigrane": "Hanken Grotesk",
+        "Signal": "Geist Mono",
+        "Tonal": "Roboto Flex",
+        "Glass": "Inter",
+        "Brutal": "Space Mono",
+        "Fluent": "Open Sans",
+        "Tactile": "Nunito Sans",
+        "Pixel": "Space Mono"
+      }
+    },
+    {
+      "name": "font/mono",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-mono)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/mono"
+        },
+        "Ledger": "IBM Plex Mono",
+        "Filigrane": "IBM Plex Mono",
+        "Signal": "Geist Mono",
+        "Tonal": "Geist Mono",
+        "Glass": "Geist Mono",
+        "Brutal": "JetBrains Mono",
+        "Fluent": "JetBrains Mono",
+        "Tactile": "Geist Mono",
+        "Pixel": "JetBrains Mono"
+      }
+    },
+    {
+      "name": "font/sans",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-sans)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/sans"
+        },
+        "Ledger": "IBM Plex Sans",
+        "Filigrane": "Hanken Grotesk",
+        "Signal": "Geist",
+        "Tonal": "Roboto Flex",
+        "Glass": "Inter",
+        "Brutal": "Space Grotesk",
+        "Fluent": "Open Sans",
+        "Tactile": "Nunito Sans",
+        "Pixel": "Inter"
+      }
+    },
+    {
+      "name": "gray/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/1"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/1"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/1"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/1"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/1"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/1"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/1"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/1"
+        }
+      }
+    },
+    {
+      "name": "gray/d/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/10"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/10"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/10"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/10"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/10"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/10"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/10"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/10"
+        },
+        "Tactile": "#7a8498",
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/10"
+        }
+      }
+    },
+    {
+      "name": "gray/d/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/11"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/11"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/11-bright"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/11"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/11-strong"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/11"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/11"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/11"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/11"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/11"
+        }
+      }
+    },
+    {
+      "name": "gray/d/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/12"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/12"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/12"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/12"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/12"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/12"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/12"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/12"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/12"
+        }
+      }
+    },
+    {
+      "name": "gray/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/2"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/2"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/2"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/2"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/2"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/2"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/2"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/2"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/2"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/2"
+        }
+      }
+    },
+    {
+      "name": "gray/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/3"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/3"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/3"
+        }
+      }
+    },
+    {
+      "name": "gray/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/4"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/4"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/4"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/4"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/4"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/4"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/4"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/4"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/4"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/4"
+        }
+      }
+    },
+    {
+      "name": "gray/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/5"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/5"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/7"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/5"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/5"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/5"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/5"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/5"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/5"
+        }
+      }
+    },
+    {
+      "name": "gray/d/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/6"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/6"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/8"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/6"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/6"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/6"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/6"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/6"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/6"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/6"
+        }
+      }
+    },
+    {
+      "name": "gray/d/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/7"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/7"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/7"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/7"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/7"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/7"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/7"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/7"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/7"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/7"
+        }
+      }
+    },
+    {
+      "name": "gray/d/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/8"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/8"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/8"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/8"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/8"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/8"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/8"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/8"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/8"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/8"
+        }
+      }
+    },
+    {
+      "name": "gray/d/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/9"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/d/9"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/9"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/d/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/9"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/9"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/9"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/9"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/9"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/9"
+        }
+      }
+    },
+    {
+      "name": "gray/d/ink-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/d/ink-hover"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/ink-hover/slate/d"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/ink-hover/sand/d"
+        },
+        "Signal": {
+          "alias": "Primitives/color/ink-hover/gray/d"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/ink-hover/mauve/d"
+        },
+        "Glass": {
+          "alias": "Primitives/color/ink-hover/slate/d"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/ink-hover/sand/d"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/ink-hover/gray/d"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/ink-hover/slate/d"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ink-hover/sand/d"
+        }
+      }
+    },
+    {
+      "name": "gray/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/1"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/1"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/1"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/1"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/1"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/1"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/1"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/1"
+        }
+      }
+    },
+    {
+      "name": "gray/l/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/10"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/10"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/10"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/10"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/10"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/10"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/10"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/10"
+        },
+        "Tactile": "#6a759e",
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/10"
+        }
+      }
+    },
+    {
+      "name": "gray/l/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/11"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/11"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/11"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/11"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/11-strong"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/11"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/11"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/11"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/11"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/11"
+        }
+      }
+    },
+    {
+      "name": "gray/l/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/12"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/12"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/12"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/12"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/12"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/12"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/12"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/12"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/12"
+        }
+      }
+    },
+    {
+      "name": "gray/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/2"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/2"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/2"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/2"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/2"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/2"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/2"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/2"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/2"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/2"
+        }
+      }
+    },
+    {
+      "name": "gray/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/3"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/3"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/3"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/3"
+        }
+      }
+    },
+    {
+      "name": "gray/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/4"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/4"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/4"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/4"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/4"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/4"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/4"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/4"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/4"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/4"
+        }
+      }
+    },
+    {
+      "name": "gray/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/5"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/5"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/5"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/5"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/5"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/5"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/5"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/5"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/5"
+        }
+      }
+    },
+    {
+      "name": "gray/l/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/6"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/6"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/6"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/6"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/6"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/6"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/6"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/6"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/6"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/6"
+        }
+      }
+    },
+    {
+      "name": "gray/l/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/7"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/7"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/7"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/7"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/7"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/7"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/7"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/7"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/7"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/7"
+        }
+      }
+    },
+    {
+      "name": "gray/l/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/8"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/8"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/8"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/8"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/8"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/8"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/8"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/8"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/8"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/8"
+        }
+      }
+    },
+    {
+      "name": "gray/l/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/9"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/slate/l/9"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/l/9"
+        },
+        "Signal": {
+          "alias": "Primitives/color/gray/l/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/9"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/9"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/l/9"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/9"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/9"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/9"
+        }
+      }
+    },
+    {
+      "name": "gray/l/ink-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Base gray/gray/l/ink-hover"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/ink-hover/slate/l"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/ink-hover/sand/l"
+        },
+        "Signal": {
+          "alias": "Primitives/color/ink-hover/gray/l"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/ink-hover/mauve/l"
+        },
+        "Glass": {
+          "alias": "Primitives/color/ink-hover/slate/l"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/ink-hover/sand/l"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/ink-hover/gray/l"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/ink-hover/slate/l"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/ink-hover/sand/l"
+        }
+      }
+    },
+    {
+      "name": "hover/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/hover/d"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/3"
+        }
+      }
+    },
+    {
+      "name": "hover/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/hover/l"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/3"
+        }
+      }
+    },
+    {
+      "name": "ink/d",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/black"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/12"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/12"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/12"
+        }
+      }
+    },
+    {
+      "name": "ink/l",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/shadow/ink"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/12"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/12"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/12"
+        }
+      }
+    },
+    {
+      "name": "material/d/fill",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/fill"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/glass/d/fill-strong"
+        },
+        "Tactile": "#2a2d32",
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/2"
+        }
+      }
+    },
+    {
+      "name": "material/d/fill-strong",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/3"
+        }
+      }
+    },
+    {
+      "name": "material/d/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/stroke"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/6"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/6"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/6"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/6"
+        }
+      }
+    },
+    {
+      "name": "material/d/track",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/track"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/3"
+        }
+      }
+    },
+    {
+      "name": "material/l/fill",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/fill"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/glass/l/fill-strong"
+        },
+        "Tactile": "#e0e5ec",
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/1"
+        }
+      }
+    },
+    {
+      "name": "material/l/fill-strong",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/white"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/white"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/white"
+        }
+      }
+    },
+    {
+      "name": "material/l/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/stroke"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/6"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/6"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/6"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/6"
+        }
+      }
+    },
+    {
+      "name": "material/l/track",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/track"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/3"
+        }
+      }
+    },
+    {
+      "name": "radius/badge",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-badge)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/radius/badge"
+        },
+        "Ledger": 3,
+        "Filigrane": 999,
+        "Signal": 4,
+        "Tonal": 8,
+        "Glass": 999,
+        "Brutal": 999,
+        "Fluent": 999,
+        "Tactile": 999,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "radius/card",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-card)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/radius/card"
+        },
+        "Ledger": 6,
+        "Filigrane": 16,
+        "Signal": 8,
+        "Tonal": 16,
+        "Glass": 22,
+        "Brutal": 12,
+        "Fluent": 8,
+        "Tactile": 24,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "radius/control",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-control)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/radius/control"
+        },
+        "Ledger": 4,
+        "Filigrane": 999,
+        "Signal": 6,
+        "Tonal": 999,
+        "Glass": 999,
+        "Brutal": 8,
+        "Fluent": 4,
+        "Tactile": 999,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "radius/input",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-input)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/radius/input"
+        },
+        "Ledger": 4,
+        "Filigrane": 10,
+        "Signal": 6,
+        "Tonal": 4,
+        "Glass": 10,
+        "Brutal": 8,
+        "Fluent": 4,
+        "Tactile": 14,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "ring/d",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/ring/d"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/d/11"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/sand/d/10"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/d/11"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/9"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/blue/d/11"
+        },
+        "Fluent": "#8d8d8d",
+        "Tactile": "#3b8bff",
+        "Pixel": {
+          "alias": "Primitives/color/ember/d/11"
+        }
+      }
+    },
+    {
+      "name": "ring/l",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/ring/l"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/indigo/l/11"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/12"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/l/11"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/violet/l/11"
+        },
+        "Glass": {
+          "alias": "Primitives/color/blue/l/11"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/blue/l/11"
+        },
+        "Fluent": "#000000e4",
+        "Tactile": "#1e7bff",
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/1"
+        }
+      }
+    },
+    {
+      "name": "selected/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/selected/d"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/3"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/3"
+        }
+      }
+    },
+    {
+      "name": "selected/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/selected/l"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Glass": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/3"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/3"
+        }
+      }
+    },
+    {
+      "name": "shadow/blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/blur"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 3,
+        "Glass": 28,
+        "Brutal": 0,
+        "Fluent": 4,
+        "Tactile": 8,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "shadow/d/color",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/d/color"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/shadow/none"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/shadow/none"
+        },
+        "Signal": {
+          "alias": "Primitives/color/shadow/none"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/shadow/d"
+        },
+        "Glass": {
+          "alias": "Primitives/color/shadow/soft-d"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/black"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/shadow/fluent-d"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/shadow/tactile-d"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/shadow/none"
+        }
+      }
+    },
+    {
+      "name": "shadow/l/color",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/l/color"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/shadow/none"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/shadow/none"
+        },
+        "Signal": {
+          "alias": "Primitives/color/shadow/none"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/shadow/l"
+        },
+        "Glass": {
+          "alias": "Primitives/color/shadow/soft-l"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/shadow/ink"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/shadow/fluent-l"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/shadow/tactile-l"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/shadow/none"
+        }
+      }
+    },
+    {
+      "name": "shadow/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/y"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 1,
+        "Glass": 10,
+        "Brutal": 4,
+        "Fluent": 2,
+        "Tactile": 3,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "surface/d/canvas",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/d/canvas"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/black"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/1"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/1"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/1"
+        },
+        "Tactile": "#2a2d32",
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/1"
+        }
+      }
+    },
+    {
+      "name": "surface/d/container",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/fill"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/3"
+        }
+      }
+    },
+    {
+      "name": "surface/d/container-high",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/4"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/4"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/4"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/4"
+        }
+      }
+    },
+    {
+      "name": "surface/d/container-highest",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/5"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/5"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/5"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/5"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/5"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/5"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/d/5"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/d/5"
+        }
+      }
+    },
+    {
+      "name": "surface/d/paper",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/d/paper"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/2"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/2"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/2"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/2"
+        },
+        "Tactile": "#2a2d32",
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/2"
+        }
+      }
+    },
+    {
+      "name": "surface/d/raised",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/d/raised"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/d/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/d/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/sand/d/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/d/3"
+        },
+        "Tactile": "#2a2d32",
+        "Pixel": {
+          "alias": "Primitives/color/paper/d/3"
+        }
+      }
+    },
+    {
+      "name": "surface/l/canvas",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/l/canvas"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/1"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/1"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/amber/l/2"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/2"
+        },
+        "Tactile": "#e0e5ec",
+        "Pixel": {
+          "alias": "Primitives/color/paper/l/2"
+        }
+      }
+    },
+    {
+      "name": "surface/l/container",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/fill"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/3"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/3"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/paper/l/3"
+        }
+      }
+    },
+    {
+      "name": "surface/l/container-high",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/4"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/4"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/4"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/4"
+        }
+      }
+    },
+    {
+      "name": "surface/l/container-highest",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/5"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/5"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/5"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/5"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/5"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/5"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/gray/l/5"
+        },
+        "Tactile": {
+          "alias": "Primitives/color/slate/l/5"
+        },
+        "Pixel": {
+          "alias": "Primitives/color/sand/l/5"
+        }
+      }
+    },
+    {
+      "name": "surface/l/paper",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/l/paper"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/white"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/1"
+        },
+        "Signal": {
+          "alias": "Primitives/color/white"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/2"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/l/2"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/white"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/white"
+        },
+        "Tactile": "#e0e5ec",
+        "Pixel": {
+          "alias": "Primitives/color/paper/l/1"
+        }
+      }
+    },
+    {
+      "name": "surface/l/raised",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/l/raised"
+        },
+        "Ledger": {
+          "alias": "Primitives/color/white"
+        },
+        "Filigrane": {
+          "alias": "Primitives/color/white"
+        },
+        "Signal": {
+          "alias": "Primitives/color/white"
+        },
+        "Tonal": {
+          "alias": "Primitives/color/mauve/l/3"
+        },
+        "Glass": {
+          "alias": "Primitives/color/glass/l/fill-strong"
+        },
+        "Brutal": {
+          "alias": "Primitives/color/white"
+        },
+        "Fluent": {
+          "alias": "Primitives/color/white"
+        },
+        "Tactile": "#e0e5ec",
+        "Pixel": {
+          "alias": "Primitives/color/paper/l/1"
+        }
+      }
+    },
+    {
+      "name": "tone/d/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/d/muted"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/3"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/3"
+        }
+      }
+    },
+    {
+      "name": "tone/d/sunken",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/d/sunken"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/2"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/2"
+        }
+      }
+    },
+    {
+      "name": "tone/l/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/l/muted"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/3"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/3"
+        }
+      }
+    },
+    {
+      "name": "tone/l/sunken",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/surface/l/sunken"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/2"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/2"
+        }
+      }
+    },
+    {
+      "name": "type/body/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-body)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/body/line"
+        },
+        "Ledger": 20,
+        "Filigrane": 24,
+        "Signal": 20,
+        "Tonal": 20,
+        "Glass": 20,
+        "Brutal": 20,
+        "Fluent": 20,
+        "Tactile": 20,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "type/body/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-body)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/body/size"
+        },
+        "Ledger": 13,
+        "Filigrane": 15,
+        "Signal": 14,
+        "Tonal": 14,
+        "Glass": 14,
+        "Brutal": 14,
+        "Fluent": 14,
+        "Tactile": 14,
+        "Pixel": 14
+      }
+    },
+    {
+      "name": "type/body/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-body)",
+      "values": {
+        "Studio": "Regular",
+        "Ledger": "Regular",
+        "Filigrane": "Regular",
+        "Signal": "Regular",
+        "Tonal": "Regular",
+        "Glass": "Regular",
+        "Brutal": "Regular",
+        "Fluent": "Regular",
+        "Tactile": "Regular",
+        "Pixel": "Regular"
+      }
+    },
+    {
+      "name": "type/body/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-body)",
+      "values": {
+        "Studio": 0,
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0.25,
+        "Glass": -0.1,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/caption/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-caption)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/caption/line"
+        },
+        "Ledger": 16,
+        "Filigrane": 16,
+        "Signal": 16,
+        "Tonal": 16,
+        "Glass": 16,
+        "Brutal": 16,
+        "Fluent": 16,
+        "Tactile": 16,
+        "Pixel": 16
+      }
+    },
+    {
+      "name": "type/caption/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-caption)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/caption/size"
+        },
+        "Ledger": 11,
+        "Filigrane": 12,
+        "Signal": 12,
+        "Tonal": 12,
+        "Glass": 12,
+        "Brutal": 12,
+        "Fluent": 12,
+        "Tactile": 12,
+        "Pixel": 12
+      }
+    },
+    {
+      "name": "type/caption/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-caption)",
+      "values": {
+        "Studio": "Regular",
+        "Ledger": "Regular",
+        "Filigrane": "Regular",
+        "Signal": "Regular",
+        "Tonal": "Regular",
+        "Glass": "Regular",
+        "Brutal": "Regular",
+        "Fluent": "Regular",
+        "Tactile": "Regular",
+        "Pixel": "Regular"
+      }
+    },
+    {
+      "name": "type/caption/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-caption)",
+      "values": {
+        "Studio": 0,
+        "Ledger": 0.1,
+        "Filigrane": 0.1,
+        "Signal": 0,
+        "Tonal": 0.4,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/display/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-display)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/display/line"
+        },
+        "Ledger": 44,
+        "Filigrane": 76,
+        "Signal": 48,
+        "Tonal": 64,
+        "Glass": 52,
+        "Brutal": 72,
+        "Fluent": 52,
+        "Tactile": 56,
+        "Pixel": 64
+      }
+    },
+    {
+      "name": "type/display/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-display)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/display/size"
+        },
+        "Ledger": 40,
+        "Filigrane": 76,
+        "Signal": 44,
+        "Tonal": 57,
+        "Glass": 48,
+        "Brutal": 72,
+        "Fluent": 40,
+        "Tactile": 48,
+        "Pixel": 64
+      }
+    },
+    {
+      "name": "type/display/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-display)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/display/style"
+        },
+        "Ledger": "Semi Bold",
+        "Filigrane": "ExtraLight",
+        "Signal": "Medium",
+        "Tonal": "Medium",
+        "Glass": "Bold",
+        "Brutal": "Bold",
+        "Fluent": "Semi Bold",
+        "Tactile": "Bold",
+        "Pixel": "Semi Bold"
+      }
+    },
+    {
+      "name": "type/display/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-display)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/display/tracking"
+        },
+        "Ledger": -1,
+        "Filigrane": -2.4,
+        "Signal": -2,
+        "Tonal": -0.25,
+        "Glass": -1.4,
+        "Brutal": -3,
+        "Fluent": 0,
+        "Tactile": -1.4,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/heading/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-heading)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/heading/line"
+        },
+        "Ledger": 20,
+        "Filigrane": 28,
+        "Signal": 20,
+        "Tonal": 24,
+        "Glass": 22,
+        "Brutal": 24,
+        "Fluent": 28,
+        "Tactile": 24,
+        "Pixel": 32
+      }
+    },
+    {
+      "name": "type/heading/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-heading)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/heading/size"
+        },
+        "Ledger": 14,
+        "Filigrane": 21,
+        "Signal": 14,
+        "Tonal": 16,
+        "Glass": 17,
+        "Brutal": 18,
+        "Fluent": 20,
+        "Tactile": 17,
+        "Pixel": 24
+      }
+    },
+    {
+      "name": "type/heading/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-heading)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/heading/style"
+        },
+        "Ledger": "Semi Bold",
+        "Filigrane": "Light",
+        "Signal": "Medium",
+        "Tonal": "Medium",
+        "Glass": "Semi Bold",
+        "Brutal": "Bold",
+        "Fluent": "Semi Bold",
+        "Tactile": "Semi Bold",
+        "Pixel": "Semi Bold"
+      }
+    },
+    {
+      "name": "type/heading/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-heading)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/heading/tracking"
+        },
+        "Ledger": 0,
+        "Filigrane": -0.2,
+        "Signal": -0.1,
+        "Tonal": 0.15,
+        "Glass": -0.3,
+        "Brutal": -0.3,
+        "Fluent": 0,
+        "Tactile": -0.2,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/kpi-sm/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-kpi-sm)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/kpi-sm/line"
+        },
+        "Ledger": 32,
+        "Filigrane": 36,
+        "Signal": 32,
+        "Tonal": 40,
+        "Glass": 40,
+        "Brutal": 44,
+        "Fluent": 32,
+        "Tactile": 36,
+        "Pixel": 40
+      }
+    },
+    {
+      "name": "type/kpi-sm/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-kpi-sm)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/kpi-sm/size"
+        },
+        "Ledger": 24,
+        "Filigrane": 30,
+        "Signal": 26,
+        "Tonal": 32,
+        "Glass": 34,
+        "Brutal": 40,
+        "Fluent": 24,
+        "Tactile": 28,
+        "Pixel": 32
+      }
+    },
+    {
+      "name": "type/kpi/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-kpi)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/kpi/line"
+        },
+        "Ledger": 32,
+        "Filigrane": 36,
+        "Signal": 32,
+        "Tonal": 52,
+        "Glass": 40,
+        "Brutal": 44,
+        "Fluent": 36,
+        "Tactile": 40,
+        "Pixel": 48
+      }
+    },
+    {
+      "name": "type/kpi/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-kpi)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/kpi/size"
+        },
+        "Ledger": 24,
+        "Filigrane": 30,
+        "Signal": 26,
+        "Tonal": 45,
+        "Glass": 34,
+        "Brutal": 40,
+        "Fluent": 28,
+        "Tactile": 32,
+        "Pixel": 40
+      }
+    },
+    {
+      "name": "type/kpi/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-kpi)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/kpi/style"
+        },
+        "Ledger": "Medium",
+        "Filigrane": "Light",
+        "Signal": "Medium",
+        "Tonal": "Medium",
+        "Glass": "Semi Bold",
+        "Brutal": "Bold",
+        "Fluent": "Semi Bold",
+        "Tactile": "Bold",
+        "Pixel": "Medium"
+      }
+    },
+    {
+      "name": "type/kpi/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-kpi)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/kpi/tracking"
+        },
+        "Ledger": -0.4,
+        "Filigrane": -0.6,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": -1,
+        "Brutal": -1.5,
+        "Fluent": 0,
+        "Tactile": -0.8,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/label/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-label)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/label/line"
+        },
+        "Ledger": 14,
+        "Filigrane": 16,
+        "Signal": 16,
+        "Tonal": 16,
+        "Glass": 16,
+        "Brutal": 16,
+        "Fluent": 16,
+        "Tactile": 16,
+        "Pixel": 16
+      }
+    },
+    {
+      "name": "type/label/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-label)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/label/size"
+        },
+        "Ledger": 11,
+        "Filigrane": 12,
+        "Signal": 11,
+        "Tonal": 12,
+        "Glass": 12,
+        "Brutal": 11,
+        "Fluent": 12,
+        "Tactile": 12,
+        "Pixel": 12
+      }
+    },
+    {
+      "name": "type/label/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-label)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Ledger": "Medium",
+        "Filigrane": "Regular",
+        "Signal": "Regular",
+        "Tonal": "Semi Bold",
+        "Glass": "Medium",
+        "Brutal": "Bold",
+        "Fluent": "Semi Bold",
+        "Tactile": "Semi Bold",
+        "Pixel": "Regular"
+      }
+    },
+    {
+      "name": "type/label/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-label)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/label/tracking"
+        },
+        "Ledger": 0.3,
+        "Filigrane": 0.2,
+        "Signal": 0.4,
+        "Tonal": 0.4,
+        "Glass": 0,
+        "Brutal": 0.6,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0.6
+      }
+    },
+    {
+      "name": "type/small/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-small)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/small/line"
+        },
+        "Ledger": 16,
+        "Filigrane": 20,
+        "Signal": 18,
+        "Tonal": 16,
+        "Glass": 18,
+        "Brutal": 18,
+        "Fluent": 16,
+        "Tactile": 18,
+        "Pixel": 18
+      }
+    },
+    {
+      "name": "type/small/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-small)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/small/size"
+        },
+        "Ledger": 12,
+        "Filigrane": 14,
+        "Signal": 13,
+        "Tonal": 12,
+        "Glass": 13,
+        "Brutal": 13,
+        "Fluent": 12,
+        "Tactile": 13,
+        "Pixel": 13
+      }
+    },
+    {
+      "name": "type/small/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-small)",
+      "values": {
+        "Studio": "Regular",
+        "Ledger": "Regular",
+        "Filigrane": "Regular",
+        "Signal": "Regular",
+        "Tonal": "Regular",
+        "Glass": "Regular",
+        "Brutal": "Regular",
+        "Fluent": "Regular",
+        "Tactile": "Regular",
+        "Pixel": "Regular"
+      }
+    },
+    {
+      "name": "type/small/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-small)",
+      "values": {
+        "Studio": 0,
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0.4,
+        "Glass": -0.05,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/strong/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-strong)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/strong/line"
+        },
+        "Ledger": 20,
+        "Filigrane": 22,
+        "Signal": 20,
+        "Tonal": 20,
+        "Glass": 20,
+        "Brutal": 20,
+        "Fluent": 20,
+        "Tactile": 20,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "type/strong/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-strong)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/strong/size"
+        },
+        "Ledger": 13,
+        "Filigrane": 15,
+        "Signal": 14,
+        "Tonal": 14,
+        "Glass": 14,
+        "Brutal": 14,
+        "Fluent": 14,
+        "Tactile": 14,
+        "Pixel": 14
+      }
+    },
+    {
+      "name": "type/strong/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-strong)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/strong/style"
+        },
+        "Ledger": "Medium",
+        "Filigrane": "Medium",
+        "Signal": "Medium",
+        "Tonal": "Semi Bold",
+        "Glass": "Medium",
+        "Brutal": "Medium",
+        "Fluent": "Semi Bold",
+        "Tactile": "Semi Bold",
+        "Pixel": "Bold"
+      }
+    },
+    {
+      "name": "type/strong/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-strong)",
+      "values": {
+        "Studio": 0,
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0.1,
+        "Glass": -0.1,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "type/title/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-title)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/title/line"
+        },
+        "Ledger": 28,
+        "Filigrane": 40,
+        "Signal": 28,
+        "Tonal": 44,
+        "Glass": 40,
+        "Brutal": 52,
+        "Fluent": 36,
+        "Tactile": 38,
+        "Pixel": 48
+      }
+    },
+    {
+      "name": "type/title/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-title)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/title/size"
+        },
+        "Ledger": 20,
+        "Filigrane": 34,
+        "Signal": 22,
+        "Tonal": 36,
+        "Glass": 34,
+        "Brutal": 52,
+        "Fluent": 28,
+        "Tactile": 30,
+        "Pixel": 40
+      }
+    },
+    {
+      "name": "type/title/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-title)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/title/style"
+        },
+        "Ledger": "Semi Bold",
+        "Filigrane": "Light",
+        "Signal": "Semi Bold",
+        "Tonal": "Medium",
+        "Glass": "Bold",
+        "Brutal": "Regular",
+        "Fluent": "Semi Bold",
+        "Tactile": "Bold",
+        "Pixel": "Semi Bold"
+      }
+    },
+    {
+      "name": "type/title/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-title)",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/title/tracking"
+        },
+        "Ledger": -0.2,
+        "Filigrane": -0.6,
+        "Signal": -0.25,
+        "Tonal": 0,
+        "Glass": -0.9,
+        "Brutal": -2,
+        "Fluent": 0,
+        "Tactile": -0.6,
+        "Pixel": 0
+      }
+    }
+  ]
+}

@@ -200,3 +200,33 @@ depend on an API read or a phone/web app being open.
 patterns for the plugin SDK `additionalBuilders` option. `defineWebhook` → `triggers`,
 `defineScheduledTrigger` → `triggers`, `defineFileWatch` → `triggers`. The CLI composes first-party
 metadata before walking the project, independently of plugin update order.
+
+## Scheduled event identity and deduplication
+
+The cron adapter identifies each callback by its trigger id and UTC minute, for example
+`scheduled_nightly-reindex_2026-10-30T02:00:00.000Z`. Both `event.id` and
+`event.idempotencyKey` use this identity. Five-field cron has minute precision; sub-minute
+execution jitter, attempts, and processor restarts do not change a slot's key. The next
+minute has a different key. `payload.scheduledAt` is the canonical minute and
+`payload.firedAt` retains the actual firing time. Timezone controls when the cron provider
+fires; it does not change UTC minute boundaries. A callback delayed into a later minute
+uses that callback minute; recovering its original intended slot requires provider support.
+
+The plugin's `enqueueJob` dispatch inherits the event key unless the action supplies its own
+`idempotencyKey`, so a retained workers applied marker cannot skip the next slot after a
+restart. Multiple triggers on the same cron remain independent. A repeated `fireNow` for
+the same trigger in the same minute, including a manual fire alongside an automatic fire,
+is a duplicate of that minute's slot.
+
+A definition's `deduplication.key(event)` takes precedence over the adapter's event key.
+Returning `undefined` preserves the event key and its normal fallbacks. The processor passes
+the selected key to the idempotency store, handler, and downstream action dispatcher. An
+explicit action key still takes precedence when enqueueing its job. Without a definition
+or event key, request idempotency headers retain their existing precedence, then the fallback
+hashes the tuple `[triggerId, payload]`. Explicit keys may intentionally group events;
+automatic payload hashes are scoped to one trigger. Atomic claim/completion and TTL behavior
+are unchanged: delivery remains at least once with key-based deduplication.
+
+Custom key callbacks used with `defer` must also distinguish replay events (for example by
+including the replay's `event.id`). A callback that always returns the original event's key
+will intentionally collide with that event's completed claim and suppress the replay.

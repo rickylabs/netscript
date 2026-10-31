@@ -1,12 +1,16 @@
 ---
 layout: layouts/base.vto
-title: Recipes
+title: Data & persistence recipes
+nav_title: Recipes
+description: Task-oriented recipes for data and persistence, one problem each.
 templateEngine: [vento, md]
 order: 100
 ---
 
-# Data & Persistence — recipes
+# Data & persistence recipes
 
-Task-oriented recipes for this area. Each one solves a single concrete problem and assumes you know
-the basics from the guides above it in the sidebar. The full cross-area catalog lives at
-[All how-to recipes]({{ "howto:index" |> xref |> url }}).
+Each recipe here solves one database or queue task. It assumes the guides above it in the sidebar.
+
+{{ for recipe of nav.menu(url, navQuery, navSort)?.children ?? [] -}}
+- [{{ recipe.data.title }}]({{ recipe.data.url }}){{ recipe.data.description ? ": " + recipe.data.description : "" }}
+{{ /for }}

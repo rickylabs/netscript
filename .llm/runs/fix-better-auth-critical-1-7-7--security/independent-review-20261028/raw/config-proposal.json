@@ -1,0 +1,34 @@
+{
+  "agent": {
+    "build": {
+      "steps": 8
+    }
+  },
+  "permission": {
+    "*": "deny",
+    "read": {
+      "*": "allow",
+      ".env": "deny",
+      ".env.*": "deny",
+      "auth.json": "deny",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/auth.json": "deny"
+    },
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "skill": "allow",
+    "bash": "deny",
+    "task": "deny",
+    "edit": "deny",
+    "external_directory": "deny",
+    "netscript_search_docs": "allow",
+    "netscript_get_doc": "allow",
+    "netscript_find_guidance": "allow",
+    "netscript_find_export": "allow",
+    "netscript_get_export": "allow",
+    "netscript_search_exports": "allow",
+    "netscript_list_package_exports": "allow"
+  }
+}

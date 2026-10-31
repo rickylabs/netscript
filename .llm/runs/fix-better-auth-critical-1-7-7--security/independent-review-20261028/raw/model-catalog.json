@@ -1,0 +1,79 @@
+{
+  "capturedAt": "2026-10-28T04:06:28.834Z",
+  "model": "openrouter/z-ai/glm-5.3-flash",
+  "metadata": {
+    "id": "z-ai/glm-5.3-flash",
+    "providerID": "openrouter",
+    "name": "GLM-5.3-Flash",
+    "family": "glm-flash",
+    "api": {
+      "id": "z-ai/glm-5.3-flash",
+      "url": "https://openrouter.ai/api/v1",
+      "npm": "@openrouter/ai-sdk-provider"
+    },
+    "status": "active",
+    "headers": {},
+    "options": {},
+    "cost": {
+      "input": 0.0453,
+      "output": 0.0745,
+      "cache": {
+        "read": 0.03,
+        "write": 0
+      }
+    },
+    "limit": {
+      "context": 1048576,
+      "output": 131072
+    },
+    "capabilities": {
+      "temperature": true,
+      "reasoning": true,
+      "attachment": true,
+      "toolcall": true,
+      "input": {
+        "text": true,
+        "audio": false,
+        "image": true,
+        "video": true,
+        "pdf": false
+      },
+      "output": {
+        "text": true,
+        "audio": false,
+        "image": false,
+        "video": false,
+        "pdf": false
+      },
+      "interleaved": false
+    },
+    "release_date": "2026-08-26",
+    "variants": {
+      "low": {
+        "reasoning": {
+          "effort": "low"
+        }
+      },
+      "high": {
+        "reasoning": {
+          "effort": "high"
+        }
+      },
+      "max": {
+        "reasoning": {
+          "effort": "max"
+        }
+      }
+    }
+  },
+  "completeCatalogSha256": "f57459647a8c0fcf2297c77b55bc5eb786a5f8c4315d51c76e8e50f8c6d411f2",
+  "capture": {
+    "stdoutCapturedBytes": 443026,
+    "stderrCapturedBytes": 0,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  },
+  "noInference": true,
+  "providerDefaultNotNamedVariant": true
+}

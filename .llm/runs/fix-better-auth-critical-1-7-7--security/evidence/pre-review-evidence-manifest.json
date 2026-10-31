@@ -1,0 +1,1207 @@
+{
+    "schemaVersion":  1,
+    "at":  "2026-10-28T03:35:16.8730086Z",
+    "purpose":  "Uncommitted local pre-review evidence inventory; no checkpoint authorization inferred",
+    "records":  [
+                    {
+                        "path":  "arch-check.native-receipt.json",
+                        "bytes":  19857,
+                        "sha256":  "9c024049bb1b6f0c32051cb3891d27e2020bc9152c0b34f9ccf8b05a3b292d49",
+                        "archiveName":  "arch-check.native-receipt.json"
+                    },
+                    {
+                        "path":  "arch-check.receipt.json",
+                        "bytes":  18620,
+                        "sha256":  "07967bf882313008d02b1c3d2f234c64f220bcaae56a6f9eca72781128502a25",
+                        "archiveName":  "arch-check.receipt.json"
+                    },
+                    {
+                        "path":  "arch-check.request.json",
+                        "bytes":  551,
+                        "sha256":  "26089504b8df7c27dc170b58e31ce3c8d050b9186fca0bb85d2f63fa422dd796",
+                        "archiveName":  "arch-check.request.json"
+                    },
+                    {
+                        "path":  "arch-check.request-original-bom.json.txt",
+                        "bytes":  554,
+                        "sha256":  "9ccdb8e133b5ed965967411664adfbd4be4ebbd7691be3d2730a1c50f29492fc",
+                        "archiveName":  "arch-check.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "arch-check-execution.process.json",
+                        "bytes":  946,
+                        "sha256":  "cfd2af73d504a64271621a1824ee937bedd68ee8a96410fc9016b2aed0faa012",
+                        "archiveName":  "arch-check-execution.process.json"
+                    },
+                    {
+                        "path":  "arch-check-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "arch-check-execution.stderr.log"
+                    },
+                    {
+                        "path":  "arch-check-execution.stdout.log",
+                        "bytes":  36740,
+                        "sha256":  "d6c6d15ff9e836890f5c48640d2bde323e12d03351ce4fdcd3650500cc8d81db",
+                        "archiveName":  "arch-check-execution.stdout.log"
+                    },
+                    {
+                        "path":  "audit-critical-green.process.json",
+                        "bytes":  1248,
+                        "sha256":  "6d2bbb6d61389f29cd3335626dea16ad053e7175f7b7399d7eab3f7360a3cc3f",
+                        "archiveName":  "audit-critical-green.process.json"
+                    },
+                    {
+                        "path":  "audit-critical-green.receipt.json",
+                        "bytes":  1216,
+                        "sha256":  "7ce2efd20f8bfdcff61b18cbd32172359237b047aa1a5ce2505ca714b3e9a938",
+                        "archiveName":  "audit-critical-green.receipt.json"
+                    },
+                    {
+                        "path":  "audit-critical-green.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "audit-critical-green.stderr.log"
+                    },
+                    {
+                        "path":  "audit-critical-green.stdout.log",
+                        "bytes":  2130,
+                        "sha256":  "9bec537fabf8f1888e954ca366792fda9c8098bfbc0f2a47f99f56e6dbf6b0db",
+                        "archiveName":  "audit-critical-green.stdout.log"
+                    },
+                    {
+                        "path":  "audit-unchanged-red.process.json",
+                        "bytes":  1243,
+                        "sha256":  "4fb57fdb09e55bf2ca88f7362b52daf6b1f10a9ba82016d6d9c14da2b20798c3",
+                        "archiveName":  "audit-unchanged-red.process.json"
+                    },
+                    {
+                        "path":  "audit-unchanged-red.receipt.json",
+                        "bytes":  1753,
+                        "sha256":  "8bba7947548a0f071f32a9661b10bc830ccc17b5a683534d09669b748179db2a",
+                        "archiveName":  "audit-unchanged-red.receipt.json"
+                    },
+                    {
+                        "path":  "audit-unchanged-red.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "audit-unchanged-red.stderr.log"
+                    },
+                    {
+                        "path":  "audit-unchanged-red.stdout.log",
+                        "bytes":  3140,
+                        "sha256":  "73ea501eeb3d97076f044a12b536f29f01d9f5b85e9353386f277b79455057d4",
+                        "archiveName":  "audit-unchanged-red.stdout.log"
+                    },
+                    {
+                        "path":  "auth-check.json",
+                        "bytes":  338,
+                        "sha256":  "301074d1a00ba03d10a93731611801b84431312ed555128d5996f4efcb298941",
+                        "archiveName":  "auth-check.json"
+                    },
+                    {
+                        "path":  "auth-check.process.json",
+                        "bytes":  916,
+                        "sha256":  "5b860c2d629e573c37c5cd1d09340a2868b1da3908bb79bc1d077f808e3505ba",
+                        "archiveName":  "auth-check.process.json"
+                    },
+                    {
+                        "path":  "auth-check.receipt.json",
+                        "bytes":  2078,
+                        "sha256":  "7ab002f422e70fd368df02d8c3dd677e16ec295a06488cc99d72859f70709c57",
+                        "archiveName":  "auth-check.receipt.json"
+                    },
+                    {
+                        "path":  "auth-check.request.json",
+                        "bytes":  448,
+                        "sha256":  "b106d0a58740fe80b8c97abd9c785e1a0449257006f00f7a55be86f2d6a3ac65",
+                        "archiveName":  "auth-check.request.json"
+                    },
+                    {
+                        "path":  "auth-check.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-check.stderr.log"
+                    },
+                    {
+                        "path":  "auth-check.stdout.log",
+                        "bytes":  3614,
+                        "sha256":  "33533ea799b7bf472c623eecc0e3e8af86e0f4667bb20e36139e0dffa83b75f6",
+                        "archiveName":  "auth-check.stdout.log"
+                    },
+                    {
+                        "path":  "auth-controls.json",
+                        "bytes":  11627,
+                        "sha256":  "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e",
+                        "archiveName":  "auth-controls.json"
+                    },
+                    {
+                        "path":  "auth-controls.process.json",
+                        "bytes":  928,
+                        "sha256":  "9107b97e8cb45919c403739db2830316c7c6a03fc236f02d1d0de982c7a37e0b",
+                        "archiveName":  "auth-controls.process.json"
+                    },
+                    {
+                        "path":  "auth-controls.receipt.json",
+                        "bytes":  2149,
+                        "sha256":  "691a98141acd3b0f61663050c3080d89851e5282aefd9de19de6a30b81d9a283",
+                        "archiveName":  "auth-controls.receipt.json"
+                    },
+                    {
+                        "path":  "auth-controls.request.json",
+                        "bytes":  500,
+                        "sha256":  "5f08f7683894e5d794a3c9c59c058a50a7774911beb1c15d7a105aa65f4a842f",
+                        "archiveName":  "auth-controls.request.json"
+                    },
+                    {
+                        "path":  "auth-controls.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-controls.stderr.log"
+                    },
+                    {
+                        "path":  "auth-controls.stdout.log",
+                        "bytes":  3756,
+                        "sha256":  "b7a9ebc70b030f1b136a73ceac995d6af2087efe5ad553783ad725a803c07977",
+                        "archiveName":  "auth-controls.stdout.log"
+                    },
+                    {
+                        "path":  "auth-controls-unchanged-baseline.json",
+                        "bytes":  12962,
+                        "sha256":  "429122eface2bf845afc17d8b2004461a13b0a302bb79bd795122c7c9024a04f",
+                        "archiveName":  "auth-controls-unchanged-baseline.json"
+                    },
+                    {
+                        "path":  "auth-fmt.json",
+                        "bytes":  314,
+                        "sha256":  "0375a7da9944233fb1797b3685b3933ccba2f72cfe749c804cf29a14574ff645",
+                        "archiveName":  "auth-fmt.json"
+                    },
+                    {
+                        "path":  "auth-fmt.process.json",
+                        "bytes":  908,
+                        "sha256":  "8e1c4d97e91a40a092e76f3e920bd17820566c6f909e4c917802a58367864852",
+                        "archiveName":  "auth-fmt.process.json"
+                    },
+                    {
+                        "path":  "auth-fmt.receipt.json",
+                        "bytes":  1997,
+                        "sha256":  "6c6fe38a32e08243cf9420e2a1686c0ae9d909530c667c5efe9ae6715dbb4fdd",
+                        "archiveName":  "auth-fmt.receipt.json"
+                    },
+                    {
+                        "path":  "auth-fmt.request.json",
+                        "bytes":  358,
+                        "sha256":  "f966732f20c29159e835260d3ec872010bb0d50f7a0f4a54c5d2f5c2bc051e0d",
+                        "archiveName":  "auth-fmt.request.json"
+                    },
+                    {
+                        "path":  "auth-fmt.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-fmt.stderr.log"
+                    },
+                    {
+                        "path":  "auth-fmt.stdout.log",
+                        "bytes":  3492,
+                        "sha256":  "c4bc884215cf32ed41e622e0f7d3f1d9708a594d1b81b454b38a097c9f9eb177",
+                        "archiveName":  "auth-fmt.stdout.log"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.json",
+                        "bytes":  1124,
+                        "sha256":  "ddbb210576aac92d2e15e2fbc0b05b6359bce11bdb8367178e497bbf684791c5",
+                        "archiveName":  "auth-jsr-surface.json"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.process.json",
+                        "bytes":  940,
+                        "sha256":  "666857284bae83bcb79805450d2f42904980595d87be723361d3d3c893a646b4",
+                        "archiveName":  "auth-jsr-surface.process.json"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.receipt.json",
+                        "bytes":  1791,
+                        "sha256":  "4d5ea4d25c645b9a4ad2e46228f432adb8e57be5a8936bd26b7bcb671a118c24",
+                        "archiveName":  "auth-jsr-surface.receipt.json"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.request.json",
+                        "bytes":  559,
+                        "sha256":  "48cfcc7c99e44547afe6a78157665a22560d3638bde1fb2317708bc513e88cac",
+                        "archiveName":  "auth-jsr-surface.request.json"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.request-original-bom.json.txt",
+                        "bytes":  562,
+                        "sha256":  "9cb9bd1b11ab5e2e5442d192d4afab1cc24e8416aece9e920125dca9d9735143",
+                        "archiveName":  "auth-jsr-surface.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.stderr.log",
+                        "bytes":  1604,
+                        "sha256":  "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+                        "archiveName":  "auth-jsr-surface.stderr.log"
+                    },
+                    {
+                        "path":  "auth-jsr-surface.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-jsr-surface.stdout.log"
+                    },
+                    {
+                        "path":  "auth-jsr-surface-execution.process.json",
+                        "bytes":  970,
+                        "sha256":  "caafed45abc973f04a04a6c643be2e86dc035bbb3ce29d7a82e07c5ee1186399",
+                        "archiveName":  "auth-jsr-surface-execution.process.json"
+                    },
+                    {
+                        "path":  "auth-jsr-surface-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-jsr-surface-execution.stderr.log"
+                    },
+                    {
+                        "path":  "auth-jsr-surface-execution.stdout.log",
+                        "bytes":  3130,
+                        "sha256":  "6a88c855d209d68fea9757ad6408222150d3403ed3b389e64c9987bc5fcc5aa8",
+                        "archiveName":  "auth-jsr-surface-execution.stdout.log"
+                    },
+                    {
+                        "path":  "auth-lint.json",
+                        "bytes":  365,
+                        "sha256":  "f3ed8878aef97d694fbf46f46466325046bba096ac53fde1c89a973cfc074aa4",
+                        "archiveName":  "auth-lint.json"
+                    },
+                    {
+                        "path":  "auth-lint.process.json",
+                        "bytes":  912,
+                        "sha256":  "0fea1b59fa1bdc55acf0dda91ee5da8b9c4b5857e2d14b1b4f9e93a662a34813",
+                        "archiveName":  "auth-lint.process.json"
+                    },
+                    {
+                        "path":  "auth-lint.receipt.json",
+                        "bytes":  1996,
+                        "sha256":  "2dba68f16a067a246811a3e1577695e8ef6f1d8474e1ec82e2624899f3ae4541",
+                        "archiveName":  "auth-lint.receipt.json"
+                    },
+                    {
+                        "path":  "auth-lint.request.json",
+                        "bytes":  361,
+                        "sha256":  "0940cbb650a8421d1785925898b5c80f0d4f6e0415c12c638d55fe9964d7d5f0",
+                        "archiveName":  "auth-lint.request.json"
+                    },
+                    {
+                        "path":  "auth-lint.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-lint.stderr.log"
+                    },
+                    {
+                        "path":  "auth-lint.stdout.log",
+                        "bytes":  3490,
+                        "sha256":  "3af4c7fb853e93516d04cff2b8d4f935486ab00327e490377d43fa2db340f775",
+                        "archiveName":  "auth-lint.stdout.log"
+                    },
+                    {
+                        "path":  "auth-public-docs.json",
+                        "bytes":  718,
+                        "sha256":  "923c4b8419dbe41845eac1d4ee4be9d2618ea3440873bf74b67b69318e19173c",
+                        "archiveName":  "auth-public-docs.json"
+                    },
+                    {
+                        "path":  "auth-public-docs.process.json",
+                        "bytes":  940,
+                        "sha256":  "eebfbb6cc73751fd19b1d2d33575f689721ff7c76ba46f4a297ee106e63d5d63",
+                        "archiveName":  "auth-public-docs.process.json"
+                    },
+                    {
+                        "path":  "auth-public-docs.receipt.json",
+                        "bytes":  1880,
+                        "sha256":  "a86daa3788b85fb8395be25a4d21622b4e12dbecbbeb0b3ca673a58cd239168d",
+                        "archiveName":  "auth-public-docs.receipt.json"
+                    },
+                    {
+                        "path":  "auth-public-docs.request.json",
+                        "bytes":  589,
+                        "sha256":  "b54f619664b718dbf7538171eaf1f178b0dcc7dd4eee1df994fc8b34ac820b77",
+                        "archiveName":  "auth-public-docs.request.json"
+                    },
+                    {
+                        "path":  "auth-public-docs.request-original-bom.json.txt",
+                        "bytes":  592,
+                        "sha256":  "fafb2568343277bd92d3e73d113b92da18207aea8e4d293c3c9f1e1e374e967a",
+                        "archiveName":  "auth-public-docs.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "auth-public-docs.stderr.log",
+                        "bytes":  1604,
+                        "sha256":  "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+                        "archiveName":  "auth-public-docs.stderr.log"
+                    },
+                    {
+                        "path":  "auth-public-docs.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-public-docs.stdout.log"
+                    },
+                    {
+                        "path":  "auth-public-docs-execution.process.json",
+                        "bytes":  970,
+                        "sha256":  "796630fbea23c4c6ffce9f5f0df7d84836f220f466f7aa44d03fb694ba87bd81",
+                        "archiveName":  "auth-public-docs-execution.process.json"
+                    },
+                    {
+                        "path":  "auth-public-docs-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-public-docs-execution.stderr.log"
+                    },
+                    {
+                        "path":  "auth-public-docs-execution.stdout.log",
+                        "bytes":  3298,
+                        "sha256":  "e3daff6c9865ed982bb2557243a38fa0511d1c4fb1a99c14aa47d9792809c74f",
+                        "archiveName":  "auth-public-docs-execution.stdout.log"
+                    },
+                    {
+                        "path":  "auth-public-docs-unchanged.json",
+                        "bytes":  798,
+                        "sha256":  "bf03dfc4d4c8dd4c6586b63c7db34951f6c1bff6dd10d9a3d4e13e7747e09054",
+                        "archiveName":  "auth-public-docs-unchanged.json"
+                    },
+                    {
+                        "path":  "auth-unchanged-baseline.process.json",
+                        "bytes":  923,
+                        "sha256":  "2ab666fc3ef37d1f6e6feb91d66ed3a3771514b182e452a661a50ec4f2afbdde",
+                        "archiveName":  "auth-unchanged-baseline.process.json"
+                    },
+                    {
+                        "path":  "auth-unchanged-baseline.stderr.log",
+                        "bytes":  2002,
+                        "sha256":  "aace005fc708f9d8e886920b7c5df4b7bb60dabd5c0e30f97b9ba76b5cb19678",
+                        "archiveName":  "auth-unchanged-baseline.stderr.log"
+                    },
+                    {
+                        "path":  "auth-unchanged-baseline.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-unchanged-baseline.stdout.log"
+                    },
+                    {
+                        "path":  "auth-unchanged-baseline-valid-archive.process.json",
+                        "bytes":  965,
+                        "sha256":  "7fbaaef184e02295c8f3bd0640d51d12eb89d5d1027ad44adcdb67e6d29b3de2",
+                        "archiveName":  "auth-unchanged-baseline-valid-archive.process.json"
+                    },
+                    {
+                        "path":  "auth-unchanged-baseline-valid-archive.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "auth-unchanged-baseline-valid-archive.stderr.log"
+                    },
+                    {
+                        "path":  "auth-unchanged-baseline-valid-archive.stdout.log",
+                        "bytes":  13406,
+                        "sha256":  "9eb1810c38d11aa1c3031e1008e62c77b41ef3869c21bc692af1045154cdf3c0",
+                        "archiveName":  "auth-unchanged-baseline-valid-archive.stdout.log"
+                    },
+                    {
+                        "path":  "baseline.json",
+                        "bytes":  21273,
+                        "sha256":  "92cd96c78fa9f80037921f2034d918687c890539b6d04f992ba38ec1b5bb74a2",
+                        "archiveName":  "baseline.json"
+                    },
+                    {
+                        "path":  "baseline-archive-setup-failure.receipt.json",
+                        "bytes":  4590,
+                        "sha256":  "6f29f99adfe3b904199fe3b8c885618786b7df47d39a44c5f396dec5414fc9c7",
+                        "archiveName":  "baseline-archive-setup-failure.receipt.json"
+                    },
+                    {
+                        "path":  "baseline-control.receipt.json",
+                        "bytes":  7071,
+                        "sha256":  "6d7856bc1b7c281eb97bc181408c329ae36bc026be1e749a88f19e1476162584",
+                        "archiveName":  "baseline-control.receipt.json"
+                    },
+                    {
+                        "path":  "baseline-control.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-control.stderr.log"
+                    },
+                    {
+                        "path":  "baseline-control.stdout.log",
+                        "bytes":  250,
+                        "sha256":  "b469c44b58308718fd6f32b76aa40ca7fba8cdc6f1e9a0e925c3109c64260639",
+                        "archiveName":  "baseline-control.stdout.log"
+                    },
+                    {
+                        "path":  "baseline-deno.json.txt",
+                        "bytes":  22366,
+                        "sha256":  "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+                        "archiveName":  "baseline-deno.json.txt"
+                    },
+                    {
+                        "path":  "baseline-deno.lock.txt",
+                        "bytes":  191344,
+                        "sha256":  "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+                        "archiveName":  "baseline-deno.lock.txt"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie.process.json",
+                        "bytes":  922,
+                        "sha256":  "bc71b19dc73472364ee8f3237aca8e5d75fdd103a9cc6c5ab1e9a09c0893aea2",
+                        "archiveName":  "baseline-doc-cookie.process.json"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie.receipt.json",
+                        "bytes":  7363,
+                        "sha256":  "e4ca8a4cd739a913a4fb40393aefa553e796af231928d2c648c98f0006e55464",
+                        "archiveName":  "baseline-doc-cookie.receipt.json"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-doc-cookie.stderr.log"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie.stdout.log",
+                        "bytes":  13140,
+                        "sha256":  "68d869bf3501b4d4bba9d4ca073533c347b89b6efa0375d27764d86a8eab95cd",
+                        "archiveName":  "baseline-doc-cookie.stdout.log"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie-archive.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-doc-cookie-archive.native-stderr.log"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie-archive.native-stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-doc-cookie-archive.native-stdout.log"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie-extract.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-doc-cookie-extract.native-stderr.log"
+                    },
+                    {
+                        "path":  "baseline-doc-cookie-extract.native-stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-doc-cookie-extract.native-stdout.log"
+                    },
+                    {
+                        "path":  "baseline-packages-fresh-ui-deno.lock.txt",
+                        "bytes":  168514,
+                        "sha256":  "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40",
+                        "archiveName":  "baseline-packages-fresh-ui-deno.lock.txt"
+                    },
+                    {
+                        "path":  "baseline-plugins-auth-tests-services-better-auth-global-logout-http_test.ts.txt",
+                        "bytes":  3200,
+                        "sha256":  "72a695a3061e3ce51231a9759aa547ea364dd68defd9cc3e5f046c609711b763",
+                        "archiveName":  "baseline-plugins-auth-tests-services-better-auth-global-logout-http_test.ts.txt"
+                    },
+                    {
+                        "path":  "baseline-plugins-auth-tests-services-unsupported-revocation-http_test.ts.txt",
+                        "bytes":  7605,
+                        "sha256":  "e0210d9b1703482af56b05452681d46ab16d148c96a40aed41584a5443df3194",
+                        "archiveName":  "baseline-plugins-auth-tests-services-unsupported-revocation-http_test.ts.txt"
+                    },
+                    {
+                        "path":  "baseline-snapshot.process.json",
+                        "bytes":  989,
+                        "sha256":  "bf142d4c0cda4c9c2407d3712ae1126e130d6e125694c8cba204dae2c84f65f9",
+                        "archiveName":  "baseline-snapshot.process.json"
+                    },
+                    {
+                        "path":  "baseline-snapshot.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "baseline-snapshot.stderr.log"
+                    },
+                    {
+                        "path":  "baseline-snapshot.stdout.log",
+                        "bytes":  114,
+                        "sha256":  "40cdde3afbc4e9128e264148a0fa48bd84d9b204c53d5fbf76bb3e0525829b6c",
+                        "archiveName":  "baseline-snapshot.stdout.log"
+                    },
+                    {
+                        "path":  "candidate-root-lock.native-1.7.14.json.txt",
+                        "bytes":  187051,
+                        "sha256":  "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+                        "archiveName":  "candidate-root-lock.native-1.7.14.json.txt"
+                    },
+                    {
+                        "path":  "cleanup-final.json",
+                        "bytes":  297,
+                        "sha256":  "34abc7d744bb2c9852036ee2e3ea28a4485bf486614529cbe733affdbdde1d5b",
+                        "archiveName":  "cleanup-final.json"
+                    },
+                    {
+                        "path":  "corpus-freshness.process.json",
+                        "bytes":  940,
+                        "sha256":  "3e5da0a7f80ae585c0d70a8722836936be49d25ca48c366a169e4cb6d1480543",
+                        "archiveName":  "corpus-freshness.process.json"
+                    },
+                    {
+                        "path":  "corpus-freshness.receipt.json",
+                        "bytes":  1633,
+                        "sha256":  "85e458b513c05ecb8c8d8d8b1765360a799070826454efc2d377476a69c817b6",
+                        "archiveName":  "corpus-freshness.receipt.json"
+                    },
+                    {
+                        "path":  "corpus-freshness.request.json",
+                        "bytes":  63,
+                        "sha256":  "cab1234ad349e85c98967c481baa48d05c7d4e9ea04d94202e0d3ca6f630aa46",
+                        "archiveName":  "corpus-freshness.request.json"
+                    },
+                    {
+                        "path":  "corpus-freshness.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "corpus-freshness.stderr.log"
+                    },
+                    {
+                        "path":  "corpus-freshness.stdout.log",
+                        "bytes":  2964,
+                        "sha256":  "9812fe075d7f8bd478ec3d12dcef63961b4fc4b71d8adaef4b332832a434d98e",
+                        "archiveName":  "corpus-freshness.stdout.log"
+                    },
+                    {
+                        "path":  "deps-audit-structured.process.json",
+                        "bytes":  960,
+                        "sha256":  "a01dd63f1ab5e6af04c6ebefd10b4b8057afb67461fcf8c489c64685dda3266b",
+                        "archiveName":  "deps-audit-structured.process.json"
+                    },
+                    {
+                        "path":  "deps-audit-structured.receipt.json",
+                        "bytes":  18260,
+                        "sha256":  "b4b216b65f3591f6ef26931bead776ba4310ff09049607944318a3f83b0deef1",
+                        "archiveName":  "deps-audit-structured.receipt.json"
+                    },
+                    {
+                        "path":  "deps-audit-structured.request.json",
+                        "bytes":  354,
+                        "sha256":  "dcaffffda64c01bdf28edf8892cfe85418a86ed1dc70185a609dd3ecb1edb209",
+                        "archiveName":  "deps-audit-structured.request.json"
+                    },
+                    {
+                        "path":  "deps-audit-structured.request-original-bom.json.txt",
+                        "bytes":  357,
+                        "sha256":  "c9fbee5d095c2daaee0cdfd2e96ef60d9f1f5800158f6e6df1cd78ffc6396b68",
+                        "archiveName":  "deps-audit-structured.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "deps-audit-structured.stderr.log",
+                        "bytes":  1604,
+                        "sha256":  "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+                        "archiveName":  "deps-audit-structured.stderr.log"
+                    },
+                    {
+                        "path":  "deps-audit-structured.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "deps-audit-structured.stdout.log"
+                    },
+                    {
+                        "path":  "deps-audit-structured-execution.process.json",
+                        "bytes":  990,
+                        "sha256":  "9435b43164e83fd7bc429bda69ec73386dce1813c51321554bf083079388c24a",
+                        "archiveName":  "deps-audit-structured-execution.process.json"
+                    },
+                    {
+                        "path":  "deps-audit-structured-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "deps-audit-structured-execution.stderr.log"
+                    },
+                    {
+                        "path":  "deps-audit-structured-execution.stdout.log",
+                        "bytes":  34920,
+                        "sha256":  "48a7ed50cebbcf5b9a8ee6f885260db4111dca292d6aa644576635067c4fc863",
+                        "archiveName":  "deps-audit-structured-execution.stdout.log"
+                    },
+                    {
+                        "path":  "final-audit.ts",
+                        "bytes":  6277,
+                        "sha256":  "94c52ef18c7b06f8cf8575a11bb2692df129a43366c32108b57a69710f6003ae",
+                        "archiveName":  "final-audit.ts.txt"
+                    },
+                    {
+                        "path":  "final-five-owner.diff",
+                        "bytes":  27228,
+                        "sha256":  "0da3897f00d0b97bc272470ea1b7c3c143d1ac7ba033692d2abc7216583df15c",
+                        "archiveName":  "final-five-owner.diff"
+                    },
+                    {
+                        "path":  "final-five-owner.diff.stderr.log",
+                        "bytes":  222,
+                        "sha256":  "7d6351e8c4aba8dbfc6d5f92a6713f6b8e189306da892e8f6d85eac80501041d",
+                        "archiveName":  "final-five-owner.diff.stderr.log"
+                    },
+                    {
+                        "path":  "final-handoff.md",
+                        "bytes":  9329,
+                        "sha256":  "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9",
+                        "archiveName":  "final-handoff.md"
+                    },
+                    {
+                        "path":  "final-source-audit.process.json",
+                        "bytes":  903,
+                        "sha256":  "6d69ed46c2f0abe344d6aa10752e2b6c9e14837811deb56370acab3701c66d4d",
+                        "archiveName":  "final-source-audit.process.json"
+                    },
+                    {
+                        "path":  "final-source-audit.stderr.log",
+                        "bytes":  1512,
+                        "sha256":  "6689cd6e00fb75bee7c2c53176172f936944078c923c734f4022322c626e892b",
+                        "archiveName":  "final-source-audit.stderr.log"
+                    },
+                    {
+                        "path":  "final-source-audit.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "final-source-audit.stdout.log"
+                    },
+                    {
+                        "path":  "final-source-audit-correct-metadata.process.json",
+                        "bytes":  954,
+                        "sha256":  "222d13e27a9d48661429a587a2e0ae41a8c59389d90f6325d3831dc1d5251395",
+                        "archiveName":  "final-source-audit-correct-metadata.process.json"
+                    },
+                    {
+                        "path":  "final-source-audit-correct-metadata.stderr.log",
+                        "bytes":  1478,
+                        "sha256":  "a2058883650abb37c46c14058101e9802ede10a1c7215166446eb80c21b9c4bd",
+                        "archiveName":  "final-source-audit-correct-metadata.stderr.log"
+                    },
+                    {
+                        "path":  "final-source-audit-correct-metadata.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "final-source-audit-correct-metadata.stdout.log"
+                    },
+                    {
+                        "path":  "final-source-audit-verified-metadata.process.json",
+                        "bytes":  957,
+                        "sha256":  "9b9ab87b93a166ca0f55588c3ceafa1c0a06a1f9f5ae837596e74b64594921d2",
+                        "archiveName":  "final-source-audit-verified-metadata.process.json"
+                    },
+                    {
+                        "path":  "final-source-audit-verified-metadata.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "final-source-audit-verified-metadata.stderr.log"
+                    },
+                    {
+                        "path":  "final-source-audit-verified-metadata.stdout.log",
+                        "bytes":  4214,
+                        "sha256":  "cafddf6fb07081588ce00d49f130c6e5c992af70d5b506e2f375bd26fd156b30",
+                        "archiveName":  "final-source-audit-verified-metadata.stdout.log"
+                    },
+                    {
+                        "path":  "final-source-closure.json",
+                        "bytes":  39301,
+                        "sha256":  "bba1db7e664e07cf7d3eabdf6b0ed81cc6efb7941f1c30f6c6e463abd84eb6c9",
+                        "archiveName":  "final-source-closure.json"
+                    },
+                    {
+                        "path":  "fresh-ui-lock-native-refresh.process.json",
+                        "bytes":  851,
+                        "sha256":  "ee821618343391ce4b3870e6786f1eb9bc4810671fa334b2447f5c5d32f4361f",
+                        "archiveName":  "fresh-ui-lock-native-refresh.process.json"
+                    },
+                    {
+                        "path":  "fresh-ui-lock-native-refresh.stderr.log",
+                        "bytes":  1208,
+                        "sha256":  "9108d21f04f5a2c8da75895cd107aebf73f601b4a9e56d484ed8b99380634f31",
+                        "archiveName":  "fresh-ui-lock-native-refresh.stderr.log"
+                    },
+                    {
+                        "path":  "fresh-ui-lock-native-refresh.stdout.log",
+                        "bytes":  740,
+                        "sha256":  "37975c8e9086ede794d552c6acb4b8c01aff2092599739904d2e1a722f334c57",
+                        "archiveName":  "fresh-ui-lock-native-refresh.stdout.log"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.json",
+                        "bytes":  1209,
+                        "sha256":  "12f4030dd3b4c31a8115b877c72694bfc6a83a3cef0b22687f26ca38f3bdc336",
+                        "archiveName":  "native-cookie-jar-gitpath.json"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.process.json",
+                        "bytes":  976,
+                        "sha256":  "86dad62d5e9df2e6ed7fd58779d9566b1070d76d886486184373ce46a01252c6",
+                        "archiveName":  "native-cookie-jar-gitpath.process.json"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.receipt.json",
+                        "bytes":  2326,
+                        "sha256":  "2b10af9e9f0d4a8c53d24aea4f11983fbfc6675de699a6bb58cf642ede4a4f09",
+                        "archiveName":  "native-cookie-jar-gitpath.receipt.json"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.request.json",
+                        "bytes":  1009,
+                        "sha256":  "83bcc8085cb214efa2aa2714a43c7b00e0b390efc59d4374663fc25c72c030a2",
+                        "archiveName":  "native-cookie-jar-gitpath.request.json"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.request-original-bom.json.txt",
+                        "bytes":  1012,
+                        "sha256":  "0975e80680c2e301e3e1a2ec687c78430727f400b8c7d1702ee9e27ed01b6000",
+                        "archiveName":  "native-cookie-jar-gitpath.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.stderr.log",
+                        "bytes":  1604,
+                        "sha256":  "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+                        "archiveName":  "native-cookie-jar-gitpath.stderr.log"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "native-cookie-jar-gitpath.stdout.log"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath-execution.process.json",
+                        "bytes":  1006,
+                        "sha256":  "e363be46a8e5885bb1fa5374c01b6b9be58c9c74e55d32656b50d9150c3bb27b",
+                        "archiveName":  "native-cookie-jar-gitpath-execution.process.json"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "native-cookie-jar-gitpath-execution.stderr.log"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath-execution.stdout.log",
+                        "bytes":  4100,
+                        "sha256":  "5a94ab15701d52cd5d327461d0de44c75fe77380189d1af9f1121e43389b634b",
+                        "archiveName":  "native-cookie-jar-gitpath-execution.stdout.log"
+                    },
+                    {
+                        "path":  "native-cookie-jar-gitpath-unchanged.json",
+                        "bytes":  1293,
+                        "sha256":  "dde7411d2dcbaa15c194f8fa7d41fdcfa09eeeac6d132e3fe507bef88db426c8",
+                        "archiveName":  "native-cookie-jar-gitpath-unchanged.json"
+                    },
+                    {
+                        "path":  "native-info-help.process.json",
+                        "bytes":  734,
+                        "sha256":  "9c40c7a41cef54dd8eb3ff901c6a0738b16761bf613ed98d20d6bab0f9d810ca",
+                        "archiveName":  "native-info-help.process.json"
+                    },
+                    {
+                        "path":  "native-info-help.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "native-info-help.stderr.log"
+                    },
+                    {
+                        "path":  "native-info-help.stdout.log",
+                        "bytes":  6610,
+                        "sha256":  "9c5be70ebfaac21f34950f2acb6a5ac9f065876e13bbb18eaef8b0b62c3cc02c",
+                        "archiveName":  "native-info-help.stdout.log"
+                    },
+                    {
+                        "path":  "native-selection-mismatch.diff",
+                        "bytes":  14957,
+                        "sha256":  "9b319455c97ea32873e7e89ca9bc340d567a3943270985c753640835279fe6b9",
+                        "archiveName":  "native-selection-mismatch.diff"
+                    },
+                    {
+                        "path":  "native-selection-mismatch-report.process.json",
+                        "bytes":  1040,
+                        "sha256":  "2c9bc51e149ee4e70fc43d0d42986ea19ec975ee630c5abbf81752d1ac1a6445",
+                        "archiveName":  "native-selection-mismatch-report.process.json"
+                    },
+                    {
+                        "path":  "native-selection-mismatch-report.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "native-selection-mismatch-report.stderr.log"
+                    },
+                    {
+                        "path":  "native-selection-mismatch-report.stdout.log",
+                        "bytes":  8088,
+                        "sha256":  "f28b781524c1cbdfc550cae3b2a59a19ff4c1d5047d723f83f56623a002a102b",
+                        "archiveName":  "native-selection-mismatch-report.stdout.log"
+                    },
+                    {
+                        "path":  "original-owned-environment.ps1.txt",
+                        "bytes":  1814,
+                        "sha256":  "a7b69d4dc9064cceedaabf0366d24fe5848f82650bddda164c0cfdf864a873a2",
+                        "archiveName":  "original-owned-environment.ps1.txt"
+                    },
+                    {
+                        "path":  "owned-git-path-correction.json",
+                        "bytes":  434,
+                        "sha256":  "28e997b8a0700a69f851ea541d29bc882fc69f3c2f40f8c819c2ab2a8a9338b4",
+                        "archiveName":  "owned-git-path-correction.json"
+                    },
+                    {
+                        "path":  "patched-auth-controls.json",
+                        "bytes":  545,
+                        "sha256":  "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f",
+                        "archiveName":  "patched-auth-controls.json"
+                    },
+                    {
+                        "path":  "patched-auth-controls.process.json",
+                        "bytes":  960,
+                        "sha256":  "509342cb6bdc1a5930422dd355a344b60d3a8ce160dd7ebc6d5f2270d5a3bd3f",
+                        "archiveName":  "patched-auth-controls.process.json"
+                    },
+                    {
+                        "path":  "patched-auth-controls.receipt.json",
+                        "bytes":  2309,
+                        "sha256":  "d92845c8b2550442759bf07b65d1e7faf31a01781222928fd1f22e5a4a7f9186",
+                        "archiveName":  "patched-auth-controls.receipt.json"
+                    },
+                    {
+                        "path":  "patched-auth-controls.request.json",
+                        "bytes":  1011,
+                        "sha256":  "3e4859f9001d6956b29d0c4e533f2c3e0c6cb0af151d134057a4f531843cc446",
+                        "archiveName":  "patched-auth-controls.request.json"
+                    },
+                    {
+                        "path":  "patched-auth-controls.request-original-bom.json.txt",
+                        "bytes":  1014,
+                        "sha256":  "23b8ea4bce008391c5d93fcd12eb2e524cbcb982ce69d5ff91832fb3a11bef48",
+                        "archiveName":  "patched-auth-controls.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "patched-auth-controls.stderr.log",
+                        "bytes":  1604,
+                        "sha256":  "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+                        "archiveName":  "patched-auth-controls.stderr.log"
+                    },
+                    {
+                        "path":  "patched-auth-controls.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "patched-auth-controls.stdout.log"
+                    },
+                    {
+                        "path":  "patched-auth-controls-execution.process.json",
+                        "bytes":  990,
+                        "sha256":  "8e660b50bd223b12b7591e07aab636cffaff1fd585629f313900b890970896e5",
+                        "archiveName":  "patched-auth-controls-execution.process.json"
+                    },
+                    {
+                        "path":  "patched-auth-controls-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "patched-auth-controls-execution.stderr.log"
+                    },
+                    {
+                        "path":  "patched-auth-controls-execution.stdout.log",
+                        "bytes":  4066,
+                        "sha256":  "b35373c4673f055e4feb37056a358358893040223d8cff4ad2d659170d2c3a39",
+                        "archiveName":  "patched-auth-controls-execution.stdout.log"
+                    },
+                    {
+                        "path":  "protected-final.json",
+                        "bytes":  28949,
+                        "sha256":  "7c710e05d57294ac4cf19de27f83b9e09661499cb91cd7fba0933055a9b96874",
+                        "archiveName":  "protected-final.json"
+                    },
+                    {
+                        "path":  "publish-dry-run.native-receipt.json",
+                        "bytes":  17546,
+                        "sha256":  "505296c0e0c9a66bb0d418e4718dc6607e43103b89a799cfd9891824a36f16e4",
+                        "archiveName":  "publish-dry-run.native-receipt.json"
+                    },
+                    {
+                        "path":  "publish-dry-run.receipt.json",
+                        "bytes":  17962,
+                        "sha256":  "ceeaeee51dacabb0d2609c5b31d607668b4f0bff298f58ec3d0d52f393de2377",
+                        "archiveName":  "publish-dry-run.receipt.json"
+                    },
+                    {
+                        "path":  "publish-dry-run.request.json",
+                        "bytes":  566,
+                        "sha256":  "9564e4933efc1890e8aa9c464c646475d7787a594586cdb51aa59d3ef4925d5f",
+                        "archiveName":  "publish-dry-run.request.json"
+                    },
+                    {
+                        "path":  "publish-dry-run.request-original-bom.json.txt",
+                        "bytes":  569,
+                        "sha256":  "3bc99965610ecfe937557e4b4330c1de51c606e24dd9251720c1d63bc471f530",
+                        "archiveName":  "publish-dry-run.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "publish-dry-run-execution.process.json",
+                        "bytes":  966,
+                        "sha256":  "43452db7080e8a45d9a352ca01b536cafae33d962313a17fc610eef8094af62b",
+                        "archiveName":  "publish-dry-run-execution.process.json"
+                    },
+                    {
+                        "path":  "publish-dry-run-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "publish-dry-run-execution.stderr.log"
+                    },
+                    {
+                        "path":  "publish-dry-run-execution.stdout.log",
+                        "bytes":  35512,
+                        "sha256":  "7921514e9b86104fa2964ab325295deb7a93af3704aea371f9061b9f74fa85e3",
+                        "archiveName":  "publish-dry-run-execution.stdout.log"
+                    },
+                    {
+                        "path":  "qualify-baseline.ts",
+                        "bytes":  3763,
+                        "sha256":  "749f3f0aea97b088c1892a70d695b9c0d88b72666acce8ad94b133e7d9808077",
+                        "archiveName":  "qualify-baseline.ts.txt"
+                    },
+                    {
+                        "path":  "qualify-baseline-doc-cookie.ts",
+                        "bytes":  3565,
+                        "sha256":  "8d2bf52518ba092d256ba786d7dd5e61f6c47e13772429de81a4cb8a1119cee9",
+                        "archiveName":  "qualify-baseline-doc-cookie.ts.txt"
+                    },
+                    {
+                        "path":  "qualify-graph.ts",
+                        "bytes":  2203,
+                        "sha256":  "bc5be6325c1bbe24069b178c81387b97605d9c0c5acdf4f0cd1b4af189d34ee4",
+                        "archiveName":  "qualify-graph.ts.txt"
+                    },
+                    {
+                        "path":  "quality-scan.native-receipt.json",
+                        "bytes":  5797,
+                        "sha256":  "0d480ec8630f653c360373dd50bb74b91aef39a0305ee80aab2b9edbbb886f6c",
+                        "archiveName":  "quality-scan.native-receipt.json"
+                    },
+                    {
+                        "path":  "quality-scan.receipt.json",
+                        "bytes":  7941,
+                        "sha256":  "b37ddee90ba4e5def413b6a327599afa3a3dd8aff317b9c30b0793ac230cc94c",
+                        "archiveName":  "quality-scan.receipt.json"
+                    },
+                    {
+                        "path":  "quality-scan.request.json",
+                        "bytes":  557,
+                        "sha256":  "3f49f28b918f313f8183e81324103af9987cebcb9d856363cdb8159850d771bd",
+                        "archiveName":  "quality-scan.request.json"
+                    },
+                    {
+                        "path":  "quality-scan.request-original-bom.json.txt",
+                        "bytes":  560,
+                        "sha256":  "744b492c040df9ce42c23055e8a59255a182506fe054424a3a03084c8223d190",
+                        "archiveName":  "quality-scan.request-original-bom.json.txt"
+                    },
+                    {
+                        "path":  "quality-scan-execution.process.json",
+                        "bytes":  954,
+                        "sha256":  "12e168ab493e347a0a1a7751bac99967c6afee95a08c44eae47ae26dc72faab4",
+                        "archiveName":  "quality-scan-execution.process.json"
+                    },
+                    {
+                        "path":  "quality-scan-execution.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "quality-scan-execution.stderr.log"
+                    },
+                    {
+                        "path":  "quality-scan-execution.stdout.log",
+                        "bytes":  15470,
+                        "sha256":  "2abf0f87bed13e01a0c05002f17841a11cdcb25393e97b721235d1f943ae4e40",
+                        "archiveName":  "quality-scan-execution.stdout.log"
+                    },
+                    {
+                        "path":  "report-native-selection.ts",
+                        "bytes":  3785,
+                        "sha256":  "02633fa69dc233838c3c2580e9893d282fc519dc1ffcae7ba272341cd845d817",
+                        "archiveName":  "report-native-selection.ts.txt"
+                    },
+                    {
+                        "path":  "request-encoding-correction.txt",
+                        "bytes":  138,
+                        "sha256":  "3a7ce57d5b4f07c389140db05b43e619ffdb94af40f865413443169a9991d96b",
+                        "archiveName":  "request-encoding-correction.txt"
+                    },
+                    {
+                        "path":  "resolution-mismatch.json",
+                        "bytes":  3840,
+                        "sha256":  "95a14d6391a78c6da3c1d0c9ec74a142f5387205037abb9d1789766212a58e5f",
+                        "archiveName":  "resolution-mismatch.json"
+                    },
+                    {
+                        "path":  "root-lock-native-refresh.process.json",
+                        "bytes":  770,
+                        "sha256":  "61e9b64f443b14014526d4c5cc9a1bbe64ab50fde25083b96584c89c3ac6a733",
+                        "archiveName":  "root-lock-native-refresh.process.json"
+                    },
+                    {
+                        "path":  "root-lock-native-refresh.stderr.log",
+                        "bytes":  78556,
+                        "sha256":  "cecf5065b1f95dbbe8c82e2f06f3d2963b95bfe6e976f2afc50972e998c43b93",
+                        "archiveName":  "root-lock-native-refresh.stderr.log"
+                    },
+                    {
+                        "path":  "root-lock-native-refresh.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "root-lock-native-refresh.stdout.log"
+                    },
+                    {
+                        "path":  "run-deno.ps1",
+                        "bytes":  1839,
+                        "sha256":  "db04b912668a92c6a6212e3b49d290c1184b209e4711d5267d9343a145c810c5",
+                        "archiveName":  "run-deno.ps1.txt"
+                    },
+                    {
+                        "path":  "run-request.ts",
+                        "bytes":  1228,
+                        "sha256":  "85f45f6cf582825fe3ee072b03d53b245f7d8cfb36e762066a1dab51b58da4df",
+                        "archiveName":  "run-request.ts.txt"
+                    },
+                    {
+                        "path":  "scope-stop-handoff.md",
+                        "bytes":  2773,
+                        "sha256":  "a7c691714010a525763e7e2fd5c6c1caac59afebccb432e3959932485abb644c",
+                        "archiveName":  "scope-stop-handoff.md"
+                    },
+                    {
+                        "path":  "selected-auth-graph.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "selected-auth-graph.native-stderr.log"
+                    },
+                    {
+                        "path":  "selected-auth-graph.process.json",
+                        "bytes":  908,
+                        "sha256":  "12b88e3d07e42958eda90de59830036da97026545e388ce139609e793939f489",
+                        "archiveName":  "selected-auth-graph.process.json"
+                    },
+                    {
+                        "path":  "selected-auth-graph.raw.json",
+                        "bytes":  1268603,
+                        "sha256":  "328afe6e6bef1850f3f80356cbecf558b9babe3ed29df4399fb42dcc5fd03e07",
+                        "archiveName":  "selected-auth-graph.raw.json"
+                    },
+                    {
+                        "path":  "selected-auth-graph.receipt.json",
+                        "bytes":  2328,
+                        "sha256":  "d6fe0a34e43eba83034996d0e2e67ea34f321bb45e06d15e21469d6ecfbeedb0",
+                        "archiveName":  "selected-auth-graph.receipt.json"
+                    },
+                    {
+                        "path":  "selected-auth-graph.stderr.log",
+                        "bytes":  1908,
+                        "sha256":  "8a36afe5a4abf42e07d0931408e06e7cd3314e93f25e2554496d656a50eede4f",
+                        "archiveName":  "selected-auth-graph.stderr.log"
+                    },
+                    {
+                        "path":  "selected-auth-graph.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "selected-auth-graph.stdout.log"
+                    },
+                    {
+                        "path":  "selected-auth-graph.ts",
+                        "bytes":  407,
+                        "sha256":  "029a3a555c9666e161247c257182e24631f108b28a0de852bcc97cf826d6fbd0",
+                        "archiveName":  "selected-auth-graph.ts.txt"
+                    },
+                    {
+                        "path":  "selected-auth-graph-final.process.json",
+                        "bytes":  926,
+                        "sha256":  "94bac74596f085b17ac71f9c2f7a64638acbe81a71023f6b0aa30c7f3c1735d4",
+                        "archiveName":  "selected-auth-graph-final.process.json"
+                    },
+                    {
+                        "path":  "selected-auth-graph-final.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "selected-auth-graph-final.stderr.log"
+                    },
+                    {
+                        "path":  "selected-auth-graph-final.stdout.log",
+                        "bytes":  4368,
+                        "sha256":  "557c37428dbc0e4efe28c877da70a788f5439e82eac9ac305fb57e77b90d16a7",
+                        "archiveName":  "selected-auth-graph-final.stdout.log"
+                    },
+                    {
+                        "path":  "selected-config-fmt.process.json",
+                        "bytes":  952,
+                        "sha256":  "f005161d1b5d152ece32ce1cc40fb52f109cce7d96696538429f035544cabe5f",
+                        "archiveName":  "selected-config-fmt.process.json"
+                    },
+                    {
+                        "path":  "selected-config-fmt.receipt.json",
+                        "bytes":  1302,
+                        "sha256":  "aca8e116c34719946f4a85006241121c746d3150cb1c23421b6e55de08466e29",
+                        "archiveName":  "selected-config-fmt.receipt.json"
+                    },
+                    {
+                        "path":  "selected-config-fmt.request.json",
+                        "bytes":  227,
+                        "sha256":  "6f3f523367358d91a4772b3ac80c00e2f842acea9f1ab5e085f0590bd2e4abf9",
+                        "archiveName":  "selected-config-fmt.request.json"
+                    },
+                    {
+                        "path":  "selected-config-fmt.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "selected-config-fmt.stderr.log"
+                    },
+                    {
+                        "path":  "selected-config-fmt.stdout.log",
+                        "bytes":  2272,
+                        "sha256":  "b28ad8cf7b65d15688e37f2b1a6e500860cfecd34aece3da1f445068b0f18d72",
+                        "archiveName":  "selected-config-fmt.stdout.log"
+                    },
+                    {
+                        "path":  "snapshot-baseline.ts",
+                        "bytes":  3021,
+                        "sha256":  "fe5004f1523c6b96e2fc05f228c29b24c6930d09c912c27c0c4706fc74229d70",
+                        "archiveName":  "snapshot-baseline.ts.txt"
+                    },
+                    {
+                        "path":  "source-whitespace.stderr.log",
+                        "bytes":  222,
+                        "sha256":  "7d6351e8c4aba8dbfc6d5f92a6713f6b8e189306da892e8f6d85eac80501041d",
+                        "archiveName":  "source-whitespace.stderr.log"
+                    },
+                    {
+                        "path":  "source-whitespace.stdout.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "source-whitespace.stdout.log"
+                    },
+                    {
+                        "path":  "unchanged-auth-public-docs.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "unchanged-auth-public-docs.native-stderr.log"
+                    },
+                    {
+                        "path":  "unchanged-auth-public-docs.native-stdout.log",
+                        "bytes":  144,
+                        "sha256":  "60f68491e20eae734cc81e491c51135c511436159a991fc7b1f7b50503dfa2ab",
+                        "archiveName":  "unchanged-auth-public-docs.native-stdout.log"
+                    },
+                    {
+                        "path":  "unchanged-native-cookie-jar-gitpath.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "archiveName":  "unchanged-native-cookie-jar-gitpath.native-stderr.log"
+                    },
+                    {
+                        "path":  "unchanged-native-cookie-jar-gitpath.native-stdout.log",
+                        "bytes":  251,
+                        "sha256":  "afe1b10d77fb796ccd458ee97a3c8d18c14bf35788d682a22a51660e2c065f1f",
+                        "archiveName":  "unchanged-native-cookie-jar-gitpath.native-stdout.log"
+                    }
+                ]
+}

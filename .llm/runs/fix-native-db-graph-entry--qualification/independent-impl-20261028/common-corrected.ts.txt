@@ -1,0 +1,126 @@
+import { parseCredentialAssignment } from '../../tools/agentic/lib/provider-credential.ts';
+import { prepareOpenCodeProjectEnvironment } from '../../tools/agentic/opencode/opencode-project-config.ts';
+export const root = 'C:/Users/ericc/source/repos/netscript-windows-qualification-008';
+export const directory: string = `${root}/.llm/tmp/windows-db-impl-review-20261028`;
+export const host: string = `${directory}/host`;
+export const expectedHead = '0d5b982b0a3050b94172770a435581c931c93b22';
+export const dbRoot = 'C:/Users/ericc/source/repos/netscript-native-db-qualification-008';
+export const dbHead = 'd4b391217664371c17295529b956bd9f8950712a';
+export const executable = 'C:/Users/ericc/.deno/bin/.opencode/node_modules/opencode-ai/bin/opencode.exe';
+export const executableHash = '83567c13cc5e361ded7e48351cb024cd4503285960d82c30fc585194da46d757';
+export const model = 'openrouter/z-ai/glm-5.3-flash';
+export const steps = 8;
+export const owners: string[] = ['check-exports-drift.ts', 'check-exports-drift_test.ts',
+  'jsdoc-example-compiler.ts', 'jsdoc-example-compiler_test.ts', 'jsdoc-example-policy.ts']
+  .map(name => `.llm/tools/docs/${name}`);
+export const run = '.llm/runs/fix-windows-qualification-tools--20261028';
+export function decode(bytes: Uint8Array): string { return new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
+export async function hash(path: string): Promise<string> { return digest(await Deno.readFile(path)); }
+export async function digest(bytes: Uint8Array): Promise<string> {
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array(bytes)))]
+    .map(n => n.toString(16).padStart(2, '0')).join('');
+}
+export async function json(name: string, value: unknown): Promise<void> {
+  await Deno.writeTextFile(`${directory}/${name}`, JSON.stringify(value, null, 2), { createNew: true });
+}
+export async function git(args: string[], cwd: string = root): Promise<string> {
+  const out = await new Deno.Command('git', { args, cwd, stdout: 'piped', stderr: 'null' }).output();
+  if (!out.success) throw new Error(`Git guard failed: ${args[0]}`);
+  return decode(out.stdout).trim();
+}
+export async function guard(): Promise<void> {
+  const snapshot = JSON.parse(await Deno.readTextFile(`${directory}/source-snapshot.json`));
+  for(const target of snapshot.targets){
+    if(await git(['rev-parse','HEAD'],target.root)!==target.head)throw new Error(`Exact ${target.name} head changed.`);
+    await git(['diff','--quiet','HEAD','--'],target.root);
+    for(const item of target.protected){if(await hash(`${target.root}/${item.path}`)!==item.sha256)throw new Error(`Protected ${target.name} drift: ${item.path}`);}
+    const extra=(await git(['ls-files','--others','--exclude-standard'],target.root)).split(/\r?\n/).filter(Boolean);
+    for(const path of extra){if(!target.untracked.includes(path)){
+      if(path!=='.netscript/agent/diagnostics/project.json')throw new Error(`Unexpected ${target.name} untracked owner.`);
+      const receipt=JSON.parse(await Deno.readTextFile(`${target.root}/${path}`));
+      if(Object.keys(receipt).sort().join(',')!=='command,exitStatus,resource,timestamp'||receipt.resource!=='project'||
+        !['mcp find_export','mcp list_package_exports','mcp get_export','mcp search_exports'].includes(receipt.command)||
+        ![0,1].includes(receipt.exitStatus)||!Number.isFinite(Date.parse(receipt.timestamp)))throw new Error('Unexpected tool-owned receipt schema.');
+    }}
+  }
+  if (await hash(executable) !== executableHash) throw new Error('Native executable changed.');
+}
+export async function environment(): Promise<Record<string,string>> {
+  const allowed = new Set(['path','pathext','comspec','systemroot','windir','systemdrive',
+    'programfiles','programfiles(x86)','programw6432','number_of_processors','processor_architecture',
+    'http_proxy','https_proxy','all_proxy','no_proxy','node_extra_ca_certs','ssl_cert_file','ssl_cert_dir',
+    'request_ca_bundle','lang','lc_all']);
+  const env = Object.fromEntries(Object.entries(Deno.env.toObject()).filter(([name]) => allowed.has(name.toLowerCase())));
+  for (const [name, leaf] of Object.entries({ HOME:'home', USERPROFILE:'home', XDG_CONFIG_HOME:'config',
+    XDG_DATA_HOME:'data', XDG_CACHE_HOME:'cache', XDG_STATE_HOME:'state', APPDATA:'appdata',
+    LOCALAPPDATA:'local', TEMP:'temp', TMP:'temp' })) env[name] = `${host}/${leaf}`;
+  Object.assign(env, { DENO_TLS_CA_STORE:'mozilla,system', NO_COLOR:'1', OTEL_DENO:'false',
+    DENO_DIR:'C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache',
+    PATH:'C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7;' + (env.PATH ?? env.Path ?? ''),
+    OPENCODE_BIN:executable, OPENCODE_CONFIG_CONTENT:await Deno.readTextFile(`${directory}/config-proposal.json`) });
+  return await prepareOpenCodeProjectEnvironment(env, { cwd:host, receiptPath:`${directory}/mcp.jsonl` });
+}
+export async function credential(): Promise<string> {
+  const key = parseCredentialAssignment(
+    await Deno.readTextFile('C:/Users/ericc/source/repos/eis-chat/.env'), 'OPENROUTER_API_KEY');
+  if (!key?.trim()) throw new Error('Selected EIS OPENROUTER assignment unavailable.');
+  return key;
+}
+export async function finiteJson<T>(client: Deno.HttpClient, path: string, key?: string, limit = 262144): Promise<T> {
+  const init: RequestInit & {client:Deno.HttpClient} = {client,redirect:'error',
+    signal:AbortSignal.timeout(15000),headers:key ? {authorization:`Bearer ${key}`} : {}};
+  const response = await fetch(`https://openrouter.ai/api/v1/${path}`, init);
+  if (!response.ok || !response.body) { await response.body?.cancel(); throw new Error(`Provider metadata HTTP${response.status}`); }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = []; let size = 0;
+  try {
+    while (true) {
+      const next = await reader.read(); if (next.done) break;
+      size += next.value.length;
+      if (size > limit) { await reader.cancel(); throw new Error('Provider metadata streaming bound exceeded.'); }
+      chunks.push(next.value);
+    }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(size); let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  return JSON.parse(decode(bytes));
+}
+export interface Allowance {
+  provider:'openrouter'; capturedAt:string; availableBalanceUsd:number; accountAvailableUsd:number;
+  keyLimit:number|null; keyRemainingUsd:number; minimumAccountAndSelectedKey:boolean;
+}
+export async function allowance(client: Deno.HttpClient, key: string): Promise<Allowance> {
+  const [credits, metadata] = await Promise.all([
+    finiteJson<{data:{total_credits:number;total_usage:number}}>(client, 'credits', key, 65536),
+    finiteJson<{data:{limit:number|null;limit_remaining:number}}>(client, 'key', key, 65536)]);
+  const account = Number(credits.data.total_credits) - Number(credits.data.total_usage);
+  let keyRemaining = account;
+  if (metadata.data.limit !== null) {
+    keyRemaining = metadata.data.limit_remaining;
+    if (typeof keyRemaining !== 'number' || !Number.isFinite(keyRemaining) || keyRemaining < 0) throw new Error('Key cap unproven.');
+  }
+  const available = Math.min(account, keyRemaining);
+  if (!Number.isFinite(available) || available < 0) throw new Error('Account/key allowance unproven.');
+  return { provider:'openrouter' as const, capturedAt:new Date().toISOString(), availableBalanceUsd:available,
+    accountAvailableUsd:account, keyLimit:metadata.data.limit, keyRemainingUsd:keyRemaining,
+    minimumAccountAndSelectedKey:true };
+}
+export interface Price {
+  capturedAt:string; inputMaxUsdPerMillion:number;outputMaxUsdPerMillion:number;steps:number;
+  inputPerStep:number;outputPerStep:number;prospectiveUsd:number;estimateUsd:number;noCacheDiscount:boolean;
+  noProviderPin:boolean;estimateNotProviderCap:boolean;nativeCatalogLimitNotEffectiveOutputCap:boolean;
+}
+export async function price(client: Deno.HttpClient, name: string): Promise<Price> {
+  const response = await finiteJson<{data:{endpoints:{pricing:{prompt:string;completion:string}}[]}}>(client, 'models/z-ai/glm-5.3-flash/endpoints');
+  await json(name, response);
+  const endpoints = response.data?.endpoints;
+  if (!Array.isArray(endpoints) || !endpoints.length) throw new Error('Concrete endpoint catalog empty.');
+  const input = Math.max(...endpoints.map(entry => Number(entry.pricing.prompt) * 1000000));
+  const output = Math.max(...endpoints.map(entry => Number(entry.pricing.completion) * 1000000));
+  const prospective = ((steps * 96000 * input + steps * 32000 * output) / 1000000 + 0.10) * 1.25;
+  if (![input, output, prospective].every(n => Number.isFinite(n) && n > 0)) throw new Error('Price/positive estimate unproven.');
+  return { capturedAt:new Date().toISOString(), inputMaxUsdPerMillion:input, outputMaxUsdPerMillion:output,
+    steps, inputPerStep:96000, outputPerStep:32000, prospectiveUsd:prospective,
+    estimateUsd:Math.ceil(prospective * 10) / 10, noCacheDiscount:true, noProviderPin:true,
+    estimateNotProviderCap:true, nativeCatalogLimitNotEffectiveOutputCap:true };
+}

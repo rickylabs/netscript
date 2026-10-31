@@ -2976,3 +2976,25 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   SHA256 `c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4`;
   [root scope/disposition](../../runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md),
   SHA256 `6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c`.
+
+## packages/fresh-ui — TOKEN-EXPORT-DIRECTORY-CARDINALITY
+
+- **ID:** `TOKEN-EXPORT-DIRECTORY-CARDINALITY`
+- **Reason:** S1 exports 18 preset configurations, 18 separate preset CSS files and 26 Figma index/collection files in the
+  `registry/theme/presets/` and `registry/theme/figma/` directories. Their flat export names exceed
+  the generic F-16 directory-child advisory cap. Existing root cardinality also grows by one
+  documented public token entrypoint.
+- **Why deferred:** Original Figma collection filenames/index shape and registry copy-source paths
+  form the S1 round-trip contract. A directory regrouping needs an explicit export-path migration;
+  generated data is deterministic and is covered by the complete output freshness gate.
+- **Cost:** Longer generated directory listings and additional advisory output; no runtime
+  ownership or dependency-layer exception.
+- **Owner:** Fresh UI design-system maintainers, epic #2412.
+- **Target:** Token schema/export-layout follow-up before the round-trip consumer freezes paths.
+- **Linked plan:** `.llm/runs/orch-divybot-6462582366--s1/plan.md`.
+- **Created:** 2026-10-28.
+- **Status:** open, DEBT_ACCEPTED.
+- **Closing gate:** Version the export-path migration, keep all original and computed collections
+  discoverable through the index, pass frozen token build/freshness and registry copy tests, and
+  remove these directory-cardinality advisories from `deno task arch:check` without adding scan
+  exclusions.

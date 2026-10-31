@@ -1,0 +1,117 @@
+{
+  "noCredentialFileValueOrHashIncluded": true,
+  "entries": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/allowance-prepare.json",
+      "bytes": 248,
+      "sha256": "1fc5ffe3555183c302d35083d064fbcf91dedec7c95bb1b719be39947b81e851",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/allowance-launch.json",
+      "bytes": 248,
+      "sha256": "fcab4badcdf337348f53cbadea99c16af7185c40246d09069be096483bf2173a",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/allowance-after.json",
+      "bytes": 248,
+      "sha256": "90119006f23312aabbe15406d04bd68eea610e11a0e88ace9795c84620b0ed51",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/expense-prepare.json",
+      "bytes": 295,
+      "sha256": "5acd80c23efbcb9d88ea2361846f5ce326a78584a9cd84644f26592ba3e86c36",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/expense-launch.json",
+      "bytes": 295,
+      "sha256": "2fcc964a706021bbe25437dbed79632a9fecd4cbeaf580233e692df49f257980",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/root-launch-authorization.json",
+      "bytes": 1246,
+      "sha256": "3b14e968a2fdd116fa907fc2fd0ee440cbd93d01c50ff8ef093042ece546f378",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/root-reservation-closed.json",
+      "bytes": 334,
+      "sha256": "325a2aa52d646846a7e208b378812c5fdd8ba2e547065e2977299d8c893364a7",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/price-prepare.json",
+      "bytes": 391,
+      "sha256": "cb7ca507b12488e73d3dd240833439a757f6f45b0aecd9a53913b4b46c614bfd",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/price-launch.json",
+      "bytes": 391,
+      "sha256": "fcec40e340dd1ffad600bb9deb3ecdcdac347801aff461ce627d35f7ea929b0f",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/model-prepare-endpoints.json",
+      "bytes": 62128,
+      "sha256": "07b443c61dd5ff3ece3614f1fd5cd088a0911f9198ddff5c255f23d39a0c97c3",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/model-launch-endpoints.json",
+      "bytes": 62076,
+      "sha256": "c08ffaec93e13529f7cae06ca84055062eb27efa6d892d972084dce0c63bcf48",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/model-catalog.json",
+      "bytes": 1719,
+      "sha256": "48e91854dae5b291cbc5a226ff27d5362fc42de6986a6c103bbd074b672d067b",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/preparation.json",
+      "bytes": 18712,
+      "sha256": "16b331de5035c4eee5d1a63ae1c18d892e05545570c75f3a1bc8bf5e9e6ffaf7",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/preparation-ci-successor.json",
+      "bytes": 20663,
+      "sha256": "9cd901bde2039b1e5efa50c8f6b63c56f5b49b054c2d31b7c150a9823e5d34d1",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/prepared-handoff.json",
+      "bytes": 5609,
+      "sha256": "a90518764b8811edc1fc178ef71089f815cec6ebab2210c080c888c84cacb4be",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-db-integration-continuation-20261028/prepared-handoff-ci-successor.json",
+      "bytes": 989,
+      "sha256": "9d9fd633dbb50c349d11e99e6abe8e7765c61608da504415c2d28055cf3e5e88",
+      "contentNotCopied": true,
+      "reason": "Private operational or historical planning payload; public estimate/admission predicate and cryptographic binding only."
+    }
+  ]
+}

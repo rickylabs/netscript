@@ -1,0 +1,160 @@
+{
+  "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "assistants": [
+    {
+      "id": "msg_180b55454001G24hKng7cGxF2J",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0008395497,
+      "tokens": {
+        "total": 17485,
+        "input": 15859,
+        "output": 318,
+        "reasoning": 1308,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      }
+    },
+    {
+      "id": "msg_180b59e0f001C7u4gvK4hGTcDu",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0041481068,
+      "tokens": {
+        "total": 96920,
+        "input": 78691,
+        "output": 421,
+        "reasoning": 400,
+        "cache": {
+          "write": 0,
+          "read": 17408
+        }
+      }
+    },
+    {
+      "id": "msg_180b5bd59001cOLXkWmEhilm5p",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0075252226,
+      "tokens": {
+        "total": 198110,
+        "input": 100267,
+        "output": 424,
+        "reasoning": 651,
+        "cache": {
+          "write": 0,
+          "read": 96768
+        }
+      }
+    },
+    {
+      "id": "msg_180b5f30b0015nqcKxpguFa7mx",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0080661705,
+      "tokens": {
+        "total": 244445,
+        "input": 45855,
+        "output": 427,
+        "reasoning": 275,
+        "cache": {
+          "write": 0,
+          "read": 197888
+        }
+      }
+    },
+    {
+      "id": "msg_180b60f45001b3jXg2szkebDpt",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0099451735,
+      "tokens": {
+        "total": 300299,
+        "input": 53395,
+        "output": 422,
+        "reasoning": 2258,
+        "cache": {
+          "write": 0,
+          "read": 244224
+        }
+      }
+    },
+    {
+      "id": "msg_180b65415001Io9WY3F0I87oVK",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0112248754,
+      "tokens": {
+        "total": 348594,
+        "input": 47348,
+        "output": 295,
+        "reasoning": 663,
+        "cache": {
+          "write": 0,
+          "read": 300288
+        }
+      }
+    },
+    {
+      "id": "msg_180b678a200152Fw0KkXOLmL5e",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.0117352962,
+      "tokens": {
+        "total": 373938,
+        "input": 21184,
+        "output": 325,
+        "reasoning": 4013,
+        "cache": {
+          "write": 0,
+          "read": 348416
+        }
+      }
+    },
+    {
+      "id": "msg_180b71473001s16rSo72CLiY0A",
+      "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "stop",
+      "cost": 0.0120100331,
+      "tokens": {
+        "total": 387575,
+        "input": 14577,
+        "output": 2788,
+        "reasoning": 802,
+        "cache": {
+          "write": 0,
+          "read": 369408
+        }
+      }
+    }
+  ],
+  "freshTaskProfile": true,
+  "rawExportSha256": "373f3c40722a73c5905782bbfee4c01e16602de503ca7ca98ec8210238cf1b01",
+  "capture": {
+    "stdoutCapturedBytes": 2139100,
+    "stderrCapturedBytes": 50,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  },
+  "requestedVariant": "provider_default; actual effort not independently attested",
+  "privateReasoningPersisted": false
+}

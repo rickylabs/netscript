@@ -1,0 +1,52 @@
+{
+  "gateId": "auth-public-docs",
+  "invocationId": "auth-public-docs",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-doc-lint.ts",
+    "--root",
+    "packages/auth-better-auth",
+    "--output",
+    ".llm/tmp/better-auth-security-sol-20261028/auth-public-docs.json"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "89c9b6e456316285eba49018f3c6300006dcf722acd7d420b2be883bda90f3bf",
+  "lifecycleId": "/root/service_qualification_sol:auth-public-docs:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-10-28T03:28:41.815Z",
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/auth-public-docs.json",
+  "startedAt": "2026-10-28T03:28:41.821Z",
+  "finishedAt": "2026-10-28T03:28:43.264Z",
+  "durationMs": 1444,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 71,
+    "sha256": "1661ce94494168d01bd23546ada3ac3eea52615312578ad1e29c0a3a71030c19",
+    "tail": "Wrote .llm/tmp/better-auth-security-sol-20261028/auth-public-docs.json\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/better-auth-security-sol-20261028/auth-public-docs.json",
+    "bytes": 718,
+    "sha256": "923c4b8419dbe41845eac1d4ee4be9d2618ea3440873bf74b67b69318e19173c",
+    "modifiedAt": "2026-10-28T03:28:43.268Z"
+  }
+}

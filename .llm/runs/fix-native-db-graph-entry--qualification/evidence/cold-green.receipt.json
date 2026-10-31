@@ -1,0 +1,42 @@
+{
+  "gateId": "native-db-cold-consumers",
+  "invocationId": "cold-green",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-env",
+    "--allow-run",
+    ".llm/tools/deps/check-db-alignment.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "5b6bd691a6fe85ae7a2022e8d7447e2af92775ea284dc9a2297bbce8f70bdba1",
+  "lifecycleId": "/root/service_qualification_sol:cold-green:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T02:38:43.092Z",
+  "startedAt": "2026-10-28T02:38:43.097Z",
+  "finishedAt": "2026-10-28T02:38:50.873Z",
+  "durationMs": 7775,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 161,
+    "sha256": "099550618bdcaebc55f70099d6b157bd9a76a3d81a20f1d651204d1ce64e1dea",
+    "tail": "db-alignment sdk-fresh identities=@tanstack/db@0.13.0_typescript@7.0.2\ndb-alignment fresh-only identities=@tanstack/db@0.13.0_typescript@7.0.2\ndb-alignment PASS\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  }
+}

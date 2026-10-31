@@ -1,0 +1,56 @@
+{
+  "gateId": "auth-fmt",
+  "invocationId": "auth-fmt",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-fmt.ts",
+    "--root",
+    "packages/auth-better-auth",
+    "--root",
+    "plugins/auth",
+    "--ext",
+    "ts,tsx",
+    "--output",
+    ".llm/tmp/better-auth-security-sol-20261028/auth-fmt.json"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "f3723f6b3d01d8c7d10ce436f8b8bea46a93a803b3ade1e4aa878d56a947a64d",
+  "lifecycleId": "/root/service_qualification_sol:auth-fmt:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:24:53.438Z",
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/auth-fmt.json",
+  "startedAt": "2026-10-28T03:24:53.444Z",
+  "finishedAt": "2026-10-28T03:24:53.856Z",
+  "durationMs": 412,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 164,
+    "sha256": "3539efbb7699ad0bdbf4c98a28a5ee043b3d87b8e5550109596d94b966fd5d64",
+    "tail": "{\"report\":\".llm/tmp/better-auth-security-sol-20261028/auth-fmt.json\",\"summary\":{\"filesSelected\":78,\"batches\":2,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/better-auth-security-sol-20261028/auth-fmt.json",
+    "bytes": 314,
+    "sha256": "0375a7da9944233fb1797b3685b3933ccba2f72cfe749c804cf29a14574ff645",
+    "modifiedAt": "2026-10-28T03:24:53.848Z"
+  }
+}

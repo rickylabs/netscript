@@ -1,0 +1,18 @@
+﻿{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-all",
+                 ".llm/tools/gates/run-gate.ts",
+                 "--gate",
+                 "quality-scan",
+                 "--id",
+                 "security-quality-scan",
+                 "--output",
+                 ".llm/tmp/better-auth-security-sol-20261028/quality-scan.native-receipt.json",
+                 "--timeout-ms",
+                 "120000"
+             ],
+    "timeoutMs":  120000
+}

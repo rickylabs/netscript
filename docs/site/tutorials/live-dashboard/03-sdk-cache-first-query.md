@@ -8,14 +8,12 @@ next: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-d
 
 # SDK client and cache-first query
 
-In chapter 2 you served an `orders.list` read-model on port **3002**. Now you will read it from the
-Fresh app. The SDK gives you a typed client built from the same contract, and a query factory that
-wraps every procedure in a KV-backed stale-while-revalidate cache. For an operations screen that
-posture matters: the queue paints instantly from the last-known rows — even while the `orders`
-service is mid-redeploy — and refreshes in the background instead of blocking the person watching it.
-That SWR behavior belongs to the callable procedure action (for example,
-`await ordersQueries.list(input)`); `getCachedEntry(input)` is a separate KV-only metadata read and
-never schedules a refresh.
+In this chapter you read the chapter 2 `orders.list` read-model from the Fresh app. The SDK gives you
+a typed client built from the same contract, and a query factory that wraps every procedure in a
+KV-backed stale-while-revalidate (SWR) cache: the queue paints from the last-known rows, even while
+the `orders` service redeploys, and refreshes in the background. The SWR behavior belongs to the
+callable procedure action (for example, `await ordersQueries.list(input)`); `getCachedEntry(input)`
+is a separate KV-only metadata read and never schedules a refresh.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -28,30 +26,33 @@ never schedules a refresh.
 
 ## What you will build
 
-A single module, `apps/dashboard/lib/orders.ts`, that exports a typed `ordersClient` and a
-`ordersQueries` query utility. The client is derived from `typeof ordersContract`, so calling
-`ordersClient.list({ … })` is type-checked against the contract you wrote in chapter 2. The query
-factory adds per-procedure helpers — `queryOptions()`, `clientKey()`, and the KV-only
-`getCachedEntry()` metadata read — that chapters 4 and 5 build the page on.
+One module, `apps/dashboard/lib/orders.ts`, that exports a typed `ordersClient` and an
+`ordersQueries` query utility. The client is derived from `typeof ordersContract`, so
+`ordersClient.list({ … })` is type-checked against the chapter 2 contract. The query factory adds
+per-procedure helpers (`queryOptions()`, `clientKey()` and the KV-only `getCachedEntry()` metadata
+read) that chapters 4 and 5 build the page on.
 
 ## Before you begin
 
-You should have completed [chapter 2](/tutorials/live-dashboard/02-contract-to-service/): the
-`orders` service answering on **3002**, the database seeded, and `aspire start` up. Confirm the typed
-read-model still returns data:
+You need [chapter 2](/tutorials/live-dashboard/02-contract-to-service/)'s `orders` service answering
+at its allocated endpoint, the database seeded, and `aspire start` up. Confirm the read-model returns data:
 
 ```sh
-curl 'http://localhost:3002/api/v1/orders/list?limit=1&offset=0'
+netscript service list
+netscript contract inspect orders
 ```
 
-You should get one seeded order back. If `items` is empty, re-run `netscript db seed` from the
-workspace root.
+Use `list_api_services` → `list_service_operations` → `get_operation_schema` for the live
+operation. The typed client in Step 1 calls it with `{ limit: 1, offset: 0 }`.
+
+The query should return one seeded order. If `items` is empty, re-run `netscript db seed` from the workspace
+root.
 
 ## Step 1 — Create the typed service client
 
-`createServiceClient` from `@netscript/sdk/client` builds a client from a contract. The key fields:
-the `contract` itself, and a `serviceName` that is the **discovery key** — how the client finds the
-service's URL at call time. Create the clients module in your Fresh app:
+`createServiceClient` from `@netscript/sdk/client` builds a client from a contract. It takes the
+`contract` and a `serviceName`, the **discovery key** the client uses to find the service's URL at
+call time. Create the module in your Fresh app:
 
 ```ts
 // apps/dashboard/lib/orders.ts
@@ -65,18 +66,23 @@ export const ordersClient = createServiceClient<typeof ordersContract>({
 });
 ```
 
-`ordersClient.list(input)` now has the exact signature the contract declared — wrong input shape, or
-reading a field the output does not have, is a compile error.
+`ordersClient.list(input)` has the exact signature the contract declares: a wrong input shape, or
+reading a field the output doesn't have, is a compile error.
 
 {{ comp callout { type: "note", title: "How serviceName resolves to a URL" } }}
-You never hardcode <code>http://localhost:3002</code>. <code>serviceName: 'orders'</code> is resolved at call time from an Aspire-injected env var — server-side <code>services__orders__http__0</code>, and the browser mirror <code>VITE_services__orders__http__0</code> — via <code>getServiceUrl</code> in <code>@netscript/sdk/discovery</code>. Aspire sets those when you list <code>orders</code> as a reference; the client just reads them. Full mechanics in <a href="/services-sdk/how-to/discover-services/">Discover services</a>.
+The client does not need a literal service URL. <code>getServiceUrl</code> in
+<code>@netscript/sdk/discovery</code> resolves <code>serviceName: 'orders'</code> at call time from an
+Aspire-injected environment variable: <code>services__orders__http__0</code> on the server and its
+browser mirror <code>VITE_services__orders__http__0</code>. Aspire sets them when you list
+<code>orders</code> as a reference. See
+<a href="/services-sdk/how-to/discover-services/">Discover services</a>.
 {{ /comp }}
 
 ## Step 2 — Add the cache-first query factory
 
-A bare client calls the service every time. For a dashboard you want **cache-first**: serve the
-last-known answer instantly, then revalidate in the background. `createQueryFactories` wraps each
-procedure in exactly that — a KV-backed stale-while-revalidate layer. Add it to the same module:
+A bare client calls the service every time. A dashboard wants **cache-first** reads: serve the
+last-known answer immediately, then revalidate in the background. `createQueryFactories` wraps each
+procedure in a KV-backed stale-while-revalidate layer. Add it to the same module:
 
 ```ts
 // apps/dashboard/lib/orders.ts (add below the client)
@@ -87,10 +93,10 @@ export const ordersQueries = createQueryFactories({
 ```
 
 The callable procedure action owns that stale policy. `getCachedEntry(input)` only inspects the KV
-value and timestamp; it does not execute the policy.
+value and timestamp; it doesn't run the policy.
 
-`ordersQueries` carries one entry per contract procedure (`list`, `getById`, `getStats`, …),
-each a small object of typed helpers. The four you will use across the next chapters:
+`ordersQueries` has one entry per contract procedure (`list`, `getById`, `getStats`, …), each a
+small object of typed helpers. The next chapters use four of them:
 
 {{ comp.apiTable({
   caption: "Per-procedure query helpers (e.g. ordersQueries.list)",
@@ -102,13 +108,18 @@ each a small object of typed helpers. The four you will use across the next chap
   ]
 }) }}
 
-{{ comp callout { type: "tip", title: "Why KV, and why cache-first" } }}
-The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). <code>getCachedEntry</code> is a pure KV read: on a warm cache it returns <code>{ data, cachedAt }</code>; on a cold cache it returns <code>null</code>. It does not evaluate staleness or start revalidation; the callable action or page/client policy must do that explicitly.
+{{ comp callout { type: "tip", title: "Where the cache lives" } }}
+The cache is backed by KV: Redis in your Aspire stack, the default <code>--cache-backend</code>,
+registered at the top of <code>main.ts</code> in chapter 1 (<code>garnet</code> and
+<code>deno-kv</code> are alternatives). <code>getCachedEntry</code> is a pure KV read: it returns
+<code>{ data, cachedAt }</code> on a warm cache and <code>null</code> on a cold one. It doesn't
+evaluate staleness or start revalidation; the callable action or the page/client policy does that
+explicitly.
 {{ /comp }}
 
 ## Step 3 — Understand the calling shapes
 
-You now have two ways to read orders, for two different places in the stack:
+You now have two ways to read orders, for two places in the stack:
 
 - **Server, policy-aware cache read** — first run
   `const data = await ordersQueries.list(input, { preferFreshOnStale: true })`, then read
@@ -119,21 +130,21 @@ You now have two ways to read orders, for two different places in the stack:
 - **Client, in an island** — `useQuery(ordersQueries.list.queryOptions(input))` inside a Fresh
   island. Used in chapter 4's `QueryIsland` for client-side reads and refetch.
 
-Both derive their types and their cache key from the *same* contract, so a server-rendered row and a
-client-refetched row are guaranteed to be the same shape.
+Both take their types and their cache key from the *same* contract, so a server-rendered row and a
+client-refetched row have the same shape.
 
 ## Verify your progress
 
-Type-check the workspace to prove the client and query factory line up with the contract:
+Type-check the workspace to confirm the client and query factory line up with the contract:
 
 ```sh
 deno task check
 ```
 
-A clean check confirms `createServiceClient<typeof ordersContract>` and the query factory typed
-themselves off your chapter-2 contract. To prove the discovery key resolves end to end, leave
-`aspire start` up — the next chapter renders the page that calls through this client, and a missing
-`services__orders__http__0` shows up there as a clear "Service URL not found" error.
+A clean check confirms `createServiceClient<typeof ordersContract>` and the query factory take their
+types from your chapter 2 contract. Leave `aspire start` up: the next chapter renders the page that
+calls through this client, and a missing `services__orders__http__0` shows up there as a
+"Service URL not found" error.
 
 - [ ] `apps/dashboard/lib/orders.ts` exports `ordersClient` and `ordersQueries`.
 - [ ] `deno task check` is clean.
@@ -142,9 +153,6 @@ themselves off your chapter-2 contract. To prove the discovery key resolves end 
 
 ## What you built
 
-A typed `ordersClient` and a cache-first `ordersQueries` query layer, both derived from the
-chapter-2 contract, with service discovery resolving the URL for you. Next you will render the live
-table: NetScript's `definePage` builder for the server shell, and a `QueryIsland` that hydrates
-these query helpers in the browser.
-
-{{ comp.nextPrev({ prev: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" }, next: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" } }) }}
+A typed `ordersClient` and a cache-first `ordersQueries` query layer, both derived from the chapter 2
+contract, with service discovery resolving the URL. Next, you render the table with NetScript's
+`definePage` builder and a `QueryIsland` that hydrates these query helpers in the browser.

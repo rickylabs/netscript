@@ -1,0 +1,5 @@
+close-gate PASS rickylabs/netscript#2437
+provenance: head=01566c31aca546cc711197d3ee66464aab73ed84 evaluated=2026-10-28T08:07:55.821Z
+snapshot: #2436 updated=2026-10-28T08:07:53Z bodySha256=f23216ce2f855f7a0c6b08e72e1cda6a82eb078a1a053c5fd6fa4b3fd3f34f45
+closing issues: #2436
+closing reference: #2436 source: manual link

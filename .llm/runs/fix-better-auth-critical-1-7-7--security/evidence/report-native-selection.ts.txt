@@ -1,0 +1,43 @@
+// Read-only selection/scope attribution. No new resolution, source edit, credential or inference.
+const dir = '.llm/tmp/better-auth-security-sol-20261028';
+const decoder = new TextDecoder();
+const sha = async (bytes: Uint8Array) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((n) => n.toString(16).padStart(2, '0')).join('');
+const json = async (path: string) => JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/, ''));
+const baseline = await json(`${dir}/baseline.json`);
+const old = await json(`${dir}/baseline-deno.lock.txt`);
+const currentBytes = await Deno.readFile('deno.lock');
+const current = JSON.parse(decoder.decode(currentBytes));
+await Deno.writeFile(`${dir}/candidate-root-lock.native-1.7.14.json.txt`, currentBytes);
+const versions = (npm: Record<string, unknown>) => {
+  const result = new Map<string, Set<string>>();
+  for (const key of Object.keys(npm)) {
+    const match = key.match(/^(@[^/]+\/[^@]+|[^@]+)@([^_]+)/);
+    if (!match) throw new Error(`Unexpected npm key: ${key}`);
+    const set = result.get(match[1]) ?? new Set<string>(); set.add(match[2]); result.set(match[1], set);
+  }
+  return result;
+};
+const before = versions(old.npm), after = versions(current.npm);
+const versionChanges = [...new Set([...before.keys(), ...after.keys()])].sort().map((name) => ({ name, before: [...before.get(name) ?? []].sort(), after: [...after.get(name) ?? []].sort() })).filter((row) => JSON.stringify(row.before) !== JSON.stringify(row.after));
+let protectedHashes = 0;
+for (const row of baseline.protectedFiles) {
+  if (await sha(await Deno.readFile(`${row.root}/${row.path}`)) !== row.sha256) throw new Error(`Protected file changed: ${row.root}/${row.path}`);
+  protectedHashes++;
+}
+const authored = [];
+for (const row of baseline.authored.filter((row: { path: string }) => !row.path.endsWith('.lock'))) {
+  const bytes = await Deno.readFile(row.path);
+  const text = decoder.decode(bytes);
+  const originalBytes = new TextEncoder().encode(text.replaceAll('^1.7.7', '^1.6.20'));
+  if (await sha(originalBytes) !== row.sha256) throw new Error('Authored change extends beyond selected floor');
+  authored.push({ path: row.path, sha256: await sha(bytes), lines: text.split('\n').length - 1, onlySelectedFloorChanged: true });
+}
+const fresh = baseline.authored.find((row: { path: string }) => row.path === 'packages/fresh-ui/deno.lock');
+const freshUiUnchanged = await sha(await Deno.readFile(fresh.path)) === fresh.sha256;
+if (!freshUiUnchanged) throw new Error('Fresh UI lock changed before version disposition');
+const diff = await new Deno.Command('git', { args: ['diff', '--full-index', '--', ...baseline.authored.map((row: {path: string}) => row.path)], stdout: 'piped', stderr: 'piped' }).output();
+if (!diff.success) throw new Error('Cannot save native candidate diff');
+await Deno.writeFile(`${dir}/native-selection-mismatch.diff`, diff.stdout);
+const report = { capturedUtc: new Date().toISOString(), acceptedRelease: '1.7.7', actualNativeRelease: [...after.get('better-auth') ?? []], nativeArgv: ['deno', 'install', '--lockfile-only'], actualFloor: '^1.7.7', scopeStopConditionTriggered: true, allDependentRefreshAndGatesStopped: true, sourceAuthored: authored, freshUiLockUnchanged: freshUiUnchanged, allProtectedHashesMatch: true, protectedHashes, versionChanges, originalRootLockSha256: baseline.authored.find((row: {path: string}) => row.path === 'deno.lock').sha256, nativeRootLockSha256: await sha(currentBytes), candidateDiffSha256: await sha(diff.stdout), noExtraOwnersEdited: true, noOverridesReloadOrAgeBypass: true, noCheckpointOrPush: true, noInference: true };
+await Deno.writeTextFile(`${dir}/resolution-mismatch.json`, JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify(report, null, 2));

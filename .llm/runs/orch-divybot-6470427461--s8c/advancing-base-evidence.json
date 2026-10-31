@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "targetMain": "96d13d29434d44538480b29ac11ac988a66d2042",
+  "oldRemoteFeatureTip": "9cc0442b2fe2a606694c126b933095d12bb6f054",
+  "authorization": "repeated latest user rebase/force request; exact lease against old remote9cc",
+  "independentPlanEval": "PASS",
+  "independentImplEval": "PASS for review only",
+  "commitsReplayed": 17,
+  "commitsSkipped": 0,
+  "conflicts": "3 generated CLI prose conflicts, fixed upstream96 each time",
+  "all286UpstreamPathsPreservedExceptRegeneratedProse": true,
+  "all48UnaffectedFeatureSourcePathsByteIdentical": true,
+  "newTokensV2PackageAndMcpExportCorpusPreserved": true,
+  "sourceComparison": "advancing-base-source-comparison.json",
+  "carrierComparison": "advancing-base-carrier-comparison.json",
+  "browser": {
+    "passed": 116,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "receipt": {
+      "requestHash": "fb04821d57cdb9871783513a6050a4b80bd04385bcdf6877bdeb79f2edb0d0b7",
+      "outcome": "PASS",
+      "durationMs": 262579,
+      "exitCode": 0
+    }
+  },
+  "toolTests": 12,
+  "typedCheckLintFmt": "PASS",
+  "generatedTypeCheck": "PASS",
+  "docsBuild": "PASS",
+  "exports": "PASS",
+  "snippets": 671,
+  "quality": "PASS",
+  "links": {
+    "count": 24225,
+    "pages": 254,
+    "outcome": "PASS"
+  },
+  "caveats": 15,
+  "repro": {
+    "html": 254,
+    "twins": 205,
+    "outcome": "PASS",
+    "exception": "known Pagefind metadata only, strict default retained"
+  },
+  "actualStyleNegativeControls": {
+    "raw-colour": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "raw-custom": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "red-role": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "red-outside-state",
+      "diagnosticFound": true
+    }
+  },
+  "fourNativeGeneratorsAndFreshness": "PASS, in required order",
+  "mcpBudget": {
+    "sourceBytes": 283750,
+    "maxBytes": 294912,
+    "count": 14
+  },
+  "rootAndDocsLocksMatchMain": true,
+  "postCommitAssetsBarrel": "pending after commit",
+  "leasePushAndHostedCI": "pending; final PR report records current results",
+  "runtimeLimitation": "unchanged unavailable local Docker/runtime/classifier limit, no merge certification"
+}

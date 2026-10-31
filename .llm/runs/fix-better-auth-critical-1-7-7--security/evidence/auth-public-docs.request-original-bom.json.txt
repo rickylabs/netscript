@@ -1,0 +1,17 @@
+﻿{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-read",
+                 "--allow-write",
+                 "--allow-run",
+                 ".llm/tools/run-deno-doc-lint.ts",
+                 "--root",
+                 "packages/auth-better-auth",
+                 "--output",
+                 ".llm/tmp/better-auth-security-sol-20261028/auth-public-docs.json"
+             ],
+    "timeoutMs":  120000,
+    "childReport":  ".llm/tmp/better-auth-security-sol-20261028/auth-public-docs.json"
+}

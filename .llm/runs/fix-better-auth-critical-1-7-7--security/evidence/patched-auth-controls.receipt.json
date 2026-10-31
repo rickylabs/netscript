@@ -1,0 +1,61 @@
+{
+  "gateId": "patched-auth-controls",
+  "invocationId": "patched-auth-controls",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-test.ts",
+    "--output",
+    ".llm/tmp/better-auth-security-sol-20261028/patched-auth-controls.json",
+    "--",
+    "--cached-only",
+    "--frozen",
+    "--check",
+    "--allow-all",
+    "--sanitize-ops",
+    "--sanitize-resources",
+    "--trace-leaks",
+    "packages/auth-better-auth/tests/",
+    "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+    "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "7db43042901c2c709b4bb33ead1ba5465492ba03bd862608d6f77ad38389ee42",
+  "lifecycleId": "/root/service_qualification_sol:patched-auth-controls:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:28:41.768Z",
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/patched-auth-controls.json",
+  "startedAt": "2026-10-28T03:28:41.775Z",
+  "finishedAt": "2026-10-28T03:28:50.105Z",
+  "durationMs": 8331,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 167,
+    "sha256": "953134902525d566e0bf8b16c527bc93729214e011a64606ad2d00485c887db1",
+    "tail": "{\"report\":\".llm/tmp/better-auth-security-sol-20261028/patched-auth-controls.json\",\"summary\":{\"passed\":21,\"failed\":0,\"ignored\":0,\"totalResults\":21,\"uniqueFailures\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/better-auth-security-sol-20261028/patched-auth-controls.json",
+    "bytes": 545,
+    "sha256": "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f",
+    "modifiedAt": "2026-10-28T03:28:50.096Z"
+  }
+}

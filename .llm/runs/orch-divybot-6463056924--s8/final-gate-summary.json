@@ -1,0 +1,93 @@
+{
+  "codeHead": "c5bbb98e27f23956954b094f724e55a9a97e936a",
+  "receipts": [
+    {
+      "gateId": "assets-barrel",
+      "argv": [
+        "deno",
+        "task",
+        "check:assets-barrel"
+      ],
+      "gitHead": "c5bbb98e27f23956954b094f724e55a9a97e936a",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "requestHash": "6a6624d6e52d0291497116c287ce0e34490f286abd4a577a37519079bce5f9ac"
+    },
+    {
+      "gateId": "fresh-ui-browser",
+      "argv": [
+        "npm",
+        "test",
+        "--",
+        "--config",
+        "docs.playwright.config.ts"
+      ],
+      "gitHead": "c5bbb98e27f23956954b094f724e55a9a97e936a",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "requestHash": "c98da51ee80d2ab897f86d4626a71c707223bd16bdeb705f258b843f14a1ff84",
+      "childReportEvidence": {
+        "path": "test-results/docs-final-head/results.json",
+        "bytes": 94446,
+        "sha256": "ace30354efdd7c5793a97d7aca03fb9d9a7ab86fb700ce4d3912a02320db6522",
+        "modifiedAt": "2026-10-28T10:03:35.979Z"
+      }
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "argv": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "gitHead": "c5bbb98e27f23956954b094f724e55a9a97e936a",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "requestHash": "db2688ef233d7ebf073b4af3a67c97ec52107541684d504aeabf2f316efaedc3"
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "argv": [
+        "deno",
+        "task",
+        "check:agent-docs-prose"
+      ],
+      "gitHead": "c5bbb98e27f23956954b094f724e55a9a97e936a",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "requestHash": "adc9f6a9c0614cc2a20282f34a86710c83d1a62cf071069552a798b99c07d15d"
+    },
+    {
+      "gateId": "publish-assets",
+      "argv": [
+        "deno",
+        "task",
+        "check:publish-assets"
+      ],
+      "gitHead": "c5bbb98e27f23956954b094f724e55a9a97e936a",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "requestHash": "aada451ce1f3355cabfd3659dea0b8d1e2e6b43e75f651cbe254e3fc286cfcd6"
+    }
+  ],
+  "browser": {
+    "stats": {
+      "startTime": "2026-10-28T10:02:13.453Z",
+      "duration": 82420.002,
+      "expected": 48,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "audits": 24,
+    "blockingAxe": 0
+  },
+  "ciComposed": {
+    "run": 40668477096,
+    "conclusion": "success",
+    "artifact": 12806972669,
+    "sourceHead": "4e0560e8ce0afb36e770437bb7eff880c76936fa"
+  },
+  "limitation": "Full CLI Postgres runtime is rerunning on the final code head; prior69f run failed34/1 at generated-guarded-service exit143; native desktop guard failed independently.",
+  "disposition": "Superseded pre-repair C5 proof. Final IMPL-EVAL found a missing-role visual defect after these gates; see impl-eval.md, impl-eval-fixed.md and impl-repair-evidence.json. New committed-head CI/receipts are required."
+}

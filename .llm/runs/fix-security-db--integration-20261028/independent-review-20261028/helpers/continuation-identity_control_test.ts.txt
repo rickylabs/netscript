@@ -1,0 +1,9 @@
+import {validateContinuationIdentity, type AssistantIdentity} from './continuation-identity.ts';
+const ids=Array.from({length:8},(_,index)=>'prior'+index);
+const rows=():AssistantIdentity[]=>[...ids,'new1'].map((id,index)=>({id,sessionID:'ses_existing',providerID:'openrouter',modelID:'z-ai/glm-5.3-flash',finish:index===8?'stop':'tool-calls'}));
+const verify=(value:unknown)=>{if(!value)throw new Error('Identity control failed.');};
+function rejects(change:(entries:AssistantIdentity[])=>void){const entries=rows();change(entries);let refused=false;try{validateContinuationIdentity(entries,ids,'ses_existing',4);}catch{refused=true;}verify(refused);}
+Deno.test({name:'same-session identity accepts eight retained and one completed continuation',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:()=>verify(validateContinuationIdentity(rows(),ids,'ses_existing',4).length===1)});
+Deno.test({name:'same-session identity refuses substituted old message or fresh session',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:()=>{rejects(entries=>{entries[0].id='replaced';});rejects(entries=>{entries[8].sessionID='ses_new';});}});
+Deno.test({name:'same-session identity refuses wrong provider and incomplete final',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:()=>{rejects(entries=>{entries[8].providerID='other';});rejects(entries=>{entries[8].finish='tool-calls';});rejects(entries=>{entries[8].finish='length';});}});
+Deno.test({name:'same-session identity refuses fifth new assistant step',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:()=>rejects(entries=>{for(let index=0;index<4;index++)entries.push({...entries[8],id:'extra'+index});})});

@@ -1,0 +1,129 @@
+{
+  "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "reads": [
+    {
+      "name": "integration-01-two-db-owners.md",
+      "expectedLines": 196,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-02-exact-combined-diff.md",
+      "expectedLines": 487,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-03-exact-combined-diff.md",
+      "expectedLines": 175,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-04-db-only-diff.md",
+      "expectedLines": 147,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-05-origins-boundary.md",
+      "expectedLines": 266,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-06-accepted-db-report.md",
+      "expectedLines": 100,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-07-integrated-six-gates.md",
+      "expectedLines": 246,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-08-full-native-composite.md",
+      "expectedLines": 188,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-09-full-native-composite.md",
+      "expectedLines": 253,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-10-full-native-composite.md",
+      "expectedLines": 29,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-11-actual-ci.md",
+      "expectedLines": 126,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "integration-12-actual-ci-successor.md",
+      "expectedLines": 576,
+      "complete": true,
+      "calls": 1
+    }
+  ],
+  "mcp": [
+    {
+      "tool": "netscript_find_guidance",
+      "input": {
+        "intent": "native dependency graph qualification and Windows db alignment: exactly one complete @tanstack/db identity across sdk-fresh and fresh-only, check-db-alignment control, Deno native info on Windows paths with spaces"
+      },
+      "status": "completed"
+    },
+    {
+      "tool": "netscript_search_docs",
+      "input": {
+        "query": "check-db-alignment tanstack db identity sdk fresh fresh-only Windows qualification dependency graph"
+      },
+      "status": "completed"
+    }
+  ],
+  "steps": [
+    {
+      "reason": "tool-calls",
+      "cost": 0.0118323672,
+      "tokens": {
+        "total": 390025,
+        "input": 5195,
+        "output": 676,
+        "reasoning": 410,
+        "cache": {
+          "write": 0,
+          "read": 383744
+        }
+      }
+    },
+    {
+      "reason": "stop",
+      "cost": 0.0151551687,
+      "tokens": {
+        "total": 461089,
+        "input": 65054,
+        "output": 2240,
+        "reasoning": 3907,
+        "cache": {
+          "write": 0,
+          "read": 389888
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "targetHeads": {
+    "Security2426": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5"
+  },
+  "distinctPublicReportsRequired": 1,
+  "manualRootRelevanceAndVerdictRequired": true
+}

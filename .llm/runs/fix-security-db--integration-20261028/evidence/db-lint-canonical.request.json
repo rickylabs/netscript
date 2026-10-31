@@ -1,0 +1,21 @@
+{
+  "timeoutMs": 120000,
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-lint.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment_test.ts",
+    "--config",
+    ".llm/tmp/security-db-integration-20261028/lint-canonical-rules.json",
+    "--output",
+    ".llm/tmp/security-db-integration-20261028/db-lint-canonical.json"
+  ],
+  "childReport": ".llm/tmp/security-db-integration-20261028/db-lint-canonical.json"
+}

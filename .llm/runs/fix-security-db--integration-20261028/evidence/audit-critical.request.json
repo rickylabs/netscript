@@ -1,0 +1,7 @@
+{
+  "timeoutMs": 120000,
+  "args": [
+    "task",
+    "audit:critical"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "raw-colour": {
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "expectedDiagnostic": "raw-colour",
+    "diagnosticFound": true
+  },
+  "raw-custom": {
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "expectedDiagnostic": "raw-colour",
+    "diagnosticFound": true
+  },
+  "red-role": {
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "expectedDiagnostic": "red-outside-state",
+    "diagnosticFound": true
+  }
+}

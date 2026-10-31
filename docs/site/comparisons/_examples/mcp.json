@@ -1,0 +1,27 @@
+[
+  {
+    "name": "list_api_services",
+    "arguments": {}
+  },
+  {
+    "name": "list_service_operations",
+    "arguments": {
+      "service": "<service name returned above>",
+      "limit": 10
+    }
+  },
+  {
+    "name": "get_operation_schema",
+    "arguments": {
+      "service": "<service name returned above>",
+      "operation": "<operation id returned above>"
+    }
+  },
+  {
+    "name": "get_recent_errors",
+    "arguments": {
+      "service": "<service name returned above>",
+      "limit": 5
+    }
+  }
+]

@@ -1,0 +1,24 @@
+﻿{
+    "name":  "arch-check",
+    "startedUtc":  "2026-10-28T02:40:47.4490953Z",
+    "finishedUtc":  "2026-10-28T02:41:12.4045951Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tools/gates/run-gate.ts",
+                      "--gate",
+                      "arch-check",
+                      "--id",
+                      "native-db-graph-entry-arch",
+                      "--timeout-ms",
+                      "180000",
+                      "--output",
+                      ".llm/tmp/native-db-qualification-sol-20261028/arch-check.receipt.json"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008\\.llm\\tmp\\native-db-qualification-sol-20261028\\arch-check.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008\\.llm\\tmp\\native-db-qualification-sol-20261028\\arch-check.stderr.log"
+}

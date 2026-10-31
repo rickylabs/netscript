@@ -1,0 +1,16 @@
+﻿{
+    "name":  "prepare-integration",
+    "startedUtc":  "2026-10-28T04:35:26.8208992Z",
+    "finishedUtc":  "2026-10-28T04:35:27.5993617Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tmp/security-db-integration-20261028/prepare-integration.ts"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\security-db-integration-20261028\\prepare-integration.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\security-db-integration-20261028\\prepare-integration.stderr.log"
+}

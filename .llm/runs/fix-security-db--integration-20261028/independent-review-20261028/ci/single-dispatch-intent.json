@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-28T04:58:17.822Z",
+  "rootAuthorized": true,
+  "method": "POST",
+  "path": "repos/rickylabs/netscript/actions/jobs/122636200954/rerun",
+  "maximumDispatches": 1,
+  "sourceHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "firstAttemptFailurePreserved": true,
+  "networkOutageNotProven": true,
+  "noInference": true
+}

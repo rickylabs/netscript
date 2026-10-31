@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-28T04:25:17.285Z",
+  "publicCandidates": 27,
+  "publicEvents": 74,
+  "embeddedToolOutputsInspected": 51,
+  "selectedCredentialComparedInMemoryOnly": true,
+  "credentialValueOrHashPublished": false,
+  "actualOperationalNumberNeedlesCompared": true,
+  "rawAccountKeyWindowAllowanceExpensePayloadsFound": 0,
+  "rawPrivateFilesExcluded": 10,
+  "publicUsageIsModelStepMetadataNotAccountWindows": true,
+  "reviewSourceHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+  "noPrivateReasoning": true,
+  "canonicalPublicCopyByteExact": true
+}

@@ -51,3 +51,20 @@
   background: color-mix(in srgb, var(--ns-muted) 18%, transparent);
   border: 1px solid var(--ns-border);
 }
+
+/* New languages supply dedicated on-subtle text roles, separate from solid fills. */
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-badge--primary {
+  color: var(--ns-primary-text);
+}
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-badge--secondary {
+  color: var(--ns-secondary-text);
+}
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-badge--success {
+  color: var(--ns-success-text);
+}
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-badge--warning {
+  color: var(--ns-warning-text);
+}
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-badge--destructive {
+  color: var(--ns-destructive-text);
+}

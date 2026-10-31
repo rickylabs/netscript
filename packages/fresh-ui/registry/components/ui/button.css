@@ -3,20 +3,20 @@
   align-items: center;
   justify-content: center;
   gap: var(--ns-space-2);
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-sm);
-  font-weight: 500;
+  font-family: var(--ns-font-label);
+  font-size: var(--ns-text-label);
+  font-weight: var(--ns-weight-label);
   line-height: 1;
-  border: 1px solid transparent;
-  border-radius: var(--ns-radius-md);
+  border: var(--ns-border-width) solid transparent;
+  border-radius: var(--ns-component-button-radius);
   padding: var(--ns-space-2) var(--ns-space-4);
   cursor: pointer;
   transition:
-    background var(--ns-ease-normal),
-    border-color var(--ns-ease-normal),
-    color var(--ns-ease-normal),
-    box-shadow var(--ns-ease-normal),
-    transform var(--ns-ease-normal);
+    background var(--ns-motion-duration-normal) var(--ns-motion-easing-normal),
+    border-color var(--ns-motion-duration-normal) var(--ns-motion-easing-normal),
+    color var(--ns-motion-duration-normal) var(--ns-motion-easing-normal),
+    box-shadow var(--ns-motion-duration-normal) var(--ns-motion-easing-normal),
+    transform var(--ns-motion-duration-normal) var(--ns-motion-easing-normal);
   white-space: nowrap;
   text-decoration: none;
 }
@@ -136,6 +136,13 @@
 }
 
 /* Sizes */
+/* Preset defaults precede size variants and contribute no qualifier specificity. */
+:where(:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark'])) .ns-btn {
+  min-height: var(--ns-component-button-height);
+  padding-inline: var(--ns-control-padding-x);
+  gap: var(--ns-control-gap);
+}
+
 .ns-btn--sm {
   font-size: var(--ns-text-xs);
   padding: var(--ns-space-1-5) var(--ns-space-3);
@@ -154,4 +161,21 @@
   /* The visually-hidden label span is still a flex item; without this the
      inherited gap pushes the glyph ~4px off center. */
   gap: 0;
+}
+
+/* Keep icon controls square, including the small mobile sidebar trigger. */
+:where(:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark'])) .ns-btn--sm {
+  min-height: var(--ns-control-height-sm);
+}
+
+:where(:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark'])) .ns-btn--icon {
+  width: var(--ns-component-button-height);
+  height: var(--ns-component-button-height);
+  padding: 0;
+  gap: 0;
+}
+
+:where(:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark'])) .ns-btn--icon.ns-btn--sm {
+  width: var(--ns-control-height-sm);
+  height: var(--ns-control-height-sm);
 }

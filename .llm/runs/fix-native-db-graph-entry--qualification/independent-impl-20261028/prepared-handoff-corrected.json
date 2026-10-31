@@ -1,0 +1,46 @@
+{
+  "noInference": true,
+  "inferenceApproved": false,
+  "predecessorHandoffSha256": "7cde8669f66f316b523bde9320cac83593c4265a2e1595495e8bf6e1d5fbaa87",
+  "corrections": {
+    "preparedAt": "2026-10-28T03:07:05.795Z",
+    "predecessorPreparationSha256": "b385edd6b76834515776a753c8c15e25066b1e81a88d86df348d56e6ecdecf14",
+    "predecessorHandoffSha256": "7cde8669f66f316b523bde9320cac83593c4265a2e1595495e8bf6e1d5fbaa87",
+    "originalRejectedGuards": [
+      "Inherited OPENROUTER_API_KEY precedence could select a different credential from the qualified EIS assignment.",
+      "Dropping reasoning alone could persist unknown raw JSON fields.",
+      "Spawn count was not explicit; conditional child await did not prove full error-path status/pipe settlement."
+    ],
+    "credential": "ONLY selected OPENROUTER_API_KEY assignment parsed from EIS .env in memory; inherited key ignored",
+    "publicProjection": "Exact accepted U1 publicEvent allowlist; private/unknown omitted, fatal UTF-8, actual1MiB line-byte cap",
+    "ownedInference": "Single spawn factory, unconditional status await plus stdout and stderr/pipe settlement before final receipt",
+    "u1HelperSha256": "f9cbfb2f1e1b296eed06094385b7e1b35e94df89882b13455df9055ac96a0e00",
+    "controls": "3/0/0 sanitized native controls; previous4capture controls retained unchanged",
+    "nativeConfigArgvPacketCatalogAndSourceUnchanged": true,
+    "noModelOrSourceGateRerun": true,
+    "noInference": true
+  },
+  "successorSeals": {
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common-corrected.ts": "feb8c8e1a4814d16b12975c1c921fe0356924c942362573291928dbb5e0e0ef5",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver-corrected.ts": "cecdd6be6db20e8d08a014066ea0fc38cee3537d12b667b54e62e91d2978c322",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/owned-spawn-corrected.ts": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/public-events-corrected.ts": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/public-events-u1-original.ts.txt": "f9cbfb2f1e1b296eed06094385b7e1b35e94df89882b13455df9055ac96a0e00",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/corrected-guards_control_test.ts": "2e4425d22dacf4b7f4236ddc527ba5b575c8fd9b54c53d7fae62cc6e81372509",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/corrected-check-attempt1.log": "735e3ff9ca693f1f474f32ac5d04336ee38bbff5e1813261aa432261887cdf91",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/corrected-controls-attempt1.log": "87a3454becec82665abc0926bc84b81497d260abf553758c4023fadcf56bdabe",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/seal-correction.ts": "6199933ce33d6f5d726466aeea5bf141567f970e4508b922c9b13bf93a4a2a32"
+  },
+  "driverSha256": "cecdd6be6db20e8d08a014066ea0fc38cee3537d12b667b54e62e91d2978c322",
+  "preparationSha256": "ba74cbfbd31a6b6da26ff0c049acd2f652c47b36c99583f3776d7aa65b78f698",
+  "guardCorrectionDiffSha256": "3afd6ac77fcf175cffc06b8d099ba690e261b6d3cacc7289f8ff1d36d2c716ae",
+  "rootLaunchReceiptPath": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/root-launch-authorization.json",
+  "rootLaunchBinding": "driverSha256 and preparationSha256 must bind corrected files; original packet/model/config/14reads/2verdicts/heads unchanged",
+  "estimateUsd": 0.7,
+  "estimateNotProviderCap": true,
+  "freshActualLaunchSelectedKeyMinimumPriceAndExpenseRequired": true,
+  "launchCommand": "portable deno run --config check-deno.json --no-lock -A implementation-driver-corrected.ts --launch",
+  "sourceAndProtectedGuardsPassed": true,
+  "predecessorAllSealsMatched": true,
+  "originalRejectedGuardHistoryRetained": true
+}

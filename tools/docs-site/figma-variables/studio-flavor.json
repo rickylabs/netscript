@@ -1,0 +1,3750 @@
+{
+  "collection": "Studio flavor",
+  "modes": [
+    "Utility",
+    "Cloud",
+    "Workshop",
+    "Playful",
+    "Ledger",
+    "Atelier",
+    "Signal"
+  ],
+  "variables": [
+    {
+      "name": "avatar/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-avatar-radius)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 999,
+        "Workshop": 6,
+        "Playful": 10,
+        "Ledger": 2,
+        "Atelier": 999,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "border/d/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/6"
+        },
+        "Cloud": "#33406a",
+        "Workshop": "#a88b66",
+        "Playful": "#4a3a6b",
+        "Ledger": "#2e4556",
+        "Atelier": "#a69e8e",
+        "Signal": "#2f3d33"
+      }
+    },
+    {
+      "name": "border/d/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/4"
+        },
+        "Cloud": "#242e52",
+        "Workshop": "#3d2f22",
+        "Playful": "#33264f",
+        "Ledger": "#172c38",
+        "Atelier": "#2e2c24",
+        "Signal": "#1a251d"
+      }
+    },
+    {
+      "name": "border/l/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/6"
+        },
+        "Cloud": "#d3dce9",
+        "Workshop": "#3a2e22",
+        "Playful": "#d9cdf7",
+        "Ledger": "#c5cfdc",
+        "Atelier": "#1f1c18",
+        "Signal": "#a9b4aa"
+      }
+    },
+    {
+      "name": "border/l/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/4"
+        },
+        "Cloud": "#e6ecf4",
+        "Workshop": "#dccfb9",
+        "Playful": "#eae2fc",
+        "Ledger": "#dde3ec",
+        "Atelier": "#ded7ca",
+        "Signal": "#d3dcd3"
+      }
+    },
+    {
+      "name": "border/width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "values": {
+        "Utility": 1,
+        "Cloud": 1,
+        "Workshop": 1.5,
+        "Playful": 1,
+        "Ledger": 1,
+        "Atelier": 1,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "brand-on/d",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Theme set/accent/d/solid-fg"
+        },
+        "Cloud": {
+          "alias": "Theme set/accent/d/solid-fg"
+        },
+        "Workshop": {
+          "alias": "Theme set/accent/d/solid-fg"
+        },
+        "Playful": {
+          "alias": "Theme set/accent/d/solid-fg"
+        },
+        "Ledger": {
+          "alias": "Theme set/accent/d/solid-fg"
+        },
+        "Atelier": {
+          "alias": "Theme set/accent/d/solid-fg"
+        },
+        "Signal": "#0b0f0b"
+      }
+    },
+    {
+      "name": "brand-on/l",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Theme set/accent/l/contrast"
+        },
+        "Cloud": {
+          "alias": "Theme set/accent/l/contrast"
+        },
+        "Workshop": {
+          "alias": "Theme set/accent/l/contrast"
+        },
+        "Playful": {
+          "alias": "Theme set/accent/l/contrast"
+        },
+        "Ledger": {
+          "alias": "Theme set/accent/l/contrast"
+        },
+        "Atelier": {
+          "alias": "Theme set/accent/l/contrast"
+        },
+        "Signal": "#0b0f0b"
+      }
+    },
+    {
+      "name": "brand/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Primitives/color/swiss-red/d/9"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/d/9"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/d/9"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/d/9"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/d/9"
+        },
+        "Atelier": {
+          "alias": "Primitives/color/tomato/d/9"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/d/9"
+        }
+      }
+    },
+    {
+      "name": "brand/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Primitives/color/swiss-red/l/9"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Atelier": "#1f1c18",
+        "Signal": {
+          "alias": "Base accent/accent/l/9"
+        }
+      }
+    },
+    {
+      "name": "button/d/shadow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#0b0704",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "button/l/shadow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "button/shadow-x",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-button-shadow-x)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 3,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "button/shadow-y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-button-shadow-y)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 3,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "card/border-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-card-border-bottom)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "card/border-side",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-card-border-side)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "card/border-top",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-card-border-top)",
+      "values": {
+        "Utility": 1,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 1,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "card/d/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1a2340",
+        "Workshop": "#2a1f15",
+        "Playful": "#251a38",
+        "Ledger": "#0d1f29",
+        "Atelier": "#00000000",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "card/d/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/5"
+        },
+        "Cloud": "#00000000",
+        "Workshop": "#a88b66",
+        "Playful": "#00000000",
+        "Ledger": "#2e4556",
+        "Atelier": "#8f8778",
+        "Signal": "#2f3d33"
+      }
+    },
+    {
+      "name": "card/d/footer",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#161e3a",
+        "Workshop": "#251b12",
+        "Playful": "#20162f",
+        "Ledger": "#0b1b24",
+        "Atelier": "#00000000",
+        "Signal": "#0c120e"
+      }
+    },
+    {
+      "name": "card/l/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fbf6ee",
+        "Playful": "#ffffff",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "card/l/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/5"
+        },
+        "Cloud": "#00000000",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#c5cfdc",
+        "Atelier": "#1f1c18",
+        "Signal": "#a9b4aa"
+      }
+    },
+    {
+      "name": "card/l/footer",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#f7f9fc",
+        "Workshop": "#f3eadb",
+        "Playful": "#f7f3ff",
+        "Ledger": "#f4f6f9",
+        "Atelier": "#00000000",
+        "Signal": "#eef2ed"
+      }
+    },
+    {
+      "name": "deco/blockbars",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "values": {
+        "Utility": false,
+        "Cloud": false,
+        "Workshop": false,
+        "Playful": false,
+        "Ledger": false,
+        "Atelier": false,
+        "Signal": true
+      }
+    },
+    {
+      "name": "deco/d/tick",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#bdee63"
+      }
+    },
+    {
+      "name": "deco/l/tick",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#1b1f1c"
+      }
+    },
+    {
+      "name": "deco/marker",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-studio-deco-marker)",
+      "description": "Shows the 6px location marker in Tabs, Nav item and Navigation menu. Utility only.",
+      "values": {
+        "Utility": true,
+        "Cloud": false,
+        "Workshop": false,
+        "Playful": false,
+        "Ledger": false,
+        "Atelier": false,
+        "Signal": false
+      }
+    },
+    {
+      "name": "deco/sparkline",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "values": {
+        "Utility": false,
+        "Cloud": true,
+        "Workshop": false,
+        "Playful": false,
+        "Ledger": false,
+        "Atelier": false,
+        "Signal": false
+      }
+    },
+    {
+      "name": "deco/ticks",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "values": {
+        "Utility": false,
+        "Cloud": false,
+        "Workshop": false,
+        "Playful": false,
+        "Ledger": false,
+        "Atelier": false,
+        "Signal": true
+      }
+    },
+    {
+      "name": "font/data",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "values": {
+        "Utility": "Host Grotesk",
+        "Cloud": "Figtree",
+        "Workshop": "Instrument Sans",
+        "Playful": "Nunito",
+        "Ledger": "IBM Plex Mono",
+        "Atelier": "Hanken Grotesk",
+        "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "font/eyebrow",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-studio-font-eyebrow)",
+      "description": "Eyebrow family per Studio flavor: Utility uses its mono (Fragment Mono); other flavors follow font/label.",
+      "values": {
+        "Utility": "Fragment Mono",
+        "Cloud": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Workshop": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Playful": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Ledger": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Atelier": {
+          "alias": "Studio flavor/font/label"
+        },
+        "Signal": {
+          "alias": "Studio flavor/font/label"
+        }
+      }
+    },
+    {
+      "name": "font/heading",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "values": {
+        "Utility": "Host Grotesk",
+        "Cloud": "Manrope",
+        "Workshop": "Bricolage Grotesque",
+        "Playful": "Fredoka",
+        "Ledger": "IBM Plex Sans Condensed",
+        "Atelier": "Newsreader",
+        "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "font/kpi",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "values": {
+        "Utility": "Host Grotesk",
+        "Cloud": "Manrope",
+        "Workshop": "Bricolage Grotesque",
+        "Playful": "Fredoka",
+        "Ledger": "IBM Plex Mono",
+        "Atelier": "Newsreader",
+        "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "font/label",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "values": {
+        "Utility": "Host Grotesk",
+        "Cloud": "Figtree",
+        "Workshop": "Instrument Sans",
+        "Playful": "Nunito",
+        "Ledger": "IBM Plex Sans Condensed",
+        "Atelier": "Hanken Grotesk",
+        "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "font/mono",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "values": {
+        "Utility": "Fragment Mono",
+        "Cloud": "Geist Mono",
+        "Workshop": "Space Mono",
+        "Playful": "DM Mono",
+        "Ledger": "IBM Plex Mono",
+        "Atelier": "IBM Plex Mono",
+        "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "font/sans",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "values": {
+        "Utility": "Host Grotesk",
+        "Cloud": "Figtree",
+        "Workshop": "Instrument Sans",
+        "Playful": "Nunito",
+        "Ledger": "IBM Plex Sans Condensed",
+        "Atelier": "Hanken Grotesk",
+        "Signal": "Geist Mono"
+      }
+    },
+    {
+      "name": "frame/inset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-frame-inset)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 16,
+        "Workshop": 0,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "hero/d/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#33236e",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "hero/l/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#e3d8ff",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "hero/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-hero-pad)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 0,
+        "Playful": 28,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "hover/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#222226",
+        "Cloud": "#1f294a",
+        "Workshop": "#33261a",
+        "Playful": "#2f2347",
+        "Ledger": "#10232e",
+        "Atelier": "#201f19",
+        "Signal": "#121b14"
+      }
+    },
+    {
+      "name": "hover/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#f3f3f3",
+        "Cloud": "#eef4fd",
+        "Workshop": "#f1e6d3",
+        "Playful": "#ede6fd",
+        "Ledger": "#eef2f7",
+        "Atelier": "#f1ece2",
+        "Signal": "#e5ece4"
+      }
+    },
+    {
+      "name": "icon/stroke",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-icon-stroke)",
+      "description": "Icon stroke width. Utility 1.5px (fine, Swiss print); other flavors 2px (unchanged).",
+      "values": {
+        "Utility": 1.5,
+        "Cloud": 2,
+        "Workshop": 2,
+        "Playful": 2,
+        "Ledger": 2,
+        "Atelier": 2,
+        "Signal": 2
+      }
+    },
+    {
+      "name": "input/d/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/9"
+        },
+        "Cloud": {
+          "alias": "Theme set/gray/d/10"
+        },
+        "Workshop": {
+          "alias": "Theme set/gray/d/10"
+        },
+        "Playful": {
+          "alias": "Theme set/gray/d/10"
+        },
+        "Ledger": {
+          "alias": "Theme set/gray/d/10"
+        },
+        "Atelier": {
+          "alias": "Theme set/gray/d/10"
+        },
+        "Signal": {
+          "alias": "Theme set/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "input/l/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "description": "Utility: gray 9 — lightest gray ≥3:1 on white. Other flavors: gray 10 (current border/input).",
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/9"
+        },
+        "Cloud": {
+          "alias": "Theme set/gray/l/10"
+        },
+        "Workshop": {
+          "alias": "Theme set/gray/l/10"
+        },
+        "Playful": {
+          "alias": "Theme set/gray/l/10"
+        },
+        "Ledger": {
+          "alias": "Theme set/gray/l/10"
+        },
+        "Atelier": {
+          "alias": "Theme set/gray/l/10"
+        },
+        "Signal": {
+          "alias": "Theme set/gray/l/10"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-border-bottom)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "kpi/border-left",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-border-left)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "kpi/border-right",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-border-right)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "kpi/border-top",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-border-top)",
+      "values": {
+        "Utility": 1,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 1,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "kpi/d/bg-1",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1a2340",
+        "Workshop": "#2e2217",
+        "Playful": "#3a1d30",
+        "Ledger": "#0d1f29",
+        "Atelier": "#00000000",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "kpi/d/bg-2",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1a2340",
+        "Workshop": "#2e2217",
+        "Playful": "#173126",
+        "Ledger": "#0d1f29",
+        "Atelier": "#00000000",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "kpi/d/bg-3",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1a2340",
+        "Workshop": "#2e2217",
+        "Playful": "#352a12",
+        "Ledger": "#0d1f29",
+        "Atelier": "#00000000",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "kpi/d/bg-4",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1a2340",
+        "Workshop": "#2e2217",
+        "Playful": "#18284a",
+        "Ledger": "#0d1f29",
+        "Atelier": "#00000000",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "kpi/d/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/5"
+        },
+        "Cloud": "#00000000",
+        "Workshop": "#a88b66",
+        "Playful": "#00000000",
+        "Ledger": "#2e4556",
+        "Atelier": "#8f8778",
+        "Signal": "#2f3d33"
+      }
+    },
+    {
+      "name": "kpi/first-left",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-first-left)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 2,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "kpi/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-gap)",
+      "values": {
+        "Utility": 24,
+        "Cloud": 16,
+        "Workshop": 16,
+        "Playful": 16,
+        "Ledger": 0,
+        "Atelier": 40,
+        "Signal": 12
+      }
+    },
+    {
+      "name": "kpi/l/bg-1",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fff8ec",
+        "Playful": "#ffe1ec",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "kpi/l/bg-2",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fff8ec",
+        "Playful": "#d9f4e3",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "kpi/l/bg-3",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fff8ec",
+        "Playful": "#fff0c2",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "kpi/l/bg-4",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fff8ec",
+        "Playful": "#dceaff",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "kpi/l/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/5"
+        },
+        "Cloud": "#00000000",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#c5cfdc",
+        "Atelier": "#1f1c18",
+        "Signal": "#a9b4aa"
+      }
+    },
+    {
+      "name": "kpi/pad-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-kpi-pad-x)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 20,
+        "Workshop": 20,
+        "Playful": 24,
+        "Ledger": 12,
+        "Atelier": 0,
+        "Signal": 14
+      }
+    },
+    {
+      "name": "nav/d/active",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#26335e",
+        "Workshop": "#3a2c1f",
+        "Playful": "#3c2b66",
+        "Ledger": "#16304a",
+        "Atelier": "#00000000",
+        "Signal": "#1c2a0e"
+      }
+    },
+    {
+      "name": "nav/d/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#251a38",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "nav/l/active",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#e7f0fd",
+        "Workshop": "#fbf6ee",
+        "Playful": "#e3d8ff",
+        "Ledger": "#e7ecf3",
+        "Atelier": "#00000000",
+        "Signal": "#e4f5bd"
+      }
+    },
+    {
+      "name": "nav/l/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#ffffff",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "nav/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-nav-pad)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 0,
+        "Playful": 4,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "nav/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-nav-radius)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 999,
+        "Workshop": 6,
+        "Playful": 999,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "primary/d/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/d/solid"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/d/solid"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/d/solid"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/d/solid"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/d/solid"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/d/solid"
+        },
+        "Signal": {
+          "alias": "Base gray/gray/d/3"
+        }
+      }
+    },
+    {
+      "name": "primary/d/bg-hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/d/solid-hover"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/d/solid-hover"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/d/solid-hover"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/d/solid-hover"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/d/solid-hover"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/d/solid-hover"
+        },
+        "Signal": {
+          "alias": "Base gray/gray/d/4"
+        }
+      }
+    },
+    {
+      "name": "primary/d/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/d/solid-fg"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/d/solid-fg"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/d/solid-fg"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/d/solid-fg"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/d/solid-fg"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/d/solid-fg"
+        },
+        "Signal": {
+          "alias": "Primitives/color/lime/d/11"
+        }
+      }
+    },
+    {
+      "name": "primary/d/stroke",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/10"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/d/11"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/d/11"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/d/11"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/d/11"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/d/11"
+        },
+        "Signal": {
+          "alias": "Base gray/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "primary/l/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/l/solid"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/l/solid"
+        }
+      }
+    },
+    {
+      "name": "primary/l/bg-hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/l/solid-hover"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/l/solid-hover"
+        }
+      }
+    },
+    {
+      "name": "primary/l/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/l/contrast"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/l/contrast"
+        }
+      }
+    },
+    {
+      "name": "primary/l/stroke",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Atelier": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/l/11"
+        }
+      }
+    },
+    {
+      "name": "prose/body/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-body-line)",
+      "values": {
+        "Utility": 26,
+        "Cloud": 26,
+        "Workshop": 26,
+        "Playful": 26,
+        "Ledger": 26,
+        "Atelier": 26,
+        "Signal": 26
+      }
+    },
+    {
+      "name": "prose/body/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-body-size)",
+      "values": {
+        "Utility": 16,
+        "Cloud": 16,
+        "Workshop": 16,
+        "Playful": 16,
+        "Ledger": 16,
+        "Atelier": 16,
+        "Signal": 16
+      }
+    },
+    {
+      "name": "prose/code/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-code-line)",
+      "values": {
+        "Utility": 22,
+        "Cloud": 22,
+        "Workshop": 22,
+        "Playful": 22,
+        "Ledger": 22,
+        "Atelier": 22,
+        "Signal": 22
+      }
+    },
+    {
+      "name": "prose/code/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-code-size)",
+      "values": {
+        "Utility": 13,
+        "Cloud": 13,
+        "Workshop": 13,
+        "Playful": 13,
+        "Ledger": 13,
+        "Atelier": 13,
+        "Signal": 13
+      }
+    },
+    {
+      "name": "prose/h1-sm/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h1-sm-line)",
+      "values": {
+        "Utility": 40,
+        "Cloud": 40,
+        "Workshop": 40,
+        "Playful": 40,
+        "Ledger": 40,
+        "Atelier": 40,
+        "Signal": 40
+      }
+    },
+    {
+      "name": "prose/h1-sm/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h1-sm-size)",
+      "values": {
+        "Utility": 36,
+        "Cloud": 36,
+        "Workshop": 36,
+        "Playful": 36,
+        "Ledger": 36,
+        "Atelier": 36,
+        "Signal": 36
+      }
+    },
+    {
+      "name": "prose/h2/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h2-line)",
+      "values": {
+        "Utility": 34,
+        "Cloud": 34,
+        "Workshop": 34,
+        "Playful": 34,
+        "Ledger": 34,
+        "Atelier": 34,
+        "Signal": 34
+      }
+    },
+    {
+      "name": "prose/h2/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h2-size)",
+      "values": {
+        "Utility": 26,
+        "Cloud": 26,
+        "Workshop": 26,
+        "Playful": 26,
+        "Ledger": 26,
+        "Atelier": 26,
+        "Signal": 26
+      }
+    },
+    {
+      "name": "prose/h2/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h2-tracking)",
+      "values": {
+        "Utility": -0.4000000059604645,
+        "Cloud": -0.4000000059604645,
+        "Workshop": -0.4000000059604645,
+        "Playful": -0.4000000059604645,
+        "Ledger": -0.4000000059604645,
+        "Atelier": -0.4000000059604645,
+        "Signal": -0.4000000059604645
+      }
+    },
+    {
+      "name": "prose/h3/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h3-line)",
+      "values": {
+        "Utility": 28,
+        "Cloud": 28,
+        "Workshop": 28,
+        "Playful": 28,
+        "Ledger": 28,
+        "Atelier": 28,
+        "Signal": 28
+      }
+    },
+    {
+      "name": "prose/h3/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h3-size)",
+      "values": {
+        "Utility": 19,
+        "Cloud": 19,
+        "Workshop": 19,
+        "Playful": 19,
+        "Ledger": 19,
+        "Atelier": 19,
+        "Signal": 19
+      }
+    },
+    {
+      "name": "prose/h3/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h3-tracking)",
+      "values": {
+        "Utility": -0.20000000298023224,
+        "Cloud": -0.20000000298023224,
+        "Workshop": -0.20000000298023224,
+        "Playful": -0.20000000298023224,
+        "Ledger": -0.20000000298023224,
+        "Atelier": -0.20000000298023224,
+        "Signal": -0.20000000298023224
+      }
+    },
+    {
+      "name": "prose/h4/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h4-line)",
+      "values": {
+        "Utility": 24,
+        "Cloud": 24,
+        "Workshop": 24,
+        "Playful": 24,
+        "Ledger": 24,
+        "Atelier": 24,
+        "Signal": 24
+      }
+    },
+    {
+      "name": "prose/h4/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-h4-size)",
+      "values": {
+        "Utility": 16,
+        "Cloud": 16,
+        "Workshop": 16,
+        "Playful": 16,
+        "Ledger": 16,
+        "Atelier": 16,
+        "Signal": 16
+      }
+    },
+    {
+      "name": "prose/lede/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-lede-line)",
+      "values": {
+        "Utility": 30,
+        "Cloud": 30,
+        "Workshop": 30,
+        "Playful": 30,
+        "Ledger": 30,
+        "Atelier": 30,
+        "Signal": 30
+      }
+    },
+    {
+      "name": "prose/lede/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-lede-size)",
+      "values": {
+        "Utility": 19,
+        "Cloud": 19,
+        "Workshop": 19,
+        "Playful": 19,
+        "Ledger": 19,
+        "Atelier": 19,
+        "Signal": 19
+      }
+    },
+    {
+      "name": "prose/measure",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-measure)",
+      "values": {
+        "Utility": 544,
+        "Cloud": 544,
+        "Workshop": 544,
+        "Playful": 544,
+        "Ledger": 544,
+        "Atelier": 544,
+        "Signal": 544
+      }
+    },
+    {
+      "name": "prose/wide",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-studio-prose-wide)",
+      "values": {
+        "Utility": 720,
+        "Cloud": 720,
+        "Workshop": 720,
+        "Playful": 720,
+        "Ledger": 720,
+        "Atelier": 720,
+        "Signal": 720
+      }
+    },
+    {
+      "name": "radius/badge",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "values": {
+        "Utility": 2,
+        "Cloud": 999,
+        "Workshop": 4,
+        "Playful": 999,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "radius/card",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "values": {
+        "Utility": 0,
+        "Cloud": 20,
+        "Workshop": 6,
+        "Playful": 28,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 2
+      }
+    },
+    {
+      "name": "radius/checkbox",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-radius-checkbox)",
+      "description": "Checkbox corner radius per Studio flavor (Utility 2, other flavors 4). Theme radius/checkbox follows it in Theme Studio.",
+      "values": {
+        "Utility": 2,
+        "Cloud": 4,
+        "Workshop": 4,
+        "Playful": 4,
+        "Ledger": 4,
+        "Atelier": 4,
+        "Signal": 4
+      }
+    },
+    {
+      "name": "radius/control",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "values": {
+        "Utility": 0,
+        "Cloud": 10,
+        "Workshop": 6,
+        "Playful": 999,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 2
+      }
+    },
+    {
+      "name": "radius/input",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "values": {
+        "Utility": 0,
+        "Cloud": 10,
+        "Workshop": 6,
+        "Playful": 18,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 2
+      }
+    },
+    {
+      "name": "ring/d",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR",
+        "EFFECT_COLOR"
+      ],
+      "description": "Focus ring (dark). Atelier: gray d/10. Others: Base accent accent/d/ring (unchanged).",
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/d/ring"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/d/ring"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/d/ring"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/d/ring"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/d/ring"
+        },
+        "Atelier": {
+          "alias": "Base gray/gray/d/10"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/d/ring"
+        }
+      }
+    },
+    {
+      "name": "ring/l",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR",
+        "EFFECT_COLOR"
+      ],
+      "description": "Focus ring (light). Atelier: ink (gray 12) — round-6 accepted gray/ink ring. Others: Base accent accent/l/11 (unchanged).",
+      "values": {
+        "Utility": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Cloud": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Workshop": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Playful": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Ledger": {
+          "alias": "Base accent/accent/l/11"
+        },
+        "Atelier": {
+          "alias": "Base gray/gray/l/12"
+        },
+        "Signal": {
+          "alias": "Base accent/accent/l/11"
+        }
+      }
+    },
+    {
+      "name": "selected/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/4"
+        },
+        "Cloud": "#1e3266",
+        "Workshop": "#4a2c10",
+        "Playful": "#3c2b66",
+        "Ledger": "#18304a",
+        "Atelier": "#2a2820",
+        "Signal": "#1c2a0e"
+      }
+    },
+    {
+      "name": "selected/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/3"
+        },
+        "Cloud": "#e3eefd",
+        "Workshop": "#fce1c0",
+        "Playful": "#e3d8ff",
+        "Ledger": "#e0e7ff",
+        "Atelier": "#efe8db",
+        "Signal": "#e4f5bd"
+      }
+    },
+    {
+      "name": "shadow/blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "values": {
+        "Utility": 0,
+        "Cloud": 32,
+        "Workshop": 0,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "shadow/d/color",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#02041099",
+        "Workshop": "#050301f2",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "shadow/l/color",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1428501f",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "shadow/x",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-shadow-x)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 4,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "shadow/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "values": {
+        "Utility": 0,
+        "Cloud": 12,
+        "Workshop": 4,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "signal/d/brand",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Studio flavor/brand/d"
+        },
+        "Cloud": {
+          "alias": "Studio flavor/brand/d"
+        },
+        "Workshop": {
+          "alias": "Studio flavor/brand/d"
+        },
+        "Playful": {
+          "alias": "Studio flavor/brand/d"
+        },
+        "Ledger": {
+          "alias": "Studio flavor/brand/d"
+        },
+        "Atelier": {
+          "alias": "Studio flavor/brand/d"
+        },
+        "Signal": {
+          "alias": "Studio flavor/brand/d"
+        }
+      }
+    },
+    {
+      "name": "signal/d/marker",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/12"
+        },
+        "Cloud": {
+          "alias": "Theme set/accent/d/solid"
+        },
+        "Workshop": {
+          "alias": "Theme set/accent/d/solid"
+        },
+        "Playful": {
+          "alias": "Theme set/accent/d/solid"
+        },
+        "Ledger": {
+          "alias": "Theme set/accent/d/solid"
+        },
+        "Atelier": {
+          "alias": "Theme set/accent/d/solid"
+        },
+        "Signal": {
+          "alias": "Theme set/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "signal/d/underline",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/8"
+        },
+        "Cloud": {
+          "alias": "Theme set/accent/d/11"
+        },
+        "Workshop": {
+          "alias": "Theme set/accent/d/11"
+        },
+        "Playful": {
+          "alias": "Theme set/accent/d/11"
+        },
+        "Ledger": {
+          "alias": "Theme set/accent/d/11"
+        },
+        "Atelier": {
+          "alias": "Theme set/accent/d/11"
+        },
+        "Signal": {
+          "alias": "Theme set/accent/d/11"
+        }
+      }
+    },
+    {
+      "name": "signal/l/brand",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "description": "Utility logo/brand (aliases brand/l). Swiss red only on the N mark.",
+      "values": {
+        "Utility": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Cloud": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Workshop": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Playful": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Ledger": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Atelier": {
+          "alias": "Studio flavor/brand/l"
+        },
+        "Signal": {
+          "alias": "Studio flavor/brand/l"
+        }
+      }
+    },
+    {
+      "name": "signal/l/marker",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "description": "Utility: ink (gray 12). Location marker square + selected-row bar + link hover underline. Other flavors: their primary.",
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/12"
+        },
+        "Cloud": {
+          "alias": "Theme set/accent/l/solid"
+        },
+        "Workshop": {
+          "alias": "Theme set/accent/l/solid"
+        },
+        "Playful": {
+          "alias": "Theme set/accent/l/solid"
+        },
+        "Ledger": {
+          "alias": "Theme set/accent/l/solid"
+        },
+        "Atelier": {
+          "alias": "Theme set/accent/l/solid"
+        },
+        "Signal": {
+          "alias": "Theme set/accent/l/solid"
+        }
+      }
+    },
+    {
+      "name": "signal/l/underline",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "description": "Utility: gray 8 resting link underline. Other flavors: primary/text.",
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/8"
+        },
+        "Cloud": {
+          "alias": "Theme set/accent/l/11"
+        },
+        "Workshop": {
+          "alias": "Theme set/accent/l/11"
+        },
+        "Playful": {
+          "alias": "Theme set/accent/l/11"
+        },
+        "Ledger": {
+          "alias": "Theme set/accent/l/11"
+        },
+        "Atelier": {
+          "alias": "Theme set/accent/l/11"
+        },
+        "Signal": {
+          "alias": "Theme set/accent/l/11"
+        }
+      }
+    },
+    {
+      "name": "surface/d/canvas",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#18181a",
+        "Cloud": "#111830",
+        "Workshop": "#1f160e",
+        "Playful": "#1a1226",
+        "Ledger": "#08171f",
+        "Atelier": "#191813",
+        "Signal": "#090e0a"
+      }
+    },
+    {
+      "name": "surface/d/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#26262a",
+        "Cloud": "#242e52",
+        "Workshop": "#3a2c1f",
+        "Playful": "#33264f",
+        "Ledger": "#16293a",
+        "Atelier": "#29271f",
+        "Signal": "#16201a"
+      }
+    },
+    {
+      "name": "surface/d/paper",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#18181a",
+        "Cloud": "#1a2340",
+        "Workshop": "#2a1f15",
+        "Playful": "#251a38",
+        "Ledger": "#0d1f29",
+        "Atelier": "#191813",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "surface/d/raised",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#222225",
+        "Cloud": "#222c4e",
+        "Workshop": "#34271b",
+        "Playful": "#2f2347",
+        "Ledger": "#132835",
+        "Atelier": "#24221c",
+        "Signal": "#141d16"
+      }
+    },
+    {
+      "name": "surface/d/sunken",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#1e1e21",
+        "Cloud": "#151c38",
+        "Workshop": "#251b12",
+        "Playful": "#20162f",
+        "Ledger": "#122735",
+        "Atelier": "#1f1e18",
+        "Signal": "#111a13"
+      }
+    },
+    {
+      "name": "surface/l/canvas",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#ffffff",
+        "Cloud": "#edf1f7",
+        "Workshop": "#f4ede1",
+        "Playful": "#f1ecfd",
+        "Ledger": "#f4f6f9",
+        "Atelier": "#f8f5ee",
+        "Signal": "#ecf0ec"
+      }
+    },
+    {
+      "name": "surface/l/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#f0f0f0",
+        "Cloud": "#e4eaf3",
+        "Workshop": "#e9decb",
+        "Playful": "#e8e0fc",
+        "Ledger": "#e7ecf3",
+        "Atelier": "#ece6da",
+        "Signal": "#dfe6de"
+      }
+    },
+    {
+      "name": "surface/l/paper",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#ffffff",
+        "Cloud": "#ffffff",
+        "Workshop": "#fbf6ee",
+        "Playful": "#fcfaff",
+        "Ledger": "#ffffff",
+        "Atelier": "#f8f5ee",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "surface/l/raised",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#ffffff",
+        "Cloud": "#ffffff",
+        "Workshop": "#fffdf8",
+        "Playful": "#ffffff",
+        "Ledger": "#ffffff",
+        "Atelier": "#ffffff",
+        "Signal": "#ffffff"
+      }
+    },
+    {
+      "name": "surface/l/sunken",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#f6f6f6",
+        "Cloud": "#f5f8fc",
+        "Workshop": "#efe5d4",
+        "Playful": "#f6f2fe",
+        "Ledger": "#e3e9f1",
+        "Atelier": "#f2eee5",
+        "Signal": "#e3e9e3"
+      }
+    },
+    {
+      "name": "table/cell-rule",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-table-cell-rule)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 0,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "table/d/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1a2340",
+        "Workshop": "#2a1f15",
+        "Playful": "#20162f",
+        "Ledger": "#0d1f29",
+        "Atelier": "#00000000",
+        "Signal": "#0e1510"
+      }
+    },
+    {
+      "name": "table/d/cell-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#1a251d"
+      }
+    },
+    {
+      "name": "table/d/head",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#1e2747",
+        "Workshop": "#3a2c1f",
+        "Playful": "#00000000",
+        "Ledger": "#15303f",
+        "Atelier": "#00000000",
+        "Signal": "#131d16"
+      }
+    },
+    {
+      "name": "table/d/head-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/5"
+        },
+        "Cloud": "#303c64",
+        "Workshop": "#a88b66",
+        "Playful": "#00000000",
+        "Ledger": "#3b5a70",
+        "Atelier": "#8f8778",
+        "Signal": "#3a4c3e"
+      }
+    },
+    {
+      "name": "table/d/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/3"
+        },
+        "Cloud": "#212b4d",
+        "Workshop": "#00000000",
+        "Playful": "#2a1e3f",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "table/d/row-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#2a1e3f",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "table/d/row-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/4"
+        },
+        "Cloud": "#222c4d",
+        "Workshop": "#3d2f22",
+        "Playful": "#00000000",
+        "Ledger": "#132a36",
+        "Atelier": "#2e2c24",
+        "Signal": "#1a251d"
+      }
+    },
+    {
+      "name": "table/d/zebra",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#2a1e3f",
+        "Ledger": "#0f222d",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "table/head-rule",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-table-head-rule)",
+      "values": {
+        "Utility": 1,
+        "Cloud": 1,
+        "Workshop": 3,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 1,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "table/inset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-table-inset)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 0,
+        "Playful": 8,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "table/l/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fbf6ee",
+        "Playful": "#f6f2fe",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "table/l/cell-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#d3dcd3"
+      }
+    },
+    {
+      "name": "table/l/head",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#f7f9fc",
+        "Workshop": "#e9dcc4",
+        "Playful": "#00000000",
+        "Ledger": "#e3e9f1",
+        "Atelier": "#00000000",
+        "Signal": "#e3e9e3"
+      }
+    },
+    {
+      "name": "table/l/head-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/5"
+        },
+        "Cloud": "#e3e9f2",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#9aa8bc",
+        "Atelier": "#1f1c18",
+        "Signal": "#a9b4aa"
+      }
+    },
+    {
+      "name": "table/l/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/2"
+        },
+        "Cloud": "#f1f6fe",
+        "Workshop": "#00000000",
+        "Playful": "#ffffff",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "table/l/row-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#ffffff",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "table/l/row-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/3"
+        },
+        "Cloud": "#eef2f7",
+        "Workshop": "#dccfb9",
+        "Playful": "#00000000",
+        "Ledger": "#e3e8ef",
+        "Atelier": "#ded7ca",
+        "Signal": "#d3dcd3"
+      }
+    },
+    {
+      "name": "table/l/zebra",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#00000000",
+        "Playful": "#ffffff",
+        "Ledger": "#f3f6fa",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "table/row-gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-table-row-gap)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 0,
+        "Playful": 6,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "table/row-radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-table-row-radius)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 0,
+        "Playful": 14,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "table/row-rule",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-table-row-rule)",
+      "values": {
+        "Utility": 1,
+        "Cloud": 1,
+        "Workshop": 1,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 1,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "tabs/d/idle-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#4d3d2c",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/d/sel-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#2a3660",
+        "Workshop": "#4a2c10",
+        "Playful": "#4a3878",
+        "Ledger": "#1f3a4c",
+        "Atelier": "#00000000",
+        "Signal": "#1c2a0e"
+      }
+    },
+    {
+      "name": "tabs/d/sel-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#ededef",
+        "Cloud": "#00000000",
+        "Workshop": "#a88b66",
+        "Playful": "#00000000",
+        "Ledger": "#3b5a70",
+        "Atelier": "#e8e2d4",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/d/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#151c38",
+        "Workshop": "#00000000",
+        "Playful": "#33264f",
+        "Ledger": "#122735",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-gap)",
+      "values": {
+        "Utility": 20,
+        "Cloud": 2,
+        "Workshop": 6,
+        "Playful": 4,
+        "Ledger": 0,
+        "Atelier": 24,
+        "Signal": 8
+      }
+    },
+    {
+      "name": "tabs/idle-stroke",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-idle-stroke)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 1.5,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "tabs/item-pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-item-pad)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 12,
+        "Workshop": 12,
+        "Playful": 14,
+        "Ledger": 8,
+        "Atelier": 0,
+        "Signal": 6
+      }
+    },
+    {
+      "name": "tabs/item-radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-item-radius)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 999,
+        "Workshop": 6,
+        "Playful": 999,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "tabs/l/idle-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#00000000",
+        "Workshop": "#cdbfa7",
+        "Playful": "#00000000",
+        "Ledger": "#00000000",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/l/sel-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#ffffff",
+        "Workshop": "#fce1c0",
+        "Playful": "#ffffff",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#e4f5bd"
+      }
+    },
+    {
+      "name": "tabs/l/sel-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": "#111111",
+        "Cloud": "#00000000",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#9aa8bc",
+        "Atelier": "#1f1c18",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/l/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#00000000",
+        "Cloud": "#e4eaf3",
+        "Workshop": "#00000000",
+        "Playful": "#e3d8ff",
+        "Ledger": "#e3e9f1",
+        "Atelier": "#00000000",
+        "Signal": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-pad)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 3,
+        "Workshop": 0,
+        "Playful": 4,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "tabs/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-radius)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 999,
+        "Workshop": 0,
+        "Playful": 999,
+        "Ledger": 2,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "tabs/sel-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-sel-bottom)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 1.5,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 1,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "tabs/sel-box",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-tabs-sel-box)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 0,
+        "Workshop": 1.5,
+        "Playful": 0,
+        "Ledger": 1,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "topbar/d/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#18181a",
+        "Cloud": "#1a2340",
+        "Workshop": "#2e2217",
+        "Playful": "#00000000",
+        "Ledger": "#04101a",
+        "Atelier": "#00000000",
+        "Signal": "#050806"
+      }
+    },
+    {
+      "name": "topbar/d/rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/d/5"
+        },
+        "Cloud": "#00000000",
+        "Workshop": "#e07b2a",
+        "Playful": "#00000000",
+        "Ledger": "#1d3442",
+        "Atelier": "#2e2c24",
+        "Signal": "#9be22d"
+      }
+    },
+    {
+      "name": "topbar/l/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "Utility": "#ffffff",
+        "Cloud": "#ffffff",
+        "Workshop": "#e9dcc4",
+        "Playful": "#00000000",
+        "Ledger": "#ffffff",
+        "Atelier": "#00000000",
+        "Signal": "#f7f9f6"
+      }
+    },
+    {
+      "name": "topbar/l/rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "Utility": {
+          "alias": "Base gray/gray/l/5"
+        },
+        "Cloud": "#00000000",
+        "Workshop": "#3a2e22",
+        "Playful": "#00000000",
+        "Ledger": "#c5cfdc",
+        "Atelier": "#ded7ca",
+        "Signal": "#a9b4aa"
+      }
+    },
+    {
+      "name": "topbar/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-studio-topbar-radius)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 16,
+        "Workshop": 0,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "topbar/rule",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-topbar-rule)",
+      "values": {
+        "Utility": 1,
+        "Cloud": 0,
+        "Workshop": 3,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 1,
+        "Signal": 1
+      }
+    },
+    {
+      "name": "topbar/shadow-blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-topbar-shadow-blur)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 24,
+        "Workshop": 0,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "topbar/shadow-y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-studio-topbar-shadow-y)",
+      "values": {
+        "Utility": 0,
+        "Cloud": 6,
+        "Workshop": 0,
+        "Playful": 0,
+        "Ledger": 0,
+        "Atelier": 0,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "type/body/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 22,
+        "Cloud": 20,
+        "Workshop": 20,
+        "Playful": 22,
+        "Ledger": 16,
+        "Atelier": 24,
+        "Signal": 18
+      }
+    },
+    {
+      "name": "type/body/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 14,
+        "Cloud": 14,
+        "Workshop": 14,
+        "Playful": 15,
+        "Ledger": 12,
+        "Atelier": 15,
+        "Signal": 13
+      }
+    },
+    {
+      "name": "type/caption/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 16,
+        "Cloud": 16,
+        "Workshop": 16,
+        "Playful": 16,
+        "Ledger": 14,
+        "Atelier": 16,
+        "Signal": 14
+      }
+    },
+    {
+      "name": "type/caption/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 12,
+        "Cloud": 12,
+        "Workshop": 12,
+        "Playful": 12,
+        "Ledger": 11,
+        "Atelier": 12,
+        "Signal": 11
+      }
+    },
+    {
+      "name": "type/display/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 68,
+        "Cloud": 58,
+        "Workshop": 64,
+        "Playful": 76,
+        "Ledger": 36,
+        "Atelier": 84,
+        "Signal": 44
+      }
+    },
+    {
+      "name": "type/display/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 64,
+        "Cloud": 52,
+        "Workshop": 64,
+        "Playful": 72,
+        "Ledger": 32,
+        "Atelier": 80,
+        "Signal": 40
+      }
+    },
+    {
+      "name": "type/display/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "values": {
+        "Utility": "Medium",
+        "Cloud": "ExtraBold",
+        "Workshop": "ExtraBold",
+        "Playful": "SemiBold",
+        "Ledger": "SemiBold",
+        "Atelier": "Light",
+        "Signal": "SemiBold"
+      }
+    },
+    {
+      "name": "type/display/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "values": {
+        "Utility": -1.600000023841858,
+        "Cloud": -1.7999999523162842,
+        "Workshop": -2.799999952316284,
+        "Playful": -2,
+        "Ledger": -0.6000000238418579,
+        "Atelier": -2.4000000953674316,
+        "Signal": -1.2000000476837158
+      }
+    },
+    {
+      "name": "type/eyebrow/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-studio-weight-eyebrow)",
+      "description": "Eyebrow font style per Studio flavor, paired with font/eyebrow. Utility is Regular because Fragment Mono has no Medium face; other flavors follow type/label/style.",
+      "values": {
+        "Utility": "Regular",
+        "Cloud": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Workshop": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Playful": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Ledger": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Atelier": {
+          "alias": "Studio flavor/type/label/style"
+        },
+        "Signal": {
+          "alias": "Studio flavor/type/label/style"
+        }
+      }
+    },
+    {
+      "name": "type/heading/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 22,
+        "Cloud": 24,
+        "Workshop": 26,
+        "Playful": 26,
+        "Ledger": 18,
+        "Atelier": 30,
+        "Signal": 20
+      }
+    },
+    {
+      "name": "type/heading/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 15,
+        "Cloud": 17,
+        "Workshop": 20,
+        "Playful": 20,
+        "Ledger": 13,
+        "Atelier": 24,
+        "Signal": 14
+      }
+    },
+    {
+      "name": "type/heading/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "values": {
+        "Utility": "Medium",
+        "Cloud": "Bold",
+        "Workshop": "Bold",
+        "Playful": "SemiBold",
+        "Ledger": "SemiBold",
+        "Atelier": "Light",
+        "Signal": "Medium"
+      }
+    },
+    {
+      "name": "type/heading/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "values": {
+        "Utility": -0.20000000298023224,
+        "Cloud": -0.20000000298023224,
+        "Workshop": -0.4000000059604645,
+        "Playful": -0.20000000298023224,
+        "Ledger": 0,
+        "Atelier": -0.30000001192092896,
+        "Signal": 0
+      }
+    },
+    {
+      "name": "type/kpi-sm/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 44,
+        "Cloud": 38,
+        "Workshop": 48,
+        "Playful": 58,
+        "Ledger": 26,
+        "Atelier": 48,
+        "Signal": 32
+      }
+    },
+    {
+      "name": "type/kpi-sm/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 40,
+        "Cloud": 32,
+        "Workshop": 44,
+        "Playful": 54,
+        "Ledger": 22,
+        "Atelier": 44,
+        "Signal": 28
+      }
+    },
+    {
+      "name": "type/kpi/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 44,
+        "Cloud": 38,
+        "Workshop": 48,
+        "Playful": 58,
+        "Ledger": 26,
+        "Atelier": 48,
+        "Signal": 32
+      }
+    },
+    {
+      "name": "type/kpi/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 40,
+        "Cloud": 32,
+        "Workshop": 44,
+        "Playful": 54,
+        "Ledger": 22,
+        "Atelier": 44,
+        "Signal": 28
+      }
+    },
+    {
+      "name": "type/kpi/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "values": {
+        "Utility": "Regular",
+        "Cloud": "Bold",
+        "Workshop": "ExtraBold",
+        "Playful": "SemiBold",
+        "Ledger": "Medium",
+        "Atelier": "Light",
+        "Signal": "SemiBold"
+      }
+    },
+    {
+      "name": "type/kpi/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "values": {
+        "Utility": -1,
+        "Cloud": -1,
+        "Workshop": -1.7999999523162842,
+        "Playful": -1.2000000476837158,
+        "Ledger": -0.4000000059604645,
+        "Atelier": -1,
+        "Signal": -1
+      }
+    },
+    {
+      "name": "type/label/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 16,
+        "Cloud": 16,
+        "Workshop": 16,
+        "Playful": 16,
+        "Ledger": 14,
+        "Atelier": 16,
+        "Signal": 14
+      }
+    },
+    {
+      "name": "type/label/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 11,
+        "Cloud": 12,
+        "Workshop": 12,
+        "Playful": 12,
+        "Ledger": 10,
+        "Atelier": 11,
+        "Signal": 11
+      }
+    },
+    {
+      "name": "type/label/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "values": {
+        "Utility": "Medium",
+        "Cloud": "Medium",
+        "Workshop": "SemiBold",
+        "Playful": "Bold",
+        "Ledger": "Medium",
+        "Atelier": "Regular",
+        "Signal": "Regular"
+      }
+    },
+    {
+      "name": "type/label/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "values": {
+        "Utility": 0.6000000238418579,
+        "Cloud": 0,
+        "Workshop": 0.20000000298023224,
+        "Playful": 0.10000000149011612,
+        "Ledger": 0.6000000238418579,
+        "Atelier": 0.800000011920929,
+        "Signal": 0.4000000059604645
+      }
+    },
+    {
+      "name": "type/small/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 18,
+        "Cloud": 18,
+        "Workshop": 18,
+        "Playful": 20,
+        "Ledger": 16,
+        "Atelier": 20,
+        "Signal": 16
+      }
+    },
+    {
+      "name": "type/small/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 13,
+        "Cloud": 13,
+        "Workshop": 13,
+        "Playful": 14,
+        "Ledger": 12,
+        "Atelier": 14,
+        "Signal": 12
+      }
+    },
+    {
+      "name": "type/strong/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 20,
+        "Cloud": 20,
+        "Workshop": 20,
+        "Playful": 22,
+        "Ledger": 16,
+        "Atelier": 22,
+        "Signal": 18
+      }
+    },
+    {
+      "name": "type/strong/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 14,
+        "Cloud": 14,
+        "Workshop": 14,
+        "Playful": 15,
+        "Ledger": 12,
+        "Atelier": 15,
+        "Signal": 13
+      }
+    },
+    {
+      "name": "type/strong/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "values": {
+        "Utility": "Medium",
+        "Cloud": "SemiBold",
+        "Workshop": "SemiBold",
+        "Playful": "SemiBold",
+        "Ledger": "Medium",
+        "Atelier": "Medium",
+        "Signal": "Medium"
+      }
+    },
+    {
+      "name": "type/title/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "values": {
+        "Utility": 52,
+        "Cloud": 38,
+        "Workshop": 44,
+        "Playful": 48,
+        "Ledger": 26,
+        "Atelier": 64,
+        "Signal": 28
+      }
+    },
+    {
+      "name": "type/title/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "values": {
+        "Utility": 48,
+        "Cloud": 30,
+        "Workshop": 40,
+        "Playful": 44,
+        "Ledger": 20,
+        "Atelier": 60,
+        "Signal": 22
+      }
+    },
+    {
+      "name": "type/title/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "values": {
+        "Utility": "Medium",
+        "Cloud": "ExtraBold",
+        "Workshop": "ExtraBold",
+        "Playful": "SemiBold",
+        "Ledger": "SemiBold",
+        "Atelier": "Light",
+        "Signal": "SemiBold"
+      }
+    },
+    {
+      "name": "type/title/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "values": {
+        "Utility": -1.2000000476837158,
+        "Cloud": -0.800000011920929,
+        "Workshop": -1.600000023841858,
+        "Playful": -1,
+        "Ledger": -0.20000000298023224,
+        "Atelier": -1.7999999523162842,
+        "Signal": -0.4000000059604645
+      }
+    }
+  ]
+}

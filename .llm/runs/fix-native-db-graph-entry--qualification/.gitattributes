@@ -1,0 +1,2 @@
+# Retain scoped provenance and native receipts byte-for-byte, including CRLF.
+* -text
