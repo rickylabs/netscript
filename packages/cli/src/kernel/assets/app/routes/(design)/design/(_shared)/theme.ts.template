@@ -3,11 +3,20 @@ import { appTheme, type AppTheme, themeFontImports, themeLabel } from '@app/lib/
 
 type PresetId = keyof typeof manifest.presets;
 
+// Vite enumerates installed preview files without importing CSS or probing missing URLs.
+const previewStylesheets = import.meta.glob('/static/presets/*.css', {
+  query: '?url',
+  import: 'default',
+});
+
 /** Only development design middleware and pages resolve preview presets. */
 export function designTheme(url: URL): AppTheme & { readonly id: PresetId } {
   const configured = appTheme();
   const requested = url.searchParams.get('preset');
-  const candidate = requested && Object.hasOwn(manifest.presets, requested) ? requested : configured.id;
+  const candidate = requested && Object.hasOwn(manifest.presets, requested) &&
+      Object.hasOwn(previewStylesheets, `/static/presets/${requested}.css`)
+    ? requested
+    : configured.id;
   if (!Object.hasOwn(manifest.presets, candidate)) throw new Error('Unknown configured token preset');
   const id = candidate as PresetId;
   return {
