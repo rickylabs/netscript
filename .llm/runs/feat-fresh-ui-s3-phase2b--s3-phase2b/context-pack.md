@@ -41,3 +41,13 @@ PASS.104inventory/90shipped/14pending/118registry. Carriers follow source commit
 Reconcile: sourceunit stays below30files, no token/lock/newdependency/schema churn.
 All-style slice12b must limit legitimate nested-root allowances to independently
 declared nesting support and include an illegitimate nested-root negative control.
+
+
+Slice9a source660c4a71: committed-source all4carrierchecksPASS; release:preflight,
+docs:accuracy and additional registry drift/embedding/design-sync checks PASS.
+Evidence carriers only since source; independent final evidence reconciliation
+before audited push. Next9b Resizable research draft remains private, no next-slice
+source before9a terminal push/comment.
+
+
+Slice9a committed-source evidence reconciliation PASS. No docs/site or published entrypoint edits in this unit; docs-site build/export drift remain final-phase gates. Source format12files. Public privacy audit0hits across addedlines and bothrun dirs. Push/comment completes9a; next9b contractcheckpoint/research.
