@@ -3,7 +3,7 @@ import { join } from '@std/path';
 import { prepareLockedFixture } from '../../../.llm/tools/testing/locked-fixture.ts';
 import { appendPluginMigrations, pendingPluginMigrations } from '../scripts/plugin-migrations.ts';
 
-for (const adoption of [false, true]) {
+for (const adoption of Deno.env.get('SAGA_COMMAND_TEST_FILTER') ? [false] : [false, true]) {
   Deno.test({
     name: `installed saga command schema and retention on real PostgreSQL (${
       adoption ? 'adoption' : 'fresh'
@@ -66,11 +66,51 @@ ${copiedModel}`,
         for (const file of installed) {
           await Deno.writeTextFile(join(schemaPath, file.name), file.content);
         }
+        const rootConfig = JSON.parse(await Deno.readTextFile('deno.json'));
+        const workspaceImports: Record<string, string> = {};
+        const externalImports: Record<string, string> = { ...rootConfig.imports };
+        const committed = JSON.parse(await Deno.readTextFile('deno.lock'));
+        for (const [name, version] of Object.entries(rootConfig.catalog)) {
+          const specifier = 'npm:' + name + '@' + version;
+          if (specifier in committed.specifiers) externalImports[name] = specifier;
+        }
+        for (const parent of ['packages', 'plugins']) {
+          for await (const member of Deno.readDir(parent)) {
+            if (!member.isDirectory) continue;
+            let config;
+            try {
+              config = JSON.parse(await Deno.readTextFile(`${parent}/${member.name}/deno.json`));
+            } catch (error) {
+              if (error instanceof Deno.errors.NotFound) continue;
+              throw error;
+            }
+            for (const [key, specifier] of Object.entries(config.imports ?? {})) {
+              if (
+                typeof specifier === 'string' &&
+                (specifier.startsWith('jsr:') ||
+                  (specifier.startsWith('npm:') &&
+                    Object.keys(externalImports).some((name) => key.startsWith(name + '/'))))
+              ) externalImports[key] = specifier;
+            }
+            for (const [subpath, path] of Object.entries(config.exports ?? {})) {
+              if (typeof path === 'string') {
+                workspaceImports[config.name + (subpath === '.' ? '' : subpath.slice(1))] =
+                  new URL(`../../../${parent}/${member.name}/${path}`, import.meta.url).href;
+              }
+            }
+          }
+        }
         await Deno.writeTextFile(
           join(temp, 'deno.json'),
           JSON.stringify({
             compilerOptions: { strict: true, isolatedDeclarations: false },
+            catalog: rootConfig.catalog,
             imports: {
+              ...externalImports,
+              ...workspaceImports,
+              zod: 'npm:zod@' + rootConfig.catalog.zod,
+              '@netscript/database/commands/postgres':
+                new URL('../commands-postgres.ts', import.meta.url).href,
               '@prisma/client': 'npm:@prisma/client@^7.10.0',
               '@prisma/adapter-pg': 'npm:@prisma/adapter-pg@^7.10.0',
               prisma: 'npm:prisma@7.10.0',
@@ -167,7 +207,21 @@ ${copiedModel}`,
           new URL('../../../plugins/sagas/database/command-outbox.migration.sql', import.meta.url),
           join(temp, 'constraints.sql'),
         );
-        frozen = await prepareLockedFixture(temp, [join(temp, 'schema-conformance_test.ts')]);
+        const retentionSource = (await Deno.readTextFile(
+          new URL('./fixtures/saga-command/retention-conformance.ts.template', import.meta.url),
+        ))
+          .replaceAll(
+            'RETENTION_MODULE',
+            new URL(
+              '../../plugin-sagas-core/src/stores/prisma-saga-command-retention.ts',
+              import.meta.url,
+            ).href,
+          );
+        await Deno.writeTextFile(join(temp, 'retention-conformance_test.ts'), retentionSource);
+        frozen = await prepareLockedFixture(temp, [
+          join(temp, 'schema-conformance_test.ts'),
+          join(temp, 'retention-conformance_test.ts'),
+        ]);
         const tested = await new Deno.Command(Deno.execPath(), {
           args: [
             'test',
@@ -175,7 +229,12 @@ ${copiedModel}`,
             '--config',
             join(temp, 'deno.json'),
             '-A',
+            '--unstable-kv',
+            ...(Deno.env.get('SAGA_COMMAND_TEST_FILTER')
+              ? ['--filter', Deno.env.get('SAGA_COMMAND_TEST_FILTER')!]
+              : []),
             join(temp, 'schema-conformance_test.ts'),
+            ...(adoption ? [] : [join(temp, 'retention-conformance_test.ts')]),
           ],
           cwd: temp,
           stdin: 'null',
@@ -183,6 +242,13 @@ ${copiedModel}`,
           stderr: 'piped',
           env: { SAGA_COMMAND_NAMESPACE: namespace },
         }).output();
+        const childEvidence = Deno.env.get('SAGA_COMMAND_EVIDENCE');
+        if (childEvidence) {
+          await Deno.writeTextFile(
+            childEvidence + (adoption ? '-adopt' : '-fresh'),
+            new TextDecoder().decode(tested.stdout) + new TextDecoder().decode(tested.stderr),
+          );
+        }
         assertEquals(
           tested.code,
           0,

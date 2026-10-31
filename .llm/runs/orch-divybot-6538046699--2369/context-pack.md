@@ -1,9 +1,5 @@
 # Context pack
 
-#2369, branch orch/divybot-6538046699, draft PR #2487. Baseline main 204a71b1ef0133faa07ce5c191e4170b5cb76171. PLAN-EVAL round1 FAIL_PLAN repaired, round2 PASS before code. S1 installed schema/migration implemented and real PostgreSQL catalog proof + 33 regression tests pass. Scoped checks/lint/format pass; independent S1 supervisor review and quality gate pending before commit/push. Next S2 bounded keyset retention with group policies, active/race protection, guard negatives; then S3 docs/carriers/final IMPL-EVAL.
+#2369, branch orch/divybot-6538046699, PR #2487 draft. Baseline 204a71b1ef0133faa07ce5c191e4170b5cb76171. S1 schema/SQL contribution + migration delivery and proof pushed; CI duplicate provider fixture repaired in 1f07678 (command-postgres green). S2 bounded retention implemented: keyset scan, cursor, per-saga windows, conservative shared outbox window, completion metadata, parent locking and target-side text/version guards. Nine real retention tests plus 12 semantic guard controls; full native conformance exit0; scoped checks/lint/fmt and quality/architecture pass; independent S2 supervisor PASS twice. S2 sign-off commit/push now.
 
-No local scaffold.runtime. Coordinator owns e2e-cli-gate and merge. No taxonomy changes or lock churn. B1 owns saga-engine.ts. Canonical final via excluded .divybot-final-report.md. Reusable environment/migration recipes in this run's memory notes.
-
-S1 terminal: independent supervisor PASS, both real Postgres modes and local gates pass; sign-off commit/push now. Next S2 per locked plan.
-
-S1 CI follow-up: duplicate outbox fixture corrected; real atomic provider conformance and independent review pass. Separate repair commit is pushed; S2 still uncommitted.
+Next S3 docs (saga/database/service relay references + READMEs/changelogs), module tags flagged by JSR audit, generated export/prose/assets carriers, final docs/package gates. Then independent IMPL-EVAL, mark ready, inspect/fix current CI and final exact pushed-head IMPL-EVAL. Do not merge/tag/release or change labels/milestones. No local scaffold.runtime; coordinator must arm CI e2e-cli-gate. Preserve no lock churn. Final READY report via excluded .divybot-final-report.md.

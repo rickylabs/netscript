@@ -40,3 +40,13 @@ S1 sign-off: independent substantive supervisor review PASS after fresh-install 
 PR command-postgres run https://github.com/rickylabs/netscript/actions/runs/41163470858 passed both install modes and existing command/relay, then failed P1012 duplicate outbox model in the provider fixture. Compared latest main run 41152000845 (green). Provider fixture now omits only the final copied outbox model before appending shipped saga schema. Independent supervisor PASS; real native PostgreSQL atomic-transition conformance passes, exit 0; scoped format exit 0. Pushing isolated correction while S2 remains in progress.
 
 Reconcile: read new PR activity and addressed CI finding; no review threads or external review comments yet.
+
+## S2 bounded retention
+
+Implemented independent relay retention contract and composed Prisma saga-command retention, with capped primary-key pages and resumable cursors, per-saga policy map, conservative shared outbox window, terminal completion anchoring, fail-closed metadata handling, ordered parent locks, fresh status/deadline/version checks and target-side rechecks. No engine edits. Independent slice review PASS. The review's numeric-precision observation was improved by comparing exact PostgreSQL envelope text; added a real integer-above-2^53 case.
+
+Real fresh/adoption install scenarios pass; fresh case runs nine retention tests (ten child tests including schema parity), all pass. Twelve semantic PostgreSQL guard-removal controls pass the negative bar; see negative-controls.md. Every retention test goes red under its guard control; sources restored. Final full native PostgreSQL conformance and post-restoration gates are running before sign-off commit.
+
+Reconcile: S1 CI repair now green at 1f07678, https://github.com/rickylabs/netscript/actions/runs/41163838807 . No unresolved review threads.
+
+S2 sign-off: full canonical native PostgreSQL conformance script exit 0 (new install/retention, existing command/relay, atomic transitions, saga-relay cohort and runtime publisher); all seven outer tests passed, with nine new retention child tests. Post-restoration structured check/lint/format exit 0; quality:gate exit 0. Independent final slice confirmation PASS. JSR dry-runs are OK; audit surfaced pre-existing missing module tags on saga backend and plugin doctor entrypoints; repair those documentation tags in S3 before final audit. No accepted debt.

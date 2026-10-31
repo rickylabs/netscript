@@ -108,3 +108,11 @@ export type {
   TransactionClientPort,
   TransactionOptions,
 } from '@netscript/database/commands/postgres';
+
+export {
+  createPrismaSagaCommandRetention,
+  type PrismaSagaCommandRetention,
+  type PrismaSagaCommandRetentionOptions,
+  type SagaCommandRetentionCursor,
+  type SagaCommandRetentionResult,
+} from './prisma-saga-command-retention.ts';
