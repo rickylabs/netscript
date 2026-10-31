@@ -77,3 +77,13 @@ CI repair validation: all seven tests covering both failed service cases and the
 JSDoc policy pass (0 failures), with structured scoped check/lint clean. The aggregate check-test
 failure reports the same test-5/test-6 failures; all other shard checks pass at the original head.
 Reconcile: repair preserves canonical atomic capability, HTTP scheduling and query-model retention.
+
+CI repair JSDoc changes also change the generated public API corpus. Its freshness check correctly
+fails at 9f1a238; regenerate with the native tool from that clean committed package/plugin read set,
+then push the generated artifact with run updates. Full-objective completion audit explicitly keeps
+scheduled/cascaded effect persistence and restart dispatch missing rather than certifying slice 1
+as the full objective.
+
+Generated corpus refreshed successfully after the CI repair: 35 packages, 304 subpaths, 9031 symbols.
+Reconcile: retain all original saga/HTTP/retention assertions and the full-objective audit. Pushing
+this generated follow-up before final exact-head review; required current-head CI is still pending.

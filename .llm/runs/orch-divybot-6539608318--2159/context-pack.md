@@ -32,3 +32,8 @@ must inspect the resulting full pushed head, including generated metadata.
 Continuation: root CI found test-5/test-6 failures omitted by the package-only suite. Two service
 fixtures need createProjectingSagaStore instead of the legacy constructor, and the public JSDoc
 codename scanner rejects the issue-number reference. Repairing these before full effects work.
+
+CI repair source is pushed as 9f1a238: both service regressions now use the projection factory,
+and public JSDoc uses domain language. Seven regression/policy tests pass with scoped check/lint
+clean. The regenerated public API corpus follows in this commit. completion-audit.md is the full
+objective audit: effect persistence and restart dispatch are still missing, not certified complete.
