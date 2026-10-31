@@ -1,0 +1,3 @@
+# Context
+
+PR #2533, #2379. Source PASS at d22b983 independently confirmed clean tree and all hashes. Core CI passed all source jobs; only unproven runtime/final-review close-gate remained red. Canonical manual E2E is supported on isolated per-PR/ref VMs without labels. Merge main a9620a3 normally to include auth fix #2519 before final runtime proof; all five JSR test/source hashes unchanged. Next: push integrated head, run final local tests, manually dispatch canonical E2E at exact new head, verify core+runtime+cleanup and final same-session evaluator, update truthful DoD and rerun close-gate. G1 #1655 is independently design-blocked in draft PR #2539; owner decision requested, no source/debt changes there.

@@ -2,6 +2,25 @@ import type { ChildHealthSnapshot } from '../domain/child-health.ts';
 import { PluginError } from '../domain/errors.ts';
 import { ChildHealthMonitor } from '../runtime/child-health-monitor.ts';
 import { childHealthResponse } from './child-health-response.ts';
+import { FileChildRestartHistory } from '../adapters/file-child-restart-history.ts';
+
+/**
+ * Process health composition, including optional single-owner restart history.
+ *
+ * @example
+ * ```ts
+ * import type { ChildHealthProcessOptions } from '@netscript/plugin/health';
+ * const options: ChildHealthProcessOptions = {
+ *   restartHistoryPath: '.data/child-health/custom.json',
+ * };
+ * ```
+ */
+export type ChildHealthProcessOptions = Readonly<{
+  /** Use the runtime's monitor for both process failure and extended snapshot diagnostics. */
+  health?: ChildHealthMonitor;
+  /** Persistent file owned by exactly one background resource; relative to its working directory. */
+  restartHistoryPath?: string;
+}>;
 
 /**
  * Start health before bootstrap and expose failure for one second before exiting.
@@ -25,12 +44,13 @@ import { childHealthResponse } from './child-health-response.ts';
 export async function runChildHealthProcess(
   run: (health: ChildHealthMonitor, signal: AbortSignal) => Promise<void>,
   snapshot?: () => ChildHealthSnapshot | undefined | Promise<ChildHealthSnapshot | undefined>,
+  options: ChildHealthProcessOptions = {},
 ): Promise<void> {
   const port = Number(Deno.env.get('PORT') ?? '0');
   if (!Number.isSafeInteger(port) || port < 0 || port > 65_535) {
     throw new Error('Invalid background child health port.');
   }
-  const health = new ChildHealthMonitor();
+  const health = options.health ?? new ChildHealthMonitor();
   const controller = new AbortController();
   const healthReads = new AbortController();
   let latest: ChildHealthSnapshot | undefined;
@@ -48,6 +68,9 @@ export async function runChildHealthProcess(
         const current = await Promise.race([snapshot?.(), interrupted.promise]);
         if (current) latest = current;
         return childHealthResponse(request, terminal ?? current ?? health.snapshot());
+      } catch (cause) {
+        failed(cause);
+        return childHealthResponse(request, terminal ?? health.snapshot());
       } finally {
         healthReads.signal.removeEventListener('abort', onStop);
       }
@@ -62,13 +85,20 @@ export async function runChildHealthProcess(
   };
   for (const signal of signals) Deno.addSignalListener(signal, stop);
   const failed = (cause: unknown): void => {
+    if (terminal) return;
     console.error('Background child failed:', cause);
     Deno.exitCode = 1;
-    health.failed();
+    try {
+      health.failed();
+    } catch {
+      // Persistence failure is latched unhealthy; fatal shutdown must still complete.
+    }
     const retainFailure = (child: ChildHealthSnapshot | undefined): void => {
       terminal = Object.freeze({
         ...(child ?? health.snapshot()),
-        state: child?.state === 'crash-looping' ? 'crash-looping' : 'failed',
+        state: child?.state === 'crash-looping' || health.snapshot().state === 'crash-looping'
+          ? 'crash-looping'
+          : 'failed',
         dependencyReady: false,
         lastFatalError: child?.lastFatalError ?? health.snapshot().lastFatalError,
       });
@@ -85,7 +115,12 @@ export async function runChildHealthProcess(
       // A failed health dependency must not hide the original process failure.
     }
   };
-  const completion = Promise.resolve().then(() => run(health, controller.signal)).then(
+  const completion = Promise.resolve().then(() => {
+    if (options.restartHistoryPath !== undefined) {
+      health.trackProcess(new FileChildRestartHistory(options.restartHistoryPath), Deno.pid);
+    }
+    return run(health, controller.signal);
+  }).then(
     () => {
       if (!controller.signal.aborted) {
         failed(new Error('Background child stopped before process shutdown.'));
@@ -98,7 +133,7 @@ export async function runChildHealthProcess(
       controller.signal.addEventListener('abort', () => resolve(), { once: true })
     );
     await completion;
-    health.stopped();
+    if (!terminal) health.stopped();
   } finally {
     clearTimeout(failureTimer);
     for (const signal of signals) Deno.removeSignalListener(signal, stop);

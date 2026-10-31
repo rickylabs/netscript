@@ -1,4 +1,8 @@
-import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
+import {
+  ChildHealthMonitor,
+  type ChildHealthMonitorOptions,
+  type ChildHealthSnapshot,
+} from '@netscript/plugin/health';
 import { FILE_WATCH_STATES } from '@netscript/plugin-triggers-core/ports';
 import type { FileWatchStatusEvent } from '@netscript/plugin-triggers-core/ports';
 import type { TriggerId } from '@netscript/plugin-triggers-core/domain';
@@ -38,8 +42,8 @@ export class TriggerHealthMonitor extends ChildHealthMonitor {
   readonly #now: () => number;
 
   /** Create a health monitor with an optional epoch-millisecond clock. */
-  constructor(now: () => number = Date.now) {
-    super(now);
+  constructor(now: () => number = Date.now, options: ChildHealthMonitorOptions = {}) {
+    super(now, options);
     this.#now = now;
   }
 
