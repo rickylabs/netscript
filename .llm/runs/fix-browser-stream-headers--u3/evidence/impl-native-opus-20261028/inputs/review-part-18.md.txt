@@ -1,0 +1,817 @@
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634.json",
+      "sha256": "ac3909eacb4d09808a5e36637750c28d5556c295cb776bbf9502a37a988598c0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "92204eea7cd9eb4e14685b03593b9deec85507ec14b7db16eea8cfcace63cad5"
+    },
+    {
+      "selected": "package-workers",
+      "args": [
+        "task",
+        "--cwd",
+        "plugins/workers",
+        "check"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:13.222Z",
+      "ended": "2026-10-28T02:21:16.047Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219.json",
+      "sha256": "c8510b2beab8b108f124bdd5bff959b3a6761fee8441fbefb2846d17f1852391",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e4468545b4dd509017e86a32f746d5a52291d271d5984a9fb6ae65d99652f69e"
+    },
+    {
+      "selected": "quality-fresh",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/quality/scan-code-quality.ts",
+        "--root",
+        "packages/fresh",
+        "--max-allow",
+        "7"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:16.169Z",
+      "ended": "2026-10-28T02:21:16.535Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165.json",
+      "sha256": "02e5ec3e84cbbba323032af7ac95afb5f6dbdd2ad7792df001404094024dc366",
+      "stdoutSha256": "73a7c15ab80e42ae0868b8c546b063838172d53c298d08bda5ab28560e1e5961",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "quality-workers",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/quality/scan-code-quality.ts",
+        "--root",
+        "plugins/workers",
+        "--max-allow",
+        "7"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:16.650Z",
+      "ended": "2026-10-28T02:21:17.311Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647.json",
+      "sha256": "95d96baf0dd2ab272be15c84a8dca1cbae27b14e295826c4df4c5248635f26a5",
+      "stdoutSha256": "6249e64ff4286877ffd26bdf1e328dcb8e104210cf10a412be7db17a88427c3e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "doctrine",
+      "args": [
+        "run",
+        "--frozen",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/fitness/check-doctrine.ts",
+        "--all-roots"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:17.419Z",
+      "ended": "2026-10-28T02:21:29.319Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416.json",
+      "sha256": "a07b177dd5ab3991bcd8f346798cf910d647225e909df53157382084307a0cc0",
+      "stdoutSha256": "1fa1702a80909b4e5404ba89fad081347deaaca9beb4d6e117f75d434ca9f5e7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "arch",
+      "args": [
+        "task",
+        "arch:check"
+      ],
+      "code": 1,
+      "started": "2026-10-28T02:21:29.434Z",
+      "ended": "2026-10-28T02:21:34.220Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431.json",
+      "sha256": "bd269909ed0a668584795e721d0a8791d5f785a47f85f365989130a03eb874a3",
+      "stdoutSha256": "958d4c97036acd38b43b9e2418511a6d322f79e0ccca73dec75122bb8f644ad1",
+      "stderrSha256": "4d818f9681f9695c962201dba20f2a8bdfe69592dffec380874724b524a1be07"
+    },
+    {
+      "selected": "publish-fresh",
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "publish:dry-run"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:34.346Z",
+      "ended": "2026-10-28T02:21:37.053Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343.json",
+      "sha256": "81911e80bb84aa51d35e682fe562a8c39f3dc03e7a5f39321847fe47879d6d3c",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "762cb4630f2bc50b5c47f739be09b81506ed0b0d99cf33dfbe1dc4018e736d25"
+    },
+    {
+      "selected": "publish-workers",
+      "args": [
+        "task",
+        "--cwd",
+        "plugins/workers",
+        "publish:dry-run"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:37.186Z",
+      "ended": "2026-10-28T02:21:40.707Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182.json",
+      "sha256": "4dde624d2d7a563888a11f8ad38c2781fd191b84141c42e05c28cc53deab7720",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "b514bd902ca45c8a6810c1a656e8ff2d6e8665c7b6c365cde8b5412cc33acbb8"
+    },
+    {
+      "selected": "parity-external",
+      "args": [
+        "run",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "--allow-read",
+        "--allow-run",
+        "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tools/docs/check-exports-drift.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:23:40.416Z",
+      "ended": "2026-10-28T02:23:45.800Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.json",
+      "sha256": "7ea3159cb21c14c9fb787f06c82de356f9a3367f55bd11182388f4a9aa52ffc2",
+      "stdoutSha256": "83f15ce3404499c38dd69139bdbc2d200144a061d61eccc92a797931bb507027",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "accuracy-parent",
+      "args": [
+        "task",
+        "docs:accuracy"
+      ],
+      "code": 1,
+      "started": "2026-10-28T02:23:45.920Z",
+      "ended": "2026-10-28T02:23:47.671Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917.json",
+      "sha256": "8a06087d6504ef12bbad2e1e00a3423e908e822945b4a13915a0d79ffe01ca7f",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "dea8905984471c36ef06e14313e59f084bd61d6322b2b4b3debdf5a06f565acb"
+    }
+  ],
+  "owningDocs": {
+    "fresh": 10,
+    "workers": 0,
+    "warningFree": true,
+    "exactTenBaselineFindingIdentitiesPreserved": true,
+    "freshBaselineUnwaived": true,
+    "identities": [
+      {
+        "publicType": "NetScriptLiveQueryFactory",
+        "privateType": "Context"
+      },
+      {
+        "publicType": "NetScriptLiveQueryFactory",
+        "privateType": "InitialQueryBuilder"
+      },
+      {
+        "publicType": "NetScriptLiveQueryFactory",
+        "privateType": "QueryBuilder"
+      },
+      {
+        "publicType": "NetScriptStateSchema",
+        "privateType": "StateSchema"
+      },
+      {
+        "publicType": "NetScriptStreamDB[\"collections\"]",
+        "privateType": "StateSchema"
+      },
+      {
+        "publicType": "NetScriptStreamDB[\"collections\"]",
+        "privateType": "StreamDB"
+      },
+      {
+        "publicType": "useLiveQuery",
+        "privateType": "Context"
+      },
+      {
+        "publicType": "useLiveQuery",
+        "privateType": "InferResultType"
+      },
+      {
+        "publicType": "useLiveSuspenseQuery",
+        "privateType": "Context"
+      },
+      {
+        "publicType": "useLiveSuspenseQuery",
+        "privateType": "InferResultType"
+      }
+    ]
+  },
+  "symbols": [
+    {
+      "owner": "fresh",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/mod.ts",
+      "symbolCount": 54,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.json"
+    },
+    {
+      "owner": "workers",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/mod.ts",
+      "symbolCount": 26,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.json"
+    },
+    {
+      "owner": "fresh-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "symbolCount": 11,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.json"
+    },
+    {
+      "owner": "workers-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+      "symbolCount": 6,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.json"
+    }
+  ],
+  "compiler": {
+    "results": [
+      {
+        "name": "positive",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/positive.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 0,
+        "ts2322Count": 0,
+        "expectedErrors": 0,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "numeric-value",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "numeric-async",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "map-factory",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",

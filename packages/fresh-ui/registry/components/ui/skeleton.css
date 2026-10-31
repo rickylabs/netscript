@@ -17,19 +17,19 @@
   animation: ns-skeleton-shimmer 1.8s ease-in-out infinite;
 }
 
-.ns-skeleton__line--xs {
+:where(.ns-skeleton__block)[data-size='xs'] {
   height: 0.5rem;
 }
 
-.ns-skeleton__line--sm {
+:where(.ns-skeleton__block)[data-size='sm'] {
   height: 0.625rem;
 }
 
-.ns-skeleton__line--md {
+:where(.ns-skeleton__block)[data-size='md'] {
   height: 0.875rem;
 }
 
-.ns-skeleton__line--lg {
+:where(.ns-skeleton__block)[data-size='lg'] {
   height: 1.5rem;
 }
 
@@ -38,17 +38,17 @@
   border-radius: var(--ns-radius-md);
 }
 
-.ns-skeleton__box--card {
+:where(.ns-skeleton__block)[data-shape='card'] {
   min-height: 8.5rem;
   border-radius: var(--ns-radius-lg);
 }
 
-.ns-skeleton__box--input {
+:where(.ns-skeleton__block)[data-shape='input'] {
   min-height: 2.5rem;
 }
 
 /* Stats: each cell mirrors a stat card (label / value / delta). */
-.ns-skeleton--stats {
+:where(.ns-skeleton)[data-variant='stats'] {
   --ns-grid-min: 10rem;
 }
 
@@ -63,7 +63,7 @@
 }
 
 /* Table: bordered container with a raised header band and hairline row dividers. */
-.ns-skeleton--table {
+:where(.ns-skeleton)[data-variant='table'] {
   border: 1px solid var(--ns-border);
   border-radius: var(--ns-radius-lg);
   background: var(--ns-card);
@@ -82,7 +82,7 @@
   border-top: 1px solid var(--ns-border);
 }
 
-.ns-skeleton__table-row--head {
+:where(.ns-skeleton__table-row)[data-type='header'] {
   min-height: 2.25rem;
   background: var(--ns-surface-raised);
 }

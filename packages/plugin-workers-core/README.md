@@ -71,6 +71,19 @@ Once a release contains this executor-driven signal and deadline, EIS's `createJ
 deadline/parent-signal workaround can be removed for job handlers. Source qualification alone does
 not establish that released-consumer deletion condition.
 
+## Job retry policy
+
+The workers plugin executes builder `.retry(maxRetries, { backoff, delayMs, maxDelayMs })` policy for
+both in-process and polyglot jobs. A discovered handler can carry the same fields in `retry`, with
+`maxRetries` included in that object. Handler fields take precedence over `metadata.retry`, legacy
+definition fields and defaults. `maxRetries` is the number of retries after the initial attempt;
+zero still executes once. The canonical runtime resolver validates counts, finite delays and capped
+fixed, linear or exponential backoff. Direct `InProcessJobRunner.dispatch()` remains one attempt;
+the plugin owns delivery retries, terminal job dead letters and queue acknowledgment.
+
+See [Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/)
+for handler declarations, retry limits, the KV job DLQ port, health depth and replay semantics.
+
 ## Install
 
 ```bash
@@ -203,6 +216,14 @@ application requires independently idempotent persistence; the claim/effect/mark
 provide it. The command relay publishes before settling, so its acceptance-to-mark crash also
 redelivers the stable key. Supplied clients own their network permissions and cancellation;
 imports/construction need none.
+
+Queue consumers pass the stable `messageId` and increasing `deliveryCount` to the idempotency
+store. With atomic KV, a newer delivery of the same message can replace its stranded active
+marker immediately after broker recovery. A different message using the same caller key cannot
+take over. Completed applied markers continue to suppress all duplicates. The returned owner
+`token` must accompany `markApplied(key, undefined, token)` and `release(key, token)` so an older
+handler cannot complete or remove the replacement claim. Legacy callers without tokens retain
+their existing behavior; KV implementations without atomic checks cannot take over active markers.
 
 ## KV retention
 

@@ -8,6 +8,8 @@
 
 export {
   createWorkersStreamDB,
+  type HeadersRecord,
+  type MaybePromise,
   type WorkerExecution,
   type WorkerJob,
   type WorkersStreamDB,

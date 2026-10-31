@@ -1,0 +1,1204 @@
+{
+ "group": "G2",
+ "styles": [
+  "cupertino",
+  "liquid"
+ ],
+ "builder": "style builder G2 (Cupertino and Liquid)",
+ "started": "2026-10-28",
+ "cupertino": {
+  "page": "29:6",
+  "modes": {
+   "Theme set": "239:8",
+   "Theme B": "239:1",
+   "Density": "3:2 Comfortable",
+   "Scheme": "3:0 Light build / 3:1 Dark check"
+  },
+  "kitsRenamed": [
+   {
+    "id": "29:22",
+    "name": "Cupertino/Specimen kit/Button"
+   },
+   {
+    "id": "29:27",
+    "name": "Cupertino/Specimen kit/Segment"
+   },
+   {
+    "id": "29:33",
+    "name": "Cupertino/Specimen kit/Search field"
+   },
+   {
+    "id": "29:38",
+    "name": "Cupertino/Specimen kit/Toggle"
+   },
+   {
+    "id": "29:43",
+    "name": "Cupertino/Specimen kit/Selection circle"
+   },
+   {
+    "id": "29:58",
+    "name": "Cupertino/Specimen kit/Sidebar item"
+   },
+   {
+    "id": "29:74",
+    "name": "Cupertino/Specimen kit/Status"
+   },
+   {
+    "id": "29:99",
+    "name": "Cupertino/Specimen kit/Grouped row"
+   }
+  ],
+  "categories": {
+   "actions": {
+    "frame": "460:729",
+    "setsFrame": "460:734",
+    "strip": "461:56363",
+    "review": "461:57923",
+    "sets": [
+     {
+      "name": "Cupertino/Icon",
+      "id": "460:735",
+      "baseId": "252:11798",
+      "variants": 3
+     },
+     {
+      "name": "Cupertino/Spinner",
+      "id": "460:742",
+      "baseId": "252:11837",
+      "variants": 18
+     },
+     {
+      "name": "Cupertino/.Focus ring",
+      "id": "460:797",
+      "baseId": "252:11805",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/.State layer",
+      "id": "460:798",
+      "baseId": "252:11806",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Button / md",
+      "id": "460:9789",
+      "baseId": "253:372",
+      "variants": 30
+     },
+     {
+      "name": "Cupertino/Button / lg",
+      "id": "460:10010",
+      "baseId": "254:721",
+      "variants": 30
+     },
+     {
+      "name": "Cupertino/Button / sm",
+      "id": "460:10231",
+      "baseId": "254:371",
+      "variants": 30
+     },
+     {
+      "name": "Cupertino/Button / xs",
+      "id": "460:10452",
+      "baseId": "254:1071",
+      "variants": 30
+     },
+     {
+      "name": "Cupertino/Icon button / md",
+      "id": "460:10673",
+      "baseId": "255:262",
+      "variants": 25
+     },
+     {
+      "name": "Cupertino/Icon button / lg",
+      "id": "460:10849",
+      "baseId": "255:740",
+      "variants": 25
+     },
+     {
+      "name": "Cupertino/Icon button / sm",
+      "id": "460:11025",
+      "baseId": "255:501",
+      "variants": 25
+     },
+     {
+      "name": "Cupertino/Icon button / xs",
+      "id": "460:11201",
+      "baseId": "255:979",
+      "variants": 25
+     },
+     {
+      "name": "Cupertino/Toggle / md",
+      "id": "460:50853",
+      "baseId": "256:281",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Toggle / sm",
+      "id": "460:50982",
+      "baseId": "256:437",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Toggle / lg",
+      "id": "460:51111",
+      "baseId": "256:593",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Icon toggle / md",
+      "id": "460:51240",
+      "baseId": "276:8291",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Icon toggle / sm",
+      "id": "460:51337",
+      "baseId": "276:8431",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Icon toggle / lg",
+      "id": "460:51434",
+      "baseId": "276:8571",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Toggle group",
+      "id": "460:51531",
+      "baseId": "257:528",
+      "variants": 12
+     },
+     {
+      "name": "Cupertino/Button group",
+      "id": "460:52020",
+      "baseId": "257:839",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/.Action bar / actions",
+      "id": "460:52375",
+      "baseId": "258:544",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Action bar",
+      "id": "460:52404",
+      "baseId": "258:663",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Theme toggle",
+      "id": "460:52528",
+      "baseId": "258:742",
+      "variants": 6
+     }
+    ],
+    "swaps": [
+     "Button/Icon button/Toggle: state-layer \u2192 Cupertino/.State layer, focus-ring \u2192 Cupertino/.Focus ring, spinner \u2192 Cupertino/Spinner",
+     "Toggle group items \u2192 Cupertino/Toggle / md|sm",
+     "Button group items \u2192 Cupertino/Button|Icon button secondary",
+     "Action bar actions \u2192 Cupertino/.Action bar / actions (also the actions INSTANCE_SWAP default), close \u2192 Cupertino/Icon button / sm ghost",
+     ".Action bar / actions \u2192 Cupertino/Button / sm ghost",
+     "Theme toggle \u2192 Cupertino/Icon button / md secondary"
+    ],
+    "swapTest": "6/6 overrides survive (label text, icon booleans and glyph swaps, count text, close boolean, Button group text). Action bar: the actions slot follows the Cupertino default by design.",
+    "pngs": [
+     "review/styles/cupertino/actions.png",
+     "review/styles/cupertino/actions-strip.png"
+    ],
+    "deviations": [
+     "C.prominent: no drop shadow, per brief (the kit 29:22 Prominent carries a 0 4 12 shadow)",
+     "Button group uses secondary (glass) capsules, derived from the header row; base uses outline",
+     "Toggle sm label 13/18 (type/small) like Button sm (derived)"
+    ]
+   },
+   "forms": {
+    "frame": "461:83986",
+    "setsFrame": "461:83991",
+    "strip": "461:152949",
+    "review": "461:155597",
+    "sets": [
+     {
+      "name": "Cupertino/Label",
+      "id": "461:83992",
+      "baseId": "278:45",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Input",
+      "id": "461:84017",
+      "baseId": "279:312",
+      "variants": 24
+     },
+     {
+      "name": "Cupertino/Textarea",
+      "id": "461:84298",
+      "baseId": "280:597",
+      "variants": 12
+     },
+     {
+      "name": "Cupertino/Select",
+      "id": "461:84401",
+      "baseId": "281:1023",
+      "variants": 24
+     },
+     {
+      "name": "Cupertino/Select content",
+      "id": "461:84650",
+      "baseId": "281:826",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Checkbox",
+      "id": "461:84717",
+      "baseId": "283:1470",
+      "variants": 15
+     },
+     {
+      "name": "Cupertino/Radio",
+      "id": "461:84883",
+      "baseId": "284:1828",
+      "variants": 10
+     },
+     {
+      "name": "Cupertino/Radio group",
+      "id": "461:85014",
+      "baseId": "284:1885",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Switch",
+      "id": "461:85128",
+      "baseId": "285:2329",
+      "variants": 20
+     },
+     {
+      "name": "Cupertino/Field",
+      "id": "461:109072",
+      "baseId": "287:2656",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Field set",
+      "id": "461:109295",
+      "baseId": "287:2743",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Input group",
+      "id": "461:109443",
+      "baseId": "297:3861",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/OTP slot",
+      "id": "461:109850",
+      "baseId": "301:4385",
+      "variants": 12
+     },
+     {
+      "name": "Cupertino/Input OTP",
+      "id": "461:109899",
+      "baseId": "301:4490",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Slider",
+      "id": "461:110054",
+      "baseId": "303:5022",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Search",
+      "id": "461:110199",
+      "baseId": "316:16426",
+      "variants": 8
+     },
+     {
+      "name": "Cupertino/Dropzone",
+      "id": "461:110412",
+      "baseId": "319:16832",
+      "variants": 7
+     },
+     {
+      "name": "Cupertino/Calendar day",
+      "id": "461:123904",
+      "baseId": "307:6154",
+      "variants": 30
+     },
+     {
+      "name": "Cupertino/Calendar",
+      "id": "461:124025",
+      "baseId": "309:8620",
+      "variants": 8
+     },
+     {
+      "name": "Cupertino/Date picker",
+      "id": "461:128291",
+      "baseId": "313:14889",
+      "variants": 10
+     },
+     {
+      "name": "Cupertino/Combobox",
+      "id": "461:129995",
+      "baseId": "305:5623",
+      "variants": 10
+     }
+    ],
+    "themeOnly": {
+     "Input": "boolean grouped + parts error-icon, grouped-row (grouped-value, grouped-error-icon)",
+     "Select": "boolean grouped + part grouped-row (grouped-value, grouped-chevron)",
+     "Checkbox/Radio": "boolean inverted + part inverted-disc (inverted-tick)",
+     "Field set": "wrappers legend-row, description-row; row-divider between rows"
+    },
+    "swaps": [
+     "Field label/control \u2192 Cupertino/Label, Cupertino/Input (horizontal: grouped=true)",
+     "Field set rows \u2192 Cupertino/Field horizontal",
+     "Radio group items \u2192 Cupertino/Radio",
+     "Input group control \u2192 Cupertino/Input|Textarea (strokeless), addon button \u2192 Cupertino/Icon button / xs ghost",
+     "Input OTP slots \u2192 Cupertino/OTP slot",
+     "Search field \u2192 Cupertino/Input",
+     "Calendar days/nav/selects \u2192 Cupertino/Calendar day, Icon button / sm ghost, Select sm",
+     "Date picker trigger \u2192 Cupertino/Select (+calendar glyph), calendar \u2192 Cupertino/Calendar",
+     "Combobox input/control \u2192 Cupertino/Input, content \u2192 Cupertino/Select content",
+     "Dropzone button \u2192 Cupertino/Button / sm secondary"
+    ],
+    "pendingSwaps": [
+     "Select content + Combobox rows: base Menu item \u2192 Cupertino/Menu item (Overlays)",
+     "Search kbd: base Kbd \u2192 Cupertino/Kbd (Data display 1)",
+     "Combobox chips: base Badge \u2192 Cupertino/Badge subtle (Data display 1)"
+    ],
+    "swapTest": "6/6 overrides survive (Input placeholder + iconStart, Checkbox label + description, Switch label, Select value, Field set legend + description, Dropzone label)",
+    "pngs": [
+     "review/styles/cupertino/forms.png",
+     "review/styles/cupertino/forms-strip.png"
+    ],
+    "deviations": [
+     "Boolean props can only show layers, so grouped / inverted are drawn as opaque cover layers (grouped-row: surface/card under material/fill-strong; inverted-disc) rather than hiding the well",
+     "Field set keeps the base's two rows; the strip shows row 2 overridden to invalid (brief asks for three rows)",
+     "Date picker open draws the Popover recipe on the base content frame instead of nesting Cupertino/Popover",
+     "Dropzone button uses the secondary glass capsule (base: outline)",
+     "Calendar days 30 with gap 0, so the grid is 210 wide (base 224)"
+    ]
+   },
+   "navigation": {
+    "frame": "462:16988",
+    "setsFrame": "462:16993",
+    "strip": "462:182114",
+    "review": "462:186178",
+    "sets": [
+     {
+      "name": "Cupertino/Location marker",
+      "id": "462:16994",
+      "baseId": "337:22",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/.Brand logo",
+      "id": "462:16997",
+      "baseId": "344:410",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Breadcrumb item",
+      "id": "462:17003",
+      "baseId": "338:92",
+      "variants": 9
+     },
+     {
+      "name": "Cupertino/Breadcrumb",
+      "id": "462:17070",
+      "baseId": "338:161",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Page key",
+      "id": "462:17183",
+      "baseId": "339:270",
+      "variants": 20
+     },
+     {
+      "name": "Cupertino/Pager tile",
+      "id": "462:17421",
+      "baseId": "339:319",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Pagination",
+      "id": "462:17488",
+      "baseId": "339:379",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Tab / horizontal",
+      "id": "462:17635",
+      "baseId": "342:402",
+      "variants": 24
+     },
+     {
+      "name": "Cupertino/Tab / vertical",
+      "id": "462:17816",
+      "baseId": "342:599",
+      "variants": 24
+     },
+     {
+      "name": "Cupertino/Tabs list",
+      "id": "462:17997",
+      "baseId": "343:424",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Tabs",
+      "id": "462:18822",
+      "baseId": "343:489",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Nav item",
+      "id": "462:94320",
+      "baseId": "345:601",
+      "variants": 20
+     },
+     {
+      "name": "Cupertino/Nav group",
+      "id": "462:94466",
+      "baseId": "346:611",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Sidebar toggle",
+      "id": "462:94785",
+      "baseId": "344:462",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Nav menu item",
+      "id": "462:94850",
+      "baseId": "349:1036",
+      "variants": 10
+     },
+     {
+      "name": "Cupertino/.Nav menu link",
+      "id": "462:94911",
+      "baseId": "348:1108",
+      "variants": 3
+     },
+     {
+      "name": "Cupertino/Navigation menu",
+      "id": "462:94927",
+      "baseId": "349:1132",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Menubar trigger",
+      "id": "462:95095",
+      "baseId": "349:1153",
+      "variants": 5
+     },
+     {
+      "name": "Cupertino/Menubar",
+      "id": "462:95116",
+      "baseId": "349:1236",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Step",
+      "id": "462:95258",
+      "baseId": "352:1355",
+      "variants": 8
+     },
+     {
+      "name": "Cupertino/Stepper",
+      "id": "462:95327",
+      "baseId": "352:1424",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Sidebar",
+      "id": "462:109818",
+      "baseId": "347:994",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Top bar",
+      "id": "462:111004",
+      "baseId": "351:1349",
+      "variants": 4
+     }
+    ],
+    "themeOnly": {
+     "Tab / horizontal|vertical": "part underline (line variant)",
+     "Pager tile": "title-row wrapper + chevron",
+     ".Brand logo": "part glyph (crafted icon/package); monogram hidden",
+     "Sidebar": "parts traffic-lights (close, minimize, zoom), sidebar-search",
+     "Top bar": "parts title-block (large-title, subtitle), filter, export, new-order"
+    },
+    "swaps": [
+     "Breadcrumb \u2192 Cupertino/Breadcrumb item",
+     "Pagination \u2192 Cupertino/Page key, Pager tile; Page key prev/next \u2192 Cupertino/Button / sm ghost",
+     "Tabs list \u2192 Cupertino/Tab; Tabs \u2192 Cupertino/Tabs list",
+     "Nav group \u2192 Cupertino/Nav item",
+     "Sidebar toggle \u2192 Cupertino/Icon button sm|lg secondary",
+     "Navigation menu \u2192 Cupertino/Nav menu item, .Nav menu link",
+     "Menubar \u2192 Cupertino/Menubar trigger",
+     "Stepper \u2192 Cupertino/Step",
+     "Sidebar \u2192 Cupertino/.Brand logo, Search, Nav group",
+     "Top bar \u2192 Cupertino/Search, Button / md, Icon button / md, Theme toggle, Sidebar toggle, Navigation menu"
+    ],
+    "pendingSwaps": [
+     "Tab / Nav item count: base Badge plain \u2192 Cupertino/Badge plain (Data display 1)",
+     "Menubar open menu: base Menu content \u2192 Cupertino/Menu content (Overlays)"
+    ],
+    "swapTest": "6/6 overrides survive (Nav item label + count + glyph, Tab label + icon, Page key label, Step title + number + description, Menubar trigger label, Nav menu item label)",
+    "pngs": [
+     "review/styles/cupertino/navigation.png",
+     "review/styles/cupertino/navigation-strip.png"
+    ],
+    "deviations": [
+     "Sidebar inset = the panel drawn as an opaque C.content plane (surface/card, rim, r26, no blur); brief text 'inset adds a C.content area' read this way",
+     "Sidebar footer role text set to 'Store manager' (base shows an email)",
+     "Top bar app desktop keeps the base notifications and theme-toggle as glass circles after the capsules",
+     "Sidebar toggle hidden in the sidebar header and in desktop top bars (crafted frames show none)"
+    ]
+   },
+   "overlays": {
+    "frame": "463:116191",
+    "setsFrame": "463:116196",
+    "strip": "463:197752",
+    "review": "463:201784",
+    "sets": [
+     {
+      "name": "Cupertino/Menu item",
+      "id": "463:116197",
+      "baseId": "371:587",
+      "variants": 30
+     },
+     {
+      "name": "Cupertino/Menu label",
+      "id": "463:116888",
+      "baseId": "373:35",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Menu separator",
+      "id": "463:116891",
+      "baseId": "373:38",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Menu group",
+      "id": "463:116893",
+      "baseId": "373:248",
+      "variants": 3
+     },
+     {
+      "name": "Cupertino/Menu content",
+      "id": "463:117272",
+      "baseId": "373:256",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Dropdown menu",
+      "id": "463:117612",
+      "baseId": "374:382",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Context menu",
+      "id": "463:118016",
+      "baseId": "374:653",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Dialog",
+      "id": "463:166323",
+      "baseId": "378:743",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Alert dialog",
+      "id": "463:166764",
+      "baseId": "378:880",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Sheet",
+      "id": "463:166989",
+      "baseId": "379:1004",
+      "variants": 8
+     },
+     {
+      "name": "Cupertino/Drawer",
+      "id": "463:167582",
+      "baseId": "379:1150",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Popover",
+      "id": "463:167815",
+      "baseId": "381:937",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Tooltip",
+      "id": "463:167926",
+      "baseId": "381:1030",
+      "variants": 12
+     },
+     {
+      "name": "Cupertino/Hover card",
+      "id": "463:168011",
+      "baseId": "381:1093",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Command item",
+      "id": "463:172920",
+      "baseId": "382:1015",
+      "variants": 9
+     },
+     {
+      "name": "Cupertino/Command palette",
+      "id": "463:173074",
+      "baseId": "383:1355",
+      "variants": 6
+     }
+    ],
+    "themeOnly": {
+     "Menu item": "boolean divider + part row-divider",
+     "Command item": "boolean divider + part row-divider",
+     "Command palette": "wrappers lanes-track (filters), group-rows (list groups)"
+    },
+    "swaps": [
+     "Menu group/content \u2192 Cupertino/Menu label, Menu item, Menu separator",
+     "Dropdown menu \u2192 Cupertino/Button / md secondary + chevron-down, Cupertino/Menu content",
+     "Context menu \u2192 Cupertino/Menu content",
+     "Dialog/Alert/Sheet/Drawer \u2192 Cupertino/Button / md (secondary, primary, destructive), close \u2192 Cupertino/Icon button / sm secondary",
+     "Popover close \u2192 Cupertino/Icon button / xs ghost",
+     "Command palette \u2192 Cupertino/Input, Cupertino/Command item",
+     "Sweep: Cupertino/Select content rows \u2192 Cupertino/Menu item option; Cupertino/Menubar menu \u2192 Cupertino/Menu content (Combobox inherits via Select content)"
+    ],
+    "pendingSwaps": [
+     "Menu item shortcut, Command item shortcut, Command palette kbd, Tooltip kbd \u2192 Cupertino/Kbd (Data display 1)",
+     "Hover card avatar \u2192 Cupertino/Avatar (Data display 1)"
+    ],
+    "swapTest": "6/6 overrides survive (Dialog title + footer + description, Alert dialog title, Menu item label + shortcut + icon, Popover titleText, Tooltip label, Command item label)",
+    "pngs": [
+     "review/styles/cupertino/overlays.png",
+     "review/styles/cupertino/overlays-strip.png (846\u00d78000: the strip is 1280\u00d712104 because dialogs and sheets wrap one per line)"
+    ],
+    "deviations": [
+     "Radio menu rows use the check tick (the base dot is hidden; its checked binding moved to the check)",
+     "Alert dialog default media tile uses warning/default (brief: <tone>/default warning|destructive)",
+     "Menu content width 240 (base 224) to fit 44px rows with shortcuts",
+     "primary/fg resolves white in Dark under Theme B Cupertino (brief table says #111113); the sets bind the role, so they follow the token"
+    ]
+   },
+   "data-display-1": {
+    "frame": "463:236076",
+    "setsFrame": "463:236081",
+    "strip": "464:35451",
+    "review": "464:43635",
+    "sets": [
+     {
+      "name": "Cupertino/Kbd",
+      "id": "463:236082",
+      "baseId": "403:28",
+      "variants": 4
+     },
+     {
+      "name": "Cupertino/Kbd group",
+      "id": "463:236091",
+      "baseId": "403:96",
+      "variants": 8
+     },
+     {
+      "name": "Cupertino/Badge",
+      "id": "463:236172",
+      "baseId": "405:180",
+      "variants": 20
+     },
+     {
+      "name": "Cupertino/Badge / kind",
+      "id": "463:236313",
+      "baseId": "405:211",
+      "variants": 10
+     },
+     {
+      "name": "Cupertino/Avatar presence",
+      "id": "463:236344",
+      "baseId": "406:43",
+      "variants": 3
+     },
+     {
+      "name": "Cupertino/Avatar",
+      "id": "463:236348",
+      "baseId": "406:95",
+      "variants": 12
+     },
+     {
+      "name": "Cupertino/Avatar group",
+      "id": "463:236424",
+      "baseId": "406:150",
+      "variants": 3
+     },
+     {
+      "name": "Cupertino/.Item icon tile",
+      "id": "463:236545",
+      "baseId": "408:82",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/.Item image",
+      "id": "463:236548",
+      "baseId": "408:85",
+      "variants": 0
+     },
+     {
+      "name": "Cupertino/Item",
+      "id": "463:236549",
+      "baseId": "408:792",
+      "variants": 27
+     },
+     {
+      "name": "Cupertino/Item group",
+      "id": "463:237524",
+      "baseId": "408:996",
+      "variants": 2
+     },
+     {
+      "name": "Cupertino/Card",
+      "id": "463:270161",
+      "baseId": "409:951",
+      "variants": 16
+     },
+     {
+      "name": "Cupertino/Stat card",
+      "id": "463:271366",
+      "baseId": "409:1270",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Table header cell",
+      "id": "463:271725",
+      "baseId": "410:546",
+      "variants": 27
+     },
+     {
+      "name": "Cupertino/Table cell",
+      "id": "463:271906",
+      "baseId": "410:383",
+      "variants": 27
+     },
+     {
+      "name": "Cupertino/Table row",
+      "id": "463:272123",
+      "baseId": "412:1187",
+      "variants": 20
+     },
+     {
+      "name": "Cupertino/Table",
+      "id": "463:273478",
+      "baseId": "413:1367",
+      "variants": 6
+     },
+     {
+      "name": "Cupertino/Data table",
+      "id": "463:274754",
+      "baseId": "416:4605",
+      "variants": 10
+     }
+    ],
+    "themeOnly": {
+     "Avatar": "boolean inverted + part inverted-disc (inverted-initials); image avatars invert to a 2px primary/fg ring",
+     "Stat card": "part icon-tile (wraps the icon part)"
+    },
+    "swaps": [
+     "Kbd group \u2192 Cupertino/Kbd",
+     "Avatar group \u2192 Cupertino/Avatar (2px OUTSIDE surface/card ring)",
+     "Avatar presence \u2192 Cupertino/Avatar presence",
+     "Item media \u2192 Cupertino/.Item icon tile (mediaContent default too), actions \u2192 Cupertino/Button / sm ghost",
+     "Item group \u2192 Cupertino/Item",
+     "Card action/footer \u2192 Cupertino/Button / md ghost|secondary|primary",
+     "Stat card badge \u2192 Cupertino/Badge",
+     "Table cell \u2192 Cupertino/Badge plain, Avatar md, Icon button / sm ghost, Checkbox",
+     "Table row \u2192 Cupertino/Table cell (selected rows invert every glyph; Checkbox and Avatar inverted=true)",
+     "Table \u2192 Cupertino/Table header cell + Table row",
+     "Data table \u2192 Cupertino/Search, Select sm, Toggle group segmented, Button / md secondary, Action bar inline, Table, Pagination, Menu content",
+     "Sweep into earlier categories (155 + 197 deep): Search/Command/Menu/Tooltip kbd \u2192 Cupertino/Kbd; Tab/Nav item counts \u2192 Cupertino/Badge plain (C.data text/muted); Combobox chips \u2192 Cupertino/Badge neutral subtle; Hover card avatar \u2192 Cupertino/Avatar; nested Location marker, Table row/cell and Badge variant overrides \u2192 Cupertino"
+    ],
+    "swapTest": "6/6 after the fix: Badge label + remove (the 'dot' default had flipped to false while hiding solid dots; fixed and re-verified by the parity check), Card title + footer + eyebrow, Stat card label + value + icon, Avatar initials, Item title + chevron (mediaContent follows the Cupertino tile default by design), Kbd label",
+    "pngs": [
+     "review/styles/cupertino/data-display-1.png",
+     "review/styles/cupertino/data-display-1-strip.png"
+    ],
+    "deviations": [
+     "Badge plain label is C.body text/fg; a count (dot off) needs a colour override to text/muted, which the Cupertino Tab and Nav item counts carry",
+     "Stat card value keeps T.kpi; icon tile shows only when the base icon boolean is on (base default off)",
+     "Table selected-row inversion is drawn as overrides on the Table row selected variants"
+    ],
+    "leftBase": "icon/package (crafted brand glyph, intended), .Slot (40), Empty state (4) and Skeleton (134) placeholders: no style sets exist for them yet"
+   }
+  },
+  "styleComponentsFrame": "460:724",
+  "parity": "All 101 Cupertino sets match base property names, variant options, variant counts and boolean/text defaults; only intended INSTANCE_SWAP defaults differ (Action bar actions, Item mediaContent).",
+  "status": "done: Actions, Forms, Navigation, Overlays, Data display 1"
+ },
+ "liquid": {
+  "page": "93:735",
+  "modes": {
+   "Theme set": "239:8",
+   "Theme B": "239:2 Liquid",
+   "Density": "3:2 Comfortable",
+   "Scheme": "3:0 Light build / 3:1 Dark check"
+  },
+  "categories": {
+   "actions": {
+    "frame": "464:302466",
+    "setsFrame": "464:302471",
+    "strip": "464:363946",
+    "review": "464:365963",
+    "sets": [
+     {
+      "name": "Liquid/Icon",
+      "id": "464:302472",
+      "baseId": "252:11798",
+      "variants": 3
+     },
+     {
+      "name": "Liquid/Spinner",
+      "id": "464:302479",
+      "baseId": "252:11837",
+      "variants": 18
+     },
+     {
+      "name": "Liquid/.Focus ring",
+      "id": "464:302534",
+      "baseId": "252:11805",
+      "variants": 0
+     },
+     {
+      "name": "Liquid/.State layer",
+      "id": "464:302535",
+      "baseId": "252:11806",
+      "variants": 0
+     },
+     {
+      "name": "Liquid/Button / md",
+      "id": "464:302536",
+      "baseId": "253:372",
+      "variants": 30
+     },
+     {
+      "name": "Liquid/Button / lg",
+      "id": "464:302937",
+      "baseId": "254:721",
+      "variants": 30
+     },
+     {
+      "name": "Liquid/Button / sm",
+      "id": "464:303338",
+      "baseId": "254:371",
+      "variants": 30
+     },
+     {
+      "name": "Liquid/Button / xs",
+      "id": "464:303739",
+      "baseId": "254:1071",
+      "variants": 30
+     },
+     {
+      "name": "Liquid/Icon button / md",
+      "id": "464:304140",
+      "baseId": "255:262",
+      "variants": 25
+     },
+     {
+      "name": "Liquid/Icon button / lg",
+      "id": "464:304416",
+      "baseId": "255:740",
+      "variants": 25
+     },
+     {
+      "name": "Liquid/Icon button / sm",
+      "id": "464:304692",
+      "baseId": "255:501",
+      "variants": 25
+     },
+     {
+      "name": "Liquid/Icon button / xs",
+      "id": "464:304968",
+      "baseId": "255:979",
+      "variants": 25
+     },
+     {
+      "name": "Liquid/Toggle / md",
+      "id": "464:338918",
+      "baseId": "256:281",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Toggle / sm",
+      "id": "464:339063",
+      "baseId": "256:437",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Toggle / lg",
+      "id": "464:339208",
+      "baseId": "256:593",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Icon toggle / md",
+      "id": "464:339353",
+      "baseId": "276:8291",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Icon toggle / sm",
+      "id": "464:339450",
+      "baseId": "276:8431",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Icon toggle / lg",
+      "id": "464:339547",
+      "baseId": "276:8571",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Toggle group",
+      "id": "464:339644",
+      "baseId": "257:528",
+      "variants": 12
+     },
+     {
+      "name": "Liquid/Button group",
+      "id": "464:340281",
+      "baseId": "257:839",
+      "variants": 6
+     },
+     {
+      "name": "Liquid/.Action bar / actions",
+      "id": "464:340792",
+      "baseId": "258:544",
+      "variants": 0
+     },
+     {
+      "name": "Liquid/Action bar",
+      "id": "464:340826",
+      "baseId": "258:663",
+      "variants": 2
+     },
+     {
+      "name": "Liquid/Theme toggle",
+      "id": "464:340965",
+      "baseId": "258:742",
+      "variants": 6
+     }
+    ],
+    "themeOnly": {
+     "Toggle group": "part divider (outline variant)"
+    },
+    "swaps": [
+     "Button/Icon button/Toggle: state-layer \u2192 Liquid/.State layer (hover-overlay, 100%), focus-ring \u2192 Liquid/.Focus ring (3px band), spinner \u2192 Liquid/Spinner",
+     "Toggle group items \u2192 Liquid/Toggle",
+     "Button group items \u2192 Liquid/Icon button / sm ghost (32\u00d728) and Liquid/Button / sm ghost (text/fg)",
+     "Action bar actions \u2192 Liquid/.Action bar / actions (also the INSTANCE_SWAP default), close \u2192 Liquid/Icon button / sm ghost",
+     ".Action bar / actions \u2192 Liquid/Button / sm ghost",
+     "Theme toggle \u2192 Liquid/Icon button / md outline"
+    ],
+    "swapTest": "6/6 overrides survive (Button label + icon + glyph, Toggle label, Icon button glyph, Action bar count + close, Button group text)",
+    "pngs": [
+     "review/styles/liquid/actions.png",
+     "review/styles/liquid/actions-strip.png"
+    ],
+    "deviations": [
+     "Gradient rims use the brief's fallback: a solid 1px INSIDE liquid/effect/specular-tint (35% / 18%), so Dark never shows a white perimeter",
+     "On-accent rim of the prominent capsule binds liquid/effect/specular-tint instead of a literal white 35% (scheme-aware)",
+     "Toggle group segments hug their labels instead of sharing the track width equally (the base track hugs)",
+     "Action bar count cell: the 10px cell padding is folded into the bar's 17px leading padding"
+    ]
+   },
+   "forms": {
+    "frame": "464:414237",
+    "setsFrame": "464:414242",
+    "strip": "465:8087",
+    "review": "465:11147",
+    "sets": [
+     {
+      "name": "Liquid/Label",
+      "id": "464:414243",
+      "baseId": "278:45",
+      "variants": 6
+     },
+     {
+      "name": "Liquid/Input",
+      "id": "464:414268",
+      "baseId": "279:312",
+      "variants": 24
+     },
+     {
+      "name": "Liquid/Textarea",
+      "id": "464:414533",
+      "baseId": "280:597",
+      "variants": 12
+     },
+     {
+      "name": "Liquid/Select",
+      "id": "464:414636",
+      "baseId": "281:1023",
+      "variants": 24
+     },
+     {
+      "name": "Liquid/Select content",
+      "id": "464:414805",
+      "baseId": "281:826",
+      "variants": 0
+     },
+     {
+      "name": "Liquid/Checkbox",
+      "id": "464:414906",
+      "baseId": "283:1470",
+      "variants": 15
+     },
+     {
+      "name": "Liquid/Radio",
+      "id": "464:415042",
+      "baseId": "284:1828",
+      "variants": 10
+     },
+     {
+      "name": "Liquid/Radio group",
+      "id": "464:415133",
+      "baseId": "284:1885",
+      "variants": 2
+     },
+     {
+      "name": "Liquid/Switch",
+      "id": "464:415238",
+      "baseId": "285:2329",
+      "variants": 20
+     },
+     {
+      "name": "Liquid/Field",
+      "id": "464:433747",
+      "baseId": "287:2656",
+      "variants": 6
+     },
+     {
+      "name": "Liquid/Field set",
+      "id": "464:433962",
+      "baseId": "287:2743",
+      "variants": 2
+     },
+     {
+      "name": "Liquid/Input group",
+      "id": "464:434146",
+      "baseId": "297:3861",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/OTP slot",
+      "id": "464:434823",
+      "baseId": "301:4385",
+      "variants": 12
+     },
+     {
+      "name": "Liquid/Input OTP",
+      "id": "464:434872",
+      "baseId": "301:4490",
+      "variants": 4
+     },
+     {
+      "name": "Liquid/Slider",
+      "id": "464:435027",
+      "baseId": "303:5022",
+      "variants": 16
+     },
+     {
+      "name": "Liquid/Search",
+      "id": "464:435172",
+      "baseId": "316:16426",
+      "variants": 8
+     },
+     {
+      "name": "Liquid/Dropzone",
+      "id": "464:435366",
+      "baseId": "319:16832",
+      "variants": 7
+     },
+     {
+      "name": "Liquid/Calendar day",
+      "id": "464:435564",
+      "baseId": "307:6154",
+      "variants": 30
+     },
+     {
+      "name": "Liquid/Calendar",
+      "id": "464:435685",
+      "baseId": "309:8620",
+      "variants": 8
+     },
+     {
+      "name": "Liquid/Date picker",
+      "id": "464:439978",
+      "baseId": "313:14889",
+      "variants": 10
+     },
+     {
+      "name": "Liquid/Combobox",
+      "id": "464:441369",
+      "baseId": "305:5623",
+      "variants": 10
+     }
+    ],
+    "themeOnly": {
+     "Input": "part error-icon (the base caret is restyled as the 1.5\u00d716 ring-blue caret)",
+     "Field set": "wrapper legend-row; row-divider between rows"
+    },
+    "swaps": [
+     "Field \u2192 Liquid/Label, Liquid/Input (horizontal: L.row label override, 176-wide control)",
+     "Field set rows \u2192 Liquid/Field horizontal",
+     "Radio group \u2192 Liquid/Radio",
+     "Input group control \u2192 Liquid/Input|Textarea strokeless, addon button \u2192 Liquid/Icon button / xs ghost",
+     "Input OTP \u2192 Liquid/OTP slot",
+     "Search field \u2192 Liquid/Input as a control-glass capsule",
+     "Calendar \u2192 Liquid/Calendar day, Icon button / sm ghost, Select sm",
+     "Date picker \u2192 Liquid/Select (+calendar glyph), Liquid/Calendar in a float-glass content",
+     "Combobox \u2192 Liquid/Input, Liquid/Select content",
+     "Dropzone button \u2192 Liquid/Button / sm secondary"
+    ],
+    "pendingSwaps": [
+     "Select content + Combobox rows: base Menu item \u2192 Liquid/Menu item (Overlays)",
+     "Search kbd \u2192 Liquid/Kbd, Combobox chips \u2192 Liquid/Badge subtle (Data display 1)",
+     "Strip Field set sits on a sheet-glass stand-in frame until Liquid/Sheet exists"
+    ],
+    "swapTest": "6/6 overrides survive (Input placeholder + iconStart, Checkbox label + description, Switch label, Select value, Field set legend + description, Dropzone label)",
+    "pngs": [
+     "review/styles/liquid/forms.png",
+     "review/styles/liquid/forms-strip.png (1099\u00d75000; strip is 1280\u00d75824)"
+    ],
+    "deviations": [
+     "Field rest edge is drawn (1px liquid/border/input); the brief notes the crafted rest field does not draw it",
+     "Search is the swapped Liquid/Input restyled as a control-glass capsule by instance overrides (220\u00d736 md, 220\u00d730 sm)",
+     "Date picker open draws the Popover float recipe on the base content frame instead of nesting Liquid/Popover"
+    ]
+   }
+  },
+  "styleComponentsFrame": "464:302461",
+  "parity": "Liquid Actions + Forms (44 sets): property names, variant options, counts and boolean/text defaults match base; only the Action bar actions INSTANCE_SWAP default differs (intended)."
+ },
+ "remaining": "Liquid: Navigation (23 sets), Overlays (16), Data display 1 (18), then the Liquid pendingSwaps sweep, the Cupertino/Liquid distinctness check at 480px, and a final name/glyph pass over Liquid.",
+ "notes": [
+  "resetOverrides() resets instance and nested layer names: every swap now restores the part name, and a pass mirrors nested names from the main component",
+  "Lucide glyph colour is an override on the glyph vector: a pass copies the main's glyph colour into swapped glyphs inside nested Cupertino instances",
+  "Bound paints store the resolved alpha as paint.opacity; every set is reseeded (colour + alpha) in its Cupertino Light context",
+  "Set figma.skipInvisibleInstanceChildren=false in every script, or hidden instance parts are skipped and index-based name mirroring breaks",
+  "Setting .visible on a layer bound to a boolean property changes the property's default for the whole set: unbind (componentPropertyReferences={}) before hiding (Cupertino Badge 'dot' was fixed this way)",
+  "Liquid strips: wallpaper blobs 133:1089-133:1093 (Light) and 133:1151-133:1155 (Dark), scaled from 1440\u00d71160; content-only instances sit on an opaque surface/card panel",
+  "Resume Liquid at Navigation: Style components 464:302461 (Actions 464:302466, Forms 464:414237); follow liquid.md \u00a74.3-4.5 and \u00a76, then sweep pendingSwaps"
+ ]
+}

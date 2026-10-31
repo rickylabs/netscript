@@ -15,20 +15,44 @@ type PaginationComponent = ((props: PaginationSectionProps) => VNode) & {
 
 function PaginationRoot({ children, class: className, ...props }: PaginationSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-pagination', className)}>
+    <div
+      {...props}
+      class={cn('ns-pagination', className)}
+      data-part='root'
+      data-scope='pagination'
+    >
       {children}
     </div>
   );
 }
 
 function PaginationMeta({ children, class: className, ...props }: PaginationSectionProps): VNode {
-  return <div {...props} class={cn('ns-pagination__meta', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-pagination__meta', className)}
+      data-part='meta'
+      data-scope='pagination'
+    >
+      {children}
+    </div>
+  );
 }
 
 function PaginationActions(
   { children, class: className, ...props }: PaginationSectionProps,
 ): VNode {
-  return <div {...props} class={cn('ns-cluster ns-cluster--sm', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-cluster', className)}
+      data-gap='sm'
+      data-part='actions'
+      data-scope='pagination'
+    >
+      {children}
+    </div>
+  );
 }
 
 /**

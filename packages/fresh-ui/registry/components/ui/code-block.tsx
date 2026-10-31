@@ -28,13 +28,18 @@ export function CodeBlock(
   { code, filename, lang, class: className, ...props }: CodeBlockProps,
 ): VNode {
   return (
-    <div {...props} class={cn('ns-code', className)}>
-      <div class='ns-code__head'>
-        {filename ? <span class='ns-code__name'>{filename}</span> : null}
-        {lang ? <span class='ns-code__lang'>{lang}</span> : null}
+    <div {...props} class={cn('ns-code', className)} data-part='root' data-scope='code-block'>
+      <div class='ns-code__head' data-part='head' data-scope='code-block'>
+        {filename
+          ? <span class='ns-code__name' data-part='name' data-scope='code-block'>{filename}</span>
+          : null}
+        {lang
+          ? <span class='ns-code__lang' data-part='lang' data-scope='code-block'>{lang}</span>
+          : null}
         <button
           type='button'
           class='ns-code__copy'
+          data-scope='code-block'
           data-part='copy'
           data-clipboard={code}
           aria-label='Copy code'
@@ -42,7 +47,10 @@ export function CodeBlock(
           Copy
         </button>
       </div>
-      <pre><code>{code}</code></pre>
+      <pre
+        data-part='content'
+        data-scope='code-block'
+      ><code data-part='code' data-scope='code-block'>{code}</code></pre>
     </div>
   );
 }

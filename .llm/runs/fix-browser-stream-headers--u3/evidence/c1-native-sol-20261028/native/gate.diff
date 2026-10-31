@@ -1,0 +1,22 @@
+diff --git a/.llm/tmp/browser-stream-headers-u3-c1/continuation-2/gate.ts b/.llm/tmp/browser-stream-headers-u3-native-sol-20261028/gate-exact-loopback-format.ts
+index 8319d6494..07e73eee0 100644
+--- a/.llm/tmp/browser-stream-headers-u3-c1/continuation-2/gate.ts
++++ b/.llm/tmp/browser-stream-headers-u3-native-sol-20261028/gate-exact-loopback-format.ts
+@@ -156,7 +156,7 @@ if (selected === "diff") {
+   const fixtureName =
+     "Deno.test('default worker stream Collection enters the actual Fresh adapter and SDK query family'";
+   const fixtureStart = original.indexOf(fixtureName);
+-  const fixtureOptions = "const server = Deno.serve({ port: 0, onListen() {} },";
++  const fixtureOptions = "const server = Deno.serve({ port: 0, onListen() {} }, () =>\n    new Response('[]', {\n      headers: {\n        'Content-Type': 'application/json',\n        'Stream-Next-Offset': '0',\n        'Stream-Up-To-Date': 'true',\n      },\n    }));";
+   const fixtureEnd = original.indexOf("\nDeno.test(", fixtureStart + fixtureName.length);
+   const boundedEnd = fixtureEnd < 0 ? original.length : fixtureEnd;
+   const fixtureText = original.slice(fixtureStart, boundedEnd);
+@@ -165,7 +165,7 @@ if (selected === "diff") {
+   }
+   const loopbackOriginal = original.slice(0, fixtureStart) + fixtureText.replace(
+     fixtureOptions,
+-    "const server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} },",
++    "const server = Deno.serve(\n    { hostname: '127.0.0.1', port: 0, onListen() {} },\n    () =>\n      new Response('[]', {\n        headers: {\n          'Content-Type': 'application/json',\n          'Stream-Next-Offset': '0',\n          'Stream-Up-To-Date': 'true',\n        },\n      }),\n  );",
+   ) + original.slice(boundedEnd);
+   const loopbackStart = loopbackOriginal.indexOf("async function startReferenceServer(");
+   const loopbackEnd = loopbackOriginal.indexOf(

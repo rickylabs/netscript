@@ -1,0 +1,186 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback-builder",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "page": {
+    "Components · Feedback": "229:345"
+  },
+  "step": "B7-feedback built B1-B7 (owner review pending): 9 sets (Alert, Inline notice, Toast, Progress, Progress circular, Spinner extended, Skeleton, Skeleton preset, Empty state), 7 review frames, themes strip; Badge solid dark fixed; Table/Data table loading+empty stand-ins swapped",
+  "addedVariables": {
+    "badge/solid": {
+      "why": "Badge solid dark reused the light saturated fills (info #0090ff + white ~3:1 on dark). Theme-following solid roles: light keeps today's values, dark is a deep-tone pair (step 5 fill + step 11 ink).",
+      "Scheme": {
+        "badge/solid/neutral/bg": "VariableID:447:69",
+        "badge/solid/neutral/fg": "VariableID:447:70",
+        "badge/solid/info/bg": "VariableID:447:71",
+        "badge/solid/info/fg": "VariableID:447:72",
+        "badge/solid/success/bg": "VariableID:447:73",
+        "badge/solid/success/fg": "VariableID:447:74",
+        "badge/solid/warning/bg": "VariableID:447:75",
+        "badge/solid/warning/fg": "VariableID:447:76",
+        "badge/solid/destructive/bg": "VariableID:447:77",
+        "badge/solid/destructive/fg": "VariableID:447:78"
+      },
+      "Theme": "VariableID:447:9 .. 447:28 (badge/solid/{l,d}/<tone>/{bg,fg})",
+      "Theme B": "VariableID:447:29 .. 447:48",
+      "Theme set": "VariableID:447:49 .. 447:68 (A -> Theme, B -> Theme B)",
+      "values": {
+        "l (every mode, = today)": "neutral Theme gray/l/3 + gray/l/12; info color/blue/l/9 + color/white; success color/grass/l/9 + color/white; warning color/amber/l/9 + color/sand/l/12; destructive color/red/l/9 + color/white",
+        "d (every mode; Studio = the sources of studio/badge-solid/* dark, verified identical)": "neutral gray/d/5 + gray/d/11; info color/blue/d/5 + color/blue/d/11; success color/grass/d/5 + color/grass/d/11; warning color/amber/d/5 + color/amber/d/11; destructive color/red/d/5 + color/red/d/11"
+      },
+      "scopes": "Scheme bg FRAME_FILL, SHAPE_FILL, STROKE_COLOR; fg SHAPE_FILL, TEXT_FILL, STROKE_COLOR; intermediates [] (hidden)",
+      "code": "var(--ns-badge-solid-<tone>-{bg,fg}) / var(--ns-badge-solid-{l,d}-<tone>-{bg,fg})"
+    }
+  },
+  "components": {
+    "Alert": {
+      "id": "450:422",
+      "variants": 12,
+      "axes": "variant neutral|info|success|warning|destructive|important x emphasis subtle|strong",
+      "props": "icon, description + descriptionText, action (exposed Button / sm link), close"
+    },
+    "Inline notice": {
+      "id": "451:56561",
+      "variants": 6,
+      "axes": "variant (6 tones)",
+      "props": "icon, description + descriptionText, action (exposed Button / xs link), close"
+    },
+    "Toast": {
+      "id": "452:245",
+      "variants": 6,
+      "axes": "type default|success|error|warning|info|loading",
+      "props": "description + descriptionText, action (exposed Button / sm outline), dismiss, progress"
+    },
+    "Progress": {
+      "id": "453:6139",
+      "variants": 30,
+      "axes": "variant primary|secondary|success|warning|destructive x size sm|md|lg x state rest|loading",
+      "props": "label + labelText, value + valueText",
+      "note": "value = track padding (instance override): rest padding-right 36%, loading padding-left 30% + padding-right 28%, 100% = padding-right 0"
+    },
+    "Progress circular": {
+      "id": "453:6280",
+      "variants": 30,
+      "axes": "variant x size sm|md|lg (24/40/64) x state rest|loading",
+      "props": "value + valueText"
+    },
+    "Spinner": {
+      "id": "252:11837",
+      "variants": 18,
+      "axes": "size sm|md|lg x tone primary|neutral|info|success|warning|destructive",
+      "note": "extended in place: original 3 nodes kept (252:11828/832/836 now tone=primary) so Button/Icon button loading instances keep their links"
+    },
+    "Skeleton": {
+      "id": "454:975",
+      "variants": 12,
+      "axes": "shape line|block|avatar x size xs|sm|md|lg"
+    },
+    "Skeleton preset": {
+      "id": "454:1072",
+      "variants": 4,
+      "axes": "variant table|stats|detail|form"
+    },
+    "Empty state": {
+      "id": "454:2671",
+      "variants": 18,
+      "axes": "type first-use|no-results|error x media none|icon|image x size md|sm",
+      "props": "title, description + descriptionText, actions, secondaryAction, border, mediaContent"
+    }
+  },
+  "showcase": {
+    "pageHeader": "231:11259",
+    "containers": {
+      "Alert": "450:431",
+      "Inline notice": "451:56562",
+      "Toast": "452:246",
+      "Progress": "453:6281",
+      "Spinner": "449:296",
+      "Skeleton": "454:1073",
+      "Empty state": "454:2672"
+    },
+    "reviews": {
+      "Alert": "457:353",
+      "Inline notice": "458:959",
+      "Toast": "459:1442",
+      "Progress": "459:75853",
+      "Spinner": "459:82009",
+      "Skeleton": "459:82324",
+      "Empty state": "459:82959"
+    },
+    "themesStrip": "460:6056",
+    "sectionLabels": {
+      "Alert": "460:11384",
+      "Inline notice": "460:11388",
+      "Toast": "460:11392",
+      "Progress": "460:11396",
+      "Spinner": "252:11820",
+      "Skeleton": "460:11400",
+      "Empty state": "460:11404",
+      "Themes": "460:11408"
+    },
+    "retired": {
+      "Spinner old container 252:11824": "removed; the Spinner set moved into 449:296"
+    },
+    "reviewPngs": "review/feedback/ (review-alert, review-inline-notice, review-toast, review-progress, review-spinner, review-skeleton, review-empty-state, themes-strip)",
+    "re-shot": [
+      "review/data-display/review-badge.png",
+      "review/data-display/review-table.png",
+      "review/data-display/review-data-table.png"
+    ]
+  },
+  "swaps": {
+    "Table layout=row, content=loading (415:1249)": "40 stand-in RECTANGLEs -> Skeleton instances (line sm/md/lg resized to the cell, avatar sm for 24x24)",
+    "Table layout=stacked, content=loading (415:1378)": "27 RECTANGLEs -> Skeleton instances",
+    "Table layout=row, content=empty (413:1136)": "empty frame -> Empty state instance 455:41362 (first-use, icon, md, border off, actions off, FILL x 200)",
+    "Table layout=stacked, content=empty (413:1355)": "empty frame -> Empty state instance 455:41415 (first-use, icon, sm)",
+    "Data table state=empty desktop (416:3267) / mobile (416:4548)": "nested Empty state overridden to type=no-results (\"No orders match SO-99999\", Clear filters) to match the toolbar search",
+    "Data table loading": "inherits the Table loading swap",
+    "descriptions": "Table 413:1367 and Data table 416:4605 descriptions updated (stand-in wording removed)"
+  },
+  "deviations": [
+    "Alert and Inline notice tone axis has 6 values: the spec 5 plus important (important/* roles), per the brief.",
+    "Alert/Inline notice/Toast label is a per-variant text layer (tone type: Note, Info, Success, Warning, Error, Important), not a TEXT property: verified that binding a TEXT property overwrites every variant with one default. Override the text in the instance for a custom title.",
+    "No iconGlyph swap property on Alert/Inline notice: verified that binding an INSTANCE_SWAP property (and swapping any variant afterwards) resets every variant to one default glyph. Each tone carries its own glyph; swap the nested glyph instance directly.",
+    "Alert: description T.body (spec T.small); padding space/card/padding on all sides and gap space/control/gap (spec 8/12, which equals a compact notice); icon box = type/strong/line, glyph size/icon/md; body indented 26 px (box 20 + gap 6) to the label.",
+    "Alert strong rule for important = important/text (no important/default role exists); neutral and info marker/default, others <tone>/default as spec.",
+    "Inline notice: <tone>/subtle fill (owner content-colour note) instead of the spec surface/surface; label T.strong-sm, description T.small; trailing link action; padding space/stack/gap x space/control/padding-x.",
+    "Toast: spec eyebrow prop dropped (owner header rule: one label). Status types use <tone>/subtle + <tone>/border + <tone>/text (owner content-colour note) on top of R.float; default and loading keep surface/raised + border/default. Padding space/card/padding (code space-4 = 16; spec space/stack/gap = 8). Timer track <tone>/border (default/loading border/default) and bar <tone>/text (default/loading text/fg) instead of material/track + <tone>/default, so the bar reads on tinted fills.",
+    "Progress primary bar = marker/default and secondary = secondary/text (spec <v>/default): primary/default is graphite #313131 in Utility dark and secondary/default is gray 3, both invisible on material/track.",
+    "Progress value is the track padding (instance-overridable) rather than a fixed bar width: Figma does not allow resizing layers inside instances.",
+    "Progress circular is a new set (the brief asks for circular; the code and spec have none): literal diameters 24/40/64 and strokes 3/4/6.",
+    "Spinner extended with tone (6) x size (3) = 18; primary arc marker/default (was primary/default, invisible in Utility dark), statuses <tone>/text, neutral text/muted; round cap per spec.",
+    "Skeleton shape values line | block | avatar (spec circle): radius/avatar, so it is square in Utility like the Avatar it stands for. Block heights bound to space/control/height-sm | height | height-lg. No shimmer layer: static frames show the resting bone (reduced motion).",
+    "Empty state adds type first-use | no-results | error (brief) to the spec media x size: 18 variants; media image = illustration .Slot swap; primary + secondary actions exposed with actions and secondaryAction booleans.",
+    "Important tone glyph = Icon/bell (the 51-glyph set has no message-square-warning; Foundations left untouched).",
+    "Badge solid light values kept as instructed although info (3.26:1), success (3.03:1) and destructive (3.91:1) are below 4.5:1 with white labels."
+  ],
+  "audit": {
+    "directThemeOrThemeBBindingsOnFeedbackPage": 0,
+    "typeVarsFromCoordinator": "no text on the page uses font/mono at caption size or font/label with strong weight, so type/mono/style and type/label-strong/style have no consumers here",
+    "perSet": {
+      "Alert": "12 variants, 132 nodes; literals: body gap 2 (label-to-description rhythm), actions padding-top 6 (no 2/6 spacing variable)",
+      "Inline notice": "6 variants, 60 nodes; 0 literals",
+      "Toast": "6 variants, 78 nodes; literals: body gap 2, actions padding-top 8, timer padding-right 137 (remaining time, overridable)",
+      "Progress": "30 variants, 180 nodes; literals: track padding (value encoding, overridable)",
+      "Progress circular": "30 variants, 110 nodes; literals: stroke weights 3/4/6 (no stroke variable)",
+      "Spinner": "18 variants, 54 nodes; literals: stroke weights 2/3 (spec lit)",
+      "Skeleton": "12 variants; 0 literal paints/spacing; size literals = code rem heights",
+      "Skeleton preset": "4 variants, 96 nodes; 0 literals",
+      "Empty state": "18 variants, 198 nodes; literals: title-description gap 4"
+    },
+    "sizeLiterals": "Alert W 480, Inline notice W 400, Toast W 360, Progress W 320 and track h 5/8/11, Toast track h 2, rule w 2, circular 24/40/64, skeleton line h 8/10/14/24, block lg 136, avatar xs 16, empty media 40/32 and 160x96/120x72, description max W 360/272, dash 4/4: spec or code px values with no size variable",
+    "paints": "every fill, stroke and text fill in the 9 sets is variable-bound; every text node binds fontFamily, fontStyle, fontSize, lineHeight, letterSpacing"
+  },
+  "badgeFix": {
+    "set": "405:180",
+    "rebound": "5 solid variants: root fill + edge -> badge/solid/<tone>/bg; dot, label, hidden icon + remove glyphs -> badge/solid/<tone>/fg",
+    "dark contrast (Utility)": "neutral 6.27, info 5.03, success 5.41, warning 7.89, destructive 6.05 (same pairs in Tonal, Brutal, Pixel, Fluent, Cupertino; neutral 6.2-6.6)",
+    "light (unchanged)": "neutral 14.30, info 3.26, success 3.03, warning 10.33, destructive 3.91"
+  },
+  "ownerNotes": [
+    "Callout/alert header rule applied to Alert, Inline notice and Toast: one label (icon + tone type or custom title, <tone>/text, Medium, body size, sentence case), no mono eyebrow, icon box = label line height centred on the first line, body indented to the label left edge.",
+    "Content colour: status tones (subtle fill + border + text) on alerts, notices and toasts; red only in the destructive tone (Alert/Notice destructive, Toast error, Empty state error, Progress destructive).",
+    "Dark is designed: Utility dark toasts are raised graphite (#222225), status fills are deep tints, solid badges use deep-tone pairs, primary indicators flip to light ink.",
+    "Theme character / style pass: language anatomy for Feedback (Tonal wavy progress, Brutal pink slab alert, Pixel banded bar, Terminal level column, Tactile meter/LED) is not built here; it belongs to the per-theme style sets."
+  ]
+}

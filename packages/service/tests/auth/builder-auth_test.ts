@@ -2,13 +2,15 @@ import { assertEquals } from '@std/assert';
 import { implement, os } from '@orpc/server';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
 import {
+  type AnonymousRequestMatch,
+  type AnonymousRule,
   type ContractAuthorizerRawRoute,
   createContractAuthorizer,
   createService,
 } from '../../mod.ts';
 import { createScopeAuthorizer } from '../../src/auth/scope-authorizer.ts';
 import { createStaticCredentialAuthenticator } from '../../src/auth/static-credential-authenticator.ts';
-import type { Principal } from '../../src/auth/types.ts';
+import type { AuthenticatorPort, Principal } from '../../src/auth/types.ts';
 
 const authenticator = createStaticCredentialAuthenticator({
   credentials: {
@@ -238,7 +240,7 @@ Deno.test('declared raw route rejects an unauthenticated caller with 401', async
   }
 });
 
-Deno.test('undeclared raw sibling stays denied with authz.no-contract-procedure', async () => {
+Deno.test('undeclared raw sibling returns typed not found after authentication', async () => {
   const app = rawRouteApp(DECLARED_MCP);
 
   const response = await app.request('/api/tools/other', {
@@ -246,10 +248,11 @@ Deno.test('undeclared raw sibling stays denied with authz.no-contract-procedure'
     headers: { authorization: 'Bearer user' },
   });
 
-  assertEquals(response.status, 403);
+  assertEquals(response.status, 404);
   assertEquals(await response.json(), {
-    error: 'FORBIDDEN',
+    error: 'NOT_FOUND',
     message: 'authz.no-contract-procedure',
+    code: 'procedure_not_found',
   });
 });
 
@@ -261,10 +264,11 @@ Deno.test('raw route declaration matches exactly, without prefix confusion', asy
       method: 'POST',
       headers: { authorization: 'Bearer user' },
     });
-    assertEquals(response.status, 403, path);
+    assertEquals(response.status, 404, path);
     assertEquals(await response.json(), {
-      error: 'FORBIDDEN',
+      error: 'NOT_FOUND',
       message: 'authz.no-contract-procedure',
+      code: 'procedure_not_found',
     }, path);
   }
 });
@@ -292,4 +296,140 @@ Deno.test('declared raw route admits a service-identity bearer and enforces decl
     error: 'FORBIDDEN',
     message: 'authz.missing-role:service',
   });
+});
+
+function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
+  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
+}
+
+const exactHealth: readonly AnonymousRequestMatch[] = [
+  { method: 'GET', path: '/health' },
+  { method: 'GET', path: '/health/live' },
+  { method: 'GET', path: '/health/ready' },
+  { method: 'HEAD', path: '/health' },
+  { method: 'HEAD', path: '/health/live' },
+  { method: 'HEAD', path: '/health/ready' },
+];
+
+exactTest('builder admits only six explicit health probes and native CORS preflight', async (t) => {
+  let authn = 0;
+  let authz = 0;
+  let raw = 0;
+  let rpc = 0;
+  const router = os.router({
+    ping: os.handler(() => {
+      rpc++;
+      return 'pong';
+    }),
+  });
+  const app = createService(router, { name: 'exact-health' })
+    .withCors({ origin: ['https://allowed.example'] })
+    .withAuthn({
+      authenticator: {
+        authenticate: () => {
+          authn++;
+          return { ok: false, reason: 'guarded' };
+        },
+      },
+      protect: ['/'],
+      allowAnonymous: exactHealth,
+    }).withAuthz({
+      authorizer: {
+        authorize: () => {
+          authz++;
+          return { allow: false, reason: 'guarded' };
+        },
+      },
+    }).withHealth().route('all', '/*', (c) => {
+      raw++;
+      return c.text('raw');
+    }).withRPC().build();
+  for (
+    const path of ['/health', '/health/live', '/health/ready', '/health/ready/x', '/api/rpc/ping']
+  ) {
+    for (const method of ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']) {
+      await t.step(`${method} ${path}`, async () => {
+        authn =
+          authz =
+          raw =
+          rpc =
+            0;
+        const response = await app.request(path, { method });
+        const body = await response.text();
+        const admitted = exactHealth.some((rule) => rule.path === path && rule.method === method);
+        assertEquals([response.status, authn, authz, raw, rpc], [
+          admitted ? 200 : 401,
+          admitted ? 0 : 1,
+          0,
+          0,
+          0,
+        ]);
+        if (method === 'HEAD') assertEquals(body, '');
+      });
+    }
+  }
+  authn =
+    authz =
+    raw =
+    rpc =
+      0;
+  const response = await app.request('/health', {
+    method: 'OPTIONS',
+    headers: { origin: 'https://allowed.example', 'access-control-request-method': 'POST' },
+  });
+  assertEquals(await response.text(), '');
+  assertEquals([response.status, authn, authz, raw, rpc], [204, 0, 0, 0, 0]);
+  assertEquals(response.headers.get('access-control-allow-origin'), 'https://allowed.example');
+});
+
+exactTest('builder snapshots exact rules and preserves authz deny and error shapes', async () => {
+  const principal: Principal = {
+    subject: 'test',
+    scopes: [],
+    roles: [],
+    scheme: 'custom',
+    claims: {},
+  };
+  for (const mode of ['deny', 'throw-closed', 'throw-open']) {
+    let authn = 0;
+    let calls = 0;
+    let handlers = 0;
+    const rules: AnonymousRule[] = [{ method: 'GET', path: '/health' }];
+    const protect = ['/'];
+    const authenticate: AuthenticatorPort['authenticate'] = () => {
+      authn++;
+      return { ok: true, principal };
+    };
+    const authorize = () => {
+      calls++;
+      if (mode !== 'deny') throw new Error('private');
+      return { allow: false, reason: 'denied' };
+    };
+    const app = createService({}, { name: 'auth-snapshots' })
+      .withAuthn({ protect, allowAnonymous: rules, authenticator: { authenticate } })
+      .withAuthz({ denyByDefault: mode !== 'throw-open', authorizer: { authorize } })
+      .route('all', '/*', (c) => {
+        handlers++;
+        return c.text('handled');
+      }).build();
+    rules.push('/');
+    protect.splice(0);
+    const get = await app.request('/health');
+    assertEquals(await get.text(), 'handled');
+    assertEquals([get.status, authn, calls, handlers], [200, 0, 0, 1]);
+    const post = await app.request('/health', { method: 'POST' });
+    const body = await post.text();
+    assertEquals([post.status, authn, calls, handlers], [
+      mode === 'throw-open' ? 200 : 403,
+      1,
+      1,
+      mode === 'throw-open' ? 2 : 1,
+    ]);
+    if (mode !== 'throw-open') {
+      assertEquals(JSON.parse(body), {
+        error: 'FORBIDDEN',
+        message: mode === 'deny' ? 'denied' : 'authz.error',
+      });
+    }
+  }
 });

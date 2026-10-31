@@ -4,11 +4,11 @@
   box-shadow: var(--ns-shadow-xs);
 }
 
-.ns-card--interactive {
+:where(.ns-card)[data-interactive='true'] {
   transition: border-color var(--ns-motion-duration-normal) var(--ns-motion-easing-normal), box-shadow var(--ns-motion-duration-normal) var(--ns-motion-easing-normal);
 }
 
-.ns-card--interactive:hover {
+:where(.ns-card)[data-interactive='true']:hover {
   border-color: var(--ns-border-strong);
   box-shadow: var(--ns-shadow-sm);
 }

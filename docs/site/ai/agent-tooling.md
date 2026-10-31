@@ -158,7 +158,7 @@ stdin is piped, it writes no human-facing output that could corrupt the JSON-RPC
 
 ## What the server exposes
 
-Twenty-two tools, each returning a bounded structured result, grouped by what an agent is trying to
+Twenty-six tools, each returning a bounded structured result, grouped by what an agent is trying to
 do:
 
 | Task | Tools | What they do |
@@ -169,6 +169,7 @@ do:
 | Discover exports | `find_export`, `list_package_exports`, `get_export`, `search_exports` | Locate package subpaths, page through package surfaces, return one bounded signature/JSDoc block, and find related helpers by partial name or declaration shape. |
 | Bridge to the CLI | `list_commands`, `execute_command` | `list_commands` discovers the current command tree (the machine-readable twin of `netscript --help`); `execute_command` runs an allowlisted `netscript …` command with policy checking, timeout handling and a bounded output tail. |
 | Record drift | `record_drift` | Appends an evidence-gated entry to the project drift log (`.netscript/agent/drift.jsonl`) when a fresh successful diagnostic receipt authorizes it. |
+| Discover UI registry items | `list_registry_items`, `search_registry_items`, `view_registry_item`, `get_registry_add_command` | Inspect built-in or app-configured registries and obtain installation arguments without executing an install. |
 | Inspect service APIs | `list_api_services`, `list_service_operations`, `get_operation_schema` | Expose live OpenAPI contracts before an agent guesses with curl. |
 
 The per-tool schemas, output bounds and the full `execute_command` policy are in the
@@ -258,6 +259,22 @@ The smoke starts the public CLI binary, initializes MCP over stdio, verifies the
 checks docs, exports, diagnostics, unreachable telemetry and command denial.
 
 ## Next steps
+
+## UI registry discovery
+
+`list_registry_items` returns item metadata with `limit` (at most 20) and `offset`;
+`search_registry_items` adds a required `query`. Both return `items`, `total` and an optional
+`nextOffset`. `view_registry_item` accepts `name` and returns a portable item with copy bytes.
+The standalone server uses the embedded Fresh UI registry without a network request.
+Hosts can inject `McpCliOptions.uiRegistryCatalog` for a selected app's registries.
+
+`get_registry_add_command` accepts a name, `@namespace/name`, or HTTP(S) item URL and returns
+`{command: "netscript", args: ["ui:add", name]}`. It does not execute the command. Pass the
+arguments directly to a process API after reviewing the installation; never join them into shell text.
+
+Registry metadata uses the server's normal output bounds. Views preserve exact file contents and
+fail with `tool_result_too_large` when the complete JSON-RPC response exceeds 64 KiB. Use
+`netscript ui:view <name>` for larger items.
 
 Look up each tool's contract and output bounds in the
 [`@netscript/mcp` reference]({{ "ref:mcp" |> xref |> url }}).

@@ -1,0 +1,18 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\packages\\service\\src\\auth\\options.ts",
+        "Hash":  "67B2894ABF0B6B421E46BA912BF163CA1CB80E53F82AFE434AD7434DD95B136E"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\packages\\service\\src\\auth\\auth-middleware.ts",
+        "Hash":  "00F33679F046E803FB3F6C26AFBBE43A0E1676753F92DB4AEF8B6D789C5D23E1"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\packages\\service\\src\\builder\\service-builder-impl.ts",
+        "Hash":  "C81161994461703CE6028075F6128A56EFB33A1A9E1D3A3D5B7D19C7BC69CBE7"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\packages\\service\\tests\\auth\\health-auth-order_test.ts",
+        "Hash":  "412961DE39985E1DE78A3245632B5E37D183843DCFC40F4E4679EFE4E64C211E"
+    }
+]

@@ -1,0 +1,56 @@
+{
+  "source": {
+    "mode": "explicit",
+    "root": "packages/fresh",
+    "entrypoints": [
+      "src/runtime/streams/mod.ts"
+    ],
+    "exitCode": 1
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 12,
+    "totalPrivateTypeRef": 12,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/fresh",
+      "dir": "packages/fresh",
+      "entrypoints": [
+        {
+          "path": "src/runtime/streams/mod.ts",
+          "privateTypeRef": 12,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 12
+        }
+      ],
+      "files": [
+        {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/mod.ts",
+          "privateTypeRef": 7,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+          "privateTypeRef": 5,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 5
+        }
+      ],
+      "combinedTotal": 12,
+      "combinedPrivateTypeRef": 12,
+      "combinedMissingJSDoc": 0,
+      "combinedOther": 0,
+      "combinedExitCode": 1,
+      "entrypointExitCodes": {
+        "src/runtime/streams/mod.ts": 1
+      }
+    }
+  ]
+}

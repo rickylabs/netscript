@@ -1,0 +1,7 @@
+{
+  "verifiedRecords": 67,
+  "allRawStageHashesMatch": true,
+  "credentialPatternFindings": 0,
+  "manifestSha256": "36e5e793155c0e09acbeb793dcab4284d9158226724abfd6123fc897aa32542f",
+  "generatorStatus": "Root source accepted; independent IMPL pending; residual gates open"
+}

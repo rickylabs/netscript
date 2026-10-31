@@ -47,17 +47,34 @@ export function ResponsiveTable<Row>(
     <div
       {...props}
       class={cn('ns-responsive-table', className)}
+      data-part='root'
+      data-scope='table'
       data-empty={rows.length === 0 ? 'true' : undefined}
     >
-      <div class='ns-responsive-table__scroller'>
-        <table class='ns-responsive-table__table'>
-          {caption && <caption class='ns-responsive-table__caption'>{caption}</caption>}
-          <thead class='ns-responsive-table__head'>
-            <tr class='ns-responsive-table__row ns-responsive-table__row--head'>
+      <div class='ns-responsive-table__scroller' data-part='scroller' data-scope='table'>
+        <table class='ns-responsive-table__table' data-part='table' data-scope='table'>
+          {caption && (
+            <caption
+              class='ns-responsive-table__caption'
+              data-part='caption'
+              data-scope='table'
+            >
+              {caption}
+            </caption>
+          )}
+          <thead class='ns-responsive-table__head' data-part='head' data-scope='table'>
+            <tr
+              class='ns-responsive-table__row'
+              data-type='header'
+              data-part='row'
+              data-scope='table'
+            >
               {columns.map((column) => (
                 <th
                   key={column.key}
                   class={cn('ns-responsive-table__header', column.headerClass)}
+                  data-part='header'
+                  data-scope='table'
                   data-align={column.align ?? 'start'}
                   scope='col'
                 >
@@ -66,11 +83,16 @@ export function ResponsiveTable<Row>(
               ))}
             </tr>
           </thead>
-          <tbody class='ns-responsive-table__body'>
+          <tbody class='ns-responsive-table__body' data-part='body' data-scope='table'>
             {rows.length === 0
               ? (
-                <tr class='ns-responsive-table__row'>
-                  <td class='ns-responsive-table__empty' colSpan={columns.length}>
+                <tr class='ns-responsive-table__row' data-part='row' data-scope='table'>
+                  <td
+                    class='ns-responsive-table__empty'
+                    data-part='empty'
+                    data-scope='table'
+                    colSpan={columns.length}
+                  >
                     {emptyState}
                   </td>
                 </tr>
@@ -79,16 +101,24 @@ export function ResponsiveTable<Row>(
                 <tr
                   key={getRowKey(row, rowIndex)}
                   class='ns-responsive-table__row'
+                  data-part='row'
+                  data-scope='table'
                 >
                   {columns.map((column) => (
                     <td
                       key={column.key}
                       class={cn('ns-responsive-table__cell', column.class)}
+                      data-part='cell'
+                      data-scope='table'
                       data-align={column.align ?? 'start'}
                       data-label={column.label}
                       data-priority={column.priority ?? 'secondary'}
                     >
-                      <span class='ns-responsive-table__cell-value'>
+                      <span
+                        class='ns-responsive-table__cell-value'
+                        data-part='cell-value'
+                        data-scope='table'
+                      >
                         {column.cell(row, rowIndex)}
                       </span>
                     </td>
@@ -98,7 +128,11 @@ export function ResponsiveTable<Row>(
           </tbody>
         </table>
       </div>
-      {summary && <div class='ns-responsive-table__summary'>{summary}</div>}
+      {summary && (
+        <div class='ns-responsive-table__summary' data-part='summary' data-scope='table'>
+          {summary}
+        </div>
+      )}
     </div>
   );
 }

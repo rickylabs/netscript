@@ -1,0 +1,28 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T05:47:50.350Z",
+  "finishedAt": "2026-10-28T05:48:02.521Z",
+  "durationMs": 12172,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 332,
+    "sha256": "6d0dfd39f3ee906d8dbd523616d0249883c9b53827426c1a7bf022c2626e945f",
+    "tail": "docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 208 published source pages, 190 shipped corpus files, one query dialect exception page, 4 cache-first loader pages, mutation-map columns, 93/93 root/direct public commands from 158 recursive paths, 3 valid @netscript/fresh root imports checked)\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 134,
+    "sha256": "b99f2bd553696ea6522afb6a2a84126543f759f1aa8b2d154f14cbf7c7451e98",
+    "tail": "Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts\n",
+    "truncated": false
+  },
+  "gateId": "docs-accuracy",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "task",
+    "docs:accuracy"
+  ],
+  "timeoutMs": 240000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative"
+}

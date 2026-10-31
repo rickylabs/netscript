@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "preact": "npm:preact@^10.29.2",
+    "preact/hooks": "npm:preact@^10.29.2/hooks",
+    "clsx": "npm:clsx@^2.1.1",
+    "tailwind-merge": "npm:tailwind-merge@^3.7.0",
+    "@preact/signals": "npm:@preact/signals@2.11.3",
+    "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime"
+  }
+}

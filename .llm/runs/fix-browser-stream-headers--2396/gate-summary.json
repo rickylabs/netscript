@@ -1,0 +1,186 @@
+{
+  "sourceHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+  "receipts": [
+    {
+      "gateId": "assets-barrel",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1743
+    },
+    {
+      "gateId": "check",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 201593
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8647
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14550
+    },
+    {
+      "gateId": "publish-assets",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 467
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13215
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10791
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5421
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13592
+    },
+    {
+      "gateId": "quality-gate",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18667
+    },
+    {
+      "gateId": "doc-lint",
+      "gitHead": "e26aacb203b702cd776ac300d00da5656bebf44e",
+      "outcome": "FAIL",
+      "exitCode": 1,
+      "durationMs": 5082
+    }
+  ],
+  "tests": {
+    "passed": 460,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 460,
+    "uniqueFailures": 0
+  },
+  "scoped": {
+    "lint": {
+      "filesSelected": 11,
+      "filesProcessed": 11,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "fmt": {
+      "filesSelected": 11,
+      "filesProcessed": 11,
+      "droppedFiles": [],
+      "refusals": []
+    }
+  },
+  "docLint": {
+    "freshCurrentEqualsMain": true,
+    "workersCurrentEqualsMain": true,
+    "fresh": {
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 45,
+        "totalPrivateTypeRef": 28,
+        "totalMissingJSDoc": 17,
+        "totalOther": 0
+      },
+      "files": [
+        {
+          "path": "packages/fresh/src/application/builders/mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "packages/fresh/src/application/query/hooks.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "packages/fresh/src/application/query/query-types.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "packages/fresh/src/application/route/_internal/contract-types.ts",
+          "privateTypeRef": 8,
+          "missingJSDoc": 17,
+          "other": 0,
+          "total": 25
+        },
+        {
+          "path": "packages/fresh/src/runtime/ai/create-chat-connection.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "packages/fresh/src/runtime/streams/mod.ts",
+          "privateTypeRef": 7,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 7
+        }
+      ]
+    },
+    "workers": {
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 2,
+        "totalPrivateTypeRef": 2,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "files": [
+        {
+          "path": "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 2
+        }
+      ]
+    }
+  },
+  "limitation": "Full doc lint remains red at unchanged main baseline; not waived or called a pass. JSR dry-run output is authoritative over the audit helper banner-warning count."
+}

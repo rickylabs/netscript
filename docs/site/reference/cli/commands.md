@@ -222,6 +222,15 @@ The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`)
 | `netscript plugin auth <sub>`                       | Configure auth and manage sessions (see below).                                                                                   |
 | `netscript plugin ai <verb> [...args]`              | Configure AI tools, agents, models, providers, and MCP servers. Flag: `--project-root <path>` (the only flag NetScript consumes). |
 
+For `plugin update`, pass the installed name shown by `netscript plugin list`:
+
+```sh
+netscript plugin update workers
+```
+
+The host re-pins the plugin and regenerates its registries. Package specifiers belong to the
+package-dispatch verbs (`enable`, `disable`, `setup`); `update` uses the installed name.
+
 `plugin ai` is a **pass-through**, not a command group with its own verbs. NetScript strips
 `--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child `deno run`
 process, forwards every remaining argument verbatim, prints its output and propagates its exit code.
@@ -323,8 +332,11 @@ the source and output extension contract.
 
 ## `ui:*` — Fresh UI registry
 
-`ui:init` and `ui:add` are in the [CLI cheat sheet](/cli-reference/#fresh-ui). The full set also
-lists, updates, and removes copied registry items:
+Fresh UI copies registry source into the selected application. Use `--app <name>` for a
+workspace app or `--project-root <path>` for an explicit application directory. App settings
+live in `components.json`; `fresh-ui.lock.json` records source identity and installed content hashes.
+The page/island scaffold forms of `ui:add` remain available in the
+[CLI reference](/cli-reference/#fresh-ui).
 
 | Command                      | Description                                                                                                    |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -332,8 +344,91 @@ lists, updates, and removes copied registry items:
 | `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
 | `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
 
-Fresh UI is copy-source, so `ui:update` only touches registry files you have not modified; your
-edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+`ui:update` compares installed copies with their lock baselines and reports local edits. The
+following registry and preset commands complete the setup and discovery workflow:
+
+| Command | Behavior |
+| --- | --- |
+| `netscript ui:build --registry registry.json --source-root . --output public/r` | Validate local authoring and publish a static catalog plus one JSON file per item. Resolve source paths inside the declared source root. |
+| `netscript ui:init --preset <code>` | Initialize the foundation using a token preset id, encoded preset, or shared URL. |
+| `netscript ui:add <name\|@namespace/name\|url> --diff` | Show installed/local/registry differences without writing application files. Omit `--diff` to install. Install a `registry:style` item or apply a preset with a `style` field to select component sources. |
+| `netscript ui:view <reference>` | Print portable metadata and exact source files without installing. |
+| `netscript ui:search [query] --registry @acme` | Search item metadata in the built-in catalog or a configured namespace. |
+| `netscript ui:docs <reference>` | Show publisher documentation and Markdown file locations. |
+| `netscript ui:info` | Describe app UI settings, install provenance and edited copies without revealing registry header values. |
+| `netscript ui:registry` | Group for source registration and JSON schema validation. |
+| `netscript ui:registry add @acme <url>` | Register a catalog or `{name}` item URL template. Repeat `--header Name=template`; `--index <url>` sets an explicit catalog URL. |
+| `netscript ui:registry validate [reference]` | Validate local JSON, a static URL, a configured namespace, or a namespaced item against the published registry schemas. Defaults to local `registry.json`. |
+| `netscript ui:preset` | Group for offline preset decoding and shareable URL generation. |
+| `netscript ui:preset decode <code>` | Decode a versioned preset, shared URL or plain token preset id without a network request. |
+| `netscript ui:preset url [code] --theme studio-utility` | Construct a shareable URL; optional `--style`, `--font`, and `--icon-library` set those preset fields. |
+| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
+
+An app configuration can declare a registry source and unresolved header templates:
+
+
+```json
+{
+  "version": 1,
+  "style": "style-utility",
+  "iconLibrary": "lucide",
+  "aliases": { "ui": "components/ui", "lib": "lib" },
+  "registries": {
+    "@acme": {
+      "url": "https://example.com/r/{name}.json",
+      "headers": { "Authorization": "Bearer ${ACME_REGISTRY_TOKEN}" }
+    }
+  }
+}
+```
+
+For example, register an authenticated namespace with an environment template, then inspect and
+install one item:
+
+```bash
+netscript ui:registry add @acme 'https://registry.example/r/{name}.json' \
+  --header 'Authorization=Bearer ${ACME_REGISTRY_TOKEN}' --project-root apps/dashboard
+netscript ui:view @acme/x --project-root apps/dashboard
+netscript ui:add @acme/x --diff --project-root apps/dashboard
+netscript ui:add @acme/x --project-root apps/dashboard
+```
+
+The transport resolves header templates from the environment when issuing a request. Resolved
+credentials are not written to app config or the install lock and are not included in diagnostic
+output. Registry source modules are never executed.
+
+A token-only preset application leaves component source unchanged and persists the selected token
+preset for later `netscript tokens build`. An explicitly changed style regenerates installed
+component copies from that style's registry source map. If a copied file differs from its recorded
+hash, regeneration stops and lists edited paths, including with `--force`. Utility is the built-in
+component style; additional source maps use the same shared contract. Theme items also install their `DESIGN.md` and
+`SKILL.md` under `.agents/skills/fresh-ui-theme-<preset-id>/`.
+
+See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) and the
+[Fresh UI reference](/reference/fresh-ui/).
+
+## `ui:migrate` — migrate app-owned Fresh UI copies
+
+`netscript ui:migrate` shows the available migrations. `netscript ui:migrate variants` converts
+0.0.8 Utility component modifiers and anatomy to the shared data-attribute contract.
+
+Preview the changes before applying them:
+
+```sh
+netscript ui:migrate variants --project-root apps/dashboard --dry-run
+```
+
+Run the same command without `--dry-run` to apply, then run the app's `deno task check`.
+`--project-root <path>` accepts a workspace or Fresh app; `--app <name>` selects an app in a workspace.
+The migration preserves custom classes, base/element hooks, strings and comments. Customized
+structural edits or detected unsupported dynamic classes stop preflight before any writes and need a
+manual merge. This includes JSX spreads without a later explicit class when the file still contains
+legacy component modifiers or state classes: convert the spread's class producer to data attributes first. Indirect
+class producers imported from other files require manual review; the migration does not evaluate
+JavaScript. CSS state selectors match component classes in either order, including
+`.is-active.ns-citation`. Controlled component overrides require conversion to their public props;
+layout utility aliases remain supported. Use the matching CLI and Fresh UI release together. Dependency copies
+and registry ownership hashes remain untouched.
 
 ## `deploy` — cloud and container targets
 

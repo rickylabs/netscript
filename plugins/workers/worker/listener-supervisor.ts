@@ -1,4 +1,5 @@
 import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
+import { QueueError, QueueErrorCode } from '@netscript/queue';
 import { delay } from '@std/async';
 
 /** Credential-safe category for a listener's most recent failure. */
@@ -245,6 +246,9 @@ function combineSignals(first: AbortSignal, second?: AbortSignal): AbortSignal {
 function classifyFailure(error: unknown): WorkerListenerFailureCause {
   let current = error;
   for (let depth = 0; depth < 8 && current instanceof Error; depth++) {
+    if (current instanceof QueueError && current.code === QueueErrorCode.CONNECTION_FAILED) {
+      return 'connection-unavailable';
+    }
     if (/\b(?:OOM|READONLY|NOPERM|MISCONF)\b/i.test(current.message)) {
       return 'store-write-refused';
     }

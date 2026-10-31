@@ -1,0 +1,12 @@
+{
+  "selected": "arch",
+  "args": [
+    "task",
+    "arch:check"
+  ],
+  "code": 1,
+  "started": "2026-10-28T01:04:36.374Z",
+  "ended": "2026-10-28T01:04:43.084Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/f15/arch-1793149476371"
+}

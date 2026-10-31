@@ -1,0 +1,461 @@
+- **Partial work:** reference the issue **without** a closing keyword (`Part of #N` / plain `#N`) and
+  state the remaining scope in the body. Never `Closes` an issue you only partially deliver.
+- **Never** put a closing keyword on an **epic/umbrella** (`type:umbrella`, `epic:*`) — those close
+  by hand once every child is done. Use `Part of #<umbrella>` instead.
+- The keyword must be in the **PR body or a commit message**, not only in a comment, for GitHub to
+  wire the auto-close. The PR template's `## Scope` is the canonical home.
+
+## Merge close-gate (#387)
+
+The closing-keyword rule above wires the auto-close; this gate governs **when a PR carrying one may
+merge**. They are separate concerns: a keyword makes the merge *close* the issue, the close-gate
+makes sure the issue is *actually done* before that happens.
+
+The machine convention is intentionally narrow:
+
+- A **close-gated PR** is any PR whose body contains a GitHub closing keyword for an issue:
+  `Closes #N`, `Fixes #N`, or `Resolves #N` (including `closed`/`fixed`/`resolved` variants and full
+  GitHub issue URLs).
+- A **close-gated issue checkbox** is either:
+  - any markdown checkbox inside an issue section whose heading contains `acceptance`, `definition
+    of done`, `gate`, or `fitness gate`; or
+  - any markdown checkbox anywhere in the issue body whose checkbox text starts with `gate:`.
+- Ordinary planning, dependency, sub-issue, or rollout checklists outside those sections are **not**
+  close-gated. If a checklist is acceptance, put it under an acceptance/gate heading.
+- Only markdown checkboxes are close-gated and mirrorable. A plain-bullet `Acceptance` section has
+  no mirrorable targets and therefore takes no `acceptance-evidence` block; convert its bullets to
+  markdown checkboxes before adding a block.
+- A checked acceptance/gate box must carry linked evidence in the issue, PR body, or PR phase comment
+  (command output, run URL, CI job, or reviewer/evaluator comment). The automation catches unchecked
+  boxes; the coordinator/evaluator verifies the evidence link quality before closing.
+
+For the normal evidence-mirroring path, put one fenced `acceptance-evidence` YAML block in the PR
+body or a PR comment for each closing issue. Map each unchecked box by exact text after trimming, or
+use its one-based `box-index` when copying a long box would be unwieldy:
+
+````markdown
+```acceptance-evidence
+issue: 1170
+entries:
+  - box: "Exit code is non-zero only when a current failure exists"
+    evidence: "check-close-gate_test.ts fixture; report.ok gate"
+  - box-index: 2
+    evidence: "CI run URL"
+```
+````
+
+The explicit fields make punctuation—including em dashes in either the box or evidence—ordinary
+data. During one transition release the mirror still reads the legacy exact
+`## Acceptance evidence` checked-list format and emits a deprecation warning naming the fenced
+format. New or edited evidence must use the fenced format.
+
+An acceptance box containing the case-insensitive marker `[post-merge]` is visibly excluded from
+the merge gate. Use this only for facts that cannot exist until after merge, such as verifying the
+published artifact. Verify it in a follow-up issue/PR comment and tick the issue box after merge;
+do not drop the PR's closing keyword merely to escape a structurally impossible pre-merge check.
+
+When the PR carries `status:ready-merge`, CI runs
+`.llm/tools/validation/mirror-acceptance-evidence.ts` before the close-gate. The mirror validates the
+complete mapping before it checks matched issue boxes and posts an issue provenance comment linking
+the PR. Unknown, duplicate, mismatched, or missing entries fail without mutation, naming the issue,
+box, comparison, and exact repair. The mirror fetches the current issue immediately before PATCH,
+checks the resulting body hash, retries once after a mid-air edit, and deduplicates its provenance
+comment by a stable marker. Use `--dry-run` to validate a real PR safely. Issues mentioned without a
+closing keyword (including epics/umbrellas referenced with `Part of`) are never mutated.
+
+The mirror and checker fetch the PR, its labels/body/head, comments, and every closing issue live
+through the API at execution time. Workflow event payloads supply only repository and PR
+identifiers: a job re-run retains its original event snapshot, but because every read is live, a
+re-run after labeling works. `openhands-phase-eval.yml` listens to `labeled`, but `ci.yml` — which
+runs the acceptance mirror and close-gate — does not. After applying `status:ready-merge`, re-run the
+existing CI workflow with `gh run rerun <run-id>` so those jobs read the live labels. Do not push
+solely to refresh them: a push moves the head and invalidates an existing IMPL-EVAL verdict. Every
+pretty/JSON verdict prints `headSha`, `evaluatedAt`, and per-issue `number`, `updatedAt`, and
+`bodySha256`, so reviewers can mechanically detect a verdict evaluated against an older issue body.
+
+### Close-gate operator playbook (read before touching a red close-gate)
+
+1. **Pre-flight before labeling.** Validate the evidence mapping locally — this catches every
+   mapping error without burning a CI round trip:
+   `GH_TOKEN=$(gh auth token) deno run --allow-env --allow-net .llm/tools/validation/mirror-acceptance-evidence.ts --repo <owner/name> --pr <n> --dry-run --pretty`
+2. **Red close-gate? Establish currency first.** Run
+   `deno task agentic:pr-checks -- --repo <owner/name> --pr <n> --pretty` before any forensic
+   digging. A red whose classification is `superseded`/`stale-post-merge`/`cancelled` is not a
+   current failure — do not chase it; let the queued current run land or trigger one. Only a
+   `current-fail` close-gate is worth reading.
+3. **Read the verdict's provenance.** Every gate/mirror output prints `headSha`, `evaluatedAt`,
+   and per-issue `updatedAt` + `bodySha256`. If the snapshot predates your latest issue/body edit,
+   the verdict is stale by construction — refresh the run instead of re-deriving the mapping.
+4. **Closing keywords are the gate's only trigger source today.** `Refs #N` / `Part of #N` are
+   never gated or mutated. Beware the side door: a manual **Development-sidebar link** makes
+   GitHub auto-close the issue on merge *without* close-gate ever checking it (#1188 tracks
+   closing that gap). Until #1188 lands, do not manually link issues you are not prepared to see
+   auto-closed unverified — use body references instead.
+5. **Post-merge-only facts** get the `[post-merge]` marker in the issue box (excluded from the
+   merge gate with a notice), never a dropped closing keyword and never a merge-blocking box that
+   only the merge itself can satisfy.
+
+A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
+artifact set can never satisfy an implementation Definition-of-Done. Merge requires
+`status:ready-merge`, and moving to `status:ready-merge` requires all three:
+
+1. **IMPL-EVAL PASS evidence** — the `[PHASE: IMPL-EVAL] [VERDICT: PASS]` phase comment from the
+   evaluator (a separate session).
+2. **DoD checklist complete** — every `- [ ]` in the PR body's Definition-of-Done is checked.
+3. **Referenced-issue acceptance** — for **every** issue closed by the PR body, every close-gated
+   issue checkbox is checked with linked evidence (command, run URL, CI job, or PR comment).
+
+The exemplar failure is **#260**, closed with its `gate:e2e` box unchecked — the false-done this gate
+exists to stop.
+
+Enforcement lives at three points:
+
+1. **Coordinator/evaluator review** — before closing an issue by hand, or before merging a PR whose
+   body carries `Closes #N` / `Fixes #N` / `Resolves #N`, verify every close-gated issue checkbox is
+   checked and has linked evidence.
+2. **CI close-gate** — `.github/workflows/ci.yml` runs the opt-in evidence mirror for
+   `status:ready-merge`, then `.llm/tools/validation/check-close-gate.ts` on pull requests. The
+   checker fails on unchecked PR-body Definition-of-Done/Acceptance boxes and independently fetches
+   each issue closed by the PR body, failing if any close-gated issue checkbox remains unchecked;
+   mirroring is not a bypass.
+3. **PR-template/evaluator checklist** — the PR close-gate checkbox and IMPL-EVAL pass both confirm
+   the same evidence before `status:ready-merge`.
+
+Legitimate exceptions require the explicit `status:close-gate-override` label. This label is an
+auditable escape hatch, not a normal lifecycle stage: the coordinator must leave a PR comment naming
+the unchecked checkbox, the reason it is safe to close anyway, and the follow-up issue if work
+remains. Do not use the override to hide missing implementation or missing evidence.
+
+## Epic / sub-issue standard
+
+Program epics use one convention so the board and the run dir agree:
+
+- **Epic issue** — title `Epic: <name>`; labels `type:umbrella` + `epic:<slug>` + the relevant
+  `area:`/`priority:` + a milestone; body = the epic's pillars, a sub-issue checklist, and links.
+  **Never put a closing keyword on an epic** (see the close-gate above) — it closes **by hand** once
+  every child is done.
+- **Sub-issues** — real issues titled `[<epic-slug> S<n>] <slice>`, each carrying `epic:<slug>` (plus
+  its own `area:`/`priority:`/milestone), linked to the epic by `Part of #<epic>` in the body.
+  Exactly **one** PR resolves each sub-issue, and that PR's body carries `Closes #<child>`.
+- GitHub-native sub-issue linkage is **unused repo-wide** today, so it is adopted **opportunistically**
+  as a nice-to-have on top of the `Part of #<epic>` body text — it is not required and carries no
+  migration burden.
+
+## Per-phase structured comments
+
+Each harness phase posts ONE comment so the PR timeline reads as a phase log. Lead with a status
+token line so the (future) label automation can parse it:
+
+```markdown
+**[PHASE: IMPL-EVAL] [VERDICT: CHANGES_REQUESTED]**
+
+<one-line headline>
+
+### Findings
+1. **C1 …** — <what + where + fix>
+...
+
+### Next
+- <action + owner>
+```
+
+Phases & their verdict vocabulary:
+
+- `RESEARCH` → (no verdict; summary only)
+- `PLAN` → summary; gate is a separate `PLAN-EVAL` comment with `APPROVED` / `CHANGES_REQUESTED`.
+- `IMPL` → summary of slices landed.
+- `IMPL-EVAL` → `PASS` / `CHANGES_REQUESTED` (the gate that clears merge).
+- `REVIEW` (augment/Fable) → advisory.
+
+The evaluator must be a **separate session** from the generator (harness rule). Comment, don't edit,
+when acting as evaluator.
+
+## Draft-PR-on-start (harness)
+
+For harnessed work, **opening the feature is opening a DRAFT PR** — in the **same session as the
+first commit**, where the run-dir bootstrap commit (`.llm/runs/<run-id>/`) is the natural first
+commit. There is no "work now, PR later": the draft PR is the reviewable surface from the first
+commit onward, so the whole run reads from mobile without cloning or diffing.
+
+The draft PR body carries these, live from the start (they are the anchors the close-gate and the
+evaluator read):
+
+- an explicit, **checkable Definition-of-Done** (the close-gate reads these boxes);
+- the run-dir path `.llm/runs/<run-id>/`;
+- the slice checklist (`## Slices`);
+- the **live commit list** — the draft PR's own commit list plus per-slice comments are the commit
+  trail (there is no `commits.md`);
+- drift / debt (`## Drift / Debt`).
+
+## Draft ↔ ready
+
+- Open multi-slice work as a **draft** PR; per-commit CI (Phase C tier 1) runs on drafts but is
+  non-blocking.
+- Flip to **ready for review** only when the slice checklist is complete and IMPL-EVAL is expected
+  to pass. Readiness alone never triggers OpenHands. For an explicitly cloud-driven fallback, add
+  `openhands` before the transition; automation then enters `status:impl-eval` and dispatches once
+  unless `impl-eval:skip` is present. Before the transition, select at most one optional
+  `eval:model:qwen` or `eval:model:glm` override. Do not also dispatch a manual `@openhands-agent`
+  run for the same head.
+
+## Label taxonomy (namespaced — Phase D)
+
+Exactly one `status:` at a time; `type:`/`area:`/`ci:` as needed. The single-status rule is what lets
+a board column reflect reality.
+
+- `type:` — `umbrella`, `sub-pr`, `chore`, `feat`, `fix`, `docs`, `refactor`, `perf`, `test`
+- `status:` — `triage` (incoming issues), `research`, `plan`, `plan-eval`, `impl`, `impl-eval`,
+  `augment-review`, `ci-fail`, `ready-merge`, `shipped` (terminal), `close-gate-override`
+- `area:` — `cli`, `fresh`, `fresh-ui`, `plugins`, `auth`, `deps`, `aspire`, `tooling`, `database`,
+  `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
+- `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
+- `ci:` — `skip-e2e`, `skip-scaffold`, `full` (manual overrides for the path-filtered CI);
+  `impl-eval:skip` — attributed escape hatch for an opted-in ready-for-review IMPL-EVAL;
+  `eval:model:qwen`, `eval:model:glm` — mutually exclusive override for the next status-driven
+  OpenHands phase; `docs-eval:skip` is a deprecated compatibility label; `gate:` — `e2e`, `jsr`
+- OpenHands fallback — `openhands` explicitly opts into the cloud runner; PR readiness never
+  implies it.
+- `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
+  `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.
+- `wave:` — scheduling band that drives the **milestone** (see below): `v1`, `v1-min`, `defer`.
+- flags — `rfc` (an RFC tracking issue/PR; see `rfcs/README.md`), `breaking`, `good first issue`,
+  `help wanted`
+
+The machine-readable label set (names + colors + descriptions) is mirrored in
+[`.github/labels.yml`](../../../.github/labels.yml) for a future label-sync workflow; keep the two in
+sync. Add labels there first — never delete an existing label (it strips the label off live issues).
+
+**Every open issue and PR carries at least one `type:` and one `area:` label, and every open issue
+carries a milestone.** New issues land with `status:triage` (the issue forms apply it automatically)
+until triaged.
+
+Source of truth stays the harness run artifacts under `.llm/runs/`. Labels + Projects v2 are a
+**view and a trigger**, not the record. When you advance a phase, move the `status:` label in the
+same action you post the phase comment, so the board never lags the timeline.
+
+### Stage-label lifecycle
+
+The `status:` labels are a **lifecycle**, not free-form tags — a harness PR walks exactly one path,
+moving the label in the **same action** as each phase comment:
+
+`status:research → status:plan → status:plan-eval → status:impl → status:impl-eval →
+status:augment-review` (optional advisory) `→ status:ready-merge`
+
+Exactly one `status:` at every point in the open lifecycle. On a completed close, atomically remove
+the phase label and apply terminal `status:shipped`; do this for issues closed by a merged PR and for
+completed issues closed by hand. A not-planned/wontfix close is the sole exception: remove the phase
+label and leave the closed item with no `status:` label, because it did not ship. Reopening an item
+requires restoring exactly one appropriate non-terminal phase label. Enforcement exists because a
+practice audit found ~50% non-compliance: recent merged PRs shipped with **zero** labels or with
+`status:` frozen mid-lifecycle (merged still at `status:plan`). The close-gate keys off
+`status:ready-merge`, so a missing or frozen `status:` before merge is a merge hazard, not a cosmetic
+lapse.
+
+`status:close-gate-override` is outside the normal lifecycle and must be used only for the audited
+exception path described in the close-gate section.
+
+> Phase D (the Action that enforces single-status, syncs label→Project column, and fires the right
+> workflow per status) is deferred to the repo-process-automation umbrella. Until it lands, apply
+> labels manually per this taxonomy so the future automation has clean data.
+
+## Milestones (release mapping)
+
+Assign every open issue and PR to the explicit release that owns it: `0.0.2` through `0.0.9`, or
+`Backlog / Triage` when it is accepted but unscheduled. The `wave:*` labels are scheduling bands and
+may span several releases; they do not determine a milestone. Epics and umbrellas use the cut in
+which their coordinated scope is expected to complete. Keep milestone scope in sync with the live
+roadmap and issue board rather than inferring it from a wave label.
+
+## Issue and PR templates
+
+Contributors and agents file through the GitHub-native forms — do not hand-author raw issues when a
+form fits:
+
+- Issue forms live in [`.github/ISSUE_TEMPLATE/`](../../../.github/ISSUE_TEMPLATE/): `bug_report`,
+  `feature_request`, `rfc_proposal`, `documentation`, plus `config.yml` (contact links). They
+  auto-apply the incoming labels (`bug`/`enhancement`/`rfc`/`documentation` + `status:triage`).
+- The PR body follows [`.github/pull_request_template.md`](../../../.github/pull_request_template.md),
+  which is the PR body template above plus the closing-keyword `## Scope` convention.
+- Substantial/breaking changes go through the RFC process in
+  [`rfcs/README.md`](../../../rfcs/README.md) before implementation.
+
+This skill is the single canonical reference for NetScript's GitHub process — label taxonomy,
+milestones, closing-keyword rule, templates, and RFC entry point. `CONTRIBUTING.md` is the
+human-facing mirror; `.github/labels.yml` is the machine-readable label set.
+
+## Path-filter awareness (Phase C)
+
+When opening a docs-only PR, proactively apply `ci:skip-e2e`. Also apply `ci:skip-scaffold` when the
+change does not need the scaffold-static gate. These labels make the intended cheap lane explicit
+even when path classification would auto-skip the jobs. Apply `ci:full` instead when a docs-only PR
+must exercise the full CI surface; it is the precedence-winning escape hatch. Don't fight the
+filter by editing workflows per PR.
+
+
+## .agents/skills/deno/SKILL.md
+
+Original-byte SHA256:258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9
+
+---
+name: deno
+description: "Diagnostic instrument for the Deno runtime and toolchain. Reach for it the moment something is wrong and you do not know why. USE FOR: a process that exits silently or hangs, a dev server that 'died', type errors the editor does not show (or shows and the CLI does not), 'Import X not a dependency', unresolved/stale modules, permission denials, leaking or hanging tests, lockfile and dependency-age failures, reading a package's API. DO NOT USE FOR: Fresh/Preact/islands/Tailwind authoring (follow the project's Fresh documentation and conventions); NetScript release/dependency policy (follow the repository's checked-in release and dependency tooling). INVOKES: deno check, deno info, deno task, deno test, deno lint, deno fmt, deno doc, deno coverage, deno bench, deno clean, deno add/install/outdated/why, bash. Verified on Deno 2.9.3 — re-verify flags on other versions."
+---
+
+# Deno Toolchain Diagnostics
+
+**The runtime will tell you what is wrong. Ask it.** Every symptom below has a command that answers
+it in seconds. Guessing, re-running, and re-reading source is what burns hours.
+
+Everything here was executed on **Deno 2.9.3** (`deno --version`). Behaviour marked _(2.9)_ is
+version-sensitive — re-check with `deno <cmd> --help` before trusting it on another release.
+
+## The exit-code trap — read this first
+
+**A pipeline reports the _last_ stage's status.** Verified: `deno check main.ts` exits 1; but
+
+```bash
+deno check main.ts | tail -1   # -> prints "error: Type checking failed."  and exits 0
+```
+
+This is true whether you pipe on the command line **or bake the pipe into a `deno.json` task** — a
+task defined as `"check": "deno check main.ts | tail -1"` reports exit 0 while type checking fails.
+
+Fixes, in order of preference: **do not pipe**; or `set -o pipefail`; or read `${PIPESTATUS[0]}`.
+
+Three more sources of a lying exit 0, all verified:
+
+| Command                                         | Silent success                                            | Why                                                                                                                                           |
+| ----------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deno check <path excluded by deno.json>`       | prints `Warning No matching files found.` and **exits 0** | `deno lint` / `deno fmt --check` / `deno test` instead print `error: No target files found.` and exit **1**. `deno check` is the odd one out. |
+| `deno run file.ts` on a file with type errors   | runs and exits 0                                          | `deno run` does **not** type-check. Use `deno check`, or `deno run --check`.                                                                  |
+| `deno info file.ts` with an unresolvable import | prints `(resolve error)` and **exits 0**                  | Read the tree, not the code.                                                                                                                  |
+
+**Rule: verify the artefact, never the exit code.** Did the file appear, did the port open, did the
+type error text vanish. Generators, installers and builds all exit 0 while producing nothing.
+
+In an initialized NetScript project, use
+`deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <path> --pretty`. It
+enumerates explicit inputs, reports `selection.filesSelected`, and fails when selection is empty,
+closing the excluded-file exit-0 trap.
+
+## CLI command reference
+
+| Task                                                       | Command                                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| Type-check the whole project (honours `include`/`exclude`) | `deno check`                                                       |
+| Type-check one file + its graph                            | `deno check path/to/file.ts`                                       |
+| Type-check a file the config excludes                      | `deno check --no-config path/to/file.ts`                           |
+| Also type-check npm/remote deps                            | `deno check --all <file>`                                          |
+| Show the resolved module graph                             | `deno info <file-or-specifier>`                                    |
+| Machine-readable graph + on-disk paths                     | `deno info <specifier> --json`                                     |
+| Show `DENO_DIR` and every cache location                   | `deno info` (no args)                                              |
+| Who pulls in a package                                     | `deno why <pkg>`                                                   |
+| List tasks                                                 | `deno task` (no args)                                              |
+| Lint                                                       | `deno lint` / `--compact` / `--json` / `--rules`                   |
+| Format check (diff + exit 1)                               | `deno fmt --check`                                                 |
+| Run tests                                                  | `deno test [--filter <s>] [--fail-fast[=N]] [--reporter=dot]`      |
+| Tests touching a file / changed files                      | `deno test --related=<file>` / `deno test --changed`               |
+| Catch leaks _(2.9: opt-in)_                                | `deno test --sanitize-ops --sanitize-resources [--trace-leaks]`    |
+| Coverage                                                   | `deno test --coverage=cov` then `deno coverage cov --detailed`     |
+| Benchmarks                                                 | `deno bench [--filter <s>] [--json]`                               |
+| Public API of a module                                     | `deno doc <specifier>` / `--filter <Symbol>` / `--lint <files...>` |
+| Re-fetch one dependency                                    | `deno check --reload=npm:<pkg> <file>`                             |
+| See what a cache wipe would cost                           | `deno clean --dry-run`                                             |
+| Debugger                                                   | `deno run --inspect-brk <file>` / `--inspect-wait`                 |
+| Op-level trace                                             | `deno run --trace-ops=<op,op> <file>`                              |
+| Verbose runtime log                                        | `deno run -L debug <file>`                                         |
+
+**Always prefix `NO_COLOR=1`** when you will read or grep the output. Deno emits ANSI escapes even
+when stdout is redirected to a file — verified with `od -c` on `deno doc > file`.
+
+## Key workflows
+
+### Debugging issues
+
+Match the symptom, run the command, read the named field.
+
+**"The process exits with no output" / "the dev server died silently."**
+
+1. Stop backgrounding it. Run it in the foreground and keep stderr:
+   `deno task dev > /tmp/dev.log 2>&1; echo "exit=$?"` — never `| tee`, that eats the exit code.
+2. Read the exit code. `0` = nothing kept the event loop alive (an aborted `AbortController`, a
+   server that never listened). `1` = uncaught error, and the text is on **stderr**. `124` = your
+   own `timeout`. `137` = SIGKILL / OOM.
+3. Port conflicts look like
+   `error: Uncaught (in promise) AddrInUse: Address already in use
+   (os error 98)` — stderr only.
+   If you discarded stderr you saw "silent".
+4. Still opaque: `deno run -L debug <entry>`. It logs every module load, V8 code-cache hit, and ends
+   with `received module evaluate Ok(())` — that line proves the module evaluated, so the problem is
+   after evaluation, not in resolution.
+5. Attach a debugger: `--inspect-brk` (break at first line) or `--inspect-wait` (wait for a client,
+   then run). Both default to `127.0.0.1:9229`.
+
+**"It hangs."** `deno run --trace-ops=op_timer_schedule,op_read <file>` — bare `--trace-ops` is a
+flood, always pass the comma-separated filter. Look for a `Dispatched` with no matching `Completed`.
+
+**"Type errors, but the editor is fine" (or the reverse).** The editor is the LSP: it checks only
+open files. `deno check` follows real module graphs and obeys `deno.json`.
+
+- `deno check` (no args) checks **every** project file — the editor never does this.
+- `deno check file.ts` checks _only that file and what it imports_. A task defined as
+  `deno check main.ts` proves nothing about the other 200 files.
+- If `deno check <file>` says `Warning No matching files found.`, the path is **excluded** in
+  `deno.json`. Re-run with `--no-config` to check it anyway.
+- Errors inside npm/remote packages are skipped by default; `deno check --all <file>` includes them.
+
+**"Type errors from generated code" (Prisma client, codegen output).** Generated directories are
+almost always in `exclude`, so plain `deno check` skips them and `deno check <that file>` exits 0
+silently. Do both of these before touching the generator:
+
+```bash
+NO_COLOR=1 deno check --no-config path/to/generated/client.ts   # the real diagnostics
+NO_COLOR=1 deno info path/to/generated/client.ts                # which .d.ts is actually loaded
+```
+
+**`Import "zod" not a dependency and not in import map`.** This is not a framework bug. It is
+resolution. `deno check` already prints the fix as a hint (`try running deno add npm:zod`). Confirm
+with the graph:
+
+```bash
+NO_COLOR=1 deno info src/thing.ts
+# └── Import "zod" not a dependency ...  (resolve error)     <- unresolved edge
+# └── npm:/zod@4.4.3 (4.35MB)                                <- resolved edge
+```
+
+`deno info <specifier> --json` gives `npmPackages["zod@4.4.3"].localPath` — the exact directory in
+the cache. Read the real `.d.ts` there instead of guessing at the types.
+
+**"A permission error."** Deno names the capability _and_ the exact resource:
+`NotCapable: Requires env access to "HOME", run again with the --allow-env flag`. Grant the
+narrowest thing that satisfies it — `--allow-env=HOME`, `--allow-read=./data`,
+`--allow-net=127.0.0.1:8000`. Scoping is literal: `--allow-net=example.com` does **not** permit
+binding `0.0.0.0:8124`. In non-interactive/agent runs add `--no-prompt` (or `DENO_NO_PROMPT=1`) so a
+missing permission fails immediately instead of blocking on an invisible prompt.
+`DENO_TRACE_PERMISSIONS=1` adds stack traces.
+
+**"A test hangs or leaks."** _(2.9)_ **Ops and resource sanitizers are off by default since 2.8** —
+a test that leaves a timer or an open file passes. Turn them on:
+
+```bash
+deno test --sanitize-ops --sanitize-resources          # or DENO_TEST_SANITIZE_OPS=1
+deno test --sanitize-ops --trace-leaks                 # adds the stack where the leak started
+```
+
+`--trace-leaks` turns `A timer was started in this test, but never completed` into the exact source
+line. Narrow the run with `--filter <substring-or-regex>`, `--fail-fast`, `--related=<file>` (note
+the `=`; a space errors), or `--changed` (needs a git repo). `--no-run` type-checks the test files
+without executing them. `--reporter=dot` for compact output.
+
+**"It worked yesterday" / stale-cache suspicion.**
+
+```bash
+NO_COLOR=1 deno info                       # DENO_DIR + remote / npm / gen cache paths
+deno check --reload=npm:<pkg> <file>       # re-fetch ONE dep; `npm:` alone reloads all npm
+DENO_DIR=/tmp/deno-probe deno check <file> # reproduce against a pristine cache, destroys nothing
+deno clean --dry-run                       # "Removed <dir> (728938 files, 13.88GB)" then aborts
+```
+
+Prefer an isolated `DENO_DIR` over `deno clean`. `deno clean` wipes the whole shared cache;
+`deno clean -e <files>` retains what those files need.
+

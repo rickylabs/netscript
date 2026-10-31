@@ -1,0 +1,81 @@
+{
+  "capturedAt": "2026-10-28T00:37:30.338464+00:00",
+  "session": "ses_e8093ffb9ffe25UDWR0TKRZ7QN",
+  "assistantTotal": 60,
+  "newAssistants": 11,
+  "newModelPairs": [
+    [
+      "openrouter",
+      "meta/muse-spark-1.3"
+    ]
+  ],
+  "newVariants": [
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh",
+    "xhigh"
+  ],
+  "newFinishes": [
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "tool-calls",
+    "length"
+  ],
+  "reportedNewMainCostUsd": 1.76043015,
+  "accountDeltaNotUniqueAttribution": true,
+  "maxGeneratedPlusReasoning": 65746,
+  "gateToolCalls": 0,
+  "inputSealsMatch": 13,
+  "source": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f",
+      "lines": 228
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+      "sha256": "08f862d16b30685864dbdda6866fd1fabeb3d94654e34f40b479d1494a258831",
+      "lines": 263
+    },
+    {
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "sha256": "3fc6e54d2426bf267f9b9e04334b875c5cac76c41334fee36d22649ac6936889",
+      "lines": 488
+    },
+    {
+      "path": "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+      "sha256": "e83c140f5770a509fef2ff80a0494f0fe503a97af0195930479e14c1d1b4f5bb",
+      "lines": 80
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts",
+      "sha256": "4ffadae7cfef4d983f156d21378d1e4c2633b86c9ceb5f15a5ba978790bb870d",
+      "lines": 87
+    }
+  ],
+  "actualFinalIsOnlyProgressNotCompletedVerdict": true,
+  "sourceAcceptance": false,
+  "requiredRepairsStillOpen": [
+    "env:false",
+    "checkpointnonempty",
+    "bodycleanup",
+    "compilerdeadline",
+    "<=480",
+    "owninggates"
+  ],
+  "nextRouteDisposition": "Native Codex subagent primary is available; old app-server/WSL doctor did not disqualify that seam. No further paid Muse continuation authorized."
+}

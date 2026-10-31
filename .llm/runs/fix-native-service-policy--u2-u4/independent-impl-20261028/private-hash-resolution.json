@@ -1,0 +1,77 @@
+{
+  "historyAndSealsUnchanged": true,
+  "rawPayloadsIncluded": false,
+  "meaning": "Original sealed hashes resolve to ignored originals, not to sanitized substitutes.",
+  "entries": [
+    {
+      "attempt": "original",
+      "originalSha256": "d035e5fa384c09354ff1a01b91af1f48d4035e8eb1cd041d932c5783c2a4fbe2",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028/allowance-prepare.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "original",
+      "originalSha256": "547c4a8dcb39489de5a78986e4bb87bc92c5a97f5c198a26c6f65e6d326af154",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028/allowance-launch.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "original",
+      "originalSha256": "e5a2c4737075dcbc0a51455329d47b88ce0b057c7945d47016fadd31a5e28f3e",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028/allowance-after.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "original",
+      "originalSha256": "ef8ba0b677b7b3c461d90349c12d9a4d52cf35ae8232b19a130de8bde6ae2abd",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028/expense-prepare.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "original",
+      "originalSha256": "b8e8f7d7ba76b5cbae3973a88627f5b8fa45745bdad51d9363fa0fae5ce02fa3",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028/expense-launch.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "debt-completion",
+      "originalSha256": "4f746518b5079f294acf4334ff5b37cb654deaf59c8163df1fca951dc8fa1aae",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/allowance-prepare.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "debt-completion",
+      "originalSha256": "a5b33c2b412f7bdedea2f97cb0799e6801008c0af68699350018a2ce028ab629",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/allowance-launch.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "debt-completion",
+      "originalSha256": "5418e0ed652cc50f951677cadea2aca12421423db83f492c94c12b79caa3441e",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/allowance-after.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "debt-completion",
+      "originalSha256": "28539e531fcd7f579c9ecc1249f2919dd88f722a179d0a3282623bc526e8d2fb",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/expense-prepare.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    },
+    {
+      "attempt": "debt-completion",
+      "originalSha256": "4d3c3060c75de12f05ea9028f248ffe7b37c3e2079a2b2ca17042ce9a7a4d1f4",
+      "privateIgnoredResolution": ".llm/tmp/native-service-policy-grok-impl-20261028-debt-completion/expense-launch.json",
+      "byteHashVerified": true,
+      "reason": "operational account/key/window snapshot; excluded from Git checkpoint"
+    }
+  ]
+}

@@ -45,3 +45,68 @@ An initial typecheck caught a test import-map mismatch; using the already record
 ## Slice1 signoff and reconcile
 
 Independent Opus5.5/high IMPL1 PASS precommit (evaluate.md), same session as PLAN2. Reviewer independently ran18 tests with Redis intentionally unset and1ignored; real Redis/negative receipts were inspected, not claimed independently rerun. Signed off for source commit. Reconciled issue2400 ownership and PR2482 comments: no competing leaf or findings. PR2481 shares worker option/composition files but remains open; no dispatcher/execution edits made here. Existing inline test selector already follows package tests’ recorded npm version and leaves lock unchanged; optional import-map consolidation is deferred, not a new dependency. Sleep failure local diagnostic now records its actual sleep error as documented; HTTP category always safe. Adds2 colocated test files to existing folder cardinality warning, no new runtime concern/folder.
+
+## Resume and current-main reconciliation (2026-10-31)
+
+Adopted PR #2482 at 048bad37987ea86ee2fd67494c9ca96a04bcfcf4.
+Main baseline is f89260ac9. The shallow checkout initially lacked a shared ancestor;
+fetching deeper history restored the genuine merge base. Current main was merged,
+retaining retryClock alongside listenerHealthyResetMs in the single options conflict.
+Dispatcher/execution files match main byte-for-byte. No new design or acceptance
+scope; PLAN2 PASS remains the pre-implementation plan authority.
+
+Inspected `deno task agentic:matrix -- --tier feature --json`. Owner override,
+verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate
+session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed,
+blockers only.” The existing evaluator session will be resumed through claude-print.
+The feature matrix retains max2 plan/max5 implementation rounds; this continuation
+uses implementation round2 after the precommit round1 PASS.
+
+Read-only leak check: unrelated/unknown-owner Aspire processes left untouched;
+Docker unavailable. No shared resource mutation. Isolated Redis proof is next.
+
+Resumed positive suite after adapting Lua fault injection:111 PASS,0 FAIL,6 ignored
+(conditional backend/CI-only coverage); both real-store #2400 cases execute. Reset
+negative control now gives explicit budget-exhaustion assertions for both stores,
+and the fake-clock spaced case fails on the cumulative count assertion. Burst
+failures, capped backoff/Infinity, shutdown and credential-safe health remain green.
+Typecheck136 and changed-source lint/fmt9 pass after the typed error addition;
+quality/arch/deps passes again. Workers publish dry-run passes. Full doclint still
+has the identical2 inherited private-type refs, changed /worker0; JSR audit has
+no FAIL, only existing cardinality/banner warnings.
+
+Independent round2 review accepted merge coexistence and required sanitizing the
+newly generated leak report before staging. Raw diagnostics were copied privately;
+the run file now has only a safe ownership summary. The reviewer did not independently
+prove real Redis; its early acceptance of receipts preceded the discovered obsolete
+ACL fault injection. That proof has since been repaired and rerun as described above.
+Round3 reviews the final source repairs and generated freshness before commit.
+
+Generated prose and export carriers refreshed through native tasks. Export generator
+used its supported --allow-dirty preview because the main merge and reviewed source
+repairs were pending. Their actual paths are in supervisor.md. No handcrafted payload.
+Review thread4429709762 answered with the QueueError contract fix and regression proof.
+Protected source files and deno.lock still match main. No labels/milestones changed.
+
+Prose freshness, MCP export freshness, docs:accuracy, and repaired workers publish
+all PASS via allowlisted durable runners. Generated corpus comparison to main changes
+only plugin-workers /runtime and /worker rows; no unrelated package rows changed.
+Review-thread gate PASS:1 answered,0 unanswered. Run privacy scan found no operator
+paths, live host addresses or session identities. All source/proof fixes are ready
+for the retained evaluator's round3 signoff.
+
+## Resumed slice signoff and reconcile
+
+Retained separate Opus5.5/high evaluator round3 PASS, substantive findings in
+evaluate.md. It independently passed the export-corpus check and a structured
+74PASS/0FAIL/17ignored worker-only suite without Redis; real-store proof remains
+supervisor-run receipts, not falsely claimed independent reproduction. Prose
+freshness already passed the supervisor's durable runner. Supervisor signs off
+this merge plus bounded fixes for commit/push. Final exact-head evaluation will
+be posted on PR2482 so no later evidence-only commit invalidates its reviewed SHA.
+
+Reconcile: #2400 still open, PR2482 adopted, review4429709762 answered. Original
+PLAN2 PASS retained, no duplicated PR or issue, no label/milestone changes.
+Coordinator owns shared E2E and merge. After commit, run the corpus regression
+that clones committed HEAD, then final review and READY handoff; any pending CI
+or shared E2E remains explicitly unproven. No new architectural debt.

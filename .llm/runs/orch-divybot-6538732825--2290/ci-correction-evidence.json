@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-31",
+  "baseHead": "4d1ebfb02b4d4f27e0637aa1c57cea44e0ed000f",
+  "generatedDocsDelta": {
+    "before": 202,
+    "after": 202,
+    "changed": [
+      "pages/reference/service/index.md",
+      "pages/tutorials/workspace/05-route-authz/index.md"
+    ]
+  },
+  "results": [
+    {
+      "gate": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "reportSha256": "1d659811cb8dcd80f633dc052acf026e8d565e0787c16b108b940ad1a06bd0d4",
+      "note": "Precommit working-tree receipt; final clean-head assets gate and clone regressions follow."
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "reportSha256": "de6a00d7255eb669a3f19d1657d8f1c66d55ec70a8e69f96f64d9766dc3e469c",
+      "note": "Precommit working-tree receipt; final clean-head assets gate and clone regressions follow."
+    },
+    {
+      "gate": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "reportSha256": "27b98caa643eceefabffe6e4e639c514fdd51126a5125323bd6602291dfa8e4a",
+      "note": "Precommit working-tree receipt; final clean-head assets gate and clone regressions follow."
+    },
+    {
+      "gate": "corpus-tests",
+      "exitCode": 0,
+      "summary": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 11,
+        "uniqueFailures": 0
+      },
+      "reportSha256": "b9aaafc317a3e2b74ee2d7aba713cf1e8096cdcc6d091f42d7f9908934b932b7"
+    },
+    {
+      "gate": "check",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "reportSha256": "e894848fc049a9ebba74c3c707d80ec2f7329ccc6c600a23a76fbf114d8bbf63"
+    },
+    {
+      "gate": "mcp-fmt",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "reportSha256": "52f7cc0baadad61a12976fc4162a4145d7a3cb7b32b5a2efdb7ff4cebeb9ff58"
+    },
+    {
+      "gate": "lint",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "reportSha256": "1f982f80a91d8f123eae7d8bb951586eda431d5db9cf76f3cb37a7fa5318c13d"
+    },
+    {
+      "gate": "publish-dry-run",
+      "member": "packages/cli",
+      "exitCode": 0,
+      "logSha256": "129aa88930292fb4e7f90494a59894eaec2b36e3f0d8301b3247e1cc267df40f"
+    },
+    {
+      "gate": "publish-dry-run",
+      "member": "packages/mcp",
+      "exitCode": 0,
+      "logSha256": "175319e69b8ff6aa2a2f7a3b3eac0725b2fca02595369427509bafdbc1cbf870"
+    }
+  ]
+}

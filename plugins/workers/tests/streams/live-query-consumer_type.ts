@@ -15,7 +15,9 @@ import {
 import { type AuthSession, createAuthStreamDB } from '@netscript/plugin-auth/streams';
 
 function useWorkerExecutions() {
-  const db = createWorkersStreamDB();
+  const db = createWorkersStreamDB({
+    headers: { authorization: () => Promise.resolve('Bearer worker-fixture') },
+  });
   const result = useLiveQuery((q) => q.from({ item: db.collections.execution }));
   assertType<IsExact<Pick<typeof result.data[number], keyof WorkerExecution>, WorkerExecution>>(
     true,

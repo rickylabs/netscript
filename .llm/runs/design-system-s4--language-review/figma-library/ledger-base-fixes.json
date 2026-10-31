@@ -1,0 +1,63 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "base-defect-fixer",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "date": "2026-11-01",
+ "scope": "Recurring cross-category defects, fixed in the base set first, then in the 10 style sets (Tonal, Bloom, Cupertino, Liquid, Fluent, Brutal, Filigrane, Terminal, Pixel, Tactile). Components changed in place; no set deleted or recreated, no property renamed, no variant value changed.",
+ "defects": {
+  "1-button-icon-colour": {
+   "status": "done",
+   "rootCause": [
+    "Base Button / Icon button mains were already correct: every glyph stroke is bound to the variant's label variable (4 sizes x 30 Button variants, 4 x 25 Icon button variants, 0 mismatches), and the binding survives an iconStart/iconEndGlyph property swap, a swapComponent() swap, a variant change and a base -> Lucide-style instance swap (all probed).",
+    "The binding is lost whenever the nested glyph instance is reset: setting iconStartGlyph/iconEndGlyph to the glyph it already shows (e.g. the default plus or arrow-right) or a scripted `instance.mainComponent = X` swap. The nested instance falls back to the glyph main's text/fg (and is renamed 'Icon/<glyph>'). That is how the Utility Dashboard 'Create order' plus vanished on the ink fill; the clones of that screen carried it into every style. A plain swap to a different Lucide glyph (property, swapComponent, UI) keeps the binding.",
+    "Style mains: many style sets kept the base role on the glyph while the label was restyled (e.g. Filigrane primary glyph primary/fg vs label action/primary-fg, Fluent glyph fill fluent/text/primary on the accent fill, Pixel glyph fill text/fg on primary hover).",
+    "Own-glyph styles (Fluent 'fsi' fills, Pixel filled 'glyph' vectors, Terminal TEXT glyphs): a swap between glyph families cannot carry a paint override (different layer names or paint model), so the nested binding cannot survive a Lucide <-> style-glyph swap."
+   ],
+   "method": {
+    "bindOnGlyph": "Lucide-glyph styles: every icon-start / icon-end glyph vector stroke (and fill, where the glyph has one) and the spinner arc bound to the same variable as the variant's label. Rebinds: Tonal 312, Bloom 20, Cupertino 240, Liquid 0, Brutal 220, Filigrane 240, Tactile 64 (spinner arcs only), Fluent 426 (before wrapping).",
+    "iconWrapper": "'Fill follows parent', applied to the base and all 10 styles: each icon-start / icon-end (Button) and glyph (Icon button) instance is moved, with its node id, name, property refs and overrides intact, into '<name>-wrap' (frame, same size and size-variable bindings, visibility bound to the same boolean) > 'icon-mask' (frame, isMask, maskType ALPHA, holds the glyph) + 'icon-tint' (rectangle, fill bound to the variant's label variable; Icon button keeps its glyph's current role). Whatever glyph is swapped in, and even after a reset, the visible colour is the tint. A frame mask holder is required: an instance used directly as the mask loses isMask on swap (probed). Wrapped per style: Button 240 (4 sizes x 30 variants x 2 icons) + Icon button 100 (Terminal 120, incl. the dark-face glyph).",
+    "whyNotBase": "Scripts that address 'icon-start' still get the glyph instance (name and id unchanged); only a new parent frame was added. Visibility is bound on both the wrapper and the glyph.",
+    "iconButtons": "Not affected by the swap defect in the Lucide styles (glyph binding survives swaps). Tonal and Liquid Icon button ghost glyphs differ from the Button label by design (Tonal text/muted, Liquid text/fg); an automatic rebind there was reverted (16 nodes).",
+    "screens": "Screens · Archetypes: Button / Icon button glyphs whose colour no longer matched the role their main defines were re-bound per instance: Utility 6 (Create order plus, light + dark), Tonal 96, Tactile 86, Cupertino 32, Brutal 12, Filigrane 66, Liquid 12, Bloom 40; Fluent, Pixel, Terminal need none (wrapper).",
+    "glyphOverrides": "Base and Lucide-glyph styles keep the glyph-level binding as well (stroke bound to the label variable). Fluent, Pixel and Terminal glyph paint overrides were cleared (resetOverrides, then name/size/constraints restored) so a swapped glyph from another family keeps its natural shape under the mask (a carried fill had turned Lucide outlines into blobs)."
+   },
+   "verification": {
+    "glyphSwaps": "Per style, temp instances of <Style>/Button / md primary, secondary, ghost, destructive with iconStart + iconEnd on, glyph swapped to Icon/check, Icon/search, Icon/trash: icon colour variable == label variable 24/24 in Tonal, Bloom, Cupertino, Liquid, Brutal, Filigrane, Tactile; base->style swap of a glyph-swapped base instance keeps the style's label role (4/4 each).",
+    "wrappedStyles": "Pixel 48/48, Fluent 48/48, Terminal 32/32: tint == label after swaps to 3 Lucide glyphs plus the style's own check glyph, rendered in the style's Light and Dark panel modes (inline renders checked: icons visible on every fill).",
+    "probes": "Temp nodes only, all removed.",
+    "defaultAndSetterPaths": "Base Button / md after wrapping: 48/48 (light + dark) with glyph swaps to check/search/trash, iconEndGlyph set to its default, and a `mainComponent =` setter swap; all icons render in the label colour (inline render). Every other style: 24/24 Button md checks (primary, secondary, ghost, destructive x 3 glyphs x 2 icons, end glyph set to its default); renders checked for Utility, Brutal, Cupertino, Fluent, Pixel, Terminal in Light and Dark.",
+    "iconButtons": "Base Icon button md primary/ghost/destructive: tint matches the main after setting the glyph to its default and to search (6/6)."
+   },
+   "notes": [
+    "Fluent and Pixel glyphs lose the 1px stroke the clone had carried onto them (the glyph renders at its true weight now).",
+    "Terminal: Lucide glyphs swapped into a Terminal button are squeezed into the 9x24 text cell (pre-existing); the Terminal primary dark-face overlay has no icon slots, so icons are hidden while it shows (pre-existing).",
+    "Spinner arcs were rebound with the label too (same defect class); Tactile secondary/outline spinners move from tactile/text/accent to tactile/text/strong."
+   ]
+  },
+  "2-card-body-min-height": {
+   "status": "done",
+   "setsTouched": {
+    "base": "Card 409:951 (Data display)",
+    "styles": "<Style>/Card on each theme page, all 10"
+   },
+   "method": "The body slot instance ('content' inside 'body') carried minHeight 96 (md) / 72 (sm) in all 16 variants; a sublayer min height cannot be overridden on an instance, so a short swapped body left an empty band. minHeight removed (null) on the 16 base variants and the 16 variants of each style set; the slot now hugs its content. No other minHeight existed in any Card set.",
+   "verification": "Instance of Card default/md/rest (base: also sm and rule) with the body swapped to a Badge: body 18 px (Tonal 16 px) instead of 96 in base and all 10 styles. Renders: Utility, Brutal, Terminal, Cupertino (light).",
+   "notes": [
+    "The default placeholder slot now shows at its natural ~20 px height in review frames.",
+    "Same pattern still exists outside this scope: Layout Panel body and Detail layout slots keep 'hug, min 96/160' (Layout & blocks); fix there if the empty band shows up."
+   ]
+  },
+  "3-bottom-sheet-width": {
+   "status": "done",
+   "setsTouched": {
+    "base": "Sheet 379:1004 (Overlays)",
+    "styles": "<Style>/Sheet on each theme page, all 10"
+   },
+   "method": "side=top and side=bottom variants (scrim false and true): the root hugged a 'content' frame fixed at 960, so resizing an instance did not reflow. The root's counter axis is now FIXED (960 default) and 'content' is FILL. Left/right sheets unchanged (their width is the sheet width).",
+   "verification": "Bottom sheet instance resized to 390 (and 600 in base): content and footer follow (390); Liquid 366 = its floating inset by design. Renders: Utility, Brutal, Terminal, Cupertino (light).",
+   "notes": [
+    "The Layout builder's FILL override on the mobile Detail layout sheet is now redundant but harmless."
+   ]
+  }
+ }
+}

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `createPrismaSagaCommandRetention` for bounded, cursor-based PostgreSQL outbox/replay cleanup,
+  preserving active saga markers and leases with per-saga terminal-completion windows.
+
 - Publish factory-owned discovery axes and exclusions through `./discovery`.
 - Add `KvSagaSchedulerStore` at `./stores` and bind the core `SagaScheduler` to originating instance
   deadlines. Bounded background sweeps preserve open sagas, expire every scoped scheduler outcome,

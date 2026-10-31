@@ -1,6 +1,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals } from 'jsr:@std/assert@^1';
-import { Command } from '@cliffy/command';
+import type { Command } from '@cliffy/command';
 import { composeLocalContributorCommandTree } from './local-contributor-command-tree.ts';
 
 describe('local contributor CLI composition', () => {
@@ -26,10 +26,19 @@ describe('local contributor CLI composition', () => {
       'plugin',
       'service',
       'tokens',
+      'ui:build',
       'ui:add',
+      'ui:apply',
       'ui:init',
       'ui:list',
       'ui:update',
+      'ui:view',
+      'ui:search',
+      'ui:docs',
+      'ui:info',
+      'ui:registry',
+      'ui:preset',
+      'ui:migrate',
       'ui:remove',
     ]);
   });

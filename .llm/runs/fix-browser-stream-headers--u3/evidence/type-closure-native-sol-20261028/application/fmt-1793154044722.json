@@ -1,0 +1,25 @@
+{
+  "selected": "fmt",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-fmt.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:44.725Z",
+  "ended": "2026-10-28T02:20:44.998Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722"
+}

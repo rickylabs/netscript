@@ -50,18 +50,25 @@ export function DesktopDialog({
   return (
     <section
       class={classes('ns-desktop-dialog', className)}
-      data-part='desktop-dialog'
+      data-scope='desktop-dialog'
+      data-part='root'
       data-state={disabled ? 'disabled' : 'ready'}
     >
-      <div class='ns-desktop-dialog__copy' data-part='copy'>
+      <div class='ns-desktop-dialog__copy' data-scope='desktop-dialog' data-part='copy'>
         <strong>Native dialogs</strong>
         <span>{message}</span>
       </div>
-      <div class='ns-desktop-dialog__actions' data-part='actions' role='group'>
+      <div
+        class='ns-desktop-dialog__actions'
+        data-scope='desktop-dialog'
+        data-part='actions'
+        role='group'
+      >
         {DIALOG_KINDS.map((kind) => (
           <button
             type='button'
             class='ns-desktop-dialog__action'
+            data-scope='desktop-dialog'
             data-dialog-kind={kind}
             data-part='action'
             disabled={disabled}

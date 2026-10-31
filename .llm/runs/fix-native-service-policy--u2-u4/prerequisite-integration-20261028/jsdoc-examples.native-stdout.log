@@ -1,0 +1,3 @@
+jsdoc examples: PASS members=35 files=2317 examples=472 candidates=471 checked=471 exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0
+enforcedFailureCensus={"badSpecifier":0,"typeError":0,"unfenced":0,"malformed":0,"unboundName":0}
+typeErrorExamples=.llm/tmp/native-service-prerequisite-integration-20261028/jsdoc-type-errors.md

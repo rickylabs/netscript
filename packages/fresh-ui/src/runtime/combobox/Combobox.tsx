@@ -46,7 +46,9 @@ function ComboboxItem({ children, value, ...props }: ComboboxItemProps): VNode {
 }
 
 function ComboboxEmpty({ children, ...props }: ComboboxEmptyProps): VNode {
-  return <div data-part='empty' {...props}>{children as ComponentChildren}</div>;
+  return (
+    <div data-part='empty' data-scope='combobox' {...props}>{children as ComponentChildren}</div>
+  );
 }
 
 export type ComboboxNamespace = Readonly<{

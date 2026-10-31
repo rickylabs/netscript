@@ -75,6 +75,9 @@ export interface MessageContext {
    * @param options - Requeue and dead-letter metadata options.
    */
   nack(options?: NackOptions): Promise<void>;
+
+  /** Extend a live claim from now; false means ownership expired or was replaced. */
+  extendVisibility?(milliseconds?: number): Promise<boolean>;
 }
 
 /**
@@ -203,6 +206,12 @@ export interface ListenOptions {
    * Provider-specific behavior.
    */
   visibilityTimeout?: number;
+
+  /** Redis delivery limit, including the first delivery; defaults to 5. */
+  maxDeliveries?: number;
+
+  /** Redis grace after lease expiry before recovery, in milliseconds; defaults to 1000. */
+  recoveryGrace?: number;
 
   /**
    * Maximum number of messages to prefetch.

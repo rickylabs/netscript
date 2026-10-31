@@ -1,0 +1,803 @@
+﻿diff --git a/packages/plugin/tests/service/create-plugin-service-auth_test.ts b/packages/plugin/tests/service/create-plugin-service-auth_test.ts
+index 56c245695..2fe007d6b 100644
+--- a/packages/plugin/tests/service/create-plugin-service-auth_test.ts
++++ b/packages/plugin/tests/service/create-plugin-service-auth_test.ts
+@@ -120,7 +120,7 @@ Deno.test('plugin factory guards REST, RPC and raw routes independently of confi
+   }
+ });
+ 
+-Deno.test('plugin factory preserves native health routes and anonymous-prefix replacement', async () => {
++Deno.test('plugin factory applies anonymous-prefix replacement to native health routes', async () => {
+   const app = createPluginService(router, {
+     ...config(),
+     auth: { authn: { authenticator, protect: ['/'], allowAnonymous: ['/api/openapi.json'] } },
+@@ -130,7 +130,7 @@ Deno.test('plugin factory preserves native health routes and anonymous-prefix re
+   assertEquals(spec.status, 200);
+   await spec.arrayBuffer();
+   const health = await app.request('/health');
+-  assertEquals(health.status, 200);
++  assertEquals(health.status, 401);
+   await health.arrayBuffer();
+   const privateHealth = await app.request('/health/private');
+   assertEquals(privateHealth.status, 401);
+diff --git a/packages/service/CHANGELOG.md b/packages/service/CHANGELOG.md
+index ff4081a8d..673eea907 100644
+--- a/packages/service/CHANGELOG.md
++++ b/packages/service/CHANGELOG.md
+@@ -2,6 +2,15 @@
+ 
+ ## Unreleased
+ 
++- **Added:** `AnonymousRequestMatch` and `AnonymousRule` support exact method/path entries in
++  `allowAnonymous`, exported from the root and `./auth`. Legacy string prefixes and omitted/empty
++  defaults remain; GET and HEAD need separate entries. Invalid exact entries fail before listen.
++- **Changed (breaking impact):** Health routes now install after auth. Custom nonempty anonymous
++  lists excluding `/health` previously bypassed auth for health GET/HEAD (200); those requests now
++  return 401 under a rejecting authenticator. Add `'/health'` to preserve the prefix capability, or
++  list GET and HEAD for `/health`, `/health/live` and `/health/ready` explicitly. Default and empty
++  lists keep public health. Failed auth construction remains failed on repeated build/serve.
++
+ - **Fixed:** Under `withCors()`, every response (RPC, OpenAPI, raw routes, proxied upstreams, health
+   and errors) now carries exactly the native service CORS decision: all six access-control headers,
+   present or absent, with the union of existing `Vary` tokens preserved. Handler, upstream and
+diff --git a/packages/service/README.md b/packages/service/README.md
+index 6428565eb..331ff24c3 100644
+--- a/packages/service/README.md
++++ b/packages/service/README.md
+@@ -120,6 +120,46 @@ only scaffold-owned opt-outs are reconciled by service add or plugin installatio
+ leaves authored inputs unchanged. Public examples below are demonstrations; declare contract access
+ before using them for private operations.
+ 
++### Exact anonymous requests
++
++`allowAnonymous` accepts exact method/path objects alongside legacy string prefixes. An exact `GET`
++entry does not admit `HEAD`, descendants, encoded spellings or slash/case variants. Use six entries
++to leave the native health probes public while guarding every other request:
++
++```typescript
++import { createService } from '@netscript/service';
++import type { AuthenticatorPort } from '@netscript/service/auth';
++
++declare const authenticator: AuthenticatorPort;
++const app = createService({}, { name: 'guarded-health' })
++  .withAuthn({
++    authenticator,
++    protect: ['/'],
++    allowAnonymous: [
++      { method: 'GET', path: '/health' },
++      { method: 'GET', path: '/health/live' },
++      { method: 'GET', path: '/health/ready' },
++      { method: 'HEAD', path: '/health' },
++      { method: 'HEAD', path: '/health/live' },
++      { method: 'HEAD', path: '/health/ready' },
++    ],
++  })
++  .withHealth()
++  .route('all', '/*', (c) => c.text('guarded'))
++  .build();
++```
++
++Omitted or empty `allowAnonymous` keeps the method-blind `/health` prefix default. A nonempty list
++replaces that default; matched contract access declarations still take precedence. Invalid exact
++entries throw `TypeError` when middleware is constructed, before requests or a listener. `OPTIONS`
++is not an exact anonymous method; configure `withCors()` for native preflight handling.
++
++Health is now installed after authentication. A custom nonempty legacy list excluding `/health`
++previously let health GET/HEAD return 200 by registration order; a rejecting authenticator now
++returns 401. Add `'/health'` to retain the prefix capability, or use the six exact entries above.
++Omitted, empty and `['/health']` lists preserve public health. Configure health checks before
++`build()`; health checks snapshot when installed, while readiness checks retain their live array.
++
+ ## CORS migration (breaking in 0.0.8)
+ 
+ Under `withCors()`, the service's native CORS decision is authoritative on every response, including
+diff --git a/packages/service/mod.ts b/packages/service/mod.ts
+index 06e6a179c..835c20ca9 100644
+--- a/packages/service/mod.ts
++++ b/packages/service/mod.ts
+@@ -86,6 +86,8 @@ export {
+ } from './src/primitives/health.ts';
+ 
+ export type {
++  AnonymousRequestMatch,
++  AnonymousRule,
+   AuthnOptions,
+   AuthzOptions,
+   ContractAuthorizerOptions,
+diff --git a/packages/service/src/auth/auth-middleware.ts b/packages/service/src/auth/auth-middleware.ts
+index 153ed5e1b..8dd54a012 100644
+--- a/packages/service/src/auth/auth-middleware.ts
++++ b/packages/service/src/auth/auth-middleware.ts
+@@ -22,7 +22,7 @@
+ 
+ import type { Context, MiddlewareHandler } from 'hono';
+ import { createLogger, type Logger } from '@netscript/logger';
+-import type { AuthnOptions, AuthzOptions } from './options.ts';
++import type { AnonymousRule, AuthnOptions, AuthzOptions } from './options.ts';
+ import type {
+   ProcedurePolicyResolution,
+   ProcedurePolicyResolver,
+@@ -49,7 +49,7 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
+ 
+   return async (c, next) => {
+     const policy = resolvePolicy(options.policyResolver, c);
+-    if (!requiresAuthentication(c.req.path, guard, policy)) {
++    if (!requiresAuthentication(c, guard, policy)) {
+       return await next();
+     }
+ 
+@@ -92,8 +92,8 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
+ export interface AuthzMiddlewareOptions extends AuthzOptions {
+   /** Path prefixes the authz stage guards. Defaults to `["/api"]`. */
+   readonly protect?: readonly string[];
+-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
+-  readonly allowAnonymous?: readonly string[];
++  /** Legacy path prefixes or exact requests left public. Defaults to `["/health"]`. */
++  readonly allowAnonymous?: readonly AnonymousRule[];
+   /** Shared resolver used to recognize matched public procedures before principal lookup. */
+   readonly policyResolver?: ProcedurePolicyResolver;
+ }
+@@ -110,7 +110,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
+       if (isPublicProcedure(policy)) {
+         return await next();
+       }
+-      if (!policy?.matched && !isGuardedPath(c.req.path, guard)) {
++      if (!policy?.matched && !isGuardedRequest(c, guard)) {
+         return await next();
+       }
+ 
+@@ -177,15 +177,20 @@ function rawPathname(c: Context): string {
+   return end < 0 ? url.slice(start) : url.slice(start, start + end);
+ }
+ 
++interface RequestGuard {
++  readonly protect: readonly string[];
++  readonly allowAnonymous: readonly AnonymousRule[];
++}
++
+ function requiresAuthentication(
+-  path: string,
+-  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
++  c: Context,
++  guard: RequestGuard,
+   resolution: ProcedurePolicyResolution | undefined,
+ ): boolean {
+   if (resolution?.matched) {
+     return resolution.policy?.authentication !== 'none';
+   }
+-  return isGuardedPath(path, guard);
++  return isGuardedRequest(c, guard);
+ }
+ 
+ function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): boolean {
+@@ -194,21 +199,46 @@ function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): b
+ 
+ function normalizeGuard(options: {
+   readonly protect?: readonly string[];
+-  readonly allowAnonymous?: readonly string[];
+-}): { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] } {
++  readonly allowAnonymous?: readonly AnonymousRule[];
++}): RequestGuard {
+   return {
+-    protect: options.protect?.length ? options.protect : DEFAULT_PROTECTED_PREFIXES,
+-    allowAnonymous: options.allowAnonymous?.length
+-      ? options.allowAnonymous
+-      : DEFAULT_ANONYMOUS_PREFIXES,
++    protect: [...(options.protect?.length ? options.protect : DEFAULT_PROTECTED_PREFIXES)],
++    allowAnonymous:
++      (options.allowAnonymous?.length ? options.allowAnonymous : DEFAULT_ANONYMOUS_PREFIXES).map(
++        normalizeAnonymousRule,
++      ),
+   };
+ }
+ 
+-function isGuardedPath(
+-  path: string,
+-  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
+-): boolean {
+-  if (guard.allowAnonymous.some((prefix) => matchesPrefix(path, prefix))) {
++function normalizeAnonymousRule(rule: AnonymousRule): AnonymousRule {
++  if (typeof rule === 'string') return rule;
++  const methods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
++  if (!rule || !methods.includes(rule.method)) {
++    throw new TypeError(
++      `[netscript.service.auth] invalid anonymous request: ${rule?.method} ${rule?.path}: unsupported method`,
++    );
++  }
++  const path = rule.path;
++  if (
++    typeof path !== 'string' || !path.startsWith('/') || /[%*:{}?#\\\s]/.test(path) ||
++    path.includes('//') || (path !== '/' && path.endsWith('/'))
++  ) {
++    throw new TypeError(
++      `[netscript.service.auth] invalid anonymous request: ${rule.method} ${path}: invalid exact path`,
++    );
++  }
++  return { method: rule.method, path };
++}
++
++function isGuardedRequest(c: Context, guard: RequestGuard): boolean {
++  const path = c.req.path;
++  if (
++    guard.allowAnonymous.some((rule) =>
++      typeof rule === 'string'
++        ? matchesPrefix(path, rule)
++        : c.req.method === rule.method && rawPathname(c) === rule.path && path === rule.path
++    )
++  ) {
+     return false;
+   }
+   return guard.protect.some((prefix) => matchesPrefix(path, prefix));
+diff --git a/packages/service/src/auth/mod.ts b/packages/service/src/auth/mod.ts
+index 5e09ce952..15a2cd1de 100644
+--- a/packages/service/src/auth/mod.ts
++++ b/packages/service/src/auth/mod.ts
+@@ -34,6 +34,8 @@
+ 
+ export type { ServiceEnv, ServiceVariables } from './hono-context.ts';
+ export type {
++  AnonymousRequestMatch,
++  AnonymousRule,
+   AuthnOptions,
+   AuthzOptions,
+   ContractAuthorizerOptions,
+diff --git a/packages/service/src/auth/options.ts b/packages/service/src/auth/options.ts
+index 05acd5aa0..d42b45f68 100644
+--- a/packages/service/src/auth/options.ts
++++ b/packages/service/src/auth/options.ts
+@@ -20,14 +20,48 @@
+ import type { InternalCallerPredicate } from './contract/contract-policy.ts';
+ import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
+ 
++/**
++ * One anonymous request with an uppercase method and byte-exact absolute path.
++ *
++ * GET does not admit HEAD. Descendants, encoded spellings and slash/case variants are not
++ * admitted; query strings are ignored. OPTIONS is excluded: use `withCors()` for preflight.
++ *
++ * @example
++ * ```ts
++ * import type { AnonymousRequestMatch } from '@netscript/service/auth';
++ * const health: readonly AnonymousRequestMatch[] = [
++ *   { method: 'GET', path: '/health' },
++ *   { method: 'GET', path: '/health/live' },
++ *   { method: 'GET', path: '/health/ready' },
++ *   { method: 'HEAD', path: '/health' },
++ *   { method: 'HEAD', path: '/health/live' },
++ *   { method: 'HEAD', path: '/health/ready' },
++ * ];
++ * ```
++ */
++export interface AnonymousRequestMatch {
++  /** Exact request method; bodyless probes require an explicit HEAD entry. */
++  readonly method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
++  /** Absolute path without encoding, parameters, wildcards, query or fragment. */
++  readonly path: string;
++}
++
++/** A legacy path prefix or one exact anonymous request. */
++export type AnonymousRule = string | AnonymousRequestMatch;
++
+ /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
+ export interface AuthnOptions {
+   /** Authenticator implementation. */
+   readonly authenticator: AuthenticatorPort;
+   /** Path prefixes the auth stage guards. Defaults to `["/api"]`. */
+   readonly protect?: readonly string[];
+-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
+-  readonly allowAnonymous?: readonly string[];
++  /**
++   * Requests left public by both auth stages. Strings are method-blind path prefixes; objects
++   * match one exact method/path. Omitted or empty retains the `/health` prefix default; a
++   * nonempty list replaces it. Invalid objects throw TypeError when middleware is constructed,
++   * before requests or listeners. Matched contract access declarations take precedence.
++   */
++  readonly allowAnonymous?: readonly AnonymousRule[];
+ }
+ 
+ /** Authorization middleware options for `withAuthz()` and `defineService({ auth })`. */
+diff --git a/packages/service/src/builder/service-builder-impl.ts b/packages/service/src/builder/service-builder-impl.ts
+index 145cd03c4..e88177bbb 100644
+--- a/packages/service/src/builder/service-builder-impl.ts
++++ b/packages/service/src/builder/service-builder-impl.ts
+@@ -86,6 +86,8 @@ export class ServiceBuilderImpl<
+   private openApiConfigured = false;
+   private docsConfigured = false;
+   private healthConfigured = false;
++  private healthInstalled = false;
++  private healthIncludeDetails = true;
+   private startupHooks: Array<() => Promise<void>> = [];
+   private shutdownHooks: ShutdownHook[] = [];
+   private contextFactory: ContextFactory<TCustom> = () => ({}) as TCustom;
+@@ -418,19 +420,23 @@ export class ServiceBuilderImpl<
+     if (options?.checks) {
+       this.healthChecks.push(...options.checks);
+     }
++    this.healthIncludeDetails = options?.includeDetails ?? true;
++    return this;
++  }
+ 
++  private installHealth(): void {
++    if (!this.healthConfigured || this.healthInstalled) return;
+     this.app.get(
+       '/health',
+       createHealthHandler({
+         checks: this.healthChecks,
+         version: this.config.version,
+-        includeDetails: options?.includeDetails ?? true,
++        includeDetails: this.healthIncludeDetails,
+       }),
+     );
+     this.app.get('/health/live', createLivenessHandler());
+     this.app.get('/health/ready', createReadinessHandler(this.readinessChecks));
+-
+-    return this;
++    this.healthInstalled = true;
+   }
+ 
+   /**
+@@ -503,6 +509,7 @@ export class ServiceBuilderImpl<
+     for (const options of this.corsOptions) assertServiceCorsOptions(options);
+     this.installAuth();
+     this.installBodyLimit();
++    this.installHealth();
+     this.installDeferredRoutes();
+     this.app.notFound(createNotFoundHandler(this.config.name));
+     this.app.onError(createErrorHandler(this.config.name));
+@@ -511,24 +518,21 @@ export class ServiceBuilderImpl<
+ 
+   private installAuth(): void {
+     if (this.authInstalled) return;
+-    this.authInstalled = true;
+     const policyResolver = this.bindContractPolicy();
+-
+-    if (this.authnOptions) {
+-      this.app.use('*', createAuthnMiddleware({ ...this.authnOptions, policyResolver }));
+-    }
+-
+-    if (this.authzOptions) {
+-      this.app.use(
+-        '*',
+-        createAuthzMiddleware({
+-          ...this.authzOptions,
+-          protect: this.authnOptions?.protect,
+-          allowAnonymous: this.authnOptions?.allowAnonymous,
+-          policyResolver,
+-        }),
+-      );
+-    }
++    const authn = this.authnOptions
++      ? createAuthnMiddleware({ ...this.authnOptions, policyResolver })
++      : undefined;
++    const authz = this.authzOptions
++      ? createAuthzMiddleware({
++        ...this.authzOptions,
++        protect: this.authnOptions?.protect,
++        allowAnonymous: this.authnOptions?.allowAnonymous,
++        policyResolver,
++      })
++      : undefined;
++    if (authn) this.app.use('*', authn);
++    if (authz) this.app.use('*', authz);
++    this.authInstalled = true;
+   }
+ 
+   private installBodyLimit(): void {
+diff --git a/packages/service/tests/auth/builder-auth_test.ts b/packages/service/tests/auth/builder-auth_test.ts
+index 0d32e8497..21c64f442 100644
+--- a/packages/service/tests/auth/builder-auth_test.ts
++++ b/packages/service/tests/auth/builder-auth_test.ts
+@@ -2,13 +2,15 @@ import { assertEquals } from '@std/assert';
+ import { implement, os } from '@orpc/server';
+ import { baseContract, SuccessSchema } from '@netscript/contracts';
+ import {
++  type AnonymousRequestMatch,
++  type AnonymousRule,
+   type ContractAuthorizerRawRoute,
+   createContractAuthorizer,
+   createService,
+ } from '../../mod.ts';
+ import { createScopeAuthorizer } from '../../src/auth/scope-authorizer.ts';
+ import { createStaticCredentialAuthenticator } from '../../src/auth/static-credential-authenticator.ts';
+-import type { Principal } from '../../src/auth/types.ts';
++import type { AuthenticatorPort, Principal } from '../../src/auth/types.ts';
+ 
+ const authenticator = createStaticCredentialAuthenticator({
+   credentials: {
+@@ -293,3 +295,139 @@ Deno.test('declared raw route admits a service-identity bearer and enforces decl
+     message: 'authz.missing-role:service',
+   });
+ });
++
++function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++const exactHealth: readonly AnonymousRequestMatch[] = [
++  { method: 'GET', path: '/health' },
++  { method: 'GET', path: '/health/live' },
++  { method: 'GET', path: '/health/ready' },
++  { method: 'HEAD', path: '/health' },
++  { method: 'HEAD', path: '/health/live' },
++  { method: 'HEAD', path: '/health/ready' },
++];
++
++exactTest('builder admits only six explicit health probes and native CORS preflight', async (t) => {
++  let authn = 0;
++  let authz = 0;
++  let raw = 0;
++  let rpc = 0;
++  const router = os.router({
++    ping: os.handler(() => {
++      rpc++;
++      return 'pong';
++    }),
++  });
++  const app = createService(router, { name: 'exact-health' })
++    .withCors({ origin: ['https://allowed.example'] })
++    .withAuthn({
++      authenticator: {
++        authenticate: () => {
++          authn++;
++          return { ok: false, reason: 'guarded' };
++        },
++      },
++      protect: ['/'],
++      allowAnonymous: exactHealth,
++    }).withAuthz({
++      authorizer: {
++        authorize: () => {
++          authz++;
++          return { allow: false, reason: 'guarded' };
++        },
++      },
++    }).withHealth().route('all', '/*', (c) => {
++      raw++;
++      return c.text('raw');
++    }).withRPC().build();
++  for (
++    const path of ['/health', '/health/live', '/health/ready', '/health/ready/x', '/api/rpc/ping']
++  ) {
++    for (const method of ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']) {
++      await t.step(`${method} ${path}`, async () => {
++        authn =
++          authz =
++          raw =
++          rpc =
++            0;
++        const response = await app.request(path, { method });
++        const body = await response.text();
++        const admitted = exactHealth.some((rule) => rule.path === path && rule.method === method);
++        assertEquals([response.status, authn, authz, raw, rpc], [
++          admitted ? 200 : 401,
++          admitted ? 0 : 1,
++          0,
++          0,
++          0,
++        ]);
++        if (method === 'HEAD') assertEquals(body, '');
++      });
++    }
++  }
++  authn =
++    authz =
++    raw =
++    rpc =
++      0;
++  const response = await app.request('/health', {
++    method: 'OPTIONS',
++    headers: { origin: 'https://allowed.example', 'access-control-request-method': 'POST' },
++  });
++  assertEquals(await response.text(), '');
++  assertEquals([response.status, authn, authz, raw, rpc], [204, 0, 0, 0, 0]);
++  assertEquals(response.headers.get('access-control-allow-origin'), 'https://allowed.example');
++});
++
++exactTest('builder snapshots exact rules and preserves authz deny and error shapes', async () => {
++  const principal: Principal = {
++    subject: 'test',
++    scopes: [],
++    roles: [],
++    scheme: 'custom',
++    claims: {},
++  };
++  for (const mode of ['deny', 'throw-closed', 'throw-open']) {
++    let authn = 0;
++    let calls = 0;
++    let handlers = 0;
++    const rules: AnonymousRule[] = [{ method: 'GET', path: '/health' }];
++    const protect = ['/'];
++    const authenticate: AuthenticatorPort['authenticate'] = () => {
++      authn++;
++      return { ok: true, principal };
++    };
++    const authorize = () => {
++      calls++;
++      if (mode !== 'deny') throw new Error('private');
++      return { allow: false, reason: 'denied' };
++    };
++    const app = createService({}, { name: 'auth-snapshots' })
++      .withAuthn({ protect, allowAnonymous: rules, authenticator: { authenticate } })
++      .withAuthz({ denyByDefault: mode !== 'throw-open', authorizer: { authorize } })
++      .route('all', '/*', (c) => {
++        handlers++;
++        return c.text('handled');
++      }).build();
++    rules.push('/');
++    protect.splice(0);
++    const get = await app.request('/health');
++    assertEquals(await get.text(), 'handled');
++    assertEquals([get.status, authn, calls, handlers], [200, 0, 0, 1]);
++    const post = await app.request('/health', { method: 'POST' });
++    const body = await post.text();
++    assertEquals([post.status, authn, calls, handlers], [
++      mode === 'throw-open' ? 200 : 403,
++      1,
++      1,
++      mode === 'throw-open' ? 2 : 1,
++    ]);
++    if (mode !== 'throw-open') {
++      assertEquals(JSON.parse(body), {
++        error: 'FORBIDDEN',
++        message: mode === 'deny' ? 'denied' : 'authz.error',
++      });
++    }
++  }
++});
+diff --git a/packages/service/tests/auth/define-service-auth_test.ts b/packages/service/tests/auth/define-service-auth_test.ts
+index f2e7cab5d..68eb594c8 100644
+--- a/packages/service/tests/auth/define-service-auth_test.ts
++++ b/packages/service/tests/auth/define-service-auth_test.ts
+@@ -217,3 +217,83 @@ Deno.test('defineService guarded policy supports authentication without authoriz
+     await running.stop();
+   }
+ });
++
++function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++exactTest(
++  'defineService passes exact health rules to a real listener without implicit HEAD',
++  async () => {
++    let calls = 0;
++    const running = await defineService({}, {
++      name: 'exact-preset',
++      port: 0,
++      auth: {
++        authn: {
++          protect: ['/'],
++          allowAnonymous: [{ method: 'GET', path: '/health' }],
++          authenticator: {
++            authenticate: () => {
++              calls++;
++              return { ok: false, reason: 'guarded' };
++            },
++          },
++        },
++      },
++    });
++    try {
++      const origin = clientOrigin(running.addr.hostname, running.addr.port);
++      for (const method of ['GET', 'HEAD', 'POST']) {
++        calls = 0;
++        const response = await fetch(`${origin}/health`, { method });
++        const body = await response.text();
++        assertEquals([response.status, calls], method === 'GET' ? [200, 0] : [401, 1]);
++        if (method === 'HEAD') assertEquals(body, '');
++      }
++    } finally {
++      await running.stop();
++    }
++  },
++);
++
++exactTest(
++  'defineService invalid exact rules reject before handlers and listener creation',
++  async () => {
++    let handlers = 0;
++    let listeners = 0;
++    const options: DefineServiceOptions = {
++      name: 'invalid-exact-preset',
++      port: 0,
++      auth: {
++        authn: {
++          authenticator: {
++            authenticate: () => {
++              handlers++;
++              return { ok: false, reason: 'guarded' };
++            },
++          },
++          allowAnonymous: [{ method: 'GET', path: '/health/' }],
++        },
++      },
++      middleware: [async (_c, next) => {
++        handlers++;
++        await next();
++      }],
++    };
++    const descriptor = Object.getOwnPropertyDescriptor(Deno, 'serve');
++    Object.defineProperty(Deno, 'serve', {
++      configurable: true,
++      value: () => {
++        listeners++;
++        throw new Error('listener must not start');
++      },
++    });
++    try {
++      await assertRejects(() => defineService({}, options), TypeError, 'invalid anonymous request');
++      assertEquals([handlers, listeners], [0, 0]);
++    } finally {
++      if (descriptor) Object.defineProperty(Deno, 'serve', descriptor);
++    }
++  },
++);
+diff --git a/packages/service/tests/auth/middleware_test.ts b/packages/service/tests/auth/middleware_test.ts
+index 8b24a4547..d89cd90f4 100644
+--- a/packages/service/tests/auth/middleware_test.ts
++++ b/packages/service/tests/auth/middleware_test.ts
+@@ -1,8 +1,9 @@
+-import { assertEquals, assertRejects } from '@std/assert';
++import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+ import { type Context, Hono } from 'hono';
+ import { createAuthnMiddleware, createAuthzMiddleware } from '../../src/auth/auth-middleware.ts';
+ import type { ProcedurePolicyResolver } from '../../src/auth/contract/contract-policy.ts';
+ import type { AuthenticatorPort, AuthorizerPort, Principal } from '../../src/auth/types.ts';
++import type { AnonymousRule, AuthnOptions } from '../../src/auth/mod.ts';
+ 
+ type AuthTestEnv = {
+   Variables: {
+@@ -324,3 +325,153 @@ Deno.test('authn middleware guards a matched required procedure outside legacy p
+   assertEquals(response.status, 401);
+   assertEquals(authenticatorCalls, 1);
+ });
++
++function exactTest(name: string, fn: Deno.TestDefinition['fn']): void {
++  Deno.test({ name, fn, sanitizeOps: true, sanitizeResources: true, sanitizeExit: true });
++}
++
++exactTest('exact anonymous rules validate in both middleware factories', () => {
++  const invalid = [
++    { method: 'get', path: '/health' },
++    { method: 'OPTIONS', path: '/health' },
++    { method: 'ALL', path: '/health' },
++    ...[
++      'health',
++      '/health/',
++      '//health',
++      '/he%61lth',
++      '/health*',
++      '/health?x',
++      '/health#f',
++      '/health/{id}',
++      '/health :x',
++      '/health\\x',
++      '',
++    ].map((path) => ({ method: 'GET', path })),
++  ];
++  for (const rule of invalid) {
++    const options: AuthnOptions = {
++      authenticator: { authenticate: () => ({ ok: true, principal }) },
++    };
++    Object.defineProperty(options, 'allowAnonymous', { value: [rule] });
++    assertThrows(() => createAuthnMiddleware(options), TypeError, 'invalid anonymous request');
++    const authorizer: AuthorizerPort = { authorize: () => ({ allow: true }) };
++    const authz = { authorizer };
++    Object.defineProperty(authz, 'allowAnonymous', { value: [rule] });
++    assertThrows(() => createAuthzMiddleware(authz), TypeError, 'invalid anonymous request');
++  }
++  for (const factory of [createAuthnMiddleware, createAuthzMiddleware]) {
++    factory({
++      authenticator: { authenticate: () => ({ ok: true, principal }) },
++      authorizer: { authorize: () => ({ allow: true }) },
++      allowAnonymous: [{ method: 'GET', path: '/' }, { method: 'GET', path: '/' }],
++    });
++  }
++});
++
++exactTest(
++  'exact anonymous method/path matrix counts dispatch and keeps contract precedence',
++  async (t) => {
++    type Row = {
++      rules?: readonly AnonymousRule[];
++      method: string;
++      path: string;
++      anonymous: boolean;
++      policy?: 'none' | 'required';
++      throwing?: boolean;
++    };
++    const get: AnonymousRule[] = [{ method: 'GET', path: '/health' }];
++    const rows: Row[] = [];
++    for (const rules of [undefined, [], ['/health'], ['/health/']]) {
++      rows.push({ rules, method: 'POST', path: '/health/anything', anonymous: true });
++      rows.push({ rules, method: 'DELETE', path: '/health%2Fx', anonymous: false });
++    }
++    for (const method of ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']) {
++      rows.push({ rules: get, method, path: '/health', anonymous: method === 'GET' });
++    }
++    for (
++      const path of [
++        '/health?x=1',
++        '/x/../health',
++        '/health/live',
++        '/health/x',
++        '/healthz',
++        '/health/',
++        '//health',
++        '/HEALTH',
++        '/he%61lth',
++        '/health%2Fx',
++        '/health%2F..%2Fx',
++      ]
++    ) {
++      rows.push({
++        rules: get,
++        method: 'GET',
++        path,
++        anonymous: path.includes('?') || path === '/x/../health',
++      });
++    }
++    const head: AnonymousRule[] = [{ method: 'HEAD', path: '/health' }];
++    rows.push(
++      { rules: head, method: 'HEAD', path: '/health', anonymous: true },
++      { rules: head, method: 'GET', path: '/health', anonymous: false },
++      { rules: ['/api/docs', ...get], method: 'POST', path: '/api/docs/anything', anonymous: true },
++      { rules: ['/api/docs', ...get], method: 'POST', path: '/health', anonymous: false },
++      { rules: get, method: 'GET', path: '/api/public', anonymous: true, policy: 'none' },
++      { rules: get, method: 'GET', path: '/health', anonymous: false, policy: 'required' },
++      { rules: get, method: 'POST', path: '/health', anonymous: false, throwing: true },
++    );
++    for (const row of rows) {
++      await t.step(
++        `${row.method} ${row.path} ${JSON.stringify(row.rules)} ${row.policy ?? ''}`,
++        async () => {
++          let authn = 0;
++          let authz = 0;
++          let handler = 0;
++          const app = new Hono<AuthTestEnv>();
++          const policy = row.policy
++            ? { authentication: row.policy, requiredScopes: [], requiredRoles: [] }
++            : undefined;
++          const policyResolver: ProcedurePolicyResolver = {
++            resolve: () => policy ? { matched: true, policy } : { matched: false },
++          };
++          const options = { protect: ['/'], allowAnonymous: row.rules, policyResolver };
++          const authenticator: AuthenticatorPort = {
++            authenticate: () => {
++              authn++;
++              if (row.throwing) throw new Error('synthetic-private-detail');
++              return { ok: false, reason: 'guarded' };
++            },
++          };
++          const authorizer: AuthorizerPort = {
++            authorize: () => {
++              authz++;
++              return { allow: false, reason: 'guarded' };
++            },
++          };
++          app.use('*', createAuthnMiddleware({ ...options, authenticator }));
++          app.use('*', createAuthzMiddleware({ ...options, authorizer }));
++          app.all('/*', (c) => {
++            handler++;
++            return c.text('handled');
++          });
++          const response = await app.request(`http://localhost${row.path}`, { method: row.method });
++          const body = await response.text();
++          assertEquals([response.status, authn, authz, handler], [
++            row.anonymous ? 200 : row.throwing ? 503 : 401,
++            row.anonymous ? 0 : 1,
++            0,
++            row.anonymous ? 1 : 0,
++          ]);
++          if (row.method === 'HEAD') assertEquals(body, '');
++          if (row.throwing) {
++            assertEquals(JSON.parse(body), {
++              error: 'SERVICE_UNAVAILABLE',
++              message: 'Authentication service unavailable',
++            });
++          }
++        },
++      );
++    }
++  },
++);

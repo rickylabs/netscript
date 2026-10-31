@@ -120,7 +120,55 @@ only scaffold-owned opt-outs are reconciled by service add or plugin installatio
 leaves authored inputs unchanged. Public examples below are demonstrations; declare contract access
 before using them for private operations.
 
+### Exact anonymous requests
+
+`allowAnonymous` accepts exact method/path objects alongside legacy string prefixes. An exact `GET`
+entry does not admit `HEAD`, descendants, encoded spellings or slash/case variants. Use six entries
+to leave the native health probes public while guarding every other request:
+
+```typescript
+import { createService } from '@netscript/service';
+import type { AuthenticatorPort } from '@netscript/service/auth';
+
+declare const authenticator: AuthenticatorPort;
+const app = createService({}, { name: 'guarded-health' })
+  .withAuthn({
+    authenticator,
+    protect: ['/'],
+    allowAnonymous: [
+      { method: 'GET', path: '/health' },
+      { method: 'GET', path: '/health/live' },
+      { method: 'GET', path: '/health/ready' },
+      { method: 'HEAD', path: '/health' },
+      { method: 'HEAD', path: '/health/live' },
+      { method: 'HEAD', path: '/health/ready' },
+    ],
+  })
+  .withHealth()
+  .route('all', '/*', (c) => c.text('guarded'))
+  .build();
+```
+
+Omitted or empty `allowAnonymous` keeps the method-blind `/health` prefix default. A nonempty list
+replaces that default; matched contract access declarations still take precedence. Invalid exact
+entries throw `TypeError` when middleware is constructed, before requests or a listener. `OPTIONS`
+is not an exact anonymous method; configure `withCors()` for native preflight handling.
+
+Health is now installed during `build()`, after authentication and body limits.
+Middleware registered with `use()` also runs before health, even when added after `withHealth()`. A custom nonempty legacy list excluding `/health`
+previously let health GET/HEAD return 200 by registration order; a rejecting authenticator now
+returns 401. Add `'/health'` to retain the prefix capability, or use the six exact entries above.
+Omitted, empty and `['/health']` lists preserve public health. Configure health checks before
+`build()`; health checks snapshot when installed, while readiness checks retain their live array.
+
 ## CORS migration (breaking in 0.0.8)
+
+Under `withCors()`, the service's native CORS decision is authoritative on every response, including
+RPC/OpenAPI projections, raw routes, proxied upstreams, health and errors. All six access-control
+headers are restored to the configured decision, including absence; handler, upstream and oRPC
+headers are replaced. Declare `exposeHeaders`, `allowHeaders` and `allowMethods` on `withCors()`.
+`Vary` retains the union of tokens present before and after downstream handling, deduplicated
+case-insensitively (`*` wins). Services that never call `withCors()` are unchanged.
 
 `withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
 omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
@@ -246,7 +294,7 @@ catch boundary.
 This migration is opt-in. Existing unguarded services, generated scaffolds, and services that use
 `createScopeAuthorizer()` by itself keep their current behavior. Fail-closed contract enforcement
 begins only when the application supplies the result of
-`createContractAuthorizer(contract, { fallback? })` to `.withAuthz()`.
+`createContractAuthorizer(contract, { fallback?, rawRoutes?, retiredPaths? })` to `.withAuthz()`.
 
 Contract metadata is authoritative. For a request that matches a contract procedure, a match-aware
 fallback is consulted only when that procedure has no access metadata. If neither the metadata nor a
@@ -285,7 +333,8 @@ const authorizer = createContractAuthorizer(OrdersContractV1, {
 is raised while the contract is traversed, not on the first request.
 
 A raw route added with `.route(method, path, handler)` under the guarded prefix matches no
-procedure, so it is denied with `authz.no-contract-procedure` until it is declared. Declare it with
+procedure, so an authenticated caller receives 404 `procedure_not_found` with message
+`authz.no-contract-procedure` until it is declared. Declare it with
 `rawRoutes`:
 
 ```ts
@@ -304,6 +353,54 @@ bypass. It may add `authorization: { scopes?, roles? }`. Matching is exact: `/ap
 not cover `/api/tools/mcp-admin` or `/api/tools/mcp/nested`. Construction rejects wildcard or
 parameter paths, a non-`'required'` authentication and duplicates. `.build()` rejects a raw path
 that overlaps the REST or RPC projection.
+
+### Unknown and retired procedures
+
+With `createContractAuthorizer()`, an authenticated request under a guarded prefix that matches
+no served procedure returns HTTP 404 with a stable machine-readable `code`. Apps can declare
+removed endpoints through `retiredPaths` to return HTTP 410 instead:
+
+```ts
+import { createContractAuthorizer, PROCEDURE_ERROR_CODES } from '@netscript/service/auth';
+import type { ContractPolicyContract } from '@netscript/service/auth';
+
+declare const OrdersContractV1: ContractPolicyContract;
+
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  retiredPaths: ['/api/v1/orders', '/api/rpc/v1/orders/list', '/stream'],
+});
+const upgradeCode = PROCEDURE_ERROR_CODES.RETIRED; // 'procedure_retired'
+```
+
+| Authenticated request | HTTP status | JSON body |
+| --- | --- | --- |
+| Unknown guarded procedure | 404 | `{ "error": "NOT_FOUND", "message": "authz.no-contract-procedure", "code": "procedure_not_found" }` |
+| Declared retired path | 410 | `{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }` |
+| Existing procedure with insufficient permission | 403 | Existing `{ "error": "FORBIDDEN", "message": "authz.missing-scope:…" }` shape |
+
+Missing or invalid credentials still receive the existing 401 `UNAUTHORIZED` response, with no
+procedure code. Availability is disclosed only after authentication. Retired declarations require
+authentication even outside `protect` and inside `allowAnonymous`; they never bypass authentication.
+Existing public contract procedures remain public. Existing procedures, internal audience guards
+and declared raw routes take precedence over retired declarations, so retirement cannot mask a
+permission check. Fallback authorizers cannot revive missing or retired procedures.
+
+Each declaration is a canonical, case-sensitive, mounted absolute path, matched for every method.
+Query strings are ignored. Trailing slashes, encoded spellings, siblings and descendants do not
+match. Parameters, wildcards, percent encoding, dot segments, repeated separators, backslashes,
+whitespace, query/fragment syntax and duplicates are rejected during construction. Declare REST,
+RPC and alias paths separately. For a parameterized removed route, undeclared concrete paths still
+get 404 under guarded coverage; parameterized retirement is not supported. Undeclared paths outside
+protected coverage retain their existing behavior.
+
+HTTP clients can branch on the JSON `code`: `procedure_retired` is the application's signal to
+show “client too old” or request an upgrade; `procedure_not_found` means no procedure is served at
+that guarded path. These pre-dispatch middleware errors are not contract-defined oRPC errors;
+clients reading raw HTTP responses should inspect the JSON code rather than parse `message`.
+`PROCEDURE_ERROR_CODES` and its derived `ProcedureErrorCode` type are exported from both the package
+root and `@netscript/service/auth`. `AuthzDecision.code` carries the optional typed failure, and
+`ProcedurePolicyResolution.retired` marks a matched retired declaration for the shared auth stages.
+Overlay authorizers never set that marker and retain their existing fallback behavior.
 
 The `defineService()` preset accepts the same ports through its `auth` option. The following legacy
 path-prefix form remains valid and behavior-compatible; new services should prefer contract metadata
@@ -650,8 +747,9 @@ exclude envelope identities, keys, hashes, payloads and correlation IDs.
 ## Anonymous route rate limits
 
 Use the existing middleware seam to reject requests before routing. Selected routes share a
-fixed-window quota per key; the default key is the socket client address. Install this stage before
-immediate health/info routes if those routes should also be limited.
+fixed-window quota per key; the default key is the socket client address. Health routes are
+installed at `build()`, so registered middleware runs before them. Install the limiter before
+`withServiceInfo()` if the immediate service-info route should also be limited.
 
 ```ts
 import { createService } from '@netscript/service';

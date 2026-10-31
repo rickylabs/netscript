@@ -13,6 +13,8 @@ interface LabelProps extends Omit<JSX.LabelHTMLAttributes<HTMLLabelElement>, 'cl
   children: Renderable;
   class?: string;
   required?: boolean;
+  'data-part'?: string;
+  'data-scope'?: string;
   srOnly?: boolean;
 }
 
@@ -29,13 +31,19 @@ export function Label({
   return (
     <label
       {...props}
-      class={cn(
-        srOnly ? 'sr-only' : 'ns-label',
-        required && !srOnly && 'ns-label--required',
-        className,
-      )}
+      class={cn(srOnly ? 'sr-only' : 'ns-label', className)}
+      data-required={(required && !srOnly) ? ('true') : undefined}
+      data-variant='default'
+      data-state='rest'
+      data-part={props['data-part'] ?? 'root'}
+      data-scope={props['data-scope'] ?? 'label'}
     >
-      {children}
+      <span
+        data-part='text'
+        data-scope='label'
+      >
+        {children}
+      </span>
     </label>
   );
 }

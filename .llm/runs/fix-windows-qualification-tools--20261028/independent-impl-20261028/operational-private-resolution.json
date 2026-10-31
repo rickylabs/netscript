@@ -1,0 +1,38 @@
+{
+  "schema": "netscript-private-operational-hash-resolution-v1",
+  "historicalManifest": {
+    "path": "root-copy-audit.json",
+    "sha256": "aee3f1fd722fea7286410edfea138664a3751ed784536485dfc19682891599d2",
+    "unchanged": true
+  },
+  "historicalPreparationSealsUnchanged": true,
+  "resolutionMeaning": "Raw hash bindings resolve to byte-identical ignored local originals; sanitized receipt is not a byte substitute.",
+  "entries": [
+    {
+      "originalSha256": "bab6bad3989b2417bb6b894b86544996a8b70996822218dd495e84af81cb1b4a",
+      "historicalCurrentTreePath": ".llm/runs/fix-windows-qualification-tools--20261028/independent-impl-20261028/allowance-launch.json",
+      "privateIgnoredResolution": ".llm/tmp/operational-evidence-correction-20261028/raw/allowance-launch.json",
+      "originalIgnoredSource": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/allowance-launch.json",
+      "byteEqualityVerified": true,
+      "ignoredAndUntrackedVerified": true
+    },
+    {
+      "originalSha256": "13cb2796853460c8883a4727c719a305627718f0d805f5950fdb4a10e4521a24",
+      "historicalCurrentTreePath": ".llm/runs/fix-windows-qualification-tools--20261028/independent-impl-20261028/allowance-after.json",
+      "privateIgnoredResolution": ".llm/tmp/operational-evidence-correction-20261028/raw/allowance-after.json",
+      "originalIgnoredSource": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/allowance-after.json",
+      "byteEqualityVerified": true,
+      "ignoredAndUntrackedVerified": true
+    },
+    {
+      "originalSha256": "e6d31f68548e8568ade520016db6ac2a47bf0c08700dae14b122e035a4e8863c",
+      "historicalCurrentTreePath": ".llm/runs/fix-windows-qualification-tools--20261028/independent-impl-20261028/expense-launch.json",
+      "privateIgnoredResolution": ".llm/tmp/operational-evidence-correction-20261028/raw/expense-launch.json",
+      "originalIgnoredSource": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/expense-launch.json",
+      "byteEqualityVerified": true,
+      "ignoredAndUntrackedVerified": true
+    }
+  ],
+  "gitHistoryRewritten": false,
+  "rawPayloadsIncluded": false
+}

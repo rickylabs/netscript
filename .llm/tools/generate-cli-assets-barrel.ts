@@ -13,6 +13,7 @@
 
 import { TEMPLATE_MANIFEST } from '../../packages/cli/src/kernel/assets/manifest.ts';
 import { freshUiRegistryManifest } from '../../packages/fresh-ui/registry.manifest.ts';
+import { freshUiRegistryJson } from '../../packages/fresh-ui/src/registry/fresh-ui-registry.ts';
 import { PLUGIN_SKELETON_TEMPLATES } from '../../packages/plugin/src/kernel/assets/template-registry.ts';
 import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './docs/agent-docs-page-carrier.ts';
 import { renderPostgresConnectionTemplate } from './generate-postgres-connection-template.ts';
@@ -178,7 +179,16 @@ ${map.join('\n')}
 async function renderFreshUiRegistryContent(): Promise<string> {
   const paths = [
     ...new Set(
-      freshUiRegistryManifest.items.flatMap((item) => item.files.map((file) => file.source)),
+      [
+        ...freshUiRegistryManifest.items.flatMap((item) => item.files.map((file) => file.source)),
+        // Protocol-only theme skills are repository sources, embedded for published installation.
+        ...freshUiRegistryJson.items.filter((item) => item.type === 'registry:theme')
+          .flatMap((item) =>
+            (item.files ?? [])
+              .filter((file) => file.path.startsWith('docs/design-system/themes/'))
+              .map((file) => `../../${file.path}`)
+          ),
+      ],
     ),
   ].sort((left, right) => left.localeCompare(right));
   const content: Record<string, string> = {};

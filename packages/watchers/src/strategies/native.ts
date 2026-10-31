@@ -11,7 +11,6 @@
  * @module
  */
 
-import { abortable } from '@std/async';
 import type { EventKind, WatchEvent, WatchStrategyHandler } from '../types.ts';
 import { safeStat } from '../fs.ts';
 
@@ -30,6 +29,8 @@ export interface NativeStrategyOptions {
   readonly paths: readonly string[];
   /** Which event kinds to yield. @default ['create'] */
   readonly events?: readonly EventKind[];
+  /** Called after the native watch is open. */
+  readonly onReady?: () => void | Promise<void>;
   /** Abort signal for graceful shutdown. */
   readonly signal?: AbortSignal;
 }
@@ -52,29 +53,36 @@ export class NativeStrategy implements WatchStrategyHandler {
   private readonly paths: readonly string[];
   private readonly allowedEvents: ReadonlySet<EventKind>;
   private readonly signal?: AbortSignal;
+  private readonly onReady?: () => void | Promise<void>;
 
   constructor(options: NativeStrategyOptions) {
     this.paths = options.paths;
     this.allowedEvents = new Set(options.events ?? ['create']);
     this.signal = options.signal;
+    this.onReady = options.onReady;
   }
 
   /** Start watching and yield file events. */
   async *watch(): AsyncIterable<WatchEvent> {
-    const watcher = Deno.watchFs(this.paths as string[], { recursive: true });
+    if (this.signal?.aborted) return;
+    const watcher = Deno.watchFs([...this.paths], { recursive: true });
 
-    const source = this.mapEvents(watcher);
-    const stream = this.signal ? abortable(source, this.signal) : source;
+    const close = () => watcher.close();
+    this.signal?.addEventListener('abort', close, { once: true });
 
     try {
-      for await (const event of stream) {
+      await this.onReady?.();
+      for await (const event of this.mapEvents(watcher)) {
         yield event;
       }
     } catch (error: unknown) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
+      if (this.signal?.aborted) {
         return; // Clean shutdown
       }
       throw error;
+    } finally {
+      this.signal?.removeEventListener('abort', close);
+      watcher.close();
     }
   }
 
@@ -84,6 +92,10 @@ export class NativeStrategy implements WatchStrategyHandler {
   ): AsyncGenerator<WatchEvent> {
     try {
       for await (const fsEvent of watcher) {
+        // Losing a root invalidates its OS watch even if the directory is recreated immediately.
+        if (fsEvent.kind === 'remove' && fsEvent.paths.some((path) => this.paths.includes(path))) {
+          throw new Deno.errors.NotFound('A watched root was removed.');
+        }
         const kind = EVENT_KIND_MAP[fsEvent.kind];
         if (!kind || !this.allowedEvents.has(kind)) continue;
 

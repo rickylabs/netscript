@@ -1,0 +1,46 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T05:47:16.031Z",
+  "finishedAt": "2026-10-28T05:47:16.267Z",
+  "durationMs": 236,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 181,
+    "sha256": "fba5f8da966e07f52daeb97debbd259de55369964d7a79a1f0bc909ab6d7aa4f",
+    "tail": "{\"report\":\".llm/tmp/native-service-prerequisite-integration-20261028/windows-fmt.json\",\"summary\":{\"filesSelected\":5,\"batches\":1,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "gateId": "windows-fmt",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-all",
+    ".llm/tools/run-deno-fmt.ts",
+    "--output",
+    ".llm/tmp/native-service-prerequisite-integration-20261028/windows-fmt.json",
+    "--config",
+    ".llm/tmp/native-service-prerequisite-integration-20261028/fmt-canonical-rules.json",
+    "--file",
+    ".llm/tools/docs/check-exports-drift.ts",
+    "--file",
+    ".llm/tools/docs/check-exports-drift_test.ts",
+    "--file",
+    ".llm/tools/docs/jsdoc-example-compiler.ts",
+    "--file",
+    ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+    "--file",
+    ".llm/tools/docs/jsdoc-example-policy.ts"
+  ],
+  "timeoutMs": 180000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative",
+  "childReport": ".llm/tmp/native-service-prerequisite-integration-20261028/windows-fmt.json"
+}

@@ -231,7 +231,10 @@ export async function copyPluginSchemasToRootDb(
     }
   } else if (await adapters.fs.exists(sourceRoot)) {
     for await (const entry of adapters.fs.walk(sourceRoot)) {
-      if (!entry.isFile || !entry.path.endsWith('.prisma')) continue;
+      if (
+        !entry.isFile ||
+        !(entry.path.endsWith('.prisma') || entry.path.endsWith('.migration.sql'))
+      ) continue;
       results.push(
         await writePluginSchemaFragment(
           projectRoot,
@@ -247,7 +250,10 @@ export async function copyPluginSchemasToRootDb(
     }
   }
 
-  if (results.length === 0 && options.schemaDeclared === true) {
+  if (
+    !results.some((result) => result.sourcePath.endsWith('.prisma')) &&
+    options.schemaDeclared === true
+  ) {
     const searchedPaths = [sourceRoot.replaceAll('\\', '/'), options.packageSearchPath].filter(
       (path): path is string => path !== undefined,
     );

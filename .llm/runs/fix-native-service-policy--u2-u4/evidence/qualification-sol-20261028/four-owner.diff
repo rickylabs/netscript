@@ -1,0 +1,497 @@
+﻿diff --git a/packages/plugin/tests/service/create-plugin-service-auth_test.ts b/packages/plugin/tests/service/create-plugin-service-auth_test.ts
+index 2fe007d6b..7ba9e613b 100644
+--- a/packages/plugin/tests/service/create-plugin-service-auth_test.ts
++++ b/packages/plugin/tests/service/create-plugin-service-auth_test.ts
+@@ -1,4 +1,5 @@
+ import { assertEquals } from '@std/assert';
++import { fromFileUrl } from '@std/path';
+ import { baseContract, SuccessSchema } from '@netscript/contracts';
+ import { implement, os } from '@orpc/server';
+ import {
+@@ -175,7 +176,7 @@ Deno.test('plugin factory reports verifier failure as redacted unavailable', asy
+ 
+ Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript caller boundary', async () => {
+   const moduleUrl = new URL('../../src/service/mod.ts', import.meta.url).href;
+-  const configPath = new URL('../../../../deno.json', import.meta.url).pathname;
++  const configPath = fromFileUrl(new URL('../../../../deno.json', import.meta.url));
+   const source = `
+     import { createPluginService } from ${JSON.stringify(moduleUrl)};
+     for (const auth of [undefined, {}, { public: true }, { public: true, reason: 'test', authn: undefined }]) {
+@@ -187,10 +188,17 @@ Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript ca
+       throw new Error('Malformed policy was accepted');
+     }
+   `;
+-  const result = await new Deno.Command(Deno.execPath(), {
+-    args: ['eval', '--config', configPath, source],
+-    stdout: 'piped',
+-    stderr: 'piped',
+-  }).output();
+-  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
++  const controller = new AbortController();
++  const deadline = setTimeout(() => controller.abort(), 15_000);
++  try {
++    const result = await new Deno.Command(Deno.execPath(), {
++      args: ['eval', '--config', configPath, source],
++      stdout: 'piped',
++      stderr: 'piped',
++      signal: controller.signal,
++    }).output();
++    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
++  } finally {
++    clearTimeout(deadline);
++  }
+ });
+diff --git a/packages/service/src/diagnostics/database-connectivity.ts b/packages/service/src/diagnostics/database-connectivity.ts
+index 666a0bd71..711faa66d 100644
+--- a/packages/service/src/diagnostics/database-connectivity.ts
++++ b/packages/service/src/diagnostics/database-connectivity.ts
+@@ -286,18 +286,20 @@ function resolveDatabaseEndpoint(engineCfg: EngineConfig): { host: string; port:
+ 
+ async function checkTcpPort(host: string, port: number, timeoutMs: number): Promise<boolean> {
+   const resolvedHost = host === LOCALHOST ? LOCALHOST_IPV4 : host;
++  const controller = new AbortController();
++  const timeout = setTimeout(() => controller.abort(new Error('TCP timeout')), timeoutMs);
+ 
+   try {
+-    const conn = await Promise.race([
+-      Deno.connect({ hostname: resolvedHost, port }),
+-      new Promise<never>((_, reject) =>
+-        setTimeout(() => reject(new Error('TCP timeout')), timeoutMs)
+-      ),
+-    ]);
+-    conn.close();
+-    return true;
++    const conn = await Deno.connect({ hostname: resolvedHost, port, signal: controller.signal });
++    try {
++      return !controller.signal.aborted;
++    } finally {
++      conn.close();
++    }
+   } catch {
+     return false;
++  } finally {
++    clearTimeout(timeout);
+   }
+ }
+ 
+diff --git a/packages/service/tests/database-connectivity_test.ts b/packages/service/tests/database-connectivity_test.ts
+index 117fc1857..b33a8b962 100644
+--- a/packages/service/tests/database-connectivity_test.ts
++++ b/packages/service/tests/database-connectivity_test.ts
+@@ -1,5 +1,9 @@
+-import { assertEquals } from '@std/assert';
+-import { resolveProbeEngine } from '../src/diagnostics/database-connectivity.ts';
++import { assert, assertEquals } from '@std/assert';
++import {
++  createDatabaseConnectivityStartupHook,
++  resolveProbeEngine,
++} from '../src/diagnostics/database-connectivity.ts';
++import type { Database } from '../src/types.ts';
+ 
+ // Regression coverage for #175: a service scaffolded with
+ // PrimaryDatabase=sqlite must NOT run (and thus must not log a spurious ERR
+@@ -74,3 +78,216 @@ function restoreEnv(name: string, value: string | undefined): void {
+     Deno.env.set(name, value);
+   }
+ }
++
++async function runProbe(port: number, database: Database): Promise<void> {
++  const environment = {
++    DB_PROVIDER: 'mysql',
++    MYSQLDB_HOST: 'localhost',
++    MYSQLDB_PORT: String(port),
++    MYSQLDB_URI: undefined,
++    ConnectionStrings__mysqldb: undefined,
++  };
++  const previous = Object.keys(environment).map((key) => [key, Deno.env.get(key)] as const);
++  try {
++    for (const [key, value] of Object.entries(environment)) restoreEnv(key, value);
++    await createDatabaseConnectivityStartupHook({ serviceName: 'probe-fixture', database })();
++  } finally {
++    for (const [key, value] of previous) restoreEnv(key, value);
++  }
++}
++
++Deno.test({
++  name: 'database TCP probe closes its native loopback connection before querying',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  async fn() {
++    const listener = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++    let peer: Deno.TcpConn | undefined;
++    const deadline = setTimeout(() => {
++      listener.close();
++      peer?.close();
++    }, 10_000);
++    let queries = 0;
++    const observation = (async () => {
++      peer = await listener.accept();
++      assertEquals(await peer.read(new Uint8Array(1)), null, 'probe must send EOF');
++    })();
++    try {
++      await runProbe(listener.addr.port, {
++        $queryRaw(query) {
++          assertEquals([...query], ['SELECT 1']);
++          queries += 1;
++          return Promise.resolve(1);
++        },
++      });
++      await observation;
++      assertEquals(queries, 1);
++    } finally {
++      clearTimeout(deadline);
++      listener.close();
++      peer?.close();
++      await observation.catch(() => undefined);
++    }
++  },
++});
++
++Deno.test({
++  name: 'database TCP probe retries a native refused endpoint and returns without querying',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  async fn() {
++    const reservation = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++    const port = reservation.addr.port;
++    reservation.close();
++    let queries = 0;
++    const started = performance.now();
++    await runProbe(port, {
++      $queryRaw() {
++        queries += 1;
++        return Promise.resolve(1);
++      },
++    });
++    assertEquals(queries, 0);
++    assert(performance.now() - started >= 4000, 'retain both 2000 ms retry delays');
++    assert(performance.now() - started < 15_000, 'refused endpoint must remain bounded');
++  },
++});
++
++// Supplemental unit scheduling evidence; native success/refusal controls above stay live.
++for (const mode of ['reject', 'throw', 'abort', 'late'] as const) {
++  Deno.test({
++    name: `database TCP probe unit ${mode}: owns abort, settlement and timeout cleanup`,
++    sanitizeOps: true,
++    sanitizeResources: true,
++    sanitizeExit: true,
++    async fn() {
++      const originalConnect = Deno.connect;
++      const originalTimeout = globalThis.setTimeout;
++      const originalClear = globalThis.clearTimeout;
++      const descriptors = [
++        Object.getOwnPropertyDescriptor(Deno, 'connect')!,
++        Object.getOwnPropertyDescriptor(globalThis, 'setTimeout')!,
++        Object.getOwnPropertyDescriptor(globalThis, 'clearTimeout')!,
++      ];
++      const timers = new Map<ReturnType<typeof setTimeout>, number>();
++      const cleared = new Set<ReturnType<typeof setTimeout>>();
++      const active = new Set<ReturnType<typeof setTimeout>>();
++      const signals: Array<AbortSignal | undefined> = [];
++      const events: string[] = [];
++      const connections: Deno.TcpConn[] = [];
++      const peers: Deno.TcpConn[] = [];
++      const pending: Array<() => void> = [];
++      let queries = 0;
++      let timedOut = false;
++      const close = (connection: Deno.TcpConn) => {
++        try {
++          connection.close();
++        } catch (error) {
++          if (!(error instanceof Deno.errors.BadResource)) throw error;
++        }
++      };
++      const deadline = originalTimeout(() => {
++        timedOut = true;
++        for (const connection of [...connections, ...peers]) close(connection);
++      }, 10_000);
++      const listener = mode === 'late'
++        ? Deno.listen({ hostname: '127.0.0.1', port: 0 })
++        : undefined;
++      try {
++        if (listener) {
++          for (let i = 0; i < 3; i++) {
++            const accepted = listener.accept();
++            connections.push(
++              await originalConnect({ hostname: '127.0.0.1', port: listener.addr.port }),
++            );
++            peers.push(await accepted);
++          }
++        }
++        Object.defineProperty(globalThis, 'setTimeout', {
++          configurable: true,
++          writable: true,
++          value(callback: () => void, ms: number) {
++            const timer = originalTimeout(() => {
++              active.delete(timer);
++              callback();
++            }, 0);
++            timers.set(timer, ms);
++            active.add(timer);
++            return timer;
++          },
++        });
++        Object.defineProperty(globalThis, 'clearTimeout', {
++          configurable: true,
++          writable: true,
++          value(timer: ReturnType<typeof setTimeout>) {
++            cleared.add(timer);
++            active.delete(timer);
++            originalClear(timer);
++          },
++        });
++        Object.defineProperty(Deno, 'connect', {
++          configurable: true,
++          writable: true,
++          value(options: Deno.ConnectOptions): Promise<Deno.TcpConn> {
++            const attempt = signals.length;
++            signals.push(options.signal);
++            if (mode === 'throw') throw new Error('unit synchronous connection error');
++            if (mode === 'reject') return Promise.reject(new Error('unit connection refusal'));
++            return new Promise((resolve, reject) => {
++              pending.push(() => reject(new Error('unit cleanup')));
++              options.signal?.addEventListener('abort', () => {
++                events.push(`abort:${attempt}`);
++                queueMicrotask(() => {
++                  events.push(`settled:${attempt}`);
++                  if (mode === 'late') resolve(connections[attempt]);
++                  else reject(options.signal?.reason);
++                });
++              }, { once: true });
++            });
++          },
++        });
++        await runProbe(3306, {
++          $queryRaw() {
++            queries += 1;
++            return Promise.resolve(1);
++          },
++        });
++        assertEquals(signals.length, 3, 'retain three TCP attempts');
++        assert(
++          signals.every((signal) => signal instanceof AbortSignal),
++          'each connect gets a signal',
++        );
++        assertEquals([...timers.values()], [3000, 2000, 3000, 2000, 3000]);
++        for (const [timer, ms] of timers) {
++          if (ms === 3000) assert(cleared.has(timer), 'clear every probe deadline in finally');
++        }
++        assertEquals(active.size, 0);
++        assertEquals(queries, 0, 'failed or timed-out connections never run SELECT 1');
++        if (mode === 'abort' || mode === 'late') {
++          assert(signals.every((signal) => signal?.aborted), 'timeout aborts every connect');
++          assertEquals(events, [
++            'abort:0',
++            'settled:0',
++            'abort:1',
++            'settled:1',
++            'abort:2',
++            'settled:2',
++          ], 'connect settlement precedes hook completion');
++          for (const peer of peers) assertEquals(await peer.read(new Uint8Array(1)), null);
++          assert(!timedOut, 'late connections must close before the unit deadline');
++        }
++      } finally {
++        Object.defineProperty(Deno, 'connect', descriptors[0]);
++        Object.defineProperty(globalThis, 'setTimeout', descriptors[1]);
++        Object.defineProperty(globalThis, 'clearTimeout', descriptors[2]);
++        for (const timer of timers.keys()) originalClear(timer);
++        originalClear(deadline);
++        for (const reject of pending) reject();
++        for (const connection of [...connections, ...peers]) close(connection);
++        listener?.close();
++      }
++    },
++  });
++}
+diff --git a/packages/service/tests/legacy-abort_test.ts b/packages/service/tests/legacy-abort_test.ts
+index 4e0802a72..1edf4c969 100644
+--- a/packages/service/tests/legacy-abort_test.ts
++++ b/packages/service/tests/legacy-abort_test.ts
+@@ -14,8 +14,9 @@
+  */
+ 
+ import { assert, assertStringIncludes } from '@std/assert';
++import { fromFileUrl } from '@std/path';
+ 
+-const FIXTURE = new URL('./_fixtures/legacy-abort-service.ts', import.meta.url).pathname;
++const FIXTURE = fromFileUrl(new URL('./_fixtures/legacy-abort-service.ts', import.meta.url));
+ const DEPRECATION_NEEDLE = 'request.signal aborts on successful responses';
+ 
+ interface SpawnedFixture {
+@@ -23,31 +24,58 @@ interface SpawnedFixture {
+   readonly port: number;
+   readonly stdoutLines: AsyncIterableIterator<string>;
+   readonly stderr: Promise<string>;
++  readonly stdoutAbort: AbortController;
+ }
+ 
+-function lineReader(stream: ReadableStream<Uint8Array>): AsyncIterableIterator<string> {
++function lineReader(
++  stream: ReadableStream<Uint8Array>,
++  signal: AbortSignal,
++): AsyncIterableIterator<string> {
+   const reader = stream.getReader();
+   const decoder = new TextDecoder();
+   let buffer = '';
+   return (async function* () {
+-    for (;;) {
+-      const { value, done } = await reader.read();
+-      if (done) {
+-        buffer += decoder.decode();
+-        if (buffer.trim().length > 0) yield buffer.trim();
+-        return;
++    let cancellation: Promise<void> | undefined;
++    const cancel = () => {
++      cancellation = reader.cancel();
++      void cancellation.catch(() => undefined);
++    };
++    signal.addEventListener('abort', cancel, { once: true });
++    try {
++      for (;;) {
++        const { value, done } = await reader.read();
++        if (done) {
++          buffer += decoder.decode();
++          if (buffer.trim().length > 0) yield buffer.trim();
++          return;
++        }
++        buffer += decoder.decode(value, { stream: true });
++        let index = buffer.indexOf('\n');
++        while (index !== -1) {
++          yield buffer.slice(0, index).trim();
++          buffer = buffer.slice(index + 1);
++          index = buffer.indexOf('\n');
++        }
+       }
+-      buffer += decoder.decode(value, { stream: true });
+-      let index = buffer.indexOf('\n');
+-      while (index !== -1) {
+-        yield buffer.slice(0, index).trim();
+-        buffer = buffer.slice(index + 1);
+-        index = buffer.indexOf('\n');
++    } finally {
++      signal.removeEventListener('abort', cancel);
++      try {
++        await cancellation;
++      } finally {
++        reader.releaseLock();
+       }
+     }
+   })();
+ }
+ 
++function killFixture(child: Deno.ChildProcess): void {
++  try {
++    child.kill('SIGKILL');
++  } catch {
++    // already exited
++  }
++}
++
+ async function spawnFixture(extraFlags: readonly string[]): Promise<SpawnedFixture> {
+   const command = new Deno.Command(Deno.execPath(), {
+     args: ['run', '-A', ...extraFlags, FIXTURE],
+@@ -55,31 +83,53 @@ async function spawnFixture(extraFlags: readonly string[]): Promise<SpawnedFixtu
+     stderr: 'piped',
+   });
+   const child = command.spawn();
+-  const stdoutLines = lineReader(child.stdout);
++  const stdoutAbort = new AbortController();
++  const stdoutLines = lineReader(child.stdout, stdoutAbort.signal);
+   const stderr = new Response(child.stderr).text();
++  const fixture = { child, port: 0, stdoutLines, stderr, stdoutAbort };
++  const deadline = setTimeout(() => killFixture(child), 10_000);
+ 
+   // Wait for the READY <port> banner. Use manual `.next()` (not `for await`) so
+   // breaking out does not call `.return()` and close the shared line reader —
+   // later tests continue reading the same stream for `CANCELLED`.
+-  for (;;) {
+-    const { value, done } = await stdoutLines.next();
+-    if (done) break;
+-    const match = value.match(/^READY (\d+)$/);
+-    if (match) {
+-      return { child, port: Number(match[1]), stdoutLines, stderr };
++  try {
++    for (;;) {
++      const { value, done } = await stdoutLines.next();
++      if (done) break;
++      const match = value.match(/^READY (\d+)$/);
++      if (match) return { ...fixture, port: Number(match[1]) };
+     }
++    throw new Error('fixture exited before reporting READY');
++  } catch (error) {
++    await shutdown(fixture);
++    throw error;
++  } finally {
++    clearTimeout(deadline);
+   }
+-  throw new Error('fixture exited before reporting READY');
+ }
+ 
+ async function shutdown(fixture: SpawnedFixture): Promise<string> {
++  killFixture(fixture.child);
++  let timedOut = false;
++  const deadline = setTimeout(() => {
++    timedOut = true;
++    fixture.stdoutAbort.abort();
++    killFixture(fixture.child);
++  }, 3000);
+   try {
+-    fixture.child.kill('SIGKILL');
+-  } catch {
+-    // already exited
++    const drained = (async () => {
++      for await (const _line of fixture.stdoutLines) { /* retain stdout through EOF */ }
++    })();
++    const results = await Promise.allSettled([fixture.child.status, fixture.stderr, drained]);
++    assert(!timedOut, 'fixture shutdown timed out before stdout EOF');
++    for (const result of results) {
++      if (result.status === 'rejected') throw result.reason;
++    }
++    const stderr = results[1];
++    return stderr.status === 'fulfilled' ? stderr.value : '';
++  } finally {
++    clearTimeout(deadline);
+   }
+-  await fixture.child.status;
+-  return await fixture.stderr;
+ }
+ 
+ Deno.test('legacy Deno.serve behavior warns on successful requests (baseline repro)', async () => {
+@@ -129,22 +179,19 @@ Deno.test('client disconnect still cancels the in-flight request with the flag',
+     // The fixture prints CANCELLED only if the handler's request signal fired,
+     // i.e. genuine cancellation still propagates under the non-legacy behavior.
+     let cancelled = false;
+-    const deadline = setTimeout(() => {
+-      try {
+-        fixture.child.kill('SIGKILL');
+-      } catch {
+-        // ignore
+-      }
+-    }, 3000);
+-    for (;;) {
+-      const { value, done } = await fixture.stdoutLines.next();
+-      if (done) break;
+-      if (value === 'CANCELLED') {
+-        cancelled = true;
+-        break;
++    const deadline = setTimeout(() => killFixture(fixture.child), 3000);
++    try {
++      for (;;) {
++        const { value, done } = await fixture.stdoutLines.next();
++        if (done) break;
++        if (value === 'CANCELLED') {
++          cancelled = true;
++          break;
++        }
+       }
++    } finally {
++      clearTimeout(deadline);
+     }
+-    clearTimeout(deadline);
+     assert(cancelled, 'expected the handler request signal to abort on client disconnect');
+   } finally {
+     await shutdown(fixture);

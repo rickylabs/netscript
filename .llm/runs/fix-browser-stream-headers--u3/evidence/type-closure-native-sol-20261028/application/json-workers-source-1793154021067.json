@@ -1,0 +1,15 @@
+{
+  "selected": "json-workers-source",
+  "args": [
+    "doc",
+    "--json",
+    "--frozen",
+    "plugins/workers/streams/factory.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:21.070Z",
+  "ended": "2026-10-28T02:20:21.210Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067"
+}

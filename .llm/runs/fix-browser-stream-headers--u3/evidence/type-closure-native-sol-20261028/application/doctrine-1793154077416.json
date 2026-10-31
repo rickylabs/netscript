@@ -1,0 +1,17 @@
+{
+  "selected": "doctrine",
+  "args": [
+    "run",
+    "--frozen",
+    "--allow-read",
+    "--allow-run",
+    ".llm/tools/fitness/check-doctrine.ts",
+    "--all-roots"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:21:17.419Z",
+  "ended": "2026-10-28T02:21:29.319Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416"
+}

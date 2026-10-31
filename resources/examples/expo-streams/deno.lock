@@ -404,6 +404,7 @@
       "jsr:@netscript/mcp@0.0.8": {
         "dependencies": [
           "jsr:@netscript/aspire@0.0.8",
+          "jsr:@netscript/fresh-ui@0.0.8",
           "jsr:@netscript/plugin@0.0.8",
           "jsr:@netscript/telemetry@0.0.8",
           "jsr:@standard-schema/spec@1.1.0",
@@ -502,7 +503,8 @@
           "jsr:@netscript/cron@0.0.8",
           "jsr:@netscript/kv@0.0.8",
           "jsr:@netscript/watchers@0.0.8",
-          "jsr:@std/assert@1"
+          "jsr:@std/assert@1",
+          "jsr:@std/async@1"
         ]
       },
       "jsr:@netscript/plugin-triggers@0.0.8": {
@@ -511,6 +513,7 @@
           "jsr:@netscript/config@0.0.8",
           "jsr:@netscript/contracts@0.0.8",
           "jsr:@netscript/kv@0.0.8",
+          "jsr:@netscript/logger@0.0.8",
           "jsr:@netscript/plugin-streams-core@0.0.8",
           "jsr:@netscript/plugin-triggers-core@0.0.8",
           "jsr:@netscript/plugin-workers-core@0.0.8",

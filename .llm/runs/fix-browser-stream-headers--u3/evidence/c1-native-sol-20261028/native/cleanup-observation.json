@@ -1,0 +1,13 @@
+{
+    "capturedAt":  "2026-10-28T00:53:31.6107389+00:00",
+    "scope":  "Current exact worktree Deno processes and gate-owned TEMP only",
+    "taskDenoProcesses":  [
+
+                          ],
+    "taskDenoProcessCount":  0,
+    "gateTempEntries":  [
+
+                        ],
+    "gateTempEntryCount":  0,
+    "historicalOrGlobalCleanlinessClaimed":  false
+}

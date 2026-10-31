@@ -86,6 +86,8 @@ export class ServiceBuilderImpl<
   private openApiConfigured = false;
   private docsConfigured = false;
   private healthConfigured = false;
+  private healthInstalled = false;
+  private healthIncludeDetails = true;
   private startupHooks: Array<() => Promise<void>> = [];
   private shutdownHooks: ShutdownHook[] = [];
   private contextFactory: ContextFactory<TCustom> = () => ({}) as TCustom;
@@ -418,19 +420,23 @@ export class ServiceBuilderImpl<
     if (options?.checks) {
       this.healthChecks.push(...options.checks);
     }
+    this.healthIncludeDetails = options?.includeDetails ?? true;
+    return this;
+  }
 
+  private installHealth(): void {
+    if (!this.healthConfigured || this.healthInstalled) return;
     this.app.get(
       '/health',
       createHealthHandler({
         checks: this.healthChecks,
         version: this.config.version,
-        includeDetails: options?.includeDetails ?? true,
+        includeDetails: this.healthIncludeDetails,
       }),
     );
     this.app.get('/health/live', createLivenessHandler());
     this.app.get('/health/ready', createReadinessHandler(this.readinessChecks));
-
-    return this;
+    this.healthInstalled = true;
   }
 
   /**
@@ -503,6 +509,7 @@ export class ServiceBuilderImpl<
     for (const options of this.corsOptions) assertServiceCorsOptions(options);
     this.installAuth();
     this.installBodyLimit();
+    this.installHealth();
     this.installDeferredRoutes();
     this.app.notFound(createNotFoundHandler(this.config.name));
     this.app.onError(createErrorHandler(this.config.name));
@@ -511,24 +518,21 @@ export class ServiceBuilderImpl<
 
   private installAuth(): void {
     if (this.authInstalled) return;
-    this.authInstalled = true;
     const policyResolver = this.bindContractPolicy();
-
-    if (this.authnOptions) {
-      this.app.use('*', createAuthnMiddleware({ ...this.authnOptions, policyResolver }));
-    }
-
-    if (this.authzOptions) {
-      this.app.use(
-        '*',
-        createAuthzMiddleware({
-          ...this.authzOptions,
-          protect: this.authnOptions?.protect,
-          allowAnonymous: this.authnOptions?.allowAnonymous,
-          policyResolver,
-        }),
-      );
-    }
+    const authn = this.authnOptions
+      ? createAuthnMiddleware({ ...this.authnOptions, policyResolver })
+      : undefined;
+    const authz = this.authzOptions
+      ? createAuthzMiddleware({
+        ...this.authzOptions,
+        protect: this.authnOptions?.protect,
+        allowAnonymous: this.authnOptions?.allowAnonymous,
+        policyResolver,
+      })
+      : undefined;
+    if (authn) this.app.use('*', authn);
+    if (authz) this.app.use('*', authz);
+    this.authInstalled = true;
   }
 
   private installBodyLimit(): void {

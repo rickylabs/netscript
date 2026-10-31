@@ -1,0 +1,1327 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "scope": "full-library",
+ "step": "B6-library-data-display-1",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "pages": {
+  "Read me": "229:336",
+  "Foundations": "229:338",
+  "Components \u00b7 Actions": "229:340",
+  "Components \u00b7 Forms": "229:341",
+  "Components \u00b7 Navigation": "229:342",
+  "Components \u00b7 Overlays": "229:343",
+  "Components \u00b7 Data display": "229:344",
+  "Components \u00b7 Feedback": "229:345",
+  "Components \u00b7 Layout & blocks": "229:346",
+  "Components \u00b7 AI": "229:347",
+  "Components \u00b7 Desktop": "229:348",
+  "Components \u00b7 Docs kit": "229:349",
+  "\u2605 Studio \u00b7 Utility": "229:351",
+  "Studio \u00b7 Flavors": "6:2",
+  "Theme \u00b7 Tonal": "16:2",
+  "Theme \u00b7 Bloom": "102:808",
+  "Theme \u00b7 Cupertino": "29:6",
+  "Theme \u00b7 Liquid": "93:735",
+  "Theme \u00b7 Fluent": "53:2",
+  "Theme \u00b7 Brutal": "33:8",
+  "Theme \u00b7 Filigrane": "37:6",
+  "Theme \u00b7 Terminal": "39:2",
+  "Theme \u00b7 Pixel": "64:443",
+  "Theme \u00b7 Tactile": "60:219",
+  "Planned \u00b7 macOS 27": "229:352",
+  "Planned \u00b7 Apple Classic": "229:353",
+  "Planned \u00b7 Fluent 2 Web": "229:354",
+  "Docs site": "174:2144",
+  "Design guidelines": "205:336",
+  "Archive \u00b7 Superseded": "0:1",
+  "Reference \u00b7 Apple macOS 27 kit": "120:1831"
+ },
+ "completedSteps": [
+  "discovery",
+  "A-pages-created",
+  "A-frames-moved",
+  "A-headers",
+  "A-readme",
+  "B0-foundations-page",
+  "B1-variables-themeB-themeset-424-new (verified 0% diff)",
+  "B2-actions-pilot-built (owner review pending)",
+  "B2-actions-fixes (icon-only Toggle \u2192 square Icon toggle sets; link underline spans the label only)",
+  "B3-forms-part1-built F1\u2013F8 (owner review pending)",
+  "B3-forms-part1-fix: Label required-mark text/muted at rest and disabled (invalid keeps destructive/text)",
+  "B3-forms-part2-built F9\u2013F16 (owner review pending)",
+  "B4-navigation-built N1\u2013N10 (owner review pending): 21 public sets + 6 private helpers, 10 review frames, themes strip, App frame; 1 variable added (type/mono-strong/style)",
+  "B4-navigation-fix: Tab / horizontal and Tab / vertical show the ink marker on variant=default only (32 marker nodes on line and segmented unbound from deco/marker and hidden); review-tabs, review-app-frame and themes-strip re-shot",
+  "B5-overlays-built O1-O10 (owner review pending): 17 sets (incl. private .Kbd), 10 review frames, themes strip; O8 menu parts replace the .Menu (Navigation) and .Select option (Forms) stand-ins, which are retired to Draft; 5 Scheme variables added (tooltip/*)",
+  "B6-library-data-display-1 built D1\u2013D7 (owner review pending): 18 sets (16 public + 2 private Item media helpers), 7 review frames, themes strip, composed Orders review; tooltip/* routed through Theme set (Tonal + Bloom = M3 inverse surface); stand-ins swapped (.Kbd \u2192 Kbd in Tooltip, Command item, Command palette; Menu item shortcut \u2192 Kbd sm; Search kbd \u2192 Kbd; Nav item + Tab counts \u2192 Badge plain; Combobox chips \u2192 Badge subtle + remove; Hover card avatar \u2192 Avatar; App frame table slot \u2192 Data table); .Kbd retired to the Overlays Draft area; 40 variables added (tooltip twins 30, card/bg 7, size/kbd-sm 3); Icon/bot glyph added",
+  "T1-shared-variables (theme character 1.0/2.3/2.4, values only, no new names): 769 Theme/Theme B cells in 13 modes; 4 reverted because crafted frames bind them (Brutal type/strong style+tracking, Filigrane type/label size+line); Studio and all 26 crafted frames 0.0000%; font-face check has 3 blockers (Liquid/macOS 27 Geist Mono Semi Bold, Brutal Space Mono Medium); see verify/theme-character/report.md",
+  "T1b font-face fix: type/mono/style (VariableID:459:74049) and type/label-strong/style (VariableID:459:74052) in Theme set; 189 main text nodes rebound; 200 direct Theme bindings on base mains moved to Theme set",
+  "B7 feedback (see ledger-feedback.json); badge/solid light info/success/destructive bg moved to Radix step 11 in every Theme, Theme B and Studio mode (min 4.77:1, 0 fails across all modes and flavors)",
+  "Screens \u00b7 Archetypes page 514:94470: 5 Utility screens (light/dark), auto-swapped into tonal, tactile, terminal, cupertino, pixel, brutal (70 PNGs, ledger-screens.json)",
+  "2026-10-31 all 10 styles complete over Actions, Forms, Navigation, Overlays, Data display 1 (1010 style sets)",
+  "2026-11-01 Feedback style pass done for all 10 styles; every style has the 5 archetype screens (light/dark)",
+  "B8 data-display-2 (ledger-dd2.json): 13 sets / 110 variants; chart/1 dark \u2192 marker/default",
+  "B9 layout & blocks (ledger-layout.json): 15 sets / 61 variants; App shell 1440/768/390",
+  "B10 AI (ledger-ai.json): 15 sets / 115 variants + composed chat screen 595:185594",
+  "B11 desktop (5 sets/37 var) + docs kit (15 sets + File tree/66 var) (ledger-desktop-docs.json); Theme set gained 16 prose/* + type/em/style. BASE LIBRARY COMPLETE: 11 categories.",
+  "V3 per-theme chart palettes (ledger-chart-palettes.json): chart/l|d/1..5 in Studio flavor, Theme, Theme B, Theme set; Scheme chart/N re-aliased; validator 145 runs"
+ ],
+ "helpers": {
+  "Doc/Page header": "230:2",
+  "Doc/Section label": "230:10"
+ },
+ "foundations": {
+  "Foundations/Colour roles": "234:19",
+  "Foundations/Type scale": "234:10489",
+  "Foundations/Spacing, radius and density": "234:10538",
+  "instances": "15 presets x (2 colour + 1 type + 1 spacing)"
+ },
+ "presetModes": {
+  "TH": "VariableCollectionId:2:330",
+  "FL": "VariableCollectionId:121:1087",
+  "GR": "VariableCollectionId:50:2",
+  "AC": "VariableCollectionId:2:357",
+  "DE": "VariableCollectionId:3:64",
+  "SCH": "VariableCollectionId:3:2",
+  "Utility": {
+   "TH": "2:1",
+   "FL": "121:0",
+   "GR": "50:0",
+   "AC": "2:8",
+   "DE": "3:3"
+  },
+  "Light": "3:0",
+  "Dark": "3:1"
+ },
+ "collections": {
+  "Theme": "VariableCollectionId:2:330",
+  "Theme B": "VariableCollectionId:239:9",
+  "Theme set": "VariableCollectionId:239:156",
+  "Scheme": "VariableCollectionId:3:2",
+  "Density": "VariableCollectionId:3:64",
+  "Studio flavor": "VariableCollectionId:121:1087",
+  "Base gray": "VariableCollectionId:50:2",
+  "Base accent": "VariableCollectionId:2:357"
+ },
+ "themeBModes": {
+  "Bloom": "239:0",
+  "Cupertino": "239:1",
+  "Liquid": "239:2",
+  "Terminal": "239:3",
+  "macOS 27": "239:4",
+  "Apple Classic": "239:5",
+  "Fluent 2 Web": "239:6"
+ },
+ "themeSetModes": {
+  "A": "239:7",
+  "B": "239:8"
+ },
+ "components": {
+  "Icon": {
+   "id": "252:11798",
+   "page": "Foundations",
+   "variants": 3,
+   "props": "size sm|md|lg; glyph (instance swap)"
+  },
+  "Icon/<glyph>": {
+   "page": "Foundations",
+   "container": "251:11788",
+   "count": 51,
+   "source": "lucide-static 0.460.0 (ISC)",
+   "ids": {
+    "Icon/plus": "251:11795",
+    "Icon/minus": "251:11800",
+    "Icon/x": "251:11808",
+    "Icon/check": "251:11813",
+    "Icon/chevron-down": "251:11818",
+    "Icon/chevron-up": "251:11823",
+    "Icon/chevron-left": "251:11828",
+    "Icon/chevron-right": "251:11833",
+    "Icon/arrow-left": "251:11841",
+    "Icon/arrow-right": "251:11849",
+    "Icon/arrow-up": "251:11857",
+    "Icon/arrow-down": "251:11865",
+    "Icon/arrow-up-right": "251:11873",
+    "Icon/arrow-up-down": "251:11883",
+    "Icon/corner-down-left": "251:11891",
+    "Icon/external-link": "251:11900",
+    "Icon/search": "251:11908",
+    "Icon/filter": "251:11913",
+    "Icon/settings": "251:11921",
+    "Icon/menu": "251:11930",
+    "Icon/more-horizontal": "251:11939",
+    "Icon/more-vertical": "251:11948",
+    "Icon/grip-vertical": "251:11960",
+    "Icon/panel-left": "251:11968",
+    "Icon/edit": "251:11976",
+    "Icon/copy": "251:11984",
+    "Icon/trash": "251:11995",
+    "Icon/download": "251:12004",
+    "Icon/upload": "251:12013",
+    "Icon/paperclip": "251:12018",
+    "Icon/file": "251:12026",
+    "Icon/file-text": "251:12037",
+    "Icon/folder": "251:12042",
+    "Icon/hash": "251:12052",
+    "Icon/calendar": "251:12062",
+    "Icon/bell": "251:12070",
+    "Icon/user": "251:12078",
+    "Icon/globe": "251:12087",
+    "Icon/camera": "251:12095",
+    "Icon/mic": "251:12104",
+    "Icon/sun": "251:12119",
+    "Icon/moon": "251:12124",
+    "Icon/info": "251:12133",
+    "Icon/alert-circle": "251:12142",
+    "Icon/alert-triangle": "251:12151",
+    "Icon/circle-check": "251:12159",
+    "Icon/circle": "251:12164",
+    "Icon/square": "251:12169",
+    "Icon/dot": "251:12174",
+    "Icon/loader": "251:12179",
+    "Icon/bot": "402:12100"
+   }
+  },
+  ".Focus ring": {
+   "id": "252:11805",
+   "page": "Foundations",
+   "private": true
+  },
+  ".State layer": {
+   "id": "252:11806",
+   "page": "Foundations",
+   "private": true
+  },
+  ".Slot": {
+   "id": "252:11807",
+   "page": "Foundations",
+   "private": true
+  },
+  "Spinner": {
+   "id": "252:11837",
+   "page": "Components \u00b7 Feedback",
+   "variants": 3,
+   "note": "built early as a Button dependency (B5)"
+  },
+  "Button / md": {
+   "id": "253:372",
+   "page": "Components \u00b7 Actions",
+   "variants": 30
+  },
+  "Button / sm": {
+   "id": "254:371",
+   "page": "Components \u00b7 Actions",
+   "variants": 30
+  },
+  "Button / lg": {
+   "id": "254:721",
+   "page": "Components \u00b7 Actions",
+   "variants": 30
+  },
+  "Button / xs": {
+   "id": "254:1071",
+   "page": "Components \u00b7 Actions",
+   "variants": 30
+  },
+  "Icon button / md": {
+   "id": "255:262",
+   "page": "Components \u00b7 Actions",
+   "variants": 25
+  },
+  "Icon button / sm": {
+   "id": "255:501",
+   "page": "Components \u00b7 Actions",
+   "variants": 25
+  },
+  "Icon button / lg": {
+   "id": "255:740",
+   "page": "Components \u00b7 Actions",
+   "variants": 25
+  },
+  "Icon button / xs": {
+   "id": "255:979",
+   "page": "Components \u00b7 Actions",
+   "variants": 25
+  },
+  "Button group": {
+   "id": "257:839",
+   "page": "Components \u00b7 Actions",
+   "variants": 6
+  },
+  "Toggle / md": {
+   "id": "256:281",
+   "page": "Components \u00b7 Actions",
+   "variants": 16
+  },
+  "Toggle / sm": {
+   "id": "256:437",
+   "page": "Components \u00b7 Actions",
+   "variants": 16
+  },
+  "Toggle / lg": {
+   "id": "256:593",
+   "page": "Components \u00b7 Actions",
+   "variants": 16
+  },
+  "Toggle group": {
+   "id": "257:528",
+   "page": "Components \u00b7 Actions",
+   "variants": 12
+  },
+  "Action bar": {
+   "id": "258:663",
+   "page": "Components \u00b7 Actions",
+   "variants": 2
+  },
+  ".Action bar / actions": {
+   "id": "258:544",
+   "page": "Components \u00b7 Actions",
+   "private": true
+  },
+  "Theme toggle": {
+   "id": "258:742",
+   "page": "Components \u00b7 Actions",
+   "variants": 6
+  },
+  "Icon toggle / md": {
+   "id": "276:8291",
+   "page": "Components \u00b7 Actions",
+   "variants": 16,
+   "note": "icon-only Toggle, W = H space/control/height"
+  },
+  "Icon toggle / sm": {
+   "id": "276:8431",
+   "page": "Components \u00b7 Actions",
+   "variants": 16,
+   "note": "icon-only Toggle, W = H space/control/height-sm"
+  },
+  "Icon toggle / lg": {
+   "id": "276:8571",
+   "page": "Components \u00b7 Actions",
+   "variants": 16,
+   "note": "icon-only Toggle, W = H space/control/height-lg"
+  },
+  "Label": {
+   "id": "278:45",
+   "page": "Components \u00b7 Forms",
+   "variants": 6
+  },
+  "Input": {
+   "id": "279:312",
+   "page": "Components \u00b7 Forms",
+   "variants": 24
+  },
+  "Textarea": {
+   "id": "280:597",
+   "page": "Components \u00b7 Forms",
+   "variants": 12
+  },
+  "Select": {
+   "id": "281:1023",
+   "page": "Components \u00b7 Forms",
+   "variants": 24
+  },
+  "Select content": {
+   "id": "281:826",
+   "page": "Components \u00b7 Forms",
+   "variants": 0,
+   "note": "single component, R.float listbox; rows are O8 Menu item type=option instances"
+  },
+  ".Select option": {
+   "id": "281:825",
+   "page": "Components \u00b7 Forms",
+   "variants": 3,
+   "private": true,
+   "note": "RETIRED to Forms Draft (wrapper 377:21937): Select content and Combobox rows now use Menu item type=option (371:587)"
+  },
+  "Checkbox": {
+   "id": "283:1470",
+   "page": "Components \u00b7 Forms",
+   "variants": 15
+  },
+  "Radio": {
+   "id": "284:1828",
+   "page": "Components \u00b7 Forms",
+   "variants": 10
+  },
+  "Radio group": {
+   "id": "284:1885",
+   "page": "Components \u00b7 Forms",
+   "variants": 2
+  },
+  "Switch": {
+   "id": "285:2329",
+   "page": "Components \u00b7 Forms",
+   "variants": 20
+  },
+  "Field": {
+   "id": "287:2656",
+   "page": "Components \u00b7 Forms",
+   "variants": 6,
+   "note": "label and control are exposed nested instances (Label, Input md)"
+  },
+  "Field set": {
+   "id": "287:2743",
+   "page": "Components \u00b7 Forms",
+   "variants": 2
+  },
+  "Input group": {
+   "id": "297:3861",
+   "page": "Components \u00b7 Forms",
+   "variants": 16,
+   "note": "align \u00d7 state; control = exposed strokeless Input md (inline) or Textarea (block); addon icon \u00b7 text \u00b7 Icon button xs"
+  },
+  "OTP slot": {
+   "id": "301:4385",
+   "page": "Components \u00b7 Forms",
+   "variants": 12,
+   "note": "content \u00d7 state; transparent, the Input OTP group carries surface/card"
+  },
+  "Input OTP": {
+   "id": "301:4490",
+   "page": "Components \u00b7 Forms",
+   "variants": 4,
+   "note": "length \u00d7 groups; exposed OTP slot instances, group gap -1, outer corners radius/input as instance overrides"
+  },
+  "Slider": {
+   "id": "303:5022",
+   "page": "Components \u00b7 Forms",
+   "variants": 16,
+   "note": "orientation \u00d7 thumbs \u00d7 state; auto-layout track segments; track border/default, range primary/stroke"
+  },
+  "Combobox": {
+   "id": "305:5623",
+   "page": "Components \u00b7 Forms",
+   "variants": 10,
+   "note": "multiple \u00d7 state; Input + Select content; chips = D2 Badge neutral subtle with remove (were Button xs); empty panel"
+  },
+  "Calendar day": {
+   "id": "307:6154",
+   "page": "Components \u00b7 Forms",
+   "variants": 30,
+   "note": "selection none|single|range-start|range-middle|range-end \u00d7 state rest|hover|focus|today|outside|disabled; W = H space/control/height"
+  },
+  "Calendar": {
+   "id": "309:8620",
+   "page": "Components \u00b7 Forms",
+   "variants": 8,
+   "note": "mode \u00d7 months \u00d7 caption; Calendar day + Icon button sm ghost + Select sm"
+  },
+  "Date picker": {
+   "id": "313:14889",
+   "page": "Components \u00b7 Forms",
+   "variants": 10,
+   "note": "mode \u00d7 state; trigger = Select md + calendar icon; open = R.float popover with Calendar"
+  },
+  "Search": {
+   "id": "316:16426",
+   "page": "Components \u00b7 Forms",
+   "variants": 8,
+   "note": "size \u00d7 state; exposed Input + exposed Kbd md (prop kbd); the shortcut text property was removed, edit the Kbd label"
+  },
+  "Dropzone": {
+   "id": "319:16832",
+   "page": "Components \u00b7 Forms",
+   "variants": 7,
+   "note": "state incl. uploading (progress from bound rectangles) and invalid"
+  },
+  "Location marker": {
+   "id": "337:22",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N8 \u00b7 size sm|md (4 / 6 px), fill marker/default; parents bind instance visibility to Theme set deco/marker"
+  },
+  "Breadcrumb item": {
+   "id": "338:92",
+   "page": "Components \u00b7 Navigation",
+   "variants": 9,
+   "note": "N1 \u00b7 type link|current|ellipsis \u00d7 state rest|hover|focus; T.mono link, current uses type/mono-strong/style; props label, separator, iconStart + iconStartGlyph"
+  },
+  "Breadcrumb": {
+   "id": "338:161",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N1 \u00b7 collapsed false|true; exposed Breadcrumb item instances"
+  },
+  "Page key": {
+   "id": "339:270",
+   "page": "Components \u00b7 Navigation",
+   "variants": 20,
+   "note": "N2 \u00b7 type page|previous|next|ellipsis \u00d7 state rest|hover|focus|current|disabled; previous/next = exposed Button / sm outline; prop label"
+  },
+  "Pager tile": {
+   "id": "339:319",
+   "page": "Components \u00b7 Navigation",
+   "variants": 6,
+   "note": "N2 (G-9) \u00b7 direction previous|next \u00d7 state rest|hover|focus; prop title"
+  },
+  "Pagination": {
+   "id": "339:379",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N2 \u00b7 variant numbered|pager"
+  },
+  "Tab / horizontal": {
+   "id": "342:402",
+   "page": "Components \u00b7 Navigation",
+   "variants": 24,
+   "note": "N3 \u00b7 variant default|line|segmented \u00d7 selected \u00d7 state rest|hover|focus|disabled; split by orientation; props label, iconStart + iconStartGlyph, count (exposed Badge neutral plain; countValue removed); marker shows on variant=default only (2026-10-28 fix)"
+  },
+  "Tab / vertical": {
+   "id": "342:599",
+   "page": "Components \u00b7 Navigation",
+   "variants": 24,
+   "note": "N3 \u00b7 as Tab / horizontal; width 200, indicator on the inline-start edge; marker shows on variant=default only (2026-10-28 fix)"
+  },
+  "Tabs list": {
+   "id": "343:424",
+   "page": "Components \u00b7 Navigation",
+   "variants": 6,
+   "note": "N3 \u00b7 variant \u00d7 orientation; exposed Tab instances"
+  },
+  "Tabs": {
+   "id": "343:489",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N3 \u00b7 orientation; exposed Tabs list + .Slot content"
+  },
+  "Nav item": {
+   "id": "345:601",
+   "page": "Components \u00b7 Navigation",
+   "variants": 20,
+   "note": "N4 \u00b7 state rest|hover|focus|selected|disabled \u00d7 level 1|2 \u00d7 collapsed; props label, icon + iconGlyph, count (exposed Badge neutral plain, mono count; countValue removed), chevron"
+  },
+  "Nav group": {
+   "id": "346:611",
+   "page": "Components \u00b7 Navigation",
+   "variants": 6,
+   "note": "N4 \u00b7 variant label|collapsible-open|collapsible-closed \u00d7 collapsed; exposed Nav item rows"
+  },
+  "Sidebar": {
+   "id": "347:994",
+   "page": "Components \u00b7 Navigation",
+   "variants": 6,
+   "note": "N4 \u00b7 variant sidebar|floating|inset \u00d7 collapsible expanded|icon"
+  },
+  "Top bar": {
+   "id": "351:1349",
+   "page": "Components \u00b7 Navigation",
+   "variants": 4,
+   "note": "N5 \u00b7 variant app|docs \u00d7 breakpoint desktop|mobile; nests Sidebar toggle, Breadcrumb, Navigation menu, Search, Icon button, Theme toggle, .Brand logo"
+  },
+  "Nav menu item": {
+   "id": "349:1036",
+   "page": "Components \u00b7 Navigation",
+   "variants": 10,
+   "note": "N6 \u00b7 trigger link|menu \u00d7 state rest|hover|focus|selected|open; prop label"
+  },
+  "Navigation menu": {
+   "id": "349:1132",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N6 \u00b7 open false|true; R.float viewport of .Nav menu link cards"
+  },
+  "Menubar trigger": {
+   "id": "349:1153",
+   "page": "Components \u00b7 Navigation",
+   "variants": 5,
+   "note": "N7 \u00b7 state rest|hover|focus|open|disabled; prop label"
+  },
+  "Menubar": {
+   "id": "349:1236",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N7 \u00b7 open false|true; open shows the O8 Menu content (373:256) configured as the File menu; review shows File and View menus"
+  },
+  "Step": {
+   "id": "352:1355",
+   "page": "Components \u00b7 Navigation",
+   "variants": 8,
+   "note": "N9 \u00b7 status complete|current|upcoming|error \u00d7 orientation; props title, number, description + descriptionText, connector"
+  },
+  "Stepper": {
+   "id": "352:1424",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "note": "N9 \u00b7 orientation; exposed Step instances"
+  },
+  "Sidebar toggle": {
+   "id": "344:462",
+   "page": "Components \u00b7 Navigation",
+   "variants": 4,
+   "note": "N10 \u00b7 open \u00d7 breakpoint desktop|mobile; exposed Icon button / sm (panel-left) or / lg (menu, x) ghost"
+  },
+  ".Brand logo": {
+   "id": "344:410",
+   "page": "Components \u00b7 Navigation",
+   "variants": 0,
+   "private": true,
+   "note": "N5 logo part: 24\u00d724 brand/default tile, N monogram in brand/fg"
+  },
+  ".Menu item": {
+   "id": "348:992",
+   "page": "Components \u00b7 Navigation",
+   "variants": 12,
+   "private": true,
+   "note": "RETIRED to Navigation Draft (wrapper 375:10884): replaced by Overlays O8 Menu item (371:587)"
+  },
+  ".Menu label": {
+   "id": "348:993",
+   "page": "Components \u00b7 Navigation",
+   "variants": 0,
+   "private": true,
+   "note": "RETIRED to Navigation Draft (wrapper 375:10884): replaced by Menu label (373:35)"
+  },
+  ".Menu separator": {
+   "id": "348:995",
+   "page": "Components \u00b7 Navigation",
+   "variants": 0,
+   "private": true,
+   "note": "RETIRED to Navigation Draft (wrapper 375:10884): replaced by Menu separator (373:38)"
+  },
+  ".Menu content": {
+   "id": "348:1092",
+   "page": "Components \u00b7 Navigation",
+   "variants": 2,
+   "private": true,
+   "note": "RETIRED to Navigation Draft (wrapper 375:10884): replaced by Menu content (373:256)"
+  },
+  ".Nav menu link": {
+   "id": "348:1108",
+   "page": "Components \u00b7 Navigation",
+   "variants": 3,
+   "private": true,
+   "note": "N6 viewport link card, state rest|highlighted|focus"
+  },
+  ".Kbd": {
+   "id": "370:31",
+   "page": "Components \u00b7 Overlays",
+   "variants": 2,
+   "private": true,
+   "note": "RETIRED to Overlays Draft (wrapper 431:18290): replaced by D7 Kbd (403:28) in Tooltip, Command item, Command palette, Menu item and Search; no instances left"
+  },
+  "Menu item": {
+   "id": "371:587",
+   "page": "Components \u00b7 Overlays",
+   "variants": 30,
+   "note": "O8 \u00b7 type action|checkbox|radio|submenu|option \u00d7 state rest|highlighted|disabled \u00d7 intent default|destructive; props label, description + descriptionText, iconStart + iconStartGlyph, shortcut (exposed Kbd sm; shortcutValue removed; hidden on submenu rows), inset, checked, indeterminate, loading; min height space/control/height-sm"
+  },
+  "Menu label": {
+   "id": "373:35",
+   "page": "Components \u00b7 Overlays",
+   "variants": 0,
+   "note": "O8 \u00b7 T.eyebrow text/muted; props label, inset"
+  },
+  "Menu separator": {
+   "id": "373:38",
+   "page": "Components \u00b7 Overlays",
+   "variants": 0,
+   "note": "O8 \u00b7 border/subtle rule, height border/width, lit 4 margins"
+  },
+  "Menu group": {
+   "id": "373:248",
+   "page": "Components \u00b7 Overlays",
+   "variants": 3,
+   "note": "O8 \u00b7 type action|checkbox|radio; Menu label + 3 exposed Menu item rows; prop label"
+  },
+  "Menu content": {
+   "id": "373:256",
+   "page": "Components \u00b7 Overlays",
+   "variants": 0,
+   "note": "O8 \u00b7 R.float panel W 224 (min 192), padding lit 4; 13 rows (label, action, submenu, checkbox, radio, separators, destructive); rows are swappable instances"
+  },
+  "Dropdown menu": {
+   "id": "374:382",
+   "page": "Components \u00b7 Overlays",
+   "variants": 2,
+   "note": "O8 \u00b7 open false|true; trigger Button / md outline + chevron-down, Menu content 4px below"
+  },
+  "Context menu": {
+   "id": "374:653",
+   "page": "Components \u00b7 Overlays",
+   "variants": 2,
+   "note": "O9 \u00b7 open false|true; dashed trigger area + Menu content at the pointer"
+  },
+  "Dialog": {
+   "id": "378:743",
+   "page": "Components \u00b7 Overlays",
+   "variants": 6,
+   "note": "O1 \u00b7 size sm|md|lg (400/512/640) \u00d7 scrim; scrim=true = 960\u00d7640 viewport + surface/overlay backdrop; props title, description + descriptionText, close, footer, body (swap)"
+  },
+  "Alert dialog": {
+   "id": "378:880",
+   "page": "Components \u00b7 Overlays",
+   "variants": 4,
+   "note": "O2 \u00b7 variant default|destructive \u00d7 size sm|md (320/512); media tile, cancel + action; props title, descriptionText, media"
+  },
+  "Sheet": {
+   "id": "379:1004",
+   "page": "Components \u00b7 Overlays",
+   "variants": 8,
+   "note": "O3 \u00b7 side top|right|bottom|left \u00d7 scrim; inner-edge stroke, exposed-corner radius, header/footer rules, bottom handle; props title, description + descriptionText, close, footer, handle, body"
+  },
+  "Drawer": {
+   "id": "379:1150",
+   "page": "Components \u00b7 Overlays",
+   "variants": 4,
+   "note": "O4 \u00b7 side bottom|right|left|top, 960\u00d7640 viewport + backdrop; handle on top/bottom; stacked full-width footer; props title, description + descriptionText, footer, body"
+  },
+  "Popover": {
+   "id": "381:937",
+   "page": "Components \u00b7 Overlays",
+   "variants": 4,
+   "note": "O5 \u00b7 placement top|right|bottom|left; R.float W 288; arrow \u2192 arrow-tip (16\u00d78); props arrow, title + titleText, description + descriptionText, close, body"
+  },
+  "Tooltip": {
+   "id": "381:1030",
+   "page": "Components \u00b7 Overlays",
+   "variants": 12,
+   "note": "O6 \u00b7 side \u00d7 align start|center|end; tooltip/* chip, arrow 10\u00d75 slides with align; props label, arrow, kbd (Kbd md inverse)"
+  },
+  "Hover card": {
+   "id": "381:1093",
+   "page": "Components \u00b7 Overlays",
+   "variants": 4,
+   "note": "O7 \u00b7 placement; R.float W 320; avatar = exposed D1 Avatar md initials (initials property removed); props arrow, title, description, meta + metaText"
+  },
+  "Command item": {
+   "id": "382:1015",
+   "page": "Components \u00b7 Overlays",
+   "variants": 9,
+   "note": "O10 \u00b7 type page|section|action \u00d7 state rest|selected|disabled; selected = surface/selected + 2px marker/default inline-start stroke + enter icon; props label, iconGlyph (action), url + urlText, excerpt, kind + kindText, shortcut; kbd = Kbd md (was .Kbd)"
+  },
+  "Command palette": {
+   "id": "383:1355",
+   "page": "Components \u00b7 Overlays",
+   "variants": 6,
+   "note": "O10 \u00b7 content results|empty|loading \u00d7 scrim (variant, not bool); input-row 56 (strokeless Input md + Kbd esc), lane filters 40, groups, footer 40; props filters, footer"
+  },
+  "Kbd": {
+   "id": "403:28",
+   "page": "Components \u00b7 Data display",
+   "variants": 4,
+   "note": "D7 \u00b7 size md|sm \u00d7 variant default|inverse; Fragment Mono 11/16 text/muted (font/mono + type/label size/line + type/caption style/tracking), surface/card + border/default at border/width, radius/badge, H size/kbd | size/kbd-sm, min width = H; inverse = tooltip/kbd + tooltip/border + tooltip/muted; prop label"
+  },
+  "Kbd group": {
+   "id": "403:96",
+   "page": "Components \u00b7 Data display",
+   "variants": 8,
+   "note": "D7 \u00b7 keys 2|3 \u00d7 size \u00d7 variant; exposed Kbd instances joined by '+' (T.caption text/muted), gap lit 4; prop separator"
+  },
+  "Badge": {
+   "id": "405:180",
+   "page": "Components \u00b7 Data display",
+   "variants": 20,
+   "note": "D2 \u00b7 tone neutral|info|success|warning|destructive \u00d7 style outline|subtle|solid|plain; outline = Utility status (1px *-text outline, 6px dot, radius/badge, font/eyebrow Fragment Mono 11 +0.6); neutral = secondary family; plain = no container, padding 0 (counts); dot radius follows radius/avatar; props label, dot, iconStart + iconStartGlyph, remove"
+  },
+  "Badge / kind": {
+   "id": "405:211",
+   "page": "Components \u00b7 Data display",
+   "variants": 10,
+   "note": "D2 \u00b7 kind function|method|class|interface|type|variable|constant|enum|module|namespace; outline anatomy in code/syntax/function|type|keyword|number or text/fg; prop dot"
+  },
+  "Avatar": {
+   "id": "406:95",
+   "page": "Components \u00b7 Data display",
+   "variants": 12,
+   "note": "D1 \u00b7 size sm|md|lg (size/avatar/*) \u00d7 content image|initials|fallback|agent; radius/avatar (square in Utility); media clips; initials T.caption|T.label|T.strong text/muted on surface/muted; agent = primary/default + Icon/bot primary/fg; props initials, presence (exposed Avatar presence)"
+  },
+  "Avatar presence": {
+   "id": "406:43",
+   "page": "Components \u00b7 Data display",
+   "variants": 3,
+   "note": "D1 \u00b7 status online|away|offline (success/default, warning/default, border/strong); 8\u00d78, 2px OUTSIDE surface/card ring, radius/avatar"
+  },
+  "Avatar group": {
+   "id": "406:150",
+   "page": "Components \u00b7 Data display",
+   "variants": 3,
+   "note": "D1 \u00b7 size; overlap lit -8; 2px OUTSIDE surface/card ring per avatar; 4 exposed Avatars + count avatar; prop count"
+  },
+  "Item": {
+   "id": "408:792",
+   "page": "Components \u00b7 Data display",
+   "variants": 27,
+   "note": "D6 \u00b7 variant default|outline|muted \u00d7 size default|sm|xs \u00d7 state rest|hover|focus; header / main (media \u00b7 content \u00b7 actions \u00b7 chevron) / footer; radius/input; props title, description + descriptionText, media + mediaContent (swap: .Item icon tile, .Item image, Avatar), actions (exposed Button / sm outline), chevron, header, footer"
+  },
+  "Item group": {
+   "id": "408:996",
+   "page": "Components \u00b7 Data display",
+   "variants": 2,
+   "note": "D6 \u00b7 separators false|true; exposed Item rows (default, sm) with Avatar media; border/subtle rule at border/width"
+  },
+  ".Item icon tile": {
+   "id": "408:82",
+   "page": "Components \u00b7 Data display",
+   "variants": 0,
+   "private": true,
+   "note": "D6 media helper: lit 32, surface/muted, radius/badge, I.md glyph text/fg; prop glyph"
+  },
+  ".Item image": {
+   "id": "408:85",
+   "page": "Components \u00b7 Data display",
+   "variants": 0,
+   "private": true,
+   "note": "D6 media helper: 40\u00d740 image fill, radius/input"
+  },
+  "Card": {
+   "id": "409:951",
+   "page": "Components \u00b7 Data display",
+   "variants": 16,
+   "note": "D3 \u00b7 variant default|rule \u00d7 size md|sm \u00d7 state rest|hover|focus|selected; default = card/bg (no fill in Utility) + card/border with card/border-top|side|bottom (Utility top hairline), radius/card, R.card-shadow; rule = no fill/radius/shadow, border/subtle top rule; header (eyebrow, title, description, exposed action), body .Slot swap (hug, min 96/72), footer card/footer + top rule + exposed buttons; props title, header, eyebrow + eyebrowText, description + descriptionText, action, body, footer"
+  },
+  "Stat card": {
+   "id": "409:1270",
+   "page": "Components \u00b7 Data display",
+   "variants": 6,
+   "note": "L3 Stat card built with D3 \u00b7 variant default|hero \u00d7 delta up|down|none; kpi/bg-1, kpi/border per side, kpi/pad-x, T.eyebrow label, T.kpi value, delta arrow + Fragment Mono value in success/text or destructive/text; deco sparkline|ticks|blockbars bound to Theme set deco/*; props label, value, badge, icon + iconGlyph, detail + detailText"
+  },
+  "Table header cell": {
+   "id": "410:546",
+   "page": "Components \u00b7 Data display",
+   "variants": 27,
+   "note": "D4 \u00b7 align \u00d7 sort none|asc|desc \u00d7 state rest|hover|focus; H.md, T.eyebrow uppercase (sorted text/fg), arrow-up-down|up|down; props label, sortable"
+  },
+  "Table cell": {
+   "id": "410:383",
+   "page": "Components \u00b7 Data display",
+   "variants": 27,
+   "note": "D4 \u00b7 type text|strong|mono|number|muted|badge|avatar|actions|select \u00d7 align; row-height, cell-padding-x, table/cell-rule; exposed Badge, Avatar, Icon button, Checkbox; props value, secondary + secondaryText"
+  },
+  "Table row": {
+   "id": "412:1187",
+   "page": "Components \u00b7 Data display",
+   "variants": 20,
+   "note": "D4 \u00b7 state rest|hover|selected|focus|disabled \u00d7 zebra \u00d7 layout row|stacked; table/row-bg|zebra|hover|surface/selected, table/row-rule, 2px marker/default selection bar + checked box; exposed Table cells; strokes excluded from layout (whole-pixel rows)"
+  },
+  "Table": {
+   "id": "413:1367",
+   "page": "Components \u00b7 Data display",
+   "variants": 6,
+   "note": "D4 \u00b7 layout row|stacked \u00d7 content rows|empty|loading; head (table/head, table/head-rule, select-all + header cells), exposed Table rows (Orders fixture), caption, summary; empty and loading are stand-ins for B7 Empty state and the B6 Skeleton table preset"
+  },
+  "Data table": {
+   "id": "416:4605",
+   "page": "Components \u00b7 Data display",
+   "variants": 10,
+   "note": "D5 \u00b7 state default|selection|columns|loading|empty \u00d7 breakpoint desktop|mobile; Card chrome + toolbar (Search, Status/date Select, Table|Board Toggle group, Columns, Export) + inline Action bar + Table + Pagination; columns opens Menu content with checkbox rows"
+  }
+ },
+ "drafts": {
+  "Button (draft, in use by specimens)": "4:146",
+  "Icons (draft frame, in use by specimens)": "4:3",
+  "Forms Input (draft, in use by specimens)": "5:50",
+  "Forms Checkbox (draft, in use by specimens)": "5:55",
+  "Forms Switch (draft, in use by specimens)": "5:60",
+  "Tab item (draft, Navigation page bottom)": "5:72",
+  "Badge (draft, Data display, in use by specimens)": "4:165",
+  "Avatar (draft, Data display, in use by specimens)": "5:65"
+ },
+ "showcase": {
+  "Components \u00b7 Actions": {
+   "containers": {
+    "Button": "253:35",
+    "Icon button": "255:35",
+    "Button group": "257:538",
+    "Toggle": "256:135",
+    "Toggle group": "257:183",
+    "Action bar": "258:543",
+    "Theme toggle": "258:669"
+   },
+   "reviews": {
+    "Button": "259:660",
+    "Icon button": "260:3020",
+    "Button group": "262:6829",
+    "Toggle": "260:5323",
+    "Toggle group": "262:5728",
+    "Action bar": "262:7946",
+    "Theme toggle": "262:8346"
+   },
+   "themesStrip": "264:7542",
+   "sectionLabels": {
+    "Button": "265:7932",
+    "Icon button": "265:7936",
+    "Button group": "265:7940",
+    "Toggle": "265:7944",
+    "Toggle group": "265:7948",
+    "Action bar": "265:7952",
+    "Theme toggle": "265:7956",
+    "Themes": "265:7960",
+    "Draft": "231:11211"
+   },
+   "iconToggleBlocks": {
+    "md": "276:8162",
+    "sm": "276:8302",
+    "lg": "276:8442"
+   }
+  },
+  "Foundations": {
+   "glyphs": "251:11788",
+   "iconSet": "252:11788",
+   "helpers": "252:11804",
+   "review": "266:11791",
+   "sectionLabels": {
+    "Icon": "266:12704",
+    "Private helpers": "266:12708",
+    "Draft": "234:10485"
+   },
+   "glyphCellBot": "402:12099"
+  },
+  "Components \u00b7 Feedback": {
+   "spinnerSet": "252:11824",
+   "sectionLabel": "252:11820"
+  },
+  "reviewPngs": {
+   "actions": "review/actions/",
+   "forms": "review/forms/",
+   "navigation": "review/navigation/",
+   "overlays": "review/overlays/",
+   "data-display": "review/data-display/"
+  },
+  "Components \u00b7 Forms": {
+   "containers": {
+    "Label": "278:20",
+    "Input": "279:95",
+    "Textarea": "280:494",
+    "Select": "281:809",
+    "Checkbox": "283:1334",
+    "Radio group": "284:1737",
+    "Switch": "285:2168",
+    "Field": "287:2547",
+    "Input group": "297:3455",
+    "Input OTP": "301:4335",
+    "Slider": "303:4876",
+    "Combobox": "305:5295",
+    "Calendar": "307:6032",
+    "Date picker": "313:14164",
+    "Search": "316:16320",
+    "Dropzone": "319:16695"
+   },
+   "reviews": {
+    "Label": "278:58",
+    "Input": "279:330",
+    "Textarea": "280:613",
+    "Select": "281:1051",
+    "Checkbox": "283:1486",
+    "Radio group": "284:1906",
+    "Switch": "285:2346",
+    "Field": "288:2658",
+    "Input group": "299:4332",
+    "Input OTP": "302:4515",
+    "Slider": "303:5033",
+    "Combobox": "306:5549",
+    "Calendar": "310:7700",
+    "Date picker": "314:14834",
+    "Search": "317:16379",
+    "Dropzone": "319:16843"
+   },
+   "themesStrip": "289:3256",
+   "sectionLabels": {
+    "Label": "278:54",
+    "Input": "279:326",
+    "Textarea": "280:609",
+    "Select": "281:1047",
+    "Checkbox": "283:1482",
+    "Radio group": "284:1902",
+    "Switch": "285:2342",
+    "Field": "287:2758",
+    "Themes": "289:3506",
+    "Draft": "231:11223",
+    "Input group": "297:3451",
+    "Input OTP": "301:4331",
+    "Slider": "303:4872",
+    "Combobox": "305:5291",
+    "Calendar": "307:6028",
+    "Date picker": "313:14160",
+    "Search": "316:16316",
+    "Dropzone": "319:16691",
+    "Themes \u00b7 part 2": "320:17128"
+   },
+   "themesStrip2": "320:17132"
+  },
+  "Components \u00b7 Navigation": {
+   "containers": {
+    "Breadcrumb": "338:177",
+    "Pagination": "339:406",
+    "Tabs": "343:530",
+    "Sidebar": "347:1023",
+    "Top bar": "351:1358",
+    "Navigation menu": "349:1260",
+    "Menubar": "349:1295",
+    "Location marker": "337:29",
+    "Stepper": "352:1440",
+    "Sidebar toggle": "344:473"
+   },
+   "reviews": {
+    "Breadcrumb": "353:1662",
+    "Pagination": "354:2228",
+    "Tabs": "355:3514",
+    "Sidebar": "357:4640",
+    "Top bar": "358:5413",
+    "Navigation menu": "358:5727",
+    "Menubar": "358:6214",
+    "Location marker": "359:6473",
+    "Stepper": "359:6765",
+    "Sidebar toggle": "359:7108"
+   },
+   "themesStrip": "360:6958",
+   "appFrame": "361:8207",
+   "sectionLabels": {
+    "Breadcrumb": "363:8404",
+    "Pagination": "363:8408",
+    "Tabs": "363:8412",
+    "Sidebar": "363:8416",
+    "Top bar": "363:8420",
+    "Navigation menu": "363:8424",
+    "Menubar": "363:8428",
+    "Location marker": "363:8432",
+    "Stepper": "363:8436",
+    "Sidebar toggle": "363:8440",
+    "Themes": "363:8444",
+    "App frame": "363:8448",
+    "Draft": "231:11235"
+   },
+   "pageHeader": "231:11227"
+  },
+  "Components \u00b7 Overlays": {
+   "pageHeader": "231:11239",
+   "containers": {
+    "Dialog": "370:16",
+    "Alert dialog": "370:17",
+    "Sheet": "370:18",
+    "Drawer": "370:19",
+    "Popover": "370:20",
+    "Tooltip": "370:21",
+    "Hover card": "370:22",
+    "Dropdown menu": "370:23",
+    "Context menu": "370:24",
+    "Command palette": "370:25"
+   },
+   "reviews": {
+    "Dialog": "385:1078",
+    "Alert dialog": "385:2114",
+    "Sheet": "385:2820",
+    "Drawer": "387:2337",
+    "Popover": "387:2924",
+    "Tooltip": "387:3607",
+    "Hover card": "387:4149",
+    "Dropdown menu": "388:3277",
+    "Context menu": "388:6671",
+    "Command palette": "388:7769"
+   },
+   "themesStrip": "390:6219",
+   "sectionLabels": {
+    "Dialog": "391:8494",
+    "Alert dialog": "391:8498",
+    "Sheet": "391:8502",
+    "Drawer": "391:8506",
+    "Popover": "391:8510",
+    "Tooltip": "391:8514",
+    "Hover card": "391:8518",
+    "Dropdown menu": "391:8522",
+    "Context menu": "391:8526",
+    "Command palette": "391:8530",
+    "Themes": "391:8534",
+    "Draft": "431:18291"
+   }
+  },
+  "Components \u00b7 Data display": {
+   "pageHeader": "231:11247",
+   "containers": {
+    "Avatar": "406:39",
+    "Badge": "405:39",
+    "Card": "409:222",
+    "Table": "410:242",
+    "Data table": "416:1279",
+    "Item": "408:81",
+    "Kbd": "403:19"
+   },
+   "blocks": {
+    "Avatar": "406:151",
+    "Avatar presence": "406:161",
+    "Avatar group": "406:168",
+    "Badge": "405:212",
+    "Badge / kind": "405:224",
+    "Card": "409:1271",
+    "Stat card": "409:1282",
+    "Table cell": "410:547",
+    "Table header cell": "410:562",
+    "Table row": "412:1188",
+    "Table": "413:1368",
+    "Data table": "416:4606",
+    "Item media (private)": "408:793",
+    "Item": "408:798",
+    "Item group": "408:997",
+    "Kbd": "403:29",
+    "Kbd group": "403:97"
+   },
+   "reviews": {
+    "Avatar": "421:4154",
+    "Badge": "420:3848",
+    "Card": "425:5173",
+    "Table": "426:6071",
+    "Data table": "426:7933",
+    "Item": "422:4572",
+    "Kbd": "418:3716"
+   },
+   "themesStrip": "427:11395",
+   "ordersReview": "428:13177",
+   "sectionLabels": {
+    "Avatar": "436:14114",
+    "Badge": "436:14118",
+    "Card": "436:14122",
+    "Table": "436:14126",
+    "Data table": "436:14130",
+    "Item": "436:14134",
+    "Kbd": "436:14138",
+    "Themes": "436:14142",
+    "Orders": "436:14146",
+    "Draft": "231:11255"
+   }
+  }
+ },
+ "addedVariables": {
+  "2026-10-28 forms-part1": {
+   "type/eyebrow/style": {
+    "why": "font/eyebrow + type/label/style resolves to Fragment Mono Medium in Utility, a face that does not exist",
+    "Studio flavor": "VariableID:277:8018 (Utility 'Regular'; other flavors alias Studio flavor type/label/style)",
+    "Theme": "VariableID:277:8019 (Studio \u2192 Studio flavor type/eyebrow/style; other modes \u2192 Theme type/label/style)",
+    "Theme B": "VariableID:277:8020 (every mode \u2192 Theme B type/label/style)",
+    "Theme set": "VariableID:277:8021 (A \u2192 Theme, B \u2192 Theme B)",
+    "scope": "FONT_STYLE",
+    "code": "var(--ns-weight-eyebrow) / var(--ns-studio-weight-eyebrow)",
+    "verified": "font/eyebrow + type/eyebrow/style exists as a face in all 10 Theme modes, all 7 Studio flavors and all 7 Theme B modes"
+   },
+   "size/switch/width-sm|height-sm|thumb-sm": {
+    "why": "F7 Switch sm (spec interim lit 28\u00d716, thumb 12) had no variable",
+    "Theme": "VariableID:277:8022 / 277:8025 / 277:8028 (Studio, Ledger, Filigrane, Signal 28/16/12; other modes alias their md value)",
+    "Theme B": "VariableID:277:8023 / 277:8026 / 277:8029 (Terminal 28/16/12; other modes alias their md value)",
+    "Theme set": "VariableID:277:8024 / 277:8027 / 277:8030 (A \u2192 Theme, B \u2192 Theme B)",
+    "scope": "WIDTH_HEIGHT",
+    "code": "var(--ns-size-switch-{width,height,thumb}-sm)"
+   }
+  },
+  "2026-10-28 forms-part2": {
+   "note": "none added: every text role used (T.body, T.small, T.strong, T.strong-sm, T.caption, T.data, font/mono + type/caption) resolves to an existing face in Utility, Tonal, Brutal, Pixel, Fluent and Cupertino"
+  },
+  "2026-10-28 navigation": {
+   "type/mono-strong/style": {
+    "why": "T.mono with type/strong/style (the current breadcrumb) resolves to faces that do not exist: Fragment Mono Medium (Studio Utility), JetBrains Mono SemiBold (Fluent, Fluent 2 Web), Space Mono SemiBold (Workshop flavor), DM Mono SemiBold (Playful flavor)",
+    "Studio flavor": "VariableID:336:20 (Utility Regular, Workshop Bold, Playful Medium; Cloud, Ledger, Atelier, Signal alias Studio flavor type/strong/style)",
+    "Theme": "VariableID:336:21 (Studio \u2192 Studio flavor type/mono-strong/style; Fluent Medium; other modes \u2192 Theme type/strong/style)",
+    "Theme B": "VariableID:336:22 (Fluent 2 Web Medium; other modes \u2192 Theme B type/strong/style)",
+    "Theme set": "VariableID:336:23 (A \u2192 Theme, B \u2192 Theme B; bind this one)",
+    "scope": "FONT_STYLE",
+    "code": "var(--ns-weight-mono-strong) / var(--ns-studio-weight-mono-strong)",
+    "verified": "font/mono + type/mono-strong/style exists as a face in all 10 Theme modes, all 7 Theme B modes and all 7 Studio flavors (24/24)"
+   },
+   "note": "every other text role used (T.body, T.strong, T.small, T.strong-sm, T.caption, T.data, font/data + strong or caption, T.mono, T.eyebrow, T.heading, T.title, font/mono + type/caption) resolves to an existing face in Utility, Tonal, Brutal, Pixel, Fluent and Cupertino"
+  },
+  "2026-10-28 overlays": {
+   "tooltip/bg|fg|border|muted|kbd": {
+    "why": "Spec O6 binds the chip to surface/inverse + text/inverse, which resolve to #eeeeee / #111111 in Utility Dark: a pale inverted chip. Dark is designed, not inverted, so the tooltip needs roles that are ink in Light and a raised dark surface with a hairline in Dark.",
+    "Scheme": {
+     "tooltip/bg": "VariableID:368:8447 (Light \u2192 surface/inverse, Dark \u2192 surface/raised; FRAME_FILL, SHAPE_FILL; var(--ns-tooltip-bg))",
+     "tooltip/fg": "VariableID:368:8448 (Light \u2192 text/inverse, Dark \u2192 text/fg; TEXT_FILL, SHAPE_FILL, STROKE_COLOR; var(--ns-tooltip-fg))",
+     "tooltip/border": "VariableID:368:8449 (Light \u2192 surface/inverse, i.e. merged; Dark \u2192 border/default; STROKE_COLOR; var(--ns-tooltip-border))",
+     "tooltip/muted": "VariableID:368:8450 (Light \u2192 Theme set gray/d/11, Dark \u2192 text/muted; TEXT_FILL, STROKE_COLOR; var(--ns-tooltip-muted))",
+     "tooltip/kbd": "VariableID:368:8451 (Light \u2192 Theme set gray/d/5, Dark \u2192 surface/raised; FRAME_FILL, SHAPE_FILL; var(--ns-tooltip-kbd))"
+    },
+    "themes": "all aliases follow the theme through Scheme roles and Theme set gray scales (verified rendering in Utility, Tonal, Brutal, Pixel, Fluent, Cupertino)"
+   },
+   "note": "no type variable added: every text role used (T.body, T.strong, T.small, T.strong-sm, T.caption, T.heading, T.eyebrow, T.mono = font/mono + type/code size/line + type/small style/tracking, font/mono + type/caption) is already verified in the six strip themes; every font the six theme rows resolve to loaded cleanly except non-existent mono weight combinations that no Overlays text binds"
+  },
+  "2026-10-28 data-display-1": {
+   "tooltip/l|d/bg|fg|border|muted|kbd": {
+    "why": "Tooltip roles applied one recipe to every theme; Tonal and Bloom (M3) use an inverse-surface plain tooltip in dark. Routed through Theme set like the other theme-following roles.",
+    "Theme": "VariableID:394:9/12 (bg l/d), 394:15/18 (fg), 394:21/24 (border), 394:27/30 (muted), 394:33/36 (kbd); every mode = Studio recipe except Tonal = M3",
+    "Theme B": "VariableID:394:10/13, 394:16/19, 394:22/25, 394:28/31, 394:34/37; every mode = Studio recipe except Bloom = M3",
+    "Theme set": "VariableID:394:11/14, 394:17/20, 394:23/26, 394:29/32, 394:35/38 (A \u2192 Theme, B \u2192 Theme B)",
+    "Scheme re-pointed": "tooltip/bg 368:8447, fg 368:8448, border 368:8449, muted 368:8450, kbd 368:8451 \u2192 Theme set tooltip/l|d/*",
+    "Studio recipe": "l: bg gray/l/12, fg gray/l/1, border gray/l/12, muted gray/d/11, kbd gray/d/5 \u00b7 d: bg surface/d/raised, fg gray/d/12, border border/d/default, muted gray/d/11, kbd surface/d/raised",
+    "M3 recipe": "l: as Studio \u00b7 d: bg gray/d/12, fg gray/d/1, border gray/d/12, muted gray/l/11, kbd gray/l/5",
+    "scope": "[] (hidden intermediates)",
+    "code": "var(--ns-tooltip-{l,d}-{part})",
+    "verified": "resolver: Utility L/D identical to before (#202020/#fcfcfc/#b4b4b4/#313131 \u00b7 #222225/#eeeeee/#3a3a3a); Tonal D and Bloom D = #eeeef0 chip, #121113 label; review-tooltip.png and overlays themes-strip.png 0.0000% pixel diff"
+   },
+   "card/bg": {
+    "why": "Utility cards have no fill (studio/card/bg transparent) but spec D3 binds surface/card, which paints white on surface/surface. Theme-following twin like card/border.",
+    "Scheme": "VariableID:402:15 (FRAME_FILL, SHAPE_FILL; var(--ns-card-bg))",
+    "Theme": "VariableID:402:9 / 402:12 (Studio \u2192 Studio flavor card/l|d/bg; other modes \u2192 surface/l|d/paper)",
+    "Theme B": "VariableID:402:10 / 402:13 (\u2192 surface/l|d/paper)",
+    "Theme set": "VariableID:402:11 / 402:14"
+   },
+   "size/kbd-sm": {
+    "why": "D7 Kbd sm height (spec lit 16) had no variable",
+    "Theme": "VariableID:402:16",
+    "Theme B": "VariableID:402:17",
+    "Theme set": "VariableID:402:18 (bind this)",
+    "value": "16 in every mode",
+    "scope": "WIDTH_HEIGHT",
+    "code": "var(--ns-size-kbd-sm)"
+   },
+   "note": "no type variable added: every text role used (T.strong, T.small, T.strong-sm, T.caption, T.label, T.eyebrow/badge, T.heading, T.kpi, T.data, T.mono, T.kbd = font/mono + caption style, T.title, T.body) resolves to an installed face in all 9 non-Studio Theme modes, all 7 Studio flavors and all 7 Theme B modes (299 checks, 0 missing)"
+  }
+ },
+ "ownerNotes": [
+  "2026-10-28 callout/alert header: one label only (icon + tone-coloured type or custom title, Medium, sentence case); no mono eyebrow beside a title. Icon box = label line height, centred on the first line; body indented to the label's left edge. Owner: 'weird hierarchy of text' / 'more importantly misaligned'.",
+  "2026-10-28 content colour: status tones on callouts/alerts/toasts/notices (subtle fill + border + text); status badges keep Utility outline + 6px square dot; kind tags use code/syntax colours; red = logo + destructive tone only.",
+  "2026-10-28 tabs: ink marker only on the default tab variant; line = underline only, segmented = fill only.",
+  "2026-10-28 owner: 'they all look too much the same, we lost the actual variation in themes I expect more'. Cause: non-Studio Theme modes got generic structure-twin values. Plan: theme character pass (theme-character.md) right after Data display 1, before more categories; language components for non-variable anatomy after the base library.",
+  "2026-10-28 owner (on the Overlays strip): variation across themes is far too small; 'I also expect uniqueness in components, example Pixel have rounded switch it make no sense'. Shape literals (999 pills etc.) must become theme variables, and language components are built per category right after the character pass, not at the end.",
+  "2026-10-28 owner accepted the style structure: each theme language is a style; step 1 = per-style component sets <Style>/<Component> (same property names, values and layer names as the base set) on each theme page, section 'Style components'; step 2 later = split each style into its own published library so Swap library restyles a design (owner publishes). Variables = token axes; variants = states/sizes within a style.",
+  "2026-10-28 coordinator decisions on style briefs: Fluent keeps accent on radio/slider/toggle/calendar/step (WinUI; owner earlier kept #60CDFF on controls); Brutal dark outlines use the higher-contrast grey (DESIGN.md contrast rule wins); Liquid interim rims use nearest Liquid roles; Terminal darkKey overlay is interim until code adds a scheme-aware role.",
+  "2026-10-28 coordinator rule for style conflicts: where DESIGN.md and a crafted frame disagree on a visual value, the crafted frame wins unless it breaks a contrast rule or the dark rule; DESIGN.md is corrected afterwards. Interim accepted: Tactile cards on Tactile's own surface; Liquid pink avatar on the red tag colour until a pink role exists; Liquid dark green delta uses success/text dark (#71d083, the crafted value).",
+  "2026-10-28 ~19:10 UTC: hit Figma MCP cap (200 calls/day, 10/min, per Full seat on Pro). Owner chose to continue within 200/day: see style-briefs/_budget-protocol.md (one builder at a time, <=60 calls per run, 2 screenshots per category).",
+  "2026-10-31 known defect: after style swaps, Table/Data table rows lose per-row status badge tones (all rows one tone). Fix in each style's tables (re-apply tone variant per row); Brutal and Filigrane affected, check the others.",
+  "2026-10-31 follow-ups: Fluent Navigation still nests 74 base Location marker + 2 Spinner instances; small Avatar group clips initials (all styles?); disabled table rows keep full-colour badges.",
+  "2026-10-31 swap-test findings to fix in a style cleanup pass: Tonal Sidebar nav items and Tonal/Field control lost part names, Tonal/Field hides labels for Switch/Radio/Slider/OTP/Checkbox; Tactile/Sheet scrim opaque (var 119:743 at 100%), Tactile toggle group shows '12' on every option, taller controls overflow the Sheet; Terminal Top bar fixed tab '2:orders', border titles clipped, emails overrun Status; Cupertino primary Button md looks disabled in light, page header repeats the large title; Pixel font breaks 'fi'. Feedback (Alert, Toast, Inline notice, Progress) has no style sets yet, so the next style pass is Feedback for all 10 styles.",
+  "2026-10-31 Tonal strong Alert info/success ~3:1 in light (same gap as solid badges) \u2192 contrast burn-down #2450 / value pass.",
+  "2026-10-31 Filigrane/Button: an icon swap carries a base icon colour that vanishes in dark; fix in the Filigrane/Button set (bind the icon stroke to the label colour). Filigrane important (tomato) vs destructive (red) Alerts look close in light.",
+  "2026-10-31 code follow-up: Pixelify Sans needs ligatures disabled in code (font-variant-ligatures: none) \u2014 Figma uses a ZWNJ workaround. Terminal: titled panes are now 10px taller (border on an inner layer); sidebar globe icon and '1:' numbering; stat-card down arrow points left. Pixel KPI block charts spill below the panels.",
+  "2026-11-01 Liquid: status glyphs and dots < 3:1 on tints (Apple system colours); top bar title constant 'Orders \u00b7 3,182'; no desktop wallpaper behind glass screens. Bloom: Orders sheet button row overflows; the dashboard shows 3 of 5 table rows; the sign-in alert title wraps. All styles: small Avatar group clipping and disabled-row badge colour follow-ups still open.",
+  "2026-11-01 coordinator decision: each theme gets its own chart palette chart/1..5 through Theme set (series collide today: Brutal 1=4, Pixel 1\u22484, Cupertino 1\u22482) \u2014 do it in the Data display 2 style pass. Code follow-up: --ns-chart-1 dark follows --ns-marker.",
+  "2026-11-01 cross-category base defects (found by Layout): Button icon keeps text/fg after glyph swap (vanishes on ink fill; same in Filigrane); Card body min-height not overridable; bottom Sheet content fixed 960 wide; Table columns overlap < ~900px; mobile Sidebar sheet toggle shows panel icon not close. \u2192 base-fix pass 2026-11-01.",
+  "2026-11-01 AI: Utility dark primary/default is graphite, so the active Citation chip uses marker/default + text/inverse and the selected Questionnaire choice uses primary/stroke. The Message set is sparse (7 variants; no text props). Tool card statuses follow code: pending|running|done|error.",
+  "2026-11-01 Docs kit follows the live site over the spec: read-only file tree, borderless attribute chip, private .Docs card. Figure images are placeholders. Fonts without an italic (Geist, Space Grotesk, Geist Mono) fall back to Regular for type/em.",
+  "2026-11-01 chart: the Donut and Chart sample data use status names (Delivered/Paid/Pending/Failed); rename to neutral categories. macOS 27 dark blue is \u0394E 0.3 from info (faithful). Brutal yellow, Pixel amber and Terminal phosphor are toned down for 3:1. The 'chart-1 dark follows marker' code note is superseded: tokens mirror chart/l|d/N per theme (#2450)."
+ ],
+ "retired": {
+  "Navigation \u00b7 .Menu helpers": {
+   "wrapper": "375:10884",
+   "blocks": [
+    "349:1276",
+    "349:1286",
+    "349:1292"
+   ],
+   "note": "moved out of Menubar container 349:1295 (container shrunk 1060 px, page content below shifted up)"
+  },
+  "Forms \u00b7 .Select option": {
+   "wrapper": "377:21937",
+   "blocks": [
+    "281:1037"
+   ]
+  },
+  "Overlays \u00b7 .Kbd": {
+   "wrapper": "431:18290",
+   "blocks": [
+    "370:26"
+   ],
+   "label": "431:18291",
+   "note": "moved out of the Tooltip container 370:21 (container shrunk 236 px, page content below shifted up)"
+  }
+ },
+ "plan": [
+  "B6 data-display-1 (running)",
+  "S0 shared variables (style-briefs/_shared-variables.md), single agent",
+  "S1..Sn style builders in parallel, one per theme group, over Actions, Forms, Navigation, Overlays (+ Data display 1)",
+  "then remaining base categories, each followed by its style pass",
+  "step 2: per-style library files (owner publishes)",
+  "D review"
+ ],
+ "styleGroups": {
+  "G1": [
+   "tonal",
+   "bloom"
+  ],
+  "G2": [
+   "cupertino",
+   "liquid"
+  ],
+  "G3": [
+   "fluent"
+  ],
+  "G4": [
+   "brutal",
+   "pixel"
+  ],
+  "G5": [
+   "filigrane",
+   "terminal"
+  ],
+  "G6": [
+   "tactile"
+  ]
+ },
+ "themePages": {
+  "tonal": "16:2",
+  "bloom": "102:808",
+  "cupertino": "29:6",
+  "liquid": "93:735",
+  "fluent": "53:2",
+  "brutal": "33:8",
+  "filigrane": "37:6",
+  "terminal": "39:2",
+  "pixel": "64:443",
+  "tactile": "60:219"
+ },
+ "ledgers": [
+  "ledger-feedback.json"
+ ],
+ "styleStatus": {
+  "tonal": "done 101",
+  "tactile": "done 101",
+  "terminal": "done 101",
+  "cupertino": "done 101",
+  "pixel": "done 101",
+  "fluent": "done 101 (g3 + g3b + g3c)",
+  "liquid": "done 101 (g2 + g2b)",
+  "bloom": "done 101 (g1b)",
+  "brutal": "done 101 (g4 + g4b); Select content row names fixed by the coordinator",
+  "filigrane": "done 101 (g5b + g5c)"
+ },
+ "feedbackStatus": {
+  "tonal": "done",
+  "tactile": "done",
+  "cupertino": "done",
+  "terminal": "done",
+  "pixel": "done",
+  "brutal": "done",
+  "fluent": "done + screens",
+  "filigrane": "done + screens",
+  "liquid": "done + screens",
+  "bloom": "done + screens"
+ },
+ "lateStatus": {
+  "tonal": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "bloom": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "cupertino": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "liquid": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "fluent": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "brutal": {
+   "A": "todo",
+   "B": "running"
+  },
+  "filigrane": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "terminal": {
+   "A": "todo",
+   "B": "running"
+  },
+  "pixel": {
+   "A": "todo",
+   "B": "todo"
+  },
+  "tactile": {
+   "A": "todo",
+   "B": "todo"
+  }
+ },
+ "lateQueue": "brief: style-briefs/_late-categories-pass.md. B first (no chart dependency) while the base-fix and chart-palette builders run; then A. Order: brutal, terminal, pixel, cupertino, fluent, tonal, bloom, liquid, filigrane, tactile."
+}

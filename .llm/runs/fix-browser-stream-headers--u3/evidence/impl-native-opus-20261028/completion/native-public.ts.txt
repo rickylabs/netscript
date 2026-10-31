@@ -1,0 +1,26 @@
+/** Claude-native equivalent of the accepted public text/tool/lifecycle allowlist. */
+export function publicEvent(v:any):Record<string,unknown>|null{
+  const base={type:v?.type,session_id:v?.session_id};
+  if(v?.type==='system'&&v.subtype==='init')return{...base,subtype:'init',model:v.model,permissionMode:v.permissionMode,
+    effort:typeof v.effort==='string'?v.effort:undefined,effortLevel:typeof v.effortLevel==='string'?v.effortLevel:undefined,
+    outputEffort:typeof v.output_config?.effort==='string'?v.output_config.effort:undefined,
+    mcp_servers:v.mcp_servers?.map((s:any)=>({name:s.name,status:s.status}))};
+  if(v?.type==='assistant')return{...base,message:{id:v.message?.id,model:v.message?.model,content:(v.message?.content??[])
+    .filter((p:any)=>p.type==='text'||p.type==='tool_use').map((p:any)=>p.type==='text'?{type:'text',text:p.text}:{type:'tool_use',id:p.id,name:p.name,input:p.input})}};
+  if(v?.type==='user')return{...base,message:{content:(v.message?.content??[]).filter((p:any)=>p.type==='tool_result')
+    .map((p:any)=>({type:'tool_result',tool_use_id:p.tool_use_id,is_error:p.is_error,
+      content:typeof p.content==='string'?p.content:(p.content??[]).filter((x:any)=>x.type==='text').map((x:any)=>({type:'text',text:x.text}))}))}};
+  if(v?.type==='result')return{...base,subtype:v.subtype,is_error:v.is_error,result:typeof v.result==='string'?v.result:undefined,num_turns:v.num_turns,
+    duration_ms:v.duration_ms};
+  if(v?.type==='error')return{...base,error:{name:v.error?.name,message:v.error?.message}};
+  return null;
+}
+export class PublicCapture{
+  readonly #decoder=new TextDecoder('utf-8',{fatal:true});#pending='';#bytes=0;
+  constructor(readonly write:(text:string)=>Promise<void>){}
+  async #line():Promise<void>{if(this.#pending.trim()){const event=publicEvent(JSON.parse(this.#pending));if(event)await this.write(JSON.stringify(event)+'\n');}this.#pending='';this.#bytes=0;}
+  async add(bytes:Uint8Array):Promise<void>{let offset=0;while(offset<bytes.length){const n=bytes.indexOf(10,offset);const end=n<0?bytes.length:n;this.#bytes+=end-offset;
+    if(this.#bytes>1024*1024)throw new Error('Public UTF-8 line exceeds1MiB.');this.#pending+=this.#decoder.decode(bytes.subarray(offset,end),{stream:true});
+    if(n<0)break;this.#pending+=this.#decoder.decode();await this.#line();offset=n+1;}}
+  async finish():Promise<void>{this.#pending+=this.#decoder.decode();await this.#line();}
+}

@@ -1,0 +1,113 @@
+{
+  "name": "@netscript/fresh",
+  "version": "0.0.8",
+  "description": "Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript.",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./server": "./src/runtime/server/mod.ts",
+    "./desktop": "./src/runtime/desktop/mod.ts",
+    "./builders": "./src/application/builders/mod.ts",
+    "./route": "./src/application/route/mod.ts",
+    "./defer": "./src/application/defer/mod.ts",
+    "./defer/island": "./src/application/defer/island.ts",
+    "./form": "./src/application/form/mod.ts",
+    "./error": "./src/diagnostics/error/mod.ts",
+    "./streams": "./src/runtime/streams/mod.ts",
+    "./ai": "./src/runtime/ai/mod.ts",
+    "./ai/sandbox": "./src/runtime/ai/sandbox.ts",
+    "./query": "./src/application/query/mod.ts",
+    "./interactive": "./src/runtime/interactive/mod.ts",
+    "./navigation": "./src/runtime/navigation/mod.ts",
+    "./vite": "./src/application/vite/vite.ts",
+    "./testing": "./src/testing/mod.ts"
+  },
+  "tasks": {
+    "test": "deno test --allow-all ./src ./tests",
+    "test:browser": "deno test --allow-all ./tests/form-navigation_browser.ts ./tests/defer-client-navigation_browser.ts ./tests/query-hydration-age_browser.ts ./tests/db-collection_browser.ts ./tests/route-purity_browser.ts ./tests/fresh-ui-modal_browser.ts",
+    "test:desktop-reload-native": "deno task --cwd ../.. test:desktop-reload-native",
+    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/runtime/navigation/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts ./tests/type-fixtures/desktop-consumer_type.ts ./tests/type-fixtures/navigation-consumer_type.ts && deno task check:streams-types",
+    "check:streams-types": "deno check --no-lock --config ./tests/type-fixtures/streamdb-consumer-deno.json --unstable-kv ./tests/type-fixtures/streamdb-wrapper_type.ts",
+    "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/runtime/navigation/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
+    "fmt": "deno fmt ./mod.ts ./src ./tests/_fixtures",
+    "fmt:check": "deno fmt --check ./mod.ts ./src ./tests/_fixtures",
+    "lint": "deno lint --rules-exclude=no-slow-types ./mod.ts ./src ./tests/_fixtures",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "imports": {
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/http": "jsr:@std/http@^1",
+    "@std/path": "jsr:@std/path@^1",
+    "@std/text": "jsr:@std/text@^1",
+    "fresh": "jsr:@fresh/core@^2.3.3",
+    "preact": "npm:preact@^10.29.2",
+    "preact-render-to-string": "npm:preact-render-to-string@^6.8.0",
+    "zod": "catalog:",
+    "@durable-streams/state": "npm:@durable-streams/state@0.3.2",
+    "@durable-streams/client": "npm:@durable-streams/client@0.2.7",
+    "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@0.0.10",
+    "@netscript/ai": "jsr:@netscript/ai@0.0.8",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.8",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8",
+    "@netscript/plugin-streams-core/sse": "jsr:@netscript/plugin-streams-core@0.0.8/sse",
+    "@netscript/sdk/desktop": "jsr:@netscript/sdk@0.0.8/desktop",
+    "@orpc/server": "npm:@orpc/server@^1.15.5",
+    "@preact/signals": "npm:@preact/signals@2.11.3",
+    "@tanstack/ai": "npm:@tanstack/ai@0.68.0",
+    "@tanstack/ai-client": "npm:@tanstack/ai-client@0.39.2",
+    "@tanstack/ai-preact": "npm:@tanstack/ai-preact@0.20.3",
+    "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.104.1",
+    "@tanstack/query-core": "npm:@tanstack/query-core@^5.104.1",
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.5.8",
+    "vite": "npm:vite@7.2.2"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts",
+      "**/*.tsx",
+      "deno.json",
+      "README.md"
+    ],
+    "exclude": [
+      "tests/",
+      "tests/type-fixtures/",
+      "**/*_test.ts",
+      "**/*_test.tsx",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "tests/fixtures/",
+      "tests/desktop-reload/",
+      "**/*_native.ts",
+      "**/*_browser.ts",
+      "**/*_browser.tsx"
+    ]
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns",
+      "deno.unstable"
+    ],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
+    ]
+  }
+}

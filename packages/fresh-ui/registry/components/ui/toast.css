@@ -17,19 +17,19 @@
   pointer-events: auto;
 }
 
-.ns-toast--success {
+:where(.ns-toast)[data-type='success'] {
   border-color: color-mix(in srgb, var(--ns-success) 24%, transparent);
 }
 
-.ns-toast--error {
+:where(.ns-toast)[data-type='error'] {
   border-color: color-mix(in srgb, var(--ns-destructive) 24%, transparent);
 }
 
-.ns-toast--warning {
+:where(.ns-toast)[data-type='warning'] {
   border-color: color-mix(in srgb, var(--ns-warning) 24%, transparent);
 }
 
-.ns-toast--info {
+:where(.ns-toast)[data-type='info'] {
   border-color: color-mix(in srgb, var(--ns-secondary) 24%, transparent);
 }
 
@@ -75,19 +75,19 @@
   color: var(--ns-secondary);
 }
 
-.ns-toast--success .ns-toast__symbol {
+:where(.ns-toast)[data-type='success'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-success) 18%, transparent);
   background: color-mix(in srgb, var(--ns-success) 8%, transparent);
   color: var(--ns-success);
 }
 
-.ns-toast--error .ns-toast__symbol {
+:where(.ns-toast)[data-type='error'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-destructive) 18%, transparent);
   background: color-mix(in srgb, var(--ns-destructive) 8%, transparent);
   color: var(--ns-destructive);
 }
 
-.ns-toast--warning .ns-toast__symbol {
+:where(.ns-toast)[data-type='warning'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-warning) 18%, transparent);
   background: color-mix(in srgb, var(--ns-warning) 8%, transparent);
   color: var(--ns-warning);
@@ -120,15 +120,15 @@
   color: color-mix(in srgb, var(--ns-secondary) 88%, var(--ns-fg) 12%);
 }
 
-.ns-toast--success .ns-toast__eyebrow {
+:where(.ns-toast)[data-type='success'] .ns-toast__eyebrow {
   color: var(--ns-success);
 }
 
-.ns-toast--error .ns-toast__eyebrow {
+:where(.ns-toast)[data-type='error'] .ns-toast__eyebrow {
   color: var(--ns-destructive);
 }
 
-.ns-toast--warning .ns-toast__eyebrow {
+:where(.ns-toast)[data-type='warning'] .ns-toast__eyebrow {
   color: var(--ns-warning);
 }
 
@@ -171,15 +171,15 @@
   background: var(--ns-secondary);
 }
 
-.ns-toast--success .ns-toast__progress-bar {
+:where(.ns-toast)[data-type='success'] .ns-toast__progress-bar {
   background: var(--ns-success);
 }
 
-.ns-toast--error .ns-toast__progress-bar {
+:where(.ns-toast)[data-type='error'] .ns-toast__progress-bar {
   background: var(--ns-destructive);
 }
 
-.ns-toast--warning .ns-toast__progress-bar {
+:where(.ns-toast)[data-type='warning'] .ns-toast__progress-bar {
   background: var(--ns-warning);
 }
 

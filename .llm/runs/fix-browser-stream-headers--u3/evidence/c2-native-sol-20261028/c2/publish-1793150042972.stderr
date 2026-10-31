@@ -1,0 +1,153 @@
+Task publish:dry-run deno publish --dry-run --allow-dirty
+Check mod.ts
+Check cli.ts
+Check src/aspire/mod.ts
+Check src/cli/composition/main.ts
+Check contracts/v1/mod.ts
+Check doctor.ts
+Check jobs/health-check.ts
+Check bin/runtime.ts
+Check scaffold.ts
+Check services/src/main.ts
+Check streams/mod.ts
+Check streams/server.ts
+Check worker/mod.ts
+Checking for slow types in the public API...
+Check mod.ts
+Check cli.ts
+Check src/aspire/mod.ts
+Check src/cli/composition/main.ts
+Check contracts/v1/mod.ts
+Check doctor.ts
+Check jobs/health-check.ts
+Check bin/runtime.ts
+Check scaffold.ts
+Check services/src/main.ts
+Check streams/mod.ts
+Check streams/server.ts
+Check worker/mod.ts
+warning[unanalyzable-dynamic-import]: unable to analyze dynamic import
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\plugins\workers\services\src\main.ts:97:55
+   | 
+97 |   const { createPluginServiceContext } = await import(bootstrapModule) as PluginServiceBootstrap;
+   |                                                       ^^^^^^^^^^^^^^^ the unanalyzable dynamic import
+   | 
+
+  info: after publishing this package, imports from the local import map / package.json do not work
+  info: dynamic imports that can not be analyzed at publish time will not be rewritten automatically
+  info: make sure the dynamic import is resolvable at runtime without an import map / package.json
+
+warning[unanalyzable-dynamic-import]: unable to analyze dynamic import
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\plugins\workers\src\cli\local-runtime-backend.ts:309:35
+    | 
+309 |       const module = await import(this.#files.toImportUrl(entrypoint));
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the unanalyzable dynamic import
+    | 
+
+  info: after publishing this package, imports from the local import map / package.json do not work
+  info: dynamic imports that can not be analyzed at publish time will not be rewritten automatically
+  info: make sure the dynamic import is resolvable at runtime without an import map / package.json
+
+warning[unanalyzable-dynamic-import]: unable to analyze dynamic import
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\plugins\workers\src\runtime\generated-jobs.ts:187:25
+    | 
+187 |     return await import(registryUrl.href) as Record<string, unknown>;
+    |                         ^^^^^^^^^^^^^^^^ the unanalyzable dynamic import
+    | 
+
+  info: after publishing this package, imports from the local import map / package.json do not work
+  info: dynamic imports that can not be analyzed at publish time will not be rewritten automatically
+  info: make sure the dynamic import is resolvable at runtime without an import map / package.json
+
+Simulating publish of @netscript/plugin-workers@0.0.8 with files:
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/README.md (10.46KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/bin/combined.ts (432B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/bin/runtime.ts (8.31KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/bin/scheduler.ts (86B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/bin/worker.ts (80B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/cli.ts (492B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/contracts/v1/mod.ts (692B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/database/workers.prisma (8.38KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/deno.json (2.91KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/doctor.ts (649B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/jobs/health-check.ts (9.59KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/jobs/job-tools.ts (231B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/mod.ts (667B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/package.json (337B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/scaffold.plugin.json (1.88KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/scaffold.runtime.json (1.63KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/scaffold.ts (647B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/generated-jobs.ts (868B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/init.ts (4.42KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/main.ts (3.66KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/router.ts (701B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/admin.ts (2.15KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/describe.ts (1.66KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/jobs.ts (4.92KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/router-context.ts (3.41KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/runs.ts (5.4KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/subscribe.ts (4.97KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/tasks.ts (3.7KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/routers/v1.ts (1.33KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/services/src/service-runtime.ts (2.83KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/plugin.ts (5.83KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/barrel/barrel.stub.ts (537B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/barrel/barrel.ts (1.89KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/glue/glue.ts (759B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/glue/runtime.stub.ts (1.23KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/input.ts (5.16KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/job/job.stub.ts (946B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/job/job.ts (1.9KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/job/webhook-delivery.stub.ts (8.64KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/mod.ts (1.06KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/resource-metadata.ts (3.04KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/task/task.stub.ts (1.77KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/task/task.ts (3.1KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/workflow/workflow.stub.ts (653B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/adapter/resources/workflow/workflow.ts (1.07KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/aspire/mod.ts (507B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/aspire/workers-contribution.ts (2.22KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/adapters/runtime-api-client.ts (2.51KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/command-types.ts (2.37KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/commands.ts (15.13KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/composition/main.ts (4.03KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/configured-job-policies.ts (4.2KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/generate-runtime-registries.ts (3.74KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/load-workers-config.ts (1.16KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/local-runtime-backend.ts (17.25KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/mod.ts (1.48KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/official-sample-configuration.ts (11.4KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/registry-compiler.ts (8.71KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/runtime-registry-generator.ts (19.06KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/cli/workers-cli.ts (2.24KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/e2e/mod.ts (231B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/e2e/probes/health.ts (318B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/e2e/probes/probe-context.ts (454B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/e2e/workers-gates.ts (942B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/package-metadata.generated.ts (219B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/public/mod.ts (4.63KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/runtime/concurrency.ts (3.03KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/src/runtime/generated-jobs.ts (8.25KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts (2.5KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/mod.ts (999B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/producer.ts (1.88KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/schema.ts (253B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/server.ts (1.5KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/job-dispatcher.ts (10.73KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/job-execution.ts (8.06KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/job-runner-pool.ts (4.65KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/listener-supervisor.ts (5.29KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/mod.ts (2.05KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/queue-consumer.ts (4.05KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler-dispatch.ts (2.41KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler-events.ts (1003B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler-info.ts (549B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler-options.ts (3.35KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler-scheduling.ts (1.98KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler-tracing.ts (2.36KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/scheduler.ts (9.2KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/subprocess-trace-context.ts (2.7KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/worker-idempotency-events.ts (1.14KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/worker-options.ts (8.24KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/worker/worker.ts (15.09KB)
+Success Dry run complete

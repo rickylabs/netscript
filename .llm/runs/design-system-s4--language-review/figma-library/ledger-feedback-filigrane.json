@@ -1,0 +1,98 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback-style-builder (Fluent, then Filigrane)",
+  "theme": "filigrane",
+  "page": "37:6",
+  "modes": {"themeSet": "239:7", "theme": "2:6", "scheme": "3:0 (Light) / 3:1 (Dark)"},
+  "status": "DONE: 9 Feedback style sets (8 new + Filigrane/Spinner verified), review + strip, swap test 22/22, sweep, row-tone fix, Filigrane screens group.",
+  "frames": {
+    "Feedback": "567:190067",
+    "Feedback · Sets": "567:190072",
+    "Style review · Feedback": "568:201658",
+    "panel · Light": "568:201659",
+    "panel · Dark": "568:203143",
+    "Filigrane style strip · Feedback": "568:204627"
+  },
+  "sets": [
+    {"name": "Filigrane/Alert", "id": "567:190073", "baseId": "450:422", "variants": 12},
+    {"name": "Filigrane/Inline notice", "id": "567:190758", "baseId": "451:56561", "variants": 6},
+    {"name": "Filigrane/Toast", "id": "567:191089", "baseId": "452:245", "variants": 6},
+    {"name": "Filigrane/Progress", "id": "568:51661", "baseId": "453:6139", "variants": 30},
+    {"name": "Filigrane/Progress circular", "id": "568:51872", "baseId": "453:6280", "variants": 30},
+    {"name": "Filigrane/Spinner", "id": "465:105330", "baseId": "252:11837", "variants": 18, "note": "existing (G5b Actions, 18 variants); verified, not rebuilt"},
+    {"name": "Filigrane/Skeleton", "id": "568:51983", "baseId": "454:975", "variants": 12},
+    {"name": "Filigrane/Skeleton preset", "id": "568:51996", "baseId": "454:1072", "variants": 4},
+    {"name": "Filigrane/Empty state", "id": "568:52093", "baseId": "454:2671", "variants": 18}
+  ],
+  "audit": "Every paint binds a core role Filigrane allows (text/*, border/*, surface/bg, primary/default|text, destructive/default|text, status defaults, action/*, card/*, table/*); none of the banned roles (surface/card|raised|muted|selected|inverse, tooltip/*). No base instances left except .Slot (6, Empty state media=image).",
+  "recipes": {
+    "Alert": "The Notice (DESIGN L349) per tone: no box, no fill, no radius. A 1px top rule (theme-only 'top-rule': border/strong; important = tomato primary/default, the Attention notice; destructive = destructive/default). One label: the 7x7 status square (the Status glyph; colour = Filigrane/Badge dot per tone, important primary/text) in a 7-wide box of the title's line height, gap 8, then the title T.strong text/fg (destructive/text, important primary/text). Body T.body text/muted on the label column. strong (derived): the base 'rule' becomes the 3px margin bar at x -8 (border/control; tomato for important; destructive/default). Action = Filigrane link (tomato text, underline).",
+    "Inline notice": "The Status anatomy: no box and no rule; square, gap 8, title in the tone ink, muted description.",
+    "Toast": "F.panel: surface/bg, 1px INSIDE border/strong, square, no shadow. Status square + title T.strong text/fg (error: destructive/text plus a 1px destructive/default accent rule over the top edge). Message text/muted. Timer: a 2px border/control bar (error: destructive/default) on a 1px border/strong baseline. Loading = Filigrane/Spinner.",
+    "Progress": "The Dropzone upload / tab underline: a 2px bar on a 1px border/strong baseline (theme-only 'baseline'), square ends; primary text/fg, secondary text/muted, success/warning/destructive in their status colour.",
+    "Progress circular": "A 1px border/strong hairline ring with a 2px square-cap arc in the same ink map.",
+    "Skeleton": "Derived: line = a greeked text bar in border/subtle; block = an empty 1px border/default hairline frame (print placeholder); avatar = the hairline circle. Square, static.",
+    "Skeleton preset": "Filigrane/Skeleton bones on the ground; row and head rules kept; no card fills.",
+    "Empty state": "No tile, no box. Lucide glyph at 1.5 in text/muted (error destructive/text); title Newsreader Light 24/32 (the one-sentence statement); description T.body text/muted (md width 400 so the sentence sets on one line); Filigrane Solid + Outline. border=true = the Dropzone bounds: 1px border/strong rules top and bottom only."
+  },
+  "pngs": {
+    "review": "review/styles/filigrane/feedback.png",
+    "review-hi": "review/styles/filigrane/feedback-hi.png",
+    "strip": "review/styles/filigrane/feedback-strip.png",
+    "strip-hi": "review/styles/filigrane/feedback-strip-hi.png"
+  },
+  "swapTest": "22/22 (Light + Dark): base Alert, Inline notice, Toast, Progress, Progress circular, Spinner, Empty state, Skeleton preset with text/boolean overrides and a custom title, swapped to Filigrane/*; every override survived.",
+  "fixesAfterReview": [
+    "Dark: the strong margin bar (8 variants) and the toast timer bar (5) were text/fg, a bright #eeeeec bar in dark; now border/control (ink #21201c light, #7c7b74 dark).",
+    "Empty state: the nested Solid button's '+' glyph carried a base colour that vanished in dark; every nested Button glyph now binds its label's role (72 vectors). md description widened 360 -> 400 (Hanken 15/24 left an orphan 'out.')."
+  ],
+  "sweep": {
+    "Filigrane/Table": "67 base Skeleton -> Filigrane/Skeleton, 2 base Empty state -> Filigrane/Empty state (the Table has no stand-ins; they were visible base sets).",
+    "Filigrane/Data table": "follows the Table main; nested empty state set to no-results with the base Data table's props ('No orders match “SO-99999”').",
+    "Filigrane/Menubar": "5 base Spinner (pass 2), then 5 base Menu item + 2 Menu separator (with their nested Kbd and .State layer) -> Filigrane sets; 5 item labels restored.",
+    "leftover": "only .Slot (46) in all Filigrane sets."
+  },
+  "ownerNoteFixes": [
+    "Row badge tones (2026-10-31, Filigrane named): Filigrane/Table and Data table rows had every badge at tone=success; 4 re-set from their status words (Paid success, Awaiting payment warning, Shipped info, Refunded neutral). The screens swap re-checks tones per row (0 lost).",
+    "Avatar group (2026-10-31, 'all styles?'): overlap set from the initials' render bounds plus the 2px ring: sm -8 -> -2, md -8 -> -6, lg unchanged.",
+    "Disabled table rows (2026-10-31): Filigrane rows use the bound R.disabled opacity (0.38), so badges and avatars already dim; no change."
+  ],
+  "screens": {
+    "group": "570:65806",
+    "y": 17544,
+    "modes": "Theme set A 239:7 · Theme Filigrane 2:6 · Density Comfortable 3:2 · Scheme Light 3:0 / Dark 3:1",
+    "ids": {
+      "Dashboard": {"light": "570:65811", "dark": "570:70134"},
+      "Orders": {"light": "570:65836", "dark": "570:73374"},
+      "Settings": {"light": "570:65867", "dark": "570:75183"},
+      "Sign-in": {"light": "570:65895", "dark": "570:75986"},
+      "Command": {"light": "570:65917", "dark": "570:80160"}
+    },
+    "swap": {"swapped": 110, "perScreen": {"Dashboard": 19, "Orders": 23, "Settings": 24, "Sign-in": 19, "Command": 25}, "alreadyStyleNested": 1192, "sharedGlyphs": 554, "partNamesRepaired": 163, "textsRestored": 4, "rowTonesReapplied": 0, "rowInitialsReapplied": 12, "errors": 0},
+    "unswapped": {".Slot": 3},
+    "feedback": "Alert (Sign-in, Orders sheet), Inline notice (Settings), Progress (onboarding) and the 3 Toasts (Command) are Filigrane now.",
+    "screenFixes": [
+      "All Filigrane Button instances (54, light + dark): the icon glyph strokes bind the label's role (action/primary-fg, primary/text, text/muted, destructive/text). The swap carried a base glyph colour that vanished in dark ('+' on Create order, the arrow on Continue).",
+      "Orders: the sheet fits (639 of 654); scrim surface/overlay at 40%."
+    ],
+    "png": [
+      "review/screens/filigrane/dashboard-light.png", "review/screens/filigrane/dashboard-dark.png",
+      "review/screens/filigrane/orders-light.png", "review/screens/filigrane/orders-dark.png",
+      "review/screens/filigrane/settings-light.png", "review/screens/filigrane/settings-dark.png",
+      "review/screens/filigrane/sign-in-light.png", "review/screens/filigrane/sign-in-dark.png",
+      "review/screens/filigrane/command-light.png", "review/screens/filigrane/command-dark.png"
+    ]
+  },
+  "deviations": [
+    "Filigrane/Spinner not re-cloned (G5b built the 18-variant tone axis).",
+    "Alert/Inline/Toast icon box is 7 wide x the title's line height (not square), so the square, gap 8 and word keep the Filigrane Status anatomy; the glyph instance part stays in the tree, hidden.",
+    "important uses the tomato Notice (primary/default rule, primary/text title and square); it reads close to destructive (#d13415 tomato vs #e5484d red).",
+    "Progress draws the same 2+1 rule at every size; status variants colour the 2px bar.",
+    "Skeleton line bars bind border/subtle as a fill (the faintest Filigrane ink), blocks/avatars are hairlines, not fills."
+  ],
+  "ownerReview": [
+    "Filigrane/Button glyph colour: on screens the swapped Buttons lost the glyph colour in dark (fixed per instance on the screens and in Empty state). The same override carry-over will hit any other base→Filigrane swap of a Button with an icon; a fix in the Filigrane/Button main (bind the glyph to the label role by layer name the swap preserves) would remove it at the source.",
+    "important vs destructive Alert: tomato and red are close in light; decide whether important should drop the square and keep only the tomato rule + eyebrow.",
+    "Skeleton lines in light (#e9e8e6 on #f9f9f8) are very faint by design; say if they should step up to border/default."
+  ]
+}

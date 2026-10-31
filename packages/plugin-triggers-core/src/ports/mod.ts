@@ -1,6 +1,12 @@
 /** @module @netscript/plugin-triggers-core/ports */
 
-export type { FileWatcherHandle, FileWatcherPort } from './file-watcher-port.ts';
+export { FILE_WATCH_STATES } from './file-watcher-port.ts';
+export type {
+  FileWatcherHandle,
+  FileWatcherPort,
+  FileWatchState,
+  FileWatchStatusEvent,
+} from './file-watcher-port.ts';
 export type { TriggerClockPort } from './trigger-clock-port.ts';
 export type {
   TriggerDeferRecord,

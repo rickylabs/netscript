@@ -1,0 +1,52 @@
+{
+  "beforeSurfaces": 299,
+  "afterSurfaces": 299,
+  "changed": [
+    {
+      "surface": "service/.",
+      "delta": [
+        {
+          "name": "AnonymousRequestMatch",
+          "after": [
+            "AnonymousRequestMatch",
+            "interface",
+            "interface AnonymousRequestMatch { readonly method: unknown; readonly path: string }",
+            "One anonymous request with an uppercase method and byte-exact absolute path.\n\nGET does not admit HEAD. Descendants, encoded spellings and slash/case variants are not\nadmitted; query strings are ignored. OPTIONS is excluded: use `withCors()` for preflight.\n@example ```ts\nimport type { AnonymousRequestMatch } from '@netscript/service/auth';\nconst health: readonly AnonymousRequestMatch[] = [\n  { method: 'GET', path: '/health' },\n  { method: 'GET', path: '/health/live' },\n  { method: 'GET', path: '/health/ready' },\n  { method: 'HEAD', path: '/health' },\n  { method: 'HEAD', path: '/health/live' },\n  { method: 'HEAD', path: '/health/ready' },\n];\n```"
+          ]
+        },
+        {
+          "name": "AnonymousRule",
+          "after": [
+            "AnonymousRule",
+            "typeAlias",
+            "type AnonymousRule = unknown",
+            "A legacy path prefix or one exact anonymous request."
+          ]
+        }
+      ]
+    },
+    {
+      "surface": "service/./auth",
+      "delta": [
+        {
+          "name": "AnonymousRequestMatch",
+          "after": [
+            "AnonymousRequestMatch",
+            "reference",
+            "reference AnonymousRequestMatch",
+            ""
+          ]
+        },
+        {
+          "name": "AnonymousRule",
+          "after": [
+            "AnonymousRule",
+            "reference",
+            "reference AnonymousRule",
+            ""
+          ]
+        }
+      ]
+    }
+  ]
+}

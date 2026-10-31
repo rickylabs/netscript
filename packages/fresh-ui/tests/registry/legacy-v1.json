@@ -1,0 +1,2568 @@
+{
+  "theme-ns-one": {
+    "name": "theme-ns-one",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "ns-one"
+    ]
+  },
+  "theme-studio-utility": {
+    "name": "theme-studio-utility",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-studio-cloud": {
+    "name": "theme-studio-cloud",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-studio-workshop": {
+    "name": "theme-studio-workshop",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-studio-playful": {
+    "name": "theme-studio-playful",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-studio-ledger": {
+    "name": "theme-studio-ledger",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-studio-atelier": {
+    "name": "theme-studio-atelier",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-studio-signal": {
+    "name": "theme-studio-signal",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "studio"
+    ]
+  },
+  "theme-tonal": {
+    "name": "theme-tonal",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "tonal"
+    ]
+  },
+  "theme-bloom": {
+    "name": "theme-bloom",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "bloom"
+    ]
+  },
+  "theme-cupertino": {
+    "name": "theme-cupertino",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "cupertino"
+    ]
+  },
+  "theme-liquid": {
+    "name": "theme-liquid",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "liquid"
+    ]
+  },
+  "theme-fluent": {
+    "name": "theme-fluent",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "fluent"
+    ]
+  },
+  "theme-brutal": {
+    "name": "theme-brutal",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "brutal"
+    ]
+  },
+  "theme-filigrane": {
+    "name": "theme-filigrane",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "filigrane"
+    ]
+  },
+  "theme-terminal": {
+    "name": "theme-terminal",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "terminal"
+    ]
+  },
+  "theme-pixel": {
+    "name": "theme-pixel",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "pixel"
+    ]
+  },
+  "theme-tactile": {
+    "name": "theme-tactile",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "tokens",
+      "tactile"
+    ]
+  },
+  "cn": {
+    "name": "cn",
+    "kind": "lib",
+    "files": [
+      {
+        "source": "registry/lib/cn.ts",
+        "target": "@lib/cn.ts"
+      }
+    ],
+    "dependencies": [
+      "npm:clsx@^2.1.1",
+      "npm:tailwind-merge@^3.7.0"
+    ],
+    "tags": [
+      "lib",
+      "class-names",
+      "support"
+    ]
+  },
+  "public-types": {
+    "name": "public-types",
+    "kind": "lib",
+    "files": [
+      {
+        "source": "registry/lib/public-types.ts",
+        "target": "@lib/public-types.ts"
+      }
+    ],
+    "tags": [
+      "lib",
+      "types",
+      "support"
+    ]
+  },
+  "control-props": {
+    "name": "control-props",
+    "kind": "support",
+    "files": [
+      {
+        "source": "registry/components/ui/control-props.ts",
+        "target": "@ui/control-props.ts"
+      }
+    ],
+    "tags": [
+      "forms",
+      "descriptors",
+      "support"
+    ]
+  },
+  "form-control-styles": {
+    "name": "form-control-styles",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/components/ui/form-control-styles.css",
+        "target": "@assets/ui/form-control-styles.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/form-control-styles.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "styles",
+      "support"
+    ]
+  },
+  "choice-styles": {
+    "name": "choice-styles",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/components/ui/choice-styles.css",
+        "target": "@assets/ui/choice-styles.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/choice-styles.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "selection",
+      "styles",
+      "support"
+    ]
+  },
+  "surface-styles": {
+    "name": "surface-styles",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/components/ui/surface-styles.css",
+        "target": "@assets/ui/surface-styles.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/surface-styles.css';"
+      }
+    ],
+    "tags": [
+      "surface",
+      "styles",
+      "support"
+    ]
+  },
+  "sheet-styles": {
+    "name": "sheet-styles",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/components/ui/sheet.css",
+        "target": "@assets/ui/sheet.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/sheet.css';"
+      }
+    ],
+    "tags": [
+      "surface",
+      "sheet",
+      "styles",
+      "support"
+    ]
+  },
+  "floating-styles": {
+    "name": "floating-styles",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/components/ui/floating.css",
+        "target": "@assets/ui/floating.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/floating.css';"
+      }
+    ],
+    "tags": [
+      "surface",
+      "popover",
+      "tooltip",
+      "styles",
+      "support"
+    ]
+  },
+  "alert-styles": {
+    "name": "alert-styles",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/components/ui/alert-styles.css",
+        "target": "@assets/ui/alert-styles.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/alert-styles.css';"
+      }
+    ],
+    "tags": [
+      "feedback",
+      "styles",
+      "support"
+    ]
+  },
+  "theme-seed": {
+    "name": "theme-seed",
+    "kind": "theme",
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/tokens.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/theme-preset.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "tags": [
+      "theme",
+      "ns-one",
+      "tailwind-v4",
+      "tokens",
+      "style-dictionary-ready"
+    ]
+  },
+  "theme-previews": {
+    "name": "theme-previews",
+    "kind": "lib",
+    "files": [
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
+      }
+    ],
+    "tags": [
+      "theme",
+      "preview",
+      "development"
+    ]
+  },
+  "layout-objects": {
+    "name": "layout-objects",
+    "kind": "style",
+    "files": [
+      {
+        "source": "registry/styles/layouts.css",
+        "target": "@assets/layouts.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './layouts.css';"
+      }
+    ],
+    "tags": [
+      "layout",
+      "styles",
+      "css-only",
+      "composition",
+      "dashboard-foundation"
+    ]
+  },
+  "button": {
+    "name": "button",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/button.tsx",
+        "target": "@ui/button.tsx"
+      },
+      {
+        "source": "registry/components/ui/button.css",
+        "target": "@assets/ui/button.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "spinner"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/button.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "actions",
+      "primitive"
+    ]
+  },
+  "icon-button": {
+    "name": "icon-button",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/icon-button.tsx",
+        "target": "@ui/icon-button.tsx"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "button"
+    ],
+    "tags": [
+      "actions",
+      "primitive",
+      "icon"
+    ]
+  },
+  "input": {
+    "name": "input",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/input.tsx",
+        "target": "@ui/input.tsx"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "form-control-styles"
+    ],
+    "tags": [
+      "forms",
+      "primitive"
+    ]
+  },
+  "textarea": {
+    "name": "textarea",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/textarea.tsx",
+        "target": "@ui/textarea.tsx"
+      },
+      {
+        "source": "registry/components/ui/textarea.css",
+        "target": "@assets/ui/textarea.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "form-control-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/textarea.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "primitive"
+    ]
+  },
+  "checkbox": {
+    "name": "checkbox",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/checkbox.tsx",
+        "target": "@ui/checkbox.tsx"
+      },
+      {
+        "source": "registry/components/ui/checkbox.css",
+        "target": "@assets/ui/checkbox.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "choice-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/checkbox.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "selection",
+      "primitive"
+    ]
+  },
+  "switch": {
+    "name": "switch",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/switch.tsx",
+        "target": "@ui/switch.tsx"
+      },
+      {
+        "source": "registry/components/ui/switch.css",
+        "target": "@assets/ui/switch.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "choice-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/switch.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "selection",
+      "primitive"
+    ]
+  },
+  "label": {
+    "name": "label",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/label.tsx",
+        "target": "@ui/label.tsx"
+      },
+      {
+        "source": "registry/components/ui/label.css",
+        "target": "@assets/ui/label.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/label.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "primitive"
+    ]
+  },
+  "select": {
+    "name": "select",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/select.tsx",
+        "target": "@ui/select.tsx"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "form-control-styles"
+    ],
+    "tags": [
+      "forms",
+      "primitive"
+    ]
+  },
+  "form-field": {
+    "name": "form-field",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/form-field.tsx",
+        "target": "@ui/form-field.tsx"
+      },
+      {
+        "source": "registry/components/ui/form-field.css",
+        "target": "@assets/ui/form-field.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "label"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/form-field.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "composed"
+    ]
+  },
+  "card": {
+    "name": "card",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/card.tsx",
+        "target": "@ui/card.tsx"
+      },
+      {
+        "source": "registry/components/ui/card.css",
+        "target": "@assets/ui/card.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "surface-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/card.css';"
+      }
+    ],
+    "tags": [
+      "surface",
+      "container",
+      "primitive"
+    ]
+  },
+  "panel": {
+    "name": "panel",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/panel.tsx",
+        "target": "@ui/panel.tsx"
+      },
+      {
+        "source": "registry/components/ui/panel.css",
+        "target": "@assets/ui/panel.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "surface-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/panel.css';"
+      }
+    ],
+    "tags": [
+      "surface",
+      "container",
+      "primitive"
+    ]
+  },
+  "badge": {
+    "name": "badge",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/badge.tsx",
+        "target": "@ui/badge.tsx"
+      },
+      {
+        "source": "registry/components/ui/badge.css",
+        "target": "@assets/ui/badge.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/badge.css';"
+      }
+    ],
+    "tags": [
+      "status",
+      "feedback",
+      "primitive"
+    ]
+  },
+  "avatar": {
+    "name": "avatar",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/avatar.tsx",
+        "target": "@ui/avatar.tsx"
+      },
+      {
+        "source": "registry/components/ui/avatar.css",
+        "target": "@assets/ui/avatar.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/avatar.css';"
+      }
+    ],
+    "tags": [
+      "identity",
+      "presence",
+      "primitive"
+    ]
+  },
+  "citation-chip": {
+    "name": "citation-chip",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/citation-chip.tsx",
+        "target": "@ui/citation-chip.tsx"
+      },
+      {
+        "source": "registry/components/ui/citation-chip.css",
+        "target": "@assets/ui/citation-chip.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/citation-chip.css';"
+      }
+    ],
+    "tags": [
+      "citation",
+      "ai",
+      "primitive"
+    ]
+  },
+  "code-block": {
+    "name": "code-block",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/code-block.tsx",
+        "target": "@ui/code-block.tsx"
+      },
+      {
+        "source": "registry/components/ui/code-block.css",
+        "target": "@assets/ui/code-block.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/code-block.css';"
+      }
+    ],
+    "tags": [
+      "code",
+      "ai",
+      "primitive"
+    ]
+  },
+  "model-selector": {
+    "name": "model-selector",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/model-selector.tsx",
+        "target": "@ui/model-selector.tsx"
+      },
+      {
+        "source": "registry/components/ui/model-selector.css",
+        "target": "@assets/ui/model-selector.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/model-selector.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "model",
+      "primitive"
+    ]
+  },
+  "tool-call-card": {
+    "name": "tool-call-card",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/tool-call-card.tsx",
+        "target": "@ui/tool-call-card.tsx"
+      },
+      {
+        "source": "registry/components/ui/tool-call-card.css",
+        "target": "@assets/ui/tool-call-card.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "badge",
+      "spinner"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/tool-call-card.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "tool",
+      "primitive"
+    ]
+  },
+  "chart-block": {
+    "name": "chart-block",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/chart-block.tsx",
+        "target": "@ui/chart-block.tsx"
+      },
+      {
+        "source": "registry/components/ui/chart-block.css",
+        "target": "@assets/ui/chart-block.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/chart-block.css';"
+      }
+    ],
+    "tags": [
+      "chart",
+      "analytics",
+      "primitive"
+    ]
+  },
+  "donut": {
+    "name": "donut",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/donut.tsx",
+        "target": "@ui/donut.tsx"
+      },
+      {
+        "source": "registry/components/ui/donut.css",
+        "target": "@assets/ui/donut.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/donut.css';"
+      }
+    ],
+    "tags": [
+      "chart",
+      "analytics",
+      "primitive"
+    ]
+  },
+  "prompt-input": {
+    "name": "prompt-input",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/prompt-input.tsx",
+        "target": "@ui/prompt-input.tsx"
+      },
+      {
+        "source": "registry/components/ui/prompt-input.css",
+        "target": "@assets/ui/prompt-input.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "model-selector"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/prompt-input.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "composer",
+      "primitive"
+    ]
+  },
+  "message": {
+    "name": "message",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/message.tsx",
+        "target": "@ui/message.tsx"
+      },
+      {
+        "source": "registry/components/ui/message.css",
+        "target": "@assets/ui/message.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "avatar",
+      "citation-chip",
+      "chart-block",
+      "code-block",
+      "tool-call-card"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/message.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "chat",
+      "primitive"
+    ]
+  },
+  "markdown": {
+    "name": "markdown",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/markdown.tsx.template",
+        "target": "@ui/markdown.tsx"
+      },
+      {
+        "source": "registry/components/ui/markdown-pipeline.ts",
+        "target": "@ui/markdown-pipeline.ts"
+      },
+      {
+        "source": "registry/components/ui/markdown.css",
+        "target": "@assets/ui/markdown.css"
+      }
+    ],
+    "dependencies": [
+      "npm:unified@^11",
+      "npm:remark-parse@^11",
+      "npm:remark-rehype@^11",
+      "npm:remark-gfm@^4",
+      "npm:remark-math@^6",
+      "npm:rehype-react@^8",
+      "npm:rehype-katex@^7",
+      "npm:rehype-highlight@^7",
+      "npm:rehype-sanitize@^6",
+      "npm:katex@^0.16",
+      "npm:highlight.js@^11"
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "citation-chip"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/markdown.css';"
+      },
+      {
+        "layer": "components",
+        "content": "@import 'katex/dist/katex.min.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "chat",
+      "markdown",
+      "component"
+    ]
+  },
+  "command-palette": {
+    "name": "command-palette",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/command-palette.tsx",
+        "target": "@ui/command-palette.tsx"
+      },
+      {
+        "source": "registry/components/ui/command-palette.css",
+        "target": "@assets/ui/command-palette.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/command-palette.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "command",
+      "palette",
+      "primitive"
+    ]
+  },
+  "search": {
+    "name": "search",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/search.tsx",
+        "target": "@ui/search.tsx"
+      },
+      {
+        "source": "registry/components/ui/search.css",
+        "target": "@assets/ui/search.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/search.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "search",
+      "navigation",
+      "primitive"
+    ]
+  },
+  "dropzone": {
+    "name": "dropzone",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/dropzone.tsx",
+        "target": "@ui/dropzone.tsx"
+      },
+      {
+        "source": "registry/components/ui/dropzone.css",
+        "target": "@assets/ui/dropzone.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/dropzone.css';"
+      }
+    ],
+    "tags": [
+      "upload",
+      "forms",
+      "primitive"
+    ]
+  },
+  "separator": {
+    "name": "separator",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/separator.tsx",
+        "target": "@ui/separator.tsx"
+      },
+      {
+        "source": "registry/components/ui/separator.css",
+        "target": "@assets/ui/separator.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/separator.css';"
+      }
+    ],
+    "tags": [
+      "surface",
+      "layout",
+      "primitive"
+    ]
+  },
+  "alert": {
+    "name": "alert",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/alert.tsx",
+        "target": "@ui/alert.tsx"
+      },
+      {
+        "source": "registry/components/ui/alert.css",
+        "target": "@assets/ui/alert.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "alert-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/alert.css';"
+      }
+    ],
+    "tags": [
+      "feedback",
+      "status",
+      "primitive"
+    ]
+  },
+  "inline-notice": {
+    "name": "inline-notice",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/inline-notice.tsx",
+        "target": "@ui/inline-notice.tsx"
+      },
+      {
+        "source": "registry/components/ui/inline-notice.css",
+        "target": "@assets/ui/inline-notice.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "alert-styles"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/inline-notice.css';"
+      }
+    ],
+    "tags": [
+      "feedback",
+      "status",
+      "primitive"
+    ]
+  },
+  "spinner": {
+    "name": "spinner",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/spinner.tsx",
+        "target": "@ui/spinner.tsx"
+      },
+      {
+        "source": "registry/components/ui/spinner.css",
+        "target": "@assets/ui/spinner.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/spinner.css';"
+      }
+    ],
+    "tags": [
+      "feedback",
+      "loading",
+      "primitive"
+    ]
+  },
+  "progress": {
+    "name": "progress",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/progress.tsx",
+        "target": "@ui/progress.tsx"
+      },
+      {
+        "source": "registry/components/ui/progress.css",
+        "target": "@assets/ui/progress.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/progress.css';"
+      }
+    ],
+    "tags": [
+      "feedback",
+      "loading",
+      "primitive"
+    ]
+  },
+  "skeleton": {
+    "name": "skeleton",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/skeleton.tsx",
+        "target": "@ui/skeleton.tsx"
+      },
+      {
+        "source": "registry/components/ui/skeleton.css",
+        "target": "@assets/ui/skeleton.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/skeleton.css';"
+      }
+    ],
+    "tags": [
+      "feedback",
+      "loading",
+      "primitive"
+    ]
+  },
+  "breadcrumb": {
+    "name": "breadcrumb",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/breadcrumb.tsx",
+        "target": "@ui/breadcrumb.tsx"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects"
+    ],
+    "tags": [
+      "navigation",
+      "dashboard",
+      "block"
+    ]
+  },
+  "sidebar-shell": {
+    "name": "sidebar-shell",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/sidebar-shell.tsx",
+        "target": "@ui/sidebar-shell.tsx"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects",
+      "breadcrumb"
+    ],
+    "tags": [
+      "layout",
+      "dashboard",
+      "shell",
+      "block"
+    ]
+  },
+  "page-header": {
+    "name": "page-header",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/page-header.tsx",
+        "target": "@ui/page-header.tsx"
+      },
+      {
+        "source": "registry/components/ui/page-header.css",
+        "target": "@assets/ui/page-header.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/page-header.css';"
+      }
+    ],
+    "tags": [
+      "layout",
+      "header",
+      "block"
+    ]
+  },
+  "filter-form": {
+    "name": "filter-form",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/filter-form.tsx",
+        "target": "@ui/filter-form.tsx"
+      },
+      {
+        "source": "registry/components/ui/filter-form.css",
+        "target": "@assets/ui/filter-form.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "card"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/filter-form.css';"
+      }
+    ],
+    "tags": [
+      "forms",
+      "filters",
+      "block"
+    ]
+  },
+  "stats-grid": {
+    "name": "stats-grid",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/stats-grid.tsx",
+        "target": "@ui/stats-grid.tsx"
+      },
+      {
+        "source": "registry/components/ui/stats-grid.css",
+        "target": "@assets/ui/stats-grid.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects",
+      "card"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/stats-grid.css';"
+      }
+    ],
+    "tags": [
+      "stats",
+      "dashboard",
+      "block"
+    ]
+  },
+  "detail-layout": {
+    "name": "detail-layout",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/detail-layout.tsx",
+        "target": "@ui/detail-layout.tsx"
+      },
+      {
+        "source": "registry/components/ui/detail-layout.css",
+        "target": "@assets/ui/detail-layout.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/detail-layout.css';"
+      }
+    ],
+    "tags": [
+      "detail",
+      "layout",
+      "block"
+    ]
+  },
+  "data-table": {
+    "name": "data-table",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/data-table.tsx",
+        "target": "@ui/data-table.tsx"
+      },
+      {
+        "source": "registry/components/ui/data-table.css",
+        "target": "@assets/ui/data-table.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "card"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/data-table.css';"
+      }
+    ],
+    "tags": [
+      "table",
+      "list",
+      "block"
+    ]
+  },
+  "responsive-table": {
+    "name": "responsive-table",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/responsive-table.tsx",
+        "target": "@ui/responsive-table.tsx"
+      },
+      {
+        "source": "registry/components/ui/responsive-table.css",
+        "target": "@assets/ui/responsive-table.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "cn",
+      "public-types"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/responsive-table.css';"
+      }
+    ],
+    "tags": [
+      "table",
+      "responsive",
+      "block"
+    ]
+  },
+  "pagination": {
+    "name": "pagination",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/pagination.tsx",
+        "target": "@ui/pagination.tsx"
+      },
+      {
+        "source": "registry/components/ui/pagination.css",
+        "target": "@assets/ui/pagination.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/pagination.css';"
+      }
+    ],
+    "tags": [
+      "pagination",
+      "navigation",
+      "block"
+    ]
+  },
+  "empty-state": {
+    "name": "empty-state",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/empty-state.tsx",
+        "target": "@ui/empty-state.tsx"
+      },
+      {
+        "source": "registry/components/ui/empty-state.css",
+        "target": "@assets/ui/empty-state.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/empty-state.css';"
+      }
+    ],
+    "tags": [
+      "empty-state",
+      "feedback",
+      "block"
+    ]
+  },
+  "section-divider": {
+    "name": "section-divider",
+    "kind": "block",
+    "files": [
+      {
+        "source": "registry/components/ui/section-divider.tsx",
+        "target": "@ui/section-divider.tsx"
+      },
+      {
+        "source": "registry/components/ui/section-divider.css",
+        "target": "@assets/ui/section-divider.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/section-divider.css';"
+      }
+    ],
+    "tags": [
+      "section",
+      "editorial",
+      "block"
+    ]
+  },
+  "theme-toggle": {
+    "name": "theme-toggle",
+    "kind": "island",
+    "files": [
+      {
+        "source": "registry/islands/ThemeToggle.tsx",
+        "target": "@islands/ThemeToggle.tsx"
+      },
+      {
+        "source": "registry/islands/theme-toggle.css",
+        "target": "@assets/ui/theme-toggle.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/theme-toggle.css';"
+      }
+    ],
+    "tags": [
+      "theme",
+      "island"
+    ]
+  },
+  "sidebar-toggle": {
+    "name": "sidebar-toggle",
+    "kind": "island",
+    "files": [
+      {
+        "source": "registry/islands/SidebarToggle.tsx",
+        "target": "@islands/SidebarToggle.tsx"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects",
+      "sidebar-shell",
+      "button"
+    ],
+    "tags": [
+      "dashboard",
+      "navigation",
+      "island"
+    ]
+  },
+  "toast-support": {
+    "name": "toast-support",
+    "kind": "support",
+    "files": [
+      {
+        "source": "registry/lib/toast.ts",
+        "target": "@lib/ui/toast.ts"
+      }
+    ],
+    "tags": [
+      "toast",
+      "helpers"
+    ]
+  },
+  "toast": {
+    "name": "toast",
+    "kind": "island",
+    "files": [
+      {
+        "source": "registry/islands/Toast.tsx",
+        "target": "@islands/Toast.tsx"
+      },
+      {
+        "source": "registry/components/ui/toast.css",
+        "target": "@assets/ui/toast.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "toast-support"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/toast.css';"
+      }
+    ],
+    "tags": [
+      "toast",
+      "feedback",
+      "island"
+    ]
+  },
+  "chat-render": {
+    "name": "chat-render",
+    "kind": "lib",
+    "files": [
+      {
+        "source": "src/chat/parse-blocks.ts",
+        "target": "@lib/chat/parse-blocks.ts"
+      }
+    ],
+    "registryDependencies": [
+      "chart-block",
+      "donut",
+      "data-table",
+      "stats-grid"
+    ],
+    "tags": [
+      "ai",
+      "chat",
+      "generative-ui",
+      "lib"
+    ]
+  },
+  "desktop-tray-menu": {
+    "name": "desktop-tray-menu",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/desktop-tray-menu.tsx",
+        "target": "@ui/desktop-tray-menu.tsx"
+      },
+      {
+        "source": "registry/components/ui/desktop-tray-menu.css",
+        "target": "@assets/ui/desktop-tray-menu.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/desktop-tray-menu.css';"
+      }
+    ],
+    "tags": [
+      "desktop",
+      "tray",
+      "menu",
+      "actions"
+    ]
+  },
+  "desktop-dialog": {
+    "name": "desktop-dialog",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/desktop-dialog.tsx",
+        "target": "@ui/desktop-dialog.tsx"
+      },
+      {
+        "source": "registry/components/ui/desktop-dialog.css",
+        "target": "@assets/ui/desktop-dialog.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/desktop-dialog.css';"
+      }
+    ],
+    "tags": [
+      "desktop",
+      "dialog",
+      "actions"
+    ]
+  },
+  "desktop-notification": {
+    "name": "desktop-notification",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/desktop-notification.tsx",
+        "target": "@ui/desktop-notification.tsx"
+      },
+      {
+        "source": "registry/components/ui/desktop-notification.css",
+        "target": "@assets/ui/desktop-notification.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/desktop-notification.css';"
+      }
+    ],
+    "tags": [
+      "desktop",
+      "notification",
+      "feedback"
+    ]
+  },
+  "desktop-window-chrome": {
+    "name": "desktop-window-chrome",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/desktop-window-chrome.tsx",
+        "target": "@ui/desktop-window-chrome.tsx"
+      },
+      {
+        "source": "registry/components/ui/desktop-window-chrome.css",
+        "target": "@assets/ui/desktop-window-chrome.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/desktop-window-chrome.css';"
+      }
+    ],
+    "tags": [
+      "desktop",
+      "window",
+      "chrome",
+      "actions"
+    ]
+  },
+  "desktop-update-prompt": {
+    "name": "desktop-update-prompt",
+    "kind": "component",
+    "files": [
+      {
+        "source": "registry/components/ui/desktop-update-prompt.tsx",
+        "target": "@ui/desktop-update-prompt.tsx"
+      },
+      {
+        "source": "registry/components/ui/desktop-update-prompt.css",
+        "target": "@assets/ui/desktop-update-prompt.css"
+      }
+    ],
+    "dependencies": [
+      "jsr:@netscript/sdk@0.0.8/auto-update"
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/desktop-update-prompt.css';"
+      }
+    ],
+    "tags": [
+      "desktop",
+      "updates",
+      "feedback"
+    ]
+  },
+  "desktop-only": {
+    "name": "desktop-only",
+    "kind": "island",
+    "files": [
+      {
+        "source": "registry/islands/DesktopOnly.tsx",
+        "target": "@islands/DesktopOnly.tsx"
+      }
+    ],
+    "dependencies": [
+      "jsr:@netscript/sdk@0.0.8/desktop",
+      "npm:preact@^10.29.2"
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "tags": [
+      "desktop",
+      "island",
+      "feature-detection"
+    ]
+  },
+  "mcp-ui-widget": {
+    "name": "mcp-ui-widget",
+    "kind": "island",
+    "files": [
+      {
+        "source": "registry/islands/McpUiWidget.tsx",
+        "target": "@islands/McpUiWidget.tsx"
+      },
+      {
+        "source": "registry/islands/mcp-ui-widget.css",
+        "target": "@assets/ui/mcp-ui-widget.css"
+      }
+    ],
+    "registryDependencies": [
+      "theme-seed"
+    ],
+    "css": [
+      {
+        "layer": "components",
+        "content": "@import './ui/mcp-ui-widget.css';"
+      }
+    ],
+    "tags": [
+      "ai",
+      "mcp-ui",
+      "iframe"
+    ]
+  },
+  "render-ui": {
+    "name": "render-ui",
+    "kind": "lib",
+    "files": [
+      {
+        "source": "src/ai/render-ui.tsx",
+        "target": "@lib/ai/render-ui.tsx"
+      }
+    ],
+    "dependencies": [
+      "jsr:@netscript/ai@0.0.8",
+      "npm:preact@^10.29.2"
+    ],
+    "registryDependencies": [
+      "theme-seed",
+      "layout-objects",
+      "chart-block",
+      "stats-grid",
+      "data-table",
+      "card"
+    ],
+    "tags": [
+      "ai",
+      "generative-ui",
+      "renderer",
+      "security"
+    ]
+  }
+}

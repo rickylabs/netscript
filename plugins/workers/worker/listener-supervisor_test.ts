@@ -1,5 +1,6 @@
 import { assertEquals, assertFalse } from '@std/assert';
 import { CHILD_CRASH_LOOP_THRESHOLD, childHealthResponse } from '@netscript/plugin/health';
+import { QueueConnectionError } from '@netscript/queue';
 import { WorkerListenerSupervisor } from './listener-supervisor.ts';
 
 Deno.test('injected listener crash loop turns the child health route red and stays red on restart', async () => {
@@ -134,7 +135,7 @@ Deno.test('spaced listener failures replenish the budget without resetting cumul
     },
   });
   listener.start();
-  await running.promise;
+  await Promise.race([running.promise, listener.completion]);
   try {
     assertEquals(listener.snapshot().restartCount, 6);
     assertEquals(listener.snapshot().childHealth.restartCount, 6);
@@ -244,6 +245,18 @@ for (
     ],
     [
       new Error('ECONNREFUSED https://user:secret@private'),
+      'connection-unavailable',
+      'Queue store connection unavailable (details redacted).',
+    ],
+    [
+      new QueueConnectionError('PostgreSQL connection not found secret-password'),
+      'connection-unavailable',
+      'Queue store connection unavailable (details redacted).',
+    ],
+    [
+      new Error('wrapper secret-url', {
+        cause: new QueueConnectionError('PostgreSQL connection not found secret-password'),
+      }),
       'connection-unavailable',
       'Queue store connection unavailable (details redacted).',
     ],

@@ -20,13 +20,50 @@ helpers that are safe as runtime dependencies, plus build tooling.
 | `@netscript/fresh-ui/interactive` | `./interactive.ts` | [Package-owned interactive compound namespaces](#interactive-namespaces-and-contracts) (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip`). |
 | `@netscript/fresh-ui/primitives` | `./primitives.tsx` | [L0 platform-contract primitives](#l0-primitives) (`Show`, `VisuallyHidden`, `SrOnly`). |
 | `@netscript/fresh-ui/registry` | `./registry.ts` | [Embedded copy-registry manifest and file content](#embedded-registry) (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`). |
+| `@netscript/fresh-ui/registry-v2` | `./registry-v2.ts` | [Portable JSON registry contracts, validation and static build](#registry-protocol). |
 | `@netscript/fresh-ui/token-config` | `./token-config.ts` | Lightweight `APP_TOKEN_FILES`, `PREVIEW_TOKEN_FILES` and `TOKEN_PRESETS` metadata, with no Style Dictionary or source corpus. |
 | `@netscript/fresh-ui/tokens` | `./tokens.ts` | [DTCG sources, language presets and the IO-free Style Dictionary token builder](#token-build-tooling) for CLI and build tooling. |
+| `@netscript/fresh-ui/contracts` | `./contracts.ts` | Shared component types, catalog and JSON serializer. |
+| `@netscript/fresh-ui/contracts.json` | `./contracts.json` | JSON module containing the same catalog. |
 
 For visual design, see the [Design system](/design-system/):
 [guidelines](/design-system/guidelines/), [theme gallery](/design-system/#design-catalogue),
 [token contract](/design-system/token-contract/) and
 [theme authoring](/design-system/create-your-own-theme/).
+
+## Component contracts
+
+`@netscript/fresh-ui/contracts` is a pure-data tooling subpath. It describes the shared interface
+that every style preserves: props, `data-part` anatomy, data-attribute values, visibility booleans,
+slots, APG/native semantics, keyboard operations and token roles. It performs no IO and contains no
+token values. Utility availability is explicit: `shipped`, planned values and native/pseudo/context
+parts distinguish a specification from a rendered implementation.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `ComponentContract` | interface | Per-component shared interface and Figma spec identity. |
+| `ComponentContractCatalog` | interface | Versioned collection of component contracts. |
+| `ContractAttribute` | interface | Allowed data-attribute values, defaults, parts and planned values. |
+| `ContractKey` | interface | Keyboard chord and observable operation. |
+| `ContractPart` | interface | Stable anatomy name, condition and element/native/pseudo/context representation. |
+| `ContractProp` | interface | Public prop kind, values, default and behavior description. |
+| `ContractSlot` | interface | Content seam and receiving part. |
+| `ContractValue` | type | Serializable scalar prop default. |
+| `componentContracts` | const | Typed catalog covering shipped components and six approved Figma categories. |
+| `serializeComponentContracts` | function | Deterministically serialize a catalog to JSON with a trailing newline. |
+| `default` | JSON module value | `./contracts.json` exports the versioned catalog as its default value. |
+
+```ts
+import { componentContracts, serializeComponentContracts } from '@netscript/fresh-ui/contracts';
+import catalog from '@netscript/fresh-ui/contracts.json' with { type: 'json' };
+
+const button = componentContracts.components.find((component) => component.name === 'button');
+console.log(button?.parts, catalog.schemaVersion);
+console.log(serializeComponentContracts(componentContracts));
+```
+
+The JSON module exports the catalog as its default value. Contracts for unshipped designs in the
+six built Figma categories are data only; additional components and styles ship in later phases.
 
 ## Class-name helper
 
@@ -406,6 +443,24 @@ at runtime.
 | `freshUiRegistryManifest` / `FreshUiRegistryManifest`                                                          | value / interface | Embedded registry manifest and its public contract.                                      |
 | `FRESH_UI_REGISTRY_CONTENT`                                                                                    | const             | Embedded file-content lookup referenced by manifest entries.                             |
 | `FreshUiRegistryCollection` / `FreshUiRegistryCssContribution` / `FreshUiRegistryFile` / `FreshUiRegistryItem` | interfaces        | Collection, stylesheet contribution, file, and item contracts that make up the manifest. |
+
+## Registry protocol
+
+`@netscript/fresh-ui/registry-v2` validates source catalogs and individual items against pinned
+published shadcn JSON schemas. The canonical `registry.json` also supplies the compatibility
+manifest on `@netscript/fresh-ui/registry`.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `freshUiRegistryJson` | const | Canonical Fresh UI JSON catalog, available on `/registry`. |
+| `REGISTRY_ITEM_TYPES` / `RegistryItemType` | const / type | The twelve supported `registry:*` item categories. |
+| `Registry` / `RegistryItem` | interfaces | Portable catalog and individual item contracts. |
+| `RegistryFile` / `RegistryFont` | interfaces | File payload and font-provider metadata. |
+| `RegistryCss` | type | Nested CSS properties, selectors and at-rules. |
+| `REGISTRY_SCHEMA_URL` / `REGISTRY_ITEM_SCHEMA_URL` | constants | Published schema URIs used by source catalogs and built items. |
+| `validateRegistry` | function | Validates a catalog and rejects duplicate or unsafe item names. |
+| `validateRegistryItem` | function | Validates one untrusted item before installation or publication. |
+| `buildRegistry` / `RegistryBuildInput` | function / interface | Reads contained source files and returns deterministic static catalog and item JSON bytes. |
 
 ## Token build tooling
 

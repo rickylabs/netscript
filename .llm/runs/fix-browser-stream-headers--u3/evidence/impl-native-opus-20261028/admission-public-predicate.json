@@ -1,0 +1,11 @@
+{
+  "authorizer": "/root",
+  "nativeIncludedAllowanceQualified": true,
+  "advertisedCapabilityQualified": true,
+  "transportAdmitted": true,
+  "actualReviewIdentityObserved": true,
+  "actualResponseEffortAttested": false,
+  "noAccountUsageWindowsBalancesOrApprovalPayloadPublished": true,
+  "operationalInputsRetainedPrivately": true,
+  "noOpenRouterAllowanceSubstitution": true
+}

@@ -40,3 +40,38 @@ No URLs, credentials, operator paths or session IDs appear in the run directory 
 - On the backoff-sleep failure path, `lastError` now holds the sleep error rather than the original listener error. That is a small change in what the local diagnostic shows; the public health output is unaffected.
 
 Final exact-pushed-head verdict will be published in the PR timeline after this sign-off commit, without a later evidence-only commit moving the evaluated head.
+
+
+# Resumed independent slice signoff (round3)
+
+**PASS**: the source, test and generated-file repairs can be committed. This is implementation round 3 of 5, before the commit. It is not the final review of the pushed head.
+
+## Repair 1: Redis test after main #2395
+- The test no longer depends on `BRPOPLPUSH`, which main replaced with Lua receipt claims. For each failure it:
+  1. acknowledges the held delivery;
+  2. denies EVAL/EVALSHA to the test's own throwaway ACL user;
+  3. queues the next message and releases the handler;
+  4. waits for the real NOPERM to be supervised and checks the fixed category text on `childHealth`;
+  5. restores the rights during backoff.
+- It still requires every message (0–4) to actually arrive. So the refused Lua claim loses no work, and 4 refusals against a budget of 1 can only pass if the budget refills.
+- The fake-clock spaced test now races `listener.completion`, so its negative control fails on a count assertion instead of hanging.
+
+## Repair 2: review thread 4429709762
+- `classifyFailure` now checks for `QueueError` with code `CONNECTION_FAILED` before the regex, at every level of the cause chain. `QueueConnectionError` (for example "PostgreSQL connection not found") is now classified as `connection-unavailable`.
+- New tests cover both the direct error and one wrapped as a cause, and assert that the HTTP payload is fixed and redacted.
+- `@netscript/queue` was already a dependency, and `QueueError`/`QueueErrorCode` are exported from its root, so nothing new is pulled in.
+
+## Generated files
+- The diff against main touches only two generated files: the prose bundle row for `tune-worker-runtime` and the export-corpus rows for `plugin-workers` `./worker` and `./runtime`.
+- I ran the read-only export-corpus check (`generate-export-surface-corpus.ts --check`) myself; it exits 0.
+- I did not run `check:agent-docs-prose`, because it builds the docs site and writes files. That check still needs to pass on the pushed head in CI.
+
+## Scope, lock and privacy
+- `job-dispatcher.ts`, `job-execution.ts` and `deno.lock` are identical to `origin/main` `f89260ac9`.
+- Nothing changed beyond the workers source, tests and docs plus the two generated files, and the generated files are recorded as scope drift.
+- `leak-report.md` is now only a safe summary. I scanned the run directory for host paths, PIDs and Redis or localhost addresses and found none.
+
+## My own test run
+I ran the structured test wrapper on `plugins/workers/worker` with the Redis URL unset: 74 passed, 0 failed, 17 ignored. The 17 are all Redis/Garnet integration cases, including this PR's ACL/Lua recovery test. I did not reproduce the real-Redis run or the real-store negative controls myself; I accepted the supervisor's sanitized summary of the private receipts.
+
+Still needed before the final verdict: the review of the exact pushed head, the prose freshness check, the clone-HEAD regression tests, and the coordinator's e2e-cli CI result.

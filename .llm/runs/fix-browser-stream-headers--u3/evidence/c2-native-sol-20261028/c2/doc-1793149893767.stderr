@@ -1,0 +1,15 @@
+error[private-type-ref]: public type 'createWorkersStreamDB' references private type 'HeadersRecord'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\plugins\workers\streams\factory.ts:58:1
+    | 
+ 58 | export function createWorkersStreamDB(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+154 | type HeadersRecord = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 1 documentation lint error.

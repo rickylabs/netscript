@@ -112,7 +112,9 @@ Deno.test({
         }),
       onFailure: (_error, snapshot) => failures.push(snapshot),
       run: (signal) =>
-        receiver.listen(async (message) => {
+        receiver.listen(async (message, context) => {
+          // Finish settlement before denying the next claim's Lua write operation.
+          await context.ack();
           const gate = Promise.withResolvers<void>();
           const abort = () => gate.resolve();
           signal.addEventListener('abort', abort, { once: true });
@@ -133,7 +135,8 @@ Deno.test({
       for (let failure = 0; failure < 4; failure++) {
         await until(() => deliveries.length === failure + 1, listener);
         now += 100; // The actual listener has delivered and is still running at this boundary.
-        await admin.acl('SETUSER', name, '-brpoplpush');
+        await admin.acl('SETUSER', name, '-eval', '-evalsha');
+        await producer.enqueue(failure + 1);
         deliveries[failure].release();
         await until(
           () => failures.length === failure + 1 && backoffs.length === failure + 1,
@@ -144,8 +147,7 @@ Deno.test({
           failures[failure].childHealth.lastFatalError?.message,
           'Queue store refused a write (details redacted).',
         );
-        await admin.acl('SETUSER', name, '+brpoplpush');
-        await producer.enqueue(failure + 1);
+        await admin.acl('SETUSER', name, '+eval', '+evalsha');
         backoffs[failure]();
       }
       await until(() => deliveries.length === 5, listener);

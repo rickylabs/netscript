@@ -28,3 +28,14 @@ No dependency/lock/version changes intended. Public-only sanitized run records, 
 Clock rollback: elapsed duration uses monotonic default, injected fake epoch is acceptable tests; backoff never counted. Concurrent snapshots: single JS event loop; resets are idempotent and cannot resurrect failed/stopped state. False-green storm: keep shared60s crash-loop monitor and cumulative counters. Secret leakage: category allowlist and fixed messages with serialization assertions. Resource leaks: abort and await all listeners; existing RedisAdapter.listen attaches an abort callback per attempt to the shared signal; recorded preexisting queue-adapter risk, not broadened into queue-adapter changes here; close DenoKV handles/queues; delete only isolated Redis ACL user/queue keys. Shared resources: no CONFIG/global state mutation; existing foreign resources left alone. Concurrent #2144 ownership: no dispatcher/execution edits and rebase/merge ordinarily if needed.
 
 Open decisions: none requiring owner choice. CLI child-health-reader currently normalizes incident messages to generic redacted text; preserving the safe category through CLI/Aspire readers is deferred. Claim is specifically HTTP health and Worker snapshots, not CLI category propagation. Deferred: all queue visibility/concurrency semantics (#2395/#2351), job retry/DLQ (#2144), logging overhaul (#2392), core/plugin restructuring and existing doc debt. No labels/milestones/merge/tag/release. Coordinator owns main verification and E2E arming.
+
+## Resume proof adaptation
+
+Current main uses receipt-fenced Lua claims. For the existing real Redis proof,
+replace the obsolete BRPOPLPUSH ACL denial with isolated EVAL/EVALSHA denial. Ack
+successful deliveries before gating the next claim; enqueue pending work before
+the denied attempt, require fixed cause, restore rights in backoff, then require
+the next delivery. This preserves the approved refusal/recovery acceptance.
+Add typed QueueConnectionError coverage using its existing CONNECTION_FAILED
+contract, both directly and under Error.cause, for review4429709762. Scope and
+public categories are unchanged; no further planning decision or new PLAN round.

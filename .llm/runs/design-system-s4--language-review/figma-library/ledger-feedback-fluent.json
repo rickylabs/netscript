@@ -1,0 +1,100 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback-style-builder (Fluent, then Filigrane)",
+  "theme": "fluent",
+  "page": "53:2",
+  "modes": {"themeSet": "239:7", "theme": "52:0", "scheme": "3:0 (Light) / 3:1 (Dark)"},
+  "status": "DONE: 9 Feedback style sets (8 new + Fluent/Spinner verified), review + strip, swap test 22/22, sweep, follow-ups, Fluent screens group.",
+  "frames": {
+    "Feedback": "563:183937",
+    "Feedback · Sets": "563:183942",
+    "Style review · Feedback": "563:206998",
+    "panel · Light": "563:206999",
+    "panel · Dark": "563:208573",
+    "Fluent style strip · Feedback": "563:210147"
+  },
+  "sets": [
+    {"name": "Fluent/Alert", "id": "563:183943", "baseId": "450:422", "variants": 12},
+    {"name": "Fluent/Inline notice", "id": "563:184680", "baseId": "451:56561", "variants": 6},
+    {"name": "Fluent/Toast", "id": "563:185043", "baseId": "452:245", "variants": 6},
+    {"name": "Fluent/Progress", "id": "563:185828", "baseId": "453:6139", "variants": 30},
+    {"name": "Fluent/Progress circular", "id": "563:186039", "baseId": "453:6280", "variants": 30},
+    {"name": "Fluent/Spinner", "id": "460:49323", "baseId": "252:11837", "variants": 18, "note": "existing (G3 Actions, already 18 variants); verified variant parity, not rebuilt"},
+    {"name": "Fluent/Skeleton", "id": "563:186150", "baseId": "454:975", "variants": 12},
+    {"name": "Fluent/Skeleton preset", "id": "563:186163", "baseId": "454:1072", "variants": 4},
+    {"name": "Fluent/Empty state", "id": "563:186260", "baseId": "454:2671", "variants": 18}
+  ],
+  "audit": "Every fill and stroke in the 8 new sets is bound to a fluent/* role (card/* and table/* kept where the base binds them). No base instances left except .Slot (6, Empty state media=image; no Fluent .Slot exists).",
+  "recipes": {
+    "Alert / Inline notice": "WinUI InfoBar: radius/control 4, 1px fluent/stroke/card, severity backgrounds (success-bg, caution-bg, critical-bg; info = card/secondary = WinUI AttentionBackground; neutral = card/default; important = fluent/badge/brand/*, derived). Severity mark 16: info-filled in text/secondary (neutral, info) or brand/fg (important); error_circle filled in system/caution (warning); a 16 disc in system/success or system/critical holding checkmark_12 / dismiss_12 in text/inverse (success, destructive). One label Body Strong text/primary, body text/primary on the label column. Literal padding 14/12/14/16, gap 10 (inline 8/8/8/12, gap 8). strong (derived): 1px stroke in the severity colour (neutral/info: stroke/surface).",
+    "Toast": "Notification flyout (F.flyout): solid/base under card/default (status types under their severity background), 1px stroke/surface, r8, shadow16 (R.float + ambient 0 0 2 #0000001f). Same severity marks; loading = Fluent/Spinner. Title text/primary, message text/secondary. Timer track stroke/divider, bar in the severity colour (text/secondary for default/info/loading). Action = Fluent/Button / sm (standard), close = Fluent/Icon button / xs ghost.",
+    "Progress": "WinUI ProgressBar: 1px fluent/control/strong rail (theme-only part 'rail') under a 3px r1.5 bar; primary text/primary (F.neutral), secondary text/secondary, success/warning/destructive = fluent/system/*. Every size is 3 tall (WinUI has one height).",
+    "Progress circular": "WinUI ProgressRing: track layer kept but unpainted, round-cap arc in the same ink map.",
+    "Skeleton": "Derived (WinUI has none): bone fluent/stroke/divider (#0000000f / #ffffff15, the Fluent 2 stencil analogue), radius/badge 4, avatar circle.",
+    "Skeleton preset": "Fluent/Skeleton bones; table preset drops the head rule (Fluent ListView).",
+    "Empty state": "40 (sm 32) r4 tile in subtle/secondary with the Fluent glyph in text/secondary (error: critical-bg tile + critical glyph); title Subtitle text/primary, description text/secondary; actions Fluent/Button md accent + standard; border=true is an F.card (card/default, solid 1px stroke/card, r8)."
+  },
+  "pngs": {
+    "review": "review/styles/fluent/feedback.png",
+    "review-hi": "review/styles/fluent/feedback-hi.png",
+    "strip": "review/styles/fluent/feedback-strip.png",
+    "strip-hi": "review/styles/fluent/feedback-strip-hi.png"
+  },
+  "swapTest": "22/22: Alert, Inline notice, Toast, Progress, Progress circular, Spinner, Empty state and Skeleton preset base instances with text/boolean overrides and a custom title, swapped to Fluent/* in Light and Dark; every override and title survived.",
+  "fixesAfterReview": [
+    "Empty state: the cloned border kept the base 4/4 dash; dashPattern cleared on 18 variants (F.card is solid).",
+    "Alert / Inline notice strong neutral+info: stroke moved from fluent/stroke/control-strong (near-white #ffffff8b in dark) to fluent/stroke/surface."
+  ],
+  "sweep": {
+    "Fluent/Table": "67 base Skeleton -> Fluent/Skeleton; 2 base Empty state -> Fluent/Empty state. The empty variants now show the Empty state (stand-in 'empty-text' hidden); the loading variants show the skeleton rows (stand-in 'loading-row' with the spinner hidden).",
+    "Fluent/Data table": "follows the Table main; its nested empty state is no-results ('No orders match “SO-99999”'), as the base Data table.",
+    "Navigation follow-up": "74 base Location marker -> Fluent/Location marker: 40 in mains (Tab / horizontal 24, Nav menu item 10, Command palette 6); Tabs list, Tabs, Navigation menu and Top bar follow their mains.",
+    "Spinner follow-up": "the 2 base Spinner instances were in Fluent/Command palette (Overlays), swapped to Fluent/Spinner.",
+    "Alert/Toast/Progress": "no other base Feedback instances exist in Fluent's earlier sets (recount: only .Slot and Fluent color glyphs remain)."
+  },
+  "ownerNoteFixes": [
+    "Avatar group (2026-10-31): overlap now keeps every initial whole, measured from the glyph render bounds plus the 2px ring: sm 0 (spread; the initials reach x 21 of 24), md -3, lg -6 (were -8).",
+    "Disabled table rows (2026-10-31): Fluent/Table row state=disabled (4 variants) now greys the badge (subtle/secondary fill, stroke/control edge, text/disabled label and glyph) and the avatar (accent/disabled fill, text/on-accent-disabled initials), and every other row text is text/disabled. No layer opacity.",
+    "Row badge tones (2026-10-31): Fluent/Table rows keep distinct tones (Paid success, Awaiting payment warning, Shipped info, Refunded neutral); the screens swap re-checks tones per row (0 lost)."
+  ],
+  "screens": {
+    "group": "565:143231",
+    "y": 15396,
+    "modes": "Theme set A 239:7 · Theme Fluent 52:0 · Density Comfortable 3:2 · Scheme Light 3:0 / Dark 3:1",
+    "ids": {
+      "Dashboard": {"light": "565:143236", "dark": "565:147678"},
+      "Orders": {"light": "565:143261", "dark": "565:151207"},
+      "Settings": {"light": "565:143292", "dark": "565:153300"},
+      "Sign-in": {"light": "565:143320", "dark": "565:154191"},
+      "Command": {"light": "565:143342", "dark": "565:158482"}
+    },
+    "swap": {"swapped": 110, "perScreen": {"Dashboard": 19, "Orders": 23, "Settings": 24, "Sign-in": 19, "Command": 25}, "alreadyStyleNested": 1764, "sharedGlyphs": 14, "partNamesRepaired": 96, "textsRestored": 12, "rowTonesReapplied": 0, "rowInitialsReapplied": 0, "errors": 0},
+    "unswapped": {".Slot": 3, "fluent-icon/* color glyphs (Fluent's own Stat card and Sidebar icons, not base)": 22},
+    "feedback": "Alert (Sign-in card, Orders sheet), Inline notice (Settings), Progress (onboarding) and the 3 Toasts (Command) are Fluent now; nothing in Feedback stays Utility.",
+    "screenFixes": [
+      "Sign-in: the onboarding Field set nests Fluent's horizontal SettingsCard field, which collapsed in the 294 px column (label under the input); that field is set to orientation=vertical in light and dark.",
+      "Orders: the sheet fits (646 of 667), no rows trimmed; the scrim is surface/overlay at 40%."
+    ],
+    "png": [
+      "review/screens/fluent/dashboard-light.png", "review/screens/fluent/dashboard-dark.png",
+      "review/screens/fluent/orders-light.png", "review/screens/fluent/orders-dark.png",
+      "review/screens/fluent/settings-light.png", "review/screens/fluent/settings-dark.png",
+      "review/screens/fluent/sign-in-light.png", "review/screens/fluent/sign-in-dark.png",
+      "review/screens/fluent/command-light.png", "review/screens/fluent/command-dark.png"
+    ]
+  },
+  "deviations": [
+    "Fluent/Spinner was not re-cloned: G3 already built it with the 18-variant tone axis.",
+    "Alert/Inline/Toast severity marks mix two drawings: the filled FSI twins (info-filled, error_circle filled) where one exists, and a drawn 16 disc + 12 glyph for success and destructive (no checkmark_circle / dismiss_circle filled component in the 51-glyph set). Warning and destructive stay distinct shapes (! vs x).",
+    "important tone uses the Fluent 2 brand tint badge roles (blue tint, not the accent fill).",
+    "Progress: every size draws the 3px WinUI bar; the size axis only changes the label type.",
+    "Skeleton bone binds fluent/stroke/divider (a stroke role used as a fill), the closest existing role to a Fluent 2 stencil.",
+    "Screens keep Lucide glyphs where the Utility screens override a glyph (14 shared glyphs), as every other style's screens do."
+  ],
+  "ownerReview": [
+    "Strong Alert emphasis is derived (WinUI has none): a 1px severity-coloured edge on the same tint. Decide whether Fluent should drop 'strong' to identical subtle.",
+    "Avatar group sm now has no overlap (spread) because a 24px avatar's initials reach the edge; the alternative is smaller initials at sm.",
+    "Table loading now shows Fluent skeleton rows instead of G3's ProgressRing stand-in row (kept hidden as 'loading-row'); revert by toggling the two layers if Fluent should load with a ring.",
+    "The dark row labels of the Feedback strip sit outside their ground and read white on the white canvas (presentation only)."
+  ]
+}

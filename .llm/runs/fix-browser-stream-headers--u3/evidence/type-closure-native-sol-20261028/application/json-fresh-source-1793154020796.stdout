@@ -1,0 +1,1325 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts": {
+      "module_doc": {
+        "doc": "Generic NetScript StreamDB factory.\n\n`createNetScriptStreamDB()` is the framework-level generic factory for\ncreating TanStack DB-backed stream databases.  It wraps\n`@durable-streams/state` `createStreamDB()` with NetScript's automatic\nURL resolution and auth header injection.\n\nPlugin-specific factories (`createWorkersStreamDB`, `createSagasStreamDB`,\n`createTriggersStreamDB`) live in their own plugin packages. Use this generic\nfactory for other compatible stream schemas.\n",
+        "tags": [
+          {
+            "kind": "module"
+          }
+        ]
+      },
+      "imports": [
+        {
+          "importedName": "abortable",
+          "originalName": "abortable",
+          "src": "https://jsr.io/@std/async/1.5.1/abortable.ts",
+          "jsDoc": {
+            "doc": "Generic NetScript StreamDB factory.\n\n`createNetScriptStreamDB()` is the framework-level generic factory for\ncreating TanStack DB-backed stream databases.  It wraps\n`@durable-streams/state` `createStreamDB()` with NetScript's automatic\nURL resolution and auth header injection.\n\nPlugin-specific factories (`createWorkersStreamDB`, `createSagasStreamDB`,\n`createTriggersStreamDB`) live in their own plugin packages. Use this generic\nfactory for other compatible stream schemas.\n",
+            "tags": [
+              {
+                "kind": "module"
+              }
+            ]
+          }
+        },
+        {
+          "importedName": "createStreamDB",
+          "originalName": "createStreamDB",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/state/0.3.2/dist/db.d.ts"
+        },
+        {
+          "importedName": "StateSchema",
+          "originalName": "StateSchema",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/state/0.3.2/dist/index.d.ts"
+        },
+        {
+          "importedName": "StreamStateDefinition",
+          "originalName": "StreamStateDefinition",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/state/0.3.2/dist/index.d.ts"
+        },
+        {
+          "importedName": "StreamDB",
+          "originalName": "StreamDB",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/state/0.3.2/dist/db.d.ts"
+        },
+        {
+          "importedName": "DurableStream",
+          "originalName": "DurableStream",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts"
+        },
+        {
+          "importedName": "HeadersRecord",
+          "originalName": "HeadersRecord",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts"
+        },
+        {
+          "importedName": "MaybePromise",
+          "originalName": "MaybePromise",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts"
+        },
+        {
+          "importedName": "buildStreamUrl",
+          "originalName": "buildStreamUrl",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/mod.ts"
+        },
+        {
+          "importedName": "getStreamsAuth",
+          "originalName": "getStreamsAuth",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/mod.ts"
+        },
+        {
+          "importedName": "getStreamsUrl",
+          "originalName": "getStreamsUrl",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/mod.ts"
+        },
+        {
+          "importedName": "createStreamDBRecoveryAdapter",
+          "originalName": "createStreamDBRecoveryAdapter",
+          "src": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/stream-db-recovery-adapter.ts"
+        }
+      ],
+      "symbols": [
+        {
+          "name": "HeadersRecord",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                "line": 153,
+                "col": 0,
+                "byteIndex": 5113
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Headers record where values can be static strings or async functions.\nFollowing the @electric-sql/client pattern for dynamic headers.\n\n**Important**: Functions are called **for each request**, not once per session.\nIn live mode with long-polling, the same function may be called many times\nto fetch fresh values (e.g., refreshed auth tokens) for each poll.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```typescript\nheaders: {\n  Authorization: `Bearer ${token}`,           // Static - same for all requests\n  'X-Tenant-Id': () => getCurrentTenant(),    // Called per-request\n  'X-Auth': async () => await refreshToken()  // Called per-request (can refresh)\n}\n```"
+                  }
+                ]
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "typeLiteral",
+                  "value": {
+                    "indexSignatures": [
+                      {
+                        "params": [
+                          {
+                            "kind": "identifier",
+                            "name": "key",
+                            "optional": false,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          }
+                        ],
+                        "tsType": {
+                          "kind": "union",
+                          "value": [
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            },
+                            {
+                              "kind": "parenthesized",
+                              "value": {
+                                "kind": "fnOrConstructor",
+                                "value": {
+                                  "constructor": false,
+                                  "tsType": {
+                                    "repr": "MaybePromise",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeParams": [
+                                        {
+                                          "repr": "string",
+                                          "kind": "keyword",
+                                          "value": "string"
+                                        }
+                                      ],
+                                      "typeName": "MaybePromise",
+                                      "resolution": {
+                                        "kind": "local"
+                                      }
+                                    }
+                                  },
+                                  "params": []
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "location": {
+                          "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                          "line": 154,
+                          "col": 2,
+                          "byteIndex": 5138
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "MaybePromise",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                "line": 135,
+                "col": 0,
+                "byteIndex": 4411
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Type for values that can be provided immediately or resolved asynchronously."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    },
+                    {
+                      "repr": "Promise",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "T",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "T",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "MaybePromise",
+                                "declaringKind": "typeAlias"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Promise"
+                      }
+                    }
+                  ]
+                },
+                "typeParams": [
+                  {
+                    "name": "T"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamDBStatus",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 26,
+                "col": 0,
+                "byteIndex": 1221
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Lifecycle of the default StreamDB consumer, including terminal failures."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "idle",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "idle"
+                      }
+                    },
+                    {
+                      "repr": "connecting",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "connecting"
+                      }
+                    },
+                    {
+                      "repr": "live",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "live"
+                      }
+                    },
+                    {
+                      "repr": "retrying",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "retrying"
+                      }
+                    },
+                    {
+                      "repr": "stopped",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "stopped"
+                      }
+                    },
+                    {
+                      "repr": "failed",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "failed"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamDBReconnectOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 35,
+                "col": 0,
+                "byteIndex": 1420
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Finite retry policy for an outage; a consumed batch resets the budget."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "maxRetries",
+                    "jsDoc": {
+                      "doc": "Retries after the first failed read; zero disables recovery. Defaults to five."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 37,
+                      "col": 2,
+                      "byteIndex": 1563
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "initialDelayMs",
+                    "jsDoc": {
+                      "doc": "Initial exponential backoff delay in milliseconds. Defaults to one hundred."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 39,
+                      "col": 2,
+                      "byteIndex": 1680
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "maxDelayMs",
+                    "jsDoc": {
+                      "doc": "Maximum backoff delay in milliseconds. Defaults to five thousand."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 41,
+                      "col": 2,
+                      "byteIndex": 1791
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamStateDefinition",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 45,
+                "col": 0,
+                "byteIndex": 1880
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "NetScript-owned durable stream state definition."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "StreamStateDefinition",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "StreamStateDefinition",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "@durable-streams/state",
+                      "name": "StreamStateDefinition"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStateSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 48,
+                "col": 0,
+                "byteIndex": 2020
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "NetScript-owned state schema accepted by the stream DB factory."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "StateSchema",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TDef",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TDef",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "NetScriptStateSchema",
+                            "declaringKind": "typeAlias"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "StateSchema",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "@durable-streams/state",
+                      "name": "StateSchema"
+                    }
+                  }
+                },
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "NetScriptStreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamDB",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 51,
+                "col": 0,
+                "byteIndex": 2191
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "NetScript-owned stream database handle returned by the factory."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "collections",
+                    "jsDoc": {
+                      "doc": "Reactive collections keyed by schema collection name."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 53,
+                      "col": 2,
+                      "byteIndex": 2338
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "indexedAccess",
+                      "value": {
+                        "objType": {
+                          "repr": "StreamDB",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "StateSchema",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeParams": [
+                                    {
+                                      "repr": "TDef",
+                                      "kind": "typeRef",
+                                      "value": {
+                                        "typeName": "TDef",
+                                        "resolution": {
+                                          "kind": "typeParam",
+                                          "declaringName": "NetScriptStreamDB",
+                                          "declaringKind": "interface"
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "typeName": "StateSchema",
+                                  "resolution": {
+                                    "kind": "import",
+                                    "specifier": "@durable-streams/state",
+                                    "name": "StateSchema"
+                                  }
+                                }
+                              }
+                            ],
+                            "typeName": "StreamDB",
+                            "resolution": {
+                              "kind": "import",
+                              "specifier": "@durable-streams/state/db",
+                              "name": "StreamDB"
+                            }
+                          }
+                        },
+                        "indexType": {
+                          "repr": "collections",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "collections"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "preload",
+                    "jsDoc": {
+                      "doc": "Start the lazy default consumer and wait until its collections are up to date."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 55,
+                      "col": 2,
+                      "byteIndex": 2494
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "fnOrConstructor",
+                      "value": {
+                        "constructor": false,
+                        "tsType": {
+                          "repr": "Promise",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "void",
+                                "kind": "keyword",
+                                "value": "void"
+                              }
+                            ],
+                            "typeName": "Promise"
+                          }
+                        },
+                        "params": []
+                      }
+                    }
+                  },
+                  {
+                    "name": "close",
+                    "jsDoc": {
+                      "doc": "Close the consumer; compatible alternate adapters may omit this hook."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 57,
+                      "col": 2,
+                      "byteIndex": 2615
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "fnOrConstructor",
+                      "value": {
+                        "constructor": false,
+                        "tsType": {
+                          "repr": "void",
+                          "kind": "keyword",
+                          "value": "void"
+                        },
+                        "params": []
+                      }
+                    }
+                  },
+                  {
+                    "name": "status",
+                    "jsDoc": {
+                      "doc": "Inspect the default consumer's liveness; alternate adapters may omit this hook."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 59,
+                      "col": 2,
+                      "byteIndex": 2735
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "NetScriptStreamDBStatus",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamDBStatus",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "stop",
+                    "jsDoc": {
+                      "doc": "Optional stop hook exposed by compatible stream DB adapters."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 61,
+                      "col": 2,
+                      "byteIndex": 2850
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "fnOrConstructor",
+                      "value": {
+                        "constructor": false,
+                        "tsType": {
+                          "kind": "union",
+                          "value": [
+                            {
+                              "repr": "void",
+                              "kind": "keyword",
+                              "value": "void"
+                            },
+                            {
+                              "repr": "Promise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "void",
+                                    "kind": "keyword",
+                                    "value": "void"
+                                  }
+                                ],
+                                "typeName": "Promise"
+                              }
+                            }
+                          ]
+                        },
+                        "params": []
+                      }
+                    }
+                  },
+                  {
+                    "name": "dispose",
+                    "jsDoc": {
+                      "doc": "Optional dispose hook exposed by compatible stream DB adapters."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 63,
+                      "col": 2,
+                      "byteIndex": 2969
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "fnOrConstructor",
+                      "value": {
+                        "constructor": false,
+                        "tsType": {
+                          "kind": "union",
+                          "value": [
+                            {
+                              "repr": "void",
+                              "kind": "keyword",
+                              "value": "void"
+                            },
+                            {
+                              "repr": "Promise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "void",
+                                    "kind": "keyword",
+                                    "value": "void"
+                                  }
+                                ],
+                                "typeName": "Promise"
+                              }
+                            }
+                          ]
+                        },
+                        "params": []
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "NetScriptStreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamDBFactoryInput",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 67,
+                "col": 0,
+                "byteIndex": 3081
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Input passed to the underlying stream DB factory port."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "streamOptions",
+                    "jsDoc": {
+                      "doc": "Transport options used to connect to the durable streams endpoint."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 69,
+                      "col": 2,
+                      "byteIndex": 3253
+                    },
+                    "tsType": {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "url",
+                            "jsDoc": {
+                              "doc": "Fully resolved durable stream URL."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                              "line": 71,
+                              "col": 4,
+                              "byteIndex": 3320
+                            },
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          },
+                          {
+                            "name": "contentType",
+                            "jsDoc": {
+                              "doc": "Content type sent to the durable streams endpoint."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                              "line": 73,
+                              "col": 4,
+                              "byteIndex": 3399
+                            },
+                            "tsType": {
+                              "repr": "application/json",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "string",
+                                "string": "application/json"
+                              }
+                            }
+                          },
+                          {
+                            "name": "headers",
+                            "jsDoc": {
+                              "doc": "Headers forwarded untouched to the durable streams client; function values resolve per request.\n\nExternal adapters that serialize `headers` as plain strings must forward the record\nto the upstream client, which owns per-request resolution; the framework\nprovides no string serializer."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                              "line": 81,
+                              "col": 4,
+                              "byteIndex": 3771
+                            },
+                            "tsType": {
+                              "repr": "HeadersRecord",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "HeadersRecord",
+                                "resolution": {
+                                  "kind": "import",
+                                  "specifier": "@durable-streams/client",
+                                  "name": "HeadersRecord"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "name": "state",
+                    "jsDoc": {
+                      "doc": "State schema passed to the underlying stream DB adapter."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 84,
+                      "col": 2,
+                      "byteIndex": 3868
+                    },
+                    "tsType": {
+                      "repr": "NetScriptStateSchema",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TDef",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TDef",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "NetScriptStreamDBFactoryInput",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "NetScriptStateSchema",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "reconnect",
+                    "jsDoc": {
+                      "doc": "Optional bounded reconnect policy understood by the default adapter."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 86,
+                      "col": 2,
+                      "byteIndex": 3983
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "NetScriptStreamDBReconnectOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamDBReconnectOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "NetScriptStreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamDBFactory",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 90,
+                "col": 0,
+                "byteIndex": 4096
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Factory port used to create a durable stream DB handle."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "fnOrConstructor",
+                  "value": {
+                    "constructor": false,
+                    "tsType": {
+                      "repr": "NetScriptStreamDB",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TDef",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TDef",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "NetScriptStreamDBFactory",
+                                "declaringKind": "typeAlias"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "NetScriptStreamDB",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "input",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "NetScriptStreamDBFactoryInput",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "TDef",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "TDef",
+                                  "resolution": {
+                                    "kind": "typeParam",
+                                    "declaringName": "NetScriptStreamDBFactory",
+                                    "declaringKind": "typeAlias"
+                                  }
+                                }
+                              }
+                            ],
+                            "typeName": "NetScriptStreamDBFactoryInput",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "NetScriptStreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NetScriptStreamDBOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 95,
+                "col": 0,
+                "byteIndex": 4305
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Options for `createNetScriptStreamDB`."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "streamPath",
+                    "jsDoc": {
+                      "doc": "Stream path relative to the streams server root.\n(e.g. `/workers/executions`)\n\nNote: The framework automatically prepends `STREAMS_URL_PREFIX` (`/v1/stream/netscript`).\nFor example, `streamPath: '/workers/executions'` resolves to `<base>/v1/stream/netscript/workers/executions`."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 103,
+                      "col": 2,
+                      "byteIndex": 4711
+                    },
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "baseUrl",
+                    "jsDoc": {
+                      "doc": "Override the base stream server URL.\nDefaults to `getStreamsUrl()` (env-resolved)."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 108,
+                      "col": 2,
+                      "byteIndex": 4838
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "schema",
+                    "jsDoc": {
+                      "doc": "State schema used by the durable stream database."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 110,
+                      "col": 2,
+                      "byteIndex": 4917
+                    },
+                    "tsType": {
+                      "repr": "NetScriptStateSchema",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TDef",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TDef",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "NetScriptStreamDBOptions",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "NetScriptStateSchema",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "createStreamDB",
+                    "jsDoc": {
+                      "doc": "Optional factory port for tests or alternate stream DB adapters."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 112,
+                      "col": 2,
+                      "byteIndex": 5029
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "NetScriptStreamDBFactory",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TDef",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TDef",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "NetScriptStreamDBOptions",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "NetScriptStreamDBFactory",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "jsDoc": {
+                      "doc": "Explicit reader headers, forwarded untouched to the durable streams client.\n\nAny supplied record (including `{}`) replaces env-resolved producer auth\nentirely; omit to keep `getStreamsAuth()`. The upstream client owns\nper-request resolution of function values; the framework provides no\nstring serializer for external adapters."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 121,
+                      "col": 2,
+                      "byteIndex": 5449
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "HeadersRecord",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "HeadersRecord",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "@durable-streams/client",
+                          "name": "HeadersRecord"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "reconnect",
+                    "jsDoc": {
+                      "doc": "Bounded reconnect policy; the default adapter resumes the last consumed batch."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                      "line": 123,
+                      "col": 2,
+                      "byteIndex": 5564
+                    },
+                    "optional": true,
+                    "tsType": {
+                      "repr": "NetScriptStreamDBReconnectOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamDBReconnectOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "NetScriptStreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "createNetScriptStreamDB",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+                "line": 156,
+                "col": 0,
+                "byteIndex": 6722
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Create a NetScript-configured TanStack DB-backed StreamDB.\n\nThe returned object has `.collections` — typed TanStack DB `Collection`\ninstances — that update reactively as events arrive from the durable\nstreams server.\nCall the default handle's `preload()` to start consumption. Recoverable\noutages use finite exponential backoff and resume the last consumed batch\nwithout replacing collections. Authentication, malformed data and invalid\nretained offsets enter `failed`; they never trigger a full-log replay.\n`stop()` and `dispose()` cancel reads and backoff and are idempotent.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```ts\nimport { createNetScriptStreamDB } from '@netscript/fresh/streams';\nimport { useLiveQuery } from '@tanstack/react-db';\nimport { myStreamSchema } from '@app/streams/schemas.ts';\n\nconst db = createNetScriptStreamDB({\n  streamPath: '/my-service/my-stream',\n  schema: myStreamSchema,\n});\nawait db.preload?.();\n\n// In a Preact island:\nconst { data: items } = useLiveQuery((q) =>\n  q.from({ i: db.collections.myEntity })\n);\n```"
+                  }
+                ]
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "options",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "NetScriptStreamDBOptions",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TDef",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TDef",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "createNetScriptStreamDB",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "NetScriptStreamDBOptions",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "NetScriptStreamDB",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TDef",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TDef",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "createNetScriptStreamDB",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "NetScriptStreamDB",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "NetScriptStreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "NetScriptStreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

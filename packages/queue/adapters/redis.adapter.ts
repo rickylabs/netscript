@@ -14,20 +14,25 @@ import type {
   ListenOptions,
   MessageContext,
   MessageQueue,
-  NackOptions,
 } from '../ports/mod.ts';
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
-import {
-  createEnvelope,
-  createMessageContext,
-  isMessageEnvelope,
-  toDeadLetterRecord,
-} from './_envelope.ts';
-import { RedisDeadLetterStore } from './redis-dead-letter-store.ts';
+import { createEnvelope, createMessageContext } from './_envelope.ts';
+import { RedisLeases } from './_redis-lease.ts';
+import type { RedisLease, RedisQueueHealth, RedisQueueMetrics } from './_redis-lease-state.ts';
+export type { RedisQueueHealth, RedisQueueMetrics } from './_redis-lease-state.ts';
 import { RedisDelayedPromotion } from './_redis-delayed-runtime.ts';
 import { DELAYED_PROMOTION_BATCH_SIZE } from './_redis-delayed-promotion.ts';
 
-export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+export type {
+  DeadLetterReason,
+  DeadLetterRecord,
+  DeadLetterStorePort,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '../ports/mod.ts';
 
 function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, unknown> {
   return {
@@ -40,7 +45,7 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
   };
 }
 
-const DEFAULT_BLOCK_TIMEOUT_SECONDS = 1;
+const EMPTY_QUEUE_POLL_MS = 50;
 const DEFAULT_DELAYED_POLL_MS = 1_000;
 const DELAYED_PROMOTION_ATTEMPTS = 3;
 const DELAYED_PROMOTION_BATCHES_PER_PASS = 10;
@@ -60,7 +65,8 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private listening = false;
   private abortController?: AbortController;
   private clients: RedisQueueClients | null = null;
-  private deadLetterStore: DeadLetterStorePort<T> | null = null;
+  private leaseRuntime?: RedisLeases<T>;
+  private leaseTimer?: ReturnType<typeof setInterval>;
   private delayedTimer?: ReturnType<typeof setInterval>;
   private delayedPromotion?: Promise<void>;
   private promotionClient?: Redis;
@@ -148,7 +154,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   }
 
   /**
-   * Listen for messages using Redis blocking pop-push semantics.
+   * Listen sequentially using atomic Redis claims with receipt-fenced leases.
    *
    * @param handler - Async callback invoked for each decoded message.
    * @param options - Listener cancellation and concurrency settings.
@@ -161,34 +167,38 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
     }
 
+    if (options?.signal?.aborted) return;
+    const leases = this.ensureLeases();
+    leases.configure(options);
     this.listening = true;
     this.abortController = new AbortController();
-    const clients = this.ensureClients();
-    this.startDelayedProcessor();
 
     const signal = options?.signal;
-    if (signal) {
-      signal.addEventListener('abort', () => {
-        this.abortController?.abort();
-        this.clients?.blocking.disconnect();
-      });
-    }
+    const onAbort = (): void => {
+      this.abortController?.abort();
+      this.clients?.blocking.disconnect();
+    };
+    signal?.addEventListener('abort', onAbort);
 
     try {
+      await leases.ready(this.abortController.signal);
+      this.abortController.signal.throwIfAborted();
+      this.startDelayedProcessor();
+      this.leaseTimer = setInterval(() => {
+        void leases.reclaimExpired().catch((error: unknown) => this.reportPromotionError(error));
+      }, leases.pollInterval);
       while (!this.abortController.signal.aborted) {
-        const encoded = await clients.blocking.brpoplpush(
-          this.queueKey,
-          this.processingKey,
-          DEFAULT_BLOCK_TIMEOUT_SECONDS,
-        );
-        if (!encoded) {
+        const claim = await leases.claim(this.abortController.signal);
+        this.abortController.signal.throwIfAborted();
+        if (!claim) {
+          await delay(EMPTY_QUEUE_POLL_MS, { signal: this.abortController.signal });
           continue;
         }
 
-        await this.handleEncodedMessage(encoded, handler);
+        await this.handleEncodedMessage(claim, handler, leases, this.abortController.signal);
       }
     } catch (error) {
-      if (this.abortController.signal.aborted || isExpectedStopError(error)) {
+      if (this.abortController.signal.aborted) {
         return;
       }
       throw new QueueError(
@@ -200,7 +210,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
         },
       );
     } finally {
+      signal?.removeEventListener('abort', onAbort);
       this.stopDelayedProcessor();
+      this.stopLeaseProcessor();
       this.listening = false;
     }
   }
@@ -212,6 +224,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.abortController?.abort();
     this.listening = false;
     this.stopDelayedProcessor();
+    this.stopLeaseProcessor();
+    this.leaseRuntime?.stop();
+    this.leaseRuntime = undefined;
     this.clients?.blocking.disconnect();
     this.clients?.commands.disconnect();
     if (this.promotionRuntime) this.promotionRuntime.disconnect();
@@ -241,8 +256,19 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       const redisOptions = getRedisOptions(this.options);
       this.clients = {
         commands: new Redis(this.url, redisOptions),
-        blocking: new Redis(this.url, redisOptions),
+        blocking: new Redis(this.url, {
+          ...redisOptions,
+          lazyConnect: true,
+          enableOfflineQueue: false,
+          autoResendUnfulfilledCommands: false,
+          maxRetriesPerRequest: 1,
+          connectTimeout: 1_000,
+          commandTimeout: 2_000,
+          retryStrategy: () => null,
+        }),
       };
+      this.clients.blocking.on('error', () => {});
+      this.clients.commands.on('error', (error: unknown) => this.reportPromotionError(error));
       return this.clients;
     } catch (error) {
       throw new QueueConnectionError(
@@ -254,71 +280,68 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
-  /**
-   * Resolve the configured DLQ store or lazily create the Redis-backed default.
-   */
-  private ensureDeadLetterStore(): DeadLetterStorePort<T> {
-    if (this.deadLetterStore) {
-      return this.deadLetterStore;
-    }
-    if (this.explicitDeadLetterStore) {
-      this.deadLetterStore = this.explicitDeadLetterStore;
-      return this.deadLetterStore;
-    }
-    this.deadLetterStore = new RedisDeadLetterStore<T>({
-      commands: this.ensureClients().commands,
-      queueName: this.queueName,
-    });
-    return this.deadLetterStore;
+  /** Return durable reclaimed, dead-lettered and refused-settlement counters. */
+  getMetrics(): Promise<RedisQueueMetrics> {
+    return this.ensureLeases().getMetrics();
   }
 
-  /**
-   * Decode one Redis message and settle it around the handler call.
-   */
-  private async handleEncodedMessage(
-    encoded: string,
-    handler: (message: T, context: MessageContext) => Promise<void>,
-  ): Promise<void> {
-    let payload: T;
-    let headers: Record<string, string> = {};
-    let messageId: string;
-    let enqueuedAt: Date;
-    let deliveryCount: number;
+  /** Return queue depths and recovery counters for health reporting. */
+  getHealth(): Promise<RedisQueueHealth> {
+    return this.ensureLeases().getHealth();
+  }
 
-    const rawMessage = JSON.parse(encoded) as unknown;
-    if (isMessageEnvelope<T>(rawMessage)) {
-      payload = rawMessage.payload;
-      headers = rawMessage.headers;
-      messageId = rawMessage.messageId;
-      enqueuedAt = new Date(rawMessage.enqueuedAt);
-      deliveryCount = rawMessage.deliveryCount + 1;
-    } else {
-      payload = rawMessage as T;
-      messageId = crypto.randomUUID();
-      enqueuedAt = new Date();
-      deliveryCount = 1;
-    }
+  /** Recover a bounded page of expired claims and observe legacy orphans. */
+  reclaimExpired(): Promise<number> {
+    return this.ensureLeases().reclaimExpired();
+  }
 
-    let settled = false;
-    const context = this.createContext(
-      messageId,
-      payload,
-      enqueuedAt,
-      headers,
-      deliveryCount,
-      encoded,
-      () => settled = true,
+  /** Resolve the receipt runtime on the existing bounded claim connection. */
+  private ensureLeases(): RedisLeases<T> {
+    return this.leaseRuntime ??= new RedisLeases(
+      this.ensureClients().blocking,
+      this.queueName,
+      this.explicitDeadLetterStore,
+      (error) => this.reportPromotionError(error),
     );
+  }
 
+  /** Clear the independent lease-recovery timer on every listener exit path. */
+  private stopLeaseProcessor(): void {
+    if (this.leaseTimer) clearInterval(this.leaseTimer);
+    this.leaseTimer = undefined;
+  }
+
+  /** Invoke a handler only after its unique claim has committed in Redis. */
+  private async handleEncodedMessage(
+    claim: RedisLease<T>,
+    handler: (message: T, context: MessageContext) => Promise<void>,
+    leases: RedisLeases<T> = this.ensureLeases(),
+    signal?: AbortSignal,
+  ): Promise<void> {
+    const { envelope } = claim;
+    let settled = false;
+    const context: MessageContext = {
+      ...createMessageContext(
+        envelope.messageId,
+        new Date(envelope.enqueuedAt),
+        envelope.headers,
+        envelope.deliveryCount,
+        async () => {
+          await leases.settle(claim, undefined, signal);
+          settled = true;
+        },
+        async (options = {}) => {
+          await leases.settle(claim, options, signal);
+          settled = true;
+        },
+      ),
+      extendVisibility: (milliseconds) => leases.extend(claim, milliseconds),
+    };
     try {
-      await handler(payload, context);
-      if (!settled) {
-        await context.ack();
-      }
+      await handler(envelope.payload, context);
+      if (!settled) await context.ack();
     } catch (error) {
-      if (!settled) {
-        await context.nack({ requeue: true });
-      }
+      if (!settled) await context.nack({ requeue: true });
       throw error;
     }
   }
@@ -404,53 +427,8 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   /** Report promotion errors without turning background or shutdown work into a rejection. */
   private reportPromotionError(error: unknown): void {
     if (!isExpectedPromotionError(error)) {
-      console.error('[RedisAdapter] Delayed promotion failed:', error);
+      console.error('[RedisAdapter] Background recovery failed:', error);
     }
-  }
-
-  /**
-   * Build the queue context passed to Redis message handlers.
-   */
-  private createContext(
-    messageId: string,
-    payload: T,
-    enqueuedAt: Date,
-    headers: Record<string, string>,
-    deliveryCount: number,
-    encoded: string,
-    markSettled: () => void,
-  ): MessageContext {
-    return createMessageContext(
-      messageId,
-      enqueuedAt,
-      headers,
-      deliveryCount,
-      async () => {
-        await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
-        markSettled();
-      },
-      async (options: NackOptions = {}) => {
-        if (options.requeue ?? true) {
-          await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
-          await this.ensureClients().commands.lpush(this.queueKey, encoded);
-        } else {
-          await this.ensureDeadLetterStore().append(toDeadLetterRecord(
-            {
-              messageId,
-              queueName: this.queueName,
-              payload,
-              headers,
-              deliveryCount,
-              enqueuedAt,
-            },
-            options.reason ?? 'nack_without_requeue',
-            options,
-          ));
-          await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
-        }
-        markSettled();
-      },
-    );
   }
 
   /**
@@ -458,13 +436,6 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
    */
   private get queueKey(): string {
     return `netscript:queue:${this.queueName}`;
-  }
-
-  /**
-   * Redis key for claimed messages.
-   */
-  private get processingKey(): string {
-    return `netscript:processing:${this.queueName}`;
   }
 
   /**
@@ -486,6 +457,6 @@ function isExpectedStopError(error: unknown): boolean {
 
 function isExpectedPromotionError(error: unknown): boolean {
   return isExpectedStopError(error) || error instanceof Error &&
-      /enableOfflineQueue options is false|ECONNREFUSED|ECONNRESET|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH/
+      /enableOfflineQueue options is false|ECONNREFUSED|ECONNRESET|EPIPE|EAI_AGAIN|ENOTFOUND|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH/
         .test(error.message);
 }

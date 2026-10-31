@@ -524,6 +524,44 @@ createWorkersContract<GeneratedJobPayloadMap>();
   });
 });
 
+Deno.test('both registry generators honor handler retry inside a group with retry fields omitted', async () => {
+  for (const compiler of [false, true]) {
+    await withTempProject(async (projectRoot) => {
+      await writeProjectDenoConfig(projectRoot);
+      await writeWorkersManifest(projectRoot);
+      await writeJob(projectRoot, 'handler-retry.ts');
+      const path = join(projectRoot, 'workers/jobs/handler-retry.ts');
+      const original = await Deno.readTextFile(path);
+      await write(
+        path,
+        original.replace(
+          'export default handler;',
+          "export default Object.assign(handler, { retry: { maxRetries: 2, delayMs: 7, backoff: 'exponential' as const, maxDelayMs: 20 } });",
+        ),
+      );
+      await write(
+        join(projectRoot, 'netscript.config.ts'),
+        `export default {
+        name: 'retry-project', databases: { config: [] },
+        workers: { groups: [{ topic: 'jobs', jobs: [{ id: 'handler-retry', name: 'Handler retry', entrypoint: './handler-retry.ts', source: 'local' }] }] },
+      };`,
+      );
+      if (compiler) await compileWorkersRegistry(new LocalProjectFiles(projectRoot));
+      else {
+        const result = await runEntryGenerator(projectRoot);
+        assertEquals(result.code, 0, result.stderr);
+      }
+      const module = await importRegistry(projectRoot, `retry-${compiler}`);
+      const definition = module.jobDefinitions.get('handler-retry');
+      assertEquals(definition?.maxRetries, 2);
+      assertEquals(definition?.retryDelay, 7);
+      assertEquals(definition?.metadata, {
+        retry: { maxRetries: 2, delayMs: 7, backoff: 'exponential', maxDelayMs: 20 },
+      });
+    });
+  }
+});
+
 function jobPolicy(id: string, entrypoint: string): Readonly<Record<string, unknown>> {
   return { id, name: id, entrypoint, source: 'local' };
 }

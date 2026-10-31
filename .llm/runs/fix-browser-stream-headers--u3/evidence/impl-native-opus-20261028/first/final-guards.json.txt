@@ -1,0 +1,25 @@
+{
+  "session": "a4d71fd7-efc6-4444-8141-7fa312a2977a",
+  "head": "9288ea2939f56eeb75fa53b6260f6cf1e91f31f0",
+  "requestedModel": "claude-opus-5",
+  "requestedEffort": "xhigh",
+  "actualEffortIndependentlyAttested": false,
+  "settlement": {
+    "spawnCount": 1,
+    "statusAwaited": true,
+    "stdoutSettled": true,
+    "pipesAwaited": true,
+    "failures": []
+  },
+  "byteCounts": [
+    1299166,
+    0
+  ],
+  "done": [
+    true,
+    true
+  ],
+  "failures": [],
+  "nativeProfileCopied": false,
+  "privateReasoningPersisted": false
+}

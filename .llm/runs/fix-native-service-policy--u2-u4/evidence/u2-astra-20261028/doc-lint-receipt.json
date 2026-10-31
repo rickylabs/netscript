@@ -1,0 +1,40 @@
+{
+  "gateId": "doc-lint",
+  "invocationId": "u2-service-doc-lint",
+  "argv": [
+    "deno",
+    "task",
+    "doc:lint",
+    "--root",
+    "packages/service",
+    "--output",
+    ".llm/tmp/native-service-policy-u2-astra-implementation-20261028/doc-lint-report.json"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:51396",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "47e8faa30de0c541b7a2bc0d058dd04d36ab05a0ea22b0bcb0f6045d3f62f3d0",
+  "lifecycleId": "worker:51396:u2-service-doc-lint:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T00:19:11.752Z",
+  "startedAt": "2026-10-28T00:19:11.757Z",
+  "finishedAt": "2026-10-28T00:19:14.036Z",
+  "durationMs": 2279,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 91,
+    "sha256": "ba8604cd06b1bb363306c12afea7cd32a0016d40ff92a3e46cd3ad04eed2db8a",
+    "tail": "Wrote .llm/tmp/native-service-policy-u2-astra-implementation-20261028/doc-lint-report.json\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 220,
+    "sha256": "5e49a0302893132432cd6ee061ff60c1f9bbd9178ac3c02e2a5d4adc27fada3b",
+    "tail": "Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service' '--output' '.llm/tmp/native-service-policy-u2-astra-implementation-20261028/doc-lint-report.json'\n",
+    "truncated": false
+  }
+}

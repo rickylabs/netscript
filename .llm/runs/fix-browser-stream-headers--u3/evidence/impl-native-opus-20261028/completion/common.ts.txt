@@ -1,0 +1,34 @@
+export const root='C:/Users/ericc/source/repos/netscript-browser-stream-headers-008';
+export const directory:string=`${root}/.llm/tmp/u3-opus-native-impl-continuation-1-20261028`;
+export const host:string='C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs';
+export const predecessor='C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028';
+export const resumeSession='a4d71fd7-efc6-4444-8141-7fa312a2977a';
+export const head='9288ea2939f56eeb75fa53b6260f6cf1e91f31f0';
+export const nativeModel='claude-opus-5';
+export const executable='C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/toolchains/claude-2.1.251-repair1-20261027/claude.exe';
+export const executableSha='8d1229a281281b98fd2dee72b3253a704be4fce4d45207200cd32a9bb5a6c909';
+export async function hash(path:string):Promise<string>{return [...new Uint8Array(await crypto.subtle.digest('SHA-256',await Deno.readFile(path)))].map(n=>n.toString(16).padStart(2,'0')).join('');}
+export async function json(name:string,value:unknown):Promise<void>{await Deno.writeTextFile(`${directory}/${name}`,JSON.stringify(value,null,2),{createNew:true});}
+export async function git(args:string[]):Promise<string>{const result=await new Deno.Command('git',{args,cwd:root,stdout:'piped',stderr:'null'}).output();if(!result.success)throw new Error('Git guard failed.');return new TextDecoder().decode(result.stdout).trim();}
+export async function guard():Promise<void>{
+  if(await git(['rev-parse','HEAD'])!==head)throw new Error('Exact head changed.');await git(['diff','--quiet','HEAD','--']);
+  const snapshot=JSON.parse(await Deno.readTextFile(`${directory}/source-bindings.json`));
+  for(const entry of snapshot.protected){if(await hash(`${root}/${entry.path}`)!==entry.sha256)throw new Error(`Protected drift:${entry.path}`);}
+  for(const path of (await git(['ls-files','--others','--exclude-standard'])).split(/\r?\n/).filter(Boolean)){
+    if(snapshot.untracked.includes(path))continue;
+    if(path!=='.netscript/agent/diagnostics/project.json')throw new Error('Unexpected untracked owner after source freeze.');
+    const receipt=JSON.parse(await Deno.readTextFile(`${root}/${path}`));
+    if(Object.keys(receipt).sort().join(',')!=='command,exitStatus,resource,timestamp'||receipt.resource!=='project'||
+      !['mcp find_export','mcp list_package_exports','mcp get_export','mcp search_exports'].includes(receipt.command)||
+      ![0,1].includes(receipt.exitStatus)||!Number.isFinite(Date.parse(receipt.timestamp)))throw new Error('Unexpected tool-owned receipt.');
+  }
+  if(await hash(executable)!==executableSha)throw new Error('Official native CLI changed.');
+}
+export function environment():Record<string,string>{
+  const env:Record<string,string>={};
+  for(const name of ['SystemRoot','WINDIR','COMSPEC','SystemDrive','PATHEXT','PATH','USERPROFILE','APPDATA','LOCALAPPDATA','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','CLAUDE_CODE_GIT_BASH_PATH']){const value=Deno.env.get(name);if(value!==undefined)env[name]=value;}
+  if(!env.USERPROFILE)throw new Error('Native CLI-owned subscription profile unavailable.');
+  Object.assign(env,{HOME:env.USERPROFILE,TEMP:`${directory}/temp`,TMP:`${directory}/temp`,TMPDIR:`${directory}/temp`,npm_config_cache:`${directory}/npm`,
+    DENO_DIR:'C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache',DENO_TLS_CA_STORE:'mozilla,system',DENO_NO_PROMPT:'1',DENO_NO_UPDATE_CHECK:'1',NO_COLOR:'1',CI:'1',DISABLE_AUTOUPDATER:'1',ENABLE_CLAUDEAI_MCP_SERVERS:'false',CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC:'1'});
+  return env;
+}

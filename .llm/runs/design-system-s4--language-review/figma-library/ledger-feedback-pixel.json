@@ -1,0 +1,76 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback-style-builder (Terminal, Pixel, Brutal)",
+  "date": "2026-10-31",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "theme": "pixel",
+  "page": "64:443",
+  "status": "done",
+  "category": {
+    "frame": "566:94593",
+    "sectionLabel": "566:94594",
+    "sets": "566:94598",
+    "strip": "567:191435",
+    "parent": "Style components 460:29935 (Theme Pixel 52:2, Theme set A, Density Comfortable, Scheme Light)"
+  },
+  "sets": [
+    {"name": "Pixel/Alert", "id": "566:94599", "baseId": "450:422", "variants": 12},
+    {"name": "Pixel/Inline notice", "id": "566:94857", "baseId": "451:56561", "variants": 6},
+    {"name": "Pixel/Toast", "id": "566:94976", "baseId": "452:245", "variants": 6},
+    {"name": "Pixel/Progress", "id": "567:94733", "baseId": "453:6139", "variants": 30},
+    {"name": "Pixel/Progress circular", "id": "567:94950", "baseId": "453:6280", "variants": 30},
+    {"name": "Pixel/Spinner", "id": "460:32723", "baseId": "252:11837", "variants": 18, "note": "existing set (Actions, stepped blocks, tone already on the lead block); reused unchanged"},
+    {"name": "Pixel/Skeleton", "id": "567:95331", "baseId": "454:975", "variants": 12},
+    {"name": "Pixel/Skeleton preset", "id": "567:95344", "baseId": "454:1072", "variants": 4},
+    {"name": "Pixel/Empty state", "id": "567:95441", "baseId": "454:2671", "variants": 18}
+  ],
+  "anatomy": {
+    "Alert": "crafted Orders notice (66:433): square <tone>/subtle panel (neutral surface/raised), 1px frame/ink (strong 2px), 8px leading bar (theme-only band-bar): five amber bands for warning and important, tag lip role for the others (destructive pixel/tag/lip-danger); 16px pixel glyph (box = type/label/line) + Space Mono Bold label; Inter body on the label column; REVIEW link with arrow.",
+    "Inline notice": "compact <tone>/subtle strip with a 4px leading indicator (two bands, or the tag lip role).",
+    "Toast": "square surface/raised panel, 1px frame/ink, 8px leading bar by type; timer = 4px surface/container track with the five bands left to right.",
+    "Progress": "fulfilment bar: square surface/container track 4/8/12; primary = five amber bands (band-bar), others a flat tone block; value stays the track padding.",
+    "Progress circular": "derived block ring: eight square blocks on a 3x3 grid; primary fills band 1 to 5; value beside the ring (Pixelify 24/32 at lg).",
+    "Skeleton": "surface/muted wells with the Pixel recess (inner shadow 2,2 pixel/recess/shade).",
+    "Skeleton preset": "nests Pixel/Skeleton; cards are square P.panels.",
+    "Empty state": "square P.panel (surface/raised, 1px frame/ink); pixel glyph in a recessed well; Pixelify 24/32 title (md); Pixel keys; action row wraps."
+  },
+  "swapTest": "13/13 pass (Light): Alert warning (action, close, description, custom title), Alert destructive strong, Inline notice info, Toast success, Toast loading, Progress md (labelText, valueText, track padding), Progress sm loading, Progress circular x3, Spinner, Skeleton preset table, Empty state no-results",
+  "sweep": {
+    "Pixel/Table": "67 Skeleton + 2 Empty state base instances -> Pixel sets",
+    "Pixel/Data table": "nested (instance-sublayer) swaps: 1 Skeleton + 2 Empty state; empty variant keeps type=no-results and its title"
+  },
+  "defectsFixed": [
+    "Pixel font breaks 'fi': Pixelify Sans text with fi/fl now carries a zero-width non-joiner between the letters (no OpenType-feature API in the plugin runtime): Pixel/Dialog title default \"Edit prof‌ile\" and the Settings screens' Pixelify heading (light + dark).",
+    "Table rows lost per-row badge tones: Pixel/Table (8 badges) and Pixel/Data table (4) replayed from the base; the main now reads success, warning, info, success, neutral.",
+    "Avatar group clipping: checked all three Pixel/Avatar group sizes, no initials overflow.",
+    "Disabled rows keep full-colour badges: no disabled rows in the Pixel tables."
+  ],
+  "screens": {
+    "group": "541:71602",
+    "swapped": "Alert x4, Inline notice x2, Progress x2, Toast x6 (light + dark); fit overlays on Sign-in re-fitted (slot paddingBottom = overlay height)",
+    "png": [
+      "review/screens/pixel/dashboard-light.png",
+      "review/screens/pixel/dashboard-dark.png",
+      "review/screens/pixel/orders-light.png",
+      "review/screens/pixel/orders-dark.png",
+      "review/screens/pixel/settings-light.png",
+      "review/screens/pixel/settings-dark.png",
+      "review/screens/pixel/sign-in-light.png",
+      "review/screens/pixel/sign-in-dark.png",
+      "review/screens/pixel/command-light.png",
+      "review/screens/pixel/command-dark.png"
+    ]
+  },
+  "png": ["review/styles/pixel/feedback.png", "review/styles/pixel/feedback-strip.png"],
+  "deviations": [
+    "Band bars bind the primitives color/band/1-5 (the documented Pixel exception); bands are used only on warning, important, default/loading toasts, timers and primary progress, so status tones keep their own colour.",
+    "Alert label is text/fg (crafted notice) rather than <tone>/text; tone reads through the panel fill and the leading bar.",
+    "Pixel has no info or circle-check glyph: info and destructive use alert-circle, success check, neutral and important bell.",
+    "Pixel/Dialog title default now contains U+200C (visually identical; contract string differs by that character)."
+  ],
+  "ownerShouldLook": [
+    "The fi fix is a character-level workaround; a proper fix is a font-feature setting (liga off) for Pixelify Sans in code.",
+    "Dashboard KPI block charts overflow the bottom of the stat panels (pre-existing, not changed).",
+    "Dashboard rows still show tinted initials for JW/LM next to identicons (pre-existing, noted in the Pixel ledger)."
+  ]
+}

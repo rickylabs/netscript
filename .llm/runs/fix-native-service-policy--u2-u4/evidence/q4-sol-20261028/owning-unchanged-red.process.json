@@ -1,0 +1,29 @@
+﻿{
+    "name":  "owning-unchanged-red",
+    "startedUtc":  "2026-10-28T01:52:19.6139239Z",
+    "finishedUtc":  "2026-10-28T01:52:20.8228537Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-read",
+                      "--allow-write",
+                      "--allow-run",
+                      ".llm/tools/run-deno-test.ts",
+                      "--output",
+                      ".llm/tmp/native-service-q4-sol-20261028/owning-unchanged-red.json",
+                      "--",
+                      "--cached-only",
+                      "--frozen",
+                      "--check",
+                      "--allow-all",
+                      "--sanitize-ops",
+                      "--sanitize-resources",
+                      "--trace-leaks",
+                      "packages/service/tests/body-limit_test.ts"
+                  ],
+    "exitCode":  1,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-unchanged-red.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-unchanged-red.stderr.log"
+}

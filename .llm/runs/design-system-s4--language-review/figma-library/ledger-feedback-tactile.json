@@ -1,0 +1,52 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback style pass (Tactile)",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "page": "60:219",
+  "frames": {"Feedback": "564:198537", "Feedback · sets": "564:198542", "review": "564:233704 (Light 564:233705, Dark 564:234332)", "strip": "564:234923"},
+  "sets": [
+    {"name": "Tactile/Alert", "id": "564:198543", "baseId": "450:422", "variants": 12},
+    {"name": "Tactile/Inline notice", "id": "564:198706", "baseId": "451:56561", "variants": 6},
+    {"name": "Tactile/Toast", "id": "564:198783", "baseId": "452:245", "variants": 6},
+    {"name": "Tactile/Progress", "id": "564:232628", "baseId": "453:6139", "variants": 30},
+    {"name": "Tactile/Progress circular", "id": "564:232809", "baseId": "453:6280", "variants": 30},
+    {"name": "Tactile/Spinner", "id": "460:13283", "baseId": "252:11837", "variants": 18, "note": "existing Actions set reused (LED segments, tone axis)"},
+    {"name": "Tactile/Skeleton", "id": "564:232920", "baseId": "454:975", "variants": 12},
+    {"name": "Tactile/Skeleton preset", "id": "564:232933", "baseId": "454:1072", "variants": 4},
+    {"name": "Tactile/Empty state", "id": "564:233030", "baseId": "454:2671", "variants": 18}
+  ],
+  "png": ["review/styles/tactile/feedback.png", "review/styles/tactile/feedback-strip.png"],
+  "swapTest": "5/5 pass (Alert title+description+action+close, Inline notice description+close, Toast title+description+progress, Progress label+value+track padding, Empty state title+secondaryAction)",
+  "bindings": "tactile/* colour roles only (generic core->tactile remap; the only unmapped role, table/row-bg at 0% on the preset root, was cleared); effects are the named Tactile/* styles",
+  "anatomy": [
+    "Alert: printed (H0) so it nests inside plateaus (sign-in card, sheet, dialog): flat tactile/surface/well band at radius/card, no stroke or effect. Status = a lit 8px LED (led/<tone> + Tactile/led-glow/<tone>) centred in the label-line icon box (glyph kept hidden) + the word in text/strong; body text/body. strong (derived): title in the status ink and the base rule drawn as the 4px LED edge.",
+    "Inline notice: printed surface/well band r14 with a 7px LED + word.",
+    "Toast: a floating Tc.plateau (surface/base, edge/border, Tactile/plateau, radius/card); LED + word; default keeps its printed glyph, loading Tactile/Spinner; timer = 6px meter (slider rail fill + well-s, text/body fill) inset, theme-only timer-gap; actions Tactile keys.",
+    "Progress: meter (as 144:1800): pill well track (rail fill + Tactile/well-s), 6/8/10 tall; printed ink fill (primary text/body, secondary text/muted, status text/<tone>); value still = track padding.",
+    "Progress circular: LED gauge: track led/off, arc lit led/<tone> + glow, Spinner dash pattern.",
+    "Skeleton: each bone a small sunk well (rail concave fill + Tactile/well-s); pill lines, round avatars, r14 blocks (lg r20).",
+    "Skeleton preset: table = printed r20 tiles without rules; stats = plateaus; detail/form = surface/well bands r14.",
+    "Empty state: border on = printed surface/well band r20 (no lines); media a surface/tone disc with the glyph in text/body | text/muted | text/danger; actions Tactile keys."
+  ],
+  "sweep": {"swapped": 69, "detail": "Data display 1: 67 Skeleton + 2 Empty state (Tactile/Table, Tactile/Data table)"},
+  "defectsFixed": [
+    "Sheet scrim opaque (tactile/surface/well = VariableID:119:743 at 100%): backdrop/scrim paints set to 60% on Tactile/Sheet (4 scrim variants), and the same defect on Tactile/Drawer (4), Tactile/Dialog (3) and Tactile/Command palette (3).",
+    "Toggle group showed '12' on every option: the theme-only count boolean on Tactile/Toggle / sm, md and lg now defaults to false (no explicit count=true overrides remain in Tactile sets).",
+    "Taller controls overflow the Sheet: in the fixed-height side=left/right variants (scrim on and off) the body now fills the panel (layoutGrow 1) and clips, so taller Tactile content scrolls inside the body instead of running past the footer; top/bottom sheets hug their content.",
+    "Owner note 2026-10-31 (row tones, 'check the others'): Tactile/Table rows were all success; tone and label re-applied from the base Table (Paid success, Awaiting payment warning, Shipped info, Paid success, Refunded neutral); Tactile/Data table inherits. Screen tables already had correct per-row overrides."
+  ],
+  "screens": {
+    "group": "534:47202",
+    "screenIds": {"Dashboard": ["534:47205", "534:47345"], "Orders": ["534:47230", "534:47370"], "Settings": ["534:47261", "534:47401"], "Sign-in": ["534:47289", "534:47429"], "Command": ["534:47311", "534:47451"], "note": "ids are the 'cell · <Screen> · <Mode>' frames (1440x928 incl. a 28px caption); PNGs are cropped to the 1440x900 screen"},
+    "swapped": {"Alert": 4, "Inline notice": 2, "Progress": 2, "Toast": 6},
+    "leftoverBaseFeedback": 0,
+    "reShot": ["review/screens/tactile/orders-light.png", "review/screens/tactile/orders-dark.png", "review/screens/tactile/settings-light.png", "review/screens/tactile/settings-dark.png", "review/screens/tactile/sign-in-light.png", "review/screens/tactile/sign-in-dark.png", "review/screens/tactile/command-light.png", "review/screens/tactile/command-dark.png"],
+    "unchanged": ["Dashboard"]
+  },
+  "ownerReview": [
+    "Tactile scrim colour stays tactile/surface/well (a material veil: it lightens in Light, darkens in Dark) at 60%; the screens' Orders sheet still carries the screens builder's base-scrim override.",
+    "Alert is printed rather than a plateau because both screen usages sit inside plateaus (nesting budget); toasts stay plateaus.",
+    "Orders sheet still hides the Email and Tracking number rows (screens builder fix); with the scrolling body they could be shown again and clip at the body edge."
+  ]
+}

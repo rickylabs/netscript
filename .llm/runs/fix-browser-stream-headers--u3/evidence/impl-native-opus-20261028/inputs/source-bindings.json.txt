@@ -1,0 +1,1156 @@
+{
+  "head": "9288ea2939f56eeb75fa53b6260f6cf1e91f31f0",
+  "owners": [
+    "docs/site/durable-workflows/streams.md",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+    "packages/fresh/tests/streamdb-headers-contract_test.ts",
+    "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts",
+    "plugins/workers/streams/factory.ts",
+    "plugins/workers/streams/mod.ts",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "plugins/workers/tests/streams/live-query-consumer_test.ts",
+    "plugins/workers/tests/streams/live-query-consumer_type.ts"
+  ],
+  "generated": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+  ],
+  "canonicalDebt": ".llm/harness/debt/arch-debt.md",
+  "sourceRows": [
+    {
+      "path": "docs/site/durable-workflows/streams.md",
+      "sha256": "0e7d33a08910bc441f0cf573f13326dfdd76f26e90ebe9eb93349204afb279f5"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "e46d3baa4c35d0ec45ea5c3fcbe47234c34d66d5a2e57336ed7819b8e5f97d2b"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+      "sha256": "3dab3c70c9cd9298a43e2d9d240c577fef1d5ed1e5a76293487b090e18eb94bf"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/mod.ts",
+      "sha256": "148969fac7d5401855af15a4eff73ac92dfe9cb4d191328d9b81f08b70e4ec36"
+    },
+    {
+      "path": "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+      "sha256": "e83c140f5770a509fef2ff80a0494f0fe503a97af0195930479e14c1d1b4f5bb"
+    },
+    {
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "sha256": "c087155cf65e5b68f4872d2695957b30e3577627394b929e6c7a94fd6588ace8"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts",
+      "sha256": "4ffadae7cfef4d983f156d21378d1e4c2633b86c9ceb5f15a5ba978790bb870d"
+    },
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "sha256": "18786a3bc5e5d13558fb2b5747d3f2278cc0f69dfa42cc4509817ae2867f055e"
+    },
+    {
+      "path": "plugins/workers/streams/mod.ts",
+      "sha256": "b07b1e26b6eb07fb95d6073a04feee4ca60470da3310c5f8b467527512ccb318"
+    },
+    {
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "sha256": "fb4341d5e31cd32f3dca71c7df45c19217193ff3b35bf4f5d0ea4cb7c70f6e17"
+    },
+    {
+      "path": "plugins/workers/tests/streams/live-query-consumer_test.ts",
+      "sha256": "c2df5eb747e6373ef7df529e3ea02c2f4c06f3dc7473a7cb82a7f5628b61ec58"
+    },
+    {
+      "path": "plugins/workers/tests/streams/live-query-consumer_type.ts",
+      "sha256": "aec81ac4ed550c8cb71766ddeb5ae6ffff32f8eb1a1062378f56741bc4156dc9"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/stream-db-recovery-adapter.ts",
+      "sha256": "7f5899f42640c7dae36d43aac2c31eee010daf9dde7990d6ec03efd201bd4791"
+    },
+    {
+      "path": ".agents/skills/netscript-harness/SKILL.md",
+      "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+    },
+    {
+      "path": ".agents/skills/netscript-doctrine/SKILL.md",
+      "sha256": "76ff1dcfc7eb00478784fcde4cd024cd4ac7f3ef5c63ea3824f5e084ab5c99a7"
+    },
+    {
+      "path": ".agents/skills/netscript-tools/SKILL.md",
+      "sha256": "e85a8e970fe53e26279203e7c77faf34a0a16c739b9e10d0ae83a2f29bf3e01f"
+    },
+    {
+      "path": ".agents/skills/jsr-audit/SKILL.md",
+      "sha256": "b34002e35bd00656f1a68f54126eb7e316e9099ca6d4be92dc460a2d50ee7a79"
+    },
+    {
+      "path": ".agents/skills/netscript-pr/SKILL.md",
+      "sha256": "486aa7f26376baaf1d467fff962a40500c8b0ca8ef1563151015e2e94392fee3"
+    },
+    {
+      "path": ".agents/skills/deno/SKILL.md",
+      "sha256": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9"
+    },
+    {
+      "path": "docs/architecture/doctrine/02-public-surface.md",
+      "sha256": "32299c4df2c00800bc78e56d0974c31b7d2cdcb13fed582c08d62b21120cb454"
+    },
+    {
+      "path": "docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md",
+      "sha256": "be35a323a5943178a131996c4343114f3e3bd0b69edaaeb4d68a3f285bdac302"
+    },
+    {
+      "path": ".llm/harness/evaluator/protocol.md",
+      "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+    },
+    {
+      "path": ".llm/harness/evaluator/verdict-definitions.md",
+      "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+    },
+    {
+      "path": ".llm/harness/workflow/run-loop.md",
+      "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+    },
+    {
+      "path": ".llm/harness/archetypes/SCOPE-docs.md",
+      "sha256": "11bbcf4317f7ed797c3851223a885c323be7f3f38899f35d31a76c5fc44c7885"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/worklog.md",
+      "sha256": "13f90750620548060822c977dcab7e0db12ca4e29a2a1eaef8e05634a1afbb24"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/context-pack.md",
+      "sha256": "ca1ce59d9ba55899bbfe5bffd282c4ff4b650b1ec9b1f68800d82185d0b883c5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/drift.md",
+      "sha256": "c44da6ec2d07ac90ff28dd5a7ffb7914909b1839bac14fed9062f11f51f86fa0"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/plan.md",
+      "sha256": "7fd0f254c5eb8d209e6aa54ec38c85fb0cd3f1e15440477a214e65924c165271"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/plan-eval.md",
+      "sha256": "2d2f36ec3692cb3be6e922222da672a82a5bf1a939a213207137516ab4ab78f5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-plan-addendum.md",
+      "sha256": "081af7ba38874f605859837dff8ae0e0b2655b2caea39bfdb02103c0636b644b"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md",
+      "sha256": "c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md",
+      "sha256": "6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-corrective-type-closure-source-acceptance.md",
+      "sha256": "164a7c1306b5be5f71bae1dbe1d6f9daf25fb478f500acf4798e45901777faae"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c1-source-acceptance.md",
+      "sha256": "c169ea7c5609a5d23cfc362f68958f7024ba04b03f545df5f7abdbe93ee933ef"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c2-scope-authorization.md",
+      "sha256": "50e5e45798fb496eb645b5f9f9a0264349f6a3178f1ccaca721ebe3f3b5e5403"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c2-windows-consumer-rescope.md",
+      "sha256": "0a1af0f0323e81e50093f8129e9b0615b237400bc7675a2eca1537586ffffa31"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c2-source-acceptance.md",
+      "sha256": "121fccc6228fac49f561e5602d7faa59efd7c5ee1ce7571115fcf0e6e626b8d5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c3-source-acceptance.md",
+      "sha256": "e8bf0acce3beee56b8dcc51a1e9e12dcc233954207067d3f30e378fe069c13c2"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/type-closure-checkpoint.md",
+      "sha256": "26a614596e339674d2956ede93f875d0833bee5ac12768853ccbe3517d1a46ca"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/c1-checkpoint.md",
+      "sha256": "349d00b0176dd6e6386137f6fd3b4c4d27b98e2cd44607b0da57e6a8b3b12454"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/c2-checkpoint.md",
+      "sha256": "0285bcbcbee3bf166a5d130b3a3ec81055ef1e80b68e9b7b05d122f8a021285f"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/c3-checkpoint.md",
+      "sha256": "e5a8b9b1eda8eb552f57b4ec77d7343b50084075d6a1eda50559dd51c6dd29eb"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-ci-generation-acceptance-20261028.md",
+      "sha256": "eef7d04ca74b2d26bc4f46ee40c398a5e6eef04777fbec4dd8070ceae0b6c2e6"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/root-audit.json",
+      "sha256": "7a3cbbb78e7eee3560020300a54e19bca2d2e069c60f8e689e4359d7962bbf67"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json",
+      "sha256": "f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json",
+      "sha256": "7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json",
+      "sha256": "6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json",
+      "sha256": "b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d"
+    },
+    {
+      "path": ".llm/tmp/root-ci-generation-20261028/index-audit.json",
+      "sha256": "2d5abba5f9632f1b437c29e59a0a6d86646fcc684287d1df8aae654c8281ed3a"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/application-review.md",
+      "sha256": "0490dcb5d0e4321022a088d1a8ecf3d6d1a35ee0a2c07c25d7eecdcfee26de4c"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-proof.json",
+      "sha256": "41ebb46f5be5cda05c68c7785ca946e2b635fed9623263fe9e86ed0434b62df7"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.ts",
+      "sha256": "e835a01b93b814bf279e6b5131d6f0ec7a8eb7085a0c195436c0ce6020bdfa89"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-fresh-1793154019653.stderr",
+      "sha256": "a7f26422892853738dfb83c87524e996bda22b74028298d88124b18c5a3bcc59"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-workers-1793154019983.stderr",
+      "sha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.json",
+      "sha256": "113cf48746ca9e9d3a724adf2c71f57eb3073abbbda3b6e4b6bc1d7c82486be4"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.json",
+      "sha256": "f1322a2976a55c3c0266cbf62b1962f0df6d6b98968f25c80db65a149d3558cb"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/types-1793154040205.json",
+      "sha256": "df2a14ad9db61b90153847873b07d78c295b01e4c11c6731604db33b5b6dd3a5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/lint-1793154043228.json",
+      "sha256": "5d9568ed4ffbba305d50b86f4aed2f077453da5366afa591c2c065cebff4abd2"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/fmt-1793154044722.json",
+      "sha256": "9b6ed4ecc8caffc93a9f2e29220e7d3f6d429b4818213973e4dacdadf7e38a11"
+    },
+    {
+      "path": ".llm/harness/archetypes/ARCHETYPE-1-small-contract.md",
+      "sha256": "25baf2693cf82f54be07a0a96c82fc90f7b8ef3b19f4c6dec382a47e71b154d9"
+    },
+    {
+      "path": ".llm/harness/archetypes/ARCHETYPE-5-plugin.md",
+      "sha256": "41abbc01781524e355d3436690673cc241a90e46693006a4aacbde23dbc1893c"
+    }
+  ],
+  "untracked": [
+    ".agents/skills/aspire-deployment/SKILL.md",
+    ".agents/skills/aspire-deployment/references/aws.md",
+    ".agents/skills/aspire-deployment/references/azure.md",
+    ".agents/skills/aspire-deployment/references/cicd.md",
+    ".agents/skills/aspire-deployment/references/docker-compose.md",
+    ".agents/skills/aspire-deployment/references/github-actions-azure-csharp.yml",
+    ".agents/skills/aspire-deployment/references/github-actions-azure-typescript.yml",
+    ".agents/skills/aspire-deployment/references/javascript.md",
+    ".agents/skills/aspire-deployment/references/kubernetes.md",
+    ".agents/skills/aspire-deployment/references/preflight.md",
+    ".agents/skills/aspire-init/SKILL.md",
+    ".agents/skills/aspire-init/references/init-workflow.md",
+    ".agents/skills/aspire-init/references/templates.md",
+    ".agents/skills/aspire-monitoring/SKILL.md",
+    ".agents/skills/aspire-monitoring/references/diagnostics-bridge.md",
+    ".agents/skills/aspire-monitoring/references/monitoring.md",
+    ".agents/skills/aspire-monitoring/references/playwright-handoff.md",
+    ".agents/skills/aspire-orchestration/SKILL.md",
+    ".agents/skills/aspire-orchestration/references/agent-workflows.md",
+    ".agents/skills/aspire-orchestration/references/app-commands.md",
+    ".agents/skills/aspire-orchestration/references/detection.md",
+    ".agents/skills/aspire-orchestration/references/resource-management.md",
+    ".agents/skills/aspire-orchestration/references/safety-guardrails.md",
+    ".agents/skills/deno/SKILL.md",
+    ".agents/skills/help.md",
+    ".agents/skills/netscript-build/SKILL.md",
+    ".agents/skills/netscript-operate/SKILL.md",
+    ".agents/skills/netscript/SKILL.md",
+    ".llm/tools/release.json",
+    ".mcp.json",
+    ".netscript/agent/diagnostics/project.json",
+    ".netscript/agent/native-inline-type-reference-probe.doc-lint.log",
+    ".netscript/agent/native-inline-type-reference-probe.doc-lint.utf8.log",
+    ".netscript/agent/native-inline-type-reference-probe.receipt.json",
+    ".netscript/agent/native-inline-type-reference-probe.ts",
+    ".netscript/docs/MANIFEST.md",
+    ".netscript/docs/context/01-how-the-web-became-the-default.mdx",
+    ".netscript/docs/context/02-how-the-web-stack-grew-up.mdx",
+    ".netscript/docs/deno-doc/service.txt",
+    ".netscript/docs/llms-full.txt",
+    ".netscript/docs/llms.txt",
+    ".netscript/docs/pages/ai/agent-tooling/index.md",
+    ".netscript/docs/pages/ai/chat-ui/index.md",
+    ".netscript/docs/pages/ai/durable-chat/index.md",
+    ".netscript/docs/pages/ai/engine/index.md",
+    ".netscript/docs/pages/ai/how-to/build-a-durable-chat/index.md",
+    ".netscript/docs/pages/ai/how-to/index.md",
+    ".netscript/docs/pages/ai/index.md",
+    ".netscript/docs/pages/ai/mcp/index.md",
+    ".netscript/docs/pages/background-processing/how-to/add-a-task-runtime-adapter/index.md",
+    ".netscript/docs/pages/background-processing/how-to/index.md",
+    ".netscript/docs/pages/background-processing/how-to/restrict-worker-task-permissions/index.md",
+    ".netscript/docs/pages/background-processing/how-to/run-a-polyglot-task/index.md",
+    ".netscript/docs/pages/background-processing/how-to/tune-worker-runtime/index.md",
+    ".netscript/docs/pages/background-processing/index.md",
+    ".netscript/docs/pages/background-processing/polyglot-tasks/index.md",
+    ".netscript/docs/pages/background-processing/workers/index.md",
+    ".netscript/docs/pages/cli-reference/index.md",
+    ".netscript/docs/pages/comparisons/backend/index.md",
+    ".netscript/docs/pages/comparisons/frontend/index.md",
+    ".netscript/docs/pages/comparisons/index.md",
+    ".netscript/docs/pages/concepts/index.md",
+    ".netscript/docs/pages/data-persistence/database/index.md",
+    ".netscript/docs/pages/data-persistence/how-to/choose-a-queue-provider/index.md",
+    ".netscript/docs/pages/data-persistence/how-to/database-migration/index.md",
+    ".netscript/docs/pages/data-persistence/how-to/index.md",
+    ".netscript/docs/pages/data-persistence/how-to/queue-kv-cron/index.md",
+    ".netscript/docs/pages/data-persistence/how-to/use-a-second-database/index.md",
+    ".netscript/docs/pages/data-persistence/index.md",
+    ".netscript/docs/pages/data-persistence/kv-queues-cron/index.md",
+    ".netscript/docs/pages/durable-workflows/expo-streams/index.md",
+    ".netscript/docs/pages/durable-workflows/how-to/bound-stream-retention/index.md",
+    ".netscript/docs/pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md",
+    ".netscript/docs/pages/durable-workflows/how-to/index.md",
+    ".netscript/docs/pages/durable-workflows/how-to/publish-a-durable-stream/index.md",
+    ".netscript/docs/pages/durable-workflows/index.md",
+    ".netscript/docs/pages/durable-workflows/sagas/index.md",
+    ".netscript/docs/pages/durable-workflows/streams/index.md",
+    ".netscript/docs/pages/durable-workflows/triggers/index.md",
+    ".netscript/docs/pages/explanation/architecture/index.md",
+    ".netscript/docs/pages/explanation/aspire/index.md",
+    ".netscript/docs/pages/explanation/auth-model/index.md",
+    ".netscript/docs/pages/explanation/compared/index.md",
+    ".netscript/docs/pages/explanation/contracts/index.md",
+    ".netscript/docs/pages/explanation/durability-model/index.md",
+    ".netscript/docs/pages/explanation/index.md",
+    ".netscript/docs/pages/explanation/observability/index.md",
+    ".netscript/docs/pages/explanation/plugin-system/index.md",
+    ".netscript/docs/pages/glossary/index.md",
+    ".netscript/docs/pages/how-to/index.md",
+    ".netscript/docs/pages/identity-access/auth/index.md",
+    ".netscript/docs/pages/identity-access/better-auth-plugins/index.md",
+    ".netscript/docs/pages/identity-access/how-to/add-authentication/index.md",
+    ".netscript/docs/pages/identity-access/how-to/index.md",
+    ".netscript/docs/pages/identity-access/index.md",
+    ".netscript/docs/pages/identity-access/session-lifecycles/index.md",
+    ".netscript/docs/pages/index.md",
+    ".netscript/docs/pages/observability/how-to/add-opentelemetry/index.md",
+    ".netscript/docs/pages/observability/how-to/index.md",
+    ".netscript/docs/pages/observability/index.md",
+    ".netscript/docs/pages/observability/telemetry/index.md",
+    ".netscript/docs/pages/orchestration-runtime/child-health/index.md",
+    ".netscript/docs/pages/orchestration-runtime/cli-scaffold/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/add-a-plugin/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/author-a-plugin/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/deno-lsp-code-intelligence/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/deploy-deno-deploy/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/deploy-local-aspire/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/deploy/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/graceful-shutdown/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/outbound-webhooks/index.md",
+    ".netscript/docs/pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md",
+    ".netscript/docs/pages/orchestration-runtime/index.md",
+    ".netscript/docs/pages/orchestration-runtime/runtime-config/index.md",
+    ".netscript/docs/pages/quickstart/aspire/index.md",
+    ".netscript/docs/pages/quickstart/index.md",
+    ".netscript/docs/pages/reference/ai/index.md",
+    ".netscript/docs/pages/reference/ai/skills/index.md",
+    ".netscript/docs/pages/reference/aspire/index.md",
+    ".netscript/docs/pages/reference/auth-better-auth/index.md",
+    ".netscript/docs/pages/reference/auth-kv-oauth/index.md",
+    ".netscript/docs/pages/reference/auth-workos/index.md",
+    ".netscript/docs/pages/reference/auth/index.md",
+    ".netscript/docs/pages/reference/cli/commands/index.md",
+    ".netscript/docs/pages/reference/cli/index.md",
+    ".netscript/docs/pages/reference/config/index.md",
+    ".netscript/docs/pages/reference/contracts/index.md",
+    ".netscript/docs/pages/reference/cron/index.md",
+    ".netscript/docs/pages/reference/database/index.md",
+    ".netscript/docs/pages/reference/fresh-ui/index.md",
+    ".netscript/docs/pages/reference/fresh/index.md",
+    ".netscript/docs/pages/reference/index.md",
+    ".netscript/docs/pages/reference/kv/index.md",
+    ".netscript/docs/pages/reference/logger/index.md",
+    ".netscript/docs/pages/reference/mcp/index.md",
+    ".netscript/docs/pages/reference/plugin-ai-core/index.md",
+    ".netscript/docs/pages/reference/plugin-ai/index.md",
+    ".netscript/docs/pages/reference/plugin-auth-core/index.md",
+    ".netscript/docs/pages/reference/plugin-auth/index.md",
+    ".netscript/docs/pages/reference/plugin-sagas-core/index.md",
+    ".netscript/docs/pages/reference/plugin-streams-core/index.md",
+    ".netscript/docs/pages/reference/plugin-triggers-core/index.md",
+    ".netscript/docs/pages/reference/plugin-workers-core/index.md",
+    ".netscript/docs/pages/reference/plugin/index.md",
+    ".netscript/docs/pages/reference/prisma-adapter-mysql/index.md",
+    ".netscript/docs/pages/reference/queue/index.md",
+    ".netscript/docs/pages/reference/runtime-config/index.md",
+    ".netscript/docs/pages/reference/sagas/index.md",
+    ".netscript/docs/pages/reference/sdk/index.md",
+    ".netscript/docs/pages/reference/service/index.md",
+    ".netscript/docs/pages/reference/streams/index.md",
+    ".netscript/docs/pages/reference/telemetry/index.md",
+    ".netscript/docs/pages/reference/triggers/index.md",
+    ".netscript/docs/pages/reference/watchers/index.md",
+    ".netscript/docs/pages/reference/workers/index.md",
+    ".netscript/docs/pages/services-sdk/how-to/add-a-service/index.md",
+    ".netscript/docs/pages/services-sdk/how-to/call-internal-procedures/index.md",
+    ".netscript/docs/pages/services-sdk/how-to/discover-services/index.md",
+    ".netscript/docs/pages/services-sdk/how-to/expose-openapi-scalar/index.md",
+    ".netscript/docs/pages/services-sdk/how-to/index.md",
+    ".netscript/docs/pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
+    ".netscript/docs/pages/services-sdk/index.md",
+    ".netscript/docs/pages/services-sdk/sdk/index.md",
+    ".netscript/docs/pages/services-sdk/service-layout/index.md",
+    ".netscript/docs/pages/services-sdk/services/index.md",
+    ".netscript/docs/pages/tutorials/chat/01-scaffold/index.md",
+    ".netscript/docs/pages/tutorials/chat/02-durable-chat-route/index.md",
+    ".netscript/docs/pages/tutorials/chat/03-chat-ui/index.md",
+    ".netscript/docs/pages/tutorials/chat/04-tool-call/index.md",
+    ".netscript/docs/pages/tutorials/chat/05-mcp/index.md",
+    ".netscript/docs/pages/tutorials/chat/06-live-streaming/index.md",
+    ".netscript/docs/pages/tutorials/chat/index.md",
+    ".netscript/docs/pages/tutorials/erp-sync/01-scaffold/index.md",
+    ".netscript/docs/pages/tutorials/erp-sync/02-import-job/index.md",
+    ".netscript/docs/pages/tutorials/erp-sync/03-polyglot-transform/index.md",
+    ".netscript/docs/pages/tutorials/erp-sync/04-queue-and-cron/index.md",
+    ".netscript/docs/pages/tutorials/erp-sync/05-deploy/index.md",
+    ".netscript/docs/pages/tutorials/erp-sync/index.md",
+    ".netscript/docs/pages/tutorials/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/01-scaffold/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/02-contract-to-service/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/05-live-stream/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/06-deploy/index.md",
+    ".netscript/docs/pages/tutorials/live-dashboard/index.md",
+    ".netscript/docs/pages/tutorials/storefront/01-scaffold/index.md",
+    ".netscript/docs/pages/tutorials/storefront/02-catalog-service/index.md",
+    ".netscript/docs/pages/tutorials/storefront/03-cart-contracts/index.md",
+    ".netscript/docs/pages/tutorials/storefront/04-checkout-saga/index.md",
+    ".netscript/docs/pages/tutorials/storefront/05-shipping-webhook/index.md",
+    ".netscript/docs/pages/tutorials/storefront/06-storefront-ui/index.md",
+    ".netscript/docs/pages/tutorials/storefront/07-deploy/index.md",
+    ".netscript/docs/pages/tutorials/storefront/index.md",
+    ".netscript/docs/pages/tutorials/workspace/01-scaffold/index.md",
+    ".netscript/docs/pages/tutorials/workspace/02-auth/index.md",
+    ".netscript/docs/pages/tutorials/workspace/03-workspace-data/index.md",
+    ".netscript/docs/pages/tutorials/workspace/04-provision-job/index.md",
+    ".netscript/docs/pages/tutorials/workspace/05-route-authz/index.md",
+    ".netscript/docs/pages/tutorials/workspace/06-deploy/index.md",
+    ".netscript/docs/pages/tutorials/workspace/index.md",
+    ".netscript/docs/pages/web-layer/builders/index.md",
+    ".netscript/docs/pages/web-layer/defer-streaming-ui/index.md",
+    ".netscript/docs/pages/web-layer/error/index.md",
+    ".netscript/docs/pages/web-layer/examples/index.md",
+    ".netscript/docs/pages/web-layer/form/index.md",
+    ".netscript/docs/pages/web-layer/fresh-ui/index.md",
+    ".netscript/docs/pages/web-layer/generated-surface/index.md",
+    ".netscript/docs/pages/web-layer/how-to/build-a-desktop-frontend/index.md",
+    ".netscript/docs/pages/web-layer/how-to/build-a-server-validated-form/index.md",
+    ".netscript/docs/pages/web-layer/how-to/customize-fresh-ui/index.md",
+    ".netscript/docs/pages/web-layer/how-to/index.md",
+    ".netscript/docs/pages/web-layer/index.md",
+    ".netscript/docs/pages/web-layer/interactive/index.md",
+    ".netscript/docs/pages/web-layer/layers/index.md",
+    ".netscript/docs/pages/web-layer/partials/index.md",
+    ".netscript/docs/pages/web-layer/query-bridge/index.md",
+    ".netscript/docs/pages/web-layer/query/index.md",
+    ".netscript/docs/pages/web-layer/resources/index.md",
+    ".netscript/docs/pages/web-layer/response/index.md",
+    ".netscript/docs/pages/web-layer/route/index.md",
+    ".netscript/docs/pages/web-layer/server/index.md",
+    ".netscript/docs/pages/web-layer/testing/index.md",
+    ".netscript/docs/pages/web-layer/vite/index.md",
+    ".netscript/docs/pages/why/index.md",
+    ".netscript/schema/config-file.v1.json"
+  ],
+  "protected": [
+    {
+      "path": "docs/site/durable-workflows/streams.md",
+      "sha256": "0e7d33a08910bc441f0cf573f13326dfdd76f26e90ebe9eb93349204afb279f5"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "e46d3baa4c35d0ec45ea5c3fcbe47234c34d66d5a2e57336ed7819b8e5f97d2b"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+      "sha256": "3dab3c70c9cd9298a43e2d9d240c577fef1d5ed1e5a76293487b090e18eb94bf"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/mod.ts",
+      "sha256": "148969fac7d5401855af15a4eff73ac92dfe9cb4d191328d9b81f08b70e4ec36"
+    },
+    {
+      "path": "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+      "sha256": "e83c140f5770a509fef2ff80a0494f0fe503a97af0195930479e14c1d1b4f5bb"
+    },
+    {
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "sha256": "c087155cf65e5b68f4872d2695957b30e3577627394b929e6c7a94fd6588ace8"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts",
+      "sha256": "4ffadae7cfef4d983f156d21378d1e4c2633b86c9ceb5f15a5ba978790bb870d"
+    },
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "sha256": "18786a3bc5e5d13558fb2b5747d3f2278cc0f69dfa42cc4509817ae2867f055e"
+    },
+    {
+      "path": "plugins/workers/streams/mod.ts",
+      "sha256": "b07b1e26b6eb07fb95d6073a04feee4ca60470da3310c5f8b467527512ccb318"
+    },
+    {
+      "path": "plugins/workers/tests/streams/factory-headers_test.ts",
+      "sha256": "fb4341d5e31cd32f3dca71c7df45c19217193ff3b35bf4f5d0ea4cb7c70f6e17"
+    },
+    {
+      "path": "plugins/workers/tests/streams/live-query-consumer_test.ts",
+      "sha256": "c2df5eb747e6373ef7df529e3ea02c2f4c06f3dc7473a7cb82a7f5628b61ec58"
+    },
+    {
+      "path": "plugins/workers/tests/streams/live-query-consumer_type.ts",
+      "sha256": "aec81ac4ed550c8cb71766ddeb5ae6ffff32f8eb1a1062378f56741bc4156dc9"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/stream-db-recovery-adapter.ts",
+      "sha256": "7f5899f42640c7dae36d43aac2c31eee010daf9dde7990d6ec03efd201bd4791"
+    },
+    {
+      "path": ".agents/skills/netscript-harness/SKILL.md",
+      "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215"
+    },
+    {
+      "path": ".agents/skills/netscript-doctrine/SKILL.md",
+      "sha256": "76ff1dcfc7eb00478784fcde4cd024cd4ac7f3ef5c63ea3824f5e084ab5c99a7"
+    },
+    {
+      "path": ".agents/skills/netscript-tools/SKILL.md",
+      "sha256": "e85a8e970fe53e26279203e7c77faf34a0a16c739b9e10d0ae83a2f29bf3e01f"
+    },
+    {
+      "path": ".agents/skills/jsr-audit/SKILL.md",
+      "sha256": "b34002e35bd00656f1a68f54126eb7e316e9099ca6d4be92dc460a2d50ee7a79"
+    },
+    {
+      "path": ".agents/skills/netscript-pr/SKILL.md",
+      "sha256": "486aa7f26376baaf1d467fff962a40500c8b0ca8ef1563151015e2e94392fee3"
+    },
+    {
+      "path": ".agents/skills/deno/SKILL.md",
+      "sha256": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9"
+    },
+    {
+      "path": "docs/architecture/doctrine/02-public-surface.md",
+      "sha256": "32299c4df2c00800bc78e56d0974c31b7d2cdcb13fed582c08d62b21120cb454"
+    },
+    {
+      "path": "docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md",
+      "sha256": "be35a323a5943178a131996c4343114f3e3bd0b69edaaeb4d68a3f285bdac302"
+    },
+    {
+      "path": ".llm/harness/evaluator/protocol.md",
+      "sha256": "cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241"
+    },
+    {
+      "path": ".llm/harness/evaluator/verdict-definitions.md",
+      "sha256": "adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7"
+    },
+    {
+      "path": ".llm/harness/workflow/run-loop.md",
+      "sha256": "0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120"
+    },
+    {
+      "path": ".llm/harness/archetypes/SCOPE-docs.md",
+      "sha256": "11bbcf4317f7ed797c3851223a885c323be7f3f38899f35d31a76c5fc44c7885"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/worklog.md",
+      "sha256": "13f90750620548060822c977dcab7e0db12ca4e29a2a1eaef8e05634a1afbb24"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/context-pack.md",
+      "sha256": "ca1ce59d9ba55899bbfe5bffd282c4ff4b650b1ec9b1f68800d82185d0b883c5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/drift.md",
+      "sha256": "c44da6ec2d07ac90ff28dd5a7ffb7914909b1839bac14fed9062f11f51f86fa0"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/plan.md",
+      "sha256": "7fd0f254c5eb8d209e6aa54ec38c85fb0cd3f1e15440477a214e65924c165271"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/plan-eval.md",
+      "sha256": "2d2f36ec3692cb3be6e922222da672a82a5bf1a939a213207137516ab4ab78f5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-plan-addendum.md",
+      "sha256": "081af7ba38874f605859837dff8ae0e0b2655b2caea39bfdb02103c0636b644b"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md",
+      "sha256": "c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md",
+      "sha256": "6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-corrective-type-closure-source-acceptance.md",
+      "sha256": "164a7c1306b5be5f71bae1dbe1d6f9daf25fb478f500acf4798e45901777faae"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c1-source-acceptance.md",
+      "sha256": "c169ea7c5609a5d23cfc362f68958f7024ba04b03f545df5f7abdbe93ee933ef"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c2-scope-authorization.md",
+      "sha256": "50e5e45798fb496eb645b5f9f9a0264349f6a3178f1ccaca721ebe3f3b5e5403"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c2-windows-consumer-rescope.md",
+      "sha256": "0a1af0f0323e81e50093f8129e9b0615b237400bc7675a2eca1537586ffffa31"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c2-source-acceptance.md",
+      "sha256": "121fccc6228fac49f561e5602d7faa59efd7c5ee1ce7571115fcf0e6e626b8d5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-c3-source-acceptance.md",
+      "sha256": "e8bf0acce3beee56b8dcc51a1e9e12dcc233954207067d3f30e378fe069c13c2"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/type-closure-checkpoint.md",
+      "sha256": "26a614596e339674d2956ede93f875d0833bee5ac12768853ccbe3517d1a46ca"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/c1-checkpoint.md",
+      "sha256": "349d00b0176dd6e6386137f6fd3b4c4d27b98e2cd44607b0da57e6a8b3b12454"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/c2-checkpoint.md",
+      "sha256": "0285bcbcbee3bf166a5d130b3a3ec81055ef1e80b68e9b7b05d122f8a021285f"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/c3-checkpoint.md",
+      "sha256": "e5a8b9b1eda8eb552f57b4ec77d7343b50084075d6a1eda50559dd51c6dd29eb"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/root-ci-generation-acceptance-20261028.md",
+      "sha256": "eef7d04ca74b2d26bc4f46ee40c398a5e6eef04777fbec4dd8070ceae0b6c2e6"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/root-audit.json",
+      "sha256": "7a3cbbb78e7eee3560020300a54e19bca2d2e069c60f8e689e4359d7962bbf67"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json",
+      "sha256": "f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json",
+      "sha256": "7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json",
+      "sha256": "6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json",
+      "sha256": "b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d"
+    },
+    {
+      "path": ".llm/tmp/root-ci-generation-20261028/index-audit.json",
+      "sha256": "2d5abba5f9632f1b437c29e59a0a6d86646fcc684287d1df8aae654c8281ed3a"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/application-review.md",
+      "sha256": "0490dcb5d0e4321022a088d1a8ecf3d6d1a35ee0a2c07c25d7eecdcfee26de4c"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-proof.json",
+      "sha256": "41ebb46f5be5cda05c68c7785ca946e2b635fed9623263fe9e86ed0434b62df7"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.ts",
+      "sha256": "e835a01b93b814bf279e6b5131d6f0ec7a8eb7085a0c195436c0ce6020bdfa89"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-fresh-1793154019653.stderr",
+      "sha256": "a7f26422892853738dfb83c87524e996bda22b74028298d88124b18c5a3bcc59"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-workers-1793154019983.stderr",
+      "sha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.json",
+      "sha256": "113cf48746ca9e9d3a724adf2c71f57eb3073abbbda3b6e4b6bc1d7c82486be4"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.json",
+      "sha256": "f1322a2976a55c3c0266cbf62b1962f0df6d6b98968f25c80db65a149d3558cb"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/types-1793154040205.json",
+      "sha256": "df2a14ad9db61b90153847873b07d78c295b01e4c11c6731604db33b5b6dd3a5"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/lint-1793154043228.json",
+      "sha256": "5d9568ed4ffbba305d50b86f4aed2f077453da5366afa591c2c065cebff4abd2"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/fmt-1793154044722.json",
+      "sha256": "9b6ed4ecc8caffc93a9f2e29220e7d3f6d429b4818213973e4dacdadf7e38a11"
+    },
+    {
+      "path": ".llm/harness/archetypes/ARCHETYPE-1-small-contract.md",
+      "sha256": "25baf2693cf82f54be07a0a96c82fc90f7b8ef3b19f4c6dec382a47e71b154d9"
+    },
+    {
+      "path": ".llm/harness/archetypes/ARCHETYPE-5-plugin.md",
+      "sha256": "41abbc01781524e355d3436690673cc241a90e46693006a4aacbde23dbc1893c"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+      "sha256": "22d0110ceccac7956008746785a5bfbc684cb77d18f6d8c7bcf7a7347de98498"
+    },
+    {
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "83ec73db03b7cef8142387a5fd2dfa49ab678342f8f543db3aa3e2e02c6c73b1"
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3"
+    },
+    {
+      "path": ".mcp.json",
+      "sha256": "e2886256bcc9225f48393e1e0a22dc9cd5b95bd92f1d0b05d377baefcc6bdda7"
+    },
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56"
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--dotnet-rfc/bench/bootsharp-lcg/package.json",
+      "sha256": "e7786a4c0cfacba76a578a82d3548b137fbfe36703ce0ba860441c100c8b3dfa"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.json",
+      "sha256": "d94c243a63bce94784ca036911d363492add32165bdfe0942163111dc9c7ccec"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.lock",
+      "sha256": "99537c6196d90ca77dbc4b5e074acb213136e2bf86cbdd8643a79749152a14c1"
+    },
+    {
+      "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.json",
+      "sha256": "61c727ccb1244b95ed768f17253f2cb5ff8fba66cbc1dc85938bd233130473e3"
+    },
+    {
+      "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.lock",
+      "sha256": "ba1b593c2be6b5097a9a4d7c168a6c1abe9ab1df96d8fd635d9fe396735e2c93"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/5-deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/6-deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/7-deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/8-deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a"
+    },
+    {
+      "path": ".llm/runs/plan-devtools-contribution--seed/research/sources/nuxt-devtools__packages_devtools-kit_package.json",
+      "sha256": "ee3efb93c3051259e3c3725a6f836affd96bd179b4841c1ad8587e2dcc6e0b3a"
+    },
+    {
+      "path": "docs/site/deno.json",
+      "sha256": "6ee7fa5da3d189e74af7be7d4c209b33258ef9235585d46b1fd9a31aa931fb3c"
+    },
+    {
+      "path": "docs/site/deno.lock",
+      "sha256": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057"
+    },
+    {
+      "path": "packages/ai/deno.json",
+      "sha256": "ff97564ea9e42cc49afb6a9da5864bd2327feb0f008a5a4254ae8baa9fb27d1e"
+    },
+    {
+      "path": "packages/aspire/deno.json",
+      "sha256": "1d440df9e1e152e2be68a7408a09099c5a6cb1eea12ea3d9b2f99d6eb4eadc42"
+    },
+    {
+      "path": "packages/auth-better-auth/deno.json",
+      "sha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+    },
+    {
+      "path": "packages/auth-better-auth/package.json",
+      "sha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+    },
+    {
+      "path": "packages/auth-kv-oauth/deno.json",
+      "sha256": "574608715e6564a2a1f5c4ea7deb91c2b66498da011d14988647e2e86e3a7206"
+    },
+    {
+      "path": "packages/auth-kv-oauth/package.json",
+      "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+    },
+    {
+      "path": "packages/auth-workos/deno.json",
+      "sha256": "0388d9fd89f61ab086c80bd20812511b25d7e8871c3c2fe437f7b9178ce5c76c"
+    },
+    {
+      "path": "packages/auth-workos/package.json",
+      "sha256": "dec9db272dca369514253e12795a4cb5dd4d4f2acc499c86e4b0ad6de07a5442"
+    },
+    {
+      "path": "packages/bench/deno.json",
+      "sha256": "4401cbbca430cac110e657d4aa94a16e189e5de8eed81fd6d417f3cfc61ba347"
+    },
+    {
+      "path": "packages/cli/deno.json",
+      "sha256": "778cff41fa1553de8e38c622d5be3c007dd57921401c7708a7d10bb36731979b"
+    },
+    {
+      "path": "packages/cli/e2e/deno.json",
+      "sha256": "0fcaa84136640b9f1a4fa424f1a9f30ad42c9b9375f978496e627565a3160d95"
+    },
+    {
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.json",
+      "sha256": "2a13d1a769e52424ee86ed44f128c160bd9f30f649cdcb24d5d59471f91c5ba7"
+    },
+    {
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.lock",
+      "sha256": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a"
+    },
+    {
+      "path": "packages/config/deno.json",
+      "sha256": "e455fc1d45fe2008df6f4cf31fc5e1937da9c853e4d0dfdc7dcb6dd87c1edf64"
+    },
+    {
+      "path": "packages/contracts/deno.json",
+      "sha256": "6d770b348514841838c68432b1decbbaacdb48f16a53efaa4ed21eb6918e2718"
+    },
+    {
+      "path": "packages/contracts/package.json",
+      "sha256": "78170b8b72c058aad12e45f1c026033a6a7562bb97c9b596e6e55d527a980e9b"
+    },
+    {
+      "path": "packages/cron/deno.json",
+      "sha256": "8095ce1848250aab5432caf017f6c3b670f526733c781234047d89c38d48b62b"
+    },
+    {
+      "path": "packages/database/deno.json",
+      "sha256": "9f4138183a0227d6ee14c7cde2672eaf7d4f7c157eba731c961122b943bf9087"
+    },
+    {
+      "path": "packages/database/package.json",
+      "sha256": "c49333df8fd0237914e43208899c4c0713a2a03e42c5057f4817427e5efd519a"
+    },
+    {
+      "path": "packages/fresh-ui/deno.json",
+      "sha256": "8858451a95ff4c56bdaa5725d6a0be74a5a5c7c9a77be6ba7436e26260bb438b"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40"
+    },
+    {
+      "path": "packages/fresh-ui/package.json",
+      "sha256": "244aa0a6dc7fe4b105e09a9a70453fcd1dab062317f07db34c44ca3cc94c73be"
+    },
+    {
+      "path": "packages/fresh/package.json",
+      "sha256": "42b09520e14b3d54de99ae694a106b0dcbd268bc4cfa29ed6b9c8ca6ce543a4a"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/query-hydration-5.101.0-deno.json",
+      "sha256": "086e999a4c39e3f7bc0d70e6e8159bddf644b5ed30518aa8e8c777e907619384"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/query-hydration-5.102.8-deno.json",
+      "sha256": "3e27d29628d164b26db94ffabec55b5662621adab9449ef542ed296ef630fdcb"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/query-hydration-5.104.1-deno.json",
+      "sha256": "5558eef4500da1276b650307d2ec0c7140abbab6ac357bc41dcd0523805a8b2c"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/streamdb-consumer-deno.json",
+      "sha256": "16a9189c140cc2c2626082a2083308a0ae4166530c922f7c8e97348acf5f616f"
+    },
+    {
+      "path": "packages/kv/deno.json",
+      "sha256": "7253605e36f72b58c5fe0b1f933016bee962cc6b37f4358da461d8adaa664f73"
+    },
+    {
+      "path": "packages/kv/package.json",
+      "sha256": "bb9ccd1176d2dfaff5829aa0b083d1585cc2de3ab27471d8e10a1a1ca3bc815d"
+    },
+    {
+      "path": "packages/logger/deno.json",
+      "sha256": "bbea9a14463d562790cb2d73c8f78d8ab07a0850d1d19cf73740574a0cf4a176"
+    },
+    {
+      "path": "packages/mcp/deno.json",
+      "sha256": "6a005c2890c618a9bd6d11087476274865a9e8cd18192f7366562239e9604b5f"
+    },
+    {
+      "path": "packages/mcp/tests/fixtures/doctor/broken/deno.json",
+      "sha256": "6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361"
+    },
+    {
+      "path": "packages/mcp/tests/fixtures/doctor/healthy/deno.json",
+      "sha256": "499b4217cd2fa71181d534f3b1ad8aed684ef454acce652913fd4b3e412d609f"
+    },
+    {
+      "path": "packages/plugin-ai-core/deno.json",
+      "sha256": "c762d15b83f30226578bec370e2fabbc780d916a26fca3748fe625ea6fcaeb1e"
+    },
+    {
+      "path": "packages/plugin-ai-core/package.json",
+      "sha256": "373e8117e98ad776231e38714d202551051b9b28fe33bf5bb99328e21db19c82"
+    },
+    {
+      "path": "packages/plugin-auth-core/deno.json",
+      "sha256": "163aa1c2ea334525ec3f62deff57182e3d6a1ca752eb4f6f1c76ab67c4c9be43"
+    },
+    {
+      "path": "packages/plugin-auth-core/package.json",
+      "sha256": "dbf8c78b4490d39c179c4da3e4a8097136f07a85bc6e2705eb9c22423b3037fa"
+    },
+    {
+      "path": "packages/plugin-sagas-core/deno.json",
+      "sha256": "35b1d5b77a08392da7e538dc52c67432085e425873c665854f60211aa821db3e"
+    },
+    {
+      "path": "packages/plugin-sagas-core/package.json",
+      "sha256": "517e0bd8c190f5932617d8b879f951abc7d09770bc337b7e430b69b837bb268f"
+    },
+    {
+      "path": "packages/plugin-streams-core/deno.json",
+      "sha256": "c2357c0cb27502a1983474cf97ff8f0ce9442aeb1d4fecb55a34f1c90eb32757"
+    },
+    {
+      "path": "packages/plugin-streams-core/package.json",
+      "sha256": "847cf8357caf867d847d56940ce9183a015139f936a47acb1dea917b1855247d"
+    },
+    {
+      "path": "packages/plugin-streams-core/tests/type-fixtures/producer-consumer-deno.json",
+      "sha256": "81e5340fe061b954f281d4b0d37f911d66e376e0d511a88abeb49e9801a7e3b5"
+    },
+    {
+      "path": "packages/plugin-triggers-core/deno.json",
+      "sha256": "a5cd22e15d458e1d58c4754bcdc1b93c75b873411f10a9b73113ef8cb63599bf"
+    },
+    {
+      "path": "packages/plugin-triggers-core/package.json",
+      "sha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66"
+    },
+    {
+      "path": "packages/plugin-workers-core/deno.json",
+      "sha256": "be7620df38f5d68f0630809e9e57d7dda8b578b34aa81698c4583eb0153dc934"
+    },
+    {
+      "path": "packages/plugin-workers-core/package.json",
+      "sha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66"
+    },
+    {
+      "path": "packages/plugin/deno.json",
+      "sha256": "ad569a7e7d3570b5a8f5bcb9b62ab77aa0fed0cc8aa517004ae7ffdd609ef247"
+    },
+    {
+      "path": "packages/prisma-adapter-mysql/deno.json",
+      "sha256": "18c3ea278afcae571428b146b58eef5a496a89d4909e7cebef2cfe408a33e54b"
+    },
+    {
+      "path": "packages/prisma-adapter-mysql/package.json",
+      "sha256": "f4ccc169e0e35b4e717962a203de504f5c8d644bca08b88b007a7e0d4bdf2d86"
+    },
+    {
+      "path": "packages/queue/deno.json",
+      "sha256": "d562b7e08101e37414018f40c9f7bbcc39c8a5f45f5d1170ebd547d8f191a8d8"
+    },
+    {
+      "path": "packages/queue/package.json",
+      "sha256": "e4e0b46a72f8ee169ccdd982949902b98f07ef9661e3b99e06492def8a5bdaca"
+    },
+    {
+      "path": "packages/runtime-config/deno.json",
+      "sha256": "914bf6589706da6957e5a79134ea165a9000de867a47f177b22e0101dd7e4cbe"
+    },
+    {
+      "path": "packages/sdk/deno.json",
+      "sha256": "c3ee8b9719fca2f2faeeb62422ba5596ef1ce9c2ffd7e73f2060cd2ca3f1e5cc"
+    },
+    {
+      "path": "packages/sdk/package.json",
+      "sha256": "3ab89c4758982551c02f1430ed86832fedc81e7a0e3b8b32165d5d9ba7a6415a"
+    },
+    {
+      "path": "packages/service/deno.json",
+      "sha256": "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70"
+    },
+    {
+      "path": "packages/service/package.json",
+      "sha256": "b68c1f8091e566601f6be579ae95a8da9a5d244535ec4989789a234b96485df1"
+    },
+    {
+      "path": "packages/telemetry/deno.json",
+      "sha256": "8d71f8a43aad6b53646a6cce076913faa7ba9eac76cc1a0bbe033fad925b6a5d"
+    },
+    {
+      "path": "packages/telemetry/package.json",
+      "sha256": "1a390489439fa337f6b08cea2f586dd4ed4e4896343b0dbbbea0bf7172302104"
+    },
+    {
+      "path": "packages/watchers/deno.json",
+      "sha256": "af996587c28f2948125331c9d09f7840468c4073286662dcd6b6264e394b88c9"
+    },
+    {
+      "path": "plugins/ai/deno.json",
+      "sha256": "6eddd0a9352194259e65b57f6956b28b6b1b4f4ac1c2df16950ed3179ce89c85"
+    },
+    {
+      "path": "plugins/ai/package.json",
+      "sha256": "bfb62e6eafd1bf6db3ca8fa70b6712d62d1ba3562451585ece7bdb56ffcd2f73"
+    },
+    {
+      "path": "plugins/auth/deno.json",
+      "sha256": "2070ee8bf2da1bec746923d1ffecf6db79c0eb379b66e3965fe679aad4ca64f2"
+    },
+    {
+      "path": "plugins/auth/package.json",
+      "sha256": "204550257f9673f24fb2abb2b72944f162e43519e2097b86503cc62f6c5b7b8f"
+    },
+    {
+      "path": "plugins/sagas/deno.json",
+      "sha256": "42d994ad1cf58c24b8b5c778c8d9ddbda789a8e11165ca02903c8e81b0d2c41a"
+    },
+    {
+      "path": "plugins/sagas/package.json",
+      "sha256": "2186043a64cb54803e88b62c4aa37531c856d1b0ea2c9f22a4501c876958123a"
+    },
+    {
+      "path": "plugins/streams/deno.json",
+      "sha256": "647bdf32fa2400139c20e384ec7993435e9c13d85d9c3971cd88118bfdfb8147"
+    },
+    {
+      "path": "plugins/streams/package.json",
+      "sha256": "a8afee82893425ddf33517e56175b3115017fabcf7e21c24c26369cf05defb36"
+    },
+    {
+      "path": "plugins/triggers/deno.json",
+      "sha256": "987493fae18d76a2372673dee1f28699a799f117f76af335a23c9630484003ce"
+    },
+    {
+      "path": "plugins/triggers/package.json",
+      "sha256": "6b165d3656c74b064375858b74b38967f695c17c6ee6b018a39ac3c55402c500"
+    },
+    {
+      "path": "plugins/workers/package.json",
+      "sha256": "564376c32ad1fccc5a9eb8c313b81ee3228f5d76f9a26cd42dcac23fb8d49429"
+    },
+    {
+      "path": "resources/examples/expo-streams/deno.json",
+      "sha256": "e473fdc51a2f77dc578dc6b9ec484c190615e8aff7bf9c1bca9e3c329f98a101"
+    },
+    {
+      "path": "resources/examples/expo-streams/deno.lock",
+      "sha256": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e"
+    },
+    {
+      "path": "resources/examples/expo-streams/package.json",
+      "sha256": "aa9daff31e5e11a9b52829d81d50894720ac42c05d0b67f0b8ca93fbb33f146b"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/raw-gates/red-1793140216669-0.stdout",
+      "sha256": "a47f5b6a2be526e71685cf921dea50224cc48cae958313f1977a654bdd66d67f"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/raw-gates/tests-1793144524427-0.stdout",
+      "sha256": "ab411e8ec58540b78e97cafe7c8cc2b0a733c16e278843c71d775cd9a052ca51"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/c2/red-1793149753389.stdout",
+      "sha256": "f9fbf3135bd9ded20914e580e22cf15f2fc58fa411db17ef0e6f278dec2ffd8e"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/failed-f15/application-failed.json",
+      "sha256": "fcc3ed1b566e732862cf9aab2a53872e20d662ec20ede5dacdda38df3b612fbd"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/failed-f15/doc-1793149474316.stderr",
+      "sha256": "e0e5ef57ed62b6f3be426a05776ee8e76568766c7e3e28dc733290e4d6967c8d"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/final-evidence.json",
+      "sha256": "681dbb5efa43c2727b8cf4c80459759ed56e932efc02dc67418a3807e40cd295"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.stdout",
+      "sha256": "5c8902c4eeb355adcd649bf62c1fa405abb21fe9b48ea01bf6e55afed20aacef"
+    },
+    {
+      "path": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.stdout",
+      "sha256": "c7e6fac422e0085ec95586e976cf058a35add3cbc641e0e9541910812e5e4d0b"
+    }
+  ]
+}

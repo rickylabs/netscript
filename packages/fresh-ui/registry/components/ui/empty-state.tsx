@@ -17,14 +17,17 @@ export function EmptyState(
   return (
     <div
       {...props}
-      class={cn(
-        'ns-empty-state',
-        heading ? 'ns-stack ns-stack--xs' : undefined,
-        className,
-      )}
+      class={cn('ns-empty-state', heading ? 'ns-stack' : undefined, className)}
+      data-gap={heading ? ('xs') : undefined}
+      data-part='root'
+      data-scope='empty-state'
     >
-      {heading && <p class='ns-empty-state__heading'>{heading}</p>}
-      <div>{children}</div>
+      {heading && (
+        <p class='ns-empty-state__heading' data-part='heading' data-scope='empty-state'>
+          {heading}
+        </p>
+      )}
+      <div data-part='content' data-scope='empty-state'>{children}</div>
     </div>
   );
 }

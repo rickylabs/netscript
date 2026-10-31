@@ -156,6 +156,23 @@ The manifest itself is plain data and can be imported anywhere TypeScript runs.
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
 
+## PostgreSQL command retention
+
+The sagas plugin contributes `NetScriptCommandOutbox` and `SagaRuntimeCommandAppliedKey` through
+its installed Prisma schema. SQL sidecars supply the reviewed outbox CHECK constraints; the normal
+application migration command appends pending contributions before deployment. Existing equivalent
+copied models are deduplicated without dropping their tables.
+
+Use `createPrismaSagaCommandRetention` from `@netscript/plugin-sagas-core/stores` in the existing
+background retention job. Pass the saga groups' completed-days policy as
+`completedRetentionDaysBySaga` (seven-day default), and persist `nextCursor` between invocations.
+Each page examines/deletes at most 100 rows per family. Pending/leased outbox records and active
+saga markers survive; terminal marker age starts at completion, and deletion rechecks fresh state.
+Keep canonical state until replay markers are gone. The shared outbox window defaults to the
+longest configured saga window.
+
+See the [schema, migration and cursor recipe](https://rickylabs.github.io/netscript/reference/plugin-sagas-core/#installed-outbox-schema-and-postgresql-retention).
+
 ## KV retention
 
 Topic groups declare `retention.completedDays` (default 7) and `retention.archiveToDb` (default

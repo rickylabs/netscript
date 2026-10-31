@@ -1,0 +1,15 @@
+{
+  "selected": "consumer-workers",
+  "args": [
+    "check",
+    "--frozen",
+    "--unstable-kv",
+    "plugins/workers/tests/streams/live-query-consumer_type.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:42.952Z",
+  "ended": "2026-10-28T02:20:43.094Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948"
+}

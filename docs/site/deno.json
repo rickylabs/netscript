@@ -1,7 +1,7 @@
 {
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -",
-    "build": "deno task check:source-format && deno task lume && deno task check:rendered-output",
+    "build": "deno task check:source-format && deno task lume && deno task build:registry && deno task check:rendered-output",
     "check:source-format": "deno run --no-lock --allow-read _plugins/check-source-format.ts .",
     "check:rendered-output": "deno run --no-lock --allow-read _plugins/check-rendered-output.ts _site/index.html",
     "test:source-format": "deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts _plugins/file-tree_test.ts _plugins/markdown-render-fixture.ts _plugins/scenario-picker-fixture.ts",
@@ -10,7 +10,8 @@
     "verify": "deno task build && deno task check:links && deno task check:caveats",
     "serve": "deno task lume -- -s",
     "diagrams:render": "deno run -A _diagrams/render.ts",
-    "diagrams:check": "deno run -A _diagrams/render.ts --check"
+    "diagrams:check": "deno run -A _diagrams/render.ts --check",
+    "build:registry": "deno run --frozen --unstable-kv -A --config ../../deno.json ../../packages/cli/bin/netscript-dev.ts ui:build --registry ../../packages/fresh-ui/registry.json --source-root ../.. --output _site/r"
   },
   "imports": {
     "lume/": "https://deno.land/x/lume@v2.5.4/",

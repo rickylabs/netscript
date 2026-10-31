@@ -1,0 +1,8 @@
+You are the independent read-only IMPL-EVAL reviewer for issue #2385, draft PR #2489. Blockers only; no edits or commands. Do not use repository profiles/. Before the sign-off commit, substantively review the current S1 working-tree changes and artifacts for correctness, completeness, scope, negative controls and honest evidence. Use Read/Glob/Grep only. Read the harness evaluator protocol and docs overlay, then this run's plan, plan-eval, worklog, context-pack, drift and negative-control records. Inspect all changed docs/tooling listed in plan.md, including the new CLI-example policy and negative fixture. Check source alignment against the unchanged public update command implementation. The owner explicitly prohibits packages/**/plugins/** changes and local scaffold.runtime. All issue requirements are in research.md and plan.md; the live issue has no Acceptance checkboxes. A required generated carrier freshness gate is already known red: refreshing packages/cli/src/kernel/assets/agent-docs-prose.generated.ts is outside this lane. Report that as a merge dependency without requesting prohibited edits. State whether the scoped implementation has any blockers, and whether the carrier dependency blocks merge. Return concise findings, scope review verdict PASS or FAIL_FIX, and no private runtime identities or absolute paths. A later resumed review will inspect the exact final pushed head and emit the final SHA-specific MERGE/CHANGES line.
+
+## SKILL
+
+- netscript-harness — independent slice review and IMPL-EVAL, no self-certification.
+- netscript-tools — structured gate evidence, lock hygiene.
+- netscript-cli — unchanged public command source is authoritative.
+- netscript-pr — owner-specific no-close and coordinator-owned merge/labels.

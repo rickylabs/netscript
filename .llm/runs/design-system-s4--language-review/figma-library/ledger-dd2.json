@@ -1,0 +1,100 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "data-display-2-builder",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "page": { "Components · Data display": "229:344" },
+  "step": "B8-library-data-display-2 built D8–D14 (owner review pending): 13 sets / 110 variants (Code line, Code block, Chart legend, Chart tooltip, Chart, Chart row, Chart block, Donut legend row, Donut, Accordion item, Accordion, Collapsible, Carousel), 7 containers, 7 Utility light | dark review frames, themes strip (part 2), 8 section labels; placed below Orders, Draft area moved below; chart/1 Dark re-pointed to marker/default; binding audit clean",
+  "components": {
+    "Code line": { "id": "577:177396", "variants": 8, "axes": "variant default|added|removed|highlighted × size md|sm", "props": { "number": "number#577:0", "lineNumbers": "lineNumbers#577:9" }, "parts": "root H-AL → marker (abs 2px marker/default, highlighted only) · line-number (W 32 right) · sign (+/-) · code (syntax ranges)" },
+    "Code block": { "id": "577:178326", "variants": 12, "axes": "variant single|tabbed|diff × size md|sm × tone default|destructive", "props": { "header": "header#577:18", "copy": "copy#577:31", "footer": "footer#577:44", "scrollbar": "scrollbar#577:57", "lang": "lang#577:70", "name": "name#577:83" }, "parts": "root (code/bg) → head (name | tabs = Tabs list line, spacer, actions → lang · copy) · content (exposed Code line rows) · scrollbar → thumb · footer", "nests": "Tabs list (343:424, counts off), Icon button / sm (md) | / xs (sm) ghost, Code line" },
+    "Chart legend": { "id": "578:173813", "variants": 2, "axes": "orientation horizontal|vertical", "props": { "values": "values#578:22", "item2": "item2#578:25", "item3": "item3#578:28", "item4": "item4#578:31", "item5": "item5#578:34" } },
+    "Chart tooltip": { "id": "578:174135", "variants": 3, "axes": "indicator dot|line|dashed", "props": { "row2": "row2#578:37", "row3": "row3#578:41" } },
+    "Chart": { "id": "578:175514", "variants": 24, "axes": "type area|line × series 1|2|3 × state rest|hover|loading|empty", "parts": "header (title, description) · plot (axis-y, grid → line ×4 + axis, series-N → area + line, axis-x → ticks + tick-labels, cursor → rule + dot-N, tooltip | skeleton | empty) · legend", "nests": "Chart legend, Chart tooltip, Skeleton block lg + line sm, Empty state no-results/icon/sm" },
+    "Chart row": { "id": "579:15560", "variants": 10, "axes": "variant bar|column × series 1…5", "props": { "label": "label#579:0", "value": "value#579:11" } },
+    "Chart block": { "id": "579:15993", "variants": 8, "axes": "variant bar|column × state rest|hover|loading|empty", "nests": "Chart row, Chart legend, Tooltip (O6), Skeleton, Empty state first-use/icon/sm" },
+    "Donut legend row": { "id": "579:16014", "variants": 5, "axes": "series 1…5" },
+    "Donut": { "id": "579:16455", "variants": 16, "axes": "segments 2|3|4|5 × state rest|hover|loading|empty", "nests": "Donut legend row, Tooltip (O6, side=top), Skeleton line, Empty state first-use/none/sm" },
+    "Accordion item": { "id": "581:51570", "variants": 8, "axes": "open false|true × state rest|hover|focus|disabled", "props": { "label": "label#581:0", "body": "body#581:9" }, "nests": "Icon md (chevron-down|chevron-up), .Focus ring" },
+    "Accordion": { "id": "581:51621", "variants": 2, "axes": "type single|multiple", "nests": "3 exposed Accordion item" },
+    "Collapsible": { "id": "581:51754", "variants": 8, "axes": "open false|true × state rest|hover|focus|disabled", "props": { "content": "content#581:18 (INSTANCE_SWAP, default .Slot)" }, "nests": "Button / sm ghost (iconEnd chevron), .Slot" },
+    "Carousel": { "id": "581:51913", "variants": 4, "axes": "orientation horizontal|vertical × controls outside|inside", "props": { "dots": "dots#581:27", "counter": "counter#581:32" }, "nests": "Icon button / sm outline, .Slot ×4" }
+  },
+  "showcase": {
+    "containers": { "Code block": "577:178338", "Chart": "578:175541", "Chart block": "579:16495", "Donut": "579:16496", "Accordion": "581:51945", "Collapsible": "581:51946", "Carousel": "581:51947" },
+    "blocks": { "Code line": "577:177397", "Code block": "577:178327", "Chart legend": "578:175515", "Chart tooltip": "578:175521", "Chart": "578:175528", "Chart row": "579:16456", "Chart block": "579:16466", "Donut legend row": "579:16475", "Donut": "579:16484", "Accordion item": "581:51914", "Accordion": "581:51923", "Collapsible": "581:51929", "Carousel": "581:51938" },
+    "reviews": { "Code block": "583:16465", "Chart": "583:17163", "Chart block": "583:75404", "Donut": "583:75859", "Accordion": "585:19832", "Collapsible": "585:20131", "Carousel": "585:20564" },
+    "themesStrip": "585:174804",
+    "sectionLabels": { "Code block": "585:184366", "Chart": "585:184370", "Chart block": "585:184374", "Donut": "585:184378", "Accordion": "585:184382", "Collapsible": "585:184386", "Carousel": "585:184390", "Themes · part 2": "585:184394" },
+    "layout": "label y → container y+52 → review container-end+48 → next label review-end+200. Code block 28328, Chart 32643, Chart block 37418, Donut 40238, Accordion 43487, Collapsible 45702, Carousel 47138, Themes · part 2 49833 (strip 49885)",
+    "draftMoved": { "Doc/Section label · Draft 231:11255": "y 52301", "Badge draft 4:165": "y 52353", "Avatar draft 5:65": "y 52353" },
+    "reviewPngs": "review/data-display-2/ (review-code-block, review-chart, review-chart-block, review-donut, review-accordion, review-collapsible, review-carousel, themes-strip)"
+  },
+  "variables": {
+    "added": "none",
+    "changed": {
+      "chart/1 (Scheme VariableID:241:107)": {
+        "mode": "Dark (3:1)",
+        "before": "alias primary/default (3:21) → Theme set accent/d/solid",
+        "after": "alias marker/default (242:22) → Theme set marker/d/default",
+        "why": "Utility dark resolved series 1 to graphite #313131 on surface/bg #18181a (invisible line, swatch and arc). Dark is designed: series 1 is light ink #eeeeee now.",
+        "verified": "resolver on the Kbd review frames: Utility Light #202020 → #202020 (unchanged), Utility Dark #313131 → #eeeeee",
+        "blastRadius": "Theme marker/d/default = accent/d/solid in every non-Studio Theme mode and Theme B marker/d/default = accent/d/solid in all 7 Theme B modes, so their dark series 1 is unchanged. Studio flavors other than Utility now use their signal/d/marker in dark instead of accent/d/solid. Anything else binding chart/1 in Studio dark (screens, docs specimens) changes the same way.",
+        "codeFollowUp": "--ns-chart-1 dark should follow --ns-marker in the CSS to keep Figma and code aligned"
+      }
+    },
+    "bound": {
+      "Scheme": "code/bg 323:9, code/syntax/keyword|function|type|string|number|comment|punctuation 323:10–16, chart/1…5 241:107–111, surface/bg|raised|selected, text/fg|muted|subtle, border/default|subtle|strong, material/track 14:37, marker/default 242:22, success/subtle|text, destructive/subtle|text|border, scrollbar/thumb 242:197, effect/shadow-overlay 241:106",
+      "Theme set": "font/sans|heading|mono|label|data|kpi, type/body|strong|small|caption|label|heading|kpi-sm/*, type/code/size 241:93 + line 241:96, type/mono/style 459:74049, radius/card|badge|control, border/width, shadow/overlay/y|blur, state/disabled-opacity 241:63, deco/ticks 243:116 (tick visibility)",
+      "Density": "space/stack/gap, space/inline/gap, space/control/gap, space/control/padding-x, space/card/padding",
+      "textRoles": "T.mono code = font/mono + type/code/size + type/code/line + type/mono/style + type/small/tracking; mono caption (sm code, diff stats) = font/mono + type/caption/* with type/mono/style; type/label-strong/style has no consumer here (no label-strong text in D8–D14)"
+    }
+  },
+  "audit": {
+    "scope": "13 sets, 110 variants, 2653 nodes incl. instance internals",
+    "paints": "1799 solid fills/strokes, 0 unbound (seeded with the resolved Utility colour)",
+    "text": "1022 text nodes, all bind fontFamily, fontStyle, fontSize, lineHeight, letterSpacing; 1224 syntax/override range segments, 0 unbound",
+    "collections": "Scheme, Theme set and Density only; 0 direct Theme or Theme B bindings",
+    "wholePixels": "0 off-pixel rectangles/frames/instances after fix (was 20: Code block head rule counted in layout put Copy/actions/spacer on .5; head.strokesIncludedInLayout=false, spacer 2px)",
+    "literals": {
+      "Code line": "line-number W 32 (spec), sign W 8, marker W 2 (spec 2px), set display widths 520",
+      "Code block": "head H 40|32 (spec lit 40), root W 600|520, scrollbar padding-bottom 4, thumb H 6 (spec) × 40% width, head spacer H 2",
+      "Chart": "plot geometry (axis-y W 32, canvas 520×160, 1px grid/axis hairlines, ticks 1×4, label offsets), series stroke 2 (spec lit 2), area layer opacity 0.2 (spec), cursor dots 8 with 2px surface/bg ring, header gap 0",
+      "Chart tooltip": "W 184, line indicator 3×16, dashed indicator 2px dash 3/2",
+      "Chart row": "track H 8 (spec), label W 96, value W 56, column W 28 × H 160, bar W 16, val gap 4; value = track padding-right / column padding-top (overridable value encoding, Progress precedent)",
+      "Chart block": "W 480, plot 480×184, cols padding-x 8, group gap 4, pair gap 2",
+      "Donut": "diameter 176, band 12 (spec lit 12), segment gap 2px, hover pop 4px, legend W 220, swatch 8 (spec), centre skeleton gap 8",
+      "Accordion item": "W 480; hover underline is a text decoration (cannot be bound)",
+      "Collapsible": "W 360, content slot H 96",
+      "Carousel": "viewport 400×240, inside-controls inset 12, dots 8×8 (spec)",
+      "docChrome": "container/review/strip labels follow the Data display 1 doc style: fills bound, fonts literal Host Grotesk / Fragment Mono",
+      "note": "raw audit 'strokeW=1' rows are default stroke weights on frames with no stroke paint, not literals"
+    }
+  },
+  "deviations": [
+    "Code block axes follow the brief: variant single|tabbed|diff × size × tone default|destructive (spec variant default|destructive renamed tone; spec header none|title|tabs replaced by variant + header boolean).",
+    "Code block root fill code/bg (brief) instead of spec surface/surface; the head has no fill of its own and sits on code/bg above a border/subtle rule.",
+    "Language label is human ('TypeScript') in T.caption text/muted, not the spec T.eyebrow (owner header rule: no mono eyebrow beside a title).",
+    "lineNumbers lives on Code line: a parent boolean cannot drive a nested instance boolean, so Code block exposes its Code line rows.",
+    "Syntax colours are bound to code/syntax/* (spec said monochrome until the roles existed; they exist). Identifiers text/fg.",
+    "Copied state is shown in the review (Copy glyph → check plus an O6 Tooltip 'Copied'), not as a variant.",
+    "Chart, Chart block and Donut gain a state axis rest|hover|loading|empty (brief); Chart loading/empty repeat per series only to size the legend skeleton.",
+    "Chart tooltip keeps the spec R.float card (surface/raised, border/default, radius/card, effect/shadow-overlay) instead of the O6 ink chip: series 1 is ink in Utility light and its swatch vanishes on the ink chip. Single-value hovers in Chart block and Donut nest the O6 Tooltip itself.",
+    "Chart row and Donut legend row use series 1…5 (chart/1…5, brief) instead of spec tone (<tone>/default).",
+    "Chart block bar is single-series (ink) on material/track; column compares This week (chart/1) with Last week (chart/2); both carry a Chart legend (brief).",
+    "Donut arcs are filled ellipse arc segments (inner radius) rather than stroked arcs; hover pops the segment 4px and floats an O6 Tooltip above the ring (outside the component bounds, like a portal).",
+    "Accordion open swaps the glyph to chevron-up instead of rotating chevron-down 180°. Single|multiple is the Accordion type axis; Collapsible is a single disclosure and has no single|multiple.",
+    "Collapsible gains state rest|hover|focus|disabled (brief), mapped onto the Button / sm ghost states; content is an INSTANCE_SWAP property.",
+    "Carousel previous/next keep radius/control: no 999 override (owner rule against pill literals). Counter added as a boolean beside dots.",
+    "Fragment Mono renders '=>' as a ⇒ ligature in Utility code (font feature, not a glyph substitution).",
+    "Draft area (label + Badge/Avatar drafts) moved below the new sections, unchanged."
+  ],
+  "findings": [
+    "Theme palette collisions (strip): series 1 = each theme's primary, so Brutal chart/1 #ffc53d equals chart/4 #ffc53d, Pixel #faab35 is close to #ffc53d, Cupertino #0d74ce is close to chart/2 #0090ff, Fluent #005fb8 vs #0090ff is weak. Proposal for the theme pass: route chart/1…5 through Theme set with a per-theme palette.",
+    "chart/4 amber #ffc53d is ~1.6:1 on white as a 2px line; fixtures use series 1–3 for lines and amber only as fills (Pending).",
+    "chart/5 is the destructive red; fixtures map it to 'Failed' only, so red stays in the destructive meaning (owner red rule).",
+    "code/bg light is white like surface/bg; the border/subtle hairline carries the panel edge in Utility light."
+  ],
+  "fonts": "builders load Host Grotesk Regular/Medium + Fragment Mono Regular; the strip loaded 110 faces (Roboto Flex, Geist Mono, Space Grotesk, JetBrains Mono, Space Mono, Inter, Pixelify Sans, Open Sans, Noto fallbacks), 0 failures",
+  "figmaCalls": "≈56 (1 create_session, 20 use_figma incl. 2 failed + retried, 35 get_screenshot)"
+}

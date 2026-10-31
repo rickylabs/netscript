@@ -205,7 +205,7 @@ Inspect, update and remove an installed plugin without scaffolding again:
     ["<code>netscript plugin list</code>", "List installed plugins in the current workspace."],
     ["<code>netscript plugin info &lt;name&gt;</code>", "Show detailed metadata for one installed plugin."],
     ["<code>netscript plugin doctor</code>", "Health-check installed plugins and report wiring problems."],
-    ["<code>netscript plugin update &lt;pkg&gt;</code>", "Dispatch the <code>update</code> verb to the plugin's own published CLI, for example <code>netscript plugin update @netscript/plugin-workers</code>. The argument is a JSR package specifier, not an installed plugin name."],
+    ["<code>netscript plugin update &lt;name&gt;</code>", "Re-pin and regenerate an installed plugin, for example <code>netscript plugin update workers</code>. Use the installed plugin name shown by <code>netscript plugin list</code>."],
     ["<code>netscript plugin remove &lt;name&gt;</code>", "Remove an installed plugin from the workspace."]
   ]
 } /}}

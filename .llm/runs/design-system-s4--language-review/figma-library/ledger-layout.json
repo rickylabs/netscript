@@ -1,0 +1,306 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "layout-builder",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "page": {
+    "Components · Layout & blocks": "229:346"
+  },
+  "step": "B8-layout built L1-L12 (owner review pending): 13 public sets + 2 private sets, 12 review frames (Utility light | dark), themes strip; no base set of another category and no variable was changed",
+  "addedVariables": {
+    "note": "none added: every binding resolves through existing Scheme (colours), Density (space/*) and Theme set (radius, type, font, border/width, kpi/*, focus/*) variables"
+  },
+  "components": {
+    "App shell": {
+      "id": "581:54792",
+      "variants": 9,
+      "axes": "sidebar expanded|collapsed|none x breakpoint desktop (1440x900)|tablet (768x1024)|mobile (390x844)",
+      "props": "content (swap .Slot), rail (bool, desktop), railContent (swap .Slot)",
+      "ids": {
+        "expanded/desktop": "581:53719",
+        "expanded/tablet": "581:54079",
+        "expanded/mobile": "581:54262",
+        "collapsed/desktop": "581:54412",
+        "collapsed/tablet": "581:54591",
+        "collapsed/mobile": "581:54622",
+        "none/desktop": "581:54653",
+        "none/tablet": "581:54730",
+        "none/mobile": "581:54761"
+      },
+      "note": "L1 · root surface/bg; exposed Sidebar (347:557 expanded / 347:665 icon) + exposed Top bar (app desktop 351:1119; tablet and mobile 351:1210); content padding space/page/padding-x|y, gap space/section/gap, page slot max W 1200; rail W 280 with border/subtle rule; tablet/mobile expanded = 280 px Sidebar sheet over a surface/overlay sidebar-backdrop; none hides the Top bar sidebar-toggle"
+    },
+    "Page header": {
+      "id": "578:177012",
+      "variants": 6,
+      "axes": "variant default|with-tabs|with-status x breakpoint desktop (W 1168)|mobile (W 358)",
+      "props": "eyebrow + eyebrowText, title, description + descriptionText, actions, breadcrumb (default off)",
+      "ids": {
+        "default/desktop": "578:176531",
+        "default/mobile": "578:176591",
+        "with-tabs/desktop": "578:176678",
+        "with-tabs/mobile": "578:176776",
+        "with-status/desktop": "578:176875",
+        "with-status/mobile": "578:176943"
+      },
+      "note": "L2 · breadcrumb (exposed Breadcrumb), layout > main > intro (eyebrow T.eyebrow text/muted, title T.title text/fg, description T.body text/muted) + actions (exposed Button / md outline Export + primary Create order); status-bar (success dot + Fragment Mono indicator, T.small meta, text/subtle separators); tabs = exposed Tabs list line"
+    },
+    "Stats grid": {
+      "id": "578:176521",
+      "variants": 6,
+      "axes": "columns 2|3|4 x joined false|true",
+      "ids": {
+        "2/false": "578:175544",
+        "2/true": "578:175653",
+        "3/false": "578:175762",
+        "3/true": "578:175925",
+        "4/false": "578:176088",
+        "4/true": "578:176308"
+      },
+      "note": "L3 · exposed Stat card instances (Data display 409:1270), fills kpi/bg-1..4 by position, first card strokeLeft kpi/first-left; gap kpi/gap; joined = kpi/border box (T/R/B at border/width, radius/card, clips) with every card carrying a border/width left divider, pad-x space/card/padding"
+    },
+    "Detail layout": {
+      "id": "580:1207",
+      "variants": 4,
+      "axes": "aside panel|sheet x breakpoint desktop (W 1168)|mobile (W 358)",
+      "props": "primaryContent, secondaryContent (swap .Slot, hug, min 96/160)",
+      "ids": {
+        "panel/desktop": "580:998",
+        "panel/mobile": "580:1042",
+        "sheet/desktop": "580:1076",
+        "sheet/mobile": "580:1141"
+      },
+      "note": "L4 · main = sections of exposed Section divider + .Slot; aside = exposed Panel (W 320) or exposed Sheet (side=right W 400 docked, FILL height; mobile side=bottom with its content frame set to FILL); gaps space/section/gap, section space/stack/gap"
+    },
+    "Filter form": {
+      "id": "580:989",
+      "variants": 2,
+      "axes": "layout inline (W 1168)|stacked (W 360)",
+      "ids": {
+        "inline": "580:697",
+        "stacked": "580:863"
+      },
+      "note": "L5 · exposed Card (409:223, title Filters) whose body swap is .Filter form body"
+    },
+    ".Filter form body": {
+      "id": "580:696",
+      "variants": 2,
+      "private": true,
+      "axes": "layout inline|stacked",
+      "ids": {
+        "inline": "580:491",
+        "stacked": "580:608"
+      },
+      "note": "Field rows (Input md + search icon, control swapped to Select md value / Date picker range, trigger FILL), active-filter row (Badge neutral subtle + remove, Button / xs link Clear all), exposed ghost Reset + primary Apply; gap space/section/gap"
+    },
+    "Panel": {
+      "id": "577:178427",
+      "variants": 3,
+      "axes": "tone default|muted|raised",
+      "props": "title, description + descriptionText, body (swap .Slot, hug, min 96), footer",
+      "ids": {
+        "default": "577:178379",
+        "muted": "577:178395",
+        "raised": "577:178411"
+      },
+      "note": "L6 · default surface/card + border/default; muted surface/muted; raised surface/raised + border/subtle + R.card-shadow; radius/card; header (T.strong title, T.small description) over a border/subtle rule; footer card/footer + top rule + meta + ghost Button / sm"
+    },
+    "Separator": {
+      "id": "577:178354",
+      "variants": 6,
+      "axes": "orientation horizontal (240x1)|vertical (1x64) x variant subtle|default|strong",
+      "ids": {
+        "h/subtle": "577:178348",
+        "h/default": "577:178349",
+        "h/strong": "577:178350",
+        "v/subtle": "577:178351",
+        "v/default": "577:178352",
+        "v/strong": "577:178353"
+      },
+      "note": "L7 · fill border/subtle|default|strong, thickness border/width"
+    },
+    "Section divider": {
+      "id": "577:178371",
+      "variants": 2,
+      "axes": "align start|center",
+      "props": "label",
+      "ids": {
+        "start": "577:178364",
+        "center": "577:178367"
+      },
+      "note": "L8 · label T.eyebrow text/muted; line = type/label/line-tall frame holding a border/subtle rule (h border/width) at y 8; gap space/inline/gap; W 481"
+    },
+    "Scrollbar": {
+      "id": "578:85858",
+      "variants": 4,
+      "axes": "orientation vertical|horizontal x state rest|hover",
+      "ids": {
+        "v/rest": "578:85850",
+        "v/hover": "578:85852",
+        "h/rest": "578:85854",
+        "h/hover": "578:85856"
+      },
+      "note": "L9 · track 10 transparent; thumb scrollbar/thumb, radius 999, 6 (rest) / 8 (hover) x 64; thumb position = start padding 24"
+    },
+    "Scroll area": {
+      "id": "578:85880",
+      "variants": 3,
+      "axes": "orientation vertical|horizontal|both",
+      "props": "content (swap .Slot; hugs with min 480 / 640)",
+      "ids": {
+        "vertical": "578:85859",
+        "horizontal": "578:85865",
+        "both": "578:85871"
+      },
+      "note": "L9 · root 320x200 clips, radius/card, border/default; viewport pads space/card/padding; Scrollbar instances pinned by constraints; corner 10x10 for both"
+    },
+    "Resizable handle": {
+      "id": "578:85923",
+      "variants": 6,
+      "axes": "orientation vertical|horizontal x state rest|hover|focus",
+      "props": "grip",
+      "ids": {
+        "v/rest": "578:85893",
+        "v/hover": "578:85898",
+        "v/focus": "578:85903",
+        "h/rest": "578:85908",
+        "h/hover": "578:85913",
+        "h/focus": "578:85918"
+      },
+      "note": "L10 · 1 px line at border/width: border/default, border/strong (hover), border/ring + .Focus ring (focus); grip 12x16 surface/muted, border/default, radius/badge, 10 px grip-vertical in text/muted"
+    },
+    "Resizable": {
+      "id": "578:85948",
+      "variants": 2,
+      "axes": "direction horizontal (560x240)|vertical (360x320)",
+      "props": "startContent, endContent (swap .Slot); handle exposed (state, grip)",
+      "ids": {
+        "horizontal": "578:85924",
+        "vertical": "578:85936"
+      },
+      "note": "L10 · panel-group clips, radius/card, border/default; start panel default size 280 / 160, end panel fills; panels pad space/card/padding"
+    },
+    "Aspect ratio": {
+      "id": "578:85840",
+      "variants": 4,
+      "axes": "ratio 16:9|4:3|1:1|21:9 at W 336 (189/252/336/144)",
+      "props": "media (swap .Slot)",
+      "ids": {
+        "16:9": "578:85828",
+        "4:3": "578:85831",
+        "1:1": "578:85834",
+        "21:9": "578:85837"
+      },
+      "note": "L11 · root clips, radius/card, surface/muted; media .Slot FILL"
+    },
+    ".Page content": {
+      "id": "581:53718",
+      "variants": 2,
+      "private": true,
+      "axes": "breakpoint desktop|mobile",
+      "ids": {
+        "desktop": "581:52759",
+        "mobile": "581:53446"
+      },
+      "note": "example App shell body: Page header + Stats grid + Cards (Orders Table with the Date column hidden, activity Item group); swap into App shell content"
+    },
+    "Direction (RTL)": {
+      "id": null,
+      "variants": 0,
+      "note": "L12 · no set (DirectionProvider renders nothing); documented in Review · Direction (RTL) 586:33226 with LTR | RTL mirrored-prop pairs (Button back/next, Input)"
+    }
+  },
+  "showcase": {
+    "pageHeader": "231:11267",
+    "containers": {
+      "App shell": "581:52757",
+      "Page header": "578:176529",
+      "Stats grid": "578:175542",
+      "Detail layout": "580:996",
+      "Filter form": "580:489",
+      "Panel": "577:178377",
+      "Separator": "577:178346",
+      "Section divider": "577:178362",
+      "Scroll area": "578:85848",
+      "Resizable": "578:85891",
+      "Aspect ratio": "578:85826"
+    },
+    "reviews": {
+      "App shell": "585:179247",
+      "Page header": "585:26352",
+      "Stats grid": "583:77327",
+      "Detail layout": "585:26851",
+      "Filter form": "583:77717",
+      "Panel": "583:21327",
+      "Separator": "583:21050",
+      "Section divider": "583:21198",
+      "Scroll area": "583:76642",
+      "Resizable": "583:77060",
+      "Aspect ratio": "583:21677",
+      "Direction (RTL)": "586:33226"
+    },
+    "themesStrip": "586:33373",
+    "themesStripRows": "Studio Utility, Tonal, Brutal, Pixel, Fluent, Cupertino (explicit modes only)",
+    "sectionLabels": {
+      "App shell": "586:35404",
+      "Page header": "586:35408",
+      "Stats grid": "586:35412",
+      "Detail layout": "586:35416",
+      "Filter form": "586:35420",
+      "Panel": "586:35424",
+      "Separator": "586:35428",
+      "Section divider": "586:35432",
+      "Scroll area": "586:35436",
+      "Resizable": "586:35440",
+      "Aspect ratio": "586:35444",
+      "Direction (RTL)": "586:35448",
+      "Themes": "586:35452"
+    },
+    "order": "spec order L1..L12 then Themes; label, container (+40), review (+48), next label (+200)",
+    "reviewPngs": "review/layout/ (review-app-shell, review-page-header, review-stats-grid, review-detail-layout, review-filter-form, review-panel, review-separator, review-section-divider, review-scroll-area, review-resizable, review-aspect-ratio, review-direction-rtl, themes-strip)"
+  },
+  "audit": {
+    "scope": "15 sets (13 public + 2 private), 61 variants, 354 own nodes; nested instance internals checked for unbound paints only",
+    "paints": "244 / 244 visible solid fills and strokes variable-bound, all colours from Scheme (0 outside Scheme)",
+    "text": "39 / 39 text nodes bind fontFamily, fontStyle, fontSize, lineHeight, letterSpacing",
+    "bindingsByCollection": {
+      "Theme set": 1208,
+      "Scheme": 526,
+      "Density": 394
+    },
+    "directThemeThemeBStudioFlavor": 0,
+    "nestedUnboundPaints": 0,
+    "fractionalEdges": "0 after fixes (Section divider rule, Stats grid 3-column width and joined strip, Filter form inline thirds)",
+    "variantCap": "max 9 variants per set (cap 30)",
+    "spacingLiterals": [
+      "Panel header gap 2 (Card heading rhythm)",
+      "Scrollbar thumb offset 24 and track inset 2 / 1, thumb radius 999 (spec lit)"
+    ],
+    "sizeLiterals": "App shell 1440x900 / 768x1024 / 390x844, sheet 280, rail 280, page max W 1200; Page header W 1168/358; Stats grid W 1168 (3-col 1170); Detail aside 320 / sheet 400; Filter form W 1168/360, inline actions 134; Panel W 360; Separator 240/64; Section divider W 481; Scroll area 320x200, content min 480/640, track 10, thumb 6/8x64; Resizable 560x240 / 360x320, start panel 280/160, grip 12x16, glyph 10; Aspect ratio W 336; status dot 6"
+  },
+  "deviations": [
+    "App shell axes are sidebar expanded|collapsed|none x breakpoint desktop|tablet|mobile (9) per the brief, not the spec's layout dashboard|chat|docs: the chat and docs layouts need Message scroller, Prompt input (AI) and Toc (Docs kit), which do not exist yet. The spec's nav prop is sidebar=none; rail is a bool with a railContent swap on desktop.",
+    "Tablet follows the code's .ns-dashboard rule (sidebar becomes a sheet at <=1024 px), so tablet and mobile use Top bar breakpoint=mobile and a 280 px sheet (code width; overrides space/sidebar/width).",
+    "The mobile and tablet sheet is the Sidebar instance over a surface/overlay sidebar-backdrop (R.scrim), not a nested Sheet: Sheet's fixed 960x640 viewport and its own header would double the Sidebar header.",
+    "Page header: intro gap space/stack/gap, but section gap and bottom padding space/section/gap (spec says space/stack/gap; code spaces sections by space-5). Breadcrumb defaults off because the Top bar already carries one. Mobile hides the last tab and the second status meta to avoid overflow. The primary action glyph is rebound to primary/fg (see base defects).",
+    "Stats grid: columns=3 variants are W 1170 so thirds land on whole pixels; the joined strip draws its outer border on T/R/B and every card carries a border/width left divider (equal FILL widths); joined cards override pad-x to space/card/padding and radius to 0.",
+    "Detail layout adds aside panel|sheet (brief: nests a Sheet or side panel), so 4 variants instead of the spec's 2. Panel aside W 320 (spec); Sheet aside W 400 (Sheet's own width; 320 clipped its footer). Mobile bottom Sheet's content frame is overridden to FILL because the base Sheet bottom is fixed at 960.",
+    "Filter form: gap space/section/gap (spec space/stack/gap; code space-4 = 16). Added an active-filters row (Badge subtle with remove, Button xs link Clear all): the Card body keeps a 96 min-height that cannot be overridden on an instance, which left a 38 px void under the inline row.",
+    "Panel: section padding space/card/padding (spec space/stack/gap = 8; code space-4/space-5). Raised adds a border/subtle hairline because Utility card shadows resolve to 0. Footer fill card/footer.",
+    "Resizable handle: grip glyph is 10 px (shadcn size-2.5) instead of I.sm 14, which does not fit a 12 px grip; grip offset -6 keeps edges whole (0.5 px off-centre on the 1 px line); hover border/strong (spec silent). Resizable start panel carries a fixed default size (280 / 160) instead of 50/50 so edges stay whole.",
+    "Scroll area adds a radius/card + border/default frame (shadcn demo). Content hugs with min 480/640; components with a fixed width (Table) are squeezed to the min because Figma cannot hug a fixed-width instance, so the review demos a Tabs list for horizontal scroll.",
+    "Section divider: the line part is a type/label/line-tall frame with a 1 px rule at y 8 (whole pixels), W 481.",
+    "Aspect ratio W 336 so all four heights are whole pixels; the review's image row uses .Item image, a 40 px avatar stand-in that pixelates when scaled.",
+    "Direction (RTL) is documented on the Layout & blocks page (review frame with mirrored-prop pairs) instead of a Foundations specimen, so Foundations stays untouched; Breadcrumb and Sidebar mirroring is described, not drawn.",
+    "New private set .Page content (example App shell body), not in the spec."
+  ],
+  "baseDefectsFound": [
+    "Button primary (Actions): after an iconStartGlyph/iconEndGlyph swap the glyph stroke stays text/fg, so the icon disappears on the ink fill in Utility light (the Dashboard screen's 'Create order' plus is missing in light). Same cause as the Filigrane/Button note. Worked around inside Page header only.",
+    "Card (Data display): the body content min-height (96/72) cannot be overridden on instances, so short swapped bodies leave a gap.",
+    "Sheet side=bottom (Overlays): the content frame is fixed at 960, so resizing the instance does not reflow.",
+    "Table (Data display): fixed width; below ~900 px the Customer and Status columns overlap (the Date column is hidden in .Page content and the Detail layout review).",
+    "Sidebar header toggle keeps panel-left inside the mobile sheet (a close glyph would read better)."
+  ],
+  "ownerNotesApplied": [
+    "Utility look: ink chrome (Top bar, Sidebar, primary actions), semantic content colour (status indicator, deltas, badges); red only in the logo and destructive deltas.",
+    "Dark is designed: every review renders the same instances under Scheme Dark (graphite primary, deep-tone badges, sheet over a darker scrim)."
+  ]
+}

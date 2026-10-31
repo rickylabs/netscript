@@ -1,3 +1,4 @@
+import { createDefaultJobDeadLetterStore, recordJobDeadLetter } from './job-dead-letters.ts';
 import {
   DEFAULT_TOPIC,
   type JobMessage,
@@ -18,6 +19,7 @@ import { WorkerAttributes } from '@netscript/telemetry/attributes';
 import { executeWorkerJob } from './job-execution.ts';
 import type { JobExecutionContext, WorkerDispatchContext } from './worker-options.ts';
 import { recordIdempotentSkip } from './worker-idempotency-events.ts';
+import { WorkerDeliveryLease } from './delivery-lease.ts';
 import {
   getMessageTraceHeaders,
   resolveSubprocessTraceHeaders,
@@ -53,9 +55,31 @@ export async function processWorkerJob(
 
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;
-  let unlinkShutdown: (() => void) | undefined;
+  const lease = new WorkerDeliveryLease(queueContext, context.shutdownSignal);
+  let attempts = 0;
+  let writingDeadLetter = false;
+  let terminalRecorded = false;
+  let executionSucceeded = false;
+  const deadLetter = async (error: string, errorCode?: string): Promise<void> => {
+    writingDeadLetter = true;
+    await recordJobDeadLetter(
+      context.deadLetters ?? createDefaultJobDeadLetterStore(context.queueName),
+      message,
+      {
+        queueName: context.queueName ?? 'jobs',
+        executionId,
+        attempts,
+        error,
+        errorCode,
+        queueContext,
+      },
+    );
+    terminalRecorded = true;
+    writingDeadLetter = false;
+  };
 
   try {
+    await lease.start();
     const jobDef = await context.registry.get(jobId);
     if (!jobDef) {
       throw new Error(`Job '${jobId}' not found in registry`);
@@ -70,10 +94,12 @@ export async function processWorkerJob(
       targetId: jobId,
       idempotencyKey: message.idempotencyKey,
       messageId: queueContext?.messageId,
+      deliveryCount: queueContext?.deliveryCount,
       payload,
     });
     if (!claim.claimed) {
       recordIdempotentSkip(context, 'job', jobId, claim, tracedContext);
+      if (!claim.alreadyApplied) throw new Error(`Job '${jobId}' is already being processed`);
       return;
     }
 
@@ -92,13 +118,7 @@ export async function processWorkerJob(
     });
 
     executionId = execution.id;
-    const abortController = new AbortController();
-    const onShutdown = (): void => {
-      abortController.abort(new DOMException('Worker shutdown began.', 'ShutdownError'));
-    };
-    if (context.shutdownSignal?.aborted) onShutdown();
-    else context.shutdownSignal?.addEventListener('abort', onShutdown, { once: true });
-    unlinkShutdown = () => context.shutdownSignal?.removeEventListener('abort', onShutdown);
+    const abortController = lease.controller;
 
     await traceJobExecution(
       {
@@ -154,13 +174,22 @@ export async function processWorkerJob(
           abortController.signal,
           subprocessHeaders,
           correlationId,
+          (attempt) => {
+            attempts = attempt;
+          },
         );
 
         addJobStepEvent('state_update', { status: result.success ? 'completed' : 'failed' });
+        lease.assertOwned();
         if (result.success) {
-          await context.idempotency.markApplied(claim!.key);
+          executionSucceeded = true;
+          await context.idempotency.markApplied(claim!.key, undefined, claim!.token);
         } else {
-          await context.idempotency.release(claim!.key);
+          await deadLetter(
+            result.error ?? 'Job failed after exhausting retries',
+            'job.retries_exhausted',
+          );
+          await context.idempotency.release(claim!.key, claim!.token);
         }
         recordSharedWorkerMetrics(
           {
@@ -181,12 +210,31 @@ export async function processWorkerJob(
       },
     );
   } catch (error) {
-    if (claim?.claimed) {
-      await context.idempotency.release(claim.key);
-    }
     await recordJobFailure(context, message, executionId, error);
+    const requeue = (claim !== undefined && !claim.claimed && !claim.alreadyApplied) ||
+      lease.lost ||
+      context.shutdownSignal?.aborted ||
+      error instanceof Error && error.name === 'ShutdownError' ||
+      writingDeadLetter || terminalRecorded || executionSucceeded;
+    try {
+      if (requeue) {
+        if (!queueContext?.extendVisibility) throw error;
+        await queueContext.nack({ requeue: true });
+        return;
+      }
+      if (!(error instanceof Error && error.name === 'AbortError')) {
+        await deadLetter(
+          error instanceof Error ? error.message : String(error),
+          error instanceof Error && error.name === 'TimeoutError'
+            ? 'job.timeout'
+            : 'job.execution_failed',
+        );
+      }
+    } finally {
+      if (claim?.claimed) await context.idempotency.release(claim.key, claim.token);
+    }
   } finally {
-    unlinkShutdown?.();
+    await lease.stop();
     if (executionId) {
       context.activeJobs.delete(executionId);
       recordSharedWorkerMetrics(
@@ -209,23 +257,30 @@ export async function processWorkerTask(
   const topic = message.topic ?? DEFAULT_TOPIC;
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;
+  let executionSucceeded = false;
+  let claimAttempted = false;
+  const lease = new WorkerDeliveryLease(queueContext, context.shutdownSignal);
 
   console.log(`[Worker ${context.workerId}] Processing task '${taskId}' (trigger: ${triggeredBy})`);
 
   try {
+    await lease.start();
     const taskDef = await context.taskRegistry.get(taskId);
     if (!taskDef) throw new Error(`Task '${taskId}' not found in registry`);
     if (!taskDef.enabled) throw new Error(`Task '${taskId}' is disabled`);
 
+    claimAttempted = true;
     claim = await context.idempotency.claim({
       concept: 'task',
       targetId: taskId,
       idempotencyKey: message.idempotencyKey,
       messageId: queueContext?.messageId,
+      deliveryCount: queueContext?.deliveryCount,
       payload,
     });
     if (!claim.claimed) {
       recordIdempotentSkip(context, 'task', taskId, claim);
+      if (!claim.alreadyApplied) throw new Error(`Task '${taskId}' is already being processed`);
       return;
     }
 
@@ -249,11 +304,14 @@ export async function processWorkerTask(
         ...(payload ? { TASK_PAYLOAD: JSON.stringify(payload) } : {}),
       },
       timeout: taskDef.timeout,
+      signal: lease.signal,
       ...toSubprocessTraceOptions(resolveSubprocessTraceHeaders(traceHeaders), correlationId),
     });
 
+    lease.assertOwned();
     if (result.success) {
-      await context.idempotency.markApplied(claim.key);
+      executionSucceeded = true;
+      await context.idempotency.markApplied(claim.key, undefined, claim.token);
     }
 
     await context.executionState.complete(executionId, {
@@ -263,7 +321,7 @@ export async function processWorkerTask(
       error: result.error ?? undefined,
     });
     if (!result.success) {
-      await context.idempotency.release(claim.key);
+      await context.idempotency.release(claim.key, claim.token);
     }
 
     console.log(
@@ -273,7 +331,7 @@ export async function processWorkerTask(
     );
   } catch (error) {
     if (claim?.claimed) {
-      await context.idempotency.release(claim.key);
+      await context.idempotency.release(claim.key, claim.token);
     }
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`[Worker ${context.workerId}] Task '${taskId}' failed:`, errorMessage);
@@ -292,6 +350,15 @@ export async function processWorkerTask(
         stateError instanceof Error ? stateError.message : String(stateError),
       );
     }
+    if (
+      executionSucceeded || lease.signal.aborted || (claimAttempted && !claim) ||
+      (claim && !claim.claimed && !claim.alreadyApplied)
+    ) {
+      if (!queueContext?.extendVisibility) throw error;
+      await queueContext.nack({ requeue: true });
+    }
+  } finally {
+    await lease.stop();
   }
 }
 

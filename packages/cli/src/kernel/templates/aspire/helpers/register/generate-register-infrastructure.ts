@@ -30,6 +30,9 @@ const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026'
 /** Redis-compatible TCP port inside cache containers. */
 const CACHE_DEFAULT_PORT = 6379
 
+/** Queue receipts require atomic Lua in every managed Garnet launch mode. */
+const GARNET_LEASE_ARGS = ['--lua', '--lua-transaction-mode'] as const
+
 /** Deno KV Connect container image (shared KV over HTTP). */
 const DENOKV_CONTAINER = {
   image: 'ghcr.io/denoland/denokv',
@@ -484,6 +487,9 @@ function garnetExecutableSetup(
   lines.push(`    const args = await context.args();`)
   lines.push(`    await args.add('--port');`)
   lines.push(`    await args.add(${id}_tcpEndpoint.property(EndpointProperty.TargetPort));`)
+  for (const arg of GARNET_LEASE_ARGS) {
+    lines.push(`    await args.add(${JSON.stringify(arg)});`)
+  }
   lines.push(`  });`)
   lines.push(
     `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
@@ -522,6 +528,9 @@ function redisGarnetContainerSetup(
     })`,
   )
   lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
+  if (entry.Engine === 'Garnet') {
+    lines.push(`    .withArgs(${JSON.stringify(GARNET_LEASE_ARGS)})`)
+  }
   if (entry.DataPath) {
     lines.push(
       `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${

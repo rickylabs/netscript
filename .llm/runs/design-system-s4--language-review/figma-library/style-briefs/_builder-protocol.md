@@ -1,0 +1,31 @@
+# Style builder protocol (all groups)
+
+- **File:** Figma `pGRLnkPPRZJZy74evNcQBr`.
+- **Setup:**
+  - Call `create_session` first.
+  - Load the deferred tools: `select:mcp__claude_ai_Figma__create_session,mcp__claude_ai_Figma__use_figma,mcp__claude_ai_Figma__get_figma_skill,mcp__claude_ai_Figma__get_screenshot`.
+  - Read `skill://figma/figma-use/SKILL.md` and `skill://figma/figma-generate-library/SKILL.md` (with `references/component-creation.md`) through `get_figma_skill`.
+  - Pass `skillNames: "resource:figma-use,resource:figma-generate-library"`.
+- **Concurrency:** up to six style builders and one base builder share the file. The server serializes `use_figma` calls per file, so they never interleave inside a script. Run your own calls one at a time.
+  - Touch **only your own theme pages**.
+  - Never edit a base component set, a variable, Scheme, Theme, Theme B, Theme set, or another theme's page.
+  - Never write `state.json`; write your own `ledger-style-<group>.json` in the figma-library folder.
+- **Method: clone, then restyle.**
+  - For each base set in your brief, `clone()` it onto your theme page under a section "Style components", subsection per category. Rename it `<Theme>/<Component …>`, for example `Pixel/Button / md`.
+  - Cloning keeps property names, values and layer names, so instance swap keeps overrides. Never rename a property, a variant value or a part layer.
+  - Restyle the clone to your brief: shapes, strokes, fills, effects, decorations, inner markup (adding style-only decoration layers is fine), text roles. Use bulk scripts per set, not node-by-node calls.
+  - Bind to variables as the base does, through Theme set for Theme-level values and Scheme for colours.
+  - Keep the cloned set's explicit modes off: the style renders under the page's or instance's modes. Set your theme page frames to your theme's modes.
+- **Nested instances:** inside your clones, swap nested base instances to your own style's components once they exist, for example `Pixel/Dialog` uses `Pixel/Button`.
+  - Work in the brief's category order: Actions → Forms 1 → Forms 2 → Navigation → Overlays → Data display 1.
+  - After each category, sweep the earlier ones and swap anything newly available.
+- **Review per category:**
+  - a "Style review" frame with your style's sets in light and dark, rendered under your theme's modes;
+  - a strip comparing `Base (Utility)` and `<Theme>` for the category's key components side by side.
+  - Screenshot both at normal scale, fix defects, and save the PNGs to `review/styles/<theme>/<category>.png` and `…-strip.png`.
+- **Quality bar:** the owner must recognise the theme at a glance. Its components must not look like Utility in another colour. Use the brief's signature anatomy and the crafted frames (node ids in the brief) as the visual source. Dark is designed, never inverted. Red only in the destructive tone.
+- **Fonts:** load every face your theme uses before mode switches. Text style roles must resolve to existing faces. `type/mono/style` and `type/label-strong/style` exist for mono and label-strong text.
+- **Budget:** your context is finite. Finish whole categories in order. After each category, update your ledger with the ids, PNG paths and what remains. If you run low, stop cleanly after a category and report what is left; you will be resumed.
+- **Report:**
+  - per category: the sets created (ids), the swaps, the PNG paths and the deviations from the brief;
+  - what the owner should look at.

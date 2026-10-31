@@ -1,9 +1,12 @@
-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
-import { join, relative } from '@std/path';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { dirname, fromFileUrl, join, relative } from '@std/path';
 import {
+  AUTHORITATIVE_MAPPING,
   checkDrift,
   checkExportsDrift,
   deriveExpectedExports,
+  discoverReferencePagePaths,
+  EXCLUDED_REFERENCE_PAGES,
   type PackageMapping,
   parseDocContent,
   validateReferencePageCoverage,
@@ -148,6 +151,44 @@ Deno.test('reference page coverage refuses pages in neither classification', () 
     [
       `Reference Page Coverage Error: ${uncovered} is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES`,
     ],
+  );
+});
+
+Deno.test('native reference discovery retains canonical identifiers and complete coverage', async () => {
+  const root = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
+  const paths = await discoverReferencePagePaths(root);
+  assert(paths.length > 0, 'reference discovery must select real pages');
+  assert(paths.every((path) => /^docs\/site\/reference\/[^/\\]+\/index\.md$/.test(path)));
+  assertEquals(
+    validateReferencePageCoverage(paths, AUTHORITATIVE_MAPPING, EXCLUDED_REFERENCE_PAGES),
+    [],
+  );
+  const referenceRoot = join(root, 'docs/site/reference');
+  let pageCount = 0;
+  for await (const entry of Deno.readDir(referenceRoot)) {
+    if (!entry.isDirectory) continue;
+    try {
+      if ((await Deno.stat(join(referenceRoot, entry.name, 'index.md'))).isFile) pageCount++;
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+  }
+  assertEquals(paths.length, pageCount, 'every existing reference index must be classified');
+  const missing = paths[0]!;
+  assertEquals(
+    validateReferencePageCoverage(
+      paths,
+      AUTHORITATIVE_MAPPING.filter(({ docPath }) => docPath !== missing),
+      EXCLUDED_REFERENCE_PAGES.filter(({ docPath }) => docPath !== missing),
+    ).length,
+    1,
+  );
+  assertEquals(
+    validateReferencePageCoverage(paths, [{ docPath: missing }], [{
+      docPath: missing,
+      reason: 'Duplicate classification control.',
+    }]).filter((error) => error.includes('is in both')).length,
+    1,
   );
 });
 
