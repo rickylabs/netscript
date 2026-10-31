@@ -10,3 +10,5 @@
 - New docs tool lint is excluded by root config; explicit root-rule config without exclusions processes the owned file and passes.
 
 - Independent S1 review PASS for docs. Its suggested publish-assets check was run: PASS, because it embeds the existing carrier. Do not confuse that result with fresh rendered-site prose; coordinator must rerun the chain after regeneration.
+
+- Final CI preflight found the Aspire scan manifest stale because the restored worker lesson now mentions Aspire. Scope addition: regenerate only `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv` with its existing generator. This is docs tooling allowed by the assignment; it adds the maintained lesson to the scan, without changing scan rules, exclusions or package/plugin code. Record as a small follow-up slice before exact-head evaluation.

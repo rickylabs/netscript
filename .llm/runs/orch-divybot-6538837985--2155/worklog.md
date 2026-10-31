@@ -58,3 +58,9 @@ Dated lesson and evaluate.md prepared. Final evaluation authority will be the in
 Review threads gate: PASS, zero current/unanswered threads at the source-slice checkpoint. No AppHost, database, container or scaffold E2E was launched. No unclear resource ownership or cleanup needed.
 
 Reconcile S2: source docs and test remain byte-identical to S1. Only scoped run artifacts change in this slice.
+
+## S2 follow-up — maintained docs scan manifest
+
+Before freezing the final head, check:aspire-version-parity identified a stale manifest after restoring the worker chapter. Regenerated with the existing aspire-surface-manifest.ts generator: exactly one row added for docs/site/tutorials/eis-chat/03-deliver-worker.md. Recheck PASS (manifestFresh true, 0 failures, missing []). This permitted docs-tooling metadata change expands scanning to the restored page; no rule or exclusion changed. Final independent review will include this deterministic follow-up.
+
+The source remained unchanged while exact-head exploratory final gates at 1fb5f71 passed docs accuracy, 34 focused tests and normal snippets. The full agent-docs-prose gate still failed at that head, confirming the recorded package-carrier prerequisite. CI close-gate also reflects the unchecked prerequisite, not missing issue acceptance (there are no issue checkboxes).

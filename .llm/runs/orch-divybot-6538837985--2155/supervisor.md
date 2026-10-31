@@ -9,3 +9,5 @@
 - Public evidence contains only repository-relative paths; no private infrastructure or session identifiers.
 - PLAN-EVAL: required before implementation. IMPL-EVAL: required before readiness and on the final pushed head.
 - PR ownership: implementer opens draft and marks ready; coordinator controls labels, milestone and merge. No local scaffold runtime E2E.
+
+- Declared docs-tooling follow-up: `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv`, regenerated after restoring the worker lesson. No scan policy changes; reason/evidence in drift.md.

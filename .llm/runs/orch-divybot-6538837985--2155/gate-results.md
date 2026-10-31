@@ -37,3 +37,8 @@ The docs verification command builds the site, registry JSON artifacts, rendered
 
 
 The full allowlisted `agent-docs-prose` gate was also measured through run-gate.ts: FAIL, exit 1, stale prose carrier. The allowlisted `publish-assets` gate was measured separately: PASS, exit 0 against the unchanged current carrier.
+
+## Final preflight
+
+- `deno task check:aspire-version-parity` initially failed manifest freshness because the restored worker page mentions Aspire. Its existing generator adds exactly that public-page row; rerun exits 0, manifestFresh true, no missing paths and zero failures. No scan rule or exclusion changes.
+- On the evidence head before that one-row metadata follow-up: normal snippets pass with 26 compiled Tier-1 fences, the combined focused/source test wrapper passes 34/34, and the allowlisted docs-accuracy receipt passes. Source docs and test are unchanged.

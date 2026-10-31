@@ -16,3 +16,5 @@ Existing code gap for coordinator follow-up: trigger processor supports definiti
 Owner boundaries: no labels/milestones/merge/release; no local scaffold.runtime; do not commit assignment or final-report files. Stop at the final handoff. Final issue report uses excluded `.divybot-final-report.md` for Orchid publication, with the exact head, twelve-item evidence, local results, CI snapshot and final evaluator line.
 
 Reconcile: latest fetched main b0b8f3f7282d073d92d64acdee522ea34bba4c5c differs only by unrelated Figma exports; none of the twelve load-bearing findings changed. No runtime resources were started; no cleanup pending. Dated lessons are in 2026-10-31-lessons.md and memory/.
+
+Final preflight follow-up: Aspire manifest refreshed with one row for the restored worker lesson; check:aspire-version-parity passes. This is permitted docs tooling, declared in supervisor/drift. Include this fixture in final evaluation. No docs/runtime/source changes followed S1; final head differs by evidence and this derived scan row.
