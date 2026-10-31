@@ -79,7 +79,11 @@ The default adapter retries failed watches with exponential delays from 250 mill
 30 seconds. Recreating a removed root allows a fresh watch to start; later changes reach the
 handler. Files changed while the watch was unavailable are not replayed automatically. Pausing
 suppresses delivery while keeping the watch and its health active. Stopping the processor cancels
-retries and drains in-flight handlers.
+retries and drains in-flight handlers. Adapter `unwatch` and `stop` calls from outside its callbacks
+also drain. Calls made from the adapter's own handler, error, or status callbacks cancel immediately
+without awaiting callback-owned tasks, so a callback can stop its own watch safely. This also
+applies when the callback cancels another trigger on the same adapter. Await `stop`
+from outside a callback when all handlers must have finished.
 
 An unavailable watch does not change aggregate child readiness: scheduled triggers and watches for
 other roots can still process events. The scaffold's starter watch root may not exist until you

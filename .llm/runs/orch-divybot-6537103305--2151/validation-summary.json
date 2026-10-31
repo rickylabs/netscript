@@ -1,15 +1,16 @@
 {
   "schemaVersion": 1,
-  "scope": "#2151 product head 34fe0583aa3b785076667c0d9fa6eaf1eec3697a; final evidence-commit head is attested on the PR timeline",
+  "scope": "#2151 review-follow-up source validation before commit; exact final head is attested on the PR timeline",
   "tests": {
     "exitCode": 0,
     "summary": {
-      "passed": 55,
+      "passed": 64,
       "failed": 0,
       "ignored": 0,
-      "totalResults": 55,
+      "totalResults": 64,
       "uniqueFailures": 0
-    }
+    },
+    "note": "Includes four callback-cancellation subtests."
   },
   "source": {
     "check": {
@@ -30,7 +31,7 @@
     },
     "fmt": {
       "summary": {
-        "filesSelected": 19,
+        "filesSelected": 20,
         "batches": 3,
         "failedBatches": 0,
         "findings": 0,
@@ -232,5 +233,76 @@
       "exitCode": 0,
       "durationMs": 1788
     }
-  ]
+  ],
+  "reviewFollowup": {
+    "sourceSignOff": "PASS",
+    "comments": [
+      4429957197,
+      4429966947,
+      4429966943,
+      4429966951
+    ],
+    "negativeControls": [
+      {
+        "name": "review-fixes-negative",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 8,
+          "ignored": 0,
+          "totalResults": 8,
+          "uniqueFailures": 4
+        }
+      },
+      {
+        "name": "review-reuse-negative",
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "totalResults": 1,
+          "uniqueFailures": 1
+        }
+      }
+    ],
+    "durableGates": [
+      {
+        "gateId": "quality-gate",
+        "invocationId": "watch-2151-review-quality",
+        "gitHead": "4ce5f31e9ae139193e7fb6dc79efe0e20fde2590",
+        "requestHash": "30e844a410958d6424f5abe130f757313116dd93102f047508e652e060ad0b39",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 15475
+      },
+      {
+        "gateId": "mcp-export-corpus",
+        "invocationId": "watch-2151-review-corpus",
+        "gitHead": "4ce5f31e9ae139193e7fb6dc79efe0e20fde2590",
+        "requestHash": "b9335e9374b83979c7ccb18311f1710f74ae4819b00c4118281712d719e8d141",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 12483
+      },
+      {
+        "gateId": "agent-docs-prose",
+        "invocationId": "watch-2151-review-prose",
+        "gitHead": "4ce5f31e9ae139193e7fb6dc79efe0e20fde2590",
+        "requestHash": "9e31f6fb5ad9dad54ff961878cab348fbb398114331c87aea4fdef4d72569c31",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 13764
+      },
+      {
+        "gateId": "publish-assets",
+        "invocationId": "watch-2151-review-assets",
+        "gitHead": "4ce5f31e9ae139193e7fb6dc79efe0e20fde2590",
+        "requestHash": "6f771b451ccfd88169b51841c7ebf5b1793efcae60fae16765c5e6f90c96613c",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 574
+      }
+    ]
+  }
 }

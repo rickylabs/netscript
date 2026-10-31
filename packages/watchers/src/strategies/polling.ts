@@ -98,13 +98,11 @@ export class PollingStrategy implements WatchStrategyHandler {
   /** Start polling and yield file events. */
   async *watch(): AsyncIterable<WatchEvent> {
     if (this.signal?.aborted) return;
-    // Readiness must not claim success for roots that disappeared during initialization.
-    for (const root of this.paths) {
-      const info = await Deno.stat(root);
-      if (!info.isDirectory) throw new Deno.errors.NotADirectory('Watch root is not a directory.');
+    // Preserve transient-access grace without announcing readiness for a failed scan.
+    while (!await this.buildSnapshot()) {
+      await delay(this.pollIntervalMs, { signal: this.signal }).catch(() => {});
+      if (this.signal?.aborted) return;
     }
-    // Initial snapshot (no events emitted for the first scan)
-    await this.buildSnapshot();
     if (this.signal?.aborted) return;
     await this.onReady?.();
 
@@ -184,38 +182,42 @@ export class PollingStrategy implements WatchStrategyHandler {
     }
   }
 
-  /** Build the initial snapshot without emitting events. */
-  private async buildSnapshot(): Promise<void> {
+  /** Retry incomplete initial scans within the existing access-failure budget. */
+  private async buildSnapshot(): Promise<boolean> {
+    let ready = true;
+    this.snapshot.clear();
     for (const root of this.paths) {
       try {
+        const info = await Deno.stat(root);
+        if (!info.isDirectory) {
+          throw new Deno.errors.NotADirectory('Watch root is not a directory.');
+        }
         for await (
-          const entry of walk(root as string, {
+          const entry of walk(root, {
             includeDirs: false,
             followSymlinks: false,
           })
         ) {
           if (!this.matchesGlob(entry.name)) continue;
-
           const stat = await safeStat(entry.path);
           if (!stat) continue;
-
           this.snapshot.set(entry.path, {
             size: stat.size,
             mtime: stat.modifiedAt?.getTime() ?? 0,
           });
         }
+        this.failureTracker.recordSuccess(root);
       } catch (error: unknown) {
-        // Directory may not exist yet — will be picked up on next poll
         if (
-          error instanceof Deno.errors.NotFound ||
-          error instanceof Deno.errors.PermissionDenied
+          !(error instanceof Deno.errors.NotFound || error instanceof Deno.errors.PermissionDenied)
         ) {
-          this.failureTracker.recordFailure(root as string);
-          continue;
+          throw error;
         }
-        throw error;
+        ready = false;
+        if (this.failureTracker.recordFailure(root)) throw error;
       }
     }
+    return ready;
   }
 
   /** Check if a filename matches any of the configured glob patterns. */

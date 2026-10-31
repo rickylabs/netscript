@@ -49,6 +49,11 @@ strategy identifiers fail with `TypeError`; there is no implicit fallback for th
 `WATCH_STRATEGIES` exports the accepted built-in values.
 
 `onReady` runs after the strategy acquires resources, independently of matching file events.
+Polling retains its consecutive-access-failure grace period during startup, but does not announce
+readiness until every root has been scanned successfully. A share that returns within that budget
+continues in the same polling session; persistent startup failures reject for supervisor recovery.
+Files present when that first successful polling scan completes establish its initial snapshot;
+changes during the startup access outage are not replayed.
 `onError` receives a `WatcherErrorEvent` containing `type: 'error'`, configured `paths`, the original
 `error`, and a `Date` timestamp. This diagnostic is separate from the `WatchEvent` stream: file
 filters and file handlers never receive an error as a file change. The original error still rejects

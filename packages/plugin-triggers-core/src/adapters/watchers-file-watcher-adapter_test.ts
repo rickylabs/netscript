@@ -1,5 +1,6 @@
+import { createWatcher } from '@netscript/watchers';
 import { assert, assertEquals, assertThrows } from '@std/assert';
-import { delay } from '@std/async';
+import { deadline, delay } from '@std/async';
 import { FakeTime } from 'jsr:@std/testing@^1/time';
 import type { FileWatchDefinition, TriggerEvent, TriggerId } from '../domain/mod.ts';
 import type { FileWatchStatusEvent } from '../ports/mod.ts';
@@ -205,5 +206,120 @@ Deno.test('watch retry policy rejects unbounded or invalid delays', () => {
     ]
   ) {
     assertThrows(() => new WatchersFileWatcherAdapter({ retry }), RangeError);
+  }
+});
+
+Deno.test({
+  name: 'hybrid retries keep an unreadable root unavailable until real recovery',
+  ignore: Deno.build.os === 'windows' ||
+    Deno.permissions.querySync({ name: 'sys', kind: 'uid' }).state !== 'granted' ||
+    Deno.uid() === 0,
+  async fn() {
+    const root = await Deno.makeTempDir();
+    const states: FileWatchStatusEvent[] = [];
+    const errors: unknown[] = [];
+    let deliveries = 0;
+    const adapter = new WatchersFileWatcherAdapter({
+      retry: { initialDelayMs: 10, maxDelayMs: 20 },
+      watcherFactory: (options) => createWatcher({ ...options, pollIntervalMs: 500 }),
+      onStatusChange: (event) => {
+        states.push(event);
+      },
+      onError: (error) => {
+        errors.push(error);
+      },
+    });
+    try {
+      await Deno.chmod(root, 0o000);
+      assertEquals((await Deno.stat(root)).isDirectory, true);
+      await adapter.watch(definition(root), () => {
+        deliveries++;
+        return Promise.resolve();
+      });
+      await waitFor(() => errors.length >= 2);
+      assertEquals(states.map((event) => event.state), ['unavailable']);
+      await Deno.chmod(root, 0o700);
+      await waitFor(() => states.at(-1)?.state === 'watching');
+      await Deno.writeTextFile(`${root}/recovered.txt`, 'readable again');
+      await waitFor(() => deliveries > 0);
+      assertEquals(states.map((event) => event.state), ['unavailable', 'watching']);
+    } finally {
+      await adapter.stop();
+      await Deno.chmod(root, 0o700);
+      await Deno.remove(root, { recursive: true });
+    }
+  },
+});
+
+Deno.test('watch callbacks can await cancellation without waiting for their own task', async (test) => {
+  for (const kind of ['handler', 'error', 'status', 'stop']) {
+    await test.step(kind, async () => {
+      const root = await Deno.makeTempDir();
+      const watch = definition(kind === 'error' ? `${root}/missing` : root);
+      const ready = Promise.withResolvers<void>();
+      const completed = Promise.withResolvers<void>();
+      const cancel = async (): Promise<void> => {
+        if (kind === 'stop') await adapter.stop();
+        else assert(await adapter.unwatch(watch.id));
+        completed.resolve();
+      };
+      const adapter: WatchersFileWatcherAdapter = new WatchersFileWatcherAdapter({
+        onStatusChange: async (event) => {
+          if (event.state !== 'watching') return;
+          ready.resolve();
+          if (kind === 'status') await cancel();
+        },
+        onError: kind === 'error' ? cancel : undefined,
+      });
+      try {
+        await adapter.watch(watch, async () => {
+          if (kind === 'handler' || kind === 'stop') await cancel();
+        });
+        if (kind === 'handler' || kind === 'stop') {
+          await deadline(ready.promise, 1500);
+          await Deno.writeTextFile(`${root}/cancel.txt`, 'cancel this watch');
+        }
+        await deadline(completed.promise, 1500);
+        await deadline(adapter.stop(), 1500);
+        assertEquals(await adapter.list(), []);
+      } finally {
+        // Bound cleanup in the reverted-fix control, whose task is self-awaiting.
+        await deadline(adapter.stop(), 100).catch(() => {});
+        await Deno.remove(root, { recursive: true });
+      }
+    });
+  }
+});
+
+Deno.test('callback cancellation still works after the same adapter drains and registers again', async () => {
+  const root = await Deno.makeTempDir();
+  const watch = definition(root);
+  let ready = Promise.withResolvers<void>();
+  let completed = Promise.withResolvers<void>();
+  const adapter = new WatchersFileWatcherAdapter({
+    onStatusChange: (event) => {
+      if (event.state === 'watching') ready.resolve();
+    },
+  });
+  try {
+    for (let iteration = 0; iteration < 2; iteration++) {
+      ready = Promise.withResolvers<void>();
+      completed = Promise.withResolvers<void>();
+      await adapter.watch(watch, async () => {
+        assert(await adapter.unwatch(watch.id));
+        completed.resolve();
+      });
+      await deadline(ready.promise, 1500);
+      await Deno.writeTextFile(
+        `${root}/iteration-${iteration}.txt`,
+        'cancel after reusing adapter',
+      );
+      await deadline(completed.promise, 1500);
+      await deadline(adapter.stop(), 1500);
+      assertEquals(await adapter.list(), []);
+    }
+  } finally {
+    await deadline(adapter.stop(), 100).catch(() => {});
+    await Deno.remove(root, { recursive: true });
   }
 });

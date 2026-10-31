@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { delay } from '@std/async';
 import { createWatcher } from '@netscript/watchers';
 import type { WatcherOptions as UpstreamWatcherOptions } from '@netscript/watchers';
@@ -60,6 +61,9 @@ export type WatcherInstance = Readonly<{
 /** Handler invoked when a file-watch trigger observes a matching event. */
 export type FileWatchHandler = (event: TriggerEvent<'file-watch'>) => Promise<void>;
 
+/** Identifies live adapter callbacks without treating later descendants as reentrant. */
+type WatchCallbackScope = { active: boolean };
+
 type WatchersFileWatcherRecord =
   & Omit<FileWatcherHandle, 'paused'>
   & {
@@ -94,6 +98,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
   readonly #initialDelayMs: number;
   readonly #maxDelayMs: number;
   readonly #tasks = new Set<Promise<void>>();
+  readonly #callbackScope = new AsyncLocalStorage<WatchCallbackScope>();
   #sequence = 0;
 
   /** Create a file-watch adapter with optional watcher and clock injection. */
@@ -141,11 +146,14 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     this.#records.set(definition.id, record);
     record.task = this.#run(record);
     this.#tasks.add(record.task);
-    void record.task.finally(() => this.#tasks.delete(record.task));
+    void record.task.finally(() => {
+      this.#tasks.delete(record.task);
+      if (this.#tasks.size === 0) this.#callbackScope.disable();
+    });
     return handle;
   }
 
-  /** Remove a file-watch trigger if it exists. */
+  /** Cancel a watch; callers outside adapter callbacks also await its task. */
   async unwatch(id: TriggerId): Promise<boolean> {
     const record = this.#records.get(id);
     if (record === undefined) {
@@ -154,7 +162,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     record.controller.abort();
     record.watcher?.stop();
     this.#records.delete(id);
-    await record.task;
+    if (!this.#callbackScope.getStore()?.active) await record.task;
     return true;
   }
 
@@ -179,7 +187,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     return Promise.resolve(this.#setPaused(id, false));
   }
 
-  /** Stop all active file-watch triggers and await their tasks. */
+  /** Cancel all watches; external callers drain tasks, while callbacks never self-await. */
   async stop(): Promise<void> {
     const records = [...this.#records.values()];
     this.#records.clear();
@@ -187,7 +195,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
       record.controller.abort();
       record.watcher?.stop();
     }
-    await Promise.all(this.#tasks);
+    if (!this.#callbackScope.getStore()?.active) await Promise.all(this.#tasks);
   }
 
   async #run(record: WatchersFileWatcherRecord): Promise<void> {
@@ -237,11 +245,13 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     if (!this.#isCurrent(record) || record.state === state) return;
     record.state = state;
     try {
-      await this.#onStatusChange?.({
-        triggerId: record.id,
-        state,
-        occurredAt: this.#now().toISOString(),
-      });
+      await this.#invokeCallback(() =>
+        this.#onStatusChange?.({
+          triggerId: record.id,
+          state,
+          occurredAt: this.#now().toISOString(),
+        })
+      );
     } catch {
       // Diagnostics cannot interrupt a watch or its recovery.
     }
@@ -249,7 +259,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
 
   async #dispatch(record: WatchersFileWatcherRecord, event: RuntimeWatchEvent): Promise<void> {
     try {
-      await record.handler(this.#eventFor(record, event));
+      await this.#invokeCallback(() => record.handler(this.#eventFor(record, event)));
     } catch (error) {
       await this.#reportError(error, stripRuntime(record));
     }
@@ -257,9 +267,19 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
 
   async #reportError(error: unknown, handle: FileWatcherHandle): Promise<void> {
     try {
-      await this.#onError?.(error, handle);
+      await this.#invokeCallback(() => this.#onError?.(error, handle));
     } catch {
       // Watcher callbacks are isolated from both handler and error-hook failures.
+    }
+  }
+
+  async #invokeCallback(callback: () => void | Promise<void>): Promise<void> {
+    const scope: WatchCallbackScope = { active: true };
+    try {
+      await this.#callbackScope.run(scope, callback);
+    } finally {
+      // A timer spawned by a finished callback is an external caller when it later runs.
+      scope.active = false;
     }
   }
 
