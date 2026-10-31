@@ -1,3 +1,15 @@
+# 2026-10-31 — Required-shard repair gates; final CI pending
+
+Reviewed test-source head **98846602fe0fc8f64bdc3ddafd1808466b6d1bd1**. Downloaded run41153807515 shard reports prove exactly2 branch regressions: old22-tool assertions where S2 exposes26. Test-2 has1429 pass/1 fail/6 ignored; test-5 has1625/1/3. CI receipts name merge execution head dda292e; the run ties it to PR source5e51beb38. No main-flake exemption.
+
+Focused before-control **30/2/0**, exit1, both26-versus22. Fixed exact canonical names/order assertions and added4 registry JSON-RPC roundtrips while retaining historical fixture/pinning/triad/old smoke checks. After-control **32/0/0**, exit0. Both-file structured check/lint/fmt0 findings/drops/refusals. Canonical release:preflight PASS and exact98846602 durable quality/architecture/dependency receipt PASS/exit0. Review threads0 unanswered. Independent retained native Opus5.5 High source/local-evidence **PASS** in2026-10-31-shard-eval.md. No production, workflow, skip, timeout, fixture, dependency, lock or shard-assignment edits.
+
+**Required final CI is still pending at this evidence commit.** Final head must be pushed before the decisive non-draft run. Require current run's8 shard jobs, check-test aggregator and quality SUCCESS, full CI workflow SUCCESS and all live protected contexts satisfied. Do not reuse older draft-run SKIPPED check-test. Live main rules require quality/check-test/deps-report; informational deps-report is skipped on green main run41151193922 too by unchanged workflow policy. Report that as policy-skipped, not executed/PASS or a flake exemption. No label or workflow-policy override.
+
+Once all current-head checks are satisfied, post exact-head run/job/context proof externally and atomically queue canonical renewed READY. Do not move the checked head with another evidence commit. Prior Docker runtime and123 component doc-lint limitations remain disclosed. Cockpit merges; no self-merge or release.
+
+## Historical gate evidence (retained)
+
 # 2026-10-31 — Coordinator publish-source repair gates
 
 Exact repaired source: **2372823dac8b6fb2d82605ac789276af4f45a335**. Normal merge d2758985a retains main a410a815c, including the former docs-quality baseline repair and upstream dependency/lock fixes. Repair source is independently reviewed PASS in2026-10-31-publish-source-eval.md; public registry contracts and canonical JSON/schema source bytes are unchanged.

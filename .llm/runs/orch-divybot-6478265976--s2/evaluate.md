@@ -1,3 +1,9 @@
+# Test-shard repair — PASS for source; every required CI check pending
+
+Independent native exact Opus5.5 High review **PASS** at98846602fe0fc8f64bdc3ddafd1808466b6d1bd1. See2026-10-31-shard-eval.md. Supervisor signs off the bounded two-test repair/local32/0/0 evidence. This does not renew READY: final non-draft current-head actual shards/check-test/quality and all live required contexts remain to be observed. Informational deps-report's unchanged policy skip is reported accurately, as on green main, not used to waive a failed test. Final CI proof belongs in the external PR/issue handoff after this evidence push; no push after green.
+
+## Historical evaluations (retained)
+
 # Coordinator publish-source repair — PASS; required CI pending
 
 Native exact-model independent repair IMPL-EVAL is **PASS** at2372823dac8b6fb2d82605ac789276af4f45a335. See2026-10-31-publish-source-eval.md for the substantive response, route/readonly proof and limitations. Canonical local release preflight now passes; full S2 suite366/0/0 and all requested local gates pass. Supervisor accepts this source sign-off. The previous READY is superseded until the required quality job succeeds at the final head; no renewed READY is claimed in this commit. CI proof must be posted externally after this evidence is pushed, preserving the checked head. Cockpit owns merge.

@@ -1,3 +1,13 @@
+# Required-shard repair — independently passed; every required CI context pending
+
+Source **98846602fe0fc8f64bdc3ddafd1808466b6d1bd1** fixes both actual CI failures in test-2/test-5, obsolete22-versus26 MCP counts. Exact public catalog names/order replace counts; native stdio calls all4 registry tools and checks bounded list/search/exact copied cn bytes/add argv. Production, fixtures/pinning/triad, skips/timeouts, workflow/shard assignment, deps/locks unchanged. Before30/2/0, after32/0/0;2-file structured wrappers, canonical preflight, exact-source durable quality/architecture and review threads PASS. Retained exact native Opus5.5 High read-only independent source/local review **PASS**, full response2026-10-31-shard-eval.md.
+
+This evidence-only commit precedes the decisive CI. Push it, ready draft2468 to trigger current non-draft CI, and run the private all-required-CI watcher. Renew READY only when that final head's actual8 shard jobs, check-test and quality plus whole current CI run succeed and live protected contexts are satisfied. Never reuse an old draft-run skipped aggregator. deps-report is an informational policy-skip on PRs and green main41151193922; report it separately without claiming execution. No flake waiver or policy change. Do not push after all-green; put final exact-head run/job proof in PR and ignored canonical issue-report handoff.
+
+Prior READY at5e51 is superseded; quality-only success was insufficient. Main remainsa410a815c. Stop after all-required-green READY for Cockpit merge. No labels/new PR/force push/self-merge/tag/release or assignment commit. Docker-unavailable runtime/123 component doc-lint limits remain. Read memory-required-shards.md and2026-10-31-shard-repair.md for exact artifacts and repair recipe.
+
+## Historical context (retained)
+
 # Coordinator repair — test shards failing; every required check required
 
 Prior READY at5e51beb38 is superseded. Run41153807515 quality passed, but test-2 and test-5 each have one obsolete22-versus26 MCP catalog assertion, so required check-test fails. Actual downloaded receipts identify init-agent_test.ts S-18 restart and agent-mcp-stdio_test.ts native smoke. Fix these branch regressions, preserve historical fixture/pinning and existing smoke checks, assert exact canonical catalog and exercise registry stdio calls, then get independent review and EVERY required context green at the exact new head. No main-flake claim without matching failed main evidence. PR2468 is draft during repair. Main remains a410a815c. Do not repeat quality-only or old skipped-context readiness; verify terminal current-head/current-run shard and aggregator success. No new PR, labels, force push, self-merge or release.
