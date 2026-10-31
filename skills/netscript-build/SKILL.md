@@ -104,8 +104,11 @@ Every page renders inside the app chrome in `routes/_layout.tsx`: the top bar, w
   preset's generated `--ns-*` tokens, which `client.ts` loads on every route, and
   `assets/theme-bridge.css` exposes them as Tailwind `*-ns-*` utilities.
 - Switch the preset with `netscript ui:apply --preset <id>`. Fine-tune it by aliasing semantic roles
-  in `tokens/semantic.tokens.json` (create it with `netscript tokens init --preset <current id>`),
-  then run `netscript tokens build`. Never hand-edit the generated `tokens.css`, `theme-bridge.css`,
+  in `tokens/semantic.tokens.json`: create the file, and when `tokens.config.json` exists
+  (`ui:apply` writes it) add `"override": "tokens/semantic.tokens.json"` to it, because
+  `tokens build` ignores an override the config does not name. Then run `netscript tokens build`. Do
+  not run `tokens init` after `ui:apply`: it fails without `--force`, which resets the override file
+  and replaces `tokens/source/`. Never hand-edit the generated `tokens.css`, `theme-bridge.css`,
   `tokens.json`, `fonts.json`, or `theme-preset.json`. Never scope theme variables to one page's
   wrapper; there is no per-page theme.
 
