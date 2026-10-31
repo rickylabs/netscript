@@ -26,3 +26,7 @@ No lock/cache deletion, dependency churn, label/milestone mutation, local scaffo
 The user explicitly requested fixing the failed quality job and pushing the repair. The failed gate is agent-docs-prose freshness after the owned triggers-doc update. Extend the write surface to the native generator outputs: packages/cli/src/kernel/assets/agent-docs-prose.generated.ts, packages/cli/src/kernel/assets/agent-docs.generated.ts, packages/cli/src/kernel/assets/embedded.generated.ts and .llm/assets/agent-docs/provenance.json if regenerated. No hand-edited carrier data or weakened freshness/discovery gates. Existing run-record paths remain authorized.
 
 The same repair slice also addresses Augment review 4429496686 (authorized by the user's instruction to address each review item): plugins/triggers/src/runtime/trigger-processor.ts and plugins/triggers/src/runtime/trigger-processor-stop_test.ts. Preserve normal event/key behavior; drain source tasks before closing processor admission.
+
+## S3 base synchronization
+
+Owner explicitly requested rebase and force-push; exact grant and fixed base/lease are recorded in worklog.md. Preserve #2484 recovery and callback-cancellation semantics, all its tests, all #2187 key/TTL/drain acceptance, and the latest upstream non-site generated prose context. Refresh generated outputs through native commands, then validate and push with an exact remote-tip lease.

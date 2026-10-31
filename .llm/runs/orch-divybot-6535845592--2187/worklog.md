@@ -78,3 +78,13 @@ The Augment shutdown race is repaired by source settlement before processor admi
 Same-session native Claude S2 review returned PASS, with no blockers. It independently reran plugin runtime plus S1 new suites: 31 passed, 0 failed, 3 Redis-only ignored. It reran agent-docs-prose, generated barrel --check and publish-asset freshness successfully. Scoped source checks and privacy/scope review pass. arch:check also exits 0. See s2-evaluate.md. Commit/push now; full git-diff-based assets-barrel verdict and CI tracking follow at that immutable repaired head.
 
 S2 reconcile: only prior-head quality is red; same failure is agent-docs-prose, with no evidence of discovery failures. Augment review 4429496686 was answered. No source acceptance weakened and no taxonomy mutations. Runtime lifecycle wiring now requires the coordinator-owned e2e-cli CI verdict, explicitly requested in the PR handoff.
+
+## S3 rebase owner authorization (verbatim)
+
+> merge-conflict: rebase onto the latest base branch, resolve conflicts, force-push.
+
+This later explicit instruction supersedes the earlier no-force instruction for this synchronization. Use an exact remote-tip --force-with-lease; never rewrite main. Fixed upstream base: 1d467c669dc122174dcea95e39871e8145591114; previous evaluated tip/lease: e147deb2464bc6846a8b2cd7bedce957f72ebb58.
+
+Conflicts were the watcher adapter callback dispatch and an add/add adapter test file from #2484. Preserve upstream recovery, onReady, health and AsyncLocalStorage callback cancellation; await key construction before invoking the existing callback wrapper. Keep the full upstream recovery/cancellation test set and append our identity tests. Controlled observation sources now stay open until adapter.stop so finite fixtures do not trigger the upstream unexpected-end retry policy. The runtime shutdown drain repair replayed cleanly beside upstream logging/health wiring.
+
+S3 validation: combined core/watchers/plugin runtime suite passes 140 tests, zero failed, 3 Redis-only ignored. Scoped source check/lint/fmt cover 120 files cleanly; quality:gate now passes on the new main (including the formerly unrelated docs fixture repair). Generated rows preserve 202 upstream pages/context, zero additions/removals and only the owned triggers-page change. Native MCP export, publish-assets and assets-barrel checks pass. Source/lock diff remains bounded to this issue relative to the fixed base. Record and push with exact lease, then bind final independent review to the new SHA.
