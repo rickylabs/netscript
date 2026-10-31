@@ -45,6 +45,57 @@ const payloadSchema = {
 export default Object.assign(async () => undefined, { payloadSchema });
 `;
 
+for (const populated of [false, true]) {
+  Deno.test(`installed zero-item registries load after ${populated ? 'removing the last definition' : 'installing without samples'}`, async () => {
+    await withTempProject(async (projectRoot) => {
+      const sources: Readonly<Record<string, string>> = populated
+        ? {
+          'triggers/only.ts': VALID_TRIGGER,
+          'workers/jobs/only.ts': VALID_JOB,
+          'sagas/only-saga.ts': `export default {
+          id: 'only', durability: 't1', initialState: {}, handledMessageTypes: [], handlers: new Map(),
+        };`,
+        }
+        : {};
+      await writeWorkspaceProject(projectRoot, [
+        'plugin-sagas',
+        'plugin-workers',
+        'plugin-triggers',
+      ], sources);
+      const generate = createInstalledRuntimeRegistryGenerator({
+        fs: new DenoFileSystem(),
+        process: new DenoProcess(),
+        fetchManifest: () => Promise.reject(new Error('workspace manifest must win')),
+      });
+      if (populated) {
+        await generate({ dryRun: false, projectRoot });
+        for (const path of Object.keys(sources)) await Deno.remove(join(projectRoot, path));
+      }
+      const generated = await generate({ dryRun: false, projectRoot });
+      assertEquals(generated.length, 3);
+      assertEquals(generated.map((entry) => entry.registrableItems), [0, 0, 0]);
+      for (const path of [SAGAS_REGISTRY_PATH, WORKERS_REGISTRY_PATH, TRIGGER_REGISTRY_PATH]) {
+        const loaded = await import(`${toFileUrl(join(projectRoot, path)).href}?empty`);
+        assert(loaded.registry instanceof Map);
+        assertEquals(loaded.registry.size, 0);
+        if (path === WORKERS_REGISTRY_PATH) assertEquals(loaded.jobDefinitions.size, 0);
+      }
+      const before = await Deno.readTextFile(join(projectRoot, WORKERS_REGISTRY_PATH));
+      const inspected = await generate({ dryRun: true, projectRoot });
+      assertEquals(inspected.length, 3);
+      assertEquals(inspected.map((entry) => entry.sourceFiles), [[], [], []]);
+      assertEquals(await Deno.readTextFile(join(projectRoot, WORKERS_REGISTRY_PATH)), before);
+      const files = new LocalProjectFiles(projectRoot);
+      await compileTriggerRegistry(files);
+      await compileWorkersRegistry(files);
+      for (const path of [TRIGGER_REGISTRY_PATH, WORKERS_REGISTRY_PATH]) {
+        const loaded = await import(`${toFileUrl(join(projectRoot, path)).href}?empty-standalone`);
+        assertEquals(loaded.registry.size, 0);
+      }
+    });
+  });
+}
+
 Deno.test('installed registry generators and plugin rewrites exclude marked factories consistently', async () => {
   await withTempProject(async (projectRoot) => {
     const ignored = '// @netscript-registry-ignore\n' +

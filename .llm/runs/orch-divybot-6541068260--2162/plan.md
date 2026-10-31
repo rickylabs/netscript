@@ -23,7 +23,7 @@ checks + tests, shared doctor + tests, installed integration tests. Prove genera
 nonempty→empty transitions, read-only doctor warning and strict negative controls. Structured
 focused tests/check/lint/fmt and quality:gate, independent slice review before commit/push.
 S2: README documentation for all three plugins; real --no-samples install/generate/doctor proof
-and isolated production startup tests if needed; run records/lessons. Scoped wrappers, JSR audit
+and required isolated production startup tests for all three plugins; run records/lessons. Scoped wrappers, JSR audit
 for affected packages, independent implementation evaluation, commit/push and ready transition.
 
 ## Risk / mitigation

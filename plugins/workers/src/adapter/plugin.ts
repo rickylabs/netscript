@@ -86,7 +86,7 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
     };
   },
 }, {
-  name: 'generated job registry is non-empty',
+  name: 'generated job registry is initialized',
   async run(context) {
     const source = await readWorkersRegistry(context);
     const hasLegacyEntries = source !== undefined &&
@@ -98,11 +98,13 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
         );
     const populated = hasLegacyEntries || hasLiteralDefinitions;
     return {
-      name: 'generated job registry is non-empty',
-      ok: populated,
+      name: 'generated job registry is initialized',
+      ok: populated || isEmptyWorkersRegistry(source),
       message: populated
         ? 'Generated job definitions are present.'
-        : `No generated jobs are registered. Run: ${GENERATE_WORKERS_REGISTRY}`,
+        : isEmptyWorkersRegistry(source)
+        ? 'Empty job registry; the processors can start idle with zero definitions.'
+        : `Job registry is incomplete. Run: ${GENERATE_WORKERS_REGISTRY}`,
     };
   },
 }, {
@@ -118,7 +120,7 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
     const loadable = source !== undefined &&
       source.includes('export const jobDefinitions') &&
       source.includes('export const registry') &&
-      declared > 0 &&
+      (declared > 0 || isEmptyWorkersRegistry(source)) &&
       compiledHandlers + generatedHandlers === declared &&
       definitions === declared;
     return {
@@ -130,6 +132,15 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
     };
   },
 }];
+
+/** Recognize complete empty handler and definition maps emitted by both job writers. */
+function isEmptyWorkersRegistry(source: string | undefined): boolean {
+  return source !== undefined &&
+    /export const jobHandlersById[^=]*=\s*Object\.freeze\(\s*\{\s*\}\s*\)/.test(source) &&
+    /export const jobDefinitionsById[^=]*=\s*Object\.freeze\(\s*\{\s*\}\s*\)/.test(source) &&
+    source.includes('export const jobDefinitions') &&
+    source.includes('export const registry');
+}
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */
 export const workersAdapterPlugin: NetScriptPlugin = {
