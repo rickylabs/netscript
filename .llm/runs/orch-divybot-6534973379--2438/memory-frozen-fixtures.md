@@ -1,0 +1,5 @@
+# Frozen temporary Deno fixtures / 2026-10-30
+
+Blindly copying root deno.lock then running --config temp/deno.json --frozen fails on workspace metadata even for identical dependency versions. Removing workspace also fails; Deno expects metadata for that config. Research proved native install on a private copy can derive metadata; restore the original lock's dependency sections and retain ONLY the new workspace metadata, then frozen execution passes for recorded requirements and rejects an absent exact API requirement. `--no-config --import-map` avoids metadata comparison but loses custom compiler options, so it is unsuitable as a general JSX/consumer fixture policy. Native `deno install --lockfile-only` can prune and alter peer bindings; never accept its dependency graph as fixture authority.
+
+The shared saga provider helper covers prisma-transition-postgres, saga-relay-cohort and plugins/sagas publish-process tests. Native PostgreSQL gate is .llm/tools/command-postgres-conformance.sh; it owns a temporary Unix-socket server and cleanup. No Aspire/container runtime required.

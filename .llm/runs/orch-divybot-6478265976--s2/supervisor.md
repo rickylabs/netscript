@@ -1,5 +1,9 @@
 # S2 registry v2 supervision
 
+## Coordinator repair — publish-source imports, 2026-10-31
+
+Owner fix brief: issue comment 6536722286. Baseline 56cc5be898fc593a99c587a5ded43a4d96cf8fd3; same branch/PR2468. Repair the three prohibited JSON import attributes with generated registry/schema TypeScript constants following the token-asset pattern. Extend the writable surface to packages/fresh-ui/scripts/embed-registry-assets.ts, src/registry generated asset files/tests, package embedding tasks, root generation/freshness tasks and directly affected generated carriers. Preserve canonical JSON/schema bytes, public contracts, existing budget and S3 exclusions. Merge current main normally to retain its docs-quality repair. Require local release:preflight, S2 regressions, scoped wrappers, four carrier checks, workspace publish dry-run and same-session independent exact-model review. Unlike the prior READY, this new handoff requires a verified green required CI quality job at the exact pushed head. PR stays under repair until those conditions hold; no labels, force push, merge of PR, release or private session metadata.
+
 ## Authorized continuation — 2026-10-31
 
 Resume existing branch and PR #2468 from evidence head `2c95e60c2dccbf07a78ae26a28237bceada7a142`, product source `dd4e793462420733f281036c48e963f661f1f9aa`. Reconcile current `origin/main` with a merge commit, refresh scoped and broader gates, resume the retained separate Anthropic evaluator using the owner's exact model/effort, record its substantive verdict, and stop at READY without merging the PR. The writable surface and S3 exclusions below still apply; normal upstream merge changes are retained. Local private execution records remain outside tracked evidence. The feature matrix was queried with `--json` again; the owner's quoted evaluator override remains authoritative.

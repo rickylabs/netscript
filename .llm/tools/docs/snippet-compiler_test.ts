@@ -20,7 +20,7 @@ async function compileFixture(name: string) {
 Deno.test('workspace resolver exposes exact exports, catalog fallbacks, and canonical ranges', async () => {
   const surface = await resolveWorkspaceSurface(repositoryRoot);
   assertEquals(surface.memberCount, 37);
-  assertEquals(Object.keys(surface.catalog).length, 38);
+  assertEquals(Object.keys(surface.catalog).length, 40);
   assert(surface.imports['@netscript/sdk/client'].endsWith('/packages/sdk/src/client/mod.ts'));
   assertEquals(surface.imports['@netscript/sdk/src/client/mod.ts'], undefined);
   assertEquals(surface.imports['@opentelemetry/api'], 'npm:@opentelemetry/api@^1.9.1');
@@ -37,7 +37,7 @@ Deno.test('copied-lock compiler is green with root catalog and leaves tracked lo
   const lockBefore = await Deno.readTextFile(join(repositoryRoot, 'deno.lock'));
   const result = await compileFixture('dialect-a-positional');
   assertEquals(result.code, 0, result.diagnostics);
-  assertEquals(result.catalogCount, 38);
+  assertEquals(result.catalogCount, 40);
   assertEquals(result.memberCount, 37);
   assert(result.rootLockUnchanged);
   assert(result.temporaryLockRewritten);

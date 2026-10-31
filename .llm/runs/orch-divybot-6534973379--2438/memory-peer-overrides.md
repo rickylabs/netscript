@@ -1,0 +1,7 @@
+# Isolated peer resolution / 2026-10-31
+
+A root lock can contain multiple valid versions of one npm package. Isolated consumer graphs can recompute peer IDs and fetch newer versions even after inheriting recorded root IDs. Use native lock adaptation plus private package.json npm overrides from the committed lock's versions, then verify every resolved npm/JSR version and integrity and remote hash before frozen execution. npm overrides in deno.json did not constrain imports in the research probe; package.json overrides did.
+
+A simple package-name pin is appropriate for a single recorded version. Preserve different majors (different minors for 0.x) with range selectors and explicit recorded-version overrides. Otherwise optional OpenAI/provider SDK contexts can recompute outside the baseline. Include the maintained Fresh UI lock: saga/service public type graphs reach Fresh UI and its dependencies even when provider behavior does not render UI. Keep checked-in lock files immutable during the fixture run.
+
+Root catalog aliases lacking any committed resolution (notably future-wave Tailwind tooling) should not become saga fixture roots. Preserve first-party file URL mappings and required npm subpath aliases; fixing just top-level aliases misses @durable-streams/state/db. The saga process crash-replay fixture also starts a child with --no-lock; change that child to --frozen so it honors the fixture lock.

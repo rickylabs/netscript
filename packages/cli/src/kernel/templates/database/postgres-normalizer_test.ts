@@ -1,3 +1,4 @@
+import { prepareLockedFixture } from '../../../../../../.llm/tools/testing/locked-fixture.ts';
 import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
@@ -87,6 +88,11 @@ export class PrismaClient {
 }
 `,
     );
+    await prepareLockedFixture(
+      root,
+      [],
+      new URL('../../../../tests/fixtures/postgres-normalizer/deno.lock', import.meta.url),
+    );
     await run(root, database);
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -101,8 +107,13 @@ async function probe(
   expected: string,
 ): Promise<void> {
   await Deno.writeTextFile(`${database}/probe.ts`, script);
+  await prepareLockedFixture(
+    root,
+    [`${database}/probe.ts`],
+    new URL('../../../../tests/fixtures/postgres-normalizer/deno.lock', import.meta.url),
+  );
   const result = await new Deno.Command('deno', {
-    args: ['run', '-A', '--no-lock', '--config', `${root}/deno.json`, 'probe.ts'],
+    args: ['run', '-A', '--config', `${root}/deno.json`, 'probe.ts'],
     cwd: database,
     env: { POSTGRES_URI: input, DATABASE_URL: input, EXPECTED_URL: expected, OTEL_DENO: 'false' },
     stdout: 'piped',
@@ -155,7 +166,6 @@ Deno.test('Postgres generated engine type-checks and runs with its generated loc
       args: [
         'check',
         '--unstable-kv',
-        '--no-lock',
         '--config',
         `${root}/deno.json`,
         'mod.ts',

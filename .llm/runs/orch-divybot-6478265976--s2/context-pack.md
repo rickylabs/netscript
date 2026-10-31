@@ -1,4 +1,8 @@
-# 2026-10-31 — S2 complete; ready for Cockpit review
+# 2026-10-31 — Under coordinator-directed publish-source repair
+
+Prior READY is superseded. Required CI quality run41148772405 at56cc5be89 fails release preflight on three registry JSON import attributes. Owner fix brief6536722286 requires generated TypeScript embeddings/freshness checks, size-budget preservation, local release preflight/S2/wrappers/carriers/publish dry-run and exact native Opus IMPL-EVAL. Renew READY only after required CI quality is green at the exact new pushed head. Existing PR2468 is draft during repair. Current normal main merge retains a410a815c, including the upstream docs unsafe-cast repair and telemetry dependency/lock fixes. No new PR, labels, force push, self-merge or release. Historical evidence below is superseded for readiness.
+
+# 2026-10-31 — Prior S2 READY evidence (retained)
 
 Product source **dd486f5692902ff2b977ef4576ac9609a5553748** normally merges current main7907293. All approved S2 implementation remains delivered, with upstream docs/carriers reconciled. The retained separate native Opus5.5 High evaluator returns final whole-change **PASS**, confirming the removal repair and the stable **364/0/0** integrated suite; native CLI3/0/0 and carrier3/0/0 also pass. All83 changed TS/TSX source/generated wrappers pass without findings/drops, public registry/MCP doc-lint and JSR metadata pass, eight durable architecture/docs/carrier/publication-dry-run receipts PASS. Docs253 HTML pages/87 registry artifacts; census109/109 commands/174 recursive paths; review threads0 unanswered. 2026-10-31-impl-eval.md preserves the independent responses, identity and evidence limits; final-gates.md is current first, historical afterward.
 

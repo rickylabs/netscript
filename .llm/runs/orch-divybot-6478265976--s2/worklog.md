@@ -1,5 +1,17 @@
 # Worklog
 
+## Coordinator publish-source repair — design checkpoint, 2026-10-31
+
+Prior READY is superseded: required CI run41148772405 fails Release preflight on three JSON import attributes in publishable registry code. Owner comment6536722286 explicitly authorizes the fix and now requires quality green at the new head before the renewed READY. Do not reinterpret a dry-run or source-review PASS as that CI proof.
+
+1. Public surface: unchanged Registry v2 catalog/schema validation; assets become ordinary generated TypeScript imports. Add registry:embed / registry:embed:check tasks consumed by root generation and freshness checks.
+2. Vocabulary: authoritative registry JSON, pinned schema snapshots, compressed embedding and freshness verdict.
+3. Ports: existing filesystem/process APIs at build-time; runtime uses the existing Web Compression/Decompression API pattern and no filesystem/network asset reads.
+4. Constants: named generated registry/schema exports, existing schema URIs and existing publish-size cap remain authoritative.
+5. One repair slice: generator + generated assets + two import sites + task/freshness wiring + focused embedding parity/staleness proof + run evidence. Gates: canonical release preflight; structured S2 tests/check/lint/fmt; four carrier checks; full workspace publish dry-run; exact native Opus independent review; required CI quality at final head. Normal main merge retains upstream source/lock changes before repair.
+6. Deferred scope: no component/source-style changes, dependency upgrades, release publication or unrelated quality-gate rewrites. PLAN-EVAL N/A: mechanical representation repair under a fully specified coordinator brief; final IMPL-EVAL remains required.
+7. Contributor path: src/registry/README.md explains authoritative sources and embedding/freshness tasks.
+
 ## Authorized continuation — 2026-10-31
 
 Recovered the complete assignment, original owner comments and retained run/memory before reading implementation. Resumed existing branch/PR at 2c95e60; queried NetScript find_guidance/search_docs and the feature matrix. Owner's exact Opus 5.5 High evaluator override and no-label/Refs-only/STOP-at-READY constraints remain in force.

@@ -1,5 +1,7 @@
 # Drift
 
+- 2026-10-31 coordinator repair: prior completion was premature because local gate coverage omitted release:preflight; required CI exposes three forbidden JSON import attributes. New brief6536722286 requires fixing the representation, wiring freshness, preserving size, rerunning gates and verifying required CI quality green at the new head before renewed READY. Scope remains S2; prior review PASS does not certify the forthcoming repair. Main now supplies the former docs-quality baseline repair; retain it by normal merge.
+
 - 2026-10-31: Owner explicitly authorizes relaunch after reviewer quota reset. Original branch/PR and full scope are retained. Main advanced by four commits, requiring a normal merge with semantic docs/prose reconciliation. This supersedes the historical availability-only stop; it does not invent a passing verdict. Docker daemon is still unavailable. No new product scope or architectural debt is accepted.
 
 - Bootstrap: RTK is not installed; use direct commands and retain structured wrapper verdicts.
