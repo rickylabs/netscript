@@ -50,3 +50,13 @@ Removed that redundant setup call: init and plugin installation already write th
 Reconcile: initial Windows failure remains explicitly recorded. Need a successful run at the repaired script before claiming READY. No issue closure, taxonomy changes or new scope.
 
 Independent same-session repair review: **SLICE REVIEW: PASS**; reviewer confirms inspecting init/plugin-generated Aspire directly is at least as strict, all four checks/assertions remain unchanged, and any Windows inspection/network failure still fails the job.
+
+## Windows acceptance evidence
+
+Run https://github.com/rickylabs/netscript/actions/runs/41208565476 at bcefeaa33ce3d8971ff3dad3dbfb6e7686e21439 completed **successfully**. Native Windows artifact downloaded and checked: CLI 0.0.8, Deno 2.9.7, OS windows, all four result objects exactly equal to Linux's. Both clean checks exit 0/current (1 plugin registry, 15 Aspire outputs); both hostile checks exit 1/drift with exactly one bytes finding at the edited target. All snapshots nonMutating=true. Full commands and excerpts: evidence.md; machine-readable evidence: windows.json and linux.json.
+
+Review-thread gate: PASS, 0 threads / 0 unanswered. Ordinary production job was skipped only for this explicit parity-only dispatch. First failed attempt preserved, not overwritten or called green. Final independent evaluation follows; artifact-only commit must retain the tested script/workflow bytes.
+
+Reconcile: issue 1912 box 8 now has both OS evidence; box closure is coordinator-owned. PR 2537 remains Refs-only and draft until final evaluation. No independent work remains in this bounded assignment.
+
+Independent evidence-slice review: **EVIDENCE SLICE REVIEW: PASS**. Reviewer checked both reports, gate summaries, privacy, failed-attempt disclosure and scope. Optional wording fixes clarify sixteen snapshots/eight comparisons and explicitly identify Linux's tested script version. Final exact-head evaluation must verify the implementation files still match tested commit bcefeaa33ce3d8971ff3dad3dbfb6e7686e21439.
