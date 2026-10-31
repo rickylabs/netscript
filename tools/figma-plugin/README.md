@@ -6,7 +6,7 @@ NOTICE records attribution and local changes. The fork uses upstream's RGB norma
 replaces the UI/providers with the NetScript variable, preset and registry contracts.
 
 Figma owns values. Code owns collection/variable identities, modes, WEB names and types.
-The nine collections and 2,186 variables follow the design handoff. Theme set A selects Theme;
+The nine collections and 2,189 variables follow the design handoff. Theme set A selects Theme;
 B selects Theme B. Alias targets use the active mode of their own collection.
 
 Build from the repository root:

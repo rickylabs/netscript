@@ -39,7 +39,7 @@ Deno.test('production main bundle runs with only the Plugin API and no DOM/decom
     main,
   );
   execute('<html></html>', host, undefined, undefined, undefined, undefined, undefined, undefined);
-  let timer: number | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     onmessage({ type: 'export' });
     const value = await Promise.race([

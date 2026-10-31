@@ -12,7 +12,7 @@
 
 .ns-error-text {
   font-size: var(--ns-text-xs);
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
   margin-top: var(--ns-space-1);
 }
 
@@ -30,5 +30,5 @@
 .ns-field__error-icon {
   font-family: var(--ns-font-mono);
   font-size: var(--ns-text-xs);
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }

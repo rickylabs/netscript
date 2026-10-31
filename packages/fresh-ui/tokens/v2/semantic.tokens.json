@@ -4,15 +4,15 @@
     "light": {
       "amber-1": {
         "$type": "color",
-        "$value": "{primitive.v0334}"
+        "$value": "{primitive.v0332}"
       },
       "amber-10": {
         "$type": "color",
-        "$value": "{primitive.v0277}"
+        "$value": "{primitive.v0276}"
       },
       "amber-11": {
         "$type": "color",
-        "$value": "{primitive.v0335}"
+        "$value": "{primitive.v0333}"
       },
       "amber-12": {
         "$type": "color",
@@ -20,19 +20,19 @@
       },
       "amber-2": {
         "$type": "color",
-        "$value": "{primitive.v0336}"
+        "$value": "{primitive.v0334}"
       },
       "amber-3": {
         "$type": "color",
-        "$value": "{primitive.v0278}"
+        "$value": "{primitive.v0277}"
       },
       "amber-7": {
         "$type": "color",
-        "$value": "{primitive.v0231}"
+        "$value": "{primitive.v0230}"
       },
       "amber-8": {
         "$type": "color",
-        "$value": "{primitive.v0339}"
+        "$value": "{primitive.v0337}"
       },
       "amber-9": {
         "$type": "color",
@@ -40,31 +40,31 @@
       },
       "band-1": {
         "$type": "color",
-        "$value": "{primitive.v0223}"
+        "$value": "{primitive.v0222}"
       },
       "band-2": {
         "$type": "color",
-        "$value": "{primitive.v0340}"
+        "$value": "{primitive.v0338}"
       },
       "band-3": {
         "$type": "color",
-        "$value": "{primitive.v0341}"
+        "$value": "{primitive.v0339}"
       },
       "band-4": {
         "$type": "color",
-        "$value": "{primitive.v0342}"
+        "$value": "{primitive.v0340}"
       },
       "band-5": {
         "$type": "color",
-        "$value": "{primitive.v0225}"
+        "$value": "{primitive.v0224}"
       },
       "blue-1": {
         "$type": "color",
-        "$value": "{primitive.v0343}"
+        "$value": "{primitive.v0341}"
       },
       "blue-10": {
         "$type": "color",
-        "$value": "{primitive.v0179}"
+        "$value": "{primitive.v0342}"
       },
       "blue-11": {
         "$type": "color",
@@ -72,19 +72,19 @@
       },
       "blue-12": {
         "$type": "color",
-        "$value": "{primitive.v0181}"
+        "$value": "{primitive.v0180}"
       },
       "blue-2": {
         "$type": "color",
-        "$value": "{primitive.v0344}"
+        "$value": "{primitive.v0343}"
       },
       "blue-3": {
         "$type": "color",
-        "$value": "{primitive.v0180}"
+        "$value": "{primitive.v0179}"
       },
       "blue-4": {
         "$type": "color",
-        "$value": "{primitive.v0345}"
+        "$value": "{primitive.v0344}"
       },
       "blue-5": {
         "$type": "color",
@@ -100,11 +100,11 @@
       },
       "blue-8": {
         "$type": "color",
-        "$value": "{primitive.v0346}"
+        "$value": "{primitive.v0345}"
       },
       "blue-9": {
         "$type": "color",
-        "$value": "{primitive.v0178}"
+        "$value": "{primitive.v0346}"
       },
       "ember-1": {
         "$type": "color",
@@ -160,7 +160,7 @@
       },
       "grass-10": {
         "$type": "color",
-        "$value": "{primitive.v0239}"
+        "$value": "{primitive.v0360}"
       },
       "grass-11": {
         "$type": "color",
@@ -168,7 +168,7 @@
       },
       "grass-12": {
         "$type": "color",
-        "$value": "{primitive.v0360}"
+        "$value": "{primitive.v0235}"
       },
       "grass-2": {
         "$type": "color",
@@ -176,7 +176,7 @@
       },
       "grass-3": {
         "$type": "color",
-        "$value": "{primitive.v0240}"
+        "$value": "{primitive.v0239}"
       },
       "grass-4": {
         "$type": "color",
@@ -192,7 +192,7 @@
       },
       "grass-7": {
         "$type": "color",
-        "$value": "{primitive.v0230}"
+        "$value": "{primitive.v0229}"
       },
       "grass-8": {
         "$type": "color",
@@ -200,83 +200,83 @@
       },
       "grass-9": {
         "$type": "color",
-        "$value": "{primitive.v0238}"
+        "$value": "{primitive.v0365}"
       },
       "indigo-1": {
         "$type": "color",
-        "$value": "{primitive.v0365}"
+        "$value": "{primitive.v0366}"
       },
       "indigo-10": {
         "$type": "color",
-        "$value": "{primitive.v0366}"
+        "$value": "{primitive.v0367}"
       },
       "indigo-11": {
         "$type": "color",
-        "$value": "{primitive.v0367}"
+        "$value": "{primitive.v0368}"
       },
       "indigo-12": {
         "$type": "color",
-        "$value": "{primitive.v0368}"
+        "$value": "{primitive.v0369}"
       },
       "indigo-2": {
         "$type": "color",
-        "$value": "{primitive.v0369}"
+        "$value": "{primitive.v0370}"
       },
       "indigo-3": {
         "$type": "color",
-        "$value": "{primitive.v0370}"
+        "$value": "{primitive.v0371}"
       },
       "indigo-4": {
         "$type": "color",
-        "$value": "{primitive.v0371}"
+        "$value": "{primitive.v0372}"
       },
       "indigo-5": {
         "$type": "color",
-        "$value": "{primitive.v0372}"
+        "$value": "{primitive.v0373}"
       },
       "indigo-6": {
         "$type": "color",
-        "$value": "{primitive.v0373}"
+        "$value": "{primitive.v0374}"
       },
       "indigo-7": {
         "$type": "color",
-        "$value": "{primitive.v0374}"
+        "$value": "{primitive.v0375}"
       },
       "indigo-8": {
         "$type": "color",
-        "$value": "{primitive.v0375}"
+        "$value": "{primitive.v0376}"
       },
       "indigo-9": {
         "$type": "color",
-        "$value": "{primitive.v0376}"
+        "$value": "{primitive.v0377}"
       },
       "lime-1": {
         "$type": "color",
-        "$value": "{primitive.v0377}"
+        "$value": "{primitive.v0378}"
       },
       "lime-10": {
         "$type": "color",
-        "$value": "{primitive.v0378}"
+        "$value": "{primitive.v0379}"
       },
       "lime-11": {
         "$type": "color",
-        "$value": "{primitive.v0379}"
+        "$value": "{primitive.v0380}"
       },
       "lime-12": {
         "$type": "color",
-        "$value": "{primitive.v0380}"
+        "$value": "{primitive.v0381}"
       },
       "lime-2": {
         "$type": "color",
-        "$value": "{primitive.v0381}"
+        "$value": "{primitive.v0382}"
       },
       "lime-3": {
         "$type": "color",
-        "$value": "{primitive.v0382}"
+        "$value": "{primitive.v0383}"
       },
       "lime-4": {
         "$type": "color",
-        "$value": "{primitive.v0383}"
+        "$value": "{primitive.v0384}"
       },
       "lime-5": {
         "$type": "color",
@@ -284,75 +284,75 @@
       },
       "lime-6": {
         "$type": "color",
-        "$value": "{primitive.v0384}"
+        "$value": "{primitive.v0385}"
       },
       "lime-7": {
         "$type": "color",
-        "$value": "{primitive.v0385}"
+        "$value": "{primitive.v0386}"
       },
       "lime-8": {
         "$type": "color",
-        "$value": "{primitive.v0386}"
+        "$value": "{primitive.v0387}"
       },
       "lime-9": {
         "$type": "color",
-        "$value": "{primitive.v0387}"
+        "$value": "{primitive.v0388}"
       },
       "mauve-1": {
         "$type": "color",
-        "$value": "{primitive.v0388}"
+        "$value": "{primitive.v0389}"
       },
       "mauve-10": {
         "$type": "color",
-        "$value": "{primitive.v0389}"
+        "$value": "{primitive.v0390}"
       },
       "mauve-11": {
         "$type": "color",
-        "$value": "{primitive.v0390}"
+        "$value": "{primitive.v0391}"
       },
       "mauve-12": {
         "$type": "color",
-        "$value": "{primitive.v0391}"
+        "$value": "{primitive.v0392}"
       },
       "mauve-2": {
         "$type": "color",
-        "$value": "{primitive.v0392}"
+        "$value": "{primitive.v0393}"
       },
       "mauve-3": {
         "$type": "color",
-        "$value": "{primitive.v0393}"
+        "$value": "{primitive.v0394}"
       },
       "mauve-4": {
         "$type": "color",
-        "$value": "{primitive.v0394}"
+        "$value": "{primitive.v0395}"
       },
       "mauve-5": {
         "$type": "color",
-        "$value": "{primitive.v0395}"
+        "$value": "{primitive.v0396}"
       },
       "mauve-6": {
         "$type": "color",
-        "$value": "{primitive.v0396}"
+        "$value": "{primitive.v0397}"
       },
       "mauve-7": {
         "$type": "color",
-        "$value": "{primitive.v0397}"
+        "$value": "{primitive.v0398}"
       },
       "mauve-8": {
         "$type": "color",
-        "$value": "{primitive.v0398}"
+        "$value": "{primitive.v0399}"
       },
       "mauve-9": {
         "$type": "color",
-        "$value": "{primitive.v0399}"
+        "$value": "{primitive.v0400}"
       },
       "orange-1": {
         "$type": "color",
-        "$value": "{primitive.v0400}"
+        "$value": "{primitive.v0401}"
       },
       "orange-10": {
         "$type": "color",
-        "$value": "{primitive.v0401}"
+        "$value": "{primitive.v0402}"
       },
       "orange-11": {
         "$type": "color",
@@ -360,23 +360,23 @@
       },
       "orange-12": {
         "$type": "color",
-        "$value": "{primitive.v0402}"
+        "$value": "{primitive.v0403}"
       },
       "orange-2": {
         "$type": "color",
-        "$value": "{primitive.v0403}"
+        "$value": "{primitive.v0404}"
       },
       "orange-3": {
         "$type": "color",
-        "$value": "{primitive.v0404}"
+        "$value": "{primitive.v0405}"
       },
       "orange-4": {
         "$type": "color",
-        "$value": "{primitive.v0405}"
+        "$value": "{primitive.v0406}"
       },
       "orange-5": {
         "$type": "color",
-        "$value": "{primitive.v0406}"
+        "$value": "{primitive.v0407}"
       },
       "orange-6": {
         "$type": "color",
@@ -384,35 +384,35 @@
       },
       "orange-7": {
         "$type": "color",
-        "$value": "{primitive.v0407}"
+        "$value": "{primitive.v0408}"
       },
       "orange-8": {
         "$type": "color",
-        "$value": "{primitive.v0408}"
+        "$value": "{primitive.v0409}"
       },
       "orange-9": {
         "$type": "color",
-        "$value": "{primitive.v0409}"
+        "$value": "{primitive.v0410}"
       },
       "paper-1": {
         "$type": "color",
-        "$value": "{primitive.v0410}"
+        "$value": "{primitive.v0411}"
       },
       "paper-2": {
         "$type": "color",
-        "$value": "{primitive.v0222}"
+        "$value": "{primitive.v0221}"
       },
       "paper-3": {
         "$type": "color",
-        "$value": "{primitive.v0226}"
+        "$value": "{primitive.v0225}"
       },
       "red-1": {
         "$type": "color",
-        "$value": "{primitive.v0411}"
+        "$value": "{primitive.v0412}"
       },
       "red-10": {
         "$type": "color",
-        "$value": "{primitive.v0108}"
+        "$value": "{primitive.v0413}"
       },
       "red-11": {
         "$type": "color",
@@ -420,35 +420,35 @@
       },
       "red-12": {
         "$type": "color",
-        "$value": "{primitive.v0110}"
+        "$value": "{primitive.v0109}"
       },
       "red-2": {
         "$type": "color",
-        "$value": "{primitive.v0412}"
+        "$value": "{primitive.v0414}"
       },
       "red-3": {
         "$type": "color",
-        "$value": "{primitive.v0109}"
+        "$value": "{primitive.v0108}"
       },
       "red-8": {
         "$type": "color",
-        "$value": "{primitive.v0415}"
+        "$value": "{primitive.v0417}"
       },
       "red-9": {
         "$type": "color",
-        "$value": "{primitive.v0107}"
+        "$value": "{primitive.v0418}"
       },
       "sand-1": {
         "$type": "color",
-        "$value": "{primitive.v0416}"
+        "$value": "{primitive.v0419}"
       },
       "sand-10": {
         "$type": "color",
-        "$value": "{primitive.v0417}"
+        "$value": "{primitive.v0420}"
       },
       "sand-11": {
         "$type": "color",
-        "$value": "{primitive.v0418}"
+        "$value": "{primitive.v0421}"
       },
       "sand-12": {
         "$type": "color",
@@ -456,43 +456,43 @@
       },
       "sand-2": {
         "$type": "color",
-        "$value": "{primitive.v0419}"
+        "$value": "{primitive.v0422}"
       },
       "sand-3": {
         "$type": "color",
-        "$value": "{primitive.v0420}"
+        "$value": "{primitive.v0423}"
       },
       "sand-4": {
         "$type": "color",
-        "$value": "{primitive.v0421}"
+        "$value": "{primitive.v0424}"
       },
       "sand-5": {
         "$type": "color",
-        "$value": "{primitive.v0422}"
+        "$value": "{primitive.v0425}"
       },
       "sand-6": {
         "$type": "color",
-        "$value": "{primitive.v0423}"
+        "$value": "{primitive.v0426}"
       },
       "sand-7": {
         "$type": "color",
-        "$value": "{primitive.v0229}"
+        "$value": "{primitive.v0228}"
       },
       "sand-8": {
         "$type": "color",
-        "$value": "{primitive.v0424}"
+        "$value": "{primitive.v0427}"
       },
       "sand-9": {
         "$type": "color",
-        "$value": "{primitive.v0425}"
+        "$value": "{primitive.v0428}"
       },
       "slate-10": {
         "$type": "color",
-        "$value": "{primitive.v0427}"
+        "$value": "{primitive.v0430}"
       },
       "slate-11": {
         "$type": "color",
-        "$value": "{primitive.v0428}"
+        "$value": "{primitive.v0431}"
       },
       "slate-12": {
         "$type": "color",
@@ -500,11 +500,11 @@
       },
       "slate-8": {
         "$type": "color",
-        "$value": "{primitive.v0435}"
+        "$value": "{primitive.v0438}"
       },
       "slate-9": {
         "$type": "color",
-        "$value": "{primitive.v0436}"
+        "$value": "{primitive.v0439}"
       },
       "swiss-red-9": {
         "$type": "color",
@@ -512,7 +512,7 @@
       },
       "teal-10": {
         "$type": "color",
-        "$value": "{primitive.v0438}"
+        "$value": "{primitive.v0441}"
       },
       "teal-11": {
         "$type": "color",
@@ -520,43 +520,43 @@
       },
       "teal-12": {
         "$type": "color",
-        "$value": "{primitive.v0439}"
+        "$value": "{primitive.v0442}"
       },
       "teal-8": {
         "$type": "color",
-        "$value": "{primitive.v0446}"
+        "$value": "{primitive.v0449}"
       },
       "teal-9": {
         "$type": "color",
-        "$value": "{primitive.v0447}"
+        "$value": "{primitive.v0450}"
       },
       "tomato-1": {
         "$type": "color",
-        "$value": "{primitive.v0411}"
+        "$value": "{primitive.v0412}"
       },
       "tomato-10": {
         "$type": "color",
-        "$value": "{primitive.v0448}"
+        "$value": "{primitive.v0451}"
       },
       "tomato-11": {
         "$type": "color",
-        "$value": "{primitive.v0449}"
+        "$value": "{primitive.v0452}"
       },
       "tomato-12": {
         "$type": "color",
-        "$value": "{primitive.v0450}"
+        "$value": "{primitive.v0453}"
       },
       "tomato-2": {
         "$type": "color",
-        "$value": "{primitive.v0451}"
+        "$value": "{primitive.v0454}"
       },
       "tomato-3": {
         "$type": "color",
-        "$value": "{primitive.v0452}"
+        "$value": "{primitive.v0455}"
       },
       "tomato-4": {
         "$type": "color",
-        "$value": "{primitive.v0453}"
+        "$value": "{primitive.v0456}"
       },
       "tomato-5": {
         "$type": "color",
@@ -564,27 +564,27 @@
       },
       "tomato-6": {
         "$type": "color",
-        "$value": "{primitive.v0454}"
+        "$value": "{primitive.v0457}"
       },
       "tomato-7": {
         "$type": "color",
-        "$value": "{primitive.v0455}"
+        "$value": "{primitive.v0458}"
       },
       "tomato-8": {
         "$type": "color",
-        "$value": "{primitive.v0456}"
+        "$value": "{primitive.v0459}"
       },
       "tomato-9": {
         "$type": "color",
-        "$value": "{primitive.v0457}"
+        "$value": "{primitive.v0460}"
       },
       "violet-1": {
         "$type": "color",
-        "$value": "{primitive.v0458}"
+        "$value": "{primitive.v0461}"
       },
       "violet-10": {
         "$type": "color",
-        "$value": "{primitive.v0459}"
+        "$value": "{primitive.v0462}"
       },
       "violet-11": {
         "$type": "color",
@@ -596,7 +596,7 @@
       },
       "violet-2": {
         "$type": "color",
-        "$value": "{primitive.v0460}"
+        "$value": "{primitive.v0463}"
       },
       "violet-3": {
         "$type": "color",
@@ -604,7 +604,7 @@
       },
       "violet-4": {
         "$type": "color",
-        "$value": "{primitive.v0461}"
+        "$value": "{primitive.v0464}"
       },
       "violet-5": {
         "$type": "color",
@@ -620,259 +620,259 @@
       },
       "violet-8": {
         "$type": "color",
-        "$value": "{primitive.v0462}"
+        "$value": "{primitive.v0465}"
       },
       "violet-9": {
         "$type": "color",
-        "$value": "{primitive.v0463}"
+        "$value": "{primitive.v0466}"
       },
       "copper-1": {
         "$type": "color",
-        "$value": "{primitive.v0476}"
+        "$value": "{primitive.v0479}"
       },
       "copper-2": {
         "$type": "color",
-        "$value": "{primitive.v0477}"
+        "$value": "{primitive.v0480}"
       },
       "copper-3": {
         "$type": "color",
-        "$value": "{primitive.v0478}"
+        "$value": "{primitive.v0481}"
       },
       "copper-4": {
         "$type": "color",
-        "$value": "{primitive.v0479}"
+        "$value": "{primitive.v0482}"
       },
       "copper-5": {
         "$type": "color",
-        "$value": "{primitive.v0480}"
+        "$value": "{primitive.v0483}"
       },
       "copper-6": {
         "$type": "color",
-        "$value": "{primitive.v0481}"
+        "$value": "{primitive.v0484}"
       },
       "copper-7": {
         "$type": "color",
-        "$value": "{primitive.v0482}"
+        "$value": "{primitive.v0485}"
       },
       "copper-8": {
         "$type": "color",
-        "$value": "{primitive.v0483}"
+        "$value": "{primitive.v0486}"
       },
       "text-3xs": {
         "$type": "dimension",
-        "$value": "{primitive.v0515}"
+        "$value": "{primitive.v0518}"
       },
       "text-2xs": {
         "$type": "dimension",
-        "$value": "{primitive.v0516}"
+        "$value": "{primitive.v0519}"
       },
       "text-chat": {
         "$type": "dimension",
-        "$value": "{primitive.v0517}"
+        "$value": "{primitive.v0520}"
       },
       "leading-tight": {
         "$type": "number",
-        "$value": "{primitive.v0518}"
+        "$value": "{primitive.v0521}"
       },
       "leading-snug": {
         "$type": "number",
-        "$value": "{primitive.v0519}"
+        "$value": "{primitive.v0522}"
       },
       "leading-normal": {
         "$type": "number",
-        "$value": "{primitive.v0520}"
+        "$value": "{primitive.v0523}"
       },
       "leading-relaxed": {
         "$type": "number",
-        "$value": "{primitive.v0521}"
+        "$value": "{primitive.v0524}"
       },
       "tracking-tight": {
         "$type": "dimension",
-        "$value": "{primitive.v0522}"
+        "$value": "{primitive.v0525}"
       },
       "tracking-normal": {
         "$type": "dimension",
-        "$value": "{primitive.v0523}"
+        "$value": "{primitive.v0526}"
       },
       "tracking-wide": {
         "$type": "dimension",
-        "$value": "{primitive.v0524}"
+        "$value": "{primitive.v0527}"
       },
       "space-0": {
         "$type": "dimension",
-        "$value": "{primitive.v0523}"
+        "$value": "{primitive.v0526}"
       },
       "space-1": {
         "$type": "dimension",
-        "$value": "{primitive.v0525}"
+        "$value": "{primitive.v0528}"
       },
       "space-2": {
         "$type": "dimension",
-        "$value": "{primitive.v0526}"
+        "$value": "{primitive.v0529}"
       },
       "space-3": {
         "$type": "dimension",
-        "$value": "{primitive.v0507}"
+        "$value": "{primitive.v0510}"
       },
       "space-4": {
         "$type": "dimension",
-        "$value": "{primitive.v0509}"
+        "$value": "{primitive.v0512}"
       },
       "space-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0511}"
+        "$value": "{primitive.v0514}"
       },
       "space-6": {
         "$type": "dimension",
-        "$value": "{primitive.v0512}"
+        "$value": "{primitive.v0515}"
       },
       "space-7": {
         "$type": "dimension",
-        "$value": "{primitive.v0527}"
+        "$value": "{primitive.v0530}"
       },
       "space-8": {
         "$type": "dimension",
-        "$value": "{primitive.v0528}"
+        "$value": "{primitive.v0531}"
       },
       "space-9": {
         "$type": "dimension",
-        "$value": "{primitive.v0514}"
+        "$value": "{primitive.v0517}"
       },
       "space-10": {
         "$type": "dimension",
-        "$value": "{primitive.v0529}"
+        "$value": "{primitive.v0532}"
       },
       "space-11": {
         "$type": "dimension",
-        "$value": "{primitive.v0530}"
+        "$value": "{primitive.v0533}"
       },
       "space-12": {
         "$type": "dimension",
-        "$value": "{primitive.v0531}"
+        "$value": "{primitive.v0534}"
       },
       "space-14": {
         "$type": "dimension",
-        "$value": "{primitive.v0532}"
+        "$value": "{primitive.v0535}"
       },
       "space-16": {
         "$type": "dimension",
-        "$value": "{primitive.v0533}"
+        "$value": "{primitive.v0536}"
       },
       "space-20": {
         "$type": "dimension",
-        "$value": "{primitive.v0534}"
+        "$value": "{primitive.v0537}"
       },
       "space-24": {
         "$type": "dimension",
-        "$value": "{primitive.v0535}"
+        "$value": "{primitive.v0538}"
       },
       "space-px": {
         "$type": "dimension",
-        "$value": "{primitive.v0536}"
+        "$value": "{primitive.v0539}"
       },
       "space-0-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0537}"
+        "$value": "{primitive.v0540}"
       },
       "space-1-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0538}"
+        "$value": "{primitive.v0541}"
       },
       "space-2-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0515}"
+        "$value": "{primitive.v0518}"
       },
       "space-3-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0508}"
+        "$value": "{primitive.v0511}"
       },
       "avatar-sm": {
         "$type": "dimension",
-        "$value": "{primitive.v0512}"
+        "$value": "{primitive.v0515}"
       },
       "avatar-md": {
         "$type": "dimension",
-        "$value": "{primitive.v0528}"
+        "$value": "{primitive.v0531}"
       },
       "avatar-lg": {
         "$type": "dimension",
-        "$value": "{primitive.v0529}"
+        "$value": "{primitive.v0532}"
       },
       "control-h": {
         "$type": "dimension",
-        "$value": "{primitive.v0514}"
+        "$value": "{primitive.v0517}"
       },
       "control-h-sm": {
         "$type": "dimension",
-        "$value": "{primitive.v0528}"
+        "$value": "{primitive.v0531}"
       },
       "app-nav": {
         "$type": "dimension",
-        "$value": "{primitive.v0539}"
+        "$value": "{primitive.v0542}"
       },
       "app-rail": {
         "$type": "dimension",
-        "$value": "{primitive.v0540}"
+        "$value": "{primitive.v0543}"
       },
       "topbar-h": {
         "$type": "dimension",
-        "$value": "{primitive.v0532}"
+        "$value": "{primitive.v0535}"
       },
       "shell-content": {
         "$type": "dimension",
-        "$value": "{primitive.v0541}"
+        "$value": "{primitive.v0544}"
       },
       "label-size": {
         "$type": "dimension",
-        "$value": "{primitive.v0516}"
+        "$value": "{primitive.v0519}"
       },
       "label-tracking": {
         "$type": "dimension",
-        "$value": "{primitive.v0542}"
+        "$value": "{primitive.v0545}"
       },
       "radius-full": {
         "$type": "dimension",
-        "$value": "{primitive.v0548}"
+        "$value": "{primitive.v0551}"
       },
       "ease-fast": {
         "$type": "transition",
-        "$value": "{primitive.v0554}"
+        "$value": "{primitive.v0557}"
       },
       "ease-normal": {
         "$type": "transition",
-        "$value": "{primitive.v0555}"
+        "$value": "{primitive.v0558}"
       },
       "ease-slow": {
         "$type": "transition",
-        "$value": "{primitive.v0556}"
+        "$value": "{primitive.v0559}"
       },
       "ease-spring": {
         "$type": "transition",
-        "$value": "{primitive.v0557}"
+        "$value": "{primitive.v0560}"
       },
       "z-base": {
         "$type": "number",
-        "$value": "{primitive.v0558}"
+        "$value": "{primitive.v0561}"
       },
       "z-dropdown": {
         "$type": "number",
-        "$value": "{primitive.v0559}"
+        "$value": "{primitive.v0562}"
       },
       "z-sticky": {
         "$type": "number",
-        "$value": "{primitive.v0560}"
+        "$value": "{primitive.v0563}"
       },
       "z-overlay": {
         "$type": "number",
-        "$value": "{primitive.v0561}"
+        "$value": "{primitive.v0564}"
       },
       "z-modal": {
         "$type": "number",
-        "$value": "{primitive.v0562}"
+        "$value": "{primitive.v0565}"
       },
       "z-toast": {
         "$type": "number",
-        "$value": "{primitive.v0563}"
+        "$value": "{primitive.v0566}"
       },
       "liquid-success-tint": {
         "$type": "color",
@@ -891,7 +891,7 @@
       },
       "liquid-tag-pink": {
         "$type": "color",
-        "$value": "{primitive.v0581}",
+        "$value": "{primitive.v0587}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-avatar-fg": {
@@ -901,12 +901,12 @@
       },
       "liquid-on-accent-rim": {
         "$type": "color",
-        "$value": "{primitive.v0582}",
+        "$value": "{primitive.v0588}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-on-accent-rim-strong": {
         "$type": "color",
-        "$value": "{primitive.v0192}",
+        "$value": "{primitive.v0191}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-avatar-ring": {
@@ -916,12 +916,12 @@
       },
       "liquid-hairline-subtle": {
         "$type": "color",
-        "$value": "{primitive.v0154}",
+        "$value": "{primitive.v0153}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-hairline-strong": {
         "$type": "color",
-        "$value": "{primitive.v0583}",
+        "$value": "{primitive.v0589}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "cupertino-radius-container": {
@@ -931,7 +931,7 @@
       },
       "cupertino-radius-sheet": {
         "$type": "dimension",
-        "$value": "{primitive.v0289}",
+        "$value": "{primitive.v0288}",
         "$description": "Node value from docs/design-system/themes/cupertino/DESIGN.md and the matching Figma node map."
       },
       "liquid-radius-window": {
@@ -946,7 +946,7 @@
       },
       "liquid-radius-field": {
         "$type": "dimension",
-        "$value": "{primitive.v0584}",
+        "$value": "{primitive.v0590}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-radius-row": {
@@ -991,12 +991,12 @@
       },
       "bloom-radius-small": {
         "$type": "dimension",
-        "$value": "{primitive.v0298}",
+        "$value": "{primitive.v0297}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "tonal-radius-full": {
         "$type": "dimension",
-        "$value": "{primitive.v0585}",
+        "$value": "{primitive.v0591}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
       "tonal-radius-extra-large": {
@@ -1026,17 +1026,17 @@
       },
       "tonal-radius-tiny": {
         "$type": "dimension",
-        "$value": "{primitive.v0586}",
+        "$value": "{primitive.v0592}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
       "tonal-radius-minimum": {
         "$type": "dimension",
-        "$value": "{primitive.v0587}",
+        "$value": "{primitive.v0593}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-2": {
         "$type": "dimension",
-        "$value": "{primitive.v0298}",
+        "$value": "{primitive.v0297}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-14": {
@@ -1046,12 +1046,12 @@
       },
       "bloom-radius-15": {
         "$type": "dimension",
-        "$value": "{primitive.v0328}",
+        "$value": "{primitive.v0326}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-18": {
         "$type": "dimension",
-        "$value": "{primitive.v0315}",
+        "$value": "{primitive.v0313}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-20": {
@@ -1061,7 +1061,7 @@
       },
       "bloom-radius-21": {
         "$type": "dimension",
-        "$value": "{primitive.v0588}",
+        "$value": "{primitive.v0594}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-22": {
@@ -1076,7 +1076,7 @@
       },
       "bloom-radius-26": {
         "$type": "dimension",
-        "$value": "{primitive.v0289}",
+        "$value": "{primitive.v0288}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-28": {
@@ -1096,7 +1096,7 @@
       },
       "bloom-radius-40": {
         "$type": "dimension",
-        "$value": "{primitive.v0291}",
+        "$value": "{primitive.v0290}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-12": {
@@ -1106,7 +1106,7 @@
       },
       "bloom-text-13": {
         "$type": "dimension",
-        "$value": "{primitive.v0290}",
+        "$value": "{primitive.v0289}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-14": {
@@ -1116,7 +1116,7 @@
       },
       "bloom-text-15": {
         "$type": "dimension",
-        "$value": "{primitive.v0328}",
+        "$value": "{primitive.v0326}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-16": {
@@ -1126,12 +1126,12 @@
       },
       "bloom-text-17": {
         "$type": "dimension",
-        "$value": "{primitive.v0589}",
+        "$value": "{primitive.v0595}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-18": {
         "$type": "dimension",
-        "$value": "{primitive.v0315}",
+        "$value": "{primitive.v0313}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-22": {
@@ -1161,22 +1161,22 @@
       },
       "bloom-text-40": {
         "$type": "dimension",
-        "$value": "{primitive.v0291}",
+        "$value": "{primitive.v0290}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-48": {
         "$type": "dimension",
-        "$value": "{primitive.v0332}",
+        "$value": "{primitive.v0330}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-60": {
         "$type": "dimension",
-        "$value": "{primitive.v0590}",
+        "$value": "{primitive.v0596}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-92": {
         "$type": "dimension",
-        "$value": "{primitive.v0591}",
+        "$value": "{primitive.v0597}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "cupertino-switch-thumb": {
@@ -1217,73 +1217,73 @@
       },
       "motion-duration-fast": {
         "$type": "duration",
-        "$value": "{primitive.v0592}"
+        "$value": "{primitive.v0598}"
       },
       "motion-easing-fast": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0593}"
+        "$value": "{primitive.v0599}"
       },
       "motion-duration-normal": {
         "$type": "duration",
-        "$value": "{primitive.v0594}"
+        "$value": "{primitive.v0600}"
       },
       "motion-easing-normal": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0593}"
+        "$value": "{primitive.v0599}"
       },
       "motion-duration-slow": {
         "$type": "duration",
-        "$value": "{primitive.v0595}"
+        "$value": "{primitive.v0601}"
       },
       "motion-easing-slow": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0593}"
+        "$value": "{primitive.v0599}"
       },
       "motion-duration-spring": {
         "$type": "duration",
-        "$value": "{primitive.v0596}"
+        "$value": "{primitive.v0602}"
       },
       "motion-easing-spring": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0597}"
+        "$value": "{primitive.v0603}"
       },
       "font-tabular": {
         "$type": "number",
-        "$value": "{primitive.v0598}"
+        "$value": "{primitive.v0604}"
       }
     },
     "dark": {
       "amber-1": {
         "$type": "color",
-        "$value": "{primitive.v0803}"
+        "$value": "{primitive.v0813}"
       },
       "amber-10": {
         "$type": "color",
-        "$value": "{primitive.v0801}"
+        "$value": "{primitive.v0811}"
       },
       "amber-11": {
         "$type": "color",
-        "$value": "{primitive.v0308}"
+        "$value": "{primitive.v0307}"
       },
       "amber-12": {
         "$type": "color",
-        "$value": "{primitive.v0804}"
+        "$value": "{primitive.v0814}"
       },
       "amber-2": {
         "$type": "color",
-        "$value": "{primitive.v0805}"
+        "$value": "{primitive.v0815}"
       },
       "amber-3": {
         "$type": "color",
-        "$value": "{primitive.v0802}"
+        "$value": "{primitive.v0812}"
       },
       "amber-7": {
         "$type": "color",
-        "$value": "{primitive.v0807}"
+        "$value": "{primitive.v0817}"
       },
       "amber-8": {
         "$type": "color",
-        "$value": "{primitive.v0808}"
+        "$value": "{primitive.v0818}"
       },
       "amber-9": {
         "$type": "color",
@@ -1291,79 +1291,79 @@
       },
       "band-1": {
         "$type": "color",
-        "$value": "{primitive.v0223}"
+        "$value": "{primitive.v0222}"
       },
       "band-2": {
         "$type": "color",
-        "$value": "{primitive.v0340}"
+        "$value": "{primitive.v0338}"
       },
       "band-3": {
         "$type": "color",
-        "$value": "{primitive.v0341}"
+        "$value": "{primitive.v0339}"
       },
       "band-4": {
         "$type": "color",
-        "$value": "{primitive.v0342}"
+        "$value": "{primitive.v0340}"
       },
       "band-5": {
         "$type": "color",
-        "$value": "{primitive.v0225}"
+        "$value": "{primitive.v0224}"
       },
       "blue-1": {
         "$type": "color",
-        "$value": "{primitive.v0809}"
+        "$value": "{primitive.v0819}"
       },
       "blue-10": {
         "$type": "color",
-        "$value": "{primitive.v0722}"
+        "$value": "{primitive.v0730}"
       },
       "blue-11": {
         "$type": "color",
-        "$value": "{primitive.v0304}"
+        "$value": "{primitive.v0303}"
       },
       "blue-12": {
         "$type": "color",
-        "$value": "{primitive.v0810}"
+        "$value": "{primitive.v0820}"
       },
       "blue-2": {
         "$type": "color",
-        "$value": "{primitive.v0811}"
+        "$value": "{primitive.v0821}"
       },
       "blue-3": {
         "$type": "color",
-        "$value": "{primitive.v0723}"
+        "$value": "{primitive.v0731}"
       },
       "blue-4": {
         "$type": "color",
-        "$value": "{primitive.v0812}"
+        "$value": "{primitive.v0822}"
       },
       "blue-5": {
         "$type": "color",
-        "$value": "{primitive.v0303}"
+        "$value": "{primitive.v0302}"
       },
       "blue-6": {
         "$type": "color",
-        "$value": "{primitive.v0721}"
+        "$value": "{primitive.v0729}"
       },
       "blue-7": {
         "$type": "color",
-        "$value": "{primitive.v0813}"
+        "$value": "{primitive.v0823}"
       },
       "blue-8": {
         "$type": "color",
-        "$value": "{primitive.v0602}"
+        "$value": "{primitive.v0608}"
       },
       "blue-9": {
         "$type": "color",
-        "$value": "{primitive.v0178}"
+        "$value": "{primitive.v0346}"
       },
       "ember-1": {
         "$type": "color",
-        "$value": "{primitive.v0814}"
+        "$value": "{primitive.v0824}"
       },
       "ember-10": {
         "$type": "color",
-        "$value": "{primitive.v0815}"
+        "$value": "{primitive.v0825}"
       },
       "ember-11": {
         "$type": "color",
@@ -1371,35 +1371,35 @@
       },
       "ember-12": {
         "$type": "color",
-        "$value": "{primitive.v0816}"
+        "$value": "{primitive.v0826}"
       },
       "ember-2": {
         "$type": "color",
-        "$value": "{primitive.v0817}"
+        "$value": "{primitive.v0827}"
       },
       "ember-3": {
         "$type": "color",
-        "$value": "{primitive.v0818}"
+        "$value": "{primitive.v0828}"
       },
       "ember-4": {
         "$type": "color",
-        "$value": "{primitive.v0819}"
+        "$value": "{primitive.v0829}"
       },
       "ember-5": {
         "$type": "color",
-        "$value": "{primitive.v0820}"
+        "$value": "{primitive.v0830}"
       },
       "ember-6": {
         "$type": "color",
-        "$value": "{primitive.v0821}"
+        "$value": "{primitive.v0831}"
       },
       "ember-7": {
         "$type": "color",
-        "$value": "{primitive.v0822}"
+        "$value": "{primitive.v0832}"
       },
       "ember-8": {
         "$type": "color",
-        "$value": "{primitive.v0823}"
+        "$value": "{primitive.v0833}"
       },
       "ember-9": {
         "$type": "color",
@@ -1407,723 +1407,723 @@
       },
       "grass-1": {
         "$type": "color",
-        "$value": "{primitive.v0824}"
+        "$value": "{primitive.v0834}"
       },
       "grass-10": {
         "$type": "color",
-        "$value": "{primitive.v0765}"
+        "$value": "{primitive.v0775}"
       },
       "grass-11": {
         "$type": "color",
-        "$value": "{primitive.v0306}"
+        "$value": "{primitive.v0305}"
       },
       "grass-12": {
         "$type": "color",
-        "$value": "{primitive.v0825}"
+        "$value": "{primitive.v0835}"
       },
       "grass-2": {
         "$type": "color",
-        "$value": "{primitive.v0826}"
+        "$value": "{primitive.v0836}"
       },
       "grass-3": {
         "$type": "color",
-        "$value": "{primitive.v0766}"
+        "$value": "{primitive.v0776}"
       },
       "grass-4": {
         "$type": "color",
-        "$value": "{primitive.v0827}"
+        "$value": "{primitive.v0837}"
       },
       "grass-5": {
         "$type": "color",
-        "$value": "{primitive.v0305}"
+        "$value": "{primitive.v0304}"
       },
       "grass-6": {
         "$type": "color",
-        "$value": "{primitive.v0764}"
+        "$value": "{primitive.v0774}"
       },
       "grass-7": {
         "$type": "color",
-        "$value": "{primitive.v0828}"
+        "$value": "{primitive.v0838}"
       },
       "grass-8": {
         "$type": "color",
-        "$value": "{primitive.v0829}"
+        "$value": "{primitive.v0839}"
       },
       "grass-9": {
         "$type": "color",
-        "$value": "{primitive.v0238}"
+        "$value": "{primitive.v0365}"
       },
       "indigo-1": {
         "$type": "color",
-        "$value": "{primitive.v0830}"
+        "$value": "{primitive.v0840}"
       },
       "indigo-10": {
         "$type": "color",
-        "$value": "{primitive.v0831}"
+        "$value": "{primitive.v0841}"
       },
       "indigo-11": {
         "$type": "color",
-        "$value": "{primitive.v0832}"
+        "$value": "{primitive.v0842}"
       },
       "indigo-12": {
         "$type": "color",
-        "$value": "{primitive.v0833}"
+        "$value": "{primitive.v0843}"
       },
       "indigo-2": {
         "$type": "color",
-        "$value": "{primitive.v0834}"
+        "$value": "{primitive.v0844}"
       },
       "indigo-3": {
         "$type": "color",
-        "$value": "{primitive.v0835}"
+        "$value": "{primitive.v0845}"
       },
       "indigo-4": {
         "$type": "color",
-        "$value": "{primitive.v0836}"
+        "$value": "{primitive.v0846}"
       },
       "indigo-5": {
         "$type": "color",
-        "$value": "{primitive.v0837}"
+        "$value": "{primitive.v0847}"
       },
       "indigo-6": {
         "$type": "color",
-        "$value": "{primitive.v0838}"
+        "$value": "{primitive.v0848}"
       },
       "indigo-7": {
         "$type": "color",
-        "$value": "{primitive.v0839}"
+        "$value": "{primitive.v0849}"
       },
       "indigo-8": {
         "$type": "color",
-        "$value": "{primitive.v0605}"
+        "$value": "{primitive.v0611}"
       },
       "indigo-9": {
         "$type": "color",
-        "$value": "{primitive.v0376}"
+        "$value": "{primitive.v0377}"
       },
       "lime-1": {
         "$type": "color",
-        "$value": "{primitive.v0840}"
+        "$value": "{primitive.v0850}"
       },
       "lime-10": {
         "$type": "color",
-        "$value": "{primitive.v0841}"
+        "$value": "{primitive.v0851}"
       },
       "lime-11": {
         "$type": "color",
-        "$value": "{primitive.v0842}"
+        "$value": "{primitive.v0852}"
       },
       "lime-12": {
         "$type": "color",
-        "$value": "{primitive.v0843}"
+        "$value": "{primitive.v0853}"
       },
       "lime-2": {
         "$type": "color",
-        "$value": "{primitive.v0844}"
+        "$value": "{primitive.v0854}"
       },
       "lime-3": {
         "$type": "color",
-        "$value": "{primitive.v0845}"
+        "$value": "{primitive.v0855}"
       },
       "lime-4": {
         "$type": "color",
-        "$value": "{primitive.v0846}"
+        "$value": "{primitive.v0856}"
       },
       "lime-5": {
         "$type": "color",
-        "$value": "{primitive.v0847}"
+        "$value": "{primitive.v0857}"
       },
       "lime-6": {
         "$type": "color",
-        "$value": "{primitive.v0848}"
+        "$value": "{primitive.v0858}"
       },
       "lime-7": {
         "$type": "color",
-        "$value": "{primitive.v0849}"
+        "$value": "{primitive.v0859}"
       },
       "lime-8": {
         "$type": "color",
-        "$value": "{primitive.v0850}"
+        "$value": "{primitive.v0860}"
       },
       "lime-9": {
         "$type": "color",
-        "$value": "{primitive.v0387}"
+        "$value": "{primitive.v0388}"
       },
       "mauve-1": {
         "$type": "color",
-        "$value": "{primitive.v0851}"
+        "$value": "{primitive.v0861}"
       },
       "mauve-10": {
         "$type": "color",
-        "$value": "{primitive.v0852}"
+        "$value": "{primitive.v0862}"
       },
       "mauve-11": {
         "$type": "color",
-        "$value": "{primitive.v0853}"
+        "$value": "{primitive.v0863}"
       },
       "mauve-12": {
         "$type": "color",
-        "$value": "{primitive.v0854}"
+        "$value": "{primitive.v0864}"
       },
       "mauve-2": {
         "$type": "color",
-        "$value": "{primitive.v0855}"
+        "$value": "{primitive.v0865}"
       },
       "mauve-3": {
         "$type": "color",
-        "$value": "{primitive.v0856}"
+        "$value": "{primitive.v0866}"
       },
       "mauve-4": {
         "$type": "color",
-        "$value": "{primitive.v0857}"
+        "$value": "{primitive.v0867}"
       },
       "mauve-5": {
         "$type": "color",
-        "$value": "{primitive.v0858}"
+        "$value": "{primitive.v0868}"
       },
       "mauve-6": {
         "$type": "color",
-        "$value": "{primitive.v0859}"
+        "$value": "{primitive.v0869}"
       },
       "mauve-7": {
         "$type": "color",
-        "$value": "{primitive.v0860}"
+        "$value": "{primitive.v0870}"
       },
       "mauve-8": {
         "$type": "color",
-        "$value": "{primitive.v0861}"
+        "$value": "{primitive.v0871}"
       },
       "mauve-9": {
         "$type": "color",
-        "$value": "{primitive.v0862}"
+        "$value": "{primitive.v0872}"
       },
       "orange-1": {
         "$type": "color",
-        "$value": "{primitive.v0863}"
+        "$value": "{primitive.v0873}"
       },
       "orange-10": {
         "$type": "color",
-        "$value": "{primitive.v0864}"
+        "$value": "{primitive.v0874}"
       },
       "orange-11": {
         "$type": "color",
-        "$value": "{primitive.v0645}"
+        "$value": "{primitive.v0652}"
       },
       "orange-12": {
         "$type": "color",
-        "$value": "{primitive.v0865}"
+        "$value": "{primitive.v0875}"
       },
       "orange-2": {
         "$type": "color",
-        "$value": "{primitive.v0866}"
+        "$value": "{primitive.v0876}"
       },
       "orange-3": {
         "$type": "color",
-        "$value": "{primitive.v0867}"
+        "$value": "{primitive.v0877}"
       },
       "orange-4": {
         "$type": "color",
-        "$value": "{primitive.v0868}"
+        "$value": "{primitive.v0878}"
       },
       "orange-5": {
         "$type": "color",
-        "$value": "{primitive.v0869}"
+        "$value": "{primitive.v0879}"
       },
       "orange-6": {
         "$type": "color",
-        "$value": "{primitive.v0870}"
+        "$value": "{primitive.v0880}"
       },
       "orange-7": {
         "$type": "color",
-        "$value": "{primitive.v0604}"
+        "$value": "{primitive.v0610}"
       },
       "orange-8": {
         "$type": "color",
-        "$value": "{primitive.v0871}"
+        "$value": "{primitive.v0881}"
       },
       "orange-9": {
         "$type": "color",
-        "$value": "{primitive.v0409}"
+        "$value": "{primitive.v0410}"
       },
       "paper-1": {
         "$type": "color",
-        "$value": "{primitive.v0760}"
+        "$value": "{primitive.v0770}"
       },
       "paper-2": {
         "$type": "color",
-        "$value": "{primitive.v0872}"
+        "$value": "{primitive.v0882}"
       },
       "paper-3": {
         "$type": "color",
-        "$value": "{primitive.v0873}"
+        "$value": "{primitive.v0883}"
       },
       "red-1": {
         "$type": "color",
-        "$value": "{primitive.v0874}"
+        "$value": "{primitive.v0884}"
       },
       "red-10": {
         "$type": "color",
-        "$value": "{primitive.v0665}"
+        "$value": "{primitive.v0672}"
       },
       "red-11": {
         "$type": "color",
-        "$value": "{primitive.v0302}"
+        "$value": "{primitive.v0301}"
       },
       "red-12": {
         "$type": "color",
-        "$value": "{primitive.v0875}"
+        "$value": "{primitive.v0885}"
       },
       "red-2": {
         "$type": "color",
-        "$value": "{primitive.v0876}"
+        "$value": "{primitive.v0886}"
       },
       "red-3": {
         "$type": "color",
-        "$value": "{primitive.v0666}"
+        "$value": "{primitive.v0673}"
       },
       "red-8": {
         "$type": "color",
-        "$value": "{primitive.v0879}"
+        "$value": "{primitive.v0889}"
       },
       "red-9": {
         "$type": "color",
-        "$value": "{primitive.v0107}"
+        "$value": "{primitive.v0418}"
       },
       "sand-1": {
         "$type": "color",
-        "$value": "{primitive.v0800}"
+        "$value": "{primitive.v0810}"
       },
       "sand-10": {
         "$type": "color",
-        "$value": "{primitive.v0880}"
+        "$value": "{primitive.v0890}"
       },
       "sand-11": {
         "$type": "color",
-        "$value": "{primitive.v0881}"
+        "$value": "{primitive.v0891}"
       },
       "sand-12": {
         "$type": "color",
-        "$value": "{primitive.v0882}"
+        "$value": "{primitive.v0892}"
       },
       "sand-2": {
         "$type": "color",
-        "$value": "{primitive.v0883}"
+        "$value": "{primitive.v0893}"
       },
       "sand-3": {
         "$type": "color",
-        "$value": "{primitive.v0884}"
+        "$value": "{primitive.v0894}"
       },
       "sand-4": {
         "$type": "color",
-        "$value": "{primitive.v0885}"
+        "$value": "{primitive.v0895}"
       },
       "sand-5": {
         "$type": "color",
-        "$value": "{primitive.v0886}"
+        "$value": "{primitive.v0896}"
       },
       "sand-6": {
         "$type": "color",
-        "$value": "{primitive.v0887}"
+        "$value": "{primitive.v0897}"
       },
       "sand-7": {
         "$type": "color",
-        "$value": "{primitive.v0888}"
+        "$value": "{primitive.v0898}"
       },
       "sand-8": {
         "$type": "color",
-        "$value": "{primitive.v0889}"
+        "$value": "{primitive.v0899}"
       },
       "sand-9": {
         "$type": "color",
-        "$value": "{primitive.v0890}"
+        "$value": "{primitive.v0900}"
       },
       "slate-10": {
         "$type": "color",
-        "$value": "{primitive.v0892}"
+        "$value": "{primitive.v0902}"
       },
       "slate-11": {
         "$type": "color",
-        "$value": "{primitive.v0893}"
+        "$value": "{primitive.v0903}"
       },
       "slate-12": {
         "$type": "color",
-        "$value": "{primitive.v0894}"
+        "$value": "{primitive.v0904}"
       },
       "slate-8": {
         "$type": "color",
-        "$value": "{primitive.v0901}"
+        "$value": "{primitive.v0911}"
       },
       "slate-9": {
         "$type": "color",
-        "$value": "{primitive.v0902}"
+        "$value": "{primitive.v0912}"
       },
       "swiss-red-9": {
         "$type": "color",
-        "$value": "{primitive.v0309}"
+        "$value": "{primitive.v0913}"
       },
       "teal-10": {
         "$type": "color",
-        "$value": "{primitive.v0904}"
+        "$value": "{primitive.v0915}"
       },
       "teal-11": {
         "$type": "color",
-        "$value": "{primitive.v0646}"
+        "$value": "{primitive.v0653}"
       },
       "teal-12": {
         "$type": "color",
-        "$value": "{primitive.v0905}"
+        "$value": "{primitive.v0916}"
       },
       "teal-8": {
         "$type": "color",
-        "$value": "{primitive.v0912}"
+        "$value": "{primitive.v0923}"
       },
       "teal-9": {
         "$type": "color",
-        "$value": "{primitive.v0447}"
+        "$value": "{primitive.v0450}"
       },
       "tomato-1": {
         "$type": "color",
-        "$value": "{primitive.v0913}"
+        "$value": "{primitive.v0924}"
       },
       "tomato-10": {
         "$type": "color",
-        "$value": "{primitive.v0914}"
+        "$value": "{primitive.v0925}"
       },
       "tomato-11": {
         "$type": "color",
-        "$value": "{primitive.v0915}"
+        "$value": "{primitive.v0926}"
       },
       "tomato-12": {
         "$type": "color",
-        "$value": "{primitive.v0916}"
+        "$value": "{primitive.v0927}"
       },
       "tomato-2": {
         "$type": "color",
-        "$value": "{primitive.v0917}"
+        "$value": "{primitive.v0928}"
       },
       "tomato-3": {
         "$type": "color",
-        "$value": "{primitive.v0918}"
+        "$value": "{primitive.v0929}"
       },
       "tomato-4": {
         "$type": "color",
-        "$value": "{primitive.v0919}"
+        "$value": "{primitive.v0930}"
       },
       "tomato-5": {
         "$type": "color",
-        "$value": "{primitive.v0920}"
+        "$value": "{primitive.v0931}"
       },
       "tomato-6": {
         "$type": "color",
-        "$value": "{primitive.v0921}"
+        "$value": "{primitive.v0932}"
       },
       "tomato-7": {
         "$type": "color",
-        "$value": "{primitive.v0922}"
+        "$value": "{primitive.v0933}"
       },
       "tomato-8": {
         "$type": "color",
-        "$value": "{primitive.v0923}"
+        "$value": "{primitive.v0934}"
       },
       "tomato-9": {
         "$type": "color",
-        "$value": "{primitive.v0457}"
+        "$value": "{primitive.v0460}"
       },
       "violet-1": {
         "$type": "color",
-        "$value": "{primitive.v0924}"
+        "$value": "{primitive.v0935}"
       },
       "violet-10": {
         "$type": "color",
-        "$value": "{primitive.v0925}"
+        "$value": "{primitive.v0619}"
       },
       "violet-11": {
         "$type": "color",
-        "$value": "{primitive.v0644}"
+        "$value": "{primitive.v0651}"
       },
       "violet-12": {
         "$type": "color",
-        "$value": "{primitive.v0926}"
+        "$value": "{primitive.v0936}"
       },
       "violet-2": {
         "$type": "color",
-        "$value": "{primitive.v0927}"
+        "$value": "{primitive.v0937}"
       },
       "violet-3": {
         "$type": "color",
-        "$value": "{primitive.v0720}"
+        "$value": "{primitive.v0728}"
       },
       "violet-4": {
         "$type": "color",
-        "$value": "{primitive.v0928}"
+        "$value": "{primitive.v0938}"
       },
       "violet-5": {
         "$type": "color",
-        "$value": "{primitive.v0929}"
+        "$value": "{primitive.v0939}"
       },
       "violet-6": {
         "$type": "color",
-        "$value": "{primitive.v0719}"
+        "$value": "{primitive.v0727}"
       },
       "violet-7": {
         "$type": "color",
-        "$value": "{primitive.v0930}"
+        "$value": "{primitive.v0940}"
       },
       "violet-8": {
         "$type": "color",
-        "$value": "{primitive.v0603}"
+        "$value": "{primitive.v0609}"
       },
       "violet-9": {
         "$type": "color",
-        "$value": "{primitive.v0463}"
+        "$value": "{primitive.v0466}"
       },
       "copper-1": {
         "$type": "color",
-        "$value": "{primitive.v0476}"
+        "$value": "{primitive.v0479}"
       },
       "copper-2": {
         "$type": "color",
-        "$value": "{primitive.v0477}"
+        "$value": "{primitive.v0480}"
       },
       "copper-3": {
         "$type": "color",
-        "$value": "{primitive.v0478}"
+        "$value": "{primitive.v0481}"
       },
       "copper-4": {
         "$type": "color",
-        "$value": "{primitive.v0479}"
+        "$value": "{primitive.v0482}"
       },
       "copper-5": {
         "$type": "color",
-        "$value": "{primitive.v0480}"
+        "$value": "{primitive.v0483}"
       },
       "copper-6": {
         "$type": "color",
-        "$value": "{primitive.v0481}"
+        "$value": "{primitive.v0484}"
       },
       "copper-7": {
         "$type": "color",
-        "$value": "{primitive.v0482}"
+        "$value": "{primitive.v0485}"
       },
       "copper-8": {
         "$type": "color",
-        "$value": "{primitive.v0483}"
+        "$value": "{primitive.v0486}"
       },
       "text-3xs": {
         "$type": "dimension",
-        "$value": "{primitive.v0515}"
+        "$value": "{primitive.v0518}"
       },
       "text-2xs": {
         "$type": "dimension",
-        "$value": "{primitive.v0516}"
+        "$value": "{primitive.v0519}"
       },
       "text-chat": {
         "$type": "dimension",
-        "$value": "{primitive.v0517}"
+        "$value": "{primitive.v0520}"
       },
       "leading-tight": {
         "$type": "number",
-        "$value": "{primitive.v0518}"
+        "$value": "{primitive.v0521}"
       },
       "leading-snug": {
         "$type": "number",
-        "$value": "{primitive.v0519}"
+        "$value": "{primitive.v0522}"
       },
       "leading-normal": {
         "$type": "number",
-        "$value": "{primitive.v0520}"
+        "$value": "{primitive.v0523}"
       },
       "leading-relaxed": {
         "$type": "number",
-        "$value": "{primitive.v0521}"
+        "$value": "{primitive.v0524}"
       },
       "tracking-tight": {
         "$type": "dimension",
-        "$value": "{primitive.v0522}"
+        "$value": "{primitive.v0525}"
       },
       "tracking-normal": {
         "$type": "dimension",
-        "$value": "{primitive.v0523}"
+        "$value": "{primitive.v0526}"
       },
       "tracking-wide": {
         "$type": "dimension",
-        "$value": "{primitive.v0524}"
+        "$value": "{primitive.v0527}"
       },
       "space-0": {
         "$type": "dimension",
-        "$value": "{primitive.v0523}"
+        "$value": "{primitive.v0526}"
       },
       "space-1": {
         "$type": "dimension",
-        "$value": "{primitive.v0525}"
+        "$value": "{primitive.v0528}"
       },
       "space-2": {
         "$type": "dimension",
-        "$value": "{primitive.v0526}"
+        "$value": "{primitive.v0529}"
       },
       "space-3": {
         "$type": "dimension",
-        "$value": "{primitive.v0507}"
+        "$value": "{primitive.v0510}"
       },
       "space-4": {
         "$type": "dimension",
-        "$value": "{primitive.v0509}"
+        "$value": "{primitive.v0512}"
       },
       "space-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0511}"
+        "$value": "{primitive.v0514}"
       },
       "space-6": {
         "$type": "dimension",
-        "$value": "{primitive.v0512}"
+        "$value": "{primitive.v0515}"
       },
       "space-7": {
         "$type": "dimension",
-        "$value": "{primitive.v0527}"
+        "$value": "{primitive.v0530}"
       },
       "space-8": {
         "$type": "dimension",
-        "$value": "{primitive.v0528}"
+        "$value": "{primitive.v0531}"
       },
       "space-9": {
         "$type": "dimension",
-        "$value": "{primitive.v0514}"
+        "$value": "{primitive.v0517}"
       },
       "space-10": {
         "$type": "dimension",
-        "$value": "{primitive.v0529}"
+        "$value": "{primitive.v0532}"
       },
       "space-11": {
         "$type": "dimension",
-        "$value": "{primitive.v0530}"
+        "$value": "{primitive.v0533}"
       },
       "space-12": {
         "$type": "dimension",
-        "$value": "{primitive.v0531}"
+        "$value": "{primitive.v0534}"
       },
       "space-14": {
         "$type": "dimension",
-        "$value": "{primitive.v0532}"
+        "$value": "{primitive.v0535}"
       },
       "space-16": {
         "$type": "dimension",
-        "$value": "{primitive.v0533}"
+        "$value": "{primitive.v0536}"
       },
       "space-20": {
         "$type": "dimension",
-        "$value": "{primitive.v0534}"
+        "$value": "{primitive.v0537}"
       },
       "space-24": {
         "$type": "dimension",
-        "$value": "{primitive.v0535}"
+        "$value": "{primitive.v0538}"
       },
       "space-px": {
         "$type": "dimension",
-        "$value": "{primitive.v0536}"
+        "$value": "{primitive.v0539}"
       },
       "space-0-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0537}"
+        "$value": "{primitive.v0540}"
       },
       "space-1-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0538}"
+        "$value": "{primitive.v0541}"
       },
       "space-2-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0515}"
+        "$value": "{primitive.v0518}"
       },
       "space-3-5": {
         "$type": "dimension",
-        "$value": "{primitive.v0508}"
+        "$value": "{primitive.v0511}"
       },
       "avatar-sm": {
         "$type": "dimension",
-        "$value": "{primitive.v0512}"
+        "$value": "{primitive.v0515}"
       },
       "avatar-md": {
         "$type": "dimension",
-        "$value": "{primitive.v0528}"
+        "$value": "{primitive.v0531}"
       },
       "avatar-lg": {
         "$type": "dimension",
-        "$value": "{primitive.v0529}"
+        "$value": "{primitive.v0532}"
       },
       "control-h": {
         "$type": "dimension",
-        "$value": "{primitive.v0514}"
+        "$value": "{primitive.v0517}"
       },
       "control-h-sm": {
         "$type": "dimension",
-        "$value": "{primitive.v0528}"
+        "$value": "{primitive.v0531}"
       },
       "app-nav": {
         "$type": "dimension",
-        "$value": "{primitive.v0539}"
+        "$value": "{primitive.v0542}"
       },
       "app-rail": {
         "$type": "dimension",
-        "$value": "{primitive.v0540}"
+        "$value": "{primitive.v0543}"
       },
       "topbar-h": {
         "$type": "dimension",
-        "$value": "{primitive.v0532}"
+        "$value": "{primitive.v0535}"
       },
       "shell-content": {
         "$type": "dimension",
-        "$value": "{primitive.v0541}"
+        "$value": "{primitive.v0544}"
       },
       "label-size": {
         "$type": "dimension",
-        "$value": "{primitive.v0516}"
+        "$value": "{primitive.v0519}"
       },
       "label-tracking": {
         "$type": "dimension",
-        "$value": "{primitive.v0542}"
+        "$value": "{primitive.v0545}"
       },
       "radius-full": {
         "$type": "dimension",
-        "$value": "{primitive.v0548}"
+        "$value": "{primitive.v0551}"
       },
       "ease-fast": {
         "$type": "transition",
-        "$value": "{primitive.v0554}"
+        "$value": "{primitive.v0557}"
       },
       "ease-normal": {
         "$type": "transition",
-        "$value": "{primitive.v0555}"
+        "$value": "{primitive.v0558}"
       },
       "ease-slow": {
         "$type": "transition",
-        "$value": "{primitive.v0556}"
+        "$value": "{primitive.v0559}"
       },
       "ease-spring": {
         "$type": "transition",
-        "$value": "{primitive.v0557}"
+        "$value": "{primitive.v0560}"
       },
       "z-base": {
         "$type": "number",
-        "$value": "{primitive.v0558}"
+        "$value": "{primitive.v0561}"
       },
       "z-dropdown": {
         "$type": "number",
-        "$value": "{primitive.v0559}"
+        "$value": "{primitive.v0562}"
       },
       "z-sticky": {
         "$type": "number",
-        "$value": "{primitive.v0560}"
+        "$value": "{primitive.v0563}"
       },
       "z-overlay": {
         "$type": "number",
-        "$value": "{primitive.v0561}"
+        "$value": "{primitive.v0564}"
       },
       "z-modal": {
         "$type": "number",
-        "$value": "{primitive.v0562}"
+        "$value": "{primitive.v0565}"
       },
       "z-toast": {
         "$type": "number",
-        "$value": "{primitive.v0563}"
+        "$value": "{primitive.v0566}"
       },
       "liquid-success-tint": {
         "$type": "color",
@@ -2142,7 +2142,7 @@
       },
       "liquid-tag-pink": {
         "$type": "color",
-        "$value": "{primitive.v0948}",
+        "$value": "{primitive.v0957}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-avatar-fg": {
@@ -2152,12 +2152,12 @@
       },
       "liquid-on-accent-rim": {
         "$type": "color",
-        "$value": "{primitive.v0582}",
+        "$value": "{primitive.v0588}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-on-accent-rim-strong": {
         "$type": "color",
-        "$value": "{primitive.v0192}",
+        "$value": "{primitive.v0191}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-avatar-ring": {
@@ -2167,7 +2167,7 @@
       },
       "liquid-hairline-subtle": {
         "$type": "color",
-        "$value": "{primitive.v0742}",
+        "$value": "{primitive.v0752}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-hairline-strong": {
@@ -2182,7 +2182,7 @@
       },
       "cupertino-radius-sheet": {
         "$type": "dimension",
-        "$value": "{primitive.v0289}",
+        "$value": "{primitive.v0288}",
         "$description": "Node value from docs/design-system/themes/cupertino/DESIGN.md and the matching Figma node map."
       },
       "liquid-radius-window": {
@@ -2197,7 +2197,7 @@
       },
       "liquid-radius-field": {
         "$type": "dimension",
-        "$value": "{primitive.v0584}",
+        "$value": "{primitive.v0590}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-radius-row": {
@@ -2242,12 +2242,12 @@
       },
       "bloom-radius-small": {
         "$type": "dimension",
-        "$value": "{primitive.v0298}",
+        "$value": "{primitive.v0297}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "tonal-radius-full": {
         "$type": "dimension",
-        "$value": "{primitive.v0585}",
+        "$value": "{primitive.v0591}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
       "tonal-radius-extra-large": {
@@ -2277,17 +2277,17 @@
       },
       "tonal-radius-tiny": {
         "$type": "dimension",
-        "$value": "{primitive.v0586}",
+        "$value": "{primitive.v0592}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
       "tonal-radius-minimum": {
         "$type": "dimension",
-        "$value": "{primitive.v0587}",
+        "$value": "{primitive.v0593}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-2": {
         "$type": "dimension",
-        "$value": "{primitive.v0298}",
+        "$value": "{primitive.v0297}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-14": {
@@ -2297,12 +2297,12 @@
       },
       "bloom-radius-15": {
         "$type": "dimension",
-        "$value": "{primitive.v0328}",
+        "$value": "{primitive.v0326}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-18": {
         "$type": "dimension",
-        "$value": "{primitive.v0315}",
+        "$value": "{primitive.v0313}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-20": {
@@ -2312,7 +2312,7 @@
       },
       "bloom-radius-21": {
         "$type": "dimension",
-        "$value": "{primitive.v0588}",
+        "$value": "{primitive.v0594}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-22": {
@@ -2327,7 +2327,7 @@
       },
       "bloom-radius-26": {
         "$type": "dimension",
-        "$value": "{primitive.v0289}",
+        "$value": "{primitive.v0288}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-radius-28": {
@@ -2347,7 +2347,7 @@
       },
       "bloom-radius-40": {
         "$type": "dimension",
-        "$value": "{primitive.v0291}",
+        "$value": "{primitive.v0290}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-12": {
@@ -2357,7 +2357,7 @@
       },
       "bloom-text-13": {
         "$type": "dimension",
-        "$value": "{primitive.v0290}",
+        "$value": "{primitive.v0289}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-14": {
@@ -2367,7 +2367,7 @@
       },
       "bloom-text-15": {
         "$type": "dimension",
-        "$value": "{primitive.v0328}",
+        "$value": "{primitive.v0326}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-16": {
@@ -2377,12 +2377,12 @@
       },
       "bloom-text-17": {
         "$type": "dimension",
-        "$value": "{primitive.v0589}",
+        "$value": "{primitive.v0595}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-18": {
         "$type": "dimension",
-        "$value": "{primitive.v0315}",
+        "$value": "{primitive.v0313}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-22": {
@@ -2412,22 +2412,22 @@
       },
       "bloom-text-40": {
         "$type": "dimension",
-        "$value": "{primitive.v0291}",
+        "$value": "{primitive.v0290}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-48": {
         "$type": "dimension",
-        "$value": "{primitive.v0332}",
+        "$value": "{primitive.v0330}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-60": {
         "$type": "dimension",
-        "$value": "{primitive.v0590}",
+        "$value": "{primitive.v0596}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "bloom-text-92": {
         "$type": "dimension",
-        "$value": "{primitive.v0591}",
+        "$value": "{primitive.v0597}",
         "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
       },
       "cupertino-switch-thumb": {
@@ -2460,39 +2460,39 @@
       },
       "motion-duration-fast": {
         "$type": "duration",
-        "$value": "{primitive.v0592}"
+        "$value": "{primitive.v0598}"
       },
       "motion-easing-fast": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0593}"
+        "$value": "{primitive.v0599}"
       },
       "motion-duration-normal": {
         "$type": "duration",
-        "$value": "{primitive.v0594}"
+        "$value": "{primitive.v0600}"
       },
       "motion-easing-normal": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0593}"
+        "$value": "{primitive.v0599}"
       },
       "motion-duration-slow": {
         "$type": "duration",
-        "$value": "{primitive.v0595}"
+        "$value": "{primitive.v0601}"
       },
       "motion-easing-slow": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0593}"
+        "$value": "{primitive.v0599}"
       },
       "motion-duration-spring": {
         "$type": "duration",
-        "$value": "{primitive.v0596}"
+        "$value": "{primitive.v0602}"
       },
       "motion-easing-spring": {
         "$type": "cubicBezier",
-        "$value": "{primitive.v0597}"
+        "$value": "{primitive.v0603}"
       },
       "font-tabular": {
         "$type": "number",
-        "$value": "{primitive.v0598}"
+        "$value": "{primitive.v0604}"
       }
     }
   },

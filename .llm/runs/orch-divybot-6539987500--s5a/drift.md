@@ -31,3 +31,18 @@
   Extend the carrier write surface to that generated fixture; no pin changes.
 - Optional Chromium UI smoke cannot launch because libnspr4.so is missing;
   browser UI execution is UNPROVEN in addition to actual Figma host execution.
+
+
+## CI merged-tree reconciliation
+
+Required non-draft CI exposed main advancing by six commits while this branch
+was implemented. Integrate origin/main1d274c16bd3163eb72a40ea3f2e3f0523861159f:
+#2506 updates the approved nine-collection fixture to2189 variables (including
+ink aliases), #2507 updates contrast sources, plus independent KV/docs work.
+Branch-local names were correct for the old input but stale in GitHub's merge.
+Regenerate inventory against the newly approved input; retain historical2186
+results above. Derive fixture totals from its authoritative index. The separate
+shard failure is an ambient Node Timeout type at the bundle test's number timer;
+use ReturnType<typeof setTimeout>. No production contract changes.
+Re-run plugin/token/native/carrier gates and retained independent evaluation
+before the next push. READY remains pending actual exact-head CI.

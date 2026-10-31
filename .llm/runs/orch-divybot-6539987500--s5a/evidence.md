@@ -80,3 +80,14 @@ required checks must be green on the final exact head before the READY report.
 
 Pinned upstream MIT LICENSE independently fetched at the NOTICE SHA and compared
 byte-for-byte: PASS. Formal evaluator was offline for that comparison.
+
+
+CI repair terminal PASS. Retained independent review confirms inventory and
+negative controls remain strict; its required native-run condition is now met:
+ci-repair-native selection15/0/0, including actual fresh-app init/UI apply/token
+rebuild/app check with the2189-variable snapshot. Plugin12/0/0 and15-file
+wrappers/bundle PASS; Node-ambient structured check2files PASS. Updated token
+quality96inputs PASS. Four carrier generators, release preflight, docs accuracy,
+Aspire manifest parity and publish-assets check all PASS. Other failed original
+shards2/5/6 contain the same stale-inventory cause only. New push must receive
+fresh exact-head required CI; no READY yet.

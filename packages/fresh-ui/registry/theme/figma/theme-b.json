@@ -498,9 +498,7 @@
           "alias": "Primitives/color/blue/l/12"
         },
         "Liquid": "#0066cc",
-        "Terminal": {
-          "alias": "Primitives/color/lime/l/11"
-        },
+        "Terminal": "#59772e",
         "macOS 27": "#0066cc",
         "Apple Classic": {
           "alias": "Primitives/color/blue/l/12"
@@ -3289,6 +3287,35 @@
       }
     },
     {
+      "name": "ink/d-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "description": "Dark source for Scheme ink/fg (text on ink). Light-ink themes: own gray/d/1; Brutal keeps black ink in dark, so gray/d/12.",
+      "values": {
+        "Bloom": {
+          "alias": "Theme B/gray/d/1"
+        },
+        "Cupertino": {
+          "alias": "Theme B/gray/d/1"
+        },
+        "Liquid": {
+          "alias": "Theme B/gray/d/1"
+        },
+        "Terminal": {
+          "alias": "Theme B/gray/d/1"
+        },
+        "macOS 27": {
+          "alias": "Theme B/gray/d/1"
+        },
+        "Apple Classic": {
+          "alias": "Theme B/gray/d/1"
+        },
+        "Fluent 2 Web": {
+          "alias": "Theme B/gray/d/1"
+        }
+      }
+    },
+    {
       "name": "ink/l",
       "type": "COLOR",
       "scopes": [],
@@ -3351,7 +3378,7 @@
         },
         "Liquid": "#86868b",
         "Terminal": {
-          "alias": "Theme B/gray/l/10"
+          "alias": "Theme B/gray/l/11"
         },
         "macOS 27": "#86868b",
         "Apple Classic": {

@@ -1,20 +1,22 @@
 # Figma variables export
 
-All local variables of Figma file `pGRLnkPPRZJZy74evNcQBr`, exported on 2026-10-31: 2,186 variables
+All local variables of Figma file `pGRLnkPPRZJZy74evNcQBr`, exported on 2026-10-31: 2,189 variables
 in nine collections. There is one JSON file per variable collection. `index.json` lists each
 collection with its file, mode names and variable count.
+
+This export includes the contrast value pass of 2026-10-31, which added `ink/d-fg`.
 
 | File                 | Collection    | Modes                                                                           | Variables |
 | -------------------- | ------------- | ------------------------------------------------------------------------------- | --------: |
 | `primitives.json`    | Primitives    | Value                                                                           |       413 |
-| `theme.json`         | Theme         | Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel |       340 |
+| `theme.json`         | Theme         | Studio, Ledger, Filigrane, Signal, Tonal, Glass, Brutal, Fluent, Tactile, Pixel |       341 |
 | `base-accent.json`   | Base accent   | Ink, Blue, Violet, Orange, Indigo, Tomato, Lime                                 |        32 |
 | `scheme.json`        | Scheme        | Light, Dark                                                                     |       462 |
 | `density.json`       | Density       | Comfortable, Compact, Dense, Airy, Chunky                                       |        19 |
 | `base-gray.json`     | Base gray     | Neutral, Slate, Sand, Mauve                                                     |        26 |
 | `studio-flavor.json` | Studio flavor | Utility, Cloud, Workshop, Playful, Ledger, Atelier, Signal                      |       214 |
-| `theme-b.json`       | Theme B       | Bloom, Cupertino, Liquid, Terminal, macOS 27, Apple Classic, Fluent 2 Web       |       340 |
-| `theme-set.json`     | Theme set     | A, B                                                                            |       340 |
+| `theme-b.json`       | Theme B       | Bloom, Cupertino, Liquid, Terminal, macOS 27, Apple Classic, Fluent 2 Web       |       341 |
+| `theme-set.json`     | Theme set     | A, B                                                                            |       341 |
 
 ## File shape
 
@@ -81,12 +83,12 @@ referring collection. For example, `Theme` mode `Studio` aliases `type/display/t
 `Studio flavor/type/display/tracking`, which then takes its value from the active `Studio flavor`
 mode.
 
-Every alias target in these files exists in the export: 4,859 alias values point to 1,504 distinct
+Every alias target in these files exists in the export: 4,870 alias values point to 1,501 distinct
 variables, all local to this file.
 
 ## Theme set
 
-`Theme`, `Theme B` and `Theme set` hold the same 340 variable names, with the same type, scopes
+`Theme`, `Theme B` and `Theme set` hold the same 341 variable names, with the same type, scopes
 and code syntax. Only some descriptions differ. `Theme set` stores no values of its own: each of
 its variables aliases the variable of the same name in `Theme` in mode `A`, and in `Theme B` in
 mode `B`.

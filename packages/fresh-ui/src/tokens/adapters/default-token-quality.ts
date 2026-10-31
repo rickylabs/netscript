@@ -1,9 +1,13 @@
 import { pairs } from '../assets/quality.generated.ts';
 import { exclusions } from '../assets/quality.generated.ts';
 import type { TokenContrastCoverage, TokenContrastExclusion } from '../domain/contrast-contract.ts';
-import { CONTROL_CONTRAST_MINIMUM, TEXT_CONTRAST_MINIMUM } from '../domain/contrast-contract.ts';
+import {
+  CONTROL_CONTRAST_MINIMUM,
+  INACTIVE_COMPONENT_CONTRAST,
+  TEXT_CONTRAST_MINIMUM,
+} from '../domain/contrast-contract.ts';
 
-/** Load the independently reviewed pair contract, narrowing only validated AA thresholds. */
+/** Load the reviewed pair contract, validating thresholds and explicit exemption markers. */
 export function defaultContrastCoverage(): TokenContrastCoverage {
   if (pairs.version !== 1) throw new Error('Unknown contrast coverage version');
   return {
@@ -13,7 +17,11 @@ export function defaultContrastCoverage(): TokenContrastCoverage {
       if (minimum !== TEXT_CONTRAST_MINIMUM && minimum !== CONTROL_CONTRAST_MINIMUM) {
         throw new Error(`Unsupported AA threshold: ${pair.id}`);
       }
-      return { ...pair, minimum };
+      const exemption = pair.exemption;
+      if (exemption !== undefined && exemption !== INACTIVE_COMPONENT_CONTRAST.exemption) {
+        throw new Error(`Unknown contrast exemption: ${pair.id}`);
+      }
+      return { ...pair, minimum, exemption };
     }),
   };
 }

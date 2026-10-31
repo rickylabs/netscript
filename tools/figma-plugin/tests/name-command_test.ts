@@ -1,5 +1,8 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { collections } from '../../../packages/fresh-ui/src/tokens/assets/figma.generated.ts';
+import {
+  collections,
+  figmaIndex,
+} from '../../../packages/fresh-ui/src/tokens/assets/figma.generated.ts';
 import { exportFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 
 Deno.test('CI name command checks actual exported files and rejects unknown WEB names with origin', async () => {
@@ -31,7 +34,12 @@ Deno.test('CI name command checks actual exported files and rejects unknown WEB 
     await Deno.writeTextFile(file, JSON.stringify(item));
     const positive = await run(['--theme', file]);
     assertEquals(positive.code, 0, positive.text);
-    assertStringIncludes(positive.text, 'pinned variables=2186 portable items=1');
+    assertStringIncludes(
+      positive.text,
+      `pinned variables=${
+        figmaIndex.collections.reduce((sum, collection) => sum + collection.variableCount, 0)
+      } portable items=1`,
+    );
     const unknown = {
       ...bundle,
       collections: bundle.collections.map((collection) =>

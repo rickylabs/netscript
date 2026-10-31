@@ -1,10 +1,11 @@
 import { assert, assertEquals } from '@std/assert';
 import { stub } from '@std/testing/mock';
 import { FakeTime } from '@std/testing/time';
+import { Redis } from 'ioredis';
 import { RedisKvAdapter } from '../redis.ts';
 import { WatchBatchQueue } from '../adapters/redis/watch-batch-queue.ts';
 import { WatchSubscriptions } from '../adapters/redis/watch-subscriptions.ts';
-import type { KvKey, KvListOptions } from '../mod.ts';
+import type { KvKey } from '../mod.ts';
 
 const redisUrl = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
 const A: KvKey = ['busy', 'expiring'];
@@ -34,11 +35,11 @@ Deno.test({
   async fn() {
     const { kv, controller } = fixture();
     await kv.set(A, 'baseline');
-    const originalList = kv.list.bind(kv);
+    const send = Redis.prototype.sendCommand;
     let scans = 0;
-    const listStub = stub(kv, 'list', async function* <T>(options: KvListOptions) {
-      scans++;
-      yield* originalList<T>(options);
+    const listStub = stub(Redis.prototype, 'sendCommand', function (command, ...args) {
+      if (command.name === 'scan' && command.args[0] === '0') scans++;
+      return send.call(this, command, ...args);
     });
     let waiting = Promise.withResolvers<void>();
     const originalNext = WatchBatchQueue.prototype.next;
@@ -84,11 +85,11 @@ Deno.test({
   async fn() {
     const { kv, controller } = fixture();
     await kv.set(A, 'baseline');
-    const originalList = kv.list.bind(kv);
+    const send = Redis.prototype.sendCommand;
     let scans = 0;
-    const listStub = stub(kv, 'list', async function* <T>(options: KvListOptions) {
-      scans++;
-      yield* originalList<T>(options);
+    const listStub = stub(Redis.prototype, 'sendCommand', function (command, ...args) {
+      if (command.name === 'scan' && command.args[0] === '0') scans++;
+      return send.call(this, command, ...args);
     });
     let waiting = Promise.withResolvers<void>();
     const originalNext = WatchBatchQueue.prototype.next;
@@ -158,11 +159,11 @@ Deno.test({
     const resume = Promise.withResolvers<void>();
     const firstBuffered = Promise.withResolvers<void>();
     const secondHeld = Promise.withResolvers<void>();
-    const originalList = kv.list.bind(kv);
-    const listStub = stub(kv, 'list', async function* <T>(options: KvListOptions) {
+    const send = Redis.prototype.sendCommand;
+    const listStub = stub(Redis.prototype, 'sendCommand', function (command, ...args) {
+      if (command.name !== 'scan') return send.call(this, command, ...args);
       scanning.resolve();
-      await resume.promise;
-      yield* originalList<T>(options);
+      return resume.promise.then(() => send.call(this, command, ...args));
     });
     const originalAcquire = WatchSubscriptions.prototype.acquire;
     let deliverSecond = () => {};

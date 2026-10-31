@@ -8,5 +8,5 @@
 
 :where(.ns-label)[data-required='true']::after {
   content: ' *';
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }

@@ -1,5 +1,8 @@
 import { assert, assertEquals, assertThrows } from '@std/assert';
-import { collections } from '../../../packages/fresh-ui/src/tokens/assets/figma.generated.ts';
+import {
+  collections,
+  figmaIndex,
+} from '../../../packages/fresh-ui/src/tokens/assets/figma.generated.ts';
 import {
   exportFigmaTokenBundle,
   importFigmaTokenBundle,
@@ -27,7 +30,10 @@ Deno.test('Plugin API export reproduces all ten handoff fixtures byte-for-byte',
     files,
   );
   assertEquals(Object.keys(files).length, 10);
-  assertEquals(snapshot.reduce((sum, collection) => sum + collection.variables.length, 0), 2186);
+  assertEquals(
+    snapshot.reduce((sum, collection) => sum + collection.variables.length, 0),
+    figmaIndex.collections.reduce((sum, collection) => sum + collection.variableCount, 0),
+  );
   for (const [name, bytes] of Object.entries(files)) {
     assertEquals(
       bytes,

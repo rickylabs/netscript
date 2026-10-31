@@ -107,3 +107,29 @@ lock tracked. Temporary baseline audit worktree removed after comparisons.
 Reconcile: all implementation/local-evidence slices complete. Next mark PR ready
 for review to materialize non-draft CI; do not report READY until exact final
 head's required checks are green. Cockpit owns merge. No Code Connect scope.
+
+
+## CI merged-tree reconciliation
+
+Required non-draft CI exposed main advancing by six commits while this branch
+was implemented. Integrate origin/main1d274c16bd3163eb72a40ea3f2e3f0523861159f:
+#2506 updates the approved nine-collection fixture to2189 variables (including
+ink aliases), #2507 updates contrast sources, plus independent KV/docs work.
+Branch-local names were correct for the old input but stale in GitHub's merge.
+Regenerate inventory against the newly approved input; retain historical2186
+results above. Derive fixture totals from its authoritative index. The separate
+shard failure is an ambient Node Timeout type at the bundle test's number timer;
+use ReturnType<typeof setTimeout>. No production contract changes.
+Re-run plugin/token/native/carrier gates and retained independent evaluation
+before the next push. READY remains pending actual exact-head CI.
+
+
+CI repair terminal PASS. Retained independent review confirms inventory and
+negative controls remain strict; its required native-run condition is now met:
+ci-repair-native selection15/0/0, including actual fresh-app init/UI apply/token
+rebuild/app check with the2189-variable snapshot. Plugin12/0/0 and15-file
+wrappers/bundle PASS; Node-ambient structured check2files PASS. Updated token
+quality96inputs PASS. Four carrier generators, release preflight, docs accuracy,
+Aspire manifest parity and publish-assets check all PASS. Other failed original
+shards2/5/6 contain the same stale-inventory cause only. New push must receive
+fresh exact-head required CI; no READY yet.
