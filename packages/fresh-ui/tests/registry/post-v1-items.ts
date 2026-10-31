@@ -30,6 +30,8 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'marker',
   'trace',
   'attachment',
+  'message-scroller',
+  'questionnaire',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */

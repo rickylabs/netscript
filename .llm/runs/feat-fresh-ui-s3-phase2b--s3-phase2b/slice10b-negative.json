@@ -1,0 +1,27 @@
+{
+  "verdict": "REGRESSION_REPRODUCED_BEFORE_FIX",
+  "exitCode": 1,
+  "passedBeforeFailure": 5,
+  "failed": 1,
+  "case": "questionnaire/native-and-prevented-reset-preserve-other-fields",
+  "expected": "initial uncontrolled radio selected after native reset",
+  "observed": "initial radio unchecked after native reset",
+  "cause": "native reset defaults were not synchronized; microtask ordering did not guarantee restoration after the default action",
+  "nativeAnchorRegression": {
+    "verdict": "REPRODUCED_BEFORE_FIX",
+    "engine": "WebKit",
+    "before": {
+      "top": 2260,
+      "height": 2580,
+      "client": 320,
+      "state": "up"
+    },
+    "after": {
+      "top": 2209,
+      "height": 2691,
+      "client": 320,
+      "state": "both"
+    },
+    "cause": "native geometry-driven scroll event cleared pinning before observer follow"
+  }
+}

@@ -11900,51 +11900,57 @@
       "specId": "I3",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "scrollable": {
-          "kind": "enum",
-          "values": [
-            "none",
-            "up",
-            "down",
-            "both"
-          ]
+        "label": {
+          "kind": "text",
+          "required": true,
+          "description": "Nonblank accessible native viewport name."
         },
         "children": {
+          "kind": "slot"
+        },
+        "followEnd": {
+          "kind": "boolean",
+          "default": true,
+          "description": "Follow growth only while already pinned; first mount pins when true."
+        },
+        "endThreshold": {
+          "kind": "number",
+          "default": 1,
+          "description": "Finite nonnegative native CSS pixel tolerance for pinning."
+        },
+        "scrollLabel": {
+          "kind": "text",
+          "default": "Scroll to latest"
+        },
+        "Item.children": {
           "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "viewport",
-          "planned": true
+          "name": "viewport"
         },
         {
-          "name": "content",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "content"
+        },
+        {
+          "name": "scroll-button"
         },
         {
           "name": "item",
-          "planned": true
-        },
-        {
-          "name": "scroll-button",
-          "planned": true
+          "when": "when Item is supplied"
         },
         {
           "name": "edge-top",
-          "planned": true,
           "representation": "pseudo"
         },
         {
           "name": "edge-bottom",
-          "planned": true,
           "representation": "pseudo"
         }
       ],
@@ -11955,14 +11961,22 @@
             "up",
             "down",
             "both"
-          ]
+          ],
+          "default": "none",
+          "description": "Derived native geometry, never an input prop. SSR none; all four states measured after hydration."
         }
       },
-      "booleans": [],
+      "booleans": [
+        "followEnd"
+      ],
       "slots": [
         {
           "name": "children",
           "part": "content"
+        },
+        {
+          "name": "Item.children",
+          "part": "item"
         }
       ],
       "apg": "native scrollable region and button",
@@ -11984,7 +11998,10 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control."
+        "ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control.",
+        "Caller owns finite root height or constrained flex/grid parent; native scroll anchoring and keys remain intact.",
+        "Scroll button stays mounted/visible while focused after pinning; otherwise pinned/unfocused visibility hidden removes it from native tab order. No live region; host owns new-message announcements.",
+        "Ledger viewport24x60, max content640 (spec720), subtle border edge rules rather than gradients; no new glyph: existing arrow-right rotates90degrees."
       ]
     },
     {
@@ -12303,7 +12320,7 @@
       "specId": "I6",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "step": {
           "kind": "enum",
@@ -12311,10 +12328,12 @@
             "question",
             "freeform",
             "complete"
-          ]
+          ],
+          "default": "question"
         },
         "title": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "description": {
           "kind": "slot"
@@ -12322,73 +12341,111 @@
         "error": {
           "kind": "slot"
         },
-        "children": {
+        "progress": {
           "kind": "slot"
         },
         "actions": {
           "kind": "slot"
         },
+        "children": {
+          "kind": "slot"
+        },
+        "options": {
+          "kind": "collection",
+          "description": "Unique nonempty value, label, optional decorative shortcut and disabled."
+        },
         "multiple": {
-          "kind": "boolean"
+          "kind": "boolean",
+          "default": false
+        },
+        "name": {
+          "kind": "text",
+          "default": "answer",
+          "description": "Native answer control name scoped per form."
+        },
+        "disabled": {
+          "kind": "boolean",
+          "default": false
+        },
+        "value": {
+          "kind": "collection",
+          "description": "Controlled readonly accepted choice values; single uses first only."
+        },
+        "defaultValue": {
+          "kind": "collection",
+          "description": "Initial uncontrolled values, default empty."
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "text": {
+          "kind": "text",
+          "description": "Controlled accepted freeform text."
+        },
+        "defaultText": {
+          "kind": "text",
+          "default": ""
+        },
+        "onTextChange": {
+          "kind": "callback"
+        },
+        "placeholder": {
+          "kind": "text"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
+        },
+        {
+          "name": "item"
+        },
+        {
+          "name": "title"
         },
         {
           "name": "progress",
-          "planned": true
-        },
-        {
-          "name": "item",
-          "planned": true
-        },
-        {
-          "name": "title",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "description",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "choices",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "choice",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "shortcut",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "label",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "indicator",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "input",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "error",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "actions",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
+        },
+        {
+          "name": "content",
+          "when": "when corresponding content or answer control is supplied"
         }
       ],
       "attributes": {
@@ -12397,11 +12454,37 @@
             "question",
             "freeform",
             "complete"
-          ]
+          ],
+          "default": "question"
+        },
+        "data-multiple": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "parts": [
+            "choices",
+            "choice"
+          ],
+          "default": "false"
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "focus",
+            "selected",
+            "disabled"
+          ],
+          "parts": [
+            "choice"
+          ],
+          "description": "Accepted checked/disabled state; transient hover/focus use native pseudo-classes."
         }
       },
       "booleans": [
-        "multiple"
+        "multiple",
+        "disabled"
       ],
       "slots": [
         {
@@ -12417,12 +12500,16 @@
           "part": "error"
         },
         {
-          "name": "children",
-          "part": "choices"
+          "name": "progress",
+          "part": "progress"
         },
         {
           "name": "actions",
           "part": "actions"
+        },
+        {
+          "name": "children",
+          "part": "content"
         }
       ],
       "apg": "native form, radio and checkbox controls",
@@ -12433,15 +12520,15 @@
         },
         {
           "key": "Arrow keys",
-          "action": "Move between radio choices"
+          "action": "Move within native radio groups"
         },
         {
           "key": "Space",
-          "action": "Select the focused radio or checkbox"
+          "action": "Select a focused native radio or checkbox"
         },
         {
           "key": "Enter",
-          "action": "Submit the current form"
+          "action": "Activate a focused submit button; textarea Enter retains native newline behavior"
         }
       ],
       "tokenRoles": [
@@ -12454,7 +12541,10 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service."
+        "ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service.",
+        "One real form; never nest inside another form. Caller owns native onSubmit/FormData, progression, validation messages and action button types.",
+        "Controlled proposals restore all owned radio/checkbox siblings and textarea before callbacks. Native reset then a guarded microtask restores accepted controlled/initial uncontrolled state only; other supplied native fields keep platform behavior.",
+        "Actions are outside the disabled answer fieldset. Shortcut text is decorative, not an installed hotkey. Complete renders no answer inputs or hidden persisted values."
       ]
     },
     {

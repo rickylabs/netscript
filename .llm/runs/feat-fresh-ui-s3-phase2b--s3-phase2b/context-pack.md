@@ -259,3 +259,78 @@ The mandatory public audit must pass before the normal push and PR2538 comment.
 Next implementation unit is AI10b MessageScroller/Questionnaire, with a fresh
 seven-item checkpoint and the same evaluator design gate before product edits.
 Remaining scope is still required; no READY and no runtime/remote-CI green claim.
+
+
+## AI10b design checkpoint
+
+AI10a terminal pushed source d4d330a5/evidence ea70dabb; PR2538 comment recorded.
+Seven-item slice10b-checkpoint.md precedes source. Actual I3/I6 spec/ledger and
+Utility renders, existing native inputs and Shell were researched. The SAME
+independent design gate is required next. No AI10b product source written.
+
+
+AI10b same independent design PASS; failure streak0. Contract-first source starts
+now. Initial scroll follow runs before paint; observers include text/subtree
+mutations. Native useId coordinates SSR/hydration names and associations; no live
+region is invented. Tests must include two independent default-named forms.
+
+
+AI10b prototype:448strict contracts PASS, first5Chromium interaction cases PASS.
+The sixth reproduced an actual native radio reset failure: microtask reconciliation
+can precede native default reset. The checkpoint records a platform-native reset
+metadata refinement, synchronizing only owned defaultChecked/defaultValue before
+current checked/value. Same independent refinement review precedes this change.
+No failure waiver; no next-unit or new scope. Source9checkPASS, lint fixture fix
+refreshing; all other gates remain pending.
+
+
+Same native-reset refinement design PASS. Owned native defaultChecked/defaultValue
+now reconcile before current checked/value on every render, preserving fixed
+initial uncontrolled defaults. The browser regression remains recorded as counts/
+verdict in slice10b-negative.json; the same unchanged native reset case will rerun.
+No timer, new engine, public API or dependency/token change. Failure streak0.
+
+
+AI10b native reset fix passed52Chromium and26Firefox cases, including all reset/
+refusal/SSR/cleanup proofs. WebKit measured a genuine anchoring race on append:
+geometry grew but native anchoring moved top upward before our observer frame,
+clearing pinning. Exact portable metrics and design refinement are retained.
+Same independent design review precedes a geometry-aware, locally observed reader
+intent fix; native anchoring stays enabled and no new key map/API is introduced.
+
+
+Same native anchoring design refinement PASS; geometry-only native scrolls now
+retain a prior pin until the coalesced measurement. Four viewport-only native
+intent listeners suppress following for one measurement and clean up with the
+existing scroll/observer/frame ownership. Editable-control keys remain native
+and do not masquerade as viewport scrolling. Native anchoring stays enabled.
+Original failed WebKit append and all original gates must pass unchanged.
+
+
+## AI10b source ready for independent review
+
+The complete26-file source/carrier unit implements both reviewed native
+refinements. Final Chromium60 and focused Firefox/WebKit60 pass on current bytes;
+the existing Shell40-case regression also passes with the same chat integration.
+Native radio edge behavior is compared against bare HTML in every engine, not
+forced to a different platform policy. Native reset defaults, fixed initial
+uncontrolled baselines, refusal across all group siblings, text/FormData/no-JS/
+hydration, geometry and input races, per-root native listeners/RO/MO/RAF teardown
+and queued reset unmount are exercised. Zero page/console errors, serious/critical
+axe findings or allowances;32 private captures. Final contract/actual ui:add
+TSX/CSS fidelity/compile/lint/SSR/embedding/closure453PASS; registry121PASS.
+Source wrappers10 and browser5fixture/1spec/lintfmt7PASS with zero dropped files.
+Quality/architecture, preflight/docs accuracy/export drift/site prose build and
+initial member publication pass; full doc-lint remains124 accepted2531, exact123
+TypeScript multiset unchanged plus one JSON limitation. Thread gate0 unanswered.
+All tokens/locks/dependency versions unchanged. Same independent source review
+is next; committed-head carriers/quality/publication follow source commit.
+No READY; remaining Docs/Desktop11, extensions/all-style12 and final13 required.
+
+
+AI10b same independent source review PASS; no blockers, failure streak0. README
+incorporates the non-blocking note that controlled text refusal can move the caret
+to the end after native value assignment. Reviewed source reconciles at26files,
+no token/dependency/lock/glyph changes. Source commit precedes canonical carriers
+and refreshed actual-head quality/publication, then same evidence review. No
+next-unit product code or READY; remaining11/12/13 scope remains required.

@@ -99,7 +99,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           ),
         );
       }
-      if (['marker', 'trace', 'attachment'].includes(name)) {
+      if (['marker', 'trace', 'attachment', 'message-scroller', 'questionnaire'].includes(name)) {
         assertEquals(
           await Deno.readTextFile(join(root, 'assets/ui', name + '.css')),
           await Deno.readTextFile(
@@ -149,7 +149,11 @@ import { DataGrid } from '@netscript/fresh-ui';
 import { Marker } from './components/ui/marker.tsx';
 import { Trace } from './components/ui/trace.tsx';
 import { Attachment } from './components/ui/attachment.tsx';
+import { MessageScroller } from './components/ui/message-scroller.tsx';
+import { Questionnaire } from './components/ui/questionnaire.tsx';
 console.log(JSON.stringify({
+  'message-scroller': render(<MessageScroller label='Conversation' style={{height:320}}><MessageScroller.Item><a href='#source'>Read source</a></MessageScroller.Item></MessageScroller>),
+  questionnaire: render(<Questionnaire title='Which storage?' options={[{value:'postgres',label:'PostgreSQL',shortcut:'1'},{value:'sqlite',label:'SQLite'}]} defaultValue={['postgres']} description='Choose project storage' error='Review the answer' actions={<button type='submit'>Next</button>} />),
   marker: render(<Marker variant='separator' icon='ⓘ' label='Restored' />),
   trace: render(<Trace status='running' title='Run'><Trace.Line title='Search' status='running' collapsible defaultOpen description='Searching docs' duration='312ms'><button type='button'>Read output</button></Trace.Line></Trace>),
   attachment: render(<Attachment title='report.pdf' description='PDF · 248 KB' state='error' size='xs' media='PDF' actions={<button type='button'>Retry</button>} />),
@@ -182,6 +186,8 @@ console.log(JSON.stringify({
       'marker',
       'trace',
       'attachment',
+      'message-scroller',
+      'questionnaire',
     ];
     assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
     for (const name of renderedNames) {

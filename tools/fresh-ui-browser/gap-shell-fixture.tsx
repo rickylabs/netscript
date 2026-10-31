@@ -1,3 +1,4 @@
+import { MessageScroller } from '../../packages/fresh-ui/registry/components/ui/message-scroller.tsx';
 import { useRef, useState } from 'preact/hooks';
 import { SidebarShell } from '../../packages/fresh-ui/registry/components/ui/sidebar-shell.tsx';
 import SidebarToggle from '../../packages/fresh-ui/registry/islands/SidebarToggle.tsx';
@@ -63,6 +64,7 @@ export function ShellExamples() {
   const [accept, setAccept] = useState(false);
   const [open, setOpen] = useState(false);
   const [revision, setRevision] = useState(0);
+  const [messages, setMessages] = useState(60);
   const reasons = useRef<string[]>([]);
   const output = useRef<HTMLOutputElement>(null);
   return (
@@ -137,7 +139,12 @@ export function ShellExamples() {
           }
           session={<h1>Support conversation</h1>}
           composer={
-            <form onSubmit={(event) => event.preventDefault()}>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                setMessages((n) => n + 1);
+              }}
+            >
               <label>
                 Message<input name='message' />
               </label>
@@ -152,9 +159,17 @@ export function ShellExamples() {
           }}
         >
           {layout === 'chat'
-            ? Array.from(
-              { length: 60 },
-              (_, index) => <p key={index}>Message {index + 1}: Your workspace is ready to use.</p>,
+            ? (
+              <MessageScroller label='Shell conversation' style={{ height: '100%' }}>
+                {Array.from(
+                  { length: messages },
+                  (_, index) => (
+                    <MessageScroller.Item key={index}>
+                      <p>Message {index + 1}: Your workspace is ready to use.</p>
+                    </MessageScroller.Item>
+                  ),
+                )}
+              </MessageScroller>
             )
             : (
               <>

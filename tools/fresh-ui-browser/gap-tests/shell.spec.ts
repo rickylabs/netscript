@@ -172,7 +172,9 @@ test(
     await expect(shell.locator('aside[data-sidebar]')).toHaveCount(0);
     await expect(shell.locator('[data-scope="sidebar-toggle"]')).toBeHidden();
     await page.getByRole('button', { name: 'Chat layout' }).click();
-    const thread = shell.locator('.ns-dashboard__thread');
+    const thread = shell.locator(
+      '.ns-dashboard__thread [data-scope="message-scroller"][data-part="viewport"]',
+    );
     expect(await thread.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
     const composer = await shell.locator('.ns-dashboard__composer').boundingBox();
     const frame = await shell.boundingBox();

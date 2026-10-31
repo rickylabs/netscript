@@ -1,0 +1,22 @@
+.ns-questionnaire { display: flex; flex-direction: column; gap: var(--ns-space-2); min-inline-size: 0; max-inline-size: 480px; box-sizing: border-box; padding: var(--ns-card-padding); border: 1px solid var(--ns-border); border-radius: var(--ns-radius-input); background: var(--ns-card); color: var(--ns-fg); }
+.ns-questionnaire > [data-part='item'] { display: flex; flex-direction: column; gap: var(--ns-space-1); min-inline-size: 0; padding: 0; margin: 0; border: 0; }
+.ns-questionnaire [data-part='title'] { padding: 0; margin-block-end: var(--ns-space-1); font-size: var(--ns-text-heading); line-height: var(--ns-leading-heading); font-weight: var(--ns-weight-strong); overflow-wrap: anywhere; }
+.ns-questionnaire [data-part='description'] { color: var(--ns-muted-fg); font-size: var(--ns-text-small); overflow-wrap: anywhere; }
+.ns-questionnaire [data-part='choices'] { display: flex; flex-direction: column; gap: 6px; margin-block-start: var(--ns-space-2); }
+.ns-questionnaire [data-part='choice'] { position: relative; display: flex; align-items: center; gap: var(--ns-control-gap); min-inline-size: 0; padding: var(--ns-space-2) var(--ns-control-padding-x); border: 1px solid var(--ns-border); border-radius: var(--ns-radius-input); font-size: var(--ns-text-small); cursor: pointer; }
+.ns-questionnaire [data-part='choice'] > input { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; margin: 0; opacity: 0; cursor: inherit; }
+.ns-questionnaire [data-part='choice']:not([data-state='disabled']):hover { background: var(--ns-muted); }
+.ns-questionnaire [data-part='choice'][data-state='selected'] { background: var(--ns-selected); border-color: var(--ns-primary-stroke); }
+.ns-questionnaire [data-part='choice']:has(:focus-visible) { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-questionnaire [data-part='choice'][data-state='disabled'] { opacity: 0.38; cursor: not-allowed; }
+.ns-questionnaire [data-part='shortcut'] { padding: 0 var(--ns-space-1); border: 1px solid var(--ns-border-subtle); font-family: var(--ns-font-mono); font-size: var(--ns-text-caption); color: var(--ns-muted-fg); }
+.ns-questionnaire [data-part='label'] { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; }
+.ns-questionnaire [data-part='indicator'] { display: grid; place-items: center; flex: none; inline-size: 14px; block-size: 14px; box-sizing: border-box; border: 1px solid var(--ns-border-strong); border-radius: 50%; color: var(--ns-fg); }
+.ns-questionnaire [data-multiple='true'] > [data-part='indicator'] { border-radius: 0; }
+.ns-questionnaire [data-state='selected'][data-multiple='false'] > [data-part='indicator']::after { content: ''; inline-size: 6px; block-size: 6px; border-radius: 50%; background: currentColor; }
+.ns-questionnaire [data-state='selected'][data-multiple='true'] > [data-part='indicator']::after { content: '✓'; font-size: 12px; line-height: 1; }
+.ns-questionnaire textarea[data-part='input'] { box-sizing: border-box; inline-size: 100%; min-inline-size: 0; margin-block-start: var(--ns-space-2); padding: var(--ns-space-2); border: 1px solid var(--ns-border); border-radius: var(--ns-radius-input); background: var(--ns-card); color: var(--ns-fg); font: inherit; font-size: var(--ns-text-small); resize: vertical; }
+.ns-questionnaire textarea[data-part='input']:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-questionnaire textarea[data-part='input']:disabled { opacity: 0.38; }
+.ns-questionnaire [data-part='error'] { margin-block-start: var(--ns-space-2); color: var(--ns-destructive-text); font-size: var(--ns-text-small); overflow-wrap: anywhere; }
+.ns-questionnaire > [data-part='actions'] { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ns-control-gap); justify-content: space-between; }

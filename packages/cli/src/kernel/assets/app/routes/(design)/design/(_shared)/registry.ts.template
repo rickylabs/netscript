@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 122,
+  'total': 124,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -814,6 +814,19 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Media and caller-owned transfer state with native child actions.',
   },
+  {
+    'name': 'message-scroller',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Native named message viewport with pinned-only growth following and stable latest-action focus.',
+  },
+  {
+    'name': 'questionnaire',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native answer form with caller-owned state, validation and progression.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -943,6 +956,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'marker',
       'trace',
       'attachment',
+      'message-scroller',
+      'questionnaire',
     ],
   },
   {

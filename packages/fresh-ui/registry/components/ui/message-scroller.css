@@ -1,0 +1,17 @@
+.ns-message-scroller { position: relative; display: grid; grid-template-rows: minmax(0,1fr); block-size: 100%; min-block-size: 0; min-inline-size: 0; max-inline-size: 100%; background: var(--ns-bg); color: var(--ns-fg); container-type: inline-size; }
+.ns-message-scroller__viewport { overflow: auto; min-block-size: 0; min-inline-size: 0; padding: var(--ns-space-6) 60px; box-sizing: border-box; }
+.ns-message-scroller__viewport > [data-part='content'] { display: flex; flex-direction: column; gap: var(--ns-section-gap); max-inline-size: 640px; min-inline-size: 0; margin-inline: auto; }
+.ns-message-scroller__item { min-inline-size: 0; overflow-wrap: anywhere; }
+.ns-message-scroller::before, .ns-message-scroller::after { content: ''; position: absolute; z-index: 1; inset-inline: 0; block-size: 2px; pointer-events: none; visibility: hidden; }
+.ns-message-scroller::before { inset-block-start: 0; border-block-start: 1px solid var(--ns-border-subtle); }
+.ns-message-scroller::after { inset-block-end: 0; border-block-end: 1px solid var(--ns-border-subtle); }
+.ns-message-scroller:is([data-scrollable='up'],[data-scrollable='both'])::before,
+.ns-message-scroller:is([data-scrollable='down'],[data-scrollable='both'])::after { visibility: visible; }
+.ns-message-scroller__latest { position: absolute; z-index: 2; inset-inline-end: var(--ns-space-3); inset-block-end: var(--ns-space-3); display: grid; place-items: center; inline-size: var(--ns-control-height-sm); block-size: var(--ns-control-height-sm); padding: 0; border: 1px solid var(--ns-border); border-radius: var(--ns-radius-control); background: var(--ns-bg); color: var(--ns-fg); box-shadow: var(--ns-shadow-md); cursor: pointer; }
+.ns-message-scroller:is([data-scrollable='none'],[data-scrollable='up']) .ns-message-scroller__latest:not(:focus) { visibility: hidden; }
+.ns-message-scroller__arrow { transform: rotate(90deg); }
+.ns-message-scroller__viewport:focus-visible,
+.ns-message-scroller__latest:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: -2px; }
+@container (max-width: 640px) {
+  .ns-message-scroller__viewport { padding-inline: var(--ns-space-4); }
+}

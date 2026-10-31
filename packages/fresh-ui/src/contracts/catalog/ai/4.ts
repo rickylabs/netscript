@@ -7,51 +7,57 @@ export const ai_4: readonly ComponentContract[] = [
     'specId': 'I3',
     'category': 'AI',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'scrollable': {
-        'kind': 'enum',
-        'values': [
-          'none',
-          'up',
-          'down',
-          'both',
-        ],
+      'label': {
+        'kind': 'text',
+        'required': true,
+        'description': 'Nonblank accessible native viewport name.',
       },
       'children': {
+        'kind': 'slot',
+      },
+      'followEnd': {
+        'kind': 'boolean',
+        'default': true,
+        'description': 'Follow growth only while already pinned; first mount pins when true.',
+      },
+      'endThreshold': {
+        'kind': 'number',
+        'default': 1,
+        'description': 'Finite nonnegative native CSS pixel tolerance for pinning.',
+      },
+      'scrollLabel': {
+        'kind': 'text',
+        'default': 'Scroll to latest',
+      },
+      'Item.children': {
         'kind': 'slot',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'viewport',
-        'planned': true,
       },
       {
         'name': 'content',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
-      },
-      {
-        'name': 'item',
-        'planned': true,
       },
       {
         'name': 'scroll-button',
-        'planned': true,
+      },
+      {
+        'name': 'item',
+        'when': 'when Item is supplied',
       },
       {
         'name': 'edge-top',
-        'planned': true,
         'representation': 'pseudo',
       },
       {
         'name': 'edge-bottom',
-        'planned': true,
         'representation': 'pseudo',
       },
     ],
@@ -63,13 +69,22 @@ export const ai_4: readonly ComponentContract[] = [
           'down',
           'both',
         ],
+        'default': 'none',
+        'description':
+          'Derived native geometry, never an input prop. SSR none; all four states measured after hydration.',
       },
     },
-    'booleans': [],
+    'booleans': [
+      'followEnd',
+    ],
     'slots': [
       {
         'name': 'children',
         'part': 'content',
+      },
+      {
+        'name': 'Item.children',
+        'part': 'item',
       },
     ],
     'apg': 'native scrollable region and button',
@@ -92,6 +107,9 @@ export const ai_4: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control.',
+      'Caller owns finite root height or constrained flex/grid parent; native scroll anchoring and keys remain intact.',
+      'Scroll button stays mounted/visible while focused after pinning; otherwise pinned/unfocused visibility hidden removes it from native tab order. No live region; host owns new-message announcements.',
+      'Ledger viewport24x60, max content640 (spec720), subtle border edge rules rather than gradients; no new glyph: existing arrow-right rotates90degrees.',
     ],
   },
   {

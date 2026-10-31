@@ -465,3 +465,55 @@ in the accessibility tree while visually hidden; progress is omitted and the
 trailing glyph carries the visual state. Busy state updates preserve native
 action identity and focus. Use caller content or host announcements for detailed
 transfer outcomes; these components never create automatic live announcements.
+
+### Pinned message scrolling and native questionnaires
+
+Install message-scroller or questionnaire with ui:add and import the copied
+component from @/components/ui/. MessageScroller requires a nonblank label and a
+finite height, or a parent with a constrained flex/grid track:
+
+    <MessageScroller label='Conversation' style={{ height: 320 }}>
+      <MessageScroller.Item>
+        <p>Caller-owned message content.</p>
+        <a href='/sources'>Read sources</a>
+      </MessageScroller.Item>
+    </MessageScroller>
+
+The named native viewport supports normal Arrow/Page/Home/End scrolling and child
+Tab order. Its data-scrollable value is measured none/up/down/both, never a prop.
+SSR reports none until geometry is available. First mount follows the end when
+followEnd is true (the default); later text, content and size changes follow only
+while already pinned. Scrolling away preserves the reader's position. Turning
+followEnd on later does not force an unpinned reader to move. endThreshold is a
+finite nonnegative pixel tolerance, default 1. scrollLabel localizes "Scroll to
+latest". That native action keeps focus after reaching the end; when pinned and
+unfocused it leaves the tab order. The component adds no live region: the host
+owns new-message announcements. Every instance owns and cleans up its observers,
+native listener and pending frame.
+
+Questionnaire renders one real native form with the ledger's 480px maximum width.
+Never nest it inside another form;
+compose a multi-step flow by rendering one Questionnaire per form. title names
+the form and answer group. step is question (default), freeform or complete; the
+caller owns progression and validation messages. options have unique nonempty
+value, label, optional decorative shortcut and disabled. Shortcut text installs
+no keyboard binding. Native radios provide single selection and arrow keys;
+multiple enables named checkboxes. Radio edge wrapping follows the browser's
+native policy. name defaults to answer, scoped to each form.
+value/defaultValue are readonly string arrays; single mode uses the first value.
+onValueChange proposes an answer; controlled refusal retains the accepted
+physical state of the entire native group. text/defaultText and onTextChange
+provide the corresponding freeform textarea port, with optional placeholder.
+Textarea Enter remains a newline. Restoring refused controlled text can move the\ncaret to the end, following native value-assignment behavior.
+
+Use native onSubmit/FormData and caller-supplied actions with explicit button
+types. Native action/method submission also works before hydration. Actions sit
+outside the disabled answer fieldset, so the host can offer Previous, Skip or
+Edit while answers are disabled. description/error link to answer controls;
+progress and children are caller content. Complete renders no answer controls or
+hidden persisted values; retain submitted answers in the host. A native reset
+honors onReset prevention, resets uncontrolled answers to their initial
+defaultValue/defaultText, and retains controlled accepted answers. Later changes
+to default* props do not change that initial reset baseline. Other supplied
+native form fields keep their own native reset behavior. Reset synthesizes no
+change or submit callback.
