@@ -36,6 +36,22 @@ binds them to a NetScript host.
 - **An operations CLI** — `list`, `add-webhook`, `add-scheduled`, `add-file-watch`, `fire`,
   `preview`, `test`, `events`, and `enable`/`disable` cover authoring and operating triggers.
 
+## Installing before the first definition
+
+Install without example definitions, then generate the registry:
+
+```sh
+netscript plugin install triggers --no-db --no-samples
+netscript generate plugins
+netscript plugin doctor
+```
+
+An installed plugin with zero definitions gets a typed empty registry. Doctor reports the empty
+registry as a warning and exits successfully; a missing or stale registry remains an error. With
+its configured dependencies available, the background runner starts idle and reports ready with
+zero definitions. Add your first definition and run `netscript generate plugins` again. Removing
+the last definition and regenerating keeps a valid empty registry.
+
 ## Excluding helpers from generated registries
 
 `netscript generate plugins` selects definition modules from `triggers/*.ts`. Keep a helper or a
