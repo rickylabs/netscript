@@ -49,3 +49,27 @@ settlement ambiguity. Revised plan locks all four, including real regressions. N
 - Run-owned backend processes stopped at handoff. No foreign resources changed.
 - Reconcile: draft PR #2483 remains open; no labels/milestones changed; coordinator #2474
   owns the next decision. Assignment and final-report files excluded from commits.
+
+
+## Authorized resumption — 2026-10-31
+
+Coordinator authorization: https://github.com/rickylabs/netscript/pull/2483#issuecomment-6536979349
+
+> Authorized: a fresh PLAN-EVAL cycle, at most 2 rounds, on your revised per-claim fence and recovery-grace design, in this draft PR. Keep both earlier verdicts in plan-eval.md and use the same separate Opus 5.5 evaluator session. Implementation starts only after a PLAN-EVAL PASS.
+
+Latest user instruction: more work remains, keep going and mark ready when done.
+Both prior FAIL_PLAN verdicts are retained. New cycle uses the same evaluator; no waiver
+of acceptance, independence, or final exact-head evaluation. NetScript MCP consulted again.
+
+Second-cycle design replaces rejected WATCH proposal with atomic Lua pickup+lease,
+receipt-fenced grace-aware reclaim and legacy orphan observation. Cancellable 50ms idle
+polling, unchanged sequential listener structure, durable outbox/counters. No dependencies.
+Garnet probe rejects XAUTOCLAIM; transactional Lua works. Document both required Lua flags.
+
+New cycle round 1 FAIL_PLAN: Lua prerequisite would break generated Garnet defaults.
+Resolved in plan by expanding generator/test scope to enable both Lua flags in Container,
+Executable and Auto paths, with existing-project migration docs. New cycle round 2 pending.
+
+Authorized cycle round 2: PASS. Independent evaluator confirmed both generator launch
+functions cover every Garnet arm, including Auto fallback. Implementation now authorized.
+Reconcile: no code yet; scaffold CI verdict is required and coordinator will be notified.

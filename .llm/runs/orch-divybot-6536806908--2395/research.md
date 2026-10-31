@@ -14,3 +14,7 @@
 - NetScript MCP find_guidance then search_docs consulted; local ports/source are the detailed
   contract authority. Prior memory confirms structured wrappers and Claude print launcher.
 - No Acceptance checkboxes exist in the issue body; owner's behavior/proof bullets are the bar.
+
+Second-cycle research: real Garnet 2.2.1 rejects XAUTOCLAIM; Redis 7 recognizes it.
+Garnet transactional Lua TIME/TYPE succeeds with both Lua flags enabled. Official
+configuration documents key locking. Retain LIST compatibility through native scripts.

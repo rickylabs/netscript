@@ -15,3 +15,11 @@ Routing inspected with `deno task agentic:matrix --tier feature --json`.
 Owner evaluator override, quoted verbatim in worklog: separate Claude Opus 5.5 high
 PLAN-EVAL and IMPL-EVAL, read-only, stdin closed. Vendor/session independence is mandatory.
 Raw evaluator identity and transport data remain outside Git; only sanitized evidence is retained.
+
+Coordinator authorized fresh two-round PLAN-EVAL cycle at the linked PR decision in worklog.
+Atomic server-side scripts replace the rejected shared-WATCH design. Additional write surface
+if needed: packages/queue/tests/abort-cleanup_test.ts (lease lifecycle stub) only.
+
+Expanded necessary compatibility scope: CLI helper register/generate-register-infrastructure.ts
+and helper tests/generate-register-infrastructure_test.ts, to enable atomic Lua in all generated
+Garnet launch arms. Record rescope and require coordinator-owned scaffold-runtime CI gate.
