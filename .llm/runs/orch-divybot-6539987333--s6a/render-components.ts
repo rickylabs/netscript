@@ -4,6 +4,8 @@ import { basicFixtures } from '../../../packages/fresh-ui/tests/contracts/utilit
 import { compositeFixtures } from '../../../packages/fresh-ui/tests/contracts/utility-composites.tsx';
 import { proseFixture } from '../../../packages/fresh-ui/tests/contracts/utility-prose.ts';
 
+import { Card } from '../../../packages/fresh-ui/registry/components/ui/card.tsx';
+
 const fixtures = [...basicFixtures, ...compositeFixtures, proseFixture];
 const output = [];
 for (const fixture of fixtures) {
@@ -16,6 +18,7 @@ for (const fixture of fixtures) {
       : render(h(Fragment, null, fixture.render!())),
   });
 }
+output.push({name:'card/keyboard',component:'card',scope:'card',html:render(h(Card,{interactive:true,tabIndex:0,children:h(Card.Body,{children:'Focusable card'})}))});
 await Deno.writeTextFile(Deno.args[0], JSON.stringify(output));
 console.log(
   `Rendered ${output.length} fixtures for ${

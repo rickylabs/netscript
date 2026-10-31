@@ -194,9 +194,6 @@ export const data_display_1: readonly ComponentContract[] = [
           'info',
           'muted',
         ],
-        'plannedValues': [
-          'info',
-        ],
       },
       'data-emphasis': {
         'values': [

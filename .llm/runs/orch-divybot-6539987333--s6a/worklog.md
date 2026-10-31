@@ -42,3 +42,9 @@ Utility-only data-part rules implemented in the eleven locked CSS files. All ref
 S2 review round 1 FAIL_FIX: evidence stale relative to in-flight fixes and label font must use font-label. Corrected label role, invalid field-label tone, and bare-studio alias. Source frozen in s2-source-hashes.json. Fresh gates: 95 tests PASS, quality:gate exit 0, legacy 262×2 unchanged, full 114-fixture/542-measurement browser run zero errors with stronger state assertions. S2 retry pending.
 
 S2 independent retry PASS. Reconcile: remote remains af6418f with no new reviewer comments; eleven CSS hashes match final browser evidence. Carry forward transparent filter-form fill to S3; dark off-thumb spec/reference discrepancy remains an explicit design gap. S2 signed off.
+
+## S3 surfaces/feedback
+
+Source frozen in s3-source-hashes.json. Utility card top-rule, panel/feedback roles, square avatars, info Badge, dark-visible indicators, single-title toasts and bottom-end placement implemented. Contract/type/render/JSON stay in sync. Gates: 93 tests pass; structured check/lint/fmt each cover 3 TS files, zero findings; quality gate exit 0; legacy 262×2 unchanged; 92 fixtures/230 measurements, zero browser errors including toast mobile/desktop RTL placement. Shared preset card specificity required the default variant qualifier; browser top-rule assertion proves it. Independent review pending.
+
+S3 independent PASS. Reconcile: all 20 frozen source hashes verified; no unreviewed source edits. S6 must capture indeterminate progress at a visible/static phase; footer border follows spec pending final ledger check. S3 signed off.

@@ -5423,9 +5423,6 @@
             "destructive",
             "info",
             "muted"
-          ],
-          "plannedValues": [
-            "info"
           ]
         },
         "data-emphasis": {

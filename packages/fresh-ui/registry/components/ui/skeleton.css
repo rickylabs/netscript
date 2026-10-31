@@ -104,3 +104,24 @@
     background: color-mix(in srgb, var(--ns-fg) 8%, transparent);
   }
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='skeleton'][data-part='block'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='skeleton'][data-part='line'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='skeleton'][data-part='box'] {
+  border-radius: var(--ns-radius-control);
+  background: var(--ns-muted);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='skeleton'][data-part='card'] {
+  border-radius: var(--ns-radius-card);
+  border-color: var(--ns-card-border);
+  background: var(--ns-card-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='skeleton'] {
+    transition: none;
+    animation: none;
+  }
+}

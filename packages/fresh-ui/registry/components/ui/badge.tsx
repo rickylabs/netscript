@@ -15,6 +15,7 @@ import type { Renderable } from '../../lib/public-types.ts';
 export type BadgeVariant =
   | 'primary'
   | 'secondary'
+  | 'info'
   | 'success'
   | 'warning'
   | 'destructive'

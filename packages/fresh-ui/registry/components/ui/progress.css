@@ -74,3 +74,41 @@
     transform: translateX(70%);
   }
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='track'] {
+  border-radius: var(--ns-radius-control);
+  background: var(--ns-material-track);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='bar'] {
+  border-radius: inherit;
+  background: var(--ns-marker);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='root'][data-variant='secondary'] [data-scope='progress'][data-part='bar'] {
+  background: var(--ns-secondary-text);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='root'][data-variant='success'] [data-scope='progress'][data-part='bar'] {
+  background: var(--ns-success);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='root'][data-variant='warning'] [data-scope='progress'][data-part='bar'] {
+  background: var(--ns-warning);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='root'][data-variant='destructive'] [data-scope='progress'][data-part='bar'] {
+  background: var(--ns-destructive);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'][data-part='track']:dir(rtl) {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='progress'] {
+    transition: none;
+    animation: none;
+  }
+}
