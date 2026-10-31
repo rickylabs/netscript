@@ -5,8 +5,8 @@ import { SagaEngine } from '@netscript/plugin-sagas-core/runtime';
 import { MemorySagaStore } from '@netscript/plugin-sagas-core/testing';
 import type { SagaCorrelationKey, SagaState } from '@netscript/plugin-sagas-core/domain';
 import {
+  createProjectingSagaStore,
   PrismaSagaInstanceProjection,
-  ProjectingSagaStore,
 } from '../../src/runtime/saga-instance-projection.ts';
 import { sagasV1 } from './routers/v1-handlers.ts';
 import type { PrismaRecord, SagaServiceDatabaseClient } from './routers/v1-types.ts';
@@ -50,7 +50,7 @@ Deno.test('Prisma-backed saga API retains its query model when optional archiveT
   };
   const projection = new PrismaSagaInstanceProjection(client, () => false, 'prisma');
   const engine = new SagaEngine({
-    store: new ProjectingSagaStore(new MemorySagaStore(), projection),
+    store: createProjectingSagaStore(new MemorySagaStore(), projection),
   });
   const definition = defineSaga('prisma-query').state<SagaState>({ status: 'pending' })
     .on('Done', () => [sagaComplete()]).build();

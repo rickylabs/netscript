@@ -1,5 +1,17 @@
 import { SagaKvRetention, sagaRetentionRemaining } from './saga-kv-retention.ts';
 import { SagasError } from '../domain/mod.ts';
+import { snapshotTransitionCommit } from '../application/validate-transition-commit.ts';
+import {
+  decodeKvSagaEnvelope,
+  decodeKvSagaRecord,
+  type KvSagaEnvelope,
+  type KvSagaRecord,
+} from './kv-saga-records.ts';
+import type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+} from '../ports/saga-transition-commit-port.ts';
 import { getKv } from '@netscript/kv';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type {
@@ -26,6 +38,7 @@ export type {
 } from '@netscript/kv';
 
 const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
+const ATOMIC_APPLIED_KEY_NAMESPACE = 'transition-v1';
 const SAGA_KV_PATH_ENV = 'NETSCRIPT_SAGA_KV_PATH';
 
 /** Options for the KV-backed saga runtime store. */
@@ -44,9 +57,16 @@ export function openSagaRuntimeKv(): Promise<KvStore> {
 }
 
 /** KV-backed saga state store for durable native saga execution. */
-export class KvSagaStore implements SagaStorePort {
+export class KvSagaStore implements SagaStorePort, SagaTransitionCommitPort {
   /** Stable store identifier used by runtime diagnostics. */
   readonly id = 'kv-saga-store';
+  /** State and replay share one CAS; worker command delivery needs its own supported adapter. */
+  readonly transitionCommitCapabilities: SagaTransitionCommitPort['transitionCommitCapabilities'] =
+    Object.freeze({
+      transitionOutbox: 'unsupported',
+      optimisticVersion: true,
+      replay: 'same_commit',
+    });
   readonly #kv: KvStore;
   readonly #prefix: KvKey;
   readonly #now: () => Date;
@@ -56,6 +76,7 @@ export class KvSagaStore implements SagaStorePort {
 
   /** Create a saga store over the supplied KV adapter. */
   constructor(options: KvSagaStoreOptions) {
+    requireAtomic(options.kv);
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? DEFAULT_SAGA_KV_PREFIX;
     this.#now = options.now ?? (() => new Date());
@@ -63,12 +84,88 @@ export class KvSagaStore implements SagaStorePort {
     this.#retention = new SagaKvRetention(this.#kv, this.#prefix, this.#now);
   }
 
+  /** Read only committed digests, independently of legacy pre-handler reservations. */
+  async hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return await this.#kv.get(this.#atomicAppliedKey(instanceId, keyHash)) !== null;
+  }
+
+  /** Commit state, history, correlation ownership and replay in one crash-safe compare-and-swap. */
+  async commitTransition(
+    request: SagaTransitionCommitRequest,
+    signal?: AbortSignal,
+  ): Promise<SagaTransitionCommitResult> {
+    signal?.throwIfAborted();
+    const value = snapshotTransitionCommit(request);
+    if (value.commands.length) {
+      throw new TypeError('KV saga store does not support worker commands.');
+    }
+    const { envelope, correlation, record, appliedKeyHash, expectedVersion } = value;
+    const instanceId = envelope.metadata.instanceId;
+    const appliedKey = appliedKeyHash === undefined
+      ? undefined
+      : this.#atomicAppliedKey(instanceId, appliedKeyHash);
+    if (appliedKey && await this.#kv.get(appliedKey)) return { committed: false };
+    const stateKey = this.#stateKey(instanceId);
+    const correlationKey = this.#correlationKey(correlation.sagaId, correlation.correlationKey);
+    const [state, owner] = await Promise.all([
+      this.#kv.get<SagaStateEnvelope>(stateKey),
+      this.#kv.get<SagaInstanceId>(correlationKey),
+    ]);
+    if (
+      (expectedVersion === 0
+        ? state !== null
+        : state?.value.metadata.version !== expectedVersion) ||
+      (owner !== null && owner.value !== instanceId)
+    ) {
+      if (appliedKey && await this.#kv.get(appliedKey)) return { committed: false };
+      throw SagasError.retryable(`Saga store version mismatch for ${instanceId}.`);
+    }
+    const expireIn = this.#remaining(envelope);
+    if (expireIn !== undefined && expireIn <= 0) {
+      throw SagasError.validationFailed('Cannot commit an already-expired saga transition.');
+    }
+    const mutations: AtomicMutation[] = [
+      { type: 'set', key: stateKey, value: envelope, expireIn },
+      { type: 'set', key: correlationKey, value: instanceId, expireIn },
+      {
+        type: 'set',
+        key: [...this.#prefix, 'correlation-instance', instanceId],
+        value: correlation,
+        expireIn,
+      },
+      {
+        type: 'set',
+        key: this.#transitionKey(instanceId, record.version),
+        value: record,
+        expireIn,
+      },
+      expireIn === undefined
+        ? { type: 'delete', key: this.#retention.key(instanceId) }
+        : this.#retention.mutation(instanceId, this.#now().getTime() + expireIn),
+    ];
+    if (appliedKey) mutations.push({ type: 'set', key: appliedKey, value: true, expireIn });
+    signal?.throwIfAborted();
+    const result = await requireAtomic(this.#kv)([
+      { key: stateKey, versionstamp: state?.versionstamp ?? null },
+      { key: correlationKey, versionstamp: owner?.versionstamp ?? null },
+      ...(appliedKey ? [{ key: appliedKey, versionstamp: null }] : []),
+    ], mutations);
+    if (result.ok) return { committed: true };
+    if (appliedKey && await this.#kv.get(appliedKey)) return { committed: false };
+    throw SagasError.retryable(`Saga store version mismatch for ${instanceId}.`);
+  }
+
+  // Nested below the raw-key depth: legacy keys cannot masquerade as committed digests.
+  #atomicAppliedKey(instanceId: SagaInstanceId, keyHash: string): KvKey {
+    return [...this.#prefix, 'applied', instanceId, ATOMIC_APPLIED_KEY_NAMESPACE, keyHash];
+  }
+
   /** Load a saga state envelope by instance id. */
   async load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {
-    const entry = await this.#kv.get<SagaStateEnvelope<TState>>(this.#stateKey(instanceId));
-    return entry?.value ?? undefined;
+    const entry = await this.#kv.get<KvSagaEnvelope<TState>>(this.#stateKey(instanceId));
+    return entry ? decodeKvSagaEnvelope(entry.value) : undefined;
   }
 
   /** Batch-read canonical state in native KV pages of at most ten identities. */
@@ -80,9 +177,11 @@ export class KvSagaStore implements SagaStorePort {
     for (let offset = 0; offset < keys.length; offset += 10) {
       const page = keys.slice(offset, offset + 10);
       const entries = this.#kv.getMany
-        ? await this.#kv.getMany<SagaStateEnvelope>(page)
-        : await Promise.all(page.map((key) => this.#kv.get<SagaStateEnvelope>(key)));
-      envelopes.push(...entries.map((entry) => entry?.value ?? undefined));
+        ? await this.#kv.getMany<KvSagaEnvelope>(page)
+        : await Promise.all(page.map((key) => this.#kv.get<KvSagaEnvelope>(key)));
+      envelopes.push(
+        ...entries.map((entry) => entry ? decodeKvSagaEnvelope(entry.value) : undefined),
+      );
     }
     return envelopes;
   }
@@ -242,9 +341,9 @@ export class KvSagaStore implements SagaStorePort {
   > {
     const entries: SagaStateEnvelope<TState>[] = [];
     for await (
-      const entry of this.#kv.list<SagaStateEnvelope<TState>>({ prefix: this.#statesPrefix() })
+      const entry of this.#kv.list<KvSagaEnvelope<TState>>({ prefix: this.#statesPrefix() })
     ) {
-      entries.push(entry.value);
+      entries.push(decodeKvSagaEnvelope(entry.value));
     }
     return Object.freeze(entries);
   }
@@ -255,11 +354,11 @@ export class KvSagaStore implements SagaStorePort {
   ): Promise<readonly SagaTransitionRecord<TState>[]> {
     const records: SagaTransitionRecord<TState>[] = [];
     for await (
-      const entry of this.#kv.list<SagaTransitionRecord<TState>>({
+      const entry of this.#kv.list<KvSagaRecord<TState>>({
         prefix: this.#transitionPrefix(instanceId),
       })
     ) {
-      records.push(entry.value);
+      records.push(decodeKvSagaRecord(entry.value));
     }
     return Object.freeze(records);
   }
@@ -299,8 +398,8 @@ export class KvSagaStore implements SagaStorePort {
       : this.#savedVersions.get(knownEnvelope);
     for (let attempt = 0; attempt < 3; attempt++) {
       if (versionstamp === undefined) {
-        const current = await this.#kv.get<SagaStateEnvelope>(stateKey);
-        envelope = current?.value;
+        const current = await this.#kv.get<KvSagaEnvelope>(stateKey);
+        envelope = current ? decodeKvSagaEnvelope(current.value) : undefined;
         versionstamp = current?.versionstamp ?? null;
       }
       // A saved instance that has since disappeared must not recreate history or correlations.

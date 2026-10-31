@@ -119,7 +119,7 @@ Deno.test('projected atomic runtime commits worker intent and state together, th
       await durable.dispose();
     }
   }
-  assertEquals(calls.length, 2);
+  assertEquals(calls.length, 1);
   assertEquals(calls[0].commands.length, 1);
   assertEquals(calls[0].envelope.state.count, 1);
   assertEquals(delegate.transitions(calls[0].correlation.instanceId).length, 1);

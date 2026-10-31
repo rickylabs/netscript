@@ -159,8 +159,8 @@ Deno.test('known engine envelope and correlation avoid per-step retention reads'
   await engine.start();
   try {
     await engine.handle({ type: 'Tick', payload: {}, correlationKey: 'one' as SagaCorrelationKey });
-    // Correlation lookup + engine state + save CAS. No reverse-index or follow-up envelope reads.
-    assertEquals(kv.reads, ['correlation', 'state', 'state']);
+    // Correlation lookup + engine state + state/correlation CAS. No ancillary retention reads.
+    assertEquals(kv.reads, ['correlation', 'state', 'state', 'correlation']);
   } finally {
     await engine.stop();
   }
