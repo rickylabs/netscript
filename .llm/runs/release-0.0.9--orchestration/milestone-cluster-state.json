@@ -1276,7 +1276,7 @@
     {
       "id": "G1-1366",
       "lane": "features",
-      "phase": "gating",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2542,
       "headSha": "99cda632399925cf2431a1ba391b50e53de23f55",
@@ -1285,7 +1285,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-1366",
       "receiptRefs": [],
-      "note": "test-5 fix pushed 99cda63; needs exact-head MERGE + re-READY; e2e re-running"
+      "note": "e2e red at 99cda63: generated.deno-fmt-check; steered"
     },
     {
       "id": "G1-2068",
@@ -1661,12 +1661,14 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2542,
       "headSha": "99cda632399925cf2431a1ba391b50e53de23f55",
       "startedAt": "2026-10-31T14:40:48Z",
       "via": "label e2e-cli-gate",
-      "note": "e1c68e5 run cancelled by fix push; re-running at 99cda63"
+      "note": "e1c68e5 run cancelled by fix push; re-running at 99cda63",
+      "result": "FAILURE generated.deno-fmt-check (both tiers) \u2014 product failure; label removed",
+      "completedAt": "2026-10-31T14:50:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1888,7 +1890,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T14:49:31Z",
+  "updatedAt": "2026-10-31T14:51:44Z",
   "dispatches": [
     {
       "issue": 2438,

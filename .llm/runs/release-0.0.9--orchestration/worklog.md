@@ -298,3 +298,5 @@
 - 14:43:35Z: #2542 pushed `99cda63` (test-5 fix); e2e re-running at the new head.
 - 14:45:21Z: #2542 Opus MERGE at `99cda63`; e2e running.
 - 14:49:30Z: **merged** #2541 (`8a2cbc1f3`) for #2068 (partial). The issue auto-closed through the linked-issue reference and was reopened with an explanation (EIS-Chat box pending Eric).
+- 14:51:43Z: #2542 (#1366) e2e RED at `99cda63`: gate generated.deno-fmt-check (generated project not fmt-clean). Steered the worker, removed the label; **expensive-gate.released**.
+- 14:52:01Z: Asked Cockpit and the Fresh UI lane to refresh #2408 (stale since 10-28; delivers #2406), or agree to a separate #2406 leaf.
