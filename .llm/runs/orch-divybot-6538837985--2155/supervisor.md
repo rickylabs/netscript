@@ -11,3 +11,15 @@
 - PR ownership: implementer opens draft and marks ready; coordinator controls labels, milestone and merge. No local scaffold runtime E2E.
 
 - Declared docs-tooling follow-up: `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv`, regenerated after restoring the worker lesson. No scan policy changes; reason/evidence in drift.md.
+
+## Coordinator generated-only exception
+
+Authority: https://github.com/rickylabs/netscript/pull/2494#issuecomment-6539166396
+
+**Authorized:** regenerate the generated documentation carriers that the docs freshness gates require, using only the canonical generator tasks. That means `packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`, then rechecking `publish-assets` and `assets-barrel`, regenerating whatever they report stale.
+
+Two limits:
+- Commit generator output only. No hand edits, and no other `packages/**` or `plugins/**` changes.
+- Name each regenerated file and the generator command that produced it in the READY reply.
+
+Allowed package writes are only canonical generator output required by prose, publish-assets and assets-barrel freshness. Framework source remains excluded. Final exact-head evaluation is rerun after integration as explicitly requested.

@@ -42,3 +42,18 @@ The full allowlisted `agent-docs-prose` gate was also measured through run-gate.
 
 - `deno task check:aspire-version-parity` initially failed manifest freshness because the restored worker page mentions Aspire. Its existing generator adds exactly that public-page row; rerun exits 0, manifestFresh true, no missing paths and zero failures. No scan rule or exclusion changes.
 - On the evidence head before that one-row metadata follow-up: normal snippets pass with 26 compiled Tier-1 fences, the combined focused/source test wrapper passes 34/34, and the allowlisted docs-accuracy receipt passes. Source docs and test are unchanged.
+
+## Coordinator-authorized carrier integration (S3)
+
+| File | Canonical generator | Result |
+| --- | --- | --- |
+| packages/cli/src/kernel/assets/agent-docs-prose.generated.ts | `deno task gen:agent-docs-prose` | Exit 0; fresh corpus matches rendered docs, including restored worker lesson |
+| packages/mcp/src/publish-assets.generated.ts | `deno task gen:publish-assets` | Exit 0; refreshed MCP documentation fallback |
+
+Both files match the separately generated preview byte-for-byte; hashes and authorization are in generated-carriers.json. No authored package/plugin source or lock changes.
+
+- Allowlisted agent-docs-prose after regeneration: PASS, exit 0. This supersedes the earlier stale-carrier failures without weakening the gate.
+- `check:publish-assets`: initially reports exactly the MCP generated file stale after prose refresh; canonical regeneration fixes it; recheck exits 0.
+- `check:assets-barrel`: its canonical generation produced no additional changed file, but the precommit task exits 1 because its final git diff detects the pending prose-carrier update. Rerun after commit for the authoritative verdict.
+- Structured TS check of the two generated files: exit 0, 2 selected files, no findings.
+- `quality:gate` (quality scan + architecture): exit 0; existing warning-only findings remain.

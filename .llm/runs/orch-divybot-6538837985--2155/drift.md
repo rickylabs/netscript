@@ -12,3 +12,5 @@
 - Independent S1 review PASS for docs. Its suggested publish-assets check was run: PASS, because it embeds the existing carrier. Do not confuse that result with fresh rendered-site prose; coordinator must rerun the chain after regeneration.
 
 - Final CI preflight found the Aspire scan manifest stale because the restored worker lesson now mentions Aspire. Scope addition: regenerate only `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv` with its existing generator. This is docs tooling allowed by the assignment; it adds the maintained lesson to the scan, without changing scan rules, exclusions or package/plugin code. Record as a small follow-up slice before exact-head evaluation.
+
+- Coordinator authorization resolves the generated-package boundary: https://github.com/rickylabs/netscript/pull/2494#issuecomment-6539166396. Only canonical generator outputs required for docs carrier freshness may change under packages. No authored framework source or plugins changes. Final review must name the new exact pushed head.

@@ -64,3 +64,13 @@ Reconcile S2: source docs and test remain byte-identical to S1. Only scoped run 
 Before freezing the final head, check:aspire-version-parity identified a stale manifest after restoring the worker chapter. Regenerated with the existing aspire-surface-manifest.ts generator: exactly one row added for docs/site/tutorials/eis-chat/03-deliver-worker.md. Recheck PASS (manifestFresh true, 0 failures, missing []). This permitted docs-tooling metadata change expands scanning to the restored page; no rule or exclusion changed. Final independent review will include this deterministic follow-up.
 
 The source remained unchanged while exact-head exploratory final gates at 1fb5f71 passed docs accuracy, 34 focused tests and normal snippets. The full agent-docs-prose gate still failed at that head, confirming the recorded package-carrier prerequisite. CI close-gate also reflects the unchecked prerequisite, not missing issue acceptance (there are no issue checkboxes).
+
+## S3 — coordinator-authorized generated carrier integration
+
+The coordinator authorized generated-only package updates in PR comment 6539166396. Exact authorization and limits are preserved in supervisor.md. The prior scope blocker is resolved; no package file will be hand-edited. Use canonical gen:agent-docs-prose, check:publish-assets and check:assets-barrel, regenerating only reported stale outputs. Record each changed file and its generator for READY. No branch rebase, force push, label, milestone or merge.
+
+The externally prepared two-file preview demonstrated freshness and MCP byte-budget headroom, but it is not applied: the coordinator requires canonical generator tasks on the assigned branch.
+
+S3 generated exactly two package files through the canonical tasks: CLI prose carrier via gen:agent-docs-prose; MCP publish assets via gen:publish-assets. Both are byte-identical to the external canonical preview. Authoritative after-generation agent-docs-prose and publish-assets checks pass, as do scoped generated-file check and quality:gate. assets-barrel generation changes no other file; its final diff check awaits the committed tree. Generator commands and hashes are recorded in generated-carriers.json. No other package/plugin/lock changes.
+
+The prior final CHANGES at 7bc4f21 is preserved as historical evidence. The coordinator explicitly requested another exact-head review after this generated-only integration; it will use the same independent evaluator.
