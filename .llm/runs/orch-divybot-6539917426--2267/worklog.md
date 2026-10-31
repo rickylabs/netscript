@@ -102,3 +102,17 @@ stdin; prompts require read-only operation and blockers-only verdicts.
   refinement, independently repeated all 12 original-file failures, all 12
   missing-delivery timeout failures, and the 160-pass full KV suite. No blockers.
 - S1 independent slice review gate satisfied. Commit/push follows this record.
+
+## S1 terminal / S2 close record
+
+- S1 committed and pushed: `883b0a4737e878a56e3402522cc7d4ddddb8e4de`. PR phase comment links scope and evidence.
+- S1 reconcile: local source hashes match tested/reviewed bytes; PR references
+  #2267 without closure, coordinator #2474 owns taxonomy; no new review comments.
+- S2 introduces only the final coordinator map and resumable records. Gate:
+  documentation/diff inspection and independent final head review. No source
+  changes since the reviewed 160-pass suite.
+- Dated lesson and small environment/validation/API/timeout memory notes retained
+  here. No new architecture debt; existing KV restructuring remains separate.
+- Remaining after S2 push: mark ready, immutable-head evaluation/CI snapshot,
+  review-thread gate and atomic READY report handoff. No further commit after
+  the final evaluation unless a blocking finding requires a new review cycle.
