@@ -199,4 +199,3 @@ Process probe: ok
 - Age: 0 ms
 - Stale: false
 - User command: `kill -TERM '1139113'`
-

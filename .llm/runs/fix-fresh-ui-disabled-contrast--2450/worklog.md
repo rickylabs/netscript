@@ -37,3 +37,17 @@ Correction to evaluator launch prose: the canonical structured result is40tests,
 IMPL-EVAL PASS (evaluate.md). Separate read-only reviewer substantively checked all annotation guards, measurements, source exclusion diff, consumers and regression evidence. No implementation defect or new debt. Evidence text corrections: canonical tests40/0, root4011files/34batches/0findings; evaluator verdict is now populated by captured output. The launch prompt guessed43 before receipt inspection; that count is superseded, never published.
 
 Reconcile: origin/main advanced to3d83caf1c (auth foreign-cookie fix #2498); no changes overlap token source/tests or policy. Baseline pinned export and values remain unchanged. No carrier diffs from canonical generators. This reviewed source checkpoint enables clean-source corpus generation; immutable checkpoint receipts and final exact-headCI remain release conditions.
+
+## Immutable source checkpoint evidence
+
+Source checkpoint0aef6eaa2575 (full SHA in receipts); package sources are committed and clean. Canonical corpus regeneration WITHOUT --allow-dirty followed by assets/publish generation produced no product/carrier diff. All6clean canonical receipts PASS at that checkpoint: quality-gate,docs-accuracy,assets-barrel,agent-docs-prose,mcp-export-corpus,publish-assets. Release preflight exit0. All8otherstaticcheck tasks exit0 (clean-static-checks.json),review-threads exit0, completing13rootcheck:*tasks. Existing fulltest40/0 and rootcheck4011/0 evidence applies to identical product sources; final exact-headCI will revalidate release head with evidence-only additions.
+
+Run-owned generated leak-report EOF normalized after a whitespace-only diff check; no resource log content removed. No new framework changes after independent implementation PASS. Final evidence re-review requested from same evaluator before final commit.
+
+Tracker reconciliation: marked the three code acceptance boxes in #2450 complete based on merged #2495 and its verified head; left the Figma burn-down box unchecked. Full before/after issue bodies retained under project runs/2026-10-31-disabled-contrast-ci. No issue closed and no duplicate sibling filed for the already-owner-controlled dependent Figma value/export pass.
+
+## Final evidence sign-off
+
+Same independent implementation evaluator re-reviewed all repaired records and clean-source checkpoint receipts: finalPASS (evaluate-final.md). Final commit contains runartifacts only. Product sources remain0aef6eaa2575. No framework/dependency/export/lock changes after substantive review; no new architecture debt. All local configured gates are terminal except explicitly UNPROVEN runtime and inherited wholepackage audit debt.
+
+CI activation detail: workflows deliberately skip every required job on draft PR events (ci.yml and fresh-ui-quality.yml). After this evidence-only finalcommit, the PR must leave draft to materialize real checks. The owner-required visible READY report is withheld until all required contexts actually execute and pass at that exact finalhead. No workflow/label bypass and no merge.
