@@ -265,10 +265,10 @@ content slots. ContextMenu accepts ordinary region content plus menu records,
 opens at pointer coordinates or with Shift+F10/ContextMenu, and shares the
 action/choice/submenu behavior of Menubar. Hydrate these controls in islands.
 
-AlertDialog's Utility destructive action temporarily inverts the existing
-destructive-text/card pair to keep small text readable. The canonical
-destructive/default palette remains owned by the token workstream; no palette
-values change here.
+AlertDialog's Utility destructive action uses the canonical destructive fill and
+foreground roles. Its scoped hover binds destructive/hover rather than the generic
+legacy Button's raw red ramp. The existing text/card inversion is removed; shared
+token values remain owned by the token workstream and are unchanged here.
 
 Data display additions: `ui:add item kbd collapsible` copies presentation rows, native keyboard notation and native details disclosures. Item retains native child links/actions; Kbd adds no focus targets; after hydration, Collapsible supports controlled open refusal and blocks disabled summary activation. Before hydration, its summary retains native disclosure behavior.
 
@@ -280,7 +280,7 @@ Chart uses an explicit `locale` (`en-US` by default) for consistent server/clien
 
 `lineNumbers`, `footer`, `footerContent`, `scrollbar`, `size` and `tone` customize the surface. Diff `lines` carry raw `text`, optional `number` and `variant` (`default`, `added`, `removed`, `highlighted`); visible plus/minus signs supplement color. Plain text is escaped. Trusted syntax content can use `CodeBlock.Token` with existing keyword/function/type/string/number/comment/punctuation roles. Clipboard writes use the exact `code` when supplied, otherwise resulting row text excluding removals. `onCopied(source)` and `onCopyError(error)` report actual outcomes; native `onCopy` remains a DOM clipboard event. A pending copy cannot mark a newly selected file copied. The optional `state` prop is a controlled visual snapshot. Published phase-one variant/header aliases remain supported.
 
-Syntax colors use existing code roles on `code/bg`. Tinted diff/highlight rows currently use `text/fg` to maintain small-text contrast; their syntax slots and diff signs remain intact.
+Syntax colors use existing code roles directly on `code/bg`. Tinted diff/highlight rows use a contextual 80% syntax / 20% text-foreground mix to retain each syntax hue with readable small-text contrast. All seven syntax roles are measured against all four row surfaces in the real Utility browser matrix; diff signs remain explicit. No shared token values change.
 
 Legacy `header="tabs"` without a file collection renders the filename/copy header (`data-header="title"`); only explicit `variant="tabbed"` requires a nonempty file collection. The contract retains the legacy alias list alongside its boolean chrome control.
 

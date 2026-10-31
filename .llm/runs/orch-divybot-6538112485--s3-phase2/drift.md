@@ -69,3 +69,24 @@ fictitious scoped PageHeader elements. This is base-source reconciliation;
 style fixtures still cannot change/remove the resulting canonical contract.
 Shell AppShell/Sidebar/TopBar research axes are explicitly outstanding Layout2b
 work in shell-archetype-audit.md, not waved through as complete coverage.
+
+## Contextual contrast fidelity correction — earlier workarounds resolved
+
+7c4 removes the earlier AlertDialog destructive text/card inversion. Actual
+canonical fill/foreground roles now pass Utility rest contrast, and the scoped
+hover uses the existing measured destructive/hover role instead of the legacy
+generic Button raw red ramp. No global Button or shared palette value changes.
+
+7c4 also removes CodeBlock's monochrome tinted-row fallback. Each of the seven
+existing syntax roles supplies component-local ink; tinted rows mix80% of that
+ink with20% existing text foreground. Default rows use their role directly.
+A real Utility/studio-utility browser matrix measures all7 roles ×4 row surfaces at AA in both schemes
+and both widths (112 cells), keeps chromatic roles distinct from plain text,
+and runs strict axe without allowances. The old fallback fails the same new
+assertion for a keyword on an added row. Raw text, diff signs and copy behavior
+are unchanged. This is contextual component styling, not a token value edit.
+The original measurements above remain historical evidence; their temporary
+component workarounds are no longer active. Native scrollbar/title-tooltip
+internals remain the previously documented platform boundary.
+
+7c4 certification is Utility/studio-utility only. Other token presets are not newly certified by these112 measurements; broader syntax-on-tint certification remains a token/visual-quality follow-up under #2450 and S6, rather than a claim of every-preset AA.

@@ -1,11 +1,25 @@
 import { useState } from 'preact/hooks';
-import { CodeBlock } from '../../packages/fresh-ui/registry/components/ui/code-block.tsx';
+import {
+  CodeBlock,
+  type CodeLineVariant,
+  type CodeSyntax,
+} from '../../packages/fresh-ui/registry/components/ui/code-block.tsx';
 
 export function CodeBlocks() {
   const [copied, setCopied] = useState(''), [errors, setErrors] = useState(0);
   const [requested, setRequested] = useState(''),
     [nativeCopies, setNativeCopies] = useState(0);
   const highlightedComment = '// highlighted';
+  const syntax: readonly CodeSyntax[] = [
+    'keyword',
+    'function',
+    'type',
+    'string',
+    'number',
+    'comment',
+    'punctuation',
+  ];
+  const rowVariants: readonly CodeLineVariant[] = ['default', 'added', 'removed', 'highlighted'];
   const files = [
     {
       value: 'one',
@@ -116,6 +130,21 @@ export function CodeBlocks() {
             },
             { text: '' },
           ]}
+        />
+      </section>
+      <section id='code-syntax-contrast' aria-label='Syntax on every code surface'>
+        <CodeBlock
+          aria-label='Syntax contrast matrix'
+          filename='syntax.ts'
+          variant='diff'
+          copy={false}
+          lines={rowVariants.map((variant) => ({
+            variant,
+            text: syntax.join(' '),
+            content: syntax.map((type) => (
+              <CodeBlock.Token key={type} type={type}>{`${type} `}</CodeBlock.Token>
+            )),
+          }))}
         />
       </section>
       <section id='code-single' aria-label='Single source example'>
