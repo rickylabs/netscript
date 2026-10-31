@@ -40,6 +40,12 @@ import McpUiWidget from '../../registry/islands/McpUiWidget.tsx';
 export const basicFixtures: readonly ContractRenderFixture[] = [
   { component: 'icon', props: ['name'], scenario: 'glyph', render: () => <Icon name='check' /> },
   {
+    component: 'icon',
+    props: ['name', 'size'],
+    scenario: 'grip-vertical',
+    render: () => <Icon name='grip-vertical' size={10} />,
+  },
+  {
     component: 'button',
     props: [],
     scenario: 'default',

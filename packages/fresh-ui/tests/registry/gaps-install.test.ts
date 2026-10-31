@@ -117,7 +117,9 @@ import { PageHeader } from './components/ui/page-header.tsx';
 import { ScrollArea } from './components/ui/scroll-area.tsx';
 import { AspectRatio } from './components/ui/aspect-ratio.tsx';
 import { Direction } from './components/ui/direction.tsx';
+import { Resizable } from './components/ui/resizable.tsx';
 console.log(JSON.stringify({
+  resizable: render(<Resizable label='Contents' startContent={<button type='button'>Open chapter</button>} endContent={<a href='#chapter'>Read chapter</a>} style={{height: 240}} />),
   'scroll-area': render(h(ScrollArea, { label: 'Recent activity', orientation: 'both', children: h('a', { href: '#activity' }, 'Activity') })),
   'aspect-ratio': render(h(AspectRatio, { ratio: '4:3', children: h('button', { type: 'button' }, 'Play') })),
   direction: render(<Direction as='section' dir='rtl'><Direction as='div' dir='ltr'><input aria-label='Search' /></Direction></Direction>),
@@ -139,6 +141,7 @@ console.log(JSON.stringify({
       'scroll-area',
       'aspect-ratio',
       'direction',
+      'resizable',
     ];
     assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
     for (const name of renderedNames) {

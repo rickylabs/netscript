@@ -132,3 +132,53 @@ canonical axes on their declared parts, or independently reviewed private
 component/part bindings with a purpose. Unknown attributes, bare/unquoted
 attributes, undeclared `data-x-*`, wrong-part axes and invalid values fail. The
 all-style slice extends this same policy to existing source fixtures.
+
+
+### Resizable
+
+`ui:add resizable` installs two panels and a native focusable splitter. Hydrate it
+inside a Fresh island. The host sets frame dimensions and owns its panel content:
+
+```tsx
+import { Resizable } from './components/ui/resizable.tsx';
+
+<Resizable
+  label='Contents'
+  endLabel='Document'
+  style={{ height: 240 }}
+  startContent={<a href='#chapter'>Chapter one</a>}
+  endContent={<article id='chapter'>Chapter content</article>}
+/>;
+```
+
+`direction` defaults to horizontal; vertical stacks the panels. The primary size
+is in **pixels**: `defaultSize` initially uses280 horizontal or160 vertical.
+For controlled state pass `size` and accept proposals through `onSizeChange`.
+Refusing a proposal keeps the visible controlled size. Arrow keys use `step`
+(default10); Home/End use current bounds. Horizontal arrows follow local native
+RTL direction. This is the resize-only APG subset: no Enter collapse or F6 mode.
+
+`minSize` defaults to80, `maxSize` is unbounded, and `endMinSize` defaults to80.
+Tiny containers adapt both minima to the available extent. Container resizing
+clamps displayed geometry without invoking `onSizeChange`; the requested size
+is retained and restored when space returns. The next interaction proposes from
+current displayed geometry and current bounds. Pointer drags use native capture;
+only the handle disables touch scrolling. Observers and active captures are
+released on unmount or direction change.
+
+`label` names the primary panel and separator. `labelledBy` may point both names
+at a visible heading; a nonblank fallback label remains required. `endLabel`
+names the secondary panel. Both independently scrollable panels are consistently
+tabbable, including text-only overflow; native child controls retain their place
+in source order. Before hydration and positive measurement, the handle is a
+static decorative part with no invented separator values or keyboard stop.
+After measurement it exposes actual percentage bounds/current value, pixel text,
+and `aria-controls` pointing at the primary group. `grip={false}` hides only the
+decorative grip; the24px hit target and keyboard behavior remain.
+
+The grip uses the shared `grip-vertical` Lucide glyph (10px, six source circles),
+with its existing source/license notice. The registry item contributes the
+package runtime dependency used by the public Icon primitive; no drag library is
+installed. Native keyboard, pointer/touch, controlled refusal, responsive bounds,
+cleanup and strict accessibility evidence live in
+`tools/fresh-ui-browser/gap-tests/resizable.spec.ts`.

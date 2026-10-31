@@ -29,6 +29,7 @@ export const foundations_1: readonly ComponentContract[] = [
           'download',
           'external-link',
           'file-text',
+          'grip-vertical',
           'info',
           'menu',
           'minus',

@@ -89,14 +89,16 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'specId': 'L10',
     'category': 'Layout & blocks',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
+      'endLabel': { 'kind': 'text', 'default': 'Secondary panel' },
       'direction': {
         'kind': 'enum',
         'values': [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
       'startContent': {
         'kind': 'slot',
@@ -106,29 +108,60 @@ export const layout_blocks_4: readonly ComponentContract[] = [
       },
       'grip': {
         'kind': 'boolean',
+        'default': true,
+      },
+      'label': {
+        'kind': 'text',
+        'required': true,
+        'description': 'Shared primary-panel and separator accessible name',
+      },
+      'labelledBy': {
+        'kind': 'text',
+      },
+      'size': {
+        'kind': 'number',
+      },
+      'defaultSize': {
+        'kind': 'number',
+        'description': 'Initial pixels:280 horizontal or160 vertical',
+      },
+      'onSizeChange': {
+        'kind': 'callback',
+        'description': 'User pixel proposal; viewport clamps do not invoke it',
+      },
+      'minSize': {
+        'kind': 'number',
+        'default': 80,
+      },
+      'maxSize': {
+        'kind': 'number',
+        'description': 'Unbounded by default; never serialized as Infinity',
+      },
+      'endMinSize': {
+        'kind': 'number',
+        'default': 80,
+      },
+      'step': {
+        'kind': 'number',
+        'default': 10,
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'panel-group',
-        'planned': true,
       },
       {
         'name': 'panel',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'handle',
-        'planned': true,
       },
       {
         'name': 'grip',
-        'planned': true,
+        'when': 'grip is enabled',
       },
     ],
     'attributes': {
@@ -137,6 +170,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
     },
     'booleans': [
@@ -173,6 +207,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-layout: 10px grip glyph; fixed default start panel size 280 horizontal or 160 vertical instead of 50/50.',
+      'Both scrollable panels are named and always tabbable, preserving keyboard access to text-only overflow. Resize-only APG subset: no Enter collapse or F6 mode. Hydrate in a Fresh island; until positive measurement, handle is decorative/unfocusable and omits separator role and value attributes. Controlled viewport clamping is geometry-only; next interaction proposes from displayed size/current bounds.',
     ],
   },
   {
