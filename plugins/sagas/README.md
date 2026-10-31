@@ -210,6 +210,33 @@ configured saga window.
 See the
 [schema, migration and cursor recipe](https://rickylabs.github.io/netscript/reference/plugin-sagas-core/#installed-outbox-schema-and-postgresql-retention).
 
+## Compensation persistence and retry
+
+`SagaEngine.commitCompensation` uses the same `SagaTransitionCommitPort` as an ordinary saga
+transition. Its replay identity includes the saga, instance and version being compensated. The
+replay digest, next state, correlation ownership and transition history commit together:
+
+| Canonical store                                 | Guarantee                                                                                                                                                |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KvSagaStore` on Deno KV                        | One atomic compare-and-swap includes every row and the replay digest. A rejected write leaves the previous `compensating` state and no committed digest. |
+| `KvSagaStore` on Redis                          | The same atomic batch commits through the Redis adapter; reopening the store preserves the same state/replay relationship.                               |
+| `PrismaSagaStore` on PostgreSQL                 | The replay insert and state/history writes share one interactive transaction. A failure after the insert rolls it back with the other rows.              |
+| `createPrismaSagaTransitionStore` on PostgreSQL | The existing transaction commits compensation state and replay together, including when the adapter also supports worker-command intents.                |
+
+Retry the **same compensation outcome**, with its original expected version, after a persistence
+failure. If the transaction failed, the retry can commit; if the commit succeeded but its
+acknowledgement was lost, the retry returns `committed: false` without appending another transition.
+This also applies to outcomes that record a compensation handler error as `failed`.
+
+Custom stores must implement the atomic state/replay capability before registration. Granular stores
+without it are rejected before handlers execute. `MemorySagaStore` supplies the same logical
+contract for tests, without persistence across process restarts.
+
+These guarantees concern canonical compensation outcomes. Redelivering an already committed inbound
+message does not reconstruct its cascades. Automatic recovery of scheduled/cascaded effects after
+the inbound commit requires the separate effects dispatcher; retrying an outcome does not provide
+that delivery guarantee. Query projections also remain separate from the canonical commit.
+
 ## KV retention
 
 Topic groups declare `retention.completedDays` (default 7) and `retention.archiveToDb` (default
