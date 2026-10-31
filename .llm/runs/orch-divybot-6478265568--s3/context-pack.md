@@ -29,3 +29,7 @@ The single canonical full scaffold.runtime attempt failed at Aspire/Docker prefl
 Obtain the owner-required independent IMPL-EVAL when its service is available. Run the full scaffold runtime suite in a working Docker/Aspire environment. Keep the PR draft until required signoff is satisfied. Do not merge, tag, release, close #2416, change labels, force-push, or commit the assignment/report handoff files.
 
 Generated carriers use existing gen:assets-barrel and gen:agent-docs-prose tasks. The migration source edits regenerate from the exact baseline through .llm/tools/generate-ui-variant-migration.ts. See memory notes for isolated parity compiler settings, CLI format exclusions, actual legacy state selectors, import relocation and evaluator/runtime availability. Raw operational evidence stays private; only sanitized evidence is tracked here.
+
+## Resume 2026-10-31
+
+Recovery in progress on the same branch/PR; integrate main 7907293f3, regenerate conflicting prose carriers, rerun source gates and the required runtime suite, and obtain the owner-selected Claude IMPL-EVAL. Original scope restrictions and phase-one-only issue linkage remain authoritative.

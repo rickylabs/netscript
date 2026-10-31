@@ -5,38 +5,40 @@ title: "@netscript/queue"
 
 # `@netscript/queue`
 
-Provider-agnostic message queue abstraction for NetScript applications. It wraps
-[Fedify](https://fedify.dev/) battle-tested queue adapters behind a single, unified
-`MessageQueue` interface with optional Zod validation and Aspire-based backend
-auto-discovery. This page is written against the package public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+Provider-agnostic message queue for NetScript applications. It wraps [Fedify](https://fedify.dev/)
+queue adapters behind one `MessageQueue` interface, with optional Zod validation and Aspire-based
+backend discovery. Use it to enqueue and consume work on Deno KV, Redis, RabbitMQ or Postgres
+without changing handler code.
 
-The root entrypoint (`@netscript/queue`) re-exports the factory functions, the port
-contracts (`./ports`), the error hierarchy (`./errors`), and the validation helpers
-(`./validation`). The remaining sub-path exports carry the concrete provider adapters and a
-test double:
+## Sub-path exports
 
-- [`@netscript/queue/ports`](#sub-path-exports) — the core interfaces and enums.
-- [`@netscript/queue/errors`](#sub-path-exports) — the queue error classes and codes.
-- [`@netscript/queue/validation`](#sub-path-exports) — Zod validation helpers.
-- [`@netscript/queue/adapters/deno-kv`](#sub-path-exports) — Deno KV adapter.
-- [`@netscript/queue/adapters/redis`](#sub-path-exports) — Redis adapter.
-- [`@netscript/queue/adapters/amqp`](#sub-path-exports) — RabbitMQ (AMQP) adapter.
-- [`@netscript/queue/adapters/kv-polling`](#sub-path-exports) — KV-polling adapter for KV Connect.
-- [`@netscript/queue/testing`](#sub-path-exports) — in-memory adapter for tests.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/queue` | `./mod.ts` | [Factory functions](#factory-functions) plus re-exported ports, errors, and validation. |
+| `@netscript/queue/ports` | `./ports/mod.ts` | [Core interfaces and enums](#port-contracts). |
+| `@netscript/queue/errors` | `./ports/errors.ts` | [Error classes and codes](#errors). |
+| `@netscript/queue/validation` | `./validation/mod.ts` | [Zod validation helpers](#validation). |
+| `@netscript/queue/testing` | `./testing/mod.ts` | [In-memory adapter for tests](#testing). |
+| `@netscript/queue/adapters/deno-kv` | `./adapters/deno-kv.adapter.ts` | [Deno KV adapter](#adapters). |
+| `@netscript/queue/adapters/redis` | `./adapters/redis.adapter.ts` | [Redis adapter](#adapters). |
+| `@netscript/queue/adapters/amqp` | `./adapters/amqp.adapter.ts` | [RabbitMQ (AMQP) adapter](#adapters). |
+| `@netscript/queue/adapters/postgres` | `./adapters/postgres.adapter.ts` | Postgres adapter. |
+| `@netscript/queue/adapters/kv-dead-letter-store` | `./adapters/kv-dead-letter-store.ts` | Deno KV dead-letter store. |
+| `@netscript/queue/adapters/postgres-dead-letter-store` | `./adapters/postgres-dead-letter-store.ts` | Postgres dead-letter store. |
+| `@netscript/queue/adapters/redis-dead-letter-store` | `./adapters/redis-dead-letter-store.ts` | Redis dead-letter store. |
+| `@netscript/queue/adapters/kv-polling` | `./adapters/kv-polling.adapter.ts` | [KV-polling adapter for KV Connect](#adapters). |
 
 ## Factory functions
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createQueue` | `function createQueue<T = unknown>(name: string, options?: QueueOptions): MessageQueue<T>` | Create a message queue instance with auto-discovery (RabbitMQ, then Redis, then Deno KV). |
-| `createTypedQueue` | `function createTypedQueue<T>(name: string, schema: ValidationSchema<T>, options?: TypedQueueOptions): TypedMessageQueue<T>` | Create a type-safe message queue with Zod validation at enqueue and dequeue time. |
-| `createParallelQueue` | `function createParallelQueue<T = unknown>(name: string, options?: ParallelQueueOptions): MessageQueue<T>` | Create a queue with concurrent processing via Fedify ParallelMessageQueue. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createQueue` | function | `function createQueue<T = unknown>(name: string, options?: QueueOptions): MessageQueue<T>` | Create a message queue instance with auto-discovery (RabbitMQ, then Redis, then Deno KV). |
+| `createTypedQueue` | function | `function createTypedQueue<T>(name: string, schema: ValidationSchema<T>, options?: TypedQueueOptions): TypedMessageQueue<T>` | Create a type-safe message queue with Zod validation at enqueue and dequeue time. |
+| `createParallelQueue` | function | `function createParallelQueue<T = unknown>(name: string, options?: ParallelQueueOptions): MessageQueue<T>` | Create a queue with concurrent processing via Fedify ParallelMessageQueue. |
 
 ## Port contracts
 
-Exported from the root and from [`@netscript/queue/ports`](#sub-path-exports).
+Exported from the root and from `@netscript/queue/ports`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -53,7 +55,7 @@ Exported from the root and from [`@netscript/queue/ports`](#sub-path-exports).
 
 ## Errors
 
-Exported from the root and from [`@netscript/queue/errors`](#sub-path-exports).
+Exported from the root and from `@netscript/queue/errors`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -66,21 +68,20 @@ Exported from the root and from [`@netscript/queue/errors`](#sub-path-exports).
 
 ## Validation
 
-Exported from the root and from [`@netscript/queue/validation`](#sub-path-exports).
+Exported from the root and from `@netscript/queue/validation`.
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `safeValidate` | `function safeValidate<T>(schema: ValidationSchema<T>, message: unknown): ValidationResult<T>` | Validate a message against a schema, returning a result object instead of throwing. |
-| `validateOrThrow` | `function validateOrThrow<T>(schema: ValidationSchema<T>, message: unknown, context?: Record): T` | Validate a message and throw `QueueValidationError` if invalid. |
-| `withValidation` | `function withValidation<T>(schema: ValidationSchema<T>, handler)` | Wrap a handler so messages are validated before it runs. |
-| `ValidationSchema` | interface | Minimal schema contract supported by the validation helpers. |
-| `ValidationResult` | interface | Result type returned by `safeValidate`. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `safeValidate` | function | `function safeValidate<T>(schema: ValidationSchema<T>, message: unknown): ValidationResult<T>` | Validate a message against a schema, returning a result object instead of throwing. |
+| `validateOrThrow` | function | `function validateOrThrow<T>(schema: ValidationSchema<T>, message: unknown, context?: Record): T` | Validate a message and throw `QueueValidationError` if invalid. |
+| `withValidation` | function | `function withValidation<T>(schema: ValidationSchema<T>, handler)` | Wrap a handler so messages are validated before it runs. |
+| `ValidationSchema` | interface | interface | Minimal schema contract supported by the validation helpers. |
+| `ValidationResult` | interface | interface | Result type returned by `safeValidate`. |
 
 ## Adapters
 
-Each provider adapter is published under its own sub-path and implements the
-`MessageQueue` contract directly. Most applications use `createQueue` and never import an
-adapter explicitly.
+Each provider adapter has its own sub-path and implements the `MessageQueue` contract directly.
+Most applications use `createQueue` and never import an adapter.
 
 | Symbol | Kind | Entrypoint | Description |
 | --- | --- | --- | --- |
@@ -91,45 +92,27 @@ adapter explicitly.
 | `KvPollingAdapter` | class | `@netscript/queue/adapters/kv-polling` | KV-polling adapter for remote KV Connect (HTTP) backends. |
 | `KvPollingAdapterOptions` | interface | `@netscript/queue/adapters/kv-polling` | Options for `KvPollingAdapter`. |
 
-The `kv-polling` adapter additionally re-exports the portable KV store contracts from
-[`@netscript/kv`](/reference/): `KvStore`, `WatchableKv`, `KvEntry`, `KvKey`,
+The `kv-polling` adapter also re-exports the portable KV store contracts from
+[`@netscript/kv`](/reference/kv/): `KvStore`, `WatchableKv`, `KvEntry`, `KvKey`,
 `AtomicMutation`, `AtomicCheck`, `AtomicResult`, `WatchEvent`, and their option interfaces
 (`KvListOptions`, `KvSetOptions`, `WatchOptions`, `WatchPrefixOptions`), so KV-Connect
 consumers can type their backing store without a second import.
 
 ## Testing
 
-Exported from [`@netscript/queue/testing`](#sub-path-exports).
+Exported from `@netscript/queue/testing`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `MemoryQueueAdapter` | class | In-memory `MessageQueue` implementation for port-contract tests. |
 | `MemoryQueueAdapterOptions` | interface | Options for `MemoryQueueAdapter`. |
 
-## Sub-path exports
+## Examples
 
-The following entrypoints are published alongside the root export. Their symbols are
-documented in the sections above.
+### Inspect and reprocess the dead-letter queue
 
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/queue` | `./mod.ts` | Factories plus re-exported ports, errors, and validation. |
-| `@netscript/queue/ports` | `./ports/mod.ts` | Core interfaces and enums. |
-| `@netscript/queue/errors` | `./ports/errors.ts` | Error classes and codes. |
-| `@netscript/queue/validation` | `./validation/mod.ts` | Zod validation helpers. |
-| `@netscript/queue/testing` | `./testing/mod.ts` | In-memory adapter for tests. |
-| `@netscript/queue/adapters/deno-kv` | `./adapters/deno-kv.adapter.ts` | Deno KV adapter. |
-| `@netscript/queue/adapters/redis` | `./adapters/redis.adapter.ts` | Redis adapter. |
-| `@netscript/queue/adapters/amqp` | `./adapters/amqp.adapter.ts` | RabbitMQ (AMQP) adapter. |
-| `@netscript/queue/adapters/postgres` | `./adapters/postgres.adapter.ts` | Postgres adapter. |
-| `@netscript/queue/adapters/kv-dead-letter-store` | `./adapters/kv-dead-letter-store.ts` | Deno KV dead-letter store. |
-| `@netscript/queue/adapters/postgres-dead-letter-store` | `./adapters/postgres-dead-letter-store.ts` | Postgres dead-letter store. |
-| `@netscript/queue/adapters/redis-dead-letter-store` | `./adapters/redis-dead-letter-store.ts` | Redis dead-letter store. |
-| `@netscript/queue/adapters/kv-polling` | `./adapters/kv-polling.adapter.ts` | KV-polling adapter for KV Connect. |
-
-## Durable DLQ Inspection and Reprocessing
-
-Terminal failures are captured in the Dead-Letter Queue (DLQ). The following example shows how to inspect dead-lettered entries, count DLQ depth, and programmatically reprocess them using `DeadLetterStorePort`.
+Terminal failures land in the dead-letter queue (DLQ). This example inspects dead-lettered entries,
+counts DLQ depth, and reprocesses them with `DeadLetterStorePort`.
 
 ```ts
 import { assertEquals } from "@std/assert";
@@ -202,15 +185,11 @@ Deno.test("durable DLQ inspection and reprocessing worked example", async () => 
 });
 ```
 
-## See it live
+## Next steps
 
-- **How-to:** [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) — enqueue, consume, and schedule against
-  these symbols end to end.
-- **How-to:** [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) — pick and pin a backend
-  from the `QueueProvider` enum above.
-- **Concept:** [KV, queues & cron](/data-persistence/kv-queues-cron/) — why a queue is
-  provider-agnostic and how Aspire wires the four backends.
-
----
-
-Back to the [reference overview](/reference/).
+- [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/): enqueue, consume, and schedule end
+  to end.
+- [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/): pick and pin a
+  backend from the `QueueProvider` enum.
+- [KV, queues & cron](/data-persistence/kv-queues-cron/): why a queue is provider-agnostic and how
+  Aspire wires the four backends.

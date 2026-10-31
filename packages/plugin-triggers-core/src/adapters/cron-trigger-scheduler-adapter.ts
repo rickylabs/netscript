@@ -13,6 +13,8 @@ import type {
   TriggerSchedulerStopOptions,
 } from '../ports/mod.ts';
 
+const CRON_SLOT_MS = 60_000;
+
 /** Cron provider selector accepted by the runtime adapter. */
 export type RuntimeCronProvider =
   | 'deno'
@@ -84,7 +86,6 @@ export class CronTriggerSchedulerAdapter implements TriggerSchedulerPort {
   readonly #records = new Map<string, CronScheduleRecord>();
   readonly #inFlight = new Set<Promise<void>>();
   readonly #onError?: (error: unknown, context: CronTriggerErrorContext) => void | Promise<void>;
-  #sequence = 0;
 
   /** Create a scheduler adapter with an optional injected cron scheduler. */
   constructor(options: CronTriggerSchedulerAdapterOptions = {}) {
@@ -204,11 +205,15 @@ export class CronTriggerSchedulerAdapter implements TriggerSchedulerPort {
     record: CronScheduleRecord,
     context: RuntimeCronJobContext,
   ): TriggerEvent<'scheduled', ScheduledTriggerPayload> {
-    this.#sequence += 1;
-    const scheduledAt = context.scheduledTime.toISOString();
+    // Five-field cron slots have minute precision; providers may report execution-start jitter.
+    const scheduledAt = new Date(
+      Math.floor(context.scheduledTime.getTime() / CRON_SLOT_MS) * CRON_SLOT_MS,
+    ).toISOString();
     const firedAt = context.actualTime.toISOString();
+    const id = `scheduled_${record.id}_${scheduledAt}` as TriggerEventId;
     return {
-      id: `scheduled_${this.#sequence}` as TriggerEventId,
+      id,
+      idempotencyKey: id,
       triggerId: record.id,
       kind: 'scheduled',
       status: 'pending',

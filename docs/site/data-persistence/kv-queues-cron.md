@@ -2,20 +2,16 @@
 layout: layouts/base.vto
 title: KV, queues & cron
 templateEngine: [vento, md]
-prev: { label: "Database & Prisma", href: "/data-persistence/database/" }
-next: { label: "Telemetry & logging", href: "/observability/telemetry/" }
 order: 2
 ---
 
 # KV, queues & cron
 
-The integration trio. Most backends end up hand-assembling three boring-but-load-bearing
-seams: a **key-value store** for cache and session state, a **message queue** for
-fire-and-forget work, and a **cron scheduler** for time-driven jobs. NetScript ships all
-three as provider-agnostic packages — `@netscript/kv`, `@netscript/queue`, and
-`@netscript/cron` — each exposing one typed contract across several backends and
-**auto-detecting** the best available adapter from the Aspire environment, with a zero-config
-local fallback so the same code runs on a laptop and in production.
+This page explains NetScript's three integration packages: `@netscript/kv` for cache and session
+state, `@netscript/queue` for fire-and-forget work and `@netscript/cron` for time-driven jobs. Each
+exposes one typed contract over several backends and **auto-detects** the best available adapter
+from the Aspire environment. A zero-config local fallback lets the same code run on a laptop and in
+production, without branching on "is this local or Aspire?" in product code.
 
 {{ comp.diagram({
   src: "/assets/diagrams/queue-worker-scheduler.svg",
@@ -23,79 +19,32 @@ local fallback so the same code runs on a laptop and in production.
   caption: "The trio in one loop: cron tick → enqueue → parallel queue listeners → KV state holds the cursor, dedupe keys, and counters."
 }) }}
 
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for <strong>KV</strong> when you need fast, typed read/write state — caches, sessions,
-feature flags, counters — with optional TTL and reactive watches. Reach for a
-<strong>queue</strong> when you have <em>fire-and-forget</em> or fan-out work that should not
-block a request: emails, webhooks, image processing. Reach for <strong>cron</strong> when work
-is <em>time-driven</em>: nightly reports, hourly cleanups, weekday digests. For
-<em>message-driven, long-running orchestration with state</em>, step up to a
-<a href="/durable-workflows/sagas/">durable saga</a>; for <em>inbound HTTP that kicks off
-work</em> use a <a href="/durable-workflows/triggers/">trigger</a>.
-{{ /comp }}
+## Which primitive to use
 
-## What it is
+{{ comp.apiTable({
+  caption: "Picking the right primitive",
+  rows: [
+    { name: "Key-value state", type: "@netscript/kv", desc: "Synchronous-feeling read/write state: caches, sessions, flags, counters, cursors. Use TTL for ephemerality and watches for reactivity." },
+    { name: "Fire-and-forget work", type: "@netscript/queue", desc: "Decouple slow work from the request path. Fan out to multiple consumers; let the backend handle retries where nativeRetrial is true. Four backends: Deno KV, Redis, AMQP, PostgreSQL." },
+    { name: "Time-driven work", type: "@netscript/cron", desc: "Run handlers on a schedule. Pair with a queue to fan a scheduled tick out into many parallel jobs." },
+    { name: "Stateful orchestration", type: "durable saga", desc: "When work spans steps with correlation and compensation, a queue is not enough — model it as a durable saga instead." }
+  ]
+}) }}
 
-Each package is built on the same NetScript opinion: a single typed contract, several adapters
-behind it, and provider selection that resolves automatically from the environment so you never
-branch on "is this local or Aspire?" in product code. KV unifies **Deno KV and Redis-compatible caches (`redis` by default, or `garnet` via `--cache-backend`), plus
-in-memory**; the queue unifies **Deno KV, Redis, RabbitMQ (AMQP), and PostgreSQL** (plus a
-KV-polling fallback for remote KV Connect endpoints); cron unifies **native `Deno.cron()` and an
-in-memory** scheduler. None of the three requires you to operate Redis, RabbitMQ, or PostgreSQL
-during development — the local adapters carry the same code until [Aspire](/explanation/aspire/)
-provisions the real backends. When [telemetry](/observability/telemetry/) is on, queues are traced
-for you with no manual instrumentation.
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "@netscript/kv",
-    body: "Reactive key-value storage. getKv() auto-detects Deno KV or Redis/Garnet; construct MemoryKvAdapter directly for tests. get/set/watch/atomic with per-key TTL.",
-    href: "/reference/kv/",
-    icon: "◆"
-  },
-  {
-    title: "@netscript/queue",
-    body: "Provider-agnostic message queues. createQueue() wraps Deno KV, Redis, RabbitMQ (AMQP), and PostgreSQL behind one MessageQueue<T> contract; createParallelQueue() adds concurrency.",
-    href: "/reference/queue/",
-    icon: "≡"
-  },
-  {
-    title: "@netscript/cron",
-    body: "Runtime-agnostic scheduling. createScheduler() uses native Deno.cron() when available and an in-memory adapter for tests.",
-    href: "/reference/cron/",
-    icon: "◎"
-  }
-] }) }}
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Do — Choose a queue provider",
-    body: "Recipe: pick between Deno KV, Redis, RabbitMQ, and PostgreSQL — and wire the Aspire-provisioned, local-fallback, and explicit-provider paths.",
-    href: "/data-persistence/how-to/choose-a-queue-provider/",
-    icon: "→"
-  },
-  {
-    title: "Understand — Orchestration with Aspire",
-    body: "How the scaffold wires Redis (the default cache backend; or Garnet via --cache-backend) and message brokers as resources, and why auto-detection just works once aspire start is up.",
-    href: "/explanation/aspire/",
-    icon: "◎"
-  }
-] }) }}
+For inbound HTTP that kicks off work, use a [trigger](/durable-workflows/triggers/). For
+message-driven, long-running orchestration with state, use a
+[durable saga](/durable-workflows/sagas/).
 
 ## One API, many backends
 
-Each package keeps a single typed contract with several adapters behind it, and provider
-selection resolves automatically from the environment. The matrix below is the full provider
-surface — read across a capability to see which backends it supports and how each is chosen. Note
-one deliberate exception: the **PostgreSQL queue backend is explicit-provider only** — it is real
-and durable, but auto-detection never selects it (see the callout below).
+Each package keeps one typed contract with several adapters behind it, and provider selection
+resolves from the environment. The matrix lists every backend, the capabilities it supports and how
+it is chosen.
 
-For contrast: BullMQ is a Redis-backed queue library, and Celery requires a message broker such
-as RabbitMQ or Redis — in both cases that infrastructure must be running before the first job
-enqueues. `createQueue()` starts on local Deno KV with nothing to provision, and the upgrade to
-Redis or RabbitMQ is an environment change, not a code change.
+BullMQ is a Redis-backed queue library, and Celery requires a broker such as RabbitMQ or Redis; in
+both cases that infrastructure must run before the first job enqueues. `createQueue()` starts on
+local Deno KV with nothing to provision, and moving to Redis or RabbitMQ is an environment change,
+not a code change.
 
 {{ comp.apiTable({
   caption: "Adapter × capability — supported backends and how they are selected",
@@ -110,34 +59,25 @@ Redis or RabbitMQ is an environment change, not a code change.
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "PostgreSQL queue is explicit-provider only" } }}
-The queue's auto-detection order is <strong>RabbitMQ → Redis → Deno KV</strong> — it never
-selects PostgreSQL. The Postgres backend is a real, durable adapter
-(<code>FOR UPDATE SKIP LOCKED</code> row-claiming, visibility timeout, ack/nack, dead-letter
-store), but you must opt in explicitly with <code>provider: QueueProvider.Postgres</code> (or
-the string <code>'postgres'</code>). The <code>url</code> in
-<code>connection.postgres</code> is optional — when omitted, the adapter falls back to the
-Aspire-provisioned Postgres URI — and <code>tableName</code> defaults to
-<code>message_queue</code>. Reach for it when you want queue state to live in the same
-transactional database as your domain data.
-{{ /comp }}
+> [!WARNING]
+> The queue's auto-detection order is **RabbitMQ → Redis → Deno KV**; it never selects PostgreSQL.
+> The Postgres backend is a durable adapter (`FOR UPDATE SKIP LOCKED` row-claiming, visibility
+> timeout, ack/nack, dead-letter store), but you must opt in with `provider: QueueProvider.Postgres`
+> or the string `'postgres'`. `connection.postgres.url` is optional and falls back to the
+> Aspire-provisioned Postgres URI; `tableName` defaults to `message_queue`. Use it when queue state
+> should live in the same transactional database as your domain data.
 
-{{ comp callout { type: "important", title: "Aspire first — then the production adapters appear" } }}
-Auto-detection upgrades to Redis/Garnet and RabbitMQ only when those resources are
-<strong>running</strong>. Bring orchestration up first:
-<code>cd aspire &amp;&amp; aspire start</code> provisions Postgres, Redis, and any message broker
-(dashboard at <a href="https://localhost:18888">https://localhost:18888</a>)
-<strong>before</strong> any <code>netscript db</code> command or service that expects those
-backends. Without Aspire, KV falls back to local Deno KV, the queue falls back to Deno KV, and
-cron falls back to the in-memory adapter — your code is identical either way. See
-<a href="/explanation/aspire/">Orchestration with Aspire</a>.
-{{ /comp }}
+> [!IMPORTANT]
+> Auto-detection upgrades to Redis/Garnet and RabbitMQ only while those resources are **running**,
+> so start orchestration first with `cd aspire && aspire start`. Without Aspire, KV and the queue fall
+> back to local Deno KV and cron to the in-memory adapter; your code is identical either way. See
+> [Orchestration with Aspire](/explanation/aspire/).
 
-## KV — key types first
+## KV
 
-`getKv(config?)` returns a `WatchableKv` bound to the auto-detected backend. Keys are typed
-tuples, values are fully typed, and `KvSetOptions.expireIn` (milliseconds) gives per-key TTL on
-every adapter. Pass a `SharedKvConfig` to override provider selection on first access.
+`getKv(config?)` returns a `WatchableKv` bound to the auto-detected backend. Keys are typed tuples,
+values are fully typed, and `KvSetOptions.expireIn` (milliseconds) sets a per-key TTL on every
+adapter. Pass a `SharedKvConfig` to override provider selection on first access.
 
 {{ comp.apiTable({
   caption: "SharedKvConfig — first-access overrides for getKv()",
@@ -157,9 +97,9 @@ every adapter. Pass a `SharedKvConfig` to override provider selection on first a
   ]
 }) }}
 
-`getKv()` is the headline entrypoint; the same module also exposes `closeKv()`, `resetKv()`
-(for tests), `getRawKv()` (the underlying `Deno.Kv` when the provider is Deno KV),
-`getActiveProvider()`, `isKvInitialized()`, and the `isWatchable()` type guard.
+The same module also exposes `closeKv()`, `resetKv()` (for tests), `getRawKv()` (the underlying
+`Deno.Kv` when the provider is Deno KV), `getActiveProvider()`, `isKvInitialized()` and the
+`isWatchable()` type guard.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -184,14 +124,13 @@ every adapter. Pass a `SharedKvConfig` to override provider selection on first a
   }
 ] }) }}
 
-## Queues — key types first
+## Queues
 
 `createQueue<T>(name, options?)` returns a `MessageQueue<T>` over the auto-detected backend. The
-factory stays synchronous; the heavy Redis, RabbitMQ (AMQP), and PostgreSQL adapters resolve
-lazily on first use and never enter your module graph until then. Producers call
-`enqueue(message, options?)`; consumers call `listen(handler, options?)`; `stop()` drains and
-releases the connection. The `QueueProvider` enum names the four backends —
-`DenoKv`, `Redis`, `RabbitMQ`, `Postgres`.
+factory stays synchronous; the Redis, RabbitMQ (AMQP) and PostgreSQL adapters load lazily on first use
+and stay out of your module graph until then. Producers call `enqueue(message, options?)`, consumers
+call `listen(handler, options?)`, and `stop()` drains and releases the connection. The
+`QueueProvider` enum names the four backends: `DenoKv`, `Redis`, `RabbitMQ` and `Postgres`.
 
 {{ comp.apiTable({
   caption: "QueueOptions — passed to createQueue / createTypedQueue / createParallelQueue",
@@ -206,10 +145,10 @@ releases the connection. The `QueueProvider` enum names the four backends —
   ]
 }) }}
 
-`createTypedQueue(name, schema, options?)` wraps a Zod schema and validates on enqueue/dequeue;
-its `TypedQueueOptions` adds `validateOnEnqueue` (default true), `validateOnDequeue` (default
-true), and `onValidationError` (`'discard'` default, `'dlq'`, or `'throw'`). `createParallelQueue`
-takes the same options plus a `concurrency` count.
+`createTypedQueue(name, schema, options?)` wraps a Zod schema and validates on enqueue and dequeue.
+Its `TypedQueueOptions` add `validateOnEnqueue` (default true), `validateOnDequeue` (default true) and
+`onValidationError` (`'discard'` by default, `'dlq'` or `'throw'`). `createParallelQueue` takes the
+same options plus a `concurrency` count.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -244,29 +183,26 @@ takes the same options plus a `concurrency` count.
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Queues are traced for you" } }}
-When telemetry is enabled, <code>createQueue()</code> auto-wraps the queue with
-<code>@netscript/telemetry</code>, so enqueue and consume spans show up in the Aspire dashboard
-alongside RPC and SSE work — no manual instrumentation. Opt out with
-<code>disableAutoTracing: true</code> when you want to wire spans by hand. See
-<a href="/observability/telemetry/">Telemetry &amp; logging</a>.
-{{ /comp }}
+> [!NOTE]
+> When telemetry is enabled, `createQueue()` wraps the queue with `@netscript/telemetry`, so enqueue
+> and consume spans appear in the Aspire dashboard beside RPC and SSE work. Set
+> `disableAutoTracing: true` to wire spans by hand. See
+> [Telemetry & logging](/observability/telemetry/).
 
-## Cron — key types first
+## Cron
 
-`createScheduler(options?)` returns a `CronScheduler` that uses native `Deno.cron()` when the
-runtime exposes it and an in-memory adapter otherwise.
-`schedule(id, expression, handler, options?)` registers a job from a standard cron expression or
-a `CronPresets` constant and resolves to a `ScheduledJob`; `trigger(id)` fires it manually (handy
-in tests); `unschedule(id)` removes one; `stop()` tears the scheduler down. For simple
-single-scheduler apps, `getScheduler()` returns a shared singleton (`stopScheduler()` resets it).
-The handler may be a bare `JobHandler` or a `ContextualJobHandler` that receives a `JobContext`
-(`jobId`, `scheduledTime`, `actualTime`, `attempt`, `signal`).
+`createScheduler(options?)` returns a `CronScheduler` that uses native `Deno.cron()` when the runtime
+exposes it and an in-memory adapter otherwise. `schedule(id, expression, handler, options?)` registers
+a job from a standard cron expression or a `CronPresets` constant and resolves to a `ScheduledJob`.
+`trigger(id)` fires a job manually, which helps in tests; `unschedule(id)` removes one; `stop()` tears
+the scheduler down. For single-scheduler apps, `getScheduler()` returns a shared singleton
+(`stopScheduler()` resets it). The handler may be a bare `JobHandler` or a `ContextualJobHandler` that
+receives a `JobContext` (`jobId`, `scheduledTime`, `actualTime`, `attempt`, `signal`).
 
-Retry behavior is identical for the memory and native `Deno.cron()` providers. `maxRetries` counts
-retries after the initial handler call, so attempts are numbered `0..maxRetries` and the maximum
-number of handler calls is `maxRetries + 1`. The default is zero retries. When `backoff` is omitted,
-configured retries run immediately.
+Retry behavior is the same for the memory and native `Deno.cron()` providers. `maxRetries` counts
+retries after the initial handler call, so attempts are numbered `0..maxRetries` and the handler runs
+at most `maxRetries + 1` times. The default is zero retries. Without `backoff`, configured retries run
+immediately.
 
 {{ comp.apiTable({
   caption: "CreateSchedulerOptions — passed to createScheduler / getScheduler",
@@ -289,15 +225,14 @@ configured retries run immediately.
 }) }}
 
 For retry number `r` (the one-based retry after handler attempt `r - 1`), fixed backoff waits
-`initialDelay`; exponential waits `initialDelay * (multiplier ?? 2)^(r - 1)`; and linear waits
+`initialDelay`, exponential waits `initialDelay * (multiplier ?? 2)^(r - 1)`, and linear waits
 `initialDelay * r`. `maxDelay`, when present, caps the result for every policy. `unschedule()` and
 `stop()` abort an in-progress backoff wait and do not start another handler attempt.
 
 Lifecycle reporting stays aggregate for compatibility. Each scheduled or manual invocation updates
-`ScheduledJob.runCount` once and emits exactly one terminal event: `jobRun` after eventual success,
-or `jobError` after the retry budget is exhausted or backoff is aborted. The event's
-`result.attempt` is the terminal zero-based handler attempt; intermediate failures do not emit
-additional terminal events.
+`ScheduledJob.runCount` once and emits exactly one terminal event: `jobRun` after eventual success, or
+`jobError` after the retry budget is exhausted or backoff is aborted. The event's `result.attempt` is
+the terminal zero-based handler attempt; intermediate failures emit no terminal events.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -324,85 +259,33 @@ additional terminal events.
 
 ## How they compose
 
-The trio is strongest together. A common pattern: a **cron** job wakes on a schedule and
-**enqueues** a batch of work; **queue** consumers process each message in parallel; and a **KV**
-store holds the cursor, dedupe keys, or rate-limit counters that keep the whole thing idempotent
-across restarts. None of these requires you to operate Redis, RabbitMQ, or PostgreSQL during
-development — the local Deno KV / in-memory adapters carry the same code until Aspire provisions
-the real backends (or until you opt in to the PostgreSQL queue explicitly).
+A common pattern uses all three: a **cron** job wakes on a schedule and **enqueues** a batch of work,
+**queue** consumers process each message in parallel, and a **KV** store holds the cursor, dedupe keys
+or rate-limit counters that keep the loop idempotent across restarts.
 
-One failure mode worth designing out from the start: **keep queue payloads small — enqueue a
-reference, not the bytes**. A job that carries a raw file or image in its payload works right up
-until the payload outgrows the backend's message limits (Deno KV caps values at 64 KiB), and the
-enqueue itself starts failing. The durable shape is to enqueue a small identifier, store the
-bytes behind a service, and have the consumer fetch them back over a
-[typed service call](/services-sdk/sdk/) — the queue then only ever moves pointers, and the same
-payload works on every backend in the matrix above.
+Keep queue payloads small: enqueue a reference, not the bytes. A job that carries a raw file or image
+works until the payload outgrows the backend's message limit (Deno KV caps values at 64 KiB), and then
+the enqueue itself fails. Enqueue a small identifier, store the bytes behind a service, and have the
+consumer fetch them over a [typed service call](/services-sdk/sdk/). The queue then only moves
+pointers, and the same payload works on every backend in the matrix.
 
-{{ comp.apiTable({
-  caption: "Picking the right primitive",
-  rows: [
-    { name: "Key-value state", type: "@netscript/kv", desc: "Synchronous-feeling read/write state: caches, sessions, flags, counters, cursors. Use TTL for ephemerality and watches for reactivity." },
-    { name: "Fire-and-forget work", type: "@netscript/queue", desc: "Decouple slow work from the request path. Fan out to multiple consumers; let the backend handle retries where nativeRetrial is true. Four backends: Deno KV, Redis, AMQP, PostgreSQL." },
-    { name: "Time-driven work", type: "@netscript/cron", desc: "Run handlers on a schedule. Pair with a queue to fan a scheduled tick out into many parallel jobs." },
-    { name: "Stateful orchestration", type: "durable saga", desc: "When work spans steps with correlation and compensation, a queue is not enough — model it as a durable saga instead." }
-  ]
-}) }}
+## Production notes
 
-{{ comp callout { type: "important", title: "Production notes" } }}
-Review these production constraints before deploying: <strong>(1)</strong> the PostgreSQL queue is
-<em>never</em> auto-detected — if you forget <code>provider: QueueProvider.Postgres</code> you
-silently get the Deno KV fallback. <strong>(2)</strong> <code>retryAttempts</code> /
-<code>retryDelay</code> apply <em>only</em> when the backend lacks native retry; check
-<code>queue.nativeRetrial</code> before assuming your config is in effect. <strong>(3)</strong>
-KV per-key TTL is set via <code>expireIn</code> (milliseconds), not an absolute timestamp.
-<strong>(4)</strong> cron <code>timezone</code> defaults to <code>UTC</code> — set it explicitly
-for business-hours schedules. <strong>(5)</strong> always <code>await scheduler.stop()</code> and
-<code>await queue.stop()</code> on shutdown so in-flight work drains and connections release.
-{{ /comp }}
+- `retryAttempts` and `retryDelay` apply **only** when the backend lacks native retry. Check
+  `queue.nativeRetrial` before assuming your config is in effect.
+- KV per-key TTL is set with `expireIn` in milliseconds, not with an absolute timestamp.
+- Cron `timezone` defaults to `UTC`. Set it explicitly for business-hours schedules.
+- Always `await scheduler.stop()` and `await queue.stop()` on shutdown so in-flight work drains and
+  connections close.
 
-## Reference →
+## Next steps
 
-{{ comp.xref({ key: "ref:kv" }) }} · {{ comp.xref({ key: "ref:queue" }) }} ·
-{{ comp.xref({ key: "ref:cron" }) }}
+Use these primitives in code with the
+[Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/) recipe.
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Do — Choose a queue provider",
-    body: "Task recipe: stand up each primitive in an existing workspace, with the Aspire-provisioned, local-fallback, and explicit-PostgreSQL paths spelled out.",
-    href: "/data-persistence/how-to/choose-a-queue-provider/",
-    icon: "◆"
-  },
-  {
-    title: "Look up — @netscript/kv reference",
-    body: "Full generated API: getKv, WatchableKv, KvSetOptions, SharedKvConfig, the Deno KV / memory / Redis adapters, and the auto-detection table.",
-    href: "/reference/kv/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — @netscript/queue reference",
-    body: "createQueue, createTypedQueue, createParallelQueue, QueueProvider, QueueOptions, MessageQueue<T>, and the Deno KV / Redis / AMQP / PostgreSQL / KV-polling adapters.",
-    href: "/reference/queue/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — @netscript/cron reference",
-    body: "createScheduler, getScheduler, CronPresets, CronScheduler, ScheduleOptions, JobContext, and the Deno.cron() and memory adapters.",
-    href: "/reference/cron/",
-    icon: "≡"
-  },
-  {
-    title: "Understand — Orchestration with Aspire",
-    body: "How the scaffold wires Redis (the default cache backend; or Garnet via --cache-backend) and message brokers as resources, and why auto-detection just works once aspire start is up.",
-    href: "/explanation/aspire/",
-    icon: "◎"
-  },
-  {
-    title: "Understand — Telemetry & logging",
-    body: "Why queues are traced by default and how KV/queue/cron spans land in the Aspire dashboard.",
-    href: "/observability/telemetry/",
-    icon: "◎"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Database & Prisma", href: "/data-persistence/database/" }, next: { label: "Telemetry & logging", href: "/observability/telemetry/" } }) }}
+- [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/): auto-discovery,
+  explicit providers and the PostgreSQL backend.
+- {{ comp.xref({ key: "ref:kv" }) }} · {{ comp.xref({ key: "ref:queue" }) }} ·
+  {{ comp.xref({ key: "ref:cron" }) }}: the full API references.
+- [Telemetry & logging](/observability/telemetry/): how queue and scheduler spans reach the Aspire
+  dashboard.

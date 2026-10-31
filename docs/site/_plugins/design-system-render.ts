@@ -19,6 +19,8 @@ import type { MarkdownRenderer } from './design-system-markdown.ts';
 export interface DesignPage {
   url: string;
   title: string;
+  /** Sidebar and breadcrumb label when it differs from the title. */
+  nav_title?: string;
   layout: string;
   content: string;
   order: number;
@@ -189,9 +191,7 @@ export function renderTheme(
     theme.id === 'studio' ? 'Studio flavors' : 'Light and dark'
   }</h2>${specimens}</section>
     ${valueTables(theme)}<section aria-label="Design specification">${prose}</section>`;
-  return `<header><p class="ns-design__eyebrow">Design system · Theme</p><h1>${
-    escapeHtml(theme.name)
-  }</h1>
+  return `<header><h1>${escapeHtml(theme.name)}</h1>
     <p class="ns-design__lede">${escapeHtml(theme.description)}</p>${
     rawLinks(`themes/${theme.id}/`)
   }</header>
@@ -220,71 +220,66 @@ export function renderDesignPages(
     {
       url: DESIGN_ROOT,
       title: 'Design system',
-      content:
-        `<header><p class="ns-design__eyebrow">Design system · Fresh UI</p><h1>NetScript Custom Design Guidelines</h1>${
-          renderGuidelines(intro)
-        }</header>
+      nav_title: 'Overview',
+      content: `<header><h1>Design system</h1>${renderGuidelines(intro)}</header>
       <p class="ns-design__default"><span class="ns-design__label">NetScript default</span> <a href="${
-          themeUrl('studio')
-        }#design-flavor-utility">Studio · Utility</a> <code>neutral × ink</code></p>
+        themeUrl('studio')
+      }#design-flavor-utility">Studio · Utility</a> <code>neutral × ink</code></p>
       <div class="ns-design__rules">${renderGuidelines(guidelineSection(guidelines, 1))}</div>
       <h2 id="design-catalogue">Theme catalogue</h2><p>${themes.length} languages · ${
-          previews.filter((preview) => preview.flavor).length
-        } Studio flavors · light and dark</p>
+        previews.filter((preview) => preview.flavor).length
+      } Studio flavors · light and dark</p>
       <div class="ns-design__gallery">${
-          previews.filter((preview) => !preview.flavor || preview.flavor === 'utility').map((
-            preview,
-          ) => galleryCard(preview, sources.imageSizes)).join('')
-        }</div>
+        previews.filter((preview) => !preview.flavor || preview.flavor === 'utility').map((
+          preview,
+        ) => galleryCard(preview, sources.imageSizes)).join('')
+      }</div>
       <h2 id="design-studio-flavors">More Studio flavors</h2><p>One component anatomy, seven product personalities. <a href="${
-          themeUrl('studio')
-        }">Explore Studio</a>.</p>
+        themeUrl('studio')
+      }">Explore Studio</a>.</p>
       <div class="ns-design__gallery">${
-          previews.filter((preview) => preview.flavor && preview.flavor !== 'utility').map((
-            preview,
-          ) => galleryCard(preview, sources.imageSizes)).join('')
-        }</div>
+        previews.filter((preview) => preview.flavor && preview.flavor !== 'utility').map((
+          preview,
+        ) => galleryCard(preview, sources.imageSizes)).join('')
+      }</div>
       <p><a href="${DESIGN_ROOT}guidelines/">Read the complete guidelines</a> · <a href="${DESIGN_ROOT}create-your-own-theme/">Create your own theme</a> · <a href="/reference/fresh-ui/">Fresh UI API reference</a></p>`,
     },
     {
       url: `${DESIGN_ROOT}guidelines/`,
       title: 'Design guidelines',
-      content:
-        `<p class="ns-design__eyebrow">Design system · Guidelines</p><p><a href="${SOURCE_ROOT}GUIDELINES.md">Read GUIDELINES.md</a></p>${
-          contents(guidelineHtml)
-        }${guidelineHtml}`,
+      content: `<p><a href="${SOURCE_ROOT}GUIDELINES.md">Read GUIDELINES.md</a></p>${
+        contents(guidelineHtml)
+      }${guidelineHtml}`,
     },
     {
       url: `${DESIGN_ROOT}token-contract/`,
       title: 'Token contract',
-      content:
-        `<header><p class="ns-design__eyebrow">Design system · Tokens</p><h1>Token contract</h1>
+      content: `<header><h1>Token contract</h1>
       <p>Theme architecture from the design guidelines. Read it with the <a href="${
-          guidelineAnchor(1)
-        }">two governing rules</a> and the <a href="${
-          guidelineAnchor(3)
-        }">compatibility contract</a>.</p></header>
+        guidelineAnchor(1)
+      }">two governing rules</a> and the <a href="${
+        guidelineAnchor(3)
+      }">compatibility contract</a>.</p></header>
       ${
-          renderGuidelines(guidelineSection(guidelines, 2))
-        }<p><a href="${SOURCE_ROOT}GUIDELINES.md">Read GUIDELINES.md</a></p>`,
+        renderGuidelines(guidelineSection(guidelines, 2))
+      }<p><a href="${SOURCE_ROOT}GUIDELINES.md">Read GUIDELINES.md</a></p>`,
     },
     {
       url: `${DESIGN_ROOT}create-your-own-theme/`,
       title: 'Create your own theme',
-      content:
-        `<header><p class="ns-design__eyebrow">Design system · Authoring</p><h1>Create your own theme</h1>
+      content: `<header><h1>Create your own theme</h1>
       <p>Start with the <a href="${guidelineAnchor(4)}">quality method</a> and <a href="${
-          guidelineAnchor(3)
-        }">compatibility contract</a>.</p></header>
+        guidelineAnchor(3)
+      }">compatibility contract</a>.</p></header>
       ${renderGuidelines(guidelineSection(guidelines, 7))}
       <h2 id="design-template">DESIGN.md template</h2><p><a href="${SOURCE_ROOT}themes/_template/DESIGN.md">Open DESIGN.md template</a></p>
       <details><summary>Read the specification template</summary><pre><code class="language-text">${
-          escapeHtml(templates.design)
-        }</code></pre></details>
+        escapeHtml(templates.design)
+      }</code></pre></details>
       <h2 id="design-skill-template">SKILL.md template</h2><p><a href="${SOURCE_ROOT}themes/_template/SKILL.md">Open SKILL.md template</a></p>
       <details><summary>Read the agent skill template</summary><pre><code class="language-text">${
-          escapeHtml(templates.skill)
-        }</code></pre></details>`,
+        escapeHtml(templates.skill)
+      }</code></pre></details>`,
     },
     ...themes.map((theme) => ({
       url: themeUrl(theme.id),

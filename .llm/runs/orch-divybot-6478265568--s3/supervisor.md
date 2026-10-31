@@ -6,3 +6,11 @@
 - Matrix queried with `deno task agentic:matrix --tier feature --json`. Implementation primary sol/xhigh. Owner explicitly overrides both evaluation routes to `claude -p --model claude-opus-5-5 --effort high`, separate read-only sessions, stdin closed, blockers only. Fix once; preserve verdicts.
 - Public evidence contains repository-relative paths and no machine/session identifiers.
 - Stop at READY; no merge, tag or release. Labels unchanged by owner instruction.
+
+## Resume 2026-10-31
+
+- Resuming existing phase-one branch and PR #2467 at 1cac8f994cd896395d2e2717d21a6752987108d8. Upstream main is 7907293f3dad3aeb557923809ddcd3435adae151; merge it with a merge commit.
+- Existing scope and exact product write surface above continue to apply. Additional integration surface: conflicts in docs/site/reference/fresh-ui/index.md and generated source/embed/prose/publish carriers, using their existing generators; no new feature scope.
+- Codex implementation route: sol/xhigh, feature tier, confirmed from agentic:matrix --tier feature --json. Owner evaluation override remains claude-opus-5-5/high in a separate read-only session, stdin closed, blockers only; one repair and same-session re-review.
+- Read the original brief and all prior plan/worklog/drift/evaluation/memory records. Consulted live NetScript MCP find_guidance and search_docs before edits. RTK is still unavailable; use native focused inspections and repository structured wrappers.
+- Resume evidence may write this run directory, with raw operational logs in the project runs directory. Assignment and final report handoffs remain excluded from Git. No new PR, labels, closure of #2416, merge of the PR, force-push, lock/cache deletion or reload.

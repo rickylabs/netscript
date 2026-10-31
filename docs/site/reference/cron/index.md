@@ -5,35 +5,33 @@ title: "@netscript/cron"
 
 # `@netscript/cron`
 
-Runtime-agnostic cron scheduling abstraction for NetScript applications. Provides a
-consistent interface across different backends (native `Deno.cron` and an in-memory
-scheduler) with timezone support, job-lifecycle event emission, and runtime
-auto-detection. This page is written against the package public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+Schedule recurring jobs from cron expressions with one `CronScheduler` interface. Use it for
+time-based work: the factory picks native `Deno.cron` at runtime and an in-memory scheduler in
+tests, with timezones, retries and job-lifecycle events.
 
-The root entrypoint (`@netscript/cron`) exposes the scheduler factory, the shared-instance
-helpers, the cron-expression utilities, and the full port contract (interfaces and type
-aliases). Three sub-path exports carry the rest of the surface:
+## Sub-path exports
 
-- [`@netscript/cron/ports`](#sub-path-exports) - the port contract types only (no factory).
-- [`@netscript/cron/adapters`](#sub-path-exports) - the concrete adapter classes.
-- [`@netscript/cron/testing`](#sub-path-exports) - the in-memory adapter for tests.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/cron` | `./mod.ts` | [Scheduler factory](#scheduler-factory), [expression utilities](#cron-expression-utilities), [constants](#constants) and the full [port contract](#scheduler-contract). |
+| `@netscript/cron/ports` | `./ports/mod.ts` | The port contract only: every interface and type alias, without the factory functions. |
+| `@netscript/cron/adapters` | `./adapters/mod.ts` | The concrete [adapters](#adapters), plus re-exported contract types and utilities. |
+| `@netscript/cron/testing` | `./testing/mod.ts` | The `MemoryCronAdapter` for tests. |
 
 ## Scheduler factory
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createScheduler` | `function createScheduler(options?: CreateSchedulerOptions): CronScheduler` | Create a cron scheduler, auto-detecting the runtime (native `Deno.cron`, or in-memory for tests). |
-| `getScheduler` | `function getScheduler(options?: CreateSchedulerOptions): CronScheduler` | Get the default shared scheduler instance, creating it on first call (options only used on first call). |
-| `stopScheduler` | `async function stopScheduler(): Promise<void>` | Stop and reset the default scheduler so the next `getScheduler()` creates a fresh instance. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createScheduler` | function | `function createScheduler(options?: CreateSchedulerOptions): CronScheduler` | Create a cron scheduler, auto-detecting the runtime (native `Deno.cron`, or in-memory for tests). |
+| `getScheduler` | function | `function getScheduler(options?: CreateSchedulerOptions): CronScheduler` | Get the default shared scheduler instance, creating it on first call (options only used on first call). |
+| `stopScheduler` | function | `async function stopScheduler(): Promise<void>` | Stop and reset the default scheduler so the next `getScheduler()` creates a fresh instance. |
 
 ## Cron expression utilities
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `isValidCronExpression` | `function isValidCronExpression(expression: string): boolean` | Validate a cron expression, returning `true` if valid. |
-| `parseCronExpression` | `function parseCronExpression(expression: string): ParsedCronExpression \| null` | Parse a cron expression string into its component parts, or `null` if invalid. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `isValidCronExpression` | function | `function isValidCronExpression(expression: string): boolean` | Validate a cron expression, returning `true` if valid. |
+| `parseCronExpression` | function | `function parseCronExpression(expression: string): ParsedCronExpression \| null` | Parse a cron expression string into its component parts, or `null` if invalid. |
 
 ## Constants
 
@@ -80,23 +78,14 @@ Concrete implementations of `CronScheduler`, exported from `@netscript/cron/adap
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `DenoCronAdapter` | class | Uses the native `Deno.cron` runtime; works on Deno Deploy and local Deno. |
-| `MemoryCronAdapter` | class | `setInterval`-based in-memory scheduler with test helpers (`triggerAll`, `waitForExecutions`, `getExecutionCount`, `setTickInterval`). Ideal for tests and development. |
+| `MemoryCronAdapter` | class | `setInterval`-based in-memory scheduler with test helpers (`triggerAll`, `waitForExecutions`, `getExecutionCount`, `setTickInterval`). Use it in tests and development. |
 
-## Sub-path exports
+## Examples
 
-The following entrypoints are published alongside the root export. Their reference surface is
-documented against their own `deno doc` output.
+### Test a schedule with fake time
 
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/cron` | `./mod.ts` | Scheduler factory, expression utilities, constants, and the full port contract (documented above). |
-| `@netscript/cron/ports` | `./ports/mod.ts` | The port contract only - every interface and type alias above, without the factory functions. |
-| `@netscript/cron/adapters` | `./adapters/mod.ts` | The concrete `DenoCronAdapter` and `MemoryCronAdapter` classes (plus re-exported contract types and utilities). |
-| `@netscript/cron/testing` | `./testing/mod.ts` | The `MemoryCronAdapter` for tests. |
-
-## Deterministic Testing and Execution
-
-Use the `MemoryCronAdapter` in tests to prove scheduling behavior deterministically. When combined with Deno's `FakeTime` clock mock, you can advance time programmatically without introducing wall-clock delays.
+Pair `MemoryCronAdapter` with the `FakeTime` clock from `@std/testing/time` to advance time in a
+test without waiting on the wall clock.
 
 ```ts
 import { assertEquals } from "@std/assert";
@@ -132,6 +121,3 @@ Deno.test("MemoryCronAdapter deterministic execution with FakeTime", async () =>
 });
 ```
 
----
-
-Back to the [reference overview](/reference/).

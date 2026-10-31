@@ -1,19 +1,16 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the workspace
+title: Scaffold the ERP sync
 templateEngine: [vento, md]
 prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }
 next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }
 ---
 
-# Scaffold the workspace
+# Scaffold the ERP sync
 
-This is the first chapter of the ERP Sync track — the service that keeps **Microsoft Dynamics**,
-the ERP your team is migrating to, fed from the file exports of **SAP**, the legacy system that is
-still the system of record. Before you can watch the SAP file drops or run background jobs, you need
-a workspace with the right plugins installed and an orchestrator to run them. In this chapter you
-create `my-erp/`, add the **workers** and **triggers** plugins, and boot the whole stack under
-Aspire so the rest of the track has something real to build on.
+This chapter creates `my-erp/`, the workspace for the SAP-to-Dynamics sync. You add the
+**workers** and **triggers** plugins and boot the stack under Aspire, so the rest of the track has
+a running system to build on.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
@@ -25,62 +22,54 @@ Aspire so the rest of the track has something real to build on.
 
 ## What you will build
 
-By the end of this chapter you will have `my-erp/` on disk — a NetScript workspace with a Postgres
-database, the **workers** plugin at `plugins/workers/` (the background-job engine), and the **triggers**
-plugin at `plugins/triggers/` (the ingress engine) — all running
-together under one `aspire start`, with the Aspire dashboard live on `:18888`.
+`my-erp/` on disk: a NetScript workspace with a Postgres database, the **workers** plugin at
+`plugins/workers/` (the background-job engine) and the **triggers** plugin at `plugins/triggers/`
+(the ingress engine), all running under one `aspire start`, with the Aspire dashboard available at the URL Aspire prints.
 
 ## Before you begin
 
-You need the same local toolchain the [main tutorials](/tutorials/) use:
+You need:
 
-- **[Deno](https://deno.com/) 2.x** on your `PATH` — check with `deno --version`.
-- The **[Aspire CLI](https://aspire.dev)** — check with `aspire --version`. Aspire provisions your
-  database and cache locally so you do not wire up Docker by hand.
-- **Docker** running, so Aspire can start the Postgres and Redis containers — confirm with
+- **[Deno](https://deno.com/) 2.x** on your `PATH`. Check with `deno --version`.
+- The **[Aspire CLI](https://aspire.dev)**. Check with `aspire --version`. Aspire provisions your
+  database and cache locally, so you don't wire up Docker by hand.
+- **Docker** running, so Aspire can start the Postgres and Redis containers. Check with
   `docker info`.
 
 Install the NetScript CLI from JSR once, then confirm it:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
-You should see the public command groups, including `init`, `plugin`, `generate`, `db`, and
-`deploy`. If `netscript` is not found, make sure Deno's install directory is on your `PATH` and open
-a fresh terminal.
-
-{{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad-hoc with
-<code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>. The rest of this track
-assumes the installed <code>netscript</code> form.
-{{ /comp }}
+The public command groups are `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `tokens`, `ui:add`, `ui:init`, `ui:list`, `ui:remove` and `ui:update`. If `netscript` is not found, add Deno's install directory to your `PATH` and open a new terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
 
-Before writing files, ask the CLI what it _would_ create. `--dry-run` plans the scaffold and prints
-the file and directory totals per phase without touching disk:
+`--dry-run` plans the scaffold and prints the file and directory totals per phase without writing
+to disk:
 
 ```sh
 netscript init my-erp --dry-run
 ```
 
-A clean dry run means your flag combination is valid — the CLI rejects bad option mixes (an unknown
-`--db` engine, for instance) here, before any files exist. Treat it as a green light to scaffold for
-real.
+The CLI rejects invalid option combinations here, such as an unknown `--db` engine, before any
+files exist. A clean dry run means your flags are valid.
 
 ## Step 2 — Create the workspace
 
-This track needs a database to anchor durable execution, so scaffold with Postgres — the recommended default. `--db` is polyglot: swap `postgres` for `mysql`, `mssql`, or `sqlite` and the rest of the track works the same (this track uses `postgres` throughout):
+Durable execution needs a database, so scaffold with Postgres, the recommended default. You can
+swap `postgres` for `mysql`, `mssql` or `sqlite` and the rest of the track works the same; this
+track uses `postgres` throughout:
 
 ```sh
 netscript init my-erp --db postgres
 cd my-erp
 ```
 
-This scaffolds `my-erp/`, formats the output with `deno fmt`, and initializes a git repository. On
-completion the CLI prints a **next steps** summary tailored to your options.
+The CLI scaffolds `my-erp/`, formats the output with `deno fmt`, initializes a git repository and
+prints a **next steps** summary for your options.
 
 {{ comp.apiTable({
   caption: "netscript init options used here (run netscript init --help for the full list)",
@@ -93,35 +82,32 @@ completion the CLI prints a **next steps** summary tailored to your options.
 }) }}
 
 {{ comp callout { type: "note", title: "Where is packages/?" } }}
-If you scaffolded from a checkout of the NetScript repo you may see a vendored
-<code>packages/</code> directory. A normal JSR install does not have one — your project pulls
-<code>@netscript/*</code> from the registry. Ignore <code>packages/</code> in this track.
+If you scaffolded from a checkout of the NetScript repo, you may see a vendored <code>packages/</code> directory. A normal JSR install does not have one: your project pulls <code>@netscript/*</code> from the registry. Ignore <code>packages/</code> in this track.
 {{ /comp }}
 
 ## Step 3 — Add the workers plugin
 
-NetScript's background capabilities arrive as plugins. Add the **workers** plugin with its sample
-jobs so you have a working reference to read and adapt:
+Add the **workers** plugin with its sample jobs, which give you a working reference to read and
+adapt:
 
 ```sh
 netscript plugin install worker --name workers --samples
 ```
 
-This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location
-— and registers it in `netscript.config.ts` (`./plugins/workers/mod.ts`) and `appsettings.json`. The
-workers plugin ships an API service and a separate background processor that drains the
-job queue.
+The plugin lands at **`plugins/workers/`**, the config-referenced install location, and is
+registered in `netscript.config.ts` (`./plugins/workers/mod.ts`) and `appsettings.json`. It ships
+an API service and a separate background processor that drains the job queue.
 
 ## Step 4 — Add the triggers plugin
 
-Now add the **triggers** plugin, which is how NetScript receives events — including the file-watch
-trigger you build in [Chapter 2](/tutorials/erp-sync/02-import-job/):
+Add the **triggers** plugin. Triggers are how NetScript receives events, including the file-watch
+trigger you build in [chapter 2](/tutorials/erp-sync/02-import-job/):
 
 ```sh
 netscript plugin install trigger --name triggers --samples
 ```
 
-This lands a workspace at `plugins/triggers/` and registers it in `netscript.config.ts`
+The plugin lands at `plugins/triggers/` and is registered in `netscript.config.ts`
 (`./plugins/triggers/mod.ts`) and `appsettings.json`. Confirm both plugins registered:
 
 ```sh
@@ -130,20 +116,19 @@ netscript plugin list
 
 You should see `workers` and `triggers` in the registry.
 
-{{ comp callout { type: "note", title: "Two trees, one canonical home" } }}
-A scaffold may also create slimmer top-level <code>workers/</code> and <code>triggers/</code>
-directories — workspace members that stage a subset of files for the background processors. The
-real, config-referenced plugins live at <strong><code>plugins/workers/</code></strong> and
-<strong><code>plugins/triggers/</code></strong>: that is what <code>netscript.config.ts</code>
-points at and where you author code. Edit under <code>plugins/</code>.
+{{ comp callout { type: "note", title: "Authoring paths and plugin implementation" } }}
+The project configuration discovers your job modules under <code>workers/jobs/</code>, tasks under
+<code>workers/tasks/</code> and trigger definitions under <code>triggers/</code>. The plugin packages
+under <code>plugins/workers/</code> and <code>plugins/triggers/</code> supply the runtime and API.
+Use the plugin CLIs to add project definitions; their registries follow the configured authoring paths.
 {{ /comp }}
 
 ## Step 5 — Bring up orchestration
 
-This is the step that turns a folder of files into a running system. **Aspire provisions your
-database and cache and starts every process; you do not start containers by hand, and you run it
-before any `netscript db` command.** Run it from the `aspire/` subfolder so the CLI sees
-`apphost.mts`:
+Aspire provisions your database and cache and starts every process. You don't start containers by
+hand, and Aspire must be running before any `netscript db` command (chapter 5 runs them; see also
+[Deploy locally with Aspire](/orchestration-runtime/how-to/deploy-local-aspire/)). Run it from the
+`aspire/` subfolder so the CLI sees `apphost.mts`:
 
 ```sh
 cd aspire
@@ -151,65 +136,53 @@ aspire restore   # once per machine: restores the Aspire SDK modules into .aspir
 aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up Postgres, the Redis cache, the workers API + processor, and the triggers API
-+ processor together, then prints a URL and a one-time login token for the **Aspire dashboard**:
+`aspire start` brings up Postgres, the Redis cache, the workers API and processor, and the
+triggers API and processor, then prints the allocated URL for the
+**Aspire dashboard**:
 
+```text
+the URL Aspire prints
 ```
-https://localhost:18888
-```
 
-The dashboard's **Resources** tab is the authority for which port each resource bound, and there is
-no shortcut around it: because you installed these plugins without `--port`, their entries carry no
-`HostPort`, so Aspire allocates their host ports at every start. Copy the `workers-api` and
-`triggers-api` endpoints from that tab now — the rest of the track writes them as
-`<workers-endpoint>` and `<triggers-endpoint>` — and re-read them after any restart. Leave
-`aspire start` going in this terminal; it is your control plane for the rest of the track.
+The dashboard's **Resources** tab is the authority for the port each resource bound. You installed
+these plugins without `--port`, so their entries carry no `HostPort`, and Aspire allocates their
+host ports at every start. Copy the `workers-api` and `triggers-api` endpoints from that tab now;
+the rest of the track writes them as `<workers-endpoint>` and `<triggers-endpoint>`. Re-read them
+after any restart.
 
-{{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
-The Postgres container only exists while <code>aspire start</code> is up. So
-<code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must run
-<strong>after</strong> Aspire has started — never before. There is more on the database sequence in
-<a href="/orchestration-runtime/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
-{{ /comp }}
+Leave `aspire start` running in this terminal. It is your control plane for the rest of the track.
 
 ## Verify your progress
 
-In a second terminal (leave `aspire start` going in the first), confirm both plugin APIs are alive:
+1. In a second terminal, confirm both plugin APIs are alive:
 
-```sh
-curl <workers-endpoint>/health    # workers API
-curl <triggers-endpoint>/health   # triggers API
-```
+   ```sh
+   curl <workers-endpoint>/health    # workers API
+   curl <triggers-endpoint>/health   # triggers API
+   ```
 
-Both should return a healthy JSON response. Then type-check the whole workspace from the project
-root:
+   Both should return a healthy JSON response.
 
-```sh
-deno task check
-```
+2. Type-check the workspace from the project root:
 
-Expected: a clean check with no errors — the scaffold, both plugins, and the database wiring all
-line up.
+   ```sh
+   deno task check
+   ```
+
+   A clean check means the scaffold, both plugins and the database wiring line up.
 
 - [ ] `my-erp/` exists with `plugins/workers/` and `plugins/triggers/` on disk.
 - [ ] `netscript plugin list` shows both `workers` and `triggers`.
-- [ ] `aspire start` is up; the dashboard on `:18888` lists `postgres`, `redis`, and both plugin APIs.
+- [ ] `aspire start` is up; the dashboard at the URL Aspire prints lists `postgres`, `redis`, and both plugin APIs.
 - [ ] `curl <workers-endpoint>/health` and `curl <triggers-endpoint>/health` both return healthy.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with
-<code>postgres</code> and <code>redis</code> healthy in the
-<a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)?
-(3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found
-<code>apphost.mts</code>? A failed <code>curl</code> usually means a service is still starting —
-give it a few seconds and retry.
+Three checks cover most first-run problems: (1) is <code>aspire start</code> still up, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means a service is still starting; wait a few seconds and retry.
 {{ /comp }}
 
 ## What you built
 
-A real NetScript workspace, `my-erp/`, with the **workers** and **triggers** plugins installed and
-the whole stack — Postgres, Redis, both plugin APIs and their background processors — running under
-one `aspire start` and visible in the dashboard. Next, you give it the SAP export to ingest.
-
-{{ comp.nextPrev({ prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }, next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" } }) }}
+`my-erp/`, with the **workers** and **triggers** plugins installed and the stack (Postgres, Redis,
+both plugin APIs and their background processors) running under one `aspire start`. Next, you give
+it the SAP export to ingest.

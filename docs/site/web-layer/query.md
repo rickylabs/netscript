@@ -2,42 +2,29 @@
 layout: layouts/base.vto
 title: Data loading and the query cache
 templateEngine: [vento, md]
-order: 4
+order: 10
 ---
 
 # Data loading and the query cache
 
-The `@netscript/fresh/query` subpath gives islands a package-owned data layer
-built on TanStack Query, while the package root exposes a small set of
-cache-entry helpers that page loaders and islands share. Reach for this surface
-when an island needs cached, refetchable, or live data, and when a server loader
-wants to prime that cache before the island hydrates.
+This page shows how islands load cached, refetchable and live data with the
+TanStack Query hooks in `@netscript/fresh/query`, and how a page loader checks
+its cache with the root cache-entry helpers.
 
 ## The two surfaces
 
-Data loading in NetScript Fresh spans two import points:
+| Import | What it provides |
+| --- | --- |
+| `@netscript/fresh/query` | TanStack Query for islands: the `QueryIsland` provider, the shared `QueryClient` (`getIslandQueryClient`), query and mutation hooks (`useIslandQuery`, `useIslandMutation` and the rest), live-query hooks (`useLiveQuery`, `useLiveSuspenseQuery`), and hydration utilities for streaming SSR. |
+| `@netscript/fresh` (root) | Page-loader cache helpers over plain `CacheEntryLike` values (a `data` payload plus a `cachedAt` Unix-epoch timestamp in milliseconds). A loader uses them to check whether its cache is complete and how fresh it is before it serves cached data or refetches. |
 
-- **`@netscript/fresh/query`** — TanStack Query hooks for islands. Island code
-  imports from this subpath rather than from `@tanstack/preact-query` directly,
-  which centralizes the dependency and enables framework-level enhancements.
-  It provides the island provider (`QueryIsland`), the shared `QueryClient`
-  singleton (`getIslandQueryClient`), the query and mutation hooks
-  (`useIslandQuery`, `useIslandMutation`, and friends), live-query hooks
-  (`useLiveQuery`, `useLiveSuspenseQuery`), and hydration utilities for
-  streaming SSR.
-- **`@netscript/fresh`** (root) — the cross-cutting page-loader cache helpers.
-  These operate on plain `CacheEntryLike` values: a `data` payload plus a
-  `cachedAt` Unix-epoch timestamp in milliseconds. They let a loader reason
-  about whether its cache is complete and how fresh it is before deciding to
-  serve cached data or refetch.
-
-Every other capability lives on its own explicit subpath (`./builders`,
-`./route`, `./form`, `./defer`, `./server`, `./streams`, `./interactive`,
-`./vite`, `./error`, and `./testing`).
+Import island hooks from `@netscript/fresh/query`, not from
+`@tanstack/preact-query`. The subpath centralizes the dependency and keeps
+framework-level enhancements available.
 
 ## Cache entries at the loader
 
-A `CacheEntryLike<T>` is the shared cache shape across page loaders and partial
+A `CacheEntryLike<T>` is the cache shape shared by page loaders and partial
 orchestration:
 
 ```ts
@@ -50,18 +37,16 @@ interface CacheEntryLike<T> {
 The root helpers operate over arrays of these entries:
 
 - `hasAllCacheEntries(entries)` returns `true` when every supplied entry is
-  present. `null` and `undefined` entries count as missing, so a loader can pass
-  the raw results of several cache reads and learn in one call whether the page
-  can be served entirely from cache.
-- `minCachedAt(entries)` returns the oldest `cachedAt` timestamp across the
-  supplied entries, or `undefined` when there are none. Use it to compute the
-  effective freshness of a composed page — the page is only as fresh as its
-  stalest entry.
-- `projectCachedItemFromList(listEntry, predicate)` projects a single cached
-  item out of a `CachedListEntryLike<TItem>` (an entry whose `data` holds an
-  `items` array) while preserving the list's `cachedAt` timestamp. This lets a
-  detail view reuse a list response already in cache instead of issuing a new
-  fetch.
+  present. `null` and `undefined` count as missing, so a loader can pass the raw
+  results of several cache reads and learn in one call whether the page can be
+  served from cache.
+- `minCachedAt(entries)` returns the oldest `cachedAt` across the supplied
+  entries, or `undefined` when there are none. A composed page is only as fresh
+  as its stalest entry.
+- `projectCachedItemFromList(listEntry, predicate)` projects one cached item out
+  of a `CachedListEntryLike<TItem>` (an entry whose `data` holds an `items`
+  array) and keeps the list's `cachedAt`. A detail view can then reuse a cached
+  list response instead of fetching again.
 
 ### A cache-first load pattern
 
@@ -104,9 +89,9 @@ if (hasAllCacheEntries(entries)) {
 
 ## Querying inside an island
 
-Islands wrap their content in `QueryIsland`, the island-level TanStack Query
-provider, then call the package-owned hooks. `useIslandQuery` runs a query
-through the shared client; its options come from `IslandQueryOptions`:
+An island wraps its content in `QueryIsland`, the island-level TanStack Query
+provider, and then calls the package hooks. `useIslandQuery` runs a query
+through the shared client and takes `IslandQueryOptions`:
 
 | Option        | Meaning                                              |
 | ------------- | ---------------------------------------------------- |
@@ -126,15 +111,13 @@ The hook returns an `IslandQueryResult` with `data`, `error`, `status`,
 
 ### From contract to island: the typed query chain
 
-`queryFn` can be any function that returns data — but on a NetScript service it
-should almost never be a hand-written `fetch`. A raw `fetch("/api/widgets")`
-re-types the response by hand, hardcodes the path, and drifts silently the moment
-the service changes. The [`@netscript/sdk`](/services-sdk/sdk/) bridge removes
-that gap: derive the `queryFn` (and its `queryKey`) straight from the same oRPC
-contract the service implements, so the island cannot drift from the API.
+For a NetScript service, derive `queryFn` and `queryKey` from the service's oRPC
+contract with [`@netscript/sdk`](/services-sdk/sdk/) instead of writing a
+`fetch`. A hand-written `fetch("/api/widgets")` re-types the response, hardcodes
+the path, and drifts when the service changes.
 
-The chain has three links, and each service owns one module under `lib/` — the
-single source of typed clients every loader and island imports:
+Give each service one module under `lib/` that builds its typed client and
+query factories. Every loader and island imports from that module:
 
 ```ts
 // apps/dashboard/lib/widgets.ts
@@ -156,10 +139,9 @@ export const widgetsQueries = createQueryFactories({
 }).widgets;
 ```
 
-Islands then import from that module and spread the generated options into the
-island hooks. `queryOptions(input)` supplies both the `queryKey` and a
-`queryFn` bound to the contract, so the hook call only adds island concerns like
-`staleTime`:
+An island spreads the generated options into the hook. `queryOptions(input)`
+supplies the `queryKey` and a contract-bound `queryFn`, so the hook call adds
+only island concerns such as `staleTime`:
 
 ```tsx
 // apps/dashboard/islands/WidgetIsland.tsx
@@ -192,24 +174,21 @@ export default function WidgetIsland() {
 }
 ```
 
-`widgetsQueries.list.queryOptions(...)` returns a typed `{ queryKey, queryFn }`; the
-`widget` element is inferred from the contract's output, so a renamed field is a
-compile error, not a runtime surprise. The same factory also supplies the KV-backed
-server SWR and prefetch helpers described in the
-[Typed SDK & client](/services-sdk/sdk/) pillar, so loaders and islands share one
-input shape and one query-key vocabulary.
-
-`initialData` is the bridge between a server loader and the island: pass the
-loader's cached payload as `initialData` so the island renders with data
-immediately and only refetches once `staleTime` elapses.
+`widgetsQueries.list.queryOptions(...)` returns a typed `{ queryKey, queryFn }`.
+The `widget` type comes from the contract's output, so a renamed field is a
+compile error. The same factory supplies the KV-backed server helpers described
+in [Typed SDK & client](/services-sdk/sdk/), so loaders and islands share one
+input shape and one query-key vocabulary. Seeding the island with the loader's
+payload through `initialData` is covered in
+[the query bridge](/web-layer/query-bridge/).
 
 ### Polling an island with `refetchInterval`
 
-When an island needs to poll for a changing status — a document moving from
-`pending` to `embedding` to `ready`, say — set `refetchInterval` rather than
-wiring a manual `setInterval`. The hook refetches on that cadence and cleans the
-timer up on unmount. Add `refetchIntervalInBackground: true` when polling must
-continue while the tab is backgrounded (the default stops polling on blur).
+To poll a changing status, such as a document moving from `pending` to
+`embedding` to `ready`, set `refetchInterval` instead of wiring a `setInterval`.
+The hook refetches on that cadence and clears the timer on unmount. Add
+`refetchIntervalInBackground: true` when polling must continue while the tab is
+in the background; by default it stops on blur.
 
 ```tsx
 import { useIslandQuery } from "@netscript/fresh/query";
@@ -228,41 +207,35 @@ function DocStatus({ id }: { id: string }) {
 }
 ```
 
-`refetchInterval` is typed `number | false`: pass a millisecond cadence to poll,
-or `false` to disable it (for example, flip it to `false` from state once the
-status reaches `ready` to stop polling).
-
 ### Mutations, infinite queries, and live data
 
 - `useIslandMutation` runs a mutation through the shared client. Its options
-  (`IslandMutationOptions`) take a `mutationFn` plus optional `onMutate`,
-  `onSuccess`, `onError`, and `onSettled` callbacks; the result exposes
-  `mutate`, `mutateAsync`, `status`, `isPending`, `data`, and `error`.
-  `onMutate` runs before the mutation fires and can return context (for
-  example, a snapshot of prior data) that `onSuccess`, `onError`, and
-  `onSettled` receive back — the seam for optimistic updates with rollback.
-  `onSettled` runs after either a success or an error.
-- `useIslandInfiniteQuery` loads paged data. Its options extend the query
-  options with `initialPageParam` and `getNextPageParam`; the result adds
-  `hasNextPage`, `isFetchingNextPage`, and `fetchNextPage()`.
+  (`IslandMutationOptions`) take a `mutationFn` and optional `onMutate`,
+  `onSuccess`, `onError` and `onSettled` callbacks. The result exposes
+  `mutate`, `mutateAsync`, `status`, `isPending`, `data` and `error`.
+  `onMutate` runs before the mutation and can return context, such as a
+  snapshot of prior data, which the other callbacks receive. That is the seam
+  for optimistic updates with rollback. `onSettled` runs after success or error.
+- `useIslandInfiniteQuery` loads paged data. Its options add
+  `initialPageParam` and `getNextPageParam`; the result adds `hasNextPage`,
+  `isFetchingNextPage` and `fetchNextPage()`.
 - `useIslandSuspenseQuery` and `useIslandSuspenseInfiniteQuery` are the
-  Suspense variants; the suspense query result guarantees `data` is present for
-  rendered consumers.
-- `useLiveQuery` and `useLiveSuspenseQuery` accept an `IslandLiveQueryFactory`
-  and an optional dependency array, returning an `IslandLiveQueryResult` with
-  `data`, `status`, `error`, and a `details` record of preserved upstream
-  fields.
+  Suspense variants. The Suspense query result guarantees `data` for rendered
+  consumers.
+- `useLiveQuery` and `useLiveSuspenseQuery` take an `IslandLiveQueryFactory`
+  and an optional dependency array. They return an `IslandLiveQueryResult` with
+  `data`, `status`, `error` and a `details` record of preserved upstream fields.
 
-Shorter aliases — `useQuery`, `useMutation`, `useInfiniteQuery`,
-`useSuspenseQuery`, and `useSuspenseInfiniteQuery` — map to their `useIsland*`
+The shorter aliases `useQuery`, `useMutation`, `useInfiniteQuery`,
+`useSuspenseQuery` and `useSuspenseInfiniteQuery` map to their `useIsland*`
 counterparts for backward compatibility.
 
 #### A worked mutation: optimistic toggle with rollback
 
-This island toggles a todo's `done` flag through `useIslandMutation`, applying the
-change optimistically and rolling back if the server rejects it. `onMutate` snapshots
-the cached list and returns it as context, `onError` restores that snapshot, and
-`onSettled` re-syncs with the server:
+This island toggles a todo's `done` flag optimistically and rolls back if the
+server rejects the change. `onMutate` snapshots the cached list and returns it
+as context, `onError` restores the snapshot, and `onSettled` re-syncs with the
+server:
 
 ```tsx
 // apps/dashboard/islands/TodoIsland.tsx
@@ -332,22 +305,18 @@ export default function TodoIsland({ todo }: { todo: Todo }) {
 }
 ```
 
-Spreading `todosQueries.update.mutationOptions()` supplies the contract-bound
-`mutationFn` and `mutationKey`; the optimistic seam — `onMutate`, `onError`,
-`onSettled` — is added on the island hook, exactly where the query cache lives.
-`mutate` takes the typed procedure input (`{ id, done }` here), and the
-`todosQueries.list.clientKey(input)` builds the same key the list query uses,
-so the snapshot, rollback, and invalidation all target the right cache entry.
-Call `mutate` for fire-and-forget UI updates, or `mutateAsync` when you need to
-await the result.
+`todosQueries.update.mutationOptions()` supplies the contract-bound `mutationFn`
+and `mutationKey`. The optimistic callbacks sit on the island hook, next to the
+query cache. `mutate` takes the typed procedure input (`{ id, done }` here).
+`todosQueries.list.clientKey(input)` builds the key the list query uses, so the
+snapshot, rollback and invalidation target the same cache entry. Call `mutate`
+for fire-and-forget updates, or `mutateAsync` when you need to await the result.
 
 ### Endpoints without a NetScript contract
 
-Sometimes an island calls something that has no oRPC contract — a third-party
-REST API, a legacy endpoint, or a webhook receiver. That is the one case where a
-hand-written `queryFn` is correct: there is no contract to derive from, so you own
-the request and its type. Keep it explicit and isolated so it does not read as the
-default pattern:
+A third-party REST API, a legacy endpoint or a webhook receiver has no oRPC
+contract to derive from. Only then is a hand-written `queryFn` correct: you own
+the request and its type. Keep it explicit and isolated:
 
 ```tsx
 import { useIslandQuery } from "@netscript/fresh/query";
@@ -373,38 +342,26 @@ function ExchangeRate() {
 }
 ```
 
-For any endpoint that *does* have a NetScript contract, reach for the typed chain
-above instead — the raw `fetch` here exists only because there is nothing typed to
-bind to.
+For an endpoint that has a NetScript contract, use the typed chain above.
 
 ## Server prefetch and hydration
 
-For streaming SSR, prefetch on the server and hand the cache to the island:
+For streaming SSR, the server prefetches into a per-request `QueryClient`,
+`dehydrateQueryClient` serializes it to a `DehydratedState`, and the island
+restores it with `HydrationBoundary` or `hydrateFromDehydrated`.
+`QueryHydrationScript` writes the state into the document as a script tag.
+[The query bridge](/web-layer/query-bridge/#dehydrate-or-props) explains when to
+dehydrate and when to pass `initialData` props instead.
 
-1. Prefetch into a per-request `QueryClient`, then call
-   `dehydrateQueryClient(queryClient)` to produce a serializable
-   `DehydratedState` (its `queries` and `mutations` arrays).
-2. Serialize that state into the document with `QueryHydrationScript`, or pass
-   it directly to an island.
-3. On the client, restore it with `HydrationBoundary` (which reads either a
-   `state` prop or a script tag by `id`) or call `hydrateFromDehydrated` against
-   the island client.
+`getIslandQueryClient()` returns the shared island client, `useQueryClient`
+returns the active handle inside an island, and `resetIslandQueryClient()`
+clears the singleton, mainly for tests.
 
-`getIslandQueryClient()` returns the shared singleton. `useQueryClient` returns
-the active handle inside an island, and `resetIslandQueryClient()` clears the
-singleton, primarily for tests.
-
-{{ comp callout { type: "note" } }}
-The island <code>QueryClient</code> is a module-scoped singleton, and nothing
-prevents server code from creating it — calling
-<code>getIslandQueryClient()</code> outside the browser lazily constructs a
-client that would then be shared across requests. Build a per-request client for
-SSR prefetch instead, and treat the singleton as browser-only.
-{{ /comp }}
-
-The cache-first variant of this handoff — SDK query factories, the server and
-client key tiers, `getCachedEntry()` at the loader, and when to dehydrate rather
-than pass `initialData` — is [The query bridge](/web-layer/query-bridge/).
+> [!CAUTION]
+> The island `QueryClient` is a module-scoped singleton. Calling
+> `getIslandQueryClient()` on the server creates a client that is then shared
+> across requests. Build a per-request client for SSR prefetch and treat the
+> singleton as browser-only.
 
 ## API summary
 
@@ -443,17 +400,9 @@ Query subpath (`@netscript/fresh/query`):
 | `QueryKey`                   | Stable query-key shape (`readonly unknown[]`).           |
 | `LoaderData`                 | Resolve the awaited return value of a Fresh route loader. |
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [
-  { title: "The Fresh page model", body: "How server pages compose and load.", href: "/web-layer/server/" },
-  { title: "Routing and route contracts", body: "Route definitions and loaders.", href: "/web-layer/route/" },
-  { title: "The query bridge", body: "SDK factories, key tiers, and server-to-island hydration.", href: "/web-layer/query-bridge/" },
-  { title: "Typed SDK & client", body: "The contract → client → query-utils bridge queryFn is built on.", href: "/services-sdk/sdk/" },
-  { title: "Interactive islands", body: "Where query hooks run on the client.", href: "/web-layer/interactive/" },
-  { title: "Deferred and streaming UI", body: "Stream data into hydrating islands.", href: "/web-layer/defer-streaming-ui/" },
-  { title: "Server-validated forms", body: "Pair mutations with form handling.", href: "/web-layer/form/" },
-  { title: "Live dashboard tutorial", body: "Build a cache-first, live-updating page.", href: "/tutorials/live-dashboard/" }
-] }) }}
-
-See also the [Web Layer hub](/web-layer/).
+Read [the query bridge](/web-layer/query-bridge/) to hand a server loader's cache
+entry to an island without a refetch. See also
+[Typed SDK & client](/services-sdk/sdk/) and the
+[live dashboard tutorial](/tutorials/live-dashboard/).

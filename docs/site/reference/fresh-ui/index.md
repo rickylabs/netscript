@@ -5,34 +5,30 @@ title: '@netscript/fresh-ui'
 
 # `@netscript/fresh-ui`
 
-Fresh UI registry seams and interactive foundations for NetScript. This page is written against the
-package public surface reported by `deno doc`. For the full index of packages and plugins return to
-the [reference overview](/reference/).
+Runtime helpers, interactive primitives, the generative-UI renderer and design-token tooling for
+NetScript Fresh apps. Copy-source registry components and islands are not package exports: they are
+copied into your app with `netscript ui:add` and stay yours to evolve. The package exports only the
+helpers that are safe as runtime dependencies, plus build tooling.
 
-The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
-components and islands remain on workspace-local deep paths so applications can own and evolve them
-after copy. The root module exposes only the supported helper utilities that are safe to consume as
-package runtime dependencies. The subpath exports carry runtime seams, build tooling and shared component contracts:
+## Sub-path exports
 
-- [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for
-  validated tool payloads.
-- [`@netscript/fresh-ui/contracts`](#component-contracts) — shared component interface and JSON serialization.
-- [`@netscript/fresh-ui/contracts.json`](#component-contracts) — machine-readable catalog.
-- [`@netscript/fresh-ui/desktop`](#sub-path-exports) — browser-safe native desktop chrome helpers.
-- [`@netscript/fresh-ui/interactive`](#sub-path-exports) — package-owned interactive namespaces for
-  stateful, accessible primitives.
-- [`@netscript/fresh-ui/primitives`](#sub-path-exports) — L0 platform-contract primitives.
-- [`@netscript/fresh-ui/registry`](#sub-path-exports) — embedded copy-registry manifest and file
-  content.
-- [`@netscript/fresh-ui/token-config`](#token-build-tooling) — lightweight file and preset metadata without the compiler.
-- [`@netscript/fresh-ui/tokens`](#token-build-tooling) — DTCG sources, language presets and the
-  Style Dictionary builder for CLI and build tooling.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/fresh-ui` | `./mod.ts` | Stable runtime helpers: [`cn`](#class-name-helper), [redirect-flash toast helpers](#redirect-flash-toast-helpers), the [`Icon` primitive](#icon-primitive) and [`DataGrid`](#datagrid). |
+| `@netscript/fresh-ui/ai/render-ui` | `./src/ai/render-ui.tsx` | [Safe, bounded generative-UI renderer](#generative-ui-renderer-netscriptfresh-uiairender-ui) (`renderUiPayload`, `RenderUiSurface`, block vocabulary). |
+| `@netscript/fresh-ui/desktop` | `./desktop.ts` | [Browser-safe native desktop chrome helpers](#desktop-chrome) and IPC bridge definitions (`createDesktopChrome`). |
+| `@netscript/fresh-ui/interactive` | `./interactive.ts` | [Package-owned interactive compound namespaces](#interactive-namespaces-and-contracts) (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip`). |
+| `@netscript/fresh-ui/primitives` | `./primitives.tsx` | [L0 platform-contract primitives](#l0-primitives) (`Show`, `VisuallyHidden`, `SrOnly`). |
+| `@netscript/fresh-ui/registry` | `./registry.ts` | [Embedded copy-registry manifest and file content](#embedded-registry) (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`). |
+| `@netscript/fresh-ui/token-config` | `./token-config.ts` | Lightweight `APP_TOKEN_FILES`, `PREVIEW_TOKEN_FILES` and `TOKEN_PRESETS` metadata, with no Style Dictionary or source corpus. |
+| `@netscript/fresh-ui/tokens` | `./tokens.ts` | [DTCG sources, language presets and the IO-free Style Dictionary token builder](#token-build-tooling) for CLI and build tooling. |
+| `@netscript/fresh-ui/contracts` | `./contracts.ts` | Shared component types, catalog and JSON serializer. |
+| `@netscript/fresh-ui/contracts.json` | `./contracts.json` | JSON module containing the same catalog. |
 
-For visual design, use the [Design system](/design-system/) section:
+For visual design, see the [Design system](/design-system/):
 [guidelines](/design-system/guidelines/), [theme gallery](/design-system/#design-catalogue),
 [token contract](/design-system/token-contract/) and
-[theme authoring](/design-system/create-your-own-theme/). The theme specifications are generated from
-their canonical design files. This page covers the package API.
+[theme authoring](/design-system/create-your-own-theme/).
 
 ## Component contracts
 
@@ -70,14 +66,14 @@ six built Figma categories are data only; additional components and styles ship 
 
 ## Class-name helper
 
-| Symbol | Signature                                      | Description                                                 |
-| ------ | ---------------------------------------------- | ----------------------------------------------------------- |
-| `cn`   | `function cn(...inputs: ClassValue[]): string` | Combines clsx and tailwind-merge for optimal class merging. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `cn` | function | `function cn(...inputs: ClassValue[]): string` | Combines clsx and tailwind-merge for optimal class merging. |
 
 ## Icon primitive
 
-`Icon` is a first-class stroke-SVG icon primitive, re-exported at the package root alongside its
-supporting types from `@netscript/fresh-ui/primitives`.
+`Icon` is a stroke-SVG icon primitive, re-exported at the package root with its supporting types
+from `@netscript/fresh-ui/primitives`.
 
 | Symbol                                                                                | Kind                     | Description                                                                                             |
 | ------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
@@ -87,9 +83,8 @@ supporting types from `@netscript/fresh-ui/primitives`.
 
 ## DataGrid
 
-`DataGrid` is a generic, templated data-grid component exported from the package root
-(`@netscript/fresh-ui`) — the successor to the earlier `DataTable` registry block. Unlike the
-copy-source registry items, `DataGrid` is a runtime export you import directly; you do **not**
+`DataGrid` is a generic, templated data-grid component exported from the package root. Unlike the
+copy-source registry items, it is a runtime export you import directly; you don't
 `netscript ui:add` it. It renders a token-styled `role="grid"` region from a `columns` contract and
 a `rows` contract, and supports plain, button, and Fresh client-navigation rows.
 
@@ -116,8 +111,8 @@ a `rows` contract, and supports plain, button, and Fresh client-navigation rows.
 ### `DataGridRow<T>`
 
 Every row carries a stable `id`, a caller-owned `data: T` payload, and an optional `selected` flag.
-A row renders differently based on which navigation field is present — the three shapes are mutually
-exclusive (supply at most one of `onSelect` or `href`):
+A row renders according to its navigation field. The three shapes are mutually exclusive: supply at
+most one of `onSelect` or `href`.
 
 | Shape  | Distinguishing field          | Renders as                                                     |
 | ------ | ----------------------------- | -------------------------------------------------------------- |
@@ -170,17 +165,17 @@ A column with `cell: "num"` renders monospace and right-aligned; `cell: "strong"
 column without `render` falls back to `row.data[column.key]` when that key holds a string, number,
 bigint, boolean, `null`, or `undefined`.
 
-> **Rows are keyed by `id`.** Supply a stable `id` per row so Preact can reconcile rows across
-> re-renders, and provide at most one of `onSelect` or `href` — the row shapes are mutually
-> exclusive, and a link row navigates through Fresh (`f-client-nav`) rather than a full page load.
+> [!IMPORTANT]
+> Rows are keyed by `id`. Supply a stable `id` per row so Preact can reconcile rows across
+> re-renders. A link row navigates through Fresh (`f-client-nav`) rather than a full page load.
 
 ## Dropzone (registry component)
 
-`Dropzone` is a copy-source registry component, not a package export — install it with
-`netscript ui:add dropzone`, after which it lives at `components/ui/dropzone.tsx` in your app and is
-yours to edit. It renders a dashed file-drop target (`<label class="ns-dropzone">`) that ingests
-files from three sources — drag-and-drop, focused clipboard paste, and the native file picker — and
-filters each ingest through a shared `accept` / `multiple` policy before calling back.
+`Dropzone` is a copy-source registry component, not a package export. Install it with
+`netscript ui:add dropzone`; it then lives at `components/ui/dropzone.tsx` in your app and is yours
+to edit. It renders a dashed file-drop target (`<label class="ns-dropzone">`) that ingests files from
+drag-and-drop, focused clipboard paste and the native file picker, and filters each ingest through
+a shared `accept` / `multiple` policy before calling back.
 
 ### Dropzone props
 
@@ -204,15 +199,15 @@ filters each ingest through a shared `accept` / `multiple` policy before calling
 
 ### Dropzone ingest types
 
-| Symbol                      | Kind      | Description                                                                      |
-| --------------------------- | --------- | -------------------------------------------------------------------------------- |
-| `DROPZONE_INGEST_SOURCES`   | const     | The ingest source names: `["drop", "paste", "picker"]`.                          |
-| `DROPZONE_REJECTED_REASONS` | const     | The rejection reason names: `["type", "too-many"]`.                              |
-| `DropzoneIngestSource`      | type      | `"drop" \| "paste" \| "picker"`.                                                 |
-| `DropzoneRejectedReason`    | type      | `"type" \| "too-many"`.                                                          |
-| `DropzoneRejectedFile`      | interface | A rejected `file`, its `reason`, and the ingest `source` that supplied it.       |
-| `DropzoneIngestDetails`     | interface | `acceptedFiles`, `rejectedFiles`, the ingest `source`, and the original `event`. |
-| `DropzoneProps`             | interface | The full prop contract documented above.                                         |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `DROPZONE_INGEST_SOURCES` | const | The ingest source names: `["drop", "paste", "picker"]`. |
+| `DROPZONE_REJECTED_REASONS` | const | The rejection reason names: `["type", "too-many"]`. |
+| `DropzoneIngestSource` | type alias | `"drop" \| "paste" \| "picker"`. |
+| `DropzoneRejectedReason` | type alias | `"type" \| "too-many"`. |
+| `DropzoneRejectedFile` | interface | A rejected `file`, its `reason`, and the ingest `source` that supplied it. |
+| `DropzoneIngestDetails` | interface | `acceptedFiles`, `rejectedFiles`, the ingest `source`, and the original `event`. |
+| `DropzoneProps` | interface | The full prop contract documented above. |
 
 ### Dropzone example
 
@@ -240,22 +235,23 @@ export function AvatarUpload() {
 ```
 
 Rejections are reported, not silent: a file whose type falls outside `accept` is rejected with
-reason `"type"`, and — when `multiple` is `false` — every file after the first is rejected with
-reason `"too-many"`. Each ingest also updates a visually-rendered `aria-live` status node so
+reason `"type"`, and when `multiple` is `false`, every file after the first is rejected with reason
+`"too-many"`. Each ingest also updates a visually-rendered `aria-live` status node so
 assistive technology hears how many files were accepted or rejected.
 
-> **Paste ingest requires focus.** Clipboard paste only fires while the dropzone (or a child) holds
-> focus, so pair it with a focusable affordance. The picker `<input>` clears its value after each
-> selection, so re-selecting the same file still triggers `onFile` / `onFiles`.
+> [!NOTE]
+> Clipboard paste only fires while the dropzone (or a child) holds focus, so pair it with a focusable
+> affordance. The picker `<input>` clears its value after each selection, so re-selecting the same
+> file still triggers `onFile` / `onFiles`.
 
 ## Redirect-flash (toast) helpers
 
-| Symbol                      | Signature                                                                           | Description                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `getToast`                  | `function getToast(url: URL): RegistryToast \| undefined`                           | Reads a toast payload from a URL when redirect-flash query parameters are present. |
-| `withToast`                 | `function withToast(path: string, toast: RegistryToast): string`                    | Appends a toast payload to a relative application path.                            |
-| `stripToastFromUrl`         | `function stripToastFromUrl(url: URL): string`                                      | Removes all toast query parameters from a URL while preserving path and hash.      |
-| `REGISTRY_TOAST_QUERY_KEYS` | `const REGISTRY_TOAST_QUERY_KEYS: { message: string; title: string; type: string }` | Query-string keys reserved by the redirect-flash helpers.                          |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `getToast` | function | `function getToast(url: URL): RegistryToast \| undefined` | Reads a toast payload from a URL when redirect-flash query parameters are present. |
+| `withToast` | function | `function withToast(path: string, toast: RegistryToast): string` | Appends a toast payload to a relative application path. |
+| `stripToastFromUrl` | function | `function stripToastFromUrl(url: URL): string` | Removes all toast query parameters from a URL while preserving path and hash. |
+| `REGISTRY_TOAST_QUERY_KEYS` | const | `const REGISTRY_TOAST_QUERY_KEYS: { message: string; title: string; type: string }` | Query-string keys reserved by the redirect-flash helpers. |
 
 ### Toast types
 
@@ -266,21 +262,21 @@ assistive technology hears how many files were accepted or rejected.
 
 ## Interactive namespaces and contracts
 
-Exported from the [`@netscript/fresh-ui/interactive`](#sub-path-exports) sub-path. Each is a
-compound namespace bundling a root component with its structural subcomponents. The namespace,
-props, event, and shared structural contracts in this section are also public exports.
+Exported from `@netscript/fresh-ui/interactive`. Each is a compound namespace bundling a root
+component with its structural subcomponents. The namespace, props, event, and shared structural
+contracts in this section are also public exports.
 
-| Symbol       | Signature                               | Description                                                                   |
-| ------------ | --------------------------------------- | ----------------------------------------------------------------------------- |
-| `Accordion`  | `const Accordion: AccordionNamespace`   | Compound accordion namespace with root and item subcomponents.                |
-| `ActionMenu` | `const ActionMenu: ActionMenuNamespace` | Keyboard-accessible action menu with intent-aware items and separators.       |
-| `Combobox`   | `const Combobox: ComboboxNamespace`     | Filterable listbox combobox with input, content, item, and empty-state parts. |
-| `Dialog`     | `const Dialog: DialogNamespace`         | Compound dialog namespace with root and structural subcomponents.             |
-| `Drawer`     | `const Drawer: DrawerNamespace`         | Compound drawer namespace with root and structural subcomponents.             |
-| `Popover`    | `const Popover: PopoverNamespace`       | Compound popover namespace with root and positioning subcomponents.           |
-| `Sheet`      | `const Sheet: SheetNamespace`           | Compound sheet namespace — side-docked inspection panel.                      |
-| `Tabs`       | `const Tabs: TabsNamespace`             | Compound tabs namespace with root, list, trigger, and content subcomponents.  |
-| `Tooltip`    | `const Tooltip: TooltipNamespace`       | Compound tooltip namespace with root and positioning subcomponents.           |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `Accordion` | const | `const Accordion: AccordionNamespace` | Compound accordion namespace with root and item subcomponents. |
+| `ActionMenu` | const | `const ActionMenu: ActionMenuNamespace` | Keyboard-accessible action menu with intent-aware items and separators. |
+| `Combobox` | const | `const Combobox: ComboboxNamespace` | Filterable listbox combobox with input, content, item, and empty-state parts. |
+| `Dialog` | const | `const Dialog: DialogNamespace` | Compound dialog namespace with root and structural subcomponents. |
+| `Drawer` | const | `const Drawer: DrawerNamespace` | Compound drawer namespace with root and structural subcomponents. |
+| `Popover` | const | `const Popover: PopoverNamespace` | Compound popover namespace with root and positioning subcomponents. |
+| `Sheet` | const | `const Sheet: SheetNamespace` | Compound sheet namespace — side-docked inspection panel. |
+| `Tabs` | const | `const Tabs: TabsNamespace` | Compound tabs namespace with root, list, trigger, and content subcomponents. |
+| `Tooltip` | const | `const Tooltip: TooltipNamespace` | Compound tooltip namespace with root and positioning subcomponents. |
 
 ### Action menu and combobox behavior
 
@@ -291,46 +287,46 @@ and empty-state parts.
 
 ### Interactive public contract inventory
 
-| Symbol                                                                                                                                                                                                                                                           | Family      | Description                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
-| `AccordionNamespace` / `AccordionRootProps` / `AccordionItemProps` / `AccordionItemTriggerProps` / `AccordionItemContentProps` / `AccordionItemIndicatorProps`                                                                                                   | Accordion   | Public compound namespace and root/item contracts.                                                                 |
-| `ACTION_MENU_ITEM_INTENTS` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuOpenChangeReason`                    | Action menu | Public namespace, part props, supported intents, and open-state reason.                                            |
-| `ComboboxNamespace` / `ComboboxRootProps` / `ComboboxInputProps` / `ComboboxContentProps` / `ComboboxItemProps` / `ComboboxEmptyProps` / `UseComboboxOptions` / `UseComboboxReturn`                                                                              | Combobox    | Public namespace, part props, and controlled filtering contracts.                                                  |
-| `DialogNamespace` / `DialogRootProps` / `DialogTriggerProps` / `DialogContentProps` / `DialogTitleProps` / `DialogDescriptionProps` / `DialogCloseProps`                                                                                                         | Dialog      | Public namespace and structural-part props.                                                                        |
-| `DrawerNamespace` / `DrawerRootProps` / `DrawerTriggerProps` / `DrawerContentProps` / `DrawerTitleProps` / `DrawerDescriptionProps` / `DrawerCloseProps`                                                                                                         | Drawer      | Public namespace and structural-part props.                                                                        |
-| `PopoverNamespace` / `PopoverRootProps` / `PopoverTriggerProps` / `PopoverAnchorProps` / `PopoverPositionerProps` / `PopoverContentProps` / `PopoverTitleProps` / `PopoverDescriptionProps` / `PopoverCloseProps` / `PopoverArrowProps` / `PopoverArrowTipProps` | Popover     | Public namespace, positioning, content, and arrow contracts.                                                       |
-| `SheetNamespace` / `SheetRootProps` / `SheetTriggerProps` / `SheetContentProps` / `SheetTitleProps` / `SheetDescriptionProps` / `SheetCloseProps`                                                                                                                | Sheet       | Public namespace and structural-part props.                                                                        |
-| `TabsNamespace` / `TabsRootProps` / `TabsListProps` / `TabsTriggerProps` / `TabsContentProps`                                                                                                                                                                    | Tabs        | Public namespace and tab/list/content props.                                                                       |
-| `TooltipNamespace` / `TooltipRootProps` / `TooltipTriggerProps` / `TooltipPositionerProps` / `TooltipContentProps` / `TooltipArrowProps` / `TooltipArrowTipProps`                                                                                                | Tooltip     | Public namespace, positioning, content, and arrow contracts.                                                       |
-| `FreshUiAttributeValue` / `FreshUiChild` / `FreshUiChildren` / `FreshUiElementProps` / `FreshUiEventHandler` / `FreshUiStyle`                                                                                                                                    | Shared      | Framework-neutral child, attribute, event, element-prop, and style contracts shared by the interactive primitives. |
+| Symbol | Kind | Family | Description |
+| --- | --- | --- | --- |
+| `AccordionNamespace` / `AccordionRootProps` / `AccordionItemProps` / `AccordionItemTriggerProps` / `AccordionItemContentProps` / `AccordionItemIndicatorProps` | type alias | Accordion | Public compound namespace and root/item contracts. |
+| `ACTION_MENU_ITEM_INTENTS` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuOpenChangeReason` | const / interface / type alias | Action menu | Public namespace, part props, supported intents, and open-state reason. |
+| `ComboboxNamespace` / `ComboboxRootProps` / `ComboboxInputProps` / `ComboboxContentProps` / `ComboboxItemProps` / `ComboboxEmptyProps` / `UseComboboxOptions` / `UseComboboxReturn` | type alias / interface | Combobox | Public namespace, part props, and controlled filtering contracts. |
+| `DialogNamespace` / `DialogRootProps` / `DialogTriggerProps` / `DialogContentProps` / `DialogTitleProps` / `DialogDescriptionProps` / `DialogCloseProps` | type alias | Dialog | Public namespace and structural-part props. |
+| `DrawerNamespace` / `DrawerRootProps` / `DrawerTriggerProps` / `DrawerContentProps` / `DrawerTitleProps` / `DrawerDescriptionProps` / `DrawerCloseProps` | type alias / reference | Drawer | Public namespace and structural-part props. |
+| `PopoverNamespace` / `PopoverRootProps` / `PopoverTriggerProps` / `PopoverAnchorProps` / `PopoverPositionerProps` / `PopoverContentProps` / `PopoverTitleProps` / `PopoverDescriptionProps` / `PopoverCloseProps` / `PopoverArrowProps` / `PopoverArrowTipProps` | type alias | Popover | Public namespace, positioning, content, and arrow contracts. |
+| `SheetNamespace` / `SheetRootProps` / `SheetTriggerProps` / `SheetContentProps` / `SheetTitleProps` / `SheetDescriptionProps` / `SheetCloseProps` | type alias | Sheet | Public namespace and structural-part props. |
+| `TabsNamespace` / `TabsRootProps` / `TabsListProps` / `TabsTriggerProps` / `TabsContentProps` | type alias | Tabs | Public namespace and tab/list/content props. |
+| `TooltipNamespace` / `TooltipRootProps` / `TooltipTriggerProps` / `TooltipPositionerProps` / `TooltipContentProps` / `TooltipArrowProps` / `TooltipArrowTipProps` | type alias | Tooltip | Public namespace, positioning, content, and arrow contracts. |
+| `FreshUiAttributeValue` / `FreshUiChild` / `FreshUiChildren` / `FreshUiElementProps` / `FreshUiEventHandler` / `FreshUiStyle` | type alias | Shared | Framework-neutral child, attribute, event, element-prop, and style contracts shared by the interactive primitives. |
 
 ## Desktop chrome
 
-Exported from [`@netscript/fresh-ui/desktop`](#sub-path-exports). `createDesktopChrome` detects the
+Exported from `@netscript/fresh-ui/desktop`. `createDesktopChrome` detects the
 available browser/native bridge and returns an active or disabled capability surface instead of
 assuming a desktop host. Window, menu, tray, notification, dialog, and event-target seams remain
 explicitly capability-checked.
 
-| Symbol                                                                                                                                                                                                                                                           | Family       | Description                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------- |
-| `createDesktopChrome` / `CreateDesktopChromeOptions`                                                                                                                                                                                                             | Factory      | Creates the capability-aware desktop chrome facade and configures bridge discovery.             |
-| `DESKTOP_CHROME_DISABLED_REASONS` / `DESKTOP_CHROME_STATUSES` / `DESKTOP_MENU_SOURCES` / `DESKTOP_OPERATION_REASONS` / `DESKTOP_OPERATION_STATUSES` / `DESKTOP_WINDOW_ACTIONS`                                                                                   | Vocabularies | Runtime constants for capability state, menu provenance, operation results, and window actions. |
-| `DesktopChromeActive` / `DesktopChromeCapability` / `DesktopChromeDisabled` / `DesktopChromeDisabledReason` / `DesktopChromeLifecycle` / `DesktopChromeStatus`                                                                                                   | Lifecycle    | Active/disabled discriminants and lifecycle contracts returned by the factory.                  |
-| `DesktopDialogCapability` / `DesktopEventTargetCapability` / `DesktopNotificationCapability` / `DesktopNotificationHandle` / `DesktopNotificationOptions` / `DesktopTrayCapability` / `DesktopTrayConfig` / `DesktopTrayConstructor` / `DesktopWindowCapability` | Capabilities | Optional native feature contracts exposed only when the host provides them.                     |
-| `DesktopMenuActionEvent` / `DesktopMenuActionItem` / `DesktopMenuItem` / `DesktopMenuRoleItem` / `DesktopMenuSeparator` / `DesktopMenuSource` / `DesktopMenuSubmenu` / `DesktopNativeMenuItem`                                                                   | Menus        | Discriminated native menu definitions and action-event payloads.                                |
-| `DesktopOperationReason` / `DesktopOperationResult` / `DesktopOperationStatus` / `DesktopWindowAction`                                                                                                                                                           | Operations   | Result and reason contracts for requested native window operations.                             |
+| Symbol | Kind | Family | Description |
+| --- | --- | --- | --- |
+| `createDesktopChrome` / `CreateDesktopChromeOptions` | function / interface | Factory | Creates the capability-aware desktop chrome facade and configures bridge discovery. |
+| `DESKTOP_CHROME_DISABLED_REASONS` / `DESKTOP_CHROME_STATUSES` / `DESKTOP_MENU_SOURCES` / `DESKTOP_OPERATION_REASONS` / `DESKTOP_OPERATION_STATUSES` / `DESKTOP_WINDOW_ACTIONS` | const | Vocabularies | Runtime constants for capability state, menu provenance, operation results, and window actions. |
+| `DesktopChromeActive` / `DesktopChromeCapability` / `DesktopChromeDisabled` / `DesktopChromeDisabledReason` / `DesktopChromeLifecycle` / `DesktopChromeStatus` | interface / type alias | Lifecycle | Active/disabled discriminants and lifecycle contracts returned by the factory. |
+| `DesktopDialogCapability` / `DesktopEventTargetCapability` / `DesktopNotificationCapability` / `DesktopNotificationHandle` / `DesktopNotificationOptions` / `DesktopTrayCapability` / `DesktopTrayConfig` / `DesktopTrayConstructor` / `DesktopWindowCapability` | interface | Capabilities | Optional native feature contracts exposed only when the host provides them. |
+| `DesktopMenuActionEvent` / `DesktopMenuActionItem` / `DesktopMenuItem` / `DesktopMenuRoleItem` / `DesktopMenuSeparator` / `DesktopMenuSource` / `DesktopMenuSubmenu` / `DesktopNativeMenuItem` | interface / type alias | Menus | Discriminated native menu definitions and action-event payloads. |
+| `DesktopOperationReason` / `DesktopOperationResult` / `DesktopOperationStatus` / `DesktopWindowAction` | type alias | Operations | Result and reason contracts for requested native window operations. |
 
 ## L0 primitives
 
-Exported from the [`@netscript/fresh-ui/primitives`](#sub-path-exports) sub-path. L0 stays small:
+Exported from `@netscript/fresh-ui/primitives`. L0 stays small:
 prefer Preact intrinsic elements and platform attributes, using these helpers only where they
 encapsulate real behavior.
 
-| Symbol           | Signature                                                                                    | Description                                                                |
-| ---------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `Show`           | `function Show<T>({ when, fallback, children }: ShowProps<T>): PrimitiveChildren`            | Conditionally renders children without introducing an extra DOM wrapper.   |
-| `VisuallyHidden` | `function VisuallyHidden({ children, style, ...props }: VisuallyHiddenProps): PrimitiveNode` | Renders content for assistive technology while keeping it visually hidden. |
-| `SrOnly`         | `function SrOnly(props: VisuallyHiddenProps): PrimitiveNode`                                 | Alias for `VisuallyHidden` using the common screen-reader naming.          |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `Show` | function | `function Show<T>({ when, fallback, children }: ShowProps<T>): PrimitiveChildren` | Conditionally renders children without introducing an extra DOM wrapper. |
+| `VisuallyHidden` | function | `function VisuallyHidden({ children, style, ...props }: VisuallyHiddenProps): PrimitiveNode` | Renders content for assistive technology while keeping it visually hidden. |
+| `SrOnly` | function | `function SrOnly(props: VisuallyHiddenProps): PrimitiveNode` | Alias for `VisuallyHidden` using the common screen-reader naming. |
 
 ### Primitive types
 
@@ -345,12 +341,13 @@ encapsulate real behavior.
 
 ## Generative UI renderer (@netscript/fresh-ui/ai/render-ui)
 
-Exported from `@netscript/fresh-ui/ai/render-ui`. This module provides a safe, bounded generative-UI
-renderer that converts structured `render_ui` tool payloads into standard Preact DOM nodes.
+A safe, bounded generative-UI renderer that converts structured `render_ui` tool payloads into
+standard Preact DOM nodes.
 
-> **Input contract:** The renderer consumes input already validated by `@netscript/ai/tools`
-> (`RenderUiToolInput`). It does not validate arbitrary model output; callers must parse and
-> validate raw model payloads with `@netscript/ai/tools` before passing them to the renderer.
+> [!CAUTION]
+> The renderer consumes input already validated by `@netscript/ai/tools` (`RenderUiToolInput`). It
+> does not validate arbitrary model output: parse and validate raw model payloads with
+> `@netscript/ai/tools` before passing them to the renderer.
 
 ### Allowed block categories
 
@@ -436,9 +433,9 @@ export function PerformanceWidget() {
 
 ## Embedded registry
 
-Exported from [`@netscript/fresh-ui/registry`](#sub-path-exports). The registry entrypoint embeds
-the copy-source manifest and file contents used by the Fresh UI installer; consumers can inspect the
-manifest without reading package files at runtime.
+Exported from `@netscript/fresh-ui/registry`. It embeds the copy-source manifest and file contents
+used by the Fresh UI installer, so consumers can inspect the manifest without reading package files
+at runtime.
 
 | Symbol                                                                                                         | Kind              | Description                                                                              |
 | -------------------------------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -460,10 +457,10 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `buildTokens` | async function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources; target app skips Figma output, and previews explicitly includes optional design styles. |
+| `buildTokens` | function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources; target app skips Figma output, and previews explicitly includes optional design styles. |
 | `defaultTokenSources` | function | Returns the bundled resolver and DTCG source documents. Clone before editing caller-owned inputs. |
-| `PREVIEW_TOKEN_FILES` | readonly string[] | The 18 optional design preview stylesheets. Install with ui:add theme-previews or tokens build --previews. Also exported from token-config without the compiler. |
-| `APP_TOKEN_FILES` | readonly string[] | The five core app files: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. Also available from the lightweight token-config entrypoint. |
+| `PREVIEW_TOKEN_FILES` | const | The 18 optional design preview stylesheets. Install with ui:add theme-previews or tokens build --previews. Also exported from token-config without the compiler. |
+| `APP_TOKEN_FILES` | const | The five core app files: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. Also available from the lightweight token-config entrypoint. |
 | `TOKEN_PRESETS` | const array | The registered language presets and their fixed Figma modes, density and optional Studio flavor. |
 | `TOKEN_SCHEMES` | const tuple | Supported scheme contexts: light and dark. |
 | `TOKEN_DENSITIES` | const tuple | Supported density contexts: comfortable and compact. |
@@ -474,17 +471,17 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 | `BuiltToken` | interface | Exported token metadata plus the resolved DTCG value used by Figma and contrast tooling. |
 | `TokenSources` | interface | The single resolver and source documents keyed by their relative reference names. |
 | `TokenResolver` | interface | DTCG version, named source sets, modifier contexts and ordered resolution references. |
-| `ResolverSource` | type | An inline token document or a resolver reference to a document, set or modifier. |
+| `ResolverSource` | type alias | An inline token document or a resolver reference to a document, set or modifier. |
 | `TokenDocument` | interface | Nested token groups, typed tokens and document metadata. |
 | `DesignToken` | interface | Explicit DTCG type/value with optional description and NetScript extensions. |
-| `TokenValue` | recursive type | JSON scalar, array or object used by aliases and typed DTCG composites. |
+| `TokenValue` | type alias | JSON scalar, array or object used by aliases and typed DTCG composites. |
 | `TokenMetadata` | interface | Registered CSS name, exact legacy spelling, category, derivation and optional Figma provenance. |
-| `TokenDerivation` | union type | The supported color-mix or shadow composite recipe. |
+| `TokenDerivation` | type alias | The supported color-mix or shadow composite recipe. |
 | `TokenMixDerivation` | interface | Two color paths, first-color weight and interpolation space; CSS retains native color-mix. |
 | `TokenShadowDerivation` | interface | Themeable shadow color/vertical-offset/blur paths and pixel horizontal-offset/spread values. |
 | `TokenPreset` | interface | Preset identity, language/flavor, selected Figma modes and fixed source/public density. |
-| `TokenScheme` | type | A supported scheme name derived from TOKEN_SCHEMES. |
-| `TokenDensity` | type | A supported density name derived from TOKEN_DENSITIES. |
+| `TokenScheme` | type alias | A supported scheme name derived from TOKEN_SCHEMES. |
+| `TokenDensity` | type alias | A supported density name derived from TOKEN_DENSITIES. |
 
 ```typescript
 import { buildTokens } from '@netscript/fresh-ui/tokens';
@@ -504,47 +501,3 @@ The generated Figma collections keep the original index/collection structure and
 migrations. Dimensions are pixel floats, durations are milliseconds, and composite shadow/transition
 values use lossless strings. CSS keeps live semantic references and native mixes with hex fallbacks
 guarded by feature support. Existing NS One declarations and the legacy dark selector remain valid.
-
-## Maintaining this reference
-
-The package export map is the authority; this page is a derived, manually curated reference. Do not
-create or hand-maintain a second export inventory under `docs/exports`.
-
-1. Read `packages/fresh-ui/deno.json` and inspect **every** target in its `exports` object with
-   `deno doc --no-lock --json <entrypoint-file>`. Do not infer a subpath from the root entrypoint.
-2. Reconcile this page's `Symbol`-headed tables with the union reported by those commands. Tables
-   headed `Prop`, `Field`, `Shape`, or `Category` are explanatory and are intentionally not treated
-   as package-symbol inventories. Display generics such as `DataGridColumn<T>` normalize to their
-   exported name.
-3. Update the `fresh-ui` `symbolCoverage` policy in `.llm/tools/docs/check-exports-drift.ts`. A real
-   exported symbol must be documented or placed in an exact, reason-bearing omission group. A
-   doc-only name belongs in `documentedNonExports` only when this page labels it explicitly as a
-   non-export, as the Dropzone copy-source section does.
-4. Run `deno task docs:exports-drift`, then `deno task docs:accuracy`. The direct task is the fast
-   drift verdict; the aggregate proves the same check remains part of documentation accuracy. When
-   working on a head before the named task exists, run the checker directly:
-   `deno run --no-lock --allow-read --allow-env --allow-run .llm/tools/docs/check-exports-drift.ts`.
-5. Treat a nonzero exit as evidence to reconcile, not as permission to widen an omission. Record any
-   intentional residual red with its exact findings.
-
-## Sub-path exports
-
-The following entrypoints are published as declared in the package export map:
-
-| Export                             | Entrypoint               | Purpose                                                                                                                                    |
-| ---------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@netscript/fresh-ui`              | `./mod.ts`               | Stable runtime helpers (`cn`, redirect-flash toast helpers, the `Icon` primitive, and `DataGrid` — documented above).                      |
-| `@netscript/fresh-ui/ai/render-ui` | `./src/ai/render-ui.tsx` | Safe, bounded generative-UI renderer (`renderUiPayload`, `RenderUiSurface`, block vocabulary — documented above).                          |
-| `@netscript/fresh-ui/desktop`      | `./desktop.ts`           | Browser-safe native desktop chrome helpers and IPC bridge definitions (`createDesktopChrome`).                                             |
-| `@netscript/fresh-ui/interactive`  | `./interactive.ts`       | Package-owned interactive compound namespaces (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` — documented above). |
-| `@netscript/fresh-ui/primitives`   | `./primitives.tsx`       | L0 platform-contract primitives (`Show`, `VisuallyHidden`, `SrOnly` — documented above).                                                   |
-| `@netscript/fresh-ui/registry`     | `./registry.ts`          | Embedded Fresh UI copy-registry manifest and file content (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`).                        |
-| `@netscript/fresh-ui/token-config` | `./token-config.ts` | Lightweight APP_TOKEN_FILES, PREVIEW_TOKEN_FILES and TOKEN_PRESETS metadata, with no Style Dictionary or source corpus. |
-| `@netscript/fresh-ui/tokens`       | `./tokens.ts`            | DTCG sources, language presets and the IO-free Style Dictionary token builder. |
-
-| `@netscript/fresh-ui/contracts` | `./contracts.ts` | Shared component types, catalog and JSON serializer. |
-| `@netscript/fresh-ui/contracts.json` | `./contracts.json` | JSON module containing the same catalog. |
-
----
-
-Back to the [reference overview](/reference/).

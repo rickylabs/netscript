@@ -121,7 +121,6 @@ docs/architecture/doctrine/07-composition-and-extension.md	doc:doctrine	archival
 docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md	doc:doctrine	archival	exempt — doctrine changes need their own run
 docs/architecture/doctrine/10-codebase-verdict-and-handoff.md	doc:doctrine	archival	exempt — doctrine changes need their own run
 docs/architecture/doctrine/11-plugin-thinness-and-base-seams.md	doc:doctrine	archival	exempt — doctrine changes need their own run
-docs/site/_data.ts	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/_data/xref.ts	doc:site-infra	S11	xref/plugin wiring; wording check only
 docs/site/_diagrams/architecture-overview.mmd	doc:diagram-source	S11	diagrams:render if S6/S8 add nodes
 docs/site/_diagrams/aspire-resource-graph.mmd	doc:diagram-source	S11	diagrams:render if S6/S8 add nodes
@@ -153,15 +152,14 @@ docs/site/_plan/worklog/quickstart.md	archival:docs-plan	archival	exempt — doc
 docs/site/_plan/worklog/why.md	archival:docs-plan	archival	exempt — documentation planning corpus
 docs/site/_plugins/ai-tooling.ts	doc:site-infra	S11	xref/plugin wiring; wording check only
 docs/site/ai/agent-tooling.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/ai/engine.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/ai/how-to/build-a-durable-chat.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/ai/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/assets/diagrams/architecture-overview.svg	doc:generated-asset	derived	diagrams:render output; gate diagrams:check
 docs/site/assets/diagrams/aspire-resource-graph.svg	doc:generated-asset	derived	diagrams:render output; gate diagrams:check
 docs/site/background-processing/how-to/tune-worker-runtime.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/background-processing/workers.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/cli-reference.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/concepts.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/comparisons/_data.ts	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/comparisons/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/data-persistence/database.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/data-persistence/how-to/choose-a-queue-provider.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/data-persistence/how-to/database-migration.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -174,10 +172,9 @@ docs/site/durable-workflows/streams.md	doc:public-page	S11	prose sweep + #1000 t
 docs/site/durable-workflows/triggers.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/architecture.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/aspire.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
-docs/site/explanation/compared.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/contracts.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/durability-model.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/explanation/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/explanation/index.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/observability.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/explanation/plugin-system.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/glossary.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -192,21 +189,21 @@ docs/site/orchestration-runtime/child-health.md	doc:public-page	S11	prose sweep 
 docs/site/orchestration-runtime/cli-scaffold.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/add-a-plugin.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/author-a-plugin.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/orchestration-runtime/how-to/deploy-deno-deploy.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/deploy-local-aspire.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
 docs/site/orchestration-runtime/how-to/deploy.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/graceful-shutdown.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/orchestration-runtime/how-to/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/runtime-config.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/quickstart.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/quickstart/aspire.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
 docs/site/reference/ai/skills.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/aspire/index.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
 docs/site/reference/cli/commands.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/config/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/mcp/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/plugin/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/reference/prisma-adapter-mysql/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/queue/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/sagas/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/sdk/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
