@@ -1,0 +1,7 @@
+# Garnet tool restoration in runtime CI
+
+PR #2512 runtime failure 41189386045 attempt 1 stops at runtime.aspire-start: Garnet exits with dotnet's instruction to restore the local garnet-server tool. This is not a saga, type-check or test-discovery failure. SQLite runtime and all core shards pass. Latest main e2e run 40539973506 has green PostgreSQL/SQLite runtime tiers; its failing desktop job is unrelated. Main PostgreSQL runtime reports 120 passed.
+
+The generated helper `_aspire-compat.ts.template` invokes dotnet tool restore with a 10,000 ms bound, stdio ignored, and catches every error. CI caches only NuGet packages; that does not populate dotnet's local tool resolver cache on a fresh runner. Existing `.llm/tools/e2e/prepull-runtime-images.ts` prepares container images but not the executable tool used by the suite. Fix prerequisites in that existing prep stage using SCAFFOLD_VERSIONS.GARNET_TOOL; do not relax convergence/readiness assertions or add suite retries. The exact swallowed restore error was not retained, so do not claim a proven timeout or registry failure.
+
+The environment's mise dotnet shim lacks a selected version even when the SDK is installed. Resolve the installed dotnet SDK through the existing mise installation and use its absolute executable or a command-scoped PATH prefix; do not mutate global mise settings. Test SDK/tool proof is much narrower than the owner-prohibited full local scaffold runtime suite.

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "description": "CI prerequisite repair source hashes and structured gate summaries. Raw logs contain operational paths and remain outside Git.",
+  "sources": {
+    ".llm/tools/e2e/prepull-runtime-images.ts": "513ff60411c11549b8b0bb7dacc88a35981436b7f780830187f837b23f137977",
+    ".llm/tools/e2e/prepull-runtime-images_test.ts": "995233d85494ca23df9f273b8242430536531bca487669585bd0e092ba67ff78"
+  },
+  "gates": [
+    {
+      "id": "ci-prep-tests",
+      "rawReportSha256": "8dd4595f4e6a0a15b0d349603660120267dc2b04ae51539864bb406c6d385e68",
+      "exitCode": 0,
+      "summary": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 11,
+        "uniqueFailures": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "ci-prep-negative",
+      "rawReportSha256": "bc602b5cc82e763cf8fc01822675b1be3418e68757e1f5f9d85e115f2151e9e5",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 1
+      },
+      "outcome": null,
+      "expectedFailure": true
+    },
+    {
+      "id": "ci-prep-check",
+      "rawReportSha256": "be99eea50c6e0a93f839c341f4d5747fa087b3f17e63b5691c086076a0feff65",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "ci-prep-lint",
+      "rawReportSha256": "bb9c2ca4a3a57f9e64ba16db4e60330b3fbe017b698c46d3087478ffad797954",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "ci-prep-fmt",
+      "rawReportSha256": "c8c0b60027dbc327a8158780dbb6bdba54a16b080920bc4db66e44d93443d267",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "ci-prep-quality-receipt",
+      "rawReportSha256": "88b91c5cc63822708a36be97e406493bb174498bca713d133be0c41e48262a91",
+      "exitCode": 0,
+      "summary": {},
+      "outcome": "PASS",
+      "expectedFailure": false
+    }
+  ],
+  "realToolProof": {
+    "pin": "2.2.1",
+    "beforeExit": 1,
+    "missingToolMessage": true,
+    "restoreSucceeded": true,
+    "restoreDurationMs": 7179,
+    "secondManifestWithoutRestoreExit": 0
+  }
+}
