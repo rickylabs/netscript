@@ -1,0 +1,340 @@
+{
+  "publish-assets-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      ".llm/tools/generate-publish-assets_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 1621,
+    "summary": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 6,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "publish-carrier-parity-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      ".llm/tools/docs/carrier-parity_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 1452,
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 3,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "publish-assets-tscheck": {
+    "source": {
+      "mode": "selection",
+      "cwd": "<worktree>"
+    },
+    "command": "deno check --unstable-kv <files>",
+    "selection": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "publish-assets-fmt": {
+    "command": "deno fmt --check",
+    "cwd": "<worktree>",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 1,
+      "filesProcessed": 1,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "downstreamGates": {
+    "2144-publish-layer-dry-run.receipt.json": {
+      "gateId": "publish-dry-run",
+      "invocationId": "2144-publish-layer-dry-run",
+      "argv": [
+        "deno",
+        "task",
+        "publish:dry-run"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:234162",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "bf1e056b065e2181a2fa015e004f5adf68242cbcb98aed41da26728c74ddb65f",
+      "lifecycleId": "worker:234162:2144-publish-layer-dry-run:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:16.798Z",
+      "startedAt": "2026-10-31T01:20:16.801Z",
+      "finishedAt": "2026-10-31T01:21:13.259Z",
+      "durationMs": 56458,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tail": "",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 377955,
+        "sha256": "590d1cb90bdf4bb17177d9a22d0f568d69212232f29b6f621ef290b1d829881d",
+        "tail": "6/packages/sdk/src/desktop/adapters/bind-channel.ts (8.72KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/desktop/adapters/orpc-serialization.ts (1.27KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/desktop/application/desktop-rpc-client.ts (2.55KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/desktop/domain/constants.ts (1.29KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/desktop/domain/types.ts (5.89KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/desktop/mod.ts (2.54KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/discovery/browser-env.ts (2.62KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/discovery/kv-connection.ts (7.4KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/discovery/mod.ts (1.67KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/discovery/service-discovery.ts (106B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/discovery/service-url.ts (5.96KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/internal/client-contributions/adapter-ports.ts (2KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/internal/client-contributions/contribution-diagnostic-id.ts (1.14KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/internal/client-contributions/prepared-call.ts (16.92KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts (9.46KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/internal/transport-policy.ts (7.41KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/openapi/helpers.ts (1.98KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/cache-entry.ts (1.51KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/cache-store.ts (3.45KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/cache-topology.ts (2.68KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/client-link-factory.ts (888B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/mod.ts (3.56KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/query-client.ts (1.68KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/query-factory.ts (6.1KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/query-key.ts (1.67KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/query-options.ts (922B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/sdk-client-contribution.ts (8.84KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/service-client.ts (12.36KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/ports/service-query-utils.ts (10.82KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/presets/define-services.ts (7.79KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/presets/mod.ts (3.4KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query-client/create-service-query-utils.ts (5.53KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query-client/key-bridge.ts (1.41KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query-client/kv-cache-persister.ts (2.63KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query-client/mod.ts (2.11KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query-client/query-client-factory.ts (1.91KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query-client/types.ts (2.38KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query/client-proxy.ts (1.25KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query/composite-query.ts (3.43KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query/mod.ts (1.23KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/query/query-factory.ts (9.86KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/streams.ts (1.86KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/telemetry/mod.ts (481B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/sdk/src/telemetry/otel-middleware.ts (1.34KB)\nSimulating publish of @netscript/plugin-streams@0.0.8 with files:\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/README.md (12.95KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/cli.ts (492B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/deno.json (2.3KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/mod.ts (939B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/package.json (145B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/scaffold.plugin.json (1.66KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/scaffold.runtime.json (52B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/scaffold.ts (647B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/services/src/bounded-file-store.ts (3.02KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/services/src/bounded-segment-log.ts (6.79KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/services/src/durability.ts (3.55KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/services/src/main.ts (5.2KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/services/src/proxy-headers.ts (5.93KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/services/src/proxy.ts (9.06KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/plugin.ts (3.01KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/barrel/barrel.stub.ts (954B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/barrel/barrel.ts (1.77KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/consumer/consumer.stub.ts (4.1KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/consumer/consumer.ts (2.11KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/input.ts (3.26KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/mod.ts (1006B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/producer/producer.stub.ts (878B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/producer/producer.ts (2.14KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/schema/schema.stub.ts (664B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/schema/schema.ts (2.78KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/stream/stream.stub.ts (2.82KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/adapter/resources/stream/stream.ts (1.72KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/aspire/mod.ts (454B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/aspire/streams-contribution.ts (1.38KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/cli/adapters/artifact-writer.ts (893B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/cli/adapters/runtime-client.ts (3.58KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/cli/adapters/topic-walker.ts (5.41KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/cli/composition/main.ts (2.37KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/cli/streams-cli.ts (5.52KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/cli/streams-types.ts (2.84KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/mod.ts (231B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/probes/health.ts (318B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/probes/probe-context.ts (1.31KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/probes/producer-reconnect.ts (4.95KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/probes/publish.ts (700B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/probes/subscribe.ts (1.68KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/e2e/streams-gates.ts (1.16KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/package-metadata.generated.ts (219B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/public/mod.ts (3.04KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/plugins/streams/src/public/stream-api.ts (751B)\nSimulating publish of @netscript/cron@0.0.8 with files:\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/README.md (6.72KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/adapters/_shared.ts (6.14KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/adapters/deno.adapter.ts (7.19KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/adapters/memory.adapter.ts (11.08KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/adapters/mod.ts (759B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/deno.json (1015B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/internal/cron-field.ts (1.03KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/internal/deno-expression.ts (869B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/internal/next-run.ts (2.82KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/mod.ts (5.88KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/ports/mod.ts (976B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/ports/scheduler.ts (4.31KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/ports/types.ts (7.47KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/cron/testing/mod.ts (226B)\nSimulating publish of @netscript/queue@0.0.8 with files:\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/README.md (9.31KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_envelope.ts (4.37KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_kv-queue/connection.ts (3.33KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_kv-queue/dispatcher.ts (12.57KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_kv-queue/routes.ts (2.76KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_pending-retention.ts (2.07KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_redis-delayed-promotion.ts (3.64KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_redis-delayed-runtime.ts (2.68KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/_redis-delayed-script.ts (3.14KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/amqp.adapter.ts (7.98KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/deno-kv.adapter.ts (11.49KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/kv-dead-letter-store.ts (7.87KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/kv-polling.adapter.ts (22.53KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/mod.ts (519B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/postgres-dead-letter-store.ts (6.82KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/postgres.adapter.ts (17.12KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/redis-dead-letter-store.ts (3.12KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/adapters/redis.adapter.ts (14.59KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/deno.json (1.94KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/factory/create-parallel-queue.ts (2.9KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/factory/create-queue.ts (9.88KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/factory/create-typed-queue.ts (5.97KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/factory/mod.ts (336B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/internal/parallel-queue.ts (7.1KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/mod.ts (2.8KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/ports/dead-letter.ts (2.45KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/ports/errors.ts (4.11KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/ports/message-queue.ts (5.94KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/ports/mod.ts (733B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/ports/options.ts (5.22KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/testing/memory-queue.ts (9.81KB)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/testing/mod.ts (211B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/validation/mod.ts (241B)\n   file://<temp>/netscript-publish-dry-run-3809e7a92f739b36/packages/queue/validation/validation.ts (4.21KB)\nSuccess Dry run complete\n",
+        "truncated": true
+      }
+    },
+    "2144-publish-layer-ai-peer-resolution.receipt.json": {
+      "gateId": "ai-peer-resolution",
+      "invocationId": "2144-publish-layer-ai-peer-resolution",
+      "argv": [
+        "deno",
+        "task",
+        "deps:check:ai-peers"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:225804",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "a7d471ad1e3771a4cec7207514f902ae0aba9f797721fa35f3c5ee1fb8a872eb",
+      "lifecycleId": "worker:225804:2144-publish-layer-ai-peer-resolution:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:01.746Z",
+      "startedAt": "2026-10-31T01:20:01.748Z",
+      "finishedAt": "2026-10-31T01:20:17.640Z",
+      "durationMs": 15892,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 46,
+        "sha256": "3ea158a5317bc4f47a05ba5c6071922dd8d6c40838fa672865cf7dca130f2760",
+        "tail": "{\"ok\":true,\"core\":[\"0.68.0\"],\"lockFree\":true}\n",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 119,
+        "sha256": "4acc963e2e845a0456576bbb2c847f574c31d20644001a822a48296e64727852",
+        "tail": "Task deps:check:ai-peers deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts\n",
+        "truncated": false
+      }
+    },
+    "2144-publish-layer-emitted-samples.receipt.json": {
+      "gateId": "emitted-samples",
+      "invocationId": "2144-publish-layer-emitted-samples",
+      "argv": [
+        "deno",
+        "task",
+        "check:emitted-samples"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:225788",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "10296671e33e4e8d816e4a0d957e3a180d57388771e866356a81fbe7e25e2389",
+      "lifecycleId": "worker:225788:2144-publish-layer-emitted-samples:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:01.765Z",
+      "startedAt": "2026-10-31T01:20:01.767Z",
+      "finishedAt": "2026-10-31T01:20:12.376Z",
+      "durationMs": 10608,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 62,
+        "sha256": "d3004ac9a69e35d543eb9fb16481313b5894aac26b6d581382f65d1945e305e4",
+        "tail": "Checked 48 emitted TypeScript samples from 38 artifact paths.\n",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 3659,
+        "sha256": "572656f9b1cb73a30ed0e4a571153d1ec21d0ded7ecc1952caba898c4fa09c11",
+        "tail": "Task check:emitted-samples deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/agents/assistant.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/ai.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/mcp/registry.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/mod.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/models.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/plugin.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/routes/chat-stream.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/routes/chat.tsx\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/thread-store.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/ai/tools/echo.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/auth/mod.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/auth/plugin.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/auth/sdk-client.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/islands/InvoicesStream.tsx\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/routes/api/streams/invoices/seed.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/sagas/mod.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/sagas/plugin.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/sagas/runtime.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/sagas/user-registration-saga.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/sagas/user-registration.config.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/streams/invoices-db.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/streams/invoices-producer.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/streams/invoices-schema.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/streams/mod.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/streams/notifications-stream.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/streams/plugin.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/triggers/daily-maintenance.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/triggers/generic-inbound-webhook.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/triggers/incoming-file-watch.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/triggers/mod.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/triggers/plugin.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/triggers/runtime.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/workers/jobs/health-check.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/workers/mod.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/workers/plugin.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/workers/runtime.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/workers/tasks/validate-payload.ts\nCheck file://<temp>/netscript-emitted-samples-ec82dc3111f812c7/workers/workflows/daily-maintenance.ts\n",
+        "truncated": false
+      }
+    },
+    "2144-publish-layer-netscript-jsr-specifiers.receipt.json": {
+      "gateId": "netscript-jsr-specifiers",
+      "invocationId": "2144-publish-layer-netscript-jsr-specifiers",
+      "argv": [
+        "deno",
+        "task",
+        "check:netscript-jsr-specifiers"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:225795",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "2cfdb5aaf2a041a7c3d5bb821be837c849c6fb8dc6f4a2bb28723833f6175870",
+      "lifecycleId": "worker:225795:2144-publish-layer-netscript-jsr-specifiers:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:01.758Z",
+      "startedAt": "2026-10-31T01:20:01.762Z",
+      "finishedAt": "2026-10-31T01:20:03.977Z",
+      "durationMs": 2216,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 238,
+        "sha256": "1604a5a6fa350b55eba207e82eecff101771dd6899807d1215c1980089ca3406",
+        "tail": "ALLOW JSR-NETSCRIPT-VERSION packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts:29 \u2014 import-map alias key maps to an exact release target.\nNetScript JSR emitted-specifier guard: scanned=2870 allowances=1 ranges=0 failures=0\n",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 123,
+        "sha256": "0ac10bb765a1a865f033f09e07fbad36112e9f2695f27a0c1a3bad2bdaef70fa",
+        "tail": "Task check:netscript-jsr-specifiers deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty\n",
+        "truncated": false
+      }
+    },
+    "2144-publish-layer-aspire-version-parity.receipt.json": {
+      "gateId": "aspire-version-parity",
+      "invocationId": "2144-publish-layer-aspire-version-parity",
+      "argv": [
+        "deno",
+        "task",
+        "check:aspire-version-parity"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:225805",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "78b65973e92d062808e553c36ede564bc8a0b8b6c2b2e746e4dd16e3c985be11",
+      "lifecycleId": "worker:225805:2144-publish-layer-aspire-version-parity:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:01.796Z",
+      "startedAt": "2026-10-31T01:20:01.799Z",
+      "finishedAt": "2026-10-31T01:20:02.348Z",
+      "durationMs": 550,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 4449,
+        "sha256": "c0bcf5a4b18f251b74e4e7122a0fe15f603dd345cc3e5e7f175d60011e7b1192",
+        "tail": "{\"gate\":\"check:aspire-version-parity\",\"phase\":1,\"expectedVersion\":\"13.5.3\",\"manifest\":\".llm/tools/validation/fixtures/aspire-surface-manifest.tsv\",\"ok\":true,\"counts\":{\"checked\":992,\"fail\":0,\"deferred\":14,\"info\":4,\"skipped\":3,\"missing\":0},\"findings\":[{\"path\":\".agents/skills/aspire-upgrade/SKILL.md\",\"class\":\"compat-fixture\",\"owner\":\"S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S13\"},{\"path\":\".llm/tools/maint/teardown/__fixtures__/aspire-ps-13.4.6.json\",\"class\":\"archival:version-suffixed-fixture\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\".llm/tools/maint/teardown/__fixtures__/README.md\",\"class\":\"compat-fixture\",\"owner\":\"S7\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7\"},{\"path\":\".llm/tools/maint/teardown/probes_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\".llm/tools/validation/aspire-surface-manifest.ts\",\"class\":\"tooling-doc\",\"owner\":\"S7/S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"13.3.0\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7/S13\"},{\"path\":\".llm/tools/validation/check-aspire-version-parity_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S7/S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"13.3.9\",\"13.2.1\",\"13.0.0\",\"Aspire 13.4\",\"Aspire 13.1\",\"Aspire 13.2\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7/S13\"},{\"path\":\".llm/tools/validation/check-compat-fixtures_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S7/S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7/S13\"},{\"path\":\".llm/tools/validation/fixtures/aspire-surface-manifest.tsv\",\"class\":\"tooling-doc\",\"owner\":\"S7/S13\",\"status\":\"deferred\",\"matches\":[\"13.3.0\",\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7/S13\"},{\"path\":\"packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"Aspire 13.4\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/fixtures/README.md\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/fixtures/telemetry/aspire-13.4.6-fixture.ts\",\"class\":\"archival:version-suffixed-fixture\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\"packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-fixture.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/fixtures/telemetry/README.md\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/service-endpoint-source-fixtures.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"Aspire 13.4\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/telemetry-live-fixture_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"Aspire 13.4\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"resources/design/dashboard/reference/dashboard-design--orchestrator/screen-catalog.md\",\"class\":\"archival:design-corpus\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\"resources/design/dashboard/reference/plan-roadmap-expansion--seed/design/A-dashboard/proposal.md\",\"class\":\"archival:design-corpus\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\",\"Aspire 13.2\"],\"reason\":\"archival owner is informational only\"}],\"skipped\":[\"packages/cli/e2e/fixtures/desktop-native/deno.lock\",\"packages/fresh-ui/deno.lock\",\"resources/examples/expo-streams/deno.lock\"],\"missing\":[],\"manifestFresh\":true}\n",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 124,
+        "sha256": "6558b4359ae7930d3e92d269c2cadd4d7fc4ec81cb81a78dbcc29b3a2b8d772b",
+        "tail": "Task check:aspire-version-parity deno run --allow-read --allow-run=git .llm/tools/validation/check-aspire-version-parity.ts\n",
+        "truncated": false
+      }
+    },
+    "2144-publish-layer-audit-critical.receipt.json": {
+      "gateId": "audit-critical",
+      "invocationId": "2144-publish-layer-audit-critical",
+      "argv": [
+        "deno",
+        "task",
+        "audit:critical"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:225814",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "72df532e25a49193c70efddb92171316ff65e2b8a6565bc9faaa52a28eb65949",
+      "lifecycleId": "worker:225814:2144-publish-layer-audit-critical:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:01.755Z",
+      "startedAt": "2026-10-31T01:20:01.759Z",
+      "finishedAt": "2026-10-31T01:20:02.221Z",
+      "durationMs": 463,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 75,
+        "sha256": "447b57e56528916d4aa9a339897109a0e3ea42ef0df44baa43fe0f059c4f8784",
+        "tail": "Found 53 vulnerabilities\nSeverity: 4 low, 27 moderate, 22 high, 0 critical\n",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 48,
+        "sha256": "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9",
+        "tail": "Task audit:critical deno audit --level critical\n",
+        "truncated": false
+      }
+    },
+    "2144-publish-layer-scaffold-versions.receipt.json": {
+      "gateId": "scaffold-versions",
+      "invocationId": "2144-publish-layer-scaffold-versions",
+      "argv": [
+        "deno",
+        "task",
+        "check:scaffold-versions"
+      ],
+      "cwd": "<worktree>",
+      "gitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "actualGitHead": "d7e4db39153a7dda79d66e1b40c0c4b8eeb84184",
+      "timeoutMs": 1800000,
+      "runnerIdentity": "worker:225802",
+      "attempt": 1,
+      "schemaVersion": 1,
+      "requestHash": "123287c914f7eccab67f86f3e0e32494121d6e4bfe6a46f724e17e8e6ab878f8",
+      "lifecycleId": "worker:225802:2144-publish-layer-scaffold-versions:1",
+      "outcome": "PASS",
+      "claimedAt": "2026-10-31T01:20:01.764Z",
+      "startedAt": "2026-10-31T01:20:01.769Z",
+      "finishedAt": "2026-10-31T01:20:01.982Z",
+      "durationMs": 213,
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 66,
+        "sha256": "57d70ebe8f93a6717289223723c905decbbd964e87e37f5201e7dad01d3df6ca",
+        "tail": "E-12 OK \u2014 12 scaffold pin(s) are stable (no prerelease suffix).\n",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 96,
+        "sha256": "f855f476910400ef885eee1df95989c57b78744da5cdbf7fd959db288decc517",
+        "tail": "Task check:scaffold-versions deno run .llm/tools/validation/check-scaffold-versions.ts --pretty\n",
+        "truncated": false
+      }
+    }
+  }
+}

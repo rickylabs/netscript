@@ -1,0 +1,9 @@
+# Generated publish carrier review
+
+Resume the same independent Anthropic evaluator, read-only and blockers only. No source/tracked edits, commits, GitHub mutations, labels, milestones, merges or local scaffold.runtime. stdin is closed. The previous exact-head approval of d7e4db39153a7dda79d66e1b40c0c4b8eeb84184 is historical once this correction is committed.
+
+New CI evidence: current-head command-postgres and Code quality passed, but the main quality job 124398202181 in run 41154448409 reached the next freshness gate and failed check:publish-assets. Its prose corpus, export corpus and asset-barrel freshness gates all passed. The only stale file is packages/mcp/src/publish-assets.generated.ts. Canonical deno task gen:publish-assets changes exactly one generated line: the llms.txt embedded docs router now carries the already-reviewed worker recipe summary. It does not embed the export corpus; the first progress message inferred the wrong dependency. All other embedded documents and runtime source are unchanged.
+
+Inspect the actual delta and provenance. deno task check:publish-assets passes, all six generator tests pass, and structured generated type/explicit format checks pass. Remaining downstream static quality gates and root publish dry-run are being exercised before commit; inspect the final reports when available. No lock or listener-supervisor changes. PR is temporarily draft; the queued ignored READY report has been renamed back to its temporary state until the new-head evaluation and ready transition are valid.
+
+Report only concrete blockers in this generated correction and whether it is a coherent supervisor sign-off slice. Final exact-pushed-head evaluation will follow after commit/push. Coordinator-owned scaffold.runtime remains unproven; no labels/milestones are authorized. End VERDICT: PASS or a concrete failure verdict.
