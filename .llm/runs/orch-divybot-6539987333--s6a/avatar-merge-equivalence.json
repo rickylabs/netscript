@@ -1,0 +1,39 @@
+{
+  "base": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+  "ours": "5f5deb9b247c911cdad25298708d829251442796",
+  "main": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
+  "overlaps": [
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "sourcePaths": 122,
+  "changedFrozenPaths": [
+    "packages/fresh-ui/registry.generated.ts",
+    "packages/fresh-ui/registry/components/ui/avatar.tsx",
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts",
+    "tools/fresh-ui-browser/README.md",
+    "tools/fresh-ui-browser/render-avatar-fixture.ts",
+    "tools/fresh-ui-browser/tests/avatar.spec.ts"
+  ],
+  "mainOnly": {
+    "paths": 89,
+    "byteIdentical": 89,
+    "exceptions": []
+  },
+  "prOnly": {
+    "paths": 225,
+    "byteIdentical": 216,
+    "exceptions": [
+      ".llm/runs/orch-divybot-6539987333--s6a/context-pack.md",
+      ".llm/runs/orch-divybot-6539987333--s6a/current-source-hashes.json",
+      ".llm/runs/orch-divybot-6539987333--s6a/drift.md",
+      ".llm/runs/orch-divybot-6539987333--s6a/visual-inventory.json",
+      ".llm/runs/orch-divybot-6539987333--s6a/visual-summary.md",
+      ".llm/runs/orch-divybot-6539987333--s6a/worklog.md",
+      "packages/fresh-ui/registry.generated.ts",
+      "packages/fresh-ui/registry/components/ui/avatar.tsx",
+      "tools/fresh-ui-browser/README.md"
+    ]
+  }
+}

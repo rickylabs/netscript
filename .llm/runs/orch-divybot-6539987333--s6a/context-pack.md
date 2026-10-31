@@ -28,7 +28,7 @@ Destructive follow-up independent review: PASS. Reviewer verified all101 current
 
 Use bare highlight.js/lib/common through the registry dependency and package authoring import map, with the same ^11 range as Markdown. Memoize escaped highlight output on code+lang per component instance. Extend the existing real browser harness to count highlight calls through Message re-renders and prove red without memoization. Keep SSR escaping and clipboard tests. Same evaluator, carriers, exact-head CI and Refs #2419 remain required. Previous READY superseded.
 
-Optional Avatar image omission is deferred: preset selection is CSS-only, and server-rendered Avatar has no request-scoped theme input. A safe omission while retaining legacy photos needs a separate theme-context contract; DOM detection after SSR cannot prevent the download. No speculative provider/API change in this blocker repair.
+Correction after the owner’s Chromium measurement: the earlier Avatar download deferral was too broad. Native loading=lazy on the server-rendered img prevents a request while Utility CSS keeps it display:none, and still loads the visible NS One photo. No theme-context API or post-hydration omission is needed. The fetch-count regression records the original hidden eager request and verifies hidden lazy0 / visible legacy1.
 
 CodeBlock repair source frozen:109 paths in current-source-hashes.json. Bare registry dependency
 shares ^11 with Markdown; memoization depends on code+lang. Browser matrix passes36/36 with
@@ -44,7 +44,8 @@ Full package test completes:334 PASS,0failures,0ignored. All local applicable ga
 same independent reviewer is evaluating the frozen CodeBlock repair before sign-off.
 
 CodeBlock independent IMPL-EVAL:PASS; all109hashes verified, both requested blockers fixed
-and negative control substantive. Avatar conditional deferral accepted; failure streak0.
+and negative control substantive. Avatar deferral was accepted at that review, then superseded by the measured native-lazy
+correction; failure streak0 at that review.
 Sign-off commit next. Main advanced to14816a4; two merge conflicts require reconciliation
 and same-evaluator review before final push/READY.
 
@@ -138,3 +139,13 @@ Newfreshscaffold52browser/37focusedCLItests/14rootchecks/typecheck/build/quality
 
 Reconciliation reviewPASS (badge-merge-review.md), failurestreak0.120hashes current. Commit merge
 and push samebranch; newheadrequiredCI/fullruntime must finish before renewedREADY.
+
+
+Owner Avatar follow-up supersedes earlier deferral. Native loading=lazy implemented. ActualSSR
+fetch-count tests:4Utilityred/4NSOnegreen withoutlazy;8green withlazy, includingreveal-load proof.
+Full60browserPASS0skips;14rootchecks/scopedquality/docs/release/carriersPASS. Main7312ba4 merged
+withoutrebase/forcepush;generatedMCPconflict resolvedcanonically;all89main-onlyfilespreserved.
+122frozenpaths. Sameindependentreview andnewheadCI/fullruntime required;package335repeatPASS.
+
+Avatar reviewPASS (avatar-review.md),failurestreak0. Alllocalgatescomplete. Commit/pushmerge+fix;
+newheadrequiredCI/fullruntime precedeREADY. Previous blanket Avatar deferral is resolved.

@@ -88,7 +88,7 @@
     "type": "registry:component",
     "scope": "avatar",
     "reference": ".llm/runs/design-system-s4--language-review/figma-library/review/data-display/review-avatar.png",
-    "result": "Locked authority: square initials tiles even when src is supplied; legacy photos retained. Sizes24/32/40 and agent/presence states."
+    "result": "Locked authority: square initials tiles even when src is supplied; native lazy images make no photo request while hidden in Utility, while visible NS One photos still load. Sizes24/32/40 and agent/presence states retained."
   },
   {
     "item": "citation-chip",

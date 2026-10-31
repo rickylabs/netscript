@@ -31,8 +31,8 @@ npm test
 
 Playwright reinstalls Message and Markdown with `ui:add --force` into the owned test scaffold before starting its dev task,
 verifies that both use the same `highlight.js` `^11` import mapping, and stops the server afterward.
-The full matrix has 52 tests: 20 route/axe captures, 12 navigation cases, and four CodeBlock
-re-render cases, eight Badge CSS cascade/fallback cases, and eight generated-query DOM contract cases. The latter compile the shipped
+The full matrix has 60 tests: 20 route/axe captures, 12 navigation cases, and four CodeBlock
+re-render cases, eight Badge CSS cascade/fallback cases, eight Avatar fetch-count cases, and eight generated-query DOM contract cases. The latter compile the shipped
 page template and the complete canonical resource island/loader (the same people/users/partial
 plan as scaffold.runtime), use the real public query singleton, and execute the same observation expression
 as the full runtime probe. Successful object/list/empty/null/scalar payloads count; loading,
@@ -44,6 +44,11 @@ The Badge cases load the actual registry stylesheet in Chromium with deliberatel
 colors. They verify all seven variants under all three Utility selectors and the info fallback
 under legacy theme selectors; a late generic paint override or a solid secondary text fallback
 must fail the computed-style assertions. These isolated CSS cases also run in external-server mode.
+Avatar cases server-render the actual registry component through Deno, deliver its markup and
+stylesheet together on initial navigation, and count intercepted image requests. Utility must
+make zero photo requests; visible NS One must make one. A visible control image proves network
+observation, and switching the hidden Avatar to NS One must load that same deferred image once.
+These cases also run in external-server mode; removing loading=lazy must fail only Utility cases.
 
 The design routes are intentionally excluded from
 production builds, so use development mode. A startup failure or missing browser fails the run.

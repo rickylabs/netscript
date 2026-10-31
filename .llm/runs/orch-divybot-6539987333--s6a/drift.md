@@ -58,8 +58,10 @@ plus per-instance code/language memoization. The real browser fixture proves the
 contract and its deliberate no-memo failure. The package import declaration also requires the
 Expo and desktop reference lock metadata to be refreshed by native Deno tooling; this extends
 the original write surface solely for lock consistency. Resolved versions remain unchanged.
-Optional Utility photo-download suppression is deferred because Avatar has no SSR preset input;
-CSS-only hiding cannot prevent the download, and preserving legacy photos needs a theme contract.
+Correction: CSS hiding alone does not stop an eager image request, but native loading=lazy
+defers the hidden Utility image while visible NS One images still fetch. The earlier blanket
+deferral was incorrect; no theme contract is needed. Owner-measured behavior is now covered by
+a real SSR/Chromium fetch-count test, red without lazy and green with it.
 
 ## Runtime CI repair at7b847c3
 
@@ -101,3 +103,12 @@ duplication belong to separate issue scope, not this PR round.
 Current-main19a677e reconciliation imports upstream changes only; canonical docs ownership is
 now MCP. Generator removes the oldCLIprosecarrier and preserves209MCPpages, with exactly two
 Utility-default page differences frommain. No badge source changes; no CSS-size/QueryResult work.
+
+
+## Avatar owner correction and main reconciliation
+
+The earlier assertion that download suppression requires SSR theme context was too broad.
+Native loading=lazy provides the requested behavior without a new API. RealSSRChromium tests
+prove hiddenUtility0fetches, visibleNSOne1, and deferredloading afterthemechange.
+Main7312ba4 onlyoverlapsMCPgeneratedcarriers;regenerationpreservesall209docs andbothparents.
+No CSS-size/QueryResult work, badge or CodeBlock changes in this follow-up.

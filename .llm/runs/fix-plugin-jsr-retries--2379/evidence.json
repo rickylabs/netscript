@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": {
+    "packages/cli/src/public/infra/jsr/read-jsr-resource.ts": "f57ce6b996d4d1226a8362f4c8419379a167af91bfbe4d844a7de7e8aa2086f9",
+    "packages/cli/src/public/infra/jsr/read-jsr-resource_test.ts": "43d1ad7d8ef2f4472dd65b38f5de136aa588a18da51d38cc7cc94a62639ea4a3",
+    "packages/cli/src/public/infra/jsr/jsr-metadata-retry_test.ts": "ba7a09fc94f7e45bbafa238d940ae1a439474ead1f52acc49a095ac3c4758c3d",
+    "packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator.ts": "daa4dd797a09bde4cba5cd5dda79c730871294ff91d95cc386cd125447404f03",
+    "packages/cli/src/public/infra/jsr/verify-jsr-package-integrity.ts": "953dbcf3301ad1772006085d321487d2b522141b492101e68fa52d7ef3eb506f"
+  },
+  "focused": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 47,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 47,
+      "uniqueFailures": 0
+    },
+    "permissions": "--allow-all --deny-net --cached-only --unstable-kv --frozen"
+  },
+  "plugins": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 511,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 511,
+      "uniqueFailures": 0
+    }
+  },
+  "negativeControl": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 8,
+      "ignored": 0,
+      "totalResults": 8,
+      "uniqueFailures": 5
+    },
+    "mutation": "MAX_ATTEMPTS 3 -> 1 in isolated source snapshot; eight selected transient/persistent retry cases fail"
+  },
+  "gates": {
+    "check": 0,
+    "lint": 0,
+    "format": 0,
+    "quality:gate": 0,
+    "doc:lint": 0,
+    "jsrAudit": 0,
+    "publishDryRun": 0,
+    "mcpCorpusFreshness": 0
+  },
+  "runtimeCI": "UNPROVEN; coordinator scheduling required"
+}

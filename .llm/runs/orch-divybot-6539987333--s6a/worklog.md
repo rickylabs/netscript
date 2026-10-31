@@ -103,7 +103,7 @@ Destructive follow-up independent review: PASS. Reviewer verified all101 current
 
 Use bare highlight.js/lib/common through the registry dependency and package authoring import map, with the same ^11 range as Markdown. Memoize escaped highlight output on code+lang per component instance. Extend the existing real browser harness to count highlight calls through Message re-renders and prove red without memoization. Keep SSR escaping and clipboard tests. Same evaluator, carriers, exact-head CI and Refs #2419 remain required. Previous READY superseded.
 
-Optional Avatar image omission is deferred: preset selection is CSS-only, and server-rendered Avatar has no request-scoped theme input. A safe omission while retaining legacy photos needs a separate theme-context contract; DOM detection after SSR cannot prevent the download. No speculative provider/API change in this blocker repair.
+Correction after the owner’s Chromium measurement: the earlier Avatar download deferral was too broad. Native loading=lazy on the server-rendered img prevents a request while Utility CSS keeps it display:none, and still loads the visible NS One photo. No theme-context API or post-hydration omission is needed. The fetch-count regression records the original hidden eager request and verifies hidden lazy0 / visible legacy1.
 
 CodeBlock repair source frozen:109 paths in current-source-hashes.json. Bare registry dependency
 shares ^11 with Markdown; memoization depends on code+lang. Browser matrix passes36/36 with
@@ -119,7 +119,8 @@ Full package test completes:334 PASS,0failures,0ignored. All local applicable ga
 same independent reviewer is evaluating the frozen CodeBlock repair before sign-off.
 
 CodeBlock independent IMPL-EVAL:PASS; all109hashes verified, both requested blockers fixed
-and negative control substantive. Avatar conditional deferral accepted; failure streak0.
+and negative control substantive. Avatar deferral was accepted at that review, then superseded by the measured native-lazy
+correction; failure streak0 at that review.
 Sign-off commit next. Main advanced to14816a4; two merge conflicts require reconciliation
 and same-evaluator review before final push/READY.
 
@@ -222,3 +223,24 @@ new exact-head CI/fullruntime precede READY. CSS-size/QueryResult scope remains 
 Main reconciliation independent OpusPASS. All120hashes verified; no authored change fromeither
 parent lost. 37CLI/52browser/29installed-typecheck/14rootchecks and productionbuild pass. Failure
 streak0. Merge commit now authorized by the independent sign-off; newheadCI precedesREADY.
+
+## Owner Avatar fetch correction
+
+Baseline5f5deb9. Owner Chromium measurement disproves the earlier blanket deferral: hidden eager
+images fetch; hidden lazy images do not; visible legacy lazy images still fetch. Public surface:
+existing Avatar img receives native loading=lazy; no new props/theme context. Vocabulary/ports:
+existing image/initials parts plus browser image requests. Constants: existing semantic CSS roles,
+no new design values. One commit slice includes img attribute, real SSR fetch-count Playwright
+regression and corrected evidence/carriers. Contributor path: avatar.tsx and avatar.spec.ts.
+Deferred scope: CSS-size growth/QueryResult duplication remain separate. Main7312ba4 merged now;
+sole conflict is generated MCP publish provenance, seeded frommain and regenerated canonically.
+Same evaluator and new exact-head CI/fullruntime remain required before READY; no rebase/force push.
+
+Avatar local validation complete:335packagePASS,60browserPASS0skips,installedapp typecheck and
+productionbuildPASS,14rootchecks/scopedcheck-lint-fmt/quality/docs/release/carriersPASS.
+Independentreview running.122sourcehashes match; no unresolved merge paths.
+
+Avatar independent OpusPASS, explicitly correcting the earlier deferral.122hashes verified;
+request-count proof and source/main preservation accepted.335package/60browser/14rootchecks and
+all applicable local gates complete. Failurestreak0. Commit merge+lazy fix, push samePR, then new
+exact-head CI/fullruntime beforeREADY. No Avatar download deferral remains.

@@ -1,0 +1,251 @@
+{
+  "baseline": "d54879b8d645554155c54af2f26c86d2232afda5",
+  "focusedHealthTests": {
+    "passed": 57,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 57,
+    "uniqueFailures": 0
+  },
+  "strengthenedGeneratedTests": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 6,
+    "uniqueFailures": 0
+  },
+  "scaffoldAndAggregateTests": {
+    "passed": 26,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 26,
+    "uniqueFailures": 0
+  },
+  "negativeControl": {
+    "mutation": "replace shared crash-loop latch assignment with false",
+    "exitCode": 1,
+    "stateWithoutDetector": "failed",
+    "restartCount": 3,
+    "sourceRestoredByteForByte": true,
+    "restoredMonitorSha256": "c9a5181922ec0c59f14ccf853ce2d9dc361dffe4266f3e9efe46e90547a40733",
+    "failedTests": [
+      "generated sagas process crash loop reaches the documented threshold",
+      "generated triggers process crash loop reaches the documented threshold"
+    ]
+  },
+  "typecheck": {
+    "files": 391,
+    "findings": 0,
+    "followupChangedEntrypoints": 7,
+    "followupFindings": 0
+  },
+  "sourceLintAndFormat": {
+    "files": 12,
+    "exitCode": 0
+  },
+  "docLint": {
+    "healthEntrypoint": 0,
+    "wholePluginInheritedPrivateTypeRef": 18,
+    "cleanMainExactEntrypointCountsMatch": true
+  },
+  "publishDryRun": {
+    "member": "packages/plugin",
+    "exitCode": 0,
+    "slowTypes": "existing approved plugin carve-out"
+  },
+  "doctrine": {
+    "affectedRootExitCodes": [
+      0,
+      0,
+      0
+    ],
+    "newPluginFindingsComparedToMain": 0
+  },
+  "durableGates": {
+    "agent-docs": {
+      "exitCode": 0,
+      "receiptSha256": "f0498d1f0885a088c40d72de7d0ed42d54dd854ea1c8b4f2ff13f7cf16ebed91"
+    },
+    "assets": {
+      "exitCode": 0,
+      "receiptSha256": "f4523a0c8c0740ce9a00692dfe01bceabea52cf6d36fee560e04bc2a7a338a13"
+    },
+    "corpus": {
+      "exitCode": 0,
+      "receiptSha256": "6ba7f4284ac7e7d6673e409aa786682abc8c121a6203125ecc84652ca98398ee"
+    },
+    "public-doc": {
+      "exitCode": 0,
+      "receiptSha256": "4dc1bffef2aff92dc8b951a9a09374a3a4cbb1d081d26c04850d3193a7ab0022"
+    },
+    "publish-assets": {
+      "exitCode": 0,
+      "receiptSha256": "b08297fe2d38d06e9901e45dba55653f6f8b43a4cc7e0813e58a0311b1599a8f"
+    },
+    "quality": {
+      "exitCode": 0,
+      "receiptSha256": "3766f19f9ff699813416686c009428086763e63acc1aa448e22bf5defa47879d"
+    }
+  },
+  "unproven": [
+    "e2e-cli scaffold.runtime CI verdict; owner forbids local full runtime suite"
+  ],
+  "mainIntegration": {
+    "mainSha": "19a677eced816061b3196ef8dffcbc0ccd8b5ad4",
+    "method": "normal merge; no rebase or force push",
+    "focusedCombinedTests": {
+      "passed": 83,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 83,
+      "uniqueFailures": 0
+    },
+    "canonicalCarrierGates": {
+      "agent-docs": {
+        "exitCode": 0,
+        "receiptSha256": "45dc43707601024145bf1e2aaf8f877de55224f198ba6447e7a866df36b799e7"
+      },
+      "assets": {
+        "exitCode": 0,
+        "receiptSha256": "59005b08df77881be469ddda18c407f7c71db8c79ae5cbea39448eb6e344f161"
+      },
+      "corpus": {
+        "exitCode": 0,
+        "receiptSha256": "64c55b216cb86d8240a1fda264abb0466fc3eb05131897346210e56e22778cb6"
+      },
+      "publish-assets": {
+        "exitCode": 0,
+        "receiptSha256": "ee3951fda7edfc8987c794b164a6eb3cb72cb8033695e7ed2d45bf4a05830365"
+      }
+    },
+    "reviewThreads": {
+      "total": 0,
+      "unanswered": 0,
+      "exitCode": 0
+    }
+  },
+  "permissionsCorrection": {
+    "failingCiJob": "https://github.com/rickylabs/netscript/actions/runs/41210312572/job/124563871879",
+    "originalShardSummary": {
+      "passed": 1337,
+      "failed": 1,
+      "ignored": 4,
+      "totalResults": 1342,
+      "uniqueFailures": 1
+    },
+    "deterministicBeforeFix": {
+      "passed": 1,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 1
+    },
+    "afterFix": {
+      "passed": 83,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 83,
+      "uniqueFailures": 0
+    },
+    "changedSourceCheckLintFormat": {
+      "files": 2,
+      "exitCodes": [
+        0,
+        0,
+        0
+      ]
+    },
+    "repositoryQualityScan": {
+      "exitCode": 0,
+      "newFindings": 0,
+      "existingAllowances": 7
+    },
+    "fix": "Restore POSIX 0600 on an already-existing temporary history file before writing and rename; fixture explicitly sets stale file to 0644.",
+    "independentSliceReview": "IMPL-EVAL round 4 PASS; final round 5 must pin new pushed head",
+    "corpusFreshnessExitCode": 0,
+    "publishFreshnessExitCode": 0
+  },
+  "runtimeCiRepair": {
+    "reportedHead": "99cda632399925cf2431a1ba391b50e53de23f55",
+    "runtimeRun": "https://github.com/rickylabs/netscript/actions/runs/41211348591",
+    "postgresAndSqliteFailure": {
+      "gate": "generated.deno-fmt-check",
+      "file": "triggers/runtime.ts",
+      "eachTierSummary": {
+        "passed": 45,
+        "failed": 1,
+        "skipped": 0
+      }
+    },
+    "latestMainRuntime": {
+      "run": "https://github.com/rickylabs/netscript/actions/runs/41197676281",
+      "postgres": "success",
+      "sqlite": "success"
+    },
+    "emittedFormattingBefore": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "workersDocBefore": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "workersDocAfter": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 0
+    },
+    "combinedFocusedAfter": {
+      "passed": 88,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 88,
+      "uniqueFailures": 0
+    },
+    "check": {
+      "selectedFiles": 7,
+      "newFindings": 0
+    },
+    "lintAndFormat": {
+      "selectedSourceFiles": 6,
+      "newFindings": 0
+    },
+    "qualityScan": {
+      "exitCode": 0,
+      "newFindings": 0
+    },
+    "widerSiblingDocLint": {
+      "inheritedPrivateTypeRef": 25,
+      "exactDiagnosticMessagesMatchCleanMain": true,
+      "newFindings": 0,
+      "wholeProbeExitCode": 1
+    },
+    "canonicalFreshness": {
+      "assets": {
+        "exitCode": 0,
+        "receiptSha256": "094c2c0f99bfa2d069d18169d65741419bab7bf5fab7edf217d7091de2933194"
+      },
+      "corpus": {
+        "exitCode": 0,
+        "receiptSha256": "4832f6bca9860ac4f2da26ed82923911e67dcdee7a68761f890ab0058c7054a2"
+      },
+      "docs": {
+        "exitCode": 0,
+        "receiptSha256": "388f4b4451f0c7e1dc29e8d906844ac9956ec1402d6d2d12ec1305bde03e1b49"
+      },
+      "publish": {
+        "exitCode": 0,
+        "receiptSha256": "0aeb92aac0214c2abebec0a19e542b3a387b81a83e9511b8566f38a2e3b8c240"
+      }
+    },
+    "localFullScaffoldRuntime": "not run by owner instruction; require both CI tiers after push"
+  }
+}
