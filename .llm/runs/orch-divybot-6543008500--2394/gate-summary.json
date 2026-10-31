@@ -1,0 +1,195 @@
+{
+  "baseline": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+  "qualityGate": {
+    "exitCode": 0,
+    "outcome": "PASS",
+    "scope": "quality:scan plus architecture/dependency checks; existing warnings retained"
+  },
+  "existingServiceTests": {
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 20,
+    "uniqueFailures": 0
+  },
+  "negativeControls": [
+    {
+      "control": "workers",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 2
+      },
+      "expectedFailure": true
+    },
+    {
+      "control": "legacy-workers",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "expectedFailure": true
+    },
+    {
+      "control": "streams",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "expectedFailure": true
+    },
+    {
+      "control": "auth",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "expectedFailure": true
+    },
+    {
+      "control": "sagas",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "expectedFailure": true
+    },
+    {
+      "control": "triggers",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "expectedFailure": true
+    },
+    {
+      "control": "triggers-start",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "expectedFailure": true
+    }
+  ],
+  "docLint": {
+    "workers": {
+      "baselineErrors": 2,
+      "currentErrors": 2,
+      "delta": 0,
+      "nativeServiceFacadeErrors": 0,
+      "sameFindingFilesAndEntrypoints": true
+    },
+    "streams": {
+      "baselineErrors": 3,
+      "currentErrors": 3,
+      "delta": 0,
+      "nativeServiceFacadeErrors": 0,
+      "sameFindingFilesAndEntrypoints": true
+    },
+    "auth": {
+      "baselineErrors": 12,
+      "currentErrors": 12,
+      "delta": 0,
+      "sameFindingFilesAndEntrypoints": true
+    },
+    "sagas": {
+      "baselineErrors": 30,
+      "currentErrors": 30,
+      "delta": 0,
+      "sameFindingFilesAndEntrypoints": true
+    },
+    "triggers": {
+      "baselineErrors": 27,
+      "currentErrors": 27,
+      "delta": 0,
+      "sameFindingFilesAndEntrypoints": true
+    }
+  },
+  "jsrAudit": {
+    "workers": {
+      "failures": 0,
+      "warnings": [
+        "F-DOCT-5 cardinality",
+        "F-DOCT-5 cardinality",
+        "F-DOCT-5 cardinality",
+        "F-JSR-7 slow-types"
+      ]
+    },
+    "streams": {
+      "failures": 0,
+      "warnings": [
+        "F-JSR-7 slow-types"
+      ]
+    },
+    "auth": {
+      "failures": 0,
+      "warnings": [
+        "F-DOCT-5 cardinality",
+        "F-JSR-7 slow-types"
+      ]
+    },
+    "sagas": {
+      "failures": 0,
+      "warnings": [
+        "F-DOCT-5 cardinality",
+        "F-DOCT-5 cardinality",
+        "F-JSR-7 slow-types"
+      ]
+    },
+    "triggers": {
+      "failures": 0,
+      "warnings": [
+        "F-DOCT-5 cardinality",
+        "F-DOCT-5 cardinality",
+        "F-JSR-7 slow-types"
+      ]
+    }
+  },
+  "nativeFacadeExports": {
+    "workers": 23,
+    "streams": 22,
+    "growth": 0
+  },
+  "scaffoldRuntime": {
+    "status": "UNPROVEN",
+    "owner": "milestone coordinator",
+    "required": "CI e2e-cli-gate opt-in; local run prohibited"
+  },
+  "requestLoggingTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 7,
+      "uniqueFailures": 0
+    }
+  }
+}

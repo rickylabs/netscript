@@ -14,6 +14,10 @@ import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/serv
 
 /** Caller-owned policy for one workers service instance. */
 export interface WorkersServiceOptions {
+  /** Request-start level; defaults to debug rather than the native middleware's info. */
+  readonly requestLevel?: 'debug' | 'info';
+  /** Successful-response level; defaults to debug rather than the native middleware's info. */
+  readonly responseLevel?: 'debug' | 'info';
   /** Native guards, or an explicit public opt-out with a nonblank reason. */
   readonly auth: ServiceAuthPolicy;
   /** Forwarded unchanged to the native CORS middleware; omitted keeps the native defaults. */
@@ -39,7 +43,7 @@ export const LEGACY_WORKERS_PUBLIC_REASON: string =
  * never closes it.
  *
  * @param context - Host-provided plugin service context; only `env.PORT` is read.
- * @param options - Auth posture plus optional CORS and listener options.
+ * @param options - Auth posture plus optional CORS, listener and HTTP logging levels.
  * @returns The running service; `stop()` drains the listener.
  * @throws {TypeError} When `options.auth` is not a valid native auth posture.
  * @throws {Error} When neither `options.serve.port` nor a `PORT` value is available.
@@ -104,6 +108,10 @@ export async function startWorkersService(
 
   const running = await createPluginService(router, {
     auth: options.auth,
+    logger: {
+      requestLevel: options.requestLevel ?? 'debug',
+      responseLevel: options.responseLevel ?? 'debug',
+    },
     cors: options.cors,
     name: 'workers',
     version: '1.0.0',

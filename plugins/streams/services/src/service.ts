@@ -9,6 +9,10 @@ import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/serv
 
 /** Native caller policy for one streams service instance. */
 export interface StreamsServiceOptions {
+  /** Request-start level; defaults to debug rather than the native middleware's info. */
+  readonly requestLevel?: 'debug' | 'info';
+  /** Successful-response level; defaults to debug rather than the native middleware's info. */
+  readonly responseLevel?: 'debug' | 'info';
   /** Native guards or an explicit public posture with a nonblank reason. */
   readonly auth: ServiceAuthPolicy;
   /** Caller fields override streams protocol defaults; omitted origin keeps native behavior. */
@@ -60,7 +64,7 @@ const DEFAULT_EXPOSE_HEADERS: readonly string[] = Object.freeze([
  * hook. Before that handle exists, startup failure attempts native upstream stop and preserves the
  * identical primary error even if cleanup rejects. No unrelated or global resources are closed.
  *
- * @param options - Required native auth posture and optional CORS/listener configuration.
+ * @param options - Required native auth posture and optional CORS, listener and HTTP log levels.
  * @returns The native running handle; its stop and caller signal use native drain semantics.
  * @throws {TypeError} When the caller's auth posture is invalid.
  * @throws {Error} When no explicit port or host PORT/STREAMS_PORT value is available.
@@ -127,6 +131,10 @@ export async function startStreamsService(options: StreamsServiceOptions): Promi
     const proxyHandler = createStreamsProxyHandler({ internalPort });
     return await createPluginService({}, {
       auth: options.auth,
+      logger: {
+        requestLevel: options.requestLevel ?? 'debug',
+        responseLevel: options.responseLevel ?? 'debug',
+      },
       name: 'streams',
       version: PLUGIN_PACKAGE_VERSION,
       port,
