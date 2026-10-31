@@ -1,3 +1,4 @@
+import { PageHeaders } from './gap-page-header-fixture.tsx';
 import { CommandPalettes } from './gap-command-palette-fixture.tsx';
 import { ProseExamples } from './gap-prose-fixture.tsx';
 import { Alerts } from './gap-alert-fixture.tsx';
@@ -69,6 +70,7 @@ function Actions() {
       <Alerts />
       <ProseExamples />
       <CommandPalettes />
+      <PageHeaders />
     </main>
   );
 }

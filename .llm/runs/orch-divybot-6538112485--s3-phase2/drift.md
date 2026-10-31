@@ -55,3 +55,17 @@ CodeBlock: native title tooltip/scrollbar parts are explicit platform internals 
 ## X1 Prose metadata correction
 
 The phase-one public contract listed level/element/state/anchor root props and data-level/data-element/data-state axes that the real Markdown renderer never accepted or emitted.7c2c removes that nonfunctional metadata and documents the real children/streaming/activeCite/onCite/class API. Native semantic HTML styling remains supported. Consumers that treated the research axes as executable API must follow the actual documented renderer surface; no runtime prop or DOM behavior is removed. Heading ID/anchor generation and native host lede/kbd markup stay host-owned, with CSS support and separate browser evidence.
+
+## L2 PageHeader metadata and native-title boundary
+
+PageHeader's phase-one contract described Figma visibility booleans and a
+breakpoint input that the copy never implemented. The audited copy now accepts
+the actual optional content slots and the requested title heading. Title is
+explicitly heading content rather than the old native root tooltip attribute;
+that collision is documented in its public README/type. Existing section
+namespace and children composition remain supported. Responsive breakpoints
+are CSS. Status indicators/separators belong to status children rather than
+fictitious scoped PageHeader elements. This is base-source reconciliation;
+style fixtures still cannot change/remove the resulting canonical contract.
+Shell AppShell/Sidebar/TopBar research axes are explicitly outstanding Layout2b
+work in shell-archetype-audit.md, not waved through as complete coverage.

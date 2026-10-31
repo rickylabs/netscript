@@ -4,6 +4,8 @@ const files = [
   'registry/theme/tokens.css',
   'registry/theme/theme-bridge.css',
   'registry/theme/presets/studio-utility.css',
+  // Copied PageHeader/SidebarShell/Breadcrumb depend on this registered layout support item.
+  'registry/styles/layouts.css',
 ];
 for await (
   const entry of Deno.readDir(new URL('packages/fresh-ui/registry/components/ui/', base))
