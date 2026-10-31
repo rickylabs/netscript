@@ -314,3 +314,6 @@
 - 16:52:34Z: #2268 box 1: the continuation claimant is gone and draft PR #2540 is plan-only. Held for the Codex budget and because worker hosts have no Docker (same root as #2185); goes to Eric with the #2185 question.
 - 16:53:27Z: #2536 (#2409): coordinator-run Opus exact-head review VERDICT: MERGE `1453c92` (receipt receipts/merge-eval/2536.1453c92.md, posted on the PR). Waiting for e2e.
 - 17:08:13Z: #2536 (#2409): green and approved at `1453c92` but conflicts with main in publish-assets.generated.ts. Posted a minimal r1 finish (Codex low: merge main, regenerate, push), comment 6546528995. Canary .3 content, so the budget rule allows it.
+- 17:14:47Z: #2409 r1 started 17:13Z.
+- 17:18:29Z: #2536 r1 READY at `b4742da` (merge main + regenerated carrier); coordinator Opus delta review VERDICT: MERGE `b4742da` (receipt). Waiting for CI and e2e at the new head.
+- 17:30:41Z: **merged** #2536 (`19bca6223`) for #2409 (F1); #2409 closed with evidence.

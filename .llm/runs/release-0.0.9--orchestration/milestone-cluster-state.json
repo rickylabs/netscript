@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
+  "currentMainSha": "19bca622338b7ac79913def27d17051b097329b6",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009e",
     "trackingIssue": 2474
@@ -417,7 +417,10 @@
     },
     {
       "number": 2409,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2536 19bca6223"
+      ]
     },
     {
       "number": 2411,
@@ -1317,16 +1320,19 @@
     {
       "id": "F1-2409",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2536,
-      "headSha": "1453c9204f8edfbfb3d3606d62db0b7d8f9407ca",
+      "headSha": "b4742dabe35b437885a1b47a7fee548574a70d7e",
       "issueNumbers": [
         2409
       ],
       "implementerAgentId": "codex-gpt-6.1-sol (unannounced continuation; adopted)",
       "receiptRefs": [],
-      "note": "green + Opus MERGE at 1453c92 but conflicts with main in publish-assets carrier; r1 mechanical finish (Codex low) posted"
+      "note": "adopted continuation PR; coordinator Opus exact-head MERGE 1453c92 + delta MERGE b4742da; 32/32 incl both runtime tiers + close-gate",
+      "mergeCommit": "19bca622338b7ac79913def27d17051b097329b6",
+      "mergedAt": "2026-10-31T17:30:35Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/coordinator-run-eval-2536"
     }
   ],
   "expensiveGates": [
@@ -1736,11 +1742,14 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2536,
-      "headSha": "1453c9204f8edfbfb3d3606d62db0b7d8f9407ca",
+      "headSha": "b4742dabe35b437885a1b47a7fee548574a70d7e",
       "startedAt": "2026-10-31T16:52:02Z",
-      "via": "label e2e-cli-gate"
+      "via": "label e2e-cli-gate",
+      "note": "re-running at the r1 merge head",
+      "result": "SUCCESS at b4742da (both runtime tiers)",
+      "completedAt": "2026-10-31T17:28:00Z"
     }
   ],
   "canaryCheckpoints": [
@@ -1773,11 +1782,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T16:19:40Z",
-    "nextReportDueAt": "2026-10-31T17:19:40Z",
-    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
-    "headline": "canary .2 READY TO CUT at 7feb24c7d",
-    "currentMainSha": "7feb24c7d09518a045c3955555967dbbde51e92a",
+    "lastReportAt": "2026-10-31T17:30:41Z",
+    "nextReportDueAt": "2026-10-31T18:30:41Z",
+    "lastReportRef": "worklog.md",
+    "headline": "merged #2536 (#2409)",
+    "currentMainSha": "19bca622338b7ac79913def27d17051b097329b6",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -1963,7 +1972,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T17:08:13Z",
+  "updatedAt": "2026-10-31T17:30:42Z",
   "dispatches": [
     {
       "issue": 2438,
