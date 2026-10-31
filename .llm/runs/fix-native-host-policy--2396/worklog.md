@@ -130,3 +130,12 @@ Reconcile: thirteen renames retain fixture content and all test names/controls. 
 module URLs, plugin-root resolution and fixture imports change. Historical paths remain in
 old run evidence. Final current paths are under services/src/tests/. Two member dry-runs and
 canonical freshness follow this clean checkpoint; other member source remains identical.
+
+S3 final local gate checkpoint: all six published-member dry-runs and four canonical freshness
+gates PASS. The relocated service test slice has final231/0/0 plugin tests, scoped19-file check,
+204-file lint/fmt and full quality/architecture PASS. Native SDK credential/discovery/ownership
+controls add137/0/0. Sanitized durable gate evidence is gate-summary.json; unchanged baseline
+documentation errors remain explicitly FAIL, with exact normalized comparison. No local
+scaffold runtime, label edit, lock churn, release, merge or private transcript is included.
+Source is ready for independent preliminary implementation review. Final review will use the
+exact pushed head; CI cannot be claimed green while draft.

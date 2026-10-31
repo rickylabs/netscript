@@ -1,0 +1,255 @@
+{
+  "sourceCheckpoint": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+  "receiptScope": "Root check and initial gates measured the authored union before source commit; subsequent source-only changes relocated tests. Scoped check of all 19 relocated test/helper files and the complete plugin suite passed afterwards. Other published-member source is unchanged.",
+  "receipts": [
+    {
+      "receipt": "check.json",
+      "gateId": "check",
+      "gitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "actualGitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 257572
+    },
+    {
+      "receipt": "final-agent-docs-prose.json",
+      "gateId": "agent-docs-prose",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13493
+    },
+    {
+      "receipt": "final-assets-barrel.json",
+      "gateId": "assets-barrel",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1695
+    },
+    {
+      "receipt": "final-mcp-export-corpus.json",
+      "gateId": "mcp-export-corpus",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9838
+    },
+    {
+      "receipt": "final-publish-assets.json",
+      "gateId": "publish-assets",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 538
+    },
+    {
+      "receipt": "layout-final-agent-docs-prose.json",
+      "gateId": "agent-docs-prose",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10927
+    },
+    {
+      "receipt": "layout-final-assets-barrel.json",
+      "gateId": "assets-barrel",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1702
+    },
+    {
+      "receipt": "layout-final-mcp-export-corpus.json",
+      "gateId": "mcp-export-corpus",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7861
+    },
+    {
+      "receipt": "layout-final-publish-assets.json",
+      "gateId": "publish-assets",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 482
+    },
+    {
+      "receipt": "layout-publish-plugins-streams.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5607
+    },
+    {
+      "receipt": "layout-publish-plugins-workers.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8240
+    },
+    {
+      "receipt": "layout-quality.json",
+      "gateId": "quality-gate",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17769
+    },
+    {
+      "receipt": "publish-packages-cli.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10550
+    },
+    {
+      "receipt": "publish-packages-fresh.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8116
+    },
+    {
+      "receipt": "publish-packages-mcp.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4285
+    },
+    {
+      "receipt": "publish-packages-service.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5259
+    },
+    {
+      "receipt": "publish-plugins-streams.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5945
+    },
+    {
+      "receipt": "publish-plugins-workers.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11005
+    },
+    {
+      "receipt": "quality.json",
+      "gateId": "quality-gate",
+      "gitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "actualGitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15095
+    }
+  ],
+  "rootCheck": {
+    "files": 3849,
+    "batches": 33,
+    "diagnostics": 0,
+    "exitCode": 0
+  },
+  "relocatedCheck": {
+    "files": 19,
+    "diagnostics": 0,
+    "exitCode": 0
+  },
+  "tests": {
+    "workersStreams": {
+      "passed": 231,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 231,
+      "uniqueFailures": 0
+    },
+    "nativeSdkCredentialsDiscovery": {
+      "passed": 137,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 137,
+      "uniqueFailures": 0
+    }
+  },
+  "lintFormat": {
+    "filesSelected": 204,
+    "filesProcessed": 204,
+    "droppedFiles": [],
+    "findings": 0
+  },
+  "documentation": {
+    "jsdocExamples": 479,
+    "jsdocFailures": 0,
+    "jsdocExemptions": 0,
+    "siteSnippets": 26,
+    "newHostGuideExamples": 3,
+    "newGuideCompileExitCode": 0,
+    "rootLockUnchanged": true,
+    "internalLinks": "PASS",
+    "exportDrift": "PASS",
+    "canonicalFreshness": "PASS"
+  },
+  "docLint": {
+    "factorySubpaths": {
+      "workers": 0,
+      "streams": 0
+    },
+    "fullPackages": {
+      "workers": 2,
+      "streams": 3,
+      "FreshPrerequisite": 45
+    },
+    "outcome": "FAIL at identical measured main baseline; no waiver or new finding",
+    "comparison": "doc-lint-baseline.json"
+  },
+  "publishDryRunMembers": [
+    "plugins/workers",
+    "plugins/streams",
+    "packages/service",
+    "packages/fresh",
+    "packages/mcp",
+    "packages/cli"
+  ],
+  "actualPublishedGraph": "UNPROVEN; release-owned HOST-POLICY-PUBLISHED-GRAPH-2396",
+  "runtimeCI": "UNPROVEN while draft; coordinator owns e2e-cli-gate",
+  "localScaffoldRuntime": "NOT RUN by explicit owner instruction",
+  "reviewThreads": {
+    "2421": 0,
+    "2422": 0,
+    "2423": 0
+  },
+  "prerequisiteEvidence": {
+    "service": ".llm/runs/fix-native-service-policy--2396/gate-summary.json",
+    "readerHeaders": ".llm/runs/fix-browser-stream-headers--2396/gate-summary.json"
+  }
+}
