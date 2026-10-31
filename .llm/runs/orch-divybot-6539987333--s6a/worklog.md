@@ -34,3 +34,11 @@ S1 review round 1 FAIL_FIX: layout chain wrapping and duplicate blank line in re
 Repaired S1 template suite: 19 passed. New native legacy preservation test: 1 passed. Leak-check: UNPROVEN, 24 unproven survivors, zero mutations; raw output private.
 
 S1 substantive review PASS (round 2); evaluator independently reran 21 tests, all passed. Implementation source and its minimal generated carriers are signed off for this slice. Source wrappers used an isolated style config to avoid root CLI exclusions; selected/processed coverage is nonzero in our retained JSON. Reconcile: PR #2503 remains draft; no source scope expansion beyond recorded drift; no new issue comments alter the assignment.
+
+## S2 actions/forms
+
+Utility-only data-part rules implemented in the eleven locked CSS files. All referenced roles exist in studio-utility.css. Focused contract/foundation/dropzone/search suite: 95 passed, zero failures. quality:gate passed with inherited warnings. Formatting checked all eleven CSS files. Browser initial run: 114 fixtures/542 measurements; stronger native invalid/focus assertions rerun on 33 form fixtures/176 measurements, zero errors after specificity corrections. Both schemes, mobile/desktop, RTL and reduced motion captured. Legacy comparison: 262 fixtures in both schemes, zero computed geometry/paint differences. See s2-comparison.md for component-level differences and unshipped variants. Independent read-only slice review pending.
+
+S2 review round 1 FAIL_FIX: evidence stale relative to in-flight fixes and label font must use font-label. Corrected label role, invalid field-label tone, and bare-studio alias. Source frozen in s2-source-hashes.json. Fresh gates: 95 tests PASS, quality:gate exit 0, legacy 262×2 unchanged, full 114-fixture/542-measurement browser run zero errors with stronger state assertions. S2 retry pending.
+
+S2 independent retry PASS. Reconcile: remote remains af6418f with no new reviewer comments; eleven CSS hashes match final browser evidence. Carry forward transparent filter-form fill to S3; dark off-thumb spec/reference discrepancy remains an explicit design gap. S2 signed off.

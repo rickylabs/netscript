@@ -1,0 +1,13 @@
+{
+  "packages/fresh-ui/registry/components/ui/button.css": "0a9b5429cbd2a83028333df8f81383bb46545550015074e22f0fc3185aac7874",
+  "packages/fresh-ui/registry/components/ui/checkbox.css": "a1ba159d87c39b97495311eb339995d68d198d85589835c40495217a83f0a20b",
+  "packages/fresh-ui/registry/components/ui/choice-styles.css": "bd883deb74086971a29544fd11be8365ef84dd0322e110e4c410bbc4ca96dfb9",
+  "packages/fresh-ui/registry/components/ui/dropzone.css": "ba76daea845bebf0cb19818b7704bbdf0c1dc8d41a980f2ba2da161dbccc8359",
+  "packages/fresh-ui/registry/components/ui/filter-form.css": "2ac87acfc8c1a5584e05bfa4bedeede2c740de5f3551ef5a5dc89f9a1d35d88b",
+  "packages/fresh-ui/registry/components/ui/form-control-styles.css": "265eb73e942a06998b3a7f6c54a4d3eabb66d6604a23579a40c0e3dad58d5261",
+  "packages/fresh-ui/registry/components/ui/form-field.css": "8fea548535d7f756e141a4cabcd930531fed894642792b6b77c7b60a87ba4cc8",
+  "packages/fresh-ui/registry/components/ui/label.css": "f3e699c298f890297f28e91032b915e38ccca30c59d72cb0ba9cad471abd337e",
+  "packages/fresh-ui/registry/components/ui/search.css": "83283c11f1859bee3ee9b156be31a5498e74a3589853df3e717926bf8ac6e70a",
+  "packages/fresh-ui/registry/components/ui/switch.css": "94f4923581fa7661eeb8888185287d828f7d12394ece57d9e2833b946d70fd06",
+  "packages/fresh-ui/registry/components/ui/textarea.css": "861f4dc1a45ed8bc7a133a96f1cceb90e19e7c77430b4b6fafc8e2eea4174d9a"
+}
