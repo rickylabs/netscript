@@ -1,4 +1,5 @@
 # STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
+- **MERGE HOLD** (Cockpit ~17:40Z): no netscript merges until S6a PR #2503 lands; wait for Cockpit's all-clear
 - CANARY .1 READY TO CUT at 15cffa2fe (11:52Z, comment 6542998232) · CANARY .2 READY TO CUT at 7feb24c7d (16:20Z, comment 6545979540) · Eric cuts; none cut yet
 - H01/H02/A1/A2/A3/E1 DONE (all closed)
 - B1 DONE (#2499 #2512 #2517 #2522 #2526; #2390 closed: no repro); #2159 OPEN for Eric's effects follow-up placement
