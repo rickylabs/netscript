@@ -9,3 +9,6 @@
 - Authorized write surface: `packages/kv/adapters/redis.adapter.ts`, `packages/kv/adapters/redis/`, `packages/kv/adapters/deno-kv.adapter.ts`, `packages/kv/adapters/memory.adapter.ts`, `packages/kv/tests/`, `packages/kv/types/common.ts`, `packages/kv/README.md`, and this run directory. Deno adapter or memory changes only if shared contract exposes a divergence.
 - Private prompts, execution logs and backend configuration: project run storage outside Git. No private machine identifiers in tracked artifacts or PR comments.
 - No label/milestone changes; no merge/release; no local scaffold runtime E2E. Assignment file excluded from commits.
+- Scope expansion after independent IMPL-EVAL: `packages/kv/adapters/denokv-bridge.ts`, with focused
+  native-vs-bridge inclusive-start tests under the already-authorized tests directory. Rationale
+  and exact compatibility correction are in drift.md; no exported signature changes.

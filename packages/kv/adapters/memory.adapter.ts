@@ -150,7 +150,7 @@ export class MemoryKvAdapter implements WatchableKv {
         continue;
       }
 
-      if (!keyHasPrefix(entry.key, options.prefix)) {
+      if (entry.key.length === options.prefix.length || !keyHasPrefix(entry.key, options.prefix)) {
         continue;
       }
 

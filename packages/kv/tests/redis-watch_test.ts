@@ -1,9 +1,10 @@
 import { assert, assertEquals } from '@std/assert';
 import { deadline } from '@std/async';
 import { stub } from '@std/testing/mock';
+import { Redis } from 'ioredis';
 import { RedisKvAdapter } from '../redis.ts';
 import { WatchBatchQueue } from '../adapters/redis/watch-batch-queue.ts';
-import type { KvKey, KvListOptions, WatchEvent } from '../mod.ts';
+import type { KvKey, WatchEvent } from '../mod.ts';
 
 const redisUrl = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
 const A: KvKey = ['prepared', 'session'];
@@ -204,15 +205,17 @@ for (const skipInitial of [false, true]) {
         originalPush.call(this, event);
         buffered.resolve();
       });
-      const original = kv.list.bind(kv);
+      const send = Redis.prototype.sendCommand;
       let scans = 0;
-      const listStub = stub(kv, 'list', async function* <T>(options: KvListOptions) {
+      // Hold the actual baseline MGET reply; watch discovery no longer uses public list().
+      const listStub = stub(Redis.prototype, 'sendCommand', function (command, ...args) {
+        if (command.name !== 'mget') return send.call(this, command, ...args);
         assertEquals(++scans, 1, 'startup mutation must arrive through subscription, not polling');
-        const entries = [];
-        for await (const entry of original<T>(options)) entries.push(entry);
-        captured.resolve();
-        await resume.promise;
-        yield* entries;
+        return Promise.resolve(send.call(this, command, ...args)).then(async (entries) => {
+          captured.resolve();
+          await resume.promise;
+          return entries;
+        });
       });
       const iterator = kv.watchPrefix(['prepared'], {
         signal: controller.signal,
@@ -249,11 +252,11 @@ Deno.test({
     const { kv, controller } = fixture();
     const captured = Promise.withResolvers<void>();
     const resume = Promise.withResolvers<void>();
-    const original = kv.list.bind(kv);
-    const listStub = stub(kv, 'list', async function* <T>(options: KvListOptions) {
+    const send = Redis.prototype.sendCommand;
+    const listStub = stub(Redis.prototype, 'sendCommand', function (command, ...args) {
+      if (command.name !== 'scan') return send.call(this, command, ...args);
       captured.resolve();
-      await resume.promise;
-      yield* original<T>(options);
+      return resume.promise.then(() => send.call(this, command, ...args));
     });
     const iterator = kv.watchPrefix(['prepared'], {
       signal: controller.signal,
