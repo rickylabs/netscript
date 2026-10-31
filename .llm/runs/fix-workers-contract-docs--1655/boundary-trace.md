@@ -1,0 +1,8 @@
+# Conditional doctrine trace — #1655
+
+Coordinator decision: https://github.com/rickylabs/netscript/issues/1655#issuecomment-6544377331 . Option B is authorized only if each finding comes from an oRPC declared internal; a NetScript-owned private type requires repair or a stop. No issue/debt mutation is authorized when that condition fails.
+
+1. `WorkersContractImplementer` in `packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts` uses `ReturnType<typeof implement<WorkersContract, TContext>>`. Its import is directly `@orpc/server`; the installed 1.15.5 `dist/index.d.mts:759` declares `implement` returning `Implementer<T,TContext,TContext>`. This is a direct upstream boundary reference.
+2. `WorkersContract` in the same module uses `WorkersContractDefinition<TPayloads>`. That symbol is imported from local `workers.contract-definition.ts`. At line398 it is a NetScript-owned interface, not an upstream declared symbol. The implementation module exports it at line572, but no public contract entry exports it. Its 22 members use local `Route`, local schemas and `JobTriggerSchema`, plus base-plugin types. `Route` eventually binds `ContractProcedureBuilderWithInputOutput` from `@orpc/contract`; that upstream interface is declared in 1.15.5 `dist/index.d.mts:142`. This transitive SDK dependency does not establish that the immediate local visibility diagnostic is an upstream declared internal.
+
+The previous isolated public-graph prototype increases findings. It is not a sound bounded repair. The direct and transitive traces must not be conflated to close the two debt rows. Production sources, acceptance and debt remain unchanged pending independent assessment of this condition.
