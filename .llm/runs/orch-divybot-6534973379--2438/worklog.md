@@ -49,3 +49,7 @@ Removed bare package-name overrides. Direct npm import requirements select only 
 New controls call preparation with unrecorded is-odd (guard throws before execution), reject the API >=1.10 <1.11 requirement against the legacy authorities, keep an open-ended instrumentation range pinned to 0.223.0, and keep a dotenv16 consumer on 16.6.1. Repository lock bytes remain unchanged by those controls. All 17 fixture tests pass. The dead catalog branch in the provider map was removed.
 
 Coordinator comment #issuecomment-6535146563 now authorizes marking ready after blocker-free implementation review to start CI. Final exact-head evaluation and READY still follow CI repair; only coordinator merges.
+
+## CI repair slice
+
+At53b8bbe, CI's cold command-postgres guard rejected node typings26.6.6; no unrecorded version was accepted. Supplying recorded26.6.5 as the private fixture's direct type dependency fixes cold wildcard resolution without a bare override or repository lock change. A new isolated DENO_DIR native provider run passes5 tests. The exact catalog census assertions now expect40 (the two approved new catalog entries), and the snippet-compiler plus fixture-policy regression suite passes15 tests. Independent repair review PASS is appended to evaluate.md. The close-gate's final exact-head publication checkbox remains pending until the final verdict is published; then its job is rerun.

@@ -58,10 +58,17 @@ export async function prepareLockedFixture(
     for (const [range, version] of compatible) overrides[`${name}@${range}`] = version;
     for (const version of versions) overrides[`${name}@${version}`] = version;
   }
+  // Deno's cold type graph otherwise resolves the '*' node-typings edges
+  // independently of conditional overrides. Supply the recorded root directly.
+  let nodeTypes: string | undefined;
+  for (const version of pinned.get('@types/node') ?? []) {
+    if (!nodeTypes || greaterThan(parse(version), parse(nodeTypes))) nodeTypes = version;
+  }
   await Deno.writeTextFile(
     join(directory, 'package.json'),
     JSON.stringify({
       private: true,
+      ...(nodeTypes ? { dependencies: { '@types/node': nodeTypes } } : {}),
       overrides,
     }),
   );

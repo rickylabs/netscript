@@ -27,3 +27,26 @@ Final exact pushed-head verdict is published in the PR timeline after the last p
 - The new `is-odd` control needs registry network access to run. That's fine in CI, but note it in the PR so it isn't mistaken for a flaky test.
 
 I took your reported results (17 fixture tests, 5 command-postgres, 66 telemetry, check, lint/fmt, publish dry-run) as given and didn't re-run any gates. They'll be checked against CI at the pushed head. Main acceptance for command-postgres stays unchecked until the coordinator merges.
+
+## Independent CI repair sign-off
+
+**PASS**: both repairs are signed off. They are correctly scoped to `.llm/tools/testing/locked-fixture.ts` and `.llm/tools/docs/snippet-compiler_test.ts`, plus run-record updates, against 53b8bbe.
+
+1. **`@types/node` cold-cache drift (`locked-fixture.ts`).**
+   - **Version:** the root, Fresh UI and normalizer reference locks each record exactly one `@types/node` version, 26.6.5. The private fixture `package.json` now declares that recorded version directly as a dependency.
+   - **Scope:** there are no bare-name overrides, no upgrade, and no change to any repository lock.
+   - **Guard:** the check after preparation still compares every resolved version and integrity against the committed locks, so a cold 26.6.6 or any other unrecorded version is still rejected.
+   - **Fallback:** if `@types/node` were ever missing from the locks, no extra dependency is written and the existing behaviour is unchanged.
+   - The new comment states the reason, and `drift.md` records the CI cause and keeps the cold cache as evidence.
+
+2. **Catalog census (`snippet-compiler_test.ts`).** The root catalog went from 38 entries at the base commit to 40 now. The difference is exactly the two approved additions: `@opentelemetry/instrumentation` and `prisma`. Both exact assertions move to 40, and none is removed or loosened.
+
+I didn't re-run either test or the native command-postgres run. I took your reports of a passing isolated-cache run with unchanged locks and the CI test shard failures as given; CI at the pushed head will confirm them.
+
+**Close-gate:** keeping it unchecked until the final review is published, then re-running that job, is correct.
+
+**Still open for the final exact-head review:**
+- command-postgres and test shard CI results at the pushed repair head.
+- The PR body stating the lock deltas, and the `is-odd` control's need for registry network access.
+
+Main acceptance stays unchecked until the coordinator merges.

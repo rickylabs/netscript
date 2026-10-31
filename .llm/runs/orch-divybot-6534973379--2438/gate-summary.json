@@ -34,6 +34,28 @@
       "passed": 5,
       "ignored": 0,
       "rawSha256": "6b2a8fbf2d0196f8e6fa95d3f2bb2d6d9d1cae174fa093df5847c44e40a38b69"
+    },
+    "coldCommandPostgres": {
+      "freshCache": true,
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": 5,
+      "ignored": 0,
+      "rawSha256": "0bb3ed4d1317ddb8ebf03cf03d39d7a992b31cfa1ab5c1c44dd4cebc1b537d12"
+    },
+    "ciRepair": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 15,
+        "uniqueFailures": 0
+      }
     }
   },
   "checks": {

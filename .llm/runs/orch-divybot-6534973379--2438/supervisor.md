@@ -29,3 +29,7 @@ Specific operator directives take precedence over generic dispatcher completion 
 ## Coordinator CI-flow update
 
 Owner/coordinator addendum: https://github.com/rickylabs/netscript/pull/2476#issuecomment-6535146563. It explicitly supersedes the original keep-draft rule: implementation must be complete and blocker-free IMPL-EVAL must precede marking ready; then fix current CI failures and review the exact final head. Only coordinator merges. No local scaffold.runtime or label changes.
+
+## CI repair surface
+
+The user's current-head CI repair request additionally authorizes `.llm/tools/docs/snippet-compiler_test.ts`: its exact catalog census must account for the two approved catalog entries. Test fixture policy receives a recorded direct node-typings root to prevent wildcard cold-cache drift; no version upgrade or registry-latest assertion is introduced.
