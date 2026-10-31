@@ -66,3 +66,7 @@
 - 02:24Z: #2396 consolidated READY: all 8 acceptance entries are mapped. #2423 MERGE at `7421a60` with CI green including both runtime tiers. #2421 is the final PR. Release follow-up: HOST-POLICY-PUBLISHED-GRAPH-2396 (published-graph / e2e-cli-prod proof after the first 0.0.9 canary) is tracked in state `releaseFollowUps`.
 - 02:25Z: dispatched #2367 (D1, internals), comment 6537761359. Builders: #2187, #2400, #2395, #2151, #2367.
 - 02:28Z: #2367 started.
+- 02:33Z: #2367 → PR #2485 (draft).
+- 02:38Z: #2422 e2e: Postgres tier PASS. SQLite tier FAIL at `cli-e2e-aspire-start` after 326s (50 pass / 1 fail), with no resource diagnostic; it matches the #2185 convergence-flake signature, and #2481's SQLite tier passed at 01:36. Reran the failed job once at the same head (job 124414783761, run 41159809248). A second failure at the same gate will be treated as a product signal on #2422.
+- 02:51Z: #2422 SQLite rerun PASS (job 124418007062), so both tiers are green at `b2e3124`. A separate Opus exact-head evaluation is running (the leaf's evaluator loop had ended on CHANGES for unarmed CI only). #2484 (#2151) READY at `ef886a7`, all 3 slices, Opus MERGE; lockfiles changed only in workspace metadata. **expensive-gate.acquired** on #2484.
+- 02:52Z: #2422 moved gating → evaluating (coordinator-run Opus eval). Dispatched #2369 (B2, features), comment 6538046699. Builders: #2187, #2400, #2395, #2367, #2369.

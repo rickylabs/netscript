@@ -6,7 +6,7 @@
 - B1 #2159 → #2383 → #2160 → #2382; #2374: W3–W6
 - B2 #2162 (after #2161) #2149: W3; #2369: W4; #2108 (after B2 pair + all B1): W7
 - C1 #2267 #2132 #2338 #1367 #2377 #2373 (W4), #2390 (after all B1): W7
-- D1 #2396 READY across #2422 (e2e gating) → #2423 (ready) → #2421 (final); post-canary published-graph proof owed; #2367 started 02:28Z (internals); #2115 #2290 #2259: W3
+- D1 #2396 READY across #2422 (e2e gating) → #2423 (ready) → #2421 (final); post-canary published-graph proof owed; #2367 → PR #2485 (implementing); #2115 #2290 #2259: W3
 - E1 #2392 #2394 #2401: W4 · E2 #2155 #2385 #1491 #1364(docs): W5 · #2268 #2269 (internals, #2269 needs embedded-docs decision): W5
 - F1 #2406 (wait PR #2408) #2409 #2379 #2375 #2411 #2384: W6
 - G1 (Step 0 re-check posted 22:54Z): #1667 #1668 CLOSED 22:58Z (Codex eval); #1364 CLOSED (obs. routed to #1381); leaves later: #1655 code, #1366 box6, #1912/#2068/#2185 verification; #2233 needs Eric (recommend option b)
