@@ -500,3 +500,32 @@ include worker/stream runtime paths inside the full test scope. Finish this revi
 slice, then normal-merge that exact main, preserve incoming authored source, regenerate only
 canonical carriers, and rerun union gates before the final exact-head review. No force push
 or rebase, no merge to main. Extra consumer probe: incoming producer-session_test.ts.
+
+Native source slice committed/pushed76bf7ee14921cb86f9c0d7f6363a1f8b88185021; PR phase
+comment6541994907 records its full local source proof and independent slice/debt review.
+Normal main merge4e018ad0bab9b9b90daf4764a035fd3ff879b9fa has NO conflicts. Native auth,
+strengthened test, both facades and entire debt ledger are byte-identical to reviewed76bf7ee.
+No lock changes. All four carriers regenerated canonically. Final four freshness checks
+finish before other sweeps; all source writers/sweeps finish before the combined union run.
+
+Final current-main union full combined PASS1897/0/19, exit0,477856ms. Scope retains the
+entire original14-root suite plus incoming producer-session_test.ts. Added ignored case is
+main's Redis listener recovery control without its test URL; none was added by this leaf.
+All27 frozen source hashes match before/after; native repair and debt unchanged. No locks.
+
+Final union all local gates terminalPASS: root4048/34/0, quality/architecture, docsaccuracy,
+Aspire parity, full service8+both structured/raw facade docs0, four freshness gates, allFIVE
+changed-package publication dry-runs (service/workers/streams/MCP/CLI). Fresh JSR audits0 with
+recorded inherited warnings. See final-union-gates.json and final-union-acceptance-evidence.md.
+Next: same independent source reviewer merge-slice signoff, then normal merge commit/push,
+final exact-head IMPL-EVAL on complete delta since d3a52cb1b. Pending/skipped external gates
+remain unproven; no new source writers or untracked tests were retained.
+
+Independent final union substantive slice CHECKPOINT: PASS, recorded in final-union-slice-
+review.md. Reviewer verified all27 source hashes, native repair identity, all63 incoming
+paths (61 exactmain plus2 canonical carriers), unchanged locks/debt and the complete suite
+scope/timing. All required local gates pass; unproven external gates remain explicit.
+Clarified publication scope: FIVE dry-runs, three source-member JSR audits. Durations are
+explicitly child477856ms versus gate478001ms (startup/receipt overhead), not conflicting data.
+Reconcile: final target main4e018ad0b is fully integrated with no authored conflict resolution.
+Commit/push this coherent merge, then same-session exact-head review; preserve that head.

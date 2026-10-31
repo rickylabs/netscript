@@ -1,0 +1,157 @@
+{
+  "context": "R2 merge working-tree evidence; command receipts identify premerge HEAD, not a clean committed merge. Raw receipts retained privately. Final head evidence will be posted on the PR.",
+  "previousHead": "6597b6452b22c72277509189b61ab78fba507648",
+  "mergedMain": "592a446afc9f9b20cac299edc015a3340c6e5df9",
+  "tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 111,
+      "failed": 0,
+      "ignored": 6,
+      "totalResults": 117,
+      "uniqueFailures": 0
+    }
+  },
+  "redis-concurrency": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 6,
+      "totalResults": 14,
+      "uniqueFailures": 0
+    }
+  },
+  "check": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 136,
+      "batches": 2,
+      "failedBatches": 0
+    }
+  },
+  "carrier-check": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 2,
+      "batches": 1,
+      "failedBatches": 0
+    }
+  },
+  "lint": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 8,
+      "batches": 1,
+      "failedBatches": 0
+    }
+  },
+  "fmt": {
+    "summary": {
+      "filesSelected": 8,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "doclint": {
+    "summary": {
+      "totalPackages": 1,
+      "totalErrors": 2,
+      "totalPrivateTypeRef": 2,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    }
+  },
+  "carrier-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 11,
+      "uniqueFailures": 0
+    }
+  },
+  "negative-real-stores": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 2
+    },
+    "assertions": [
+      {
+        "message": "AssertionError: Listener exhausted its budget before recovery.",
+        "tests": [
+          "real Redis queue recovers from repeated ACL write refusals beyond the burst budget"
+        ]
+      },
+      {
+        "message": "AssertionError: Listener exhausted its budget before recovery.",
+        "tests": [
+          "supervised real Deno KV writes recover repeatedly after closed-handle refusals"
+        ]
+      }
+    ]
+  },
+  "negative-spaced": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "assertions": [
+      {
+        "message": "AssertionError: Values are not equal.",
+        "tests": [
+          "spaced listener failures replenish the budget without resetting cumulative restart counts"
+        ]
+      }
+    ]
+  },
+  "quality-receipt": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "prose-receipt": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "corpus-receipt-valid": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "docs-receipt": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "publish": "PASS exit0; native catalog-materialized member dry-run",
+  "jsrAudit": "No FAIL; inherited directory-cardinality and banner slow-type warnings",
+  "docLint": "Exit1: 2 inherited core-contract private-type-ref diagnostics; changed /worker entrypoint clean",
+  "protectedFilesMatchMain": true,
+  "supervisorMatchesPreviousHead": true,
+  "reviewThreads": "PASS 1 answered, 0 unanswered",
+  "sharedRuntime": "Not run locally per owner; both exact-head E2E CLI runtime tiers remain coordinator-owned"
+}

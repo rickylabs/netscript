@@ -1,0 +1,285 @@
+{
+  "parentNativeRepair": "76bf7ee14921cb86f9c0d7f6363a1f8b88185021",
+  "incomingMain": "4e018ad0bab9b9b90daf4764a035fd3ff879b9fa",
+  "incomingChangedPaths": 63,
+  "incomingSourcePaths": 19,
+  "mainSourceExceptions": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+  ],
+  "exceptionMeaning": "canonical generated source unions; no authored runtime resolution",
+  "nativeAuthFacadesTestsDebt": "byte-identical to reviewed native repair",
+  "sourceSha256": {
+    ".llm/2026-10-31-streams-producer-epochs.md": "1098b1eef78f9d376c2dbcf371cf95ffd3a6e20039c74c4cf8151efc37bafcf0",
+    ".llm/harness/debt/arch-debt.md": "07f7b35f4c79135db0a0fc667f6192697160e91dd093dee49c742c9674ea6171",
+    "docs/site/background-processing/how-to/tune-worker-runtime.md": "ec79c66f87878496563bc6d250a9045e11e9cfd39ef86a669c977f8b47617d91",
+    "docs/site/durable-workflows/streams.md": "8597f2ba6539b7866fc443884d52e1af6f657fb5e4cca85f27738a919ffd0514",
+    "docs/site/reference/service/index.md": "d18e630d08c4cedd607fccc39a171be05290b422a3451e9ae0507d55a83adde9",
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts": "172f54720156ffa17ade36e60247c56a8d5019b92bf5e46d3645d1adc00e819f",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts": "459350b1d79d319fc2b7331306d102405d8bc6e0ebb351b8a80af61e62566a3f",
+    "packages/plugin-streams-core/README.md": "07eea50fd66d57e91046cc1f961d680f5f19e61bcde06b8ae0c2102a5e8c048c",
+    "packages/plugin-streams-core/src/application/create-durable-stream.ts": "73325d5a29afb598f0d1ff53803c6b22a22e4c6c256ab82fc80da459752543dc",
+    "packages/plugin-streams-core/src/application/durable-stream-producer-supervisor-contract.ts": "8ddce831ba39e055536aef847ab59632dacd8ffda953b58940ab949441b26c53",
+    "packages/plugin-streams-core/src/application/durable-stream-producer-supervisor.ts": "1d90e58b9d889ceb1e3f41328671b689bfd448827ed63cbd06c8b6d28f6897b6",
+    "packages/plugin-streams-core/tests/application/producer-session_test.ts": "7b3f360539b0d0d26bd123565597612de036aa0f859db609a512415a3968f1fa",
+    "packages/service/README.md": "3aa9c83f11c11694ca7605e56d0d27014f91fc52e34d702d391845f7b1ebc2b7",
+    "packages/service/src/auth/types.ts": "b0f5bc3a97af6e4ee4b11f17606e065131cfc30bc258eddcc8c30f737730f68d",
+    "packages/service/src/primitives/scalar.generated.ts": "38e7fd81fe48a98fb58a73c35966987857bd26aab5f44fc478ed5d4fc84ebdf2",
+    "packages/service/tests/auth/procedure-availability_test.ts": "80f0ce4a5ba12b94ede856df87dd42195f72f2fa298aef537c2d445213d0c020",
+    "plugins/streams/services/mod.ts": "04b622895c983127531a0989c2647e1acd5b6bf3977a6e92ee957451d461f5b7",
+    "plugins/streams/tests/service/durable-stream-producer-idempotency_test.ts": "3065812e8a4bc8e000b60efd1520cb4d736fc0dabcd5f0b0199781e47007d814",
+    "plugins/workers/services/mod.ts": "04d0af14c7f298da223f3e741c14be7b9d52a8b546de4cc5ffd6ce6e794cc7d2",
+    "plugins/workers/worker/listener-recovery_test.ts": "2eedf993031c2707d032bd1e0d2ed7fe812db69acf02a37fb6a7944cd1170aec",
+    "plugins/workers/worker/listener-supervisor.ts": "e528fa2cb0fe004bcc982bf002c9fae12bd3043760edcbd7f3491bad7eb6f360",
+    "plugins/workers/worker/listener-supervisor_test.ts": "4a1446be4e73263dbce15bf7c21016b2d881a3c79d6977293e1b178d649fd80e",
+    "plugins/workers/worker/mod.ts": "a2839d0a4ee1e430cd2c5b653ecdf1f8fac85b02cce17c2fdc8850939eca724d",
+    "plugins/workers/worker/queue-consumer.ts": "9dd14b257e4b91231df49e18a989b2ecf59c71bdec94e1f0845bc6f5bd6d4ac3",
+    "plugins/workers/worker/worker-listener-health_test.ts": "f5fdc77723799b4faa4a52024e839132d13abb351c3983f4945a4414175ee4f6",
+    "plugins/workers/worker/worker-options.ts": "6efa94d126bcb6da88c2ca4a7034bfb26e28a1728f8abaede074401831323794",
+    "plugins/workers/worker/worker.ts": "8208607e09e5fce3cf04c51f5f5c1579725c84f2c639836d0302a4525c3585af"
+  },
+  "testedTree": "uncommitted normal main merge over reviewed76bf7ee; receipts record that parent HEAD plus the frozen source union. Final pushed-head evaluator must match all27 hashes.",
+  "gates": [
+    {
+      "evidence": "check",
+      "gateId": "check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 114817,
+      "requestHash": "def98a81fd65fd4d28e4505ebad1be6e8886a6f89fac6f3cba1a32b439c2115f"
+    },
+    {
+      "evidence": "quality-gate",
+      "gateId": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15879,
+      "requestHash": "ec1c0cb691c24213f11435e4e8b0dbb2f924e362bc59f6c47f6b994131b7cc90"
+    },
+    {
+      "evidence": "docs-accuracy",
+      "gateId": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7486,
+      "requestHash": "fbfd9b888f2a27048688576bd6373d7508fac56eeff6326e44d5337febf3744f"
+    },
+    {
+      "evidence": "aspire-version-parity",
+      "gateId": "aspire-version-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 319,
+      "requestHash": "9813bcde7322cfe64d6cbf69b6bd7d3a76055dd63479aefe4446f67da7186f99"
+    },
+    {
+      "evidence": "mcp-export-corpus",
+      "gateId": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9039,
+      "requestHash": "d78a0bd617a2fd8ece6907582077008ffb0893626ec24917970bf2c47f8e6b37"
+    },
+    {
+      "evidence": "agent-docs-prose",
+      "gateId": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13762,
+      "requestHash": "822a564aca45f8418ba4af249a0691b6326e1321ddb04ccc7b625d392ae7ad1b"
+    },
+    {
+      "evidence": "assets-barrel",
+      "gateId": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2312,
+      "requestHash": "ed51ebdd9ad18c1074fef26e4dd105351b5ffc1166ad99f887c6d1c52924c5cf"
+    },
+    {
+      "evidence": "publish-assets",
+      "gateId": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 448,
+      "requestHash": "9da0f078fd382a14ef5a4df7b26e31669cfad81233643a199b1912ddea5d0989"
+    },
+    {
+      "evidence": "service-doc",
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1223,
+      "requestHash": "3fce5f37774a0c37f633def290210810c418b110ed444854bcd731268e7be0af"
+    },
+    {
+      "evidence": "workers-doc",
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 997,
+      "requestHash": "b238d8b870f0f6122392dbe87279c17b103222dab0991acdf1bb6a201ded69ee"
+    },
+    {
+      "evidence": "streams-doc",
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 370,
+      "requestHash": "260af56a11bd824b80d72e3c9a7f25608fb91567ef22bd53abbba1bc07826c64"
+    },
+    {
+      "evidence": "workers-raw-doc",
+      "gateId": "public-doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 688,
+      "requestHash": "6b1db0095e507f606ba415b03fda82c07728bd4e3a4c711e85a45a8693afb489"
+    },
+    {
+      "evidence": "streams-raw-doc",
+      "gateId": "public-doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 289,
+      "requestHash": "81b3af31be62832c112edeef77b07c13843d1c6339664a6e338700011efb9162"
+    },
+    {
+      "evidence": "publish-packages-service",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 6442,
+      "requestHash": "0c3e77ee9dc886e3b8b307dd3ac7124d864df35977582deb48059cfff4a7acd0"
+    },
+    {
+      "evidence": "publish-plugins-workers",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10693,
+      "requestHash": "7e0c2230c4ab33d43dcece0129d431b3b936864cfab79cdc3e437d6dd757f6f7"
+    },
+    {
+      "evidence": "publish-plugins-streams",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 6820,
+      "requestHash": "59977d02bf693fa263280ebc98f90ef82a761f93391c107b0f0222ca8cccd1cc"
+    },
+    {
+      "evidence": "publish-packages-mcp",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3718,
+      "requestHash": "28f04cfa79c1e4f940310055f234815a09b53c66eb14f4245f7db5cf2960e6bd"
+    },
+    {
+      "evidence": "publish-packages-cli",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8475,
+      "requestHash": "709668f7117b05319134d615558592c0f5220d235db199e870235975476c5f88"
+    },
+    {
+      "evidence": "combined",
+      "gateId": "test",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 478001,
+      "requestHash": "fb24616ebaa6a70451e99045075c16858a68c675f43bd7757e1e3af3f73d9e80"
+    }
+  ],
+  "rootCheck": {
+    "selection": {
+      "filesSelected": 4048,
+      "batches": 34,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "combinedTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1897,
+      "failed": 0,
+      "ignored": 19,
+      "totalResults": 1916,
+      "uniqueFailures": 0
+    },
+    "testScope": [
+      "packages/service",
+      "packages/plugin",
+      "packages/fresh",
+      "packages/fresh-ui",
+      "plugins/workers",
+      "plugins/streams",
+      "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+      "packages/sdk/tests/internal-credential-contribution_test.ts",
+      "packages/sdk/tests/client-contribution-validation_test.ts",
+      "packages/sdk/tests/client-contribution-observability_test.ts",
+      "packages/sdk/tests/integration/client-contribution-adapter_test.ts",
+      "packages/sdk/tests/discovery/env-ordering_test.ts",
+      "packages/kv/tests/list-contract_test.ts",
+      "packages/kv/tests/bridge-list_test.ts"
+    ],
+    "additionalMainRegression": "packages/plugin-streams-core/tests/application/producer-session_test.ts",
+    "ignored": "19 inherited/incoming cases: prior18 plus incoming listener recovery Redis control without NETSCRIPT_TEST_REDIS_URL; no leaf skip/filter/assertion/permission/timeout changes",
+    "childDurationMs": 477856,
+    "gateDurationMs": 478001,
+    "durationMeaning": "Child TAP wrapper excludes gate startup/receipt overhead; both measured durations are retained."
+  },
+  "nativeDocs": {
+    "serviceEntrypoints": 8,
+    "serviceErrors": 0,
+    "workersServiceErrors": 0,
+    "streamsServiceErrors": 0,
+    "rawFacadeLintExitCodes": [
+      0,
+      0
+    ]
+  },
+  "nativeApiAndDebt": "identical to reviewed76bf7ee; exact23/22; independent F-5 reviewPASS, target2026-11-10, no extension/growth; actual baseline semantic equality1/0/0 and raw4 representation changes remain recorded",
+  "scopedCheckLintFmt": "same four source/test/facade files and same hashes as reviewed native repair; wrappers previously selected all4 and passed with zero diagnostics/findings",
+  "jsrAudits": [
+    {
+      "member": "packages/service",
+      "exitCode": 0,
+      "findings": [
+        "INFO F-JSR-7 slow-types: Checking for slow types in the public API... \u2014 sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)"
+      ]
+    },
+    {
+      "member": "plugins/workers",
+      "exitCode": 0,
+      "findings": [
+        "WARN F-DOCT-5 cardinality: directory has 20 immediate children; doctrine cap is 12",
+        "WARN F-DOCT-5 cardinality: directory has 13 immediate children; doctrine cap is 12 (src/cli)",
+        "WARN F-DOCT-5 cardinality: directory has 33 immediate children; doctrine cap is 12 (worker)",
+        "WARN F-JSR-7 slow-types: Checking for slow types in the public API..."
+      ]
+    },
+    {
+      "member": "plugins/streams",
+      "exitCode": 0,
+      "findings": [
+        "WARN F-JSR-7 slow-types: Checking for slow types in the public API..."
+      ]
+    }
+  ],
+  "locks": "unchanged, exact incoming main",
+  "reviewThreads": {
+    "exitCode": 0,
+    "unanswered": 0
+  },
+  "hostedRuntime": "UNPROVEN: coordinator must arm e2e-cli at final pushed head; no local scaffold.runtime",
+  "publishedGraph": "UNPROVEN: existing release-owned first exact canary proof before stable"
+}

@@ -65,7 +65,8 @@ export class DurableStreamProducerSupervisor {
   };
   #accepted = true;
   #closing = false;
-  #epoch = 0;
+  readonly #autoClaim: boolean;
+  #epoch: number;
   #nextSequence = 0;
 
   /** Start connecting immediately under a bounded policy. */
@@ -74,6 +75,8 @@ export class DurableStreamProducerSupervisor {
     this.#headers = options.headers;
     this.#retention = options.retention;
     this.#producerId = options.producerId;
+    this.#epoch = options.initialEpoch ?? 0;
+    this.#autoClaim = options.initialEpoch === undefined;
     this.#transport = options.transport;
     this.#clock = options.clock;
     this.#random = options.random;
@@ -250,11 +253,11 @@ export class DurableStreamProducerSupervisor {
         this.#onStopped?.();
         return;
       }
-      if (result.failure.kind === 'stale-epoch') {
+      if (result.failure.kind === 'stale-epoch' && this.#autoClaim) {
         this.#epoch = (result.failure.currentEpoch ?? this.#epoch) + 1;
         this.#nextSequence = 0;
         identity = this.#identity();
-      } else if (!isRetryable(result.failure)) {
+      } else if (!this.#canRetry(result.failure)) {
         this.#fail(result.failure.message);
         throw new Error(result.failure.message);
       }
@@ -309,7 +312,7 @@ export class DurableStreamProducerSupervisor {
           if (this.#abort.signal.aborted) {
             return false;
           }
-          if (!isRetryable(connected.failure)) {
+          if (!this.#canRetry(connected.failure)) {
             this.#failActive(entry, connected.failure, attempt);
             return false;
           }
@@ -353,11 +356,11 @@ export class DurableStreamProducerSupervisor {
       if (this.#abort.signal.aborted) {
         return false;
       }
-      if (result.failure.kind === 'stale-epoch') {
+      if (result.failure.kind === 'stale-epoch' && this.#autoClaim) {
         this.#epoch = (result.failure.currentEpoch ?? this.#epoch) + 1;
         this.#nextSequence = 0;
         entry.identity = this.#identity();
-      } else if (!isRetryable(result.failure)) {
+      } else if (!this.#canRetry(result.failure)) {
         this.#failActive(entry, result.failure, attempt);
         return false;
       }
@@ -396,7 +399,7 @@ export class DurableStreamProducerSupervisor {
       if (this.#abort.signal.aborted) {
         return false;
       }
-      if (!isRetryable(result.failure) || attempt === this.#reconnectPolicy.maxAttempts) {
+      if (!this.#canRetry(result.failure) || attempt === this.#reconnectPolicy.maxAttempts) {
         this.#fail(result.failure.message);
         return false;
       }
@@ -425,6 +428,10 @@ export class DurableStreamProducerSupervisor {
     }
   }
 
+  #canRetry(failure: StreamProducerTransportFailureV1): boolean {
+    return isRetryable(failure) && (failure.kind !== 'stale-epoch' || this.#autoClaim);
+  }
+
   #failActive(
     active: ProducerQueueEntry,
     failure: StreamProducerTransportFailureV1,
@@ -434,7 +441,7 @@ export class DurableStreamProducerSupervisor {
       status: 'delivery-unknown',
       reason: failure.kind === 'aborted'
         ? 'transport-aborted'
-        : !isRetryable(failure)
+        : !this.#canRetry(failure)
         ? 'transport-refused'
         : 'retry-exhausted',
       error: failure.message,

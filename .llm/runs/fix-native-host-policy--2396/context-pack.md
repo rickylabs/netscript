@@ -234,3 +234,26 @@ to4e018ad0b (#2510/#2482/#2513). Reconcile that exact main as a separate normal-
 canonically regenerate carriers and prove the new source union; include incoming producer
 session tests along with the full original combined scope. Freeze source writers/sweeps
 before tests. Final same-session exact-head IMPL-EVAL follows that final pushed union.
+
+Native repair committed76bf7ee14921cb86f9c0d7f6363a1f8b88185021 and pushed. Normal merge
+of4e018ad0b is currently uncommitted, no conflicts. See final-union-plan.md. Four generator/
+freshness gates, root, quality/architecture, docsaccuracy, Aspire parity, all native docs,
+three publication dry-runs and audits PASS. Full final union test run is live, original14
+roots PLUS incoming packages/plugin-streams-core/tests/application/producer-session_test.ts.
+All writers/sweeps finished before it started. Source27-file hashes and raw receipts live
+in the external final-union run. Do not claim final acceptance until its terminal report,
+same-session substantive merge review, commit/push and final exact-head IMPL-EVAL.
+
+Final current-main union terminalPASS1897/0/19. All27 source hashes unchanged throughout;
+root4048/34/0 and every other required local gatePASS, including five member dry-runs.
+Evidence: final-union-gates.json and final-union-acceptance-evidence.md. Need same-session
+independent substantive merge review before committing the currently staged/uncommitted
+normal main merge; then push, final exact-pushed-head total delta review, PR verdict and
+canonical READY handoff. Native repairs/debt identical to reviewed76bf; only canonical
+carriers differ from main source. Preserve final head after its review. No merge/release.
+
+Final union substantive slice reviewPASS. All27 hashes and main63-path faithful union
+independently checked. Ready to commit/push normal merge4e018ad0b over76bf7ee. Final exact-
+pushed-head total-delta IMPL-EVAL still required; do not make a later commit solely for its
+verdict. Local union1897/0/19 and root4048/34/0, every required local gatePASS. Five publication
+dry-runs, three source-member audits with warnings retained. Only coordinator arms runtime.

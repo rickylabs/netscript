@@ -1,0 +1,106 @@
+{
+  "context": "R3 merge working-tree evidence. Gates ran with premerge HEAD dfa2502be and pending merged source. These are not clean final-head receipts. Raw receipts stay private; final exact pushed-head review and CI belong on the PR.",
+  "previousHead": "dfa2502be5fbb9ec275452738de0915f87dc1d3a",
+  "mergedMain": "f6839463668c5dae4ca7234d26909e74e10b89c0",
+  "listener-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 21,
+      "uniqueFailures": 0
+    },
+    "rawReportSha256": "7266673b8b282c196cdbef4c7a42daf14968fca6d757a36744a20985209afd2a"
+  },
+  "check": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 136,
+      "batches": 2,
+      "failedBatches": 0
+    },
+    "rawReportSha256": "b431b31b322cf8db93c8d110d8322cfab029e214faaa30a4cbf64a9f44e4a5ec"
+  },
+  "lint": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 8,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "rawReportSha256": "5bf8dd3a6d007ecdd87b86c8663b7aa4e462f74eaa462da47aac58a556456c41"
+  },
+  "fmt": {
+    "summary": {
+      "filesSelected": 8,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "rawReportSha256": "d18388f478686124deb204d2e4a9ce48dea307b60c69b83bfa7d995a6c4b6f44"
+  },
+  "carrier-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 3,
+      "uniqueFailures": 0
+    },
+    "rawReportSha256": "12521ce39a052e89d32523f739c8248e0131a4ecb0f4bfdee837b039e7e02bd4"
+  },
+  "carrier-consumer-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 8,
+      "uniqueFailures": 0
+    },
+    "rawReportSha256": "5054d535a5455cb86b908165e7c9cc81ddc1547ad6a98c02bfe67572a789a80a"
+  },
+  "quality-receipt": {
+    "exitCode": 0,
+    "outcome": "PASS",
+    "rawReportSha256": "fd49c88cc2b5090b38e676621dbe3ba42c218a1bccf3446eb2bb612baf0d2f7e"
+  },
+  "prose-receipt": {
+    "exitCode": 0,
+    "outcome": "PASS",
+    "rawReportSha256": "24e09aea6dcb67dfbcd0cae955c7c684dc796c9b928e60cf74620cf264c52d0c"
+  },
+  "publish-receipt": {
+    "exitCode": 0,
+    "outcome": "PASS",
+    "rawReportSha256": "dba42c1dd0fe80c68c8abf00d8992351d7df3667895088a933dea0e984ef0cdf"
+  },
+  "corpus-receipt": {
+    "exitCode": 0,
+    "outcome": "PASS",
+    "rawReportSha256": "772f9fa35180bd016380ce02a36e100bb4145492510cc261315bb97553b683f5"
+  },
+  "docs-receipt": {
+    "exitCode": 0,
+    "outcome": "PASS",
+    "rawReportSha256": "86b7a78c82d977120caf289e990714e2f29bc2e6d0afa017d0ecbb5f62a5763a"
+  },
+  "protectedSource": "Worker source/tests match dfa2502be. Queue, dispatcher/execution, all lock files match main. No authored runtime changes.",
+  "negativeControls": "R2 reset-revert controls preserved and applicable because runtime/tests are unchanged; not rerun in R3.",
+  "reviewThreads": "PASS: 1 answered, 0 unanswered",
+  "runtimeE2E": "Not run locally per owner. Both exact-head CI runtime tiers required before coordinator merges.",
+  "inheritedDebt": "Unchanged prior JSR/doc assessment: 2 core-contract private-type-ref diagnostics; /worker clean. No new public surface or debt."
+}
