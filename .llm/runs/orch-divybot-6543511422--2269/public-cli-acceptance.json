@@ -1,5 +1,5 @@
 {
-  "implementationHead": "1261c03e42626a941d5b60d311f2b8c598fef780",
+  "implementationHead": "a74b039a20137f564c1cf524fdc848c4869574e4",
   "consumer": "local CLI MCP stdio, empty project",
   "responses": [
     {
@@ -9,7 +9,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "slug": "pages/reference/kv"
     },
@@ -20,7 +20,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "slug": "pages/observability/telemetry"
     },
@@ -31,7 +31,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "slug": "pages/observability"
     },
@@ -42,7 +42,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "slug": "pages/data-persistence/kv-queues-cron"
     },
@@ -53,7 +53,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "slug": "pages/background-processing/workers"
     },
@@ -64,7 +64,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "slug": "pages/durable-workflows/streams"
     },
@@ -75,7 +75,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "confidence": "low",
       "top": [
@@ -100,7 +100,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "confidence": "low",
       "top": [
@@ -125,7 +125,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "confidence": "low",
       "top": [
@@ -150,7 +150,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "count": 0,
       "fallback": "No seam documented for this query in this corpus. Use find_export or search_exports for public APIs."
@@ -162,7 +162,7 @@
       },
       "citation": {
         "frameworkVersion": "0.0.8",
-        "sha256": "11d1be74aea743e8f9f0cb9e95c8748a7e74a84e8f7065bcc79168b881f1d5d5"
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
       },
       "count": 2,
       "fallback": null

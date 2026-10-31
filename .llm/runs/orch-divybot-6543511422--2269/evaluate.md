@@ -31,3 +31,6 @@ VERDICT: MERGE 1261c03e42626a941d5b60d311f2b8c598fef780
 
 Final exact-head review is published on PR 2529 and in the canonical READY report after the
 evidence-only commit. This file preserves the pre-ready implementation evaluation.
+
+Owner-requested rebase supersedes the original head references. Rebased gates and the final
+exact rewritten-head evaluation are recorded in worklog.md and the PR/READY handoff.

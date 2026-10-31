@@ -1,20 +1,17 @@
-# Resume / coordinator handoff
+# Resume / final coordinator handoff
 
-Issue 2269, E2, coordinator 2474, PR 2529. Implementation head
-1261c03e42626a941d5b60d311f2b8c598fef780 passed independent IMPL-EVAL with no blockers.
-PLAN-EVAL round 2 and independent S1/S2 supervisor reviews passed before their phases completed.
+Issue 2269, E2, coordinator 2474, ready PR 2529. The owner later explicitly requested a rebase
+and force-push for a merge conflict, overriding the original prohibition. Rebased onto
+a9620a34e14e067c56bb6af025ec015f7252b7aa; regenerated conflicting publish metadata from merged canonical pages.
+Upstream auth/saga changes are retained. Explicit force-with-lease protects the prior remote head.
 
-303 selected tests plus 14 export generator tests passed. Structured check/lint/fmt, native
-MCP doc-lint/publish dry-run, quality:gate, all four carrier freshness gates and Aspire parity pass.
-Public CLI MCP stdio has 11 cited acceptance responses in public-cli-acceptance.json. Negative
-controls are recorded in worklog.md. No unanswered review threads. CI docs build failure fixed.
+Rebased implementation source a74b039a20137f564c1cf524fdc848c4869574e4 passes 317 selected tests (0 failed/ignored), MCP
+check/lint/fmt, quality:gate, all four carrier freshness gates, and 11 public CLI stdio acceptance
+requests with refreshed citations. Evidence is in worklog.md and public-cli-acceptance.json.
+Earlier evaluations are historical and a final exact rewritten-head review is required in the
+same independent evaluator session. That verdict/CI snapshot lives in the PR and canonical READY
+report so recording it cannot move its own SHA. Review threads must be checked again before READY.
 
-The following commit changes only run evidence and an explicit extension to existing MCP debt:
-contract table +10 lines, infrastructure +1 real docs asset group. See the debt record's cost/gate.
-Runtime e2e-cli is not needed for this scope; no local scaffold runtime ran. Coordinator owns
-labels, milestones and merge; no merge/tag/release, lock churn, rebase or force push occurred.
-
-Final exact pushed-head IMPL-EVAL and live CI state are published on PR 2529 and the canonical
-READY report, so recording that verdict cannot itself move the reviewed SHA. Continue from those
-external records if CI or review reports a later issue. Final report uses the excluded atomic
-.divybot-final-report.md file handoff, not a direct issue comment.
+No local scaffold runtime; runtime e2e-cli is unnecessary for this docs retrieval scope, independently
+confirmed before rebase. No locks, labels/milestones, merge/tag/release or foreign resources changed.
+Use the excluded atomic .divybot-final-report.md handoff for canonical issue publication.

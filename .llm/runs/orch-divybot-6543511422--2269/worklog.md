@@ -124,3 +124,25 @@ Accepted maintenance debt and its bounded cost are recorded under mcp-tool-contr
 no runtime debt. Existing static warnings are not suppressed. The new public docs subpath passes
 native doc-lint/publish analysis. No lock changes, started application resources, or unknown-owner
 cleanup required. Final exact-head verdict and CI snapshot are published in the PR/READY report.
+
+## Owner-requested conflict repair and revalidation
+
+Later user instruction explicitly authorized rebase and force-push for the merge conflict,
+overriding the initial prohibition. New main baseline: a9620a34e14e067c56bb6af025ec015f7252b7aa.
+Rebased implementation source head: a74b039a20137f564c1cf524fdc848c4869574e4.
+Both conflicts were in packages/mcp/src/publish-assets.generated.ts; regenerated from canonical
+merged page data. All other source/prose/export row changes from main merged normally.
+
+| Rebased gate | Result |
+| --- | --- |
+| Combined selected suite including export generator | PASS, 317 tests, 0 failed/ignored |
+| Structured MCP check/lint/fmt | PASS, 0 findings, full coverage |
+| quality:gate (issue2269-rebased-quality) | PASS, exit 0 |
+| Four carrier freshness gates (issue2269-rebased-prose/assets/publish/exports) | PASS, exit 0 each |
+| Public CLI MCP stdio | PASS, 11 newly cited responses; public-cli-acceptance.json refreshed |
+
+The explicit force-with-lease targets the former remote head
+c9d5bb04275d2f8a64dc5f80e2484580088d0ba0, so another author's remote changes cannot be overwritten.
+No application resources or local scaffold runtime were started. The previous exact-head MERGE
+verdict is preserved in evaluate-pre-rebase.md and is superseded. Final same-session IMPL-EVAL
+must evaluate the rewritten pushed head. PR remains ready; coordinator still owns merge.

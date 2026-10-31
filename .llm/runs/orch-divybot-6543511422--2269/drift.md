@@ -33,3 +33,10 @@
   schema/adapter-group cleanup gate extend mcp-tool-contracts-a8-1102; no new runtime cost accepted.
 - First IMPL-EVAL PASS at implementation head 1261c03. Final verdict follows the evidence-only
   commit on the exact pushed head; it is published externally to avoid a self-referential SHA.
+
+- Later owner instruction overrides the initial no-rebase/no-force rule for this conflict repair:
+  "merge-conflict: rebase onto the latest base branch, resolve conflicts, force-push."
+  Rebased onto main including #2519, #2526 and #2528. Both conflicts were generated publish
+  metadata; regenerated from the combined canonical carrier. Upstream auth/saga prose and export
+  rows were retained. The push uses an explicit lease against the previously published c9d5bb0.
+  Earlier exact-head verdicts are historical; a fresh same-evaluator verdict is required.
