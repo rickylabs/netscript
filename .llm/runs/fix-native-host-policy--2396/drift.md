@@ -102,3 +102,15 @@ as acceptance of a new commit. The concrete current-main integration and its tes
 prepared/pushed, but its new exact-head independent sign-off must stay UNPROVEN and be
 surfaced to the coordinator as an authorization/process decision. Source behavior itself
 was accepted in round5; a source equivalence claim is narrower than a new-head MERGE verdict.
+
+
+Relaunch preflight: the dispatcher checkout was shallow at main, preventing a common ancestor. Fetched100 ancestors without rewriting history; merge-base is204a71b1. Main advanced during preflight to7ee9c3ed04607eb0967f9ef0ef4cd874652817aa. Merge-tree confirms exactly the same three non-source conflicts as the coordinator review. Workers README merges automatically; no authored runtime/test conflict.
+
+Canonical prose generation initially refused the conflicted carrier: Duplicate offline docs page llms.txt. Took incoming carriers only as parseable generator seeds, as the repository memory prescribes; both are being overwritten canonically over the full source union. No generated rows were manually resolved.
+
+Combined suite terminal:1526 passed/1 failed/16 ignored. Sole failure is workers non-contract
+entrypoint doc lint, private-type-ref: native AuthzDecision now references ProcedureErrorCode
+(introduced on incoming main). Full original test remains red; no test assertion or export/debt
+bound is changed. Both factories still preserve their reviewed source. This merge-only brief
+expressly forbids reimplementation; closure repair would grow the exact22/21 named surfaces
+and requires coordinator disposition. Report acceptance8 and complete-suite proof as unproven.

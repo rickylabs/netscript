@@ -2,6 +2,7 @@ import { assertEquals, assertInstanceOf, assertMatch, assertThrows } from '@std/
 import type { TaskStdinJson } from '../../src/executor/mod.ts';
 import { defineTask as defineRootTask } from '../../mod.ts';
 import { defineTask } from '../../src/builders/mod.ts';
+import { terminated } from './process-termination.ts';
 import {
   createDefaultTaskExecutor,
   ExecutableRuntimeAdapter,
@@ -239,18 +240,7 @@ await new Promise(resolve => setTimeout(resolve, 60000));`,
         assertEquals(Date.now() - started < 1200, true);
         assertEquals(Number.isSafeInteger(pid), true);
         // A reparented zombie is already terminated and owns no pipes or memory.
-        let dead = false;
-        for (let attempt = 0; attempt < 50 && !dead; attempt++) {
-          try {
-            const stat = await Deno.readTextFile(`/proc/${pid}/stat`);
-            dead = stat.slice(stat.lastIndexOf(')') + 2).split(' ')[0] === 'Z';
-          } catch (error) {
-            if (!(error instanceof Deno.errors.NotFound)) throw error;
-            dead = true;
-          }
-          if (!dead) await new Promise((resolve) => setTimeout(resolve, 10));
-        }
-        assertEquals(dead, true);
+        assertEquals(await terminated(pid!), true);
       } finally {
         clearTimeout(watchdog);
         if (pid !== undefined) {

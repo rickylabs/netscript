@@ -4,6 +4,13 @@
 unexempted TypeScript blocks on the current coverage floor against exact public `@netscript/*`
 entrypoints. It compiles snippets only; it does not execute them or start services.
 
+The same source walk checks `netscript plugin update` examples on every Markdown/Vento page,
+including inline code and HTML tables, regardless of the TypeScript coverage floor. The public
+command takes an installed plugin name (`netscript plugin update workers`, as shown by
+`netscript plugin update --help`). `cli-example-policy.ts` rejects scoped/JSR package operands and
+package-style placeholders with a source path and line. Other verbs retain their own operand
+contracts; this policy does not execute shell examples.
+
 ## Day-one floor
 
 The initial floor covers these #1373 Tier-1 pages:
@@ -35,11 +42,12 @@ Run one fixture explicitly as `deno task docs:snippets:negative <case>`, where `
 
 - `non-exported-symbol`
 - `empty-exemption-reason`
+- `plugin-update-package-specifier`
 - `dialect-a-object-input`
 - `dialect-a-positional`
 - `dialect-b-object-input`
 
-The first three are required raw red controls; the last two prove the checker accepts the valid
+The first four are required raw red controls; the last two prove the checker accepts the valid
 dialect-A and dialect-B shapes. A missing or unknown case exits non-zero and prints this complete
 usage list. The `:negative` task never falls back to the ordinary positive corpus gate.
 

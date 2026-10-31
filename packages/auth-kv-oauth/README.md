@@ -52,6 +52,19 @@ Custom `KvOAuthStore` implementations must provide `getSessionEntry(id)` with th
 its KV versionstamp. This new required method lets refresh and revoke compare against the version
 they actually read; implementations of the earlier store interface need to add it.
 
+## Cookie parsing
+
+`parseCookieHeader` from `@netscript/auth-kv-oauth/cookies` URI-decodes valid cookie values and
+skips an individual value if its percent encoding or UTF-8 is invalid. For example,
+`other=%E0%A4%A; __Host-ns_session=abc` still yields `abc` for `__Host-ns_session`. Skipping
+undecodable values prevents malformed credentials from being treated as raw session identifiers.
+Duplicate names use the last successfully decoded value; a malformed duplicate does not erase an
+earlier valid value.
+
+The OAuth callback's transaction-cookie fallback, `getSessionId` and `signOut` use this same parser.
+The backend's `authenticate` and `sessions.getSession` read through `AuthnRequest.cookie`; hosts
+that use this parser for that method receive the same tolerance.
+
 ## Architecture
 
 ```mermaid

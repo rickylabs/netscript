@@ -294,7 +294,7 @@ catch boundary.
 This migration is opt-in. Existing unguarded services, generated scaffolds, and services that use
 `createScopeAuthorizer()` by itself keep their current behavior. Fail-closed contract enforcement
 begins only when the application supplies the result of
-`createContractAuthorizer(contract, { fallback? })` to `.withAuthz()`.
+`createContractAuthorizer(contract, { fallback?, rawRoutes?, retiredPaths? })` to `.withAuthz()`.
 
 Contract metadata is authoritative. For a request that matches a contract procedure, a match-aware
 fallback is consulted only when that procedure has no access metadata. If neither the metadata nor a
@@ -333,7 +333,8 @@ const authorizer = createContractAuthorizer(OrdersContractV1, {
 is raised while the contract is traversed, not on the first request.
 
 A raw route added with `.route(method, path, handler)` under the guarded prefix matches no
-procedure, so it is denied with `authz.no-contract-procedure` until it is declared. Declare it with
+procedure, so an authenticated caller receives 404 `procedure_not_found` with message
+`authz.no-contract-procedure` until it is declared. Declare it with
 `rawRoutes`:
 
 ```ts
@@ -352,6 +353,54 @@ bypass. It may add `authorization: { scopes?, roles? }`. Matching is exact: `/ap
 not cover `/api/tools/mcp-admin` or `/api/tools/mcp/nested`. Construction rejects wildcard or
 parameter paths, a non-`'required'` authentication and duplicates. `.build()` rejects a raw path
 that overlaps the REST or RPC projection.
+
+### Unknown and retired procedures
+
+With `createContractAuthorizer()`, an authenticated request under a guarded prefix that matches
+no served procedure returns HTTP 404 with a stable machine-readable `code`. Apps can declare
+removed endpoints through `retiredPaths` to return HTTP 410 instead:
+
+```ts
+import { createContractAuthorizer, PROCEDURE_ERROR_CODES } from '@netscript/service/auth';
+import type { ContractPolicyContract } from '@netscript/service/auth';
+
+declare const OrdersContractV1: ContractPolicyContract;
+
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  retiredPaths: ['/api/v1/orders', '/api/rpc/v1/orders/list', '/stream'],
+});
+const upgradeCode = PROCEDURE_ERROR_CODES.RETIRED; // 'procedure_retired'
+```
+
+| Authenticated request | HTTP status | JSON body |
+| --- | --- | --- |
+| Unknown guarded procedure | 404 | `{ "error": "NOT_FOUND", "message": "authz.no-contract-procedure", "code": "procedure_not_found" }` |
+| Declared retired path | 410 | `{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }` |
+| Existing procedure with insufficient permission | 403 | Existing `{ "error": "FORBIDDEN", "message": "authz.missing-scope:…" }` shape |
+
+Missing or invalid credentials still receive the existing 401 `UNAUTHORIZED` response, with no
+procedure code. Availability is disclosed only after authentication. Retired declarations require
+authentication even outside `protect` and inside `allowAnonymous`; they never bypass authentication.
+Existing public contract procedures remain public. Existing procedures, internal audience guards
+and declared raw routes take precedence over retired declarations, so retirement cannot mask a
+permission check. Fallback authorizers cannot revive missing or retired procedures.
+
+Each declaration is a canonical, case-sensitive, mounted absolute path, matched for every method.
+Query strings are ignored. Trailing slashes, encoded spellings, siblings and descendants do not
+match. Parameters, wildcards, percent encoding, dot segments, repeated separators, backslashes,
+whitespace, query/fragment syntax and duplicates are rejected during construction. Declare REST,
+RPC and alias paths separately. For a parameterized removed route, undeclared concrete paths still
+get 404 under guarded coverage; parameterized retirement is not supported. Undeclared paths outside
+protected coverage retain their existing behavior.
+
+HTTP clients can branch on the JSON `code`: `procedure_retired` is the application's signal to
+show “client too old” or request an upgrade; `procedure_not_found` means no procedure is served at
+that guarded path. These pre-dispatch middleware errors are not contract-defined oRPC errors;
+clients reading raw HTTP responses should inspect the JSON code rather than parse `message`.
+`PROCEDURE_ERROR_CODES` and its derived `ProcedureErrorCode` type are exported from both the package
+root and `@netscript/service/auth`. `AuthzDecision.code` carries the optional typed failure, and
+`ProcedurePolicyResolution.retired` marks a matched retired declaration for the shared auth stages.
+Overlay authorizers never set that marker and retain their existing fallback behavior.
 
 The `defineService()` preset accepts the same ports through its `auth` option. The following legacy
 path-prefix form remains valid and behavior-compatible; new services should prefer contract metadata

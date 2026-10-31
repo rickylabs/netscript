@@ -7,6 +7,7 @@ const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.u
 const NEGATIVE_FIXTURE_NAMES = [
   'non-exported-symbol',
   'empty-exemption-reason',
+  'plugin-update-package-specifier',
   'dialect-a-object-input',
   'dialect-a-positional',
   'dialect-b-object-input',

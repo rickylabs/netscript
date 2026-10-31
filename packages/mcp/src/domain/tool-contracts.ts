@@ -141,7 +141,34 @@ export interface DoctorResult {
     readonly import('./doctor-check-family.ts').DoctorFamilyResult[];
 }
 
+const registryPageProperties = {
+  offset: { type: 'integer', minimum: 0, maximum: 100000 },
+  limit: { type: 'integer', minimum: 1, maximum: 20 },
+};
+const registryNameProperty = { type: 'string', minLength: 1, maxLength: 2000 } as const;
+const registryPageShape = objectSchema({
+  items: {
+    type: 'array',
+    maxItems: 20,
+    items: objectSchema({
+      name: stringProperty,
+      type: stringProperty,
+      title: stringProperty,
+      description: stringProperty,
+    }, ['name', 'type']),
+  },
+  total: { type: 'integer', minimum: 0 },
+  nextOffset: { type: 'integer', minimum: 0 },
+}, ['items', 'total']);
+
 const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
+  list_registry_items: objectSchema(registryPageProperties),
+  search_registry_items: objectSchema({
+    ...registryPageProperties,
+    query: { type: 'string', minLength: 1, maxLength: 500 },
+  }, ['query']),
+  view_registry_item: objectSchema({ name: registryNameProperty }, ['name']),
+  get_registry_add_command: objectSchema({ name: registryNameProperty }, ['name']),
   get_app_status: objectSchema({ service: stringProperty, limit: limitProperty }),
   list_runs: objectSchema({
     domain: stringProperty,
@@ -216,6 +243,13 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
 };
 
 const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
+  list_registry_items: registryPageShape,
+  search_registry_items: registryPageShape,
+  view_registry_item: objectSchema({ item: { type: 'object' } }, ['item']),
+  get_registry_add_command: objectSchema({
+    command: { const: 'netscript' },
+    args: { type: 'array', minItems: 2, maxItems: 2, items: stringProperty },
+  }, ['command', 'args']),
   get_app_status: objectSchema({
     status: { enum: ['pass', 'warn', 'fail'] },
     counts: { type: 'object' },

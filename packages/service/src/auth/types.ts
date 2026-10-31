@@ -92,10 +92,32 @@ export interface AuthzRequest {
   readonly rawPath?: string;
 }
 
-/** Authorization decision. */
+/**
+ * Stable machine-readable codes for authenticated requests to unavailable procedures.
+ *
+ * @example
+ * ```ts
+ * import { PROCEDURE_ERROR_CODES } from '@netscript/service/auth';
+ * const upgradeRequired = PROCEDURE_ERROR_CODES.RETIRED;
+ * ```
+ */
+export const PROCEDURE_ERROR_CODES = {
+  NOT_FOUND: 'procedure_not_found',
+  RETIRED: 'procedure_retired',
+} as const;
+
+/** Error code identifying an unknown (404) or explicitly retired (410) procedure. */
+export type ProcedureErrorCode = typeof PROCEDURE_ERROR_CODES[keyof typeof PROCEDURE_ERROR_CODES];
+
+/** Authorization decision; procedure errors stop dispatch after successful authentication. */
 export type AuthzDecision =
   | { readonly allow: true }
-  | { readonly allow: false; readonly reason: string };
+  | {
+    readonly allow: false;
+    readonly reason: string;
+    /** Optional typed procedure failure; other denials retain the ordinary 403 response. */
+    readonly code?: ProcedureErrorCode;
+  };
 
 /** Authorization boundary that decides whether a principal may proceed. */
 export interface AuthorizerPort {

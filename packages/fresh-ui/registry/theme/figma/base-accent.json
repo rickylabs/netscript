@@ -16,7 +16,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/1"
@@ -44,7 +44,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/ink-hover"
+          "alias": "Theme set/gray/d/ink-hover"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/10"
@@ -72,7 +72,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/11"
@@ -100,7 +100,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/12"
@@ -128,7 +128,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/2"
+          "alias": "Theme set/gray/d/2"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/2"
@@ -156,7 +156,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/3"
+          "alias": "Theme set/gray/d/3"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/3"
@@ -184,7 +184,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/4"
+          "alias": "Theme set/gray/d/4"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/4"
@@ -212,7 +212,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/5"
+          "alias": "Theme set/gray/d/5"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/5"
@@ -240,7 +240,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/6"
+          "alias": "Theme set/gray/d/6"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/6"
@@ -268,7 +268,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/7"
+          "alias": "Theme set/gray/d/7"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/7"
@@ -296,7 +296,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/8"
+          "alias": "Theme set/gray/d/8"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/8"
@@ -324,7 +324,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/9"
@@ -352,22 +352,22 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Blue": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Violet": {
           "alias": "Primitives/color/white"
         },
         "Orange": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Indigo": {
           "alias": "Primitives/color/white"
         },
         "Tomato": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Lime": {
           "alias": "Primitives/color/lime/d/11"
@@ -380,7 +380,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/11"
@@ -408,7 +408,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/5"
+          "alias": "Theme set/gray/d/5"
         },
         "Blue": {
           "alias": "Primitives/color/blue/d/9"
@@ -436,22 +436,22 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         },
         "Blue": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Violet": {
           "alias": "Primitives/color/white"
         },
         "Orange": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Indigo": {
           "alias": "Primitives/color/white"
         },
         "Tomato": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         },
         "Lime": {
           "alias": "Primitives/color/lime/d/11"
@@ -465,7 +465,7 @@
       "codeSyntax": "var(--ns-accent-solid-hover)",
       "values": {
         "Ink": {
-          "alias": "Theme/gray/d/6"
+          "alias": "Theme set/gray/d/6"
         },
         "Blue": {
           "alias": "Base accent/accent/d/10"
@@ -493,7 +493,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/1"
+          "alias": "Theme set/gray/l/1"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/1"
@@ -521,7 +521,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/ink-hover"
+          "alias": "Theme set/gray/l/ink-hover"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/10"
@@ -549,26 +549,22 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Blue": {
-          "alias": "Primitives/color/blue/l/11"
+          "alias": "Primitives/color/blue/l/11-hover"
         },
         "Violet": {
           "alias": "Primitives/color/violet/l/11"
         },
-        "Orange": {
-          "alias": "Primitives/color/orange/l/11"
-        },
+        "Orange": "#af4607",
         "Indigo": {
           "alias": "Primitives/color/indigo/l/11"
         },
         "Tomato": {
-          "alias": "Primitives/color/tomato/l/11"
+          "alias": "Primitives/color/tomato/l/11-hover"
         },
-        "Lime": {
-          "alias": "Primitives/color/lime/l/11"
-        }
+        "Lime": "#55702b"
       }
     },
     {
@@ -577,7 +573,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/12"
@@ -605,7 +601,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/2"
+          "alias": "Theme set/gray/l/2"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/2"
@@ -633,7 +629,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/3"
+          "alias": "Theme set/gray/l/3"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/3"
@@ -661,7 +657,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/4"
+          "alias": "Theme set/gray/l/4"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/4"
@@ -689,7 +685,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/5"
+          "alias": "Theme set/gray/l/5"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/5"
@@ -717,7 +713,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/6"
+          "alias": "Theme set/gray/l/6"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/6"
@@ -745,7 +741,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/7"
+          "alias": "Theme set/gray/l/7"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/7"
@@ -773,7 +769,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/8"
+          "alias": "Theme set/gray/l/8"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/8"
@@ -801,7 +797,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/9"
@@ -829,7 +825,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/1"
+          "alias": "Theme set/gray/l/1"
         },
         "Blue": {
           "alias": "Primitives/color/white"
@@ -857,7 +853,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/11"
@@ -885,7 +881,7 @@
       "scopes": [],
       "values": {
         "Ink": {
-          "alias": "Theme/gray/l/ink-hover"
+          "alias": "Theme set/gray/l/ink-hover"
         },
         "Blue": {
           "alias": "Primitives/color/blue/l/11-hover"

@@ -1,0 +1,36 @@
+{
+  "gateId": "publish-assets",
+  "invocationId": "s1b-fixed-publish",
+  "argv": [
+    "deno",
+    "task",
+    "check:publish-assets"
+  ],
+  "cwd": ".",
+  "gitHead": "f836d0256fda694f19234601d092f848e9546505",
+  "actualGitHead": "f836d0256fda694f19234601d092f848e9546505",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:4115181",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "33f1b9d0f2425af46652ecf580a3deb14e2727a112b0bdf8c9d073371120f649",
+  "lifecycleId": "worker:4115181:s1b-fixed-publish:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-31T04:54:57.734Z",
+  "startedAt": "2026-10-31T04:54:57.737Z",
+  "finishedAt": "2026-10-31T04:54:58.358Z",
+  "durationMs": 622,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 198,
+    "sha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b",
+    "tail": "Task check:publish-assets deno task gen:publish-assets --check\nTask gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'\n",
+    "truncated": false
+  }
+}

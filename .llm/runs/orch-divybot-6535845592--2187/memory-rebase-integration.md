@@ -1,0 +1,3 @@
+# Rebase #2187 onto watcher recovery
+
+#2484 changes finite watcher iterable completion into a retryable failure. Synthetic observation fixtures must signal completion after yielding all inputs but keep the iterable open until stop; use a separate sourceStopped promise. Preserve AsyncLocalStorage callback cancellation by constructing the async keyed event before entering #invokeCallback. The combined suite (core, watchers, trigger runtime) passes 140 tests with 3 Redis-only skips. When the clone has no task-branch remote-tracking ref, bind force-with-lease to a fresh git ls-remote value, not an inferred origin/<branch> ref. The owner's explicit rebase/force-push request supersedes the earlier no-force rule for this synchronization.

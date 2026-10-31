@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--unstable-kv",
+    "--allow-all",
+    "packages/auth-kv-oauth/tests/"
+  ],
+  "exitCode": 1,
+  "durationMs": 3241,
+  "summary": {
+    "passed": 50,
+    "failed": 5,
+    "ignored": 0,
+    "totalResults": 55,
+    "uniqueFailures": 3
+  },
+  "failures": [
+    {
+      "message": "URIError: URI malformed\n    at decodeURIComponent (<anonymous>)\n    at parseCookieHeader (file://<cwd>/packages/auth-kv-oauth/src/cookies.ts:<line>:<column>)\n    at file://<cwd>/packages/auth-kv-oauth/tests/cookie-policy_test.ts:<line>:<column>",
+      "count": 3,
+      "tests": [
+        {
+          "name": "\\#2115 cookie parsing preserves the session beside an undecodable foreign cookie",
+          "file": "./packages/auth-kv-oauth/tests/cookie-policy_test.ts",
+          "line": 31
+        },
+        {
+          "name": "\\#2115 cookie parsing skips malformed escapes and UTF-8 in any position",
+          "file": "./packages/auth-kv-oauth/tests/cookie-policy_test.ts",
+          "line": 37
+        },
+        {
+          "name": "\\#2115 cookie parsing retains the last valid duplicate value",
+          "file": "./packages/auth-kv-oauth/tests/cookie-policy_test.ts",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "message": "URIError: URI malformed\n    at decodeURIComponent (<anonymous>)\n    at parseCookieHeader (file://<cwd>/packages/auth-kv-oauth/src/cookies.ts:<line>:<column>)\n    at Object.cookie (file://<cwd>/packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts:<line>:<column>)\n    at resolveSessionCredential (file://<cwd>/packages/auth-kv-oauth/src/backend.ts:<line>:<column>)\n    at Object.authenticate (file://<cwd>/packages/auth-kv-oauth/src/backend.ts:<line>:<column>)\n    at file://<cwd>/packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "\\#2115 backend session reads and signout tolerate malformed foreign cookies",
+          "file": "./packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts",
+          "line": 366
+        }
+      ]
+    },
+    {
+      "message": "URIError: URI malformed\n    at decodeURIComponent (<anonymous>)\n    at parseCookieHeader (file://<cwd>/packages/auth-kv-oauth/src/cookies.ts:<line>:<column>)\n    at Object.handleCallback (file://<cwd>/packages/auth-kv-oauth/src/flow.ts:<line>:<column>)\n    at file://<cwd>/packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "flow performs sign-in and callback with single-use state and a malformed foreign cookie",
+          "file": "./packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts",
+          "line": 155
+        }
+      ]
+    }
+  ]
+}

@@ -416,6 +416,318 @@
     }
   },
   {
+    "name": "theme-ledger",
+    "kind": "theme",
+    "author": "NetScript",
+    "copyOwnership": "app-owned-after-copy",
+    "description": "ledger language preset; fixed compact density (Dense Figma geometry).",
+    "tags": [
+      "theme",
+      "tokens",
+      "ledger"
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/ledger.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ledger.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "meta": {
+      "preset": {
+        "version": 2,
+        "id": "ledger",
+        "language": "ledger",
+        "flavor": null,
+        "density": "compact",
+        "sourceDensity": "Dense"
+      }
+    }
+  },
+  {
+    "name": "theme-signal",
+    "kind": "theme",
+    "author": "NetScript",
+    "copyOwnership": "app-owned-after-copy",
+    "description": "signal language preset; fixed compact density (Dense Figma geometry).",
+    "tags": [
+      "theme",
+      "tokens",
+      "signal"
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/signal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/signal.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "meta": {
+      "preset": {
+        "version": 2,
+        "id": "signal",
+        "language": "signal",
+        "flavor": null,
+        "density": "compact",
+        "sourceDensity": "Dense"
+      }
+    }
+  },
+  {
+    "name": "theme-glass",
+    "kind": "theme",
+    "author": "NetScript",
+    "copyOwnership": "app-owned-after-copy",
+    "description": "glass language preset; fixed comfortable density (Comfortable Figma geometry).",
+    "tags": [
+      "theme",
+      "tokens",
+      "glass"
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/glass.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/glass.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "meta": {
+      "preset": {
+        "version": 2,
+        "id": "glass",
+        "language": "glass",
+        "flavor": null,
+        "density": "comfortable",
+        "sourceDensity": "Comfortable"
+      }
+    }
+  },
+  {
+    "name": "theme-macos-27",
+    "kind": "theme",
+    "author": "NetScript",
+    "copyOwnership": "app-owned-after-copy",
+    "description": "macos-27 language preset; fixed comfortable density (Comfortable Figma geometry).",
+    "tags": [
+      "theme",
+      "tokens",
+      "macos-27"
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/macos-27.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/macos-27.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "meta": {
+      "preset": {
+        "version": 2,
+        "id": "macos-27",
+        "language": "macos-27",
+        "flavor": null,
+        "density": "comfortable",
+        "sourceDensity": "Comfortable"
+      }
+    }
+  },
+  {
+    "name": "theme-apple-classic",
+    "kind": "theme",
+    "author": "NetScript",
+    "copyOwnership": "app-owned-after-copy",
+    "description": "apple-classic language preset; fixed comfortable density (Comfortable Figma geometry).",
+    "tags": [
+      "theme",
+      "tokens",
+      "apple-classic"
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/apple-classic.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/apple-classic.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "meta": {
+      "preset": {
+        "version": 2,
+        "id": "apple-classic",
+        "language": "apple-classic",
+        "flavor": null,
+        "density": "comfortable",
+        "sourceDensity": "Comfortable"
+      }
+    }
+  },
+  {
+    "name": "theme-fluent-2-web",
+    "kind": "theme",
+    "author": "NetScript",
+    "copyOwnership": "app-owned-after-copy",
+    "description": "fluent-2-web language preset; fixed comfortable density (Comfortable Figma geometry).",
+    "tags": [
+      "theme",
+      "tokens",
+      "fluent-2-web"
+    ],
+    "registryDependencies": [
+      "cn",
+      "public-types"
+    ],
+    "files": [
+      {
+        "source": "registry/theme/styles.css",
+        "target": "@assets/styles.css"
+      },
+      {
+        "source": "registry/theme/theme-bridge.css",
+        "target": "@assets/theme-bridge.css"
+      },
+      {
+        "source": "registry/theme/tokens.json",
+        "target": "@assets/tokens.json"
+      },
+      {
+        "source": "registry/theme/fonts.json",
+        "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/fluent-2-web.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent-2-web.json",
+        "target": "@assets/theme-preset.json"
+      }
+    ],
+    "meta": {
+      "preset": {
+        "version": 2,
+        "id": "fluent-2-web",
+        "language": "fluent-2-web",
+        "flavor": null,
+        "density": "comfortable",
+        "sourceDensity": "Comfortable"
+      }
+    }
+  },
+  {
     "name": "theme-tonal",
     "kind": "theme",
     "author": "NetScript",

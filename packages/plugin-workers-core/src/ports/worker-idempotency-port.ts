@@ -11,6 +11,8 @@ export type WorkerIdempotencyInput = Readonly<{
   idempotencyKey?: string;
   /** Queue message identifier, stable across redelivery for durable queue adapters. */
   messageId?: string;
+  /** Broker delivery generation, increasing only after the previous visibility lease is lost. */
+  deliveryCount?: number;
   /** Payload used for the hash fallback when no explicit key exists. */
   payload?: unknown;
 }>;
@@ -25,6 +27,8 @@ export type WorkerIdempotencyClaim = Readonly<{
   source: WorkerIdempotencySource;
   /** True only when a completed applied marker already exists. */
   alreadyApplied: boolean;
+  /** Opaque owner token used to fence completion and release after queue redelivery. */
+  token?: string;
 }>;
 
 /**
@@ -36,7 +40,7 @@ export interface WorkerIdempotencyPort {
   /** Atomically claim this delivery before running effects. */
   claim(input: WorkerIdempotencyInput): Promise<WorkerIdempotencyClaim>;
   /** Mark a claimed key as applied after effects complete successfully. */
-  markApplied(key: string, ttlMs?: number): Promise<void>;
+  markApplied(key: string, ttlMs?: number, token?: string): Promise<void>;
   /** Release an active claim after failed effects so retry can re-run. */
-  release(key: string): Promise<void>;
+  release(key: string, token?: string): Promise<void>;
 }

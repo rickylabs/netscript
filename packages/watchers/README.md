@@ -18,6 +18,8 @@ actually wants to consume.
 
 ## Why teams use it
 
+- **Explicit native mode** — `strategy: 'native'` emits an error diagnostic and rejects on failure
+  without starting polling. Explicit strategy selection overrides automatic heuristics.
 - **Auto-selected strategy** — `FileWatcher` chooses native OS notifications for local paths and
   polling for network shares; set `forcePolling: true` for SMB/NFS mounts where native events are
   unreliable.
@@ -80,15 +82,44 @@ try {
 
 The loop yields each `*.csv` created or modified under `./incoming` — scanning existing files on startup within 24h, debouncing rapid bursts per path, and waiting until the file has stayed unchanged for three consecutive checks before downstream processing consumes it.
 
+## Native mode and recovery
+
+```ts
+import { createWatcher } from '@netscript/watchers';
+
+const watcher = createWatcher({
+  paths: ['./incoming'],
+  strategy: 'native',
+  onError: ({ error }) => console.error('Native watch failed', error),
+});
+try {
+  for await (const event of watcher.watch()) console.log(event.path);
+} finally {
+  watcher.stop();
+}
+```
+
+Native mode never selects polling, including when native setup fails. `onError` receives a typed
+error diagnostic before the iterator rejects with the original error. Error-hook failures cannot
+mask it. `onReady` reports acquired resources without waiting for a file change; cancellation
+completes without an error diagnostic. A removed root fails the watch even if `remove` events are
+filtered out. Standalone watchers do not retry: create a fresh instance for each session or recovery
+attempt. The trigger adapter adds bounded retry and per-trigger health.
+
+Explicit `strategy` values (`native`, `polling`, `hybrid`) override `forcePolling` and network-path
+heuristics. Omitting `strategy` preserves automatic selection. Detection is best effort; changes
+during downtime are not replayed. Each watch processes its stream serially, and `stop()` cancels
+pending native or polling waits.
+
 ## Public surface
 
 | Symbol group                                                             | What it gives you                          |
 | ------------------------------------------------------------------------ | ------------------------------------------ |
 | `createWatcher`, `FileWatcher`                                           | The watcher runtime and its factory        |
 | `GlobFilter`, `DebounceFilter`, `StabilityFilter`, `DedupFilter`         | The composable filter pipeline             |
-| `NativeStrategy`, `PollingStrategy`, `HybridStrategy`                    | Watch strategies behind the auto-selection |
+| `NativeStrategy`, `PollingStrategy`, `HybridStrategy`                    | Internal strategy types; select through watcher options |
 | `safeReadFile`, `safeStat`, `computeContentHash`, `AccessFailureTracker` | Resilient filesystem helpers               |
-| `WatchEvent`, `WatcherOptions`, `EventKind`, `WatchStrategy`             | The typed event contract                   |
+| `WatchEvent`, `WatcherErrorEvent`, `WatcherOptions`, `EventKind`, `WatchStrategy` | The typed event and diagnostic contracts                   |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/watchers@<version>`](https://jsr.io/@netscript/watchers/doc) (pin

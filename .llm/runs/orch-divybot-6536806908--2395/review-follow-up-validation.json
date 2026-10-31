@@ -1,0 +1,217 @@
+{
+  "evidenceScope": "Rebased working tree with all four review fixes, prior to final exact pushed-head evaluation. Command summaries do not replace durable receipts.",
+  "gates": [
+    {
+      "gate": "combined-final",
+      "rawReportSha256": "1b101fce646ab9237114da4cb97373d6b202e11f13014c8eb90fb4a615d5611a",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "packages/queue/tests",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-concurrency_test.ts",
+        "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+        "plugins/workers/worker",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 275,
+        "failed": 0,
+        "ignored": 2,
+        "totalResults": 277,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "transport-prefix-negative",
+      "rawReportSha256": "3c2d28c6f2ec895bd7aaa7c62d1976af5d8247ac26a64aa98977e4e2c7464e6b",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/queue/tests/redis-lease-prefix_test.ts",
+        "packages/queue/tests/redis-lease-outage_test.ts"
+      ],
+      "exitCode": 1,
+      "summary": {
+        "passed": 6,
+        "failed": 4,
+        "ignored": 0,
+        "totalResults": 10,
+        "uniqueFailures": 2
+      },
+      "expectedExitCode": 1,
+      "failingTests": [
+        "Redis prefixed receipts recover, renew, settle and dead-letter without double prefix",
+        "Garnet prefixed receipts recover, renew, settle and dead-letter without double prefix",
+        "Redis an open connection with missing replies does not terminate consumption",
+        "Garnet an open connection with missing replies does not terminate consumption"
+      ]
+    },
+    {
+      "gate": "worker-negative",
+      "rawReportSha256": "5bb6a4bbe75c92e63b735c277bd1f096f6809fb046e66ebab5d0bc9de560597d",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "--no-check",
+        "--filter",
+        "/replacement|healthy|newer broker/",
+        "plugins/workers/worker/redis-worker-lease_test.ts",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts"
+      ],
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 7,
+        "ignored": 0,
+        "totalResults": 7,
+        "uniqueFailures": 4
+      },
+      "expectedExitCode": 1,
+      "failingTests": [
+        "Redis a healthy task subprocess outlives the default lease without being reclaimed",
+        "Garnet a healthy task subprocess outlives the default lease without being reclaimed",
+        "Redis a replacement task executes after a process dies with an active marker",
+        "Garnet a replacement task executes after a process dies with an active marker",
+        "Redis a replacement job executes after a process dies with an active marker",
+        "Garnet a replacement job executes after a process dies with an active marker",
+        "newer broker delivery takes over its stranded marker and fences the former owner"
+      ]
+    },
+    {
+      "gate": "worker-integration",
+      "rawReportSha256": "bf751e525a541d3cb4d680b907f111984a42c6ecee7ffe4ad694cc6b08f4372a",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/redis-worker-lease_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 7,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "cancellation",
+      "rawReportSha256": "c222bf861f42eeedef598785382d7c2f40ce87b81aa2a28a716ece9e8f02c1ad",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/delivery-lease_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 3,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "check",
+      "rawReportSha256": "a7058ed3f65919ccfdeb9a339e57f66b41c4e98a252ef74b3037cbe6358ff44d",
+      "command": "deno check --unstable-kv <files>",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 101,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "gate": "lint",
+      "rawReportSha256": "c94afb8881401a501cd76295ee4fa70c1ef1082efeeb88a610a2b88973b3e823",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 101,
+        "batches": 3,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 101,
+        "filesProcessed": 101,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "format",
+      "rawReportSha256": "d9db40d8e456aff2ecbd200c015d6863ad15944c8a598f14d28adf73ba376011",
+      "command": "deno fmt",
+      "summary": {
+        "filesSelected": 101,
+        "batches": 3,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 101,
+        "filesProcessed": 101,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "corpus-tests",
+      "rawReportSha256": "d863cd07c48627206150779b9ca0a0b6de7b2b5ae523714dd44cd2613d5b2ef1",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/mcp/tests/embedded-export-surface-corpus_test.ts",
+        "packages/mcp/tests/export-surface-flows_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 7,
+        "uniqueFailures": 0
+      }
+    }
+  ],
+  "additionalGates": {
+    "qualityArchitectureDependencies": "PASS (exit 0), durable receipt retained privately; rerun on committed exact head",
+    "mcpCorpusFreshness": "PASS (exit 0), durable native gate receipt",
+    "assetsBarrel": "PASS",
+    "publishAssets": "PASS",
+    "workerCorePublicationDryRun": "PASS",
+    "workerCoreCombinedDocLint": "2 identical baseline private-type-ref diagnostics in unchanged workers.contract-types.ts, verified with old source restored",
+    "scaffoldRuntimeCI": "UNPROVEN: coordinator-owned e2e-cli-gate is required; not armed at recording time",
+    "finalExactHeadEvaluation": "PENDING: final independent round5 after push"
+  }
+}

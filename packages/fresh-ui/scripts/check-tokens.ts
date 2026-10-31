@@ -10,13 +10,14 @@ import {
   evaluateTokenContrast,
 } from '../src/tokens/domain/check-token-contrast.ts';
 import type { TokenDocument } from '../src/tokens/domain/token-contract.ts';
+import { INACTIVE_COMPONENT_CONTRAST } from '../src/tokens/domain/contrast-contract.ts';
 import { tokenAlias } from '../src/tokens/domain/token-contract.ts';
 import roleRegistry from '../tokens/role-manifest.json' with { type: 'json' };
 
-const CONTROLS = ['unknown-name', 'raw-semantic', 'contrast'];
+const CONTROLS = ['unknown-name', 'raw-semantic', 'contrast', 'exempt-active'];
 
 if (Deno.args.includes('--help')) {
-  console.log('tokens:validate [--report] [--negative-control=unknown-name|raw-semantic|contrast]');
+  console.log(`tokens:validate [--report] [--negative-control=${CONTROLS.join('|')}]`);
 } else {
   try {
     const control = Deno.args.find((arg) => arg.startsWith('--negative-control='))?.split('=')[1];
@@ -52,6 +53,10 @@ if (Deno.args.includes('--help')) {
       actual.size !== expected.length || expected.some((key) => !actual.has(key))
     ) throw new Error('Contrast check is missing a requested preset/scheme/density context');
     const coverage = defaultContrastCoverage();
+    if (control === 'exempt-active') {
+      const active = coverage.pairs.find((pair) => pair.foreground === 'fg')!;
+      Object.assign(active, { exemption: INACTIVE_COMPONENT_CONTRAST.exemption });
+    }
     const checked = control === 'contrast'
       ? {
         ...coverage,
@@ -90,7 +95,7 @@ if (Deno.args.includes('--help')) {
       console.log(
         `Token quality PASS: ${build.contexts.length} inputs, ${actual.size} effective contexts, ${
           Object.keys(roleRegistry.roles).length
-        } registered roles, ${report.checks} contrast uses, ${report.excluded.length} exact source exclusions.`,
+        } registered roles, ${report.checks} contrast uses, ${report.excluded.length} exact source exclusions, ${report.exempt.length} exempt inactive text uses.`,
       );
     }
   } catch (error) {

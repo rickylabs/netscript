@@ -66,3 +66,25 @@ bump. Reproduce native parity, inspect the exact diff, then run all remaining qu
 that CI skipped after parity so the final fifth evaluator round is not spent prematurely.
 The fourth implementation verdict is MERGE at a4dc70531c3e3a8c3139ecfa16419126c9551463;
 only one owner-authorized feature evaluation round remains. Reuse the same independent session.
+
+
+## 2026-10-31 reconciliation relaunch mc009d-r2-2396
+
+Implementer: Codex (OpenAI family), feature tier, owner-requested high effort.
+Baseline PR head: c875e3893458f92a701239ff10461df2c56c2c9f.
+Incoming main: 7ee9c3ed04607eb0967f9ef0ef4cd874652817aa.
+Existing branch fix/native-host-policy and existing PR2421 only.
+Write scope: this run directory; merge incoming main verbatim; retain both debt-registry
+sides; canonical generators may update packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts,
+packages/mcp/src/publish-assets.generated.ts and packages/cli/src/kernel/assets/*generated.ts,
+plus their canonical generated inputs. No authored feature source or tests will be rewritten.
+A generated prerequisite outside this set must be recorded before writing.
+
+The feature matrix was queried with --json. Owner evaluator override (verbatim):
+"Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only."
+Owner additionally authorizes "one exact-head IMPL-EVAL on the merge delta only" in this
+relaunch after the earlier feature review loop ended. This is a newly authorized merge
+reconciliation review, not a sixth source-feature evaluation. The source review history remains.
+Both evaluator phases use independent Anthropic sessions and read-only tools; private
+execution metadata stays outside Git. No labels/milestones, local scaffold.runtime, rebase,
+force-push, main merge, tag, release or new PR.

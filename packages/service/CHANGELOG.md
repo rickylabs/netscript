@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Changed:** Strict contract authorization returns 404 `procedure_not_found` for authenticated
+  requests to unknown guarded procedures. `retiredPaths` declares exact mounted paths returning
+  410 `procedure_retired`; both retain the existing anonymous 401 refusal. Live procedure/raw
+  policies and internal audience guards take precedence. Export `PROCEDURE_ERROR_CODES` and
+  `ProcedureErrorCode` from root and `./auth`; `AuthzDecision.code` selects typed failures and
+  `ProcedurePolicyResolution.retired` marks a retired match. Permission denials remain 403.
+
 - **Added:** `AnonymousRequestMatch` and `AnonymousRule` support exact method/path entries in
   `allowAnonymous`, exported from the root and `./auth`. Legacy string prefixes and omitted/empty
   defaults remain; GET and HEAD need separate entries. Invalid exact entries fail before listen.

@@ -110,3 +110,26 @@ paths and both plugin export maps remain byte-identical to reviewed94393bc8. Inc
 source is retained exactly from main. This carrier-only continuation finalizes the coherent
 merge tree; post-merge root/union tests/quality are running. Its new exact-head independent
 sign-off remains unproven at the spent5-round cap and must be decided by the coordinator.
+
+
+## Current relaunch mc009d-r2-2396
+
+The owner explicitly authorized one new merge-delta review after the historical feature loop.
+See supervisor.md and reconciliation-plan.md. Independent reconciliation PLAN-EVAL PASS.
+Merged7ee9c3ed04607eb0967f9ef0ef4cd874652817aa with exactly the coordinator's three
+non-source conflicts. All debt headings from both parents remain. Factory source unchanged.
+Carrier seeds were replaced by canonical prose/publish/corpus/barrel generation; no generated
+rows were hand-resolved. Corpus35 packages/306 subpaths/9074 symbols. Four freshness checks,
+quality/architecture, Aspire parity, docs accuracy and release preflight PASS. Wrapper
+check/native tests are running; final results will be recorded before the final handoff.
+New raw logs/receipts remain outside Git; reconciliation-gates.json is a privacy-safe summary.
+Incoming main has since advanced to1d274c16bd3163eb72a40ea3f2e3f0523861159f; a normal
+follow-up merge and targeted regeneration will precede final independent exact-head review.
+No runtime CI, published graph or merge-readiness claim is inferred from local gates.
+
+Combined suite terminal:1526 passed/1 failed/16 ignored. Sole failure is workers non-contract
+entrypoint doc lint, private-type-ref: native AuthzDecision now references ProcedureErrorCode
+(introduced on incoming main). Full original test remains red; no test assertion or export/debt
+bound is changed. Both factories still preserve their reviewed source. This merge-only brief
+expressly forbids reimplementation; closure repair would grow the exact22/21 named surfaces
+and requires coordinator disposition. Report acceptance8 and complete-suite proof as unproven.

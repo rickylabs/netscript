@@ -66,3 +66,6 @@ S3 pre-implementation finding: native auth defaults guard `/api`, while streams 
 `/v1/stream` paths. Existing factory tests explicitly select `protect: ['/']`, but the adopted
 streams JSDoc examples omit it. Correct those examples and explicitly test/document native
 raw-route policy selection. Do not silently rewrite caller policy or duplicate #2364.
+
+
+Relaunch: audited live PR2421 head c875e3893458f92a701239ff10461df2c56c2c9f and current main7ee9c3ed04607eb0967f9ef0ef4cd874652817aa. Existing PR covers the feature; only integration requested. MCP find_guidance and search_docs consulted. RTK remains unavailable. Existing memory confirms four-carrier chain and canonical corpus --allow-dirty support.

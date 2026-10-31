@@ -34,6 +34,7 @@ export function formatFigmaCollection(collection: FigmaCollection): FigmaCollect
 }
 
 function figmaValue(token: BuiltToken): string | number {
+  if (token.sourceStyle) return token.sourceStyle;
   if (token.hex) return token.hex;
   const value: TokenValue = token.resolved;
   if (

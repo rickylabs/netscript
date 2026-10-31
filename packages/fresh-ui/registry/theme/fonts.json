@@ -35,13 +35,37 @@
     "studio-signal": [
       "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
     ],
+    "ledger": [
+      "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap",
+      "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    ],
+    "signal": [
+      "https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap",
+      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    ],
+    "glass": [
+      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    ],
+    "macos-27": [
+      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    ],
+    "apple-classic": [
+      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    ],
+    "fluent-2-web": [
+      "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap",
+      "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+    ],
     "tonal": [
       "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap",
       "https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500;600&display=swap"
     ],
     "bloom": [
-      "https://fonts.googleapis.com/css2?family=Funnel+Display:wght@500&display=swap",
-      "https://fonts.googleapis.com/css2?family=Funnel+Sans:wght@400;600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400&display=swap",
+      "https://fonts.googleapis.com/css2?family=Funnel+Sans:wght@400;500&display=swap",
       "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap"
     ],
     "cupertino": [
@@ -49,7 +73,7 @@
       "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     ],
     "liquid": [
-      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap",
+      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@600&display=swap",
       "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     ],
     "fluent": [
@@ -64,11 +88,10 @@
     "filigrane": [
       "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&display=swap",
       "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap",
-      "https://fonts.googleapis.com/css2?family=Newsreader:wght@200;300&display=swap"
+      "https://fonts.googleapis.com/css2?family=Newsreader:wght@300&display=swap"
     ],
     "terminal": [
-      "https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap",
-      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+      "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap"
     ],
     "pixel": [
       "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap",
@@ -78,7 +101,7 @@
     ],
     "tactile": [
       "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap",
-      "https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap"
+      "https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&display=swap"
     ]
   }
 }

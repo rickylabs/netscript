@@ -1,0 +1,312 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "style-builder-G5b (filigrane)",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "page": "37:6",
+ "styleComponents": "465:98595",
+ "modes": "Theme set A 239:7, Theme Filigrane 2:6, Scheme Light 3:0, Density Comfortable 3:2 (explicit on Style components); review/strip columns set Scheme Light 3:0 / Dark 3:1",
+ "categoryFrames": {
+  "Actions": "465:98596",
+  "Forms": "465:98602",
+  "Navigation": "465:98608",
+  "Overlays": "465:98614",
+  "Data display 1": "465:98620"
+ },
+ "setsFrames": {
+  "Actions": "465:98601",
+  "Forms": "465:98607",
+  "Navigation": "465:98613",
+  "Overlays": "465:98619",
+  "Data display 1": "465:98625"
+ },
+ "kitsRenamed": {
+  "37:22": "Filigrane/Specimen kit/Button",
+  "37:44": "Filigrane/Specimen kit/Field",
+  "37:60": "Filigrane/Specimen kit/Status",
+  "37:67": "Filigrane/Specimen kit/Tab",
+  "37:72": "Filigrane/Specimen kit/Checkbox"
+ },
+ "sets": [
+  {
+   "name": "Filigrane/Icon",
+   "id": "465:105323",
+   "baseId": "252:11798",
+   "variants": 3
+  },
+  {
+   "name": "Filigrane/Spinner",
+   "id": "465:105330",
+   "baseId": "252:11837",
+   "variants": 18
+  },
+  {
+   "name": "Filigrane/.Focus ring",
+   "id": "465:105385",
+   "baseId": "252:11805",
+   "variants": 0
+  },
+  {
+   "name": "Filigrane/.State layer",
+   "id": "465:105387",
+   "baseId": "252:11806",
+   "variants": 0
+  },
+  {
+   "name": "Filigrane/Button / md",
+   "id": "465:105388",
+   "baseId": "253:372",
+   "variants": 30
+  },
+  {
+   "name": "Filigrane/Button / lg",
+   "id": "465:112127",
+   "baseId": "254:721",
+   "variants": 30
+  },
+  {
+   "name": "Filigrane/Button / sm",
+   "id": "465:112404",
+   "baseId": "254:371",
+   "variants": 30
+  },
+  {
+   "name": "Filigrane/Button / xs",
+   "id": "465:112681",
+   "baseId": "254:1071",
+   "variants": 30
+  },
+  {
+   "name": "Filigrane/Icon button / md",
+   "id": "465:112958",
+   "baseId": "255:262",
+   "variants": 25
+  },
+  {
+   "name": "Filigrane/Icon button / lg",
+   "id": "465:113164",
+   "baseId": "255:740",
+   "variants": 25
+  },
+  {
+   "name": "Filigrane/Icon button / sm",
+   "id": "465:113370",
+   "baseId": "255:501",
+   "variants": 25
+  },
+  {
+   "name": "Filigrane/Icon button / xs",
+   "id": "465:113576",
+   "baseId": "255:979",
+   "variants": 25
+  },
+  {
+   "name": "Filigrane/Toggle / md",
+   "id": "466:45877",
+   "baseId": "256:281",
+   "variants": 16
+  },
+  {
+   "name": "Filigrane/Toggle / sm",
+   "id": "466:46026",
+   "baseId": "256:437",
+   "variants": 16
+  },
+  {
+   "name": "Filigrane/Toggle / lg",
+   "id": "466:46175",
+   "baseId": "256:593",
+   "variants": 16
+  },
+  {
+   "name": "Filigrane/Icon toggle / md",
+   "id": "466:46324",
+   "baseId": "276:8291",
+   "variants": 16
+  },
+  {
+   "name": "Filigrane/Icon toggle / sm",
+   "id": "466:46441",
+   "baseId": "276:8431",
+   "variants": 16
+  },
+  {
+   "name": "Filigrane/Icon toggle / lg",
+   "id": "466:46558",
+   "baseId": "276:8571",
+   "variants": 16
+  },
+  {
+   "name": "Filigrane/.Action bar / actions",
+   "id": "466:65710",
+   "baseId": "258:544",
+   "variants": 0
+  },
+  {
+   "name": "Filigrane/Action bar",
+   "id": "466:65782",
+   "baseId": "258:663",
+   "variants": 2
+  },
+  {
+   "name": "Filigrane/Button group",
+   "id": "466:65960",
+   "baseId": "257:839",
+   "variants": 6
+  },
+  {
+   "name": "Filigrane/Toggle group",
+   "id": "466:66526",
+   "baseId": "257:528",
+   "variants": 12
+  },
+  {
+   "name": "Filigrane/Theme toggle",
+   "id": "466:67255",
+   "baseId": "258:742",
+   "variants": 6
+  },
+  {
+   "name": "Filigrane/Label",
+   "id": "467:3813",
+   "baseId": "278:45",
+   "variants": 6,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Input",
+   "id": "467:3838",
+   "baseId": "279:312",
+   "variants": 24,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Select",
+   "id": "467:4039",
+   "baseId": "281:1023",
+   "variants": 24,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Textarea",
+   "id": "467:4212",
+   "baseId": "280:597",
+   "variants": 12,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Select content",
+   "id": "467:4331",
+   "baseId": "281:826",
+   "variants": 0,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Checkbox",
+   "id": "467:4337",
+   "baseId": "283:1470",
+   "variants": 15,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Radio",
+   "id": "467:4471",
+   "baseId": "284:1828",
+   "variants": 10,
+   "category": "Forms"
+  },
+  {
+   "name": "Filigrane/Switch",
+   "id": "467:4574",
+   "baseId": "285:2329",
+   "variants": 20,
+   "category": "Forms"
+  }
+ ],
+ "categories": {
+  "Actions": {
+   "status": "done",
+   "sets": 23,
+   "review": "466:77886",
+   "strip": "466:79029",
+   "png": [
+    "review/styles/filigrane/actions.png",
+    "review/styles/filigrane/actions-strip.png"
+   ],
+   "swapTest": "32/32 pass (Light+Dark)",
+   "deviations": [
+    "Hover/pressed underline on boxed and ghost buttons is a theme-only 'underline' rect inside a theme-only 'label-wrap' frame (the base link variant's own anatomy, extended to every variant); hidden at rest",
+    "Icon button hover underline is a theme-only absolute 'underline' under the glyph (boxed variants only)",
+    "Toggle default variant has padding 0 (no box) so the 2px tabs/sel-border underline (theme-only 'underline', root bottom) spans icon+label; outline keeps padding 0/18 (sm 14, lg 22)",
+    "Toggle group segmented adds paddingBottom 1 and a theme-only 'baseline' so the selected underline sits on the 1px border/strong baseline; vertical puts the baseline on the inline-start edge",
+    "Action bar inline adds theme-only 'margin-bar' (3px primary/default at x -8); floating is F.panel 48 tall",
+    "Button group text part height follows its buttons (32/40/48)",
+    "Spinner arc for primary/neutral tones is text/fg; status tones keep their tone arc",
+    "Action bar 'actions' INSTANCE_SWAP default now points at Filigrane/.Action bar / actions",
+    "Heights, paddings and gaps are literals (Filigrane binds no Density variable); radius bindings kept (all resolve 0)"
+   ]
+  },
+  "Forms": {
+   "status": "in progress (stopped: Figma MCP plan call limit reached)",
+   "built": [
+    "Label",
+    "Input",
+    "Select",
+    "Textarea",
+    "Select content",
+    "Checkbox",
+    "Radio",
+    "Switch"
+   ],
+   "verified": "NOT yet: the script returned without error, but the screenshot call was refused by the rate limit, so these 8 sets have not been inspected visually or regridded-checked",
+   "remainingSets": [
+    "Radio group (284:1885)",
+    "Field (287:2656)",
+    "Field set (287:2743)",
+    "Input group (297:3861)",
+    "OTP slot (301:4385)",
+    "Input OTP (301:4490)",
+    "Slider (303:5022)",
+    "Combobox (305:5623)",
+    "Calendar day (307:6154)",
+    "Calendar (309:8620)",
+    "Date picker (313:14889)",
+    "Search (316:16426)",
+    "Dropzone (319:16832)"
+   ],
+   "remainingWork": [
+    "screenshot the Forms sets frame 465:98607 and fix defects in the 8 built sets",
+    "build the 13 remaining sets",
+    "Forms review frame + strip (build() helper as in Actions) with swap test; set the Forms Doc/Section label 465:98603 text",
+    "PNG review/styles/filigrane/forms.png and forms-strip.png"
+   ],
+   "pendingSwaps": [
+    "Select content rows (base Menu item) -> Filigrane/Menu item type=option (after Overlays)",
+    "Combobox chips -> Filigrane/Badge subtle (after Data display 1)",
+    "Date picker open -> Filigrane/Popover + Filigrane/Calendar (after Overlays)"
+   ],
+   "deviations": [
+    "Input/Select/Textarea: theme-only absolute 'underline' rect (F.hair) at the field bottom; padding 2/0/(6+underline)/0 as measured on kit 37:44 (md 37/38, sm 29/30)",
+    "Input/Textarea: theme-only BOOLEAN 'caret' (default false) bound to the base caret part, which is now 1x20 text/fg after the value",
+    "Textarea resize-handle unbound from 'resize' and hidden (default kept true); its underline sits on the content frame so the counter reads under it",
+    "Radio indicator ellipse replaced by a 6x6 rectangle named 'indicator'; Switch thumb ellipse replaced by a square frame named 'thumb' (width/height re-bound to size/switch/thumb or thumb-sm)",
+    "Checkbox/Radio/Switch disabled recolour (border/default, text/muted) with root opacity unbound to 1; checked+disabled draws no fill",
+    "Label disabled binds root opacity to state/disabled-opacity (R.disabled)"
+   ]
+  },
+  "Navigation": {
+   "status": "not started"
+  },
+  "Overlays": {
+   "status": "not started"
+  },
+  "Data display 1": {
+   "status": "not started"
+  }
+ },
+ "remaining": "Forms (13 sets + verification of 8 built + review/strip), Navigation, Overlays, Data display 1. Resume with the Actions script helpers (prelude: V map by name, sp() seeded paints, role() text roles incl. F.lead 17/28, fixCommon() ring/state-layer/spinner swaps, regrid(), swapKeep()/sweep() for nested swaps, build() for review+strip).",
+ "lessons": [
+  "frame.resize() after setting primaryAxisSizingMode='AUTO' resets it to FIXED: the Style components frame was clipped to 400px and every screenshot inside it came back 1x1 or blank. Set sizing modes after resize, and keep clipsContent false on the section frames",
+  "Figma MCP plan call limit (Full seat, Professional): reached after ~20 Figma calls in this session; both use_figma and get_screenshot are refused until the limit resets. Batch more per call (whole category per script) when resuming",
+  "Swap tests use plain swapComponent() on base instances with TEXT/BOOLEAN overrides; nested composite swaps use swapKeep (swap + resetOverrides + re-apply TEXT/BOOLEAN/INSTANCE_SWAP props + restore layer name), which avoids stale size overrides from the base"
+ ]
+}

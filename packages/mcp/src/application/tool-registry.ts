@@ -9,6 +9,10 @@ import {
 import { createPlannedFlow } from './flows/planned-flow.ts';
 
 const kinds: Readonly<Record<ToolName, ToolKind>> = {
+  list_registry_items: 'read',
+  search_registry_items: 'read',
+  view_registry_item: 'read',
+  get_registry_add_command: 'meta',
   get_app_status: 'read',
   list_runs: 'read',
   get_run: 'read',
@@ -33,6 +37,11 @@ const kinds: Readonly<Record<ToolName, ToolKind>> = {
   get_operation_schema: 'read',
 };
 const summaries: Readonly<Record<ToolName, string>> = {
+  list_registry_items: 'List available Fresh UI registry item metadata with pagination.',
+  search_registry_items: 'Search Fresh UI registry names, types, titles and descriptions.',
+  view_registry_item: 'View a portable Fresh UI registry item and its copy files.',
+  get_registry_add_command:
+    'Return a structured netscript ui:add command; never executes or installs files.',
   get_app_status: 'Summarize NetScript app health.',
   list_runs: 'List recent bounded execution summaries.',
   get_run: 'Summarize one execution end to end.',
@@ -67,6 +76,12 @@ const summaries: Readonly<Record<ToolName, string>> = {
 const policies: Partial<
   Record<ToolName, Pick<ToolDefinition, 'description' | 'truncation' | 'envelopeCheck'>>
 > = {
+  view_registry_item: {
+    description:
+      'View exact UI registry copy bytes. Responses exceeding the transport byte limit fail with a structured error; use netscript ui:view for larger items.',
+    truncation: 'exempt',
+    envelopeCheck: true,
+  },
   get_doc: {
     description:
       'Get faithful documentation: verbatim under budget, deterministic extract otherwise; full: true and nextCursor deliver exact pages. Reports contractVersion 2 and mode.',

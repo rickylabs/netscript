@@ -82,7 +82,6 @@ Deno.test('redis listener disconnects blocking client on abort', async () => {
   queue['queueName'] = 'jobs';
   queue['options'] = undefined;
   queue['listening'] = false;
-  queue['abortController'] = undefined;
   queue['delayedTimer'] = undefined;
   queue['clients'] = {
     commands: {
@@ -114,9 +113,25 @@ Deno.test('redis listener disconnects blocking client on abort', async () => {
       promotionDisconnected = true;
     },
   };
+  queue['leaseRuntime'] = {
+    configure() {},
+    ready: () => Promise.resolve(),
+    pollInterval: 1_000,
+    claim: () =>
+      new Promise<null>((resolve) => {
+        releaseBlocking = () => resolve(null);
+        blockingStarted.resolve();
+      }),
+    stop() {
+      releaseBlocking?.();
+    },
+  };
   const controller = new AbortController();
 
-  const listening = queue.listen(async () => {}, { signal: controller.signal });
+  const listening = queue.listen(async () => {}, {
+    signal: controller.signal,
+    visibilityTimeout: 100,
+  });
   await blockingStarted.promise;
   controller.abort();
   await listening;
@@ -128,4 +143,5 @@ Deno.test('redis listener disconnects blocking client on abort', async () => {
   assertEquals(queue['clients'], null);
   assertEquals(queue['listening'], false);
   assertEquals(queue['delayedTimer'], undefined);
+  assertEquals(queue['leaseTimer'], undefined);
 });

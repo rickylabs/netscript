@@ -3086,7 +3086,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## packages/fresh-ui — TOKEN-EXPORT-DIRECTORY-CARDINALITY
 
 - **ID:** `TOKEN-EXPORT-DIRECTORY-CARDINALITY`
-- **Reason:** S1 exports 18 preset configurations, 18 separate preset CSS files and 26 Figma index/collection files in the
+- **Reason:** S1b exports 24 preset configurations, 24 separate preset CSS files and 34 Figma index/collection files in the
   `registry/theme/presets/` and `registry/theme/figma/` directories. Their flat export names exceed
   the generic F-16 directory-child advisory cap. Existing root cardinality also grows by one
   documented public token entrypoint.
@@ -3097,8 +3097,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   ownership or dependency-layer exception.
 - **Owner:** Fresh UI design-system maintainers, epic #2412.
 - **Target:** Token schema/export-layout follow-up before the round-trip consumer freezes paths.
-- **Linked plan:** `.llm/runs/orch-divybot-6462582366--s1/plan.md`.
-- **Created:** 2026-10-28.
+- **Linked plan:** `.llm/runs/orch-divybot-6462582366--s1/plan.md`; S1b extension `.llm/runs/orch-divybot-6538850770--s1b/plan.md`.
+- **Created:** 2026-10-28; metrics updated 2026-10-31.
 - **Status:** open, DEBT_ACCEPTED.
 - **Closing gate:** Version the export-path migration, keep all original and computed collections
   discoverable through the index, pass frozen token build/freshness and registry copy tests, and
@@ -3141,3 +3141,34 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Cost:** One additional metadata entry and its advisory; no runtime or type-system cost.
 - **Closing gate:** Consolidate the workers package-root layout to cap 12 while preserving every
   public export and release note; pass publication dry-run and all native consumer tests.
+## packages/queue/adapters — F-16 private Redis lease modules (redis-lease-cardinality)
+
+- **Reason:** The existing adapters directory already exceeded the advisory cap (15 direct
+  children versus 12). The #2395 crash-recovery fix adds four cohesive private modules:
+  receipt types/normalization, atomic scripts, bounded script transport, and recovery policy.
+  Folding these into redis.adapter.ts would deepen its existing orchestration size and mix
+  independently reviewed failure boundaries. Issue #2351 adds one private admission/drain module
+  to keep the adapter below the 500-line gate while preserving independent receipt lifetimes.
+  Direct children now total 20.
+- **Owner:** NetScript queue maintainers.
+- **Target:** Next queue adapter organization pass after the 0.0.9 recovery fix.
+- **Linked plan:** .llm/runs/orch-divybot-6536806908--2395/plan.md; issue #2395.
+  Concurrency extension: .llm/runs/orch-divybot-6538963429--2351/plan.md; issue #2351.
+- **Created:** 2026-10-31.
+- **Status:** open.
+- **Gate:** F-16 adapters cardinality at or below 12, with all Redis/Garnet lease, delayed
+  promotion, public-export and scaffold-runtime regressions retained.
+- **Notes:** Cost is contributor navigation across five additional private modules; no public
+  export or dependency is added for these modules. A follow-up can group private implementation
+  concerns without changing the adapter contract. No scanner exemption or runtime gate waiver.
+
+## packages/fresh-ui token emphasis style — A1/A2 (mixed Figma style/weight name)
+
+- **Reason:** Fresh Figma `type/em/style` uses Italic in most modes but aliases body weight in Signal, Brutal and Terminal. WEB names `--ns-weight-em` and `--ns-studio-weight-em` therefore mix CSS font-style and font-weight semantics. DTCG 2025.10 has no fontStyle primitive. S1b preserves the source style through explicit `figmaStyle`/`sourceStyle` metadata and CSS while keeping a schema-valid regular fontWeight carrier for Italic. Code must not invent a replacement Figma value.
+- **Owner:** Fresh UI design-system maintainers / Figma vocabulary owner.
+- **Target:** Before the next stable Fresh UI design-system release; vocabulary follow-up to #2450.
+- **Linked plan:** `.llm/runs/orch-divybot-6538850770--s1b/plan.md`.
+- **Created:** 2026-10-31.
+- **Status:** open.
+- **Gate:** Split emphasis font-style and font-weight names with an explicit migration, preserve Figma round-trip, and pass DTCG schema/name/CSS tests across every preset.
+- **Notes:** Cost: standard DTCG consumers see regular weight for Italic unless they read the style extension; CSS consumers cannot use the mixed source WEB name in one fixed property across every preset. No current in-repo component consumes these names. Preserve exact original export and expose the limitation until the naming migration is ratified. Independent slice-review F1 identified this risk; scoped owner authorization covers recording it, not closing the design burn-down.

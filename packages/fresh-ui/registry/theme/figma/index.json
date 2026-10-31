@@ -1,6 +1,6 @@
 {
   "fileKey": "pGRLnkPPRZJZy74evNcQBr",
-  "exportDate": "2026-10-28",
+  "exportDate": "2026-10-31",
   "collections": [
     {
       "collection": "Primitives",
@@ -25,7 +25,7 @@
         "Tactile",
         "Pixel"
       ],
-      "variableCount": 146
+      "variableCount": 341
     },
     {
       "collection": "Base accent",
@@ -48,7 +48,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 399
+      "variableCount": 462
     },
     {
       "collection": "Density",
@@ -60,7 +60,7 @@
         "Airy",
         "Chunky"
       ],
-      "variableCount": 15
+      "variableCount": 19
     },
     {
       "collection": "Base gray",
@@ -85,7 +85,30 @@
         "Atelier",
         "Signal"
       ],
-      "variableCount": 198
+      "variableCount": 214
+    },
+    {
+      "collection": "Theme B",
+      "file": "theme-b.json",
+      "modes": [
+        "Bloom",
+        "Cupertino",
+        "Liquid",
+        "Terminal",
+        "macOS 27",
+        "Apple Classic",
+        "Fluent 2 Web"
+      ],
+      "variableCount": 341
+    },
+    {
+      "collection": "Theme set",
+      "file": "theme-set.json",
+      "modes": [
+        "A",
+        "B"
+      ],
+      "variableCount": 341
     },
     {
       "collection": "NetScript ns-one",
@@ -94,7 +117,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-utility",
@@ -103,7 +126,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-cloud",
@@ -112,7 +135,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-workshop",
@@ -121,7 +144,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-playful",
@@ -130,7 +153,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-ledger",
@@ -139,7 +162,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-atelier",
@@ -148,7 +171,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript studio-signal",
@@ -157,7 +180,61 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
+    },
+    {
+      "collection": "NetScript ledger",
+      "file": "ledger.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 1180
+    },
+    {
+      "collection": "NetScript signal",
+      "file": "signal.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 1180
+    },
+    {
+      "collection": "NetScript glass",
+      "file": "glass.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 1180
+    },
+    {
+      "collection": "NetScript macos-27",
+      "file": "macos-27.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 1180
+    },
+    {
+      "collection": "NetScript apple-classic",
+      "file": "apple-classic.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 1180
+    },
+    {
+      "collection": "NetScript fluent-2-web",
+      "file": "fluent-2-web.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 1180
     },
     {
       "collection": "NetScript tonal",
@@ -166,7 +243,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript bloom",
@@ -175,7 +252,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript cupertino",
@@ -184,7 +261,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript liquid",
@@ -193,7 +270,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript fluent",
@@ -202,7 +279,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript brutal",
@@ -211,7 +288,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript filigrane",
@@ -220,7 +297,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript terminal",
@@ -229,7 +306,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript pixel",
@@ -238,7 +315,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     },
     {
       "collection": "NetScript tactile",
@@ -247,7 +324,7 @@
         "Light",
         "Dark"
       ],
-      "variableCount": 903
+      "variableCount": 1180
     }
   ]
 }

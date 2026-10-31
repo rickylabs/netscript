@@ -168,7 +168,7 @@ netscript tokens build --app dashboard
 
 For a semantic override, edit `tokens/semantic.tokens.json` using aliases only, then rebuild. The
 source copies and `tokens.config.json` are app-owned; the five core web assets are generated, so do
-not hand-edit generated CSS or JSON. Add `--previews` to the build command to generate 18 separate
+not hand-edit generated CSS or JSON. Add `--previews` to the build command to generate 24 separate
 development preset stylesheets. The
 [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens) covers
 precedence, validation and cleanup.

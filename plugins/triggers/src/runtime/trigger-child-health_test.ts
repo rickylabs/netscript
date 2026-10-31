@@ -65,3 +65,51 @@ Deno.test('trigger dependency unavailable cannot turn background health green', 
   assertEquals(health.snapshot().dependencyReady, false);
   assertEquals(health.snapshot().state, 'failed');
 });
+
+Deno.test('default trigger processor logs a real watch failure and later recovery', async () => {
+  const directory = await Deno.makeTempDir();
+  const root = `${directory}/incoming`;
+  const controller = new AbortController();
+  const log: Array<Readonly<{ message: string; attributes?: Readonly<Record<string, unknown>> }>> =
+    [];
+  const record = (message: string, attributes?: Readonly<Record<string, unknown>>) => {
+    log.push({ message, attributes });
+  };
+  const completion = startTriggerProcessorRuntime({
+    signal: controller.signal,
+    definitions: [{
+      id: 'incoming' as import('@netscript/plugin-triggers-core/domain').TriggerId,
+      kind: 'file-watch',
+      durability: 't1',
+      paths: [root],
+      patterns: ['*.txt'],
+      on: ['create'],
+      handler: () => Promise.resolve([]),
+    }],
+    processor: {
+      process: (event) => Promise.resolve({ event, status: 'completed', actionsDispatched: 0 }),
+      stop: () => Promise.resolve(),
+    },
+    logger: { debug: record, info: record, warn: record, error: record },
+  });
+  async function waitFor(predicate: () => boolean): Promise<void> {
+    for (let attempt = 0; attempt < 500; attempt++) {
+      if (predicate()) return;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    assertEquals(predicate(), true, 'watch log was not emitted');
+  }
+  try {
+    await waitFor(() => log.some((entry) => entry.message === 'trigger.file_watch.error'));
+    assertEquals(
+      log.find((entry) => entry.message === 'trigger.file_watch.error')?.attributes?.triggerId,
+      'incoming',
+    );
+    await Deno.mkdir(root);
+    await waitFor(() => log.some((entry) => entry.attributes?.state === 'watching'));
+  } finally {
+    controller.abort();
+    await completion;
+    await Deno.remove(directory, { recursive: true });
+  }
+});

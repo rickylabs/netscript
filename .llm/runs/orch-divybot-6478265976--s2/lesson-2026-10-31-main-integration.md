@@ -1,0 +1,5 @@
+# 2026-10-31 — Generated conflicts and exact-head CI
+
+When retry/DLQ changes land during another feature PR, preserve main production and regenerate combined documentation/publication carriers instead of manually selecting generated blobs. Prove main equality for worker source and exercise retry/DLQ plus any branch-owned process-test probe together. Current combined tests123/0/4; existing Redis ignores are environmental and should execute in the Redis-enabled CI job.
+
+A completed quality job is insufficient when actual shards or their required aggregator fail. Decode uploaded structured shard reports first; do not infer a main flake from identical source. Here stale MCP counts were a branch regression and Linux ESRCH was an actual test-probe race. A bounded repair preserves the real behavior assertions. Final tracked evidence and independent review must be committed before scheduling the decisive all-check CI run. Report remote proof externally after green; another evidence push would invalidate the exact checked head.

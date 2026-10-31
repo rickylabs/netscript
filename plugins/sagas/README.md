@@ -37,6 +37,42 @@ them to a NetScript host.
 - **Durable streams + Aspire** — `./streams` publishes saga entities to durable stream topics;
   `./aspire` contributes the saga resources to the AppHost.
 
+## Excluding helpers from generated registries
+
+`netscript generate plugins` selects definition modules from `sagas/*-saga.ts`. Keep a helper or a
+dependency-injected factory beside those definitions by putting this exact comment on its first
+line:
+
+```ts
+// @netscript-registry-ignore
+export function scopedId(scope: string, name: string): string {
+  return `${scope}.${name}`;
+}
+```
+
+For example, add it to `sagas/factory-saga.ts`. The directive is shared by all plugin runtime
+registries and standalone registry compilers. It excludes the whole module before generating
+imports; ordinary imports from your application keep working. Use a separate module for a top-level
+saga definition that should remain registered.
+
+The marker must be the complete first-line comment, before any license header or code. Indentation,
+a UTF-8 BOM and CRLF are accepted; a later comment, a string containing the marker, or extra text on
+the line does not opt out. Existing manifest suffix and filename exclusions still apply.
+
+Regenerate and inspect the result:
+
+```sh
+netscript generate plugins
+netscript plugin doctor
+```
+
+Doctor names eligible modules carrying the directive as `Explicitly excluded registry modules`, on
+both healthy and stale registries. Remove the directive and regenerate to register the module again.
+Sagas already skips modules without statically discovered definition calls; the explicit exclusion
+report covers otherwise eligible saga definition or factory modules. Unmarked modules retain the
+plugin's existing definition validation. Keep the CLI, shared plugin package and installed plugins
+on matching release versions so their selector and inspection protocol agree.
+
 ## Architecture
 
 ```mermaid
@@ -155,6 +191,24 @@ The manifest itself is plain data and can be imported anywhere TypeScript runs.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## PostgreSQL command retention
+
+The sagas plugin contributes `NetScriptCommandOutbox` and `SagaRuntimeCommandAppliedKey` through its
+installed Prisma schema. SQL sidecars supply the reviewed outbox CHECK constraints; the normal
+application migration command appends pending contributions before deployment. Existing equivalent
+copied models are deduplicated without dropping their tables.
+
+Use `createPrismaSagaCommandRetention` from `@netscript/plugin-sagas-core/stores` in the existing
+background retention job. Pass the saga groups' completed-days policy as
+`completedRetentionDaysBySaga` (seven-day default), and persist `nextCursor` between invocations.
+Each page examines/deletes at most 100 rows per family. Pending/leased outbox records and active
+saga markers survive; terminal marker age starts at completion, and deletion rechecks fresh state.
+Keep canonical state until replay markers are gone. The shared outbox window defaults to the longest
+configured saga window.
+
+See the
+[schema, migration and cursor recipe](https://rickylabs.github.io/netscript/reference/plugin-sagas-core/#installed-outbox-schema-and-postgresql-retention).
 
 ## KV retention
 

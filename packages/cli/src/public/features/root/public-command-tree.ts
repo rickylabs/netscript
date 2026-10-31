@@ -1,3 +1,8 @@
+import { createUiApplyCommand } from '../ui/apply/apply-ui-command.ts';
+import { createUiInspectCommand } from '../ui/protocol/inspect/inspect-ui-command.ts';
+import { createUiRegistryCommand } from '../ui/protocol/registry/ui-registry-command.ts';
+import { createUiPresetCommand } from '../ui/protocol/preset/ui-preset-command.ts';
+import { createUiBuildCommand } from '../ui/build/build-ui-command.ts';
 import { CliCommandRegistry } from '../../composition/cli-command-registry.ts';
 import { contractCommand } from '../contracts/contracts-group.ts';
 import { createDbCommand } from '../db/db-group.ts';
@@ -94,10 +99,27 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
     id: 'tokens',
     create: ({ dependencies }) => createTokensCommand(dependencies),
   });
+  registry.register('ui:build', {
+    id: 'ui:build',
+    create: ({ host, dependencies }) =>
+      createUiBuildCommand({
+        fs: dependencies.fs,
+        paths: dependencies.uiRegistryPaths,
+        resolvePath: host.resolvePath,
+      }),
+  });
   registry.register('ui:add', {
     id: 'ui:add',
     create: ({ dependencies }) =>
       createUiAddCommand({
+        installDependencies: dependencies.uiInstallDependencies,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
+      }),
+  });
+  registry.register('ui:apply', {
+    id: 'ui:apply',
+    create: ({ dependencies }) =>
+      createUiApplyCommand({
         installDependencies: dependencies.uiInstallDependencies,
         resolveUiAppRoot: dependencies.resolveUiAppRoot,
       }),
@@ -126,13 +148,34 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
     });
   }
 
+  for (const kind of ['view', 'search', 'docs', 'info'] as const) {
+    registry.register(`ui:${kind}`, {
+      id: `ui:${kind}`,
+      create: ({ dependencies }) =>
+        createUiInspectCommand(kind, {
+          installDependencies: dependencies.uiInstallDependencies,
+          resolveUiAppRoot: dependencies.resolveUiAppRoot,
+        }),
+    });
+  }
+  registry.register('ui:registry', {
+    id: 'ui:registry',
+    create: ({ host, dependencies }) =>
+      createUiRegistryCommand({
+        installDependencies: dependencies.uiInstallDependencies,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
+        resolvePath: host.resolvePath,
+      }),
+  });
+  registry.register('ui:preset', { id: 'ui:preset', create: () => createUiPresetCommand() });
   registry.register('ui:migrate', {
     id: 'ui:migrate',
-    create: ({ dependencies }) => createUiMigrateCommand({
-      fs: dependencies.uiInstallDependencies.fs,
-      formatter: dependencies.uiPageFormatter,
-      resolveUiAppRoot: dependencies.resolveUiAppRoot,
-    }),
+    create: ({ dependencies }) =>
+      createUiMigrateCommand({
+        fs: dependencies.uiInstallDependencies.fs,
+        formatter: dependencies.uiPageFormatter,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
+      }),
   });
 
   registry.register('ui:remove', {

@@ -313,3 +313,34 @@ Deno.test('copyPluginSchemasToRootDb reinstalls a changed fragment without self-
   }]);
   assertEquals(await fs.readFile(targetPath), updated);
 });
+
+Deno.test('plugin schema copy installs immutable SQL sidecars beside deduplicated Prisma models', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const schema = 'model CopiedOutbox { id String @id }\n';
+  await fs.writeFile('/project/database/postgres/schema/copied.prisma', schema);
+  const result = await copyPluginSchemasToRootDb(
+    '/project',
+    'example',
+    {
+      requiresDb: true,
+      dbExists: true,
+      targetConfigKey: 'postgres',
+      targetEngine: 'postgres',
+      needsProvisioning: false,
+    },
+    { fs, scaffolder },
+    {
+      schemaDeclared: true,
+      packageFragments: [
+        { path: 'database/runtime.prisma', content: schema },
+        {
+          path: 'database/checks.migration.sql',
+          content: 'ALTER TABLE example ADD CHECK (id > 0);',
+        },
+      ],
+    },
+  );
+  assertEquals(result[0].written, false);
+  assertEquals(await fs.readFile(result[1].targetPath), 'ALTER TABLE example ADD CHECK (id > 0);');
+});

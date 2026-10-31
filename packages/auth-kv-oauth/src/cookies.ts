@@ -34,13 +34,23 @@ export type KvOAuthCookieOptions = Readonly<{
   allowInsecureDev?: boolean;
 }>;
 
-/** Parses a Cookie header into a key/value map. */
+/**
+ * Parses a Cookie header into a key/value map, skipping values with invalid percent encoding.
+ * Valid values are URI-decoded; the last successfully decoded value wins for duplicate names.
+ */
 export function parseCookieHeader(cookieHeader: string | undefined): ReadonlyMap<string, string> {
   const cookies = new Map<string, string>();
   for (const part of cookieHeader?.split(';') ?? []) {
     const [rawName, ...rawValue] = part.trim().split('=');
     if (rawName) {
-      cookies.set(rawName, decodeURIComponent(rawValue.join('=')));
+      let value: string;
+      try {
+        value = decodeURIComponent(rawValue.join('='));
+      } catch (error) {
+        if (error instanceof URIError) continue;
+        throw error;
+      }
+      cookies.set(rawName, value);
     }
   }
   return cookies;

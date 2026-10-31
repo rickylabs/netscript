@@ -228,3 +228,30 @@ model SagaExecutionHistory {
   @@index([outcome])
   @@map("saga_execution_history")
 }
+
+// Command intents committed atomically with saga transitions.
+// CHECK constraints are contributed by command-outbox.migration.sql.
+model NetScriptCommandOutbox {
+  id String @id
+  executionId String @map("execution_id")
+  commandName String @map("command_name")
+  commandVersion Int @map("command_version")
+  destination String
+  topic String
+  payloadJson String @map("payload_json")
+  dedupeKey String @map("dedupe_key")
+  correlationId String @map("correlation_id")
+  traceparent String?
+  tracestate String?
+  availableAt DateTime @map("available_at") @db.Timestamptz(3)
+  attemptCount Int @default(0) @map("attempt_count")
+  claimToken String? @map("claim_token")
+  claimUntil DateTime? @map("claim_until") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  terminalAt DateTime? @map("terminal_at") @db.Timestamptz(3)
+  lastFailure String? @map("last_failure")
+  acceptanceIdentity String? @map("acceptance_identity") @db.VarChar(256)
+  acceptedAt DateTime? @map("accepted_at") @db.Timestamptz(3)
+  @@index([availableAt], map: "command_outbox_due")
+  @@map("netscript_command_outbox")
+}

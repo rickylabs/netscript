@@ -131,10 +131,11 @@ export async function installUiRegistryItems(
   };
 }
 
-/** List manifest items with installed state derived from their target files. */
+/** List target-file install state, optionally including partial copies for legacy restoration. */
 export async function listUiRegistryItems(
   projectRootInput: string,
   fs: FileSystemPort,
+  options: { readonly includePartial?: boolean } = {},
 ): Promise<
   {
     readonly items: readonly UiRegistryListEntry[];
@@ -143,12 +144,16 @@ export async function listUiRegistryItems(
 > {
   const { freshUiRegistryManifest } = await import('@netscript/fresh-ui/registry');
   const projectRoot = resolve(projectRootInput);
-  const items = await Promise.all(freshUiRegistryManifest.items.map(async (item) => ({
-    ...item,
-    installed: item.files.length > 0 && (await Promise.all(
+  const items = await Promise.all(freshUiRegistryManifest.items.map(async (item) => {
+    const present = await Promise.all(
       item.files.map((file) => fs.exists(resolveTarget(projectRoot, file.target))),
-    )).every(Boolean),
-  })));
+    );
+    return {
+      ...item,
+      installed: item.files.length > 0 &&
+        (options.includePartial ? present.some(Boolean) : present.every(Boolean)),
+    };
+  }));
   return { items, collections: freshUiRegistryManifest.collections };
 }
 
@@ -315,7 +320,8 @@ function isTypeScriptLike(path: string): boolean {
   return path.endsWith('.ts') || path.endsWith('.tsx');
 }
 
-function rewriteRegistryImports(
+/** Rewrite imports to the actual destination of each copied registry source. */
+export function rewriteRegistryImports(
   content: string,
   sourceFile: string,
   targetFile: string,
@@ -325,7 +331,15 @@ function rewriteRegistryImports(
   const rewrite = (specifier: string): string => {
     const source = resolveSpecifierSource(sourceFile, registryRoot, specifier);
     if (!source) return specifier;
-    const mapped = sourceToTarget.get(normalize(source));
+    const candidates = [
+      source,
+      ...['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx'].map((extension) =>
+        source + extension
+      ),
+    ];
+    const mapped = candidates.map((candidate) => sourceToTarget.get(normalize(candidate))).find((
+      target,
+    ) => target !== undefined);
     if (!mapped) return specifier;
     return toImportSpecifier(relative(dirname(targetFile), mapped));
   };
@@ -342,6 +356,10 @@ function rewriteRegistryImports(
       (_match, open: string, specifier: string, close: string) =>
         open + rewrite(specifier) +
         close,
+    )
+    .replace(
+      /(\bimport\s*\(\s*['"])([^'"]+)(['"])/g,
+      (_match, open: string, specifier: string, close: string) => open + rewrite(specifier) + close,
     );
 }
 

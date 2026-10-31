@@ -84,6 +84,22 @@
       }
     },
     {
+      "name": "space/control/height-lg",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-control-height-lg)",
+      "description": "Large control height (lg buttons, icon buttons, toggles, action bar).",
+      "values": {
+        "Comfortable": 44,
+        "Compact": 40,
+        "Dense": 36,
+        "Airy": 48,
+        "Chunky": 52
+      }
+    },
+    {
       "name": "space/control/height-sm",
       "type": "FLOAT",
       "scopes": [
@@ -99,6 +115,22 @@
       }
     },
     {
+      "name": "space/control/height-xs",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-control-height-xs)",
+      "description": "Extra-small control height (xs buttons and icon buttons, input-group addons).",
+      "values": {
+        "Comfortable": 24,
+        "Compact": 22,
+        "Dense": 20,
+        "Airy": 26,
+        "Chunky": 28
+      }
+    },
+    {
       "name": "space/control/padding-x",
       "type": "FLOAT",
       "scopes": [
@@ -111,6 +143,22 @@
         "Dense": 10,
         "Airy": 18,
         "Chunky": 20
+      }
+    },
+    {
+      "name": "space/control/padding-x-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-control-padding-x-sm)",
+      "description": "Horizontal padding of sm controls.",
+      "values": {
+        "Comfortable": 10,
+        "Compact": 8,
+        "Dense": 6,
+        "Airy": 12,
+        "Chunky": 14
       }
     },
     {
@@ -171,6 +219,22 @@
         "Dense": 12,
         "Airy": 40,
         "Chunky": 24
+      }
+    },
+    {
+      "name": "space/sidebar/width",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-sidebar-width)",
+      "description": "Expanded sidebar width (Sidebar, App shell).",
+      "values": {
+        "Comfortable": 240,
+        "Compact": 224,
+        "Dense": 208,
+        "Airy": 272,
+        "Chunky": 256
       }
     },
     {

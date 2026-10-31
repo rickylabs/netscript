@@ -491,14 +491,6 @@
       "minimum": 4.5
     },
     {
-      "id": "accent-fg/accent-solid-hover",
-      "foreground": "accent-fg",
-      "background": [
-        "accent-solid-hover"
-      ],
-      "minimum": 4.5
-    },
-    {
       "id": "primary-on-container/primary-container",
       "foreground": "primary-on-container",
       "background": [
@@ -520,7 +512,8 @@
       "background": [
         "state-disabled-container"
       ],
-      "minimum": 4.5
+      "minimum": 4.5,
+      "exemption": "inactive-component"
     },
     {
       "id": "ring/bg",
@@ -2308,7 +2301,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "fluent-text-inverse/inverse",
@@ -2839,7 +2833,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "fluent-system-caution/fluent-solid-base+fluent-system-caution-bg",
@@ -3197,7 +3192,8 @@
       "minimum": 4.5,
       "presets": [
         "tactile"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "tactile-edge-control/tactile-surface-well",
@@ -3365,17 +3361,6 @@
       ]
     },
     {
-      "id": "liquid-text-fg/liquid-material-tinted-primary",
-      "foreground": "liquid-text-fg",
-      "background": [
-        "liquid-material-tinted-primary"
-      ],
-      "minimum": 4.5,
-      "presets": [
-        "liquid"
-      ]
-    },
-    {
       "id": "liquid-text-muted/liquid-surface-zebra",
       "foreground": "liquid-text-muted",
       "background": [
@@ -3453,17 +3438,6 @@
       ]
     },
     {
-      "id": "liquid-text-muted/liquid-material-tinted-primary",
-      "foreground": "liquid-text-muted",
-      "background": [
-        "liquid-material-tinted-primary"
-      ],
-      "minimum": 4.5,
-      "presets": [
-        "liquid"
-      ]
-    },
-    {
       "id": "liquid-primary-text/liquid-surface-zebra",
       "foreground": "liquid-primary-text",
       "background": [
@@ -3534,17 +3508,6 @@
       "foreground": "liquid-primary-text",
       "background": [
         "liquid-material-segment-thumb"
-      ],
-      "minimum": 4.5,
-      "presets": [
-        "liquid"
-      ]
-    },
-    {
-      "id": "liquid-primary-text/liquid-material-tinted-primary",
-      "foreground": "liquid-primary-text",
-      "background": [
-        "liquid-material-tinted-primary"
       ],
       "minimum": 4.5,
       "presets": [
@@ -3965,7 +3928,8 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
-      ]
+      ],
+      "exemption": "inactive-component"
     },
     {
       "id": "fluent-text-primary/fluent-solid-base+fluent-layer-default+fluent-card-secondary+fluent-control-default",
@@ -4315,6 +4279,3633 @@
       "minimum": 4.5,
       "presets": [
         "fluent"
+      ],
+      "exemption": "inactive-component"
+    },
+    {
+      "id": "badge-solid-d-destructive-fg/badge-solid-d-destructive-bg",
+      "foreground": "badge-solid-d-destructive-fg",
+      "background": [
+        "badge-solid-d-destructive-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "badge-solid-d-info-fg/badge-solid-d-info-bg",
+      "foreground": "badge-solid-d-info-fg",
+      "background": [
+        "badge-solid-d-info-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "badge-solid-d-neutral-fg/badge-solid-d-neutral-bg",
+      "foreground": "badge-solid-d-neutral-fg",
+      "background": [
+        "badge-solid-d-neutral-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "badge-solid-d-success-fg/badge-solid-d-success-bg",
+      "foreground": "badge-solid-d-success-fg",
+      "background": [
+        "badge-solid-d-success-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "badge-solid-d-warning-fg/badge-solid-d-warning-bg",
+      "foreground": "badge-solid-d-warning-fg",
+      "background": [
+        "badge-solid-d-warning-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "badge-solid-l-destructive-fg/badge-solid-l-destructive-bg",
+      "foreground": "badge-solid-l-destructive-fg",
+      "background": [
+        "badge-solid-l-destructive-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "badge-solid-l-info-fg/badge-solid-l-info-bg",
+      "foreground": "badge-solid-l-info-fg",
+      "background": [
+        "badge-solid-l-info-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "badge-solid-l-neutral-fg/badge-solid-l-neutral-bg",
+      "foreground": "badge-solid-l-neutral-fg",
+      "background": [
+        "badge-solid-l-neutral-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "badge-solid-l-success-fg/badge-solid-l-success-bg",
+      "foreground": "badge-solid-l-success-fg",
+      "background": [
+        "badge-solid-l-success-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "badge-solid-l-warning-fg/badge-solid-l-warning-bg",
+      "foreground": "badge-solid-l-warning-fg",
+      "background": [
+        "badge-solid-l-warning-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "brand-d-fg/brand-d-default",
+      "foreground": "brand-d-fg",
+      "background": [
+        "brand-d-default"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "brand-l-fg/brand-l-default",
+      "foreground": "brand-l-fg",
+      "background": [
+        "brand-l-default"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/card-d-bg",
+      "foreground": "fg",
+      "background": [
+        "card-d-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/card-l-bg",
+      "foreground": "fg",
+      "background": [
+        "card-l-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/hero-d-bg",
+      "foreground": "fg",
+      "background": [
+        "hero-d-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/hero-l-bg",
+      "foreground": "fg",
+      "background": [
+        "hero-l-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/kpi-d-bg-1",
+      "foreground": "fg",
+      "background": [
+        "kpi-d-bg-1"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/kpi-d-bg-2",
+      "foreground": "fg",
+      "background": [
+        "kpi-d-bg-2"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/kpi-d-bg-3",
+      "foreground": "fg",
+      "background": [
+        "kpi-d-bg-3"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/kpi-d-bg-4",
+      "foreground": "fg",
+      "background": [
+        "kpi-d-bg-4"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/kpi-l-bg-1",
+      "foreground": "fg",
+      "background": [
+        "kpi-l-bg-1"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/kpi-l-bg-2",
+      "foreground": "fg",
+      "background": [
+        "kpi-l-bg-2"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/kpi-l-bg-3",
+      "foreground": "fg",
+      "background": [
+        "kpi-l-bg-3"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/kpi-l-bg-4",
+      "foreground": "fg",
+      "background": [
+        "kpi-l-bg-4"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/table-d-row-bg",
+      "foreground": "fg",
+      "background": [
+        "table-d-row-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/table-l-row-bg",
+      "foreground": "fg",
+      "background": [
+        "table-l-row-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/tabs-d-sel-bg",
+      "foreground": "fg",
+      "background": [
+        "tabs-d-sel-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/tabs-l-sel-bg",
+      "foreground": "fg",
+      "background": [
+        "tabs-l-sel-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "tooltip-d-fg/tooltip-d-bg",
+      "foreground": "tooltip-d-fg",
+      "background": [
+        "tooltip-d-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "tooltip-d-muted/tooltip-d-bg",
+      "foreground": "tooltip-d-muted",
+      "background": [
+        "tooltip-d-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "tooltip-l-fg/tooltip-l-bg",
+      "foreground": "tooltip-l-fg",
+      "background": [
+        "tooltip-l-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "tooltip-l-muted/tooltip-l-bg",
+      "foreground": "tooltip-l-muted",
+      "background": [
+        "tooltip-l-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "fg/topbar-d-bg",
+      "foreground": "fg",
+      "background": [
+        "topbar-d-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "fg/topbar-l-bg",
+      "foreground": "fg",
+      "background": [
+        "topbar-l-bg"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "badge-solid-destructive-fg/badge-solid-destructive-bg",
+      "foreground": "badge-solid-destructive-fg",
+      "background": [
+        "badge-solid-destructive-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "badge-solid-info-fg/badge-solid-info-bg",
+      "foreground": "badge-solid-info-fg",
+      "background": [
+        "badge-solid-info-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "badge-solid-neutral-fg/badge-solid-neutral-bg",
+      "foreground": "badge-solid-neutral-fg",
+      "background": [
+        "badge-solid-neutral-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "badge-solid-success-fg/badge-solid-success-bg",
+      "foreground": "badge-solid-success-fg",
+      "background": [
+        "badge-solid-success-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "badge-solid-warning-fg/badge-solid-warning-bg",
+      "foreground": "badge-solid-warning-fg",
+      "background": [
+        "badge-solid-warning-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "brand-fg/brand",
+      "foreground": "brand-fg",
+      "background": [
+        "brand"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/card-bg",
+      "foreground": "fg",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/code-bg",
+      "foreground": "fg",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/hero-bg",
+      "foreground": "fg",
+      "background": [
+        "hero-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "important-text/important-subtle",
+      "foreground": "important-text",
+      "background": [
+        "important-subtle"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/kpi-bg-1",
+      "foreground": "fg",
+      "background": [
+        "kpi-bg-1"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/kpi-bg-2",
+      "foreground": "fg",
+      "background": [
+        "kpi-bg-2"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/kpi-bg-3",
+      "foreground": "fg",
+      "background": [
+        "kpi-bg-3"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/kpi-bg-4",
+      "foreground": "fg",
+      "background": [
+        "kpi-bg-4"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/table-row-bg",
+      "foreground": "fg",
+      "background": [
+        "table-row-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/tabs-sel-bg",
+      "foreground": "fg",
+      "background": [
+        "tabs-sel-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "tooltip-fg/tooltip-bg",
+      "foreground": "tooltip-fg",
+      "background": [
+        "tooltip-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "tooltip-muted/tooltip-bg",
+      "foreground": "tooltip-muted",
+      "background": [
+        "tooltip-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "fg/topbar-bg",
+      "foreground": "fg",
+      "background": [
+        "topbar-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-comment/code-bg",
+      "foreground": "code-syntax-comment",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-function/code-bg",
+      "foreground": "code-syntax-function",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-keyword/code-bg",
+      "foreground": "code-syntax-keyword",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-number/code-bg",
+      "foreground": "code-syntax-number",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-punctuation/code-bg",
+      "foreground": "code-syntax-punctuation",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-string/code-bg",
+      "foreground": "code-syntax-string",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "code-syntax-type/code-bg",
+      "foreground": "code-syntax-type",
+      "background": [
+        "code-bg"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "chart-d-1/bg",
+      "foreground": "chart-d-1",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/card-bg",
+      "foreground": "chart-d-1",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/card",
+      "foreground": "chart-d-1",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/cupertino-surface-bg",
+      "foreground": "chart-d-1",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/cupertino-surface-card",
+      "foreground": "chart-d-1",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/cupertino-surface-raised",
+      "foreground": "chart-d-1",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/cupertino-surface-well",
+      "foreground": "chart-d-1",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/liquid-surface-bg",
+      "foreground": "chart-d-1",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/liquid-surface-card",
+      "foreground": "chart-d-1",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/liquid-surface-raised",
+      "foreground": "chart-d-1",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/liquid-surface-well",
+      "foreground": "chart-d-1",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/liquid-surface-zebra",
+      "foreground": "chart-d-1",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-1/fluent-solid-base",
+      "foreground": "chart-d-1",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/bg",
+      "foreground": "chart-d-2",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/card-bg",
+      "foreground": "chart-d-2",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/card",
+      "foreground": "chart-d-2",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/cupertino-surface-bg",
+      "foreground": "chart-d-2",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/cupertino-surface-card",
+      "foreground": "chart-d-2",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/cupertino-surface-raised",
+      "foreground": "chart-d-2",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/cupertino-surface-well",
+      "foreground": "chart-d-2",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/liquid-surface-bg",
+      "foreground": "chart-d-2",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/liquid-surface-card",
+      "foreground": "chart-d-2",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/liquid-surface-raised",
+      "foreground": "chart-d-2",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/liquid-surface-well",
+      "foreground": "chart-d-2",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/liquid-surface-zebra",
+      "foreground": "chart-d-2",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-2/fluent-solid-base",
+      "foreground": "chart-d-2",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/bg",
+      "foreground": "chart-d-3",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/card-bg",
+      "foreground": "chart-d-3",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/card",
+      "foreground": "chart-d-3",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/cupertino-surface-bg",
+      "foreground": "chart-d-3",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/cupertino-surface-card",
+      "foreground": "chart-d-3",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/cupertino-surface-raised",
+      "foreground": "chart-d-3",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/cupertino-surface-well",
+      "foreground": "chart-d-3",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/liquid-surface-bg",
+      "foreground": "chart-d-3",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/liquid-surface-card",
+      "foreground": "chart-d-3",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/liquid-surface-raised",
+      "foreground": "chart-d-3",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/liquid-surface-well",
+      "foreground": "chart-d-3",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/liquid-surface-zebra",
+      "foreground": "chart-d-3",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-3/fluent-solid-base",
+      "foreground": "chart-d-3",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/bg",
+      "foreground": "chart-d-4",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/card-bg",
+      "foreground": "chart-d-4",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/card",
+      "foreground": "chart-d-4",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/cupertino-surface-bg",
+      "foreground": "chart-d-4",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/cupertino-surface-card",
+      "foreground": "chart-d-4",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/cupertino-surface-raised",
+      "foreground": "chart-d-4",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/cupertino-surface-well",
+      "foreground": "chart-d-4",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/liquid-surface-bg",
+      "foreground": "chart-d-4",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/liquid-surface-card",
+      "foreground": "chart-d-4",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/liquid-surface-raised",
+      "foreground": "chart-d-4",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/liquid-surface-well",
+      "foreground": "chart-d-4",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/liquid-surface-zebra",
+      "foreground": "chart-d-4",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-4/fluent-solid-base",
+      "foreground": "chart-d-4",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/bg",
+      "foreground": "chart-d-5",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/card-bg",
+      "foreground": "chart-d-5",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/card",
+      "foreground": "chart-d-5",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/cupertino-surface-bg",
+      "foreground": "chart-d-5",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/cupertino-surface-card",
+      "foreground": "chart-d-5",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/cupertino-surface-raised",
+      "foreground": "chart-d-5",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/cupertino-surface-well",
+      "foreground": "chart-d-5",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/liquid-surface-bg",
+      "foreground": "chart-d-5",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/liquid-surface-card",
+      "foreground": "chart-d-5",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/liquid-surface-raised",
+      "foreground": "chart-d-5",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/liquid-surface-well",
+      "foreground": "chart-d-5",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/liquid-surface-zebra",
+      "foreground": "chart-d-5",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-d-5/fluent-solid-base",
+      "foreground": "chart-d-5",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "chart-l-1/bg",
+      "foreground": "chart-l-1",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/card-bg",
+      "foreground": "chart-l-1",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/card",
+      "foreground": "chart-l-1",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/cupertino-surface-bg",
+      "foreground": "chart-l-1",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/cupertino-surface-card",
+      "foreground": "chart-l-1",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/cupertino-surface-raised",
+      "foreground": "chart-l-1",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/cupertino-surface-well",
+      "foreground": "chart-l-1",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/liquid-surface-bg",
+      "foreground": "chart-l-1",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/liquid-surface-card",
+      "foreground": "chart-l-1",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/liquid-surface-raised",
+      "foreground": "chart-l-1",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/liquid-surface-well",
+      "foreground": "chart-l-1",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/liquid-surface-zebra",
+      "foreground": "chart-l-1",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-1/fluent-solid-base",
+      "foreground": "chart-l-1",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/bg",
+      "foreground": "chart-l-2",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/card-bg",
+      "foreground": "chart-l-2",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/card",
+      "foreground": "chart-l-2",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/cupertino-surface-bg",
+      "foreground": "chart-l-2",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/cupertino-surface-card",
+      "foreground": "chart-l-2",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/cupertino-surface-raised",
+      "foreground": "chart-l-2",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/cupertino-surface-well",
+      "foreground": "chart-l-2",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/liquid-surface-bg",
+      "foreground": "chart-l-2",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/liquid-surface-card",
+      "foreground": "chart-l-2",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/liquid-surface-raised",
+      "foreground": "chart-l-2",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/liquid-surface-well",
+      "foreground": "chart-l-2",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/liquid-surface-zebra",
+      "foreground": "chart-l-2",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-2/fluent-solid-base",
+      "foreground": "chart-l-2",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/bg",
+      "foreground": "chart-l-3",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/card-bg",
+      "foreground": "chart-l-3",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/card",
+      "foreground": "chart-l-3",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/cupertino-surface-bg",
+      "foreground": "chart-l-3",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/cupertino-surface-card",
+      "foreground": "chart-l-3",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/cupertino-surface-raised",
+      "foreground": "chart-l-3",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/cupertino-surface-well",
+      "foreground": "chart-l-3",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/liquid-surface-bg",
+      "foreground": "chart-l-3",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/liquid-surface-card",
+      "foreground": "chart-l-3",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/liquid-surface-raised",
+      "foreground": "chart-l-3",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/liquid-surface-well",
+      "foreground": "chart-l-3",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/liquid-surface-zebra",
+      "foreground": "chart-l-3",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-3/fluent-solid-base",
+      "foreground": "chart-l-3",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/bg",
+      "foreground": "chart-l-4",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/card-bg",
+      "foreground": "chart-l-4",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/card",
+      "foreground": "chart-l-4",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/cupertino-surface-bg",
+      "foreground": "chart-l-4",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/cupertino-surface-card",
+      "foreground": "chart-l-4",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/cupertino-surface-raised",
+      "foreground": "chart-l-4",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/cupertino-surface-well",
+      "foreground": "chart-l-4",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/liquid-surface-bg",
+      "foreground": "chart-l-4",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/liquid-surface-card",
+      "foreground": "chart-l-4",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/liquid-surface-raised",
+      "foreground": "chart-l-4",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/liquid-surface-well",
+      "foreground": "chart-l-4",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/liquid-surface-zebra",
+      "foreground": "chart-l-4",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-4/fluent-solid-base",
+      "foreground": "chart-l-4",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/bg",
+      "foreground": "chart-l-5",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/card-bg",
+      "foreground": "chart-l-5",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/card",
+      "foreground": "chart-l-5",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/cupertino-surface-bg",
+      "foreground": "chart-l-5",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/cupertino-surface-card",
+      "foreground": "chart-l-5",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/cupertino-surface-raised",
+      "foreground": "chart-l-5",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/cupertino-surface-well",
+      "foreground": "chart-l-5",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/liquid-surface-bg",
+      "foreground": "chart-l-5",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/liquid-surface-card",
+      "foreground": "chart-l-5",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/liquid-surface-raised",
+      "foreground": "chart-l-5",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/liquid-surface-well",
+      "foreground": "chart-l-5",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/liquid-surface-zebra",
+      "foreground": "chart-l-5",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-l-5/fluent-solid-base",
+      "foreground": "chart-l-5",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-d-1/bg",
+      "foreground": "studio-chart-d-1",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-1/card-bg",
+      "foreground": "studio-chart-d-1",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-1/card",
+      "foreground": "studio-chart-d-1",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-2/bg",
+      "foreground": "studio-chart-d-2",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-2/card-bg",
+      "foreground": "studio-chart-d-2",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-2/card",
+      "foreground": "studio-chart-d-2",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-3/bg",
+      "foreground": "studio-chart-d-3",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-3/card-bg",
+      "foreground": "studio-chart-d-3",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-3/card",
+      "foreground": "studio-chart-d-3",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-4/bg",
+      "foreground": "studio-chart-d-4",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-4/card-bg",
+      "foreground": "studio-chart-d-4",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-4/card",
+      "foreground": "studio-chart-d-4",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-5/bg",
+      "foreground": "studio-chart-d-5",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-5/card-bg",
+      "foreground": "studio-chart-d-5",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-d-5/card",
+      "foreground": "studio-chart-d-5",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "studio-chart-l-1/bg",
+      "foreground": "studio-chart-l-1",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-1/card-bg",
+      "foreground": "studio-chart-l-1",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-1/card",
+      "foreground": "studio-chart-l-1",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-2/bg",
+      "foreground": "studio-chart-l-2",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-2/card-bg",
+      "foreground": "studio-chart-l-2",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-2/card",
+      "foreground": "studio-chart-l-2",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-3/bg",
+      "foreground": "studio-chart-l-3",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-3/card-bg",
+      "foreground": "studio-chart-l-3",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-3/card",
+      "foreground": "studio-chart-l-3",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-4/bg",
+      "foreground": "studio-chart-l-4",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-4/card-bg",
+      "foreground": "studio-chart-l-4",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-4/card",
+      "foreground": "studio-chart-l-4",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-5/bg",
+      "foreground": "studio-chart-l-5",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-5/card-bg",
+      "foreground": "studio-chart-l-5",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "studio-chart-l-5/card",
+      "foreground": "studio-chart-l-5",
+      "background": [
+        "card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "studio-utility",
+        "studio-cloud",
+        "studio-workshop",
+        "studio-playful",
+        "studio-ledger",
+        "studio-atelier",
+        "studio-signal"
+      ],
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "chart-1/bg",
+      "foreground": "chart-1",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-1/card-bg",
+      "foreground": "chart-1",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-1/card",
+      "foreground": "chart-1",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-1/cupertino-surface-bg",
+      "foreground": "chart-1",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-1/cupertino-surface-card",
+      "foreground": "chart-1",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-1/cupertino-surface-raised",
+      "foreground": "chart-1",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-1/cupertino-surface-well",
+      "foreground": "chart-1",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-1/liquid-surface-bg",
+      "foreground": "chart-1",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-1/liquid-surface-card",
+      "foreground": "chart-1",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-1/liquid-surface-raised",
+      "foreground": "chart-1",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-1/liquid-surface-well",
+      "foreground": "chart-1",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-1/liquid-surface-zebra",
+      "foreground": "chart-1",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-1/fluent-solid-base",
+      "foreground": "chart-1",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "chart-2/bg",
+      "foreground": "chart-2",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-2/card-bg",
+      "foreground": "chart-2",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-2/card",
+      "foreground": "chart-2",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-2/cupertino-surface-bg",
+      "foreground": "chart-2",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-2/cupertino-surface-card",
+      "foreground": "chart-2",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-2/cupertino-surface-raised",
+      "foreground": "chart-2",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-2/cupertino-surface-well",
+      "foreground": "chart-2",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-2/liquid-surface-bg",
+      "foreground": "chart-2",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-2/liquid-surface-card",
+      "foreground": "chart-2",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-2/liquid-surface-raised",
+      "foreground": "chart-2",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-2/liquid-surface-well",
+      "foreground": "chart-2",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-2/liquid-surface-zebra",
+      "foreground": "chart-2",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-2/fluent-solid-base",
+      "foreground": "chart-2",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "chart-3/bg",
+      "foreground": "chart-3",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-3/card-bg",
+      "foreground": "chart-3",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-3/card",
+      "foreground": "chart-3",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-3/cupertino-surface-bg",
+      "foreground": "chart-3",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-3/cupertino-surface-card",
+      "foreground": "chart-3",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-3/cupertino-surface-raised",
+      "foreground": "chart-3",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-3/cupertino-surface-well",
+      "foreground": "chart-3",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-3/liquid-surface-bg",
+      "foreground": "chart-3",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-3/liquid-surface-card",
+      "foreground": "chart-3",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-3/liquid-surface-raised",
+      "foreground": "chart-3",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-3/liquid-surface-well",
+      "foreground": "chart-3",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-3/liquid-surface-zebra",
+      "foreground": "chart-3",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-3/fluent-solid-base",
+      "foreground": "chart-3",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "chart-4/bg",
+      "foreground": "chart-4",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-4/card-bg",
+      "foreground": "chart-4",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-4/card",
+      "foreground": "chart-4",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-4/cupertino-surface-bg",
+      "foreground": "chart-4",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-4/cupertino-surface-card",
+      "foreground": "chart-4",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-4/cupertino-surface-raised",
+      "foreground": "chart-4",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-4/cupertino-surface-well",
+      "foreground": "chart-4",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-4/liquid-surface-bg",
+      "foreground": "chart-4",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-4/liquid-surface-card",
+      "foreground": "chart-4",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-4/liquid-surface-raised",
+      "foreground": "chart-4",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-4/liquid-surface-well",
+      "foreground": "chart-4",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-4/liquid-surface-zebra",
+      "foreground": "chart-4",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-4/fluent-solid-base",
+      "foreground": "chart-4",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "chart-5/bg",
+      "foreground": "chart-5",
+      "background": [
+        "bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-5/card-bg",
+      "foreground": "chart-5",
+      "background": [
+        "card-bg"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-5/card",
+      "foreground": "chart-5",
+      "background": [
+        "card"
+      ],
+      "minimum": 3
+    },
+    {
+      "id": "chart-5/cupertino-surface-bg",
+      "foreground": "chart-5",
+      "background": [
+        "cupertino-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-5/cupertino-surface-card",
+      "foreground": "chart-5",
+      "background": [
+        "cupertino-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-5/cupertino-surface-raised",
+      "foreground": "chart-5",
+      "background": [
+        "cupertino-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-5/cupertino-surface-well",
+      "foreground": "chart-5",
+      "background": [
+        "cupertino-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "cupertino"
+      ]
+    },
+    {
+      "id": "chart-5/liquid-surface-bg",
+      "foreground": "chart-5",
+      "background": [
+        "liquid-surface-bg"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-5/liquid-surface-card",
+      "foreground": "chart-5",
+      "background": [
+        "liquid-surface-card"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-5/liquid-surface-raised",
+      "foreground": "chart-5",
+      "background": [
+        "liquid-surface-raised"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-5/liquid-surface-well",
+      "foreground": "chart-5",
+      "background": [
+        "liquid-surface-well"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-5/liquid-surface-zebra",
+      "foreground": "chart-5",
+      "background": [
+        "liquid-surface-zebra"
+      ],
+      "minimum": 3,
+      "presets": [
+        "liquid"
+      ]
+    },
+    {
+      "id": "chart-5/fluent-solid-base",
+      "foreground": "chart-5",
+      "background": [
+        "fluent-solid-base"
+      ],
+      "minimum": 3,
+      "presets": [
+        "fluent"
+      ]
+    },
+    {
+      "id": "tooltip-fg/tooltip-kbd",
+      "foreground": "tooltip-fg",
+      "background": [
+        "tooltip-bg",
+        "tooltip-kbd"
+      ],
+      "minimum": 4.5
+    },
+    {
+      "id": "tooltip-l-fg/tooltip-l-kbd",
+      "foreground": "tooltip-l-fg",
+      "background": [
+        "tooltip-l-bg",
+        "tooltip-l-kbd"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "light"
+      ]
+    },
+    {
+      "id": "tooltip-d-fg/tooltip-d-kbd",
+      "foreground": "tooltip-d-fg",
+      "background": [
+        "tooltip-d-bg",
+        "tooltip-d-kbd"
+      ],
+      "minimum": 4.5,
+      "schemes": [
+        "dark"
+      ]
+    },
+    {
+      "id": "liquid-primary-fg/liquid-material-tinted-primary",
+      "foreground": "liquid-primary-fg",
+      "background": [
+        "liquid-material-tinted-primary"
+      ],
+      "minimum": 4.5,
+      "presets": [
+        "liquid"
       ]
     }
   ],

@@ -1,0 +1,5 @@
+# 2026-10-31 — Collection membership is not a lock key
+
+A copy registry locks resolved members, so collection updates need member-based installed recognition. Share validated collection metadata with the resolver; require nonempty/all-member own keys for locked apps, retain true-missing refusal, and validate every explicit request before resolving files or writing. Prove actual surface-core restoration/drift plus empty/partial/complete/mixed controls. Local metadata reads differ from item-source or remote resolution; count the latter explicitly.
+
+When merging a separately reviewed S3 surface, keep both CLI trees, package exports and publication docs; verify the resulting command census against the live tree. Regenerate source-content carriers before docs prose when copied components changed, then rebuild consumers. Re-measure old limitations: doclint124 is exact-main baseline after S3, not historical123. Native independent review signs off local source only; final readiness still needs both runtime suites and all required CI at the final evidence head.

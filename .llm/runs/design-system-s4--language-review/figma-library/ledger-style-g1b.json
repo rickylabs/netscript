@@ -1,0 +1,815 @@
+{
+ "group": "G1b",
+ "style": "bloom",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "updated": "2026-10-28",
+ "page": "102:808",
+ "styleComponents": "464:335306",
+ "modesOnStyleComponents": {
+  "Theme set": "B 239:8",
+  "Theme B": "Bloom 239:0",
+  "Theme": "Tonal 14:0 (as the crafted Bloom frames)",
+  "Scheme": "Light 3:0",
+  "Density": "Comfortable 3:2"
+ },
+ "kitsRenamed": [],
+ "prerequisite": "Theme B Bloom font/sans = Funnel Sans (checked)",
+ "categories": {
+  "actions": {
+   "status": "done",
+   "frame": "464:335307",
+   "setsFrame": "464:335312",
+   "review": "464:429365",
+   "strip": "465:92370",
+   "png": [
+    "review/styles/bloom/actions.png",
+    "review/styles/bloom/actions-strip.png"
+   ],
+   "swapTest": "pass (Button lg label+iconEnd+iconEndGlyph, outline label+iconEnd, Toggle label+selected, Icon button glyph, Action bar count kept)",
+   "sets": [
+    {
+     "name": "Bloom/Icon",
+     "id": "464:335313",
+     "baseId": "252:11798",
+     "variants": 3
+    },
+    {
+     "name": "Bloom/Icon/menu-dots",
+     "id": "464:335323",
+     "baseId": "(theme glyph, from 108:898)",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Spinner",
+     "id": "464:335328",
+     "baseId": "252:11837",
+     "variants": 18
+    },
+    {
+     "name": "Bloom/.Focus ring",
+     "id": "464:335383",
+     "baseId": "252:11805",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/.State layer",
+     "id": "464:335384",
+     "baseId": "252:11806",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Button / md",
+     "id": "464:370386",
+     "baseId": "253:372",
+     "variants": 30
+    },
+    {
+     "name": "Bloom/Button / lg",
+     "id": "464:370617",
+     "baseId": "254:721",
+     "variants": 30
+    },
+    {
+     "name": "Bloom/Button / sm",
+     "id": "464:370848",
+     "baseId": "254:371",
+     "variants": 30
+    },
+    {
+     "name": "Bloom/Button / xs",
+     "id": "464:371079",
+     "baseId": "254:1071",
+     "variants": 30
+    },
+    {
+     "name": "Bloom/Icon button / md",
+     "id": "464:412855",
+     "baseId": "255:262",
+     "variants": 25
+    },
+    {
+     "name": "Bloom/Icon button / lg",
+     "id": "464:413031",
+     "baseId": "255:740",
+     "variants": 25
+    },
+    {
+     "name": "Bloom/Icon button / sm",
+     "id": "464:413207",
+     "baseId": "255:501",
+     "variants": 25
+    },
+    {
+     "name": "Bloom/Icon button / xs",
+     "id": "464:413383",
+     "baseId": "255:979",
+     "variants": 25
+    },
+    {
+     "name": "Bloom/Toggle / md",
+     "id": "464:413559",
+     "baseId": "256:281",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Toggle / sm",
+     "id": "464:413688",
+     "baseId": "256:437",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Toggle / lg",
+     "id": "464:413817",
+     "baseId": "256:593",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Icon toggle / md",
+     "id": "464:413946",
+     "baseId": "276:8291",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Icon toggle / sm",
+     "id": "464:414043",
+     "baseId": "276:8431",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Icon toggle / lg",
+     "id": "464:414140",
+     "baseId": "276:8571",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Button group",
+     "id": "464:427939",
+     "baseId": "257:839",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Toggle group",
+     "id": "464:428414",
+     "baseId": "257:528",
+     "variants": 12
+    },
+    {
+     "name": "Bloom/.Action bar / actions",
+     "id": "464:429047",
+     "baseId": "258:544",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Action bar",
+     "id": "464:429109",
+     "baseId": "258:663",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Theme toggle",
+     "id": "464:429196",
+     "baseId": "258:742",
+     "variants": 6
+    }
+   ],
+   "swaps": [
+    "Button / Icon button / Toggle / Icon toggle: state-layer -> Bloom/.State layer, focus-ring -> Bloom/.Focus ring, spinner -> Bloom/Spinner",
+    "Button group items -> Bloom/Button / sm|md|lg + Bloom/Icon button / sm|md|lg (clean swap, full radius re-bound)",
+    "Toggle group items -> Bloom/Toggle / sm|md",
+    "Action bar actions default -> Bloom/.Action bar / actions (Bloom/Button / sm ghost); theme-only more = Bloom/Icon button / md secondary at 44 with more-horizontal",
+    "Theme toggle -> Bloom/Icon button / md outline"
+   ],
+   "deviations": [
+    "Primary pill padding is the B.pill table's asymmetric left/right (e.g. md 20/15) whether or not iconEnd shows: padding cannot follow the boolean, so a label-only hero pill sits 2-3px left of centre.",
+    "The label-to-disc gap uses a theme-only end-gap spacer (bound to iconEnd) with gap 8 (xs 6), so icon-start keeps a normal 8 gap; label-to-icon-end totals the table gap (19/21/17/15).",
+    "Button loading: the spinner stays in the base start slot with the arc in the label role; it is not moved into the action disc.",
+    "Action bar close is unbound from the close boolean and hidden (the brief hides it); the close property still exists for contract parity.",
+    "Action bar more disc is a 44 override of Bloom/Icon button / md secondary (the ladder has no 44 disc).",
+    "Link focus ring is full radius, so on a 48-tall link it reads as a near-circle.",
+    "API note: the runtime skips invisible instance children unless figma.skipInvisibleInstanceChildren = false; hidden glyph/spinner colours were re-applied with it off. Setting an instance-swap glyph to its own default resets nested colour overrides (instance-level quirk)."
+   ]
+  },
+  "forms": {
+   "status": "done",
+   "frame": "465:104405",
+   "setsFrame": "465:104410",
+   "review": "466:96713",
+   "strip": "466:100029",
+   "png": [
+    "review/styles/bloom/forms.png",
+    "review/styles/bloom/forms-strip.png"
+   ],
+   "swapTest": "pass (Input value+iconStart, Checkbox label+description+descriptionVisible, Switch label, Select placeholder, Field error kept)",
+   "sets": [
+    {
+     "name": "Bloom/Label",
+     "id": "465:104411",
+     "baseId": "278:45",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Input",
+     "id": "465:104436",
+     "baseId": "279:312",
+     "variants": 24
+    },
+    {
+     "name": "Bloom/Textarea",
+     "id": "465:104717",
+     "baseId": "280:597",
+     "variants": 12
+    },
+    {
+     "name": "Bloom/Select",
+     "id": "465:104852",
+     "baseId": "281:1023",
+     "variants": 24
+    },
+    {
+     "name": "Bloom/Select content",
+     "id": "465:105069",
+     "baseId": "281:826",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Checkbox",
+     "id": "465:105668",
+     "baseId": "283:1470",
+     "variants": 15
+    },
+    {
+     "name": "Bloom/Radio",
+     "id": "465:105819",
+     "baseId": "284:1828",
+     "variants": 10
+    },
+    {
+     "name": "Bloom/Switch",
+     "id": "465:105910",
+     "baseId": "285:2329",
+     "variants": 20
+    },
+    {
+     "name": "Bloom/Radio group",
+     "id": "466:64159",
+     "baseId": "284:1885",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Field",
+     "id": "466:64264",
+     "baseId": "287:2656",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Field set",
+     "id": "466:64479",
+     "baseId": "287:2743",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Input group",
+     "id": "466:64649",
+     "baseId": "297:3861",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/OTP slot",
+     "id": "466:65361",
+     "baseId": "301:4385",
+     "variants": 12
+    },
+    {
+     "name": "Bloom/Input OTP",
+     "id": "466:65410",
+     "baseId": "301:4490",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/Slider",
+     "id": "466:65565",
+     "baseId": "303:5022",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Combobox",
+     "id": "466:76594",
+     "baseId": "305:5623",
+     "variants": 10
+    },
+    {
+     "name": "Bloom/Calendar day",
+     "id": "466:69802",
+     "baseId": "307:6154",
+     "variants": 30
+    },
+    {
+     "name": "Bloom/Calendar",
+     "id": "466:69953",
+     "baseId": "309:8620",
+     "variants": 8
+    },
+    {
+     "name": "Bloom/Date picker",
+     "id": "466:74779",
+     "baseId": "313:14889",
+     "variants": 10
+    },
+    {
+     "name": "Bloom/Search",
+     "id": "466:77395",
+     "baseId": "316:16426",
+     "variants": 8
+    },
+    {
+     "name": "Bloom/Dropzone",
+     "id": "466:77597",
+     "baseId": "319:16832",
+     "variants": 7
+    }
+   ],
+   "swaps": [
+    "Field label/control -> Bloom/Label + Bloom/Input (state-matched); vertical hides the nested label and writes its text into the Input field-label",
+    "Field set fields -> Bloom/Field; Radio group -> Bloom/Radio; Input OTP slots -> Bloom/OTP slot",
+    "Input group control -> Bloom/Input (chrome dropped, drawn on the group), addon button -> Bloom/Icon button / xs outline",
+    "Calendar days/nav/month select -> Bloom/Calendar day, Bloom/Icon button outline, Bloom/Select sm",
+    "Date picker trigger/calendar -> Bloom/Select (state-matched), Bloom/Calendar",
+    "Combobox input -> Bloom/Input, content -> Bloom/Select content",
+    "Search field -> Bloom/Input sm with B.outline pill overrides (40/36, radius/control, control-outline edge, field-label hidden)",
+    "Dropzone icon -> Bloom/Icon button / lg outline with upload; button -> Bloom/Button / sm outline",
+    "Sweep: every base .Focus ring / .State layer / Spinner left inside Actions + Forms sets -> Bloom (30/7/7); Action bar close -> Bloom/Icon button / sm ghost"
+   ],
+   "pendingSweeps": [
+    "Select content rows + Combobox rows -> Bloom/Menu item type=option (Overlays)",
+    "Search kbd, Select content/Combobox shortcut Kbd -> Bloom/Kbd; Combobox chips -> Bloom/Badge subtle + remove (Data display 1)",
+    "Date picker popover surface -> Bloom/Popover (Overlays)"
+   ],
+   "deviations": [
+    "Input/Select/Textarea field-label is a theme-only text layer with no text property (protocol allows only theme-only boolean properties); override its text per instance (defaults: Email, Status, Note, Date on Date picker).",
+    "Input/Select icons sit in the value row (below the field-label), not centred on the 56 capsule, because the capsule's 26/9 padding is on the root row.",
+    "Input/Select/Textarea hover uses a theme-only state-layer (Bloom/.State layer) since the base has no state-layer part; Checkbox and Switch add the same theme-only part on the disc.",
+    "Input width raised to a 280 minimum (Select 280, Textarea 320) so the label-inside capsule reads; instances can still override width.",
+    "Switch thumb ellipse replaced by a 12 frame named thumb (size/switch/thumb) holding Icon/check; sm switch binds the md size/switch/* (both 28 per the brief).",
+    "Textarea alert-circle is absolute at the top-right, not in a flow row.",
+    "Search is built on Bloom/Input sm with pill overrides rather than its own pill anatomy.",
+    "Combobox and Date picker popover surfaces use the Menu content recipe directly until Bloom/Popover and Bloom/Menu item exist."
+   ]
+  },
+  "navigation": {
+   "status": "done",
+   "frame": "538:77615",
+   "setsFrame": "538:77620",
+   "review": "541:12804",
+   "strip": "541:16300",
+   "png": [
+    "review/styles/bloom/navigation.png",
+    "review/styles/bloom/navigation-strip.png"
+   ],
+   "swapTest": "pass (Tab label+count, Nav item label+count, Page key label, Step title+description+descriptionText kept)",
+   "sets": [
+    {
+     "name": "Bloom/Location marker",
+     "id": "538:77621",
+     "baseId": "337:22",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Breadcrumb item",
+     "id": "538:77624",
+     "baseId": "338:92",
+     "variants": 9
+    },
+    {
+     "name": "Bloom/Breadcrumb",
+     "id": "538:77697",
+     "baseId": "338:161",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Page key",
+     "id": "538:77829",
+     "baseId": "339:270",
+     "variants": 20
+    },
+    {
+     "name": "Bloom/Pager tile",
+     "id": "538:78007",
+     "baseId": "339:319",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Pagination",
+     "id": "538:78056",
+     "baseId": "339:379",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Tab / horizontal",
+     "id": "538:78176",
+     "baseId": "342:402",
+     "variants": 24
+    },
+    {
+     "name": "Bloom/Tab / vertical",
+     "id": "538:78525",
+     "baseId": "342:599",
+     "variants": 24
+    },
+    {
+     "name": "Bloom/Tabs list",
+     "id": "538:78874",
+     "baseId": "343:424",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Tabs",
+     "id": "538:79641",
+     "baseId": "343:489",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Nav item",
+     "id": "540:11856",
+     "baseId": "345:601",
+     "variants": 20
+    },
+    {
+     "name": "Bloom/Nav group",
+     "id": "540:12074",
+     "baseId": "346:611",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Sidebar",
+     "id": "540:132555",
+     "baseId": "347:994",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Top bar",
+     "id": "540:133678",
+     "baseId": "351:1349",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/.Brand logo",
+     "id": "538:79894",
+     "baseId": "344:410",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Nav menu item",
+     "id": "540:12463",
+     "baseId": "349:1036",
+     "variants": 10
+    },
+    {
+     "name": "Bloom/.Nav menu link",
+     "id": "540:12524",
+     "baseId": "348:1108",
+     "variants": 3
+    },
+    {
+     "name": "Bloom/Navigation menu",
+     "id": "540:12540",
+     "baseId": "349:1132",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Menubar trigger",
+     "id": "540:12710",
+     "baseId": "349:1153",
+     "variants": 5
+    },
+    {
+     "name": "Bloom/Menubar",
+     "id": "540:12731",
+     "baseId": "349:1236",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Step",
+     "id": "540:13142",
+     "baseId": "352:1355",
+     "variants": 8
+    },
+    {
+     "name": "Bloom/Stepper",
+     "id": "540:13211",
+     "baseId": "352:1424",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Sidebar toggle",
+     "id": "538:79896",
+     "baseId": "344:462",
+     "variants": 4
+    }
+   ],
+   "swaps": [
+    "Breadcrumb -> Bloom/Breadcrumb item; Pagination -> Bloom/Page key + Bloom/Pager tile",
+    "Tabs list -> Bloom/Tab / horizontal|vertical; Tabs -> Bloom/Tabs list",
+    "Nav group -> Bloom/Nav item; Navigation menu -> Bloom/Nav menu item + Bloom/.Nav menu link; Menubar -> Bloom/Menubar trigger",
+    "Stepper -> Bloom/Step; Sidebar toggle -> Bloom/Icon button / sm outline (desktop) | lg ghost with Bloom/Icon/menu-dots (mobile closed)",
+    "Sidebar -> Bloom/Nav group, Bloom/.Brand logo, Bloom/Sidebar toggle; Top bar -> Bloom/Sidebar toggle, Bloom/Breadcrumb, Bloom/Search, Bloom/Icon button / md outline (bell, mobile search), Bloom/Theme toggle, Bloom/Navigation menu"
+   ],
+   "pendingSweeps": [
+    "Menubar open menu (base Menu content) -> Bloom/Menu content (Overlays)",
+    "Tab and Nav item count -> Bloom/Badge plain (Data display 1)",
+    "Sidebar footer and Top bar avatar frames are base frames styled as bloom/peach initials circles; swap to Bloom/Avatar only if the base used Avatar instances (it uses frames)"
+   ],
+   "deviations": [
+    "Tab line indicator: the base part indicator (a 2px rule) is reshaped into the 6px bloom/fg dot (horizontal centred under the label, vertical on the inline-start side) instead of a new layer, so the part name stays unique.",
+    "Page key previous/next are drawn as the outline pill inside Page key (not nested Bloom/Button instances), because they are variants of Page key in the base.",
+    "Sidebar collapsible=icon column widened to 60 so the 44 nav discs fit with the 8 body padding.",
+    "Sidebar and Top bar avatars are the base avatar frames restyled (bloom/peach circle, B.initials at 40, caption Medium at 32), not Bloom/Avatar instances.",
+    "Top bar desktop shows the open sidebar toggle (x), following the base instance's open=true and the brief's desktop x for open.",
+    "Strip: the three Top bar instances sit in their own rows (Base (Utility) \u00b7 Top bar, Base under Bloom \u00b7 Top bar, Bloom \u00b7 Top bar) so the 1280 bar is not clipped."
+   ]
+  },
+  "overlays": {
+   "status": "done",
+   "frame": "544:141783",
+   "setsFrame": "544:141788",
+   "review": "547:76312",
+   "strip": "547:78769",
+   "png": [
+    "review/styles/bloom/overlays.png",
+    "review/styles/bloom/overlays-strip.png"
+   ],
+   "swapTest": "pass (Menu item label+shortcut, Tooltip label, Alert dialog title+descriptionText, Dialog title+footer kept)",
+   "sets": [
+    {
+     "name": "Bloom/Menu item",
+     "id": "544:141789",
+     "baseId": "371:587",
+     "variants": 30
+    },
+    {
+     "name": "Bloom/Menu label",
+     "id": "544:142456",
+     "baseId": "373:35",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Menu separator",
+     "id": "544:142459",
+     "baseId": "373:38",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Menu group",
+     "id": "544:142461",
+     "baseId": "373:248",
+     "variants": 3
+    },
+    {
+     "name": "Bloom/Menu content",
+     "id": "544:142837",
+     "baseId": "373:256",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Dropdown menu",
+     "id": "544:143174",
+     "baseId": "374:382",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Context menu",
+     "id": "544:143570",
+     "baseId": "374:653",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/Dialog",
+     "id": "545:60004",
+     "baseId": "378:743",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Alert dialog",
+     "id": "545:60468",
+     "baseId": "378:880",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/Sheet",
+     "id": "545:60703",
+     "baseId": "379:1004",
+     "variants": 8
+    },
+    {
+     "name": "Bloom/Drawer",
+     "id": "545:61330",
+     "baseId": "379:1150",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/Popover",
+     "id": "544:144034",
+     "baseId": "381:937",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/Tooltip",
+     "id": "544:143949",
+     "baseId": "381:1030",
+     "variants": 12
+    },
+    {
+     "name": "Bloom/Hover card",
+     "id": "544:144145",
+     "baseId": "381:1093",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/Command item",
+     "id": "545:61579",
+     "baseId": "382:1015",
+     "variants": 9
+    },
+    {
+     "name": "Bloom/Command palette",
+     "id": "545:61805",
+     "baseId": "383:1355",
+     "variants": 6
+    }
+   ],
+   "swaps": [
+    "Menu group / Menu content -> Bloom/Menu label, item, separator",
+    "Dropdown menu trigger -> Bloom/Button / md outline + iconEnd chevron-down; Dropdown/Context menu -> Bloom/Menu content",
+    "Dialog/Alert dialog/Sheet/Drawer footers -> Bloom/Button / lg outline (cancel) + lg primary with check disc (action) or lg destructive; close -> Bloom/Icon button / sm outline (Dialog) | ghost (Sheet/Drawer)",
+    "Popover close -> Bloom/Icon button / xs outline; Command item enter -> Bloom/Icon button / sm outline with corner-down-left",
+    "Command palette -> Bloom/Command item, Bloom/Tab / horizontal segmented filters, Bloom/Input (sm, chrome stripped) in the capsule input-row",
+    "SWEEP: Bloom/Select content rows -> Bloom/Menu item (5); Bloom/Menubar open menu -> Bloom/Menu content; Page key previous/next nest Bloom/Button / sm outline (wrapper chrome dropped); base Location marker -> Bloom/Location marker (157, incl. hidden markers); leftover base .Focus ring / .State layer / Spinner -> Bloom (6/13/12)"
+   ],
+   "pendingSweeps": [
+    "Menu item / Tooltip / Command item / Command palette / Menubar / Top bar / Search / Select content / Combobox Kbd -> Bloom/Kbd; Hover card avatar -> Bloom/Avatar (Data display 1)"
+   ],
+   "deviations": [
+    "Popover / Tooltip / Hover card arrows: the arrow frame stays bound to the arrow boolean; its tip is hidden and the frame collapsed to ~0 height, so arrow=true adds no visible gap.",
+    "Sheet/Drawer: the theme-only sheet frame starts under the header (header padding 28/28/20) rather than at exactly header height + 20; body padding 26/28/0/28 and footer 20/28/28/28 sit on top of it.",
+    "Context menu open variant grown to 392x535 so the taller 44-row Bloom menu stays inside the component.",
+    "The base .Slot placeholder (private, no Bloom twin in the brief) stays base; its radius is overridden to 22 inside Bloom sets so it does not render as a 999 circle.",
+    "Scrim fills are copied from the base backdrop (surface/overlay with its alpha) rather than re-bound.",
+    "Command palette dialog uses padding 16/16/8 so the input-row capsule can sit inside the r36 dialog."
+   ]
+  },
+  "data-display-1": {
+   "status": "done",
+   "frame": "550:23689",
+   "setsFrame": "550:23694",
+   "review": "558:27202",
+   "strip": "558:29430",
+   "png": [
+    "review/styles/bloom/data-display-1.png",
+    "review/styles/bloom/data-display-1-strip.png"
+   ],
+   "swapTest": "pass (Badge label+remove, Avatar initials+presence, Stat card label+value+detailText+detail, Card title+descriptionText+description kept)",
+   "sets": [
+    {
+     "name": "Bloom/Kbd",
+     "id": "550:23695",
+     "baseId": "403:28",
+     "variants": 4
+    },
+    {
+     "name": "Bloom/Kbd group",
+     "id": "550:23704",
+     "baseId": "403:96",
+     "variants": 8
+    },
+    {
+     "name": "Bloom/Badge",
+     "id": "550:23785",
+     "baseId": "405:180",
+     "variants": 20
+    },
+    {
+     "name": "Bloom/Badge / kind",
+     "id": "550:23926",
+     "baseId": "405:211",
+     "variants": 10
+    },
+    {
+     "name": "Bloom/Avatar",
+     "id": "550:23961",
+     "baseId": "406:95",
+     "variants": 12
+    },
+    {
+     "name": "Bloom/Avatar presence",
+     "id": "550:23957",
+     "baseId": "406:43",
+     "variants": 3
+    },
+    {
+     "name": "Bloom/Avatar group",
+     "id": "550:24013",
+     "baseId": "406:150",
+     "variants": 3
+    },
+    {
+     "name": "Bloom/Item",
+     "id": "550:24108",
+     "baseId": "408:792",
+     "variants": 27
+    },
+    {
+     "name": "Bloom/Item group",
+     "id": "550:25198",
+     "baseId": "408:996",
+     "variants": 2
+    },
+    {
+     "name": "Bloom/.Item icon tile",
+     "id": "550:24104",
+     "baseId": "408:82",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/.Item image",
+     "id": "550:24107",
+     "baseId": "408:85",
+     "variants": 0
+    },
+    {
+     "name": "Bloom/Card",
+     "id": "552:23896",
+     "baseId": "409:951",
+     "variants": 16
+    },
+    {
+     "name": "Bloom/Stat card",
+     "id": "552:25231",
+     "baseId": "409:1270",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Table header cell",
+     "id": "552:25668",
+     "baseId": "410:546",
+     "variants": 27
+    },
+    {
+     "name": "Bloom/Table cell",
+     "id": "552:25831",
+     "baseId": "410:383",
+     "variants": 27
+    },
+    {
+     "name": "Bloom/Table row",
+     "id": "553:24071",
+     "baseId": "412:1187",
+     "variants": 20
+    },
+    {
+     "name": "Bloom/Table",
+     "id": "553:25855",
+     "baseId": "413:1367",
+     "variants": 6
+    },
+    {
+     "name": "Bloom/Data table",
+     "id": "553:27222",
+     "baseId": "416:4605",
+     "variants": 10
+    }
+   ],
+   "swaps": [
+    "Kbd group -> Bloom/Kbd; Avatar -> Bloom/Avatar presence; Avatar group -> Bloom/Avatar (2px OUTSIDE canvas ring, -10 overlap, count on surface-high)",
+    "Item media default (mediaContent) -> Bloom/.Item icon tile; Item actions -> Bloom/Button / sm outline; Item group -> Bloom/Item",
+    "Card action -> Bloom/Button / sm outline (rule: Bloom/Icon button / lg outline plus disc); footer -> Bloom/Button / lg outline + primary",
+    "Stat card badge -> Bloom/Badge outline; theme-only open disc = Bloom/Icon button / lg outline; hero notch-disc = Bloom/Icon button / md outline at 42 with pen",
+    "Table cell -> Bloom/Badge outline, Bloom/Avatar md initials on bloom/sky, Bloom/Checkbox, Bloom/Icon button / sm outline (pen)",
+    "Table row -> Bloom/Table cell; Table -> Bloom/Table header cell + Bloom/Table row; Data table -> Bloom/Table, Bloom/Search, Bloom/Button md/sm outline (filters as pills with chevron), Bloom/Toggle group, Bloom/Pagination, Bloom/Action bar floating, Bloom/Menu content",
+    "Row data re-applied after the swap by path from the matching base variant (Filigrane lesson): badge tones + labels (5 re-toned), avatar initials (51), cell text/boolean props (50)",
+    "SWEEP: base Kbd (83) -> Bloom/Kbd (Tooltip kbd = inverse); base Badge (68) -> Bloom/Badge (Tab/Nav/Sidebar counts = plain, Combobox chips = subtle + remove); base Avatar (4) -> Bloom/Avatar (Hover card on bloom/sky); general top-down sweep of any remaining base twin (86, Item group/Table/Data table)"
+   ],
+   "deviations": [
+    "Stat card head row: label moved from the header to the root below the head row; icon wrapped in a theme-only icon-disc (48 bloom/hero) that carries the icon boolean; theme-only head-spacer keeps the open disc on the right. Theme-only booleans open (default true) and track (default false) added.",
+    "Stat card hero is fixed at 248x128 with the copied notch vector (path unchanged); padding 20/12/20/18 so the base sample value fits. The hero hides the head row and label.",
+    "Table cell number/avatar text use bound font/* and type/*/style with literal 24/28, 28/32 and 14/18 (no Theme B variables, as the brief documents). The avatar cell's secondary (meta) line is reordered above the name.",
+    "Table row actions cell uses layer opacity (1 on hover/selected, 0 otherwise) rather than visibility, so the cell keeps its column width.",
+    "Data table filter chips (base Toggle instances) become Bloom/Button / md outline pills with a chevron, per the brief; their selected state is not carried.",
+    "Card hover adds a theme-only state-layer; Card rule focus ring is r8.",
+    "Item title uses B.heading at every size (xs included), per the brief.",
+    "Left base (no Bloom twin in the brief): .Slot placeholders (radius overridden to 22), Skeleton and Empty state inside Table/Data table loading and empty variants (and the base buttons inside Empty state)."
+   ]
+  }
+ },
+ "remaining": [
+  "optional theme extra Bloom/Notch (not built; the hero stat card carries the copied notch path)",
+  "Base-only placeholders without a Bloom twin: .Slot, Skeleton, Empty state"
+ ],
+ "status": "All five categories built: 101 sets + Bloom/Icon/menu-dots; review frames and strips captured; Navigation/Overlays/Forms PNGs re-captured after the Data display 1 sweep.",
+ "resumeNotes": [
+  "Run every script with figma.skipInvisibleInstanceChildren = false, or hidden nested parts (icon-end, spinner, hidden glyphs) are silently skipped.",
+  "Swap nested base instances with a clean swap (read componentProperties, swapComponent, resetOverrides, re-apply non-variant props) so base fill/stroke overrides do not leak; use plain swapComponent only for the strip swap test.",
+  "Find a set's own focus-ring as a direct child; a deep findOne can hit a nested Bloom instance's ring first (Input group, Dropzone).",
+  "Helper prelude and ID map rebuilt 2026-10-31 in the builder's session scratchpad (g1b/prelude.js, g1b/vars.md); rebuild from this ledger if missing.",
+  "Never use resetOverrides() on a nested part without restoring inst.name afterwards."
+ ],
+ "partNameFix": "Clean swaps used resetOverrides(), which also reset nested instance layer names to their component names (e.g. checkbox -> Bloom/Checkbox). 1120 nested part names were restored from the base sets (unmatched defaulted names mapped to unmatched base names in order, per container). Later swaps keep the name explicitly."
+}

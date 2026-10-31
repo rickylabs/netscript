@@ -269,3 +269,39 @@ paths and both plugin export maps remain byte-identical to reviewed94393bc8. Inc
 source is retained exactly from main. This carrier-only continuation finalizes the coherent
 merge tree; post-merge root/union tests/quality are running. Its new exact-head independent
 sign-off remains unproven at the spent5-round cap and must be decided by the coordinator.
+
+
+## Design — reconciliation relaunch mc009d-r2-2396
+
+1. Public surface: existing workers/streams native factory contracts unchanged.
+2. Vocabulary: merge reconciliation and generated carriers; no new domain terms.
+3. Ports: existing generators, native service runtime and wrapper test runners.
+4. Constants: existing task/gate IDs reused; no new product constants.
+5. Commit slices: one coherent main merge/carrier refresh plus run evidence; gates and files
+   enumerated in reconciliation-plan.md. No history rewrite or intermediate broken push.
+6. Deferred scope: hosted scaffold.runtime to coordinator; published graph to release captain.
+7. Contributor path: this run context-pack.md links source, tests, acceptance and current gates.
+
+Selected PLAN-EVAL is mandatory under the relaunch brief; waiting for its independent verdict
+before merging. Matrix resolved; owner evaluator override recorded verbatim in supervisor.md.
+
+Independent reconciliation PLAN-EVAL: PASS before merge. Requested/observed model claude-opus-5-5, high effort, separate Anthropic session, read-only tools and closed stdin. See reconciliation-plan-eval.md.
+
+Merge started against7ee9c3ed04607eb0967f9ef0ef4cd874652817aa. Exactly three non-source conflicts. Debt conflict resolved by retaining both complete blocks, unchanged. Generated files will be overwritten solely by generators. Regenerate prose and publish-assets before corpus so Deno documentation never parses conflict markers in a carrier.
+
+Canonical chain completed: prose → publish-assets → corpus (--allow-dirty during merge) →
+assets barrel. Four freshness checks, quality:gate, Aspire parity, docs accuracy and release
+preflight PASS. Structured lint has zero occurrences; fmt365 selected, zero findings.
+Both parents' debt headings retained; workers/streams services source matches accepted PR.
+Run-wide git diff --check flags whitespace only in incoming main's retained historical run
+artifacts; no cleanup is authorized or needed for this bounded reconciliation.
+Reconcile: live main advanced to1d274c16bd3163eb72a40ea3f2e3f0523861159f (KV pagination
+and workflow docs). Preserve first merge's checks, then take that main through a second normal
+merge before final push/review. No feature scope expansion or lock churn is inferred.
+
+Combined suite terminal:1526 passed/1 failed/16 ignored. Sole failure is workers non-contract
+entrypoint doc lint, private-type-ref: native AuthzDecision now references ProcedureErrorCode
+(introduced on incoming main). Full original test remains red; no test assertion or export/debt
+bound is changed. Both factories still preserve their reviewed source. This merge-only brief
+expressly forbids reimplementation; closure repair would grow the exact22/21 named surfaces
+and requires coordinator disposition. Report acceptance8 and complete-suite proof as unproven.

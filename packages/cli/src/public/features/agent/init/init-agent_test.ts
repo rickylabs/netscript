@@ -15,6 +15,7 @@ import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated
 import { DenoAgentInitFileSystem } from './agent-init-file-system.ts';
 import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
 import { initAgent } from './init-agent.ts';
+import { TOOL_NAMES } from '@netscript/mcp';
 import { describeAgentInitResolution } from './hosts/agent-host-resolution.ts';
 import type { AgentDocsGenerator } from './agent-docs-generator.ts';
 
@@ -380,7 +381,7 @@ Deno.test('S-18 prior-release host stays pinned until agent init and restart exp
     assertEquals(after.mcpServers.netscript.args[6], MIGRATION_TARGET_SPECIFIER);
 
     const restartedTools = await listToolsAfterHostRestart(root);
-    assertEquals(restartedTools.length, 22);
+    assertEquals(restartedTools, [...TOOL_NAMES]);
     for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });

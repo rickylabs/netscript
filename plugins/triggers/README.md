@@ -36,6 +36,41 @@ binds them to a NetScript host.
 - **An operations CLI** — `list`, `add-webhook`, `add-scheduled`, `add-file-watch`, `fire`,
   `preview`, `test`, `events`, and `enable`/`disable` cover authoring and operating triggers.
 
+## Excluding helpers from generated registries
+
+`netscript generate plugins` selects definition modules from `triggers/*.ts`. Keep a helper or a
+dependency-injected factory beside those definitions by putting this exact comment on its first
+line:
+
+```ts
+// @netscript-registry-ignore
+export function scopedId(scope: string, name: string): string {
+  return `${scope}.${name}`;
+}
+```
+
+For example, add it to `triggers/helper.ts`. The directive is shared by all plugin runtime
+registries and standalone registry compilers. It excludes the whole module before generating
+imports; ordinary imports from your application keep working. Use a separate module for a top-level
+trigger definition that should remain registered.
+
+The marker must be the complete first-line comment, before any license header or code. Indentation,
+a UTF-8 BOM and CRLF are accepted; a later comment, a string containing the marker, or extra text on
+the line does not opt out. Existing manifest suffix and filename exclusions still apply.
+
+Regenerate and inspect the result:
+
+```sh
+netscript generate plugins
+netscript plugin doctor
+```
+
+Doctor names eligible modules carrying the directive as `Explicitly excluded registry modules`, on
+both healthy and stale registries. Remove the directive and regenerate to register the module again.
+Unmarked modules retain the plugin's existing definition validation. Keep the CLI, shared plugin
+package and installed plugins on matching release versions so their selector and inspection protocol
+agree.
+
 ## Architecture
 
 ```mermaid
@@ -125,6 +160,18 @@ console.log(triggersPlugin.name); // "@netscript/plugin-triggers"
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-triggers@<version>`](https://jsr.io/@netscript/plugin-triggers/doc)
 (pin `<version>` on the pre-release line, as above).
+
+## File-watch availability
+
+The generated background child includes `fileWatches` in its existing `/health` response. Each entry
+identifies the trigger and reports `watching` or `unavailable` with an ISO transition time. Missing
+roots and failed watches remain visible while other triggers continue processing. The adapter
+retries with bounded exponential backoff and reports recovery after reopening the root. It does not
+replay files changed during an outage. Shutdown cancels retries and drains handlers.
+
+Custom background glue can use `TriggerHealthMonitor` from the runtime subpath and provide its
+snapshot to `runChildHealthProcess`. Aggregate child readiness remains independent of individual
+watch availability, including the starter watch before its directory exists.
 
 ## Docs
 

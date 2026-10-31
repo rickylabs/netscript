@@ -38,6 +38,8 @@ export interface PollingStrategyOptions {
    * @default 3
    */
   readonly maxConsecutiveFailures?: number;
+  /** Called after roots are accessible and the initial snapshot is built. */
+  readonly onReady?: () => void | Promise<void>;
   /** Abort signal for graceful shutdown. */
   readonly signal?: AbortSignal;
 }
@@ -66,6 +68,7 @@ export class PollingStrategy implements WatchStrategyHandler {
   private readonly allowedEvents: ReadonlySet<EventKind>;
   private readonly pollIntervalMs: number;
   private readonly signal?: AbortSignal;
+  private readonly onReady?: () => void | Promise<void>;
   private readonly snapshot = new Map<string, FileSnapshot>();
   private readonly failureTracker: AccessFailureTracker;
 
@@ -74,6 +77,7 @@ export class PollingStrategy implements WatchStrategyHandler {
     this.allowedEvents = new Set(options.events ?? ['create']);
     this.pollIntervalMs = Math.max(options.pollIntervalMs ?? 5000, 500);
     this.signal = options.signal;
+    this.onReady = options.onReady;
 
     this.failureTracker = new AccessFailureTracker({
       maxConsecutiveFailures: options.maxConsecutiveFailures ?? 3,
@@ -93,8 +97,14 @@ export class PollingStrategy implements WatchStrategyHandler {
 
   /** Start polling and yield file events. */
   async *watch(): AsyncIterable<WatchEvent> {
-    // Initial snapshot (no events emitted for the first scan)
-    await this.buildSnapshot();
+    if (this.signal?.aborted) return;
+    // Preserve transient-access grace without announcing readiness for a failed scan.
+    while (!await this.buildSnapshot()) {
+      await delay(this.pollIntervalMs, { signal: this.signal }).catch(() => {});
+      if (this.signal?.aborted) return;
+    }
+    if (this.signal?.aborted) return;
+    await this.onReady?.();
 
     while (!this.signal?.aborted) {
       await delay(this.pollIntervalMs, { signal: this.signal }).catch(() => {});
@@ -172,38 +182,42 @@ export class PollingStrategy implements WatchStrategyHandler {
     }
   }
 
-  /** Build the initial snapshot without emitting events. */
-  private async buildSnapshot(): Promise<void> {
+  /** Retry incomplete initial scans within the existing access-failure budget. */
+  private async buildSnapshot(): Promise<boolean> {
+    let ready = true;
+    this.snapshot.clear();
     for (const root of this.paths) {
       try {
+        const info = await Deno.stat(root);
+        if (!info.isDirectory) {
+          throw new Deno.errors.NotADirectory('Watch root is not a directory.');
+        }
         for await (
-          const entry of walk(root as string, {
+          const entry of walk(root, {
             includeDirs: false,
             followSymlinks: false,
           })
         ) {
           if (!this.matchesGlob(entry.name)) continue;
-
           const stat = await safeStat(entry.path);
           if (!stat) continue;
-
           this.snapshot.set(entry.path, {
             size: stat.size,
             mtime: stat.modifiedAt?.getTime() ?? 0,
           });
         }
+        this.failureTracker.recordSuccess(root);
       } catch (error: unknown) {
-        // Directory may not exist yet — will be picked up on next poll
         if (
-          error instanceof Deno.errors.NotFound ||
-          error instanceof Deno.errors.PermissionDenied
+          !(error instanceof Deno.errors.NotFound || error instanceof Deno.errors.PermissionDenied)
         ) {
-          this.failureTracker.recordFailure(root as string);
-          continue;
+          throw error;
         }
-        throw error;
+        ready = false;
+        if (this.failureTracker.recordFailure(root)) throw error;
       }
     }
+    return ready;
   }
 
   /** Check if a filename matches any of the configured glob patterns. */

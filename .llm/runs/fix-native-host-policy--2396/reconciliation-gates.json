@@ -1,0 +1,69 @@
+{
+  "sourceMain": "7ee9c3ed04607eb0967f9ef0ef4cd874652817aa",
+  "note": "Wrapper receipts were collected on the merge working tree at baseline c875e3893458f92a701239ff10461df2c56c2c9f; they attest commands, not clean-head certification. Final exact-head review follows push.",
+  "gates": [
+    {
+      "gate": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 22749
+    },
+    {
+      "gate": "aspire-version-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 475
+    },
+    {
+      "gate": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2762
+    },
+    {
+      "gate": "check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 280678
+    },
+    {
+      "gate": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10233
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12101
+    },
+    {
+      "gate": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 573
+    },
+    {
+      "gate": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 27303
+    }
+  ],
+  "combinedTests": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 1526,
+      "failed": 1,
+      "ignored": 16,
+      "totalResults": 1543,
+      "uniqueFailures": 1
+    },
+    "failure": {
+      "name": "workers non-contract entrypoints have no documentation diagnostics",
+      "file": "plugins/workers/tests/public/type-refs_test.ts",
+      "reason": "Native AuthzDecision now references ProcedureErrorCode introduced by incoming main; factory facade lacks that public type closure. Existing exact22/21 export-debt bounds forbid silently adding exports."
+    }
+  }
+}

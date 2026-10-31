@@ -1,0 +1,5 @@
+Task tokens:sources:check deno task tokens:embed:check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/import-figma-tokens.ts --check && deno run --lock=deno.lock --frozen --allow-read=. --allow-env scripts/validate-token-sources.ts
+Task tokens:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check
+Token JSON embeddings checked.
+Imported 24 presets, 1144 registered roles.
+DTCG schemas, alias-only semantics and registered names: PASS; 96 resolver inputs.

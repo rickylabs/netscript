@@ -309,7 +309,7 @@ const app = createService(router, { name: 'orders' })
 
 Contract enforcement is opt-in: existing unguarded services, scaffolds, and standalone
 `createScopeAuthorizer()` consumers are unchanged. It activates only when an application passes a
-`createContractAuthorizer(contract, { fallback?, rawRoutes? })` result to `.withAuthz()`.
+`createContractAuthorizer(contract, { fallback?, rawRoutes?, retiredPaths? })` result to `.withAuthz()`.
 
 Contract metadata wins on disagreement. A match-aware fallback, including
 `createScopeAuthorizer()`, is consulted only when a matched procedure has no access metadata. No
@@ -326,9 +326,53 @@ migration fallback; it is not deprecated.
 > `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
 > construction, before any request.
 
+### Unknown and retired procedures
+
+An authenticated request under guarded coverage that matches no served procedure returns **404**:
+
+```json
+{ "error": "NOT_FOUND", "message": "authz.no-contract-procedure", "code": "procedure_not_found" }
+```
+
+Declare removed mounted paths when an app needs an explicit upgrade signal:
+
+```ts
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  retiredPaths: ['/api/v1/orders', '/api/rpc/v1/orders/list', '/stream'],
+});
+```
+
+These paths return **410** after authentication:
+
+```json
+{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }
+```
+
+Missing or invalid credentials retain the existing 401 `UNAUTHORIZED` response without a procedure
+code. Retirement requires authentication even outside `protect` or inside `allowAnonymous`.
+Active REST/RPC procedures (including aliases), internal audience guards and declared raw routes
+win over retirement. Their scope/role denials remain 403; public procedures stay public. A fallback
+cannot turn a missing or retired path into an allowed request. Undeclared paths outside protected
+coverage keep their previous behavior.
+
+`retiredPaths` contains exact, case-sensitive, canonical mounted absolute paths for all methods,
+with query strings ignored. Declare REST/RPC/alias paths separately. No trailing slash, percent
+encoding, parameters, wildcards, repeated separators, dot segments, backslashes, whitespace, query
+or fragment is allowed in a declaration; invalid or duplicate declarations throw during
+construction. Encoded requests, slash variants, siblings and descendants do not match retirement.
+Parameterized retirement is unsupported; unmatched concrete paths under guard still return 404.
+
+Clients inspecting HTTP responses can map `procedure_retired` to “client too old” and offer an
+upgrade without treating it as a permission denial. These are pre-dispatch middleware errors,
+not contract-defined oRPC errors. Use the response JSON `code`, not its human-readable message.
+`PROCEDURE_ERROR_CODES` and the derived `ProcedureErrorCode` type are available at the root and
+`./auth`; `AuthzDecision.code` is optional so existing authorizers preserve their 403 responses.
+The matched branch of `ProcedurePolicyResolution` has an optional `retired?: true` marker;
+contract-overlay authorizers never set it and retain their current fallback semantics.
+
 ### Raw routes beside a contract router
 
-A request under the guarded prefix that matches no contract procedure is denied with
+A request under the guarded prefix that matches no contract procedure returns 404 `procedure_not_found` after authentication, with message
 `authz.no-contract-procedure`, including raw routes added with `.route(method, path, handler)`.
 Declare each raw route that should be served through the `rawRoutes` option:
 
@@ -350,7 +394,7 @@ is outside `protect` or inside `allowAnonymous`, so a declaration never makes a 
 optional `authorization: { scopes?, roles? }` is enforced like a procedure's declared
 authorization. Matching is exact and case-sensitive, and ignores only a trailing slash. Declaring
 `/api/tools/mcp` covers neither `/api/tools/mcp-admin` nor `/api/tools/mcp/nested`, and every
-undeclared sibling stays denied with `authz.no-contract-procedure`.
+undeclared guarded sibling returns 404 `procedure_not_found` after authentication.
 
 Declarations are validated before any request. Construction throws
 `[netscript.service.contract-policy] invalid raw route: <path> ...` for a path that is not absolute,
@@ -496,6 +540,10 @@ assertServiceAuthPolicy(policy);
 | `createStaticCredentialAuthenticator` | function | Maps configured credentials to principals. |
 | `createTrustedHeaderAuthenticator` | function | Maps trusted upstream identity headers to principals. |
 | `Principal` | interface | Service-owned identity contract. |
+| `PROCEDURE_ERROR_CODES` | constant | Stable `NOT_FOUND` (`procedure_not_found`) and `RETIRED` (`procedure_retired`) HTTP error codes. |
+| `ProcedureErrorCode` | type alias | Union of the stable unknown/retired procedure codes. |
+| `AuthzDecision` | type alias | Allow or deny, with an optional procedure failure code selecting 404/410. |
+| `ProcedurePolicyResolution` | type alias | Shared matched policy or miss; `retired?: true` marks authenticated retirement. |
 | `ContractPolicyAuthorizerPort` | interface | Authorizer that binds to the builder's REST/RPC projection paths. |
 | `ContractAuthorizerRawRoute` | interface | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
 
@@ -615,6 +663,16 @@ acceptance is checked and normalized before the database writes it together with
 Uncertain settlement errors surface without a speculative release. Optional C4-compatible tracing
 selects finite command attributes and preserves deferred/producer propagation without raw identity
 attributes. The database owns leases; no second relay, queue or runtime DDL is introduced.
+
+The sagas plugin contributes the Prisma command outbox model and its reviewed SQL constraints.
+Apply the normal application migration after installation. For bounded maintenance, the PostgreSQL
+relay store exposes `pruneSettled`; the composed saga API also prunes atomic replay keys according
+to terminal completion and the saga group's completed-retention window (default seven days).
+Pending work, leases and active saga markers survive; eligibility is rechecked at deletion.
+See [outbox retention](../database/index.md#bounded-outbox-retention) and the
+[Prisma saga retention recipe](../plugin-sagas-core/index.md#installed-outbox-schema-and-postgresql-retention)
+for migration, policies and persisted cursor examples.
+
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |

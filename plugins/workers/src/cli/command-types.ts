@@ -71,6 +71,8 @@ export interface RenderedRuntimeRegistry {
   readonly registryPath: string;
   /** Generator-selected project sources. */
   readonly sourceFiles: readonly string[];
+  /** Candidate modules carrying the shared registry opt-out directive. */
+  readonly excludedSourceFiles?: readonly string[];
   /** Unformatted module bytes, or null for an empty selection. */
   readonly content: string | null;
 }

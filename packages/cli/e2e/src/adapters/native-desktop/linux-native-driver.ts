@@ -1,5 +1,5 @@
 import { ensureDir, walk } from '@std/fs';
-import { join, relative, resolve } from '@std/path';
+import { dirname, join, relative, resolve } from '@std/path';
 import { createReleaseRequestHandler } from '../../../../src/public/features/deploy/target/desktop/release/server/release-handler.ts';
 import { createReleaseSigningFixture } from '../../../fixtures/desktop-native/src/release-signing-fixture.ts';
 import { prepareDesktopFixture } from './fixture-workspace.ts';
@@ -87,6 +87,23 @@ async function sha256(path: string): Promise<string> {
   return digest.toHex();
 }
 
+/** Locate the installed executable without assuming the runtime and launcher share a stem. */
+export async function findInstalledLauncher(runtime: string): Promise<string> {
+  const directory = dirname(runtime);
+  const candidates: string[] = [];
+  for await (const entry of Deno.readDir(directory)) {
+    if (!entry.isFile) continue;
+    const path = join(directory, entry.name);
+    if (path === runtime) continue;
+    const mode = (await Deno.stat(path)).mode;
+    if (mode !== null && (mode & 0o111) !== 0) candidates.push(path);
+  }
+  if (candidates.length !== 1) {
+    throw new Error(`Expected one installed launcher beside runtime, found ${candidates.length}.`);
+  }
+  return candidates[0];
+}
+
 async function installPackage(
   smokeRoot: string,
   artifact: LinuxArtifact,
@@ -103,7 +120,7 @@ async function installPackage(
     artifact.deb,
   ]);
   const runtime = join(root, relative(artifact.extracted, artifact.runtime));
-  const launcher = runtime.slice(0, -'.so'.length);
+  const launcher = await findInstalledLauncher(runtime);
   await Promise.all([Deno.stat(runtime), Deno.stat(launcher)]);
   return { root, launcher, runtime };
 }

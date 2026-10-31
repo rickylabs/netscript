@@ -4,7 +4,7 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 22 token-bounded tools for app health, correlated
+**The Model Context Protocol server for NetScript: 26 token-bounded tools for app health, correlated
 execution debugging, framework telemetry, CLI diagnostics, intent-aware documentation guidance, and
 first-party export discovery over stdio.**
 
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **22 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **26 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -49,7 +49,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>22 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>26 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
     S --> E["Export corpus<br/>(pinned deno doc JSON)"]
@@ -409,7 +409,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 22-tool field overview, policy, and exports**:
+- **MCP reference — the 26-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
@@ -428,3 +428,19 @@ values, credentials, or secrets.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## UI registry discovery
+
+`list_registry_items` returns item metadata with `limit` (at most 20) and `offset`;
+`search_registry_items` adds a required `query`. Both return `items`, `total` and an optional
+`nextOffset`. `view_registry_item` accepts `name` and returns a portable item with copy bytes.
+The standalone server uses the embedded Fresh UI registry without a network request.
+Hosts can inject `McpCliOptions.uiRegistryCatalog` for a selected app's registries.
+
+`get_registry_add_command` accepts a name, `@namespace/name`, or HTTP(S) item URL and returns
+`{command: "netscript", args: ["ui:add", name]}`. It does not execute the command. Pass the
+arguments directly to a process API after reviewing the installation; never join them into shell text.
+
+Registry metadata uses the server's normal output bounds. Views preserve exact file contents and
+fail with `tool_result_too_large` when the complete JSON-RPC response exceeds 64 KiB. Use
+`netscript ui:view <name>` for larger items.

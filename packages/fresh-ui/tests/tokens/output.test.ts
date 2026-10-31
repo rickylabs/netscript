@@ -12,8 +12,10 @@ import figmaIndex from '../../tokens/figma/index.json' with { type: 'json' };
 import { figmaCollections } from '../../src/tokens/adapters/figma-collections.ts';
 import { formatFigmaPreset } from '../../src/tokens/adapters/format-figma.ts';
 import { normalizeFontStyle, roundTokenNumber } from '../../src/tokens/domain/figma-aliases.ts';
+import compatibilityNames from './ns-one-css-names.json' with { type: 'json' };
 import nameMigrations from '../../tokens/name-migrations.json' with { type: 'json' };
 import contrastExclusions from '../../tokens/contrast-exclusions.json' with { type: 'json' };
+import { evaluateTokenContrast } from '../../src/tokens/domain/check-token-contrast.ts';
 import { defaultContrastCoverage } from '../../src/tokens/adapters/default-token-quality.ts';
 import Color from 'npm:colorjs.io@0.5.2';
 import { tokenContrastColor } from '../../src/tokens/adapters/contrast-color.ts';
@@ -94,8 +96,11 @@ Deno.test('app CSS contains only its preset and NS One compatibility with bounde
 
 Deno.test('SD formats cover all requested inputs and retain every legacy declaration', async () => {
   const build = await built();
-  assertEquals(build.contexts.length, 72);
-  assertEquals(Object.keys(build.files).length, 68);
+  assertEquals(build.contexts.length, TOKEN_PRESETS.length * 4);
+  assertEquals(
+    Object.keys(build.files).length,
+    6 + TOKEN_PRESETS.length * 3 + figmaIndex.collections.length + 1,
+  );
   assertStringIncludes(build.files['tokens.css'], legacy.css.trim());
   assertStringIncludes(build.files['theme-bridge.css'], legacy.bridge.trim());
   const fallbackCss = build.files['tokens.css'].split('@supports')[0].replace(
@@ -126,8 +131,8 @@ Deno.test('SD formats cover all requested inputs and retain every legacy declara
       `Legacy selector native-value symmetry: ${name}`,
     );
   }
-  assertEquals(manifest.inputs.length, 72);
-  assertEquals(Object.keys(manifest.presets).length, 18);
+  assertEquals(manifest.inputs.length, TOKEN_PRESETS.length * 4);
+  assertEquals(Object.keys(manifest.presets).length, TOKEN_PRESETS.length);
   assertEquals(manifest.ramps.flatMap((ramp: { steps: string[] }) => ramp.steps).length > 0, true);
   assertEquals(manifest.generatedBy, 'Style Dictionary 5.7.1');
   assertEquals(JSON.parse(build.files['fonts.json']).imports['ns-one'], legacy.fontImports);
@@ -203,7 +208,7 @@ Deno.test('Figma output preserves original index, collection shape, aliases, sco
   const index = JSON.parse(build.files['figma/index.json']);
   assertEquals(index.fileKey, figmaIndex.fileKey);
   assertEquals(index.exportDate, figmaIndex.exportDate);
-  assertEquals(index.collections.slice(0, 7), figmaIndex.collections);
+  assertEquals(index.collections.slice(0, figmaIndex.collections.length), figmaIndex.collections);
   for (const collection of figmaCollections()) {
     const file = figmaIndex.collections.find((entry) =>
       entry.collection === collection.collection
@@ -311,36 +316,35 @@ Deno.test('builder rejects resolver contexts that have no registered preset', as
   await assertRejects(() => buildTokens({ sources }), Error, 'registered public contexts');
 });
 
-Deno.test('NS One exclusions contain only legacy roles or exact inherited component colors', async () => {
+Deno.test('shipped contrast has zero active failures and checks the actual accent and Liquid labels', async () => {
   const build = await built();
-  const pairs = new Map(defaultContrastCoverage().pairs.map((pair) => [pair.id, pair]));
-  const inherited: Readonly<Record<string, string>> = {
-    'component-button-fg': 'primary-fg',
-    'component-button-hover': 'primary-hover',
-    'component-input-bg': 'surface',
-    'component-tabs-ring': 'ring',
-    'component-tabs-bg': 'muted',
-  };
-  for (
-    const exclusion of contrastExclusions.exclusions.filter((entry) => entry.preset === 'ns-one')
-  ) {
-    const pair = pairs.get(exclusion.pair)!;
-    const context = build.contexts.find((entry) =>
-      entry.preset.id === 'ns-one' && entry.scheme === exclusion.scheme
+  const coverage = defaultContrastCoverage();
+  const report = evaluateTokenContrast(build.contexts, coverage, [], tokenContrastColor);
+  assertEquals(report.failures, []);
+  assertEquals(report.excluded, []);
+  assertEquals(contrastExclusions.exclusions, []);
+  assertEquals(report.exempt.length, 58);
+  assertEquals(report.exempt.filter((row) => row.ratio < row.minimum).length, 56);
+  assertEquals(coverage.pairs.some((pair) => pair.id === 'accent-fg/accent-solid-hover'), false);
+  const accent = coverage.pairs.find((pair) => pair.id === 'accent-fg/accent-hover')!;
+  assertEquals(accent.foreground, 'accent-fg');
+  assertEquals(accent.background, ['accent-hover']);
+  const glass = coverage.pairs.filter((pair) =>
+    pair.background.includes('liquid-material-tinted-primary')
+  );
+  assertEquals(glass.length, 1);
+  assertEquals(glass[0].foreground, 'liquid-primary-fg');
+  for (const scheme of ['light', 'dark']) {
+    const context = build.contexts.find((row) =>
+      row.preset.id === 'liquid' && row.scheme === scheme
     )!;
-    for (const name of [pair.foreground, ...pair.background]) {
-      if (Object.hasOwn(legacy.tokens, name)) continue;
-      assertEquals(
-        name.startsWith('component-') && Object.hasOwn(inherited, name),
-        true,
-        `A new NS One gap cannot be excluded as S0: ${name}`,
-      );
-      assertEquals(
-        context.tokens[name].resolved,
-        context.tokens[inherited[name]].resolved,
-        `Component color must exactly match its S0 role: ${name}`,
-      );
-    }
+    const measured = tokenContrastColor.measure(
+      context.tokens[glass[0].foreground].resolved,
+      glass[0].background.map((name) => context.tokens[name].resolved),
+      context.tokens.bg.resolved,
+    );
+    assertEquals(measured.foreground, '#ffffff');
+    assertEquals(measured.ratio >= 4.5, true);
   }
 });
 
@@ -364,6 +368,7 @@ Deno.test('default CSS keeps the legacy byte prefix and fits its six-KB gzip bud
   );
   // Every retained native alias still resolves after unused ramps/packs are trimmed.
   const declared = new Set([...css.matchAll(/(--ns-[a-z0-9-]+):/g)].map((match) => match[1]));
+  for (const name of compatibilityNames.names) assertEquals(declared.has(name), true, name);
   for (const match of (css + build.files['theme-bridge.css']).matchAll(/var\((--ns-[a-z0-9-]+)/g)) {
     assertEquals(declared.has(match[1]), true, match[1]);
   }
@@ -375,7 +380,7 @@ Deno.test('app build skips Figma and preview assets unless requested without cha
   assertEquals(Object.keys(app.files).sort(), [...APP_TOKEN_FILES].sort());
   for (const file of APP_TOKEN_FILES) assertEquals(app.files[file], full.files[file], file);
   const previews = await buildTokens({ target: 'app', previews: true });
-  assertEquals(Object.keys(previews.files).length, 23);
+  assertEquals(Object.keys(previews.files).length, 5 + TOKEN_PRESETS.length);
   for (const preset of TOKEN_PRESETS) {
     assertEquals(
       previews.files[`presets/${preset.id}.css`],
@@ -383,9 +388,28 @@ Deno.test('app build skips Figma and preview assets unless requested without cha
     );
   }
   for (const context of app.contexts) {
-    const matching = app.contexts.find((candidate) =>
+    const matching = full.contexts.find((candidate) =>
       candidate.preset.id === context.preset.id && candidate.scheme === context.scheme
     )!;
     assertEquals(context.tokens, matching.tokens);
+  }
+});
+
+Deno.test('new font-style and opacity roles retain schema-valid CSS and Figma source meaning', async () => {
+  const build = await built();
+  for (const id of ['bloom', 'macos-27', 'apple-classic', 'fluent-2-web']) {
+    const context = build.contexts.find((entry) =>
+      entry.preset.id === id && entry.scheme === 'light'
+    )!;
+    assertEquals(context.tokens['weight-em'].type, 'fontWeight');
+    assertEquals(context.tokens['weight-em'].value, 'italic');
+    assertEquals(context.tokens['weight-em'].sourceStyle, 'Italic');
+    const collection = formatFigmaPreset(build.contexts, id);
+    assertEquals(
+      collection.variables.find((variable) => variable.name === 'weight-em')!.values.Light,
+      'Italic',
+    );
+    assertEquals(context.tokens['state-disabled-opacity'].type, 'number');
+    assertEquals(context.tokens['state-disabled-opacity'].value.endsWith('px'), false);
   }
 });

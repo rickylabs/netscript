@@ -91,6 +91,8 @@ for (
     'primitives',
     'scheme',
     'theme',
+    'theme-b',
+    'theme-set',
     'density',
     'base-gray',
     'base-accent',

@@ -45,6 +45,75 @@ flowchart LR
     L -- "terminal failure" --> DLQ["Dead-letter store<br/>(KV · Postgres · Redis)"]
 ```
 
+## Redis claim leases and recovery
+
+The Redis adapter delivers work **at least once**. Each delivery has a unique fenced receipt,
+a visibility deadline, and a persisted delivery count. A consumer that exits before acknowledging
+leaves a durable claim. Another consumer returns that message to the ready queue after the lease
+and recovery grace expire; the next handler sees the same `messageId` and `deliveryCount: 2`.
+After the configured delivery limit, expiry or a requeuing nack writes a structured dead-letter
+record with reason `max_attempts_exceeded`. Explicit terminal nacks retain their reason and error
+metadata. Handler errors retain the existing listener error behavior after settling the claim.
+
+Configure Redis listeners with `visibilityTimeout` (milliseconds, default 30,000), `maxDeliveries`
+(including the first delivery, default 5), and `recoveryGrace` (milliseconds, default 1,000).
+The listener honors `ListenOptions.concurrency` (default 1), admitting at most that many handlers
+including their acknowledgement work. Concurrency must be a positive integer no larger than
+2147483647. Each delivery has its own receipt and heartbeat; slow handlers do not hold other slots.
+Recovery runs independently while handlers are working; an idle listener polls every 50 ms by
+default. Recovery examines at most 100 expired claims and 100 legacy processing entries per pass.
+
+Long jobs must call `await context.extendVisibility?.(milliseconds)` periodically before their
+current lease expires. Omit the argument to extend by the original visibility timeout. A `false`
+result means ownership expired or changed: stop performing effects for that receipt. Expired or
+replaced acknowledgements and nacks are refused and counted; they cannot settle a later delivery.
+
+The first-party workers plugin renews job and task deliveries automatically: it requests a
+60-second lease before dispatch and renews every 20 seconds until execution finishes. Lease loss
+or renewal failure cancels the job/subprocess and prevents successful application being recorded.
+Custom queue consumers remain responsible for their own heartbeat.
+
+Use `await redisQueue.getMetrics()` to read durable `reclaimed`, `deadLettered`,
+`staleSettlements`, and `observedOrphans` counters. `await redisQueue.getHealth()` includes these
+counters plus `ready`, `processing`, `deadLetterDepth`, and `outboxDepth`. The explicit
+`await redisQueue.reclaimExpired()` seam runs one bounded recovery pass without starting a listener.
+Counters survive consumer process restarts. These methods are available on `RedisAdapter` from
+`@netscript/queue/adapters/redis`.
+
+Handler effects and acknowledgement are separate transactions. If an effect succeeds and its
+acknowledgement is lost, the job can run again with the same message ID and a higher delivery count.
+Use the message ID or your domain idempotency key to deduplicate effects. A heartbeat protects
+ownership; it does not make application effects exactly once.
+
+The default dead-letter destination is the existing Redis DLQ list. A configured external
+`DeadLetterStorePort` receives records through a durable Redis outbox: failed writes remain in the
+outbox and are retried independently by recovery polling. A failed or slow external store does not
+stop consumption or lease recovery. External stores must honor the port's idempotent append
+contract. Use the built-in Redis store as the default rather than as an external mirror, since its
+append operation does not deduplicate repeated writes. Health exposes pending outbox records.
+
+### Upgrading existing Redis and Garnet queues
+
+Existing ready lists, delayed entries, and dead-letter records retain their format. Recovery also
+observes old processing entries without receipts, gives each a fresh visibility lease, then permits
+recovery only after that lease and grace expire. Quiesce old consumers before upgrading: old code
+cannot fence its byte-based acknowledgements. Receipts retain the payload even if an old worker
+removes its processing entry, so migration can repeat already-applied effects.
+
+Redis requires scripting permission. **Garnet requires both `--lua` and `--lua-transaction-mode`**
+(or `EnableLua: true` and `LuaTransactionMode: true` in its configuration). New CLI scaffolds pass
+both flags in Container, Executable, and Auto fallback launches. For existing scaffolds, regenerate
+the infrastructure helper or add both flags to the managed Garnet launch before upgrading the
+consumer. Configure externally managed Garnet similarly. Scripting is checked before consumption;
+a server without it fails without removing ready work. Leases intentionally have no unsafe
+non-scripting fallback. These options follow the [Garnet configuration reference](https://microsoft.github.io/garnet/docs/getting-started/configuration).
+
+The lease implementation is in `adapters/_redis-lease.ts` and `_redis-lease-script.ts`. Every
+transition declares all keys for Garnet's transactional locking. It validates destination types and
+inserts into the destination before deleting source claim data. Receipt envelopes remain opaque
+JSON strings inside Lua, preserving payload number precision. Extending this seam should retain
+its real Redis/Garnet crash, heartbeat, fencing, and delivery-limit tests.
+
 ## Install
 
 ```bash
@@ -117,6 +186,36 @@ the pre-release line, as above).
   [rickylabs.github.io/netscript/how-to/choose-a-queue-provider/](https://rickylabs.github.io/netscript/how-to/choose-a-queue-provider/)
 - **API docs on JSR**: [jsr.io/@netscript/queue/doc](https://jsr.io/@netscript/queue/doc)
 
+## Redis dispatch and shutdown
+
+`listen(handler, { concurrency: 4, pollIntervalMs: 20, delayedPollIntervalMs: 20 })` overlaps four
+handlers on the same event loop. Both intervals accept integer milliseconds from 10 to 60000.
+Defaults are 50 ms for idle pickup and 1000 ms for delayed promotion. Explicit options override
+`NETSCRIPT_REDIS_QUEUE_POLL_INTERVAL_MS` and `NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS`, then defaults.
+Invalid values fail before connections are allocated. If a scoped environment permission denies
+access, defaults apply; explicit values require no access to these environment variables. Other
+providers ignore these Redis-specific intervals.
+
+With a free slot, healthy backend, established queue/promotion connections, no promotion backlog and
+a responsive event loop, the polling
+contribution to ready pickup is at most `pollIntervalMs`; delayed pickup after eligibility adds at
+most `delayedPollIntervalMs + pollIntervalMs`. Redis command time, clock differences and event-loop
+scheduling are additional. Promotion connects lazily; startup or reconnect can miss a promotion
+pass while the connection is being established. This is not an unconditional wall-clock SLA:
+saturated workers, outages,
+large or invalid delayed backlogs and blocked synchronous JavaScript have no fixed pickup bound.
+See [Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/).
+
+Abort stops admission. A claim already committed still reaches its handler; in-flight handlers and
+fenced acknowledgements drain for up to `visibilityTimeout` (default 30000 ms), starting at abort,
+stop or listener failure. `stop()` awaits that same drain before disconnecting. Claims left when
+the budget expires remain durable for reclaim, and the old contexts cannot acknowledge or renew.
+Calling and awaiting `stop()` inside its own handler consumes the drain budget and leaves that
+handler's claim for recovery. Signal cancellation to the host instead when the handler should
+finish and acknowledge normally. Handlers must respect their application's cancellation signal;
+the drain cannot terminate JavaScript or undo effects. First-party workers retain their existing
+per-delivery renewal and cancellation policy.
+
 ## Compatibility
 
 Redis delayed-message promotion is at most once across listeners sharing a delayed key. The adapter
@@ -128,18 +227,20 @@ a failed `LPUSH` and restores the member at its original score inside the same s
 ready-list enqueues/dequeues cannot abort this path. Both keys are passed explicitly as `KEYS`, and
 envelope bytes/routing are unchanged.
 
-Servers without scripting, including Garnet with Lua disabled, use `WATCH`/`MULTI`/`EXEC`. Only the
+Delayed promotion retains a compatibility fallback for servers without scripting, including Garnet
+with Lua disabled; queue consumption still requires the Lua settings above. This fallback uses
+`WATCH`/`MULTI`/`EXEC`. Only the
 delayed set is watched; hot ready lists are type-checked in a pipelined preflight without WATCH.
 Wrongly typed targets found in preflight are logged and retained. This fallback accepts the narrow
 race where a target is changed to a non-list after preflight: Redis does not roll back EXEC, so that
 race can lose the member. Queue keys must stay absent or lists while consumers operate. A connection
 epoch counts close/end/ready events; a changed epoch abandons the snapshot before MULTI so a
 reconnect cannot commit it without WATCH. Delayed-set writes can still abort this path: each poll
-has three attempts per batch with 1–5 ms jitter, then defers to the next 1 s poll. Continuous
+has three attempts per batch with 1–5 ms jitter, then defers to the next configured delayed poll (default 1 s). Continuous
 delayed writes therefore have no fixed promotion-latency bound.
 
 Both paths read at most 100 due members per attempt and continue while a full batch is promoted, up
-to ten batches (1,000 members) per pass. Larger backlogs continue on the next 1 s poll; no batch
+to ten batches (1,000 members) per pass. Larger backlogs continue on the next configured delayed poll; no batch
 allocates or reads the whole backlog. There is no poison-member skip/quarantine: 100 retained
 wrongly typed targets can block valid members behind them, and invalid JSON halts its batch. Repair
 those keys/members to resume progress. Handler retries still require idempotency. The promotion
@@ -151,8 +252,8 @@ abandoned server-side operations either committed atomically or wrote nothing.
 
 The existing `netscript:queue:<name>`, `netscript:processing:<name>`, and `netscript:delayed:<name>`
 key layout is unchanged and targets single-node Redis-compatible servers. Redis Cluster is outside
-this adapter's supported scope: these keys have no shared hash tag, so multi-key transactions and
-blocking pop-push operations can cross hash slots.
+this adapter's supported scope: these keys have no shared hash tag, so multi-key lease and promotion
+operations can cross hash slots.
 
 Designed for Deno. The Deno KV backend needs the `kv` unstable feature (`--unstable-kv`); Redis,
 RabbitMQ, and PostgreSQL backends need `--allow-net` plus `--allow-env` for discovery. Backend

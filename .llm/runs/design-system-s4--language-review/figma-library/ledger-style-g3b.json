@@ -1,0 +1,72 @@
+{
+ "group": "G3b",
+ "theme": "fluent",
+ "page": "53:2",
+ "continues": "ledger-style-g3.json",
+ "status": "PARTIAL: stopped by the Figma MCP tool-call limit (seat rate limit) while creating Fluent/Data table. 17 of 18 Data display 1 sets exist; no review frame, strip, swap test or sweep yet.",
+ "modes": {"themeSet": "239:7", "theme": "52:0", "scheme": "3:0"},
+ "frames": {
+  "Data display 1": "465:98973",
+  "Data display 1 section label": "465:98974",
+  "Data display 1 · Sets": "465:98978"
+ },
+ "sets": [
+  {"category": "Data display 1", "name": "Fluent/Kbd", "id": "465:98979", "baseId": "403:28", "variants": 4},
+  {"category": "Data display 1", "name": "Fluent/Kbd group", "id": "465:98991", "baseId": "403:96", "variants": 8},
+  {"category": "Data display 1", "name": "Fluent/Badge", "id": "465:104106", "baseId": "405:180", "variants": 20},
+  {"category": "Data display 1", "name": "Fluent/Badge / kind", "id": "465:104210", "baseId": "405:211", "variants": 10},
+  {"category": "Data display 1", "name": "Fluent/Avatar presence", "id": "465:105136", "baseId": "406:43", "variants": 3},
+  {"category": "Data display 1", "name": "Fluent/Avatar", "id": "465:105144", "baseId": "406:95", "variants": 12},
+  {"category": "Data display 1", "name": "Fluent/Avatar group", "id": "465:105220", "baseId": "406:150", "variants": 3},
+  {"category": "Data display 1", "name": "Fluent/.Item icon tile", "id": "465:111648", "baseId": "408:82", "variants": "1 (component)"},
+  {"category": "Data display 1", "name": "Fluent/.Item image", "id": "465:111655", "baseId": "408:85", "variants": "1 (component)"},
+  {"category": "Data display 1", "name": "Fluent/Item", "id": "465:111659", "baseId": "408:792", "variants": 27},
+  {"category": "Data display 1", "name": "Fluent/Item group", "id": "465:113782", "baseId": "408:996", "variants": 2},
+  {"category": "Data display 1", "name": "Fluent/Card", "id": "466:44976", "baseId": "409:951", "variants": 16},
+  {"category": "Data display 1", "name": "Fluent/Stat card", "id": "466:45258", "baseId": "409:1270", "variants": 6},
+  {"category": "Data display 1", "name": "Fluent/Table header cell", "id": "466:67853", "baseId": "410:546", "variants": 27},
+  {"category": "Data display 1", "name": "Fluent/Table cell", "id": "466:68073", "baseId": "410:383", "variants": 27},
+  {"category": "Data display 1", "name": "Fluent/Table row", "id": "466:68272", "baseId": "412:1187", "variants": 20},
+  {"category": "Data display 1", "name": "Fluent/Table", "id": "466:98664", "baseId": "413:1367", "variants": 6}
+ ],
+ "notBuilt": [
+  {"name": "Fluent/Data table", "baseId": "416:4605", "variants": 10, "note": "The create call was refused by the rate limit, so it most likely never ran. Before rebuilding, check 465:98978 for a stray 'Fluent/Data table · block' or 'Fluent/Data table' and delete it if one exists. Plan: Card chrome (card/bg, 1px card/border on all sides, r8); header padding 16/16/12, title F.body-strong, 1px fluent/stroke/divider bottom rule; swaps search->Fluent/Search 462:149338, filter-*->Fluent/Select 461:143975, view-toggle->Fluent/Toggle group 461:79429, columns->Fluent/Dropdown menu 463:299968 open=false (label 'Columns'), export->Fluent/Button / md 460:54573 ghost + iconStart arrow-export 460:43168, action-bar->Fluent/Action bar 461:80253, table->Fluent/Table 466:98664 (override fills/strokes/padding off), pagination->Fluent/Pagination 463:207962, columns-menu->Fluent/Menu content 463:299482; footer min 48."}
+ ],
+ "remaining": [
+  "Build Fluent/Data table (above).",
+  "Run the grey-seed re-seed pass (below) over 465:98978 after the Table and Data table builds.",
+  "Visual check at normal scale of Item, Card, Stat card, Table header cell, Table cell, Table and Data table. Already checked: Kbd, Kbd group, Badge, Badge / kind, presence, Avatar, Avatar group, Table row.",
+  "Style review · Data display 1 frame (panel · Light / panel · Dark, same layout as 464:315211) -> review/styles/fluent/data-display-1.png.",
+  "Fluent style strip · Data display 1 with the five rows (Base (Utility), Base (Theme Fluent), Fluent style, Swap test, States) in Light above Dark, instances per brief section 6 -> review/styles/fluent/data-display-1-strip.png (plus -hi if tall).",
+  "Swap test: base instances with label/boolean overrides swapped to Fluent/*; record the pass count.",
+  "Sweep: Kbd into Fluent/Menu item 463:298676 (shortcut), Fluent/Tooltip 463:300672 (kbd), Fluent/Command item 464:277887 and Command palette 464:278042, Fluent/Search 462:149338 (kbd); Badge plain into Fluent/Tab / horizontal 463:223548, Tab / vertical 463:223792 and Nav item 463:224951 counts, Badge subtle into Fluent/Combobox 462:149786 chips; Avatar into Fluent/Hover card 463:300851, Fluent/Sidebar 463:237853 footer, Fluent/Top bar 463:238887. Re-apply part names after every swap, then re-screenshot and overwrite forms/navigation/overlays PNGs (review and strip)."
+ ],
+ "pngs": {},
+ "deviations": [
+  "Kbd: label is left-aligned (primaryAxisAlign MIN) inside the kept min width = H, so a Kbd group reads 'Ctrl+K' and not 'Ctrl+ K'.",
+  "Badge / Badge / kind: the dot is unpainted and taken out of the flow (layoutPositioning ABSOLUTE), so dot=true shows nothing and adds no gap. Height 20 and padding 0/6 are literal (the space/badge/* tokens resolve to Density values 22/8). The iconStartGlyph default is now Fluent/Icon/circle-check (property name unchanged).",
+  "Avatar: agent is the Fluent Color bot_24_color (152:775) rescaled to 16/20/24 for sm/md/lg (the brief gives only md 20). Presence nests Fluent/Avatar presence.",
+  "Avatar presence offline: no fill, with a theme-only child 'ring' (1px INSIDE fluent/stroke/control-strong); the root keeps the 2px OUTSIDE fluent/solid/base ring.",
+  "Avatar group: all four members are initials avatars (royal-blue MR, teal AT, grape JW, marigold LK), not the base images, to show one palette per member. At sm (24) the -8 overlap clips the second initial ('M', 'A' read cut). The variants are stacked in one column.",
+  ".Item icon tile: the glyph default is Fluent/Icon/file-text, bound to size/icon/lg (20).",
+  "Item: sm and xs keep the stated padding (12; 8/12), so two-line rows grow to 60 and 52. The 48 and 40 heights are minimums that a single-line row meets. Gap after media: 20 (default size), 12 (sm, xs). The mediaContent default is now Fluent/.Item icon tile. muted hover = fluent/control/secondary (derived). Strokes are excluded from layout.",
+  "Item group: separators=false rows are Fluent/Item outline sm (the SettingsCard stack, 4 apart). separators=true rows are Fluent/Item default sm on one card. Media overrides are remapped to the Fluent/Avatar md initials (465:105163) and agent (465:105171) variants.",
+  "Card: sm uses padding 12 (md 16). rule cards have no side padding. The rule selected state is fluent/subtle/secondary with a fluent/stroke/control-strong top rule. The base bound card shadow effect is kept (it resolves to 0 under Fluent). The body .Slot stroke is overridden to fluent/stroke/divider.",
+  "Stat card: the root is now horizontal: 'icon' (moved out of 'header', 32px, default iconGlyph data_trending_32_color 152:769) sits left of a theme-only 'stack' frame holding header, value, detail and the deco parts (part names unchanged, path changed). The icon boolean keeps its base default false, so the icon shows only when the instance turns it on. Default height 110 (hero 126) with stack gap 2. The delta arrows are the FSI 12 filled colour components (152:766 / 152:767) recoloured to the success or critical role.",
+  "Table header cell: for sort=none the sort-icon (Fluent/Icon/arrow-up-down) stays bound to 'sortable' but is unpainted and taken out of the flow, so it shows nothing.",
+  "Table cell: avatar = Fluent/Avatar md initials (not the base image); actions = Fluent/Icon button / md ghost with glyph more-horizontal and label 'Row actions' re-applied after resetOverrides.",
+  "Table row: table/inset stays 0. The 12 content inset comes from the cell padding (the brief's 'padding-left 12'). disabled drops the base 0.38 layer opacity and paints every text fluent/text/disabled (badges and avatars keep their colours). The selected select cell has its checkbox set to checked=true.",
+  "Table: root padding 4 inside the card, so the r4 rows sit inside the r8 card. The head is 36 with no fill and no rule. empty/loading: the base B7 'empty' and B6 'skeleton-row' parts are kept hidden; theme-only 'empty-text' and 'loading-row' (Fluent/Spinner md 'size=md, tone=primary' + 'Loading orders…') stand in."
+ ],
+ "gotchas": [
+  "Bound paints whose variable resolves to alpha 0 (table/row-bg, table/head) keep the stored seed colour and render it. Seed every bound paint with its resolved colour (variable.resolveForConsumer(node)). A re-seed pass fixed 21 paints in 465:98978; run it again after any new build.",
+  "The children of hidden nested instances (bound to a false boolean) are not reachable. To tint such glyphs, flip the boolean default to true with editComponentProperty, tint, then flip it back (used for Badge icon/remove and Item chevron).",
+  "editComponentProperty({defaultValue}) on an INSTANCE_SWAP property swaps every bound instance in all variants.",
+  "resetOverrides() was used on purpose on focus-ring, Item media, Table cell avatar and actions. Each part name was re-applied right after (the G3 bug note)."
+ ],
+ "ownerReview": [
+  "Stat card: the colour icon appears only when icon=true (the base default false is kept). Decide whether Fluent may default it on.",
+  "Avatar group sm: the initials are clipped by the -8 overlap.",
+  "Table row disabled: there is no layer opacity, so the badge and avatar keep their full colour in a disabled row."
+ ]
+}
