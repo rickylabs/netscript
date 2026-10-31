@@ -30,11 +30,9 @@ import {
 import {
   buildAspireArgs,
   buildDbCliEnv,
-  buildExecutableDisplayName,
-  findExecutableStatus,
   findRunningAppHost,
   resolveDbCliTimeoutSeconds,
-  TERMINAL_RESOURCE_STATES,
+  watchExecutableCompletion,
 } from './operation-runner-helpers.ts';
 
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
@@ -312,26 +310,30 @@ export class DbOperationRunner implements DbOperationExecutor {
     const resourceName = `${configKey}-cli`;
     const operationRequestPath = join(aspireDir, `.netscript-db-operation-${configKey}.json`);
     await this.writeOperationRequest(operationRequestPath, env);
+    let startRequested = false;
     try {
-      await this.runAspire(
-        [
-          'resource',
-          resourceName,
-          'start',
-          '--apphost',
-          apphostPath,
-          '--non-interactive',
-          '--nologo',
-        ],
-        { cwd: aspireDir, signal },
-      );
-      const code = await this.waitForExecutableCompletion(
-        operation,
-        configKey,
+      const code = await watchExecutableCompletion(this.executor, {
+        resourceName,
         apphostPath,
-        aspireDir,
+        cwd: aspireDir,
+        timeoutMs: this.timeoutMs,
         signal,
-      );
+        start: async (watchSignal) => {
+          startRequested = true;
+          await this.runAspire(
+            [
+              'resource',
+              resourceName,
+              'start',
+              '--apphost',
+              apphostPath,
+              '--non-interactive',
+              '--nologo',
+            ],
+            { cwd: aspireDir, signal: watchSignal },
+          );
+        },
+      });
       await this.printResourceLogs(resourceName, apphostPath, aspireDir, signal);
       if (code === 0) {
         outputText(`db ${operation} completed successfully.`);
@@ -340,44 +342,12 @@ export class DbOperationRunner implements DbOperationExecutor {
       }
       return code;
     } finally {
-      await this.stopResource(resourceName, apphostPath, aspireDir);
-      await this.removeOperationRequest(operationRequestPath);
-    }
-  }
-
-  private async waitForExecutableCompletion(
-    operation: DbOperationRequest['operation'],
-    configKey: string,
-    apphostPath: string,
-    aspireDir: string,
-    signal: AbortSignal,
-  ): Promise<number> {
-    const displayName = buildExecutableDisplayName(operation, configKey);
-    const deadline = Date.now() + this.timeoutMs;
-
-    while (Date.now() <= deadline) {
-      const output = await this.runAspire(
-        [
-          'describe',
-          '--apphost',
-          apphostPath,
-          '--format',
-          'Json',
-          '--non-interactive',
-          '--nologo',
-        ],
-        { cwd: aspireDir, signal },
-      );
-      const resource = findExecutableStatus(output.stdout, apphostPath, displayName);
-      if (resource && resource.state && TERMINAL_RESOURCE_STATES.has(resource.state)) {
-        if (typeof resource.exitCode === 'number') return resource.exitCode;
-        throw new Error(
-          `Aspire resource ${displayName} reached ${resource.state} without an exit code.`,
-        );
+      try {
+        if (startRequested) await this.stopResource(resourceName, apphostPath, aspireDir);
+      } finally {
+        await this.removeOperationRequest(operationRequestPath);
       }
-      await this.sleep(this.pollIntervalMs);
     }
-    throw new Error(`Timed out waiting for Aspire resource ${displayName} to complete.`);
   }
 
   private async printResourceLogs(

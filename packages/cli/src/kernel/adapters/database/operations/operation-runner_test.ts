@@ -3,6 +3,7 @@
 import { join } from '@std/path';
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { FakeTime } from 'jsr:@std/testing@^1/time';
 
 import type { DbOperationRequest, DiscoveredDatabase } from '../../../domain/db-engine.ts';
 import type { AppHostLifecycleLease, AppHostLifecycleLock } from './apphost-lifecycle-lock.ts';
@@ -28,6 +29,29 @@ type OutputStep = CommandOutput | ((options: RecordedCall['options']) => Promise
 class FakeAspireExecutor {
   readonly outputCalls: RecordedCall[] = [];
   readonly spawnCalls: RecordedCall[] = [];
+  readonly streamCalls: RecordedCall[] = [];
+  streamClosed = false;
+
+  async *stream(
+    args: readonly string[],
+    options: RecordedCall['options'],
+  ): AsyncGenerator<string, void> {
+    this.streamCalls.push({ args: [...args], options });
+    try {
+      yield resourceLine('Finished', 99);
+      yield resourceLine('Running');
+      const result = await this.outputForStream(options);
+      yield result.stdout;
+    } finally {
+      this.streamClosed = true;
+    }
+  }
+
+  private outputForStream(options: RecordedCall['options']): Promise<CommandOutput> {
+    const next = this.outputs.shift();
+    if (!next) throw new Error('Missing fake stream completion');
+    return typeof next === 'function' ? next(options) : Promise.resolve(next);
+  }
 
   constructor(
     private readonly outputs: OutputStep[] = [],
@@ -47,6 +71,15 @@ class FakeAspireExecutor {
     if (next === undefined) throw new Error(`Unexpected spawn() call: ${args.join(' ')}`);
     return Promise.resolve(next);
   }
+}
+
+function resourceLine(state: string, exitCode?: number): string {
+  return JSON.stringify({
+    displayName: 'postgres-cli',
+    resourceType: 'Executable',
+    state,
+    exitCode,
+  });
 }
 
 class FakeLock implements AppHostLifecycleLock {
@@ -105,21 +138,100 @@ function runner(
   options: {
     readonly writeOperationRequest?: (path: string, env: Record<string, string>) => Promise<void>;
     readonly registerSignalAbort?: (abort: () => void) => () => void;
+    readonly timeoutMs?: number;
+    readonly removeOperationRequest?: (path: string) => Promise<void>;
   } = {},
 ): DbOperationRunner {
   return new DbOperationRunner({
     executor,
     lifecycleLock: new FakeLock(),
     pollIntervalMs: 0,
-    timeoutMs: 60_000,
+    timeoutMs: options.timeoutMs ?? 60_000,
     sleep: async () => {},
     writeOperationRequest: options.writeOperationRequest ?? (() => Promise.resolve()),
-    removeOperationRequest: () => Promise.resolve(),
+    removeOperationRequest: options.removeOperationRequest ?? (() => Promise.resolve()),
     registerSignalAbort: options.registerSignalAbort ?? (() => () => {}),
   });
 }
 
 describe('DbOperationRunner', () => {
+  it('removes the request without stopping an unstarted resource if initial observation fails', async () => {
+    const executor = new FakeAspireExecutor([running(), output()]);
+    executor.stream = async function* () {
+      yield 'not-json';
+    };
+    let removed = false;
+    await assertRejects(() =>
+      runner(executor, {
+        removeOperationRequest: () => {
+          removed = true;
+          return Promise.resolve();
+        },
+      }).execute(request('init', 'init')), SyntaxError);
+    assertEquals(removed, true);
+    assertEquals(executor.outputCalls.map((call) => call.args[0]), ['ps', 'wait']);
+  });
+
+  it('stops the owned resource and removes the request if the new run has no exit code', async () => {
+    const executor = new FakeAspireExecutor([running(), output(), output(), output()]);
+    executor.stream = async function* () {
+      yield resourceLine('Stopped', 22);
+      yield resourceLine('Running');
+      yield resourceLine('Finished');
+    };
+    let removed = false;
+    await assertRejects(
+      () =>
+        runner(executor, {
+          removeOperationRequest: () => {
+            removed = true;
+            return Promise.resolve();
+          },
+        }).execute(request('init', 'init')),
+      Error,
+      'without an exit code',
+    );
+    assertEquals(removed, true);
+    assertEquals(executor.outputCalls.at(-1)?.args.slice(0, 3), [
+      'resource',
+      'postgres-cli',
+      'stop',
+    ]);
+  });
+
+  it('one follow stream spans simulated minutes without snapshot polls', async () => {
+    using time = new FakeTime();
+    const completion = Promise.withResolvers<CommandOutput>();
+    const waiting = Promise.withResolvers<void>();
+    const executor = new FakeAspireExecutor([
+      running(),
+      output(),
+      output(),
+      () => {
+        waiting.resolve();
+        return completion.promise;
+      },
+      output(),
+      output(),
+    ]);
+    const result = runner(executor, { timeoutMs: 600_000 }).execute(request('init', 'init'));
+    await waiting.promise;
+    try {
+      await time.tickAsync(180_000);
+      assertEquals(executor.streamCalls.length, 1);
+      assertEquals(executor.outputCalls.filter((call) => call.args[0] === 'describe').length, 0);
+    } finally {
+      completion.resolve(completedResource(7));
+      assertEquals(await result, 7);
+    }
+    assertEquals(executor.streamClosed, true);
+    assertEquals(executor.outputCalls.at(-1)?.args.slice(0, 3), [
+      'resource',
+      'postgres-cli',
+      'stop',
+    ]);
+  });
+
   it('matches the project AppHost and routes migrate through its typed resource command', async () => {
     const executor = new FakeAspireExecutor([
       running(),
@@ -269,10 +381,22 @@ describe('DbOperationRunner', () => {
       'ps',
       'wait',
       'resource',
-      'describe',
       'logs',
       'resource',
     ]);
+    assertEquals(executor.streamCalls.length, 1);
+    assertEquals(executor.streamCalls[0].args, [
+      'describe',
+      'postgres-cli',
+      '--follow',
+      '--format',
+      'Json',
+      '--apphost',
+      APPHOST,
+      '--non-interactive',
+      '--nologo',
+    ]);
+    assertEquals(executor.streamClosed, true);
     assertEquals(executor.outputCalls[2].args.slice(0, 3), [
       'resource',
       'postgres-cli',
