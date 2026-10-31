@@ -13,3 +13,5 @@
 ## Reconcile and plan gate
 
 Predecessor31cc758 is frozen for hosted CI; PR2488 independent source/evidence IMPL-EVALPASS at4c4f41e.608package/302browserPASS; hosted Postgres120/0/0 and SQLite113/0/0 at31cc758 now supply runtime proof (rawartifact kept privately). Native Desktop policy accepts existing#859 callback gap, not a native pass. Newbranch and scoped run only; no product edits. Detailed2b plan includes the later owner x-extension decision and must receive the same evaluator’s PLAN-EVAL before implementation.
+
+Stacked draftPR2538 is open against PR2488 branch; milestone Frontend Contribution, no labels/closing keyword. Hosted parentruntime evidence is now retained as verdict/counts/links only:Postgres120/0/0,0retriedgates,cleanupPASS at31cc758;SQLite113/0/0. Existing open859 nativeDesktop2/1 remains accepted-policy failure, not nativePASS. Raw artifact stays private. Product implementation still waits for detailed2b PLAN-EVAL; metadata/bootstrap only so far.
