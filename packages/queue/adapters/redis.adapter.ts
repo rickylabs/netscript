@@ -18,6 +18,8 @@ import type {
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { createEnvelope, createMessageContext } from './_envelope.ts';
 import { RedisLeases } from './_redis-lease.ts';
+import { RedisListener } from './_redis-listener.ts';
+import { redisListenerPolicy } from './_redis-lease-state.ts';
 import type { RedisLease, RedisQueueHealth, RedisQueueMetrics } from './_redis-lease-state.ts';
 export type { RedisQueueHealth, RedisQueueMetrics } from './_redis-lease-state.ts';
 import { RedisDelayedPromotion } from './_redis-delayed-runtime.ts';
@@ -45,8 +47,8 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
   };
 }
 
-const EMPTY_QUEUE_POLL_MS = 50;
 const DEFAULT_DELAYED_POLL_MS = 1_000;
+const DISCONNECT_DRAIN_MS = 100;
 const DELAYED_PROMOTION_ATTEMPTS = 3;
 const DELAYED_PROMOTION_BATCHES_PER_PASS = 10;
 const DELAYED_PROMOTION_JITTER_MS = 5;
@@ -63,7 +65,9 @@ interface RedisQueueClients {
  */
 export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private listening = false;
-  private abortController?: AbortController;
+  private listener?: RedisListener<T>;
+  private listenerCompletion?: Promise<void>;
+  private stopCompletion?: Promise<void>;
   private clients: RedisQueueClients | null = null;
   private leaseRuntime?: RedisLeases<T>;
   private leaseTimer?: ReturnType<typeof setInterval>;
@@ -154,7 +158,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   }
 
   /**
-   * Listen sequentially using atomic Redis claims with receipt-fenced leases.
+   * Listen with bounded concurrent handlers and independent receipt-fenced leases.
    *
    * @param handler - Async callback invoked for each decoded message.
    * @param options - Listener cancellation and concurrency settings.
@@ -163,44 +167,34 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
-    if (this.listening) {
+    if (this.listening || this.stopCompletion) {
       throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
     }
 
+    const policy = redisListenerPolicy(options);
     if (options?.signal?.aborted) return;
     const leases = this.ensureLeases();
     leases.configure(options);
     this.listening = true;
-    this.abortController = new AbortController();
-
+    const listener = new RedisListener(
+      leases,
+      policy,
+      (claim, signal) => this.handleEncodedMessage(claim, handler, leases, signal),
+    );
+    this.listener = listener;
     const signal = options?.signal;
-    const onAbort = (): void => {
-      this.abortController?.abort();
-      this.clients?.blocking.disconnect();
-    };
-    signal?.addEventListener('abort', onAbort);
-
-    try {
-      await leases.ready(this.abortController.signal);
-      this.abortController.signal.throwIfAborted();
-      this.startDelayedProcessor();
+    signal?.addEventListener('abort', listener.stop, { once: true });
+    if (signal?.aborted) listener.stop();
+    const completion = listener.run(() => {
+      this.startDelayedProcessor(policy.delayedPollIntervalMs);
       this.leaseTimer = setInterval(() => {
         void leases.reclaimExpired().catch((error: unknown) => this.reportPromotionError(error));
       }, leases.pollInterval);
-      while (!this.abortController.signal.aborted) {
-        const claim = await leases.claim(this.abortController.signal);
-        this.abortController.signal.throwIfAborted();
-        if (!claim) {
-          await delay(EMPTY_QUEUE_POLL_MS, { signal: this.abortController.signal });
-          continue;
-        }
-
-        await this.handleEncodedMessage(claim, handler, leases, this.abortController.signal);
-      }
+    });
+    this.listenerCompletion = completion;
+    try {
+      await completion;
     } catch (error) {
-      if (this.abortController.signal.aborted) {
-        return;
-      }
       throw new QueueError(
         `Queue listener failed: ${error instanceof Error ? error.message : String(error)}`,
         QueueErrorCode.DEQUEUE_FAILED,
@@ -210,21 +204,30 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
         },
       );
     } finally {
-      signal?.removeEventListener('abort', onAbort);
+      signal?.removeEventListener('abort', listener.stop);
       this.stopDelayedProcessor();
       this.stopLeaseProcessor();
       this.listening = false;
+      this.listener = undefined;
+      this.listenerCompletion = undefined;
+      if (listener.closed && this.leaseRuntime === leases) this.leaseRuntime = undefined;
     }
   }
 
   /**
-   * Stop the listener, delayed processor, and blocking Redis client.
+   * Stop admission and drain for visibilityTimeout (default 30 s), then close sockets.
+   * Awaiting stop inside a handler consumes that budget and leaves its claim for recovery.
    */
-  async stop(): Promise<void> {
-    this.abortController?.abort();
-    this.listening = false;
+  stop(): Promise<void> {
+    return this.stopCompletion ??= this.close().finally(() => this.stopCompletion = undefined);
+  }
+
+  /** Drain the current listener before disconnecting this adapter's clients. */
+  private async close(): Promise<void> {
+    this.listener?.stop();
     this.stopDelayedProcessor();
     this.stopLeaseProcessor();
+    if (this.listenerCompletion) await this.listenerCompletion.catch(() => {});
     this.leaseRuntime?.stop();
     this.leaseRuntime = undefined;
     this.clients?.blocking.disconnect();
@@ -241,7 +244,8 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.promotionRuntime = undefined;
     this.promotionClient = undefined;
     this.clients = null;
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Preserve the existing grace for queued disconnect and promotion-error callbacks.
+    await delay(DISCONNECT_DRAIN_MS);
   }
 
   /**
@@ -335,7 +339,8 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
           settled = true;
         },
       ),
-      extendVisibility: (milliseconds) => leases.extend(claim, milliseconds),
+      extendVisibility: (milliseconds) =>
+        signal?.aborted ? Promise.resolve(false) : leases.extend(claim, milliseconds),
     };
     try {
       await handler(envelope.payload, context);
@@ -349,7 +354,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   /**
    * Start polling delayed messages into the ready queue.
    */
-  private startDelayedProcessor(): void {
+  private startDelayedProcessor(interval = DEFAULT_DELAYED_POLL_MS): void {
     if (this.delayedTimer) {
       return;
     }
@@ -358,7 +363,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
         if (this.delayedPromotion) return;
         void this.moveDueDelayedMessages().catch(() => {});
       },
-      DEFAULT_DELAYED_POLL_MS,
+      interval,
     );
   }
 

@@ -64,6 +64,61 @@ export function leasePolicy(options?: ListenOptions): RedisLeasePolicy {
   };
 }
 
+/** Validated per-listener admission, drain and pickup policy. */
+export interface RedisListenerPolicy {
+  concurrency: number;
+  drainTimeout: number;
+  pollIntervalMs: number;
+  delayedPollIntervalMs: number;
+}
+
+const DEFAULT_POLL_INTERVAL_MS = 50;
+const DEFAULT_DELAYED_POLL_INTERVAL_MS = 1_000;
+const MIN_POLL_INTERVAL_MS = 10;
+const MAX_POLL_INTERVAL_MS = 60_000;
+const POLL_INTERVAL_ENV = 'NETSCRIPT_REDIS_QUEUE_POLL_INTERVAL_MS';
+const DELAYED_POLL_INTERVAL_ENV = 'NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS';
+
+/** Resolve Redis-only tuning before allocating any connections. */
+export function redisListenerPolicy(options?: ListenOptions): RedisListenerPolicy {
+  return {
+    concurrency: leaseDuration(options?.concurrency ?? 1, 'concurrency'),
+    drainTimeout: leaseDuration(options?.visibilityTimeout ?? 30_000, 'visibilityTimeout'),
+    pollIntervalMs: pollInterval(
+      options?.pollIntervalMs,
+      POLL_INTERVAL_ENV,
+      DEFAULT_POLL_INTERVAL_MS,
+    ),
+    delayedPollIntervalMs: pollInterval(
+      options?.delayedPollIntervalMs,
+      DELAYED_POLL_INTERVAL_ENV,
+      DEFAULT_DELAYED_POLL_INTERVAL_MS,
+    ),
+  };
+}
+
+function pollInterval(explicit: number | undefined, variable: string, fallback: number): number {
+  let value = explicit;
+  let name = variable;
+  if (value === undefined) {
+    try {
+      const environment = Deno.env.get(variable);
+      value = environment === undefined ? fallback : Number(environment);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotCapable)) throw error;
+      value = fallback;
+    }
+  } else {
+    name = variable === POLL_INTERVAL_ENV ? 'pollIntervalMs' : 'delayedPollIntervalMs';
+  }
+  if (
+    !Number.isSafeInteger(value) || value < MIN_POLL_INTERVAL_MS || value > MAX_POLL_INTERVAL_MS
+  ) {
+    throw new QueueConfigurationError(`${name} must be an integer between 10 and 60000`);
+  }
+  return value;
+}
+
 /** Normalize legacy JSON once and count the delivery about to begin. */
 export function normalizeLeaseEnvelope(raw: string): {
   envelope: MessageEnvelope<unknown>;

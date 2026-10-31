@@ -1,0 +1,60 @@
+{
+  "baseline": {
+    "queue": {
+      "passed": 144,
+      "failed": 0,
+      "ignored": 3
+    },
+    "worker": {
+      "passed": 13,
+      "failed": 0
+    }
+  },
+  "S1": {
+    "check": "PASS",
+    "lint": "PASS",
+    "fmt": "PASS",
+    "qualityGate": "PASS",
+    "correctedFocused": {
+      "passed": 26,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 26,
+      "uniqueFailures": 0
+    },
+    "initialFullQueue": {
+      "passed": 155,
+      "failed": 3,
+      "ignored": 3,
+      "failure": "producer-only promotion disconnect/error callback ordering; corrected preserving existing 100 ms disconnect grace"
+    },
+    "negativeControl": {
+      "source": "main b0b8f3f, exact new tests, --no-check in isolated source copy",
+      "passed": 0,
+      "failed": 14,
+      "distinguishingFailures": [
+        "N active barrier",
+        "slow/fast overlap",
+        "stop drain",
+        "post-abort final claim handled=0",
+        "configuration rejection missing"
+      ]
+    },
+    "fullQueueFinal": {
+      "exitCode": 0,
+      "durationMs": 68259,
+      "passed": 158,
+      "failed": 0,
+      "ignored": 3,
+      "totalResults": 161,
+      "uniqueFailures": 0
+    },
+    "independentReview": "PASS round 2",
+    "docLint": {
+      "newDiagnostics": 0,
+      "inheritedDiagnostics": 1,
+      "inheritedSource": "packages/kv/types/watchable-kv.ts private-type-ref"
+    },
+    "jsrDryRun": "PASS"
+  }
+}

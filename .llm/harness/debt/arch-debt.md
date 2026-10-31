@@ -3039,14 +3039,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   children versus 12). The #2395 crash-recovery fix adds four cohesive private modules:
   receipt types/normalization, atomic scripts, bounded script transport, and recovery policy.
   Folding these into redis.adapter.ts would deepen its existing orchestration size and mix
-  independently reviewed failure boundaries. Direct children now total 19.
+  independently reviewed failure boundaries. Issue #2351 adds one private admission/drain module
+  to keep the adapter below the 500-line gate while preserving independent receipt lifetimes.
+  Direct children now total 20.
 - **Owner:** NetScript queue maintainers.
 - **Target:** Next queue adapter organization pass after the 0.0.9 recovery fix.
 - **Linked plan:** .llm/runs/orch-divybot-6536806908--2395/plan.md; issue #2395.
+  Concurrency extension: .llm/runs/orch-divybot-6538963429--2351/plan.md; issue #2351.
 - **Created:** 2026-10-31.
 - **Status:** open.
 - **Gate:** F-16 adapters cardinality at or below 12, with all Redis/Garnet lease, delayed
   promotion, public-export and scaffold-runtime regressions retained.
-- **Notes:** Cost is contributor navigation across four additional private modules; no public
+- **Notes:** Cost is contributor navigation across five additional private modules; no public
   export or dependency is added for these modules. A follow-up can group private implementation
   concerns without changing the adapter contract. No scanner exemption or runtime gate waiver.
