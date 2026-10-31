@@ -98,16 +98,21 @@ Every page renders inside the app chrome in `routes/_layout.tsx`: the top bar, w
 - Start each page from `<main class='ns-shell ns-section ns-stack ns-stack--lg'>` plus `PageHeader`,
   which `ui:add page` writes, and compose the app-owned primitives from `@app/components/ui/mod.ts`.
   Browse the running app's `/design` routes for the component gallery and tokens.
-- There is one app-wide theme. `assets/styles.css` imports `tokens.css` (the `--ns-*` tokens: light
-  on `:root`, dark on `[data-theme='dark']`, which `routes/_app.tsx` and `ThemeToggle` set on
-  `<html>`) and `theme-bridge.css` (Tailwind `*-ns-*` utilities over the same tokens). Restyle by
-  overriding tokens on `:root` then `[data-theme='dark']`, in `tokens.css` or below the
-  `App-specific custom styles below.` marker in `styles.css`, which `ui:add` preserves. Never scope
-  theme variables to one page's wrapper; there is no per-page theme attribute.
+- There is one app-wide theme. `assets/theme-preset.json` names the preset (Studio Utility for new
+  apps), and `routes/_app.tsx` stamps it on `<html>` as `data-theme`, `data-flavor`, `data-density`,
+  and `data-scheme` (light or dark, flipped by `ThemeToggle`). `assets/tokens.css` holds the
+  preset's generated `--ns-*` tokens, which `client.ts` loads on every route, and
+  `assets/theme-bridge.css` exposes them as Tailwind `*-ns-*` utilities.
+- Switch the preset with `netscript ui:apply --preset <id>`. Fine-tune it by aliasing semantic roles
+  in `tokens/semantic.tokens.json` (create it with `netscript tokens init --preset <current id>`),
+  then run `netscript tokens build`. Never hand-edit the generated `tokens.css`, `theme-bridge.css`,
+  `tokens.json`, `fonts.json`, or `theme-preset.json`. Never scope theme variables to one page's
+  wrapper; there is no per-page theme.
 
-Read `web-layer/how-to/customize-fresh-ui` through MCP `get_doc` before restyling or reshaping the
-frame. An app without `navigation.ts` was scaffolded before shared navigation: its
-`routes/_layout.tsx` shows the top bar only for an allowlist of routes, so add new pages there.
+Read `web-layer/how-to/theme-your-app` through MCP `get_doc` before changing the theme or the frame,
+and `web-layer/how-to/customize-fresh-ui` before editing routes, islands, or registry components. An
+app without `navigation.ts` was scaffolded before shared navigation: its `routes/_layout.tsx` shows
+the top bar only for an allowlist of routes, so add new pages there.
 
 ## Route lifecycle: rename, move, or remove a page
 
