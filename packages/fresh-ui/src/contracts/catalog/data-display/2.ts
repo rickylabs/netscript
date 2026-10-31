@@ -357,7 +357,7 @@ export const data_display_2: readonly ComponentContract[] = [
     'specId': 'D6',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'variant': {
         'kind': 'enum',
@@ -375,70 +375,70 @@ export const data_display_2: readonly ComponentContract[] = [
           'xs',
         ],
       },
-      'description': {
-        'kind': 'boolean',
-      },
-      'actions': {
-        'kind': 'boolean',
-      },
-      'header': {
-        'kind': 'boolean',
-      },
-      'footer': {
-        'kind': 'boolean',
-      },
       'chevron': {
         'kind': 'boolean',
       },
       'media': {
         'kind': 'slot',
       },
+      'title': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'children': { 'kind': 'slot' },
+      'description': {
+        'kind': 'slot',
+      },
+      'actions': {
+        'kind': 'slot',
+      },
+      'header': {
+        'kind': 'slot',
+      },
+      'footer': {
+        'kind': 'slot',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'media',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'content',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'actions',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'header',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'footer',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'chevron',
+        'when': 'when chevron is true',
       },
     ],
     'attributes': {
@@ -458,10 +458,6 @@ export const data_display_2: readonly ComponentContract[] = [
       },
     },
     'booleans': [
-      'description',
-      'actions',
-      'header',
-      'footer',
       'chevron',
     ],
     'slots': [
@@ -469,9 +465,38 @@ export const data_display_2: readonly ComponentContract[] = [
         'name': 'media',
         'part': 'media',
       },
+      {
+        'name': 'title',
+        'part': 'title',
+      },
+      {
+        'name': 'description',
+        'part': 'description',
+      },
+      {
+        'name': 'actions',
+        'part': 'actions',
+      },
+      {
+        'name': 'header',
+        'part': 'header',
+      },
+      {
+        'name': 'footer',
+        'part': 'footer',
+      },
     ],
     'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Move between native child controls',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Activate native child buttons; links use Enter',
+      },
+    ],
     'tokenRoles': [
       'border/default',
       'radius/badge',
@@ -482,7 +507,7 @@ export const data_display_2: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native child controls retain their own semantics and keyboard behavior; no wrapper key manager.',
     ],
   },
 ];

@@ -438,6 +438,10 @@ export function PerformanceWidget() {
 }
 ```
 
+## Data display registry components
+
+`ui:add item kbd collapsible` installs three copy-source components. `Item` composes native content and action slots (`title`, `description`, `media`, `actions`, `header`, `footer`) with `variant` and `size`; its wrapper adds no focus target, and `Item.Group separators` adds row dividers. `Kbd` renders native key notation, and `Kbd.Group` joins keys with decorative separators (`separator={false}` omits them). Neither handles shortcuts. `Collapsible` composes native details/summary with `label`, `children`, `open`/`defaultOpen`, `onOpenChange` and `disabled`. Enter/Space toggles the summary; controlled callers may refuse the requested state, and disabled summaries leave the tab order. State refusal and disabled activation blocking apply after hydration; before hydration, summaries retain native disclosure behavior.
+
 ## Embedded registry
 
 Exported from `@netscript/fresh-ui/registry`. It embeds the copy-source manifest and file contents

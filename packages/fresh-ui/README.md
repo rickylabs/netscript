@@ -275,3 +275,5 @@ AlertDialog's Utility destructive action temporarily inverts the existing
 destructive-text/card pair to keep small text readable. The canonical
 destructive/default palette remains owned by the token workstream; no palette
 values change here.
+
+Data display additions: `ui:add item kbd collapsible` copies presentation rows, native keyboard notation and native details disclosures. Item retains native child links/actions; Kbd adds no focus targets; after hydration, Collapsible supports controlled open refusal and blocks disabled summary activation. Before hydration, its summary retains native disclosure behavior.

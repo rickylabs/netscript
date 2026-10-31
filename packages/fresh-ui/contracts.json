@@ -6445,7 +6445,7 @@
       "specId": "D6",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -6463,70 +6463,72 @@
             "xs"
           ]
         },
-        "description": {
-          "kind": "boolean"
-        },
-        "actions": {
-          "kind": "boolean"
-        },
-        "header": {
-          "kind": "boolean"
-        },
-        "footer": {
-          "kind": "boolean"
-        },
         "chevron": {
           "kind": "boolean"
         },
         "media": {
           "kind": "slot"
+        },
+        "title": {
+          "kind": "slot",
+          "required": true
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "header": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "media",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "actions",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "chevron",
+          "when": "when chevron is true"
         }
       ],
       "attributes": {
@@ -6546,20 +6548,45 @@
         }
       },
       "booleans": [
-        "description",
-        "actions",
-        "header",
-        "footer",
         "chevron"
       ],
       "slots": [
         {
           "name": "media",
           "part": "media"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        },
+        {
+          "name": "header",
+          "part": "header"
+        },
+        {
+          "name": "footer",
+          "part": "footer"
         }
       ],
       "apg": "noninteractive presentation",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between native child controls"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate native child buttons; links use Enter"
+        }
+      ],
       "tokenRoles": [
         "border/default",
         "radius/badge",
@@ -6570,7 +6597,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native child controls retain their own semantics and keyboard behavior; no wrapper key manager."
       ]
     },
     {
@@ -6578,7 +6605,7 @@
       "specId": "D7",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "size": {
           "kind": "enum",
@@ -6593,23 +6620,19 @@
             "default",
             "inverse"
           ]
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
-        },
-        {
-          "name": "focus-ring",
-          "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         }
       ],
       "attributes": {
@@ -6628,7 +6651,7 @@
       },
       "booleans": [],
       "slots": [],
-      "apg": "noninteractive presentation",
+      "apg": "native kbd notation; no keyboard interaction",
       "keyboard": [],
       "tokenRoles": [
         "border/default",
@@ -6640,7 +6663,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native kbd notation is noninteractive; Kbd.Group joins keys with decorative plus separators."
       ]
     },
     {
@@ -7396,36 +7419,51 @@
       "specId": "D13",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "onOpenChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "label": {
+          "kind": "slot",
+          "required": true
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "label"
+        },
+        {
+          "name": "indicator"
         }
       ],
       "attributes": {
@@ -7434,10 +7472,25 @@
             "false",
             "true"
           ]
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "disabled"
+          ]
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "label",
+          "part": "label"
+        },
+        {
+          "name": "children",
+          "part": "content"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
       "keyboard": [
         {
@@ -7446,10 +7499,13 @@
         }
       ],
       "tokenRoles": [
-        "space/stack/gap"
+        "space/stack/gap",
+        "text/muted",
+        "radius/control",
+        "state/disabled-opacity"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native details/summary retains no-JavaScript disclosure behavior. After hydration, controlled refusal preserves open and disabled summary prevents activation. Before hydration, native disclosure remains toggleable, including aria-disabled summaries. No global listeners."
       ]
     },
     {

@@ -7,7 +7,7 @@ export const data_display_3: readonly ComponentContract[] = [
     'specId': 'D7',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'size': {
         'kind': 'enum',
@@ -23,22 +23,18 @@ export const data_display_3: readonly ComponentContract[] = [
           'inverse',
         ],
       },
+      'children': {
+        'kind': 'slot',
+        'required': true,
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
-      },
-      {
-        'name': 'focus-ring',
-        'representation': 'pseudo',
-        'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -57,7 +53,7 @@ export const data_display_3: readonly ComponentContract[] = [
     },
     'booleans': [],
     'slots': [],
-    'apg': 'noninteractive presentation',
+    'apg': 'native kbd notation; no keyboard interaction',
     'keyboard': [],
     'tokenRoles': [
       'border/default',
@@ -69,7 +65,7 @@ export const data_display_3: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native kbd notation is noninteractive; Kbd.Group joins keys with decorative plus separators.',
     ],
   },
   {

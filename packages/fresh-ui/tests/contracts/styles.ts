@@ -1,3 +1,4 @@
+import { displayBasicFixtures, displayBasicKeyboard } from './utility-display-basics.tsx';
 import { overlayFixtures, overlayKeyboard } from './utility-overlays.tsx';
 import { navigationFixtures, navigationKeyboard } from './utility-navigation.tsx';
 import { calendarFixtures, calendarKeyboard } from './utility-calendar.tsx';
@@ -24,6 +25,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...calendarFixtures,
     ...navigationFixtures,
     ...overlayFixtures,
+    ...displayBasicFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -32,5 +34,6 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...calendarKeyboard,
     ...navigationKeyboard,
     ...overlayKeyboard,
+    ...displayBasicKeyboard,
   ],
 }];
