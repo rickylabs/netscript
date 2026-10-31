@@ -220,7 +220,8 @@ build your screens with the same `definePage`, island, and query-factory shape o
 
 ## Next steps
 
-Install components and edit the tokens with [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+Install components with [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/), and change the
+theme or the app chrome with [Theme your app](/web-layer/how-to/theme-your-app/).
 See also the [`@netscript/fresh` reference](/reference/fresh/), the
 [`@netscript/fresh-ui` reference](/reference/fresh-ui/), and the
 storefront tutorial chapter [A typed catalog service](/tutorials/storefront/02-catalog-service/).
