@@ -72,3 +72,6 @@
 - 02:52Z: #2422 moved gating → evaluating (coordinator-run Opus eval). Dispatched #2369 (B2, features), comment 6538046699. Builders: #2187, #2400, #2395, #2367, #2369.
 - 02:54Z: **merged** #2422 (`727542963`, #2396 part 1 of 3, breaking change documented). Gate: leaf READY; separate Opus exact-head MERGE (`receipts/merge-eval/2422.b2e3124.md`); CI green including both e2e tiers (SQLite on rerun); close-gate PASS; 0 threads. PR body appended with the coordinator verdict. Next: #2423, then #2421.
 - 02:55Z: **merged** #2423 (`204a71b1e`, #2396 part 2 of 3). Leaf MERGE at `7421a60`; CI green including both e2e tiers; 0 threads; clean after #2422. #2421 (final) runs its e2e after #2484's gate.
+- 02:57Z: #2369 started.
+- 03:02Z: #2369 → PR #2487 (draft). (#2486 is a design-system PR, not ours.)
+- 03:07Z: **merged** #2484 (`1d467c669`) for #2151; #2151 closed. The expensive gate is free: #2421 is next once its leaf posts READY at the new head.
