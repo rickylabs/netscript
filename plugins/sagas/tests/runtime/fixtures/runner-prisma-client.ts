@@ -10,6 +10,7 @@ import { SAGA_RUNTIME_CORRELATION_SELECTOR } from '@netscript/plugin-sagas-core/
 export class RunnerPrismaClient implements PrismaSagaStoreClient {
   queryReads = 0;
   readonly sagaInstance = {
+    findFirst: (): Promise<null> => Promise.resolve(null),
     findMany: (): Promise<[]> => {
       this.queryReads++;
       return Promise.resolve([]);

@@ -23,6 +23,7 @@ import type {
 
 const emptyDatabase: SagaServiceDatabaseClient = Object.freeze({
   sagaInstance: Object.freeze({
+    findFirst: () => Promise.resolve(null),
     findMany: () => Promise.resolve([]),
     count: () => Promise.resolve(0),
   }),

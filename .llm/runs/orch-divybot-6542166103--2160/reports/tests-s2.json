@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","--unstable-kv","--frozen","packages/plugin-sagas-core","plugins/sagas"],"cwd":"<worktree>","exitCode":0,"durationMs":20720,"summary":{"passed":328,"failed":0,"ignored":18,"totalResults":346,"uniqueFailures":0},"failures":[]}
