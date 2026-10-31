@@ -134,3 +134,7 @@ this phase alone. Existing phase1 acceptance proof is retained, not rewritten.
 Cockpit retargets the stacked2b PR to main after merging2a; normal merges only,
 no force push. The canonical final handoff follows the phase-specific operator
 directive (Refs only), not the contradictory generic issue-closing template.
+
+## Owner decision — additive style extensions
+
+Authority: https://github.com/rickylabs/netscript/issues/2416#issuecomment-6541012019. A style may add declared extensions and may never change or remove base contract items. Names begin x-; presentational extensions map to data-x-* attributes read only by that style; structural extensions map to optional named slots or style-scoped blocks, empty by default. Each registry:style declaration records component, name, type, default and maps-to. Base contracts run for every registered source style; extension fixtures run only for their declaring style. Undeclared props, parts, variant values and keyboard changes still fail. The harness slice must include an undeclared-addition negative control and a declared x-extension positive control, plus the existing mutation negatives. Two-style demand promotes an extension into the base contract. Style-switch unsupported-attribute diagnostics and the Figma plugin manifest consume this declaration boundary in their owning workstreams.

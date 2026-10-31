@@ -106,10 +106,12 @@ import { CodeBlock } from './components/ui/code-block.tsx';
 import { Label } from './components/ui/label.tsx';
 import { Card } from './components/ui/card.tsx';
 import { Pagination } from './components/ui/pagination.tsx';
+import { Alert } from './components/ui/alert.tsx';
 console.log(JSON.stringify({
   'code-block': render(h(CodeBlock, { tabs: [{ value: 'source', label: 'Source', code: 'x' }] })),
   label: render(h(Label, { children: 'Email', variant: 'eyebrow', optional: true })),
   card: render(h(Card, { children: 'Card', variant: 'rule', size: 'sm' })),
+  alert: render(h(Alert, { variant: 'important', emphasis: 'strong', close: true, title: 'Important', description: 'Review settings' })),
   pagination: render(h(Pagination, { variant: 'pager', children: h(Pagination.Next, { href: '#next', children: 'Next document' }) })),
 }));
 `,
