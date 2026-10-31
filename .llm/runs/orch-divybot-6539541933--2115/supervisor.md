@@ -12,3 +12,7 @@
 > Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only.
 
 `deno task agentic:matrix --tier feature --json` resolved implementation Sol xhigh, plan-evaluation GLM 5.3 then Fable 5.1, and implementation-evaluation Muse Spark 1.3 then Opus 5. Owner override above selects Opus high for both reviews. Separate-session and family independence remain required. Feature policy: max 2 plan rounds and 5 implementation rounds; stop after two consecutive terminal failures.
+
+## CI repair scope addendum
+
+CI quality reported stale generated MCP export corpus after the public parser JSDoc change. Authorized repair adds `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` and any deterministic dependent publish carriers produced by the repository generator. Generated metadata only; no scaffold/template/runtime behavior. Record actual resulting files in drift.md.

@@ -41,3 +41,9 @@ S1 committed as e2d5a21 (see actual PR commit list for the full immutable hash) 
 ## Reconcile S2
 
 PR #2498 remains the only issue PR; issue #2115 still open. No metadata/lock/scaffold changes. Preliminary implementation verdict PASS; transition to ready immediately after this final records commit, then resume the same read-only evaluator for the exact pushed head. Final exact-head verdict and current CI snapshot belong in the final PR review comment and ignored canonical report handoff, avoiding a commit that would invalidate that verdict. No merge, tag or release is authorized for this worker.
+
+## S3 CI repair evidence
+
+See ci-repair.md: one deterministic corpus row refresh only. Corpus and publish-carrier freshness plus generated-file structured fmt/check pass. Auth source/test evidence unchanged. Await independent same-session generated repair review before commit.
+
+S3 substantive independent review PASS before commit (ci-repair-eval.md). Test-4 artifact inspected: both failures are stale-corpus generator assertions, not auth regression. Reconcile: PR temporarily draft, source/lock unchanged; original CI diagnostics are fully accounted for. Commit/push deterministic repair, run generator tests against committed HEAD, then exact-head review.

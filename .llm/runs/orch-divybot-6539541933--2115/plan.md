@@ -30,3 +30,7 @@ Structured check/test/lint/fmt wrappers scoped to packages/auth-kv-oauth; qualit
 ## Deferred scope
 
 No general cookie grammar redesign, new dependencies, upstream port changes, scaffold changes, CLI E2E launch, release or merge. Independent evaluator must pass before implementation (PLAN-EVAL explicitly requested) and before ready (IMPL-EVAL). Do not merge until final evaluation and required coordinator gates complete.
+
+## S3 CI repair
+
+Regenerate MCP export corpus with gen:mcp-export-corpus, refresh dependent publish carriers if needed, verify check:mcp-export-corpus/check:publish-assets and changed-carrier structured fmt/check. Independent same-session review precedes commit. Source behavior unchanged; previous package and negative-control evidence remains applicable. Commit/push repair with worklog/context, then final exact-head review (round 4 of max 5) and CI snapshot.
